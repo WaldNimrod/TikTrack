@@ -137,6 +137,8 @@
             } else if (window.initializeButtons) {
                 window.initializeButtons();
             }
+
+            this.setupHoverDetails();
         },
 
         renderHighlightItem(item) {
@@ -148,14 +150,34 @@
 
             const FieldRenderer = window.FieldRendererService;
 
-            const executionBadge = '<span class="badge bg-light text-body">ביצוע</span>';
             const tickerLink = FieldRenderer?.renderLinkedEntity('ticker', execution.ticker_id, execution.ticker_symbol, { short: true }) || execution.ticker_symbol || '-';
-            const actionBadge = FieldRenderer?.renderAction?.(execution.action) || `<span class="badge bg-secondary">${execution.action || '-'}</span>`;
+            const actionBadgeDetailed = FieldRenderer?.renderAction?.(execution.action) || `<span class="badge bg-secondary">${execution.action || '-'}</span>`;
             const quantityDisplay = FieldRenderer?.renderShares?.(execution.quantity) || `<span class="text-muted">${execution.quantity ?? '-'}</span>`;
-            const executionDate = FieldRenderer?.renderExecutionDate?.(execution.date) || (FieldRenderer?.renderDate?.(execution.date, true) || '-');
+            let quantityCompact = FieldRenderer?.renderShares?.(execution.quantity, 'numeric-ltr text-muted small') || '';
+            if (!quantityCompact || quantityCompact === '-') {
+                quantityCompact = '<span class="text-muted small">-</span>';
+            }
+            const executionDate = FieldRenderer?.renderDateShort?.(execution.date)
+                || (FieldRenderer?.renderDate?.(execution.date, false) || '-');
+            const executionDateCompact = `<span class="text-muted small">${executionDate}</span>`;
             const executionPrice = typeof FieldRenderer?.renderAmount === 'function'
                 ? FieldRenderer.renderAmount(execution.price, '$', 2, false)
                 : (execution.price ? `<span class="text-muted">$${parseFloat(execution.price).toFixed(2)}</span>` : '<span class="text-muted">-</span>');
+            const actionLower = (execution.action || '').toString().toLowerCase();
+            const isBuyAction = actionLower === 'buy' || actionLower === 'קניה' || actionLower === 'קנייה';
+            const actionDirectionBadge = execution.action
+                ? `<span class="badge ${isBuyAction ? 'badge-long' : 'badge-short'}" data-tooltip="${isBuyAction ? 'קניה' : 'מכירה'}" data-tooltip-placement="top" data-tooltip-trigger="hover">${isBuyAction ? '↑' : '↓'}</span>`
+                : '';
+            const actionSummaryInline = `
+                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                    ${actionDirectionBadge}
+                    <div class="d-flex align-items-center gap-1">
+                        ${quantityCompact}
+                        <span class="text-muted small">|</span>
+                        ${executionDateCompact}
+                    </div>
+                </div>
+            `;
             const sharedAccount = execution.trading_account_id || primarySuggestion?.trading_account_id
                 ? FieldRenderer?.renderLinkedEntity(
                     'trading_account',
@@ -167,23 +189,17 @@
                     ? `<span class="badge rounded-pill bg-body-secondary text-body">${execution.account_name || primarySuggestion?.account_name}</span>`
                     : '');
             const sharedTickerRow = `
-                <div class="d-flex align-items-center flex-wrap gap-2 text-muted small flex-grow-1">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="entity-icon-circle">
-                            <img src="images/icons/tickers.svg" alt="טיקר" />
-                        </span>
-                        ${tickerLink}
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="entity-icon-circle">
-                            <img src="images/icons/trading_accounts.svg" alt="חשבון מסחר" />
-                        </span>
-                        ${sharedAccount || '<span class="text-muted">לא מוגדר</span>'}
-                    </div>
+                <div class="d-flex align-items-center flex-wrap text-muted small gap-1">
+                    <span class="entity-icon-circle entity-icon-circle-sm d-flex align-items-center justify-content-center">
+                        <img src="images/icons/tickers.svg" alt="טיקר" width="12" height="12" />
+                    </span>
+                    ${tickerLink}
+                    <span class="entity-icon-circle entity-icon-circle-sm d-flex align-items-center justify-content-center">
+                        <img src="images/icons/trading_accounts.svg" alt="חשבון מסחר" width="12" height="12" />
+                    </span>
+                    ${sharedAccount || '<span class="text-muted">לא מוגדר</span>'}
                 </div>
             `;
-
-            const tradeBadge = '<span class="badge bg-light text-body">טרייד</span>';
 
             const tradeStatus = primarySuggestion && FieldRenderer?.renderStatus
                 ? FieldRenderer.renderStatus(primarySuggestion.status, 'trade')
@@ -197,9 +213,9 @@
                 ? FieldRenderer.renderType(primarySuggestion.investment_type)
                 : (primarySuggestion?.investment_type ? `<span class="badge bg-light text-body">${primarySuggestion.investment_type}</span>` : '');
 
-            const tradeDate = primarySuggestion && FieldRenderer?.renderDate
-                ? FieldRenderer.renderDate(primarySuggestion.created_at, false)
-                : (primarySuggestion?.created_at || '-');
+            const tradeDate = primarySuggestion && FieldRenderer?.renderDateShort
+                ? FieldRenderer.renderDateShort(primarySuggestion.created_at)
+                : (primarySuggestion && FieldRenderer?.renderDate ? FieldRenderer.renderDate(primarySuggestion.created_at, false) : (primarySuggestion?.created_at || '-'));
 
             const scoreTooltip = 'טיקר תואם • חשבון מסחר תואם • תאריך בטווח הטרייד';
             const scoreBadge = typeof score === 'number'
@@ -213,31 +229,32 @@
             const itemIdAttr = execution.id ? `data-execution-id="${execution.id}"` : '';
 
             const topRow = `
-                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-                    ${sharedTickerRow}
-                    <div class="d-flex flex-column align-items-end gap-2">
-                        <div class="d-flex flex-column align-items-end gap-1">
+                <div class="d-flex flex-column gap-1">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        ${actionSummaryInline}
+                        <div class="d-flex align-items-center gap-1 ms-auto">
                             ${scoreBadge}
                             ${additionalText}
-                        </div>
-                        <div class="d-flex flex-wrap gap-2 justify-content-end">
-                            <button
-                                data-button-type="APPROVE"
-                                data-variant="small"
-                                data-classes="btn btn-sm btn-outline-success table-btn-small"
-                                data-text="אשר שיוך"
-                                data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
-                                ${primarySuggestion ? '' : 'disabled'}
-                            ></button>
-                            <button
-                                data-button-type="REJECT"
-                                data-variant="small"
-                                data-classes="btn btn-sm btn-outline-danger table-btn-small"
-                                data-text="דחה"
-                                data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
-                            ></button>
+                            <div class="d-flex align-items-center gap-1 ms-1">
+                                <button
+                                    data-button-type="APPROVE"
+                                    data-variant="small"
+                                    data-classes="btn btn-sm btn-outline-success table-btn-small"
+                                    data-text="אשר שיוך"
+                                    data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
+                                    ${primarySuggestion ? '' : 'disabled'}
+                                ></button>
+                                <button
+                                    data-button-type="REJECT"
+                                    data-variant="small"
+                                    data-classes="btn btn-sm btn-outline-danger table-btn-small"
+                                    data-text="דחה"
+                                    data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
+                                ></button>
+                            </div>
                         </div>
                     </div>
+                    ${sharedTickerRow}
                 </div>
             `;
 
@@ -248,8 +265,7 @@
                         onkeypress="if(event.key==='Enter'){PendingExecutionsHighlights.openExecutionDetails(${execution.id});}">
                         <div class="fw-semibold text-muted">פרטי ביצוע</div>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
-                            ${executionBadge}
-                            ${actionBadge}
+                            ${actionBadgeDetailed}
                         </div>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
                             ${quantityDisplay}
@@ -270,7 +286,6 @@
                             onkeypress="if(event.key==='Enter'){PendingExecutionsHighlights.openTradeDetails(${primarySuggestion.trade_id});}">
                             <div class="fw-semibold text-muted">פרטי טרייד</div>
                             <div class="d-flex flex-wrap gap-2 align-items-center">
-                                ${tradeBadge}
                                 ${tradeStatus}
                             </div>
                             <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -295,12 +310,51 @@
             return `
                 <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
                     ${topRow}
-                    <div class="row g-2 mt-2 align-items-stretch">
+                    <div class="pending-highlight-details row g-2 align-items-stretch">
                         ${executionDetails}
                         ${tradeDetails}
                     </div>
                 </li>
             `;
+        },
+
+        setupHoverDetails() {
+            if (!this.dom?.list) {
+                return;
+            }
+
+            const items = this.dom.list.querySelectorAll('.pending-highlight-item');
+            items.forEach(item => {
+                let hideTimer = null;
+
+                const showDetails = () => {
+                    if (hideTimer) {
+                        clearTimeout(hideTimer);
+                        hideTimer = null;
+                    }
+                    item.classList.add('is-hovered');
+                };
+
+                const hideDetails = () => {
+                    if (hideTimer) {
+                        clearTimeout(hideTimer);
+                    }
+                    hideTimer = window.setTimeout(() => {
+                        item.classList.remove('is-hovered');
+                        hideTimer = null;
+                    }, 160);
+                };
+
+                item.addEventListener('mouseenter', showDetails);
+                item.addEventListener('mouseleave', hideDetails);
+
+                item.addEventListener('focusin', showDetails);
+                item.addEventListener('focusout', (event) => {
+                    if (!item.contains(event.relatedTarget)) {
+                        hideDetails();
+                    }
+                });
+            });
         },
 
         updateCountBadge() {

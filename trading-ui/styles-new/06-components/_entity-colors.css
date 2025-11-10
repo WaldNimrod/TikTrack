@@ -74,6 +74,10 @@
   /* איקון פנימי - 30px (50% יותר מ-20px) */
 }
 
+.entity-icon-circle-sm {
+  padding: 0.25rem;
+}
+
 .entity-icon-circle img {
   width: 30px;
   height: 30px;

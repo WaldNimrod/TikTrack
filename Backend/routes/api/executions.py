@@ -86,11 +86,11 @@ def create_execution():
             if trade and trade.ticker_id:
                 data['ticker_id'] = trade.ticker_id
                 logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
-
+        
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
-
+        
         normalized_payload = normalizer.normalize_input_payload(data)
 
         is_valid, errors = ValidationService.validate_data(db, 'executions', normalized_payload)
@@ -146,10 +146,10 @@ def update_execution(execution_id: int):
                 if trade and trade.ticker_id:
                     data['ticker_id'] = trade.ticker_id
                     logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
-
+            
             if 'notes' in data and data['notes']:
                 data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
-
+            
             normalized_payload = normalizer.normalize_input_payload(data)
 
             is_valid, errors = ValidationService.validate_data(db, 'executions', normalized_payload, exclude_id=execution_id)

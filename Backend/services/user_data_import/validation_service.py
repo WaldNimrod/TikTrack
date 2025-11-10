@@ -186,17 +186,17 @@ class ValidationService:
             else:
                 errors.append("Date must be a valid ISO string or DateEnvelope")
             return errors
-
+        
         # Ensure timezone awareness (treat as UTC if naive)
         if normalized_dt.tzinfo is None:
             normalized_dt = normalized_dt.replace(tzinfo=timezone.utc)
-        
-        # Check if date is reasonable (not too far in past/future)
+            
+            # Check if date is reasonable (not too far in past/future)
         now = datetime.now(timezone.utc)
         if normalized_dt.year < 1900:
-            errors.append("Date too far in the past")
+                errors.append("Date too far in the past")
         elif normalized_dt.year > now.year + 1:
-            errors.append("Date too far in the future")
+                errors.append("Date too far in the future")
         
         return errors
     

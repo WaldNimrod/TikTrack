@@ -37,13 +37,19 @@
         error: () => {}
     };
 
+    const TABLE_TYPE = 'import_history';
+    const TABLE_ID = 'importHistoryTable';
+    const MAX_TABLE_REGISTRATION_ATTEMPTS = 20;
+    let tableRegistrationAttempts = 0;
+
     const ACTIVE_STATUSES = new Set(['created', 'analyzing', 'ready', 'importing']);
 
     const state = {
         accounts: [],
         sessions: [],
         loading: false,
-        lastError: null
+        lastError: null,
+        tableRegistered: false
     };
 
     const SELECTORS = {
@@ -64,6 +70,65 @@
         history: (accountId, limit = 20) =>
             `/api/user-data-import/history?trading_account_id=${accountId}&limit=${limit}&_=${Date.now()}`
     };
+
+    /**
+     * Normalize any date-like value into the unified DateEnvelope structure.
+     * Falls back gracefully if the utilities are unavailable.
+     * @param {any} value
+     * @returns {Object|null}
+     */
+    function coerceDateEnvelope(value) {
+        if (!value) {
+            return null;
+        }
+
+        try {
+            if (window.dateUtils?.ensureDateEnvelope) {
+                return window.dateUtils.ensureDateEnvelope(value);
+            }
+        } catch (error) {
+            Logger.warn?.('⚠️ Failed to normalize date envelope', { value, error: error.message, page: PAGE_NAME });
+        }
+
+        if (typeof value === 'object') {
+            return value;
+        }
+
+        const parsed = Date.parse(value);
+        if (!Number.isNaN(parsed)) {
+            const iso = new Date(parsed).toISOString();
+            return {
+                utc: iso,
+                local: iso,
+                epochMs: parsed,
+                display: new Date(parsed).toLocaleString('he-IL')
+            };
+        }
+
+        return { display: String(value) };
+    }
+
+    /**
+     * Extract epoch (ms) from envelope or plain date.
+     * @param {Object|string|null} envelope
+     * @returns {number}
+     */
+    function getEpochFromEnvelope(envelope) {
+        if (!envelope) {
+            return 0;
+        }
+
+        if (typeof envelope === 'number') {
+            return envelope;
+        }
+
+        const candidate = envelope.epochMs
+            ?? (envelope.utc ? Date.parse(envelope.utc) : null)
+            ?? (envelope.local ? Date.parse(envelope.local) : null)
+            ?? (typeof envelope === 'string' ? Date.parse(envelope) : null);
+
+        return Number.isFinite(candidate) ? candidate : 0;
+    }
 
     /**
      * Initializes the Data Import page.
@@ -90,6 +155,7 @@
             }
 
             await refreshDataImportHistory(true);
+            registerDataImportTable();
         } catch (error) {
             Logger.error('❌ Failed to initialize Data Import page', { error, page: PAGE_NAME });
             notify('שגיאה בטעינת עמוד ייבוא הנתונים. נסה לרענן את הדף.', 'error');
@@ -130,14 +196,13 @@
             const sessions = historyResults
                 .flat()
                 .map(normalizeSessionRecord)
-                .sort((a, b) => {
-                    const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                    const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                    return bTime - aTime;
-                });
+                .sort((a, b) => (b.createdAtEpoch || 0) - (a.createdAtEpoch || 0));
 
             state.sessions = sessions;
             state.lastError = null;
+
+            updateTableRegistry(state.sessions);
+            registerDataImportTable();
 
             renderImportSummary();
             renderImportHistoryTable();
@@ -148,6 +213,7 @@
             toggleErrorState(true, error.message || 'שגיאה לא ידועה בטעינת הנתונים');
         } finally {
             setLoadingState(false);
+            registerDataImportTable();
         }
     }
 
@@ -252,22 +318,50 @@
      * @returns {Object}
      */
     function normalizeSessionRecord(session) {
-        const createdAt = session.created_at || null;
-        const completedAt = session.completed_at || null;
+        const summary = session.summary_data || {};
+        const analysisTimestamp = summary.analysis_timestamp || summary.analysis?.timestamp || null;
+        const previewTimestamp = summary.preview_timestamp || summary.preview?.timestamp || null;
+
+        const createdSource =
+            session.created_at ||
+            summary.created_at ||
+            analysisTimestamp;
+
+        const updatedSource =
+            session.completed_at ||
+            summary.completed_at ||
+            previewTimestamp ||
+            analysisTimestamp;
+
+        const createdEnvelope = coerceDateEnvelope(createdSource);
+        const updatedEnvelope = coerceDateEnvelope(updatedSource);
 
         return {
             id: session.id,
             tradingAccountId: session.trading_account_id,
             tradingAccountName: session.trading_account_name || 'לא ידוע',
+            trading_account_name: session.trading_account_name || 'לא ידוע',
             provider: session.provider || 'לא צויין',
+            provider_name: session.provider || 'לא צויין',
             fileName: session.file_name || 'לא צויין',
+            file_name: session.file_name || 'לא צויין',
             totalRecords: Number(session.total_records) || 0,
+            total_records: Number(session.total_records) || 0,
             importedRecords: Number(session.imported_records) || 0,
+            imported_records: Number(session.imported_records) || 0,
             skippedRecords: Number(session.skipped_records) || 0,
+            skipped_records: Number(session.skipped_records) || 0,
             status: session.status || 'unknown',
-            summaryData: session.summary_data || {},
-            createdAt,
-            completedAt
+            status_label: session.status || 'unknown',
+            summaryData: summary,
+            createdAt: createdEnvelope,
+            createdAtEpoch: getEpochFromEnvelope(createdEnvelope),
+            createdAtDisplay: formatDateValue(createdEnvelope),
+            created_at: createdEnvelope,
+            updatedAt: updatedEnvelope,
+            updatedAtEpoch: getEpochFromEnvelope(updatedEnvelope),
+            updatedAtDisplay: formatDateValue(updatedEnvelope || createdEnvelope),
+            completed_at: updatedEnvelope
         };
     }
 
@@ -287,18 +381,15 @@
 
         if (lastImportElement) {
             const latestSession = state.sessions[0];
-            if (latestSession && latestSession.createdAt) {
-                const formatted = formatDateValue(latestSession.completedAt || latestSession.createdAt);
-                lastImportElement.textContent = formatted || 'לא זמין';
-            } else {
-                lastImportElement.textContent = 'לא זמין';
-            }
+            const displayValue = latestSession?.updatedAtDisplay || latestSession?.createdAtDisplay || 'לא זמין';
+            lastImportElement.textContent = displayValue || 'לא זמין';
         }
 
         if (activeStatusElement) {
             const activeSession = state.sessions.find(session => ACTIVE_STATUSES.has(session.status));
             if (activeSession) {
-                activeStatusElement.textContent = `${activeSession.status} (סשן ${activeSession.id})`;
+                const statusHtml = renderStatus(activeSession.status);
+                activeStatusElement.innerHTML = `${statusHtml} <span class="session-meta">(#${activeSession.id})</span>`;
             } else {
                 activeStatusElement.textContent = 'אין סשנים פעילים';
             }
@@ -310,7 +401,7 @@
      * @function renderImportHistoryTable
      * @returns {void}
      */
-    function renderImportHistoryTable() {
+    function renderImportHistoryTable(tableData = null) {
         const tableBody = document.querySelector(SELECTORS.tableBody);
         if (!tableBody) {
             return;
@@ -318,15 +409,20 @@
 
         tableBody.innerHTML = '';
 
-        if (!state.sessions.length) {
+        const effectiveData = Array.isArray(tableData) ? tableData : state.sessions;
+
+        if (!effectiveData.length) {
             toggleEmptyState(true);
+            if (window.TableDataRegistry) {
+                window.TableDataRegistry.setPageData(TABLE_TYPE, [], { tableId: TABLE_ID, skipCounts: true });
+            }
             return;
         }
 
         toggleEmptyState(false);
 
         const rowsFragment = document.createDocumentFragment();
-        state.sessions.forEach(session => {
+        effectiveData.forEach(session => {
             rowsFragment.appendChild(renderHistoryRow(session));
         });
 
@@ -334,6 +430,16 @@
 
         if (typeof window.processButtons === 'function') {
             window.processButtons();
+        }
+
+        if (window.TableDataRegistry) {
+            window.TableDataRegistry.setPageData(TABLE_TYPE, effectiveData, {
+                tableId: TABLE_ID,
+                skipCounts: false,
+                pageInfo: {
+                    currentPageSize: effectiveData.length
+                }
+            });
         }
     }
 
@@ -349,8 +455,8 @@
 
         const statusDisplay = renderStatus(session.status);
 
-        const createdDisplay = formatDateValue(session.createdAt);
-        const updatedDisplay = formatDateValue(session.completedAt || session.createdAt);
+        const createdDisplay = session.createdAtDisplay || formatDateValue(session.createdAt);
+        const updatedDisplay = session.updatedAtDisplay || formatDateValue(session.updatedAt || session.createdAt);
 
         row.innerHTML = [
             `<td class="col-session-id">#${session.id}</td>`,
@@ -375,11 +481,34 @@
      * @returns {string}
      */
     function renderStatus(status) {
+        const normalizedStatus = typeof status === 'string' ? status.toLowerCase() : '';
+
         if (window.FieldRendererService?.renderStatus) {
-            return window.FieldRendererService.renderStatus(status, 'import_session');
+            return window.FieldRendererService.renderStatus(normalizedStatus || 'unknown', 'import_session');
         }
 
-        return `<span class="status-badge status-${status || 'unknown'}">${status || 'לא ידוע'}</span>`;
+        const translations = {
+            completed: 'הושלם',
+            ready: 'מוכן',
+            analyzing: 'בבדיקה',
+            importing: 'ייבוא פעיל',
+            failed: 'נכשל',
+            cancelled: 'בוטל',
+            canceled: 'בוטל',
+            created: 'נוצר'
+        };
+
+        let category = 'unknown';
+        if (normalizedStatus === 'completed' || normalizedStatus === 'importing') {
+            category = 'open';
+        } else if (normalizedStatus === 'ready' || normalizedStatus === 'analyzing') {
+            category = 'closed';
+        } else if (normalizedStatus === 'failed' || normalizedStatus === 'cancelled' || normalizedStatus === 'canceled') {
+            category = 'cancelled';
+        }
+
+        const label = translations[normalizedStatus] || status || 'לא ידוע';
+        return `<span class="status-badge" data-status-category="${category}" data-entity="import_session">${label}</span>`;
     }
 
     /**
@@ -393,6 +522,24 @@
             return '';
         }
 
+        if (typeof window.renderImportDate === 'function') {
+            const rendered = window.renderImportDate(value, '');
+            if (rendered) {
+                return rendered;
+            }
+        }
+
+        const envelope = coerceDateEnvelope(value);
+        if (envelope) {
+            if (window.FieldRendererService?.renderDate) {
+                const rendered = window.FieldRendererService.renderDate(envelope, true);
+                if (rendered) {
+                    return rendered;
+                }
+            }
+            return envelope.display || envelope.local || envelope.utc || '';
+        }
+
         if (window.dateUtils?.formatDateTime) {
             return window.dateUtils.formatDateTime(value);
         }
@@ -403,7 +550,7 @@
 
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
-            return value;
+            return typeof value === 'string' ? value : '';
         }
 
         return date.toLocaleString('he-IL');
@@ -487,8 +634,79 @@
         }
     }
 
+    /**
+     * Update TableDataRegistry datasets for the import history table.
+     * @param {Array<Object>} [data] - Optional data override.
+     */
+    function updateTableRegistry(data = state.sessions) {
+        if (!window.TableDataRegistry) {
+            return;
+        }
+
+        const safeData = Array.isArray(data) ? data : [];
+
+        window.TableDataRegistry.registerTable({
+            tableType: TABLE_TYPE,
+            tableId: TABLE_ID,
+            source: 'data-import-page'
+        });
+
+        window.TableDataRegistry.setFullData(TABLE_TYPE, safeData, {
+            tableId: TABLE_ID,
+            resetFiltered: true
+        });
+    }
+
+    /**
+     * Register the import history table with the Unified Table System.
+     * @param {boolean} [force=false]
+     */
+    function registerDataImportTable(force = false) {
+        if (state.tableRegistered && !force) {
+            return;
+        }
+
+        if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+            if (tableRegistrationAttempts < MAX_TABLE_REGISTRATION_ATTEMPTS) {
+                tableRegistrationAttempts += 1;
+                setTimeout(() => registerDataImportTable(force), 250);
+            }
+            return;
+        }
+
+        const columns = window.TABLE_COLUMN_MAPPINGS?.[TABLE_TYPE] || [];
+
+        window.UnifiedTableSystem.registry.register(TABLE_TYPE, {
+            dataGetter: () => state.sessions || [],
+            updateFunction: (data) => renderImportHistoryTable(Array.isArray(data) ? data : null),
+            tableSelector: `#${TABLE_ID}`,
+            columns,
+            sortable: true,
+            filterable: true,
+            defaultSort: { columnIndex: 8, direction: 'desc' }
+        });
+
+        if (window.TableDataRegistry) {
+            window.TableDataRegistry.registerTable({
+                tableType: TABLE_TYPE,
+                tableId: TABLE_ID,
+                source: 'data-import-page'
+            });
+        }
+
+        if (window.PaginationSystem?.registerTableInRegistry) {
+            window.PaginationSystem.registerTableInRegistry(TABLE_TYPE, TABLE_ID, 'data-import-page');
+        }
+
+        tableRegistrationAttempts = 0;
+        state.tableRegistered = true;
+
+        Logger.info('📊 Registered import history table with UnifiedTableSystem', { page: PAGE_NAME });
+    }
+
     // Expose globals for the unified initializer
     window.initializeDataImportPage = initializeDataImportPage;
     window.refreshDataImportHistory = refreshDataImportHistory;
+    window.registerDataImportTable = registerDataImportTable;
 })();
 

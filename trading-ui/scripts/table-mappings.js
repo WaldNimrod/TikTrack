@@ -106,6 +106,20 @@ const TABLE_COLUMN_MAPPINGS = {
     'source',                // 5 - מקור
   ],
 
+  // טבלת היסטוריית ייבוא נתונים (Data Import History)
+  'import_history': [
+    { key: 'id', sortType: 'numeric' },                    // 0 - מספר סשן
+    { key: 'trading_account_name', sortType: 'string' },   // 1 - חשבון מסחר
+    { key: 'provider_name', sortType: 'string' },          // 2 - ספק נתונים
+    { key: 'file_name', sortType: 'string' },              // 3 - שם קובץ
+    { key: 'status_label', sortType: 'string' },           // 4 - סטטוס
+    { key: 'total_records', sortType: 'numeric' },         // 5 - סה"כ רשומות
+    { key: 'imported_records', sortType: 'numeric' },      // 6 - רשומות שיובאו
+    { key: 'skipped_records', sortType: 'numeric' },       // 7 - רשומות שהושמטו
+    { key: 'created_at', sortType: 'dateEnvelope' },       // 8 - נוצר בתאריך
+    { key: 'completed_at', sortType: 'dateEnvelope' }      // 9 - עודכן לאחרונה
+  ],
+
   // טבלת התראות (Alerts) - Alerts Page Structure (מוצג בפועל)
   'alerts': [
     'related_object',        // 0 - קשור ל (מחושב)
@@ -246,6 +260,18 @@ const TABLE_COLUMN_SORT_TYPES = {
   },
   cash_flows: {
     date: 'date'
+  },
+  import_history: {
+    id: 'numeric',
+    trading_account_name: 'string',
+    provider_name: 'string',
+    file_name: 'string',
+    status_label: 'string',
+    total_records: 'numeric',
+    imported_records: 'numeric',
+    skipped_records: 'numeric',
+    created_at: 'dateEnvelope',
+    completed_at: 'dateEnvelope'
   },
   tickers: {
     symbol: 'string',

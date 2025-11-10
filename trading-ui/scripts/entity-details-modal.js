@@ -1060,7 +1060,7 @@ class EntityDetailsModal {
             headerElement.classList.add(`entity-${normalizedType}`);
             
             // הוספת data-entity-type למודול (תמיד מעדכן כדי לשמור על סינכרון)
-            modalElement.setAttribute('data-entity-type', entityType);
+                modalElement.setAttribute('data-entity-type', entityType);
             
             if (window.Logger) {
                 window.Logger.info(`🎨 Applied entity class to modal header: entity-${normalizedType} (entityType: ${entityType})`, { 

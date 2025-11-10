@@ -132,7 +132,7 @@ class NormalizationService:
         date = record.get('date')
         quantity = record.get('quantity', 0)
         price = record.get('price', 0)
-
+        
         date_iso = self._coerce_date_to_iso(date)
         date_str = date_iso[:10] if date_iso else 'unknown'
         return f"fallback_{symbol}_{date_str}_{quantity}_{price}"

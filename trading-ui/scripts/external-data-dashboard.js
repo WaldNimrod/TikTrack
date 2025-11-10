@@ -1967,10 +1967,125 @@
   };
 
   window.copyDetailedLogLocal = async function () {
-    if (window.externalDataDashboard) {
-      return window.externalDataDashboard.copyDetailedLog();
+    try {
+        const detailedLog = await generateDetailedLog();
+        if (detailedLog) {
+            await navigator.clipboard.writeText(detailedLog);
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח!');
+            }
+        } else {
+            if (window.showWarningNotification) {
+                window.showWarningNotification('אין לוג להעתקה');
+            } else {
+                alert('אין לוג להעתקה');
+            }
+        }
+    } catch (err) {
+        console.error('שגיאה בהעתקה:', err);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
     }
-    return '';
+  };
+
+  window.ExternalDataDashboardActions = {
+    refreshStatus(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.loadSystemStatus(true);
+    },
+    refreshProviders(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.loadProviders(true);
+    },
+    refreshCacheStats(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.loadCacheStats(true);
+    },
+    refreshAllExternalData(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.refreshCoreData();
+    },
+    clearExternalCache(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.clearCache();
+    },
+    optimizeExternalCache(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.optimizeCache();
+    },
+    saveCacheSettings(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.saveSettings();
+    },
+    resetCacheSettings(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.resetSettings();
+    },
+    runUnitTests(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.runUnitTests();
+    },
+    generateTestReport(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.generateTestReport();
+    },
+    testAllProviders(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.testAllProviders();
+    },
+    analyzeData(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.analyzeData();
+    },
+    exportData(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.exportData();
+    },
+    backupData(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.backupData();
+    },
+    copyDetailedLog(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.copyDetailedLog();
+    },
+    startMonitoring(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.startPerformanceMonitoring();
+    },
+    stopMonitoring(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.stopPerformanceMonitoring();
+    },
+    analyzeBottlenecks(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.analyzeBottlenecks();
+    },
+    exportPerformanceData(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.exportPerformanceData();
+    },
+    refreshLogs(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.loadLogs(true);
+    },
+    clearLogs(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.clearLogs();
+    },
+    refreshHistory(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.loadGroupRefreshHistory(true);
+    },
+    refreshPerformanceCharts(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.refreshPerformanceCharts();
+    }
   };
 })();
 

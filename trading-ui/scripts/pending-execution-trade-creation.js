@@ -321,6 +321,7 @@
                 data-role="create-trade"
                 data-cluster-id="${cluster.cluster_id}"
                 data-text="פתח טרייד חדש" 
+                data-onclick="PendingExecutionTradeCreation.openTradeModalFromCluster('${cluster.cluster_id}')"
                 title="יצירת טרייד חדש עבור הביצועים הנבחרים">
               </button>
               <button
@@ -329,7 +330,17 @@
                 data-role="refresh-cluster"
                 data-cluster-id="${cluster.cluster_id}"
                 data-text="רענן אשכול"
+                data-onclick="PendingExecutionTradeCreation.forceRefresh('executions')"
                 title="טעינת נתונים מחדש לאשכול">
+              </button>
+              <button
+                data-button-type="REJECT"
+                data-variant="small"
+                data-role="dismiss-cluster"
+                data-cluster-id="${cluster.cluster_id}"
+                data-text="התעלם"
+                data-onclick="PendingExecutionTradeCreation.dismissCluster('${cluster.cluster_id}', 'executions')"
+                title="הסתרת האשכול מהממשק">
               </button>
             </div>
           </div>
@@ -346,14 +357,14 @@
       const item = document.createElement('li');
       item.className = 'list-group-item trade-create-widget-item';
       item.dataset.clusterId = cluster.cluster_id;
- 
+
       const summary = this.computeSelectionSummary(cluster, selectedIds);
       const dateRange = cluster.stats?.date_range || {};
  
       const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
       const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
       const dateRangeText = dateRange.start ? this.renderDateRange(dateRange) : '';
- 
+
       item.innerHTML = `
         <div class="trade-create-widget-top d-flex flex-wrap align-items-center gap-2">
           <div class="d-flex align-items-center gap-2">
@@ -370,6 +381,7 @@
               data-role="create-trade"
               data-cluster-id="${cluster.cluster_id}"
               data-text="פתח טרייד"
+              data-onclick="PendingExecutionTradeCreation.openTradeModalFromCluster('${cluster.cluster_id}')"
               title="יצירת טרייד חדש עבור האשכול">
             </button>
             <button
@@ -378,6 +390,7 @@
               data-role="dismiss-cluster"
               data-cluster-id="${cluster.cluster_id}"
               data-text="התעלם"
+              data-onclick="PendingExecutionTradeCreation.dismissCluster('${cluster.cluster_id}', 'dashboard')"
               title="הסתרת האשכול מהממשק">
             </button>
           </div>
@@ -402,7 +415,7 @@
           ${this.renderExecutionsList(cluster)}
         </div>
       `;
- 
+
       return item;
     },
 
@@ -582,33 +595,38 @@
     },
 
     handleExecutionsClick(event) {
-      const createBtn = event.target.closest('[data-role=\"create-trade\"]');
+      const createBtn = event.target.closest('[data-role="create-trade"]');
       if (createBtn) {
         const clusterId = createBtn.dataset.clusterId;
         this.openTradeModalFromCluster(clusterId);
         return;
       }
 
-      const refreshBtn = event.target.closest('[data-role=\"refresh-cluster\"]');
+      const refreshBtn = event.target.closest('[data-role="refresh-cluster"]');
       if (refreshBtn) {
-        this.refreshClusters({ source: 'executions', force: true });
+        this.forceRefresh('executions');
+        return;
+      }
+
+      const dismissBtn = event.target.closest('[data-role="dismiss-cluster"]');
+      if (dismissBtn) {
+        const clusterId = dismissBtn.dataset.clusterId;
+        this.dismissCluster(clusterId, 'executions');
       }
     },
 
     handleDashboardClick(event) {
-      const createBtn = event.target.closest('[data-role=\"create-trade\"]');
+      const createBtn = event.target.closest('[data-role="create-trade"]');
       if (createBtn) {
         const clusterId = createBtn.dataset.clusterId;
         this.openTradeModalFromCluster(clusterId);
         return;
       }
 
-      const dismissBtn = event.target.closest('[data-role=\"dismiss-cluster\"]');
+      const dismissBtn = event.target.closest('[data-role="dismiss-cluster"]');
       if (dismissBtn) {
         const clusterId = dismissBtn.dataset.clusterId;
-        this.state.dismissed.add(clusterId);
-        this.persistDismissedClusters();
-        this.renderDashboardWidget();
+        this.dismissCluster(clusterId, 'dashboard');
       }
     },
 
@@ -835,6 +853,43 @@
         window.ButtonSystem.initializeButtons(container);
       } else if (typeof window.initializeButtons === 'function') {
         window.initializeButtons(container);
+      }
+    },
+
+    removeExecutionFromState(executionId, score = null) {
+      this.state.items = this.state.items.filter(item => item.execution_id !== executionId);
+      if (typeof score === 'number' && score >= 50 && this.state.totalEligibleCount > 0) {
+        this.state.totalEligibleCount = Math.max(0, this.state.totalEligibleCount - 1);
+      }
+      this.render();
+    },
+ 
+    dismissCluster(clusterId, source = 'dashboard') {
+      if (!clusterId) {
+        return;
+      }
+
+      this.state.dismissed.add(clusterId);
+      this.persistDismissedClusters();
+      this.removeCluster(clusterId);
+
+      if (source === 'dashboard') {
+        this.renderDashboardWidget();
+      } else if (source === 'executions') {
+        this.renderExecutionsSection();
+      }
+    },
+
+    forceRefresh(source = 'executions') {
+      this.refreshClusters({ source, force: true });
+    },
+
+    openExecutionDetails(executionId) {
+      if (!executionId) {
+        return;
+      }
+      if (typeof window.showEntityDetails === 'function') {
+        window.showEntityDetails(executionId);
       }
     }
   };

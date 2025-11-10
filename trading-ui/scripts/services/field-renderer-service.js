@@ -59,6 +59,16 @@ class FieldRendererService {
         else if (statusLower === 'cancelled' || statusLower === 'canceled') category = 'cancelled';
         else if (statusLower === 'triggered') category = 'warning';
         else if (statusLower === 'not_triggered') category = 'info';
+
+        if (entityType === 'import_session') {
+            if (statusLower === 'completed' || statusLower === 'importing') {
+                category = 'open';
+            } else if (statusLower === 'ready' || statusLower === 'analyzing') {
+                category = 'closed';
+            } else if (statusLower === 'failed') {
+                category = 'cancelled';
+            }
+        }
         
         // שימוש במחלקה הייעודית שלנו ל-outline כדי למנוע טקסט לבן
         return `<span class="status-badge" data-status-category="${category}" data-entity="${entityType}">${translatedStatus}</span>`;
@@ -1323,6 +1333,20 @@ class FieldRendererService {
         const translator = translators[entityType];
         if (translator && typeof translator === 'function') {
             return translator(status);
+        }
+
+        if (entityType === 'import_session') {
+            const importTranslations = {
+                'completed': 'הושלם',
+                'ready': 'מוכן',
+                'analyzing': 'בבדיקה',
+                'importing': 'ייבוא פעיל',
+                'failed': 'נכשל',
+                'cancelled': 'בוטל',
+                'canceled': 'בוטל',
+                'created': 'נוצר'
+            };
+            return importTranslations[status.toLowerCase()] || status;
         }
         
         // תרגום גנרי - רק סטטוסים סטנדרטיים

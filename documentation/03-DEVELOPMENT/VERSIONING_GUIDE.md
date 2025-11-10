@@ -64,4 +64,14 @@ python3 scripts/versioning/bump-version.py --help
 - לפני קידום פרודקשן, ודא שהגרסה ב-main כבר זוהתה ב-manifest (קל להשוות).
 - אל תקדם Major/Minor ללא תיאום – זה משפיע על כל הדוקומנטציה והפריסה.
 
+## 🔒 Hook אוטומטי (מומלץ)
+
+```bash
+./scripts/git-hooks/install-version-hook.sh
+```
+
+- ההתקנה יוצרת `pre-commit` שמפעיל בדיקה על ענפי `main` ו-`production`.
+- הקומיט ייחסם אם `documentation/version-manifest.json` והיסטוריית הסביבה המתאימה לא נמצאים בסטייג׳.
+- לעקיפה חריגה: `SKIP_VERSION_CHECK=1 git commit ...`.
+
 

@@ -1345,6 +1345,35 @@ const PACKAGE_MANIFEST = {
     ],
     estimatedSize: '~45KB',
     initTime: '~30ms'
+  },
+
+  // Game plan: dynamic loader uses PAGE_REQUIREMENTS; add validation dependencies for dashboard use cases
+  'dashboard': {
+    id: 'dashboard-modules',
+    name: 'Dashboard Modules',
+    description: 'מודולים ייעודיים לדשבורד כולל תמיכה ביצירת טרייד',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 3.6,
+    dependencies: ['modules', 'validation'],
+    scripts: [
+      {
+        file: 'trade-selector-modal.js',
+        globalCheck: 'window.openTradeSelectorModal',
+        description: 'מודול בחירת טרייד',
+        required: false,
+        loadOrder: 0
+      },
+      {
+        file: 'modal-configs/trades-config.js',
+        globalCheck: 'window.tradesModalConfig',
+        description: 'הגדרות מודל טריידים',
+        required: false,
+        loadOrder: 1
+      }
+    ],
+    estimatedSize: '~20KB',
+    initTime: '~10ms'
   }
 };
 

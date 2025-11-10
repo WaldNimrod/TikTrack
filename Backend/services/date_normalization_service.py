@@ -271,7 +271,7 @@ class DateNormalizationService:
                     return dt.replace(tzinfo=timezone.utc)
                 if assume_utc:
                     return dt.astimezone(timezone.utc)
-                return dt
+            return dt
 
         try:
             if self._ISO_DATE_ONLY.match(value):

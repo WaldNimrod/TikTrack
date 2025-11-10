@@ -469,7 +469,21 @@ window.initializeIndexPage = async function() {
         // window.Logger.info('📊 Initializing home page charts...', { page: "index" });
         await refreshAllCharts();
     }, 1000);
-    
+ 
+    // Initialize pending execution trade creation widget
+    if (window.PendingExecutionTradeCreation?.initializeDashboardWidget) {
+        setTimeout(() => {
+            window.PendingExecutionTradeCreation.initializeDashboardWidget({
+                cardSelector: '#pendingExecutionsTradeCreationCard',
+                listSelector: '#pendingTradeCreationWidgetList',
+                countSelector: '#pendingExecutionsTradeCreationCount',
+                loadingSelector: '#pendingExecutionsTradeCreationLoading',
+                emptySelector: '#pendingExecutionsTradeCreationEmpty',
+                errorSelector: '#pendingExecutionsTradeCreationError'
+            });
+        }, 1400);
+    }
+
     // Initialize pending executions widget
     if (typeof window.initializePendingExecutionsWidget === 'function') {
         setTimeout(() => {

@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 import logging
 import os
 import json
+import re
+from html import escape
 from sqlalchemy.orm import Session
 
 from models.import_session import ImportSession
@@ -24,11 +26,13 @@ from models.ticker import Ticker
 from .normalization_service import NormalizationService
 from .validation_service import ValidationService
 from .duplicate_detection_service import DuplicateDetectionService
+from .symbol_metadata_service import SymbolMetadataService
 from services.user_data_import.report_generator import ImportReportGenerator
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
 from services.date_normalization_service import DateNormalizationService
 from services.advanced_cache_service import advanced_cache_service
+from services.ticker_service import TickerService
 
 from config.logging import get_logger
 logger = get_logger(__name__)
@@ -58,6 +62,7 @@ class ImportOrchestrator:
         self.duplicate_detection_service = DuplicateDetectionService(db_session)
         self.report_generator = ImportReportGenerator()
         self.utc_normalizer = DateNormalizationService("UTC")
+        self.symbol_metadata_service = SymbolMetadataService(db_session)
         
         # Available connectors
         self.connectors = {
@@ -306,6 +311,11 @@ class ImportOrchestrator:
             raw_records = connector.parse_file(file_content, session.file_name)
             session.total_records = len(raw_records)
             logger.info(f"✅ File parsed: {len(raw_records)} records found")
+            symbol_metadata = self.symbol_metadata_service.build_metadata_map(
+                connector=connector,
+                file_content=file_content,
+                raw_records=raw_records
+            )
             
             # Normalize records
             logger.info("🔄 [File Analysis] Normalizing records", 
@@ -381,7 +391,8 @@ class ImportOrchestrator:
                 'normalization_errors': normalization_result['errors'],
                 'validation_errors': validation_result['validation_errors'],
                 'duplicate_details': duplicate_result,
-                'analysis_timestamp': analysis_timestamp
+                'analysis_timestamp': analysis_timestamp,
+                'symbol_metadata': symbol_metadata
             }
 
             analysis_results_storage = self.utc_normalizer.normalize_output(analysis_results_raw)
@@ -398,6 +409,7 @@ class ImportOrchestrator:
                 'existing_records': len(duplicate_result['existing_records']),
                 'missing_tickers': missing_tickers_data,
                 'analysis_timestamp': analysis_timestamp,
+                'symbol_metadata': symbol_metadata,
                 # Add detailed data for step 4
                 'normalization_errors': normalization_result.get('errors', []),
                 'validation_errors': validation_result.get('validation_errors', []),
@@ -493,6 +505,14 @@ class ImportOrchestrator:
             logger.info(f"🔄 Parsing file: {session.file_name}")
             raw_records = connector.parse_file(file_content, session.file_name)
             logger.info(f"📊 Parsed {len(raw_records)} raw records")
+            symbol_metadata = session.get_summary_data('symbol_metadata')
+            if not symbol_metadata:
+                symbol_metadata = self.symbol_metadata_service.build_metadata_map(
+                    connector=connector,
+                    file_content=file_content,
+                    raw_records=raw_records
+                )
+                session.add_summary_data({'symbol_metadata': symbol_metadata})
             
             # Normalize records
             logger.info("🔄 Normalizing records...")
@@ -646,7 +666,8 @@ class ImportOrchestrator:
                     'missing_tickers': validation_result.get('missing_tickers', []),
                     'duplicate_records': len(duplicate_result.get('within_file_duplicates', [])),
                     'existing_records': len(duplicate_result.get('existing_records', []))
-                }
+                },
+                'symbol_metadata': symbol_metadata
             }
             
             # Update session with preview data
@@ -720,7 +741,6 @@ class ImportOrchestrator:
             
             from sqlalchemy import func
             from models.execution import Execution
-            from services.ticker_service import TickerService
             
             initial_execution_count = self.db_session.query(func.count(Execution.id)).scalar() or 0
             
@@ -744,6 +764,16 @@ class ImportOrchestrator:
             imported_count = 0
             import_errors: List[str] = []
             
+            try:
+                self._update_ticker_metadata(enriched_records, symbol_metadata)
+            except Exception as metadata_error:
+                logger.warning(
+                    "⚠️ Session %s: failed to update ticker metadata: %s",
+                    session_id,
+                    metadata_error,
+                    exc_info=True
+                )
+
             for index, execution_data in enumerate(enriched_records):
                 try:
                     execution_date = self._resolve_datetime(execution_data.get('date'))
@@ -824,7 +854,7 @@ class ImportOrchestrator:
                 'import_errors': import_errors,
                 'session_status': import_session.status
             }
-        
+            
         except Exception as error:
             logger.error(f"Failed to execute import for session {session_id}: {error}", exc_info=True)
             self.db_session.rollback()
@@ -861,6 +891,167 @@ class ImportOrchestrator:
                 'success': False,
                 'error': str(error)
             }
+
+    # ------------------------------------------------------------------
+    # Metadata helpers
+    # ------------------------------------------------------------------
+    _AUTO_LINK_BLOCK_PATTERN = re.compile(
+        r'<div[^>]+data-auto-generated="import-links"[^>]*>.*?</div>',
+        re.IGNORECASE | re.DOTALL
+    )
+
+    def _update_ticker_metadata(
+        self,
+        enriched_records: List[Dict[str, Any]],
+        symbol_metadata: Optional[Any]
+    ) -> None:
+        if not enriched_records or not symbol_metadata:
+            return
+
+        symbol_map = self._normalise_symbol_metadata(symbol_metadata)
+        if not symbol_map:
+            return
+
+        ticker_ids = {
+            record.get('ticker_id')
+            for record in enriched_records
+            if record.get('ticker_id')
+        }
+
+        if not ticker_ids:
+            return
+
+        tickers = self.db_session.query(Ticker).filter(
+            Ticker.id.in_(ticker_ids)
+        ).all()
+
+        updated = False
+        for ticker in tickers:
+            symbol_key = (ticker.symbol or '').upper()
+            metadata = symbol_map.get(symbol_key)
+            if not metadata:
+                continue
+
+            # Update ticker name if missing and metadata provides one
+            company_name = metadata.get('company_name')
+            if company_name and not (ticker.name and ticker.name.strip()):
+                ticker.name = company_name.strip()
+                updated = True
+
+            rich_text_block = self._build_links_rich_text(metadata)
+            if not rich_text_block:
+                continue
+
+            existing_remarks = ticker.remarks or ''
+            merged = self._merge_rich_text(existing_remarks, rich_text_block)
+            if merged is None:
+                continue
+
+            if merged != existing_remarks:
+                ticker.remarks = merged
+                updated = True
+
+        if updated:
+            self.db_session.flush()
+
+    def _normalise_symbol_metadata(self, metadata: Any) -> Dict[str, Dict[str, Any]]:
+        if isinstance(metadata, dict):
+            return {
+                symbol.upper(): value
+                for symbol, value in metadata.items()
+                if isinstance(symbol, str) and isinstance(value, dict)
+            }
+
+        if isinstance(metadata, list):
+            normalised: Dict[str, Dict[str, Any]] = {}
+            for entry in metadata:
+                if not isinstance(entry, dict):
+                    continue
+                symbol = (entry.get('symbol') or '').upper()
+                if not symbol:
+                    continue
+                normalised[symbol] = entry
+            return normalised
+
+        return {}
+
+    def _build_links_rich_text(self, metadata: Dict[str, Any]) -> Optional[str]:
+        links = metadata.get('links') or {}
+        google_url = links.get('google_finance')
+        yahoo_url = links.get('yahoo_finance')
+        status = links.get('status')
+        company_name = metadata.get('company_name')
+
+        if not company_name and not google_url and not yahoo_url:
+            return None
+
+        parts: List[str] = ['<div data-auto-generated="import-links">']
+
+        if company_name:
+            parts.append(
+                f'<p><strong>Company:</strong> {escape(str(company_name), quote=True)}</p>'
+            )
+
+        if google_url or yahoo_url:
+            parts.append('<ul>')
+            if google_url:
+                parts.append(
+                    '<li>'
+                    f'<a href="{escape(str(google_url), quote=True)}" '
+                    'target="_blank" rel="noopener noreferrer">Google Finance</a>'
+                    '</li>'
+                )
+            if yahoo_url:
+                parts.append(
+                    '<li>'
+                    f'<a href="{escape(str(yahoo_url), quote=True)}" '
+                    'target="_blank" rel="noopener noreferrer">Yahoo Finance</a>'
+                    '</li>'
+                )
+            parts.append('</ul>')
+        else:
+            parts.append('<p>No external links available.</p>')
+
+        if status:
+            parts.append(
+                f'<p><small>Link status: {escape(str(status), quote=True)}</small></p>'
+            )
+
+        parts.append('</div>')
+        html_block = ''.join(parts)
+
+        if len(html_block) > TickerService.MAX_REMARKS_LENGTH:
+            logger.warning(
+                "Generated remarks block exceeds max length (%s > %s)",
+                len(html_block),
+                TickerService.MAX_REMARKS_LENGTH
+            )
+            return None
+
+        return html_block
+
+    def _merge_rich_text(self, existing_html: str, new_block: str) -> Optional[str]:
+        if not new_block:
+            return None
+
+        existing_html = existing_html or ''
+
+        if self._AUTO_LINK_BLOCK_PATTERN.search(existing_html):
+            merged = self._AUTO_LINK_BLOCK_PATTERN.sub(new_block, existing_html)
+        elif existing_html.strip():
+            merged = f"{existing_html.strip()}\n<hr />\n{new_block}"
+        else:
+            merged = new_block
+
+        if len(merged) > TickerService.MAX_REMARKS_LENGTH:
+            logger.warning(
+                "Merged remarks block exceeds max length (%s > %s); skipping update",
+                len(merged),
+                TickerService.MAX_REMARKS_LENGTH
+            )
+            return None
+
+        return merged
 
     def reset_session(self, session_id: int) -> Dict[str, Any]:
         """

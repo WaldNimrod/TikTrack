@@ -28,6 +28,8 @@ let selectedDataTypeKey = null;
 let currencyCacheByCode = null;
 let tickersModalConfigPromise = null;
 let activeSessionInfo = null;
+let symbolMetadataCache = {};
+const TICKER_REMARKS_EDITOR_ID = 'tickerRemarksRichText';
 const ACTIVE_SESSION_STORAGE_KEY = 'tiktrack_import_user_data_session';
 const ACTIVE_SESSION_SOURCE = 'import-user-data';
 let importModalBootstrapInstance = null;
@@ -64,6 +66,249 @@ const IMPORT_DATA_TYPE_DEFINITIONS = {
         documentationAnchor: '#taxes-and-fx-pipeline'
     }
 };
+
+function normaliseSymbolKey(symbol) {
+    return typeof symbol === 'string'
+        ? symbol.trim().toUpperCase()
+        : '';
+}
+
+function clearSymbolMetadataCache() {
+    symbolMetadataCache = {};
+}
+
+function updateSymbolMetadataCache(metadata) {
+    if (!metadata) {
+        return;
+    }
+
+    const assignEntry = (symbol, data) => {
+        const key = normaliseSymbolKey(symbol);
+        if (!key || !data || typeof data !== 'object') {
+            return;
+        }
+        const existing = symbolMetadataCache[key] || {};
+        symbolMetadataCache[key] = {
+            ...existing,
+            ...data
+        };
+    };
+
+    if (Array.isArray(metadata)) {
+        metadata.forEach((entry) => {
+            if (!entry || typeof entry !== 'object') {
+                return;
+            }
+            assignEntry(entry.symbol || entry.display_symbol, entry);
+        });
+        return;
+    }
+
+    if (typeof metadata === 'object') {
+        Object.entries(metadata).forEach(([symbol, data]) => assignEntry(symbol, data));
+    }
+}
+
+function getSymbolMetadata(symbol) {
+    const key = normaliseSymbolKey(symbol);
+    if (!key) {
+        return null;
+    }
+    return symbolMetadataCache[key] || null;
+}
+
+function escapeHtml(value) {
+    if (value === null || value === undefined) {
+        return '';
+    }
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function escapeAttribute(value) {
+    return escapeHtml(value);
+}
+
+function sanitizeRichText(html) {
+    if (window.RichTextEditorService && typeof window.RichTextEditorService.sanitizeHTML === 'function') {
+        return window.RichTextEditorService.sanitizeHTML(html);
+    }
+    return html;
+}
+
+function buildRichTextFromMetadata(metadata) {
+    if (!metadata || typeof metadata !== 'object') {
+        return '';
+    }
+
+    const links = metadata.links || {};
+    const googleUrl = links.google_finance;
+    const yahooUrl = links.yahoo_finance;
+    const status = links.status;
+    const parts = ['<div data-auto-generated="import-links">'];
+
+    if (metadata.company_name) {
+        parts.push(
+            `<p><strong>Company:</strong> ${escapeHtml(metadata.company_name)}</p>`
+        );
+    }
+
+    if (googleUrl || yahooUrl) {
+        parts.push('<ul>');
+        if (googleUrl) {
+            parts.push(
+                '<li>'
+                + `<a href="${escapeAttribute(googleUrl)}" target="_blank" rel="noopener noreferrer">Google Finance</a>`
+                + '</li>'
+            );
+        }
+        if (yahooUrl) {
+            parts.push(
+                '<li>'
+                + `<a href="${escapeAttribute(yahooUrl)}" target="_blank" rel="noopener noreferrer">Yahoo Finance</a>`
+                + '</li>'
+            );
+        }
+        parts.push('</ul>');
+    } else {
+        parts.push('<p>No external links available.</p>');
+    }
+
+    if (status) {
+        parts.push(
+            `<p><small>Link status: ${escapeHtml(status)}</small></p>`
+        );
+    }
+
+    parts.push('</div>');
+    return sanitizeRichText(parts.join(''));
+}
+
+function buildMetadataLinksList(metadata, options = {}) {
+    if (!metadata || typeof metadata !== 'object') {
+        return '';
+    }
+
+    const links = metadata.links || {};
+    const googleUrl = links.google_finance;
+    const yahooUrl = links.yahoo_finance;
+    const status = links.status;
+    const containerClass = options.containerClass || 'metadata-links';
+    const listClass = options.listClass || 'metadata-links-list';
+    const statusClass = options.statusClass || 'metadata-links-status';
+    const items = [];
+
+    if (googleUrl) {
+        items.push(
+            `<li><a href="${escapeAttribute(googleUrl)}" target="_blank" rel="noopener noreferrer">Google Finance</a></li>`
+        );
+    }
+
+    if (yahooUrl) {
+        items.push(
+            `<li><a href="${escapeAttribute(yahooUrl)}" target="_blank" rel="noopener noreferrer">Yahoo Finance</a></li>`
+        );
+    }
+
+    if (!items.length) {
+        return '';
+    }
+
+    const statusHtml = options.showStatus && status
+        ? `<div class="${statusClass}"><small>${escapeHtml(status)}</small></div>`
+        : '';
+
+    return `
+        <div class="${containerClass}">
+            <ul class="${listClass}">
+                ${items.join('')}
+            </ul>
+            ${statusHtml}
+        </div>
+    `;
+}
+
+function renderMetadataSummaryBlock(metadata) {
+    if (!metadata || typeof metadata !== 'object') {
+        return '';
+    }
+
+    const parts = [];
+    if (metadata.company_name) {
+        parts.push(
+            `<div class="metadata-company"><i class="bi bi-building"></i> ${escapeHtml(metadata.company_name)}</div>`
+        );
+    }
+
+    const linksHtml = buildMetadataLinksList(metadata, {
+        containerClass: 'metadata-links',
+        listClass: 'metadata-links-list',
+        statusClass: 'metadata-links-status',
+        showStatus: true
+    });
+
+    if (linksHtml) {
+        parts.push(linksHtml);
+    }
+
+    return parts.join('');
+}
+
+function ensureRichTextEditorForTickerRemarks(modalElement) {
+    if (!modalElement) {
+        return null;
+    }
+
+    const textarea = modalElement.querySelector('#tickerRemarks');
+    if (!textarea || !window.initRichTextEditor) {
+        return null;
+    }
+
+    if (textarea.getAttribute('data-rich-text-enhanced') === 'true') {
+        return TICKER_REMARKS_EDITOR_ID;
+    }
+
+    const editorContainer = document.createElement('div');
+    editorContainer.id = TICKER_REMARKS_EDITOR_ID;
+    editorContainer.classList.add('rich-text-editor-container');
+
+    textarea.style.display = 'none';
+    textarea.setAttribute('data-rich-text-enhanced', 'true');
+    textarea.parentNode.insertBefore(editorContainer, textarea.nextSibling);
+
+    window.initRichTextEditor(TICKER_REMARKS_EDITOR_ID, {
+        placeholder: 'הכנס הערות על הטיקר...',
+        maxLength: 500
+    });
+
+    return TICKER_REMARKS_EDITOR_ID;
+}
+
+function syncTickerRemarksEditorToField(modalElement) {
+    const effectiveModal = modalElement || document.getElementById('tickersModal');
+    if (!effectiveModal) {
+        return;
+    }
+
+    const textarea = effectiveModal.querySelector('#tickerRemarks');
+    if (!textarea) {
+        return;
+    }
+
+    if (window.RichTextEditorService && typeof window.RichTextEditorService.getEditorInstance === 'function') {
+        const editor = window.RichTextEditorService.getEditorInstance(TICKER_REMARKS_EDITOR_ID);
+        if (editor && typeof window.RichTextEditorService.getContent === 'function') {
+            const htmlContent = window.RichTextEditorService.getContent(TICKER_REMARKS_EDITOR_ID) || '';
+            textarea.value = htmlContent;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            textarea.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+}
 
 function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
@@ -365,6 +610,7 @@ async function fetchExistingSessionDetails(sessionId) {
         const session = data.session || {};
         const summary = session.summary_data || session.summary || {};
         
+        updateSymbolMetadataCache(summary?.symbol_metadata || session.symbol_metadata);
         updateActiveSessionInfo({
             status: mapSessionStatusToLabel(session.status),
             totalRecords: summary.total_records ?? session.total_records ?? activeSessionInfo?.totalRecords ?? 0,
@@ -407,6 +653,7 @@ async function fetchLatestActiveSession() {
         const session = data.session;
         const summary = data.summary || {};
         
+        updateSymbolMetadataCache(summary?.symbol_metadata || session.symbol_metadata);
         currentSessionId = session.id;
         window.currentSessionId = session.id;
         selectedAccount = session.trading_account_id ?? null;
@@ -626,9 +873,10 @@ async function ensureTickersModalConfigLoaded() {
     return loaded;
 }
 
-async function quickAddTicker(symbol, name, currencyCode = 'USD') {
+async function quickAddTicker(symbol, name, currencyCode = 'USD', metadata = null) {
     const trimmedSymbol = symbol?.trim();
-    const trimmedName = name?.trim();
+    const normalizedMetadataName = metadata?.company_name?.trim();
+    const trimmedName = (name ?? normalizedMetadataName)?.trim();
     if (!trimmedSymbol || !trimmedName) {
         showImportUserDataNotification('נא למלא את כל השדות', 'error');
         return;
@@ -638,6 +886,8 @@ async function quickAddTicker(symbol, name, currencyCode = 'USD') {
         const currencies = await loadCurrencyCache();
         const currency = currencies[currencyCode.toUpperCase()];
         const currencyId = currency?.id || 1;
+
+        const remarksHtml = buildRichTextFromMetadata(metadata);
 
         const response = await fetch('/api/tickers', {
             method: 'POST',
@@ -650,6 +900,7 @@ async function quickAddTicker(symbol, name, currencyCode = 'USD') {
                 type: 'stock',
                 currency_id: currencyId,
                 status: 'closed',
+                remarks: remarksHtml || null,
             }),
         });
 
@@ -690,6 +941,13 @@ function ensureTickerSaveHook(retry = 0) {
     }
 
     const wrapped = async function(...args) {
+        try {
+            syncTickerRemarksEditorToField(document.getElementById('tickersModal'));
+        } catch (syncError) {
+            window.Logger?.debug?.('[Import Modal] Failed to sync rich text editor before saving ticker', {
+                error: syncError?.message
+            });
+        }
         const result = await saveFn.apply(this, args);
         if (currentSessionId && result) {
             try {
@@ -848,6 +1106,16 @@ function resetImportModal() {
     detectedDataTypes = [];
     selectedDataTypeKey = null;
     activeSessionInfo = null;
+    clearSymbolMetadataCache();
+    if (window.destroyRichTextEditor) {
+        try {
+            window.destroyRichTextEditor(TICKER_REMARKS_EDITOR_ID);
+        } catch (editorError) {
+            window.Logger?.debug?.('[Import Modal] Failed to destroy ticker remarks editor during reset', {
+                error: editorError?.message
+            });
+        }
+    }
     
     // Reset form elements
     const fileInput = document.getElementById('fileInput');
@@ -2050,6 +2318,7 @@ function analyzeFile() {
             currentSessionId = data.session_id;
             window.currentSessionId = data.session_id; // Make it global
             analysisResults = data.analysis_results;
+            updateSymbolMetadataCache(data.analysis_results?.symbol_metadata);
             
             updateActiveSessionInfo({
                 status: 'ניתוח הושלם',
@@ -2089,6 +2358,7 @@ function displayAnalysisResults(results) {
     window.Logger.debug('[Import Modal] Displaying analysis results', { results, page: 'import-user-data' });
     
     try {
+        updateSymbolMetadataCache(results?.symbol_metadata);
         // Update the analysis cards
         const totalRecords = document.getElementById('totalRecords');
         const validRecords = document.getElementById('validRecords');
@@ -2914,18 +3184,28 @@ async function openAddTickerModal(symbol, currency = 'USD') {
             await showModal('tickersModal', 'add');
 
             const modalElement = document.getElementById('tickersModal');
-            if (modalElement) {
+    const metadata = getSymbolMetadata(normalizedSymbol);
+
+    if (modalElement) {
                 const symbolInput = modalElement.querySelector('#tickerSymbol');
                 const nameInput = modalElement.querySelector('#tickerName');
                 const typeSelect = modalElement.querySelector('#tickerType');
                 const currencySelect = modalElement.querySelector('#tickerCurrency');
                 const remarksField = modalElement.querySelector('#tickerRemarks');
+                const externalDataResult = modalElement.querySelector('#tickerExternalDataResult');
+                const externalDataWarning = modalElement.querySelector('#tickerExternalDataWarning');
+
+                const remarksHtml = buildRichTextFromMetadata(metadata);
 
                 if (symbolInput) {
                     setInputValue(symbolInput, normalizedSymbol);
                 }
-                if (nameInput && !nameInput.value) {
-                    setInputValue(nameInput, normalizedSymbol);
+                if (nameInput) {
+                    if (metadata?.company_name) {
+                        setInputValue(nameInput, metadata.company_name);
+                    } else if (!nameInput.value) {
+                        setInputValue(nameInput, normalizedSymbol);
+                    }
                 }
                 if (typeSelect) {
                     setSelectValue(typeSelect, 'stock');
@@ -2934,19 +3214,45 @@ async function openAddTickerModal(symbol, currency = 'USD') {
                     await setCurrencySelectValue(currencySelect, normalizedCurrency);
                 }
                 if (remarksField) {
-                    remarksField.value = '';
+                    remarksField.value = remarksHtml || '';
+                }
+
+                const editorId = ensureRichTextEditorForTickerRemarks(modalElement);
+                if (editorId && typeof window.setRichTextContent === 'function') {
+                    window.setRichTextContent(editorId, remarksHtml || '');
+                }
+
+                if (externalDataResult) {
+                    const summaryHtml = renderMetadataSummaryBlock(metadata);
+                    if (summaryHtml) {
+                        externalDataResult.innerHTML = summaryHtml;
+                        externalDataResult.style.display = 'block';
+                    } else {
+                        externalDataResult.innerHTML = '';
+                        externalDataResult.style.display = 'none';
+                    }
+                }
+
+                if (externalDataWarning && metadata) {
+                    externalDataWarning.style.display = 'none';
+                    externalDataWarning.innerHTML = '';
                 }
             }
-        return;
+            return;
         } catch (error) {
             window.Logger?.error('[Import Modal] Failed to open tickers modal via ModalManager', { error: error.message });
             showImportUserDataNotification('שגיאה בפתיחת מודול הטיקר', 'error');
         }
     }
 
-    const fallbackName = prompt(`הזן שם לטיקר ${normalizedSymbol}:`, normalizedSymbol);
-    if (fallbackName) {
-        await quickAddTicker(normalizedSymbol, fallbackName, normalizedCurrency);
+    const fallbackName = prompt(`הזן שם לטיקר ${normalizedSymbol}:`, metadata?.company_name || normalizedSymbol);
+    if (fallbackName || metadata?.company_name) {
+        await quickAddTicker(
+            normalizedSymbol,
+            fallbackName || metadata?.company_name || normalizedSymbol,
+            normalizedCurrency,
+            metadata
+        );
     }
 }
 
@@ -2987,6 +3293,7 @@ function displayPreview(data) {
     const container = document.getElementById('previewContainer');
     if (!container) return;
     
+    updateSymbolMetadataCache(data?.symbol_metadata);
     container.innerHTML = `
         <div class="preview-data">
             <h5>תצוגה מקדימה</h5>
@@ -3365,7 +3672,7 @@ function resolveImportNotificationDelegate() {
 
     if (window.NotificationSystem?.show && window.NotificationSystem.show !== showImportUserDataNotification) {
         return window.NotificationSystem.show.bind(window.NotificationSystem);
-    }
+        }
 
     return null;
 }
@@ -3426,6 +3733,7 @@ function displayProblemResolutionDetailed(data) {
     
     // Clear existing content
     clearProblemSections();
+    updateSymbolMetadataCache(data?.symbol_metadata || data?.summary?.symbol_metadata);
     
     // Display missing tickers
     if (data.summary?.missing_tickers && data.summary.missing_tickers.length > 0) {
@@ -3527,6 +3835,20 @@ function displayExistingRecords(existingRecords) {
 function renderMissingTickerCard(ticker) {
     const symbol = typeof ticker === 'string' ? ticker : ticker.symbol;
     const currency = typeof ticker === 'string' ? 'USD' : ticker.currency;
+    const metadata = getSymbolMetadata(symbol);
+    const metadataSummary = metadata
+        ? `
+            <div class="missing-ticker-metadata">
+                ${metadata.company_name ? `<div class="missing-ticker-company"><i class="bi bi-building"></i> ${escapeHtml(metadata.company_name)}</div>` : ''}
+                ${buildMetadataLinksList(metadata, {
+                    containerClass: 'missing-ticker-links',
+                    listClass: 'missing-ticker-links-list',
+                    statusClass: 'missing-ticker-links-status',
+                    showStatus: true
+                })}
+            </div>
+        `
+        : '';
     
     return `
         <div class="problem-card missing-ticker-card">
@@ -3539,6 +3861,7 @@ function renderMissingTickerCard(ticker) {
                     <i class="bi bi-info-circle"></i>
                     הטיקר ${symbol} לא קיים במערכת
                 </div>
+                ${metadataSummary}
             </div>
             <div class="problem-card-actions">
                 <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${symbol}', '${currency}')">
@@ -3625,6 +3948,7 @@ function refreshPreviewData() {
     .then(data => {
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
+            updateSymbolMetadataCache(data.preview_data?.symbol_metadata || data.preview_data?.summary?.symbol_metadata);
             updateActiveSessionFromPreview(data.preview_data);
             // Refresh the current step display
             if (currentStep === 3) {

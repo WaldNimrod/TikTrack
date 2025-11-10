@@ -22,6 +22,9 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 from .base_connector import BaseConnector
 from services.date_normalization_service import DateNormalizationService
+from config.logging import get_logger
+
+logger = get_logger(__name__)
 
 class IBKRConnector(BaseConnector):
     """
@@ -30,7 +33,10 @@ class IBKRConnector(BaseConnector):
     This connector handles the complex IBKR CSV format and extracts
     trading data from the Trades section of the statement.
     """
-    
+    def __init__(self):
+        super().__init__()
+        self._last_symbol_metadata_entries: List[Dict[str, Any]] = []
+
     def identify_file(self, file_content: str, file_name: str) -> bool:
         """
         Identifies if the given file content and name match the IBKR Activity Statement format.
@@ -101,6 +107,7 @@ class IBKRConnector(BaseConnector):
                 return []
             
             lines = file_content.strip().split('\n')
+            self._last_symbol_metadata_entries = self._parse_symbol_metadata(lines)
             
             # Find the Trades section
             trades_start = None
@@ -156,6 +163,22 @@ class IBKRConnector(BaseConnector):
             raise ValueError(f"Failed to parse IBKR file: {str(e)}")
         
         return records
+
+    def extract_symbol_metadata(
+        self,
+        file_content: str,
+        raw_records: Optional[List[Dict[str, Any]]] = None
+    ) -> List[Dict[str, Any]]:
+        if not self._last_symbol_metadata_entries and file_content:
+            try:
+                lines = file_content.strip().split('\n')
+                self._last_symbol_metadata_entries = self._parse_symbol_metadata(lines)
+            except Exception as parse_error:
+                # Log and continue with empty metadata
+                logger.warning("Failed to parse IBKR symbol metadata: %s", parse_error)
+                self._last_symbol_metadata_entries = []
+
+        return list(self._last_symbol_metadata_entries)
     
     def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -424,3 +447,83 @@ class IBKRConnector(BaseConnector):
             pass
         
         return account_info
+
+    def _parse_symbol_metadata(self, lines: List[str]) -> List[Dict[str, Any]]:
+        entries: Dict[str, Dict[str, Any]] = {}
+
+        for line in lines:
+            if not line.startswith('Net Stock Position Summary,Data'):
+                continue
+
+            try:
+                values = next(csv.reader(io.StringIO(line)))
+            except Exception:
+                continue
+
+            if len(values) < 6:
+                continue
+
+            currency = values[3].strip()
+            symbol = values[4].strip()
+            company_name = values[5].strip()
+
+            if not symbol:
+                continue
+
+            normalized_symbol = symbol.upper()
+            entry = entries.setdefault(normalized_symbol, {
+                'symbol': normalized_symbol,
+                'display_symbol': symbol,
+                'source': 'ibkr_net_stock_position_summary',
+                'sources': ['ibkr_net_stock_position_summary']
+            })
+
+            if company_name:
+                entry.setdefault('company_name', company_name)
+            if currency:
+                entry.setdefault('currency', currency)
+
+        for line in lines:
+            if not line.startswith('Financial Instrument Information,Data'):
+                continue
+
+            try:
+                values = next(csv.reader(io.StringIO(line)))
+            except Exception:
+                continue
+
+            if len(values) < 9:
+                continue
+
+            symbol = values[3].strip() or values[7].strip()
+            if not symbol:
+                continue
+
+            normalized_symbol = symbol.upper()
+            entry = entries.setdefault(normalized_symbol, {
+                'symbol': normalized_symbol,
+                'display_symbol': symbol,
+                'source': 'ibkr_financial_instrument_information',
+                'sources': ['ibkr_financial_instrument_information']
+            })
+
+            company_name = values[4].strip()
+            exchange_code = values[8].strip()
+
+            if company_name and not entry.get('company_name'):
+                entry['company_name'] = company_name
+            if exchange_code:
+                entry['exchange_code'] = exchange_code
+
+            sources = set(entry.get('sources', []))
+            sources.add('ibkr_financial_instrument_information')
+            entry['sources'] = sorted(sources)
+
+        # Ensure we always return the company name source even when only the first section is parsed
+        for entry in entries.values():
+            sources = set(entry.get('sources', []))
+            if entry.get('source') == 'ibkr_net_stock_position_summary':
+                sources.add('ibkr_net_stock_position_summary')
+            entry['sources'] = sorted(sources) if sources else [entry.get('source', 'connector')]
+
+        return list(entries.values())

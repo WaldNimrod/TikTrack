@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from .normalization_service import NormalizationService
 from .validation_service import ValidationService
 from .duplicate_detection_service import DuplicateDetectionService
+from .symbol_metadata_service import SymbolMetadataService
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ class ImportProcessor:
         self.normalization_service = NormalizationService()
         self.validation_service = ValidationService(db_session)
         self.duplicate_service = DuplicateDetectionService(db_session)
+        self.symbol_metadata_service = SymbolMetadataService(db_session)
     
     def get_cache_key(self, session_id: int, step: str) -> str:
         """
@@ -140,6 +142,18 @@ class ImportProcessor:
                 return parse_results
             
             raw_records = parse_results['data']['raw_records']
+
+            # Step 1b: Collect symbol metadata
+            metadata_results = self._process_step(
+                session_id,
+                'symbol_metadata',
+                lambda: self._extract_symbol_metadata(connector, file_content, raw_records)
+            )
+
+            if not metadata_results['success']:
+                return metadata_results
+
+            symbol_metadata = metadata_results['data']
             
             # Step 2: Normalize records
             normalize_results = self._process_step(
@@ -186,10 +200,12 @@ class ImportProcessor:
                 'duplicate_records': len(duplicate_results['data']['within_file_duplicates']) + 
                                    len(duplicate_results['data']['existing_records']),
                 'missing_tickers': missing_tickers,
+                'symbol_metadata': symbol_metadata,
                 'existing_records': len(duplicate_results['data']['existing_records']),
                 'processing_timestamp': datetime.now().isoformat(),
                 'steps': {
                     'parse': parse_results['data'],
+                    'symbol_metadata': {'metadata': symbol_metadata},
                     'normalize': normalize_results['data'],
                     'validate': validation_results['data'],
                     'duplicates': duplicate_results['data']
@@ -277,6 +293,27 @@ class ImportProcessor:
             }
         except Exception as e:
             raise Exception(f"Record normalization failed: {str(e)}")
+
+    def _extract_symbol_metadata(
+        self,
+        connector,
+        file_content: str,
+        raw_records: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Extract symbol metadata using the shared metadata service."""
+        try:
+            metadata_map = self.symbol_metadata_service.build_metadata_map(
+                connector=connector,
+                file_content=file_content,
+                raw_records=raw_records
+            )
+            return metadata_map
+        except Exception as error:
+            logger.error(
+                "❌ Symbol metadata extraction failed: %s",
+                error
+            )
+            return {}
     
     def _validate_records(self, normalized_records: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Validate normalized records"""
@@ -420,7 +457,8 @@ class ImportProcessor:
                     'missing_tickers': missing_tickers,
                     'duplicate_records': len(within_file_duplicates),
                     'existing_records': len(existing_records)
-                }
+                },
+                'symbol_metadata': final_results.get('symbol_metadata', {})
             }
             
             # Cache preview data

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>ייבוא נתונים - TikTrack</title>
+    
+    <!-- 
+    ===== NEW DATA IMPORT PAGE =====
+    
+    This page follows the unified TikTrack page template:
+    1. Complete ITCSS implementation
+    2. Header system integration
+    3. Unified initialization + package manifest loading order
+    4. Section locking + comments
+    
+    ======================================
+    -->
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
+    <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
+    <script>
+        window.showModalSafe = async function(modalId, mode = 'add') {
+            try {
+                if (!window.ModalManagerV2) {
+                    for (let i = 0; i < 20; i++) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        if (window.ModalManagerV2) {
+                            break;
+                        }
+                    }
+                }
+                
+                if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+                    await window.ModalManagerV2.showModal(modalId, mode);
+                } else if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                }
+            } catch (error) {
+                console.error('❌ [showModalSafe] Error showing modal:', error);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+                }
+            }
+        };
+    </script>
+</head>
+
+<body class="data-import-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Data Import overview - top section -->
+                <div class="top-section" data-section="top">
+                    <!-- Section header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="ייבוא נתונים" class="section-icon">
+                            ייבוא נתונים
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="IMPORT"
+                                    data-variant="full"
+                                    data-onclick="openImportUserDataModal()"
+                                    data-text="📥 הפעלת מודול ייבוא"
+                                    id="openImportModalBtn"
+                                    title="פתיחת מודול ייבוא הנתונים"></button>
+                            <button data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('top')"
+                                    data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <!-- Section body -->
+                    <div class="section-body">
+                        <active-alerts></active-alerts>
+
+                        <div class="info-summary" id="importSummaryStats">
+                            <div>סה"כ תהליכי ייבוא: <strong id="totalImportSessions">0</strong></div>
+                            <div>ייבוא אחרון: <strong id="lastImportTime">לא זמין</strong></div>
+                            <div>סשן פעיל: <strong id="activeImportStatus">אין סשנים פעילים</strong></div>
+                        </div>
+                        <div class="info-summary secondary">
+                            <div>סוגי נתונים זמינים: <strong>ביצועים, תזרימי מזומן, בדיקת חשבון</strong></div>
+                            <div>תהליכים עתידיים: <strong>פורטפוליו, מיסים והפרשי מטבע</strong></div>
+                        </div>
+                    </div>
+                </div> <!-- End top-section -->
+
+                <!-- Import history table - primary section -->
+                <div class="content-section" data-section="import-history" id="importHistorySection">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/executions.svg" alt="היסטוריית ייבוא" class="section-icon">
+                            היסטוריית תהליכי ייבוא
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="REFRESH"
+                                    data-variant="small"
+                                    data-onclick="refreshDataImportHistory()"
+                                    data-text="רענן היסטוריה"
+                                    id="refreshHistoryBtn"></button>
+                            <button data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('import-history')"
+                                    data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <div class="section-body">
+                        <div class="table-responsive" id="importHistoryContainer">
+                            <table class="table table-hover"
+                                   id="importHistoryTable"
+                                   data-table-type="import_history">
+                                <thead>
+                                    <tr>
+                                        <th class="col-session-id">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 0)">מספר סשן <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-account">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 1)">חשבון מסחר <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-provider">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 2)">ספק נתונים <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-file">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 3)">שם קובץ <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-status">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 4)">סטטוס <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-records text-center">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 5)">סה"כ רשומות <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-imported text-center">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 6)">יובאו <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-skipped text-center">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 7)">הושמטו <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-created">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 8)">נוצר בתאריך <span class="sort-icon">↕</span></button>
+                                        </th>
+                                        <th class="col-updated">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('import_history', 9)">עודכן לאחרונה <span class="sort-icon">↕</span></button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="importHistoryTableBody">
+                                    <tr>
+                                        <td colspan="10" class="loading">טוען נתוני ייבוא...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="importHistoryEmptyState" class="empty-state" style="display: none;">
+                            <i class="bi bi-inbox"></i>
+                            <p>עדיין לא בוצעו תהליכי ייבוא. לחץ על "📥 הפעלת מודול ייבוא" כדי להתחיל תהליך חדש.</p>
+                        </div>
+                        <div id="importHistoryErrorState" class="error-state" style="display: none;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <p id="importHistoryErrorMessage">שגיאה בטעינת תהליכי הייבוא. נסה לרענן את הנתונים.</p>
+                        </div>
+                    </div>
+                </div> <!-- End import-history section -->
+            </div> <!-- End main-content -->
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+    
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → VALIDATION → ENTITY-SERVICES → ENTITY-DETAILS → INFO-SUMMARY → INIT-SYSTEM -->
+    <!-- 🎯 Page: data_import | Generated: 2025-11-11 -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/11: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [1] -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <!-- [2] -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    <!-- [3] -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
+    <!-- [4] -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
+    <!-- [5] -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script>
+    <!-- [6] -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- [7] -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <!-- [8] -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script>
+    <!-- [9] -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
+    <!-- [10] -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    <!-- [11] -->
+    <script src="scripts/header-system.js?v=1.0.0"></script>
+    <!-- [12] -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    <!-- [13] -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    <!-- [14] -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script>
+    <!-- [15] -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script>
+    <!-- [16] -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+    <!-- [17] -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/11: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [18] -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <!-- [19] -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <!-- [20] -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <!-- [21] -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
+    <!-- [22] -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
+    <!-- [23] -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
+    <!-- [24] -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script>
+    <!-- [25] -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script>
+    <!-- [26] -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <!-- [27] -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <!-- [28] -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script>
+    <!-- [29] -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/11: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [30] -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
+    <!-- [31] -->
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <!-- [32] -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script>
+    <!-- [33] -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/11: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [34] -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script>
+    <!-- [35] -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script>
+    <!-- [36] -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script>
+    <!-- [37] -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script>
+    <!-- [38] -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script>
+    <!-- [39] -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script>
+    <!-- [40] -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script>
+    <!-- [41] -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script>
+    <!-- [42] -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script>
+    <!-- [43] -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script>
+    <!-- [44] -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script>
+    <!-- [45] -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/11: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [46] -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
+    <!-- [47] -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <!-- [48] -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/11: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [49] -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script>
+    <!-- [50] -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script>
+    <!-- [51] -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script>
+    <!-- [52] -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script>
+    <!-- [53] -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script>
+    <!-- [54] -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/11: VALIDATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [55] -->
+    <script src="scripts/validation-utils.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/11: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [56] -->
+    <script src="scripts/account-service.js?v=1.0.0"></script>
+    <!-- [57] -->
+    <script src="scripts/alert-service.js?v=1.0.0"></script>
+    <!-- [58] -->
+    <script src="scripts/ticker-service.js?v=1.0.0"></script>
+    <!-- [59] -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0"></script>
+    <!-- [60] -->
+    <script src="scripts/condition-translator.js?v=1.0.0"></script>
+    <!-- [61] -->
+    <script src="scripts/constraints.js?v=1.0.0"></script>
+    <!-- [62] -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script>
+    <!-- [63] -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script>
+    <!-- [64] -->
+    <script src="scripts/related-object-filters.js?v=1.0.0"></script>
+    <!-- [65] -->
+    <script src="scripts/account-activity.js?v=1.0.0"></script>
+    <!-- [66] -->
+    <script src="scripts/positions-portfolio.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/11: ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [67] -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script>
+    <!-- [68] -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script>
+    <!-- [69] -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/11: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [70] -->
+    <script src="scripts/info-summary-system.js?v=1.0.0"></script>
+    <!-- [71] -->
+    <script src="scripts/info-summary-configs.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/11: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- [72] -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <!-- [73] -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <!-- [74] -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script>
+    <!-- [75] -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
+    <!-- [76] -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+    <!-- [77] -->
+    <script src="scripts/data_import.js?v=1.0.0"></script>
+</body>
+</html>
+

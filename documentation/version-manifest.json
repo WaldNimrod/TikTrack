@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.0.0.0",
+    "version": "1.0.2.0",
     "major": 1,
     "minor": 0,
-    "patch": 0,
+    "patch": 2,
     "build": 0,
-    "commit": "da1dc88875f8804f9805700e2f444ba56fb5bd72",
-    "updated_at": "2025-11-10T19:16:37+00:00",
-    "notes": "Initial alignment (prod commit da1dc88875f8804f9805700e2f444ba56fb5bd72, main commit d7169b3f225184f9d6c1ccbb1826135e045cb335)"
+    "commit": "8b3f1d8af5fc366fd9af36470254b25be42700d4",
+    "updated_at": "2025-11-10T22:38:05+00:00",
+    "notes": "Add data import page and history dashboard"
   },
   "development": {
-    "version": "1.0.1.0",
+    "version": "1.0.2.0",
     "major": 1,
     "minor": 0,
-    "patch": 1,
+    "patch": 2,
     "build": 0,
-    "commit": "d786779b30821af99c11af9226662fed4b3f2126",
-    "updated_at": "2025-11-10T22:22:45+00:00",
-    "notes": "Synchronize pagination data flows and counters"
+    "commit": "8b3f1d8af5fc366fd9af36470254b25be42700d4",
+    "updated_at": "2025-11-10T22:38:03+00:00",
+    "notes": "Enhance import metadata and UI cleanup"
   }
 }

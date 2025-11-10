@@ -1162,13 +1162,14 @@ async function loadExecutionsData() {
             filters.dateRange,
             filters.search,
           );
-          updateExecutionsTableMain(filteredData);
+          syncExecutionsPagination(executionsData);
+          setExecutionsFilteredDataset(filteredData);
           return;
         }
       }
 
       // עדכון הטבלה
-      updateExecutionsTableMain(executionsData);
+      syncExecutionsPagination(executionsData);
       
       // Register table with UnifiedTableSystem after data is loaded
       if (typeof window.registerExecutionsTables === 'function') {
@@ -1190,43 +1191,143 @@ async function loadExecutionsData() {
 }
 
 /**
- * עדכון טבלת עסקעות
+ * Synchronize executions pagination with dataset
+ * @param {Array} executionsData
  */
-function handleExecutionsPagination(allExecutions) {
-    if (!window.createPagination) {
-        return false;
+function syncExecutionsPagination(executionsData) {
+  try {
+    const tableId = 'executionsTable';
+    const tableType = 'executions';
+
+    if (window.setTableData) {
+      window.setTableData(tableType, executionsData, { tableId });
+      window.setFilteredTableData(tableType, executionsData, { tableId, skipPageReset: true });
     }
 
-    const dataArray = Array.isArray(allExecutions) ? allExecutions : [];
-    window.executionsData = dataArray;
+    const paginationInstance = window.ensureTablePagination
+      ? window.ensureTablePagination(tableId, getExecutionsPaginationOptions())
+      : null;
 
-    if (!executionsPaginationInstance) {
-        executionsPaginationInstance = window.createPagination('executionsTable', {
-            showPageSizeSelector: true,
-            showNavigation: true,
-            onPageChange: (pageData) => {
-                updateExecutionsTableMain(pageData, { skipPagination: true });
-            },
-            onPageSizeChange: () => {
-                if (executionsPaginationInstance) {
-                    const currentPageData = executionsPaginationInstance.getCurrentPageData();
-                    updateExecutionsTableMain(currentPageData, { skipPagination: true });
-                }
-            }
-        });
+    if (paginationInstance) {
+      paginationInstance.setData(executionsData);
+    } else {
+      updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
+      updateExecutionsSummary(executionsData);
+      updateExecutionsCounters(executionsData?.length || 0);
     }
-
-    executionsPaginationInstance.setData(dataArray);
-    const currentPageData = executionsPaginationInstance.getCurrentPageData();
-    updateExecutionsTableMain(currentPageData, { skipPagination: true });
-    return true;
+  } catch (error) {
+    window.Logger?.error('syncExecutionsPagination failed', { error });
+    updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
+    updateExecutionsSummary(executionsData);
+    updateExecutionsCounters(executionsData?.length || 0);
+  }
 }
 
-async function updateExecutionsTableMain(executions, options = {}) {
-  if (!options.skipPagination) {
-    if (handleExecutionsPagination(executions)) {
+function setExecutionsFilteredDataset(filteredExecutions) {
+  try {
+    const tableId = 'executionsTable';
+    const tableType = 'executions';
+
+    if (window.setFilteredTableData) {
+      window.setFilteredTableData(tableType, filteredExecutions, { tableId });
+    }
+
+    const paginationInstance = window.ensureTablePagination
+      ? window.ensureTablePagination(tableId, getExecutionsPaginationOptions())
+      : null;
+
+    if (paginationInstance) {
+      paginationInstance.setData(filteredExecutions);
+    } else {
+      updateExecutionsTableMain(filteredExecutions, { skipCounters: true, skipSummary: true, internal: true });
+      updateExecutionsSummary(filteredExecutions);
+      updateExecutionsCounters(filteredExecutions?.length || 0);
+    }
+  } catch (error) {
+    window.Logger?.error('setExecutionsFilteredDataset failed', { error });
+    updateExecutionsTableMain(filteredExecutions || [], { skipCounters: true, skipSummary: true, internal: true });
+    updateExecutionsSummary(filteredExecutions);
+    updateExecutionsCounters(filteredExecutions?.length || 0);
+  }
+}
+
+function getExecutionsPaginationOptions() {
+  return {
+    tableType: 'executions',
+    onAfterRender: handleExecutionsPageRender,
+    onFilteredDataChange: handleExecutionsFilteredChange,
+  };
+}
+
+function handleExecutionsPageRender({ pageData, pagination }) {
+  updateExecutionsTableMain(pageData, { skipCounters: true, skipSummary: true, internal: true });
+  if (window.setPageTableData) {
+    window.setPageTableData('executions', pageData, {
+      tableId: 'executionsTable',
+      pageInfo: pagination,
+    });
+  }
+  updateExecutionsCounters();
+}
+
+function handleExecutionsFilteredChange({ filteredData }) {
+  updateExecutionsSummary(filteredData);
+  updateExecutionsCounters(filteredData?.length || 0);
+}
+
+function applyExecutionsFilteredData(data) {
+  filteredExecutions = Array.isArray(data) ? data : [];
+  setExecutionsFilteredDataset(filteredExecutions);
+}
+
+function updateExecutionsSummary(filteredDataOverride = null) {
+  try {
+    const filteredData = filteredDataOverride
+      || (window.getFilteredTableData ? window.getFilteredTableData('executions', { asReference: true }) : window.executionsData);
+
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
+      const config = window.INFO_SUMMARY_CONFIGS.executions;
+      if (config) {
+        window.InfoSummarySystem.calculateAndRender(filteredData || [], config);
+      }
+    } else if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('executions', filteredData || window.executionsData);
+    }
+  } catch (error) {
+    window.Logger?.warn('updateExecutionsSummary failed', { error });
+  }
+}
+
+function updateExecutionsCounters(filteredCountOverride = null) {
+  try {
+    const countElement = document.querySelector('.table-count');
+    if (!countElement) {
       return;
     }
+
+    let filteredCount = filteredCountOverride;
+    if (filteredCount === null || typeof filteredCount === 'undefined') {
+      if (window.getTableDataCounts) {
+        const counts = window.getTableDataCounts('executions');
+        filteredCount = counts.filtered;
+      } else {
+        filteredCount = window.executionsData?.length || 0;
+      }
+    }
+
+    countElement.textContent = `${filteredCount} עסקעות`;
+  } catch (error) {
+    window.Logger?.warn('updateExecutionsCounters failed', { error });
+  }
+}
+
+/**
+ * עדכון טבלת עסקעות
+ */
+async function updateExecutionsTableMain(executions, options = {}) {
+  if (!options.internal) {
+    setExecutionsFilteredDataset(executions);
+    return;
   }
 
   executions = Array.isArray(executions) ? executions : [];
@@ -1497,14 +1598,13 @@ async function updateExecutionsTableMain(executions, options = {}) {
     }, 100); // קצת delay כדי שהטבלה תיטען
   }
 
-  // עדכון הספירה
-  const countElement = document.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${executions.length} עסקעות`;
+  if (!options.skipCounters) {
+    updateExecutionsCounters();
   }
 
-  // עדכון ה-info-summary
-  updateExecutionsSummary(executions);
+  if (!options.skipSummary) {
+    updateExecutionsSummary();
+  }
 
   // Table update completed successfully
   // === END UPDATE EXECUTIONS TABLE ===
@@ -1783,6 +1883,17 @@ window.initializeExecutionsPage = async function() {
   
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
+
+  // אתחול ממשק יצירת טרייד מאשכול ביצועים
+  if (window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
+    window.PendingExecutionTradeCreation.initializeExecutionsSection({
+      containerId: 'executionTradeCreationClustersContainer',
+      countElementId: 'executionTradeCreationClustersCount',
+      loadingElementId: 'executionTradeCreationClustersLoading',
+      emptyStateId: 'executionTradeCreationClustersEmpty',
+      errorElementId: 'executionTradeCreationClustersError'
+    });
+  }
 
   // שחזור מצב הסגירה - handled by global toggleSection system
 
@@ -2840,8 +2951,7 @@ function setupExecutionsFilterFunctions() {
     // רישום הפונקציות הגלובליות למערכת הפילטרים
     window.executionsFilterFunctions = {
       updateTable(filteredData) {
-        updateExecutionsTableMain(filteredData);
-        updateExecutionsSummary(filteredData);
+        applyExecutionsFilteredData(filteredData);
       },
     };
   }
@@ -2857,8 +2967,7 @@ function setupExecutionsFilterFunctions() {
     if (namesArray.length === 0 || namesArray.includes('all') || namesArray.includes('הכול')) {
       filteredExecutions = [...originalExecutions];
       // Showing all executions
-      updateExecutionsTableMain(filteredExecutions);
-      updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
       // Filtered to executions
       return;
     }
@@ -2880,16 +2989,14 @@ function setupExecutionsFilterFunctions() {
           handleApiError(error, 'טריידים לפילטר חשבון מסחר');
           // Fallback - הצגת כל הביצועים
           filteredExecutions = [...allExecutions];
-          updateExecutionsTableMain(filteredExecutions);
-          updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
         });
     }
     } catch (error) {
       console.error('filterExecutionsByAccount failed:', error);
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
-      updateExecutionsTableMain(filteredExecutions);
-      updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
     }
   };
 
@@ -2914,8 +3021,7 @@ function setupExecutionsFilterFunctions() {
     });
 
     // Filtered executions count
-    updateExecutionsTableMain(filteredExecutions);
-    updateExecutionsSummary(filteredExecutions);
+    applyExecutionsFilteredData(filteredExecutions);
     // Filtered to executions
   }
 
@@ -2941,15 +3047,14 @@ function setupExecutionsFilterFunctions() {
       );
     }
 
-    updateExecutionsTableMain(filteredExecutions);
+    applyExecutionsFilteredData(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
     // Search results
     } catch (error) {
       console.error('searchExecutions failed:', error);
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
-      updateExecutionsTableMain(filteredExecutions);
-      updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
     }
   };
 
@@ -2973,15 +3078,14 @@ function setupExecutionsFilterFunctions() {
       });
     }
 
-    updateExecutionsTableMain(filteredExecutions);
+    applyExecutionsFilteredData(filteredExecutions);
     updateExecutionsSummary(filteredExecutions);
     // Filtered by type
     } catch (error) {
       console.error('filterExecutionsByType failed:', error);
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
-      updateExecutionsTableMain(filteredExecutions);
-      updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
     }
   };
 
@@ -3025,15 +3129,13 @@ function setupExecutionsFilterFunctions() {
       });
     }
 
-    updateExecutionsTableMain(filteredExecutions);
-    updateExecutionsSummary(filteredExecutions);
+    applyExecutionsFilteredData(filteredExecutions);
     // Filtered by date
     } catch (error) {
       console.error('filterExecutionsByDate failed:', error);
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
-      updateExecutionsTableMain(filteredExecutions);
-      updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
     }
   };
 
@@ -3042,15 +3144,13 @@ function setupExecutionsFilterFunctions() {
     try {
     // Resetting executions filters
     filteredExecutions = [...originalExecutions];
-    updateExecutionsTableMain(filteredExecutions);
-    updateExecutionsSummary(filteredExecutions);
+    applyExecutionsFilteredData(filteredExecutions);
     // Filters reset, showing all executions
     } catch (error) {
       console.error('resetExecutionsFilters failed:', error);
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
-      updateExecutionsTableMain(filteredExecutions);
-      updateExecutionsSummary(filteredExecutions);
+      applyExecutionsFilteredData(filteredExecutions);
     }
   };
 
@@ -3707,7 +3807,6 @@ window.registerExecutionsTables = function() {
 let tradeSuggestionsData = {};
 let tradeSuggestionsFlatList = [];
 let tradeSuggestionsPaginationInstance = null;
-let executionsPaginationInstance = null;
 
 /**
  * Load trade suggestions for all pending executions

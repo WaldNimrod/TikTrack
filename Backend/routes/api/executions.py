@@ -283,6 +283,34 @@ def get_pending_assignment_highlights():
         error_payload = BaseEntityUtils.create_error_payload(normalizer, str(e))
         return jsonify(error_payload), 500
 
+
+@executions_bp.route('/pending-assignment/trade-creation-clusters', methods=['GET'])
+@handle_database_session()
+def get_pending_assignment_trade_creation_clusters():
+    """Get execution clusters suited for creating new trades."""
+    normalizer = None
+    try:
+        db: Session = g.db
+        normalizer = _get_date_normalizer()
+
+        items_limit = request.args.get('limit', default=None, type=int)
+
+        clusters = ExecutionTradeMatchingService.get_execution_trade_creation_clusters(
+            db,
+            max_items=items_limit
+        )
+
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=clusters,
+            extra={"count": len(clusters)}
+        )
+        return jsonify(payload), 200
+    except Exception as e:
+        logger.error(f"Error getting trade creation clusters: {str(e)}")
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, str(e))
+        return jsonify(error_payload), 500
+
 @executions_bp.route('/<int:execution_id>/suggest-trades', methods=['GET'])
 @handle_database_session()
 def suggest_trades_for_execution(execution_id: int):

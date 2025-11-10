@@ -722,7 +722,7 @@ def allow_existing_record(session_id):
             # Save updated preview
             session.preview_data = _utc_storage_normalizer.normalize_output(preview_data)
             db.session.commit()
-
+        
         projected_preview = _project_storage_payload(preview_data)
         return jsonify({'status': 'success', 'preview_data': projected_preview})
         

@@ -638,7 +638,7 @@ function resolveFieldId(candidateIds, fallbackId) {
 
 /**
  * שמירת טיקר חדש
- *
+ * 
  * Note: updated_at field is NOT set during creation - it's reserved for future pricing system updates
  */
 /**

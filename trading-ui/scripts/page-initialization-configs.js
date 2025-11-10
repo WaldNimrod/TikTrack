@@ -501,6 +501,37 @@ const PAGE_CONFIGS = {
         ]
     },
     
+    'data_import': {
+        name: 'Data Import',
+        
+        // 📦 Required packages for the Data Import dashboard
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
+        
+        requiredGlobals: [
+            'NotificationSystem',
+            'window.Logger',
+            'window.ModalManagerV2',
+            'window.initializeDataImportPage',
+            'window.refreshDataImportHistory',
+            'window.showImportUserDataNotification'
+        ],
+        
+        description: 'דף מרכזי לניהול תהליכי ייבוא נתונים ושיגור המודול המאוחד',
+        lastModified: '2025-11-11',
+        pageType: 'crud',
+        
+        requiresFilters: false,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async () => {
+                if (typeof window.initializeDataImportPage === 'function') {
+                    await window.initializeDataImportPage();
+                }
+            }
+        ]
+    },
+    
     'trade_plans': {
         name: 'Trade Plans',
         

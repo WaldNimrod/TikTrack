@@ -208,6 +208,30 @@
                         </div>
                     </div>
                 </div>
+
+            <!-- Trade creation clusters section -->
+            <div class="content-section" id="tradeCreationClustersSection" data-section="trade-creation">
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/trades.svg" alt="יצירת טרייד מהביצועים" class="section-icon">
+                        יצירת טריידים מאשכול ביצועים
+                    </div>
+                    <div class="table-count" id="executionTradeCreationClustersCount">0</div>
+                    <div class="table-actions">
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('trade-creation')" data-text="הצג/הסתר"></button>
+                    </div>
+                </div>
+                <div class="section-body d-flex flex-column gap-3">
+                    <div id="executionTradeCreationClustersLoading" class="d-flex align-items-center text-muted small d-none">
+                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                        <span>טוען אשכולות ליצירת טרייד...</span>
+                    </div>
+                    <div id="executionTradeCreationClustersError" class="alert alert-danger d-none" role="alert"></div>
+                    <div id="executionTradeCreationClustersEmpty" class="alert alert-success d-none" role="status">
+                        אין כרגע ביצועים זמינים ליצירת טרייד חדש.
+                    </div>
+                    <div id="executionTradeCreationClustersContainer" class="d-flex flex-column gap-3"></div>
+                </div>
             </div>
 
             <!-- UI Content Section 2 Start-->
@@ -739,6 +763,7 @@
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
     <!-- [39] Load Order: 39 -->
     <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <script src="scripts/pending-execution-trade-creation.js?v=1.0.0"></script> <!-- יצירת טרייד מאשכול ביצועים -->
     <!-- [40] Load Order: 40 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [41] Load Order: 41 -->

@@ -33,6 +33,9 @@ class QuoteData:
     currency: str = 'USD'
     asof_utc: Optional[datetime] = None
     source: str = 'yahoo_finance'
+    long_name: Optional[str] = None
+    exchange_name: Optional[str] = None
+    exchange_code: Optional[str] = None
 
 @dataclass
 class IntradayData:
@@ -86,7 +89,29 @@ class YahooFinanceAdapter:
         
         # Market timezone - always New York (NYSE)
         self.market_timezone = pytz.timezone('America/New_York')
-    
+
+    def _normalize_symbol(self, symbol: Optional[str]) -> Optional[str]:
+        """Normalize incoming symbols to a safe canonical representation"""
+        if symbol is None:
+            return None
+
+        normalized = symbol.strip().upper()
+        return normalized or None
+
+    def _is_symbol_valid(self, symbol: Optional[str]) -> bool:
+        """Validate symbol format before hitting the provider"""
+        if not symbol:
+            return False
+
+        allowed_extra_chars = {'.', '-', '_', '/'}
+        for char in symbol:
+            if char.isalnum():
+                continue
+            if char in allowed_extra_chars:
+                continue
+            return False
+        return True
+
     def _load_provider_config(self):
         """Load provider configuration from database"""
         try:
@@ -341,6 +366,12 @@ class YahooFinanceAdapter:
     def get_quote(self, symbol: str) -> Optional[QuoteData]:
         """Get single quote for a symbol"""
         try:
+            normalized_symbol = self._normalize_symbol(symbol)
+            if not self._is_symbol_valid(normalized_symbol):
+                logger.error(f"Invalid symbol supplied for quote fetch: '{symbol}'")
+                return None
+            symbol = normalized_symbol
+
             # Check cache first
             cached_quote = self._get_cached_quote(symbol)
             if cached_quote and not self._is_stale(cached_quote):
@@ -375,17 +406,29 @@ class YahooFinanceAdapter:
         """Get quotes for multiple symbols in batches"""
         if not symbols:
             return []
+
+        sanitized_symbols: List[str] = []
+        for raw_symbol in symbols:
+            normalized_symbol = self._normalize_symbol(raw_symbol)
+            if not self._is_symbol_valid(normalized_symbol):
+                logger.warning(f"Skipping invalid symbol during batch fetch: '{raw_symbol}'")
+                continue
+            sanitized_symbols.append(normalized_symbol)
+
+        if not sanitized_symbols:
+            logger.warning("No valid symbols supplied for batch quote fetch")
+            return []
         
         all_quotes = []
         start_time = datetime.now(timezone.utc)
         
         # Split into batches
         batches = [
-            symbols[i:i + self.preferred_batch_size] 
-            for i in range(0, len(symbols), self.preferred_batch_size)
+            sanitized_symbols[i:i + self.preferred_batch_size]
+            for i in range(0, len(sanitized_symbols), self.preferred_batch_size)
         ]
         
-        logger.info(f"Processing {len(symbols)} symbols in {len(batches)} batches")
+        logger.info(f"Processing {len(sanitized_symbols)} symbols in {len(batches)} batches")
         
         for batch_num, batch_symbols in enumerate(batches, 1):
             try:
@@ -420,13 +463,13 @@ class YahooFinanceAdapter:
         duration_ms = int((end_time - start_time).total_seconds() * 1000)
         
         self._log_refresh_operation(
-            symbols_requested=len(symbols),
+            symbols_requested=len(sanitized_symbols),
             symbols_successful=len(all_quotes),
-            symbols_failed=len(symbols) - len(all_quotes),
+            symbols_failed=len(sanitized_symbols) - len(all_quotes),
             start_time=start_time,
             end_time=end_time,
             total_duration_ms=duration_ms,
-            status='success' if len(all_quotes) == len(symbols) else 'partial_success'
+            status='success' if len(all_quotes) == len(sanitized_symbols) else 'partial_success'
         )
         
         # Update provider health and last successful request
@@ -474,7 +517,10 @@ class YahooFinanceAdapter:
                 price=current_price,
                 currency=meta.get('currency', 'USD'),
                 source='yahoo_finance',
-                asof_utc=market_now  # Store market time as reference
+                asof_utc=market_now,  # Store market time as reference
+                long_name=meta.get('longName') or meta.get('shortName'),
+                exchange_name=meta.get('fullExchangeName') or meta.get('exchangeName'),
+                exchange_code=meta.get('exchange') or meta.get('exchangeCode')
             )
             
             # Extract additional data if available
@@ -1061,27 +1107,41 @@ class YahooFinanceAdapter:
         try:
             logger.debug(f"🔄 Updating quotes_last table for ticker {ticker_id}")
             
-            # Use raw SQL to update quotes_last with INSERT OR REPLACE
-            # This ensures we maintain the UNIQUE (ticker_id) constraint as specified
             from sqlalchemy import text
+
+            asof_utc = quote.asof_utc
+            if asof_utc is None:
+                asof_utc = datetime.now(timezone.utc)
+            elif asof_utc.tzinfo is None:
+                asof_utc = asof_utc.replace(tzinfo=timezone.utc)
+
+            fetched_at = datetime.now(timezone.utc)
+
+            provider_name = quote.source or 'yahoo_finance'
+
             self.db_session.execute(
                 text("""
                 INSERT OR REPLACE INTO quotes_last 
-                (ticker_id, price, change_pct_day, change_amount_day, volume, currency, 
-                 asof_utc, fetched_at, source)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (ticker_id, price, change_amount, change_percent, volume, provider, source,
+                 currency, asof_utc, fetched_at, last_updated, is_stale, quality_score)
+                VALUES (:ticker_id, :price, :change_amount, :change_percent, :volume, :provider, :source,
+                        :currency, :asof_utc, :fetched_at, :last_updated, :is_stale, :quality_score)
                 """),
-                (
-                    ticker_id,
-                    quote.price,
-                    quote.change_pct,
-                    quote.change_amount,
-                    quote.volume,
-                    quote.currency,
-                    quote.asof_utc,
-                    datetime.now(timezone.utc),
-                    quote.source
-                )
+                {
+                    "ticker_id": ticker_id,
+                    "price": quote.price,
+                    "change_amount": quote.change_amount,
+                    "change_percent": quote.change_pct,
+                    "volume": quote.volume,
+                    "provider": provider_name,
+                    "source": provider_name,
+                    "currency": quote.currency or 'USD',
+                    "asof_utc": asof_utc,
+                    "fetched_at": fetched_at,
+                    "last_updated": fetched_at,
+                    "is_stale": 0,
+                    "quality_score": 1.0,
+                }
             )
             
             logger.debug(f"✅ Updated quotes_last for ticker {ticker_id}")

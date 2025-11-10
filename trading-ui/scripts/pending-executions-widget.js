@@ -26,10 +26,12 @@
             items: [],
             isLoading: false,
             dismissed: new Set(),
-            autoRefreshTimer: null
+            autoRefreshTimer: null,
+            totalEligibleCount: 0
         },
 
         init() {
+            this.ensureCardExists();
             this.cacheDom();
             if (!this.dom.card) {
                 window.Logger?.warn('⚠️ Pending Executions highlights card not found', { page: 'index' });
@@ -41,6 +43,46 @@
             this.startAutoRefresh();
 
             window.Logger?.info('📊 Pending Executions Highlights widget initialized', { page: 'index' });
+        },
+
+        ensureCardExists() {
+            if (document.querySelector(SELECTORS.card)) {
+                return;
+            }
+
+            const rowContainer = document.querySelector('#main .section-body .row');
+            if (!rowContainer) {
+                window.Logger?.warn('⚠️ Pending Executions highlights container row not found', { page: 'index' });
+                return;
+            }
+
+            const column = document.createElement('div');
+            column.className = 'col-12 col-lg-6 col-xl-4';
+            column.innerHTML = `
+                <div class="card h-100" id="pendingExecutionsHighlightsCard">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/executions.svg" alt="ביצועים" width="20" height="20">
+                            המלצות שיוך בולטות
+                        </h5>
+                        <span class="badge entity-execution" id="pendingExecutionsHighlightsCount">0</span>
+                    </div>
+                    <div class="card-body d-flex flex-column gap-3">
+                        <div id="pendingExecutionsHighlightsLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                            <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                            <span>טוען המלצות...</span>
+                        </div>
+                        <div id="pendingExecutionsHighlightsError" class="alert alert-danger d-none" role="alert"></div>
+                        <div id="pendingExecutionsHighlightsEmpty" class="alert alert-success d-none" role="status">
+                            אין כרגע ביצועים שממתינים לשיוך. המשך עבודה מצוינת!
+                        </div>
+                        <ul class="list-group list-group-flush flex-grow-1" id="pendingExecutionsHighlightsList"></ul>
+                    </div>
+                </div>
+            `;
+
+            rowContainer.prepend(column);
+            window.Logger?.info('🧩 Pending Executions highlights card auto-inserted', { page: 'index' });
         },
 
         cacheDom() {
@@ -100,7 +142,13 @@
                 }
 
                 const data = Array.isArray(payload.data) ? payload.data : [];
+                const totalEligibleCount = data.filter(highlight => {
+                    const bestScore = this.getBestScore(highlight);
+                    return typeof bestScore === 'number' && bestScore >= 50;
+                }).length;
+
                 const filtered = data.filter(item => !this.state.dismissed.has(item.execution_id));
+                this.state.totalEligibleCount = totalEligibleCount;
                 this.state.items = filtered;
 
                 this.render();
@@ -146,7 +194,8 @@
             const suggestions = Array.isArray(item.suggestions) ? item.suggestions : [];
             const primarySuggestion = item.primary_suggestion || suggestions[0] || null;
             const additionalSuggestions = item.additional_suggestions ?? Math.max(suggestions.length - 1, 0);
-            const score = item.best_score ?? (primarySuggestion ? primarySuggestion.score : null);
+            const rawScore = item.best_score ?? (primarySuggestion ? primarySuggestion.score : null);
+            const score = this.normalizeScore(rawScore);
 
             const FieldRenderer = window.FieldRendererService;
 
@@ -163,6 +212,17 @@
             const executionPrice = typeof FieldRenderer?.renderAmount === 'function'
                 ? FieldRenderer.renderAmount(execution.price, '$', 2, false)
                 : (execution.price ? `<span class="text-muted">$${parseFloat(execution.price).toFixed(2)}</span>` : '<span class="text-muted">-</span>');
+            const executionFee = typeof FieldRenderer?.renderAmount === 'function'
+                ? FieldRenderer.renderAmount(execution.fee, '$', 2, false)
+                : (execution.fee ? `<span class="text-muted">$${parseFloat(execution.fee).toFixed(2)}</span>` : '');
+            const executionRealized = typeof FieldRenderer?.renderAmount === 'function'
+                ? FieldRenderer.renderAmount(execution.realized_pl, '$', 2, true)
+                : (execution.realized_pl ? `<span class="text-muted">$${parseFloat(execution.realized_pl).toFixed(2)}</span>` : '');
+            const executionSource = execution.source ? `<span class="badge bg-body-secondary text-body">${execution.source}</span>` : '';
+            const executionExternalId = execution.external_id ? `<span class="text-muted small">${execution.external_id}</span>` : '';
+            const executionNotes = execution.notes && typeof FieldRenderer?.renderTextPreview === 'function'
+                ? FieldRenderer.renderTextPreview(execution.notes, { maxLength: 80, tooltip: true, className: 'text-muted small' })
+                : (execution.notes ? `<span class="text-muted small">${execution.notes}</span>` : '');
             const actionLower = (execution.action || '').toString().toLowerCase();
             const isBuyAction = actionLower === 'buy' || actionLower === 'קניה' || actionLower === 'קנייה';
             const actionDirectionBadge = execution.action
@@ -216,6 +276,21 @@
             const tradeDate = primarySuggestion && FieldRenderer?.renderDateShort
                 ? FieldRenderer.renderDateShort(primarySuggestion.created_at)
                 : (primarySuggestion && FieldRenderer?.renderDate ? FieldRenderer.renderDate(primarySuggestion.created_at, false) : (primarySuggestion?.created_at || '-'));
+            const tradeClosedDate = primarySuggestion && FieldRenderer?.renderDateShort
+                ? FieldRenderer.renderDateShort(primarySuggestion.closed_at)
+                : (primarySuggestion && FieldRenderer?.renderDate ? FieldRenderer.renderDate(primarySuggestion.closed_at, false) : (primarySuggestion?.closed_at || ''));
+            const tradeMatchReasons = Array.isArray(primarySuggestion?.match_reasons) ? primarySuggestion.match_reasons : [];
+            const matchReasonsHtml = tradeMatchReasons.length
+                ? `<ul class="list-unstyled mb-0 text-muted small">${tradeMatchReasons.map(reason => `<li class="d-flex align-items-center gap-1"><span class="badge bg-light text-body-secondary">•</span>${reason}</li>`).join('')}</ul>`
+                : '';
+            const secondarySuggestions = suggestions.slice(1, 4);
+            const secondarySuggestionsHtml = secondarySuggestions.length
+                ? `<div class="text-muted small">הצעות נוספות:</div><ul class="list-unstyled mb-0 text-muted small">${secondarySuggestions.map(item => {
+                        const itemScore = this.normalizeScore(item?.score);
+                        const itemDate = FieldRenderer?.renderDateShort ? FieldRenderer.renderDateShort(item?.created_at) : (item?.created_at || '-');
+                        return `<li class="d-flex align-items-center gap-1"><span class="badge bg-body-secondary text-body">${itemScore ?? '-'}</span><span>#${item?.trade_id || '-'}</span><span class="text-muted">${itemDate}</span></li>`;
+                    }).join('')}</ul>`
+                : '';
 
             const scoreTooltip = 'טיקר תואם • חשבון מסחר תואם • תאריך בטווח הטרייד';
             const scoreBadge = typeof score === 'number'
@@ -241,7 +316,7 @@
                                     data-variant="small"
                                     data-classes="btn btn-sm btn-outline-success table-btn-small"
                                     data-text="אשר שיוך"
-                                    data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'})"
+                                    data-onclick="PendingExecutionsHighlights.acceptSuggestion(${execution.id}, ${primarySuggestion?.trade_id || 'null'}, ${typeof score === 'number' ? score : 'null'})"
                                     ${primarySuggestion ? '' : 'disabled'}
                                 ></button>
                                 <button
@@ -249,7 +324,7 @@
                                     data-variant="small"
                                     data-classes="btn btn-sm btn-outline-danger table-btn-small"
                                     data-text="דחה"
-                                    data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id})"
+                                    data-onclick="PendingExecutionsHighlights.rejectSuggestion(${execution.id}, ${typeof score === 'number' ? score : 'null'})"
                                 ></button>
                             </div>
                         </div>
@@ -271,9 +346,14 @@
                             ${quantityDisplay}
                             ${executionPrice}
                         </div>
-                        <div class="text-muted small">
-                            ${executionDate}
+                        <div class="text-muted small d-flex flex-wrap gap-2 align-items-center">
+                            <span>${executionDate}</span>
+                            ${executionSource ? `<span>${executionSource}</span>` : ''}
                         </div>
+                        ${executionFee ? `<div class="text-muted small">עמלה: ${executionFee}</div>` : ''}
+                        ${executionRealized ? `<div class="text-muted small">רווח/הפסד: ${executionRealized}</div>` : ''}
+                        ${executionExternalId ? `<div class="text-muted small">מזהה חיצוני: ${executionExternalId}</div>` : ''}
+                        ${executionNotes ? `<div class="text-muted small">הערות: ${executionNotes}</div>` : ''}
                     </div>
                 </div>
             `;
@@ -292,9 +372,12 @@
                                 ${tradeSide}
                                 ${investmentType}
                             </div>
-                            <div class="text-muted small">
-                                ${tradeDate}
+                            <div class="text-muted small d-flex flex-wrap gap-2 align-items-center">
+                                <span>נפתח: ${tradeDate}</span>
+                                ${tradeClosedDate ? `<span>נסגר: ${tradeClosedDate}</span>` : ''}
                             </div>
+                            ${matchReasonsHtml ? `<div class="mt-1">${matchReasonsHtml}</div>` : ''}
+                            ${secondarySuggestionsHtml ? `<div class="mt-2">${secondarySuggestionsHtml}</div>` : ''}
                         </div>
                     </div>
                 `
@@ -310,9 +393,11 @@
             return `
                 <li class="list-group-item pending-highlight-item" ${itemIdAttr}>
                     ${topRow}
-                    <div class="pending-highlight-details row g-2 align-items-stretch">
-                        ${executionDetails}
-                        ${tradeDetails}
+                    <div class="pending-highlight-details">
+                        <div class="row g-2 align-items-stretch">
+                            ${executionDetails}
+                            ${tradeDetails}
+                        </div>
                     </div>
                 </li>
             `;
@@ -325,6 +410,10 @@
 
             const items = this.dom.list.querySelectorAll('.pending-highlight-item');
             items.forEach(item => {
+                if (item.dataset.hoverBound === 'true') {
+                    return;
+                }
+
                 let hideTimer = null;
 
                 const showDetails = () => {
@@ -354,6 +443,8 @@
                         hideDetails();
                     }
                 });
+
+                item.dataset.hoverBound = 'true';
             });
         },
 
@@ -361,7 +452,7 @@
             if (!this.dom.count) {
                 return;
             }
-            const count = this.state.items.length;
+            const count = this.state.totalEligibleCount ?? 0;
             this.dom.count.textContent = count.toString();
             this.dom.count.classList.remove('bg-danger', 'bg-success', 'bg-warning');
             this.dom.count.classList.add(count > 0 ? 'entity-execution' : 'bg-success');
@@ -394,7 +485,7 @@
             }
         },
 
-        async acceptSuggestion(executionId, tradeId) {
+        async acceptSuggestion(executionId, tradeId, score = null) {
             if (!executionId || !tradeId) {
                 window.Logger?.warn('⚠️ Missing execution/trade id for acceptance', { executionId, tradeId }, { page: 'index' });
                 return;
@@ -417,7 +508,9 @@
                     window.showSuccessNotification('שיוך הושלם', `ביצוע #${executionId} שויך לטרייד #${tradeId}`);
                 }
 
-                this.removeExecutionFromState(executionId);
+                this.state.dismissed.add(executionId);
+                this.removeExecutionFromState(executionId, score);
+                await this.delay(250);
                 this.fetchHighlights();
             } catch (error) {
                 window.Logger?.error('❌ Failed to accept highlight suggestion', { error: error?.message, executionId, tradeId }, { page: 'index' });
@@ -427,7 +520,7 @@
             }
         },
 
-        rejectSuggestion(executionId) {
+        rejectSuggestion(executionId, score = null) {
             if (!executionId) {
                 return;
             }
@@ -435,11 +528,15 @@
             window.Logger?.info('🚫 Highlight suggestion dismissed', { executionId }, { page: 'index' });
             this.state.dismissed.add(executionId);
             this.persistDismissedExecutionIds();
-            this.removeExecutionFromState(executionId);
+            this.removeExecutionFromState(executionId, score);
         },
 
-        removeExecutionFromState(executionId) {
+        removeExecutionFromState(executionId, score = null) {
+            const normalizedScore = this.normalizeScore(score);
             this.state.items = this.state.items.filter(item => item.execution_id !== executionId);
+            if (typeof normalizedScore === 'number' && normalizedScore >= 50 && this.state.totalEligibleCount > 0) {
+                this.state.totalEligibleCount = Math.max(0, this.state.totalEligibleCount - 1);
+            }
             this.render();
         },
 
@@ -477,6 +574,36 @@
                 window.clearInterval(this.state.autoRefreshTimer);
                 this.state.autoRefreshTimer = null;
             }
+        },
+
+        getBestScore(highlight) {
+            if (!highlight) {
+                return null;
+            }
+            if (highlight.best_score !== undefined && highlight.best_score !== null) {
+                return this.normalizeScore(highlight.best_score);
+            }
+            const primary = highlight.primary_suggestion;
+            if (primary && primary.score !== undefined && primary.score !== null) {
+                return this.normalizeScore(primary.score);
+            }
+            const suggestions = Array.isArray(highlight.suggestions) ? highlight.suggestions : [];
+            return suggestions.length ? this.normalizeScore(suggestions[0]?.score) : null;
+        },
+
+        delay(ms) {
+            return new Promise(resolve => window.setTimeout(resolve, ms));
+        },
+
+        normalizeScore(value) {
+            if (value === null || value === undefined || value === '') {
+                return null;
+            }
+            if (typeof value === 'number') {
+                return Number.isFinite(value) ? value : null;
+            }
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : null;
         }
     };
 

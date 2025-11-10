@@ -87,6 +87,7 @@ from services.health_service import health_service
 from services.metrics_collector import metrics_collector
 from services.database_optimizer import database_optimizer
 from services.background_tasks import BackgroundTaskManager
+from services.system_settings_service import SystemSettingsService
 from utils.response_optimizer import ResponseOptimizer
 
 # Import External Data Integration components
@@ -284,9 +285,7 @@ if EXTERNAL_DATA_AVAILABLE and DataRefreshScheduler:
     try:
         # Create a database session for the scheduler
         from config.database import SessionLocal
-        from services.system_settings_service import SystemSettingsService
-        db_session = SessionLocal()
-        data_refresh_scheduler = DataRefreshScheduler(db_session)
+        data_refresh_scheduler = DataRefreshScheduler(SessionLocal)
         print("✅ Data Refresh Scheduler initialized successfully")
     except Exception as e:
         print(f"❌ Failed to initialize Data Refresh Scheduler: {e}")
@@ -1266,74 +1265,94 @@ def stop_data_refresh_scheduler() -> Any:
 @rate_limit_api(requests_per_minute=60)
 def refresh_all_external_data() -> Any:
     """Refresh all external data from primary provider"""
-    max_retries = 3
-    retry_delay = 1  # seconds
-    
-    for attempt in range(max_retries):
-        try:
-            # Import the market data service
-            import sys
-            import os
-            external_data_path = os.path.join(os.path.dirname(__file__), '..', 'external_data_integration_server')
-            if external_data_path not in sys.path:
-                sys.path.append(external_data_path)
-            
-            # Use the main database models instead of external_data_integration_server
-            from models.ticker import Ticker
-            from models.external_data import MarketDataQuote, ExternalDataProvider
-            from config.database import get_db
-            
-            # Get database session
-            db_session = next(get_db())
-            
-            # Get all active tickers
-            tickers = db_session.query(Ticker).filter(Ticker.status == 'open').all()
-            
-            results = {
-                'total_tickers': len(tickers),
-                'successful_updates': 0,
-                'failed_updates': 0,
-                'errors': []
-            }
-            
-            # For now, just return a success message since we don't have Yahoo Finance integration working yet
-            logger.info(f"Refresh request received for {len(tickers)} tickers")
-            
-            result = {
-                'message': 'Data refresh endpoint is working - integration with Yahoo Finance pending',
-                'tickers_found': len(tickers),
-                'status': 'pending_integration'
-            }
-            
-            return jsonify({
-                "status": "success",
-                "message": "External data refresh completed",
-                "result": result,
-                "timestamp": datetime.now().isoformat()
-            }), 200
-                
-        except Exception as e:
-            logger.warning(f"Attempt {attempt + 1} failed: {e}")
-            if attempt < max_retries - 1:
-                import time
-                time.sleep(retry_delay)
-                retry_delay *= 2  # Exponential backoff
+    session = None
+    try:
+        from config.database import SessionLocal
+        from models.ticker import Ticker
+        from models.external_data import ExternalDataProvider
+        from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+
+        session = SessionLocal()
+
+        tickers = session.query(Ticker).filter(Ticker.status == 'open').all()
+        requested_symbols: List[str] = []
+        skipped_tickers: List[Dict[str, Any]] = []
+
+        for ticker in tickers:
+            symbol = (ticker.symbol or '').strip()
+            if not symbol:
+                skipped_tickers.append({
+                    'id': ticker.id,
+                    'reason': 'missing_symbol'
+                })
                 continue
-            else:
-                logger.error(f"All {max_retries} attempts failed: {e}")
-                return jsonify({
-                    "status": "error",
-                    "error": str(e),
-                    "timestamp": datetime.now().isoformat()
-                }), 500
-            db_session.close()
-            
-    # If we get here, all retries failed
-    return jsonify({
-        "status": "error",
-        "error": "All retry attempts failed",
-        "timestamp": datetime.now().isoformat()
-    }), 500
+            requested_symbols.append(symbol)
+
+        if not requested_symbols:
+            logger.warning("Manual external data refresh requested but no valid symbols were found")
+            response = {
+                "status": "error",
+                "error": "No open tickers with valid symbols",
+                "skipped": skipped_tickers,
+                "timestamp": datetime.now().isoformat()
+            }
+            return jsonify(response), 400
+
+        provider = session.query(ExternalDataProvider).filter(
+            ExternalDataProvider.name == 'yahoo_finance'
+        ).first()
+
+        if not provider:
+            logger.error("Yahoo Finance provider not configured for manual refresh")
+            return jsonify({
+                "status": "error",
+                "error": "Yahoo Finance provider is not configured",
+                "timestamp": datetime.now().isoformat()
+            }), 500
+
+        adapter = YahooFinanceAdapter(session, provider.id)
+        quotes = adapter.get_quotes_batch(requested_symbols)
+
+        successful_symbols = {quote.symbol for quote in quotes}
+        failed_symbols = sorted(set(requested_symbols) - successful_symbols)
+
+        if successful_symbols:
+            for dependency in ['tickers', 'dashboard', 'external_data']:
+                advanced_cache_service.invalidate_by_dependency(dependency)
+
+        message = "External data refresh completed"
+        status = "success"
+        http_status = 200
+        if failed_symbols:
+            status = "partial_success"
+            message = "External data refresh completed with partial failures"
+            http_status = 207
+
+        return jsonify({
+            "status": status,
+            "message": message,
+            "data": {
+                "requested": len(requested_symbols),
+                "fetched": len(successful_symbols),
+                "failed": len(failed_symbols),
+                "failed_symbols": failed_symbols,
+                "skipped": skipped_tickers
+            },
+            "timestamp": datetime.now().isoformat()
+        }), http_status
+
+    except Exception as e:
+        if session:
+            session.rollback()
+        logger.error(f"Manual external data refresh failed: {e}", exc_info=True)
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+    finally:
+        if session:
+            session.close()
 
 @app.route("/api/external-data/scheduler/status", methods=["GET"])
 @rate_limit_api(requests_per_minute=30)

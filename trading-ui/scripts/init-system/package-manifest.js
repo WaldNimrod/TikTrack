@@ -343,18 +343,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1
       },
       {
+        file: 'table-data-registry.js',
+        globalCheck: 'window.TableDataRegistry',
+        description: 'רישום נתוני טבלאות',
+        required: true,
+        loadOrder: 2
+      },
+      {
         file: 'pagination-system.js',
         globalCheck: 'window.PaginationSystem',
         description: 'מערכת עימוד',
         required: true,
-        loadOrder: 2
+        loadOrder: 3
       },
       {
         file: 'modules/actions-menu-system.js',
         globalCheck: 'window.ActionsMenuSystem',
         description: 'מערכת תפריט פעולות',
         required: true,
-        loadOrder: 3
+        loadOrder: 4
       }
     ],
     estimatedSize: '~80KB',

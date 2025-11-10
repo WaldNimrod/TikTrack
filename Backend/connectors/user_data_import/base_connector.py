@@ -293,3 +293,23 @@ class BaseConnector(ABC):
             'supports_external_id': True,
             'supports_validation': True
         }
+
+    def extract_symbol_metadata(
+        self,
+        file_content: str,
+        raw_records: Optional[List[Dict[str, Any]]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Optional hook for connectors to expose symbol-level metadata.
+
+        Returns a list of dictionaries that may include the following keys:
+        - symbol (required)
+        - display_symbol
+        - company_name
+        - exchange_code
+        - currency
+        - source (identifier for the originating system/section)
+
+        Default implementation returns an empty list; connectors can override.
+        """
+        return []

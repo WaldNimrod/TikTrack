@@ -18,7 +18,7 @@ import logging
 import time
 import threading
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Callable
 import pytz
 import sys
 import os
@@ -26,8 +26,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Fixed imports for current project structure
 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+from services.advanced_cache_service import advanced_cache_service
 # from models.quote import Quote  # Not needed for basic functionality
 # from models.market_preferences import MarketPreferences  # Not needed for basic functionality
+from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +44,7 @@ class DataRefreshScheduler:
     - Different refresh rates for active vs inactive tickers
     """
     
-    def __init__(self, db_session, config: Dict = None):
+    def __init__(self, db_session=None, config: Dict = None):
         """
         Initialize the Data Refresh Scheduler.
         
@@ -50,7 +52,8 @@ class DataRefreshScheduler:
             db_session: Database session for data operations
             config (Dict, optional): Configuration dictionary
         """
-        self.db_session = db_session
+        self.session_factory = self._get_session_factory(db_session)
+        self.db_session = None
         self.config = config or self._get_default_config()
         self.ny_timezone = pytz.timezone('America/New_York')
         self.running = False
@@ -58,6 +61,8 @@ class DataRefreshScheduler:
         # Simplified initialization without complex dependencies
         # self.yahoo_adapter = YahooFinanceAdapter(self.config.get('yahoo_finance', {}))
         self.yahoo_adapter = None
+        self.provider_id: Optional[int] = None
+        self.cache_dependencies: List[str] = ['tickers', 'dashboard', 'external_data']
         
         # Default refresh policy as per specification
         self.refresh_policy = {
@@ -93,6 +98,25 @@ class DataRefreshScheduler:
             'max_concurrent_refreshes': 3
         }
     
+    def _get_session_factory(self, db_session) -> Callable[[], "Session"]:
+        """Create a session factory from a provided session or use global SessionLocal."""
+        if callable(db_session):
+            return db_session
+
+        if db_session is not None:
+            try:
+                bind = db_session.get_bind()
+                factory = sessionmaker(autocommit=False, autoflush=False, bind=bind)
+            finally:
+                try:
+                    db_session.close()
+                except Exception:
+                    pass
+            return factory
+
+        from config.database import SessionLocal
+        return SessionLocal
+    
     def start(self):
         """Start the scheduler."""
         if self.running:
@@ -114,21 +138,33 @@ class DataRefreshScheduler:
     def _scheduler_loop(self):
         """Main scheduler loop."""
         while self.running:
+            session = None
             try:
+                session = self.session_factory()
+                self.db_session = session
+                self.yahoo_adapter = None
+
                 current_ny_time = datetime.now(self.ny_timezone)
-                
+
                 # Check if it's a trading day and time
                 if self._is_trading_time(current_ny_time):
                     self._process_trading_day_refresh(current_ny_time)
                 else:
                     self._process_off_hours_refresh(current_ny_time)
-                
+
                 # Wait for next check
                 time.sleep(self.config['scheduler_interval'])
-                
+
             except Exception as e:
+                if session:
+                    session.rollback()
                 logger.error(f"Error in scheduler loop: {e}")
                 time.sleep(self.config['scheduler_interval'])
+            finally:
+                if session:
+                    session.close()
+                self.db_session = None
+                self.yahoo_adapter = None
     
     def _is_trading_time(self, ny_time: datetime) -> bool:
         """
@@ -238,7 +274,18 @@ class DataRefreshScheduler:
             
             # Execute query and return results
             tickers = query.all()
-            return [{'id': t.id, 'symbol': t.symbol, 'name': t.name} for t in tickers]
+            sanitized_tickers: List[Dict[str, Any]] = []
+            for ticker in tickers:
+                symbol = (ticker.symbol or '').strip()
+                if not symbol:
+                    logger.warning(f"Skipping ticker {ticker.id} due to missing symbol")
+                    continue
+                sanitized_tickers.append({
+                    'id': ticker.id,
+                    'symbol': symbol,
+                    'name': ticker.name
+                })
+            return sanitized_tickers
             
         except Exception as e:
             logger.error(f"Error getting tickers needing refresh: {e}")
@@ -277,6 +324,9 @@ class DataRefreshScheduler:
             
             # Log group refresh completion
             self._log_group_refresh_completion(group_id, successful_refreshes, failed_refreshes)
+
+            if successful_refreshes > 0:
+                self._invalidate_cache_dependencies()
                     
         except Exception as e:
             logger.error(f"Error refreshing tickers: {e}")
@@ -301,16 +351,18 @@ class DataRefreshScheduler:
             # Initialize Yahoo Finance adapter if needed
             if not self.yahoo_adapter:
                 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
-                # Get the primary provider (Yahoo Finance)
                 from models.external_data import ExternalDataProvider
-                provider = self.db_session.query(ExternalDataProvider).filter(
-                    ExternalDataProvider.name == 'yahoo_finance'
-                ).first()
-                if provider:
-                    self.yahoo_adapter = YahooFinanceAdapter(self.db_session, provider.id)
-                else:
-                    logger.error("Yahoo Finance provider not found")
-                    return 0, 0
+
+                if self.provider_id is None:
+                    provider = self.db_session.query(ExternalDataProvider).filter(
+                        ExternalDataProvider.name == 'yahoo_finance'
+                    ).first()
+                    if not provider:
+                        logger.error("Yahoo Finance provider not found")
+                        return 0, len(tickers)
+                    self.provider_id = provider.id
+
+                self.yahoo_adapter = YahooFinanceAdapter(self.db_session, self.provider_id)
             
             # Extract symbols for batch request
             symbols = [ticker['symbol'] for ticker in tickers]
@@ -459,6 +511,14 @@ class DataRefreshScheduler:
             
         except Exception as e:
             logger.error(f"Error logging group refresh completion: {e}")
+
+    def _invalidate_cache_dependencies(self) -> None:
+        """Invalidate unified cache dependencies after successful refresh."""
+        for dependency in self.cache_dependencies:
+            try:
+                advanced_cache_service.invalidate_by_dependency(dependency)
+            except Exception as exc:
+                logger.error(f"Failed to invalidate cache dependency '{dependency}': {exc}")
     
     def _log_group_refresh_failure(self, group_id: int, error_message: str):
         """Log the failure of a group refresh operation."""
@@ -496,14 +556,15 @@ class DataRefreshScheduler:
     
     def get_group_refresh_history(self, limit: int = 50) -> List[Dict]:
         """Get recent group refresh history."""
+        session = None
         try:
             from models.external_data import DataRefreshLog
-            
-            # Get recent refresh logs
-            logs = self.db_session.query(DataRefreshLog).order_by(
+
+            session = self.session_factory()
+            logs = session.query(DataRefreshLog).order_by(
                 DataRefreshLog.start_time.desc()
             ).limit(limit).all()
-            
+
             return [
                 {
                     'id': log.id,
@@ -519,10 +580,13 @@ class DataRefreshScheduler:
                 }
                 for log in logs
             ]
-            
+
         except Exception as e:
             logger.error(f"Error getting group refresh history: {e}")
             return []
+        finally:
+            if session:
+                session.close()
 
 # Global scheduler instance
 data_refresh_scheduler = None

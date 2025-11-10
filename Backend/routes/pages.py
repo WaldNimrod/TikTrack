@@ -71,6 +71,11 @@ def cash_flows() -> Any:
     """Cash flows page"""
     return send_from_directory(UI_DIR, "cash_flows.html")
 
+@pages_bp.route('/data_import')
+def data_import() -> Any:
+    """Data import page"""
+    return send_from_directory(UI_DIR, "data_import.html")
+
 
 
 @pages_bp.route('/designs')

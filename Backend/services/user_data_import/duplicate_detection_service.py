@@ -258,7 +258,7 @@ class DuplicateDetectionService:
                     same_day = date1.date() == date2.date()
                     time_diff = abs((date1 - date2).total_seconds())
                     within_5_minutes = time_diff <= 300  # 5 minutes = 300 seconds
-
+                    
                     if same_day and within_5_minutes:
                         score += 1
             except Exception:

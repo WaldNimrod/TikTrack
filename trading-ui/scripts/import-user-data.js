@@ -23,12 +23,47 @@ let selectedAccount = null;
 let selectedConnector = null;
 let analysisResults = null;
 let previewData = null;
+let detectedDataTypes = [];
+let selectedDataTypeKey = null;
 let currencyCacheByCode = null;
 let tickersModalConfigPromise = null;
 let activeSessionInfo = null;
 const ACTIVE_SESSION_STORAGE_KEY = 'tiktrack_import_user_data_session';
 const ACTIVE_SESSION_SOURCE = 'import-user-data';
 let importModalBootstrapInstance = null;
+
+const IMPORT_DATA_TYPE_DEFINITIONS = {
+    executions: {
+        key: 'executions',
+        label: 'ביצועי מסחר (Executions)',
+        description: 'ייבוא רשומות ביצועי מסחר הכוללות תאריך, פעולה, כמות, מחיר ונתוני עמלות.',
+        documentationAnchor: '#import-executions-pipeline'
+    },
+    cashflows: {
+        key: 'cashflows',
+        label: 'תזרימי מזומנים (Cash Flows)',
+        description: 'פלייסהולדר: ניתוח תזרימי מזומנים (הפקדות, משיכות, דיבידנדים וריביות) להשוואה מול המערכת.',
+        documentationAnchor: '#import-cashflows-pipeline'
+    },
+    account_reconciliation: {
+        key: 'account_reconciliation',
+        label: 'בדיקת שיוך חשבון',
+        description: 'פלייסהולדר: אימות פרטי חשבון, מטבע בסיס והרשאות לפני ייבוא.',
+        documentationAnchor: '#account-reconciliation-pipeline'
+    },
+    portfolio_positions: {
+        key: 'portfolio_positions',
+        label: 'השוואת פורטפוליו',
+        description: 'פלייסהולדר: השוואת פוזיציות פתוחות, NAV ושווי שוק מול נתוני המערכת.',
+        documentationAnchor: '#portfolio-reconciliation-pipeline'
+    },
+    taxes_and_fx: {
+        key: 'taxes_and_fx',
+        label: 'ריביות, מיסים והפרשי מטבע',
+        description: 'פלייסהולדר: זיהוי הפרשים בריביות, מיסים ותרגומי מטבע ביחס לנתוני הבסיס.',
+        documentationAnchor: '#taxes-and-fx-pipeline'
+    }
+};
 
 function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
@@ -719,21 +754,21 @@ async function openImportUserDataModal() {
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('modal-open');
     }
-    
-    // Process buttons using centralized button system
-    if (window.processButtons) {
-        window.processButtons(modal);
-        window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-    } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
-        window.advancedButtonSystem.processButtons(modal);
-        window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-    } else if (window.initializeButtons) {
-        window.initializeButtons();
-        window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
-    }
-    
+        
+        // Process buttons using centralized button system
+        if (window.processButtons) {
+            window.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+        } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+            window.advancedButtonSystem.processButtons(modal);
+            window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+        } else if (window.initializeButtons) {
+            window.initializeButtons();
+            window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+        }
+        
     // Load accounts and restore active session state
-    await loadAccounts();
+        await loadAccounts();
     await restoreActiveSessionFromStorage();
     
     if (activeSessionInfo?.accountId) {
@@ -810,6 +845,8 @@ function resetImportModal() {
     selectedConnector = null;
     analysisResults = null;
     previewData = null;
+    detectedDataTypes = [];
+    selectedDataTypeKey = null;
     activeSessionInfo = null;
     
     // Reset form elements
@@ -852,6 +889,12 @@ function resetImportModal() {
     resetPreviewDisplay();
     clearProblemSections();
     updateActiveSessionIndicator();
+    
+    const dataTypeCard = document.getElementById('dataTypeSelectionCard');
+    if (dataTypeCard) {
+        dataTypeCard.style.display = 'none';
+    }
+    setDataTypeActionsState(false);
 }
 
 function finalizeImportReset(options = {}) {
@@ -1224,6 +1267,11 @@ function loadStep2Content() {
     // The HTML content is already in the DOM, just need to display analysis results
     if (analysisResults) {
         displayAnalysisResults(analysisResults);
+        if (!detectedDataTypes.length) {
+            prepareDataTypeSelection(analysisResults);
+        } else {
+            renderDataTypeSelection();
+        }
     }
 }
 
@@ -2090,9 +2138,178 @@ function displayAnalysisResults(results) {
         
         window.Logger.info('[Import Modal] Analysis results displayed successfully', { page: 'import-user-data' });
         updateActiveSessionFromAnalysis(results);
+        prepareDataTypeSelection(results);
     } catch (error) {
         window.Logger.error('[Import Modal] Error displaying analysis results', { error: error.message, stack: error.stack, page: 'import-user-data' });
     }
+}
+
+function prepareDataTypeSelection(results = {}) {
+    detectedDataTypes = detectAvailableDataTypes(results);
+    const availableType = detectedDataTypes.find(type => type.status === 'available');
+    selectedDataTypeKey = availableType ? availableType.key : null;
+    renderDataTypeSelection();
+    setDataTypeActionsState(Boolean(availableType));
+}
+
+function detectAvailableDataTypes(results = {}) {
+    const detected = [];
+    const executionsDefinition = IMPORT_DATA_TYPE_DEFINITIONS.executions;
+    const totalExecutions = Number(results.total_records ?? results.records_total ?? 0);
+    detected.push({
+        ...executionsDefinition,
+        records: totalExecutions,
+        status: 'available'
+    });
+    
+    const cashflowsDefinition = IMPORT_DATA_TYPE_DEFINITIONS.cashflows;
+    const cashflowsCount = Number(
+        results.cashflow_records ??
+        results.summary?.cashflows_total ??
+        results.summary_data?.cashflows_total ??
+        0
+    );
+    detected.push({
+        ...cashflowsDefinition,
+        records: cashflowsCount,
+        status: 'planned'
+    });
+    
+    const accountDefinition = IMPORT_DATA_TYPE_DEFINITIONS.account_reconciliation;
+    detected.push({
+        ...accountDefinition,
+        records: Number(results.accounts_detected ?? 0),
+        status: 'planned'
+    });
+    
+    const portfolioDefinition = IMPORT_DATA_TYPE_DEFINITIONS.portfolio_positions;
+    detected.push({
+        ...portfolioDefinition,
+        records: Number(results.positions_detected ?? 0),
+        status: 'planned'
+    });
+    
+    const taxesDefinition = IMPORT_DATA_TYPE_DEFINITIONS.taxes_and_fx;
+    detected.push({
+        ...taxesDefinition,
+        records: Number(results.taxes_detected ?? results.fx_adjustments ?? 0),
+        status: 'planned'
+    });
+    
+    return detected;
+}
+
+function renderDataTypeSelection() {
+    const card = document.getElementById('dataTypeSelectionCard');
+    const listContainer = document.getElementById('dataTypeList');
+    const detectedLabel = document.getElementById('dataTypeDetectedLabel');
+    
+    if (!card || !listContainer) {
+        window.Logger.warn('[Import Modal] Data type selection container missing', { page: 'import-user-data' });
+        return;
+    }
+    
+    if (!detectedDataTypes || detectedDataTypes.length === 0) {
+        card.style.display = 'none';
+        setDataTypeActionsState(true);
+        return;
+    }
+    
+    card.style.display = 'block';
+    listContainer.innerHTML = '';
+    
+    const availableTypes = detectedDataTypes.filter(type => type.status === 'available');
+    if (!selectedDataTypeKey && availableTypes.length > 0) {
+        selectedDataTypeKey = availableTypes[0].key;
+    }
+    
+    detectedDataTypes.forEach(type => {
+        const optionWrapper = document.createElement('div');
+        optionWrapper.className = 'form-check';
+        if (type.status !== 'available') {
+            optionWrapper.classList.add('opacity-75');
+        }
+        
+        const input = document.createElement('input');
+        input.className = 'form-check-input';
+        input.type = 'radio';
+        input.name = 'importDataType';
+        input.id = `import-data-type-${type.key}`;
+        input.value = type.key;
+        input.disabled = type.status !== 'available';
+        input.checked = selectedDataTypeKey === type.key;
+        input.addEventListener('change', () => handleDataTypeRadioSelection(type.key));
+        
+        const label = document.createElement('label');
+        label.className = 'form-check-label d-flex flex-column gap-1';
+        label.setAttribute('for', input.id);
+        label.innerHTML = `
+            <div class="fw-bold">${type.label}</div>
+            <div class="small text-muted">${type.description}</div>
+            <div class="mt-1 d-flex flex-wrap gap-2 align-items-center">
+                <span class="badge bg-light text-dark">${type.records || 0} רשומות בקובץ</span>
+                ${type.status !== 'available' ? '<span class="badge bg-secondary">בפיתוח</span>' : ''}
+            </div>
+        `;
+        
+        optionWrapper.appendChild(input);
+        optionWrapper.appendChild(label);
+        listContainer.appendChild(optionWrapper);
+    });
+    
+    if (detectedLabel) {
+        const availableCount = availableTypes.length;
+        const plannedCount = detectedDataTypes.filter(type => type.status !== 'available').length;
+        detectedLabel.textContent = availableCount > 0
+            ? `נמצאו ${detectedDataTypes.length} סוגי נתונים בקובץ (${availableCount} זמינים, ${plannedCount} בהכנה)`
+            : `התהליכים החדשים עדיין נמצאים בשלבי אפיון – בחירת הביצועים זמינה להמשך`;
+    }
+    
+    setDataTypeActionsState(Boolean(availableTypes.length));
+}
+
+function handleDataTypeRadioSelection(typeKey) {
+    selectedDataTypeKey = typeKey;
+    setDataTypeActionsState(true);
+    window.Logger.info('[Import Modal] Data type selected', { selectedDataTypeKey, page: 'import-user-data' });
+}
+
+function setDataTypeActionsState(isEnabled) {
+    const confirmBtn = document.getElementById('confirmDataTypeBtn');
+    const continueBtn = document.querySelector('[data-id="btn-preview-continue"]');
+    const placeholderBtn = document.getElementById('dataTypePlaceholderBtn');
+    
+    [confirmBtn, continueBtn].forEach(button => {
+        if (button) {
+            button.disabled = !isEnabled;
+        }
+    });
+    
+    if (placeholderBtn) {
+        placeholderBtn.style.display = isEnabled ? 'none' : 'inline-flex';
+        if (!isEnabled) {
+            placeholderBtn.setAttribute('data-text', 'תהליכי ייבוא נוספים יתווספו בקרוב (פלייסהולדר)');
+        }
+    }
+}
+
+function confirmSelectedDataType() {
+    if (!selectedDataTypeKey) {
+        showImportUserDataNotification('בחר סוג נתונים לייבוא לפני המשך התהליך', 'warning');
+        return;
+    }
+    
+    const selectedType = detectedDataTypes.find(type => type.key === selectedDataTypeKey);
+    if (!selectedType || selectedType.status !== 'available') {
+        showImportUserDataNotification('התהליך שנבחר עדיין בהכנה. אנו מציגים פלייסהולדר ועדכון יישלח כאשר התהליך יהיה פעיל.', 'info');
+        return;
+    }
+    
+    window.Logger.info('[Import Modal] Continuing with selected import data type', {
+        selectedDataTypeKey,
+        page: 'import-user-data'
+    });
+    goToStep(3);
 }
 
 /**
@@ -3466,3 +3683,4 @@ window.performImport = performImport;
 window.showImportUserDataNotification = showImportUserDataNotification;
 window.resetFile = resetFile;
 window.confirmImport = confirmImport;
+window.confirmSelectedDataType = confirmSelectedDataType;

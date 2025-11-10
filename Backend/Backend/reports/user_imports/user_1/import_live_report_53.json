@@ -8,11 +8,11 @@
   "steps": {
     "file_upload": {
       "timestamp": {
-        "utc": "2025-11-10T00:05:08.252710Z",
-        "epochMs": 1762733108252,
-        "local": "2025-11-10T00:05:08.252710+00:00",
+        "utc": "2025-11-10T00:39:47.465711Z",
+        "epochMs": 1762735187465,
+        "local": "2025-11-10T00:39:47.465711+00:00",
         "timezone": "UTC",
-        "display": "10/11/2025 00:05"
+        "display": "10/11/2025 00:39"
       },
       "data": {
         "file_name": "activity - 2024.csv",
@@ -28,11 +28,11 @@
     },
     "analysis": {
       "timestamp": {
-        "utc": "2025-11-10T00:05:08.340988Z",
-        "epochMs": 1762733108340,
-        "local": "2025-11-10T00:05:08.340988+00:00",
+        "utc": "2025-11-10T00:39:47.573326Z",
+        "epochMs": 1762735187573,
+        "local": "2025-11-10T00:39:47.573326+00:00",
         "timezone": "UTC",
-        "display": "10/11/2025 00:05"
+        "display": "10/11/2025 00:39"
       },
       "data": {
         "total_records": 280,
@@ -40,9 +40,13 @@
         "normalized_records": 280,
         "valid_records": 280,
         "invalid_records": 0,
-        "clean_records": 278,
-        "duplicate_records": 1,
+        "clean_records": 274,
+        "duplicate_records": 3,
         "missing_tickers": [
+          {
+            "symbol": "500X",
+            "currency": "EUR"
+          },
           {
             "symbol": "5ESG",
             "currency": "EUR"
@@ -212,7 +216,7 @@
             "currency": "USD"
           }
         ],
-        "missing_ticker_records": 254,
+        "missing_ticker_records": 255,
         "existing_records": 0,
         "normalization_errors": [],
         "validation_errors": [],
@@ -269,6 +273,130 @@
                     "code": "O",
                     "row_number": 366,
                     "external_id": "2024-10-23T08_34_51Z_SP5C_buy_20_0_386_00",
+                    "source": "ibkr_import"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 80.0,
+                  "similarity_score": 4
+                }
+              ],
+              "system_matches": [],
+              "duplicate_type": "within_file_only",
+              "confidence_score": 80.0
+            },
+            {
+              "record_index": 36,
+              "record": {
+                "symbol": "AVGO",
+                "action": "buy",
+                "date": {
+                  "utc": "2024-12-17T11:22:19Z",
+                  "epochMs": 1734434539000,
+                  "local": "2024-12-17T11:22:19+00:00",
+                  "timezone": "UTC",
+                  "display": "17/12/2024 11:22"
+                },
+                "quantity": 10.0,
+                "price": 238.3,
+                "fee": 1.00048,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": -2383.0,
+                "basis": 2384.00048,
+                "realized_pl": 0.0,
+                "mtm_pl": 19.3,
+                "code": "O",
+                "row_number": 402,
+                "external_id": "2024-12-17T11_22_19Z_AVGO_buy_10_0_238_30",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [
+                {
+                  "record_index": 37,
+                  "record": {
+                    "symbol": "AVGO",
+                    "action": "buy",
+                    "date": {
+                      "utc": "2024-12-17T11:24:30Z",
+                      "epochMs": 1734434670000,
+                      "local": "2024-12-17T11:24:30+00:00",
+                      "timezone": "UTC",
+                      "display": "17/12/2024 11:24"
+                    },
+                    "quantity": 10.0,
+                    "price": 238.0,
+                    "fee": 1.00048,
+                    "currency": "USD",
+                    "asset_category": "Stocks",
+                    "proceeds": -2380.0,
+                    "basis": 2381.00048,
+                    "realized_pl": 0.0,
+                    "mtm_pl": 22.3,
+                    "code": "O",
+                    "row_number": 403,
+                    "external_id": "2024-12-17T11_24_30Z_AVGO_buy_10_0_238_00",
+                    "source": "ibkr_import"
+                  },
+                  "match_type": "field_similarity",
+                  "confidence": 80.0,
+                  "similarity_score": 4
+                }
+              ],
+              "system_matches": [],
+              "duplicate_type": "within_file_only",
+              "confidence_score": 80.0
+            },
+            {
+              "record_index": 127,
+              "record": {
+                "symbol": "NNE",
+                "action": "sell",
+                "date": {
+                  "utc": "2024-12-20T09:30:05Z",
+                  "epochMs": 1734687005000,
+                  "local": "2024-12-20T09:30:05+00:00",
+                  "timezone": "UTC",
+                  "display": "20/12/2024 09:30"
+                },
+                "quantity": 100.0,
+                "price": 23.7,
+                "fee": 1.087286,
+                "currency": "USD",
+                "asset_category": "Stocks",
+                "proceeds": 2370.0,
+                "basis": -2452.0048,
+                "realized_pl": -83.092086,
+                "mtm_pl": -149.0,
+                "code": "C",
+                "row_number": 505,
+                "external_id": "2024-12-20T09_30_05Z_NNE_sell_100_0_23_70",
+                "source": "ibkr_import"
+              },
+              "within_file_matches": [
+                {
+                  "record_index": 128,
+                  "record": {
+                    "symbol": "NNE",
+                    "action": "sell",
+                    "date": {
+                      "utc": "2024-12-20T09:34:00Z",
+                      "epochMs": 1734687240000,
+                      "local": "2024-12-20T09:34:00+00:00",
+                      "timezone": "UTC",
+                      "display": "20/12/2024 09:34"
+                    },
+                    "quantity": 100.0,
+                    "price": 23.1,
+                    "fee": 1.085618,
+                    "currency": "USD",
+                    "asset_category": "Stocks",
+                    "proceeds": 2310.0,
+                    "basis": -2438.8048,
+                    "realized_pl": -129.890418,
+                    "mtm_pl": -209.0,
+                    "code": "C;P",
+                    "row_number": 506,
+                    "external_id": "2024-12-20T09_34_00Z_NNE_sell_100_0_23_10",
                     "source": "ibkr_import"
                   },
                   "match_type": "field_similarity",
@@ -1198,60 +1326,6 @@
                 "code": "O",
                 "row_number": 400,
                 "external_id": "2024-12-04T13_00_00Z_ANET_buy_20_0_104_20",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 36,
-              "record": {
-                "symbol": "AVGO",
-                "action": "buy",
-                "date": {
-                  "utc": "2024-12-17T11:22:19Z",
-                  "epochMs": 1734434539000,
-                  "local": "2024-12-17T11:22:19+00:00",
-                  "timezone": "UTC",
-                  "display": "17/12/2024 11:22"
-                },
-                "quantity": 10.0,
-                "price": 238.3,
-                "fee": 1.00048,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": -2383.0,
-                "basis": 2384.00048,
-                "realized_pl": 0.0,
-                "mtm_pl": 19.3,
-                "code": "O",
-                "row_number": 402,
-                "external_id": "2024-12-17T11_22_19Z_AVGO_buy_10_0_238_30",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 37,
-              "record": {
-                "symbol": "AVGO",
-                "action": "buy",
-                "date": {
-                  "utc": "2024-12-17T11:24:30Z",
-                  "epochMs": 1734434670000,
-                  "local": "2024-12-17T11:24:30+00:00",
-                  "timezone": "UTC",
-                  "display": "17/12/2024 11:24"
-                },
-                "quantity": 10.0,
-                "price": 238.0,
-                "fee": 1.00048,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": -2380.0,
-                "basis": 2381.00048,
-                "realized_pl": 0.0,
-                "mtm_pl": 22.3,
-                "code": "O",
-                "row_number": 403,
-                "external_id": "2024-12-17T11_24_30Z_AVGO_buy_10_0_238_00",
                 "source": "ibkr_import"
               }
             },
@@ -3655,60 +3729,6 @@
                 "code": "O",
                 "row_number": 504,
                 "external_id": "2024-12-18T18_39_19Z_NNE_buy_20_0_24_25",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 127,
-              "record": {
-                "symbol": "NNE",
-                "action": "sell",
-                "date": {
-                  "utc": "2024-12-20T09:30:05Z",
-                  "epochMs": 1734687005000,
-                  "local": "2024-12-20T09:30:05+00:00",
-                  "timezone": "UTC",
-                  "display": "20/12/2024 09:30"
-                },
-                "quantity": 100.0,
-                "price": 23.7,
-                "fee": 1.087286,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": 2370.0,
-                "basis": -2452.0048,
-                "realized_pl": -83.092086,
-                "mtm_pl": -149.0,
-                "code": "C",
-                "row_number": 505,
-                "external_id": "2024-12-20T09_30_05Z_NNE_sell_100_0_23_70",
-                "source": "ibkr_import"
-              }
-            },
-            {
-              "record_index": 128,
-              "record": {
-                "symbol": "NNE",
-                "action": "sell",
-                "date": {
-                  "utc": "2024-12-20T09:34:00Z",
-                  "epochMs": 1734687240000,
-                  "local": "2024-12-20T09:34:00+00:00",
-                  "timezone": "UTC",
-                  "display": "20/12/2024 09:34"
-                },
-                "quantity": 100.0,
-                "price": 23.1,
-                "fee": 1.085618,
-                "currency": "USD",
-                "asset_category": "Stocks",
-                "proceeds": 2310.0,
-                "basis": -2438.8048,
-                "realized_pl": -129.890418,
-                "mtm_pl": -209.0,
-                "code": "C;P",
-                "row_number": 506,
-                "external_id": "2024-12-20T09_34_00Z_NNE_sell_100_0_23_10",
                 "source": "ibkr_import"
               }
             },
@@ -7791,15 +7811,15 @@
             }
           ],
           "total_checked": 280,
-          "duplicate_count": 1,
-          "clean_count": 278
+          "duplicate_count": 3,
+          "clean_count": 274
         },
         "analysis_timestamp": {
-          "utc": "2025-11-10T00:05:08.327162Z",
-          "epochMs": 1762733108327,
-          "local": "2025-11-10T00:05:08.327162+00:00",
+          "utc": "2025-11-10T00:39:47.559788Z",
+          "epochMs": 1762735187559,
+          "local": "2025-11-10T00:39:47.559788+00:00",
           "timezone": "UTC",
-          "display": "10/11/2025 00:05"
+          "display": "10/11/2025 00:39"
         }
       }
     }

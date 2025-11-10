@@ -117,6 +117,40 @@ python3 Backend/scripts/create_production_db.py
 
 **📖 למדריך מפורט ומלא:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
 
+### ניהול גרסאות פרודקשן
+
+- המערכת משתמשת ב-4 ספרות: `Major.Minor.Patch.Build`.
+  - `Major` / `Minor` – נקבעים ידנית ע״י נמרוד בלבד.
+  - `Patch` – מתקדם אוטומטית בכל פעם שמקדמים קוד מ-`main` לפרודקשן.
+  - `Build` – מתקדם בכל הפעלה/פריסה של אותה גרסת קוד.
+- הסטטוס העדכני נשמר ב-`documentation/version-manifest.json` והיסטוריה מלאה ב-`documentation/production/VERSION_HISTORY.md`.
+- כלי העדכון: `scripts/versioning/bump-version.py`.
+
+דוגמאות:
+
+```bash
+# אחרי מיזוג main → production (קידום גרסת קוד)
+python3 scripts/versioning/bump-version.py \
+  --env production \
+  --bump patch \
+  --note "Sync main into production"
+
+# הפעלת שרת נוספת עם אותה גרסה (למשל ריענון בלבד)
+python3 scripts/versioning/bump-version.py \
+  --env production \
+  --bump build \
+  --note "Restart production server"
+
+# עדכון Major/Minor - נמרוד בלבד
+python3 scripts/versioning/bump-version.py \
+  --env production \
+  --set-version 2.1.0.0 \
+  --allow-major-minor \
+  --note "Manual major release (approved)"
+```
+
+> ℹ️ כל פקודה מעדכנת אוטומטית את ה-manifest ואת קובץ ההיסטוריה, כולל החתימה (`commit`) והתאריך.
+
 ### תהליך עדכון מומלץ:
 
 1. **עדכון Main Branch:**

@@ -12,13 +12,14 @@
 
 ## 📋 תהליך עדכון פרודקשן - סקירה מהירה
 
-### תהליך מלא (5 שלבים):
+### תהליך מלא (6 שלבים):
 
 1. **עדכון main branch** - משיכת שינויים אחרונים
 2. **מיזוג main → production** - העברת שינויים לפרודקשן
 3. **סינכרון קוד** - העתקת קבצים פעילים לפרודקשן
 4. **בדיקות** - אימות שהכל עובד
-5. **Commit & Push** - שמירת שינויים ב-Git
+5. **עדכון גרסה** - קידום `Patch/Build` במערכת הגרסאות
+6. **Commit & Push** - שמירת שינויים ב-Git
 
 ---
 
@@ -202,7 +203,29 @@ cd production
 
 ---
 
-### שלב 5: Commit & Push
+### שלב 5: עדכון גרסה
+
+```bash
+# קידום גרסת הפרודקשן אחרי סנכרון קוד
+python3 scripts/versioning/bump-version.py \
+  --env production \
+  --bump patch \
+  --note "Sync main into production - $(date +%Y-%m-%d)"
+
+# הפעלה נוספת של אותו קוד (בחירה)
+python3 scripts/versioning/bump-version.py \
+  --env production \
+  --bump build \
+  --note "Restart production server"
+```
+
+- כל הרצות הסקריפט מעדכנות את `documentation/version-manifest.json` ואת ההיסטוריה (`documentation/production/VERSION_HISTORY.md`).
+- **Major/Minor** מתקדמים רק באישור נמרוד (`--set-version ... --allow-major-minor`).
+- בתהליך הבא יש לציין בהערת הגרסה את הפעולה (מיזוג, הפעלה, hotfix וכו').
+
+---
+
+### שלב 6: Commit & Push
 
 ```bash
 # ודא שאתה ב-production branch
@@ -249,8 +272,18 @@ git merge main
 # 3. בדיקה מהירה
 ./scripts/verify_production_isolation.sh
 
-# 4. Commit & Push
-git add production/ scripts/ documentation/production/
+# 4. עדכון גרסה
+python3 scripts/versioning/bump-version.py \
+  --env production \
+  --bump patch \
+  --note "Quick update - $(date +%Y-%m-%d)"
+
+# 5. Commit & Push
+git add documentation/version-manifest.json \
+        documentation/production/VERSION_HISTORY.md \
+        scripts/versioning/ \
+        documentation/production/ \
+        scripts/
 git commit -m "feat: Update production from main"
 git push origin production
 ```

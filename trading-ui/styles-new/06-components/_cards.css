@@ -2,7 +2,7 @@
  * כרטיסים - Cards
  * 
  * קובץ זה מכיל את הסגנונות של כל הכרטיסים במערכת
- * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * מבוסס על הסגנות הקיימים ב-apple-theme.css
  * 
  * @version 1.0.0
  * @lastUpdated January 5, 2025
@@ -725,4 +725,64 @@
 
 .section-icon.purple {
   color: #6f42c1; /* Purple - נשאר קבוע */
+}
+
+.pending-highlight-item {
+  position: relative;
+}
+
+#pendingExecutionsHighlightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-end;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.pending-highlight-item {
+  inline-size: min(100%, 320px);
+  margin: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--bs-body-bg, #fff);
+  padding: 0.75rem 0.9rem;
+  align-self: flex-end;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.pending-highlight-item > .d-flex {
+  inline-size: 100%;
+}
+
+.pending-highlight-item + .pending-highlight-item {
+  margin-top: 0;
+}
+
+.pending-highlight-item .pending-highlight-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: max-height 0.28s ease, opacity 0.18s ease, transform 0.28s ease;
+  pointer-events: none;
+  margin-top: 0;
+}
+
+.pending-highlight-item.is-hovered .pending-highlight-details {
+  max-height: 1000px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 0.75rem;
+  pointer-events: auto;
+}
+
+.pending-highlight-item .pending-highlight-details > .col-12 {
+  transform: translateY(-6px);
+  transition: transform 0.25s ease;
+}
+
+.pending-highlight-item.is-hovered .pending-highlight-details > .col-12 {
+  transform: translateY(0);
 }

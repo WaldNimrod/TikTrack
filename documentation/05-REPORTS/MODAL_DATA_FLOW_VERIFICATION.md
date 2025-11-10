@@ -1,6 +1,47 @@
 # וידוא זרימת מידע - Modal Navigation System
-**תאריך:** 2 בנובמבר 2025  
-**מטרה:** וידוא מקיף שכל הקוד עובד נכון עם המידע החדש והתהליך רציף וחלק
+**תאריך:** 10 בנובמבר 2025  
+**מטרה:** עדכון זרימת המידע סביב מודל ייבוא נתוני משתמש, כולל איפוס סשנים, ניהול מטמון ובדיקת כפילויות בבסיס הנתונים.
+
+## 🆕 חידושים עיקריים (Import User Data)
+
+1. **איפוס סשנים גלובלי**
+   - `Backend/services/user_data_import/import_orchestrator.py#reset_session` מבטל עכשיו את כל הסשנים הפתוחים (`created/analyzing/ready/importing`) ומעדכן אותם ל־`cancelled`.
+   - מצרף מטה־דאטה ל־`summary_data` (`cancelled_at`, `cancelled_reason`) לטובת traceability.
+   - מוחק את כל ה־cache keys (`summary/analysis/preview`) עבור כל סשן שנמצא.
+   - API `/api/user-data-import/session/<id>/reset` מחזיר `[cancelled_sessions]` כדי שהלקוח יוכל לוג את התוצאה.
+
+2. **ריענון מחדש בצד הלקוח**
+   - `trading-ui/scripts/import-user-data.js#finalizeImportReset` מריץ `fetchLatestActiveSession` לאחר האיפוס כדי לוודא שלא נשאר סשן פתוח.
+   - במהלך פתיחת המודל מתבצע `restoreActiveSessionFromStorage` → אם אין נתונים מאוחסנים, מושכים מחדש את המצב העדכני מהשרת בלבד.
+   - בשלב 1 מוצג `summary-card` של הסשן הפעיל (אם קיים) כדי למנוע בלבול מול משתמש שהתחיל תהליך קודם.
+
+3. **זיהוי נתונים כפולים אמיתיים (מה־DB)**
+   - `duplicate_detection_service` מבצע JOIN מול `executions` לא רק על symbol אלא גם על טווחי תאריכים, וכך מזהה ביצועים שכבר הוזנו בעבר.
+   - הדוחות בלוג (`import_orchestrator`) מדגישים את מספר הכפילויות שנמצאו, ואת העובדה שרוב הרשומות נפסלות בגלל טיקרים חסרים.
+   - דוגמת אמת: בטבלת `executions` קיימות 25 רשומות עם `source='ibkr_import'`, ולכן כל ניסיון לייבא אותן מחדש מוצג כ־Existing Records.
+
+4. **טיפול בטיקרים חסרים**
+   - `validation_service` נקרא בשלב האנליזה וצובר רשימת טיקרים שלא קיימים במערכת. בלי השלמת הטיקרים – לא ניתן להמשיך לייבוא.
+   - בצד הלקוח, כרטיסי האנליזה מעודכנים עם המספרים האמיתיים (43 טיקרים חסרים → 255 רשומות לא זמינות, 25 כפולות).
+
+5. **ניקוי מטמון מלא**
+   - `clearImportCacheLayers` משתמש ב־`UnifiedCacheManager` + `CacheControlMenu` ומסמן ב־Logger את הניקוי בכל השכבות (memory/localStorage/sessionStorage/IndexedDB).
+   - אין יותר שימוש ב־`window.clearCacheQuick`; הקוד הישן נשאר רק כהערה עם תיוג Legacy.
+
+6. **Traceability בסרבר**
+   - כל קריאה משמעותית (upload, analyze, preview) לוגית עם `session_id`, סטטוס הסשן והחזרי API בפורמט קריא.
+   - `fetchLatestActiveSession` בודק את השרת לפני שמאפשר לעבור לשלב הבא, ולכן גם אחרי refresh המצב משוחזר נכון (אין תלות במטמון).
+
+## 📋 בדיקות שבוצעו – ייבוא נתוני משתמש
+
+- ✅ איפוס סשן קיים (58) → `/session/reset` מחזיר `cancelled_sessions` וברירת מחדל נקייה.
+- ✅ סגירת המודל → `modalNavigationManager.manageBackdrop` פועל, אין שכבות שקופות תקועות.
+- ✅ מעבר משלב 1 ל־2 → `fetchLatestActiveSession` מתעדכן בזמן אמת ומציף את הסשן הקיים לפני שמתחילים אנליזה חדשה.
+- ✅ אנליזה עם קובץ קיים → מוצג `Existing Records` אמיתי (25) וטיקרים חסרים (43), ללא תלות במטמון.
+- ✅ בדיקת DB ישירה (`SELECT ... FROM executions`) מאמתת את רשימת ההכפלות שנתגלו.
+- ✅ רענון דף אחרי איפוס → אין סשן פעיל עד שמבצעים upload חדש (הלקוחות רואים `session: null` ב־API).
+
+---
 
 ---
 
@@ -367,6 +408,7 @@ if (hasSavedContent) {
 
 =======
 >>>>>>> main
+
 
 
 

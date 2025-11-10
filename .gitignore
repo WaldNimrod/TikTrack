@@ -53,3 +53,5 @@ production/Backend/db/*.db-shm
 production/Backend/db/*.db-wal
 production/Backend/logs/
 production/Backend/logs-production/
+
+Backend/Backend/reports/user_imports/

@@ -8,6 +8,8 @@ IS_PRODUCTION = ENVIRONMENT == 'production'
 # Paths
 BASE_DIR = Path(__file__).parent.parent
 
+# NOTE: Production relies on port 5001 with the isolated TikTrack database.
+#       Full environment mapping lives in documentation/production/PRODUCTION_SETUP.md.
 # Database path - different for production vs development
 if IS_PRODUCTION:
     DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
@@ -20,7 +22,7 @@ UI_DIR = BASE_DIR.parent / "trading-ui"
 DEBUG = False
 HOST = '127.0.0.1'
 
-# Port - different for production vs development
+# Port - different for production vs development (see documentation/production/PRODUCTION_SETUP.md)
 if IS_PRODUCTION:
     PORT = 5001  # Production port
 else:

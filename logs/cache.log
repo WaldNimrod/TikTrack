@@ -17758,3 +17758,4 @@ TypeError: object of type 'Mock' has no len()
 2025-11-09 13:19:30,628 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:ab888137e3c309cc44a92b2d92afdf08
 2025-11-09 13:19:30,628 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
 2025-11-09 13:19:30,636 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-10 21:06:25,392 - cache - INFO - Cache disabled - skipping set for key: import_session_59_summary

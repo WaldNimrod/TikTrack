@@ -161,6 +161,20 @@ class BaseImportConnector(ABC):
 - נקודות הקצה ב-`production/Backend/routes/api/user_data_import.py` מחשבות את איזור הזמן של המשתמש ומריצות `_project_storage_payload` לפני החזרת JSON.
 - ה-UI (ב-`production/trading-ui/scripts/import-user-data.js`) משתמש בפונקציות `renderImportDate()` ו-`showImportUserDataNotification()` כדי להציג תאריכים בהתאם להעדפות המשתמש ולמנוע לולאות במערכת ההודעות.
 
+### Orchestrator + Task Plugins (2025-11)
+
+- `ImportOrchestrator` מתפקד כמנהל תהליכים אחיד: הוא מאתר את הקונקטור, מריץ ניתוח ומפעיל **Task** ייעודי לכל סוג נתונים.
+- כל Task מממש ממשק קבוע (`load_raw() → normalize() → validate() → persist()`) ונרשם ב-`tasks_registry`.
+- מצב תהליכים:
+  | מפתח | סטטוס | תיאור קצר |
+  |------|-------|------------|
+  | `executions` | זמין | ייבוא ביצועי מסחר (התהליך הקיים – כולל DateEnvelope וזרימת Preview מלאה). |
+  | `cashflows` | פלייסהולדר | ייבוא תזרימי מזומנים (הפקדות, משיכות, ריביות, דיבידנדים) – ממתין למימוש Task ייעודי. |
+  | `account_reconciliation` | פלייסהולדר | אימות מפרטי החשבון והמטבע הבסיסי מול נתוני המערכת. |
+  | `portfolio_positions` | פלייסהולדר | השוואת פוזיציות פתוחות/NAV מול נתוני פורטפוליו פנימיים. |
+  | `taxes_and_fx` | פלייסהולדר | ניתוח ריביות, מיסים ותרגומי מטבע, כולל איתור פערים. |
+- UI: בשלב 2 של המודל מוצגת כעת בחירת התהליך. רק תהליכים במצב "זמין" מאפשרים מעבר לשלב הבא; תהליכים עתידיים מציגים הודעת פלייסהולדר ומפנים למסמך אפיון.
+
 ## שירותים
 
 ### Normalization Service
@@ -295,6 +309,12 @@ class BaseImportConnector(ABC):
 
 #### `rejectDuplicate(index, type)`
 דוחה כפילות ומעדכן את התצוגה.
+
+#### `prepareDataTypeSelection(results)`
+מבצע איתור של סוגי נתונים בקובץ ומציג למשתמש את רשימת התהליכים (זמינים ופלייסהולדרים). נשען על `detectAvailableDataTypes` ומעדכן את ממשק שלב 2.
+
+#### `confirmSelectedDataType()`
+מאשר את סוג הייבוא שנבחר. אם התהליך זמין – ממשיך לשלב התצוגה המקדימה; אחרת מציג לאדמין הודעת פלייסהולדר ומפנה למסמך האפיון הרלוונטי.
 
 #### `openAddTickerModal(symbol, currency)`
 פותח את `tickersModal` דרך ModalManagerV2, ממלא מראש את הסמל והמטבע (כולל ניסיון להתאים קוד מטבע לערך הקיים ברשימת המטבעות) ומוודא שהקריאה ל-`saveTicker` של המערכת הכללית תוביל לרענון אוטומטי של תצוגת הייבוא.

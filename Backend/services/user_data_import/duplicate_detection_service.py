@@ -300,12 +300,12 @@ class DuplicateDetectionService:
                 
                 # Parse dates and get range
                 parsed_dates = []
-        for date_value in dates:
-            parsed_date = self._resolve_datetime(date_value)
-            if parsed_date:
-                parsed_dates.append(parsed_date)
-            else:
-                logger.warning(f"Failed to parse date {date_value}")
+                for date_value in dates:
+                    parsed_date = self._resolve_datetime(date_value)
+                    if parsed_date:
+                        parsed_dates.append(parsed_date)
+                    else:
+                        logger.warning(f"Failed to parse date {date_value}")
                 
                 if not parsed_dates:
                     logger.warning("No valid dates found in records")
@@ -316,13 +316,15 @@ class DuplicateDetectionService:
                 
                 logger.info(f"Querying executions for symbols {symbols} between {min_date} and {max_date}")
                 
+                symbol_values = [symbol.upper() for symbol in symbols]
+                
                 # Query executions in date range for these symbols
                 # Check both direct ticker_id and through trade
                 executions = self.db_session.query(Execution)\
                     .outerjoin(Trade, Execution.trade_id == Trade.id)\
                     .outerjoin(Ticker, (Trade.ticker_id == Ticker.id) | (Execution.ticker_id == Ticker.id))\
                     .filter(
-                        Ticker.symbol.in_(symbols),
+                        Ticker.symbol.in_(symbol_values),
                         Execution.date >= min_date,
                         Execution.date <= max_date
                     ).all()
@@ -331,7 +333,7 @@ class DuplicateDetectionService:
                 direct_executions = self.db_session.query(Execution)\
                     .join(Ticker, Execution.ticker_id == Ticker.id)\
                     .filter(
-                        Ticker.symbol.in_(symbols),
+                        Ticker.symbol.in_(symbol_values),
                         Execution.date >= min_date,
                         Execution.date <= max_date
                     ).all()

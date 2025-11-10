@@ -303,6 +303,34 @@ class ImportSessionManager:
             logger.error(f"❌ Failed to get sessions by status {status}: {str(e)}")
             return []
     
+    def get_latest_active_session(self, statuses: Optional[List[str]] = None) -> Optional[ImportSession]:
+        """
+        Get the latest active import session (ready/importing/analyzing).
+        
+        Args:
+            statuses: Optional list of statuses to consider active
+            
+        Returns:
+            ImportSession instance or None
+        """
+        try:
+            active_statuses = statuses or ['importing', 'ready', 'analyzing']
+            
+            session = self.db_session.query(ImportSession).filter(
+                ImportSession.status.in_(active_statuses)
+            ).order_by(desc(ImportSession.id)).first()
+            
+            if session:
+                logger.debug(f"Retrieved latest active session {session.id} with status {session.status}")
+            else:
+                logger.debug("No active import sessions found")
+            
+            return session
+        
+        except Exception as e:
+            logger.error(f"❌ Failed to get latest active session: {str(e)}")
+            return None
+    
     def cleanup_old_sessions(self, days: int = 30) -> int:
         """
         Clean up old sessions and their data.

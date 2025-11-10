@@ -8,6 +8,8 @@
 # Purpose: Start TikTrack production server safely with conflict detection
 # Location: start_production.sh (project root)
 # Integration: Uses Backend/utils/server_lock_manager.py
+# NOTE: Production stack must stay on port 5001 with Backend/db/TikTrack_DB.db.
+#       See documentation/production/PRODUCTION_SETUP.md for the full checklist.
 # 
 # Features:
 # - Process conflict detection on port 5001

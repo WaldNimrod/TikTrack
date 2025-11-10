@@ -346,7 +346,7 @@ def get_session(session_id: int):
                 summary_data = session.summary_data
                 logger.info(f"📋 Retrieved summary_data from database")
             
-            session_dict = session.to_dict()
+            session_dict = _project_storage_payload(session.to_dict())
             if summary_data:
                 session_dict['summary_data'] = _project_storage_payload(summary_data)
             
@@ -694,6 +694,11 @@ def allow_existing_record(session_id):
         preview_data = session.preview_data
         if not preview_data:
             return jsonify({'status': 'error', 'message': 'No preview data'}), 400
+        try:
+            preview_data = _utc_storage_normalizer.normalize_input_payload(preview_data)
+        except Exception:
+            # Fallback to original structure if normalization fails
+            preview_data = session.preview_data
         
         # Find the record in records_to_skip
         record_to_move = None
@@ -715,10 +720,11 @@ def allow_existing_record(session_id):
             preview_data['force_import_existing'].append(record_index)
             
             # Save updated preview
-            session.preview_data = preview_data
+            session.preview_data = _utc_storage_normalizer.normalize_output(preview_data)
             db.session.commit()
-        
-        return jsonify({'status': 'success', 'preview_data': _project_storage_payload(preview_data)})
+
+        projected_preview = _project_storage_payload(preview_data)
+        return jsonify({'status': 'success', 'preview_data': projected_preview})
         
     except Exception as e:
         logger.error(f"Error allowing existing record: {str(e)}")
@@ -739,13 +745,16 @@ def execute_import(session_id: int):
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.execute_import(session_id)
+            result_raw = orchestrator.execute_import(session_id)
             
-            if not result['success']:
+            if not result_raw['success']:
                 return jsonify({
                     'status': 'error',
-                    'message': result['error']
+                    'message': result_raw['error']
                 }), 400
+
+            normalizer = _get_date_normalizer()
+            result = normalizer.normalize_output(result_raw)
             
             return jsonify({
                 'status': 'success',
@@ -812,17 +821,24 @@ def get_session_status(session_id: int):
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.get_session_status(session_id)
+            result_raw = orchestrator.get_session_status(session_id)
             
-            if not result['success']:
+            if not result_raw['success']:
                 return jsonify({
                     'status': 'error',
-                    'message': result['error']
+                    'message': result_raw['error']
                 }), 404
+
+            session_payload = _project_storage_payload(result_raw.get('session'))
+            summary_stats_payload = _project_storage_payload(result_raw.get('summary_stats'))
+            result = result_raw.copy()
+            result['session'] = session_payload
+            result['summary_stats'] = summary_stats_payload
             
             return jsonify({
                 'status': 'success',
-                'session': result['session']
+                'session': result['session'],
+                'summary_stats': result.get('summary_stats')
             }), 200
             
         finally:
@@ -860,17 +876,19 @@ def get_import_history():
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.get_import_history(trading_account_id, limit)
+            result_raw = orchestrator.get_import_history(trading_account_id, limit)
             
-            if not result['success']:
+            if not result_raw['success']:
                 return jsonify({
                     'status': 'error',
-                    'message': result['error']
+                    'message': result_raw['error']
                 }), 400
+
+            sessions_payload = _project_storage_payload(result_raw.get('sessions'))
             
             return jsonify({
                 'status': 'success',
-                'sessions': result['sessions']
+                'sessions': sessions_payload
             }), 200
             
         finally:

@@ -8,6 +8,9 @@
 # Purpose: Start TikTrack server safely with conflict detection
 # Location: start_server.sh (project root)
 # Integration: Uses Backend/utils/server_lock_manager.py
+# NOTE: This script runs the development stack on port 8080.
+#       For production (port 5001, TikTrack_DB.db) use start_production.sh
+#       as documented in documentation/production/PRODUCTION_SETUP.md.
 # 
 # Features:
 # - Process conflict detection

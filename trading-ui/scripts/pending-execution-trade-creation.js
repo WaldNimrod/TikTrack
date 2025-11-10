@@ -352,12 +352,16 @@
  
       const totalValueDisplay = summary.totalValue ? `$${summary.totalValue.toFixed(2)}` : '-';
       const averagePriceDisplay = summary.averagePrice ? `$${summary.averagePrice.toFixed(4)}` : '-';
+      const dateRangeText = dateRange.start ? this.renderDateRange(dateRange) : '';
  
       item.innerHTML = `
         <div class="trade-create-widget-top d-flex flex-wrap align-items-center gap-2">
           <div class="d-flex align-items-center gap-2">
             <span class="badge ${cluster.side === 'long' ? 'badge-long' : 'badge-short'}">${cluster.side === 'long' ? 'לונג' : 'שורט'}</span>
-            <span class="text-muted small">${summary.selectedCount}/${cluster.stats.execution_count} ביצועים</span>
+            <span class="text-muted small d-flex flex-column">
+              <span>${summary.selectedCount}/${cluster.stats.execution_count} ביצועים</span>
+              ${dateRangeText ? `<span>${dateRangeText}</span>` : ''}
+            </span>
           </div>
           <div class="ms-auto d-flex gap-1">
             <button
@@ -387,7 +391,6 @@
             <img src="images/icons/trading_accounts.svg" alt="חשבון" width="12" height="12" />
           </span>
           ${this.renderAccountBadge(cluster)}
-          ${dateRange.start ? `<span class="text-muted small">${this.renderDateRange(dateRange)}</span>` : ''}
         </div>
         <div class="trade-create-widget-details" data-role="widget-detail" data-cluster-id="${cluster.cluster_id}">
           <div class="trade-create-widget-stats text-muted small mb-2 d-flex flex-wrap gap-2">

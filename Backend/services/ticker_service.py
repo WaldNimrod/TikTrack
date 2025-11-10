@@ -12,6 +12,7 @@ Version: 1.0
 Date: August 2025
 """
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import DatabaseError
 from models.ticker import Ticker
@@ -22,10 +23,12 @@ from models.alert import Alert
 from models.external_data import MarketDataQuote
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
+from services.constraint_service import ConstraintService
 # from services.smart_query_optimizer import optimize_query, profile_query  # TEMPORARILY DISABLED
 from typing import List, Optional, Dict, Any, Union
 import logging
 import time
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +43,7 @@ class TickerService:
     - Activity status management
     
     Attributes:
-        VALID_TICKER_TYPES (List[str]): Valid ticker types in system
+        DEFAULT_TICKER_TYPES (List[str]): Fallback ticker types if dynamic lookup fails
         MAX_SYMBOL_LENGTH (int): Maximum length for symbol
         MAX_NAME_LENGTH (int): Maximum length for name
         MAX_REMARKS_LENGTH (int): Maximum length for remarks
@@ -57,12 +60,69 @@ class TickerService:
     """
     
     # Constants for validation
-    VALID_TICKER_TYPES: List[str] = ['stock', 'etf', 'crypto', 'forex', 'commodity']
+    DEFAULT_TICKER_TYPES: List[str] = ['stock', 'etf', 'bond', 'crypto', 'forex', 'commodity', 'other']
     MAX_SYMBOL_LENGTH: int = 10
     MAX_NAME_LENGTH: int = 100  # Changed back to 100
     MAX_TYPE_LENGTH: int = 20
     MAX_REMARKS_LENGTH: int = 500
     # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
+    _constraint_service = ConstraintService()
+    _valid_ticker_types_cache: List[str] = DEFAULT_TICKER_TYPES.copy()
+    _types_cache_expires_at: float = 0
+    _types_cache_lock = threading.Lock()
+    _TYPES_CACHE_TTL_SECONDS: int = 300
+
+    @classmethod
+    def get_valid_ticker_types(cls, db: Optional[Session] = None, force_refresh: bool = False) -> List[str]:
+        """
+        Retrieve active ticker types from the dynamic constraints table with caching.
+
+        Falls back to DEFAULT_TICKER_TYPES if constraints query fails.
+        """
+        now = time.time()
+
+        if not force_refresh and cls._valid_ticker_types_cache and now < cls._types_cache_expires_at:
+            return cls._valid_ticker_types_cache
+
+        types: List[str] = []
+
+        # Try to use current SQLAlchemy session first
+        if db is not None:
+            try:
+                result = db.execute(
+                    text("""
+                        SELECT ev.value
+                        FROM constraints c
+                        JOIN enum_values ev ON c.id = ev.constraint_id
+                        WHERE c.table_name = :table
+                          AND c.column_name = :column
+                          AND c.constraint_type = 'ENUM'
+                          AND c.is_active = 1
+                          AND ev.is_active = 1
+                        ORDER BY ev.sort_order
+                    """),
+                    {"table": "tickers", "column": "type"}
+                ).fetchall()
+                types = [row[0] for row in result]
+            except Exception as db_error:
+                logger.warning("Failed to load ticker type enum values via session: %s", db_error)
+
+        # Fallback to constraint service (direct SQLite) if needed
+        if not types:
+            try:
+                enum_values = cls._constraint_service.get_enum_values('tickers', 'type')
+                types = [value['value'] for value in enum_values] if enum_values else []
+            except Exception as constraint_error:
+                logger.warning("Failed to load ticker type enum values via ConstraintService: %s", constraint_error)
+
+        if not types:
+            types = cls.DEFAULT_TICKER_TYPES.copy()
+
+        with cls._types_cache_lock:
+            cls._valid_ticker_types_cache = types
+            cls._types_cache_expires_at = now + cls._TYPES_CACHE_TTL_SECONDS
+
+        return cls._valid_ticker_types_cache
     @staticmethod
     @cache_with_deps(ttl=30, dependencies=['tickers'])  # Cache for 30 seconds - critical data with frequent updates
     def get_all(db: Session) -> List[Ticker]:
@@ -163,7 +223,7 @@ class TickerService:
         return db.query(Ticker).filter(Ticker.symbol == symbol.upper()).first()
     
     @staticmethod
-    def validate_ticker_data(ticker_data: dict) -> Dict[str, Any]:
+    def validate_ticker_data(ticker_data: dict, db: Optional[Session] = None) -> Dict[str, Any]:
         """
         Validate ticker data
         
@@ -211,8 +271,9 @@ class TickerService:
         ticker_type = ticker_data.get('type', '')
         if ticker_type:
             ticker_type = ticker_type.strip()
-            if ticker_type not in TickerService.VALID_TICKER_TYPES:
-                warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(TickerService.VALID_TICKER_TYPES)}")
+            valid_types = TickerService.get_valid_ticker_types(db)
+            if ticker_type not in valid_types:
+                warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(valid_types)}")
         
         # Currency validation - now checking currency_id
         currency_id = ticker_data.get('currency_id')
@@ -353,7 +414,7 @@ class TickerService:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
         
         # Additional custom validation
-        validation = TickerService.validate_ticker_data(ticker_data)
+        validation = TickerService.validate_ticker_data(ticker_data, db)
         if not validation['is_valid']:
             raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
@@ -385,7 +446,7 @@ class TickerService:
             raise ValueError(f"Ticker with ID {ticker_id} not found")
         
         # Data validation
-        validation = TickerService.validate_ticker_data(ticker_data)
+        validation = TickerService.validate_ticker_data(ticker_data, db)
         if not validation['is_valid']:
             raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         

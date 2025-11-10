@@ -48,6 +48,7 @@ const tickersModalConfig = {
             options: [
                 { value: 'stock', label: 'מניה' },
                 { value: 'etf', label: 'קרן נאמנות (ETF)' },
+                { value: 'bond', label: 'אג"ח' },
                 { value: 'crypto', label: 'מטבע דיגיטלי' },
                 { value: 'forex', label: 'מטבע חוץ' },
                 { value: 'commodity', label: 'סחורה' }
@@ -114,7 +115,7 @@ const tickersModalConfig = {
         },
         tickerType: {
             required: true,
-            enum: ['stock', 'etf', 'crypto', 'forex', 'commodity']
+            enum: ['stock', 'etf', 'bond', 'crypto', 'forex', 'commodity']
         },
         tickerCurrency: {
             required: true,

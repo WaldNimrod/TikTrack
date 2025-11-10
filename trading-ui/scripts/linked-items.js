@@ -969,6 +969,7 @@ function createTickerDetails(item) {
     const typeMap = {
       'stock': 'מניה',
       'etf': 'ETF',
+      'bond': 'אג"ח',
       'crypto': 'קריפטו',
       'forex': 'מט"ח',
       'commodity': 'סחורה',

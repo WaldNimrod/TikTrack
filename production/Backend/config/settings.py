@@ -6,7 +6,7 @@ IS_PRODUCTION = True
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
-DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
+DB_PATH = BASE_DIR / "db" / "tiktrack.db"
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings

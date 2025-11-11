@@ -213,7 +213,7 @@ def create_backup(db_path, output_dir=None, include_wal=False):
 def main():
     parser = argparse.ArgumentParser(description='יצירת גיבוי מקיף לבסיס הנתונים')
     parser.add_argument('--db-path', type=str, default=None,
-                       help='נתיב לבסיס הנתונים (default: production/Backend/db/TikTrack_DB.db)')
+                       help='נתיב לבסיס הנתונים (default: production/Backend/db/tiktrack.db)')
     parser.add_argument('--output-dir', type=str, default=None,
                        help='תיקיית יעד לגיבוי (default: Backend/db/backups)')
     parser.add_argument('--include-wal', action='store_true',

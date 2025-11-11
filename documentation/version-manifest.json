@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.0.6.0",
+    "version": "1.0.7.0",
     "major": 1,
     "minor": 0,
-    "patch": 6,
+    "patch": 7,
     "build": 0,
-    "commit": "842bf100763cc766c266d88db208b1626cb7eec5",
-    "updated_at": "2025-11-11T08:55:25+00:00",
-    "notes": "Restore cache Stage B-Lite scripts"
+    "commit": "a543d9141104085540f0e8c81ba79fdf2daa1310",
+    "updated_at": "2025-11-11T09:02:07+00:00",
+    "notes": "Sync production environment configuration"
   },
   "development": {
     "version": "1.0.7.0",

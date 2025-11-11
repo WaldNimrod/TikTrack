@@ -13,7 +13,7 @@ from pathlib import Path
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
-DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
+DB_PATH = BASE_DIR / "db" / "tiktrack.db"  # Production database
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings

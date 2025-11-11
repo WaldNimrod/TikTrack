@@ -68,8 +68,8 @@ if __name__ == "__main__":
     
     # Use production database
     # Note: This script should be run from project root
-    # Production DB is at production/Backend/db/TikTrack_DB.db
-    prod_db = Path(__file__).parent.parent / "production" / "Backend" / "db" / "TikTrack_DB.db"
+    # Production DB is at production/Backend/db/tiktrack.db
+    prod_db = Path(__file__).parent.parent / "production" / "Backend" / "db" / "tiktrack.db"
     
     if not prod_db.exists():
         print(f"❌ Production database not found: {prod_db}")

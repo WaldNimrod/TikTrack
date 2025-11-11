@@ -110,7 +110,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/TikTrack_DB.db
+DB: /path/to/production/Backend/db/tiktrack.db
 Port: 5001
 Production: True
 ```
@@ -120,7 +120,7 @@ Production: True
 1. **תקן `production/Backend/config/settings.py`:**
    - ודא ש-`IS_PRODUCTION = True` (hardcoded)
    - ודא ש-`PORT = 5001` (hardcoded)
-   - ודא ש-`DB_PATH` מצביע על `TikTrack_DB.db`
+   - ודא ש-`DB_PATH` מצביע על `tiktrack.db`
    - ודא ש-`UI_DIR` מצביע על `production/trading-ui`
 
 2. **תקן `production/Backend/config/logging.py`:**
@@ -175,7 +175,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 **תוצאה צפויה:**
 ```
 UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/TikTrack_DB.db
+DB: /path/to/production/Backend/db/tiktrack.db
 Port: 5001
 Production: True
 ```
@@ -336,7 +336,7 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
 # ודא ש-IS_PRODUCTION = True (hardcoded)
 # ודא ש-PORT = 5001 (hardcoded)
 # ודא ש-UI_DIR מצביע על production/trading-ui
-# ודא ש-DB_PATH מצביע על production/Backend/db/TikTrack_DB.db
+# ודא ש-DB_PATH מצביע על production/Backend/db/tiktrack.db
 ```
 
 ### בעיה: הגדרות production לא נכונות אחרי sync
@@ -349,7 +349,7 @@ python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
    ```python
    IS_PRODUCTION = True  # Hardcoded!
    PORT = 5001  # Hardcoded!
-   DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"
+   DB_PATH = BASE_DIR / "db" / "tiktrack.db"
    UI_DIR = BASE_DIR.parent / "trading-ui"
    ```
 3. פתח `production/Backend/config/logging.py`
@@ -384,7 +384,7 @@ python3 -c "from config.settings import PORT, DB_PATH, UI_DIR; \
 - [ ] **ההגדרות ב-`production/Backend/config/settings.py` נכונות (hardcoded production)**
 - [ ] **ההגדרות ב-`production/Backend/config/logging.py` נכונות (logs directory)**
 - [ ] UI_DIR מצביע על `production/trading-ui`
-- [ ] DB_PATH מצביע על `production/Backend/db/TikTrack_DB.db`
+- [ ] DB_PATH מצביע על `production/Backend/db/tiktrack.db`
 - [ ] PORT = 5001 (hardcoded)
 - [ ] IS_PRODUCTION = True (hardcoded)
 - [ ] ה-commit message ברור ומתאר את השינויים

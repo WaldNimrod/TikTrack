@@ -392,7 +392,7 @@
         {
             "label": "TT: Database Backup",
             "type": "shell",
-            "command": "cp Backend/db/simpleTrade_new.db Backend/backups/backup_$(date +%Y%m%d_%H%M%S).db && echo '✅ Backup created successfully'",
+            "command": "cp Backend/db/tiktrack.db Backend/backups/backup_$(date +%Y%m%d_%H%M%S).db && echo '✅ Backup created successfully'",
             "group": "none",
             "presentation": {
                 "reveal": "always",
@@ -411,7 +411,7 @@
         {
             "label": "TT: Database Status",
             "type": "shell",
-            "command": "ls -lh Backend/db/simpleTrade_new.db && echo '\n' && sqlite3 Backend/db/simpleTrade_new.db 'SELECT COUNT(*) as ticker_count FROM tickers;'",
+            "command": "ls -lh Backend/db/tiktrack.db && echo '\n' && sqlite3 Backend/db/tiktrack.db 'SELECT COUNT(*) as ticker_count FROM tickers;'",
             "group": "none",
             "presentation": {
                 "reveal": "always",

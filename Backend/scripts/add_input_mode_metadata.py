@@ -25,7 +25,7 @@ from datetime import datetime
 # Add parent directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'db', 'tiktrack.db')
 
 def run_migration():
     """Run the migration"""

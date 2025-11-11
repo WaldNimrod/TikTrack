@@ -3,7 +3,7 @@
 # Creates a timestamped backup of the database
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-SOURCE_DB="Backend/db/simpleTrade_new.db"
+SOURCE_DB="Backend/db/tiktrack.db"
 BACKUP_DIR="Backend/db/backups"
 BACKUP_FILE="${BACKUP_DIR}/simpleTrade_new_before_remove_cash_balance_${TIMESTAMP}.db"
 

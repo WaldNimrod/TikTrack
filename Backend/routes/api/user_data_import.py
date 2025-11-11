@@ -91,7 +91,7 @@ def upload_and_preview():
         # Create database session
         from sqlalchemy import create_engine
         from sqlalchemy.orm import sessionmaker
-        engine = create_engine('sqlite:///db/simpleTrade_new.db')
+        engine = create_engine('sqlite:///db/tiktrack.db')
         Session = sessionmaker(bind=engine)
         db_session = Session()
         

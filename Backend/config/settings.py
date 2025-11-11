@@ -10,11 +10,8 @@ BASE_DIR = Path(__file__).parent.parent
 
 # NOTE: Production relies on port 5001 with the isolated TikTrack database.
 #       Full environment mapping lives in documentation/production/PRODUCTION_SETUP.md.
-# Database path - different for production vs development
-if IS_PRODUCTION:
-    DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
-else:
-    DB_PATH = BASE_DIR / "db" / "simpleTrade_new.db"  # Development database
+# Database path - use unified tiktrack database in all environments
+DB_PATH = BASE_DIR / "db" / "tiktrack.db"
 
 UI_DIR = BASE_DIR.parent / "trading-ui"
 

@@ -66,7 +66,7 @@ check "No Cross-Links" "[ ! -L \"$PRODUCTION_BACKEND/Backend\" ]" "No symlinks t
 # ========================================
 info ""
 info "2. Checking database isolation..."
-check "Production DB" "[ -f \"$PRODUCTION_BACKEND/db/TikTrack_DB.db\" ]" "TikTrack_DB.db exists"
+check "Production DB" "[ -f \"$PRODUCTION_BACKEND/db/tiktrack.db\" ]" "tiktrack.db exists"
 check "Dev DB Separate" "[ -f \"$DEV_BACKEND/db/simpleTrade_new.db\" ]" "simpleTrade_new.db (dev) exists separately"
 
 # Check for cross-references
@@ -74,8 +74,8 @@ if [ -f "$PRODUCTION_BACKEND/db/simpleTrade_new.db" ]; then
     warn "Dev DB in Prod" "simpleTrade_new.db found in production (should not exist)"
 fi
 
-if [ -f "$DEV_BACKEND/db/TikTrack_DB.db" ]; then
-    warn "Prod DB in Dev" "TikTrack_DB.db found in development (should not exist)"
+if [ -f "$DEV_BACKEND/db/tiktrack.db" ]; then
+    warn "Prod DB in Dev" "tiktrack.db found in development (should not exist)"
 fi
 
 # ========================================
@@ -121,10 +121,10 @@ else
 fi
 
 # Check DB path
-if grep -q "TikTrack_DB.db" "$PRODUCTION_BACKEND/config/settings.py"; then
-    check "DB Path Config" "true" "DB path points to TikTrack_DB.db"
+if grep -q "tiktrack.db" "$PRODUCTION_BACKEND/config/settings.py"; then
+    check "DB Path Config" "true" "DB path points to tiktrack.db"
 else
-    warn "DB Path Config" "DB path not pointing to TikTrack_DB.db"
+    warn "DB Path Config" "DB path not pointing to tiktrack.db"
 fi
 
 # ========================================
@@ -189,6 +189,42 @@ if [ -d "$PRODUCTION_BACKEND/migrations" ]; then
     warn "Migrations Dir" "migrations/ directory found in production (should not exist)"
 else
     check "No Migrations" "true" "No migrations/ directory in production"
+fi
+
+# ========================================
+# 9. Checking for legacy database filenames in code...
+# ========================================
+info "9. Checking for legacy database filenames in code..."
+
+legacy_refs=$(grep -R -n \
+    --exclude-dir=.git \
+    --exclude-dir=documentation \
+    --exclude-dir=Backend/db/backups \
+    --exclude-dir=production/Backend/db/backups \
+    --exclude-dir=production/trading-ui/images \
+    --exclude='*.md' \
+    --exclude='*.json' \
+    --exclude='scripts/verify_production_isolation.sh' \
+    "simpleTrade_new.db" .. || true)
+
+legacy_prod_refs=$(grep -R -n \
+    --exclude-dir=.git \
+    --exclude-dir=documentation \
+    --exclude-dir=Backend/db/backups \
+    --exclude-dir=production/Backend/db/backups \
+    --exclude-dir=production/trading-ui/images \
+    --exclude='*.md' \
+    --exclude='*.json' \
+    --exclude='scripts/verify_production_isolation.sh' \
+    "TikTrack_DB.db" .. || true)
+
+if [ -n "$legacy_refs" ] || [ -n "$legacy_prod_refs" ]; then
+    echo -e "${RED}❌ Legacy DB references detected:${NC}"
+    [ -n "$legacy_refs" ] && echo "$legacy_refs"
+    [ -n "$legacy_prod_refs" ] && echo "$legacy_prod_refs"
+    ((errors++))
+else
+    check "Legacy DB references" "true" "No legacy database filenames found in code"
 fi
 
 # ========================================

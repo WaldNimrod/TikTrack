@@ -29,6 +29,7 @@ from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
 import threading
+from config.settings import DB_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -542,13 +543,9 @@ class TickerService:
             # Use the linked_items system to get all child entities
             from routes.api.linked_items import get_ticker_child_entities
             import sqlite3
-            import os
             
             # Get database connection for linked_items
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-            
-            conn = sqlite3.connect(DB_PATH)
+            conn = sqlite3.connect(str(DB_PATH))
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             
@@ -635,7 +632,6 @@ class TickerService:
         
         from routes.api.linked_items import get_child_entities, get_parent_entities
         import sqlite3
-        import os
         
         result = {
             'entity_type': entity_type,
@@ -653,10 +649,7 @@ class TickerService:
         
         try:
             # Get database connection for linked_items
-            BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-            
-            conn = sqlite3.connect(DB_PATH)
+            conn = sqlite3.connect(str(DB_PATH))
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             

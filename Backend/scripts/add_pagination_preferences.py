@@ -14,7 +14,7 @@ def add_pagination_preferences():
     """הוספת הגדרות חלוקה לעמודים לבסיס הנתונים"""
     
     # חיבור לבסיס הנתונים
-    conn = sqlite3.connect('db/simpleTrade_new.db')
+    conn = sqlite3.connect('db/tiktrack.db')
     cursor = conn.cursor()
     
     print("🔧 הוספת הגדרות חלוקה לעמודים לבסיס הנתונים...")

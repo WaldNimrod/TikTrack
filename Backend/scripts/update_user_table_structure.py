@@ -16,7 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def get_db_path():
     """Get database path"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
+    return os.path.join(current_dir, "..", "db", "tiktrack.db")
 
 def backup_database():
     """Create backup of database"""

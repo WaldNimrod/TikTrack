@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
-from .settings import DATABASE_URL
+from pathlib import Path
+
+from .settings import DATABASE_URL, IS_PRODUCTION, DB_PATH
 from typing import Generator
 import logging
 
@@ -37,6 +39,10 @@ def get_db() -> Generator[Session, None, None]:
 
 def init_db() -> None:
     """יצירת כל הטבלאות"""
+    if IS_PRODUCTION and Path(DB_PATH).exists():
+        logger.info("Production database detected - skipping metadata create_all")
+        return
+
     from models.base import Base
     from models import ticker, trade, trading_account, trade_plan, alert, cash_flow, note, execution, currency, note_relation_type, user, preferences
     Base.metadata.create_all(bind=engine)

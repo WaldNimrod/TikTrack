@@ -50,9 +50,9 @@ class ImportSystemMigration:
         self.backup_dir.mkdir(parents=True, exist_ok=True)
         
         # Backup database
-        db_path = project_root / "Backend" / "db" / "simpleTrade_new.db"
+        db_path = project_root / "Backend" / "db" / "tiktrack.db"
         if db_path.exists():
-            backup_path = self.backup_dir / "simpleTrade_new.db"
+            backup_path = self.backup_dir / "tiktrack.db"
             shutil.copy2(db_path, backup_path)
             self.log(f"Database backed up to: {backup_path}")
         else:

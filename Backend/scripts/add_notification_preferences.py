@@ -14,7 +14,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 def add_notification_preferences():
     """Add notification preferences to the database"""
     
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'tiktrack.db')
     
     # New notification preferences to add
     notification_preferences = [

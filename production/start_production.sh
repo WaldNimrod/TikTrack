@@ -8,7 +8,7 @@
 # Purpose: Start TikTrack production server safely with conflict detection
 # Location: start_production.sh (project root)
 # Integration: Uses Backend/utils/server_lock_manager.py
-# NOTE: Production stack must stay on port 5001 with Backend/db/TikTrack_DB.db.
+# NOTE: Production stack must stay on port 5001 with Backend/db/tiktrack.db.
 #       See documentation/production/PRODUCTION_SETUP.md for the full checklist.
 # 
 # Features:
@@ -72,7 +72,7 @@ show_help() {
     echo ""
     echo "Description:"
     echo "  Starts TikTrack production server on port $PRODUCTION_PORT"
-    echo "  Uses production database: Backend/db/TikTrack_DB.db"
+    echo "  Uses production database: Backend/db/tiktrack.db"
     echo "  Uses production logs: Backend/logs-production/"
     echo ""
     echo "Examples:"
@@ -105,8 +105,8 @@ check_files() {
     fi
     
     # Check if production database exists
-    if [ ! -f "Backend/db/TikTrack_DB.db" ]; then
-        log_warning "Production database not found: Backend/db/TikTrack_DB.db"
+    if [ ! -f "Backend/db/tiktrack.db" ]; then
+        log_warning "Production database not found: Backend/db/tiktrack.db"
         log_warning "Please run: python3 Backend/scripts/create_production_db.py"
         exit 1
     fi
@@ -142,7 +142,7 @@ start_server() {
     log_info "Server file: $SERVER_FILE"
     log_info "Environment: PRODUCTION"
     log_info "Port: $PRODUCTION_PORT"
-    log_info "Database: db/TikTrack_DB.db"
+    log_info "Database: db/tiktrack.db"
     log_info "Logs: logs-production/"
     log_info "Starting server in foreground mode..."
     echo ""
@@ -151,7 +151,7 @@ start_server() {
     echo "🌐 TikTrack Production Server Starting..."
     echo "📍 URL: http://127.0.0.1:$PRODUCTION_PORT"
     echo "📁 Working Directory: $(pwd)"
-    echo "🗄️  Database: TikTrack_DB.db"
+    echo "🗄️  Database: tiktrack.db"
     echo "📝 Logs: logs-production/"
     echo "📅 Started: $(date)"
     echo "🔄 Mode: Production (Foreground)"

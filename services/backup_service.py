@@ -29,6 +29,7 @@ import logging
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from config.database import get_db
+from config.settings import DB_PATH
 # realtime_notifications removed - using localStorage Events instead
 
 logger = logging.getLogger(__name__)
@@ -125,7 +126,7 @@ class BackupService:
     def _backup_database(self, backup_path: Path) -> Dict[str, Any]:
         """Backup SQLite database"""
         try:
-            db_path = Path("Backend/db/simpleTrade_new.db")
+            db_path = Path(DB_PATH)
             if not db_path.exists():
                 return {'status': 'error', 'error': 'Database file not found'}
             
@@ -396,7 +397,7 @@ class BackupService:
                 return {'status': 'error', 'error': 'Database backup not found'}
             
             # Backup current database
-            current_db_path = Path("Backend/db/simpleTrade_new.db")
+            current_db_path = Path(DB_PATH)
             if current_db_path.exists():
                 backup_current_path = current_db_path.parent / f"{current_db_path.stem}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
                 shutil.copy2(current_db_path, backup_current_path)

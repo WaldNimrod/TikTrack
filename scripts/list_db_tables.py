@@ -6,8 +6,10 @@ import sqlite3
 import sys
 from pathlib import Path
 
+from config.settings import DB_PATH
+
 # Database path
-db_path = Path(__file__).parent.parent / "Backend" / "db" / "simpleTrade_new.db"
+db_path = Path(DB_PATH)
 
 if not db_path.exists():
     print(f"❌ Database not found at: {db_path}")

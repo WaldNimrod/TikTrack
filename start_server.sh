@@ -9,7 +9,7 @@
 # Location: start_server.sh (project root)
 # Integration: Uses Backend/utils/server_lock_manager.py
 # NOTE: This script runs the development stack on port 8080.
-#       For production (port 5001, TikTrack_DB.db) use start_production.sh
+#       For production (port 5001, tiktrack.db) use start_production.sh
 #       as documented in documentation/production/PRODUCTION_SETUP.md.
 # 
 # Features:
@@ -29,7 +29,7 @@ SERVER_DIR="Backend"
 SERVER_FILE="$SERVER_DIR/app.py"
 LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
 SERVER_PORT=8080
-DB_PATH="$SERVER_DIR/db/simpleTrade_new.db"
+DB_PATH="$SERVER_DIR/db/tiktrack.db"
 
 # Colors for output
 RED='\033[0;31m'
@@ -237,7 +237,7 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=5001
-            DB_PATH="$SERVER_DIR/db/TikTrack_DB.db"
+            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             ;;
         development|dev|DEVELOPMENT|Dev|"")
             ENVIRONMENT="development"
@@ -245,7 +245,7 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=8080
-            DB_PATH="$SERVER_DIR/db/simpleTrade_new.db"
+            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             ;;
         *)
             log_error "Unknown environment: $ENVIRONMENT"

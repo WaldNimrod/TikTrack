@@ -350,32 +350,6 @@ function getCurrencySymbol(currencyId) {
   }
 }
 
-
-/**
- * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
- */
-function getTimeDuration(dateString) {
-  try {
-    if (!dateString) return 'N/A';
-    
-    const now = new Date();
-    const date = new Date(dateString);
-    
-    if (isNaN(date.getTime())) return 'N/A';
-    
-    const diffMs = now - date;
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
-    // פורמט אחיד: ימים:שעות:דקות
-    return `${diffDays.toString().padStart(2, '0')}:${diffHours.toString().padStart(2, '0')}:${diffMinutes.toString().padStart(2, '0')}`;
-  } catch (error) {
-    console.error('getTimeDuration failed:', error);
-    return 'N/A';
-  }
-}
-
 /**
  * קבלת עיצוב סוג טיקר
  */
@@ -1652,7 +1626,17 @@ async function loadTickersData() {
     const data = await response.json();
 
     // שמירת הנתונים
-    tickersData = data.data || data;
+    const rawTickers = data?.data || data;
+    tickersData = Array.isArray(rawTickers)
+      ? rawTickers.map(ticker => ({
+          ...ticker,
+          updated_at: ticker.updated_at
+            || ticker.yahoo_updated_at
+            || ticker.fetched_at
+            || ticker.last_updated_at
+            || null
+        }))
+      : [];
     window.tickersData = tickersData;
 
     // עדכון שדה active_trades
@@ -1769,7 +1753,6 @@ function renderTickersTableRows(tickers) {
       const priceValue = toFiniteNumber(ticker.current_price);
       const changePercentValue = toFiniteNumber(ticker.change_percent);
       const volumeValue = toFiniteNumber(ticker.volume);
-      const updatedAtDate = parseValidDate(ticker.yahoo_updated_at);
 
       const priceHtml = (typeof window.renderAmount === 'function' && priceValue !== null)
         ? window.renderAmount(priceValue, currencySymbol, 2, false)
@@ -1794,14 +1777,23 @@ function renderTickersTableRows(tickers) {
               ${statusLabel}
            </span>`;
 
-      // נתוני מחירים מהשירות החיצוני
-      const updatedAtDisplay = updatedAtDate ? updatedAtDate.toLocaleString('he-IL') : 'N/A';
-      const updatedAtIso = updatedAtDate ? updatedAtDate.toISOString().split('T')[0] : '';
-      const updatedAtCellContent = updatedAtDate
-        ? (typeof window.renderDate === 'function'
-            ? window.renderDate(updatedAtDate, true)
-            : `${updatedAtDate.toLocaleDateString('he-IL')} ${updatedAtDate.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`)
-        : 'N/A';
+      const updatedCellHtml = (() => {
+        if (typeof window.renderUpdatedCell === 'function') {
+          return window.renderUpdatedCell(ticker, {
+            fields: ['updated_at', 'yahoo_updated_at', 'fetched_at', 'last_updated_at'],
+            columnClass: 'col-updated'
+          });
+        }
+        const fallbackDate = parseValidDate(ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at);
+        if (!fallbackDate) {
+          return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+        }
+        const absolute = fallbackDate.toLocaleString('he-IL');
+        const duration = typeof window.getDurationSince === 'function'
+          ? window.getDurationSince(fallbackDate, { fallback: absolute })
+          : absolute;
+        return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+      })();
 
       return `
                 <tr>
@@ -1833,9 +1825,7 @@ function renderTickersTableRows(tickers) {
                     <td class="table-cell-center" title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}">
                         ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
                     </td>
-                    <td class="date-cell table-cell-center" data-date="${updatedAtIso}" title="${updatedAtDate ? `עודכן: ${updatedAtDisplay}` : 'אין נתוני עדכון'}">
-                        ${updatedAtCellContent}
-                    </td>
+                    ${updatedCellHtml}
                     <td class="actions-cell">
                         ${(() => {
                           if (!window.createActionsMenu) return '<!-- Actions menu not available -->';

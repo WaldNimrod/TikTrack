@@ -29,9 +29,9 @@
   --color-warning-border: #ffeaa7;
   
   /* מידע - Info */
-  --color-info: #007bff;
-  --color-info-light: #d1ecf1;
-  --color-info-border: #bee5eb;
+  --color-info: var(--brand-primary-color, #26baac);
+  --color-info-light: #d2f4ef;
+  --color-info-border: #a8e8de;
   
   /* ===== צבעי ערכים מספריים ===== */
   

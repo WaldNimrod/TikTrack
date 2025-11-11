@@ -260,7 +260,7 @@ await window.resetToDefaults(); // איפוס לברירות מחדל
 ## 🎨 מערכת צבעים
 
 ### צבעי מערכת בסיסיים:
-- `primaryColor` - צבע ראשי (#007bff)
+- `primaryColor` - צבע ראשי (#26baac)
 - `secondaryColor` - צבע משני (#6c757d)
 - `successColor` - צבע הצלחה (#28a745)
 - `warningColor` - צבע אזהרה (#ffc107)
@@ -269,7 +269,7 @@ await window.resetToDefaults(); // איפוס לברירות מחדל
 ### צבעי ישויות:
 - `entityAccountColor` - צבע חשבונות (#28a745)
 - `entityTickerColor` - צבע מטבעות (#17a2b8)
-- `entityTradeColor` - צבע עסקאות (#007bff)
+- `entityTradeColor` - צבע עסקאות (#26baac)
 - `entityCashFlowColor` - צבע תזרים מזומנים (#20c997)
 - `entityCashFlowColorLight` - צבע בהיר לתזרים (#20c997)
 - `entityCashFlowColorDark` - צבע כהה לתזרים (#138496)

@@ -151,7 +151,13 @@ window.loadAlertsData = async function() {
       window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
 
       // שמירת הנתונים במשתנה גלובלי
-      window.alertsData = data.data || data;
+      const rawAlerts = data?.data || data;
+      window.alertsData = Array.isArray(rawAlerts)
+        ? rawAlerts.map(alert => ({
+            ...alert,
+            updated_at: alert.updated_at || alert.triggered_at || alert.created_at || alert.last_evaluated_at || null
+          }))
+        : [];
       window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
 
       // עדכון הטבלה
@@ -460,7 +466,7 @@ function renderAlertsTableRows(alerts) {
     // בדיקה שהנתונים קיימים
     if (!alerts || !Array.isArray(alerts)) {
       window.Logger.warn('⚠️ alerts parameter is not available or not an array', { page: "alerts" });
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין התראות להצגה</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין התראות להצגה</td></tr>';
       return;
     }
 
@@ -876,6 +882,27 @@ function renderAlertsTableRows(alerts) {
           <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
           <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
           <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
+          ${(() => {
+            if (typeof window.renderUpdatedCell === 'function') {
+              return window.renderUpdatedCell(alert, {
+                fields: ['updated_at', 'triggered_at', 'created_at'],
+                columnClass: 'col-updated'
+              });
+            }
+            const fallbackDate = window.toDateObject
+              ? window.toDateObject(alert.updated_at || alert.triggered_at || alert.created_at)
+              : (alert.updated_at || alert.triggered_at || alert.created_at
+                  ? new Date(alert.updated_at || alert.triggered_at || alert.created_at)
+                  : null);
+            if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+            const absolute = fallbackDate.toLocaleString('he-IL');
+            const duration = typeof window.getDurationSince === 'function'
+              ? window.getDurationSince(fallbackDate, { fallback: absolute })
+              : absolute;
+            return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+          })()}
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';

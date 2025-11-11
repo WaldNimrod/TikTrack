@@ -34,10 +34,10 @@
 }
 
 .actions-row .action-btn:hover {
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #26baac);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 8px rgba(38, 186, 172, 0.2);
 }
 
 /* Button Layout - פריסת כפתורים */
@@ -84,8 +84,8 @@
 .btn-add,
 button.btn-add {
     background-color: white;
-    color: var(--primary-color, #007bff);
-    border: 2px solid var(--primary-color, #007bff);
+    color: var(--primary-color, #26baac);
+    border: 2px solid var(--primary-color, #26baac);
     border-radius: 6px;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
@@ -95,10 +95,10 @@ button.btn-add {
 }
 
 .btn-add:hover {
-    background-color: color-mix(in srgb, var(--primary-color, #007bff) 30%, transparent);
-    color: var(--primary-color, #007bff);
+    background-color: color-mix(in srgb, var(--primary-color, #26baac) 30%, transparent);
+    color: var(--primary-color, #26baac);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 8px rgba(38, 186, 172, 0.2);
 }
 
 /* .filter-toggle-btn moved to 05-objects/_layout.css - more detailed definition */

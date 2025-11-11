@@ -193,6 +193,102 @@ function toDateObject(value) {
   return null;
 }
 
+function resolvePropertyPath(source, path) {
+  if (source === null || source === undefined || path === undefined || path === null) {
+    return undefined;
+  }
+
+  if (Array.isArray(path)) {
+    return path.reduce((current, segment) => resolvePropertyPath(current, segment), source);
+  }
+
+  const segments = String(path).split('.').filter(Boolean);
+  let current = source;
+
+  for (const segment of segments) {
+    if (current === null || current === undefined) {
+      return undefined;
+    }
+    current = current?.[segment];
+  }
+
+  return current;
+}
+
+function getLatestTimestamp(entity, fieldPaths = []) {
+  if (!entity) {
+    return null;
+  }
+
+  const paths = Array.isArray(fieldPaths) ? fieldPaths : [fieldPaths];
+  const candidates = [];
+
+  for (const path of paths) {
+    if (!path) {
+      continue;
+    }
+    const rawValue = resolvePropertyPath(entity, path);
+    const dateObj = toDateObject(rawValue);
+    if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
+      candidates.push(dateObj);
+    }
+  }
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  candidates.sort((a, b) => b.getTime() - a.getTime());
+  return candidates[0];
+}
+
+function padDurationPart(value) {
+  return String(Math.max(0, value || 0)).padStart(2, '0');
+}
+
+function formatDurationParts(diffMs, { format = 'dhm', includeSeconds = false } = {}) {
+  if (!Number.isFinite(diffMs) || diffMs < 0) {
+    diffMs = 0;
+  }
+
+  const secondMs = 1000;
+  const minuteMs = secondMs * 60;
+  const hourMs = minuteMs * 60;
+  const dayMs = hourMs * 24;
+
+  const days = Math.floor(diffMs / dayMs);
+  const hours = Math.floor((diffMs % dayMs) / hourMs);
+  const minutes = Math.floor((diffMs % hourMs) / minuteMs);
+  const seconds = Math.floor((diffMs % minuteMs) / secondMs);
+
+  if (format === 'hms') {
+    const totalHours = Math.floor(diffMs / hourMs);
+    if (includeSeconds) {
+      return `${padDurationPart(totalHours)}:${padDurationPart(minutes)}:${padDurationPart(seconds)}`;
+    }
+    return `${padDurationPart(totalHours)}:${padDurationPart(minutes)}`;
+  }
+
+  // Default format: days:hours:minutes
+  if (includeSeconds) {
+    return `${padDurationPart(days)}:${padDurationPart(hours)}:${padDurationPart(minutes)}:${padDurationPart(seconds)}`;
+  }
+
+  return `${padDurationPart(days)}:${padDurationPart(hours)}:${padDurationPart(minutes)}`;
+}
+
+function getDurationSince(value, options = {}) {
+  const { format = 'dhm', includeSeconds = false, fallback = null } = options || {};
+  const dateObj = toDateObject(value);
+  if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) {
+    return fallback;
+  }
+
+  const now = Date.now();
+  const diffMs = now - dateObj.getTime();
+  return formatDurationParts(diffMs, { format, includeSeconds });
+}
+
 function getEpochMilliseconds(value) {
   if (isDateEnvelope(value)) {
     if (typeof value.epochMs === 'number') {
@@ -820,6 +916,9 @@ window.addMonths = addMonths;
 window.getEpochMilliseconds = getEpochMilliseconds;
 window.ensureDateEnvelope = ensureDateEnvelope;
 window.isDateEnvelope = isDateEnvelope;
+window.resolvePropertyPath = resolvePropertyPath;
+window.getLatestTimestamp = getLatestTimestamp;
+window.getDurationSince = getDurationSince;
 window.setUserTimezone = setUserTimezone;
 window.getUserTimezone = getUserTimezone;
 window.adaptDateEnvelopes = adaptDateEnvelopes;

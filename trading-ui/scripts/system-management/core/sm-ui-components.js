@@ -305,7 +305,7 @@ class SMUIComponents {
       warning: { color: '#ffc107', icon: 'fa-exclamation-triangle' },
       danger: { color: '#dc3545', icon: 'fa-times-circle' },
       info: { color: '#17a2b8', icon: 'fa-info-circle' },
-      primary: { color: '#007bff', icon: 'fa-circle' },
+      primary: { color: '#26baac', icon: 'fa-circle' },
       secondary: { color: '#6c757d', icon: 'fa-circle' }
     };
     

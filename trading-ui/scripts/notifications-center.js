@@ -67,7 +67,7 @@ async function loadCategoriesOverview() {
 
     // Get available categories from the system
     const categories = [
-      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: '#007bff' },
+      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: '#26baac' },
       { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: '#28a745' },
       { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: '#17a2b8' },
       { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: '#6f42c1' },

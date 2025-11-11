@@ -137,7 +137,7 @@ function getInvestmentTypeColor(investmentType) {
 
   // השתמש במערכת הצבעים הכללית אם היא זמינה
   const typeColors = {
-    'swing': window.getEntityColor ? window.getEntityColor('trade') : '#007bff',
+    'swing': window.getEntityColor ? window.getEntityColor('trade') : '#26baac',
     'investment': window.getEntityColor ? window.getEntityColor('account') : '#28a745',
     'passive': window.getEntityColor ? window.getEntityColor('note') : '#6f42c1',
   };

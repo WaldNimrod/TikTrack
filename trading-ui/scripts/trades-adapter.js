@@ -198,8 +198,8 @@ class TradesAdapter {
                 {
                     label: 'Daily Performance',
                     data: daily,
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderColor: '#26baac',
+                    backgroundColor: 'rgba(38, 186, 172, 0.1)',
                     tension: 0.4
                 },
                 {
@@ -236,8 +236,8 @@ class TradesAdapter {
                     summary.openTrades || 0,
                     summary.closedTrades || 0
                 ],
-                backgroundColor: ['#007bff', '#28a745', '#dc3545'],
-                borderColor: ['#0056b3', '#1e7e34', '#c82333'],
+                backgroundColor: ['#26baac', '#28a745', '#dc3545'],
+                borderColor: ['#1a8f83', '#1e7e34', '#c82333'],
                 borderWidth: 2
             }]
         };
@@ -261,8 +261,8 @@ class TradesAdapter {
                     label: 'Daily Performance',
                     data: daily,
                     type: 'line',
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderColor: '#26baac',
+                    backgroundColor: 'rgba(38, 186, 172, 0.1)',
                     tension: 0.4
                 },
                 {
@@ -297,8 +297,8 @@ class TradesAdapter {
                 datasets: [{
                     label: 'Performance',
                     data: [100, 120, 95, 110, 125],
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)'
+                    borderColor: '#26baac',
+                    backgroundColor: 'rgba(38, 186, 172, 0.1)'
                 }]
             },
             account: {
@@ -306,7 +306,7 @@ class TradesAdapter {
                 datasets: [{
                     label: 'Account',
                     data: [3, 2, 1],
-                    backgroundColor: ['#007bff', '#28a745', '#dc3545']
+                    backgroundColor: ['#26baac', '#28a745', '#dc3545']
                 }]
             },
             mixed: {
@@ -316,7 +316,7 @@ class TradesAdapter {
                         label: 'Performance',
                         data: [100, 120, 95],
                         type: 'line',
-                        borderColor: '#007bff'
+                        borderColor: '#26baac'
                     },
                     {
                         label: 'Profits',

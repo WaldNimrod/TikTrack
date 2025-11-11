@@ -2298,7 +2298,7 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
             'medium': {
                 emoji: '🔵',
                 name: 'Medium - ניקוי בינוני',
-                color: '#007bff',
+                color: '#26baac',
                 warning: 'ניקוי בינוני - מומלץ לפיתוח יומיומי',
                 items: [
                     `✅ כל Light (Memory + Services)`,

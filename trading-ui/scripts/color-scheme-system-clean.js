@@ -19,8 +19,19 @@ const VALID_ENTITY_TYPES = [
 ];
 
 // ===== COLOR DEFINITIONS =====
+const BRAND_PRIMARY = '#26baac';
+const BRAND_PRIMARY_TEXT = '#1a8f83';
+const BRAND_PRIMARY_LIGHT = '#6ed8ca';
+const BRAND_PRIMARY_BG = 'rgba(38, 186, 172, 0.1)';
+const BRAND_PRIMARY_BORDER = 'rgba(38, 186, 172, 0.3)';
+const BRAND_SECONDARY = '#fc5a06';
+const BRAND_SECONDARY_TEXT = '#d24d05';
+const BRAND_SECONDARY_LIGHT = '#ffb17a';
+const BRAND_SECONDARY_BG = 'rgba(252, 90, 6, 0.12)';
+const BRAND_SECONDARY_BORDER = 'rgba(252, 90, 6, 0.3)';
+
 const ENTITY_COLORS = {
-  trade: '#007bff',
+  trade: BRAND_PRIMARY,
   trade_plan: '#28a745',
   execution: '#17a2b8',
   account: '#6f42c1',
@@ -36,7 +47,7 @@ const ENTITY_COLORS = {
 };
 
 const ENTITY_BACKGROUND_COLORS = {
-  trade: 'rgba(0, 123, 255, 0.1)',
+  trade: BRAND_PRIMARY_BG,
   trade_plan: 'rgba(40, 167, 69, 0.1)',
   execution: 'rgba(23, 162, 184, 0.1)',
   account: 'rgba(111, 66, 193, 0.1)',
@@ -52,7 +63,7 @@ const ENTITY_BACKGROUND_COLORS = {
 };
 
 const ENTITY_TEXT_COLORS = {
-  trade: '#0056b3',
+  trade: BRAND_PRIMARY_TEXT,
   trade_plan: '#1e7e34',
   execution: '#117a8b',
   account: '#59359a',
@@ -68,7 +79,7 @@ const ENTITY_TEXT_COLORS = {
 };
 
 const ENTITY_BORDER_COLORS = {
-  trade: 'rgba(0, 123, 255, 0.3)',
+  trade: BRAND_PRIMARY_BORDER,
   trade_plan: 'rgba(40, 167, 69, 0.3)',
   execution: 'rgba(23, 162, 184, 0.3)',
   account: 'rgba(111, 66, 193, 0.3)',
@@ -97,9 +108,9 @@ const STATUS_COLORS = {
 
 const INVESTMENT_TYPE_COLORS = {
   swing: {
-    medium: '#007bff',
-    light: 'rgba(0, 123, 255, 0.1)',
-    border: 'rgba(0, 123, 255, 0.3)'
+    medium: BRAND_PRIMARY,
+    light: BRAND_PRIMARY_BG,
+    border: BRAND_PRIMARY_BORDER
   },
   day: {
     medium: '#28a745',
@@ -381,8 +392,8 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
 
 function applyLightScheme() {
   // Apply light theme colors
-  document.documentElement.style.setProperty('--primary-color', '#007bff');
-  document.documentElement.style.setProperty('--secondary-color', '#6c757d');
+  document.documentElement.style.setProperty('--primary-color', BRAND_PRIMARY);
+  document.documentElement.style.setProperty('--secondary-color', BRAND_SECONDARY);
   document.documentElement.style.setProperty('--success-color', '#28a745');
   document.documentElement.style.setProperty('--danger-color', '#dc3545');
   document.documentElement.style.setProperty('--warning-color', '#ffc107');
@@ -391,8 +402,8 @@ function applyLightScheme() {
 
 function applyDarkScheme() {
   // Apply dark theme colors
-  document.documentElement.style.setProperty('--primary-color', '#0d6efd');
-  document.documentElement.style.setProperty('--secondary-color', '#6c757d');
+  document.documentElement.style.setProperty('--primary-color', BRAND_PRIMARY_TEXT);
+  document.documentElement.style.setProperty('--secondary-color', BRAND_SECONDARY_TEXT);
   document.documentElement.style.setProperty('--success-color', '#198754');
   document.documentElement.style.setProperty('--danger-color', '#dc3545');
   document.documentElement.style.setProperty('--warning-color', '#ffc107');

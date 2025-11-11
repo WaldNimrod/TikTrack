@@ -31,7 +31,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--primary-color, #007bff);
+  background: var(--primary-color, #26baac);
   opacity: 0.2;
   z-index: -1; /* מאחורי האיור */
 }
@@ -119,8 +119,8 @@
 .hero-stat:hover {
   transform: translateY(-2px);
   background: var(--card-bg-hover, #f8f9fa);
-  border-color: var(--primary-color, #007bff);
-  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.1);
+  border-color: var(--primary-color, #26baac);
+  box-shadow: 0 4px 16px rgba(38, 186, 172, 0.12);
 }
 
 .hero-stat-number {
@@ -167,11 +167,11 @@
 }
 
 .quick-link-icon:hover {
-  background: var(--primary-color, #007bff);
+  background: var(--primary-color, #26baac);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(38, 186, 172, 0.2);
   color: white;
-  border-color: var(--primary-color, #007bff);
+  border-color: var(--primary-color, #26baac);
 }
 
 .quick-link-icon.gradient-bg {

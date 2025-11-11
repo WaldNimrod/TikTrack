@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>Future Tasks Review Form</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 24px;
+      background-color: #f7f9fb;
+      color: #1f2933;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #0d3b66;
+    }
+    fieldset {
+      border: 1px solid #cbd5e0;
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+    }
+    legend {
+      font-weight: 600;
+      padding: 0 8px;
+    }
+    .task {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 0;
+    }
+    .task:last-child {
+      border-bottom: none;
+    }
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .task-desc {
+      margin: 0 0 8px 0;
+      color: #4a5568;
+      font-size: 0.95rem;
+    }
+    label {
+      font-weight: 500;
+      margin-left: 8px;
+    }
+    select, input[type="text"] {
+      padding: 6px 8px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+    select {
+      min-width: 140px;
+    }
+    .other-input {
+      display: none;
+      margin-top: 8px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    button {
+      background-color: #26baac;
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1ea094;
+    }
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      margin-top: 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e0;
+      padding: 8px;
+      font-size: 0.95rem;
+    }
+    .helper {
+      font-size: 0.85rem;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <h1>Future Tasks Review – טופס עבודה זמני</h1>
+  <p class="helper">בחר סטטוס לכל סעיף לפי ההנחיות. בסטטוס "אחר" ניתן להוסיף הסבר חופשי.</p>
+
+  <form id="tasksForm">
+    <!-- Category 1 -->
+    <fieldset>
+      <legend>1. ממשק משתמש וחוויית משתמש</legend>
+
+      <div class="task" data-id="1.1.1">
+        <div class="task-title">צבעי כותרות דינמיים</div>
+        <p class="task-desc">אחידות צבעים לכל כותרות המערכת תוך שימוש במערכת צבעים מאוחדת.</p>
+        <label for="status-1.1.1">סטטוס:</label>
+        <select id="status-1.1.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.1.2">
+        <div class="task-title">מינוח אחיד</div>
+        <p class="task-desc">יישור כל הטקסטים במערכת למונחים מוסכמים לפי המדריכים.</p>
+        <label for="status-1.1.2">סטטוס:</label>
+        <select id="status-1.1.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.2.1">
+        <div class="task-title">שיפור נגישות – תמיכה בקוראי מסך</div>
+        <p class="task-desc">הוספת ARIA ואינטגרציה עם קריינות לכל רכיבי ה־UI.</p>
+        <label for="status-1.2.1">סטטוס:</label>
+        <select id="status-1.2.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.2.2">
+        <div class="task-title">שיפור נגישות – ניווט במקלדת</div>
+        <p class="task-desc">הבטחת פוקוס תקין וקיצורי דרך לניהול המערכת.</p>
+        <label for="status-1.2.2">סטטוס:</label>
+        <select id="status-1.2.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.2.3">
+        <div class="task-title">שיפור נגישות – התאמת גדלי מסך</div>
+        <p class="task-desc">בדיקות רספונסיביות והבטחת קריאות בכל הרזולוציות.</p>
+        <label for="status-1.2.3">סטטוס:</label>
+        <select id="status-1.2.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.2.4">
+        <div class="task-title">שיפור נגישות – ניגודיות צבעים</div>
+        <p class="task-desc">התאמת צבעים לעמידה ב־WCAG 2.1 AA.</p>
+        <label for="status-1.2.4">סטטוס:</label>
+        <select id="status-1.2.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.3.1">
+        <div class="task-title">מודל פרטי היסטוריה – background-tasks.js</div>
+        <p class="task-desc">יצירת מודל אחיד להצגת היסטוריה, פעולות וסטטוסי משימות.</p>
+        <label for="status-1.3.1">סטטוס:</label>
+        <select id="status-1.3.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.3.2">
+        <div class="task-title">אימות משתמש והצטרפות לחדר – realtime-notifications</div>
+        <p class="task-desc">ניהול זיהוי משתמש, חדרי WebSocket והרשאות בזמן אמת.</p>
+        <label for="status-1.3.2">סטטוס:</label>
+        <select id="status-1.3.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.4.1">
+        <div class="task-title">מערכת תבניות מתקדמת</div>
+        <p class="task-desc">ניהול תבניות UI לשימוש חוזר במודולים שונים.</p>
+        <label for="status-1.4.1">סטטוס:</label>
+        <select id="status-1.4.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.4.2">
+        <div class="task-title">מערכת תגיות מתקדמת</div>
+        <p class="task-desc">הוספת תגיות, אנליטיקה וחיפוש רוחבי לכל הישויות.</p>
+        <label for="status-1.4.2">סטטוס:</label>
+        <select id="status-1.4.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.1">
+        <div class="task-title">עמודת “עודכן” בכל הטבלאות</div>
+        <p class="task-desc">הוספת עמודת Updated ויצירת תצוגת זמן עדכנית.</p>
+        <label for="status-1.6.1">סטטוס:</label>
+        <select id="status-1.6.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.2">
+        <div class="task-title">עדכון CSS לרוחב טבלאות ויישור כותרות</div>
+        <p class="task-desc">הבטחת 100% רוחב ויישור מרכזי לכל הטבלאות.</p>
+        <label for="status-1.6.2">סטטוס:</label>
+        <select id="status-1.6.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.3">
+        <div class="task-title">הטמעת getTimeDuration</div>
+        <p class="task-desc">שימוש בפונקציה להצגת זמן שעבר מאז העדכון האחרון.</p>
+        <label for="status-1.6.3">סטטוס:</label>
+        <select id="status-1.6.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.4">
+        <div class="task-title">עיצוב עמודת Has Trades</div>
+        <p class="task-desc">שימוש באייקונים ואינדיקציות לפי מערכת הצבעים.</p>
+        <label for="status-1.6.4">סטטוס:</label>
+        <select id="status-1.6.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.5">
+        <div class="task-title">עיצוב מספרים עם שתי ספרות אחרי הנקודה</div>
+        <p class="task-desc">אחידות פורמט מסחר בטבלאות.</p>
+        <label for="status-1.6.5">סטטוס:</label>
+        <select id="status-1.6.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.6">
+        <div class="task-title">הטמעת RTL בטבלאות, מודלים ו־linked items</div>
+        <p class="task-desc">עבודה עם CSS לוגי ותמיכה מלאה בעברית.</p>
+        <label for="status-1.6.6">סטטוס:</label>
+        <select id="status-1.6.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.7">
+        <div class="task-title">שימוש ב־CSS variables לצבעי ישויות</div>
+        <p class="task-desc">חיבור לכל צבעי המערכת במשתנים אחידים.</p>
+        <label for="status-1.6.7">סטטוס:</label>
+        <select id="status-1.6.7">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.8">
+        <div class="task-title">עדכון map & sorting לטבלאות</div>
+        <p class="task-desc">עדכון `tables.js` ו־`table-mappings.js` ליישומים החדשים.</p>
+        <label for="status-1.6.8">סטטוס:</label>
+        <select id="status-1.6.8">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="1.6.9">
+        <div class="task-title">עדכון קבצים נלווים</div>
+        <p class="task-desc">התאמת קבצי CSS ו־JS תומכים (table, styles, linked-items, color-scheme, preferences).</p>
+        <label for="status-1.6.9">סטטוס:</label>
+        <select id="status-1.6.9">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.6">
+        <div class="task-title">מערכת Analytics מתקדמת</div>
+        <p class="task-desc">בניית Dashboard למדדי שימוש וביצועים עם איסוף metrics.</p>
+        <label for="status-2.3.6">סטטוס:</label>
+        <select id="status-2.3.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.7">
+        <div class="task-title">Plugin Architecture</div>
+        <p class="task-desc">הגדרת מודולריות, ממשקי הרחבה וניהול lifecycle של תוספים.</p>
+        <label for="status-2.3.7">סטטוס:</label>
+        <select id="status-2.3.7">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+    </fieldset>
+
+    <!-- Category 3 -->
+    <fieldset>
+      <legend>3. בסיס נתונים, טריגרים ומיגרציות</legend>
+
+      <div class="task" data-id="3.1.1">
+        <div class="task-title">השלמת טריגרי active_trades</div>
+        <p class="task-desc">הוספת insert/update/delete לטריגר וניהול אינטגריטי.</p>
+        <label for="status-3.1.1">סטטוס:</label>
+        <select id="status-3.1.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.1.2">
+        <div class="task-title">טריגרי סטטוס טיקר</div>
+        <p class="task-desc">סנכרון סטטוס בטיקר עבור כל פעולות CRUD ב־trade ו־trade_plan.</p>
+        <label for="status-3.1.2">סטטוס:</label>
+        <select id="status-3.1.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.1.3">
+        <div class="task-title">בדיקת טריגרים קיימים</div>
+        <p class="task-desc">וידוא שאין התנגשויות ותיעוד מלא למדריך התחזוקה.</p>
+        <label for="status-3.1.3">סטטוס:</label>
+        <select id="status-3.1.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.2.1">
+        <div class="task-title">יצירת טבלאות users / user_preferences / quotes_last / intraday_slots</div>
+        <p class="task-desc">בניית סכמות חדשות לרמות המשתמשים והנתונים.</p>
+        <label for="status-3.2.1">סטטוס:</label>
+        <select id="status-3.2.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.2.2">
+        <div class="task-title">ארגון מודלים והעברת imports</div>
+        <p class="task-desc">פיזור המודלים לקבצים הנכונים ושמירת סדר טעינה.</p>
+        <label for="status-3.2.2">סטטוס:</label>
+        <select id="status-3.2.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.2.3">
+        <div class="task-title">מודל User ומערכת הרשאות בסיסית</div>
+        <p class="task-desc">הוספת ORM, אימותים והרשאות admin/user/guest.</p>
+        <label for="status-3.2.3">סטטוס:</label>
+        <select id="status-3.2.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.2.4">
+        <div class="task-title">עדכון קשרים ואינדקסים</div>
+        <p class="task-desc">הגדרת Foreign Keys, אינדקסים ויחסים בין מודלים.</p>
+        <label for="status-3.2.4">סטטוס:</label>
+        <select id="status-3.2.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.2.5">
+        <div class="task-title">ולידציות ואודיט לוגים</div>
+        <p class="task-desc">הוספת אימותי אימייל/סיסמה ו־audit logs לשינויים.</p>
+        <label for="status-3.2.5">סטטוס:</label>
+        <select id="status-3.2.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.2.6">
+        <div class="task-title">אופטימיזציית ביצועי שאילתות</div>
+        <p class="task-desc">שיפור queries כבדים והפחתת עומסי DB.</p>
+        <label for="status-3.2.6">סטטוס:</label>
+        <select id="status-3.2.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.3.1">
+        <div class="task-title">טבלת users מלאה</div>
+        <p class="task-desc">הגדרת שדות, אינדקסים וניהול משתמשים בסיסי.</p>
+        <label for="status-3.3.1">סטטוס:</label>
+        <select id="status-3.3.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+
+    <!-- Category 2 -->
+    <fieldset>
+      <legend>2. Backend, תשתיות ושרת</legend>
+
+      <div class="task" data-id="2.1.1">
+        <div class="task-title">אופטימיזציה של טעינת נתונים</div>
+        <p class="task-desc">שיפור שאילתות וזרימות נתונים להפחתת זמני טעינה.</p>
+        <label for="status-2.1.1">סטטוס:</label>
+        <select id="status-2.1.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.3.2">
+        <div class="task-title">טבלת user_preferences</div>
+        <p class="task-desc">קשר ל־users, שדות preference_key/value ועקיבה אחר עדכונים.</p>
+        <label for="status-3.3.2">סטטוס:</label>
+        <select id="status-3.3.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.3.3">
+        <div class="task-title">מערכת אימות משתמשים</div>
+        <p class="task-desc">login/logout, JWT, refresh tokens וניהול סשנים.</p>
+        <label for="status-3.3.3">סטטוס:</label>
+        <select id="status-3.3.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.3.4">
+        <div class="task-title">ניהול פרופיל משתמש</div>
+        <p class="task-desc">עריכת פרטים אישיים, שינוי סיסמה וניהול העדפות.</p>
+        <label for="status-3.3.4">סטטוס:</label>
+        <select id="status-3.3.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.3.5">
+        <div class="task-title">מערכת הרשאות מתקדמת</div>
+        <p class="task-desc">תשתית להרשאות גרנולריות לפי טבלה ופעולה.</p>
+        <label for="status-3.3.5">סטטוס:</label>
+        <select id="status-3.3.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.3.6">
+        <div class="task-title">ולידציות, גיבויים ולוגים</div>
+        <p class="task-desc">הוספת ולידציות מתקדמות, גיבוי אוטומטי ולוגי מערכת.</p>
+        <label for="status-3.3.6">סטטוס:</label>
+        <select id="status-3.3.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.1">
+        <div class="task-title">גיבוי בסיס הנתונים לפני פעולות</div>
+        <p class="task-desc">נהלי גיבוי לפני כל שינוי במערכת ההעדפות.</p>
+        <label for="status-3.4.1">סטטוס:</label>
+        <select id="status-3.4.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.2">
+        <div class="task-title">עדכון סקריפטי מיגרציה</div>
+        <p class="task-desc">שינוי שמות הקבצים והפונקציות לטיפול בהעדפות המאוחדות.</p>
+        <label for="status-3.4.2">סטטוס:</label>
+        <select id="status-3.4.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.3">
+        <div class="task-title">עדכון בדיקות V2</div>
+        <p class="task-desc">החלפת שמות קבצי הבדיקות והתייחסויות לטבלאות V2.</p>
+        <label for="status-3.4.3">סטטוס:</label>
+        <select id="status-3.4.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.4">
+        <div class="task-title">ניקוי טבלת user_data_preferences</div>
+        <p class="task-desc">הסרת נתונים ישנים והתאמת הסכמה ל־V2 המאוחדת.</p>
+        <label for="status-3.4.4">סטטוס:</label>
+        <select id="status-3.4.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.5">
+        <div class="task-title">עדכון קבצי Frontend להעדפות</div>
+        <p class="task-desc">שינוי שמות קבצים וקישורים ל־preferences.js ו־preferences.html.</p>
+        <label for="status-3.4.5">סטטוס:</label>
+        <select id="status-3.4.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.6">
+        <div class="task-title">ניקוי התייחסויות V1/V2 בדוקומנטציה</div>
+        <p class="task-desc">עדכון index וקבצי מדריך להסרה מוחלטת של V1/V2.</p>
+        <label for="status-3.4.6">סטטוס:</label>
+        <select id="status-3.4.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.7">
+        <div class="task-title">עדכון קבצי תצורה</div>
+        <p class="task-desc">התאמת JSON, js_map, pages ו־app להגדרות החדשות.</p>
+        <label for="status-3.4.7">סטטוס:</label>
+        <select id="status-3.4.7">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="3.4.8">
+        <div class="task-title">בדיקות מערכת ההעדפות המאוחדת</div>
+        <p class="task-desc">בדיקות DB, API, Frontend ואינטגרציה מלאה.</p>
+        <label for="status-3.4.8">סטטוס:</label>
+        <select id="status-3.4.8">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+    </fieldset>
+
+    <!-- Category 4 -->
+    <fieldset>
+      <legend>4. תכונות עתידיות ומודולים חדשים</legend>
+
+      <div class="task" data-id="4.1.1">
+        <div class="task-title">מערכת דוחות מתקדמת</div>
+        <p class="task-desc">בניית דשבורד דוחות עם גרפים ויצוא מתקדם.</p>
+        <label for="status-4.1.1">סטטוס:</label>
+        <select id="status-4.1.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+
+      <div class="task" data-id="2.1.2">
+        <div class="task-title">שיפור זמני תגובה</div>
+        <p class="task-desc">מדידת Response Time בכל ה־API והפחתת latency.</p>
+        <label for="status-2.1.2">סטטוס:</label>
+        <select id="status-2.1.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.1.2">
+        <div class="task-title">אינטגרציה עם פלטפורמות נוספות</div>
+        <p class="task-desc">חיבור מקורות מידע חיצוניים חדשים מעבר ל־Yahoo Finance.</p>
+        <label for="status-4.1.2">סטטוס:</label>
+        <select id="status-4.1.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.1.3">
+        <div class="task-title">מערכת התראות חכמה</div>
+        <p class="task-desc">התראות מבוססות AI והקשרים עסקיים מורחבים.</p>
+        <label for="status-4.1.3">סטטוס:</label>
+        <select id="status-4.1.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.1.4">
+        <div class="task-title">אנליטיקה מתקדמת</div>
+        <p class="task-desc">ניתוח ביצועים מתקדם, מגמות ותחזיות.</p>
+        <label for="status-4.1.4">סטטוס:</label>
+        <select id="status-4.1.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.2.1">
+        <div class="task-title">כפילות תכניות וטריידים</div>
+        <p class="task-desc">כפתור שכפול, דיאלוג אישור ושימור קישורים.</p>
+        <label for="status-4.2.1">סטטוס:</label>
+        <select id="status-4.2.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.2.2">
+        <div class="task-title">מערכת תבניות מתקדמת (פיתוח)</div>
+        <p class="task-desc">יצירה, שמירה ותבניות ברירת מחדל למודולים קריטיים.</p>
+        <label for="status-4.2.2">סטטוס:</label>
+        <select id="status-4.2.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.2.3">
+        <div class="task-title">חישוב יעד וסטופ אוטומטי</div>
+        <p class="task-desc">RR, ATR, overrides ועדכונים בזמן אמת לטפסים.</p>
+        <label for="status-4.2.3">סטטוס:</label>
+        <select id="status-4.2.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.2.4">
+        <div class="task-title">Trading Journal Database Design</div>
+        <p class="task-desc">מבנה טבלאות, קשרים, קטגוריות ותשתיות חיפוש.</p>
+        <label for="status-4.2.4">סטטוס:</label>
+        <select id="status-4.2.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.2.5">
+        <div class="task-title">מערכת התראות מתקדמת (ערוצים מרובים)</div>
+        <p class="task-desc">התראות push, אימייל, SMS והגדרות אישיות.</p>
+        <label for="status-4.2.5">סטטוס:</label>
+        <select id="status-4.2.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.2.6">
+        <div class="task-title">מערכת דוחות מתקדמת (יישום)</div>
+        <p class="task-desc">בניית UI, גרפים, שמירה וייצוא דוחות בפועל.</p>
+        <label for="status-4.2.6">סטטוס:</label>
+        <select id="status-4.2.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.1">
+        <div class="task-title">שדה open_plans לטיקרים</div>
+        <p class="task-desc">הוספת שדה, טריגרים, UI ועדכוני API.</p>
+        <label for="status-4.3.1">סטטוס:</label>
+        <select id="status-4.3.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.2">
+        <div class="task-title">מערכת קישור אובייקטים מתקדמת</div>
+        <p class="task-desc">קישורים מותאמים, פוליניווטיבה ו־history מלא.</p>
+        <label for="status-4.3.2">סטטוס:</label>
+        <select id="status-4.3.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+
+      <div class="task" data-id="2.1.3">
+        <div class="task-title">מיטוב שימוש בזיכרון</div>
+        <p class="task-desc">בדיקות Profiler והפחתת שימוש RAM בתהליכי backend.</p>
+        <label for="status-2.1.3">סטטוס:</label>
+        <select id="status-2.1.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.3">
+        <div class="task-title">מערכת הערות מתקדמת עם rich text</div>
+        <p class="task-desc">עורך טקסט עשיר, קבצים מצורפים וניהול גרסאות.</p>
+        <label for="status-4.3.3">סטטוס:</label>
+        <select id="status-4.3.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.4">
+        <div class="task-title">מערכת היסטוריה מפורטת לכל הפעולות</div>
+        <p class="task-desc">חיפוש, סינון וייצוא היסטוריית פעולות מלאה.</p>
+        <label for="status-4.3.4">סטטוס:</label>
+        <select id="status-4.3.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.5">
+        <div class="task-title">מערכת סינון מתקדמת</div>
+        <p class="task-desc">פילטרים מורכבים, שמירת פילטרים ושיתוף.</p>
+        <label for="status-4.3.5">סטטוס:</label>
+        <select id="status-4.3.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.6">
+        <div class="task-title">מערכת חיפוש מתקדמת</div>
+        <p class="task-desc">Full-text search, היסטוריית חיפושים והמלצות.</p>
+        <label for="status-4.3.6">סטטוס:</label>
+        <select id="status-4.3.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.7">
+        <div class="task-title">מערכת ייצוא מתקדמת</div>
+        <p class="task-desc">תמיכה ב־PDF, Excel, CSV ותבניות עיצוב.</p>
+        <label for="status-4.3.7">סטטוס:</label>
+        <select id="status-4.3.7">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.8">
+        <div class="task-title">מערכת אנליטיקה לתגיות/Linked Objects/Alerts</div>
+        <p class="task-desc">ניתוח שימוש ויצירת תובנות לפי תגיות וקישורים.</p>
+        <label for="status-4.3.8">סטטוס:</label>
+        <select id="status-4.3.8">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.9">
+        <div class="task-title">Field rename "Reasons" → "Strategy"</div>
+        <p class="task-desc">עדכון DB, API ו־UI למונח החדש.</p>
+        <label for="status-4.3.9">סטטוס:</label>
+        <select id="status-4.3.9">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.10">
+        <div class="task-title">Symbol Page ייעודי</div>
+        <p class="task-desc">דף מידע, גרפים, חדשות ואינטגרציות לטיקר בודד.</p>
+        <label for="status-4.3.10">סטטוס:</label>
+        <select id="status-4.3.10">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.11">
+        <div class="task-title">Linked Objects Modal Windows (שלב טבלה ומודל)</div>
+        <p class="task-desc">תצוגת טבלה ומודל, עדכוני נתונים בזמן אמת ופעולות bulk.</p>
+        <label for="status-4.3.11">סטטוס:</label>
+        <select id="status-4.3.11">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.12">
+        <div class="task-title">Transaction Association System</div>
+        <p class="task-desc">טבלת קשר, כלי bulk, ולידציה ו־UI לניהול חיבורים.</p>
+        <label for="status-4.3.12">סטטוס:</label>
+        <select id="status-4.3.12">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.13">
+        <div class="task-title">Account Management Functions</div>
+        <p class="task-desc">הוספת עריכה, מחיקה, ולידציה והיסטוריה לחשבונות.</p>
+        <label for="status-4.3.13">סטטוס:</label>
+        <select id="status-4.3.13">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.14">
+        <div class="task-title">Data Update Verification Across All Pages</div>
+        <p class="task-desc">עדכונים בזמן אמת, fallback של polling וכפתורי רענון.</p>
+        <label for="status-4.3.14">סטטוס:</label>
+        <select id="status-4.3.14">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.15">
+        <div class="task-title">Preferences Page bug – שמירת ברירות מחדל</div>
+        <p class="task-desc">טיפול בכתיבת קבצי API, לוגים ובדיקות העדפות.</p>
+        <label for="status-4.3.15">סטטוס:</label>
+        <select id="status-4.3.15">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.16">
+        <div class="task-title">Price Data & Ticker Information API</div>
+        <p class="task-desc">אינטגרציות למחירי שוק היסטוריים ו־caching.</p>
+        <label for="status-4.3.16">סטטוס:</label>
+        <select id="status-4.3.16">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+
+      <div class="task" data-id="2.2.1">
+        <div class="task-title">בדיקת תאימות SSL לפני עדכוני תלות</div>
+        <p class="task-desc">שמירת גרסאות urllib3, ניתוח לוגים ובדיקות תאימות.</p>
+        <label for="status-2.2.1">סטטוס:</label>
+        <select id="status-2.2.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.17">
+        <div class="task-title">Trading Journal Implementation מלא</div>
+        <p class="task-desc">עורך עשיר, קבצים מצורפים, תבניות, חיפוש וייצוא.</p>
+        <label for="status-4.3.17">סטטוס:</label>
+        <select id="status-4.3.17">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.18">
+        <div class="task-title">Tagging System נרחב</div>
+        <p class="task-desc">ניהול תגיות, אנליטיקה, הצעות וצבעים דינמיים.</p>
+        <label for="status-4.3.18">סטטוס:</label>
+        <select id="status-4.3.18">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.19">
+        <div class="task-title">Trade Alerts System</div>
+        <p class="task-desc">יצירה, ניהול, היסטוריה והתראות בזמן אמת.</p>
+        <label for="status-4.3.19">סטטוס:</label>
+        <select id="status-4.3.19">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.20">
+        <div class="task-title">Advanced Alert Types</div>
+        <p class="task-desc">התראות נפח, תנאים מותאמים וסינרים מורכבים.</p>
+        <label for="status-4.3.20">סטטוס:</label>
+        <select id="status-4.3.20">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.21">
+        <div class="task-title">Advanced Template Features</div>
+        <p class="task-desc">הרחבות עתידיות לתבניות, כולל placeholders פונקציונליים.</p>
+        <label for="status-4.3.21">סטטוס:</label>
+        <select id="status-4.3.21">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.3.22">
+        <div class="task-title">Top Section Spacing Enhancement</div>
+        <p class="task-desc">קביעת מרווח עליון קבוע ובדיקות תאימות header.</p>
+        <label for="status-4.3.22">סטטוס:</label>
+        <select id="status-4.3.22">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.4.1">
+        <div class="task-title">דגשים למערכות תנאים, אסטרטגיות ותיוג</div>
+        <p class="task-desc">הרחבת המערכות הקיימות לכניסות מתקדמות ותיוגים.</p>
+        <label for="status-4.4.1">סטטוס:</label>
+        <select id="status-4.4.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="4.4.2">
+        <div class="task-title">הרחבה על open_plans</div>
+        <p class="task-desc">מיגרציה, מודל, API ו־UI להרחבת open_plans.</p>
+        <label for="status-4.4.2">סטטוס:</label>
+        <select id="status-4.4.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+    </fieldset>
+
+    <!-- Category 5 -->
+    <fieldset>
+      <legend>5. איכות, בדיקות וכלי פיתוח</legend>
+
+      <div class="task" data-id="5.1.1">
+        <div class="task-title">בדיקות יחידה</div>
+        <p class="task-desc">כיסוי מודלים, שירותים, API ו־UI ברמת יחידה.</p>
+        <label for="status-5.1.1">סטטוס:</label>
+        <select id="status-5.1.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.1.2">
+        <div class="task-title">בדיקות אינטגרציה</div>
+        <p class="task-desc">בדיקות End-to-End בין מודולים, DB ומערכת מלאה.</p>
+        <label for="status-5.1.2">סטטוס:</label>
+        <select id="status-5.1.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.1.3">
+        <div class="task-title">בדיקות UI/UX</div>
+        <p class="task-desc">תאימות דפדפנים, רספונסיביות, נגישות וביצועים.</p>
+        <label for="status-5.1.3">סטטוס:</label>
+        <select id="status-5.1.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.2.1">
+        <div class="task-title">ניקוי אזהרות לינטר – no-console</div>
+        <p class="task-desc">הפחתת אזהרות ל-300 והחלפתן במערכת הלוגים המאוחדת.</p>
+        <label for="status-5.2.1">סטטוס:</label>
+        <select id="status-5.2.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.2.2">
+        <div class="task-title">אופטימיזציה ל-class-methods-use-this</div>
+        <p class="task-desc">המרת מתודות ל-static או ארגון מחדש של מחלקות.</p>
+        <label for="status-5.2.2">סטטוס:</label>
+        <select id="status-5.2.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.2.3">
+        <div class="task-title">טיפול ב־require-await / max-len / no-unused-vars / no-shadow</div>
+        <p class="task-desc">ניקוי שיטתי של האזהרות הנפוצות בקבצי JS.</p>
+        <label for="status-5.2.3">סטטוס:</label>
+        <select id="status-5.2.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.2.4">
+        <div class="task-title">ניקוי קבצים עם אזהרות רבות</div>
+        <p class="task-desc">קבצים מרכזיים (header-system, system-test-center ועוד).</p>
+        <label for="status-5.2.4">סטטוס:</label>
+        <select id="status-5.2.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.2.5">
+        <div class="task-title">יעדי ניקוי לטווח בינוני וארוך</div>
+        <p class="task-desc">הפחתת אזהרות ל-500 ואז 200 וניקוי 80% מהקבצים.</p>
+        <label for="status-5.2.5">סטטוס:</label>
+        <select id="status-5.2.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.3.1">
+        <div class="task-title">יישור עמודי כלי פיתוח</div>
+        <p class="task-desc">אימוץ העיצוב החדש, שימוש בכפתורי copyDetailedLog וכו'.</p>
+        <label for="status-5.3.1">סטטוס:</label>
+        <select id="status-5.3.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.4.1">
+        <div class="task-title">התמקדות ב־Background Tasks</div>
+        <p class="task-desc">לאחר השלמת מערכות קריטיות – הרחבת משימות הרקע.</p>
+        <label for="status-5.4.1">סטטוס:</label>
+        <select id="status-5.4.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.4.2">
+        <div class="task-title">הפעלת APIs אמיתיים</div>
+        <p class="task-desc">Query Optimization, External Data ו־Performance עם נתונים חיצוניים.</p>
+        <label for="status-5.4.2">סטטוס:</label>
+        <select id="status-5.4.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.4.3">
+        <div class="task-title">הרחבת Unified Test Center</div>
+        <p class="task-desc">הזנת נתונים אמיתיים ובדיקות אינטגרציה מקיפות.</p>
+        <label for="status-5.4.3">סטטוס:</label>
+        <select id="status-5.4.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="5.4.4">
+        <div class="task-title">מדידת מדדי הצלחה</div>
+        <p class="task-desc">Response Time, שימוש CPU/זיכרון, throughput ו־UX.</p>
+        <label for="status-5.4.4">סטטוס:</label>
+        <select id="status-5.4.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+    </fieldset>
+
+    <!-- Category 6 -->
+    <fieldset>
+      <legend>6. טיפול מרוכז בעמודי כלי פיתוח</legend>
+
+      <div class="task" data-id="6.1.1">
+        <div class="task-title">background-tasks.html</div>
+        <p class="task-desc">ניקוי CSS, שיוך לקבצי המערכת והוספת copyDetailedLog.</p>
+        <label for="status-6.1.1">סטטוס:</label>
+        <select id="status-6.1.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+
+      <div class="task" data-id="2.2.2">
+        <div class="task-title">מערכת מיגרציות מתקדמת</div>
+        <p class="task-desc">הפעלת מיגרציות אוטומטיות, בדיקת תקינות ו־rollback מלא.</p>
+        <label for="status-2.2.2">סטטוס:</label>
+        <select id="status-2.2.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="6.1.2">
+        <div class="task-title">cache-test.html</div>
+        <p class="task-desc">יישור עמוד בדיקות המטמון לעיצוב המאוחד.</p>
+        <label for="status-6.1.2">סטטוס:</label>
+        <select id="status-6.1.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="6.1.3">
+        <div class="task-title">db_display.html</div>
+        <p class="task-desc">השלמת סטנדרטיזציה ושילוב copyDetailedLog.</p>
+        <label for="status-6.1.3">סטטוס:</label>
+        <select id="status-6.1.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="6.1.4">
+        <div class="task-title">db_extradata.html</div>
+        <p class="task-desc">החלת Apple Theme וסטנדרטיזציה מלאה לעמוד.</p>
+        <label for="status-6.1.4">סטטוס:</label>
+        <select id="status-6.1.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="6.1.5">
+        <div class="task-title">linter-realtime-monitor.html</div>
+        <p class="task-desc">עדכון העיצוב ויישור הפונקציונליות עם שאר הכלים.</p>
+        <label for="status-6.1.5">סטטוס:</label>
+        <select id="status-6.1.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="6.1.6">
+        <div class="task-title">notifications-center.html</div>
+        <p class="task-desc">שדרוג המבנה, סטיילינג אחיד והעתקת לוג מפורט.</p>
+        <label for="status-6.1.6">סטטוס:</label>
+        <select id="status-6.1.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="6.1.7">
+        <div class="task-title">server-monitor.html</div>
+        <p class="task-desc">השלמת סטנדרטיזציה וחיבור לפונקציות ניהול השרת.</p>
+        <label for="status-6.1.7">סטטוס:</label>
+        <select id="status-6.1.7">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+    </fieldset>
+
+      <div class="task" data-id="2.2.3">
+        <div class="task-title">אופטימיזציית בסיס נתונים</div>
+        <p class="task-desc">ניתוח שאילתות, יצירת אינדקסים וניטור סכמה מתמשך.</p>
+        <label for="status-2.2.3">סטטוס:</label>
+        <select id="status-2.2.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.2.4">
+        <div class="task-title">Advanced Security Features</div>
+        <p class="task-desc">הצפנת נתונים, ניהול מפתחות, הרשאות מתקדמות ו־API Keys.</p>
+        <label for="status-2.2.4">סטטוס:</label>
+        <select id="status-2.2.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.2.5">
+        <div class="task-title">Performance and Scaling</div>
+        <p class="task-desc">הטמעת Redis, איזון עומסים ו־Horizontal Scaling.</p>
+        <label for="status-2.2.5">סטטוס:</label>
+        <select id="status-2.2.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.2.6">
+        <div class="task-title">Advanced Testing</div>
+        <p class="task-desc">Load Testing, Security Testing ו־compliance מקיף.</p>
+        <label for="status-2.2.6">סטטוס:</label>
+        <select id="status-2.2.6">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.1">
+        <div class="task-title">השלמת Backend APIs למערכות קיימות</div>
+        <p class="task-desc">חיבור Query Optimization, External Data ו־Performance לנתונים אמיתיים.</p>
+        <label for="status-2.3.1">סטטוס:</label>
+        <select id="status-2.3.1">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.2">
+        <div class="task-title">מערכת Background Tasks מתקדמת</div>
+        <p class="task-desc">פיתוח AdvancedBackgroundTaskManager עם תור, עדיפויות ו־UI ניהול.</p>
+        <label for="status-2.3.2">סטטוס:</label>
+        <select id="status-2.3.2">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.3">
+        <div class="task-title">מערכת Real-time Notifications</div>
+        <p class="task-desc">אינטגרציית Flask-SocketIO, חדרים אישיים והרשאות.</p>
+        <label for="status-2.3.3">סטטוס:</label>
+        <select id="status-2.3.3">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.4">
+        <div class="task-title">מערכת API Versioning חכמה</div>
+        <p class="task-desc">ניהול גרסאות, תאימות לאחור וכלי מיגרציה בין גרסאות.</p>
+        <label for="status-2.3.4">סטטוס:</label>
+        <select id="status-2.3.4">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+        </select>
+        <input type="text" class="other-input" placeholder="פירוט נוסף">
+      </div>
+
+      <div class="task" data-id="2.3.5">
+        <div class="task-title">מערכת Data Validation מתקדמת</div>
+        <p class="task-desc">Rules Engine, מאמתים מותאמים אישית ודיווח שגיאות מפורט.</p>
+        <label for="status-2.3.5">סטטוס:</label>
+        <select id="status-2.3.5">
+          <option value="">בחר</option>
+          <option>בוצע</option>
+          <option>בוצע חלקית</option>
+          <option>קריטי</option>
+          <option>דחוף</option>
+          <option>חשוב</option>
+          <option>עתידי</option>
+          <option>אחר</option>
+
+    <div class="actions">
+      <button type="button" id="copyButton">העתק סיכום ללוח</button>
+    </div>
+    <textarea id="summaryOutput" placeholder="התוצאות שיועתקו ללוח יוצגו כאן"></textarea>
+  </form>
+
+  <script>
+    const selectElements = document.querySelectorAll('select');
+    selectElements.forEach(select => {
+      select.addEventListener('change', (event) => {
+        const taskDiv = event.target.closest('.task');
+        const otherInput = taskDiv.querySelector('.other-input');
+        if (event.target.value === 'אחר') {
+          otherInput.style.display = 'block';
+          otherInput.focus();
+        } else {
+          otherInput.value = '';
+          otherInput.style.display = 'none';
+        }
+      });
+    });
+
+    document.getElementById('copyButton').addEventListener('click', () => {
+      const tasks = document.querySelectorAll('.task');
+      const lines = [];
+
+      tasks.forEach(task => {
+        const title = task.querySelector('.task-title').textContent.trim();
+        const select = task.querySelector('select');
+        const status = select.value || 'לא נבחר';
+        let line = `${title}: ${status}`;
+
+        if (status === 'אחר') {
+          const otherValue = task.querySelector('.other-input').value.trim();
+          if (otherValue) {
+            line += ` – ${otherValue}`;
+          }
+        }
+        lines.push(line);
+      });
+
+      const summary = lines.join('\n');
+      const output = document.getElementById('summaryOutput');
+      output.value = summary;
+      navigator.clipboard.writeText(summary)
+        .then(() => {
+          output.focus();
+          output.select();
+        })
+        .catch(() => {
+          alert('שגיאה בהעתקה ללוח. ניתן להעתיק ידנית מהשדה.');
+        });
+    });
+  </script>
+</body>
+</html>
+

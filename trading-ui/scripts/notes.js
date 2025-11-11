@@ -113,7 +113,13 @@ window.loadNotesData = async function() {
     window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "notes" });
 
     // שמירת הנתונים במשתנה גלובלי
-    window.notesData = data.data || data;
+    const rawNotes = data?.data || data;
+    window.notesData = Array.isArray(rawNotes)
+      ? rawNotes.map(note => ({
+          ...note,
+          updated_at: note.updated_at || note.modified_at || note.created_at || null
+        }))
+      : [];
     window.Logger.info('💾 נתונים נשמרו ב-window.notesData:', window.notesData.length, 'הערות', { page: "notes" });
 
     // עדכון הטבלה
@@ -481,14 +487,14 @@ function updateNotesTable(notes) {
       // בדיקה שהנתונים קיימים
       if (!notes || !Array.isArray(notes)) {
         window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">אין הערות להצגה</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
         return;
       }
 
       if (notes.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="text-center text-muted">
+            <td colspan="6" class="text-center text-muted">
             <div style="padding: 20px;">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
@@ -704,6 +710,25 @@ function updateNotesTable(notes) {
             <td>${contentDisplay}</td>
             <td data-date='${dateSortValue}'>${dateDisplay}</td>
             <td>${attachmentDisplay}</td>
+            ${(() => {
+              if (typeof window.renderUpdatedCell === 'function') {
+                return window.renderUpdatedCell(note, {
+                  fields: ['updated_at', 'created_at'],
+                  columnClass: 'col-updated'
+                });
+              }
+              const fallbackDate = window.toDateObject
+                ? window.toDateObject(note.updated_at || note.created_at)
+                : (note.updated_at || note.created_at ? new Date(note.updated_at || note.created_at) : null);
+              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+              const absolute = fallbackDate.toLocaleString('he-IL');
+              const duration = typeof window.getDurationSince === 'function'
+                ? window.getDurationSince(fallbackDate, { fallback: absolute })
+                : absolute;
+              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+            })()}
             <td class='actions-cell'>
               ${(() => {
                 if (!window.createActionsMenu) return '<!-- Actions menu not available -->';

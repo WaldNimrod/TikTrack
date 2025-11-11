@@ -624,6 +624,7 @@ function enrichAccountsWithBalances(accounts, balancesMap) {
       cash_balance: balanceData?.base_currency_total ?? account.cash_balance ?? 0,
       base_currency_symbol: baseCurrencySymbol,
       balance_details: balanceData || null,
+      updated_at: account.updated_at || account.last_activity_at || account.last_activity || account.created_at || null
     };
   });
 }
@@ -704,7 +705,7 @@ function updateTradingAccountsTable(trading_accounts) {
     }
 
     if (trading_accounts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center">אין חשבונות מסחר להצגה</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין חשבונות מסחר להצגה</td></tr>';
       const countElement = document.getElementById('accountsCount');
       if (countElement) {
         countElement.textContent = '0 חשבונות';
@@ -743,6 +744,27 @@ function updateTradingAccountsTable(trading_accounts) {
         <td class="status-cell" data-status="${tradingAccount.status || ''}">
           ${window.renderStatus ? window.renderStatus(tradingAccount.status, 'trading_account') : `<span class="status-${tradingAccount.status}">${tradingAccount.status}</span>`}
         </td>
+        ${(() => {
+          if (typeof window.renderUpdatedCell === 'function') {
+            return window.renderUpdatedCell(tradingAccount, {
+              fields: ['updated_at', 'last_activity_at', 'created_at'],
+              columnClass: 'col-updated'
+            });
+          }
+          const fallbackDate = window.toDateObject
+            ? window.toDateObject(tradingAccount.updated_at || tradingAccount.last_activity_at || tradingAccount.created_at)
+            : (tradingAccount.updated_at || tradingAccount.last_activity_at || tradingAccount.created_at
+                ? new Date(tradingAccount.updated_at || tradingAccount.last_activity_at || tradingAccount.created_at)
+                : null);
+          if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+          const absolute = fallbackDate.toLocaleString('he-IL');
+          const duration = typeof window.getDurationSince === 'function'
+            ? window.getDurationSince(fallbackDate, { fallback: absolute })
+            : absolute;
+          return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+        })()}
         <td class="actions-cell">
           ${window.createActionsMenu ? window.createActionsMenu([
             { type: 'VIEW', onclick: `window.showEntityDetails('trading_account', ${tradingAccount.id}, { mode: 'view' })`, title: 'צפה בפרטי חשבון מסחר' },
@@ -779,7 +801,7 @@ function updateTradingAccountsTable(trading_accounts) {
     }
     const tbody = document.querySelector('#accountsTable tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="color: #dc3545;">⚠️ שגיאה בעדכון הטבלה: ${error.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #dc3545;">⚠️ שגיאה בעדכון הטבלה: ${error.message}</td></tr>`;
     }
   } finally {
     isUpdatingTradingAccountsTable = false;

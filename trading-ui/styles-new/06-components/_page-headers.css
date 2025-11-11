@@ -209,7 +209,7 @@
   background: var(--entity-trade-bg, rgba(0, 123, 255, 0.1));
   border: 1px solid var(--entity-trade-border, rgba(0, 123, 255, 0.3));
   border-radius: 50%;
-  color: var(--entity-trade-color, #007bff);
+  color: var(--entity-trade-color, #26baac);
   font-size: 0.9rem;
   font-weight: 600;
   margin-inline-start: 8px;
@@ -217,7 +217,7 @@
 }
 
 .active-trades-icon:hover {
-  background: var(--entity-trade-color, #007bff);
+  background: var(--entity-trade-color, #26baac);
   color: white;
   transform: scale(1.1);
 }

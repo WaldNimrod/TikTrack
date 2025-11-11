@@ -489,12 +489,12 @@ const statusOptions = [
 .header-container {
     /* Customize header container */
     background: #f8f9fa;
-    border-bottom: 2px solid #007bff;
+    border-bottom: 2px solid #26baac;
 }
 
 .tiktrack-nav-link {
     /* Customize navigation links */
-    color: #007bff;
+    color: #26baac;
     font-weight: 600;
 }
 

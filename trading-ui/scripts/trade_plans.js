@@ -2067,11 +2067,17 @@ async function loadTradePlansData() {
       const data = await window.tradePlanService.loadTradePlansData();
 
       // Update global data
-      window.tradePlansData = data;
+      const normalizedData = Array.isArray(data)
+        ? data.map(plan => ({
+            ...plan,
+            updated_at: plan.updated_at || plan.modified_at || plan.cancelled_at || plan.created_at || null
+          }))
+        : [];
+      window.tradePlansData = normalizedData;
       window.tradePlansLoaded = true;
 
       // Update the table
-      updateTradePlansTable(data);
+      updateTradePlansTable(normalizedData);
       
       // Register table with UnifiedTableSystem after data is loaded
       if (typeof window.registerTradePlansTables === 'function') {
@@ -2103,12 +2109,18 @@ async function loadTradePlansData() {
       const data = result.data || [];
       
       // Update global data
-      window.tradePlansData = data;
+      const normalizedData = Array.isArray(data)
+        ? data.map(plan => ({
+            ...plan,
+            updated_at: plan.updated_at || plan.modified_at || plan.cancelled_at || plan.created_at || null
+          }))
+        : [];
+      window.tradePlansData = normalizedData;
       window.tradePlansLoaded = true;
       
       // Update the table
-      window.Logger.info(`🔄 Updating table with ${data.length} trade plans...`, { page: "trade_plans" });
-      updateTradePlansTable(data);
+      window.Logger.info(`🔄 Updating table with ${normalizedData.length} trade plans...`, { page: "trade_plans" });
+      updateTradePlansTable(normalizedData);
       
       // Register table with UnifiedTableSystem after data is loaded
       if (typeof window.registerTradePlansTables === 'function') {
@@ -2323,14 +2335,14 @@ function updateTradePlansTable(trade_plans) {
     if (hasOriginalData && hasActiveFilters) {
       // There is data but the filter didn't find results
       // Showing "no results" message due to filters
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-info">
+      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-info">
                 <i class="fas fa-search"></i> לא נמצאו תוצאות
                 <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
             </td></tr>`;
     } else {
       // No data at all
       // Showing "no data" message
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted">
+      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted">
                 <i class="fas fa-info-circle"></i> אין תכנונים להצגה
                 <br><small>לא נמצאו תכנונים במערכת</small>
             </td></tr>`;
@@ -2553,6 +2565,27 @@ function updateTradePlansTable(trade_plans) {
             return `<span class="numeric-value-zero entity-badge-medium">-</span>`;
           })()}
         </td>
+        ${(() => {
+          if (typeof window.renderUpdatedCell === 'function') {
+            return window.renderUpdatedCell(design, {
+              fields: ['updated_at', 'updatedAt', 'cancelled_at', 'created_at'],
+              columnClass: 'col-updated'
+            });
+          }
+          const fallbackDate = window.toDateObject
+            ? window.toDateObject(design.updated_at || design.cancelled_at || design.created_at)
+            : (design.updated_at || design.cancelled_at || design.created_at
+                ? new Date(design.updated_at || design.cancelled_at || design.created_at)
+                : null);
+          if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+          const absolute = fallbackDate.toLocaleString('he-IL');
+          const duration = typeof window.getDurationSince === 'function'
+            ? window.getDurationSince(fallbackDate, { fallback: absolute })
+            : absolute;
+          return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+        })()}
         <td class="actions-cell">
           ${(() => {
             if (!window.createActionsMenu) {

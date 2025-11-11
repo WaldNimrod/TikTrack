@@ -205,6 +205,8 @@ class UnifiedCacheManager {
             'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
+            'alerts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['accounts-data'] },
+            'alert-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['alerts-data'] },
             'trade-data': { layer: 'backend', ttl: 30000, compress: false },
             'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
             'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },

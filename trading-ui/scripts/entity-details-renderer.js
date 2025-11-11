@@ -151,7 +151,7 @@ class EntityDetailsRenderer {
         // צבעי ברירת מחדל
         this.entityColors = {
             ticker: '#019193',
-            trade: '#007bff', 
+            trade: '#26baac', 
             trade_plan: '#0056b3',
             execution: '#17a2b8',
             account: '#28a745',
@@ -883,7 +883,7 @@ class EntityDetailsRenderer {
      */
     renderTrade(tradeData, options = {}) {
         try {
-        const entityColor = this.entityColors.trade || '#007bff';
+        const entityColor = this.entityColors.trade || '#26baac';
         
         // סטטוס - שימוש במערכת הרינדור הכללית
         const statusDisplay = window.FieldRendererService.renderStatus(tradeData.status, 'trade');
@@ -1008,7 +1008,7 @@ class EntityDetailsRenderer {
                                     page: "entity-details-renderer"
                                 });
                             }
-                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#007bff', 'trade', tradeData.id, options?.sourceInfo || null, options);
+                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#26baac', 'trade', tradeData.id, options?.sourceInfo || null, options);
                         })()}
                     </div>
                 </div>
@@ -1030,7 +1030,7 @@ class EntityDetailsRenderer {
      */
     renderTradeSpecific(tradeData, tradeColor = null) {
         try {
-            const color = tradeColor || this.entityColors.trade || '#007bff';
+            const color = tradeColor || this.entityColors.trade || '#26baac';
             const FieldRenderer = window.FieldRendererService || null;
         
         // Trade Plan Link
@@ -5046,7 +5046,7 @@ class EntityDetailsRenderer {
             `;
         } else if (entityType === 'trade') {
             const FieldRenderer = window.FieldRendererService || null;
-            const color = this.entityColors.trade || '#007bff';
+            const color = this.entityColors.trade || '#26baac';
             
             // Side (Long/Short)
             const sideDisplay = FieldRenderer?.renderSide

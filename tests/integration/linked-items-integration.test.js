@@ -107,7 +107,7 @@ describe('Linked Items Integration', () => {
             getEntityColor: jest.fn((type) => {
                 const colors = {
                     ticker: '#019193',
-                    trade: '#007bff',
+                    trade: '#26baac',
                     trade_plan: '#0056b3'
                 };
                 return colors[type] || '#6c757d';
@@ -327,7 +327,7 @@ describe('Linked Items Integration', () => {
 
             const actionsHtml = LinkedItemsService.generateLinkedItemActions(item, 'table', {
                 entityColors: {
-                    trade: '#007bff'
+                    trade: '#26baac'
                 },
                 sourceInfo: {
                     sourceModal: 'entity-details',

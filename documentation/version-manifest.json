@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.9.0",
+    "version": "1.0.10.0",
     "major": 1,
     "minor": 0,
-    "patch": 9,
+    "patch": 10,
     "build": 0,
-    "commit": "d6c4d76fc4aaba5dcb784d6ff43c0411beb2a9c0",
-    "updated_at": "2025-11-11T16:10:41+00:00",
-    "notes": "Active alerts empty state refinement"
+    "commit": "05f649646e375ad5e769ae4cd27eb5a8990e1e63",
+    "updated_at": "2025-11-11T18:04:02+00:00",
+    "notes": "Align brand color tokens across UI"
   }
 }

@@ -1442,7 +1442,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
       }
       relatedIcon = '📈';
       relatedClass = 'related-trade entity-trade-badge';
-      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
+      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#26baac';
       relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
       break;
     }

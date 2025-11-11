@@ -16,9 +16,16 @@
   /* ===== צבעי ישויות דינמיים ===== */
   
   /* צבעים ראשיים */
-  --primary-color: #007bff;
-  --chart-primary-color: #1e40af;
-  --secondary-color: #6c757d;
+  --brand-primary-color: #26baac;
+  --brand-primary-dark: #1a8f83;
+  --brand-primary-light: #6ed8ca;
+  --brand-secondary-color: #fc5a06;
+  --brand-secondary-dark: #d24d05;
+  --brand-secondary-light: #ffb17a;
+
+  --primary-color: var(--brand-primary-color);
+  --chart-primary-color: var(--brand-primary-dark);
+  --secondary-color: var(--brand-secondary-color);
   
   /* צבעי מערכת בסיסיים */
   --success-color: #28a745;
@@ -36,8 +43,8 @@
   --border-color: #dee2e6;
   
   /* צבעי hover */
-  --primary-hover: #0056b3;
-  --secondary-hover: #545b62;
+  --primary-hover: var(--brand-primary-dark);
+  --secondary-hover: var(--brand-secondary-dark);
   --success-hover: #1e7e34;
   --warning-hover: #e0a800;
   --danger-hover: #c82333;
@@ -54,7 +61,7 @@
   --chart-text-color: #212529;
   --chart-grid-color: #e9ecef;
   --chart-border-color: #dee2e6;
-  --chart-point-color: #007bff;
+  --chart-point-color: var(--brand-primary-color);
   
   /* הגדרות גרפים */
   --chart-auto-refresh: true;
@@ -69,10 +76,10 @@
   --chart-export-background: true;
   
   /* טרייד - Trade */
-  --entity-trade-color: #007bff;
-  --entity-trade-bg: rgba(0, 123, 255, 0.1);
-  --entity-trade-text: #0056b3;
-  --entity-trade-border: rgba(0, 123, 255, 0.3);
+  --entity-trade-color: var(--brand-primary-color);
+  --entity-trade-bg: rgba(38, 186, 172, 0.1);
+  --entity-trade-text: var(--brand-primary-dark);
+  --entity-trade-border: rgba(38, 186, 172, 0.3);
   
   /* תוכנית מסחר - Trade Plan */
   --entity-trade-plan-color: #0056b3;
@@ -145,10 +152,10 @@
   --entity-constraint-border: rgba(232, 62, 140, 0.3);
   
   /* פיתוח - Development */
-  --entity-development-color: #6c757d;
-  --entity-development-bg: rgba(108, 117, 125, 0.1);
-  --entity-development-text: #495057;
-  --entity-development-border: rgba(108, 117, 125, 0.3);
+  --entity-development-color: var(--brand-secondary-color);
+  --entity-development-bg: rgba(252, 90, 6, 0.12);
+  --entity-development-text: var(--brand-secondary-dark);
+  --entity-development-border: rgba(252, 90, 6, 0.3);
   
   /* מידע - Info */
   --entity-info-color: #17a2b8;

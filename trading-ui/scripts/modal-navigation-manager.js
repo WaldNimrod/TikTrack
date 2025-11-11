@@ -718,7 +718,7 @@ class ModalNavigationManager {
                     breadcrumb += `<span class="breadcrumb-item breadcrumb-current" data-modal-index="${index}" data-entity-type="${entityType}" data-entity-id="${entityId}" style="font-weight: bold; color: var(--current-entity-color-dark, #333);">${displayText}${separator}</span>`;
                 } else {
                     // כל המודולים האחרים (כולל הראשון) - קישורים שניתן ללחוץ עליהם
-                    breadcrumb += `<a href="#" class="breadcrumb-item breadcrumb-link" data-modal-index="${index}" data-entity-type="${entityType}" data-entity-id="${entityId}" style="color: var(--current-entity-color-dark, #007bff); text-decoration: underline; cursor: pointer;">${displayText}</a>${separator}`;
+                    breadcrumb += `<a href="#" class="breadcrumb-item breadcrumb-link" data-modal-index="${index}" data-entity-type="${entityType}" data-entity-id="${entityId}" style="color: var(--current-entity-color-dark, #26baac); text-decoration: underline; cursor: pointer;">${displayText}</a>${separator}`;
                 }
             });
             
@@ -1310,7 +1310,7 @@ class ModalNavigationManager {
         
         // fallback לצבעים בסיסיים
         const colors = {
-            ticker: '#007bff',
+            ticker: '#26baac',
             trade: '#28a745',
             trade_plan: '#17a2b8',
             execution: '#ffc107',

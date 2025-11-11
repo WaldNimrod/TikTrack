@@ -253,7 +253,7 @@ function getInvestmentTypeColor(investmentType) {
 
   // השתמש במערכת הצבעים הכללית אם היא זמינה
   const typeColors = {
-    'swing': window.getEntityColor ? window.getEntityColor('trade') : '#007bff',
+    'swing': window.getEntityColor ? window.getEntityColor('trade') : '#26baac',
     'investment': window.getEntityColor ? window.getEntityColor('account') : '#28a745',
     'passive': window.getEntityColor ? window.getEntityColor('note') : '#6f42c1',
   };
@@ -355,7 +355,8 @@ async function loadTradesData() {
       position: trade.position,
       current_price: trade.current_price,
       daily_change: trade.daily_change,
-      change_amount: trade.change_amount
+    change_amount: trade.change_amount,
+    updated_at: trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at
     }));
 
     // עדכון המשתנה הגלובלי
@@ -821,20 +822,9 @@ async function updateTradesTable(trades) {
       })()}</td>
       <td class="change-cell">${(() => {
         const tickerData = tickerDataMap[trade.ticker_id];
-        let dailyChange = tickerData?.daily_change || trade.daily_change;
-        
-        // אם אין נתוני טיקר, נציג נתונים דמה
-        if (!dailyChange || dailyChange === 0) {
-          // נתונים דמה לפי הטיקר
-          const mockChanges = {
-            'AAPL': 2.5,
-            'MSFT': -1.2,
-            'GOOGL': 3.1,
-            'TSLA': -0.8,
-            'SPY': 1.5
-          };
-          const tickerSymbol = trade.ticker_symbol || 'AAPL';
-          dailyChange = mockChanges[tickerSymbol] || 0;
+        const dailyChange = tickerData?.daily_change ?? trade.daily_change;
+        if (dailyChange === null || dailyChange === undefined) {
+          return '<span class="numeric-value-zero">לא זמין</span>';
         }
         
         return window.FieldRendererService ? window.FieldRendererService.renderNumericValue(dailyChange, '%', true) : formatDailyChange(dailyChange);
@@ -936,6 +926,27 @@ async function updateTradesTable(trades) {
           return '<span class="date-text"></span>';
         })()}
       </td>
+      ${(() => {
+        if (typeof window.renderUpdatedCell === 'function') {
+          return window.renderUpdatedCell(trade, {
+            fields: ['updated_at', 'closed_at', 'cancelled_at', 'created_at'],
+            columnClass: 'col-updated'
+          });
+        }
+        const fallbackDate = window.toDateObject
+          ? window.toDateObject(trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at)
+          : (trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at
+              ? new Date(trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at)
+              : null);
+        if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+        const absolute = fallbackDate.toLocaleString('he-IL');
+        const duration = typeof window.getDurationSince === 'function'
+          ? window.getDurationSince(fallbackDate, { fallback: absolute })
+          : absolute;
+        return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+      })()}
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${(() => {

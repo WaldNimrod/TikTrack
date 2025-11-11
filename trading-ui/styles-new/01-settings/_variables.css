@@ -157,6 +157,6 @@
   --type-swing-color: var(--user-status-danger-color, #dc3545);        /* סכנה - סווינג */
   --type-investment-color: var(--user-status-warning-color, #ffc107);  /* אזהרה - השקעה */
   --type-passive-color: var(--user-status-info-color, #17a2b8);        /* מידע - פסיבי */
-  --type-day-trading-color: var(--user-status-primary-color, #007bff); /* ראשי - מסחר יומי */
+  --type-day-trading-color: var(--user-status-primary-color, var(--brand-primary-color, #26baac)); /* ראשי - מסחר יומי */
   --type-scalping-color: var(--user-status-secondary-color, #6c757d);  /* משני - סקלפינג */
 }

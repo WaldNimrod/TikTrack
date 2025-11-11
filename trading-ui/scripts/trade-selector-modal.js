@@ -554,7 +554,7 @@ class TradeSelectorModal {
             case 'renderType':
                 const type = args[0] || '';
                 const typeColors = {
-                    'swing': '#007bff',
+                    'swing': '#26baac',
                     'investment': '#28a745',
                     'passive': '#ffc107',
                     'day': '#dc3545'

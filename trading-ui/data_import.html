@@ -206,18 +206,29 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="import-steps-indicator">
-                        <div class="step" data-step="1">
-                            <div class="step-number">1</div>
-                            <div class="step-label">העלאה</div>
+                    <div class="steps-header-bar" style="display:flex; align-items:center; gap:1.5rem; justify-content:space-between; flex-wrap:wrap;">
+                        <div class="import-steps-indicator" style="margin-inline:auto;">
+                            <div class="step" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">העלאה</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">ניתוח + פתרון בעיות</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">תצוגה מקדימה + אישור</div>
+                            </div>
                         </div>
-                        <div class="step" data-step="2">
-                            <div class="step-number">2</div>
-                            <div class="step-label">ניתוח + פתרון בעיות</div>
-                        </div>
-                        <div class="step" data-step="3">
-                            <div class="step-number">3</div>
-                            <div class="step-label">תצוגה מקדימה + אישור</div>
+                        <div class="analysis-loading-indicator" id="analysisLoadingIndicator" style="display:none; align-items:center; gap:0.75rem; min-width:260px;">
+                            <div class="spinner-border text-primary" role="status" aria-hidden="true" style="width:1.8rem;height:1.8rem;"></div>
+                            <div class="flex-grow-1 d-flex flex-column gap-1">
+                                <span class="analysis-loading-text" style="font-weight:600;">טוען ומעבד נתונים...</span>
+                                <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height:6px;">
+                                    <div class="progress-bar" id="analysisProgressBar" style="width:0%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -226,8 +237,13 @@
                             <div class="connector-section">
                                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                     <label for="connectorSelect">בחר ספק נתונים:</label>
-                                    <button data-button-type="SECONDARY" data-text="איפוס תהליך"
-                                            data-onclick="confirmResetImportSession()" id="resetImportSessionBtn"></button>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <button data-button-type="TERTIARY" data-text="המשך סשן פעיל"
+                                                data-onclick="resumeActiveImportSession()" id="resumeImportSessionBtn"
+                                                style="display:none;"></button>
+                                        <button data-button-type="SECONDARY" data-text="איפוס תהליך"
+                                                data-onclick="confirmResetImportSession()" id="resetImportSessionBtn"></button>
+                                    </div>
                                 </div>
                                 <select id="connectorSelect" class="form-select">
                                     <option value="">בחר ספק נתונים...</option>
@@ -235,6 +251,22 @@
                                     <option value="demo">Demo Data</option>
                                 </select>
                                 <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
+                            </div>
+
+                            <div class="data-type-section">
+                                <label for="importDataTypeSelect">בחר תהליך ייבוא:</label>
+                                <select id="importDataTypeSelect" class="form-select">
+                                    <option value="executions">ביצועי מסחר (Executions)</option>
+                                </select>
+                                <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
+                                    <div class="summary-header">
+                                        <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
+                                        <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
+                                    </div>
+                                    <div class="summary-body" id="dataTypeInfoContent">
+                                        <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="summary-card active-session-card" id="activeSessionIndicator" style="display:none;">
@@ -324,27 +356,6 @@
                     <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
                         <div class="step-content">
                             <h3>תוצאות ניתוח</h3>
-                            <div class="summary-card import-type-selection" id="dataTypeSelectionCard" style="display:none;">
-                                <div class="summary-header">
-                                    <div class="summary-title">
-                                        <i class="bi bi-diagram-3"></i>
-                                        בחירת תהליך ייבוא
-                                    </div>
-                                    <div class="summary-subtitle">
-                                        <span id="dataTypeDetectedLabel">מזהה את סוגי הנתונים שהקובץ מכיל ומאפשר לבחור את התהליך הרצוי</span>
-                                    </div>
-                                </div>
-                                <div class="summary-body">
-                                    <div class="data-type-list" id="dataTypeList">
-                                        <!-- ימולא דינמית -->
-                                    </div>
-                                </div>
-                                <div class="summary-footer">
-                                    <button data-button-type="PRIMARY" data-text="המשך לתהליך הנבחר" id="confirmDataTypeBtn" data-onclick="confirmSelectedDataType()" disabled></button>
-                                    <button data-button-type="SECONDARY" data-text="פלייסהולדר – תהליכים נוספים בקרוב" id="dataTypePlaceholderBtn" style="display:none;"></button>
-                                </div>
-                            </div>
-
                             <div class="analysis-cards">
                                 <div class="analysis-card total">
                                     <div class="card-icon"><i class="bi bi-file-text"></i></div>
@@ -395,6 +406,14 @@
                                         <div class="card-label">רשומות קיימות במערכת</div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="step-actions analysis-actions" id="analysisStepActions" style="display:none;">
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לפתרון בעיות"
+                                        data-onclick="proceedToProblemResolution()"
+                                        id="analysisContinueBtn"
+                                        disabled></button>
                             </div>
 
                             <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
@@ -455,11 +474,6 @@
                                 </div>
                             </div>
 
-                            <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" data-onclick="goToStep(1)"></button>
-                                <button data-button-type="PRIMARY" data-text="המשך לתצוגה מקדימה"
-                                        data-onclick="confirmSelectedDataType()" data-id="btn-preview-continue" disabled></button>
-                            </div>
                         </div>
                     </div>
 
@@ -554,7 +568,7 @@
                             </div>
 
                             <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" data-onclick="goToStep(2)"></button>
+                                <button data-button-type="BACK" data-text="חזור" data-import-back-step="2" data-onclick="goToStep(2)"></button>
                                 <button data-button-type="CANCEL" data-text="ביטול" data-onclick="confirmResetImportSession()"></button>
                                 <button data-button-type="SAVE" data-text="ביצוע ייבוא" data-onclick="confirmImport()"></button>
                                 <button data-button-type="DOWNLOAD" data-text="ביצוע ייבוא + הורדת דוח" data-onclick="confirmImport(true)"></button>

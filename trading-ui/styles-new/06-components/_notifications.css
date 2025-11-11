@@ -538,8 +538,8 @@
 }
 
 .active-alerts__card[data-entity-type="trade"] {
-  --active-alert-card-bg: var(--entity-trade-bg, color-mix(in srgb, var(--entity-trade-color, #007bff) 12%, transparent));
-  --active-alert-card-border: var(--entity-trade-border, color-mix(in srgb, var(--entity-trade-color, #007bff) 28%, transparent));
+  --active-alert-card-bg: var(--entity-trade-bg, color-mix(in srgb, var(--entity-trade-color, #26baac) 12%, transparent));
+  --active-alert-card-border: var(--entity-trade-border, color-mix(in srgb, var(--entity-trade-color, #26baac) 28%, transparent));
   --active-alert-card-text: var(--entity-trade-text, var(--apple-text-primary));
 }
 

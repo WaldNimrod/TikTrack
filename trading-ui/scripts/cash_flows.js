@@ -117,8 +117,14 @@ async function loadCashFlowsData() {
     console.log('🔥 loadCashFlowsData: First item:', data[0]);
       
     // עדכון הנתונים הגלובליים
-    window.cashFlowsData = data;
-    cashFlowsData = data;
+    const normalizedCashFlows = Array.isArray(data)
+      ? data.map(cf => ({
+          ...cf,
+          updated_at: cf.updated_at || cf.date || cf.created_at || null
+        }))
+      : [];
+    window.cashFlowsData = normalizedCashFlows;
+    cashFlowsData = normalizedCashFlows;
     
     console.log('🔥 loadCashFlowsData: Calling updateCashFlowsTable...');
     // עדכון הטבלה (ראשוני לפני החלת סידור ברירת מחדל/מצב שמור)
@@ -766,7 +772,7 @@ async function renderCashFlowsTable() {
   tbody.innerHTML = '';
 
   if (!cashFlowsData || cashFlowsData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
 
@@ -871,6 +877,27 @@ async function renderCashFlowsTable() {
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
+            ${(() => {
+              if (typeof window.renderUpdatedCell === 'function') {
+                return window.renderUpdatedCell(cashFlow, {
+                  fields: ['updated_at', 'date', 'created_at'],
+                  columnClass: 'col-updated'
+                });
+              }
+              const fallbackDate = window.toDateObject
+                ? window.toDateObject(cashFlow.updated_at || cashFlow.date || cashFlow.created_at)
+                : (cashFlow.updated_at || cashFlow.date || cashFlow.created_at
+                    ? new Date(cashFlow.updated_at || cashFlow.date || cashFlow.created_at)
+                    : null);
+              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+              const absolute = fallbackDate.toLocaleString('he-IL');
+              const duration = typeof window.getDurationSince === 'function'
+                ? window.getDurationSince(fallbackDate, { fallback: absolute })
+                : absolute;
+              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+            })()}
             <td class="col-actions actions-cell actions-4-items">
               ${actionsMenu}
             </td>

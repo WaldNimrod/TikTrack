@@ -1016,7 +1016,7 @@ async function showDetailsModal(title, content, options = {}) {
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
+          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#26baac' : '#26baac'};">
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="${modalId}-copy-btn" data-text="העתק" title="העתק ללוח">
               </button>

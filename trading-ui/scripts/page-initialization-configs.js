@@ -191,7 +191,7 @@ const PAGE_CONFIGS = {
         // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
         // - 'entity-details': מערכות פרטי ישויות
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-details', 'init-system'],
+        packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'entity-details', 'dashboard-widgets', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -199,7 +199,9 @@ const PAGE_CONFIGS = {
             'DataUtils',
             'window.Logger',
             'window.CacheSyncManager',
-            'window.loadDashboardData'
+            'window.loadDashboardData',
+            'window.PendingExecutionsHighlights',
+            'window.PendingExecutionTradeCreation'
         ],
         
         // ← NEW: מטאדאטה
@@ -937,7 +939,7 @@ const PAGE_CONFIGS = {
         name: 'System Management',
         
         // החבילות הדרושות למערכת הניהול המשולבת
-        packages: ['base', 'logs', 'cache', 'system-management', 'management', 'init-system'],
+        packages: ['base', 'logs', 'cache', 'external-data', 'system-management', 'management', 'init-system'],
         
         requiredGlobals: [
             'NotificationSystem',
@@ -1010,11 +1012,12 @@ const PAGE_CONFIGS = {
     'external-data-dashboard': {
         name: 'External Data',
         
-        packages: ['base', 'logs', 'external-data', 'init-system'],
+        packages: ['base', 'external-data', 'charts', 'logs', 'init-system'],
         
         requiredGlobals: [
             'NotificationSystem',
             'window.ExternalDataDashboard',
+            'window.ExternalDataDashboardActions',
             'window.YahooFinanceService'
         ],
         
@@ -1032,17 +1035,17 @@ const PAGE_CONFIGS = {
         requiresValidation: false,
         requiresTables: true,
         customInitializers: [
-            async (pageConfig) => {
+            async () => {
                 window.Logger.info('🌐 Initializing External Data...', { page: "page-initialization-configs" });
-                
-                // Ensure dashboard instance is ready
+
                 if (!window.externalDataDashboard && typeof window.ExternalDataDashboard === 'function') {
                     window.externalDataDashboard = new window.ExternalDataDashboard();
-                    window.externalDataDashboard.init();
-                    window.Logger.info('✅ External Data Dashboard initialized', { page: "page-initialization-configs" });
                 }
-                
-                // Initialize Unified Log System
+
+                if (window.externalDataDashboard && !window.externalDataDashboard.isInitialized) {
+                    await window.externalDataDashboard.init();
+                }
+
                 if (window.UnifiedLogAPI && !window.UnifiedLogAPI.initialized) {
                     try {
                         await window.UnifiedLogAPI.initialize();
@@ -1051,191 +1054,10 @@ const PAGE_CONFIGS = {
                         window.Logger.warn('⚠️ Failed to initialize Unified Log System:', error, { page: "page-initialization-configs" });
                     }
                 }
-                
-                // Define global functions for button onclick handlers
-                window.Logger.info('🔧 Defining global functions for External Data Dashboard...', { page: "page-initialization-configs" });
-                
-                window.refreshLogs = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.loadLogs();
-                    }
-                };
 
-                window.saveSettings = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.saveSettings();
-                    }
-                };
-
-                window.clearLogs = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.clearLogs();
-                    }
-                };
-
-                window.analyzeData = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.analyzeData();
-                    }
-                };
-
-                window.backupData = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.backupData();
-                    }
-                };
-
-                window.optimizeCache = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.optimizeCache();
-                    }
-                };
-
-                window.refreshProviders = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.loadProviders();
-                    }
-                };
-
-                window.testAllProviders = function() {
-                    window.Logger.info('🔔 testAllProviders called from global function', { page: "page-initialization-configs" });
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.testAllProviders();
-                    } else {
-                        window.Logger.error('❌ externalDataDashboard not available', { page: "page-initialization-configs" });
-                    }
-                };
-
-                window.exportData = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.exportData();
-                    }
-                };
-
-                window.resetSettings = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.resetSettings();
-                    }
-                };
-
-                window.refreshGroupHistory = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.loadGroupRefreshHistory();
-                    }
-                };
-
-                window.exportGroupHistory = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.exportGroupHistory();
-                    }
-                };
-
-                window.validateData = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.validateData();
-                    }
-                };
-
-                window.runUnitTests = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.runUnitTests();
-                    }
-                };
-
-                window.testSpecificFunction = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.testSpecificFunction();
-                    }
-                };
-
-                window.generateTestReport = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.generateTestReport();
-                    }
-                };
-
-                window.startPerformanceMonitoring = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.startPerformanceMonitoring();
-                    }
-                };
-
-                window.analyzeBottlenecks = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.analyzeBottlenecks();
-                    }
-                };
-
-                window.stopPerformanceMonitoring = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.stopPerformanceMonitoring();
-                    }
-                };
-
-                window.testAPIEndpoints = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.testAPIEndpoints();
-                    }
-                };
-
-                window.testRateLimiting = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.testRateLimiting();
-                    }
-                };
-
-                window.testErrorHandling = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.testErrorHandling();
-                    }
-                };
-
-                window.refreshPerformanceCharts = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.refreshPerformanceCharts();
-                    }
-                };
-
-                window.exportPerformanceData = function() {
-                    if (window.externalDataDashboard) {
-                        window.externalDataDashboard.exportPerformanceData();
-                    }
-                };
-
-                window.refreshChart = function(chartId) {
-                    if (window.externalDataDashboard) {
-                        switch(chartId) {
-                            case 'responseTimeChart':
-                                window.externalDataDashboard.refreshPerformanceCharts();
-                                break;
-                            case 'dataQualityChart':
-                                window.externalDataDashboard.refreshPerformanceCharts();
-                                break;
-                            case 'providerComparisonChart':
-                                window.externalDataDashboard.refreshPerformanceCharts();
-                                break;
-                            case 'errorAnalysisChart':
-                                window.externalDataDashboard.refreshPerformanceCharts();
-                                break;
-                            default:
-                                window.Logger.warn(`Unknown chart ID: ${chartId}`, { page: "page-initialization-configs" });
-                        }
-                    }
-                };
-                
-                window.Logger.info('✅ Global functions defined for External Data Dashboard', { page: "page-initialization-configs" });
-                
-                // Load external data log after page initialization
-                setTimeout(async () => {
-                    try {
-                        if (typeof window.loadExternalDataLog === 'function') {
-                            await window.loadExternalDataLog();
-                            window.Logger.info('✅ External data log loaded after page initialization', { page: "page-initialization-configs" });
-                        }
-                    } catch (error) {
-                        window.Logger.error('❌ Failed to load external data log:', error, { page: "page-initialization-configs" });
-                    }
-                }, 1000); // Wait 1 second after page load
+                if (!window.ExternalDataDashboardActions) {
+                    window.Logger.warn('⚠️ ExternalDataDashboardActions not available', { page: "page-initialization-configs" });
+                }
             }
         ]
     },

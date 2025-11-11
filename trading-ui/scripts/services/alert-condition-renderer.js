@@ -45,6 +45,15 @@ class AlertConditionRenderer {
             min: 0.01,           // כמו מחיר
             max: 10000,          // כמו מחיר
             step: 0.01 
+        },
+        balance: {
+            label: 'יתרה',
+            unit: '',
+            icon: '🏦',
+            inputType: 'number',
+            min: -1000000000,
+            max: 1000000000,
+            step: 0.01
         }
     };
     
@@ -71,8 +80,10 @@ class AlertConditionRenderer {
         const attrLabel = attrConfig.label || attribute;
         const opLabel = opConfig.label || operator;
         const unit = attrConfig.unit || '';
+        const formattedNumber = this.formatConditionNumber(number, attrConfig);
+        const unitSuffix = unit ? ` ${unit}` : '';
         
-        return `${attrLabel} ${opLabel} ${number}${unit}`;
+        return `${attrLabel} ${opLabel} ${formattedNumber}${unitSuffix}`.trim();
     }
     
     /**
@@ -237,6 +248,30 @@ class AlertConditionRenderer {
         
         // כאן ניתן להוסיף לוגיקה נוספת למעבר בין ממשקים מלאים
         // כרגע הממשק המתקדם הוא ברירת המחדל ב-HTML
+    }
+
+    /**
+     * פורמט מספר להצגת תנאי
+     * @param {string|number} value - ערך התנאי
+     * @param {Object} attrConfig - הגדרות המאפיין
+     * @returns {string} הערך בפורמט קריא
+     */
+    static formatConditionNumber(value, attrConfig = {}) {
+        if (value === null || value === undefined || value === '') {
+            return '-';
+        }
+
+        const raw = typeof value === 'string' ? value.replace(/,/g, '').trim() : value;
+        const numericValue = Number(raw);
+        if (!Number.isFinite(numericValue)) {
+            return String(value);
+        }
+
+        const decimals = attrConfig?.step === 1 ? 0 : 2;
+        return numericValue.toLocaleString('he-IL', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: decimals,
+        });
     }
 }
 

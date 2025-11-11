@@ -775,7 +775,7 @@ async function _REMOVED_loadEditTradeModalData(trade) {
     // טעינת חשבונות, תוכניות טרייד וטיקרים
     const [accountsResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/trading-accounts/'),
-      fetch('/api/trade_plans/'),
+      fetch('/api/trade-plans/'),
       fetch('/api/tickers/'),
     ]);
 
@@ -1421,7 +1421,7 @@ async function loadModalData() {
     const accounts = await accountsResponse.json();
 
     // טעינת תוכניות טרייד
-    const tradePlansResponse = await fetch('/api/trade_plans/');
+    const tradePlansResponse = await fetch('/api/trade-plans/');
     const tradePlans = await tradePlansResponse.json();
 
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
@@ -2138,7 +2138,7 @@ async function loadTradePlanDates() {
     const planId = link.getAttribute('data-plan-id');
     if (planId) {
       try {
-        const response = await fetch(`/api/trade_plans/${planId}`);
+        const response = await fetch(`/api/trade-plans/${planId}`);
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success' && data.data) {
@@ -2216,7 +2216,7 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
   try {
     // קבלת פרטי התוכנית החדשה
     // Use relative URL to work with both development (8080) and production (5001)
-    const url = `/api/trade_plans/${newTradePlanId}`;
+    const url = `/api/trade-plans/${newTradePlanId}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -2489,7 +2489,7 @@ async function validateTradePlanDate(tradePlanId, tradeData) {
 
   try {
     // קבלת פרטי תוכנית הטרייד
-    const response = await fetch(`/api/trade_plans/${tradePlanId}`);
+    const response = await fetch(`/api/trade-plans/${tradePlanId}`);
     if (!response.ok) {
       throw new Error('שגיאה בקבלת פרטי תוכנית טרייד');
     }
@@ -2536,7 +2536,7 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
 
   try {
     // קבלת פרטי התוכנית
-    const response = await fetch(`/api/trade_plans/${tradePlanId}`);
+    const response = await fetch(`/api/trade-plans/${tradePlanId}`);
     if (!response.ok) {
       throw new Error('שגיאה בקבלת פרטי תוכנית טרייד');
     }

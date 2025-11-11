@@ -438,7 +438,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
 
     switch (itemType) {
     case 'trade_plan':
-      response = await fetch(`/api/trade_plans/${itemId}`, {
+      response = await fetch(`/api/trade-plans/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -1817,6 +1817,147 @@ async function loadSectionStates() {
 // ===== PAGE SUMMARY STATISTICS FUNCTIONS =====
 // These functions are used across multiple pages for summary statistics
 
+// ===== SCRIPT LOADING UTILITIES =====
+// Shared helpers for on-demand script loading (used by dashboard lazy flows)
+
+const __uiUtilsScriptRegistry = new Map();
+
+/**
+ * Normalize script key for registry comparison.
+ * Strips origin and cache-busting query parameters for consistent matching.
+ *
+ * @param {string} src - Script source path.
+ * @returns {string} Normalized path key.
+ */
+function normalizeScriptKey(src) {
+  if (!src) {
+    return '';
+  }
+  try {
+    const url = new URL(src, window.location.origin);
+    return url.pathname.replace(/^\//, '');
+  } catch (_error) {
+    return src.replace(window.location.origin, '').split('?')[0].replace(/^\//, '');
+  }
+}
+
+/**
+ * Check if script already exists in DOM.
+ * @param {string} normalizedKey - Normalized script key
+ * @returns {boolean}
+ */
+function isScriptInDOM(normalizedKey) {
+  return Array.from(document.querySelectorAll('script[src]')).some(scriptEl => {
+    const existingKey = normalizeScriptKey(scriptEl.src);
+    return existingKey === normalizedKey;
+  });
+}
+
+/**
+ * Load a script tag only once and cache the pending promise.
+ *
+ * @param {string} src - Script URL (relative or absolute).
+ * @param {Object} [options] - Optional configuration.
+ * @param {number} [options.timeoutMs=10000] - Timeout in milliseconds.
+ * @param {boolean} [options.async=true] - Whether to set the async attribute.
+ * @param {Object} [options.attributes] - Additional attributes for the script element.
+ * @returns {Promise<void>} Resolves when the script is loaded.
+ */
+function loadScriptOnce(src, options = {}) {
+  if (!src) {
+    return Promise.reject(new Error('loadScriptOnce: src is required'));
+  }
+
+  const {
+    timeoutMs = 10000,
+    async = true,
+    attributes = {}
+  } = options;
+
+  const normalizedKey = normalizeScriptKey(src);
+
+  if (__uiUtilsScriptRegistry.has(normalizedKey)) {
+    return __uiUtilsScriptRegistry.get(normalizedKey);
+  }
+
+  if (isScriptInDOM(normalizedKey)) {
+    return Promise.resolve();
+  }
+
+  const scriptPromise = new Promise((resolve, reject) => {
+    const scriptElement = document.createElement('script');
+    scriptElement.src = src;
+    scriptElement.async = async;
+    scriptElement.dataset.loader = 'ui-utils/loadScriptOnce';
+
+    Object.entries(attributes).forEach(([attr, value]) => {
+      if (typeof value !== 'undefined' && value !== null) {
+        scriptElement.setAttribute(attr, value);
+      }
+    });
+
+    let timeoutHandle = null;
+    const clear = () => {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+        timeoutHandle = null;
+      }
+    };
+
+    scriptElement.onload = () => {
+      clear();
+      if (window.Logger?.info) {
+        window.Logger.info(`✅ Script loaded: ${src}`, { page: 'ui-utils', loader: 'loadScriptOnce' });
+      }
+      resolve();
+    };
+
+    scriptElement.onerror = (event) => {
+      clear();
+      __uiUtilsScriptRegistry.delete(normalizedKey);
+      const error = new Error(`Failed to load script: ${src}`);
+      error.event = event;
+      if (window.Logger?.error) {
+        window.Logger.error('❌ Script load error', error, { page: 'ui-utils', loader: 'loadScriptOnce' });
+      }
+      reject(error);
+    };
+
+    timeoutHandle = setTimeout(() => {
+      __uiUtilsScriptRegistry.delete(normalizedKey);
+      if (window.Logger?.error) {
+        window.Logger.error(`❌ Script load timeout: ${src}`, { page: 'ui-utils', loader: 'loadScriptOnce', timeoutMs });
+      }
+      reject(new Error(`Script load timeout: ${src}`));
+    }, timeoutMs);
+
+    document.head.appendChild(scriptElement);
+  });
+
+  __uiUtilsScriptRegistry.set(normalizedKey, scriptPromise);
+  return scriptPromise;
+}
+
+/**
+ * Load multiple scripts sequentially while preserving the provided order.
+ *
+ * @param {string[]} sources - Array of script paths.
+ * @param {Object} [options] - Options forwarded to each loadScriptOnce call.
+ * @returns {Promise<void>} Resolves when all scripts finish loading.
+ */
+async function loadScriptsOnce(sources, options = {}) {
+  if (!Array.isArray(sources)) {
+    throw new Error('loadScriptsOnce: sources must be an array');
+  }
+
+  for (const source of sources) {
+    if (!source) {
+      continue;
+    }
+    await loadScriptOnce(source, options);
+  }
+}
+
 /**
  * Update page summary statistics - Unified function
  * Calculates and displays page-specific statistics using InfoSummarySystem
@@ -1891,6 +2032,8 @@ window.toggleAllSectionsGlobal = window.toggleAllSections;
 window.toggleTopSection = toggleTopSection;
 window.loadSectionStates = loadSectionStates;
 window.updatePageSummaryStats = updatePageSummaryStats;
+window.loadScriptOnce = loadScriptOnce;
+window.loadScriptsOnce = loadScriptsOnce;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Load section states when DOM is ready

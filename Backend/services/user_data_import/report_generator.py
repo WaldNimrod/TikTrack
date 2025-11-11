@@ -156,8 +156,21 @@ class ImportReportGenerator:
             "invalid_records": analysis_results.get('invalid_records', 0),
             "duplicate_records": analysis_results.get('duplicate_records', 0),
             "success_rate": 0,
-            "import_status": "pending"
+            "import_status": "pending",
+            "task_type": analysis_results.get('task_type', 'executions')
         }
+
+        task_type = summary['task_type']
+
+        if task_type == 'cashflows':
+            summary['cashflow_summary'] = analysis_results.get('cashflow_summary', {})
+            summary['missing_accounts'] = analysis_results.get('missing_accounts', [])
+            summary['currency_issues'] = analysis_results.get('currency_issues', [])
+        elif task_type == 'account_reconciliation':
+            summary['missing_accounts'] = analysis_results.get('missing_accounts', [])
+            summary['base_currency_mismatches'] = analysis_results.get('base_currency_mismatches', [])
+            summary['entitlement_warnings'] = analysis_results.get('entitlement_warnings', [])
+            summary['missing_documents_report'] = analysis_results.get('missing_documents_report', [])
         
         if analysis_results.get('total_records', 0) > 0:
             summary["success_rate"] = (analysis_results.get('valid_records', 0) / 

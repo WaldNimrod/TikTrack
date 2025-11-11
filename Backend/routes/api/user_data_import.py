@@ -81,6 +81,9 @@ def upload_and_preview():
     except ValueError:
         return jsonify({"error": "Invalid trading account ID"}), 400
 
+    task_type = (request.form.get('task_type') or 'executions').strip().lower()
+    connector_type = (request.form.get('connector_type') or 'ibkr').strip().lower()
+
     file_content = file.read().decode('utf-8')
     file_name = file.filename
 
@@ -95,14 +98,20 @@ def upload_and_preview():
         orchestrator = ImportOrchestrator(db_session)
         
         # Create import session first
-        session_data = orchestrator.create_import_session(trading_account_id, file_name, file_content)
+        session_data = orchestrator.create_import_session(
+            trading_account_id,
+            file_name,
+            file_content,
+            connector_type=connector_type,
+            task_type=task_type
+        )
         session_id = session_data['session_id']
         
         # Analyze the file
-        analysis_data_raw = orchestrator.analyze_file(session_id)
+        analysis_data_raw = orchestrator.analyze_file(session_id, task_type)
         
         # Generate preview
-        preview_data_raw = orchestrator.generate_preview(session_id)
+        preview_data_raw = orchestrator.generate_preview(session_id, task_type)
 
         normalizer = _get_date_normalizer()
         analysis_data = normalizer.normalize_output(analysis_data_raw)
@@ -112,6 +121,7 @@ def upload_and_preview():
         result = {
             'session_id': session_id,
             'file_name': file_name,
+            'task_type': task_type,
             'analysis': analysis_data,
             'preview': preview_data
         }
@@ -132,6 +142,8 @@ def upload_file():
     Expected form data:
     - file: CSV file to import
     - trading_account_id: Trading account ID (optional, defaults to first account)
+    - connector_type: Selected connector key (ibkr/demo/…)
+    - task_type: Selected task key (executions/cashflows/account_reconciliation)
     
     Returns:
         JSON response with session ID and analysis results
@@ -184,16 +196,10 @@ def upload_file():
             finally:
                 db_session.close()
         
-        # Get connector type
-        connector_type = request.form.get('connector_type')
-        logger.info(f"🔌 Connector type from request: {connector_type}")
-        
-        if not connector_type:
-            logger.error("❌ No connector type provided")
-            return jsonify({
-                'success': False,
-                'error': 'Connector type is required'
-            }), 400
+        # Get connector/task type
+        connector_type = (request.form.get('connector_type') or 'ibkr').strip().lower()
+        task_type = (request.form.get('task_type') or 'executions').strip().lower()
+        logger.info(f"🔌 Connector type: {connector_type}, Task: {task_type}")
         
         # Read file content
         file_content = file.read().decode('utf-8')
@@ -211,7 +217,8 @@ def upload_file():
                 trading_account_id=trading_account_id,
                 file_name=file.filename,
                 file_content=file_content,
-                connector_type=connector_type
+                connector_type=connector_type,
+                task_type=task_type
             )
             logger.info(f"📊 Session creation result: {result}")
             
@@ -226,7 +233,7 @@ def upload_file():
             
             # Analyze file
             logger.info("🔍 Starting file analysis...")
-            analysis_result_raw = orchestrator.analyze_file(result['session_id'])
+            analysis_result_raw = orchestrator.analyze_file(result['session_id'], task_type)
             logger.info(f"📊 Analysis result: {analysis_result_raw}")
             
             if not analysis_result_raw['success']:
@@ -238,8 +245,6 @@ def upload_file():
             
             logger.info("✅ File analysis completed successfully")
             
-            # Note: analyze_file already saves the results to session and commits
-            # No need to save again here
             normalizer = _get_date_normalizer()
             analysis_result = normalizer.normalize_output(analysis_result_raw)
             
@@ -247,6 +252,7 @@ def upload_file():
                 'success': True,
                 'session_id': result['session_id'],
                 'provider': result['provider'],
+                'task_type': task_type,
                 'analysis_results': analysis_result['analysis_results']
             }
             logger.info(f"🎉 Returning success response: {response_data}")
@@ -270,15 +276,13 @@ def analyze_session(session_id: int):
     
     Args:
         session_id: Import session ID
-        
-    Returns:
-        JSON response with analysis results
     """
     try:
+        task_type = request.args.get('task_type')
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.analyze_file(session_id)
+            result_raw = orchestrator.analyze_file(session_id, task_type)
             
             if not result_raw['success']:
                 return jsonify({
@@ -414,15 +418,19 @@ def get_preview(session_id: int):
     
     Args:
         session_id: Import session ID
-        
+    
+    Query params:
+        task_type: Optional override for task type
+    
     Returns:
         JSON response with preview data
     """
     try:
+        task_type = request.args.get('task_type')
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.generate_preview(session_id)
+            result_raw = orchestrator.generate_preview(session_id, task_type)
             
             if not result_raw['success']:
                 return jsonify({
@@ -705,13 +713,20 @@ def allow_existing_record(session_id):
         new_skip_list = []
         for skip_record in preview_data.get('records_to_skip', []):
             if skip_record.get('record_index') == record_index and skip_record.get('reason') == 'existing_record':
-                record_to_move = skip_record['record']
+                record_to_move = skip_record.get('record') or skip_record
             else:
                 new_skip_list.append(skip_record)
         
         if record_to_move:
-            # Move to records_to_import
-            preview_data['records_to_import'].append({'record': record_to_move})
+            records_to_import = preview_data.get('records_to_import', []) or []
+            use_wrapped_format = any(isinstance(item, dict) and 'record' in item for item in records_to_import)
+
+            if use_wrapped_format:
+                records_to_import.append({'record': record_to_move})
+            else:
+                records_to_import.append(record_to_move)
+
+            preview_data['records_to_import'] = records_to_import
             preview_data['records_to_skip'] = new_skip_list
             
             # Mark as "force import existing"
@@ -737,15 +752,21 @@ def execute_import(session_id: int):
     
     Args:
         session_id: Import session ID
-        
+    
+    Body params:
+        task_type: Optional override for task type
+        generate_report: Whether to generate a report after import
+    
     Returns:
         JSON response with import results
     """
     try:
+        payload = request.get_json(silent=True) or {}
+        task_type = payload.get('task_type')
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.execute_import(session_id)
+            result_raw = orchestrator.execute_import(session_id, task_type)
             
             if not result_raw['success']:
                 return jsonify({
@@ -760,7 +781,8 @@ def execute_import(session_id: int):
                 'status': 'success',
                 'imported_count': result['imported_count'],
                 'skipped_count': result['skipped_count'],
-                'import_errors': result['import_errors']
+                'import_errors': result['import_errors'],
+                'task_type': result.get('task_type')
             }), 200
             
         finally:

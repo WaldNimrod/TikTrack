@@ -506,7 +506,7 @@ class SelectPopulatorService {
         
         try {
             // טעינת תוכניות מ-API
-            const response = await fetch('/api/trade_plans/');
+            const response = await fetch('/api/trade-plans/');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

@@ -10,6 +10,12 @@
   const AUTO_REFRESH_INTERVAL_MS = 30000;
   const PERFORMANCE_SAMPLE_INTERVAL_MS = 15000;
   const NOT_AVAILABLE_TEXT = 'לא זמין';
+  const CHART_IDS = {
+    responseTime: 'externalDataResponseTime',
+    dataQuality: 'externalDataQuality',
+    providerComparison: 'externalDataProviderComparison',
+    errorAnalysis: 'externalDataErrorAnalysis'
+  };
 
   const logger = window.Logger || {
     info: () => {},
@@ -114,6 +120,40 @@
     return `לפני ${diffDays} ימים`;
   }
 
+  function extractTimestampIso(value) {
+    if (!value) {
+      return null;
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (typeof value === 'object') {
+      return value.utc || value.local || value.display || null;
+    }
+    return null;
+  }
+
+  function formatRelativeFromPayload(value) {
+    const isoValue = extractTimestampIso(value);
+    return isoValue ? formatRelativeTime(isoValue) : NOT_AVAILABLE_TEXT;
+  }
+
+  async function ensureExternalDashboardInstance() {
+    if (!window.ExternalDataDashboard || typeof window.ExternalDataDashboard !== 'function') {
+      throw new Error('ExternalDataDashboard class is not available');
+    }
+
+    if (!window.externalDataDashboard) {
+      window.externalDataDashboard = new window.ExternalDataDashboard();
+    }
+
+    if (!window.externalDataDashboard.isInitialized) {
+      await window.externalDataDashboard.init();
+    }
+
+    return window.externalDataDashboard;
+  }
+
   function setElementText(id, value) {
     const element = document.getElementById(id);
     if (element) {
@@ -152,6 +192,24 @@
     element.textContent = textValue;
   }
 
+  function getThemeFonts() {
+    if (window.ChartTheme && typeof window.ChartTheme.getTheme === 'function') {
+      const theme = window.ChartTheme.getTheme();
+      if (theme?.fonts) {
+        return {
+          family: theme.fonts.family || 'Noto Sans Hebrew, Arial, sans-serif',
+          size: theme.fonts.size || 12,
+          weight: theme.fonts.weight || 'normal'
+        };
+      }
+    }
+    return {
+      family: 'Noto Sans Hebrew, Arial, sans-serif',
+      size: 12,
+      weight: 'normal'
+    };
+  }
+
   class ExternalDataDashboard {
     constructor() {
       this.isInitialized = false;
@@ -167,6 +225,42 @@
       this.dataQualityChart = null;
       this.providerComparisonChart = null;
       this.errorAnalysisChart = null;
+      this.chartSystemUnavailable = false;
+    }
+
+    getChartSystem() {
+      if (window.ChartSystem) {
+        this.chartSystemUnavailable = false;
+        return window.ChartSystem;
+      }
+      if (!this.chartSystemUnavailable) {
+        logger.warn(`${MODULE_NAME}:chart-system-missing`);
+        this.chartSystemUnavailable = true;
+      }
+      return null;
+    }
+
+    destroyChart(id, propertyName = null) {
+      const chartSystem = this.getChartSystem();
+      if (chartSystem && typeof chartSystem.destroy === 'function') {
+        try {
+          chartSystem.destroy(id);
+        } catch (error) {
+          logger.warn(`${MODULE_NAME}:chart-destroy-warning`, { id, error });
+        }
+      }
+
+      if (propertyName && this[propertyName]) {
+        try {
+          if (typeof this[propertyName].destroy === 'function') {
+            this[propertyName].destroy();
+          }
+        } catch (error) {
+          logger.warn(`${MODULE_NAME}:local-chart-destroy-warning`, { id, error });
+        }
+        this[propertyName] = null;
+      }
+      return true;
     }
 
     async init() {
@@ -185,7 +279,7 @@
         this.startAutoRefresh();
         this.isInitialized = true;
         logger.info(`${MODULE_NAME}:init:completed`);
-      } catch (error) {
+    } catch (error) {
         this.handleError('שגיאה באתחול דשבורד הנתונים החיצוניים', error, 'init');
       }
     }
@@ -194,7 +288,7 @@
       if (window.headerSystem && typeof window.headerSystem.init === 'function') {
         try {
           window.headerSystem.init();
-        } catch (error) {
+    } catch (error) {
           this.handleError('שגיאה בהפעלת מערכת התפריט', error, 'header-init');
         }
       }
@@ -242,12 +336,127 @@
       ]);
     }
 
-    async refreshCoreData() {
+    async refreshCoreData(showNotifications = false) {
       await Promise.allSettled([
-        this.loadSystemStatus(),
-        this.loadProviders(),
-        this.loadCacheStats()
+        this.loadSystemStatus(showNotifications),
+        this.loadProviders(showNotifications),
+        this.loadCacheStats(showNotifications)
       ]);
+    }
+
+    async refreshAllExternalData() {
+      const startTime = performance.now();
+      try {
+        notification.info('רענון נתונים חיצוניים', 'התהליך החל, נעדכן בסיום');
+        const response = await fetch('/api/external-data/refresh/all', { method: 'POST' });
+        const rawText = await response.text();
+        let payload = {};
+        if (rawText) {
+          try {
+            payload = JSON.parse(rawText);
+          } catch (parseError) {
+            payload = { message: rawText };
+          }
+        }
+
+        if (!response.ok) {
+          const errorMessage = safeText(
+            payload?.error || payload?.message || 'רענון הנתונים החיצוניים נכשל'
+          );
+          throw new Error(errorMessage);
+        }
+
+        const duration = performance.now() - startTime;
+        const result = payload?.data || {};
+        const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
+        const fetched = Number.isFinite(Number(result.fetched)) ? Number(result.fetched) : 0;
+        const failedSymbols = Array.isArray(result.failed_symbols) ? result.failed_symbols : [];
+        const skippedEntries = Array.isArray(result.skipped) ? result.skipped : [];
+
+        const summaryParts = [
+          `עודכנו ${formatNumber(fetched)} מתוך ${formatNumber(requested)} טיקרים`,
+          `משך ${formatDurationMs(duration)}`
+        ];
+
+        const isFullSuccess =
+          requested > 0 &&
+          fetched === requested &&
+          failedSymbols.length === 0 &&
+          skippedEntries.length === 0;
+
+        const developerDetails = [
+          `• טיקרים שהתבקשו: ${formatNumber(requested)}`,
+          `• טיקרים שעודכנו: ${formatNumber(fetched)}`,
+          `• טיקרים שנכשלו: ${formatNumber(failedSymbols.length)}`,
+          `• טיקרים שדולגו (חסר סימול): ${formatNumber(skippedEntries.length)}`,
+          `• מזהה בקשה: ${safeText(payload.requestId || payload.timestamp || 'לא זמין')}`,
+          `• משך כולל: ${formatDurationMs(duration)}`
+        ];
+
+        if (failedSymbols.length) {
+          const truncatedFailed = failedSymbols.slice(0, 10).join(', ');
+          const hasMoreFailures = failedSymbols.length > 10 ? ' (קיימים נוספים…) ' : '';
+          developerDetails.push(`• סימבולים שנכשלו: ${truncatedFailed}${hasMoreFailures}`);
+        }
+
+        if (skippedEntries.length) {
+          const truncatedSkipped = skippedEntries
+            .slice(0, 5)
+            .map((entry) => `ID:${entry.id} (${safeText(entry.reason, 'לא צויין')})`)
+            .join(', ');
+          const hasMoreSkipped = skippedEntries.length > 5 ? ' (קיימים נוספים…) ' : '';
+          developerDetails.push(`• פרטי טיקרים שדולגו: ${truncatedSkipped}${hasMoreSkipped}`);
+        }
+
+        const summaryMessage = summaryParts.join(' · ');
+
+        if (!requested) {
+          const userMessage = 'לא נמצאו טיקרים פעילים עם סימול תקף ולכן הרענון לא בוצע.';
+          notification.error(
+            'רענון נתונים חיצוניים נכשל',
+            `${userMessage}\n\nמידע למפתח:\n${developerDetails.join('\n')}`
+          );
+          logger.error(`${MODULE_NAME}:refresh-all:no-requested`, {
+            requested,
+            fetched,
+            failed: failedSymbols.length,
+            skipped: skippedEntries.length
+          });
+        } else if (!isFullSuccess) {
+          const userMessage =
+            'הרענון נעצר לפני שהושלם. חלק מהטיקרים נכשלו או דולגו ולכן נדרש טיפול.';
+          notification.error(
+            'רענון נתונים חיצוניים נכשל (חלקי)',
+            `${userMessage}\n\nמידע למפתח:\n${developerDetails.join('\n')}`
+          );
+          logger.warn(`${MODULE_NAME}:refresh-all:partial`, {
+            requested,
+            fetched,
+            failed: failedSymbols.length,
+            skipped: skippedEntries.length
+          });
+        } else {
+          notification.success('רענון נתונים חיצוניים', summaryMessage);
+          logger.info(`${MODULE_NAME}:refresh-all:success`, {
+            requested,
+            fetched,
+            skipped: skippedEntries.length
+          });
+        }
+
+        await Promise.allSettled([
+          this.refreshCoreData(),
+          this.loadGroupRefreshHistory(),
+          this.loadLogs()
+        ]);
+
+        return payload;
+      } catch (error) {
+        const duration = performance.now() - startTime;
+        logger.error(`${MODULE_NAME}:refresh-all:error`, { error, duration });
+        this.handleError('שגיאה ברענון כל הטיקרים', error, 'refresh-all');
+        throw error;
+      }
     }
 
     async loadSystemStatus(showNotifications = false) {
@@ -262,8 +471,8 @@
         this.renderSystemStatus(data);
         if (showNotifications) {
           notification.success('סטטוס עודכן', 'נתוני הסטטוס נטענו בהצלחה');
-        }
-      } catch (error) {
+      }
+    } catch (error) {
         this.statusData = null;
         this.renderSystemStatus(null);
         this.handleError('שגיאה בטעינת סטטוס המערכת', error, 'load-system-status');
@@ -275,13 +484,15 @@
       this.renderStatusIndicators(data);
       this.updateProviderLastUpdateTimes(data ? data.providers?.details || [] : []);
       this.updateStatisticsCards(data);
-      this.updateChartsFromStatus(data);
+      this.updateChartsFromStatus(data).catch((error) => {
+        logger.error(`${MODULE_NAME}:update-charts-failed`, { error });
+      });
     }
 
     renderSummaryCards(data) {
       const providersTotal = data?.providers?.total ?? null;
       const totalQuotes = data?.cache?.total_quotes ?? null;
-      const lastUpdate = data?.timestamp ?? null;
+      const lastUpdateText = formatRelativeFromPayload(data?.timestamp);
       const overallHealth = data?.overall_health;
 
       setElementText('providers-count', providersTotal !== null ? formatNumber(providersTotal) : NOT_AVAILABLE_TEXT);
@@ -291,7 +502,7 @@
         totalQuotes !== null ? formatNumber(totalQuotes) : NOT_AVAILABLE_TEXT
       );
 
-      setElementText('last-update-time', lastUpdate ? formatRelativeTime(lastUpdate) : NOT_AVAILABLE_TEXT);
+      setElementText('last-update-time', lastUpdateText);
 
       const overallStatusElement = getElement('overall-status');
       if (overallStatusElement) {
@@ -346,7 +557,7 @@
         detailsElement.innerHTML = [
           `<div class="status-detail">📊 ספק: ${safeText(yahooProvider.display_name || yahooProvider.name)}</div>`,
           `<div class="status-detail">📈 רשומות: ${formatNumber(records)}</div>`,
-          `<div class="status-detail">🕒 עדכון אחרון: ${formatRelativeTime(yahooProvider.last_successful_request)}</div>`,
+          `<div class="status-detail">🕒 עדכון אחרון: ${formatRelativeFromPayload(yahooProvider.last_successful_request)}</div>`,
           yahooProvider.last_error
             ? `<div class="status-detail error">⚠️ שגיאה אחרונה: ${safeText(yahooProvider.last_error)}</div>`
             : ''
@@ -368,10 +579,20 @@
         return;
       }
 
+      const ttlHot = cacheData.ttl_minutes?.hot != null
+        ? `${formatDecimal(cacheData.ttl_minutes.hot, 1)} דקות`
+        : NOT_AVAILABLE_TEXT;
+      const ttlWarm = cacheData.ttl_minutes?.warm != null
+        ? `${formatDecimal(cacheData.ttl_minutes.warm, 1)} דקות`
+        : NOT_AVAILABLE_TEXT;
+
       detailsElement.innerHTML = [
         `<div class="status-detail">💾 ציטוטים: ${formatNumber(cacheData.total_quotes)}</div>`,
         `<div class="status-detail">📈 אחוז פגיעות: ${formatPercent(cacheData.cache_hit_rate)}</div>`,
-        `<div class="status-detail">🗓️ נתונים פגומים: ${formatNumber(cacheData.stale_data_count)}</div>`
+        `<div class="status-detail">🗓️ נתונים פגומים: ${formatNumber(cacheData.stale_data_count)}</div>`,
+        `<div class="status-detail">⏲️ גיל ממוצע (דקות): ${formatDecimal(cacheData.avg_quote_age_minutes ?? 0, 1)}</div>`,
+        `<div class="status-detail">🔥 TTL חם: ${ttlHot}</div>`,
+        `<div class="status-detail">🌤️ TTL חמים: ${ttlWarm}</div>`
       ].join('');
     }
 
@@ -427,7 +648,7 @@
       if (yahooElement) {
         const yahooProvider = providerDetails.find((provider) => provider.name === 'yahoo_finance');
         yahooElement.textContent = yahooProvider?.last_successful_request
-          ? formatRelativeTime(yahooProvider.last_successful_request)
+          ? formatRelativeFromPayload(yahooProvider.last_successful_request)
           : NOT_AVAILABLE_TEXT;
       }
 
@@ -435,12 +656,12 @@
       if (alphaElement) {
         const alphaProvider = providerDetails.find((provider) => provider.name === 'alpha_vantage');
         alphaElement.textContent = alphaProvider?.last_successful_request
-          ? formatRelativeTime(alphaProvider.last_successful_request)
+          ? formatRelativeFromPayload(alphaProvider.last_successful_request)
           : NOT_AVAILABLE_TEXT;
-      }
     }
+  }
 
-    updateStatisticsCards(data) {
+  updateStatisticsCards(data) {
       if (!data) {
         setElementText('records-count', NOT_AVAILABLE_TEXT);
         setElementText('cache-size', NOT_AVAILABLE_TEXT);
@@ -473,13 +694,13 @@
       setElementText('hit-rate', hitRate !== undefined ? formatPercent(hitRate) : NOT_AVAILABLE_TEXT);
 
       const generalStatusElement = getElement('general-status');
-      if (generalStatusElement) {
+    if (generalStatusElement) {
         if (data.overall_health === true) {
-          generalStatusElement.textContent = 'פעיל';
-          generalStatusElement.className = 'text-success';
+        generalStatusElement.textContent = 'פעיל';
+        generalStatusElement.className = 'text-success';
         } else if (data.overall_health === false) {
-          generalStatusElement.textContent = 'בעיה';
-          generalStatusElement.className = 'text-warning';
+        generalStatusElement.textContent = 'בעיה';
+        generalStatusElement.className = 'text-warning';
         } else {
           generalStatusElement.textContent = NOT_AVAILABLE_TEXT;
           generalStatusElement.className = 'text-muted';
@@ -487,13 +708,12 @@
       }
     }
 
-    updateChartsFromStatus(data) {
-      if (!data) {
-        return;
-      }
-      this.updateDataQualityChart(data);
-      this.updateProviderComparisonChart(data);
-      this.updateErrorAnalysisChart();
+    async updateChartsFromStatus(data) {
+      await Promise.all([
+        this.updateDataQualityChart(data),
+        this.updateProviderComparisonChart(data),
+        this.updateErrorAnalysisChart()
+      ]);
     }
 
     async loadProviders(showNotification = false) {
@@ -504,68 +724,89 @@
           throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
         }
         const data = await response.json();
-        this.providers = Array.isArray(data.providers) ? data.providers : [];
-        this.renderProviders();
+        this.providers = Array.isArray(data.providers)
+          ? data.providers.map((provider) => ({
+        id: provider.id,
+        name: provider.name,
+              displayName: provider.display_name,
+              isActive: provider.is_active,
+              isHealthy: provider.is_healthy,
+              rateLimitPerHour: provider.rate_limit_per_hour,
+              rateLimitRemaining: provider.recent_activity?.rate_limit_remaining ?? null,
+              recentSuccessRate: provider.recent_activity?.success_rate ?? provider.recent_success_rate ?? null,
+              lastSuccessfulRequest: extractTimestampIso(provider.last_successful_request),
+              lastSuccessfulDisplay: provider.last_successful_request?.display ?? null,
+              lastError: provider.last_error
+            }))
+          : [];
+      this.renderProviders();
         if (showNotification) {
           notification.success('ספקים רועננו', 'נתוני הספקים נטענו בהצלחה');
         }
-      } catch (error) {
+    } catch (error) {
         this.providers = [];
         this.renderProviders();
         this.handleError('שגיאה בטעינת רשימת הספקים', error, 'load-providers');
-      }
     }
+  }
 
-    renderProviders() {
+  renderProviders() {
       const providersGrid = getElement('providers-grid');
       if (!providersGrid) {
         return;
       }
+
       if (!this.providers.length) {
-        providersGrid.innerHTML = '<div class="text-muted text-center p-4">לא נמצאו ספקים פעילים</div>';
+        providersGrid.innerHTML = '<div class="col-12 text-center text-muted py-4">לא נמצאו ספקים פעילים</div>';
         return;
       }
+
       providersGrid.innerHTML = this.providers
         .map((provider) => {
-          const statusClass = provider.is_active
-            ? provider.is_healthy
-              ? 'active'
-              : 'warning'
-            : 'inactive';
-          const statusLabel = provider.is_active
-            ? provider.is_healthy
+          const statusBadgeClass = provider.isActive
+            ? provider.isHealthy
+              ? 'bg-success'
+              : 'bg-warning text-dark'
+            : 'bg-secondary';
+          const statusLabel = provider.isActive
+            ? provider.isHealthy
               ? 'פעיל'
               : 'בעיה'
             : 'לא פעיל';
+          const lastUpdate = provider.lastSuccessfulDisplay
+            ? safeText(provider.lastSuccessfulDisplay)
+            : provider.lastSuccessfulRequest
+              ? formatRelativeTime(provider.lastSuccessfulRequest)
+              : NOT_AVAILABLE_TEXT;
+          const successRate = provider.recentSuccessRate != null
+            ? formatPercent(provider.recentSuccessRate * 100)
+            : NOT_AVAILABLE_TEXT;
+          const rateLimitRemaining = provider.rateLimitRemaining != null
+            ? formatNumber(provider.rateLimitRemaining)
+            : NOT_AVAILABLE_TEXT;
+          const rateLimitPerHour = provider.rateLimitPerHour != null
+            ? formatNumber(provider.rateLimitPerHour)
+            : NOT_AVAILABLE_TEXT;
+          const errorDetails = provider.lastError
+            ? `<div class="text-danger small mt-2">שגיאה אחרונה: ${safeText(provider.lastError)}</div>`
+            : '';
+
           return `
-            <div class="provider-card ${statusClass}">
-              <div class="provider-header">
-                <h4>${safeText(provider.display_name || provider.name)}</h4>
-                <span class="provider-status ${statusClass}">${statusLabel}</span>
-              </div>
-              <div class="provider-details">
-                <div class="provider-info">
-                  <span class="info-label">שם פנימי:</span>
-                  <span class="info-value">${safeText(provider.name)}</span>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <span>${safeText(provider.displayName || provider.name)}</span>
+                  <span class="badge ${statusBadgeClass}">${statusLabel}</span>
                 </div>
-                <div class="provider-info">
-                  <span class="info-label">סטטוס בריאות:</span>
-                  <span class="info-value">${provider.is_healthy ? 'בריא' : 'בעיה'}</span>
-                </div>
-                <div class="provider-info">
-                  <span class="info-label">עדכון אחרון:</span>
-                  <span class="info-value">${formatRelativeTime(provider.last_successful_request)}</span>
-                </div>
-                ${
-                  provider.last_error
-                    ? `<div class="provider-info">
-                        <span class="info-label">שגיאה אחרונה:</span>
-                        <span class="info-value text-danger">${safeText(provider.last_error)}</span>
-                      </div>`
-                    : ''
-                }
-              </div>
-            </div>
+                <div class="card-body small text-muted">
+                  <div class="mb-2">עדכון אחרון: ${lastUpdate}</div>
+                  <div class="mb-2">בקשות לשעה: ${rateLimitPerHour}</div>
+                  <div class="mb-2">בקשות זמינות: ${rateLimitRemaining}</div>
+                  <div class="mb-2">אחוז הצלחה: ${successRate}</div>
+                  ${errorDetails}
+                    </div>
+                    </div>
+                    </div>
           `;
         })
         .join('');
@@ -583,8 +824,8 @@
         this.renderCacheStats();
         if (showNotification) {
           notification.success('נתוני מטמון', 'סטטיסטיקות המטמון נטענו בהצלחה');
-        }
-      } catch (error) {
+      }
+    } catch (error) {
         this.cacheStats = null;
         this.renderCacheStats();
         this.handleError('שגיאה בטעינת סטטיסטיקות מטמון', error, 'load-cache-stats');
@@ -602,26 +843,26 @@
       }
 
       const stats = this.cacheStats.data;
-      cacheStatsElement.innerHTML = `
-        <div class="cache-stats-grid">
-          <div class="stat-card">
+    cacheStatsElement.innerHTML = `
+            <div class="cache-stats-grid">
+                <div class="stat-card">
             <div class="stat-value">${formatNumber(stats.total_entries)}</div>
             <div class="stat-label">רשומות במטמון</div>
-          </div>
-          <div class="stat-card">
+                </div>
+                <div class="stat-card">
             <div class="stat-value">${formatNumber(stats.expired_entries)}</div>
             <div class="stat-label">רשומות פג תוקף</div>
-          </div>
-          <div class="stat-card">
+                </div>
+                <div class="stat-card">
             <div class="stat-value">${formatPercent(stats.hit_rate)}</div>
-            <div class="stat-label">אחוז פגיעות</div>
-          </div>
-          <div class="stat-card">
+                    <div class="stat-label">אחוז פגיעות</div>
+                </div>
+                <div class="stat-card">
             <div class="stat-value">${formatDecimal(stats.estimated_memory_mb, 2)}MB</div>
             <div class="stat-label">שימוש בזיכרון</div>
-          </div>
-        </div>
-      `;
+                </div>
+            </div>
+        `;
 
       this.updateCurrentSettings(stats);
     }
@@ -652,18 +893,30 @@
 
     async loadLogs(showNotification = false) {
       try {
-        const response = await fetch('/api/external-data/status/logs');
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+        const logManager = window.UnifiedLogManager;
+        if (logManager && typeof logManager.getLogData === 'function') {
+          if (!logManager.initialized && typeof logManager.initialize === 'function') {
+            await logManager.initialize();
+          }
+          const result = await logManager.getLogData('externalDataLog', {
+            sortBy: 'timestamp',
+            sortOrder: 'desc'
+          });
+          this.logs = Array.isArray(result?.data) ? result.data : [];
+        } else {
+          const response = await fetch('/api/external-data/status/logs');
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+          }
+          const fallbackData = await response.json();
+          this.logs = Array.isArray(fallbackData.logs) ? fallbackData.logs : [];
         }
-        const data = await response.json();
-        this.logs = Array.isArray(data.logs) ? data.logs : [];
         this.applyLogFilters();
         if (showNotification) {
           notification.success('לוגים נטענו', 'נמשכו רשומות מהשרת');
         }
-      } catch (error) {
+    } catch (error) {
         this.logs = [];
         this.applyLogFilters();
         this.handleError('שגיאה בטעינת לוגים', error, 'load-logs');
@@ -689,30 +942,30 @@
       }
       this.filteredLogs = filtered;
       this.renderLogs(filtered);
-    }
+  }
 
-    renderLogs(logs) {
+  renderLogs(logs) {
       const logContent = getElement('log-content');
       if (!logContent) {
         return;
       }
 
       if (!logs.length) {
-        const currentTime = new Date().toLocaleString('he-IL');
-        logContent.innerHTML = `
-          <div class="no-logs">
-            <div class="no-logs-icon">📋</div>
-            <div class="no-logs-title">אין לוגים להצגה</div>
-            <div class="no-logs-subtitle">המערכת פועלת ללא שגיאות</div>
-            <div class="no-logs-time">נבדק לאחרונה: ${currentTime}</div>
-            <div class="no-logs-info">
-              <p>• לוגים יופיעו כאן כאשר יש פעילות במערכת</p>
-              <p>• רענן את הדף כדי לבדוק עדכונים חדשים</p>
-            </div>
+      const currentTime = new Date().toLocaleString('he-IL');
+      logContent.innerHTML = `
+        <div class="no-logs">
+          <div class="no-logs-icon">📋</div>
+          <div class="no-logs-title">אין לוגים להצגה</div>
+          <div class="no-logs-subtitle">המערכת פועלת ללא שגיאות</div>
+          <div class="no-logs-time">נבדק לאחרונה: ${currentTime}</div>
+          <div class="no-logs-info">
+            <p>• לוגים יופיעו כאן כאשר יש פעילות במערכת</p>
+            <p>• רענן את הדף כדי לבדוק עדכונים חדשים</p>
           </div>
-        `;
-        return;
-      }
+        </div>
+      `;
+      return;
+    }
 
       logContent.innerHTML = logs
         .map((log) => {
@@ -794,7 +1047,7 @@
       return labels[category] || category || NOT_AVAILABLE_TEXT;
     }
 
-    async refreshProviders() {
+  async refreshProviders() {
       await this.loadProviders(true);
     }
 
@@ -818,9 +1071,9 @@
       };
 
       try {
-        const response = await fetch('/api/external-data/status/settings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+      const response = await fetch('/api/external-data/status/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         if (!response.ok) {
@@ -829,12 +1082,12 @@
         }
         notification.success('הצלחה', 'ההגדרות נשמרו בהצלחה');
         await this.loadCacheStats();
-      } catch (error) {
+    } catch (error) {
         this.handleError('נכשל לשמור את ההגדרות', error, 'save-settings');
-      }
     }
+  }
 
-    async resetSettings() {
+  async resetSettings() {
       const hotElement = getElement('hot-cache-ttl');
       const warmElement = getElement('warm-cache-ttl');
       const maxElement = getElement('max-requests-hour');
@@ -844,11 +1097,11 @@
       if (maxElement) maxElement.value = '';
 
       notification.info('הגדרות אופסו', 'ניתן להזין ערכים חדשים ולשמור');
-    }
+  }
 
-    async clearLogs() {
-      try {
-        const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
+  async clearLogs() {
+    try {
+      const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
         if (!response.ok) {
           if (response.status === 501) {
             const data = await response.json();
@@ -860,14 +1113,14 @@
         }
         notification.success('לוגים נוקו', 'הלוגים נוקו בהצלחה');
         await this.loadLogs();
-      } catch (error) {
+    } catch (error) {
         this.handleError('שגיאה בניקוי הלוגים', error, 'clear-logs');
-      }
     }
+  }
 
-    async clearCache() {
-      try {
-        const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
+  async clearCache() {
+    try {
+      const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
@@ -875,14 +1128,26 @@
         notification.success('מטמון נוקה', 'מטמון הנתונים החיצוניים נוקה בהצלחה');
         await this.loadCacheStats();
         await this.loadSystemStatus();
-      } catch (error) {
+        await this.loadProviders();
+        await this.loadGroupRefreshHistory();
+    } catch (error) {
         this.handleError('שגיאה בניקוי המטמון', error, 'clear-cache');
-      }
     }
+  }
 
-    async optimizeCache() {
-      try {
-        const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
+  async resetExternalSystem() {
+    try {
+      await this.clearCache();
+      await this.clearLogs();
+      notification.success('המערכת אופסה', 'כל הנתונים ההיסטוריים והלוגים נוקו בהצלחה');
+    } catch (error) {
+      this.handleError('שגיאה באיפוס מערכת הנתונים החיצוניים', error, 'reset-system');
+    }
+  }
+
+  async optimizeCache() {
+    try {
+      const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
@@ -893,13 +1158,13 @@
           `אופטימיזציית המטמון הושלמה (${formatNumber(result.optimized_size_bytes || 0)} בייטים שוחררו)`
         );
         await this.loadCacheStats();
-      } catch (error) {
+    } catch (error) {
         this.handleError('שגיאה באופטימיזציית המטמון', error, 'optimize-cache');
-      }
     }
+  }
 
-    async testAllProviders() {
-      try {
+  async testAllProviders() {
+    try {
         const startTime = performance.now();
         const response = await fetch('/api/external-data/status/providers');
         const duration = performance.now() - startTime;
@@ -914,7 +1179,7 @@
         const results = providers.map((provider) => ({
           name: provider.display_name || provider.name,
           status: provider.is_healthy ? 'active' : 'inactive',
-          lastUpdate: provider.last_successful_request,
+          lastUpdate: extractTimestampIso(provider.last_successful_request),
           error: provider.last_error,
           successRate: provider.recent_activity?.success_rate
             ? formatPercent(provider.recent_activity.success_rate * 100)
@@ -978,7 +1243,7 @@
           </div>
         </div>
       `;
-      window.showDetailsModal('בדיקת ספקי נתונים - תוצאות מפורטות', modalContent);
+        window.showDetailsModal('בדיקת ספקי נתונים - תוצאות מפורטות', modalContent);
     }
 
     async analyzeData() {
@@ -1018,7 +1283,7 @@
         const filename = `external-data-backup-${new Date().toISOString().split('T')[0]}.json`;
         this.exportToFile(filename, exportPayload);
         notification.success('גיבוי הושלם', 'קובץ הגיבוי ירד בהצלחה');
-      } catch (error) {
+    } catch (error) {
         this.handleError('שגיאה ביצירת גיבוי', error, 'backup-data');
       }
     }
@@ -1026,12 +1291,12 @@
     exportToFile(filename, data) {
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+        const link = document.createElement('a');
       link.href = url;
       link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     }
 
@@ -1046,11 +1311,11 @@
       if (!Array.isArray(this.providers) || !this.providers.length) {
         issues.push('לא נמצאו ספקים במערכת');
       } else {
-        const inactiveProviders = this.providers.filter((provider) => !provider.is_active);
+        const inactiveProviders = this.providers.filter((provider) => !provider.isActive);
         if (inactiveProviders.length) {
           issues.push(`נמצאו ${inactiveProviders.length} ספקים שאינם פעילים`);
         }
-        const providersWithErrors = this.providers.filter((provider) => provider.last_error);
+        const providersWithErrors = this.providers.filter((provider) => provider.lastError);
         if (providersWithErrors.length) {
           issues.push(`נמצאו ${providersWithErrors.length} ספקים עם שגיאה אחרונה`);
         }
@@ -1137,10 +1402,10 @@
           </div>
         </div>
       `;
-      window.showDetailsModal('בדיקות יחידה - תוצאות מפורטות', modalContent);
-    }
+        window.showDetailsModal('בדיקות יחידה - תוצאות מפורטות', modalContent);
+  }
 
-    async testSpecificFunction() {
+  async testSpecificFunction() {
       const tests = [];
       tests.push(await this.testYahooFinanceAPI());
       tests.push(await this.testCacheOperations());
@@ -1154,9 +1419,9 @@
         notification.warning('בדיקת פונקציות', summary);
       }
       return tests;
-    }
+  }
 
-    async generateTestReport() {
+  async generateTestReport() {
       const result = await this.runUnitTests();
       const report = {
         generatedAt: new Date().toISOString(),
@@ -1177,9 +1442,9 @@
         this.exportToFile(`external-data-test-report-${new Date().toISOString()}.txt`, report);
       }
       return report;
-    }
+  }
 
-    generateTextReport(report) {
+  generateTextReport(report) {
       const lines = [];
       lines.push('=== דוח בדיקות מערכת נתונים חיצוניים ===');
       lines.push(`זמן יצירה: ${new Date(report.generatedAt).toLocaleString('he-IL')}`);
@@ -1200,19 +1465,19 @@
       return lines.join('\n');
     }
 
-    async testYahooFinanceAPI() {
+  async testYahooFinanceAPI() {
       const startTime = performance.now();
-      try {
-        const response = await fetch('/api/external-data/yahoo/quote/AAPL');
+    try {
+      const response = await fetch('/api/external-data/yahoo/quote/AAPL');
         const duration = performance.now() - startTime;
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            name: 'Yahoo Finance API Connection',
-            status: 'passed',
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          name: 'Yahoo Finance API Connection',
+          status: 'passed',
             duration: formatDurationMs(duration),
             details: `AAPL: ${safeText(data.data?.price, 'מחיר לא זמין')}`
-          };
+        };
         }
         return {
           name: 'Yahoo Finance API Connection',
@@ -1220,29 +1485,29 @@
           duration: formatDurationMs(duration),
           error: `HTTP ${response.status}`
         };
-      } catch (error) {
-        return {
-          name: 'Yahoo Finance API Connection',
-          status: 'failed',
-          duration: 'N/A',
-          error: error.message
-        };
-      }
+    } catch (error) {
+      return {
+        name: 'Yahoo Finance API Connection',
+        status: 'failed',
+        duration: 'N/A',
+        error: error.message
+      };
     }
+  }
 
-    async testDatabaseOperations() {
+  async testDatabaseOperations() {
       const startTime = performance.now();
-      try {
-        const response = await fetch('/api/external-data/refresh/all', { method: 'POST' });
+    try {
+      const response = await fetch('/api/external-data/refresh/all', { method: 'POST' });
         const duration = performance.now() - startTime;
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            name: 'Database Operations',
-            status: 'passed',
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          name: 'Database Operations',
+          status: 'passed',
             duration: formatDurationMs(duration),
             details: `${formatNumber(data.result?.successful_updates || 0)} טיקרים עודכנו`
-          };
+        };
         }
         return {
           name: 'Database Operations',
@@ -1250,29 +1515,29 @@
           duration: formatDurationMs(duration),
           error: `HTTP ${response.status}`
         };
-      } catch (error) {
-        return {
-          name: 'Database Operations',
-          status: 'failed',
-          duration: 'N/A',
-          error: error.message
-        };
-      }
+    } catch (error) {
+      return {
+        name: 'Database Operations',
+        status: 'failed',
+        duration: 'N/A',
+        error: error.message
+      };
     }
+  }
 
-    async testCacheOperations() {
+  async testCacheOperations() {
       const startTime = performance.now();
-      try {
-        const response = await fetch('/api/cache/stats');
+    try {
+      const response = await fetch('/api/cache/stats');
         const duration = performance.now() - startTime;
-        if (response.ok) {
-          const data = await response.json();
-          return {
-            name: 'Cache Operations',
-            status: 'passed',
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          name: 'Cache Operations',
+          status: 'passed',
             duration: formatDurationMs(duration),
             details: `${formatNumber(data.data?.total_entries || 0)} רשומות במטמון`
-          };
+        };
         }
         return {
           name: 'Cache Operations',
@@ -1280,17 +1545,17 @@
           duration: formatDurationMs(duration),
           error: `HTTP ${response.status}`
         };
-      } catch (error) {
-        return {
-          name: 'Cache Operations',
-          status: 'failed',
-          duration: 'N/A',
-          error: error.message
-        };
-      }
+    } catch (error) {
+      return {
+        name: 'Cache Operations',
+        status: 'failed',
+        duration: 'N/A',
+        error: error.message
+      };
     }
+  }
 
-    async testRateLimitingReal() {
+  async testRateLimitingReal() {
       const startTime = performance.now();
       try {
         const requests = [];
@@ -1306,20 +1571,20 @@
           duration: formatDurationMs(duration),
           details: `${successCount}/3 בקשות הצליחו`
         };
-      } catch (error) {
-        return {
-          name: 'Rate Limiting',
-          status: 'failed',
-          duration: 'N/A',
-          error: error.message
-        };
-      }
+    } catch (error) {
+      return {
+        name: 'Rate Limiting',
+        status: 'failed',
+        duration: 'N/A',
+        error: error.message
+      };
     }
+  }
 
-    async testDataValidation() {
+  async testDataValidation() {
       const startTime = performance.now();
-      try {
-        const response = await fetch('/api/external-data/status/');
+    try {
+      const response = await fetch('/api/external-data/status/');
         const duration = performance.now() - startTime;
         if (!response.ok) {
           return {
@@ -1340,28 +1605,28 @@
           duration: formatDurationMs(duration),
           details: passed ? 'מבנה הנתונים תקין' : 'נמצאו שדות חסרים בתשובה'
         };
-      } catch (error) {
-        return {
-          name: 'Data Validation',
-          status: 'failed',
-          duration: 'N/A',
-          error: error.message
-        };
-      }
+    } catch (error) {
+      return {
+        name: 'Data Validation',
+        status: 'failed',
+        duration: 'N/A',
+        error: error.message
+      };
     }
+  }
 
-    async testErrorHandling() {
+  async testErrorHandling() {
       const startTime = performance.now();
-      try {
-        const response = await fetch('/api/external-data/nonexistent-endpoint');
+    try {
+      const response = await fetch('/api/external-data/nonexistent-endpoint');
         const duration = performance.now() - startTime;
-        if (response.status === 404) {
-          return {
-            name: 'Error Handling',
-            status: 'passed',
+      if (response.status === 404) {
+        return {
+          name: 'Error Handling',
+          status: 'passed',
             duration: formatDurationMs(duration),
             details: 'שרת החזיר סטטוס 404 כמצופה'
-          };
+        };
         }
         return {
           name: 'Error Handling',
@@ -1369,11 +1634,11 @@
           duration: formatDurationMs(duration),
           error: `סטטוס לא צפוי: ${response.status}`
         };
-      } catch (error) {
-        return {
-          name: 'Error Handling',
-          status: 'passed',
-          duration: 'N/A',
+    } catch (error) {
+      return {
+        name: 'Error Handling',
+        status: 'passed',
+        duration: 'N/A',
           details: 'שגיאת רשת טופלה בהצלחה'
         };
       }
@@ -1510,8 +1775,8 @@
         if (this.performanceSamples.length > 50) {
           this.performanceSamples.shift();
         }
-        this.updateResponseTimeChart();
-        this.updateErrorAnalysisChart();
+        await this.updateResponseTimeChart();
+        await this.updateErrorAnalysisChart();
       } catch (error) {
         const sample = {
           timestamp: new Date().toISOString(),
@@ -1523,64 +1788,87 @@
         if (this.performanceSamples.length > 50) {
           this.performanceSamples.shift();
         }
-        this.updateErrorAnalysisChart();
+        await this.updateErrorAnalysisChart();
       }
     }
 
-    refreshPerformanceCharts() {
-      this.updateResponseTimeChart();
-      this.updateDataQualityChart(this.statusData);
-      this.updateProviderComparisonChart(this.statusData);
-      this.updateErrorAnalysisChart();
+    async refreshPerformanceCharts() {
+      await Promise.all([
+        this.updateResponseTimeChart(),
+        this.updateDataQualityChart(this.statusData),
+        this.updateProviderComparisonChart(this.statusData),
+        this.updateErrorAnalysisChart()
+      ]);
       notification.success('גרפי ביצועים', 'הגרפים עודכנו על סמך נתונים אחרונים');
     }
 
-    updateResponseTimeChart() {
-      const ctx = getElement('responseTimeChart');
-      if (!ctx || typeof Chart === 'undefined') {
+    async updateResponseTimeChart() {
+      const chartSystem = this.getChartSystem();
+      if (!chartSystem) {
+        return;
+      }
+
+      const chartId = CHART_IDS.responseTime;
+      const selector = '#responseTimeChart';
+      const canvas = document.querySelector(selector);
+
+      if (!canvas || !this.performanceSamples.length) {
+        this.destroyChart(chartId, 'responseTimeChart');
         return;
       }
 
       const labels = this.performanceSamples.map((sample) =>
         new Date(sample.timestamp).toLocaleTimeString('he-IL')
       );
-      const data = this.performanceSamples.map((sample) => sample.responseTimeMs || 0);
+      const dataset = this.performanceSamples.map((sample) => sample.responseTimeMs || 0);
 
-      if (!this.responseTimeChart) {
-        this.responseTimeChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [
-              {
-                label: 'זמן תגובה (ms)',
-                data,
-                borderColor: 'rgb(38, 186, 172)',
-                backgroundColor: 'rgba(38, 186, 172, 0.2)',
-                tension: 0.15
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true
-              }
+      const chartConfig = {
+        id: chartId,
+        type: 'line',
+        container: selector,
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'זמן תגובה (ms)',
+              data: dataset,
+              borderColor: 'rgb(38, 186, 172)',
+              backgroundColor: 'rgba(38, 186, 172, 0.2)',
+              tension: 0.15
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
             }
           }
-        });
-      } else {
-        this.responseTimeChart.data.labels = labels;
-        this.responseTimeChart.data.datasets[0].data = data;
-        this.responseTimeChart.update();
+        }
+      };
+
+      try {
+        this.destroyChart(chartId, 'responseTimeChart');
+        this.responseTimeChart = await chartSystem.create(chartConfig);
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:chart-system-error`, { chartId, error });
       }
     }
 
-    updateDataQualityChart(data) {
-      const ctx = getElement('dataQualityChart');
-      if (!ctx || typeof Chart === 'undefined' || !data?.cache) {
+    async updateDataQualityChart(data) {
+      const chartSystem = this.getChartSystem();
+      if (!chartSystem) {
+        return;
+      }
+
+      const chartId = CHART_IDS.dataQuality;
+      const selector = '#dataQualityChart';
+      const canvas = document.querySelector(selector);
+
+      if (!canvas || !data?.cache) {
+        this.destroyChart(chartId, 'dataQualityChart');
         return;
       }
 
@@ -1588,34 +1876,45 @@
       const staleData = data.cache.stale_data_count || 0;
       const validData = Math.max(totalQuotes - staleData, 0);
 
-      const chartData = {
-        labels: ['נתונים תקינים', 'נתונים פגומים'],
-        datasets: [
-          {
-            data: [validData, staleData],
-            backgroundColor: ['rgba(38, 186, 172, 0.8)', 'rgba(252, 90, 6, 0.7)']
-          }
-        ]
+      const chartConfig = {
+        id: chartId,
+        type: 'doughnut',
+        container: selector,
+        data: {
+          labels: ['נתונים תקינים', 'נתונים פגומים'],
+          datasets: [
+            {
+              data: [validData, staleData],
+              backgroundColor: ['rgba(38, 186, 172, 0.8)', 'rgba(252, 90, 6, 0.7)']
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
       };
 
-      if (!this.dataQualityChart) {
-        this.dataQualityChart = new Chart(ctx, {
-          type: 'doughnut',
-          data: chartData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        });
-      } else {
-        this.dataQualityChart.data = chartData;
-        this.dataQualityChart.update();
+      try {
+        this.destroyChart(chartId, 'dataQualityChart');
+        this.dataQualityChart = await chartSystem.create(chartConfig);
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:chart-system-error`, { chartId, error });
       }
     }
 
-    updateProviderComparisonChart(data) {
-      const ctx = getElement('providerComparisonChart');
-      if (!ctx || typeof Chart === 'undefined' || !data?.providers?.details) {
+    async updateProviderComparisonChart(data) {
+      const chartSystem = this.getChartSystem();
+      if (!chartSystem) {
+        return;
+      }
+
+      const chartId = CHART_IDS.providerComparison;
+      const selector = '#providerComparisonChart';
+      const canvas = document.querySelector(selector);
+
+      if (!canvas || !data?.providers?.details?.length) {
+        this.destroyChart(chartId, 'providerComparisonChart');
         return;
       }
 
@@ -1629,85 +1928,104 @@
         return rate * 100;
       });
 
-      const chartData = {
-        labels,
-        datasets: [
-          {
-            label: 'אחוז הצלחה',
-            data: successRates,
-            backgroundColor: 'rgba(38, 186, 172, 0.7)'
-          }
-        ]
-      };
-
-      if (!this.providerComparisonChart) {
-        this.providerComparisonChart = new Chart(ctx, {
-          type: 'bar',
-          data: chartData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 100
-              }
+      const chartConfig = {
+        id: chartId,
+        type: 'bar',
+        container: selector,
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'אחוז הצלחה',
+              data: successRates,
+              backgroundColor: 'rgba(38, 186, 172, 0.7)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
             }
           }
-        });
-      } else {
-        this.providerComparisonChart.data = chartData;
-        this.providerComparisonChart.update();
+        }
+      };
+
+      try {
+        this.destroyChart(chartId, 'providerComparisonChart');
+        this.providerComparisonChart = await chartSystem.create(chartConfig);
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:chart-system-error`, { chartId, error });
       }
     }
 
-    updateErrorAnalysisChart() {
-      const ctx = getElement('errorAnalysisChart');
-      if (!ctx || typeof Chart === 'undefined') {
+    async updateErrorAnalysisChart() {
+      const chartSystem = this.getChartSystem();
+      if (!chartSystem) {
         return;
       }
 
-      const samples = this.performanceSamples.slice(-10);
-      if (!samples.length) {
+      const chartId = CHART_IDS.errorAnalysis;
+      const selector = '#errorAnalysisChart';
+      const canvas = document.querySelector(selector);
+
+      if (!canvas) {
+        this.destroyChart(chartId, 'errorAnalysisChart');
         return;
       }
 
-      const labels = samples.map((sample) => new Date(sample.timestamp).toLocaleTimeString('he-IL'));
-      const errorFlags = samples.map((sample) => (sample.status === 'error' ? 1 : 0));
-
-      const chartData = {
-        labels,
-        datasets: [
-          {
-            label: 'שגיאות',
-            data: errorFlags,
-            borderColor: 'rgb(252, 90, 6)',
-            backgroundColor: 'rgba(252, 90, 6, 0.2)',
-            tension: 0.1
+      const errorCounts = this.performanceSamples.reduce(
+        (acc, sample) => {
+          if (sample.status === 'error') {
+            const key = sample.error || 'שגיאה לא ידועה';
+            acc[key] = (acc[key] || 0) + 1;
           }
-        ]
-      };
+          return acc;
+        },
+        {}
+      );
 
-      if (!this.errorAnalysisChart) {
-        this.errorAnalysisChart = new Chart(ctx, {
-          type: 'line',
-          data: chartData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  stepSize: 1
-                }
-              }
+      const labels = Object.keys(errorCounts);
+      const values = Object.values(errorCounts);
+
+      if (!labels.length) {
+        this.destroyChart(chartId, 'errorAnalysisChart');
+        return;
+      }
+
+      const chartConfig = {
+        id: chartId,
+        type: 'bar',
+        container: selector,
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'מספר הופעות',
+              data: values,
+              backgroundColor: 'rgba(252, 90, 6, 0.7)'
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true
             }
           }
-        });
-      } else {
-        this.errorAnalysisChart.data = chartData;
-        this.errorAnalysisChart.update();
+        }
+      };
+
+      try {
+        this.destroyChart(chartId, 'errorAnalysisChart');
+        this.errorAnalysisChart = await chartSystem.create(chartConfig);
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:chart-system-error`, { chartId, error });
       }
     }
 
@@ -1861,7 +2179,7 @@
         lines.push(`בריאות כללית: ${safeText(this.statusData.overall_health)}`);
         lines.push(`ספקים פעילים: ${formatNumber(this.statusData.providers?.active ?? 0)}`);
         lines.push(`ציטוטים במטמון: ${formatNumber(this.statusData.cache?.total_quotes ?? 0)}`);
-      } else {
+            } else {
         lines.push('סטטוס לא נטען');
       }
       lines.push('');
@@ -1870,14 +2188,18 @@
       if (this.providers.length) {
         this.providers.forEach((provider) => {
           lines.push(
-            `${safeText(provider.display_name || provider.name)} | פעיל: ${
-              provider.is_active ? 'כן' : 'לא'
-            } | בריא: ${provider.is_healthy ? 'כן' : 'לא'} | עדכון אחרון: ${formatRelativeTime(
-              provider.last_successful_request
-            )}`
+            `${safeText(provider.displayName || provider.name)} | פעיל: ${
+              provider.isActive ? 'כן' : 'לא'
+            } | בריא: ${provider.isHealthy ? 'כן' : 'לא'} | עדכון אחרון: ${
+              provider.lastSuccessfulDisplay
+                ? safeText(provider.lastSuccessfulDisplay)
+                : provider.lastSuccessfulRequest
+                ? formatRelativeTime(provider.lastSuccessfulRequest)
+                : NOT_AVAILABLE_TEXT
+            }`
           );
         });
-      } else {
+        } else {
         lines.push('לא נמצאו ספקים');
       }
       lines.push('');
@@ -1889,7 +2211,7 @@
         lines.push(`רשומות פג תוקף: ${formatNumber(stats.expired_entries)}`);
         lines.push(`אחוז פגיעות: ${formatPercent(stats.hit_rate)}`);
         lines.push(`שימוש בזיכרון: ${formatDecimal(stats.estimated_memory_mb, 2)}MB`);
-      } else {
+            } else {
         lines.push('נתוני מטמון לא זמינים');
       }
       lines.push('');
@@ -1897,7 +2219,35 @@
       lines.push('--- לוגים אחרונים ---');
       if (this.logs.length) {
         this.logs.slice(0, 10).forEach((logEntry) => {
-          lines.push(`[${safeText(logEntry.timestamp)}] (${safeText(logEntry.level)}) ${safeText(logEntry.message)}`);
+          const timestamp = safeText(logEntry.timestamp ?? logEntry.time ?? 'לא זמין');
+          const level = safeText((logEntry.level ?? 'info').toString());
+
+          let message = logEntry.message ?? logEntry.text ?? '';
+          if (typeof message === 'object' && message !== null) {
+            try {
+              message = JSON.stringify(message, null, 2);
+            } catch (error) {
+              message = safeText(message.toString());
+            }
+          } else {
+            message = safeText(message.toString());
+          }
+
+          lines.push(`[${timestamp}] (${level}) ${message}`);
+
+          const extra = { ...logEntry };
+          delete extra.timestamp;
+          delete extra.time;
+          delete extra.level;
+          delete extra.message;
+          delete extra.text;
+          if (Object.keys(extra).length) {
+            try {
+              lines.push(`  details: ${JSON.stringify(extra, null, 2)}`);
+            } catch (error) {
+              lines.push(`  details: ${safeText(extra.toString())}`);
+            }
+          }
         });
       } else {
         lines.push('אין לוגים זמינים');
@@ -1915,7 +2265,7 @@
     }
   }
 
-  window.ExternalDataDashboard = ExternalDataDashboard;
+window.ExternalDataDashboard = ExternalDataDashboard;
 
   if (!window.externalDataDashboard) {
     window.externalDataDashboard = new ExternalDataDashboard();
@@ -1988,11 +2338,20 @@
     },
     refreshAllExternalData(event) {
       if (event) event.preventDefault();
-      return window.externalDataDashboard?.refreshCoreData();
+      return ensureExternalDashboardInstance()
+        .then((dashboard) => dashboard.refreshAllExternalData())
+        .catch((error) => {
+          logger.error(`${MODULE_NAME}:actions:refresh-all`, { error });
+          notification.error('שגיאה ברענון כל הטיקרים', error.message || 'רענון הטיקרים נכשל');
+        });
     },
     clearExternalCache(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.clearCache();
+    },
+    resetExternalSystem(event) {
+      if (event) event.preventDefault();
+      return window.externalDataDashboard?.resetExternalSystem();
     },
     optimizeExternalCache(event) {
       if (event) event.preventDefault();

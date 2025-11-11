@@ -5244,7 +5244,7 @@ class ModalManagerV2 {
                     };
                 }
             } else if (relatedTypeId === '3' || relatedTypeId === 3) { // trade_plan
-                const response = await fetch(`/api/trade_plans/${relatedId}`);
+                const response = await fetch(`/api/trade-plans/${relatedId}`);
                 if (response.ok) {
                     const result = await response.json();
                     const planData = result.data || result;
@@ -5414,7 +5414,7 @@ class ModalManagerV2 {
                     textField = 'symbol';
                     break;
                 case 3: // trade_plan
-                    endpoint = '/api/trade_plans/';
+                    endpoint = '/api/trade-plans/';
                     valueField = 'id';
                     textField = 'symbol';
                     break;
@@ -5563,7 +5563,7 @@ class ModalManagerV2 {
                     textField = 'symbol';
                     break;
                 case 3: // trade_plan
-                    endpoint = '/api/trade_plans/';
+                    endpoint = '/api/trade-plans/';
                     valueField = 'id';
                     textField = 'symbol';
                     break;

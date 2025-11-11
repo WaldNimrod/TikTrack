@@ -172,7 +172,7 @@ class CRUDEnhancedTester {
             'cash_flows': {
                 type: 'user_page',
                 displayName: 'תזרימי מזומנים',
-                apiUrl: '/api/cash_flows/',
+                apiUrl: '/api/cash-flows/',
                 pageUrl: '/cash_flows',
                 hasCRUD: true,
                 testData: {
@@ -194,7 +194,7 @@ class CRUDEnhancedTester {
             'trade_plans': {
                 type: 'user_page',
                 displayName: 'תוכניות מסחר',
-                apiUrl: '/api/trade_plans/',
+                apiUrl: '/api/trade-plans/',
                 pageUrl: '/trade_plans',
                 hasCRUD: true,
                 testData: {

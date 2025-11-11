@@ -421,7 +421,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
 
     switch (itemType) {
     case 'trade_plan':
-      response = await fetch(`${base}/api/trade_plans/${itemId}`, {
+      response = await fetch(`${base}/api/trade-plans/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),

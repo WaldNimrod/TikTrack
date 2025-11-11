@@ -18,7 +18,8 @@ Last Updated: 2025-01-16
 
 import csv
 import io
-from typing import List, Dict, Any, Optional
+from decimal import Decimal, InvalidOperation
+from typing import List, Dict, Any, Optional, Tuple, Iterable
 from datetime import datetime, timezone
 from .base_connector import BaseConnector
 from services.date_normalization_service import DateNormalizationService
@@ -33,9 +34,26 @@ class IBKRConnector(BaseConnector):
     This connector handles the complex IBKR CSV format and extracts
     trading data from the Trades section of the statement.
     """
+    CASHFLOW_SECTION_NAMES = {
+        'Cash Report': 'cash_report',
+        'Deposits & Withdrawals': 'deposit_withdrawal',
+        'Interest': 'interest',
+        'Dividends': 'dividend',
+        'Withholding Tax': 'tax',
+        'Other Fees': 'fee'
+    }
+
+    ACCOUNT_SECTION_NAMES = {
+        'Account Information': 'account_info',
+        'Account Configuration': 'account_configuration',
+        'Base Currency Summary': 'base_currency',
+        'Account Summary': 'account_summary'
+    }
+
     def __init__(self):
         super().__init__()
         self._last_symbol_metadata_entries: List[Dict[str, Any]] = []
+        self._cached_sections: Dict[str, Any] = {}
 
     def identify_file(self, file_content: str, file_name: str) -> bool:
         """
@@ -89,80 +107,387 @@ class IBKRConnector(BaseConnector):
         except Exception:
             return False
     
-    def parse_file(self, file_content: str, file_name: str = None) -> List[Dict[str, Any]]:
+    def parse_file(
+        self,
+        file_content: str,
+        file_name: str = None,
+        task_type: str = 'executions'
+    ) -> List[Dict[str, Any]]:
         """
-        Parse the IBKR CSV file content.
-        
+        Parse the IBKR CSV file content for the requested task type.
+
         Args:
             file_content: Raw file content as string
-            
+            task_type: Import task identifier (executions | cashflows | account_reconciliation)
+
         Returns:
-            List[Dict[str, Any]]: List of raw data records
+            List[Dict[str, Any]]: Raw data records for the selected task
         """
-        records = []
-        
-        try:
-            # Handle empty file
-            if not file_content or not file_content.strip():
-                return []
-            
-            lines = file_content.strip().split('\n')
-            self._last_symbol_metadata_entries = self._parse_symbol_metadata(lines)
-            
-            # Find the Trades section
-            trades_start = None
-            for i, line in enumerate(lines):
-                if line.startswith('Trades,Header,DataDiscriminator'):
-                    trades_start = i
-                    break
-            
-            if trades_start is None:
-                raise ValueError("Trades section not found in IBKR file")
-            
-            # Get the header row (the line with Trades,Header)
-            if trades_start >= len(lines):
-                raise ValueError("Trades header not found")
-            
-            # Parse header using CSV reader to handle any quoted fields
-            import csv
-            from io import StringIO
-            
-            header_line = lines[trades_start]
-            csv_reader = csv.reader(StringIO(header_line))
-            headers = [col.strip() for col in next(csv_reader)]
-            
-            # Parse trade records - only lines that start exactly with "Trades,Data"
-            for i in range(trades_start + 1, len(lines)):
-                line = lines[i].strip()
-                if not line:
-                    continue
-                
-                # Only process lines that start exactly with "Trades,Data"
-                if line.startswith('Trades,Data'):
-                    # Parse the trade record using CSV parser to handle quoted values
-                    import csv
-                    from io import StringIO
-                    
-                    # Create a CSV reader for this line
-                    csv_reader = csv.reader(StringIO(line))
-                    values = next(csv_reader)
-                    
-                    # Create a dictionary mapping headers to values
-                    row = {}
-                    for j, header in enumerate(headers):
-                        if j < len(values):
-                            row[header] = values[j].strip()
-                        else:
-                            row[header] = ''
-                    
-                    # Add row number for tracking
-                    row['_row_number'] = i + 1
-                    records.append(row)
-                    
-        except Exception as e:
-            raise ValueError(f"Failed to parse IBKR file: {str(e)}")
-        
+        sections = self.parse_sections(file_content)
+        if task_type == 'cashflows':
+            return sections.get('cashflows', [])
+        if task_type == 'account_reconciliation':
+            account_data = sections.get('account_reconciliation') or {}
+            # Account reconciliation returns a single struct rather than list
+            return [account_data] if account_data else []
+        return sections.get('executions', [])
+
+    def parse_sections(self, file_content: str) -> Dict[str, Any]:
+        """
+        Parse the file into logical sections (executions, cashflows, account info).
+        Results are cached per connector instance to avoid re-parsing.
+        """
+        if not file_content or not file_content.strip():
+            return {
+                'executions': [],
+                'cashflows': [],
+                'account_reconciliation': {}
+            }
+
+        content_hash = hash(file_content)
+        if (
+            self._cached_sections
+            and self._cached_sections.get('raw_content_hash') == content_hash
+        ):
+            return self._cached_sections['sections']
+
+        lines = file_content.strip().split('\n')
+        self._last_symbol_metadata_entries = self._parse_symbol_metadata(lines)
+
+        executions = self._parse_trades_section(lines)
+        cashflows = self._parse_cashflow_sections(lines)
+        account_info = self._parse_account_sections(lines)
+
+        sections = {
+            'executions': executions,
+            'cashflows': cashflows,
+            'account_reconciliation': account_info
+        }
+
+        self._cached_sections = {
+            'raw_content_hash': content_hash,
+            'sections': sections
+        }
+        return sections
+
+    # ------------------------------------------------------------------
+    # Section parsing
+    # ------------------------------------------------------------------
+
+    def _parse_trades_section(self, lines: List[str]) -> List[Dict[str, Any]]:
+        """
+        Parse the Trades section and return raw execution rows.
+        """
+        records: List[Dict[str, Any]] = []
+        trades_start = None
+
+        for idx, line in enumerate(lines):
+            if line.startswith('Trades,Header,DataDiscriminator'):
+                trades_start = idx
+                break
+
+        if trades_start is None:
+            raise ValueError("Trades section not found in IBKR file")
+
+        header_line = lines[trades_start]
+        header_reader = csv.reader(io.StringIO(header_line))
+        headers = [col.strip() for col in next(header_reader)]
+
+        for rel_idx in range(trades_start + 1, len(lines)):
+            line = lines[rel_idx].strip()
+            if not line:
+                continue
+
+            if line.startswith('Trades,Trailer'):
+                break
+
+            if not line.startswith('Trades,Data'):
+                continue
+
+            value_reader = csv.reader(io.StringIO(line))
+            values = next(value_reader)
+            row = {}
+            for col_idx, header in enumerate(headers):
+                row[header] = values[col_idx].strip() if col_idx < len(values) else ''
+            row['_row_number'] = rel_idx + 1
+            records.append(row)
+
         return records
+
+    def _parse_cashflow_sections(self, lines: List[str]) -> List[Dict[str, Any]]:
+        """
+        Parse cashflow-related sections (cash report, deposits, interest, etc.)
+        """
+        records: List[Dict[str, Any]] = []
+        current_section: Optional[str] = None
+        current_headers: Optional[List[str]] = None
+
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+
+            header_section = self._match_section_header(stripped, self.CASHFLOW_SECTION_NAMES.keys())
+            if header_section:
+                current_section = header_section
+                current_headers = self._parse_section_headers(stripped)
+                continue
+
+            if not current_section or not current_headers:
+                continue
+
+            if stripped.startswith(f'{current_section},Trailer'):
+                current_section = None
+                current_headers = None
+                continue
+
+            if not stripped.startswith(f'{current_section},Data'):
+                continue
+
+            value_reader = csv.reader(io.StringIO(stripped))
+            values = next(value_reader)
+            row = {}
+            for idx, header in enumerate(current_headers):
+                value_idx = idx + 2  # Skip section & descriptor columns
+                row[header] = values[value_idx].strip() if value_idx < len(values) else ''
+
+            record = self._build_cashflow_record(current_section, row)
+            if record:
+                records.append(record)
+
+        return records
+
+    def _build_cashflow_record(self, section_name: str, row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Convert raw row dictionary into a unified cashflow record dict.
+        """
+        try:
+            cashflow_type = self._resolve_cashflow_type(section_name, row)
+            amount, currency = self._extract_amount_and_currency(row)
+
+            if amount is None or amount == 0:
+                return None
+
+            effective_date = self._extract_datetime(
+                row,
+                ['Date', 'Trade Date', 'Settle Date', 'Value Date']
+            )
+
+            source_account = row.get('Account') or row.get('Account ID') or ''
+            target_account = row.get('Transfer Account') or ''
+            asset_symbol = row.get('Symbol') or row.get('Underlying Symbol') or ''
+            memo = row.get('Description') or row.get('Activity Description') or row.get('Memo') or ''
+
+            record = {
+                'section': section_name,
+                'cashflow_type': cashflow_type,
+                'amount': amount,
+                'currency': currency or row.get('Currency') or '',
+                'effective_date': effective_date,
+                'source_account': source_account,
+                'target_account': target_account,
+                'asset_symbol': asset_symbol,
+                'memo': memo,
+                'tax_country': row.get('Withholding Tax Country') or row.get('Country') or '',
+                '_raw_row': row
+            }
+            return record
+        except Exception as exc:
+            logger.debug("Failed to build cashflow record for section %s: %s", section_name, exc)
+            return None
+
+    def _parse_account_sections(self, lines: List[str]) -> Dict[str, Any]:
+        """
+        Parse account configuration sections and consolidate into a single structure.
+        """
+        account_data: Dict[str, Any] = {
+            'account_id': None,
+            'base_currency': None,
+            'margin_status': None,
+            'entitlements': set(),
+            'missing_documents': set(),
+            'account_aliases': set(),
+            'raw_sections': {}
+        }
+
+        current_section: Optional[str] = None
+        current_headers: Optional[List[str]] = None
+
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+
+            header_section = self._match_section_header(stripped, self.ACCOUNT_SECTION_NAMES.keys())
+            if header_section:
+                current_section = header_section
+                current_headers = self._parse_section_headers(stripped)
+                account_data['raw_sections'][self.ACCOUNT_SECTION_NAMES[header_section]] = []
+                continue
+
+            if not current_section or not current_headers:
+                continue
+
+            if stripped.startswith(f'{current_section},Trailer'):
+                current_section = None
+                current_headers = None
+                continue
+
+            if not stripped.startswith(f'{current_section},Data'):
+                continue
+
+            values = next(csv.reader(io.StringIO(stripped)))
+            row = {}
+            for idx, header in enumerate(current_headers):
+                value_idx = idx + 2
+                row[header] = values[value_idx].strip() if value_idx < len(values) else ''
+
+            section_key = self.ACCOUNT_SECTION_NAMES[current_section]
+            account_data['raw_sections'][section_key].append(row)
+            self._accumulate_account_data(section_key, row, account_data)
+
+        account_data['entitlements'] = sorted(account_data['entitlements'])
+        account_data['missing_documents'] = sorted(account_data['missing_documents'])
+        account_data['account_aliases'] = sorted(account_data['account_aliases'])
+
+        return account_data
+
+    def _accumulate_account_data(self, section_key: str, row: Dict[str, Any], accumulator: Dict[str, Any]) -> None:
+        """
+        Populate consolidated account information from a row.
+        """
+        if section_key == 'account_info':
+            field = row.get('Field Name') or row.get('Field')
+            value = row.get('Field Value') or row.get('Value')
+            if not field or value is None:
+                return
+            lowered = field.lower()
+            if lowered in {'account id', 'accountid'}:
+                accumulator['account_id'] = value
+            elif lowered in {'base currency', 'basecurrency'}:
+                accumulator['base_currency'] = value
+            elif lowered in {'margin type', 'account type'}:
+                accumulator['margin_status'] = value
+
+        elif section_key == 'base_currency':
+            currency = row.get('Currency') or row.get('Base Currency')
+            if currency:
+                accumulator['base_currency'] = currency
+
+        elif section_key == 'account_summary':
+            tag = row.get('Tag') or row.get('Field Name')
+            value = row.get('Value') or row.get('Amount')
+            if not tag:
+                return
+            accumulator.setdefault('summary_values', {})[tag] = value
+
+        elif section_key == 'account_configuration':
+            setting = row.get('Setting') or row.get('Description')
+            value = row.get('Value') or row.get('Status')
+            if not setting:
+                return
+            lowered = setting.lower()
+            if 'entitlement' in lowered and value:
+                accumulator['entitlements'].add(value)
+            elif 'document' in lowered and value and 'missing' in value.lower():
+                accumulator['missing_documents'].add(setting)
+            elif 'alias' in lowered and value:
+                accumulator['account_aliases'].add(value)
+
+    # ------------------------------------------------------------------
+    # Utility helpers for parsing
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _parse_section_headers(header_line: str) -> List[str]:
+        reader = csv.reader(io.StringIO(header_line))
+        headers = [col.strip() for col in next(reader)]
+        if len(headers) > 2 and headers[1].lower() == 'header':
+            return headers[2:]
+        return headers
+
+    @staticmethod
+    def _match_section_header(line: str, candidates: Iterable[str]) -> Optional[str]:
+        for candidate in candidates:
+            if line.startswith(f'{candidate},Header'):
+                return candidate
+        return None
+
+    def _resolve_cashflow_type(self, section_name: str, row: Dict[str, Any]) -> str:
+        section_key = self.CASHFLOW_SECTION_NAMES.get(section_name, '').lower()
+
+        if section_key == 'cash_report':
+            activity_code = (row.get('Activity Code') or row.get('Activity') or '').lower()
+            description = (row.get('Description') or row.get('Activity Description') or '').lower()
+            if 'dividend' in activity_code or 'dividend' in description:
+                return 'dividend'
+            if 'interest' in activity_code or 'interest' in description:
+                return 'interest'
+            if 'tax' in activity_code or 'withholding' in description:
+                return 'tax'
+            if 'fee' in activity_code or 'commission' in description:
+                return 'fee'
+            if 'deposit' in description:
+                return 'deposit'
+            if 'withdrawal' in description or 'transfer' in description:
+                return 'withdrawal'
+            return activity_code or 'cash_adjustment'
+
+        if section_key == 'deposit_withdrawal':
+            amount, _ = self._extract_amount_and_currency(row)
+            return 'deposit' if amount and amount > 0 else 'withdrawal'
+
+        if section_key == 'interest':
+            return 'interest'
+        if section_key == 'dividend':
+            return 'dividend'
+        if section_key == 'tax':
+            return 'tax'
+        if section_key == 'fee':
+            return 'fee'
+
+        return section_key or 'cash_adjustment'
+
+    def _extract_amount_and_currency(self, row: Dict[str, Any]) -> Tuple[Optional[float], Optional[str]]:
+        possible_amount_keys = [
+            'Amount', 'Settled Cash', 'Gross Amount', 'Net Amount',
+            'Amount (Base Currency)', 'Net Cash', 'Trade Amount', 'Value'
+        ]
+
+        amount_decimal: Optional[Decimal] = None
+        for key in possible_amount_keys:
+            if key in row and row[key]:
+                amount_decimal = self._safe_decimal(row[key])
+                if amount_decimal is not None:
+                    break
+
+        currency = row.get('Currency') or row.get('Trade Currency') or row.get('Base Currency')
+        return (float(amount_decimal) if amount_decimal is not None else None, currency)
+
+    def _extract_datetime(self, row: Dict[str, Any], keys: List[str]) -> Optional[datetime]:
+        for key in keys:
+            candidate = row.get(key)
+            if not candidate:
+                continue
+            try:
+                return self._parse_ibkr_datetime(candidate)
+            except ValueError:
+                continue
+        return None
+
+    @staticmethod
+    def _safe_decimal(value: Any) -> Optional[Decimal]:
+        if value in (None, '', '--'):
+            return None
+        if isinstance(value, (int, float, Decimal)):
+            return Decimal(str(value))
+        try:
+            cleaned = str(value).replace('$', '').replace(',', '').strip()
+            if cleaned.startswith('(') and cleaned.endswith(')'):
+                cleaned = f"-{cleaned[1:-1]}"
+            return Decimal(cleaned)
+        except (InvalidOperation, ValueError):
+            return None
 
     def extract_symbol_metadata(
         self,

@@ -156,7 +156,44 @@ class YahooFinanceAdapter:
         except Exception as e:
             logger.error(f"Error loading user timezone: {e}")
             return 'Asia/Jerusalem'
-    
+
+    def build_time_payload(self, source_time: Optional[datetime]) -> Optional[Dict[str, Any]]:
+        """Build standardized time payload for responses"""
+        if not source_time:
+            return None
+
+        try:
+            if source_time.tzinfo is None:
+                source_time = source_time.replace(tzinfo=timezone.utc)
+
+            utc_time = source_time.astimezone(timezone.utc)
+            epoch_ms = int(utc_time.timestamp() * 1000)
+            user_tz = pytz.timezone(self.user_timezone)
+            local_time = utc_time.astimezone(user_tz)
+
+            return {
+                'utc': utc_time.isoformat().replace('+00:00', 'Z'),
+                'epochMs': epoch_ms,
+                'local': local_time.isoformat(),
+                'timezone': self.user_timezone,
+                'display': local_time.strftime('%d/%m/%Y %H:%M')
+            }
+
+        except Exception as error:
+            logger.error(f"Error building time payload: {error}")
+            try:
+                epoch_ms = int(source_time.timestamp() * 1000)
+            except Exception:
+                epoch_ms = None
+
+            return {
+                'utc': source_time.isoformat(),
+                'epochMs': epoch_ms,
+                'local': None,
+                'timezone': self.user_timezone,
+                'display': source_time.strftime('%Y-%m-%d %H:%M:%S')
+            }
+
     def _convert_to_user_timezone(self, utc_time: datetime) -> datetime:
         """Convert UTC time to user's preferred timezone"""
         try:
@@ -884,38 +921,42 @@ class YahooFinanceAdapter:
             provider = self.db_session.query(ExternalDataProvider).filter(
                 ExternalDataProvider.id == self.provider_id
             ).first()
-            
+ 
             if not provider:
                 return {'status': 'unknown', 'error': 'Provider not found'}
-            
+ 
+            now = datetime.now(timezone.utc)
+            hour_ago = now - timedelta(hours=1)
+
             # Check recent refresh logs
             recent_logs = self.db_session.query(DataRefreshLog).filter(
                 DataRefreshLog.provider_id == self.provider_id,
-                DataRefreshLog.start_time >= datetime.now(timezone.utc).replace(hour=datetime.now(timezone.utc).hour - 1)
+                DataRefreshLog.start_time >= hour_ago
             ).all()
-            
+ 
             success_count = len([log for log in recent_logs if log.status == 'success'])
             total_count = len(recent_logs)
-            
+ 
             # Get market status
             market_status = self.get_market_status()
-            
+ 
             return {
                 'provider_id': provider.id,
                 'name': provider.name,
                 'display_name': provider.display_name,
                 'is_active': provider.is_active,
                 'is_healthy': provider.is_healthy,
-                'last_successful_request': provider.last_successful_request.isoformat() if provider.last_successful_request else None,
+                'last_successful_request': self.build_time_payload(provider.last_successful_request),
                 'last_error': provider.last_error,
                 'error_count': provider.error_count,
-                'rate_limit_remaining': self.max_requests_per_hour - self.requests_this_hour,
+                'rate_limit_remaining': max(self.max_requests_per_hour - self.requests_this_hour, 0),
                 'requests_this_hour': self.requests_this_hour,
                 'recent_success_rate': success_count / total_count if total_count > 0 else 0,
                 'recent_requests': total_count,
-                'market_status': market_status
+                'market_status': market_status,
+                'timestamp': self.build_time_payload(now)
             }
-            
+ 
         except SQLAlchemyError as e:
             logger.error(f"Error getting provider status: {e}")
             return {'status': 'error', 'error': str(e)}

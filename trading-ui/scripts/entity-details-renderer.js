@@ -1959,22 +1959,22 @@ class EntityDetailsRenderer {
                         <thead>
                             <tr>
                                 <th>
-                                    <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTableData(0, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)">תאריך <span class="sort-icon">↕</span></button>
+                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTableData(0, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)"></button>
                                 </th>
                                 <th>
-                                    <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTableData(1, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)">פעולה <span class="sort-icon">↕</span></button>
+                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="פעולה" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTableData(1, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)"></button>
                                 </th>
                                 <th>
-                                    <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTableData(2, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)">כמות <span class="sort-icon">↕</span></button>
+                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="כמות" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTableData(2, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)"></button>
                                 </th>
                                 <th>
-                                    <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTableData(3, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)">מחיר <span class="sort-icon">↕</span></button>
+                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מחיר" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTableData(3, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)"></button>
                                 </th>
                                 <th>
-                                    <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTableData(4, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)">עמלה <span class="sort-icon">↕</span></button>
+                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="עמלה" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTableData(4, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)"></button>
                                 </th>
                                 <th>
-                                    <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTableData(5, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)">סה"כ <span class="sort-icon">↕</span></button>
+                                    <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סה"כ" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTableData(5, window.positionExecutionsData || [], 'position_executions', window.updatePositionExecutionsTable)"></button>
                                 </th>
                             </tr>
                         </thead>
@@ -2180,7 +2180,7 @@ class EntityDetailsRenderer {
 
             const sortHandlerReference = `window.linkedItemsSortHandlers['${tableId}']`;
             const makeSortButton = (label, columnIndex, alignment = 'start') => `
-                <button class="btn btn-link sortable-header px-0 text-${alignment}" data-onclick="window.sortTableData(${columnIndex}, window.linkedItemsTableData['${tableId}'] || [], 'linked_items', ${sortHandlerReference})">${label} <span class="sort-icon">↕</span></button>
+                <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="${label}" data-classes="btn-link sortable-header px-0 text-${alignment}" data-onclick="window.sortTableData(${columnIndex}, window.linkedItemsTableData['${tableId}'] || [], 'linked_items', ${sortHandlerReference})"></button>
             `;
 
             // Get table headers based on entity types in the table

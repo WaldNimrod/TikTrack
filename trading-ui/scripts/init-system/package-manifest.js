@@ -94,6 +94,13 @@ const PACKAGE_MANIFEST = {
     dependencies: [],
     scripts: [
       {
+        file: 'api-config.js',
+        globalCheck: 'window.API_BASE_URL',
+        description: 'הגדרות API מרכזיות',
+        required: true,
+        loadOrder: 0
+      },
+      {
         file: 'global-favicon.js',
         globalCheck: 'window.setFavicon',
         description: 'ניהול favicon',
@@ -760,6 +767,14 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
+        file: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+        globalCheck: 'window.Chart',
+        description: 'ספריית Chart.js (CDN)',
+        required: true,
+        loadOrder: 0,
+        external: true
+      },
+      {
         file: 'charts/chart-theme.js',
         globalCheck: 'window.ChartTheme',
         description: 'ערכת גרפים',
@@ -1345,6 +1360,42 @@ const PACKAGE_MANIFEST = {
     ],
     estimatedSize: '~45KB',
     initTime: '~30ms'
+  },
+
+  // 19.5 DASHBOARD WIDGETS PACKAGE - רכיבי דף הבית
+  'dashboard-widgets': {
+    id: 'dashboard-widgets',
+    name: 'Dashboard Widgets',
+    description: 'ווידג׳טים וממשקי דף הבית (Pending Executions, Trade Creation)',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 19.5,
+    dependencies: ['base', 'services', 'ui-advanced', 'entity-services'],
+    scripts: [
+      {
+        file: 'pending-executions-widget.js',
+        globalCheck: 'window.PendingExecutionsHighlights',
+        description: 'ווידג׳ט המלצות שיוך',
+        required: true,
+        loadOrder: 0
+      },
+      {
+        file: 'pending-execution-trade-creation.js',
+        globalCheck: 'window.PendingExecutionTradeCreation',
+        description: 'ממשק יצירת טרייד מביצועים',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'index.js',
+        globalCheck: 'window.initializeIndexPage',
+        description: 'לוגיקת דף הבית',
+        required: true,
+        loadOrder: 2
+      }
+    ],
+    estimatedSize: '~110KB',
+    initTime: '~60ms'
   },
 
   // Game plan: dynamic loader uses PAGE_REQUIREMENTS; add validation dependencies for dashboard use cases

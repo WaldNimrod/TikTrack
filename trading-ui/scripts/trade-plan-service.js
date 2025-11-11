@@ -60,7 +60,7 @@ async function loadTradePlansData() {
     // Loading trade plans data from server...
 
     // Use relative URL to work with both development (8080) and production (5001)
-    const url = '/api/trade_plans/';
+    const url = '/api/trade-plans/';
 
     const response = await fetch(url);
 

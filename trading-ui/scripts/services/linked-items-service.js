@@ -167,6 +167,7 @@ class LinkedItemsService {
             trade: '/trading-ui/images/icons/trades.svg',
             trade_plan: '/trading-ui/images/icons/trade_plans.svg',
             execution: '/trading-ui/images/icons/executions.svg',
+            trading_account: '/trading-ui/images/icons/trading_accounts.svg',
             account: '/trading-ui/images/icons/trading_accounts.svg',
             alert: '/trading-ui/images/icons/alerts.svg',
             cash_flow: '/trading-ui/images/icons/cash_flows.svg',

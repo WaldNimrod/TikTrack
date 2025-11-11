@@ -767,6 +767,7 @@ function translateConditionFields(attribute, operator, number) {
     'change': 'שינוי',
     'ma': 'ממוצע נע',
     'volume': 'נפח מסחר',
+    'balance': 'יתרה',
   };
 
   // תרגום האופרטור לסימנים חשבונאיים
@@ -793,6 +794,11 @@ function translateConditionFields(attribute, operator, number) {
   } else if (attribute === 'volume') {
     // עיצוב נפח עם פסיקים
     formattedNumber = parseInt(number).toLocaleString('he-IL');
+  } else if (attribute === 'balance') {
+    const asNumber = Number(number);
+    formattedNumber = Number.isFinite(asNumber)
+      ? asNumber.toLocaleString('he-IL')
+      : number;
   }
 
   return `${translatedAttribute} ${operatorSymbol} ${formattedNumber}`;

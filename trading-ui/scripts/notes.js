@@ -445,7 +445,7 @@ function updateNotesTable(notes) {
         const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
           fetch('/api/trading-accounts/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
           fetch('/api/trades/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/trade_plans/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
+          fetch('/api/trade-plans/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
           fetch('/api/tickers/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
         ]);
 
@@ -1025,7 +1025,7 @@ async function populateEditSelectByType(relationType, selectedId) {
       break;
     }
     case 3: { // תוכנית
-      const plansResponse = await fetch('/api/trade_plans/');
+      const plansResponse = await fetch('/api/trade-plans/');
       const plansData = await plansResponse.json();
       data = Array.isArray(plansData.data) ? plansData.data : [];
       displayField = 'id';

@@ -13,6 +13,7 @@ Last Updated: 2025-01-16
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -34,15 +35,21 @@ class NormalizationService:
             'external_id', 'source', 'currency'
         ]
         self.date_normalizer = DateNormalizationService()
+        self.utc_normalizer = DateNormalizationService("UTC")
     
-    def normalize_records(self, raw_records: List[Dict[str, Any]], 
-                         connector) -> List[Dict[str, Any]]:
+    def normalize_records(
+        self,
+        raw_records: List[Dict[str, Any]],
+        connector,
+        task_type: str = 'executions'
+    ) -> Dict[str, Any]:
         """
         Normalize a list of raw records using the specified connector.
         
         Args:
             raw_records: List of raw data records
             connector: Connector instance with normalization methods
+            task_type: Type of import task (executions | cashflows | account_reconciliation)
             
         Returns:
             List[Dict[str, Any]]: List of normalized records
@@ -52,15 +59,20 @@ class NormalizationService:
         
         for i, raw_record in enumerate(raw_records):
             try:
-                # Use connector's normalization method
-                normalized = connector.normalize_record(raw_record)
-                
-                # Add external ID and source
-                normalized['external_id'] = connector.generate_external_id(normalized)
-                normalized['source'] = connector.get_source_value()
-                
+                if task_type == 'cashflows':
+                    normalized = self._normalize_cashflow_record(raw_record, connector)
+                    validation_errors = self._validate_cashflow_record(normalized)
+                elif task_type == 'account_reconciliation':
+                    normalized = self._normalize_account_record(raw_record, connector)
+                    validation_errors = self._validate_account_record(normalized)
+                else:
+                    normalized = connector.normalize_record(raw_record)
+                    normalized['external_id'] = connector.generate_external_id(normalized)
+                    normalized['source'] = connector.get_source_value()
+                    normalized['task_type'] = 'executions'
+                    validation_errors = connector.validate_record(normalized)
+
                 # Validate the normalized record
-                validation_errors = connector.validate_record(normalized)
                 if validation_errors:
                     errors.append({
                         'record_index': i,
@@ -85,6 +97,159 @@ class NormalizationService:
             'successful': len(normalized_records),
             'failed': len(errors)
         }
+
+    # ------------------------------------------------------------------
+    # Task-specific normalization helpers
+    # ------------------------------------------------------------------
+
+    def _normalize_cashflow_record(self, raw_record: Dict[str, Any], connector) -> Dict[str, Any]:
+        if raw_record is None:
+            raise ValueError("Cashflow record is empty")
+
+        amount = raw_record.get('amount')
+        if amount is None:
+            raise ValueError("Cashflow amount is missing")
+
+        try:
+            amount = float(amount)
+        except (ValueError, TypeError):
+            raise ValueError(f"Invalid cashflow amount: {amount}")
+
+        effective_date = raw_record.get('effective_date')
+        effective_envelope = self._normalize_date_envelope(effective_date)
+
+        normalized = {
+            'task_type': 'cashflows',
+            'cashflow_type': str(raw_record.get('cashflow_type') or 'cash_adjustment').lower(),
+            'amount': amount,
+            'currency': str(raw_record.get('currency') or '').upper(),
+            'effective_date': effective_envelope,
+            'source_account': raw_record.get('source_account') or '',
+            'target_account': raw_record.get('target_account') or '',
+            'asset_symbol': raw_record.get('asset_symbol') or '',
+            'memo': raw_record.get('memo') or '',
+            'tax_country': raw_record.get('tax_country') or '',
+            'section': raw_record.get('section') or '',
+            'source': connector.get_source_value(),
+            'raw_row': raw_record.get('_raw_row') or raw_record
+        }
+
+        normalized['external_id'] = self._generate_cashflow_external_id(normalized)
+        return normalized
+
+    def _normalize_account_record(self, raw_record: Dict[str, Any], connector) -> Dict[str, Any]:
+        if raw_record is None:
+            raise ValueError("Account reconciliation record is empty")
+
+        account_id = raw_record.get('account_id') or ''
+        base_currency = raw_record.get('base_currency') or ''
+        as_of = raw_record.get('as_of') or datetime.utcnow()
+        as_of_envelope = self._normalize_date_envelope(as_of)
+
+        normalized = {
+            'task_type': 'account_reconciliation',
+            'account_id': account_id,
+            'base_currency': base_currency.upper() if base_currency else '',
+            'margin_status': raw_record.get('margin_status') or '',
+            'entitlements': list(raw_record.get('entitlements', [])),
+            'missing_documents': list(raw_record.get('missing_documents', [])),
+            'account_aliases': list(raw_record.get('account_aliases', [])),
+            'summary_values': raw_record.get('summary_values', {}),
+            'raw_sections': raw_record.get('raw_sections', {}),
+            'source': connector.get_source_value(),
+            'as_of': as_of_envelope
+        }
+
+        normalized['external_id'] = self._generate_account_external_id(normalized)
+        return normalized
+
+    # ------------------------------------------------------------------
+    # Validation helpers
+    # ------------------------------------------------------------------
+
+    def _validate_cashflow_record(self, record: Dict[str, Any]) -> List[str]:
+        errors: List[str] = []
+
+        if not record.get('cashflow_type'):
+            errors.append("Missing cashflow_type")
+        if record.get('amount') is None:
+            errors.append("Missing amount")
+        if record.get('currency') in (None, ''):
+            errors.append("Missing currency")
+        if not record.get('effective_date'):
+            errors.append("Missing effective_date")
+        if not record.get('source_account'):
+            errors.append("Missing source_account")
+
+        return errors
+
+    def _validate_account_record(self, record: Dict[str, Any]) -> List[str]:
+        errors: List[str] = []
+
+        if not record.get('account_id'):
+            errors.append("Missing account_id")
+        if not record.get('base_currency'):
+            errors.append("Missing base_currency")
+        if not record.get('as_of'):
+            errors.append("Missing as_of date")
+
+        return errors
+
+    # ------------------------------------------------------------------
+    # External ID helpers
+    # ------------------------------------------------------------------
+
+    def _generate_cashflow_external_id(self, record: Dict[str, Any]) -> str:
+        date_iso = self._coerce_date_to_iso(record.get('effective_date'))
+        amount = record.get('amount') or 0.0
+        parts = [
+            date_iso or 'na',
+            record.get('cashflow_type', 'cashflow'),
+            record.get('currency', ''),
+            f"{abs(float(amount)):.2f}",
+            record.get('source_account', '')
+        ]
+        candidate = '_'.join(filter(None, parts))
+        return self._sanitize_external_id(candidate)
+
+    def _generate_account_external_id(self, record: Dict[str, Any]) -> str:
+        date_iso = self._coerce_date_to_iso(record.get('as_of'))
+        parts = [
+            record.get('account_id', 'account'),
+            record.get('base_currency', ''),
+            date_iso or datetime.utcnow().strftime('%Y-%m-%d')
+        ]
+        candidate = '_'.join(filter(None, parts))
+        return self._sanitize_external_id(candidate)
+
+    @staticmethod
+    def _sanitize_external_id(value: str) -> str:
+        sanitized = re.sub(r'[^a-zA-Z0-9_-]', '_', value)
+        return sanitized[:120] if len(sanitized) > 120 else sanitized
+
+    def _normalize_date_envelope(self, value: Any) -> Optional[Dict[str, Any]]:
+        if not value:
+            return None
+
+        if isinstance(value, dict):
+            # Assume already DateEnvelope
+            return value
+
+        if isinstance(value, datetime):
+            dt = value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+            return self.utc_normalizer.normalize_output(dt)
+
+        try:
+            normalized = self.date_normalizer.normalize_input_payload({'date': value})
+            dt = normalized.get('date') if isinstance(normalized, dict) else None
+            if isinstance(dt, datetime):
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                return self.utc_normalizer.normalize_output(dt)
+        except Exception:
+            return None
+
+        return None
     
     def ensure_standard_format(self, record: Dict[str, Any]) -> Dict[str, Any]:
         """

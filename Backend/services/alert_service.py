@@ -394,7 +394,7 @@ class AlertService:
                 alert_data['condition_number'] = '0'
             
             # Validate new condition fields
-            valid_attributes = ['price', 'change', 'ma', 'volume']
+            valid_attributes = ['price', 'change', 'ma', 'volume', 'balance']
             valid_operators = ['more_than', 'less_than', 'cross', 'cross_up', 'cross_down', 'change', 'change_up', 'change_down', 'equals']
             
             if alert_data['condition_attribute'] not in valid_attributes:

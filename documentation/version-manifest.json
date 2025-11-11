@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.0.1.0",
+    "version": "1.0.5.0",
     "major": 1,
     "minor": 0,
-    "patch": 1,
+    "patch": 5,
     "build": 0,
-    "commit": "50d337a197bca3413ee53eae53896c2b5e0b3e77",
-    "updated_at": "2025-11-10T19:58:48+00:00",
-    "notes": "Sync production deployment configuration"
+    "commit": "4f8ac52d3e416f09d82d0c5340501b6a27404e36",
+    "updated_at": "2025-11-11T01:30:58+00:00",
+    "notes": "Sync main into production - 2025-11-11"
   },
   "development": {
-    "version": "1.0.0.0",
+    "version": "1.0.5.0",
     "major": 1,
     "minor": 0,
-    "patch": 0,
+    "patch": 5,
     "build": 0,
-    "commit": "d7169b3f225184f9d6c1ccbb1826135e045cb335",
-    "updated_at": "2025-11-10T19:16:47+00:00",
-    "notes": "Initial alignment (dev commit d7169b3f225184f9d6c1ccbb1826135e045cb335, prod commit da1dc88875f8804f9805700e2f444ba56fb5bd72)"
+    "commit": "ab26eb7a516afef0b851e4a08da7fabbb9e1197d",
+    "updated_at": "2025-11-11T01:01:46+00:00",
+    "notes": "Document active alerts component and add API path audit tool"
   }
 }

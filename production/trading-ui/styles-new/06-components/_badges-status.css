@@ -1,0 +1,249 @@
+/* TikTrack Status Badges - Simplified */
+
+.priority-badge.priority-high {
+background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) ;
+  color: #d32f2f ;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) ;
+}
+
+.priority-badge.priority-medium {
+background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) ;
+  color: #f57c00 ;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) ;
+}
+
+.priority-badge.priority-low {
+background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) ;
+  color: #388e3c ;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) ;
+}
+
+.numeric-text-negative {
+color: var(--numeric-negative-medium) ;
+  font-weight: 600;
+}
+
+.numeric-text-zero {
+color: var(--numeric-zero-medium) ;
+}
+
+.profit-positive {
+color: var(--numeric-positive-medium) ;
+  font-weight: 600;
+}
+
+.profit-negative {
+color: var(--numeric-negative-medium) ;
+  font-weight: 600;
+}
+
+.numeric-value-positive,
+.numeric-value-negative,
+.numeric-value-zero,
+.numeric-value-neutral,
+.numeric-text-negative,
+.numeric-text-zero,
+.profit-positive,
+.profit-negative {
+  color: var(--text-color, #333);
+  font-weight: 500;
+  direction: ltr;
+  unicode-bidi: bidi-override;
+  text-align: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.numeric-value-positive,
+.profit-positive {
+  color: var(--numeric-positive-medium);
+  font-weight: 600;
+}
+
+.numeric-value-negative,
+.numeric-text-negative,
+.profit-negative {
+  color: var(--numeric-negative-medium);
+  font-weight: 600;
+}
+
+.numeric-value-neutral,
+.numeric-text-zero {
+  color: var(--text-color, #333);
+}
+
+/* Badge Base Styles - סטנדרט אחיד לכל ה-badges */
+.status-badge,
+.badge-long,
+.badge-short,
+.badge-type,
+.priority-badge,
+.triggered-badge,
+.development-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* רוחב מקסימלי 100px לכל הבאדג'ים */
+  max-width: 100px;
+  width: auto;
+  min-width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status Categories */
+.status-badge[data-status-category="open"] {
+  background-color: var(--status-open-bg, #e8f5e8);
+  color: var(--status-open-color, #2e7d32);
+  border-color: var(--status-open-border, #4caf50);
+}
+
+.status-badge[data-status-category="closed"] {
+  background-color: var(--status-closed-bg, #ffebee);
+  color: var(--status-closed-color, #c62828);
+  border-color: var(--status-closed-border, #f44336);
+}
+
+.status-badge[data-status-category="cancelled"] {
+  background-color: var(--status-cancelled-bg, #f3e5f5);
+  color: var(--status-cancelled-color, #7b1fa2);
+  border-color: var(--status-cancelled-border, #9c27b0);
+}
+
+.status-badge[data-status-category="warning"] {
+  background-color: var(--status-warning-bg, #fff3e0);
+  color: var(--status-warning-color, #ef6c00);
+  border-color: var(--status-warning-border, #ff9800);
+}
+
+.status-badge[data-status-category="info"] {
+  background-color: var(--status-info-bg, #e3f2fd);
+  color: var(--status-info-color, #1565c0);
+  border-color: var(--status-info-border, #2196f3);
+}
+
+.status-badge[data-status-category="unknown"] {
+  background-color: var(--status-unknown-bg, #f5f5f5);
+  color: var(--status-unknown-color, #616161);
+  border-color: var(--status-unknown-border, #9e9e9e);
+}
+
+/* הגדרות ישנות הוסרו - משתמשים ב-badge-long ו-badge-short */
+
+/* הגדרות ישנות הוסרו - משתמשים ב-badge-type */
+
+.triggered-badge.triggered-yes {
+background-color: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.triggered-badge.triggered-no {
+background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
+.triggered-badge.triggered-new {
+background-color: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffcc02;
+}
+
+.triggered-badge.triggered-unknown {
+background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
+.status-dot.online {
+background-color: var(--status-open-color);
+}
+
+.status-dot.offline {
+background-color: var(--status-closed-color);
+}
+
+.status-dot.pending {
+background-color: var(--status-pending-color);
+}
+
+/* צד טרייד - רק צבעים חיוביים/שליליים (לא צבע ישות) */
+.badge-long {
+  background-color: color-mix(in srgb, var(--numeric-positive-medium, #28a745) 10%, transparent);
+  color: var(--numeric-positive-medium, #28a745);
+  border: 1px solid var(--numeric-positive-medium, #28a745);
+}
+
+.badge-short {
+  background-color: color-mix(in srgb, var(--numeric-negative-medium, #dc3545) 10%, transparent);
+  color: var(--numeric-negative-medium, #dc3545);
+  border: 1px solid var(--numeric-negative-medium, #dc3545);
+}
+
+.badge-neutral {
+  background-color: color-mix(in srgb, var(--value-neutral-color, #6c757d) 10%, transparent);
+  color: var(--value-neutral-color, #6c757d);
+  border: 1px solid var(--value-neutral-color, #6c757d);
+}
+
+/* סוג טרייד - רק צבעים */
+.badge-type {
+  background-color: color-mix(in srgb, var(--current-entity-color, #007bff) 10%, transparent);
+  color: var(--current-entity-color, #007bff);
+  border: 1px solid var(--current-entity-color, #007bff);
+}
+
+.badge-type.text-success {
+  background-color: color-mix(in srgb, var(--user-status-positive-color, #28a745) 10%, transparent);
+  color: var(--user-status-positive-color, #28a745);
+  border: 1px solid var(--user-status-positive-color, #28a745);
+}
+
+.badge-type.text-danger {
+  background-color: color-mix(in srgb, var(--user-status-negative-color, #dc3545) 10%, transparent);
+  color: var(--user-status-negative-color, #dc3545);
+  border: 1px solid var(--user-status-negative-color, #dc3545);
+}
+
+/* צבעים ספציפיים לכל סוג טרייד - סגנון אחיד עם באדג'י סטטוס */
+.badge-type[data-type="swing"] {
+  background-color: color-mix(in srgb, var(--type-swing-color) 10%, transparent);
+  color: var(--type-swing-color);
+  border: 1px solid var(--type-swing-color);
+}
+
+.badge-type[data-type="investment"] {
+  background-color: color-mix(in srgb, var(--type-investment-color) 10%, transparent);
+  color: var(--type-investment-color);
+  border: 1px solid var(--type-investment-color);
+}
+
+.badge-type[data-type="passive"] {
+  background-color: color-mix(in srgb, var(--type-passive-color) 10%, transparent);
+  color: var(--type-passive-color);
+  border: 1px solid var(--type-passive-color);
+}
+
+.badge-type[data-type="day-trading"] {
+  background-color: color-mix(in srgb, var(--type-day-trading-color) 10%, transparent);
+  color: var(--type-day-trading-color);
+  border: 1px solid var(--type-day-trading-color);
+}
+
+.badge-type[data-type="scalping"] {
+  background-color: color-mix(in srgb, var(--type-scalping-color) 10%, transparent);
+  color: var(--type-scalping-color);
+  border: 1px solid var(--type-scalping-color);
+}
+

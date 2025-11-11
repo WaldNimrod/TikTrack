@@ -1,0 +1,867 @@
+{
+  "generatedAt": "2025-11-11T00:51:13.966Z",
+  "safeRouteMap": {
+    "account_activity": "account-activity",
+    "background_tasks": "background-tasks",
+    "cache_sync": "cache-sync",
+    "database_schema": "database-schema",
+    "entity_details": "entity-details",
+    "file_scanner": "file-scanner",
+    "linked_items": "linked-items",
+    "plan_conditions": "plan-conditions",
+    "query_optimization": "query-optimization",
+    "system_settings": "system-settings",
+    "trade_conditions": "trade-conditions",
+    "trading_accounts": "trading-accounts",
+    "trading_methods": "trading-methods",
+    "user_data_import": "user-data-import"
+  },
+  "safeReplacements": [
+    {
+      "file": "Backend/routes/api/plan_conditions_list.py",
+      "replacements": [
+        {
+          "change": "/api/plan_conditions -> /api/plan-conditions",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "replacements": [
+        {
+          "change": "/api/plan_conditions -> /api/plan-conditions",
+          "count": 1
+        },
+        {
+          "change": "/api/trade_conditions -> /api/trade-conditions",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "manualFindings": [
+    {
+      "file": "Backend/routes/api/cash_flows.py",
+      "line": 22,
+      "legacyPath": "/api/cash_flows",
+      "context": "sh_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash_flows')\n\n# Create a service class for cash flows\nc"
+    },
+    {
+      "file": "Backend/routes/api/external_data_providers.py",
+      "line": 17,
+      "legacyPath": "/api/external_data_providers",
+      "context": " Blueprint('external_data_providers', __name__, url_prefix='/api/external_data_providers')\n\ndef get_db_connection():\n   "
+    },
+    {
+      "file": "Backend/routes/api/note_relation_types.py",
+      "line": 18,
+      "legacyPath": "/api/note_relation_types",
+      "context": "bp = Blueprint('note_relation_types', __name__, url_prefix='/api/note_relation_types')\n\n# Initialize base API (note_rela"
+    },
+    {
+      "file": "Backend/routes/api/preference_groups.py",
+      "line": 17,
+      "legacyPath": "/api/preference_groups",
+      "context": "s_bp = Blueprint('preference_groups', __name__, url_prefix='/api/preference_groups')\n\ndef get_db_connection():\n    \"\"\"Ge"
+    },
+    {
+      "file": "Backend/routes/api/quotes_last.py",
+      "line": 17,
+      "legacyPath": "/api/quotes_last",
+      "context": "es_last_bp = Blueprint('quotes_last', __name__, url_prefix='/api/quotes_last')\n\ndef get_db_connection():\n    \"\"\"Get data"
+    },
+    {
+      "file": "Backend/routes/api/system_setting_groups.py",
+      "line": 17,
+      "legacyPath": "/api/system_setting_groups",
+      "context": " = Blueprint('system_setting_groups', __name__, url_prefix='/api/system_setting_groups')\n\ndef get_db_connection():\n    \""
+    },
+    {
+      "file": "Backend/routes/api/trade_plans.py",
+      "line": 16,
+      "legacyPath": "/api/trade_plans",
+      "context": "e_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans')\n\n# Initialize base API\nbase_api = BaseEnt"
+    },
+    {
+      "file": "Backend/routes/api/user_preferences_list.py",
+      "line": 17,
+      "legacyPath": "/api/user_preferences",
+      "context": " = Blueprint('user_preferences_list', __name__, url_prefix='/api/user_preferences')\n\ndef get_db_connection():\n    \"\"\"Get"
+    },
+    {
+      "file": "Backend/tests/test_routes/test_trade_plans_routes.py",
+      "line": 38,
+      "legacyPath": "/api/trade_plans",
+      "context": "rn_value = [mock_plan]\n\n        response = self.client.get(\"/api/trade_plans/\")\n        self.assertEqual(response.status"
+    },
+    {
+      "file": "Backend/utils/response_optimizer.py",
+      "line": 221,
+      "legacyPath": "/api/note_relation_types",
+      "context": "cies',\n                '/api/constraints',\n                '/api/note_relation_types',\n                '/api/linked-item"
+    },
+    {
+      "file": "Backend/utils/response_optimizer.py",
+      "line": 228,
+      "legacyPath": "/api/trade_plans",
+      "context": "api/cache',\n                '/api/trades',\n                '/api/trade_plans',\n                '/api/cash_flows',\n      "
+    },
+    {
+      "file": "Backend/utils/response_optimizer.py",
+      "line": 229,
+      "legacyPath": "/api/cash_flows",
+      "context": "ades',\n                '/api/trade_plans',\n                '/api/cash_flows',\n                '/api/notes',\n            "
+    },
+    {
+      "file": "trading-ui/scripts/active-alerts-component.js",
+      "line": 743,
+      "legacyPath": "/api/trade_plans",
+      "context": " { data: [] })).catch(() => ({ data: [] })),\n        fetch('/api/trade_plans/').then(r => (r.ok ? r.json() : { data: [] "
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "line": 440,
+      "legacyPath": "/api/trade_plans",
+      "context": "(r => r.json()).catch(() => ({ data: [] })),\n        fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data:"
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "line": 1029,
+      "legacyPath": "/api/trade_plans",
+      "context": "en(r => r.json()).catch(() => ({ data: [] })),\n      fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data:"
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "line": 2994,
+      "legacyPath": "/api/trade_plans",
+      "context": "ditions() {\n    try {\n        const response = await fetch('/api/trade_plans');\n        if (!response.ok) throw new Erro"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 99,
+      "legacyPath": "/api/cash_flows",
+      "context": "עם timestamp למניעת cache\n    const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {\n      method: 'GET',\n "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 388,
+      "legacyPath": "/api/cash_flows",
+      "context": "80) and production (5001)\n    const response = await fetch('/api/cash_flows/');\n    if (!response.ok) {\n      throw new "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 604,
+      "legacyPath": "/api/cash_flows",
+      "context": "\n\n    // שליחת בקשת מחיקה\n    const response = await fetch(`/api/cash_flows/${id}`, {\n      method: 'DELETE',\n    });\n\n "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1634,
+      "legacyPath": "/api/cash_flows",
+      "context": " \n        // Prepare API call\n        const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';\n        "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1634,
+      "legacyPath": "/api/cash_flows",
+      "context": "    const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';\n        const method = isEdit ? 'PUT' : 'P"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1854,
+      "legacyPath": "/api/cash_flows",
+      "context": ".dataset.exchangeId;\n        \n        const url = isEdit ? `/api/cash_flows/exchange/${exchangeId}` : '/api/cash_flows/e"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1854,
+      "legacyPath": "/api/cash_flows",
+      "context": " url = isEdit ? `/api/cash_flows/exchange/${exchangeId}` : '/api/cash_flows/exchange';\n        const method = isEdit ? '"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1911,
+      "legacyPath": "/api/cash_flows",
+      "context": "exchangeId);\n        \n        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`);\n        if (!respo"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 2014,
+      "legacyPath": "/api/cash_flows",
+      "context": "exchangeId);\n        \n        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`, {\n            metho"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 2307,
+      "legacyPath": "/api/trade_plans",
+      "context": "hFlow(selectId) {\n  try {\n    const response = await fetch('/api/trade_plans/');\n    if (!response.ok) {\n      throw new"
+    },
+    {
+      "file": "trading-ui/scripts/conditions-test.js",
+      "line": 522,
+      "legacyPath": "/api/trade_plans",
+      "context": "oid infinite loop\n            const response = await fetch('/api/trade_plans/');\n            const data = await response"
+    },
+    {
+      "file": "trading-ui/scripts/conditions-test.js",
+      "line": 533,
+      "legacyPath": "/api/trade_plans",
+      "context": "e first\n                const createResponse = await fetch('/api/trade_plans/', {\n                    method: 'POST',\n  "
+    },
+    {
+      "file": "trading-ui/scripts/conditions-test.js",
+      "line": 891,
+      "legacyPath": "/api/trade_plans",
+      "context": "t\n            const plansResponse = await this.makeApiCall('/api/trade_plans/', 'GET');\n            const plansCount = p"
+    },
+    {
+      "file": "trading-ui/scripts/crud-testing-enhanced.js",
+      "line": 175,
+      "legacyPath": "/api/cash_flows",
+      "context": "    displayName: 'תזרימי מזומנים',\n                apiUrl: '/api/cash_flows/',\n                pageUrl: '/cash_flows',\n "
+    },
+    {
+      "file": "trading-ui/scripts/crud-testing-enhanced.js",
+      "line": 197,
+      "legacyPath": "/api/trade_plans",
+      "context": "      displayName: 'תוכניות מסחר',\n                apiUrl: '/api/trade_plans/',\n                pageUrl: '/trade_plans',"
+    },
+    {
+      "file": "trading-ui/scripts/entity-details-api.js",
+      "line": 470,
+      "legacyPath": "/api/trade_plans",
+      "context": " trade: `/api/trades/${entityId}`,\n            trade_plan: `/api/trade_plans/${entityId}`,\n            execution: `/api/"
+    },
+    {
+      "file": "trading-ui/scripts/entity-details-api.js",
+      "line": 475,
+      "legacyPath": "/api/cash_flows",
+      "context": "  alert: `/api/alerts/${entityId}`,\n            cash_flow: `/api/cash_flows/${entityId}`,\n            note: `/api/notes/"
+    },
+    {
+      "file": "trading-ui/scripts/entity-details-api.js",
+      "line": 1629,
+      "legacyPath": "/api/cash_flows",
+      "context": "tching from API...');\n        const response = await fetch(`/api/cash_flows/${cashFlowId}`);\n        const apiData = awa"
+    },
+    {
+      "file": "trading-ui/scripts/modal-manager-v2.js",
+      "line": 5247,
+      "legacyPath": "/api/trade_plans",
+      "context": "// trade_plan\n                const response = await fetch(`/api/trade_plans/${relatedId}`);\n                if (respons"
+    },
+    {
+      "file": "trading-ui/scripts/modal-manager-v2.js",
+      "line": 5417,
+      "legacyPath": "/api/trade_plans",
+      "context": "      case 3: // trade_plan\n                    endpoint = '/api/trade_plans/';\n                    valueField = 'id';\n "
+    },
+    {
+      "file": "trading-ui/scripts/modal-manager-v2.js",
+      "line": 5566,
+      "legacyPath": "/api/trade_plans",
+      "context": "      case 3: // trade_plan\n                    endpoint = '/api/trade_plans/';\n                    valueField = 'id';\n "
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 778,
+      "legacyPath": "/api/trade_plans",
+      "context": "e.all([\n      fetch('/api/trading-accounts/'),\n      fetch('/api/trade_plans/'),\n      fetch('/api/tickers/'),\n    ]);\n\n"
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 1424,
+      "legacyPath": "/api/trade_plans",
+      "context": "ת תוכניות טרייד\n    const tradePlansResponse = await fetch('/api/trade_plans/');\n    const tradePlans = await tradePlans"
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2141,
+      "legacyPath": "/api/trade_plans",
+      "context": "planId) {\n      try {\n        const response = await fetch(`/api/trade_plans/${planId}`);\n        if (response.ok) {\n   "
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2219,
+      "legacyPath": "/api/trade_plans",
+      "context": "h development (8080) and production (5001)\n    const url = `/api/trade_plans/${newTradePlanId}`;\n    const response = aw"
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2492,
+      "legacyPath": "/api/trade_plans",
+      "context": "/ קבלת פרטי תוכנית הטרייד\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2539,
+      "legacyPath": "/api/trade_plans",
+      "context": "\n    // קבלת פרטי התוכנית\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2039,
+      "legacyPath": "/api/trade_plans",
+      "context": "es/',\n      'trades': '/api/trades/',\n      'trade_plans': '/api/trade_plans/',\n      'cash_flows': '/api/cash_flows/',\n"
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2040,
+      "legacyPath": "/api/cash_flows",
+      "context": "   'trade_plans': '/api/trade_plans/',\n      'cash_flows': '/api/cash_flows/',\n      'db_extradata': '/api/db_extradata/"
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2041,
+      "legacyPath": "/api/db_extradata",
+      "context": "   'cash_flows': '/api/cash_flows/',\n      'db_extradata': '/api/db_extradata/',\n      'db_display': '/api/db_display/',"
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2042,
+      "legacyPath": "/api/db_display",
+      "context": " 'db_extradata': '/api/db_extradata/',\n      'db_display': '/api/db_display/',\n      'constraints': '/api/constraints/',"
+    },
+    {
+      "file": "trading-ui/scripts/modules/ui-basic.js",
+      "line": 414,
+      "legacyPath": "/api/trade_plans",
+      "context": "ype) {\n    case 'trade_plan':\n      response = await fetch(`/api/trade_plans/${itemId}`, {\n        method: 'PUT',\n      "
+    },
+    {
+      "file": "trading-ui/scripts/notes.js",
+      "line": 448,
+      "legacyPath": "/api/trade_plans",
+      "context": " data: [] })).catch(() => ({ data: [] })),\n          fetch('/api/trade_plans/').then(r => r.ok ? r.json() : ({ data: [] "
+    },
+    {
+      "file": "trading-ui/scripts/notes.js",
+      "line": 1028,
+      "legacyPath": "/api/trade_plans",
+      "context": "ase 3: { // תוכנית\n      const plansResponse = await fetch('/api/trade_plans/');\n      const plansData = await plansResp"
+    },
+    {
+      "file": "trading-ui/scripts/services/select-populator-service.js",
+      "line": 509,
+      "legacyPath": "/api/trade_plans",
+      "context": "ינת תוכניות מ-API\n            const response = await fetch('/api/trade_plans/');\n            if (!response.ok) {\n       "
+    },
+    {
+      "file": "trading-ui/scripts/test-header-only.js",
+      "line": 603,
+      "legacyPath": "/api/trade_plans",
+      "context": " תכנוני טריידים...');\n        const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {\n            method: '"
+    },
+    {
+      "file": "trading-ui/scripts/ticker-service.js",
+      "line": 146,
+      "legacyPath": "/api/trade_plans",
+      "context": "getTradePlans() {\n  try {\n    const response = await fetch('/api/trade_plans/');\n    if (response.ok) {\n      const data"
+    },
+    {
+      "file": "trading-ui/scripts/trade-plan-service.js",
+      "line": 63,
+      "legacyPath": "/api/trade_plans",
+      "context": "h development (8080) and production (5001)\n    const url = '/api/trade_plans/';\n\n    const response = await fetch(url);\n"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 129,
+      "legacyPath": "/api/trade_plans",
+      "context": "Message)) {\n      // שליחה לשרת לביצוע התוכנית\n      fetch('/api/trade_plans/' + planId + '/execute', {\n        method: "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 201,
+      "legacyPath": "/api/trade_plans",
+      "context": " null\n    };\n    \n    // שליחה לשרת ליצירת העותק\n    fetch('/api/trade_plans', {\n      method: 'POST',\n      headers: {\n"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 1306,
+      "legacyPath": "/api/trade_plans",
+      "context": "\n    }\n\n    // שליחה לשרת\n    const response = await fetch(`/api/trade_plans/${formData.id}`, {\n      method: 'PUT',\n   "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 1318,
+      "legacyPath": "/api/trade_plans",
+      "context": "      successMessage: 'תכנון עודכן בהצלחה!',\n      apiUrl: '/api/trade_plans/',\n      entityName: 'תכנון',\n      reloadF"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 1354,
+      "legacyPath": "/api/trade_plans",
+      "context": "80) and production (5001)\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`, {\n      method: 'PUT',\n   "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 2090,
+      "legacyPath": "/api/trade_plans",
+      "context": " timestamp למניעת cache\n      const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {\n        method: 'GET'"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 2810,
+      "legacyPath": "/api/trade_plans",
+      "context": " }\n\n      // שליחה לשרת\n      const response = await fetch(`/api/trade_plans/${formData.id}`, {\n        method: 'PUT',\n "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 2856,
+      "legacyPath": "/api/trade_plans",
+      "context": "};\n\n      // שליחה לשרת\n      const response = await fetch('/api/trade_plans/', {\n        method: 'POST',\n        header"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 3241,
+      "legacyPath": "/api/trade_plans",
+      "context": " \n        // Prepare API call\n        const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';\n     "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 3241,
+      "legacyPath": "/api/trade_plans",
+      "context": "  const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';\n        const method = isEdit ? 'PUT' : '"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 3376,
+      "legacyPath": "/api/trade_plans",
+      "context": "/ Send delete request\n        const response = await fetch(`/api/trade_plans/${tradePlanId}`, {\n            method: 'DEL"
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 1003,
+      "legacyPath": "/api/trade_plans",
+      "context": "e;\n      \n      try {\n        const response = await fetch(`/api/trade_plans/${planId}`);\n        if (response.ok) {\n   "
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 2616,
+      "legacyPath": "/api/trade_plans",
+      "context": "h development (8080) and production (5001)\n    const url = `/api/trade_plans/${newTradePlanId}`;\n    const response = aw"
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 2928,
+      "legacyPath": "/api/trade_plans",
+      "context": "/ קבלת פרטי תוכנית הטרייד\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 2975,
+      "legacyPath": "/api/trade_plans",
+      "context": "\n    // קבלת פרטי התוכנית\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/ui-utils.js",
+      "line": 441,
+      "legacyPath": "/api/trade_plans",
+      "context": "ype) {\n    case 'trade_plan':\n      response = await fetch(`/api/trade_plans/${itemId}`, {\n        method: 'PUT',\n      "
+    },
+    {
+      "file": "trading-ui/scripts/active-alerts-component.js",
+      "line": 743,
+      "legacyPath": "/api/trade_plans",
+      "context": " { data: [] })).catch(() => ({ data: [] })),\n        fetch('/api/trade_plans/').then(r => (r.ok ? r.json() : { data: [] "
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "line": 440,
+      "legacyPath": "/api/trade_plans",
+      "context": "(r => r.json()).catch(() => ({ data: [] })),\n        fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data:"
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "line": 1029,
+      "legacyPath": "/api/trade_plans",
+      "context": "en(r => r.json()).catch(() => ({ data: [] })),\n      fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data:"
+    },
+    {
+      "file": "trading-ui/scripts/alerts.js",
+      "line": 2994,
+      "legacyPath": "/api/trade_plans",
+      "context": "ditions() {\n    try {\n        const response = await fetch('/api/trade_plans');\n        if (!response.ok) throw new Erro"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 99,
+      "legacyPath": "/api/cash_flows",
+      "context": "עם timestamp למניעת cache\n    const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {\n      method: 'GET',\n "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 388,
+      "legacyPath": "/api/cash_flows",
+      "context": "80) and production (5001)\n    const response = await fetch('/api/cash_flows/');\n    if (!response.ok) {\n      throw new "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 604,
+      "legacyPath": "/api/cash_flows",
+      "context": "\n\n    // שליחת בקשת מחיקה\n    const response = await fetch(`/api/cash_flows/${id}`, {\n      method: 'DELETE',\n    });\n\n "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1634,
+      "legacyPath": "/api/cash_flows",
+      "context": " \n        // Prepare API call\n        const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';\n        "
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1634,
+      "legacyPath": "/api/cash_flows",
+      "context": "    const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';\n        const method = isEdit ? 'PUT' : 'P"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1854,
+      "legacyPath": "/api/cash_flows",
+      "context": ".dataset.exchangeId;\n        \n        const url = isEdit ? `/api/cash_flows/exchange/${exchangeId}` : '/api/cash_flows/e"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1854,
+      "legacyPath": "/api/cash_flows",
+      "context": " url = isEdit ? `/api/cash_flows/exchange/${exchangeId}` : '/api/cash_flows/exchange';\n        const method = isEdit ? '"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 1911,
+      "legacyPath": "/api/cash_flows",
+      "context": "exchangeId);\n        \n        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`);\n        if (!respo"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 2014,
+      "legacyPath": "/api/cash_flows",
+      "context": "exchangeId);\n        \n        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`, {\n            metho"
+    },
+    {
+      "file": "trading-ui/scripts/cash_flows.js",
+      "line": 2307,
+      "legacyPath": "/api/trade_plans",
+      "context": "hFlow(selectId) {\n  try {\n    const response = await fetch('/api/trade_plans/');\n    if (!response.ok) {\n      throw new"
+    },
+    {
+      "file": "trading-ui/scripts/conditions-test.js",
+      "line": 522,
+      "legacyPath": "/api/trade_plans",
+      "context": "oid infinite loop\n            const response = await fetch('/api/trade_plans/');\n            const data = await response"
+    },
+    {
+      "file": "trading-ui/scripts/conditions-test.js",
+      "line": 533,
+      "legacyPath": "/api/trade_plans",
+      "context": "e first\n                const createResponse = await fetch('/api/trade_plans/', {\n                    method: 'POST',\n  "
+    },
+    {
+      "file": "trading-ui/scripts/conditions-test.js",
+      "line": 891,
+      "legacyPath": "/api/trade_plans",
+      "context": "t\n            const plansResponse = await this.makeApiCall('/api/trade_plans/', 'GET');\n            const plansCount = p"
+    },
+    {
+      "file": "trading-ui/scripts/crud-testing-enhanced.js",
+      "line": 175,
+      "legacyPath": "/api/cash_flows",
+      "context": "    displayName: 'תזרימי מזומנים',\n                apiUrl: '/api/cash_flows/',\n                pageUrl: '/cash_flows',\n "
+    },
+    {
+      "file": "trading-ui/scripts/crud-testing-enhanced.js",
+      "line": 197,
+      "legacyPath": "/api/trade_plans",
+      "context": "      displayName: 'תוכניות מסחר',\n                apiUrl: '/api/trade_plans/',\n                pageUrl: '/trade_plans',"
+    },
+    {
+      "file": "trading-ui/scripts/entity-details-api.js",
+      "line": 470,
+      "legacyPath": "/api/trade_plans",
+      "context": " trade: `/api/trades/${entityId}`,\n            trade_plan: `/api/trade_plans/${entityId}`,\n            execution: `/api/"
+    },
+    {
+      "file": "trading-ui/scripts/entity-details-api.js",
+      "line": 475,
+      "legacyPath": "/api/cash_flows",
+      "context": "  alert: `/api/alerts/${entityId}`,\n            cash_flow: `/api/cash_flows/${entityId}`,\n            note: `/api/notes/"
+    },
+    {
+      "file": "trading-ui/scripts/entity-details-api.js",
+      "line": 1629,
+      "legacyPath": "/api/cash_flows",
+      "context": "tching from API...');\n        const response = await fetch(`/api/cash_flows/${cashFlowId}`);\n        const apiData = awa"
+    },
+    {
+      "file": "trading-ui/scripts/modal-manager-v2.js",
+      "line": 5247,
+      "legacyPath": "/api/trade_plans",
+      "context": "// trade_plan\n                const response = await fetch(`/api/trade_plans/${relatedId}`);\n                if (respons"
+    },
+    {
+      "file": "trading-ui/scripts/modal-manager-v2.js",
+      "line": 5417,
+      "legacyPath": "/api/trade_plans",
+      "context": "      case 3: // trade_plan\n                    endpoint = '/api/trade_plans/';\n                    valueField = 'id';\n "
+    },
+    {
+      "file": "trading-ui/scripts/modal-manager-v2.js",
+      "line": 5566,
+      "legacyPath": "/api/trade_plans",
+      "context": "      case 3: // trade_plan\n                    endpoint = '/api/trade_plans/';\n                    valueField = 'id';\n "
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 778,
+      "legacyPath": "/api/trade_plans",
+      "context": "e.all([\n      fetch('/api/trading-accounts/'),\n      fetch('/api/trade_plans/'),\n      fetch('/api/tickers/'),\n    ]);\n\n"
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 1424,
+      "legacyPath": "/api/trade_plans",
+      "context": "ת תוכניות טרייד\n    const tradePlansResponse = await fetch('/api/trade_plans/');\n    const tradePlans = await tradePlans"
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2141,
+      "legacyPath": "/api/trade_plans",
+      "context": "planId) {\n      try {\n        const response = await fetch(`/api/trade_plans/${planId}`);\n        if (response.ok) {\n   "
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2219,
+      "legacyPath": "/api/trade_plans",
+      "context": "h development (8080) and production (5001)\n    const url = `/api/trade_plans/${newTradePlanId}`;\n    const response = aw"
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2492,
+      "legacyPath": "/api/trade_plans",
+      "context": "/ קבלת פרטי תוכנית הטרייד\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/modules/business-module.js",
+      "line": 2539,
+      "legacyPath": "/api/trade_plans",
+      "context": "\n    // קבלת פרטי התוכנית\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2039,
+      "legacyPath": "/api/trade_plans",
+      "context": "es/',\n      'trades': '/api/trades/',\n      'trade_plans': '/api/trade_plans/',\n      'cash_flows': '/api/cash_flows/',\n"
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2040,
+      "legacyPath": "/api/cash_flows",
+      "context": "   'trade_plans': '/api/trade_plans/',\n      'cash_flows': '/api/cash_flows/',\n      'db_extradata': '/api/db_extradata/"
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2041,
+      "legacyPath": "/api/db_extradata",
+      "context": "   'cash_flows': '/api/cash_flows/',\n      'db_extradata': '/api/db_extradata/',\n      'db_display': '/api/db_display/',"
+    },
+    {
+      "file": "trading-ui/scripts/modules/data-basic.js",
+      "line": 2042,
+      "legacyPath": "/api/db_display",
+      "context": " 'db_extradata': '/api/db_extradata/',\n      'db_display': '/api/db_display/',\n      'constraints': '/api/constraints/',"
+    },
+    {
+      "file": "trading-ui/scripts/modules/ui-basic.js",
+      "line": 414,
+      "legacyPath": "/api/trade_plans",
+      "context": "ype) {\n    case 'trade_plan':\n      response = await fetch(`/api/trade_plans/${itemId}`, {\n        method: 'PUT',\n      "
+    },
+    {
+      "file": "trading-ui/scripts/notes.js",
+      "line": 448,
+      "legacyPath": "/api/trade_plans",
+      "context": " data: [] })).catch(() => ({ data: [] })),\n          fetch('/api/trade_plans/').then(r => r.ok ? r.json() : ({ data: [] "
+    },
+    {
+      "file": "trading-ui/scripts/notes.js",
+      "line": 1028,
+      "legacyPath": "/api/trade_plans",
+      "context": "ase 3: { // תוכנית\n      const plansResponse = await fetch('/api/trade_plans/');\n      const plansData = await plansResp"
+    },
+    {
+      "file": "trading-ui/scripts/services/select-populator-service.js",
+      "line": 509,
+      "legacyPath": "/api/trade_plans",
+      "context": "ינת תוכניות מ-API\n            const response = await fetch('/api/trade_plans/');\n            if (!response.ok) {\n       "
+    },
+    {
+      "file": "trading-ui/scripts/test-header-only.js",
+      "line": 603,
+      "legacyPath": "/api/trade_plans",
+      "context": " תכנוני טריידים...');\n        const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {\n            method: '"
+    },
+    {
+      "file": "trading-ui/scripts/ticker-service.js",
+      "line": 146,
+      "legacyPath": "/api/trade_plans",
+      "context": "getTradePlans() {\n  try {\n    const response = await fetch('/api/trade_plans/');\n    if (response.ok) {\n      const data"
+    },
+    {
+      "file": "trading-ui/scripts/trade-plan-service.js",
+      "line": 63,
+      "legacyPath": "/api/trade_plans",
+      "context": "h development (8080) and production (5001)\n    const url = '/api/trade_plans/';\n\n    const response = await fetch(url);\n"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 129,
+      "legacyPath": "/api/trade_plans",
+      "context": "Message)) {\n      // שליחה לשרת לביצוע התוכנית\n      fetch('/api/trade_plans/' + planId + '/execute', {\n        method: "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 201,
+      "legacyPath": "/api/trade_plans",
+      "context": " null\n    };\n    \n    // שליחה לשרת ליצירת העותק\n    fetch('/api/trade_plans', {\n      method: 'POST',\n      headers: {\n"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 1306,
+      "legacyPath": "/api/trade_plans",
+      "context": "\n    }\n\n    // שליחה לשרת\n    const response = await fetch(`/api/trade_plans/${formData.id}`, {\n      method: 'PUT',\n   "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 1318,
+      "legacyPath": "/api/trade_plans",
+      "context": "      successMessage: 'תכנון עודכן בהצלחה!',\n      apiUrl: '/api/trade_plans/',\n      entityName: 'תכנון',\n      reloadF"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 1354,
+      "legacyPath": "/api/trade_plans",
+      "context": "80) and production (5001)\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`, {\n      method: 'PUT',\n   "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 2090,
+      "legacyPath": "/api/trade_plans",
+      "context": " timestamp למניעת cache\n      const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {\n        method: 'GET'"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 2810,
+      "legacyPath": "/api/trade_plans",
+      "context": " }\n\n      // שליחה לשרת\n      const response = await fetch(`/api/trade_plans/${formData.id}`, {\n        method: 'PUT',\n "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 2856,
+      "legacyPath": "/api/trade_plans",
+      "context": "};\n\n      // שליחה לשרת\n      const response = await fetch('/api/trade_plans/', {\n        method: 'POST',\n        header"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 3241,
+      "legacyPath": "/api/trade_plans",
+      "context": " \n        // Prepare API call\n        const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';\n     "
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 3241,
+      "legacyPath": "/api/trade_plans",
+      "context": "  const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';\n        const method = isEdit ? 'PUT' : '"
+    },
+    {
+      "file": "trading-ui/scripts/trade_plans.js",
+      "line": 3376,
+      "legacyPath": "/api/trade_plans",
+      "context": "/ Send delete request\n        const response = await fetch(`/api/trade_plans/${tradePlanId}`, {\n            method: 'DEL"
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 1003,
+      "legacyPath": "/api/trade_plans",
+      "context": "e;\n      \n      try {\n        const response = await fetch(`/api/trade_plans/${planId}`);\n        if (response.ok) {\n   "
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 2616,
+      "legacyPath": "/api/trade_plans",
+      "context": "h development (8080) and production (5001)\n    const url = `/api/trade_plans/${newTradePlanId}`;\n    const response = aw"
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 2928,
+      "legacyPath": "/api/trade_plans",
+      "context": "/ קבלת פרטי תוכנית הטרייד\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/trades.js",
+      "line": 2975,
+      "legacyPath": "/api/trade_plans",
+      "context": "\n    // קבלת פרטי התוכנית\n    const response = await fetch(`/api/trade_plans/${tradePlanId}`);\n    if (!response.ok) {\n "
+    },
+    {
+      "file": "trading-ui/scripts/ui-utils.js",
+      "line": 441,
+      "legacyPath": "/api/trade_plans",
+      "context": "ype) {\n    case 'trade_plan':\n      response = await fetch(`/api/trade_plans/${itemId}`, {\n        method: 'PUT',\n      "
+    },
+    {
+      "file": "scripts/cleanup/delete-all-cash-flows-http.html",
+      "line": 62,
+      "legacyPath": "/api/cash_flows",
+      "context": "         const response = await fetch('http://localhost:8080/api/cash_flows/delete-all', {\n                    method: '"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 48,
+      "legacyPath": "/api/trade_plans",
+      "context": "a directly from API...');\n    const response = await fetch('/api/trade_plans/');\n    \n    if (!response.ok) {\n      thro"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 80,
+      "legacyPath": "/api/trade_plans",
+      "context": "ePlan(planData) {\n  try {\n    const response = await fetch('/api/trade_plans/', {\n      method: 'POST',\n      headers: {"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 118,
+      "legacyPath": "/api/trade_plans",
+      "context": ".0.0.1:8080' : '';\n    const response = await fetch(`${base}/api/trade_plans/${planId}`, {\n      method: 'PUT',\n      he"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 155,
+      "legacyPath": "/api/trade_plans",
+      "context": ".0.0.1:8080' : '';\n    const response = await fetch(`${base}/api/trade_plans/${planId}`, {\n      method: 'DELETE',\n    }"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 187,
+      "legacyPath": "/api/trade_plans",
+      "context": "adePlan(planId) {\n  try {\n    const response = await fetch('/api/trade_plans/' + planId + '/execute', {\n      method: 'P"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 223,
+      "legacyPath": "/api/trade_plans",
+      "context": ".0.0.1:8080' : '';\n    const response = await fetch(`${base}/api/trade_plans/${planId}/cancel`, {\n      method: 'POST',\n"
+    },
+    {
+      "file": "scripts/trade_plans/trade-plans-data.js",
+      "line": 258,
+      "legacyPath": "/api/trade_plans",
+      "context": "adePlan(planId) {\n  try {\n    const response = await fetch('/api/trade_plans', {\n      method: 'POST',\n      headers: {\n"
+    },
+    {
+      "file": "scripts/ui-utils.js",
+      "line": 424,
+      "legacyPath": "/api/trade_plans",
+      "context": "    case 'trade_plan':\n      response = await fetch(`${base}/api/trade_plans/${itemId}`, {\n        method: 'PUT',\n      "
+    }
+  ]
+}

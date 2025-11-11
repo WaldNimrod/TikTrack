@@ -7,4 +7,7 @@ This log records every production version update, including manual major/minor a
 
 
 | 2025-11-10T19:16:37+00:00 | 1.0.0.0 | 0.0.0.0 | da1dc88875f8804f9805700e2f444ba56fb5bd72 | - | set | Initial alignment (prod commit da1dc88875f8804f9805700e2f444ba56fb5bd72, main commit d7169b3f225184f9d6c1ccbb1826135e045cb335) |
-| 2025-11-10T19:58:48+00:00 | 1.0.1.0 | 1.0.0.0 | 50d337a197bca3413ee53eae53896c2b5e0b3e77 | da1dc88875f8804f9805700e2f444ba56fb5bd72 | patch | Sync production deployment configuration |
+| 2025-11-10T22:34:00+00:00 | 1.0.1.0 | 1.0.0.0 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | da1dc88875f8804f9805700e2f444ba56fb5bd72 | patch | Enhance import metadata and UI cleanup |
+| 2025-11-10T22:38:05+00:00 | 1.0.2.0 | 1.0.1.0 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Add data import page and history dashboard |
+| 2025-11-11T00:54:31+00:00 | 1.0.3.0 | 1.0.2.0 | 01c735221df88555af989a0a718215c6a618ae70 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Resync preferences page assets |
+| 2025-11-11T01:30:58+00:00 | 1.0.5.0 | 1.0.4.0 | 4f8ac52d3e416f09d82d0c5340501b6a27404e36 | fad1251215d82f64a73ff9e267d86fc75e98a8d1 | patch | Sync main into production - 2025-11-11 |

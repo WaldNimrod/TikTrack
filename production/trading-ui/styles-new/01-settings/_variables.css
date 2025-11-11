@@ -1,0 +1,162 @@
+/**
+ * CSS Variables - משתנים גלובליים
+ * 
+ * קובץ זה מכיל את כל המשתנים הגלובליים של המערכת
+ * מבוסס על Apple Design System עם התאמה לעברית ו-RTL
+ * 
+ * ⚠️ Dark mode removed - light mode only
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 21, 2025
+ */
+
+:root {
+  /* ===== צבעי Apple System ===== */
+  --apple-blue: #007AFF;
+  --apple-blue-dark: #0056CC;
+  --logo-orange: #ff9e04;
+  --apple-gray-1: #F2F2F7;
+  --apple-gray-2: #E5E5EA;
+  --apple-gray-3: #D1D1D6;
+  --apple-gray-4: #C7C7CC;
+  --apple-gray-5: #AEAEB2;
+  --apple-gray-6: #8E8E93;
+  --apple-gray-7: #636366;
+  --apple-gray-8: #48484A;
+  --apple-gray-9: #3A3A3C;
+  --apple-gray-10: #2C2C2E;
+  --apple-gray-11: #1C1C1E;
+  --apple-red: #FF3B30;
+  --apple-red-dark: #D70015;
+  --apple-green: #34C759;
+  --apple-green-dark: #248A3D;
+  --apple-orange: #FF9500;
+  --apple-orange-dark: #CC7700;
+  --apple-yellow: #FFCC02;
+  --apple-purple: #AF52DE;
+  --apple-pink: #FF2D92;
+
+  /* ===== רקעים ===== */
+  --apple-bg-primary: #FFFFFF;
+  --apple-bg-secondary: #F2F2F7;
+  --apple-bg-tertiary: #FFFFFF;
+  --apple-bg-elevated: #FFFFFF;
+
+  /* ===== טקסט ===== */
+  --apple-text-primary: #000000;
+  --apple-text-secondary: #3C3C43;
+  --apple-text-tertiary: #3C3C4399;
+  --apple-text-quaternary: #3C3C434D;
+  
+  /* ===== צבעי טקסט סמנטיים ===== */
+  --color-text-primary: #000000;
+  --color-text-secondary: #6c757d;
+  --color-text-muted: #868e96;
+  --color-text-primary-dark: #212529;
+
+  /* ===== גבולות ===== */
+  --apple-border: #C6C6C8;
+  --apple-border-light: #E5E5EA;
+
+  /* ===== צללים ===== */
+  --apple-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --apple-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --apple-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  /* ===== רדיוס ===== */
+  --apple-radius-small: 6px;
+  --apple-radius-medium: 10px;
+  --apple-radius-large: 16px;
+
+  /* ===== נקודות שבירה רספונסיביות 2026 ===== */
+  --breakpoint-xs: 320px;    /* טלפונים קטנים */
+  --breakpoint-sm: 480px;    /* טלפונים */
+  --breakpoint-md: 768px;    /* טאבלטים */
+  --breakpoint-lg: 992px;    /* מחשבים קטנים */
+  --breakpoint-xl: 1200px;   /* מחשבים גדולים */
+  --breakpoint-xxl: 1600px;  /* מחשבים גדולים מאוד */
+
+  /* ===== רוחבי קונטיינרים רספונסיביים ===== */
+  /* Container widths are defined in _breakpoints.css to avoid conflicts */
+
+  /* ===== רוחבי טבלאות ===== */
+  --table-min-width: 800px;
+  --table-breakpoint: 1000px;  /* יעד: מעל 1000px ללא גלילה */
+
+  /* ===== מרווחים רספונסיביים ===== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* ===== רוחבי עמודות טבלאות ===== */
+  --col-id-width: 80px;
+  --col-name-width: 18%;
+  --col-amount-width: 12%;
+  --col-date-width: 12%;
+  --col-description-width: 28%;
+  --col-source-width: 12%;
+  --col-actions-width: 100px;
+
+  /* ===== רוחבי עמודות פעולות דינמיים ===== */
+  --actions-1-btn-width: 60px;
+  --actions-2-btn-width: 80px;
+  --actions-3-btn-width: 120px;
+  --actions-4-btn-width: 160px;
+  --actions-5-btn-width: 200px;
+
+  /* ===== רוחבי מסכים לבדיקות ===== */
+  --screen-xs-min: 320px;
+  --screen-xs-max: 479px;
+  --screen-sm-min: 480px;
+  --screen-sm-max: 767px;
+  --screen-md-min: 768px;
+  --screen-md-max: 991px;
+  --screen-lg-min: 992px;
+  --screen-lg-max: 1199px;
+  --screen-xl-min: 1200px;
+  --screen-xl-max: 1599px;
+  --screen-xxl-min: 1600px;
+
+  /* ===== משתני RTL לוגיים ===== */
+  --direction-start: start;
+  --direction-end: end;
+  --margin-inline-start: margin-inline-start;
+  --margin-inline-end: margin-inline-end;
+  --padding-inline-start: padding-inline-start;
+  --padding-inline-end: padding-inline-end;
+
+  /* ===== צבעי סטטוס דינמיים מהעדפות המשתמש ===== */
+  --status-open-color: var(--user-status-open-color, var(--apple-green));
+  --status-open-bg: var(--user-status-open-bg, color-mix(in srgb, var(--user-status-open-color, var(--apple-green)) 10%, transparent));
+  --status-open-border: var(--user-status-open-border, var(--user-status-open-color, var(--apple-green)));
+
+  --status-closed-color: var(--user-status-closed-color, var(--apple-orange));
+  --status-closed-bg: var(--user-status-closed-bg, color-mix(in srgb, var(--user-status-closed-color, var(--apple-orange)) 10%, transparent));
+  --status-closed-border: var(--user-status-closed-border, var(--user-status-closed-color, var(--apple-orange)));
+
+  --status-cancelled-color: var(--user-status-cancelled-color, var(--apple-red));
+  --status-cancelled-bg: var(--user-status-cancelled-bg, color-mix(in srgb, var(--user-status-cancelled-color, var(--apple-red)) 10%, transparent));
+  --status-cancelled-border: var(--user-status-cancelled-border, var(--user-status-cancelled-color, var(--apple-red)));
+
+  --status-warning-color: var(--user-status-warning-color, var(--apple-orange));
+  --status-warning-bg: var(--user-status-warning-bg, color-mix(in srgb, var(--user-status-warning-color, var(--apple-orange)) 10%, transparent));
+  --status-warning-border: var(--user-status-warning-border, var(--user-status-warning-color, var(--apple-orange)));
+
+  --status-info-color: var(--user-status-info-color, var(--apple-blue));
+  --status-info-bg: var(--user-status-info-bg, color-mix(in srgb, var(--user-status-info-color, var(--apple-blue)) 10%, transparent));
+  --status-info-border: var(--user-status-info-border, var(--user-status-info-color, var(--apple-blue)));
+
+  --status-unknown-color: var(--user-status-unknown-color, var(--apple-gray-6));
+  --status-unknown-bg: var(--user-status-unknown-bg, color-mix(in srgb, var(--user-status-unknown-color, var(--apple-gray-6)) 10%, transparent));
+  --status-unknown-border: var(--user-status-unknown-border, var(--user-status-unknown-color, var(--apple-gray-6)));
+
+  /* ===== צבעי סוגי טרייד ===== */
+  --type-swing-color: var(--user-status-danger-color, #dc3545);        /* סכנה - סווינג */
+  --type-investment-color: var(--user-status-warning-color, #ffc107);  /* אזהרה - השקעה */
+  --type-passive-color: var(--user-status-info-color, #17a2b8);        /* מידע - פסיבי */
+  --type-day-trading-color: var(--user-status-primary-color, #007bff); /* ראשי - מסחר יומי */
+  --type-scalping-color: var(--user-status-secondary-color, #6c757d);  /* משני - סקלפינג */
+}

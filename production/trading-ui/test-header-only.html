@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>בדיקת ראש הדף - TikTrack</title>
+    
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet"><link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    
+    <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    </head>
+
+<body class="test-header-only">
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
+        <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+            <div class="main-content">
+                <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/trade_plans.svg" alt="תכנוני טריידים" class="section-icon">
+                            תכנוני טריידים - תצוגה לבדיקה
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="trade_plansContainer">
+                            <table class="table trade-plans-table" id="trade_plansTable" data-table-type="trade_plans">
+                                <thead>
+                                    <tr>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 0)">
+                                                טיקר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-date">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 1)">
+                                                תאריך <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-type">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 2)">
+                                                סוג <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-side">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 3)">
+                                                צד <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-quantity">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 4)">
+                                                כמות <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-price">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 5)">
+                                                מחיר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-investment">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 6)">
+                                                השקעה <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-status">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 7)">
+                                                סטטוס <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-reward">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 8)">
+                                                סיכוי <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-risk">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 9)">
+                                                סיכון <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-ratio">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('trade_plans', 10)">
+                                                יחס <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-items"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="12" class="loading">טוען תכנונים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->
+                
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/executions.svg" alt="עסקעות" class="section-icon">
+                            עסקעות - תצוגה לבדיקה
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section2')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive" id="executionsContainer">
+                            <table class="table" id="executionsTable" data-table-type="executions">
+                                <thead>
+                                    <tr>
+                                        <th class="col-ticker">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 0)">
+                                                טיקר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-action">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 1)">
+                                                פעולה <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-account">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 2)">
+                                                חשבון מסחר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-quantity">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 3)">
+                                                כמות <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-price">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 4)">
+                                                מחיר <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-pnl">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 5)">
+                                                P&L <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-realized-pl">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 6)">
+                                                Realized P/L <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-mtm-pl">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 7)">
+                                                MTM P/L <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-execution-date">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 8)">
+                                                תאריך <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-source">
+                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('executions', 9)">
+                                                מקור <span class="sort-icon">↕</span>
+                                            </button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-items"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="11" class="loading">טוען עסקעות...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End -->
+
+                <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
+            </div>
+            <!-- ===== END MAIN CONTENT ===== -->
+        </div>
+        <!-- ===== END PAGE BODY ===== -->
+    </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
+
+    
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: test-header-only | Generated: 2025-11-07T22:30:33.554Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/6: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/6: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: שירותים כלליים -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [22] Load Order: 22 -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [23] Load Order: 23 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/6: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: ממשק משתמש מתקדם -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/6: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: מערכות לניהול נתונים וטבלאות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/6: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: מערכת העדפות משתמש v2.0 (6 קבצים) -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [32] Load Order: 32 -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [37] Load Order: 37 -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/6: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, import -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [38] Load Order: 38 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+
+    <!-- =============================================================== -->
+    <!-- ===== END SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [43] Page-specific: test-header-only -->
+    <script src="scripts/test-header-only.js?v=1.0.0"></script> <!-- Page-specific script for test-header-only -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 43 | Unique Scripts Loaded: 43 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("test-header-only") -->
+</body>
+</html>

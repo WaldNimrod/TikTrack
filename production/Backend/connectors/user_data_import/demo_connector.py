@@ -1,0 +1,283 @@
+"""
+Demo Import Connector - Simple CSV connector for testing
+
+This connector handles simple CSV files with basic trading data for testing
+and demonstration purposes. It provides a straightforward format that's
+easy to understand and modify.
+
+CSV Format:
+symbol,action,date,quantity,price,fee
+
+Example:
+AAPL,buy,2025-01-15T10:30:00,100,150.25,1.50
+TSLA,sell,2025-01-15T11:45:00,50,200.75,2.00
+
+Author: TikTrack Development Team
+Version: 1.0
+Last Updated: 2025-01-16
+"""
+
+import csv
+import io
+from typing import List, Dict, Any, List
+from datetime import datetime, timezone
+from .base_connector import BaseConnector
+from services.date_normalization_service import DateNormalizationService
+
+class DemoConnector(BaseConnector):
+    """
+    Demo connector for simple CSV files.
+    
+    This connector is designed for testing and demonstration purposes.
+    It handles a simple CSV format with basic trading data.
+    """
+    
+    def identify_file(self, file_content: str, file_name: str) -> bool:
+        """
+        Identifies if the given file content and name match this connector's format.
+        """
+        if not file_name.lower().endswith('.csv'):
+            return False
+        
+        # Check for expected headers in the first line
+        first_line = file_content.splitlines()[0]
+        expected_headers = ["Ticker", "Date", "Action", "Quantity", "Price", "Fee"]
+        return all(header in first_line for header in expected_headers)
+
+    def detect_format(self, file_content: str) -> bool:
+        """
+        Detect if the file content matches the demo CSV format.
+        
+        Args:
+            file_content: Raw file content as string
+            
+        Returns:
+            bool: True if format matches, False otherwise
+        """
+        try:
+            # Try to parse as CSV
+            reader = csv.DictReader(io.StringIO(file_content))
+            
+            # Check if we have the expected columns
+            expected_columns = {'symbol', 'action', 'date', 'quantity', 'price', 'fee'}
+            actual_columns = set(reader.fieldnames or [])
+            
+            # Must have all expected columns
+            if not expected_columns.issubset(actual_columns):
+                return False
+            
+            # Try to read at least one row to validate format
+            rows = list(reader)
+            if not rows:
+                return False
+            
+            # Check if first row has valid data structure
+            first_row = rows[0]
+            for field in expected_columns:
+                if field not in first_row:
+                    return False
+            
+            return True
+            
+        except Exception:
+            return False
+    
+    def parse_file(self, file_content: str, file_name: str) -> List[Dict[str, Any]]:
+        """
+        Parse the demo CSV file content.
+        
+        Args:
+            file_content: Raw file content as string
+            
+        Returns:
+            List[Dict[str, Any]]: List of raw data records
+        """
+        records = []
+        
+        try:
+            reader = csv.DictReader(io.StringIO(file_content))
+            
+            for row_num, row in enumerate(reader, 1):
+                # Skip empty rows
+                if not any(row.values()):
+                    continue
+                
+                # Add row number for tracking
+                row['_row_number'] = row_num
+                records.append(row)
+                
+        except Exception as e:
+            raise ValueError(f"Failed to parse demo CSV file: {str(e)}")
+        
+        return records
+    
+    def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Normalize a demo CSV record to standard format.
+        
+        Args:
+            raw_record: Raw data record from parse_file
+            
+        Returns:
+            Dict[str, Any]: Normalized record with standard fields
+        """
+        try:
+            # Extract and clean data
+            symbol = str(raw_record.get('Ticker', raw_record.get('symbol', ''))).strip().upper()
+            action = str(raw_record.get('Action', raw_record.get('action', ''))).strip().lower()
+            date_str = str(raw_record.get('Date', raw_record.get('date', ''))).strip()
+            quantity = self._parse_float(raw_record.get('Quantity', raw_record.get('quantity', 0)))
+            price = self._parse_float(raw_record.get('Price', raw_record.get('price', 0)))
+            fee = self._parse_float(raw_record.get('Fee', raw_record.get('fee', 0)))
+            
+            # Parse date
+            date_value = self._parse_date(date_str)
+            normalizer = DateNormalizationService("UTC")
+            date_envelope = normalizer.normalize_output(date_value)
+            
+            # Determine action based on quantity sign
+            if quantity < 0:
+                action = 'sell'
+                quantity = abs(quantity)  # Make quantity positive
+            elif action not in ['buy', 'sell']:
+                # Default to buy if action is not specified or invalid
+                action = 'buy'
+            
+            return {
+                'symbol': symbol,
+                'action': action,
+                'date': date_envelope,
+                'quantity': quantity,
+                'price': price,
+                'fee': fee,
+                'currency': 'USD',  # Demo connector defaults to USD
+                'external_id': self._generate_external_id(symbol, action, date_value, quantity, price),
+                'source': 'demo_import',
+                'row_number': raw_record.get('_row_number', 0)
+            }
+            
+        except Exception as e:
+            raise ValueError(f"Failed to normalize demo record: {str(e)}")
+    
+    def _generate_external_id(self, symbol: str, action: str, date: datetime, quantity: float, price: float) -> str:
+        """
+        Generate a unique external ID for a demo record.
+        
+        Args:
+            symbol: Ticker symbol
+            action: Buy/sell action
+            date: Transaction date
+            quantity: Transaction quantity
+            price: Transaction price
+            
+        Returns:
+            str: Unique external ID
+        """
+        date_str = date.strftime('%Y-%m-%d')
+        return f"{date_str}_{symbol}_{action}_{quantity}_{price}"
+    
+    def get_supported_file_types(self) -> List[str]:
+        """
+        Returns a list of file extensions supported by this connector.
+        """
+        return ['.csv']
+
+    def get_connector_name(self) -> str:
+        """
+        Returns the human-readable name of the connector.
+        """
+        return 'Demo CSV Connector'
+
+    def get_provider_name(self) -> str:
+        """
+        Get the provider name for this connector.
+        
+        Returns:
+            str: Provider name
+        """
+        return "Demo"
+    
+    def _parse_float(self, value: Any) -> float:
+        """
+        Parse a value to float, handling various formats.
+        
+        Args:
+            value: Value to parse
+            
+        Returns:
+            float: Parsed float value
+        """
+        if value is None or value == '':
+            return 0.0
+        
+        try:
+            # Handle string values
+            if isinstance(value, str):
+                # Remove common currency symbols and formatting
+                cleaned = value.replace('$', '').replace(',', '').replace(' ', '')
+                return float(cleaned)
+            
+            return float(value)
+            
+        except (ValueError, TypeError):
+            return 0.0
+    
+    def _parse_date(self, date_str: str) -> datetime:
+        """
+        Parse date string to ISO format.
+        
+        Args:
+            date_str: Date string to parse
+            
+        Returns:
+            datetime: UTC datetime object
+        """
+        if not date_str:
+            raise ValueError("Date is required")
+        
+        # Try common date formats
+        date_formats = [
+            '%Y-%m-%dT%H:%M:%S',      # ISO format with time
+            '%Y-%m-%d %H:%M:%S',      # ISO format with space
+            '%Y-%m-%d',               # ISO date only
+            '%Y/%m/%d',               # US format
+            '%d/%m/%Y',               # European format
+            '%m/%d/%Y'                # US format with month first
+        ]
+        
+        for fmt in date_formats:
+            try:
+                dt = datetime.strptime(date_str, fmt)
+                return dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                continue
+        
+        # If no format matches, try to parse as ISO
+        try:
+            dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            else:
+                dt = dt.astimezone(timezone.utc)
+            return dt
+        except ValueError:
+            raise ValueError(f"Unable to parse date: {date_str}")
+    
+    def get_expected_format(self) -> Dict[str, Any]:
+        """
+        Get information about the expected file format.
+        
+        Returns:
+            Dict[str, Any]: Format information
+        """
+        return {
+            'format_name': 'Demo CSV',
+            'file_extension': '.csv',
+            'required_columns': ['symbol', 'action', 'date', 'quantity', 'price', 'fee'],
+            'optional_columns': [],
+            'delimiter': ',',
+            'encoding': 'utf-8',
+            'example_header': 'symbol,action,date,quantity,price,fee',
+            'example_row': 'AAPL,buy,2025-01-15T10:30:00,100,150.25,1.50',
+            'description': 'Simple CSV format for testing and demonstration'
+        }

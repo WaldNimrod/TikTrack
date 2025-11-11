@@ -12,6 +12,7 @@ Version: 1.0
 Date: August 2025
 """
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import DatabaseError
 from models.ticker import Ticker
@@ -22,10 +23,12 @@ from models.alert import Alert
 from models.external_data import MarketDataQuote
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
+from services.constraint_service import ConstraintService
 # from services.smart_query_optimizer import optimize_query, profile_query  # TEMPORARILY DISABLED
-from typing import List, Optional, Dict, Any, Union
+from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +43,7 @@ class TickerService:
     - Activity status management
     
     Attributes:
-        VALID_TICKER_TYPES (List[str]): Valid ticker types in system
+        DEFAULT_TICKER_TYPES (List[str]): Fallback ticker types if dynamic lookup fails
         MAX_SYMBOL_LENGTH (int): Maximum length for symbol
         MAX_NAME_LENGTH (int): Maximum length for name
         MAX_REMARKS_LENGTH (int): Maximum length for remarks
@@ -57,12 +60,72 @@ class TickerService:
     """
     
     # Constants for validation
-    VALID_TICKER_TYPES: List[str] = ['stock', 'etf', 'crypto', 'forex', 'commodity']
+    DEFAULT_TICKER_TYPES: List[str] = ['stock', 'etf', 'bond', 'crypto', 'forex', 'commodity', 'other']
     MAX_SYMBOL_LENGTH: int = 10
     MAX_NAME_LENGTH: int = 100  # Changed back to 100
     MAX_TYPE_LENGTH: int = 20
     MAX_REMARKS_LENGTH: int = 500
     # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
+    PLACEHOLDER_PREFIXES: Tuple[str, ...] = (
+        'TEST', 'DEMO', 'PLACEHOLDER', 'DUMMY', 'UNIQUE', 'FRESH', 'SAMPLE'
+    )
+    _constraint_service = ConstraintService()
+    _valid_ticker_types_cache: List[str] = DEFAULT_TICKER_TYPES.copy()
+    _types_cache_expires_at: float = 0
+    _types_cache_lock = threading.Lock()
+    _TYPES_CACHE_TTL_SECONDS: int = 300
+
+    @classmethod
+    def get_valid_ticker_types(cls, db: Optional[Session] = None, force_refresh: bool = False) -> List[str]:
+        """
+        Retrieve active ticker types from the dynamic constraints table with caching.
+
+        Falls back to DEFAULT_TICKER_TYPES if constraints query fails.
+        """
+        now = time.time()
+
+        if not force_refresh and cls._valid_ticker_types_cache and now < cls._types_cache_expires_at:
+            return cls._valid_ticker_types_cache
+
+        types: List[str] = []
+
+        # Try to use current SQLAlchemy session first
+        if db is not None:
+            try:
+                result = db.execute(
+                    text("""
+                        SELECT ev.value
+                        FROM constraints c
+                        JOIN enum_values ev ON c.id = ev.constraint_id
+                        WHERE c.table_name = :table
+                          AND c.column_name = :column
+                          AND c.constraint_type = 'ENUM'
+                          AND c.is_active = 1
+                          AND ev.is_active = 1
+                        ORDER BY ev.sort_order
+                    """),
+                    {"table": "tickers", "column": "type"}
+                ).fetchall()
+                types = [row[0] for row in result]
+            except Exception as db_error:
+                logger.warning("Failed to load ticker type enum values via session: %s", db_error)
+
+        # Fallback to constraint service (direct SQLite) if needed
+        if not types:
+            try:
+                enum_values = cls._constraint_service.get_enum_values('tickers', 'type')
+                types = [value['value'] for value in enum_values] if enum_values else []
+            except Exception as constraint_error:
+                logger.warning("Failed to load ticker type enum values via ConstraintService: %s", constraint_error)
+
+        if not types:
+            types = cls.DEFAULT_TICKER_TYPES.copy()
+
+        with cls._types_cache_lock:
+            cls._valid_ticker_types_cache = types
+            cls._types_cache_expires_at = now + cls._TYPES_CACHE_TTL_SECONDS
+
+        return cls._valid_ticker_types_cache
     @staticmethod
     @cache_with_deps(ttl=30, dependencies=['tickers'])  # Cache for 30 seconds - critical data with frequent updates
     def get_all(db: Session) -> List[Ticker]:
@@ -160,10 +223,36 @@ class TickerService:
             >>> ticker = TickerService.get_by_symbol(db_session, "AAPL")
             >>> if ticker:
         """
-        return db.query(Ticker).filter(Ticker.symbol == symbol.upper()).first()
+        normalized_symbol = TickerService._normalize_symbol(symbol)
+        if not normalized_symbol:
+            return None
+        return db.query(Ticker).filter(Ticker.symbol == normalized_symbol).first()
     
     @staticmethod
-    def validate_ticker_data(ticker_data: dict) -> Dict[str, Any]:
+    def _normalize_symbol(symbol: Optional[str]) -> Optional[str]:
+        """Normalize ticker symbol to canonical uppercase form."""
+        if symbol is None:
+            return None
+        normalized = symbol.strip().upper()
+        return normalized or None
+    
+    @staticmethod
+    def _is_symbol_valid(symbol: Optional[str]) -> bool:
+        """Validate ticker symbol against project rules."""
+        if not symbol:
+            return False
+        
+        allowed_extra_chars = {'.', '-', '_', '/'}
+        for char in symbol:
+            if char.isalnum():
+                continue
+            if char in allowed_extra_chars:
+                continue
+            return False
+        return True
+    
+    @classmethod
+    def validate_ticker_data(cls, ticker_data: dict, db: Optional[Session] = None) -> Dict[str, Any]:
         """
         Validate ticker data
         
@@ -191,28 +280,30 @@ class TickerService:
         errors = []
         warnings = []
         
-        # Symbol validation - only required for CREATE, optional for UPDATE
-        symbol = ticker_data.get('symbol', '')
-        if symbol:
-            symbol = symbol.strip().upper()
-            if len(symbol) > TickerService.MAX_SYMBOL_LENGTH:
-                errors.append(f"Symbol cannot be longer than {TickerService.MAX_SYMBOL_LENGTH} characters")
-            elif not symbol.isalnum():
-                errors.append("Symbol can only contain English letters and numbers (no dots)")
+        symbol = ticker_data.get('symbol')
+        normalized_symbol = cls._normalize_symbol(symbol)
+        if normalized_symbol:
+            if len(normalized_symbol) > cls.MAX_SYMBOL_LENGTH:
+                errors.append(f"Symbol cannot be longer than {cls.MAX_SYMBOL_LENGTH} characters")
+            elif not cls._is_symbol_valid(normalized_symbol):
+                errors.append("Symbol may only contain letters, numbers, '.', '-', '_' or '/'")
+        else:
+            errors.append("Symbol is required")
         
         # Name validation
         name = ticker_data.get('name', '')
         if name:
             name = name.strip()
-            if len(name) > TickerService.MAX_NAME_LENGTH:
-                errors.append(f"Name cannot be longer than {TickerService.MAX_NAME_LENGTH} characters")
+            if len(name) > cls.MAX_NAME_LENGTH:
+                errors.append(f"Name cannot be longer than {cls.MAX_NAME_LENGTH} characters")
         
         # Type validation
         ticker_type = ticker_data.get('type', '')
         if ticker_type:
             ticker_type = ticker_type.strip()
-            if ticker_type not in TickerService.VALID_TICKER_TYPES:
-                warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(TickerService.VALID_TICKER_TYPES)}")
+            valid_types = cls.get_valid_ticker_types(db)
+            if ticker_type not in valid_types:
+                warnings.append(f"Unknown type: {ticker_type}. Known types: {', '.join(valid_types)}")
         
         # Currency validation - now checking currency_id
         currency_id = ticker_data.get('currency_id')
@@ -250,8 +341,7 @@ class TickerService:
         Returns:
             bool - True if symbol exists, False otherwise
         """
-        if symbol:
-            symbol = symbol.upper()
+        symbol = TickerService._normalize_symbol(symbol)
         query = db.query(Ticker).filter(Ticker.symbol == symbol)
         if exclude_id:
             query = query.filter(Ticker.id != exclude_id)
@@ -276,11 +366,16 @@ class TickerService:
         if not symbols:
             return {}
         
-        # Convert to uppercase for consistency
-        symbols_upper = [symbol.upper() for symbol in symbols]
+        normalized_symbols = []
+        for symbol in symbols:
+            normalized = TickerService._normalize_symbol(symbol)
+            if normalized:
+                normalized_symbols.append(normalized)
         
-        # Query database for existing tickers
-        tickers = db.query(Ticker).filter(Ticker.symbol.in_(symbols_upper)).all()
+        if not normalized_symbols:
+            return {}
+        
+        tickers = db.query(Ticker).filter(Ticker.symbol.in_(normalized_symbols)).all()
         
         # Create mapping
         mapping = {ticker.symbol: ticker.id for ticker in tickers}
@@ -308,31 +403,42 @@ class TickerService:
         if not records:
             return records
         
-        # Get unique symbols from records
-        symbols = list(set([record.get('symbol') for record in records if record.get('symbol')]))
+        normalized_symbols = set()
+        invalid_symbols = []
+        for record in records:
+            raw_symbol = record.get('symbol')
+            normalized = TickerService._normalize_symbol(raw_symbol)
+            if normalized and TickerService._is_symbol_valid(normalized):
+                normalized_symbols.add(normalized)
+            else:
+                if raw_symbol is not None:
+                    invalid_symbols.append(raw_symbol)
         
-        if not symbols:
-            logger.warning("No symbols found in records")
+        if invalid_symbols:
+            logger.warning(f"⚠️ Invalid symbols encountered while enriching records: {invalid_symbols}")
+        
+        if not normalized_symbols:
+            logger.warning("No valid symbols found in records")
             return records
         
-        # Get mapping
-        symbol_to_id = TickerService.get_symbols_to_ids_mapping(db, symbols)
+        symbol_to_id = TickerService.get_symbols_to_ids_mapping(db, list(normalized_symbols))
         
-        # Enrich records
         enriched_records = []
         missing_symbols = []
         
         for record in records:
             enriched_record = record.copy()
-            symbol = record.get('symbol')
+            raw_symbol = record.get('symbol')
+            normalized = TickerService._normalize_symbol(raw_symbol)
             
-            if symbol and symbol.upper() in symbol_to_id:
-                enriched_record['ticker_id'] = symbol_to_id[symbol.upper()]
+            if normalized and normalized in symbol_to_id:
+                enriched_record['ticker_id'] = symbol_to_id[normalized]
+                enriched_record['symbol'] = normalized
                 enriched_records.append(enriched_record)
             else:
-                if symbol:
-                    missing_symbols.append(symbol)
-                logger.warning(f"⚠️ No ticker_id found for symbol: {symbol}")
+                if raw_symbol is not None:
+                    missing_symbols.append(raw_symbol)
+                logger.warning(f"⚠️ No ticker_id found for symbol: {raw_symbol}")
         
         if missing_symbols:
             logger.warning(f"⚠️ Missing ticker_ids for symbols: {missing_symbols}")
@@ -353,15 +459,13 @@ class TickerService:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
         
         # Additional custom validation
-        validation = TickerService.validate_ticker_data(ticker_data)
+        validation = TickerService.validate_ticker_data(ticker_data, db)
         if not validation['is_valid']:
             raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
         # Normalize data
-        symbol = ticker_data.get('symbol', '')
-        if symbol:
-            symbol = symbol.strip().upper()
-        ticker_data['symbol'] = symbol
+        normalized_symbol = TickerService._normalize_symbol(ticker_data.get('symbol'))
+        ticker_data['symbol'] = normalized_symbol
         
         if 'name' in ticker_data and ticker_data['name']:
             ticker_data['name'] = ticker_data['name'].strip()
@@ -385,18 +489,16 @@ class TickerService:
             raise ValueError(f"Ticker with ID {ticker_id} not found")
         
         # Data validation
-        validation = TickerService.validate_ticker_data(ticker_data)
+        validation = TickerService.validate_ticker_data(ticker_data, db)
         if not validation['is_valid']:
             raise ValueError(f"Invalid data: {'; '.join(validation['errors'])}")
         
         # Check that symbol doesn't exist (if changed)
         if 'symbol' in ticker_data:
-            symbol = ticker_data.get('symbol', '')
-            if symbol:
-                symbol = symbol.strip().upper()
-            if TickerService.check_symbol_exists(db, symbol, exclude_id=ticker_id):
-                raise ValueError(f"Symbol {symbol} already exists in system")
-            ticker_data['symbol'] = symbol
+            normalized_symbol = TickerService._normalize_symbol(ticker_data.get('symbol'))
+            if TickerService.check_symbol_exists(db, normalized_symbol, exclude_id=ticker_id):
+                raise ValueError(f"Symbol {normalized_symbol} already exists in system")
+            ticker_data['symbol'] = normalized_symbol
         
         # Normalize data
         if 'name' in ticker_data and ticker_data['name']:
@@ -864,6 +966,58 @@ class TickerService:
             db.commit()
         
         return updated_count
+    
+    @classmethod
+    def cleanup_invalid_tickers(cls, db: Session) -> Dict[str, Any]:
+        """
+        Remove invalid tickers and normalize symbols that violate formatting rules.
+        Returns summary dictionary with affected records.
+        """
+        tickers: List[Ticker] = db.query(Ticker).all()
+        to_delete: List[int] = []
+        to_normalize: List[Tuple[int, str]] = []
+        
+        for ticker in tickers:
+            normalized_symbol = cls._normalize_symbol(ticker.symbol)
+            placeholder_match = False
+            if normalized_symbol:
+                for prefix in cls.PLACEHOLDER_PREFIXES:
+                    if normalized_symbol.startswith(prefix):
+                        placeholder_match = True
+                        break
+
+            if placeholder_match or not cls._is_symbol_valid(normalized_symbol):
+                to_delete.append(ticker.id)
+                logger.warning(f"Deleting invalid ticker {ticker.id} with symbol '{ticker.symbol}'")
+                continue
+            
+            if ticker.symbol != normalized_symbol:
+                to_normalize.append((ticker.id, normalized_symbol))
+        
+        deleted_count = 0
+        normalized_count = 0
+        
+        if to_delete:
+            deleted_count = db.query(Ticker).filter(Ticker.id.in_(to_delete)).delete(synchronize_session=False)
+            logger.info(f"Removed {deleted_count} invalid tickers")
+        
+        if to_normalize:
+            for ticker_id, normalized_symbol in to_normalize:
+                db.query(Ticker).filter(Ticker.id == ticker_id).update(
+                    {'symbol': normalized_symbol}, synchronize_session=False
+                )
+            normalized_count = len(to_normalize)
+            logger.info(f"Normalized symbols for {normalized_count} tickers")
+        
+        if deleted_count or normalized_count:
+            db.commit()
+        
+        return {
+            'total_processed': len(tickers),
+            'deleted': deleted_count,
+            'normalized': normalized_count,
+            'invalid_ids': to_delete
+        }
     
     @staticmethod
     def update_open_status(db: Session, ticker_id: int) -> bool:

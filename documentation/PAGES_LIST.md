@@ -97,6 +97,7 @@
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading_accounts/*` |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` |
+| **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` |
 | **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash_flows/*` |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` |

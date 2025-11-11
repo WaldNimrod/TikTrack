@@ -39,6 +39,10 @@ class ImportSession(BaseModel):
                                comment="Trading account ID for the import")
     provider = Column(String(50), nullable=False, 
                      comment="Data provider: ibkr, demo, etc.")
+    connector_type = Column(String(50), nullable=True,
+                     comment="Connector key used for this import")
+    task_type = Column(String(50), nullable=False, default='executions',
+                     comment="Import task key: executions/cashflows/account_reconciliation")
     file_name = Column(String(255), nullable=False, 
                       comment="Original uploaded file name")
     total_records = Column(Integer, default=0, nullable=False, 
@@ -72,6 +76,8 @@ class ImportSession(BaseModel):
             'id': self.id,
             'trading_account_id': self.trading_account_id,
             'provider': self.provider,
+            'connector_type': self.connector_type,
+            'task_type': self.task_type,
             'file_name': self.file_name,
             'total_records': self.total_records,
             'imported_records': self.imported_records,

@@ -437,7 +437,7 @@ function renderAlertsTableRows(alerts) {
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
         fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/trade-plans/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
       ]);
 
@@ -1026,7 +1026,7 @@ async function loadModalData() {
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trade-plans/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
     ]);
 
@@ -2991,7 +2991,7 @@ function loadConditionsFromSource() {
  */
 async function loadTradePlansForConditions() {
     try {
-        const response = await fetch('/api/trade_plans');
+        const response = await fetch('/api/trade-plans');
         if (!response.ok) throw new Error('Failed to load trade plans');
         
         const tradePlans = await response.json();

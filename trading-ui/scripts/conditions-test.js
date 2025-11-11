@@ -519,7 +519,7 @@ class ConditionsTestManager {
     async getTradePlanId() {
         try {
             // Use direct fetch to avoid infinite loop
-            const response = await fetch('/api/trade_plans/');
+            const response = await fetch('/api/trade-plans/');
             const data = await response.json();
             
             console.log('Trade plans response:', data);
@@ -530,7 +530,7 @@ class ConditionsTestManager {
             } else {
                 console.log('No trade plans found, creating new one...');
                 // If no trade plans exist, create one first
-                const createResponse = await fetch('/api/trade_plans/', {
+                const createResponse = await fetch('/api/trade-plans/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -888,7 +888,7 @@ class ConditionsTestManager {
             document.getElementById('tradingMethodsCount').textContent = methodsCount;
 
             // Load trade plans count
-            const plansResponse = await this.makeApiCall('/api/trade_plans/', 'GET');
+            const plansResponse = await this.makeApiCall('/api/trade-plans/', 'GET');
             const plansCount = plansResponse.data ? plansResponse.data.length : 0;
             document.getElementById('tradePlansCount').textContent = plansCount;
 

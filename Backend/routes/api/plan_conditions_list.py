@@ -14,7 +14,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-plan_conditions_list_bp = Blueprint('plan_conditions_list', __name__, url_prefix='/api/plan_conditions')
+plan_conditions_list_bp = Blueprint('plan_conditions_list', __name__, url_prefix='/api/plan-conditions')
 
 def get_db_connection():
     """Get database connection"""

@@ -298,6 +298,26 @@ POST /api/quotes/{ticker_id}/refresh      # Refresh specific ticker
 
 **Note**: The unified `/api/tickers/` endpoint is the recommended approach for better performance.
 
+#### External Data Status Endpoint (Backend/routes/external_data/status.py)
+- **Endpoint**: `GET /api/external-data/status/`
+- **Purpose**: Aggregated health, cache and provider metrics for the dashboard and system management page.
+- **Structured Timestamps**: All time fields now return a payload of the form:
+  ```json
+  {
+    "utc": "2025-11-10T23:48:30.527206Z",
+    "local": "2025-11-11T01:48:30.527206+02:00",
+    "epochMs": 1762818510527,
+    "timezone": "Asia/Jerusalem",
+    "display": "11/11/2025 01:48"
+  }
+  ```
+- **Cache Metrics**: Response includes `cache.ttl_seconds` and `cache.ttl_minutes` that mirror the values loaded by `CacheManager.ttl_settings` from user preferences.
+- **Provider Details**: Each entry in `providers.details` contains structured timestamps (`last_successful_request`, `metrics_timestamp`) alongside rate-limit counters and recent success rates.
+- **Consumers**: `external-data-dashboard.js` and `system-management/sections/sm-section-external-data.js` rely on this structure and never fall back to dummy data.
+- **Maintenance Endpoints**:
+  - `POST /api/external-data/status/cache/clear` – resets historical quotes (`market_data_quotes`, `intraday_data_slots`, `data_refresh_logs`, `quotes_last`) and clears the in-memory `AdvancedCacheService`.
+  - `POST /api/external-data/status/logs/clear` – truncates server log files under `logs/` and wipes `DataRefreshLog` records so only fresh activity appears after a reset.
+
 ---
 
 ## ⚙️ **Settings and Preferences**
@@ -367,6 +387,11 @@ Price display page:
 - Filter by price change
 - Filter by volume
 
+### **External Data Dashboard (Frontend/scripts/external-data-dashboard.js)**
+- **Charts**: Delegates all graph rendering to the global `ChartSystem`/`ChartLoader` modules and keeps fallbacks only for legacy compatibility.
+- **Logging**: Retrieves records through `UnifiedLogManager.getLogData('externalDataLog')` and formats exports via the Unified Log system instead of direct fetches.
+- **Status Integration**: Consumes the structured timestamps and cache metrics returned by `GET /api/external-data/status/`, surfacing TTL values and provider health without placeholders.
+
 ---
 
 ## 🧪 **Testing and Validation**
@@ -394,9 +419,10 @@ Price display page:
 ## 📈 **Performance and Optimization**
 
 ### **Cache System**
-- **Short TTL**: 30 seconds for prices
-- **Medium TTL**: 5 minutes for static data
-- **Long TTL**: 1 hour for history
+- **Dynamic TTL**: Derived from `UserService.get_user_preferences(1)['cacheTTL']`.
+- **Hot Layer**: `ttl_seconds.hot` (`ttl_minutes.hot`) equals the user-defined cache TTL (default 60 seconds).
+- **Warm Layer**: `ttl_seconds.warm` doubles the hot TTL to provide a secondary buffer.
+- **Monitoring**: `CacheManager.get_cache_stats()` exposes hit-rate, stale counts, average ages and TTL data to the status endpoint for frontend display.
 
 ### **Rate Limiting**
 - **Yahoo Finance**: 100 requests/minute

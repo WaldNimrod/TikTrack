@@ -10,5 +10,6 @@ This log records every production version update, including manual major/minor a
 | 2025-11-10T22:34:00+00:00 | 1.0.1.0 | 1.0.0.0 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | da1dc88875f8804f9805700e2f444ba56fb5bd72 | patch | Enhance import metadata and UI cleanup |
 | 2025-11-10T22:38:05+00:00 | 1.0.2.0 | 1.0.1.0 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Add data import page and history dashboard |
 | 2025-11-11T00:54:31+00:00 | 1.0.3.0 | 1.0.2.0 | 01c735221df88555af989a0a718215c6a618ae70 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Resync preferences page assets |
+| 2025-11-11T00:58:14+00:00 | 1.0.4.0 | 1.0.3.0 | fad1251215d82f64a73ff9e267d86fc75e98a8d1 | 01c735221df88555af989a0a718215c6a618ae70 | patch | Standardize button system across user pages |
 | 2025-11-11T01:30:58+00:00 | 1.0.5.0 | 1.0.4.0 | 4f8ac52d3e416f09d82d0c5340501b6a27404e36 | fad1251215d82f64a73ff9e267d86fc75e98a8d1 | patch | Sync main into production - 2025-11-11 |
 | 2025-11-11T08:55:25+00:00 | 1.0.6.0 | 1.0.5.0 | 842bf100763cc766c266d88db208b1626cb7eec5 | 4f8ac52d3e416f09d82d0c5340501b6a27404e36 | patch | Restore cache Stage B-Lite scripts |

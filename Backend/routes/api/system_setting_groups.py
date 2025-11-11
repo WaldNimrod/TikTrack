@@ -14,7 +14,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-system_setting_groups_bp = Blueprint('system_setting_groups', __name__, url_prefix='/api/system_setting_groups')
+system_setting_groups_bp = Blueprint('system_setting_groups', __name__, url_prefix='/api/system-setting-groups')
 
 def get_db_connection():
     """Get database connection"""

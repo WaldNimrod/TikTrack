@@ -37,22 +37,22 @@ async function loadAllTables() {
   
   // API endpoints and their corresponding container IDs
   const tables = [
-    { api: 'constraints', container: 'constraintsContainer' },
-    { api: 'currencies', container: 'currenciesContainer' },
-    { api: 'preference_groups', container: 'preferenceGroupsContainer' },
-    { api: 'system_setting_groups', container: 'systemSettingGroupsContainer' },
-    { api: 'external_data_providers', container: 'externalDataProvidersContainer' },
-    { api: 'quotes_last', container: 'quotesLastContainer' },
-    { api: 'plan_conditions', container: 'planConditionsContainer' },
-    { api: 'user_preferences', container: 'userPreferencesContainer' }
+    { type: 'constraints', apiSlug: 'constraints', container: 'constraintsContainer' },
+    { type: 'currencies', apiSlug: 'currencies', container: 'currenciesContainer' },
+    { type: 'preference_groups', apiSlug: 'preference-groups', container: 'preferenceGroupsContainer' },
+    { type: 'system_setting_groups', apiSlug: 'system-setting-groups', container: 'systemSettingGroupsContainer' },
+    { type: 'external_data_providers', apiSlug: 'external-data-providers', container: 'externalDataProvidersContainer' },
+    { type: 'quotes_last', apiSlug: 'quotes-last', container: 'quotesLastContainer' },
+    { type: 'plan_conditions', apiSlug: 'plan-conditions', container: 'planConditionsContainer' },
+    { type: 'user_preferences', apiSlug: 'user-preferences', container: 'userPreferencesContainer' }
   ];
   
   totalRecords = 0;
   
   for (const table of tables) {
     try {
-      console.log(`📊 Loading ${table.api}...`);
-      await loadTableData(table.api, table.container);
+      console.log(`📊 Loading ${table.type} (API: ${table.apiSlug})...`);
+      await loadTableData(table.type, table.apiSlug, table.container);
     } catch (error) {
       console.error(`Error loading ${table.api}:`, error);
     }
@@ -70,7 +70,7 @@ async function loadAllTables() {
  * @param {string} tableType - The table type to load
  * @param {string} containerId - The container ID for the table
  */
-async function loadTableData(tableType, containerId) {
+async function loadTableData(tableType, apiSlug, containerId) {
   try {
     console.log(`📊 Loading data for table type: ${tableType}`);
 
@@ -78,7 +78,7 @@ async function loadTableData(tableType, containerId) {
     showLoadingState(tableType);
 
     // Fetch data from server
-    const data = await fetchTableData(tableType);
+    const data = await fetchTableData(apiSlug);
 
     // Store data
     tableData[tableType] = data;
@@ -107,17 +107,17 @@ async function loadTableData(tableType, containerId) {
  * @param {string} tableType - The table type to fetch
  * @returns {Array} The table data
  */
-async function fetchTableData(tableType) {
-  console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);
+async function fetchTableData(apiSlug) {
+  console.log(`🌐 Fetching data from /api/${apiSlug}/`);
   
-  const response = await fetch(`/api/${tableType}/`);
+  const response = await fetch(`/api/${apiSlug}/`);
   
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   
   const result = await response.json();
-  console.log(`📥 Received response for ${tableType}:`, result);
+  console.log(`📥 Received response for ${apiSlug}:`, result);
   
   if (result.data && Array.isArray(result.data)) {
     return result.data;

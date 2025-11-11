@@ -467,12 +467,12 @@ class EntityDetailsAPI {
         const endpointMappings = {
             ticker: `/api/tickers/${entityId}`,
             trade: `/api/trades/${entityId}`,
-            trade_plan: `/api/trade_plans/${entityId}`,
+            trade_plan: `/api/trade-plans/${entityId}`,
             execution: `/api/executions/${entityId}`,
             account: `/api/trading-accounts/${entityId}`,
             trading_account: `/api/trading-accounts/${entityId}`, // Alias for trading_account
             alert: `/api/alerts/${entityId}`,
-            cash_flow: `/api/cash_flows/${entityId}`,
+            cash_flow: `/api/cash-flows/${entityId}`,
             note: `/api/notes/${entityId}`
         };
 
@@ -1626,7 +1626,7 @@ window.debugCashFlow = async function(cashFlowId) {
     try {
         // 1. Fetch from API
         console.log('📡 Step 1: Fetching from API...');
-        const response = await fetch(`/api/cash_flows/${cashFlowId}`);
+        const response = await fetch(`/api/cash-flows/${cashFlowId}`);
         const apiData = await response.json();
         console.log('✅ API Response:', apiData);
         console.log('📊 API Data Field:', apiData.data);

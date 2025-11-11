@@ -20,6 +20,8 @@ from sqlalchemy import or_, and_
 from models.execution import Execution
 from models.ticker import Ticker
 from models.trade import Trade
+from models.cash_flow import CashFlow
+from models.trading_account import TradingAccount
 
 logger = logging.getLogger(__name__)
 
@@ -46,18 +48,31 @@ class DuplicateDetectionService:
         self.price_tolerance = 0.01    # Price difference tolerance
         self.date_tolerance_days = 1   # Date difference tolerance
     
-    def detect_duplicates(self, records: List[Dict[str, Any]], 
-                         trading_trading_account_id: int) -> Dict[str, Any]:
+    def detect_duplicates(
+        self,
+        records: List[Dict[str, Any]],
+        trading_trading_account_id: int,
+        task_type: str = 'executions'
+    ) -> Dict[str, Any]:
         """
-        Detect duplicates in a list of records.
-        
-        Args:
-            records: List of normalized records to check
-            trading_trading_account_id: Account ID for system duplicate checking
-            
-        Returns:
-            Dict[str, Any]: Duplicate detection results
+        Detect duplicates in a list of records for the requested task type.
         """
+        task = (task_type or 'executions').lower()
+        if task == 'cashflows':
+            return self._detect_cashflow_duplicates(records, trading_trading_account_id)
+        if task == 'account_reconciliation':
+            return self._detect_account_reconciliation_duplicates(records)
+        return self._detect_execution_duplicates(records, trading_trading_account_id)
+
+    # ------------------------------------------------------------------
+    # Execution duplicate detection (legacy behavior)
+    # ------------------------------------------------------------------
+
+    def _detect_execution_duplicates(
+        self,
+        records: List[Dict[str, Any]],
+        trading_trading_account_id: int
+    ) -> Dict[str, Any]:
         results = {
             'within_file_duplicates': [],
             'existing_records': [],
@@ -122,6 +137,298 @@ class DuplicateDetectionService:
                 results['clean_count'] += 1
         
         return results
+
+    # ------------------------------------------------------------------
+    # Cashflow duplicate detection
+    # ------------------------------------------------------------------
+
+    def _detect_cashflow_duplicates(
+        self,
+        records: List[Dict[str, Any]],
+        trading_trading_account_id: int
+    ) -> Dict[str, Any]:
+        results = {
+            'within_file_duplicates': [],
+            'existing_records': [],
+            'clean_records': [],
+            'total_checked': len(records),
+            'duplicate_count': 0,
+            'clean_count': 0
+        }
+
+        if not records:
+            return results
+
+        signature_map: Dict[str, Dict[str, Any]] = {}
+        processed_indices: Set[int] = set()
+        existing_cashflows = self._get_existing_cashflows(records)
+
+        for index, record in enumerate(records):
+            if index in processed_indices:
+                continue
+
+            signature = self._calculate_cashflow_signature(record)
+            matches = []
+
+            if signature in signature_map:
+                matches.append({
+                    'record_index': signature_map[signature]['index'],
+                    'record': signature_map[signature]['record'],
+                    'match_type': 'cashflow_signature',
+                    'confidence': 90,
+                    'signature': signature
+                })
+
+            signature_map[signature] = {'index': index, 'record': record}
+
+            system_matches = self._find_existing_cashflow_matches(record, existing_cashflows)
+            if system_matches:
+                matches.extend(system_matches)
+
+            if matches:
+                duplicate_info = {
+                    'record_index': index,
+                    'record': record,
+                    'within_file_matches': [m for m in matches if m.get('record_index') is not None],
+                    'system_matches': [m for m in matches if m.get('cashflow_id')],
+                    'duplicate_type': 'cashflow_duplicate',
+                    'confidence_score': self._calculate_cashflow_confidence(matches)
+                }
+
+                if duplicate_info['within_file_matches']:
+                    results['within_file_duplicates'].append(duplicate_info)
+                    for match in duplicate_info['within_file_matches']:
+                        processed_indices.add(match['record_index'])
+
+                if duplicate_info['system_matches']:
+                    results['existing_records'].append(duplicate_info)
+
+                processed_indices.add(index)
+                results['duplicate_count'] += 1
+            else:
+                results['clean_records'].append({
+                    'record_index': index,
+                    'record': record,
+                    'signature': signature
+                })
+                results['clean_count'] += 1
+
+        return results
+
+    # ------------------------------------------------------------------
+    # Account reconciliation duplicate detection
+    # ------------------------------------------------------------------
+
+    def _detect_account_reconciliation_duplicates(
+        self,
+        records: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        results = {
+            'within_file_duplicates': [],
+            'existing_records': [],
+            'clean_records': [],
+            'total_checked': len(records),
+            'duplicate_count': 0,
+            'clean_count': 0
+        }
+
+        seen_external_ids: Dict[str, Dict[str, Any]] = {}
+
+        for index, record in enumerate(records):
+            external_id = record.get('external_id')
+            signature = self._calculate_account_signature(record)
+            matches = []
+
+            if external_id and external_id in seen_external_ids:
+                matches.append({
+                    'record_index': seen_external_ids[external_id]['index'],
+                    'record': seen_external_ids[external_id]['record'],
+                    'match_type': 'external_id',
+                    'confidence': 100
+                })
+
+            elif signature and signature in seen_external_ids:
+                matches.append({
+                    'record_index': seen_external_ids[signature]['index'],
+                    'record': seen_external_ids[signature]['record'],
+                    'match_type': 'account_signature',
+                    'confidence': 85
+                })
+
+            if external_id:
+                seen_external_ids[external_id] = {'index': index, 'record': record}
+            if signature:
+                seen_external_ids[signature] = {'index': index, 'record': record}
+
+            if matches:
+                duplicate_info = {
+                    'record_index': index,
+                    'record': record,
+                    'within_file_matches': matches,
+                    'system_matches': [],
+                    'duplicate_type': 'account_reconciliation_duplicate',
+                    'confidence_score': max(match['confidence'] for match in matches)
+                }
+                results['within_file_duplicates'].append(duplicate_info)
+                results['duplicate_count'] += 1
+            else:
+                results['clean_records'].append({
+                    'record_index': index,
+                    'record': record
+                })
+                results['clean_count'] += 1
+
+        return results
+    
+    # ------------------------------------------------------------------
+    # Helper methods for cashflow/account duplicate detection
+    # ------------------------------------------------------------------
+
+    def _calculate_cashflow_signature(self, record: Dict[str, Any]) -> str:
+        try:
+            amount = abs(float(record.get('amount', 0)))
+        except (TypeError, ValueError):
+            amount = 0.0
+
+        date_value = self._resolve_datetime(record.get('effective_date'))
+        date_key = date_value.date().isoformat() if date_value else 'unknown'
+
+        signature_parts = [
+            str(record.get('cashflow_type') or '').lower(),
+            str(record.get('currency') or '').upper(),
+            f"{amount:.2f}",
+            date_key,
+            str(record.get('source_account') or '').upper()
+        ]
+        return '|'.join(signature_parts)
+
+    def _calculate_cashflow_confidence(self, matches: List[Dict[str, Any]]) -> float:
+        if not matches:
+            return 0.0
+        return max(match.get('confidence', 75) for match in matches)
+
+    def _find_existing_cashflow_matches(
+        self,
+        record: Dict[str, Any],
+        existing_cashflows: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        matches = []
+        record_signature = self._calculate_cashflow_signature(record)
+        record_external_id = record.get('external_id')
+
+        for cashflow in existing_cashflows:
+            signature = cashflow.get('_signature')
+            external_id = cashflow.get('external_id')
+
+            if record_external_id and external_id and record_external_id == external_id:
+                matches.append({
+                    'cashflow_id': cashflow.get('id'),
+                    'cashflow': cashflow,
+                    'match_type': 'exact_external_id',
+                    'confidence': 100
+                })
+                continue
+
+            if signature and signature == record_signature:
+                matches.append({
+                    'cashflow_id': cashflow.get('id'),
+                    'cashflow': cashflow,
+                    'match_type': 'cashflow_signature',
+                    'confidence': 90
+                })
+
+        return matches
+
+    def _get_existing_cashflows(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        if not self.db_session or not CashFlow:
+            return []
+
+        account_ids = set()
+        date_candidates = []
+
+        for record in records:
+            account_id = self._resolve_account_id(record.get('source_account'))
+            if account_id:
+                account_ids.add(account_id)
+
+            effective_date = self._resolve_datetime(record.get('effective_date'))
+            if effective_date:
+                date_candidates.append(effective_date.date())
+
+        query = self.db_session.query(CashFlow)
+
+        if account_ids:
+            query = query.filter(CashFlow.trading_account_id.in_(list(account_ids)))
+
+        if date_candidates:
+            min_date = min(date_candidates) - timedelta(days=1)
+            max_date = max(date_candidates) + timedelta(days=1)
+            query = query.filter(CashFlow.date >= min_date, CashFlow.date <= max_date)
+
+        try:
+            cashflows = query.all()
+        except Exception as exc:
+            logger.error("Failed to fetch cashflows for duplicate detection: %s", exc)
+            return []
+
+        results = []
+        for cashflow in cashflows:
+            try:
+                cf_dict = cashflow.to_dict()
+                signature = self._calculate_cashflow_signature({
+                    'cashflow_type': cf_dict.get('type'),
+                    'currency': cf_dict.get('currency_symbol'),
+                    'amount': cf_dict.get('amount'),
+                    'effective_date': cf_dict.get('date'),
+                    'source_account': cf_dict.get('account_name')
+                })
+                cf_dict['_signature'] = signature
+                results.append(cf_dict)
+            except Exception as exc:
+                logger.debug("Failed to build cashflow signature for %s: %s", cashflow.id, exc)
+                continue
+
+        return results
+
+    def _resolve_account_id(self, account_identifier: Any) -> Optional[int]:
+        if not self.db_session or account_identifier is None or not TradingAccount:
+            return None
+
+        if isinstance(account_identifier, int):
+            return account_identifier
+
+        if isinstance(account_identifier, str):
+            try:
+                if account_identifier.isdigit():
+                    return int(account_identifier)
+            except ValueError:
+                pass
+
+            account = self.db_session.query(TradingAccount).filter(
+                TradingAccount.name == account_identifier
+            ).first()
+            if account:
+                return account.id
+
+            account = self.db_session.query(TradingAccount).filter(
+                TradingAccount.name.ilike(account_identifier)
+            ).first()
+            if account:
+                return account.id
+
+        return None
+
+    def _calculate_account_signature(self, record: Dict[str, Any]) -> Optional[str]:
+        account_id = record.get('account_id')
+        as_of = self._resolve_datetime(record.get('as_of'))
+
+        if not account_id or not as_of:
+            return None
+
+        normalized_currency = str(record.get('base_currency') or '').upper()
+        date_key = as_of.date().isoformat()
+
+        return f"{account_id}|{normalized_currency}|{date_key}"
     
     def _find_within_file_duplicates(self, records: List[Dict[str, Any]], 
                                    current_index: int, 

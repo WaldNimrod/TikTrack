@@ -213,23 +213,10 @@ function generateEntityTypeFilterButtons(entityTypes, options = {}) {
     return '';
   }
   
-  const {
-    filterFunctionName = 'filterAlertsByRelatedObjectType',
-    tableId = null,
-    containerId = null,
-    useDataOnclick = false,
-    useTooltips = false,
-    iconSize = 14
-  } = options;
-  
   return entityTypes.map(entityType => 
     generateEntityTypeFilterButton(entityType, {
-      filterFunctionName,
-      tableId,
-      containerId,
-      useDataOnclick,
-      useTooltips,
-      iconSize
+      ...options,
+      entityType,
     })
   ).join('');
 }
@@ -249,9 +236,19 @@ function generateEntityTypeFilterButton(entityType, options = {}) {
     containerId = null,
     useDataOnclick = false,
     useTooltips = false,
-    iconSize = 14
+    iconSize = 14,
+    interactionMode = (useDataOnclick ? 'data-onclick' : 'onclick'),
+    buttonClassName = 'btn btn-sm btn-outline-primary filter-icon-btn',
+    iconClassName = useTooltips ? 'filter-icon' : '',
+    showLabel = false,
+    labelClassName = 'filter-icon-label',
+    disableInlineStyles = false,
+    includeDataTypeAttribute = true,
+    additionalAttributes = '',
+    getDataOnclickExpression = null,
+    getOnclickExpression = null,
   } = options;
-  
+
   // Get icon path from LinkedItemsService or fallback
   const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
     ? window.LinkedItemsService.getLinkedItemIcon(entityType)
@@ -267,13 +264,21 @@ function generateEntityTypeFilterButton(entityType, options = {}) {
   // Generate onclick or data-onclick value
   let onclickValue = '';
   let dataOnclickValue = '';
-  
-  if (useDataOnclick && tableId) {
-    // For linked items modal - use data-onclick
-    dataOnclickValue = `window.filterLinkedItemsByType('${tableId}', '${entityType}')`;
-  } else {
-    // For alerts page - use onclick directly
-    onclickValue = `${filterFunctionName}('${entityType}')`;
+
+  if (interactionMode === 'data-onclick') {
+    if (typeof getDataOnclickExpression === 'function') {
+      dataOnclickValue = getDataOnclickExpression(entityType, { filterFunctionName, tableId, containerId });
+    } else if (tableId) {
+      dataOnclickValue = `window.filterLinkedItemsByType('${tableId}', '${entityType}')`;
+    } else {
+      dataOnclickValue = `${filterFunctionName}('${entityType}')`;
+    }
+  } else if (interactionMode === 'onclick') {
+    if (typeof getOnclickExpression === 'function') {
+      onclickValue = getOnclickExpression(entityType, { filterFunctionName, tableId, containerId });
+    } else {
+      onclickValue = `${filterFunctionName}('${entityType}')`;
+    }
   }
   
   // Generate button ID if containerId provided
@@ -286,24 +291,29 @@ function generateEntityTypeFilterButton(entityType, options = {}) {
     : '';
   
   // Generate onclick or data-onclick attribute
-  const onclickAttr = onclickValue ? `onclick="${onclickValue}"` : '';
-  const dataOnclickAttr = dataOnclickValue ? `data-onclick="${dataOnclickValue}"` : '';
+  const onclickAttr = (interactionMode === 'onclick' && onclickValue) ? `onclick="${onclickValue}"` : '';
+  const dataOnclickAttr = (interactionMode === 'data-onclick' && dataOnclickValue) ? `data-onclick="${dataOnclickValue}"` : '';
   
-  // Determine icon class - add filter-icon class for linked items
-  const iconClass = useTooltips ? 'filter-icon' : '';
+  const dataTypeAttr = includeDataTypeAttribute ? `data-type="${entityType}"` : '';
+  const styleAttr = disableInlineStyles ? '' : 'style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"';
+  const iconStyleAttr = disableInlineStyles ? '' : `style="width: ${iconSize}px; height: ${iconSize}px;"`;
+  const labelHtml = showLabel ? `<span class="${labelClassName}">${entityLabel}</span>` : '';
   
   // Generate button HTML
   return `
     <button 
-      class="btn btn-sm btn-outline-primary filter-icon-btn" 
+      type="button"
+      class="${buttonClassName}"
       ${idAttr}
-      data-type="${entityType}"
+      ${dataTypeAttr}
       ${onclickAttr}
       ${dataOnclickAttr}
       ${tooltipAttrs}
       title="${entityLabel}"
-      style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-      <img src="${iconPath}" alt="${entityLabel}" ${iconClass ? `class="${iconClass}"` : ''} style="width: ${iconSize}px; height: ${iconSize}px;">
+      ${styleAttr}
+      ${additionalAttributes}>
+      <img src="${iconPath}" alt="${entityLabel}" ${iconClassName ? `class="${iconClassName}"` : ''} ${iconStyleAttr}>
+      ${labelHtml}
     </button>
   `;
 }
@@ -322,35 +332,62 @@ function generateAllFilterButton(options = {}) {
   const {
     filterFunctionName = 'filterAlertsByRelatedObjectType',
     tableId = null,
-    useOnclick = true
+    useOnclick = true,
+    interactionMode = undefined,
+    buttonClassName = 'btn btn-sm active',
+    disableInlineStyles = false,
+    label = 'הכל',
+    additionalAttributes = '',
+    getDataOnclickExpression = null,
+    getOnclickExpression = null,
   } = options;
   
   // Generate onclick or data-onclick value
   let onclickValue = '';
   let dataOnclickValue = '';
-  
-  if (!useOnclick && tableId) {
-    // For linked items modal - use data-onclick
-    dataOnclickValue = `window.filterLinkedItemsByType('${tableId}', 'all')`;
+
+  const resolvedInteraction = interactionMode
+    ? interactionMode
+    : (useOnclick === false ? 'data-onclick' : 'onclick');
+
+  if (resolvedInteraction === 'data-onclick') {
+    if (typeof getDataOnclickExpression === 'function') {
+      dataOnclickValue = getDataOnclickExpression('all', { filterFunctionName, tableId });
+    } else if (tableId) {
+      dataOnclickValue = `window.filterLinkedItemsByType('${tableId}', 'all')`;
+    } else {
+      dataOnclickValue = `${filterFunctionName}('all')`;
+    }
+  } else if (resolvedInteraction === 'onclick') {
+    if (typeof getOnclickExpression === 'function') {
+      onclickValue = getOnclickExpression('all', { filterFunctionName, tableId });
+    } else {
+      onclickValue = `${filterFunctionName}('all')`;
+    }
   } else {
-    // For alerts page - use onclick directly
-    onclickValue = `${filterFunctionName}('all')`;
+    onclickValue = '';
+    dataOnclickValue = '';
   }
   
   const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
+  const styleAttr = disableInlineStyles
+    ? ''
+    : `style="background-color: white; color: ${colors.positive}; border-color: ${colors.positive};"`;
   
-  const onclickAttr = onclickValue ? `onclick="${onclickValue}"` : '';
-  const dataOnclickAttr = dataOnclickValue ? `data-onclick="${dataOnclickValue}"` : '';
+  const onclickAttr = (resolvedInteraction === 'onclick' && onclickValue) ? `onclick="${onclickValue}"` : '';
+  const dataOnclickAttr = (resolvedInteraction === 'data-onclick' && dataOnclickValue) ? `data-onclick="${dataOnclickValue}"` : '';
   
   return `
     <button 
-      class="btn btn-sm active" 
+      type="button"
+      class="${buttonClassName}" 
       ${onclickAttr}
       ${dataOnclickAttr}
       data-type="all" 
       title="הצג הכל"
-      style="background-color: white; color: ${colors.positive}; border-color: ${colors.positive};">
-      הכל
+      ${styleAttr}
+      ${additionalAttributes}>
+      ${label}
     </button>
   `;
 }

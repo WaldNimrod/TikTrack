@@ -2,7 +2,7 @@
 
 ## סקירה כללית
 
-מערכת ייבוא נתוני משתמש מאפשרת ייבוא ביצועים (executions) מקבצי CSV של ברוקרים שונים, עם דגש על IBKR בשלב ראשון. המערכת כוללת ארכיטקטורה רב-שכבתית, זיהוי כפילויות חכם, ואישור סופי עם תצוגה מקדימה.
+מערכת ייבוא נתוני משתמש מאפשרת ייבוא ביצועים (executions) מקבצי CSV של ברוקרים שונים, עם דגש על IBKR בשלב ראשון. החל ממהדורת 2025-11 המערכת מורחבת לתזרים מזומנים (cashflows) ולתהליך בדיקת חשבון (account reconciliation) במסגרת ארכיטקטורת **Orchestrator + Task Plugins**. המערכת כוללת שכבות פריסה מלאות (Parsing → Normalization → Validation → Duplicate Detection → Preview → Execution), זיהוי כפילויות חכם, טיפול בבעיות לפי סוג תהליך, ואישור סופי עם תצוגה מקדימה.
 
 ## ארכיטקטורה
 
@@ -38,10 +38,24 @@ trading-ui/
 ### זרימת נתונים
 
 ```
-File Upload → Format Detection → Parsing → Normalization → 
-Validation → Duplicate Detection → Preview → User Confirmation → 
-Import Execution → Database Storage
+File Upload → Data Type Selection → Task Dispatch →
+Parsing → Normalization → Validation →
+Duplicate / Integrity Checks → Problem Resolution →
+Preview & Summary → User Confirmation →
+Task-specific Execution → Database Storage & Reporting
 ```
+
+### פריסת תהליכים (Task Plugins)
+
+| שלב | Executions | Cashflows | Account Reconciliation |
+| --- | --- | --- | --- |
+| Parsing | קריאת מקטע TRADES | קריאת מקטעים: Cash Report, Interest, Deposits/Withdrawals, Dividends | קריאת Account Information, BaseCurrency, Entitlements |
+| Normalization | `symbol`, `action`, `quantity`, `price`, `fee`, DateEnvelope | `cashflow_type`, `amount`, `currency`, `effective_date`, `source_account`, `target_account`, `asset_symbol` | `account_id`, `base_currency`, `margin_status`, `missing_documents`, `account_aliases` |
+| Validation | צד העסקה, שדות חובה, סכומים חיוביים | סכומים ≠ 0, מטבע מזוהה, שיוך חשבון, סיווג תזרים | קיום חשבון במערכת, התאמת מטבע בסיס, וולידציה מול הרשאות קיימות |
+| Duplicate Detection / Integrity | exact external_id, 5/5 match | התאמה לפי (`cashflow_type`, `amount`, `effective_date`, `currency`, `source_account`) | איתור חשבונות חסרים/חסומים, שינויים קריטיים במטבע |
+| Summary Outputs | `analysis_results`, `duplicate_details`, `missing_tickers` | `cashflow_records`, `cashflow_summary`, `cashflow_duplicates`, `missing_accounts` | `account_validation_results`, `reconciliation_flags`, `missing_accounts` |
+| Problem Resolution UI | Missing tickers, duplicates, existing records | Cashflow issues: חשבונות חסרים, כפילויות, מטבע לא תואם | Account reconciliation issues: בסיס מטבע, הרשאות חסרות, שמות חשבון |
+| Execution | יצירת `Execution` | יצירת `CashFlow` / `CashFlowAdjustment` | עדכון טבלת `trading_accounts`, יצירת דוח סטיות (ללא שינוי נתונים אם יש שגיאות) |
 
 ### זרימת נתונים בין שלבים
 
@@ -51,28 +65,35 @@ Import Execution → Database Storage
    - יצירת `ImportSession` בבסיס הנתונים
    - שמירת `file_content` ו-`account_id` ב-session
 
-2. **שלב 3**: ניתוח קובץ
-   - קריאה ל-`/api/user-data-import/upload`
-   - השרת מחזיר `session_id` ו-`analysis_results`
-   - הנתונים נשמרים ב-`ImportSession.summary_data` (JSON)
-   - שמירה מקומית ב-Unified Cache Manager
+2. **שלב 2.5**: מסך מעבר (Loading Overlay)
+   - לאחר לחיצה על "המשך לניתוח" נפתח ממשק טעינה אחיד (`ProcessingOverlay`).
+   - תכולה: כותרת "טוען ומעבד נתונים", Progress Bar אנימטיבי (Bootstrap), לוגים קצרים בזמן אמת (Client + Server), הודעת ביטול (Disabled).
+   - הממשק ננעל עד קבלת תשובה מהשרת או הודעת שגיאה, ומאפשר שקיפות לגבי זמן העיבוד (לרבות Multi-Task).
 
-3. **שלב 3**: פתרון בעיות (מפורט)
+3. **שלב 3**: ניתוח קובץ (Task-specific)
+   - קריאה ל-`/api/user-data-import/upload`
+   - פרמטר חובה חדש: `import_task` (`executions`/`cashflows`/`account_reconciliation`)
+   - השרת מחזיר `session_id`, `analysis_results`, ושדות ייעודיים (לדוגמה `cashflow_summary`, `account_reconciliation_summary`)
+   - הנתונים נשמרים ב-`ImportSession.summary_data` (JSON) + ב-Unified Cache Manager לפי סוג תהליך
+
+4. **שלב 3**: פתרון בעיות (מפורט, משתנה לפי Task)
    - קריאה ל-`/api/user-data-import/session/{id}/preview` לקבלת נתוני הניתוח
-   - הצגת בעיות בממשק אינטראקטיבי מפורט:
+   - הצגת בעיות בממשק אינטראקטיבי מפורט (ספציפי לסוג התהליך):
      - **טיקרים חסרים**: כרטיסים עם כפתור "הוסף טיקר"
      - **כפילויות בקובץ**: כרטיסים עם כפתורי "קבל"/"דחה"
      - **רשומות קיימות**: כרטיסים עם כפתורי "קבל"/"דחה"
+     - **תזרימי מזומנים**: חשבונות חסרים, סוג תזרים לא ידוע, חוסר התאמת מטבע ⇒ כפתורי "שייך חשבון", "תקן מטבע"
+     - **בדיקת חשבון**: בסיס מטבע לא תואם, חשבונות חסרי הרשאות, מסמכים חסרים ⇒ כפתורי "סמן כטופל", "פתח משימה"
    - כל כרטיס מציג פרטים מלאים: סמל, פעולה, כמות, מחיר, תאריך, עמלה
    - confidence scores לכפילויות עם אינדיקטור ויזואלי
    - ממשק להוספת טיקרים חדשים עם מודל Bootstrap
    - רענון אוטומטי של התצוגה לאחר פעולות המשתמש
 
-4. **שלב 4**: תצוגה מקדימה
+5. **שלב 4**: תצוגה מקדימה
    - קריאה ל-`/api/user-data-import/session/{id}/preview`
-   - השרת מחזיר `preview_data` עם שתי טבלאות
+   - השרת מחזיר `preview_data` עם טבלאות מותאמות לתהליך (Executions, Cashflows, Account Issues)
 
-5. **שלב 5**: אישור סופי
+6. **שלב 5**: אישור סופי
    - הצגת סיכום סופי
    - קריאה ל-`/api/user-data-import/session/{id}/execute` לביצוע הייבוא
 
@@ -141,12 +162,43 @@ class BaseImportConnector(ABC):
 
 ### IBKR Connector
 
-מטפל בקבצי IBKR Activity Statement:
+מטפל בקבצי IBKR Activity Statement ומיישם כעת Multi-Section parsing לפי Task:
 
-- **זיהוי פורמט**: חיפוש שורות "Trades,Data,Order"
-- **פרסינג**: חילוץ עמודות IBKR סטנדרטיות
-- **נורמליזציה**: המרה לפורמט אחיד
-- **external_id**: `"{date}_{symbol}_{quantity}_{price}"`
+| Task | מקטעים נצרכים | פונקציות Parsing עיקריות | פלט ראשוני |
+| ---- | -------------- | ------------------------- | ----------- |
+| `executions` | `Trades,Header` + `Trades,Data` | `_parse_trades_section` | רשומות ביצועים |
+| `cashflows` | `Cash Report`, `Deposits & Withdrawals`, `Interest`, `Dividends`, `Withholding Tax` | `_parse_cash_report`, `_parse_interest`, `_parse_dividends`, `_parse_withdrawals` | רשומות תזרים עם סוג תזרים |
+| `account_reconciliation` | `Account Information`, `Account Configuration`, `Base Currency`, `Account Summary` | `_parse_account_configuration`, `_parse_base_currency` | נתוני חשבון ומטבע בסיס |
+
+#### אובייקטי נורמליזציה
+
+- **ExecutionRecord**: כפי שהוגדר בעבר.
+- **CashflowRecord**:
+  ```python
+  {
+      "cashflow_type": "deposit" | "withdrawal" | "dividend" | "interest" | "fee" | "tax",
+      "amount": 1250.45,
+      "currency": "USD",
+      "effective_date": datetime,
+      "source_account": "U1234567",
+      "target_account": "Brokerage",
+      "asset_symbol": "AAPL",              # במידת הצורך
+      "memo": "Dividend 2024-10",
+      "external_id": "2024-10-01_dividend_USD_1250.45"
+  }
+  ```
+- **AccountReconciliationRecord**:
+  ```python
+  {
+      "account_id": "U1234567",
+      "base_currency": "USD",
+      "margin_status": "Reg T Margin",
+      "entitlements": ["Stocks", "Options"],
+      "missing_documents": ["W8BEN"],
+      "account_aliases": ["Main IBKR"],
+      "external_id": "U1234567_2024-10-31"
+  }
+  ```
 
 ### Demo Connector
 
@@ -179,73 +231,56 @@ class BaseImportConnector(ABC):
 
 ### Normalization Service
 
-המרת נתונים גולמיים לפורמט אחיד:
+המרת נתונים גולמיים לפורמט אחיד לפי Task:
 
-```python
-{
-    "symbol": "AAPL",
-    "action": "buy",                    # או "sell"
-    "date": {                          # DateEnvelope לאחר נורמליזציה
-        "utc": "2025-09-03T09:35:18Z",
-        "epochMs": 1757208918000,
-        "local": "2025-09-03T12:35:18+03:00",
-        "timezone": "Asia/Jerusalem",
-        "display": "03/09/2025 12:35"
-    },
-    "quantity": 250,
-    "price": 13.6,
-    "fee": 1.2555,
-    "realized_pl": null,                # NULL בקנייה, חובה במכירה
-    "mtm_pl": null,                      # רשות בשני המקרים
-    "external_id": "2025-09-03_AAL_250_13.6",  # ייחודי
-    "source": "ibkr_import"             # מקור הנתונים
-}
-```
+| Task | שדות חובה | שדות אופציונליים | הערות |
+| ---- | ---------- | ---------------- | ------ |
+| Executions | `symbol`, `action`, `date`, `quantity`, `price`, `fee`, `external_id`, `source` | `realized_pl`, `mtm_pl`, `currency`, `asset_category` | בהתאם לסטנדרט הקיים |
+| Cashflows | `cashflow_type`, `amount`, `currency`, `effective_date`, `source_account`, `external_id`, `source` | `target_account`, `asset_symbol`, `memo`, `tax_country` | סכום ≠ 0, DateEnvelope מלא |
+| Account Reconciliation | `account_id`, `base_currency`, `external_id`, `source` | `margin_status`, `entitlements`, `missing_documents`, `account_aliases`, `risk_profile` | מזהה חיצוני ייחודי לפי חשבון + תאריך דיווח |
 
 ### Validation Service
 
-וולידציה מקיפה:
+וולידציה מותאמת תהליך:
 
-- **שדות חובה**: symbol, action, date, quantity, price
-- **טיפוסי נתונים**: בדיקת מספרים, תאריכים
-- **ערכים חיוביים**: כמות ומחיר חיוביים
-- **תאריכים תקינים**: פורמט ISO תקין
-- **צד תקין**: "buy" או "sell" בלבד
+- Executions: כמתועד.
+- Cashflows:
+  - סכום חיובי/שלילי בהתאם לסוג (הפקדה חיובית, משיכה שלילית).
+  - מטבע קיים במערכת (`currency_service`).
+  - חשבון מקור נמצא במערכת; עבור קבלת מידע חסר הוספת פריט ל-`missing_accounts`.
+  - סיווג תזרים מוכר (`cashflow_type`).
+  - תאריך אפקטיבי תקין (`DateEnvelope`).
+- Account Reconciliation:
+  - חשבון קיים במערכת.
+  - מטבע בסיס תואם להגדרת החשבון (או מסומן כחריגה).
+  - רשימת הרשאות (entitlements) אינה ריקה – אחרת flagged.
+  - מסמכים חסרים מדווחים ב-`missing_documents`.
 
 ### Duplicate Detection Service
 
-זיהוי כפילויות חכם:
+זיהוי כפילויות מותאם לכל תהליך:
 
-#### לוגיקת זיהוי:
-
-1. **exact external_id**: התאמה מדויקת במזהה חיצוני
-2. **5/5 similarity**: התאמה מלאה ב-5 פרמטרים (עדכון 2025-10-27):
-   - ticker (זהה)
-   - quantity (זהה)
-   - price (חלק שלם זהה - התעלמות מחלק עשרוני)
-   - date (אותו יום - התעלמות משעה)
-   - action (buy/sell זהה)
-
-#### סוגי כפילויות:
-
-- **within_file**: כפילויות בתוך אותו קובץ
-- **existing_records**: רשומות קיימות במערכת (עדכון 2025-10-27)
-
-#### זיהוי רשומות קיימות במערכת:
-
-המערכת בודקת מול **כל הרשומות הקיימות במערכת** (לא רק לפי חשבון):
-- שאילתה על כל ה-`Execution` records
-- השוואה לפי 5 פרמטרים: ticker, quantity, action, date (יום בלבד), price (חלק שלם בלבד)
-- אם כל 5 הפרמטרים זהים - הרשומה מסומנת כ"קיימת במערכת"
+- Executions: exact external_id + 5/5 match (לפי ההגדרה הקיימת).
+- Cashflows:
+  - exact external_id.
+  - התאמה על בסיס (`cashflow_type`, `effective_date (יום)`, `abs(amount)`, `currency`, `source_account`).
+  - עבור דיבידנדים וריביות – השוואה גם לפי `asset_symbol`.
+  - מייצרת מבנה `cashflow_duplicates` עם confidence score וסוג כפילות (`within_file`, `existing_records`).
+- Account Reconciliation:
+  - אין כפילות "נתון" אלא "חריגות". השירות מזהה:
+    - חשבון שכבר עבר reconcile מאותו תאריך (`external_id` כפול).
+    - סטטוס בסיס/הרשאות שכבר נמצא במערכת (Deep compare) ומסמן `unchanged`.
+  - פלט: `reconciliation_flags` עם רשימת חריגות (חדש/מעודכן/חסר).
 
 ### Import Orchestrator
 
-תיאום כל התהליך:
+תיאום כל התהליך (עבור Task Plugins):
 
-1. **יצירת סשן**: `create_import_session()`
-2. **ניתוח קובץ**: `analyze_file()`
-3. **הכנת תצוגה מקדימה**: `generate_preview()`
-4. **ביצוע ייבוא**: `execute_import()`
+1. **יצירת סשן**: `create_import_session()` – שומר `task_type`, `parsed_sections`, `raw_metadata`.
+2. **ניתוח קובץ**: `analyze_file(task_type)` – מפעיל Pipeline ייעודי ומחזיר שדות מותאמים (`analysis_results`, `cashflow_summary`, `reconciliation_summary`).
+3. **הכנת תצוגה מקדימה**: `generate_preview(task_type)` – משחזר נתונים מהתהליך, מפיק סטטיסטיקות וטבלאות.
+4. **ביצוע ייבוא**: `execute_import(task_type)` – מפעיל persister בהתאם (Executions → `Execution`, Cashflows → `CashFlow`/`CashFlowAdjustment`, Account Reconciliation → `AccountAuditReport`/עדכוני חשבון).
+5. **דוחות לייב**: `create_live_report()` מעדכן כעת גם `cashflow_records`, `cashflow_duplicates`, `missing_accounts`, `account_reconciliation_flags`.
 
 ## ממשק משתמש - שלב 3: פתרון בעיות
 
@@ -640,6 +675,7 @@ console.error('Import failed:', error);
 - בדיקת גודל קובץ
 - בדיקת תוכן קובץ
 - בדיקת הרשאות משתמש
+- בדיקת task נבחר (התמיכה היום: `executions`, `cashflows`, `account_reconciliation`)
 
 ### הגנה
 

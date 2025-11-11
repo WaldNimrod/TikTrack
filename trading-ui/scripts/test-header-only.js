@@ -600,7 +600,7 @@ async function loadRealData() {
 async function loadTradePlansTableData() {
     try {
         console.log('🔄 טוען נתוני תכנוני טריידים...');
-        const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {
+        const response = await fetch(`/api/trade-plans/?_t=${Date.now()}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
         });

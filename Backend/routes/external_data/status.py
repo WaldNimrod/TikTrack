@@ -6,12 +6,15 @@ Handles system status and health monitoring for external data services
 from flask import Blueprint, request, jsonify, current_app
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import text
 import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, List
+from pathlib import Path
 
 from services.external_data import YahooFinanceAdapter, CacheManager
-from models.external_data import ExternalDataProvider, DataRefreshLog, MarketDataQuote
+from services.advanced_cache_service import advanced_cache_service
+from models.external_data import ExternalDataProvider, DataRefreshLog, MarketDataQuote, IntradayDataSlot
 from config.database import get_db
 
 # Configure logging
@@ -35,11 +38,21 @@ def get_system_status():
         try:
             # Get all providers
             providers = db_session.query(ExternalDataProvider).all()
-            
+
+            # Prepare shared adapter for formatting (fall back to provider 1)
+            formatter_adapter = None
+            if providers:
+                try:
+                    formatter_adapter = YahooFinanceAdapter(db_session, providers[0].id)
+                except Exception:
+                    formatter_adapter = None
+            if formatter_adapter is None:
+                formatter_adapter = YahooFinanceAdapter(db_session, providers[0].id if providers else 1)
+
             # Get cache stats
             cache_manager = CacheManager(db_session)
             cache_stats = cache_manager.get_cache_stats()
-            
+
             # Get recent activity
             now = datetime.now(timezone.utc)
             hour_ago = now - timedelta(hours=1)
@@ -72,11 +85,13 @@ def get_system_status():
                         'display_name': provider.display_name,
                         'is_active': provider.is_active,
                         'is_healthy': provider.is_healthy,
-                        'last_successful_request': provider.last_successful_request.isoformat() if provider.last_successful_request else None,
+                        'last_successful_request': status.get('last_successful_request') or adapter.build_time_payload(provider.last_successful_request),
                         'last_error': provider.last_error,
                         'error_count': provider.error_count,
                         'rate_limit_remaining': status.get('rate_limit_remaining', 0),
-                        'recent_success_rate': status.get('recent_success_rate', 0)
+                        'recent_success_rate': status.get('recent_success_rate', 0),
+                        'market_status': status.get('market_status'),
+                        'metrics_timestamp': status.get('timestamp')
                     })
                     
                     # Only check health for active providers
@@ -104,7 +119,7 @@ def get_system_status():
             
             response = {
                 'success': True,
-                'timestamp': now.isoformat(),
+                'timestamp': formatter_adapter.build_time_payload(now),
                 'service': 'external_data_system',
                 'status': 'operational' if overall_health else 'degraded',
                 'overall_health': overall_health,
@@ -118,7 +133,14 @@ def get_system_status():
                     'total_quotes': cache_stats.total_quotes,
                     'total_intraday_slots': cache_stats.total_intraday_slots,
                     'cache_hit_rate': cache_stats.cache_hit_rate,
-                    'stale_data_count': cache_stats.stale_data_count
+                    'stale_data_count': cache_stats.stale_data_count,
+                    'avg_quote_age_minutes': cache_stats.avg_quote_age_minutes,
+                    'avg_intraday_age_minutes': cache_stats.avg_intraday_age_minutes,
+                    'ttl_seconds': getattr(cache_manager, 'ttl_settings', None),
+                    'ttl_minutes': {
+                        key: round(value / 60, 2)
+                        for key, value in getattr(cache_manager, 'ttl_settings', {}).items()
+                    } if getattr(cache_manager, 'ttl_settings', None) else None
                 },
                 'recent_activity': {
                     'last_hour': {
@@ -162,6 +184,15 @@ def get_providers_status():
             providers = db_session.query(ExternalDataProvider).all()
             
             provider_details = []
+            formatter_adapter = None
+            if providers:
+                try:
+                    formatter_adapter = YahooFinanceAdapter(db_session, providers[0].id)
+                except Exception:
+                    formatter_adapter = None
+            if formatter_adapter is None:
+                formatter_adapter = YahooFinanceAdapter(db_session, providers[0].id if providers else 1)
+
             for provider in providers:
                 try:
                     adapter = YahooFinanceAdapter(db_session, provider.id)
@@ -188,7 +219,7 @@ def get_providers_status():
                         'rate_limit_per_hour': provider.rate_limit_per_hour,
                         'timeout_seconds': provider.timeout_seconds,
                         'retry_attempts': provider.retry_attempts,
-                        'last_successful_request': provider.last_successful_request.isoformat() if provider.last_successful_request else None,
+                        'last_successful_request': status.get('last_successful_request') or adapter.build_time_payload(provider.last_successful_request),
                         'last_error': provider.last_error,
                         'error_count': provider.error_count,
                         'recent_activity': {
@@ -196,8 +227,8 @@ def get_providers_status():
                             'success_rate': success_rate,
                             'rate_limit_remaining': status.get('rate_limit_remaining', 0)
                         },
-                        'created_at': provider.created_at.isoformat() if provider.created_at else None,
-                        'updated_at': provider.updated_at.isoformat() if provider.updated_at else None
+                        'created_at': adapter.build_time_payload(provider.created_at),
+                        'updated_at': adapter.build_time_payload(provider.updated_at)
                     })
                     
                 except Exception as e:
@@ -209,9 +240,10 @@ def get_providers_status():
                         'error': str(e)
                     })
             
+            now = datetime.now(timezone.utc)
             response = {
                 'success': True,
-                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'timestamp': formatter_adapter.build_time_payload(now),
                 'service': 'external_data_providers',
                 'providers_count': len(providers),
                 'providers': provider_details
@@ -287,7 +319,7 @@ def get_provider_status(provider_id: int):
             
             response = {
                 'success': True,
-                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'timestamp': adapter.build_time_payload(datetime.now(timezone.utc)),
                 'provider': {
                     'id': provider.id,
                     'name': provider.name,
@@ -303,11 +335,11 @@ def get_provider_status(provider_id: int):
                     'cache_ttl_warm': provider.cache_ttl_warm,
                     'max_symbols_per_batch': provider.max_symbols_per_batch,
                     'preferred_batch_size': provider.preferred_batch_size,
-                    'last_successful_request': provider.last_successful_request.isoformat() if provider.last_successful_request else None,
+                    'last_successful_request': adapter.build_time_payload(provider.last_successful_request),
                     'last_error': provider.last_error,
                     'error_count': provider.error_count,
-                    'created_at': provider.created_at.isoformat() if provider.created_at else None,
-                    'updated_at': provider.updated_at.isoformat() if provider.updated_at else None
+                    'created_at': adapter.build_time_payload(provider.created_at),
+                    'updated_at': adapter.build_time_payload(provider.updated_at)
                 },
                 'status': status,
                 'metrics': {
@@ -391,14 +423,14 @@ def get_yahoo_finance_status():
             
             response = {
                 'success': True,
-                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'timestamp': adapter.build_time_payload(datetime.now(timezone.utc)),
                 'provider': {
                     'id': provider.id,
                     'name': provider.name,
                     'display_name': provider.display_name,
                     'is_active': provider.is_active,
                     'is_healthy': provider.is_healthy,
-                    'last_successful_request': provider.last_successful_request.isoformat() if provider.last_successful_request else None,
+                    'last_successful_request': adapter.build_time_payload(provider.last_successful_request),
                     'last_error': provider.last_error,
                     'error_count': provider.error_count
                 },
@@ -583,24 +615,39 @@ def clear_cache_endpoint():
     - JSON response with operation result
     """
     try:
-        # Get database session
         db_session = next(get_db())
-        
+        deleted_quotes = deleted_intraday = deleted_logs = quotes_last_deleted = 0
         try:
-            # TODO: Implement actual cache clearing
-            # For now, return error indicating feature not implemented
-            return jsonify({
-                'success': False,
-                'error_code': 'FEATURE_NOT_IMPLEMENTED',
-                'message': 'Cache clearing not yet implemented',
-                'suggestion': 'This feature will be available in the next update'
-            }), 501  # Not Implemented
-            
-            return jsonify(response), 200
-            
+            deleted_quotes = db_session.query(MarketDataQuote).delete()
+            deleted_intraday = db_session.query(IntradayDataSlot).delete()
+            deleted_logs = db_session.query(DataRefreshLog).delete()
+            quotes_last_result = db_session.execute(text("DELETE FROM quotes_last"))
+            quotes_last_deleted = quotes_last_result.rowcount if quotes_last_result else 0
+            db_session.commit()
+        except Exception as db_error:
+            db_session.rollback()
+            raise db_error
         finally:
             db_session.close()
-            
+
+        try:
+            advanced_cache_service.clear()
+        except Exception as cache_error:
+            logger.warning(f"Failed to clear advanced cache: {cache_error}")
+
+        response = {
+            'success': True,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'message': 'External data cache cleared successfully',
+            'cleared': {
+                'market_data_quotes': deleted_quotes,
+                'intraday_slots': deleted_intraday,
+                'data_refresh_logs': deleted_logs,
+                'quotes_last': quotes_last_deleted,
+            }
+        }
+        return jsonify(response), 200
+
     except Exception as e:
         logger.error(f"Error in clear_cache_endpoint: {e}")
         return jsonify({
@@ -812,24 +859,40 @@ def clear_data_logs():
     - JSON response with operation result
     """
     try:
-        # Get database session
+        logs_dir = Path('logs')
+        cleared_files = []
+        if logs_dir.exists():
+            for log_file in logs_dir.glob('*.log*'):
+                if log_file.is_file():
+                    try:
+                        log_file.write_text('', encoding='utf-8')
+                        cleared_files.append(log_file.name)
+                    except Exception as file_error:
+                        logger.warning(f"Failed to clear log file {log_file}: {file_error}")
+
         db_session = next(get_db())
-        
+        deleted_logs = 0
         try:
-            # TODO: Implement actual log clearing
-            # For now, return error indicating feature not implemented
-            return jsonify({
-                'success': False,
-                'error_code': 'FEATURE_NOT_IMPLEMENTED',
-                'message': 'Log clearing not yet implemented',
-                'suggestion': 'This feature will be available in the next update'
-            }), 501  # Not Implemented
-            
-            return jsonify(response), 200
-            
+            deleted_logs = db_session.query(DataRefreshLog).delete()
+            db_session.commit()
+        except Exception as db_error:
+            db_session.rollback()
+            raise db_error
         finally:
             db_session.close()
-            
+
+        response = {
+            'success': True,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'message': 'External data logs cleared successfully',
+            'cleared': {
+                'data_refresh_logs': deleted_logs,
+                'log_files': cleared_files
+            }
+        }
+
+        return jsonify(response), 200
+
     except Exception as e:
         logger.error(f"Error in clear_data_logs: {e}")
         return jsonify({

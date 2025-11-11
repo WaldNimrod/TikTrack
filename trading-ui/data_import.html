@@ -406,6 +406,42 @@
                                     <div class="problem-card-container" id="missingTickersContainer"></div>
                                 </div>
 
+                                <div class="problem-section" id="cashflowMissingAccountsSection" style="display:none;">
+                                    <h4><i class="bi bi-people"></i> חשבונות חסרים</h4>
+                                    <p>החשבונות הבאים לא קיימים במערכת. יש לשייך אותם לפני המשך הייבוא:</p>
+                                    <div class="problem-card-container" id="cashflowMissingAccountsContainer"></div>
+                                </div>
+
+                                <div class="problem-section" id="cashflowCurrencyIssuesSection" style="display:none;">
+                                    <h4><i class="bi bi-currency-exchange"></i> בעיות מטבע</h4>
+                                    <p>נמצאו רשומות עם קודי מטבע לא מזוהים או שגויים:</p>
+                                    <div class="problem-card-container" id="cashflowCurrencyIssuesContainer"></div>
+                                </div>
+
+                                <div class="problem-section" id="accountMissingAccountsSection" style="display:none;">
+                                    <h4><i class="bi bi-person-x"></i> חשבונות חסרים</h4>
+                                    <p>חשבונות אלו לא קיימים במערכת או אינם משויכים. יש לטפל בהם לפני המשך התהליך:</p>
+                                    <div class="problem-card-container" id="accountMissingAccountsContainer"></div>
+                                </div>
+
+                                <div class="problem-section" id="accountCurrencyMismatchesSection" style="display:none;">
+                                    <h4><i class="bi bi-cash-stack"></i> אי התאמות מטבע בסיס</h4>
+                                    <p>החשבונות הבאים מכילים מטבע בסיס שונה מזה המוגדר במערכת:</p>
+                                    <div class="problem-card-container" id="accountCurrencyMismatchesContainer"></div>
+                                </div>
+
+                                <div class="problem-section" id="accountEntitlementWarningsSection" style="display:none;">
+                                    <h4><i class="bi bi-shield-exclamation"></i> הרשאות חסרות</h4>
+                                    <p>החשבונות הבאים חסרים הרשאות נדרשות:</p>
+                                    <div class="problem-card-container" id="accountEntitlementWarningsContainer"></div>
+                                </div>
+
+                                <div class="problem-section" id="accountMissingDocumentsSection" style="display:none;">
+                                    <h4><i class="bi bi-file-earmark-excel"></i> מסמכים חסרים</h4>
+                                    <p>יש להשלים את המסמכים המופיעים להלן עבור חשבונות אלו:</p>
+                                    <div class="problem-card-container" id="accountMissingDocumentsContainer"></div>
+                                </div>
+
                                 <div class="problem-section" id="existingRecordsSection" style="display:none;">
                                     <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
                                     <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
@@ -577,6 +613,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script>
     <!-- [17] -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <!-- [18] -->
+    <script src="scripts/api-config.js?v=1.0.0"></script>
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/11: SERVICES PACKAGE ===== -->

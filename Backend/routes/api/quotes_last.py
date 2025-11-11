@@ -14,7 +14,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-quotes_last_bp = Blueprint('quotes_last', __name__, url_prefix='/api/quotes_last')
+quotes_last_bp = Blueprint('quotes_last', __name__, url_prefix='/api/quotes-last')
 
 def get_db_connection():
     """Get database connection"""

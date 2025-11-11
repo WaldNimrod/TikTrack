@@ -143,7 +143,7 @@ async function getTrades() {
  */
 async function getTradePlans() {
   try {
-    const response = await fetch('/api/trade_plans/');
+    const response = await fetch('/api/trade-plans/');
     if (response.ok) {
       const data = await response.json();
       const plans = data.data || data || [];

@@ -121,7 +121,7 @@ const response = await fetch(endpoint);
    - `populateTickersSelect()` - `/api/tickers/` (שורה 204)
    - `populateCurrenciesSelect()` - `/api/currencies/` (שורה 340)
    - `populateTradesSelect()` - `/api/trades/` (שורה 450)
-   - `populateTradePlansSelect()` - `/api/trade_plans/` (שורה 509)
+   - `populateTradePlansSelect()` - `/api/trade-plans/` (שורה 509)
 
 ### סטטוס
 ✅ **תוקן** - cache busting נוסף ל-`populateAccountsSelect()` גם ב-Development וגם ב-Production

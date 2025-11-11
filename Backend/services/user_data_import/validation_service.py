@@ -16,6 +16,8 @@ from sqlalchemy.orm import Session
 
 from services.date_normalization_service import DateNormalizationService
 
+logger = logging.getLogger(__name__)
+
 # Import models
 try:
     from models.ticker import Ticker
@@ -23,7 +25,11 @@ except ImportError:
     logger.warning("Failed to import Ticker model - ticker validation will be limited")
     Ticker = None
 
-logger = logging.getLogger(__name__)
+try:
+    from models.trading_account import TradingAccount
+except ImportError:
+    logger.warning("Failed to import TradingAccount model - account validation will be limited")
+    TradingAccount = None
 
 class ValidationService:
     """
@@ -51,24 +57,34 @@ class ValidationService:
             'source': self._validate_source
         }
     
-    def validate_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def validate_records(
+        self,
+        records: List[Dict[str, Any]],
+        task_type: str = 'executions'
+    ) -> Dict[str, Any]:
         """
-        Validate a list of normalized records.
-        
-        Args:
-            records: List of normalized records to validate
-            
-        Returns:
-            Dict[str, Any]: Validation results
+        Validate a list of normalized records for the specified task type.
         """
+        task = (task_type or 'executions').lower()
+        if task == 'cashflows':
+            return self._validate_cashflow_records(records)
+        if task == 'account_reconciliation':
+            return self._validate_account_reconciliation_records(records)
+        return self._validate_execution_records(records)
+
+    # ------------------------------------------------------------------
+    # Execution validation (existing flow)
+    # ------------------------------------------------------------------
+
+    def _validate_execution_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
         valid_records = []
         invalid_records = []
         validation_errors = []
-        
+
         for i, record in enumerate(records):
             try:
                 errors = self._validate_single_record(record)
-                
+
                 if errors:
                     invalid_records.append(record)
                     validation_errors.append({
@@ -78,21 +94,20 @@ class ValidationService:
                     })
                 else:
                     valid_records.append(record)
-                    
-            except Exception as e:
+
+            except Exception as exc:
                 invalid_records.append(record)
                 validation_errors.append({
                     'record_index': i,
                     'record': record,
-                    'errors': [f"Validation error: {str(e)}"]
+                    'errors': [f"Validation error: {str(exc)}"]
                 })
-                logger.error(f"Failed to validate record {i}: {str(e)}")
-        
-        # Check for missing tickers
-        logger.info(f"🔍 Starting missing tickers check for {len(valid_records)} valid records")
+                logger.error("Failed to validate execution record %s: %s", i, exc)
+
+        logger.info("🔍 Starting missing tickers check for %s valid execution records", len(valid_records))
         missing_tickers = self._check_missing_tickers(valid_records)
-        logger.info(f"📊 Missing tickers result: {missing_tickers}")
-        
+        logger.info("📊 Missing tickers result: %s", missing_tickers)
+
         return {
             'valid_records': valid_records,
             'invalid_records': invalid_records,
@@ -103,6 +118,238 @@ class ValidationService:
             'invalid_count': len(invalid_records),
             'validation_rate': (len(valid_records) / len(records) * 100) if records else 0
         }
+
+    # ------------------------------------------------------------------
+    # Cashflow validation
+    # ------------------------------------------------------------------
+
+    def _validate_cashflow_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        valid_records = []
+        invalid_records = []
+        validation_errors = []
+        missing_accounts: Dict[str, int] = {}
+        currency_issues: List[Dict[str, Any]] = []
+
+        for i, record in enumerate(records):
+            try:
+                errors = []
+
+                amount = record.get('amount')
+                if amount is None:
+                    errors.append("Missing amount")
+                else:
+                    try:
+                        amount_value = float(amount)
+                        if amount_value == 0:
+                            errors.append("Amount cannot be zero")
+                    except (TypeError, ValueError):
+                        errors.append(f"Invalid amount value: {amount}")
+
+                currency = record.get('currency')
+                if not currency:
+                    errors.append("Currency is required")
+                else:
+                    normalized_currency = self._normalize_currency_code(currency)
+                    if not normalized_currency:
+                        errors.append(f"Invalid currency code: {currency}")
+                    elif len(normalized_currency) != 3:
+                        currency_issues.append({
+                            'record_index': i,
+                            'currency': currency,
+                            'message': 'Currency code should be 3 characters'
+                        })
+
+                if not record.get('cashflow_type'):
+                    errors.append("cashflow_type is required")
+
+                if not record.get('effective_date'):
+                    errors.append("effective_date envelope is required")
+
+                source_account = record.get('source_account')
+                if not source_account:
+                    errors.append("source_account is required")
+                else:
+                    if not self._account_exists(source_account):
+                        missing_accounts[source_account] = missing_accounts.get(source_account, 0) + 1
+
+                if errors:
+                    invalid_records.append(record)
+                    validation_errors.append({
+                        'record_index': i,
+                        'record': record,
+                        'errors': errors
+                    })
+                else:
+                    valid_records.append(record)
+
+            except Exception as exc:
+                invalid_records.append(record)
+                validation_errors.append({
+                    'record_index': i,
+                    'record': record,
+                    'errors': [f"Validation error: {str(exc)}"]
+                })
+                logger.error("Failed to validate cashflow record %s: %s", i, exc)
+
+        return {
+            'valid_records': valid_records,
+            'invalid_records': invalid_records,
+            'validation_errors': validation_errors,
+            'missing_accounts': sorted(missing_accounts.keys()),
+            'currency_issues': currency_issues,
+            'total_records': len(records),
+            'valid_count': len(valid_records),
+            'invalid_count': len(invalid_records),
+            'validation_rate': (len(valid_records) / len(records) * 100) if records else 0
+        }
+
+    # ------------------------------------------------------------------
+    # Account reconciliation validation
+    # ------------------------------------------------------------------
+
+    def _validate_account_reconciliation_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        valid_records = []
+        invalid_records = []
+        validation_errors = []
+
+        missing_accounts: Dict[str, int] = {}
+        base_currency_mismatches: List[Dict[str, Any]] = []
+        entitlement_warnings: List[Dict[str, Any]] = []
+        missing_documents_report: List[Dict[str, Any]] = []
+
+        for i, record in enumerate(records):
+            try:
+                errors = []
+                account_identifier = record.get('account_id')
+                base_currency = record.get('base_currency')
+                as_of_envelope = record.get('as_of')
+
+                if not account_identifier:
+                    errors.append("account_id is required")
+                if not base_currency:
+                    errors.append("base_currency is required")
+                if not as_of_envelope:
+                    errors.append("as_of date envelope is required")
+
+                account = self._fetch_account(account_identifier) if account_identifier else None
+                if account_identifier and not account:
+                    missing_accounts[account_identifier] = missing_accounts.get(account_identifier, 0) + 1
+                elif account and base_currency:
+                    account_currency_code = self._extract_account_currency(account)
+                    normalized_requested = self._normalize_currency_code(base_currency)
+                    if account_currency_code and normalized_requested and account_currency_code != normalized_requested:
+                        base_currency_mismatches.append({
+                            'account_id': account_identifier,
+                            'expected': account_currency_code,
+                            'reported': normalized_requested
+                        })
+
+                entitlements = record.get('entitlements') or []
+                if not entitlements:
+                    entitlement_warnings.append({
+                        'account_id': account_identifier,
+                        'message': 'No entitlements reported'
+                    })
+
+                missing_documents = record.get('missing_documents') or []
+                if missing_documents:
+                    missing_documents_report.append({
+                        'account_id': account_identifier,
+                        'documents': missing_documents
+                    })
+
+                if errors:
+                    invalid_records.append(record)
+                    validation_errors.append({
+                        'record_index': i,
+                        'record': record,
+                        'errors': errors
+                    })
+                else:
+                    valid_records.append(record)
+
+            except Exception as exc:
+                invalid_records.append(record)
+                validation_errors.append({
+                    'record_index': i,
+                    'record': record,
+                    'errors': [f"Validation error: {str(exc)}"]
+                })
+                logger.error("Failed to validate account reconciliation record %s: %s", i, exc)
+
+        return {
+            'valid_records': valid_records,
+            'invalid_records': invalid_records,
+            'validation_errors': validation_errors,
+            'missing_accounts': sorted(missing_accounts.keys()),
+            'base_currency_mismatches': base_currency_mismatches,
+            'entitlement_warnings': entitlement_warnings,
+            'missing_documents_report': missing_documents_report,
+            'total_records': len(records),
+            'valid_count': len(valid_records),
+            'invalid_count': len(invalid_records),
+            'validation_rate': (len(valid_records) / len(records) * 100) if records else 0
+        }
+
+    # ------------------------------------------------------------------
+    # Helpers for account & currency validation
+    # ------------------------------------------------------------------
+
+    def _account_exists(self, account_identifier: str) -> bool:
+        if not account_identifier:
+            return False
+        if not self.db_session or not TradingAccount:
+            return True
+        return self._fetch_account(account_identifier) is not None
+
+    def _fetch_account(self, account_identifier: str) -> Optional[TradingAccount]:
+        if not self.db_session or not TradingAccount or account_identifier is None:
+            return None
+
+        query = self.db_session.query(TradingAccount)
+
+        # Try numeric ID
+        account = None
+        if isinstance(account_identifier, (int,)) or (
+            isinstance(account_identifier, str) and account_identifier.isdigit()
+        ):
+            try:
+                account = query.filter(TradingAccount.id == int(account_identifier)).first()
+            except (ValueError, TypeError):
+                account = None
+
+        if account:
+            return account
+
+        # Fallback: match by name (case-sensitive first, then case-insensitive)
+        account = query.filter(TradingAccount.name == account_identifier).first()
+        if account:
+            return account
+
+        return query.filter(TradingAccount.name.ilike(account_identifier)).first()
+
+    def _extract_account_currency(self, account: TradingAccount) -> Optional[str]:
+        if not account:
+            return None
+        try:
+            if hasattr(account, 'currency') and account.currency and hasattr(account.currency, 'symbol'):
+                symbol = account.currency.symbol
+            elif hasattr(account, 'currency_symbol'):
+                symbol = account.currency_symbol
+            else:
+                symbol = None
+            return self._normalize_currency_code(symbol)
+        except Exception:
+            return None
+
+    @staticmethod
+    def _normalize_currency_code(currency: Any) -> Optional[str]:
+        if not currency:
+            return None
+        try:
+            return str(currency).strip().upper()
+        except Exception:
+            return None
     
     def _validate_single_record(self, record: Dict[str, Any]) -> List[str]:
         """

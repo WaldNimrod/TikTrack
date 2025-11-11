@@ -42,7 +42,7 @@ class Alert(BaseModel):
         Validate the new condition fields format
         """
         # Validate condition_attribute
-        valid_attributes = ['price', 'change', 'ma', 'volume']
+        valid_attributes = ['price', 'change', 'ma', 'volume', 'balance']
         if self.condition_attribute not in valid_attributes:
             raise ValueError(f"condition_attribute must be one of: {valid_attributes}")
         
@@ -72,7 +72,8 @@ class Alert(BaseModel):
             'price': 'מחיר',
             'change': 'שינוי',
             'ma': 'ממוצע',
-            'volume': 'נפח'
+            'volume': 'נפח',
+            'balance': 'יתרה'
         }
         
         # Operator translations
@@ -90,7 +91,7 @@ class Alert(BaseModel):
         
         attribute = attribute_translations.get(self.condition_attribute, self.condition_attribute)
         operator = operator_translations.get(self.condition_operator, self.condition_operator)
-        number = self.condition_number
+        number = self._format_condition_number(self.condition_number)
         
         return f"{attribute} {operator} {number}"
     
@@ -144,3 +145,16 @@ class Alert(BaseModel):
             result['trade_plan_id'] = self.related_id
         
         return result
+
+    @staticmethod
+    def _format_condition_number(value: Optional[str]) -> str:
+        if value is None:
+            return '-'
+        try:
+            numeric = float(value)
+            if numeric.is_integer():
+                return f"{int(numeric):,}"
+            formatted = f"{numeric:,.2f}"
+            return formatted.rstrip('0').rstrip('.')
+        except (ValueError, TypeError):
+            return str(value)

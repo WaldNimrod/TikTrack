@@ -17,7 +17,7 @@ The Active Alerts component (`trading-ui/scripts/active-alerts-component.js`) re
 2. `loadActiveAlerts()` fetches unread alerts, clears counts, and hydrates with related entities by calling:
    - `/api/trading-accounts/`
    - `/api/trades/`
-   - `/api/trade_plans/`
+  - `/api/trade-plans/`
    - `/api/tickers/`
 3. Alerts are cached in-memory (`this.alerts`) and filtered through `ActiveAlertsFilterRouter`.
 4. `renderAlerts()` generates DOM nodes programmatically and injects them into the list container (`<div data-role="list">`).

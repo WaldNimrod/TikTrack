@@ -19,7 +19,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash_flows')
+cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash-flows')
 
 # Create a service class for cash flows
 class CashFlowService:

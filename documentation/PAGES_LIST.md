@@ -92,13 +92,13 @@
 |------|--------|------|-----|
 | **index.html** | דשבורד ראשי | `http://localhost:5000/` | `/api/dashboard/*` |
 | **trades.html** | ניהול טריידים | `http://localhost:5000/trades.html` | `/api/trades/*` |
-| **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade_plans/*` |
+| **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` |
 | **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` |
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` |
-| **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading_accounts/*` |
+| **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` |
 | **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` |
-| **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash_flows/*` |
+| **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` |

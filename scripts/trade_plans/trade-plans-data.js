@@ -45,7 +45,7 @@ async function loadTradePlansData() {
 
     // Fallback: load data directly from API
     console.log('🔄 Loading trade plans data directly from API...');
-    const response = await fetch('/api/trade_plans/');
+    const response = await fetch('/api/trade-plans/');
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,7 +77,7 @@ async function loadTradePlansData() {
  */
 async function saveTradePlan(planData) {
   try {
-    const response = await fetch('/api/trade_plans/', {
+    const response = await fetch('/api/trade-plans/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ async function saveTradePlan(planData) {
 async function updateTradePlan(planId, planData) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trade_plans/${planId}`, {
+    const response = await fetch(`${base}/api/trade-plans/${planId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ async function updateTradePlan(planId, planData) {
 async function deleteTradePlan(planId) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trade_plans/${planId}`, {
+    const response = await fetch(`${base}/api/trade-plans/${planId}`, {
       method: 'DELETE',
     });
 
@@ -184,7 +184,7 @@ async function deleteTradePlan(planId) {
  */
 async function executeTradePlan(planId) {
   try {
-    const response = await fetch('/api/trade_plans/' + planId + '/execute', {
+    const response = await fetch('/api/trade-plans/' + planId + '/execute', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ async function executeTradePlan(planId) {
 async function cancelTradePlan(planId) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/trade_plans/${planId}/cancel`, {
+    const response = await fetch(`${base}/api/trade-plans/${planId}/cancel`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ async function cancelTradePlan(planId) {
  */
 async function copyTradePlan(planId) {
   try {
-    const response = await fetch('/api/trade_plans', {
+    const response = await fetch('/api/trade-plans', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

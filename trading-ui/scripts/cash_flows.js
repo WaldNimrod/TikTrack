@@ -96,7 +96,7 @@ async function loadCashFlowsData() {
     window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
     
     // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/cash_flows/?_t=${Date.now()}`, {
+    const response = await fetch(`/api/cash-flows/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -385,7 +385,7 @@ async function _REMOVED_loadCashFlows() {
   try {
 
     // Use relative URL to work with both development (8080) and production (5001)
-    const response = await fetch('/api/cash_flows/');
+    const response = await fetch('/api/cash-flows/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -601,7 +601,7 @@ async function performCashFlowDeletion(id) {
     }
 
     // שליחת בקשת מחיקה
-    const response = await fetch(`/api/cash_flows/${id}`, {
+    const response = await fetch(`/api/cash-flows/${id}`, {
       method: 'DELETE',
     });
 
@@ -1631,7 +1631,7 @@ async function saveCashFlow() {
         // No need to call clearCacheBeforeCRUD here
         
         // Prepare API call
-        const url = isEdit ? `/api/cash_flows/${cashFlowId}` : '/api/cash_flows';
+        const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
         const method = isEdit ? 'PUT' : 'POST';
         console.log('🔵 saveCashFlow - Fetching to:', url, 'method:', method);
         console.log('🔵 saveCashFlow - Data to send:', dataToSend);
@@ -1851,7 +1851,7 @@ async function saveCurrencyExchange() {
         const isEdit = form.dataset.mode === 'edit';
         const exchangeId = form.dataset.exchangeId;
         
-        const url = isEdit ? `/api/cash_flows/exchange/${exchangeId}` : '/api/cash_flows/exchange';
+        const url = isEdit ? `/api/cash-flows/exchange/${exchangeId}` : '/api/cash-flows/exchange';
         const method = isEdit ? 'PUT' : 'POST';
         
         console.log('🔵 saveCurrencyExchange - Fetching to:', url, 'method:', method);
@@ -1908,7 +1908,7 @@ async function loadCurrencyExchange(exchangeId) {
     try {
         console.log('🔵 loadCurrencyExchange - Loading exchange:', exchangeId);
         
-        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`);
+        const response = await fetch(`/api/cash-flows/exchange/${exchangeId}`);
         if (!response.ok) {
             throw new Error('Failed to load currency exchange');
         }
@@ -2011,7 +2011,7 @@ async function deleteCurrencyExchange(exchangeId) {
         
         console.log('🔵 deleteCurrencyExchange - Deleting exchange:', exchangeId);
         
-        const response = await fetch(`/api/cash_flows/exchange/${exchangeId}`, {
+        const response = await fetch(`/api/cash-flows/exchange/${exchangeId}`, {
             method: 'DELETE'
         });
         
@@ -2304,7 +2304,7 @@ async function _REMOVED_loadTradesForCashFlow(selectId) {
  */
 async function _REMOVED_loadTradePlansForCashFlow(selectId) {
   try {
-    const response = await fetch('/api/trade_plans/');
+    const response = await fetch('/api/trade-plans/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

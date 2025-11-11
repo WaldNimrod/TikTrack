@@ -126,7 +126,7 @@ function executeTradePlan(planId) {
     
     if (confirm(confirmMessage)) {
       // שליחה לשרת לביצוע התוכנית
-      fetch('/api/trade_plans/' + planId + '/execute', {
+      fetch('/api/trade-plans/' + planId + '/execute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ function _REMOVED_copyTradePlan(planId) {
     };
     
     // שליחה לשרת ליצירת העותק
-    fetch('/api/trade_plans', {
+    fetch('/api/trade-plans', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1303,7 +1303,7 @@ async function _REMOVED_saveEditTradePlan() {
     }
 
     // שליחה לשרת
-    const response = await fetch(`/api/trade_plans/${formData.id}`, {
+    const response = await fetch(`/api/trade-plans/${formData.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1315,7 +1315,7 @@ async function _REMOVED_saveEditTradePlan() {
     await CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'editTradePlanModal',
       successMessage: 'תכנון עודכן בהצלחה!',
-      apiUrl: '/api/trade_plans/',
+      apiUrl: '/api/trade-plans/',
       entityName: 'תכנון',
       reloadFn: window.loadTradePlansData,
       requiresHardReload: false
@@ -1351,7 +1351,7 @@ async function reactivateTradePlan(tradePlanId) {
     }
 
     // Use relative URL to work with both development (8080) and production (5001)
-    const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
+    const response = await fetch(`/api/trade-plans/${tradePlanId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2087,7 +2087,7 @@ async function loadTradePlansData() {
       window.Logger.info('Loading trade plans data (bypass cache)', { page: "trade_plans" });
       
       // קריאה ישירה לשרת עם timestamp למניעת cache
-      const response = await fetch(`/api/trade_plans/?_t=${Date.now()}`, {
+      const response = await fetch(`/api/trade-plans/?_t=${Date.now()}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -2807,7 +2807,7 @@ async function saveTradePlanData(mode) {
       }
 
       // שליחה לשרת
-      const response = await fetch(`/api/trade_plans/${formData.id}`, {
+      const response = await fetch(`/api/trade-plans/${formData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -2853,7 +2853,7 @@ async function saveTradePlanData(mode) {
       };
 
       // שליחה לשרת
-      const response = await fetch('/api/trade_plans/', {
+      const response = await fetch('/api/trade-plans/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -3238,7 +3238,7 @@ async function saveTradePlan() {
         }
         
         // Prepare API call
-        const url = isEdit ? `/api/trade_plans/${tradePlanId}` : '/api/trade_plans';
+        const url = isEdit ? `/api/trade-plans/${tradePlanId}` : '/api/trade-plans';
         const method = isEdit ? 'PUT' : 'POST';
         
         // Send to API
@@ -3373,7 +3373,7 @@ async function performTradePlanDeletion(tradePlanId) {
         }
         
         // Send delete request
-        const response = await fetch(`/api/trade_plans/${tradePlanId}`, {
+        const response = await fetch(`/api/trade-plans/${tradePlanId}`, {
             method: 'DELETE'
         });
         

@@ -2036,10 +2036,10 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
       'alerts': '/api/alerts/',
       'notes': '/api/notes/',
       'trades': '/api/trades/',
-      'trade_plans': '/api/trade_plans/',
-      'cash_flows': '/api/cash_flows/',
-      'db_extradata': '/api/db_extradata/',
-      'db_display': '/api/db_display/',
+      'trade_plans': '/api/trade-plans/',
+      'cash_flows': '/api/cash-flows/',
+      'db_extradata': '/api/db-extradata/',
+      'db_display': '/api/db-display/',
       'constraints': '/api/constraints/',
       'preferences': '/api/preferences/'
     };

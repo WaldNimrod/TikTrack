@@ -8,6 +8,16 @@
  * - ModalManagerV2
  * - UnifiedCacheManager
  * - CRUDResponseHandler
+ *
+ * Function Index:
+ * - initializeExecutionsSection(options)
+ * - initializeDashboardWidget(options)
+ * - refreshClusters({ source, force })
+ * - ensureTradeModalDependencies()
+ * - openTradeModalFromCluster(clusterId)
+ * - handleTradeCreated(result)
+ * - dismissCluster(clusterId, source)
+ * - forceRefresh(source)
  */
 
 (function () {
@@ -665,6 +675,115 @@
       `;
     },
 
+    /**
+     * Ensure all modal dependencies are loaded before opening the trade modal.
+     * Loads scripts sequentially with caching and validates required globals.
+     *
+     * @returns {Promise<void>} Resolves when dependencies are available.
+     */
+    async ensureTradeModalDependencies() {
+      if (this.dependencyPromise) {
+        return this.dependencyPromise;
+      }
+
+      const coreScripts = [
+        'scripts/modal-navigation-manager.js?v=1.0.0',
+        'scripts/modal-manager-v2.js?v=1.0.0'
+      ];
+      const dependentScripts = [
+        'scripts/services/investment-calculation-service.js?v=1.0.0',
+        'scripts/trade-selector-modal.js?v=1.0.0',
+        'scripts/modal-configs/trades-config.js?v=1.0.0',
+        'scripts/trades.js?v=1.0.0',
+        'scripts/validation-utils.js?v=1.0.0'
+      ];
+      const bootstrapScript = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
+
+      const fallbackLoader = async (sources) => {
+        if (typeof window.loadScriptsOnce === 'function') {
+          await window.loadScriptsOnce(sources);
+          return;
+        }
+
+        for (const source of sources) {
+          if (!source) {
+            continue;
+          }
+          if (typeof window.loadScriptOnce === 'function') {
+            await window.loadScriptOnce(source);
+            continue;
+          }
+
+          await new Promise((resolve, reject) => {
+            const scriptElement = document.createElement('script');
+            scriptElement.src = source;
+            scriptElement.async = true;
+            scriptElement.dataset.loader = 'pending-execution-trade-creation/fallback';
+            scriptElement.onload = resolve;
+            scriptElement.onerror = (event) => {
+              const error = new Error(`Failed to load script: ${source}`);
+              error.event = event;
+              reject(error);
+            };
+            document.head.appendChild(scriptElement);
+          });
+        }
+      };
+
+      const ensureModalManagerReady = () => {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+          return;
+        }
+
+        if (typeof ModalManagerV2 === 'function') {
+          try {
+            // Lazy instantiate to replace the DOMContentLoaded auto-init that already fired
+            new ModalManagerV2();
+            window.Logger?.info('✅ ModalManagerV2 initialized via lazy loader', { page: 'trade-create-widget' });
+          } catch (error) {
+            window.Logger?.error('❌ Failed to lazily initialize ModalManagerV2', { page: 'trade-create-widget', error: error?.message });
+          }
+        }
+      };
+
+      this.dependencyPromise = (async () => {
+        if (!window.bootstrap) {
+          await fallbackLoader([bootstrapScript]);
+        }
+        await fallbackLoader(coreScripts);
+        ensureModalManagerReady();
+        if (!window.bootstrap) {
+          await fallbackLoader([bootstrapScript]);
+        }
+        await fallbackLoader(dependentScripts);
+        ensureModalManagerReady();
+
+        if (!window.ModalManagerV2 || typeof window.ModalManagerV2.showModal !== 'function') {
+          throw new Error('ModalManagerV2 not available after loading dependencies');
+        }
+        if (!window.bootstrap) {
+          throw new Error('Bootstrap not available after loading dependencies');
+        }
+        if (!window.saveTrade) {
+          throw new Error('saveTrade handler not available after loading dependencies');
+        }
+        if (!window.validateEntityForm) {
+          throw new Error('Validation system not available after loading dependencies');
+        }
+      })().catch(error => {
+        this.dependencyPromise = null;
+        throw error;
+      });
+
+      return this.dependencyPromise;
+    },
+
+    /**
+     * Open the trade modal with prefilled data for the selected execution cluster.
+     *
+     * @param {string} clusterId - Identifier of the execution cluster.
+     * @returns {Promise<void>}
+     */
     async openTradeModalFromCluster(clusterId) {
       const cluster = this.state.clusterMap.get(clusterId);
       if (!cluster) {
@@ -686,6 +805,16 @@
       if (!selectedExecutions.length) {
         if (typeof window.showWarningNotification === 'function') {
           window.showWarningNotification('לא נבחרו ביצועים', 'בחר לפחות ביצוע אחד לפני יצירת טרייד');
+        }
+        return;
+      }
+
+      try {
+        await this.ensureTradeModalDependencies();
+      } catch (error) {
+        window.Logger?.error('❌ Failed to load trade modal dependencies', { error: error?.message }, { page: 'trade-create-widget' });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה בטעינת רכיבי יצירת טרייד', error?.message || 'לא ניתן לטעון את רכיבי המודל כעת. נסה שוב מאוחר יותר.');
         }
         return;
       }

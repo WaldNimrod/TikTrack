@@ -144,6 +144,21 @@ The unified initialization system includes a comprehensive section state persist
 | `window.restoreTicker(tickerId)` | Restore ticker |
 | `window.deleteTicker(tickerId)` | Delete ticker |
 | `window.loadSectionStates()` | Load section states from localStorage |
+| `window.loadScriptOnce(src, options)` | Load external script once with cached promise & timeout control |
+| `window.loadScriptsOnce(sources, options)` | Sequential loader that preserves order across multiple scripts |
+
+### Lazy Script Loading Utilities
+The dashboard widgets use the shared script loader utilities to avoid loading heavy trade-modals on initial render.  
+`PendingExecutionTradeCreation.ensureTradeModalDependencies()` relies on `loadScriptOnce`/`loadScriptsOnce` to fetch:
+- Bootstrap bundle (guard rails ensure `window.bootstrap` קיים לפני קריאת `ModalManagerV2`)
+- Modal navigation & manager systems
+- Trade modal configuration (selectors, save handler)
+- Validation utilities
+
+This guarantees:
+- Zero redundant script tags across widgets
+- Deterministic load order before opening the trade modal
+- Clear error reporting when a dependency fails
 
 ### 📊 Data Utilities (`data-utils.js`)
 | Function | Description |
@@ -203,6 +218,15 @@ The unified initialization system includes a comprehensive section state persist
 | `window.showInfoNotification(title, message)` | Show info notification |
 | `window.showDetailsModal(title, content, options)` | Show details modal with close button |
 | `window.loadLinkedItemsData(itemId, itemType)` | Load linked items data |
+
+### 🏠 Dashboard Loader (`index.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadDashboardData(options)` | מאחד טעינת טריידים, התראות, חשבונות ותזרימי מזומנים עם `CacheTTLGuard`/`UnifiedCacheManager`, ומעדכן את כרטיסי הדשבורד וה-Info Summary |
+| `window.refreshDashboard(force)` | עטיפה נוחה לטעינה כפויה (כולל איפוס מטמון) לשימוש בכפתורי רענון ותסריטי ניטור |
+| `window.dashboardDataState` | אובייקט סטטוס המכיל את זמן הטעינה האחרון, מקור הנתונים (cache/network) וה- snapshot האחרון שהוזרק ל-UI |
+
+> **Implementation notes:** מערך הטעינה משתמש ב-`FieldRendererService` לעיצוב סכומים ותאריכים, מוודא שמזהי המטבע מתקבלים מחשבונות/טריידים, ורושם שגיאות דרך `Logger` + מערכת ההתראות המאוחדת. כך נשמרת תאימות לכללי "אין נתוני דמו" וכן לדרישות ה-Cache Stage B-Lite.
 
 ### 📋 Table System (`tables.js`)
 | Function | Description |

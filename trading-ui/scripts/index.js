@@ -77,6 +77,551 @@ window.homeCharts = {
     mixedChart: null
 };
 
+const DASHBOARD_DATA_KEY = 'dashboard-data';
+const DASHBOARD_DATA_TTL = 60000;
+let dashboardDataPromise = null;
+const dashboardDataState = {
+    lastLoadedAt: null,
+    source: null,
+    data: null
+};
+
+const DASHBOARD_ENDPOINTS = Object.freeze({
+    trades: '/api/trades/',
+    alerts: '/api/alerts/',
+    accounts: '/api/trading-accounts/',
+    cashFlows: '/api/cash-flows/'
+});
+
+const SIDE_LABELS = Object.freeze({
+    long: 'לונג',
+    short: 'שורט',
+    buy: 'קניה',
+    sell: 'מכירה'
+});
+
+function toNumber(value) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        return value;
+    }
+    const parsed = parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function resolveDateValue(value) {
+    if (!value && value !== 0) {
+        return null;
+    }
+    if (typeof value === 'string') {
+        return value;
+    }
+    if (typeof value === 'object') {
+        return value.utc || value.local || value.display || value.iso || null;
+    }
+    return null;
+}
+
+function formatDateShort(value) {
+    const resolved = resolveDateValue(value);
+    if (!resolved) {
+        return '';
+    }
+    if (window.FieldRendererService?.renderDateShort) {
+        try {
+            return window.FieldRendererService.renderDateShort(resolved) || '';
+        } catch (error) {
+            window.Logger?.warn?.('⚠️ renderDateShort failed', { error: error?.message }, { page: 'index' });
+        }
+    }
+    try {
+        const dateObj = new Date(resolved);
+        if (Number.isNaN(dateObj.getTime())) {
+            return '';
+        }
+        return dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    } catch (error) {
+        window.Logger?.warn?.('⚠️ formatDateShort fallback failed', { error: error?.message }, { page: 'index' });
+        return '';
+    }
+}
+
+function normalizeArray(payload) {
+    if (!payload) {
+        return [];
+    }
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+    if (Array.isArray(payload.data)) {
+        return payload.data;
+    }
+    if (payload.data && Array.isArray(payload.data.records)) {
+        return payload.data.records;
+    }
+    if (payload.data && Array.isArray(payload.data.data)) {
+        return payload.data.data;
+    }
+    if (Array.isArray(payload.records)) {
+        return payload.records;
+    }
+    return [];
+}
+
+function determineCurrencySymbol(accounts = [], trades = []) {
+    for (const account of accounts) {
+        if (account?.currency_symbol) {
+            return account.currency_symbol;
+        }
+        if (account?.currency?.symbol) {
+            return account.currency.symbol;
+        }
+    }
+    for (const trade of trades) {
+        if (trade?.currency_symbol) {
+            return trade.currency_symbol;
+        }
+        if (trade?.ticker?.currency_symbol) {
+            return trade.ticker.currency_symbol;
+        }
+        if (trade?.ticker?.currency?.symbol) {
+            return trade.ticker.currency.symbol;
+        }
+    }
+    return '$';
+}
+
+function formatAmountHtml(value, currencySymbol = '$', decimals = 2) {
+    const numericValue = toNumber(value);
+    if (!Number.isFinite(numericValue)) {
+        return '<span class="text-muted">לא זמין</span>';
+    }
+    if (window.FieldRendererService?.renderAmount) {
+        try {
+            return window.FieldRendererService.renderAmount(numericValue, currencySymbol, decimals, true);
+        } catch (error) {
+            window.Logger?.warn?.('⚠️ renderAmount failed', { error: error?.message }, { page: 'index' });
+        }
+    }
+    return `${currencySymbol}${numericValue.toFixed(decimals)}`;
+}
+
+function translateSide(side) {
+    if (!side && side !== 0) {
+        return '';
+    }
+    const normalized = side.toString().toLowerCase();
+    if (window.FieldRendererService?.renderSide) {
+        try {
+            return window.FieldRendererService.renderSide(normalized);
+        } catch (error) {
+            window.Logger?.warn?.('⚠️ renderSide failed', { error: error?.message }, { page: 'index' });
+        }
+    }
+    return SIDE_LABELS[normalized] || side;
+}
+
+function computePortfolioPnL(trades = [], accounts = [], cashFlows = []) {
+    let total = 0;
+    trades.forEach((trade) => {
+        if (trade?.position?.unrealized_pl) {
+            total += toNumber(trade.position.unrealized_pl);
+        }
+        if (trade?.position?.realized_pl) {
+            total += toNumber(trade.position.realized_pl);
+        } else if (!trade?.position && trade?.total_pl) {
+            total += toNumber(trade.total_pl);
+        } else if (trade?.profit_loss) {
+            total += toNumber(trade.profit_loss);
+        }
+    });
+    if (total === 0 && accounts.length) {
+        accounts.forEach((account) => {
+            if (account?.total_pl) {
+                total += toNumber(account.total_pl);
+            }
+        });
+    }
+    if (total === 0 && cashFlows.length) {
+        const income = cashFlows
+            .filter((flow) => (flow.type || '').toLowerCase() === 'income')
+            .reduce((sum, flow) => sum + toNumber(flow.amount), 0);
+        const expenses = cashFlows
+            .filter((flow) => (flow.type || '').toLowerCase() === 'expense')
+            .reduce((sum, flow) => sum + toNumber(flow.amount), 0);
+        total += income + expenses;
+    }
+    return total;
+}
+
+function updateSummaryStats(data, currencySymbol) {
+    const { trades = [], alerts = [], accounts = [], cashFlows = [] } = data;
+
+    const totalTradesEl = document.getElementById('totalTrades');
+    if (totalTradesEl) {
+        totalTradesEl.textContent = trades.length.toLocaleString('he-IL');
+    }
+
+    const totalAlertsEl = document.getElementById('totalAlerts');
+    if (totalAlertsEl) {
+        totalAlertsEl.textContent = alerts.length.toLocaleString('he-IL');
+    }
+
+    const balance = accounts.reduce((sum, account) => {
+        const value = account?.total_value ?? account?.opening_balance ?? 0;
+        return sum + toNumber(value);
+    }, 0);
+    const balanceEl = document.getElementById('currentBalance');
+    if (balanceEl) {
+        balanceEl.innerHTML = formatAmountHtml(balance, currencySymbol);
+    }
+
+    const totalPnL = computePortfolioPnL(trades, accounts, cashFlows);
+    const totalPnLEl = document.getElementById('totalPnL');
+    if (totalPnLEl) {
+        totalPnLEl.innerHTML = formatAmountHtml(totalPnL, currencySymbol);
+    }
+}
+
+function updateRecentTrades(trades = [], currencySymbol) {
+    const container = document.getElementById('recentTrades');
+    if (!container) {
+        return;
+    }
+
+    if (!Array.isArray(trades) || trades.length === 0) {
+        container.innerHTML = '<div class="text-muted small">אין טריידים זמינים</div>';
+        return;
+    }
+
+    const sorted = [...trades].sort((a, b) => {
+        const dateA = new Date(resolveDateValue(a?.created_at || a?.opened_at || a?.entry_date) || 0).getTime();
+        const dateB = new Date(resolveDateValue(b?.created_at || b?.opened_at || b?.entry_date) || 0).getTime();
+        return dateB - dateA;
+    });
+
+    const topTrades = sorted.slice(0, 5);
+    const list = document.createElement('ul');
+    list.className = 'list-group list-group-flush';
+
+    topTrades.forEach((trade) => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item d-flex justify-content-between align-items-start gap-2';
+
+        const mainWrap = document.createElement('div');
+        mainWrap.className = 'd-flex flex-column';
+
+        const title = document.createElement('span');
+        title.className = 'fw-semibold';
+        title.textContent = trade?.ticker?.symbol || trade?.symbol || (trade?.id ? `טרייד #${trade.id}` : 'לא זמין');
+        mainWrap.appendChild(title);
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'd-flex flex-wrap align-items-center gap-2 text-muted small';
+
+        const sideHtml = translateSide(trade?.side || trade?.position?.side || '');
+        if (sideHtml) {
+            const sideSpan = document.createElement('span');
+            if (typeof sideHtml === 'string' && sideHtml.includes('<')) {
+                sideSpan.innerHTML = sideHtml;
+            } else {
+                sideSpan.textContent = sideHtml;
+            }
+            metaRow.appendChild(sideSpan);
+        }
+
+        const quantity = trade?.position?.quantity ?? trade?.quantity;
+        if (quantity !== undefined && quantity !== null) {
+            const qtySpan = document.createElement('span');
+            qtySpan.textContent = `כמות: ${toNumber(quantity).toLocaleString('he-IL')}`;
+            metaRow.appendChild(qtySpan);
+        }
+
+        const dateLabel = formatDateShort(trade?.created_at || trade?.opened_at || trade?.entry_date);
+        if (dateLabel) {
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = dateLabel;
+            metaRow.appendChild(dateSpan);
+        }
+
+        mainWrap.appendChild(metaRow);
+        item.appendChild(mainWrap);
+
+        const amountWrapper = document.createElement('div');
+        amountWrapper.className = 'text-muted small text-end';
+        const value = trade?.position?.market_value ?? trade?.position?.current_value ?? trade?.entry_price;
+        if (value !== undefined && value !== null) {
+            amountWrapper.innerHTML = formatAmountHtml(value, currencySymbol);
+        } else {
+            amountWrapper.textContent = 'לא זמין';
+        }
+        item.appendChild(amountWrapper);
+
+        list.appendChild(item);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(list);
+}
+
+function updateActiveAlerts(alerts = []) {
+    const container = document.getElementById('activeAlerts');
+    if (!container) {
+        return;
+    }
+
+    if (!Array.isArray(alerts) || alerts.length === 0) {
+        container.innerHTML = '<div class="text-muted small">אין התראות זמינות</div>';
+        return;
+    }
+
+    const activeAlerts = alerts.filter((alert) => (alert?.status || '').toLowerCase() === 'active');
+    const alertSubset = (activeAlerts.length ? activeAlerts : alerts).slice(0, 5);
+
+    const list = document.createElement('ul');
+    list.className = 'list-group list-group-flush';
+
+    alertSubset.forEach((alert) => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item d-flex justify-content-between align-items-start gap-2';
+
+        const mainWrap = document.createElement('div');
+        mainWrap.className = 'd-flex flex-column';
+
+        const title = document.createElement('span');
+        title.className = 'fw-semibold';
+        title.textContent = alert?.title || alert?.name || (alert?.id ? `התראה #${alert.id}` : 'לא זמין');
+        mainWrap.appendChild(title);
+
+        const metaRow = document.createElement('div');
+        metaRow.className = 'd-flex flex-wrap align-items-center gap-2 text-muted small';
+
+        if (alert?.status) {
+            const statusHtml = window.FieldRendererService?.renderStatus?.(alert.status, 'alert');
+            const statusSpan = document.createElement('span');
+            if (statusHtml && statusHtml.includes('<')) {
+                statusSpan.innerHTML = statusHtml;
+            } else {
+                statusSpan.textContent = statusHtml || alert.status;
+            }
+            metaRow.appendChild(statusSpan);
+        }
+
+        if (alert?.priority) {
+            const priorityHtml = window.FieldRendererService?.renderPriority?.(alert.priority);
+            const prioritySpan = document.createElement('span');
+            if (priorityHtml && priorityHtml.includes('<')) {
+                prioritySpan.innerHTML = priorityHtml;
+            } else {
+                prioritySpan.textContent = alert.priority;
+            }
+            metaRow.appendChild(prioritySpan);
+        }
+
+        const relatedSymbol = alert?.related_symbol || alert?.ticker?.symbol;
+        if (relatedSymbol) {
+            const symbolSpan = document.createElement('span');
+            symbolSpan.textContent = relatedSymbol;
+            metaRow.appendChild(symbolSpan);
+        }
+
+        const dateLabel = formatDateShort(alert?.created_at || alert?.triggered_at || alert?.updated_at);
+        if (dateLabel) {
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = dateLabel;
+            metaRow.appendChild(dateSpan);
+        }
+
+        mainWrap.appendChild(metaRow);
+        item.appendChild(mainWrap);
+
+        list.appendChild(item);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(list);
+}
+
+function updateDashboardCount({ trades = [], alerts = [], accounts = [] }) {
+    const countEl = document.getElementById('dashboardCount');
+    if (!countEl) {
+        return;
+    }
+
+    const activeAlerts = alerts.filter((alert) => (alert?.status || '').toLowerCase() === 'active');
+    countEl.textContent = `טריידים: ${trades.length.toLocaleString('he-IL')} • התראות פעילות: ${activeAlerts.length.toLocaleString('he-IL')} • חשבונות: ${accounts.length.toLocaleString('he-IL')}`;
+}
+
+function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, currencySymbol) {
+    const container = document.getElementById('portfolioSummaryStats');
+    if (!container) {
+        return;
+    }
+
+    if (!accounts.length) {
+        container.innerHTML = '<div class="text-muted small">אין נתוני פורטפוליו זמינים</div>';
+        return;
+    }
+
+    const activeAccounts = accounts.filter((account) => (account?.status || '').toLowerCase() === 'open');
+    const totalValue = accounts.reduce((sum, account) => {
+        const value = account?.total_value ?? account?.opening_balance ?? 0;
+        return sum + toNumber(value);
+    }, 0);
+    const avgValue = accounts.length ? totalValue / accounts.length : 0;
+    const openTrades = trades.filter((trade) => (trade?.status || '').toLowerCase() === 'open');
+    const pnl = computePortfolioPnL(trades, accounts, cashFlows);
+
+    container.innerHTML = `
+        <div class="d-flex flex-wrap gap-3 text-muted small">
+            <span>חשבונות פעילים: ${activeAccounts.length.toLocaleString('he-IL')} מתוך ${accounts.length.toLocaleString('he-IL')}</span>
+            <span>שווי כולל: ${formatAmountHtml(totalValue, currencySymbol)}</span>
+            <span>שווי ממוצע לחשבון: ${formatAmountHtml(avgValue, currencySymbol)}</span>
+            <span>טריידים פתוחים: ${openTrades.length.toLocaleString('he-IL')}</span>
+            <span>P/L כולל: ${formatAmountHtml(pnl, currencySymbol)}</span>
+        </div>
+    `;
+}
+
+function showDashboardError(message) {
+    const fallback = message || 'שגיאה בטעינת נתוני הדשבורד';
+    const recentContainer = document.getElementById('recentTrades');
+    if (recentContainer) {
+        recentContainer.innerHTML = `<div class="text-danger small">${fallback}</div>`;
+    }
+    const alertsContainer = document.getElementById('activeAlerts');
+    if (alertsContainer) {
+        alertsContainer.innerHTML = `<div class="text-danger small">${fallback}</div>`;
+    }
+    const countEl = document.getElementById('dashboardCount');
+    if (countEl) {
+        countEl.textContent = 'שגיאה בטעינת נתונים';
+    }
+}
+
+function handleDashboardError(error) {
+    const message = error?.message || 'שגיאה בטעינת נתוני הדשבורד';
+    window.Logger?.error?.('❌ Error loading dashboard data', { message, stack: error?.stack }, { page: 'index' });
+    if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', message, 6000, 'system');
+    }
+    showDashboardError(message);
+}
+
+function processDashboardData(data, source = 'network') {
+    if (!data) {
+        return;
+    }
+
+    const trades = Array.isArray(data.trades) ? data.trades : [];
+    const alerts = Array.isArray(data.alerts) ? data.alerts : [];
+    const accounts = Array.isArray(data.accounts) ? data.accounts : [];
+    const cashFlows = Array.isArray(data.cashFlows) ? data.cashFlows : [];
+    const currencySymbol = determineCurrencySymbol(accounts, trades);
+
+    updateSummaryStats({ trades, alerts, accounts, cashFlows }, currencySymbol);
+    updateRecentTrades(trades, currencySymbol);
+    updateActiveAlerts(alerts);
+    updateDashboardCount({ trades, alerts, accounts });
+    updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
+
+    dashboardDataState.lastLoadedAt = Date.now();
+    dashboardDataState.source = source;
+    dashboardDataState.data = { trades, alerts, accounts, cashFlows };
+    window.dashboardData = dashboardDataState.data;
+}
+
+async function fetchDashboardDataFromApi() {
+    const fetchJsonList = async (url, label) => {
+        const response = await fetch(url, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error(`טעינת ${label} נכשלה (${response.status})`);
+        }
+        const payload = await response.json();
+        if (payload?.status && payload.status !== 'success') {
+            const errorMessage = payload?.error?.message || payload?.message || `טעינת ${label} נכשלה`;
+            throw new Error(errorMessage);
+        }
+        return normalizeArray(payload);
+    };
+
+    const [trades, alerts, accounts, cashFlows] = await Promise.all([
+        fetchJsonList(DASHBOARD_ENDPOINTS.trades, 'טריידים').catch((error) => {
+            window.Logger?.error?.('❌ Failed to load trades for dashboard', { error: error?.message }, { page: 'index' });
+            throw error;
+        }),
+        fetchJsonList(DASHBOARD_ENDPOINTS.alerts, 'התראות').catch((error) => {
+            window.Logger?.error?.('❌ Failed to load alerts for dashboard', { error: error?.message }, { page: 'index' });
+            throw error;
+        }),
+        fetchJsonList(DASHBOARD_ENDPOINTS.accounts, 'חשבונות מסחר').catch((error) => {
+            window.Logger?.error?.('❌ Failed to load trading accounts for dashboard', { error: error?.message }, { page: 'index' });
+            throw error;
+        }),
+        fetchJsonList(DASHBOARD_ENDPOINTS.cashFlows, 'תזרימי מזומנים').catch((error) => {
+            window.Logger?.warn?.('⚠️ Failed to load cash flows for dashboard', { error: error?.message }, { page: 'index' });
+            return [];
+        })
+    ]);
+
+    const result = { trades, alerts, accounts, cashFlows };
+    processDashboardData(result, 'network');
+    return result;
+}
+
+window.loadDashboardData = async function(options = {}) {
+    const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
+
+    if (!force && dashboardDataPromise) {
+        return dashboardDataPromise;
+    }
+
+    const executeLoad = async () => {
+        if (force && window.UnifiedCacheManager?.clearByPattern) {
+            try {
+                await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
+            } catch (clearError) {
+                window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+            }
+        }
+
+        if (window.CacheTTLGuard?.ensure && !force) {
+            return window.CacheTTLGuard.ensure(DASHBOARD_DATA_KEY, fetchDashboardDataFromApi, {
+                ttl,
+                afterRead: (cached) => {
+                    if (cached) {
+                        processDashboardData(cached, 'cache');
+                    }
+                }
+            });
+        }
+
+        return fetchDashboardDataFromApi();
+    };
+
+    dashboardDataPromise = executeLoad()
+        .catch((error) => {
+            handleDashboardError(error);
+            throw error;
+        })
+        .finally(() => {
+            dashboardDataPromise = null;
+        });
+
+    return dashboardDataPromise;
+};
+
+if (typeof window.refreshDashboard !== 'function') {
+    window.refreshDashboard = async function(force = false) {
+        return window.loadDashboardData({ force, ttl: DASHBOARD_DATA_TTL });
+    };
+}
+
+window.dashboardDataState = dashboardDataState;
+
 // ===== TAB MANAGEMENT =====
 /**
  * Switch between table tabs on the index page
@@ -109,7 +654,9 @@ function switchTableTab(tabName) {
  */
 function refreshOverview() {
     window.Logger.info('Refreshing overview data...', { page: "index" });
-    // Implement data fetching and UI update for overview section
+    window.loadDashboardData().catch((error) => {
+        window.Logger?.error?.('❌ Error refreshing dashboard overview', { message: error?.message }, { page: 'index' });
+    });
 }
 
 /**

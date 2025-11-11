@@ -10,13 +10,13 @@
     "notes": "Add data import page and history dashboard"
   },
   "development": {
-    "version": "1.0.2.0",
+    "version": "1.0.3.0",
     "major": 1,
     "minor": 0,
-    "patch": 2,
+    "patch": 3,
     "build": 0,
-    "commit": "8b3f1d8af5fc366fd9af36470254b25be42700d4",
-    "updated_at": "2025-11-10T22:38:03+00:00",
-    "notes": "Enhance import metadata and UI cleanup"
+    "commit": "3e9cacd7ba6349e969ed78604cbc4f4583781781",
+    "updated_at": "2025-11-11T00:32:03+00:00",
+    "notes": "Document dashboard data loader and ensure trade modal bootstrap load"
   }
 }

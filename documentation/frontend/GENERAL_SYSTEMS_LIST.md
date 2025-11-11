@@ -11,7 +11,7 @@
 | מערכת התראות | `trading-ui/scripts/notification-system.js` | [NOTIFICATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM.md) | שכבת התראות אחידה (Success/Error/Info/Warning/Details) |
 | Modal Manager V2 | `trading-ui/scripts/modal-manager-v2.js` | [MODAL_SYSTEM_V2.md](../02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md) | ניהול פתיחה, עריכה, מחיקה ותרחישי CRUD אחידים במודלים |
 | Modal Navigation System | `trading-ui/scripts/modal-navigation-manager.js` | [MODAL_NAVIGATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/MODAL_NAVIGATION_SYSTEM.md) | ניווט stack של מודלים, breadcrumb, backdrop מאוחד |
-| UI Utilities & Section Toggle | `trading-ui/scripts/ui-utils.js` | [SECTION_TOGGLE_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/SECTION_TOGGLE_SYSTEM.md)<br>[JAVASCRIPT_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md#ui-utilities) | פונקציות משותפות ל-Toggle, Refresh, טיפול בפעולות UI כלליות |
+| UI Utilities & Section Toggle | `trading-ui/scripts/ui-utils.js` | [SECTION_TOGGLE_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/SECTION_TOGGLE_SYSTEM.md)<br>[JAVASCRIPT_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md#ui-utilities) | פונקציות משותפות ל-Toggle, Refresh, טיפול בפעולות UI כלליות + כלי טעינת סקריפטים עצלה (`loadScriptOnce`, `loadScriptsOnce`) |
 | Page State Management | `trading-ui/scripts/page-utils.js` | [PAGE_STATE_MANAGEMENT_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/PAGE_STATE_MANAGEMENT_SYSTEM.md) | שמירת מצב עמוד, שחזור פילטרים וסקשנים, איפוס מצב |
 | Translation Utilities | `trading-ui/scripts/translation-utils.js` | [TRANSLATION_FUNCTIONS.md](../02-ARCHITECTURE/FRONTEND/TRANSLATION_FUNCTIONS.md) | טיפול במחרוזות, בחירת שפה ותמיכה ב-RTL |
 | Event Handler Manager | `trading-ui/scripts/event-handler-manager.js` | [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md) | Delegation גלובלי, מניעת כפילויות, ניטור האזנות |
@@ -20,6 +20,7 @@
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Data Collection Service | `trading-ui/scripts/services/data-collection-service.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | איסוף/הצבת נתוני טפסים במפה אחידה והמרות טיפוס |
+| Dashboard Data Loader | `trading-ui/scripts/index.js` | [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#dashboard-loader-indexjs) | טעינת נתוני דשבורד אמיתיים + עיבוד מטבעות/סיכומים עם CacheTTLGuard |
 | Investment Calculation Service | `trading-ui/scripts/services/investment-calculation-service.js` | [INVESTMENT_CALCULATION_SERVICE.md](INVESTMENT_CALCULATION_SERVICE.md) | חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל |
 | CRUD Response Handler | `trading-ui/scripts/services/crud-response-handler.js` | [CRUD_RESPONSE_HANDLER.md](../02-ARCHITECTURE/FRONTEND/CRUD_RESPONSE_HANDLER.md) | טיפול בתגובות CRUD, סגירת מודלים, הודעות ושחזור טבלאות |
 | Select Populator Service | `trading-ui/scripts/services/select-populator-service.js` | [SELECT_POPULATOR_SERVICE.md](../02-ARCHITECTURE/FRONTEND/SELECT_POPULATOR_SERVICE.md) | מילוי Selectים מבוססי API כולל caching, fallback ושמירת העדפות |

@@ -13,3 +13,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-11T00:32:03+00:00 | 1.0.3.0 | 1.0.2.0 | 3e9cacd7ba6349e969ed78604cbc4f4583781781 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Document dashboard data loader and ensure trade modal bootstrap load |
 | 2025-11-11T00:54:34+00:00 | 1.0.4.0 | 1.0.3.0 | 01c735221df88555af989a0a718215c6a618ae70 | 3e9cacd7ba6349e969ed78604cbc4f4583781781 | patch | Resync preferences page assets |
 | 2025-11-11T01:01:46+00:00 | 1.0.5.0 | 1.0.4.0 | ab26eb7a516afef0b851e4a08da7fabbb9e1197d | 01c735221df88555af989a0a718215c6a618ae70 | patch | Document active alerts component and add API path audit tool |
+| 2025-11-11T01:30:37+00:00 | 1.0.6.0 | 1.0.5.0 | b79e7f3216a3384aaf8c166b2141cb9efaebaae6 | ab26eb7a516afef0b851e4a08da7fabbb9e1197d | patch | Standardize API path naming to hyphen format |

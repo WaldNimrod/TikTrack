@@ -347,7 +347,7 @@ test.describe('Cross-Page Consistency', () => {
     await page.waitForLoadState('networkidle');
     
     // Simulate network failure
-    await page.route('**/api/cash_flows', route => route.abort());
+    await page.route('**/api/cash-flows', route => route.abort());
     
     // Try to load data
     await page.reload();

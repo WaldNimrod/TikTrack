@@ -28,9 +28,9 @@ No connection to testing system!
     /api/trading-accounts    # Trading Accounts
     /api/trades              # Trades
     /api/tickers             # Tickers
-    /api/trade_plans         # Plans
+    /api/trade-plans         # Plans
     /api/alerts              # Alerts
-    /api/cash_flows          # Cash flows
+    /api/cash-flows          # Cash flows
     /api/notes               # Notes
     /api/executions          # Executions
     /api/tests/run        # Run tests (testing system)

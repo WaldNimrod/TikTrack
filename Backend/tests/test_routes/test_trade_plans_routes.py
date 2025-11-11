@@ -35,7 +35,7 @@ class TestTradePlansRoutes(unittest.TestCase):
         }
         mock_get_all.return_value = [mock_plan]
 
-        response = self.client.get("/api/trade_plans/")
+        response = self.client.get("/api/trade-plans/")
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
         self.assertEqual(payload["status"], "success")

@@ -44,11 +44,11 @@ async function loadAllTables() {
     { api: 'trading-accounts', container: 'accountsContainer' },
     { api: 'trades', container: 'tradesContainer' },
     { api: 'tickers', container: 'tickersContainer' },
-    { api: 'trade_plans', container: 'tradePlansContainer' },
+    { api: 'trade-plans', container: 'tradePlansContainer' },
     { api: 'executions', container: 'executionsContainer' },
     { api: 'alerts', container: 'alertsContainer' },
     { api: 'notes', container: 'notesContainer' },
-    { api: 'cash_flows', container: 'cashFlowsContainer' }
+    { api: 'cash-flows', container: 'cashFlowsContainer' }
   ];
   
   totalRecords = 0;
@@ -188,11 +188,11 @@ function getSectionId(tableType) {
     'trading-accounts': 'accountsSection',
     'trades': 'tradesSection',
     'tickers': 'tickersSection',
-    'trade_plans': 'tradePlansSection',
+    'trade-plans': 'tradePlansSection',
     'executions': 'executionsSection',
     'alerts': 'alertsSection',
     'notes': 'notesSection',
-    'cash_flows': 'cashFlowsSection'
+    'cash-flows': 'cashFlowsSection'
   };
   return mapping[tableType] || tableType + 'Section';
 }
@@ -207,11 +207,11 @@ function getContainerId(tableType) {
     'trading-accounts': 'accountsContainer',
     'trades': 'tradesContainer',
     'tickers': 'tickersContainer',
-    'trade_plans': 'tradePlansContainer',
+    'trade-plans': 'tradePlansContainer',
     'executions': 'executionsContainer',
     'alerts': 'alertsContainer',
     'notes': 'notesContainer',
-    'cash_flows': 'cashFlowsContainer'
+    'cash-flows': 'cashFlowsContainer'
   };
   return mapping[tableType] || tableType + 'Container';
 }
@@ -226,11 +226,11 @@ function getTableId(tableType) {
     'trading-accounts': 'accountsTable',
     'trades': 'tradesTable',
     'tickers': 'tickersTable',
-    'trade_plans': 'tradePlansTable',
+    'trade-plans': 'tradePlansTable',
     'executions': 'executionsTable',
     'alerts': 'alertsTable',
     'notes': 'notesTable',
-    'cash_flows': 'cashFlowsTable'
+    'cash-flows': 'cashFlowsTable'
   };
   return mapping[tableType] || tableType + 'Table';
 }
@@ -332,11 +332,11 @@ function getCountElementId(tableType) {
     'trading-accounts': 'accountsCount',
     'trades': 'tradesCount',
     'tickers': 'tickersCount',
-    'trade_plans': 'tradePlansCount',
+    'trade-plans': 'tradePlansCount',
     'executions': 'executionsCount',
     'alerts': 'alertsCount',
     'notes': 'notesCount',
-    'cash_flows': 'cashFlowsCount'
+    'cash-flows': 'cashFlowsCount'
   };
   return mapping[tableType] || tableType + 'Count';
 }

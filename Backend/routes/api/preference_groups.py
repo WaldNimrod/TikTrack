@@ -14,7 +14,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-preference_groups_bp = Blueprint('preference_groups', __name__, url_prefix='/api/preference_groups')
+preference_groups_bp = Blueprint('preference_groups', __name__, url_prefix='/api/preference-groups')
 
 def get_db_connection():
     """Get database connection"""

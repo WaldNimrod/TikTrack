@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2025-11-11T01:25:29.382Z",
+  "safeRouteMap": {
+    "account_activity": "account-activity",
+    "background_tasks": "background-tasks",
+    "cache_sync": "cache-sync",
+    "cash_flows": "cash-flows",
+    "database_schema": "database-schema",
+    "entity_details": "entity-details",
+    "external_data_providers": "external-data-providers",
+    "file_scanner": "file-scanner",
+    "linked_items": "linked-items",
+    "note_relation_types": "note-relation-types",
+    "plan_conditions": "plan-conditions",
+    "preference_groups": "preference-groups",
+    "query_optimization": "query-optimization",
+    "quotes_last": "quotes-last",
+    "system_setting_groups": "system-setting-groups",
+    "system_settings": "system-settings",
+    "trade_conditions": "trade-conditions",
+    "trade_plans": "trade-plans",
+    "trading_accounts": "trading-accounts",
+    "trading_methods": "trading-methods",
+    "user_data_import": "user-data-import",
+    "user_preferences": "user-preferences"
+  },
+  "safeReplacements": [],
+  "manualFindings": []
+}

@@ -14,7 +14,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-external_data_providers_bp = Blueprint('external_data_providers', __name__, url_prefix='/api/external_data_providers')
+external_data_providers_bp = Blueprint('external_data_providers', __name__, url_prefix='/api/external-data-providers')
 
 def get_db_connection():
     """Get database connection"""

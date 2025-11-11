@@ -14,7 +14,7 @@ import sqlite3
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_prefix='/api/user_preferences')
+user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_prefix='/api/user-preferences')
 
 def get_db_connection():
     """Get database connection"""

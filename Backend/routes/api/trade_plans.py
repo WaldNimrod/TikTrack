@@ -13,7 +13,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans')
+trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade-plans')
 
 # Initialize base API
 base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')

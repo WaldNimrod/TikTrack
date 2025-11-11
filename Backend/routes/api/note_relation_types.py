@@ -15,7 +15,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='/api/note_relation_types')
+note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='/api/note-relation-types')
 
 # Initialize base API (note_relation_types uses direct SQLite, so we'll use it selectively)
 

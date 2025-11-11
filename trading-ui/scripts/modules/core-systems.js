@@ -2448,6 +2448,8 @@ window.showClearCacheConfirmation = async function(level, currentStats) {
  */
 function showFinalSuccessModal(successInfo) {
   console.log('🔍 showFinalSuccessModal called:', { successInfo });
+  const headerColors = getBlockingModalColors('success');
+  const headerStyle = `direction: rtl; background-color: ${headerColors.backgroundColor}; color: ${headerColors.textColor}; border-bottom: 1px solid ${headerColors.borderColor};`;
   
   // Create modal HTML
   // Note: Don't add aria-hidden or inert - let Bootstrap manage these automatically
@@ -2455,17 +2457,13 @@ function showFinalSuccessModal(successInfo) {
     <div class="modal fade" id="finalSuccessModal" tabindex="-1" aria-labelledby="finalSuccessModalLabel">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header modal-header-success text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
+          <div class="modal-header modal-header-success d-flex justify-content-between align-items-center" style="${headerStyle}">
             <h4 class="modal-title fw-bold" id="finalSuccessModalLabel">
               <i class="fas fa-check-circle"></i> ${successInfo.title}
             </h4>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-light" id="finalSuccessModal-copy-btn" title="העתק פרטים ללוח">
-                <i class="fas fa-copy"></i> העתק
-              </button>
-              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" title="סגור">
-                <i class="fas fa-times"></i> סגור
-              </button>
+              <button data-button-type="COPY" id="finalSuccessModal-copy-btn" data-text="העתק" title="העתק פרטי הצלחה"></button>
+              <button data-button-type="CLOSE" id="finalSuccessModal-close-btn" data-text="סגור" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -2497,9 +2495,8 @@ function showFinalSuccessModal(successInfo) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-            <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-              <i class="fas fa-check"></i> הבנתי
-            </button>
+            <button data-button-type="COPY" id="finalSuccessModal-footer-copy" data-text="העתק" title="העתק פרטי הצלחה"></button>
+            <button data-button-type="CLOSE" id="finalSuccessModal-footer-close" data-text="סגור" title="סגור"></button>
           </div>
         </div>
       </div>
@@ -2513,12 +2510,24 @@ function showFinalSuccessModal(successInfo) {
   window.currentSuccessInfo = successInfo;
   
   // Add copy button functionality
-  const copyButton = document.getElementById('finalSuccessModal-copy-btn');
-  if (copyButton) {
-    copyButton.addEventListener('click', () => {
-      copySuccessDetails();
+  const modalElement = document.getElementById('finalSuccessModal');
+  const modalInstance = modal;
+
+  const copyButtons = modalElement ? modalElement.querySelectorAll('#finalSuccessModal-copy-btn, #finalSuccessModal-footer-copy') : [];
+  copyButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      copyBlockingModalContent(modalElement, successInfo.title, [formatSuccessForCopy(successInfo)]);
     });
-  }
+  });
+
+  const closeButtons = modalElement ? modalElement.querySelectorAll('#finalSuccessModal-close-btn, #finalSuccessModal-footer-close') : [];
+  closeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    });
+  });
 }
 
 /**
@@ -2579,23 +2588,21 @@ async function showFinalSuccessNotificationWithReload(title, message, details = 
  */
 function showFinalSuccessModalWithReload(successInfo) {
   console.log('🔍 showFinalSuccessModalWithReload called:', { successInfo });
+  const headerColors = getBlockingModalColors('success');
+  const headerStyle = `direction: rtl; background-color: ${headerColors.backgroundColor}; color: ${headerColors.textColor}; border-bottom: 1px solid ${headerColors.borderColor};`;
   
   // Create modal HTML with reload button
   const modalHtml = `
     <div class="modal fade" id="finalSuccessModalWithReload" tabindex="-1" aria-labelledby="finalSuccessModalWithReloadLabel">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header modal-header-success text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
+          <div class="modal-header modal-header-success d-flex justify-content-between align-items-center" style="${headerStyle}">
             <h4 class="modal-title fw-bold" id="finalSuccessModalWithReloadLabel">
               <i class="fas fa-check-circle"></i> ${successInfo.title}
             </h4>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-light" id="finalSuccessModal-copy-btn" title="העתק פרטים ללוח">
-                <i class="fas fa-copy"></i> העתק
-              </button>
-              <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" title="סגור">
-                <i class="fas fa-times"></i> סגור
-              </button>
+              <button data-button-type="COPY" id="finalSuccessModalWithReload-copy-btn" data-text="העתק" title="העתק פרטי הצלחה"></button>
+              <button data-button-type="CLOSE" id="finalSuccessModalWithReload-close-btn" data-text="סגור" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -2630,9 +2637,10 @@ function showFinalSuccessModalWithReload(successInfo) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: space-between; direction: rtl;">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-              <i class="fas fa-times"></i> סגור בלי רענון
-            </button>
+            <div class="d-flex gap-2">
+              <button data-button-type="COPY" id="finalSuccessModalWithReload-footer-copy" data-text="העתק" title="העתק פרטי הצלחה"></button>
+              <button data-button-type="CLOSE" id="finalSuccessModalWithReload-footer-close" data-text="סגור" title="סגור"></button>
+            </div>
             <button type="button" class="btn btn-primary" id="finalSuccessModal-reload-btn">
               <i class="fas fa-sync-alt"></i> רענן עכשיו
             </button>
@@ -2649,12 +2657,24 @@ function showFinalSuccessModalWithReload(successInfo) {
   window.currentSuccessInfo = successInfo;
   
   // Add copy button functionality
-  const copyButton = document.getElementById('finalSuccessModal-copy-btn');
-  if (copyButton) {
-    copyButton.addEventListener('click', () => {
-      copySuccessDetails();
+  const modalElement = document.getElementById('finalSuccessModalWithReload');
+  const modalInstance = modal;
+
+  const copyButtons = modalElement ? modalElement.querySelectorAll('#finalSuccessModalWithReload-copy-btn, #finalSuccessModalWithReload-footer-copy') : [];
+  copyButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      copyBlockingModalContent(modalElement, successInfo.title, [formatSuccessForCopy(successInfo)]);
     });
-  }
+  });
+
+  const closeButtons = modalElement ? modalElement.querySelectorAll('#finalSuccessModalWithReload-close-btn, #finalSuccessModalWithReload-footer-close') : [];
+  closeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    });
+  });
   
   // Add reload button functionality
   const reloadButton = document.getElementById('finalSuccessModal-reload-btn');
@@ -2693,6 +2713,8 @@ function showFinalSuccessModalWithReload(successInfo) {
 
 async function showCriticalErrorModal(errorInfo, detailedMessage) {
   console.log('🔍 showCriticalErrorModal called:', { errorInfo, detailedMessage });
+  const headerColors = getBlockingModalColors('error');
+  const headerStyle = `direction: rtl; background-color: ${headerColors.backgroundColor}; color: ${headerColors.textColor}; border-bottom: 1px solid ${headerColors.borderColor};`;
   
   // Close any existing modals
   closeAllDetailsModals();
@@ -2705,17 +2727,13 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header modal-header-danger text-white d-flex justify-content-between align-items-center" style="direction: rtl;">
+          <div class="modal-header modal-header-danger d-flex justify-content-between align-items-center" style="${headerStyle}">
             <h4 class="modal-title fw-bold" id="${modalId}-label">
               <i class="fas fa-exclamation-triangle"></i> ${errorInfo.title}
             </h4>
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm btn-warning" id="${modalId}-copy-btn" title="העתק פרטי שגיאה">
-                <i class="fas fa-copy"></i> העתק
-              </button>
-              <button type="button" class="btn btn-sm btn-secondary" id="${modalId}-close-btn" title="סגור">
-                <i class="fas fa-times"></i> סגור
-              </button>
+              <button data-button-type="COPY" id="${modalId}-copy-btn" data-text="העתק" title="העתק פרטי שגיאה"></button>
+              <button data-button-type="CLOSE" id="${modalId}-close-btn" data-text="סגור" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -2748,12 +2766,8 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
             </div>
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
-            <button type="button" class="btn btn-warning" id="${modalId}-copy-details-btn">
-              <i class="fas fa-copy"></i> העתק פרטי שגיאה
-            </button>
-            <button type="button" class="btn btn-secondary" id="${modalId}-footer-close">
-              <i class="fas fa-times"></i> סגור
-            </button>
+            <button data-button-type="COPY" id="${modalId}-copy-details-btn" data-text="העתק" title="העתק פרטי שגיאה"></button>
+            <button data-button-type="CLOSE" id="${modalId}-footer-close" data-text="סגור" title="סגור"></button>
           </div>
         </div>
       </div>
@@ -2777,19 +2791,14 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
   
   // Copy button in header
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
-  if (copyButton) {
-    copyButton.addEventListener('click', () => {
-      copyToClipboard(detailedMessage, errorInfo.title);
-    });
-  }
-  
-  // Copy button in footer
   const copyDetailsButton = modal.querySelector(`#${modalId}-copy-details-btn`);
-  if (copyDetailsButton) {
-    copyDetailsButton.addEventListener('click', () => {
-      copyToClipboard(detailedMessage, errorInfo.title);
-    });
-  }
+  [copyButton, copyDetailsButton].forEach(button => {
+    if (button) {
+      button.addEventListener('click', () => {
+        copyBlockingModalContent(modal, errorInfo.title, [detailedMessage]);
+      });
+    }
+  });
   
   // Close button in header
   const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
@@ -3387,6 +3396,100 @@ async function loadGlobalNotificationStats() {
   };
 }
 
+const BLOCKING_MODAL_COLOR_FALLBACK = {
+  success: '#28a745',
+  error: '#dc3545',
+  warning: '#ffc107',
+  info: '#17a2b8'
+};
+
+function getBlockingModalColors(type) {
+  let backgroundColor = BLOCKING_MODAL_COLOR_FALLBACK[type] || BLOCKING_MODAL_COLOR_FALLBACK.success;
+
+  try {
+    if (typeof window.getNotificationColor === 'function') {
+      backgroundColor = window.getNotificationColor(type);
+    } else if (typeof window.getEntityColor === 'function') {
+      switch (type) {
+        case 'success':
+          backgroundColor = window.getEntityColor('account') || backgroundColor;
+          break;
+        case 'error':
+          backgroundColor = window.getEntityColor('ticker') || backgroundColor;
+          break;
+        case 'warning':
+          backgroundColor = window.getEntityColor('alert') || backgroundColor;
+          break;
+        case 'info':
+          backgroundColor = window.getEntityColor('execution') || backgroundColor;
+          break;
+        default:
+          backgroundColor = window.getEntityColor(type) || backgroundColor;
+      }
+    }
+  } catch (error) {
+    if (window.Logger && window.Logger.warn) {
+      window.Logger.warn('⚠️ Failed to resolve blocking modal color, using fallback', error, { page: 'core-systems' });
+    } else {
+      console.warn('⚠️ Failed to resolve blocking modal color, using fallback:', error);
+    }
+  }
+
+  return {
+    backgroundColor,
+    borderColor: backgroundColor,
+    textColor: '#ffffff'
+  };
+}
+
+function extractModalContentText(modalElement) {
+  if (!modalElement) {
+    return '';
+  }
+
+  const contentElement = modalElement.querySelector('.modal-content');
+  if (!contentElement) {
+    return '';
+  }
+
+  // Clone element to avoid modifying DOM
+  const clone = contentElement.cloneNode(true);
+
+  // Remove buttons to avoid duplicating action labels if needed
+  clone.querySelectorAll('button').forEach(button => {
+    button.remove();
+  });
+
+  const rawText = clone.innerText || '';
+  return rawText
+    .replace(/\u00A0/g, ' ') // replace non-breaking spaces
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function copyBlockingModalContent(modalElement, title, fallbackSegments = []) {
+  const segments = [];
+  const modalText = extractModalContentText(modalElement);
+  if (modalText) {
+    segments.push(modalText);
+  }
+
+  (fallbackSegments || []).forEach(segment => {
+    if (segment) {
+      segments.push(segment);
+    }
+  });
+
+  if (!segments.length) {
+    segments.push('תוכן לא זמין להעתקה');
+  }
+
+  const content = segments.join('\n\n');
+  const resolvedTitle = title || 'TikTrack Modal Details';
+
+  copyToClipboard(content, resolvedTitle);
+}
+
 /**
  * Format success information for copying
  * NOTIFICATION SYSTEM - Formats success details for clipboard
@@ -3434,17 +3537,17 @@ ${successInfo.performance ? `⚡ ביצועים:\n${JSON.stringify(successInfo.p
 
 // Global function for copying success details
 window.copySuccessDetails = function() {
-  if (window.currentSuccessInfo) {
-    const successText = formatSuccessForCopy(window.currentSuccessInfo);
-    navigator.clipboard.writeText(successText).then(() => {
-      console.log('Success details copied to clipboard');
-      // Show simple success notification to avoid recursion
-      window.showSuccessNotification('פרטי ההצלחה הועתקו ללוח', 'הפרטים הועתקו בהצלחה');
-    }).catch(err => {
-      console.error('Failed to copy success details:', err);
-      window.showErrorNotification('שגיאה בהעתקה', 'לא ניתן להעתיק את פרטי ההצלחה');
-    });
+  if (!window.currentSuccessInfo) {
+    if (window.Logger && window.Logger.warn) {
+      window.Logger.warn('⚠️ copySuccessDetails called without currentSuccessInfo', null, { page: 'core-systems' });
+    } else {
+      console.warn('⚠️ copySuccessDetails called without currentSuccessInfo');
+    }
+    return;
   }
+
+  const modalElement = document.getElementById('finalSuccessModal') || document.getElementById('finalSuccessModalWithReload');
+  copyBlockingModalContent(modalElement, window.currentSuccessInfo.title, [formatSuccessForCopy(window.currentSuccessInfo)]);
 };
 
 // ===== EXPORT TO GLOBAL SCOPE =====

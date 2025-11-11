@@ -164,13 +164,16 @@ class ImportReportGenerator:
 
         if task_type == 'cashflows':
             summary['cashflow_summary'] = analysis_results.get('cashflow_summary', {})
+            summary['cashflow_records'] = analysis_results.get('cashflow_records', summary['cashflow_summary'].get('record_count', 0))
             summary['missing_accounts'] = analysis_results.get('missing_accounts', [])
             summary['currency_issues'] = analysis_results.get('currency_issues', [])
         elif task_type == 'account_reconciliation':
-            summary['missing_accounts'] = analysis_results.get('missing_accounts', [])
-            summary['base_currency_mismatches'] = analysis_results.get('base_currency_mismatches', [])
-            summary['entitlement_warnings'] = analysis_results.get('entitlement_warnings', [])
-            summary['missing_documents_report'] = analysis_results.get('missing_documents_report', [])
+            account_validation_results = analysis_results.get('account_validation_results', {})
+            summary['missing_accounts'] = account_validation_results.get('missing_accounts', analysis_results.get('missing_accounts', []))
+            summary['base_currency_mismatches'] = account_validation_results.get('base_currency_mismatches', analysis_results.get('base_currency_mismatches', []))
+            summary['entitlement_warnings'] = account_validation_results.get('entitlement_warnings', analysis_results.get('entitlement_warnings', []))
+            summary['missing_documents_report'] = account_validation_results.get('missing_documents_report', analysis_results.get('missing_documents_report', []))
+            summary['account_validation_results'] = account_validation_results
         
         if analysis_results.get('total_records', 0) > 0:
             summary["success_rate"] = (analysis_results.get('valid_records', 0) / 

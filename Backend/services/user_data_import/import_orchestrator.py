@@ -208,7 +208,9 @@ class ImportOrchestrator:
                 trading_account_id=trading_account_id,
                 provider=connector.get_provider_name(),
                 file_name=file_name,
-                status='analyzing'
+                status='analyzing',
+                connector_type=connector_type,
+                task_type=task_type_normalized
             )
             
             self.db_session.add(session)
@@ -398,11 +400,13 @@ class ImportOrchestrator:
 
         if task == 'cashflows':
             cashflow_summary = self._summarize_cashflows(validation_result.get('valid_records', []))
+            cashflow_records = len(validation_result.get('valid_records', []))
             analysis_results = {
                 **base_stats,
                 'missing_accounts': validation_result.get('missing_accounts', []),
                 'currency_issues': validation_result.get('currency_issues', []),
-                'cashflow_summary': cashflow_summary
+                'cashflow_summary': cashflow_summary,
+                'cashflow_records': cashflow_records
             }
             summary_data = {
                 'task_type': task,
@@ -414,27 +418,39 @@ class ImportOrchestrator:
                 'missing_accounts': validation_result.get('missing_accounts', []),
                 'currency_issues': validation_result.get('currency_issues', []),
                 'cashflow_summary': cashflow_summary,
+                'cashflow_records': cashflow_records,
                 'duplicate_details': duplicate_result
             }
             return analysis_results, summary_data
 
         if task == 'account_reconciliation':
-            analysis_results = {
-                **base_stats,
+            account_validation_results = {
                 'missing_accounts': validation_result.get('missing_accounts', []),
                 'base_currency_mismatches': validation_result.get('base_currency_mismatches', []),
                 'entitlement_warnings': validation_result.get('entitlement_warnings', []),
                 'missing_documents_report': validation_result.get('missing_documents_report', [])
+            }
+            accounts_detected = len(validation_result.get('valid_records', []))
+            analysis_results = {
+                **base_stats,
+                'missing_accounts': account_validation_results['missing_accounts'],
+                'base_currency_mismatches': account_validation_results['base_currency_mismatches'],
+                'entitlement_warnings': account_validation_results['entitlement_warnings'],
+                'missing_documents_report': account_validation_results['missing_documents_report'],
+                'account_validation_results': account_validation_results,
+                'accounts_detected': accounts_detected
             }
             summary_data = {
                 'task_type': task,
                 'analysis_timestamp': analysis_timestamp,
                 'valid_records': len(validation_result.get('valid_records', [])),
                 'invalid_records': len(validation_result.get('invalid_records', [])),
-                'missing_accounts': validation_result.get('missing_accounts', []),
-                'base_currency_mismatches': validation_result.get('base_currency_mismatches', []),
-                'entitlement_warnings': validation_result.get('entitlement_warnings', []),
-                'missing_documents_report': validation_result.get('missing_documents_report', []),
+                'missing_accounts': account_validation_results['missing_accounts'],
+                'base_currency_mismatches': account_validation_results['base_currency_mismatches'],
+                'entitlement_warnings': account_validation_results['entitlement_warnings'],
+                'missing_documents_report': account_validation_results['missing_documents_report'],
+                'accounts_detected': accounts_detected,
+                'account_validation_results': account_validation_results,
                 'duplicate_details': duplicate_result
             }
             return analysis_results, summary_data
@@ -600,13 +616,15 @@ class ImportOrchestrator:
                     'total_records': len(raw_records),
                     'records_to_import': len(records_to_import),
                     'records_to_skip': len(records_to_skip),
+                    'cashflow_records': len(records_to_import),
                     'net_amount': cashflow_summary.get('net_amount', 0),
                     'totals_by_type': cashflow_summary.get('totals_by_type', {}),
                     'totals_by_currency': cashflow_summary.get('totals_by_currency', {}),
                     'missing_accounts': validation_result.get('missing_accounts', []),
                     'currency_issues': validation_result.get('currency_issues', [])
                 },
-                'cashflow_summary': cashflow_summary
+                'cashflow_summary': cashflow_summary,
+                'cashflow_records': len(records_to_import)
             }
 
         if task == 'account_reconciliation':
@@ -628,8 +646,11 @@ class ImportOrchestrator:
                     'total_records': len(raw_records),
                     'valid_records': len(valid_records),
                     'invalid_records': len(validation_result.get('invalid_records', [])),
-                    'issues': issues
-                }
+                    'issues': issues,
+                    'accounts_detected': len(valid_records)
+                },
+                'account_validation_results': issues,
+                'accounts_detected': len(valid_records)
             }
 
         # Default executions preview
@@ -751,6 +772,14 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Session not found'}
             
             logger.info(f"✅ Session found: {session.id}, status: {session.status}")
+
+            # Ensure connector/task metadata columns are populated for legacy sessions
+            if not session.connector_type:
+                connector_from_summary = session.get_summary_data('connector_type')
+                if connector_from_summary:
+                    session.connector_type = connector_from_summary
+            if not session.task_type:
+                session.task_type = (task_type or session.get_summary_data('task_type') or 'executions').lower()
             
             if task_type:
                 normalized_task = task_type.lower()
@@ -1036,7 +1065,7 @@ class ImportOrchestrator:
             except Exception as save_error:
                 logger.error(f"Failed to save import file after completion: {save_error}")
 
-            return {
+            response_payload = {
                 'success': True,
                 'imported_count': task_result.get('imported_count', 0),
                 'skipped_count': task_result.get('skipped_count', 0),
@@ -1044,6 +1073,15 @@ class ImportOrchestrator:
                 'session_status': import_session.status,
                 'task_type': requested_task_type
             }
+
+            if requested_task_type == 'cashflows':
+                response_payload['cashflow_summary'] = task_result.get('cashflow_summary', {})
+                response_payload['cashflow_records'] = task_result.get('cashflow_records', 0)
+            elif requested_task_type == 'account_reconciliation':
+                response_payload['account_validation_results'] = task_result.get('account_validation_results', {})
+                response_payload['accounts_detected'] = task_result.get('accounts_detected', 0)
+
+            return response_payload
 
         except Exception as error:
             logger.error(f"Failed to execute import for session {session_id}: {error}", exc_info=True)
@@ -1305,12 +1343,16 @@ class ImportOrchestrator:
 
         self.db_session.flush()
 
+        cashflow_summary = self._summarize_cashflows(cashflow_records)
+
         return {
             'success': True,
             'imported_count': imported_count,
             'skipped_count': skipped_count,
             'errors': import_errors,
-            'cache_patterns': ['cash_flows', 'dashboard']
+            'cache_patterns': ['cash_flows', 'dashboard'],
+            'cashflow_summary': cashflow_summary,
+            'cashflow_records': len(cashflow_records)
         }
 
     def _execute_import_account_reconciliation(
@@ -1342,7 +1384,9 @@ class ImportOrchestrator:
             'imported_count': len(records),
             'skipped_count': skipped_count,
             'errors': [],
-            'cache_patterns': []
+            'cache_patterns': [],
+            'account_validation_results': summary.get('issues', {}),
+            'accounts_detected': len(records)
         }
 
     # ------------------------------------------------------------------

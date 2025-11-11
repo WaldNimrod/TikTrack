@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.0.4.0",
+    "version": "1.0.5.0",
     "major": 1,
     "minor": 0,
-    "patch": 4,
+    "patch": 5,
     "build": 0,
-    "commit": "fad1251215d82f64a73ff9e267d86fc75e98a8d1",
-    "updated_at": "2025-11-11T00:58:14+00:00",
-    "notes": "Standardize button system across user pages"
+    "commit": "43c635fb02951bd9d8391cc43b030fe974957226",
+    "updated_at": "2025-11-11T02:26:15+00:00",
+    "notes": "External data dashboard updates and backup"
   },
   "development": {
     "version": "1.0.7.0",

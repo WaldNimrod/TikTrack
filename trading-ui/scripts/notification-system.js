@@ -354,6 +354,55 @@ function getNotificationIcon(type) {
 }
 
 /**
+ * Get notification color based on preferences and entity colors
+ * NOTIFICATION SYSTEM - Centralized color resolver for notifications and blocking modals
+ *
+ * @param {string} type - Notification type (success, error, warning, info)
+ * @returns {string} Hex/RGB color string
+ */
+function getNotificationColor(type) {
+  const preferences = window.currentPreferences || {};
+  const customColorMap = {
+    success: preferences.notificationSuccessColor,
+    error: preferences.notificationErrorColor,
+    warning: preferences.notificationWarningColor,
+    info: preferences.notificationInfoColor
+  };
+
+  if (customColorMap[type]) {
+    return customColorMap[type];
+  }
+
+  if (typeof window.getEntityColor === 'function') {
+    switch (type) {
+      case 'success':
+        return window.getEntityColor('account') || '#28a745';
+      case 'error':
+        return window.getEntityColor('ticker') || '#dc3545';
+      case 'warning':
+        return window.getEntityColor('alert') || '#ffc107';
+      case 'info':
+        return window.getEntityColor('execution') || '#17a2b8';
+      default:
+        return '#6c757d';
+    }
+  }
+
+  switch (type) {
+    case 'success':
+      return '#28a745';
+    case 'error':
+      return '#dc3545';
+    case 'warning':
+      return '#ffc107';
+    case 'info':
+      return '#17a2b8';
+    default:
+      return '#6c757d';
+  }
+}
+
+/**
  * Check if notification should be shown based on category preferences
  * NOTIFICATION SYSTEM - Checks user preferences for notification category
  *
@@ -557,39 +606,6 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     window.Logger.info(`✅ Showing notification (category: ${category}, { page: "notification-system" })`);
   }
   
-  // Get dynamic colors from color scheme system
-  const getNotificationColor = (type) => {
-    const preferences = window.currentPreferences || {};
-    const customColorMap = {
-      success: preferences.notificationSuccessColor,
-      error: preferences.notificationErrorColor,
-      warning: preferences.notificationWarningColor,
-      info: preferences.notificationInfoColor
-    };
-
-    if (customColorMap[type]) {
-      return customColorMap[type];
-    }
-
-    if (typeof window.getEntityColor === 'function') {
-      switch (type) {
-        case 'success': return window.getEntityColor('account') || '#28a745';
-        case 'error': return window.getEntityColor('ticker') || '#dc3545';
-        case 'warning': return window.getEntityColor('alert') || '#ffc107';
-        case 'info': return window.getEntityColor('execution') || '#17a2b8';
-        default: return '#6c757d';
-      }
-    }
-    // Fallback to default colors
-    switch (type) {
-      case 'success': return '#28a745';
-      case 'error': return '#dc3545';
-      case 'warning': return '#ffc107';
-      case 'info': return '#17a2b8';
-      default: return '#6c757d';
-    }
-  };
-
   const notificationColor = getNotificationColor(type);
   
   // Debug: Log dynamic color
@@ -1426,6 +1442,7 @@ window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
 window.showDetailsModal = showDetailsModal;
+window.getNotificationColor = getNotificationColor;
 
 // Export NOTIFICATION CATEGORIES SYSTEM functions to global scope
 window.shouldShowNotification = shouldShowNotification;
@@ -1463,6 +1480,7 @@ window.notificationSystem = {
   createNotificationContainer,
   hideNotification,
   getNotificationIcon,
+  getNotificationColor,
   
   // NOTIFICATION CATEGORIES SYSTEM functions
   shouldShowNotification,
@@ -1487,6 +1505,7 @@ window.NotificationSystem = {
     showDetails: window.showDetailsModal,
     shouldShow: window.shouldShowNotification,
     logWithCategory: window.logWithCategory,
+    getNotificationColor: window.getNotificationColor,
     getCategoryIcon: window.getCategoryIcon,
     addGlobal: window.addGlobalNotification,
     getGlobal: window.getGlobalNotifications,

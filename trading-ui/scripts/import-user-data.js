@@ -2513,12 +2513,15 @@ function analyzeFile() {
         page: 'import-user-data'
     });
     
+    showProcessingOverlay('טוען ומעבד נתונים...');
+
     fetch('/api/user-data-import/upload', {
             method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
+        hideProcessingOverlay();
         if (data.success || data.status === 'success') {
             window.Logger.info('[Import Modal] File analysis completed', { data, page: 'import-user-data' });
             currentSessionId = data.session_id;
@@ -2557,6 +2560,7 @@ function analyzeFile() {
         }
     })
     .catch(error => {
+        hideProcessingOverlay();
         window.Logger.error('Analysis error:', error);
         showImportUserDataNotification('שגיאה בניתוח הקובץ', 'error');
     });
@@ -2618,7 +2622,7 @@ function renderCashflowAnalysisSummary(results) {
     const currencyIssues = results.currency_issues || summary.currency_issues || [];
 
     const totalRecords = results.total_records ?? summary.record_count ?? results.valid_records ?? 0;
-    const validRecords = summary.record_count ?? results.valid_records ?? 0;
+    const validRecords = results.cashflow_records ?? summary.record_count ?? results.valid_records ?? 0;
     const invalidRecords = results.invalid_records ?? (summary.invalid_records ?? 0);
     const duplicateRecords = results.duplicate_records ?? 0;
 
@@ -2642,8 +2646,8 @@ function renderAccountReconciliationAnalysisSummary(results) {
     const entitlementWarnings = results.entitlement_warnings || issues.entitlement_warnings || [];
     const missingDocuments = results.missing_documents_report || issues.missing_documents_report || [];
 
-    const totalRecords = results.total_records || results.valid_records || missingAccounts.length || 0;
-    const validRecords = results.valid_records || (totalRecords - (missingAccounts.length + baseCurrencyMismatches.length));
+    const totalRecords = results.total_records || results.valid_records || results.accounts_detected || missingAccounts.length || 0;
+    const validRecords = results.accounts_detected || results.valid_records || (totalRecords - (missingAccounts.length + baseCurrencyMismatches.length));
     const invalidRecords = results.invalid_records || missingDocuments.length || 0;
 
     setAnalysisCardValue('totalRecords', totalRecords);
@@ -2676,6 +2680,7 @@ function detectAvailableDataTypes(results = {}) {
     const cashflowsDefinition = IMPORT_DATA_TYPE_DEFINITIONS.cashflows;
     const cashflowsCount = Number(
         results.cashflow_records ??
+        results.cashflow_summary?.record_count ??
         results.summary?.cashflows_total ??
         results.summary_data?.cashflows_total ??
         0
@@ -2687,7 +2692,12 @@ function detectAvailableDataTypes(results = {}) {
     });
     
     const accountDefinition = IMPORT_DATA_TYPE_DEFINITIONS.account_reconciliation;
-    const accountsDetected = Number(results.accounts_detected ?? results.summary?.accounts_detected ?? 0);
+    const accountsDetected = Number(
+        results.accounts_detected ??
+        results.summary?.accounts_detected ??
+        results.summary_data?.accounts_detected ??
+        0
+    );
     detected.push({
         ...accountDefinition,
         records: accountsDetected,

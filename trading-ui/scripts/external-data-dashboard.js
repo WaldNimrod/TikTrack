@@ -44,6 +44,24 @@
       if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification(title, message, duration, category);
       }
+    },
+    detailedError(title, userMessage, developerDetails = [], options = {}) {
+      const developerSection = developerDetails.length
+        ? `---\nמידע למפתח:\n${developerDetails.join('\n')}`
+        : '';
+      const body = developerSection ? `${userMessage}\n\n${developerSection}` : userMessage;
+
+      if (typeof window.showDetailedNotification === 'function') {
+        window.showDetailedNotification(
+          title,
+          body,
+          'error',
+          options.duration ?? 0,
+          options.category ?? 'system'
+        );
+      } else if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification(title, body);
+      }
     }
   };
 
@@ -136,6 +154,43 @@
   function formatRelativeFromPayload(value) {
     const isoValue = extractTimestampIso(value);
     return isoValue ? formatRelativeTime(isoValue) : NOT_AVAILABLE_TEXT;
+  }
+
+  function formatTimePayloadForDeveloper(value) {
+    if (!value) {
+      return 'לא זמין';
+    }
+
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (typeof value === 'object') {
+      const display = safeText(value.display, null);
+      const timezoneLabel = safeText(value.timezone, null);
+      const utcValue = safeText(value.utc, null);
+      const components = [];
+
+      if (display) {
+        components.push(display);
+      }
+
+      if (timezoneLabel) {
+        components.push(`אזור זמן: ${timezoneLabel}`);
+      }
+
+      if (utcValue) {
+        components.push(`UTC: ${utcValue}`);
+      }
+
+      if (Number.isFinite(Number(value.epochMs))) {
+        components.push(`epochMs: ${value.epochMs}`);
+      }
+
+      return components.length ? components.join(' | ') : JSON.stringify(value);
+    }
+
+    return String(value);
   }
 
   async function ensureExternalDashboardInstance() {
@@ -389,9 +444,13 @@
           `• טיקרים שעודכנו: ${formatNumber(fetched)}`,
           `• טיקרים שנכשלו: ${formatNumber(failedSymbols.length)}`,
           `• טיקרים שדולגו (חסר סימול): ${formatNumber(skippedEntries.length)}`,
-          `• מזהה בקשה: ${safeText(payload.requestId || payload.timestamp || 'לא זמין')}`,
+          `• חותמת בקשה: ${formatTimePayloadForDeveloper(payload.timestamp)}`,
           `• משך כולל: ${formatDurationMs(duration)}`
         ];
+
+        if (safeText(payload.requestId, null)) {
+          developerDetails.push(`• מזהה בקשה: ${safeText(payload.requestId)}`);
+        }
 
         if (failedSymbols.length) {
           const truncatedFailed = failedSymbols.slice(0, 10).join(', ');
@@ -412,9 +471,10 @@
 
         if (!requested) {
           const userMessage = 'לא נמצאו טיקרים פעילים עם סימול תקף ולכן הרענון לא בוצע.';
-          notification.error(
+          notification.detailedError(
             'רענון נתונים חיצוניים נכשל',
-            `${userMessage}\n\nמידע למפתח:\n${developerDetails.join('\n')}`
+            userMessage,
+            developerDetails
           );
           logger.error(`${MODULE_NAME}:refresh-all:no-requested`, {
             requested,
@@ -425,9 +485,10 @@
         } else if (!isFullSuccess) {
           const userMessage =
             'הרענון נעצר לפני שהושלם. חלק מהטיקרים נכשלו או דולגו ולכן נדרש טיפול.';
-          notification.error(
+          notification.detailedError(
             'רענון נתונים חיצוניים נכשל (חלקי)',
-            `${userMessage}\n\nמידע למפתח:\n${developerDetails.join('\n')}`
+            userMessage,
+            developerDetails
           );
           logger.warn(`${MODULE_NAME}:refresh-all:partial`, {
             requested,

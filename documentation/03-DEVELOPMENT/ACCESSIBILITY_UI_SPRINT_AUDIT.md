@@ -76,6 +76,11 @@
 - לעדכן את מסמכי ה־UI (PAGE_UPDATE_GUIDE, CSS_ARCHITECTURE_GUIDE) עם כללים חדשים לנגישות.
 - לשקול הוספת פרופיל העדפות משתמש לניגודיות/פונט כחלק מ־`Preferences` כדי לשמור העדפות לגולש.
 
+## 6. סטטוס אוטומציה מעודכן
+- 🔄 **בדיקות axe-core**: נוספה הרצת smoke בדיקות ב־Jest (`npm run test:a11y`) על דפי הליבה (`trades`, `trade_plans`, `trading_accounts`, `alerts`, `cash_flows`, `notes`, `executions`, `data_import`, `tickers`). הבדיקה מדווחת על חריגות ברמה Serious/Critical ומנטרלת זמנית את בדיקת הניגודיות (מכוסה בתיקון העיצובי).
+- 📄 **מיקום הבדיקה**: `tests/integration/accessibility/a11y-baseline.test.js`
+- 🧪 **שימוש מומלץ**: לשלב את הפקודה ב־CI ובסבבי QA לפני העלאה לסביבת בדיקות.
+
 ---
 **המסמך נוצר כחלק מהשלמת המשימה “audit-accessibility” בתוכנית הספציפית וילווה את שלבי הפיתוח הבאים.**
 

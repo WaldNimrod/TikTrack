@@ -18,3 +18,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-11T11:07:42+00:00 | 1.0.8.0 | 1.0.7.0 | 71acdafb71ffef4c7680a6c8805c2f969686748b | 5ff43ef8ae692a1622a83666d6947ced000802b5 | patch | Link homepage execution widgets to executions page |
 | 2025-11-11T16:10:41+00:00 | 1.0.9.0 | 1.0.8.0 | d6c4d76fc4aaba5dcb784d6ff43c0411beb2a9c0 | 71acdafb71ffef4c7680a6c8805c2f969686748b | patch | Active alerts empty state refinement |
 | 2025-11-11T18:04:02+00:00 | 1.0.10.0 | 1.0.9.0 | 05f649646e375ad5e769ae4cd27eb5a8990e1e63 | d6c4d76fc4aaba5dcb784d6ff43c0411beb2a9c0 | patch | Align brand color tokens across UI |
+| 2025-11-11T18:51:14+00:00 | 1.0.11.0 | 1.0.10.0 | 08d71320193ccf6f6e8dc8c75f95af1c96d95b44 | 05f649646e375ad5e769ae4cd27eb5a8990e1e63 | patch | Add accessibility smoke tests |

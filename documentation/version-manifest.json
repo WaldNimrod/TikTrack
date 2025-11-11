@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.10.0",
+    "version": "1.0.11.0",
     "major": 1,
     "minor": 0,
-    "patch": 10,
+    "patch": 11,
     "build": 0,
-    "commit": "05f649646e375ad5e769ae4cd27eb5a8990e1e63",
-    "updated_at": "2025-11-11T18:04:02+00:00",
-    "notes": "Align brand color tokens across UI"
+    "commit": "08d71320193ccf6f6e8dc8c75f95af1c96d95b44",
+    "updated_at": "2025-11-11T18:51:14+00:00",
+    "notes": "Add accessibility smoke tests"
   }
 }

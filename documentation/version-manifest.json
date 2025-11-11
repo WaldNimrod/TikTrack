@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.8.0",
+    "version": "1.0.9.0",
     "major": 1,
     "minor": 0,
-    "patch": 8,
+    "patch": 9,
     "build": 0,
-    "commit": "71acdafb71ffef4c7680a6c8805c2f969686748b",
-    "updated_at": "2025-11-11T11:07:42+00:00",
-    "notes": "Link homepage execution widgets to executions page"
+    "commit": "d6c4d76fc4aaba5dcb784d6ff43c0411beb2a9c0",
+    "updated_at": "2025-11-11T16:10:41+00:00",
+    "notes": "Active alerts empty state refinement"
   }
 }

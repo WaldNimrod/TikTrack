@@ -1,0 +1,216 @@
+[
+  {
+    "page": "index.html",
+    "file_path": "trading-ui/index.html",
+    "total_buttons": 16,
+    "regular_buttons": 0,
+    "data_attr_buttons": 16,
+    "dominant_types": {
+      "TOGGLE": 3,
+      "VIEW": 1,
+      "FILTER": 3,
+      "SORT": 9
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "trades.html",
+    "file_path": "trading-ui/trades.html",
+    "total_buttons": 17,
+    "regular_buttons": 0,
+    "data_attr_buttons": 17,
+    "dominant_types": {
+      "TOGGLE": 2,
+      "ADD": 1,
+      "SORT": 12,
+      "CLOSE": 1,
+      "CANCEL": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "trade_plans.html",
+    "file_path": "trading-ui/trade_plans.html",
+    "total_buttons": 14,
+    "regular_buttons": 0,
+    "data_attr_buttons": 14,
+    "dominant_types": {
+      "TOGGLE": 2,
+      "ADD": 1,
+      "SORT": 11
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "executions.html",
+    "file_path": "trading-ui/executions.html",
+    "total_buttons": 46,
+    "regular_buttons": 0,
+    "data_attr_buttons": 46,
+    "dominant_types": {
+      "TOGGLE": 4,
+      "ADD": 2,
+      "IMPORT": 1,
+      "SORT": 19,
+      "PRIMARY": 2,
+      "SECONDARY": 3,
+      "SAVE": 2,
+      "BACK": 2,
+      "CANCEL": 1,
+      "DOWNLOAD": 1,
+      "LINK": 6,
+      "VIEW": 1,
+      "APPROVE": 1,
+      "REJECT": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "alerts.html",
+    "file_path": "trading-ui/alerts.html",
+    "total_buttons": 20,
+    "regular_buttons": 0,
+    "data_attr_buttons": 20,
+    "dominant_types": {
+      "EVALUATE": 1,
+      "REFRESH": 1,
+      "TOGGLE": 2,
+      "ADD": 1,
+      "FILTER": 5,
+      "SORT": 9,
+      "SECONDARY": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "tickers.html",
+    "file_path": "trading-ui/tickers.html",
+    "total_buttons": 12,
+    "regular_buttons": 0,
+    "data_attr_buttons": 12,
+    "dominant_types": {
+      "TOGGLE": 2,
+      "ADD": 1,
+      "SORT": 9
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "trading_accounts.html",
+    "file_path": "trading-ui/trading_accounts.html",
+    "total_buttons": 31,
+    "regular_buttons": 0,
+    "data_attr_buttons": 31,
+    "dominant_types": {
+      "TOGGLE": 5,
+      "ADD": 1,
+      "SORT": 21,
+      "VIEW": 1,
+      "EDIT": 1,
+      "${tradingAccount.status === ": 1,
+      "DELETE": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "cash_flows.html",
+    "file_path": "trading-ui/cash_flows.html",
+    "total_buttons": 10,
+    "regular_buttons": 0,
+    "data_attr_buttons": 10,
+    "dominant_types": {
+      "TOGGLE": 2,
+      "ADD": 1,
+      "SORT": 7
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "notes.html",
+    "file_path": "trading-ui/notes.html",
+    "total_buttons": 14,
+    "regular_buttons": 0,
+    "data_attr_buttons": 14,
+    "dominant_types": {
+      "TOGGLE": 2,
+      "ADD": 2,
+      "FILTER": 5,
+      "SORT": 3,
+      "SECONDARY": 1,
+      "CANCEL": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "data_import.html",
+    "file_path": "trading-ui/data_import.html",
+    "total_buttons": 18,
+    "regular_buttons": 0,
+    "data_attr_buttons": 18,
+    "dominant_types": {
+      "SORT": 10,
+      "SECONDARY": 2,
+      "PRIMARY": 1,
+      "BACK": 2,
+      "CANCEL": 1,
+      "SAVE": 1,
+      "DOWNLOAD": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "preferences.html",
+    "file_path": "trading-ui/preferences.html",
+    "total_buttons": 20,
+    "regular_buttons": 0,
+    "data_attr_buttons": 20,
+    "dominant_types": {
+      "SAVE": 8,
+      "TOGGLE": 9,
+      "REFRESH": 1,
+      "ADD": 1,
+      "SECONDARY": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "constraints.html",
+    "file_path": "trading-ui/constraints.html",
+    "total_buttons": 18,
+    "regular_buttons": 0,
+    "data_attr_buttons": 18,
+    "dominant_types": {
+      "TOGGLE": 5,
+      "REFRESH": 1,
+      "CHECK": 2,
+      "VIEW": 1,
+      "EDIT": 2,
+      "${constraint.is_active ? ": 1,
+      "CLOSE": 5,
+      "EXPORT": 1
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "db_display.html",
+    "file_path": "trading-ui/db_display.html",
+    "total_buttons": 9,
+    "regular_buttons": 0,
+    "data_attr_buttons": 9,
+    "dominant_types": {
+      "TOGGLE": 9
+    },
+    "conversion_priority": 0
+  },
+  {
+    "page": "db_extradata.html",
+    "file_path": "trading-ui/db_extradata.html",
+    "total_buttons": 9,
+    "regular_buttons": 0,
+    "data_attr_buttons": 9,
+    "dominant_types": {
+      "TOGGLE": 9
+    },
+    "conversion_priority": 0
+  }
+]

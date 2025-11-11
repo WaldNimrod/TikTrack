@@ -883,9 +883,7 @@ function displayLinkedItems(linkedItems) {
                         ${linkedItems.trades.map(trade => `
                             <li>
                                 טרייד #${trade.id} - חשבון מסחר: ${trade.account_name || 'לא זמין'} - סטטוס: ${trade.status}
-                                <button class="btn btn-sm ms-2" onclick="goToTrade(${trade.id})">
-                                    עבור לטרייד
-                                </button>
+                                <button data-button-type="LINK" data-variant="full" data-icon="🔗" data-text="עבור לטרייד" data-classes="btn-sm ms-2" data-onclick="goToTrade(${trade.id})"></button>
                             </li>
                         `).join('')}
                     </ul>
@@ -922,10 +920,7 @@ function displayLinkedItems(linkedItems) {
                                         <td><span class="badge bg-info">${plan.status}</span></td>
                                         <td>${formatDate(plan.created_at)}</td>
                                         <td>
-                                            <button class="btn btn-sm" 
-                                              onclick="goToPlan(${plan.id})">
-                                                עבור לתכנון
-                                            </button>
+                                            <button data-button-type="LINK" data-variant="full" data-icon="🔗" data-text="עבור לתכנון" data-classes="btn-sm" data-onclick="goToPlan(${plan.id})"></button>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -972,10 +967,7 @@ function displayLinkedItems(linkedItems) {
     alert.status
 }</span></td>
                                         <td>
-                                            <button class="btn btn-sm" 
-                                              onclick="goToAlert(${alert.id})">
-                                                עבור להתראה
-                                            </button>
+                                            <button data-button-type="LINK" data-variant="full" data-icon="🔗" data-text="עבור להתראה" data-classes="btn-sm" data-onclick="goToAlert(${alert.id})"></button>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -1016,10 +1008,7 @@ function displayLinkedItems(linkedItems) {
 }</td>
                                         <td>${formatDate(note.created_at)}</td>
                                         <td>
-                                            <button class="btn btn-sm" 
-                                              onclick="goToNote(${note.id})">
-                                                עבור להערה
-                                            </button>
+                                            <button data-button-type="LINK" data-variant="full" data-icon="🔗" data-text="עבור להערה" data-classes="btn-sm" data-onclick="goToNote(${note.id})"></button>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -1465,11 +1454,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     // Trade column - show trade ID with link button if exists
     const tradeCell = execution.trade_id 
       ? `<div class="table-cell-flex-small">
-           <button class="btn btn-sm btn-outline-primary table-btn-small" 
-                   onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" 
-                   title="פתח פרטי טרייד">
-             🔗
-           </button>
+           <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" title="פתח פרטי טרייד"></button>
            <span>#${execution.trade_id}</span>
          </div>`
       : '-';
@@ -3397,18 +3382,8 @@ function updateTickersSummaryTable(tickers = null) {
             <td>${ticker.totalTrades} (${ticker.activeTrades} פעיל, ${ticker.closedTrades} סגור)</td>
             <td>${creationDate}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm" 
-                  onclick="viewTickerDetails(${ticker.id})" 
-                  title="צפה בפרטים">
-                    <img src="images/icons/tickers.svg" alt="צפה" 
-                      class="action-icon" style="width: 14px; height: 14px;">
-                </button>
-                <button class="btn btn-sm" 
-                  onclick="addExecutionForTicker(${ticker.id})" 
-                  title="הוסף עסקה">
-                    <img src="images/icons/executions.svg" alt="הוסף" 
-                      class="action-icon" style="width: 14px; height: 14px;">
-                </button>
+                <button data-button-type="VIEW" data-variant="small" data-icon="👁️" data-classes="btn-outline-primary table-btn-small" onclick="viewTickerDetails(${ticker.id})" title="צפה בפרטים"></button>
+                <button data-button-type="ADD" data-variant="small" data-icon="➕" data-classes="btn-outline-success table-btn-small" onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה"></button>
             </td>
         `;
 
@@ -3938,49 +3913,31 @@ function renderTradeSuggestionsSection(suggestionsData, flatList = null) {
                             <input type="checkbox" id="selectAllSuggestions" title="בחר הכל" onchange="toggleAllSuggestions(this.checked)">
                         </th>
                         <th class="col-score">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 1)">
-                                ציון התאמה <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="ציון התאמה" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 1)"></button>
                         </th>
                         <th class="col-execution">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 2)">
-                                ביצוע <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="ביצוע" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 2)"></button>
                         </th>
                         <th class="col-trade">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 3)">
-                                טרייד <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="טרייד" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 3)"></button>
                         </th>
                         <th class="col-account">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 4)">
-                                חשבון <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="חשבון" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 4)"></button>
                         </th>
                         <th class="col-date">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 5)">
-                                תאריך טרייד <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך טרייד" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 5)"></button>
                         </th>
                         <th class="col-status">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 6)">
-                                סטטוס <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 6)"></button>
                         </th>
                         <th class="col-side">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 7)">
-                                צד <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="צד" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 7)"></button>
                         </th>
                         <th class="col-type">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 8)">
-                                סוג <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סוג" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 8)"></button>
                         </th>
                         <th class="col-match">
-                            <button class="btn btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 9)">
-                                סיבות התאמה <span class="sort-icon">↕</span>
-                            </button>
+                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סיבות התאמה" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trade_suggestions', 9)"></button>
                         </th>
                         <th class="col-actions actions-cell">פעולות</th>
                     </tr>
@@ -4077,11 +4034,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             </td>
             <td class="col-trade">
                 <div class="table-cell-flex">
-                    <button class="btn btn-sm btn-outline-primary table-btn-small" 
-                            onclick="openTradeDetailsModal(${suggestion.trade_id})"
-                            title="פתח פרטי טרייד">
-                        🔗
-                    </button>
+                    <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" onclick="openTradeDetailsModal(${suggestion.trade_id})" title="פתח פרטי טרייד"></button>
                     <strong>#${suggestion.trade_id}</strong>
                 </div>
                 <div class="text-muted small">${suggestion.ticker_symbol || ''}</div>
@@ -4106,16 +4059,8 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             </td>
             <td class="col-actions actions-cell">
                 <div class="table-cell-flex-small">
-                    <button class="btn btn-sm btn-outline-success table-btn-small" 
-                            onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})"
-                            title="קבל המלצה">
-                        ✓
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger table-btn-small" 
-                            onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})"
-                            title="דחה המלצה">
-                        ✗
-                    </button>
+                    <button data-button-type="APPROVE" data-variant="small" data-icon="✓" data-classes="btn-outline-success table-btn-small" onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})" title="קבל המלצה"></button>
+                    <button data-button-type="REJECT" data-variant="small" data-icon="✗" data-classes="btn-outline-danger table-btn-small" onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})" title="דחה המלצה"></button>
                 </div>
             </td>
         </tr>

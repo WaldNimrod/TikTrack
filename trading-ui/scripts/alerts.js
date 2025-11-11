@@ -3056,9 +3056,9 @@ async function loadConditionsFromItem() {
     try {
         let endpoint;
         if (sourceType === 'trade_plan') {
-            endpoint = `/api/plan_conditions?plan_id=${sourceId}`;
+            endpoint = `/api/plan-conditions?plan_id=${sourceId}`;
         } else if (sourceType === 'trade') {
-            endpoint = `/api/trade_conditions?trade_id=${sourceId}`;
+            endpoint = `/api/trade-conditions?trade_id=${sourceId}`;
         }
         
         const response = await fetch(endpoint);
@@ -3092,9 +3092,7 @@ function displayAvailableConditions(conditions, sourceType) {
                     <div class="card-body">
                         <h6 class="card-title">${condition.method_name || 'תנאי לא ידוע'}</h6>
                         <p class="card-text small text-muted">${condition.parameters_json || 'אין פרמטרים'}</p>
-                        <button class="btn btn-sm" onclick="selectConditionForAlert(${condition.id}, '${sourceType}')">
-                            בחר תנאי זה
-                        </button>
+                        <button data-button-type="SECONDARY" data-variant="full" data-text="בחר תנאי זה" data-classes="btn-sm" data-onclick="selectConditionForAlert(${condition.id}, '${sourceType}')"></button>
                     </div>
                 </div>
             </div>

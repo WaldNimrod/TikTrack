@@ -492,7 +492,7 @@ function updateNotesTable(notes) {
             <div style="padding: 20px;">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
-              <button class="btn btn-sm" onclick="openNoteDetails()">הוסף הערה ראשונה</button>
+              <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()"></button>
             </div>
           </td>
         </tr>
@@ -1579,12 +1579,8 @@ function setupNoteValidationEvents() {
         const actionsElement = document.getElementById('attachmentActions');
         if (actionsElement) {
           actionsElement.innerHTML = `
-            <button type="button" class="btn btn-sm" disabled>
-              ✅ קובץ נבחר
-            </button>
-            <button type="button" class="btn btn-sm" onclick="clearSelectedFile()">
-              ❌ בטל בחירה
-            </button>
+            <button data-button-type="SECONDARY" data-variant="full" data-text="✅ קובץ נבחר" data-classes="btn-sm" type="button" disabled></button>
+            <button data-button-type="CANCEL" data-variant="full" data-icon="❌" data-text="בטל בחירה" data-classes="btn-sm" data-onclick="clearSelectedFile()" type="button"></button>
           `;
           actionsElement.style.display = 'block';
         }

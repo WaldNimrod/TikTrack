@@ -1,0 +1,324 @@
+{
+  "files": [
+    {
+      "path": "trading-ui/scripts/event-handler-manager.js",
+      "count": 1,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/notifications-center.js",
+      "count": 6,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/entity-details-modal.js",
+      "count": 4,
+      "category": "modal-system"
+    },
+    {
+      "path": "trading-ui/scripts/conditions-test.js",
+      "count": 1,
+      "category": "conditions-system"
+    },
+    {
+      "path": "trading-ui/scripts/preferences-ui.js",
+      "count": 1,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/header-system.js",
+      "count": 9,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/linked-items.js",
+      "count": 3,
+      "category": "linked-items"
+    },
+    {
+      "path": "trading-ui/scripts/notes.js",
+      "count": 3,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/trade-selector-modal.js",
+      "count": 16,
+      "category": "modal-system"
+    },
+    {
+      "path": "trading-ui/scripts/notification-system.js",
+      "count": 7,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/entity-details-renderer.js",
+      "count": 10,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/cache-management.js",
+      "count": 1,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/constraint-manager.js",
+      "count": 5,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/pending-execution-trade-creation.js",
+      "count": 5,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/auth.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/positions-portfolio.js",
+      "count": 2,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/executions.js",
+      "count": 19,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/unified-log-manager.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/alerts.js",
+      "count": 1,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/account-activity.js",
+      "count": 1,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/related-object-filters.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/tickers.js",
+      "count": 4,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/constraints.js",
+      "count": 11,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/warning-system.js",
+      "count": 3,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/init-system-management.js",
+      "count": 5,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/ui-utils.js",
+      "count": 5,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/button-system-demo-core.js",
+      "count": 54,
+      "category": "button-system"
+    },
+    {
+      "path": "trading-ui/scripts/linter-realtime-monitor.js",
+      "count": 6,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/linter-export-system.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/pending-executions-widget.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/crud-testing-enhanced.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/import-user-data.js",
+      "count": 16,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/unified-log-display.js",
+      "count": 7,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/cash_flows.js",
+      "count": 1,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/button-system-init.js",
+      "count": 2,
+      "category": "button-system"
+    },
+    {
+      "path": "trading-ui/scripts/pagination-system.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/button-helpers.js",
+      "count": 9,
+      "category": "button-system"
+    },
+    {
+      "path": "trading-ui/scripts/background-tasks.js",
+      "count": 4,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/init-system-check.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/currencies.js",
+      "count": 2,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/modal-manager-v2.js",
+      "count": 8,
+      "category": "modal-system"
+    },
+    {
+      "path": "trading-ui/scripts/trading_accounts.js",
+      "count": 5,
+      "category": "page-specific"
+    },
+    {
+      "path": "trading-ui/scripts/quick-quality-check.js",
+      "count": 2,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/system-management.js",
+      "count": 8,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/system-management-main.js",
+      "count": 1,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/sections/sm-section-external-data.js",
+      "count": 9,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/sections/sm-section-alerts.js",
+      "count": 8,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/sections/sm-section-database.js",
+      "count": 7,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/sections/sm-section-operations.js",
+      "count": 22,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/sections/sm-section-cache.js",
+      "count": 11,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/sections/sm-section-background-tasks.js",
+      "count": 8,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/core/sm-ui-components.js",
+      "count": 3,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/system-management/core/sm-error-handler.js",
+      "count": 4,
+      "category": "system-management"
+    },
+    {
+      "path": "trading-ui/scripts/modal-configs/tickers-config.js",
+      "count": 1,
+      "category": "modal-system"
+    },
+    {
+      "path": "trading-ui/scripts/conditions/conditions-form-generator.js",
+      "count": 3,
+      "category": "conditions-system"
+    },
+    {
+      "path": "trading-ui/scripts/conditions/condition-builder.js",
+      "count": 6,
+      "category": "conditions-system"
+    },
+    {
+      "path": "trading-ui/scripts/enhancements/index-enhancements.js",
+      "count": 5,
+      "category": "shared-other"
+    },
+    {
+      "path": "trading-ui/scripts/modules/core-systems.js",
+      "count": 19,
+      "category": "shared-modules"
+    },
+    {
+      "path": "trading-ui/scripts/modules/ui-basic.js",
+      "count": 5,
+      "category": "shared-modules"
+    },
+    {
+      "path": "trading-ui/scripts/modules/business-module.js",
+      "count": 1,
+      "category": "shared-modules"
+    },
+    {
+      "path": "trading-ui/scripts/modules/actions-menu-system.js",
+      "count": 4,
+      "category": "shared-modules"
+    },
+    {
+      "path": "trading-ui/scripts/services/field-renderer-service.js",
+      "count": 2,
+      "category": "shared-modules"
+    },
+    {
+      "path": "trading-ui/scripts/services/crud-response-handler.js",
+      "count": 2,
+      "category": "shared-modules"
+    },
+    {
+      "path": "trading-ui/scripts/services/linked-items-service.js",
+      "count": 6,
+      "category": "shared-modules"
+    }
+  ]
+}

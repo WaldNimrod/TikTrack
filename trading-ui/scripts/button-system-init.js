@@ -766,16 +766,16 @@ class AdvancedButtonSystem {
         element.outerHTML = fallbackButton;
     }
 
-    addButton(container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal') {
-        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, '');
+    addButton(container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal', icon = '') {
+        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, icon);
         container.insertAdjacentHTML('beforeend', buttonHtml);
         this.logger.debug(`Added dynamic button: ${type}`);
     }
 
-    updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal') {
+    updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal', icon = '') {
         const element = document.getElementById(buttonId);
         if (element) {
-            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, '');
+            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, icon);
             element.outerHTML = newButton;
             this.logger.debug(`Updated button: ${buttonId}`);
         } else {
@@ -811,12 +811,12 @@ window.initializeButtons = () => {
     window.advancedButtonSystem.initializeButtons();
 };
 
-window.addDynamicButton = (container, type, onClick, classes = '', attributes = '', text = '', id = '') => {
-    window.advancedButtonSystem.addButton(container, type, onClick, classes, attributes, text, id);
+window.addDynamicButton = (container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal', icon = '') => {
+    window.advancedButtonSystem.addButton(container, type, onClick, classes, attributes, text, id, variant, icon);
 };
 
-window.updateButton = (buttonId, type, onClick, classes = '', attributes = '', text = '') => {
-    window.advancedButtonSystem.updateButton(buttonId, type, onClick, classes, attributes, text);
+window.updateButton = (buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal', icon = '') => {
+    window.advancedButtonSystem.updateButton(buttonId, type, onClick, classes, attributes, text, variant, icon);
 };
 
 window.getButtonSystemStats = () => {

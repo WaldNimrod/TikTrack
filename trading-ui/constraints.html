@@ -62,9 +62,7 @@
                         <h1>🔒 מוניטור אילוצים</h1>
                         <p>ניהול וניטור אילוצי בסיס הנתונים</p>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים" type="button"></button>
                         </div>
                     </div>
                     <div class="section-body">
@@ -110,9 +108,7 @@
                     <div class="section-header">
                         <h2 id="overview-title">📊 סקירה כללית</h2>
                         <p>תצוגה כללית של כל האילוצים במערכת</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section1')" data-classes="filter-toggle-btn" title="הצג/הסתר סקשן" ></button>
                     </div>
                     <div class="section-body">
                         <div id="overview-content">
@@ -132,18 +128,12 @@
                     <div class="section-header">
                         <h2>📋 כל האילוצים</h2>
                         <p>טבלה מפורטת של כל האילוצים במערכת</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section2')" data-classes="filter-toggle-btn" title="הצג/הסתר סקשן" ></button>
                     </div>
                     <div class="section-body">
                         <div class="d-flex gap-2 mb-3">
-                            <button class="btn btn-primary" onclick="window.refreshConstraints()">
-                                <i class="fas fa-sync-alt"></i> רענן נתונים
-                            </button>
-                            <button class="btn btn-success" onclick="window.validateAllConstraints()">
-                                <i class="fas fa-check-double"></i> בדוק כל האילוצים
-                            </button>
+                            <button data-button-type="REFRESH" data-variant="full" data-icon="🔄" data-text="רענן נתונים" data-classes="btn-primary" data-onclick="window.refreshConstraints()" type="button"></button>
+                            <button data-button-type="CHECK" data-variant="full" data-icon="✓" data-text="בדוק כל האילוצים" data-classes="btn-success" data-onclick="window.validateAllConstraints()" type="button"></button>
                         </div>
                         
                         <!-- Filter Controls -->
@@ -226,9 +216,7 @@
                     <div class="section-header">
                         <h2>📋 אילוצים לפי טבלאות</h2>
                         <p>תצוגה מפורטת של אילוצים לפי טבלאות</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section3')" data-classes="filter-toggle-btn" title="הצג/הסתר סקשן" ></button>
                     </div>
                     <div class="section-body">
                         <div id="by-table-content">
@@ -248,9 +236,7 @@
                     <div class="section-header">
                         <h2>🏷️ אילוצים לפי סוג</h2>
                         <p>תצוגה מפורטת של אילוצים לפי סוג</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('section4')" data-classes="filter-toggle-btn" title="הצג/הסתר סקשן" ></button>
                     </div>
                     <div class="section-body">
                         <div id="by-type-content">

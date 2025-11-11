@@ -529,7 +529,7 @@ class ConstraintsMonitor {
             messagesContainer.innerHTML = `
                 <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
                     ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button data-button-type="CLOSE" data-variant="small" data-attributes="data-bs-dismiss='alert' type='button'"></button>
                 </div>
             `;
             
@@ -646,7 +646,7 @@ window.viewConstraint = function(constraintName) {
                         <h5 class="modal-title">
                             <i class="fas fa-eye"></i> פרטי אילוץ: ${constraint.constraint_name}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button data-button-type="CLOSE" data-variant="small" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
@@ -670,9 +670,7 @@ window.viewConstraint = function(constraintName) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn" onclick="window.editConstraint('${constraint.constraint_name}')" data-bs-dismiss="modal">
-                            <i class="fas fa-edit"></i> ערוך
-                        </button>
+                        <button data-button-type="EDIT" data-variant="full" data-icon="✏️" data-text="ערוך" data-classes="btn" data-onclick="window.editConstraint('${constraint.constraint_name}')" data-attributes="data-bs-dismiss='modal'"></button>
                     </div>
                 </div>
             </div>
@@ -774,7 +772,7 @@ function showValidationModal(constraint, isAll) {
                         <h5 class="modal-title">
                             <i class="fas fa-check-double"></i> ${title}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button data-button-type="CLOSE" data-variant="small" data-attributes="data-bs-dismiss='modal' type='button'"></button>
                     </div>
                     <div class="modal-body">
                         <div id="validation-progress" class="mb-3">
@@ -794,9 +792,7 @@ function showValidationModal(constraint, isAll) {
                     </div>
                     <div class="modal-footer">
                         <button data-button-type="CLOSE" data-attributes="data-bs-dismiss='modal' type='button'"></button>
-                        <button type="button" class="btn" onclick="exportValidationReport()">
-                            <i class="fas fa-download"></i> ייצא דוח
-                        </button>
+                        <button data-button-type="EXPORT" data-variant="full" data-icon="📤" data-text="ייצא דוח" data-classes="btn" data-onclick="exportValidationReport()" type="button"></button>
                     </div>
                 </div>
             </div>

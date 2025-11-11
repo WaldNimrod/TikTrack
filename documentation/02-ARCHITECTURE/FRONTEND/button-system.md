@@ -108,6 +108,34 @@ ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
 - `size` (string, optional): גודל הכפתור
 - `additionalClasses` (string, optional): מחלקות CSS נוספות
 
+### 6. `createFilterButtonHelper(container, onClick, text, options)`
+**תפקיד**: יצירת כפתורי פילטר (chips / quick filters) בהתאם למערכת החדשה  
+**פרמטרים מרכזיים**:
+- `container` (HTMLElement): אלמנט היעד להזרקת הכפתור
+- `onClick` (string): הערך שיוזן לתוך `data-onclick`
+- `text` (string): הטקסט שיוצג בכפתור
+- `options` (object, optional):
+  - `title` (string): טקסט נגישות (ברירת מחדל = הטקסט)
+  - `additionalClasses` (string): מחלקות CSS משותפות (למשל `btn-outline-primary filter-icon-btn`)
+  - `additionalAttributes` (string): אטריביוטים מותאמים אישית (למשל `data-type="account"`)
+  - `variant` (string): `small` לאייקון בלבד, `normal` לטקסט בלבד, `full` לטקסט + אייקון
+  - `icon` (string): איקון חלופי (אם לא סופק – המערכת משתמשת באיקון ברירת המחדל של FILTER)
+
+```javascript
+createFilterButtonHelper(
+    filtersContainer,
+    "filterAlertsByRelatedObjectType('account')",
+    'חשבונות',
+    {
+        title: 'סינון לפי חשבון מסחר',
+        additionalClasses: 'btn-outline-primary filter-icon-btn',
+        additionalAttributes: 'data-type=\"account\"',
+        variant: 'full',
+        icon: '🏦'
+    }
+);
+```
+
 ## מערכת מתקדמת - כפתורי פעולות לטבלאות
 
 ### 1. `generateActionButtons(entityId, entityType, status, ...functions, ...showFlags)`
@@ -209,6 +237,43 @@ if (item.status) {
     actionsHtml += createCancelButton(tableType, item.id, item.status, 'sm');
 }
 ```
+
+## דפוסי שימוש מומלצים
+
+### כותרות מיון (`SORT`)
+- השתמשו ב-`data-button-type="SORT"` עם `data-variant="full"` כדי להציג את טקסט העמודה לצד האיקון `↕️`.
+- `data-icon` ניתן להחלפה במקרה שרוצים אייקון אחר.
+- דוגמה:
+  ```html
+  <button
+    data-button-type="SORT"
+    data-variant="full"
+    data-icon="↕️"
+    data-text="שם החשבון"
+    data-classes="btn-link sortable-header"
+    data-onclick="window.sortTable('trading_accounts', 0)"></button>
+  ```
+
+### כפתורי הצג/הסתר (`TOGGLE`)
+- ברירת המחדל: `data-variant="small"` להצגת איקון בלבד.
+- תמיד לספק `title` / `data-tooltip` עבור נגישות.
+- ניתן להשתמש ב-`createToggleButtonHelper` לשימוש חוזר.
+
+### כפתורי פילטר (`FILTER` / `SECONDARY`)
+- לפילטרים טקסטואליים: `data-variant="normal"` + `data-text`.
+- לפילטרים עם איקון: `data-variant="full"` + `data-icon`.
+- `createFilterButtonHelper` מספק API אחיד לסינונים (כולל options עבור classes, attributes ו-title).
+
+### פעולות CRUD קטנות
+- כפתורי שורה (לינק, עריכה, מחיקה, אישור/דחייה) מומלץ להגדיר עם `data-variant="small"` כדי לקבל איקון בלבד.
+- כפתורי טפסים/פעולות עיקריות (שמור, ייצוא, בדיקה) מומלץ להגדיר עם `data-variant="full"` כדי לשלב טקסט ואיקון.
+
+## הרחבת API גלובלי
+
+- `window.addDynamicButton(container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal', icon = '')`
+- `window.updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal', icon = '')`
+
+הפרמטרים החדשים (`variant`, `icon`) מאפשרים לנהל את תצוגת הכפתור מתוך קוד JS (כולל איקון מותאם, וריאציה של טקסט/איקון ובחירת מחלקות CSS תומכות).
 
 ## יתרונות המערכת
 

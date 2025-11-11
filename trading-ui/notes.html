@@ -117,21 +117,11 @@
                         <div class="filter-buttons-container button-row">
                             <button data-button-type="ADD" data-entity-type="note" data-variant="full" data-onclick="window.showModalSafe('notesModal','add')" data-text="הוסף הערה" title="הוסף הערה חדשה"></button>
                             <div class="action-separator"></div>
-                            <button class="btn btn-sm active" data-onclick="filterNotesByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover">
-                                הכל
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover">
-                                <img src="images/icons/trading_accounts.svg" alt="חשבונות מסחר" class="filter-icon">
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover">
-                                <img src="images/icons/trades.svg" alt="טריידים" class="filter-icon">
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover">
-                                <img src="images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon">
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover">
-                                <img src="images/icons/tickers.svg" alt="טיקרים" class="filter-icon">
-                            </button>
+                            <button data-button-type="FILTER" data-variant="normal" data-text="הכל" data-classes="btn-sm active" data-onclick="filterNotesByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                            <button data-button-type="FILTER" data-variant="full" data-icon="🏦" data-text="חשבונות" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                            <button data-button-type="FILTER" data-variant="full" data-icon="💼" data-text="טריידים" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                            <button data-button-type="FILTER" data-variant="full" data-icon="📝" data-text="תוכניות" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                            <button data-button-type="FILTER" data-variant="full" data-icon="📈" data-text="טיקרים" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterNotesByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
                             
                             <span class="filter-separator">|</span>
                         </div>
@@ -145,13 +135,13 @@
                                 <thead>
                                     <tr>
                                         <th class="col-linked-object">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('notes', 0)">אובייקט מקושר <span class="sort-icon">↕</span></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="אובייקט מקושר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 0)" ></button>
                                         </th>
                                         <th class="col-content">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('notes', 1)">תוכן <span class="sort-icon">↕</span></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תוכן" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 1)" ></button>
                                         </th>
                                         <th class="col-created">
-                                            <button class="btn btn-link sortable-header" data-onclick="window.sortTable('notes', 2)">תאריך <span class="sort-icon">↕</span></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 2)" ></button>
                                         </th>
                                         <th class="col-attachment">
                                             קובץ מצורף

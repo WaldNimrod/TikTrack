@@ -98,7 +98,7 @@ function createCancelButtonHelper(container, itemType, itemId, status = 'open', 
     
     // יצירת כפתור עם המערכת החדשה
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, type, onclick, classes, attributes, '', `cancel-btn-${itemType}-${itemId}`);
+        window.addDynamicButton(container, type, onclick, classes, attributes, '', `cancel-btn-${itemType}-${itemId}`, 'small');
     } else {
         // fallback - יצירת כפתור ישירות (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onclick}" ${attributes}>
@@ -163,7 +163,7 @@ function createDeleteButtonByTypeHelper(container, itemType, itemId, size = 'sm'
     
     // יצירת כפתור עם המערכת החדשה
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'DELETE', onclick, classes, attributes, '', `delete-btn-${itemType}-${itemId}`);
+        window.addDynamicButton(container, 'DELETE', onclick, classes, attributes, '', `delete-btn-${itemType}-${itemId}`, 'small');
     } else {
         // fallback - יצירת כפתור ישירות (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onclick}" ${attributes}>
@@ -183,7 +183,7 @@ function createEditButtonHelper(container, onClick, additionalClasses = '') {
     const classes = `btn btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'EDIT', onClick, classes, '', '', `edit-btn-${Date.now()}`);
+        window.addDynamicButton(container, 'EDIT', onClick, classes, '', '', `edit-btn-${Date.now()}`, 'small');
     } else {
         // fallback (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="ערוך">
@@ -203,7 +203,7 @@ function createDeleteButtonHelper(container, onClick, additionalClasses = '') {
     const classes = `btn btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'DELETE', onClick, classes, '', '', `delete-btn-${Date.now()}`);
+        window.addDynamicButton(container, 'DELETE', onClick, classes, '', '', `delete-btn-${Date.now()}`, 'small');
     } else {
         // fallback (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="מחק">
@@ -223,7 +223,7 @@ function createLinkButtonHelper(container, onClick, additionalClasses = '') {
     const classes = `btn btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'LINK', onClick, classes, '', '', `link-btn-${Date.now()}`);
+        window.addDynamicButton(container, 'LINK', onClick, classes, '', '', `link-btn-${Date.now()}`, 'small');
     } else {
         // fallback (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="קישור">
@@ -243,7 +243,7 @@ function createCloseButtonHelper(container, additionalClasses = '') {
     const attributes = 'data-bs-dismiss="modal" type="button"';
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'CLOSE', '', classes, attributes, '', `close-btn-${Date.now()}`);
+        window.addDynamicButton(container, 'CLOSE', '', classes, attributes, '', `close-btn-${Date.now()}`, 'small');
     } else {
         // fallback
         const buttonHtml = `<button class="btn ${classes}" ${attributes} title="סגור">
@@ -263,15 +263,13 @@ function createCloseButtonHelper(container, additionalClasses = '') {
  */
 function createSortButtonHelper(container, onClick, additionalClasses = 'sortable-header', additionalAttributes = '', text = '') {
     const classes = `btn-link ${additionalClasses}`.trim();
-    const attributes = additionalAttributes;
+    const attributes = `${additionalAttributes} data-icon="↕️"`.trim();
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'SORT', onClick, classes, attributes, text, `sort-btn-${Date.now()}`);
+        window.addDynamicButton(container, 'SORT', onClick, classes, attributes, text, `sort-btn-${Date.now()}`, 'full', '↕️');
     } else {
         // fallback (עם data-onclick)
-        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" ${attributes} title="מיון">
-            ${text}↕️
-        </button>`;
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" ${additionalAttributes} title="מיון">${text} <span class="sort-icon">↕️</span></button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
     }
 }
@@ -287,12 +285,42 @@ function createToggleButtonHelper(container, onClick, title = 'הצג/הסתר',
     const classes = `btn ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, 'TOGGLE', onClick, classes, `title="${title}"`, '', `toggle-btn-${Date.now()}`);
+        window.addDynamicButton(container, 'TOGGLE', onClick, classes, `title="${title}"`, '', `toggle-btn-${Date.now()}`, 'small', '▼');
     } else {
         // fallback (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" title="${title}">
             <span class="toggle-icon">▼</span>
         </button>`;
+        container.insertAdjacentHTML('beforeend', buttonHtml);
+    }
+}
+
+/**
+ * יצירת כפתור פילטר
+ * @param {HTMLElement} container - אלמנט ה-container
+ * @param {string} onClick - פונקציה להרצה (data-onclick)
+ * @param {string} text - טקסט הכפתור
+ * @param {Object} options - הגדרות נוספות
+ */
+function createFilterButtonHelper(container, onClick, text = '', options = {}) {
+    const {
+        title = text || 'פילטר',
+        additionalClasses = '',
+        additionalAttributes = '',
+        variant = 'full',
+        icon = ''
+    } = options;
+
+    const classes = `btn btn-sm ${additionalClasses}`.trim();
+    const attributes = `${additionalAttributes} title="${title}"`.trim();
+    const buttonId = `filter-btn-${Date.now()}`;
+
+    if (window.addDynamicButton) {
+        window.addDynamicButton(container, 'FILTER', onClick, classes, attributes, text, buttonId, variant, icon);
+    } else {
+        // fallback (עם data-onclick)
+        const displayIcon = icon || '🔍';
+        const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" ${attributes}>${displayIcon} ${text}</button>`;
         container.insertAdjacentHTML('beforeend', buttonHtml);
     }
 }
@@ -309,7 +337,7 @@ function createButtonHelper(container, type, onClick, additionalClasses = '', ad
     const classes = `btn-sm ${additionalClasses}`.trim();
     
     if (window.addDynamicButton) {
-        window.addDynamicButton(container, type, onClick, classes, additionalAttributes, '', `btn-${type}-${Date.now()}`);
+        window.addDynamicButton(container, type, onClick, classes, additionalAttributes, '', `btn-${type}-${Date.now()}`, 'full');
     } else {
         // fallback (עם data-onclick)
         const buttonHtml = `<button class="btn ${classes}" data-onclick="${onClick}" ${additionalAttributes} title="${type}">
@@ -328,6 +356,7 @@ window.createLinkButtonHelper = createLinkButtonHelper;
 window.createCloseButtonHelper = createCloseButtonHelper;
 window.createSortButtonHelper = createSortButtonHelper;
 window.createToggleButtonHelper = createToggleButtonHelper;
+window.createFilterButtonHelper = createFilterButtonHelper;
 window.createButtonHelper = createButtonHelper;
 
 console.log('🔧 Button Helpers loaded successfully');

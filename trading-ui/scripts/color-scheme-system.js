@@ -1134,6 +1134,73 @@ function updateEntityColors(preferences) {
 
 function updateCSSVariablesFromPreferences(preferences) {
   try {
+    const setVar = (name, value) => {
+      if (typeof value === 'string' && value.trim() !== '') {
+        document.documentElement.style.setProperty(name, value);
+      }
+    };
+
+    const computeVariant = (base, fallback, variant) => {
+      if (fallback) {
+        return fallback;
+      }
+      if (!base || typeof base !== 'string') {
+        return null;
+      }
+      try {
+        if (variant === 'light') {
+          return lightenColor(base, 25);
+        }
+        if (variant === 'dark') {
+          return darkenColor(base, 20);
+        }
+        if (variant === 'border') {
+          return lightenColor(base, 35);
+        }
+      } catch (variantError) {
+        if (window.Logger) {
+          window.Logger.warn('⚠️ Failed to compute color variant', { base, variant, error: variantError }, { page: "color-scheme" });
+        }
+      }
+      return null;
+    };
+
+    const applyNumericPalette = (key, tokens = {}, semanticBase = null) => {
+      const medium = tokens.medium;
+      const light = computeVariant(medium, tokens.light, 'light');
+      const dark = computeVariant(medium, tokens.dark, 'dark');
+      const border = computeVariant(medium, tokens.border, 'border') || medium;
+
+      setVar(`--numeric-${key}-medium`, medium);
+      setVar(`--numeric-${key}-light`, light);
+      setVar(`--numeric-${key}-dark`, dark);
+      setVar(`--numeric-${key}-border`, border);
+
+      if (semanticBase) {
+        setVar(`--color-${semanticBase}`, medium);
+        setVar(`--color-${semanticBase}-light`, light);
+        setVar(`--color-${semanticBase}-dark`, dark);
+        setVar(`--color-${semanticBase}-border`, border);
+        setVar(`--color-${semanticBase}-bg`, light || medium);
+      }
+    };
+
+    const applyThemeColor = (baseName, color, variants = {}) => {
+      if (!color || typeof color !== 'string') {
+        return;
+      }
+      const medium = color;
+      const light = computeVariant(medium, variants.light, 'light');
+      const dark = computeVariant(medium, variants.dark, 'dark');
+      const border = computeVariant(medium, variants.border, 'border') || medium;
+
+      setVar(`--color-${baseName}`, medium);
+      setVar(`--color-${baseName}-light`, light);
+      setVar(`--color-${baseName}-dark`, dark);
+      setVar(`--color-${baseName}-border`, border);
+      setVar(`--color-${baseName}-bg`, light || medium);
+    };
+
     if (preferences && preferences.colorScheme) {
       // Update CSS variables based on preferences
       if (preferences.colorScheme.entities) {
@@ -1162,6 +1229,62 @@ function updateCSSVariablesFromPreferences(preferences) {
           document.documentElement.style.setProperty(`--user-status-${statusType}-border`, borderColor);
         });
       }
+
+      if (preferences.colorScheme.numericValues) {
+        const numericValues = preferences.colorScheme.numericValues;
+
+        const positiveTokens = {
+          medium: preferences.valuePositiveColor || numericValues.positive?.medium,
+          light: preferences.valuePositiveColorLight || numericValues.positive?.light,
+          dark: preferences.valuePositiveColorDark || numericValues.positive?.dark,
+          border: numericValues.positive?.border
+        };
+        applyNumericPalette('positive', positiveTokens, 'success');
+
+        const negativeTokens = {
+          medium: preferences.valueNegativeColor || numericValues.negative?.medium,
+          light: preferences.valueNegativeColorLight || numericValues.negative?.light,
+          dark: preferences.valueNegativeColorDark || numericValues.negative?.dark,
+          border: numericValues.negative?.border
+        };
+        applyNumericPalette('negative', negativeTokens, 'danger');
+
+        const zeroTokens = {
+          medium: preferences.valueNeutralColor || numericValues.zero?.medium,
+          light: preferences.valueNeutralColorLight || numericValues.zero?.light,
+          dark: preferences.valueNeutralColorDark || numericValues.zero?.dark,
+          border: numericValues.zero?.border
+        };
+        applyNumericPalette('zero', zeroTokens, 'neutral');
+      }
+    }
+
+    // Theme-level semantic colors (warning/info/success/danger overrides)
+    const successOverride = preferences.successColor || preferences.valuePositiveColor;
+    const dangerOverride = preferences.dangerColor || preferences.valueNegativeColor;
+    const warningOverride = preferences.warningColor;
+    const infoOverride = preferences.infoColor || preferences.primaryColor || (preferences.colorScheme && preferences.colorScheme.entities && preferences.colorScheme.entities.info);
+
+    if (successOverride) {
+      applyThemeColor('success', successOverride, {
+        light: preferences.valuePositiveColorLight,
+        dark: preferences.valuePositiveColorDark
+      });
+    }
+
+    if (dangerOverride) {
+      applyThemeColor('danger', dangerOverride, {
+        light: preferences.valueNegativeColorLight,
+        dark: preferences.valueNegativeColorDark
+      });
+    }
+
+    if (warningOverride) {
+      applyThemeColor('warning', warningOverride);
+    }
+
+    if (infoOverride) {
+      applyThemeColor('info', infoOverride);
     }
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error updating CSS variables from preferences:', error, { page: "color-scheme" }); }

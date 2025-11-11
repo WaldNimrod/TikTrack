@@ -67,19 +67,19 @@ async function loadCategoriesOverview() {
 
     // Get available categories from the system
     const categories = [
-      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: '#26baac' },
-      { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: '#28a745' },
-      { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: '#17a2b8' },
-      { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: '#6f42c1' },
-      { name: 'performance', title: 'ביצועים', icon: 'fas fa-tachometer-alt', color: '#fd7e14' },
-      { name: 'security', title: 'אבטחה', icon: 'fas fa-shield-alt', color: '#dc3545' },
-      { name: 'network', title: 'רשת', icon: 'fas fa-network-wired', color: '#20c997' },
-      { name: 'database', title: 'מסד נתונים', icon: 'fas fa-database', color: '#6c757d' },
-      { name: 'user', title: 'משתמש', icon: 'fas fa-user', color: '#e83e8c' },
-      { name: 'trade', title: 'עסקאות', icon: 'fas fa-chart-line', color: '#ffc107' },
-      { name: 'ticker', title: 'טיקרים', icon: 'fas fa-coins', color: '#fd7e14' },
-      { name: 'alert', title: 'התראות', icon: 'fas fa-bell', color: '#dc3545' },
-      { name: 'general', title: 'כללי', icon: 'fas fa-info-circle', color: '#6c757d' }
+      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: 'var(--primary-color, #26baac)' },
+      { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: 'var(--color-success, #28a745)' },
+      { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: 'var(--color-info, #17a2b8)' },
+      { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: 'var(--entity-development-color, #fc5a06)' },
+      { name: 'performance', title: 'ביצועים', icon: 'fas fa-tachometer-alt', color: 'var(--entity-cash_flow-color, #fd7e14)' },
+      { name: 'security', title: 'אבטחה', icon: 'fas fa-shield-alt', color: 'var(--color-danger, #dc3545)' },
+      { name: 'network', title: 'רשת', icon: 'fas fa-network-wired', color: 'var(--entity-ticker-color, #20c997)' },
+      { name: 'database', title: 'מסד נתונים', icon: 'fas fa-database', color: 'var(--entity-preference-color, #6c757d)' },
+      { name: 'user', title: 'משתמש', icon: 'fas fa-user', color: 'var(--entity-constraint-color, #e83e8c)' },
+      { name: 'trade', title: 'עסקאות', icon: 'fas fa-chart-line', color: 'var(--entity-trade-color, #26baac)' },
+      { name: 'ticker', title: 'טיקרים', icon: 'fas fa-coins', color: 'var(--entity-ticker-color, #fd7e14)' },
+      { name: 'alert', title: 'התראות', icon: 'fas fa-bell', color: 'var(--entity-alert-color, #dc3545)' },
+      { name: 'general', title: 'כללי', icon: 'fas fa-info-circle', color: 'var(--color-neutral, #6c757d)' }
     ];
 
     let html = '<div class="row">';
@@ -165,10 +165,10 @@ async function loadCategoryStats() {
     }
 
     const categories = [
-      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: '#28a745' },
-      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: '#dc3545' },
-      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: '#ffc107' },
-      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: '#17a2b8' }
+      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: 'var(--color-success, #28a745)' },
+      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: 'var(--color-danger, #dc3545)' },
+      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: 'var(--color-warning, #ffc107)' },
+      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: 'var(--color-info, #17a2b8)' }
     ];
 
     let html = '<div class="row">';
@@ -2224,10 +2224,10 @@ async function loadCategoryStats() {
     }
 
     const categories = [
-      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: '#28a745' },
-      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: '#dc3545' },
-      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: '#ffc107' },
-      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: '#17a2b8' }
+      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: 'var(--color-success, #28a745)' },
+      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: 'var(--color-danger, #dc3545)' },
+      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: 'var(--color-warning, #ffc107)' },
+      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: 'var(--color-info, #17a2b8)' }
     ];
 
     let html = '<div class="row">';

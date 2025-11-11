@@ -81,6 +81,13 @@
 - 📄 **מיקום הבדיקה**: `tests/integration/accessibility/a11y-baseline.test.js`
 - 🧪 **שימוש מומלץ**: לשלב את הפקודה ב־CI ובסבבי QA לפני העלאה לסביבת בדיקות.
 
+## 7. סטטוס כיסוי צבעים דינמי
+- **העדפות > UI**: צבעי חיובי/שלילי/ניטרלי ממערכת ההעדפות (valuePositive / valueNegative / valueNeutral) מפרנסים כעת את כל משתני ה־CSS הסמנטיים (`--color-success`, `--color-danger`, `--color-neutral`, וכו׳) כולל גזרות רקע/מסגרת.
+- **Theme צבעי אזהרה/מידע**: `warningColor` ו־`infoColor` נצרכים בזמן ריצה ומרעננים `--color-warning` / `--color-info` והנגזרות שלהם (רקע/מסגרת) לצד fallback מאובטח.
+- **מערכת ניהול > Dashboards**: רכיבי System Management (SMUI) משתמשים ב־`SMUIColorUtils` החדש כדי לשלוף את הגוונים הדינמיים עבור סטטוסים, מדדי ביצועים ופסי התקדמות (אחידות ב־Dashboard, Cache, Server).
+- **מרכז התראות**: חלוניות הסיווג משתמשות בצבעי ישויות גלובליים (`--entity-*`) ובצבעים סמנטיים קלים לעדכון במקום hex קשיחים.
+- **ייבוא נתונים**: מדד התאמה (confidence score) משתקף באמצעות `var(--color-success / warning / danger)` במקום צבעים קשיחים.
+
 ---
 **המסמך נוצר כחלק מהשלמת המשימה “audit-accessibility” בתוכנית הספציפית וילווה את שלבי הפיתוח הבאים.**
 

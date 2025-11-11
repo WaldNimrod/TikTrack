@@ -558,6 +558,70 @@ function updateEntityColors(preferences) {
 
 function updateCSSVariablesFromPreferences(preferences) {
   try {
+    const setVar = (name, value) => {
+      if (typeof value === 'string' && value.trim() !== '') {
+        document.documentElement.style.setProperty(name, value);
+      }
+    };
+
+    const computeVariant = (base, fallback, variant) => {
+      if (fallback) {
+        return fallback;
+      }
+      if (!base || typeof base !== 'string') {
+        return null;
+      }
+      try {
+        if (variant === 'light') {
+          return lightenColor(base, 25);
+        }
+        if (variant === 'dark') {
+          return darkenColor(base, 20);
+        }
+        if (variant === 'border') {
+          return lightenColor(base, 35);
+        }
+      } catch (variantError) {
+        console.warn('⚠️ Failed to compute color variant', { base, variant, error: variantError });
+      }
+      return null;
+    };
+
+    const applyNumericPalette = (key, tokens = {}, semanticBase = null) => {
+      const medium = tokens.medium;
+      const light = computeVariant(medium, tokens.light, 'light');
+      const dark = computeVariant(medium, tokens.dark, 'dark');
+      const border = computeVariant(medium, tokens.border, 'border') || medium;
+
+      setVar(`--numeric-${key}-medium`, medium);
+      setVar(`--numeric-${key}-light`, light);
+      setVar(`--numeric-${key}-dark`, dark);
+      setVar(`--numeric-${key}-border`, border);
+
+      if (semanticBase) {
+        setVar(`--color-${semanticBase}`, medium);
+        setVar(`--color-${semanticBase}-light`, light);
+        setVar(`--color-${semanticBase}-dark`, dark);
+        setVar(`--color-${semanticBase}-border`, border);
+        setVar(`--color-${semanticBase}-bg`, light || medium);
+      }
+    };
+
+    const applyThemeColor = (baseName, color, variants = {}) => {
+      if (!color) {
+        return;
+      }
+      const light = computeVariant(color, variants.light, 'light');
+      const dark = computeVariant(color, variants.dark, 'dark');
+      const border = computeVariant(color, variants.border, 'border') || color;
+
+      setVar(`--color-${baseName}`, color);
+      setVar(`--color-${baseName}-light`, light);
+      setVar(`--color-${baseName}-dark`, dark);
+      setVar(`--color-${baseName}-border`, border);
+      setVar(`--color-${baseName}-bg`, light || color);
+    };
+
     if (preferences && preferences.colorScheme) {
       // Update CSS variables based on preferences
       if (preferences.colorScheme.entities) {
@@ -565,7 +629,45 @@ function updateCSSVariablesFromPreferences(preferences) {
           document.documentElement.style.setProperty(`--entity-${entityType}-color`, color);
         });
       }
+
+      if (preferences.colorScheme.numericValues) {
+        const numericValues = preferences.colorScheme.numericValues;
+
+        applyNumericPalette('positive', {
+          medium: preferences.valuePositiveColor || numericValues.positive?.medium,
+          light: preferences.valuePositiveColorLight || numericValues.positive?.light,
+          dark: preferences.valuePositiveColorDark || numericValues.positive?.dark,
+          border: numericValues.positive?.border
+        }, 'success');
+
+        applyNumericPalette('negative', {
+          medium: preferences.valueNegativeColor || numericValues.negative?.medium,
+          light: preferences.valueNegativeColorLight || numericValues.negative?.light,
+          dark: preferences.valueNegativeColorDark || numericValues.negative?.dark,
+          border: numericValues.negative?.border
+        }, 'danger');
+
+        applyNumericPalette('zero', {
+          medium: preferences.valueNeutralColor || numericValues.zero?.medium,
+          light: preferences.valueNeutralColorLight || numericValues.zero?.light,
+          dark: preferences.valueNeutralColorDark || numericValues.zero?.dark,
+          border: numericValues.zero?.border
+        }, 'neutral');
+      }
     }
+
+    applyThemeColor('success', preferences.successColor || preferences.valuePositiveColor, {
+      light: preferences.valuePositiveColorLight,
+      dark: preferences.valuePositiveColorDark
+    });
+
+    applyThemeColor('danger', preferences.dangerColor || preferences.valueNegativeColor, {
+      light: preferences.valueNegativeColorLight,
+      dark: preferences.valueNegativeColorDark
+    });
+
+    applyThemeColor('warning', preferences.warningColor);
+    applyThemeColor('info', preferences.infoColor || preferences.brandPrimaryColor);
   } catch (error) {
     console.error('❌ Error updating CSS variables from preferences:', error);
   }

@@ -10,6 +10,32 @@
  * @author TikTrack Development Team
  */
 
+function getCSSVariableValue(variableName, fallback) {
+  try {
+    if (typeof window !== 'undefined' && window.getComputedStyle) {
+      const value = getComputedStyle(document.documentElement).getPropertyValue(variableName);
+      if (value) {
+        const trimmed = value.trim();
+        if (trimmed) {
+          return trimmed;
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.warn('⚠️ Failed to read CSS variable', { variableName, error }, { page: 'sm-ui-components' });
+  }
+  return fallback;
+}
+
+const SM_SEMANTIC_COLORS = {
+  success: () => getCSSVariableValue('--color-success', '#28a745'),
+  warning: () => getCSSVariableValue('--color-warning', '#ffc107'),
+  danger: () => getCSSVariableValue('--color-danger', '#dc3545'),
+  info: () => getCSSVariableValue('--color-info', '#17a2b8'),
+  primary: () => getCSSVariableValue('--primary-color', '#26baac'),
+  secondary: () => getCSSVariableValue('--numeric-zero-medium', '#6c757d')
+};
+
 class SMUIComponents {
   /**
    * Create a status card
@@ -301,12 +327,12 @@ class SMUIComponents {
    */
   static getStatusConfig(status) {
     const configs = {
-      success: { color: '#28a745', icon: 'fa-check-circle' },
-      warning: { color: '#ffc107', icon: 'fa-exclamation-triangle' },
-      danger: { color: '#dc3545', icon: 'fa-times-circle' },
-      info: { color: '#17a2b8', icon: 'fa-info-circle' },
-      primary: { color: '#26baac', icon: 'fa-circle' },
-      secondary: { color: '#6c757d', icon: 'fa-circle' }
+      success: { color: SM_SEMANTIC_COLORS.success(), icon: 'fa-check-circle' },
+      warning: { color: SM_SEMANTIC_COLORS.warning(), icon: 'fa-exclamation-triangle' },
+      danger: { color: SM_SEMANTIC_COLORS.danger(), icon: 'fa-times-circle' },
+      info: { color: SM_SEMANTIC_COLORS.info(), icon: 'fa-info-circle' },
+      primary: { color: SM_SEMANTIC_COLORS.primary(), icon: 'fa-circle' },
+      secondary: { color: SM_SEMANTIC_COLORS.secondary(), icon: 'fa-circle' }
     };
     
     return configs[status] || configs.info;
@@ -334,10 +360,10 @@ class SMUIComponents {
    * קבלת צבע פס התקדמות לפי אחוז
    */
   static getProgressColor(percentage) {
-    if (percentage >= 90) return '#dc3545'; // Red
-    if (percentage >= 75) return '#ffc107'; // Yellow
-    if (percentage >= 50) return '#17a2b8'; // Blue
-    return '#28a745'; // Green
+    if (percentage >= 90) return SM_SEMANTIC_COLORS.danger();
+    if (percentage >= 75) return SM_SEMANTIC_COLORS.warning();
+    if (percentage >= 50) return SM_SEMANTIC_COLORS.info();
+    return SM_SEMANTIC_COLORS.success();
   }
 
   /**
@@ -419,3 +445,7 @@ class SMUIComponents {
 
 // Export for use in other modules
 window.SMUIComponents = SMUIComponents;
+window.SMUIColorUtils = {
+  get: (token, fallback) => SM_SEMANTIC_COLORS[token]?.() || getCSSVariableValue(token, fallback),
+  getCSSVariableValue
+};

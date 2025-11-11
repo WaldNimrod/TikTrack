@@ -581,7 +581,12 @@ function syncTickerRemarksEditorToField(modalElement) {
 function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
     const resumeButton = document.getElementById('resumeImportSessionBtn');
-    const hasSession = Boolean(currentSessionId && activeSessionInfo);
+    const hasSession = Boolean(currentSessionId);
+    const actionsContainer = document.getElementById('activeSessionActions');
+
+    if (actionsContainer) {
+        actionsContainer.style.display = hasSession ? 'flex' : 'none';
+    }
 
     if (!resetButton) {
         if (resumeButton) {
@@ -593,6 +598,7 @@ function updateResetSessionButtonState() {
         return;
     }
 
+    resetButton.style.display = hasSession ? 'inline-flex' : 'none';
     resetButton.disabled = !hasSession;
     resetButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
 
@@ -837,13 +843,15 @@ function updateActiveSessionFromPreview(preview) {
         return;
     }
     
-    const readyRecords = Array.isArray(preview.records_to_import)
-        ? preview.records_to_import.length
-        : (preview.summary?.records_to_import || activeSessionInfo?.readyRecords || 0);
+    const summary = preview.summary || {};
+    const readyRecords = summary.records_to_import
+        ?? summary.cashflow_records
+        ?? summary.valid_records
+        ?? (Array.isArray(preview.records_to_import) ? preview.records_to_import.length : activeSessionInfo?.readyRecords || 0);
     
-    const skipRecords = Array.isArray(preview.records_to_skip)
-        ? preview.records_to_skip.length
-        : (preview.summary?.records_to_skip || activeSessionInfo?.skipRecords || 0);
+    const skipRecords = summary.records_to_skip
+        ?? summary.invalid_records
+        ?? (Array.isArray(preview.records_to_skip) ? preview.records_to_skip.length : activeSessionInfo?.skipRecords || 0);
     
     updateActiveSessionInfo({
         readyRecords,
@@ -1469,12 +1477,17 @@ function closeImportUserDataModal() {
         document.body.style.paddingRight = '';
         const backdrops = document.querySelectorAll('.modal-backdrop');
         backdrops.forEach(backdrop => backdrop.remove());
-        resetImportModal();
     }
     
     if (window.modalNavigationManager?.manageBackdrop) {
         setTimeout(() => window.modalNavigationManager.manageBackdrop(), 50);
     }
+
+    setTimeout(() => {
+        window.refreshDataImportHistory?.();
+    }, 250);
+
+    resetImportModal();
 }
 
 /**
@@ -2010,34 +2023,6 @@ function loadConfirmationData() {
     }
 }
 
-/**
- * Load problem resolution
- */
-function loadProblemResolution() {
-    if (!currentSessionId) {
-        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
-        return;
-    }
-    
-    const taskKey = selectedDataTypeKey || analysisResults?.task_type || 'executions';
-    fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodeURIComponent(taskKey)}`, {
-        method: 'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success || data.status === 'success') {
-            previewData = data.preview_data;
-            displayProblemResolutionDetailed(data.preview_data);
-        } else {
-            showImportUserDataNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
-        }
-    })
-    .catch(error => {
-        window.Logger.error('Problem resolution error:', error);
-        showImportUserDataNotification('שגיאה בטעינת נתוני בעיות', 'error');
-    });
-}
-
 async function reanalyseSessionForTask(taskKey, loadingMessage = 'טוען ומעבד נתונים...') {
     if (!currentSessionId) {
         throw new Error('לא נמצא מזהה סשן פעיל');
@@ -2178,7 +2163,17 @@ function displayExistingRecords(existingRecords) {
             confidenceScore = matches[0].confidence || 0;
         }
         
-        const confidenceColor = confidenceScore >= 80 ? '#28a745' : confidenceScore >= 50 ? '#ffc107' : '#dc3545';
+        const semanticColors = {
+            success: 'var(--color-success, #28a745)',
+            warning: 'var(--color-warning, #ffc107)',
+            danger: 'var(--color-danger, #dc3545)'
+        };
+
+        const confidenceColor = confidenceScore >= 80
+            ? semanticColors.success
+            : confidenceScore >= 50
+                ? semanticColors.warning
+                : semanticColors.danger;
         
         card.innerHTML = `
             <div class="problem-card-header">
@@ -2974,6 +2969,9 @@ function displayAnalysisResults(results) {
             continueBtn.disabled = false;
             continueBtn.setAttribute('aria-disabled', 'false');
         }
+
+        // Auto-load problem resolution data after analysis completes
+        loadProblemResolution(true);
     } catch (error) {
         window.Logger.error('[Import Modal] Error displaying analysis results', { error: error.message, stack: error.stack, page: 'import-user-data' });
     }
@@ -3283,17 +3281,24 @@ function buildPreviewFromAnalysis(results) {
     };
 }
 
-async function loadProblemResolution() {
+async function loadProblemResolution(autoTriggered = false) {
     if (!currentSessionId) {
         showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
     
+    const taskKey = selectedDataTypeKey || analysisResults?.task_type || activeSessionInfo?.taskType || 'executions';
+    window.Logger.info('[Import Modal] Loading problem resolution data', {
+        sessionId: currentSessionId,
+        taskKey,
+        autoTriggered,
+        page: 'import-user-data'
+    });
     const analysisFallback = buildProblemResolutionFromAnalysis(analysisResults);
     setAnalysisLoadingState(true, 'טוען נתוני פתרון בעיות...', 70);
 
     try {
-        const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
+        const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodeURIComponent(taskKey)}`, {
         method: 'GET'
         });
         const data = await response.json();
@@ -3301,16 +3306,21 @@ async function loadProblemResolution() {
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
             displayProblemResolutionDetailed(data.preview_data);
+            window.Logger.info('[Import Modal] Problem resolution data loaded', {
+                summary: data.preview_data?.summary,
+                autoTriggered,
+                page: 'import-user-data'
+            });
             setAnalysisLoadingState(true, 'מאתר פטרונות והצעות לשיפור...', 82);
             window.setTimeout(() => setAnalysisLoadingState(false), 1000);
             const stepActions = document.getElementById('analysisStepActions');
             const continueBtn = document.getElementById('analysisContinueBtn');
             if (stepActions) {
-                stepActions.style.display = 'none';
+                stepActions.style.display = 'flex';
             }
             if (continueBtn) {
-                continueBtn.disabled = true;
-                continueBtn.setAttribute('aria-disabled', 'true');
+                continueBtn.disabled = false;
+                continueBtn.setAttribute('aria-disabled', 'false');
             }
             return;
         }
@@ -3320,10 +3330,16 @@ async function loadProblemResolution() {
             error: data.error || data.message,
             page: 'import-user-data'
         });
+        window.Logger.warn('[Import Modal] Using analysis-based problem resolution fallback', {
+            hasAnalysisFallback: Boolean(analysisFallback),
+            autoTriggered,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('לא ניתן לטעון את נתוני הפתרון המלאים. מוצגים נתוני ניתוח זמניים.', 'warning');
     } catch (error) {
         window.Logger.error('Problem resolution fetch error - using analysis fallback', {
             error: error.message,
+            autoTriggered,
             page: 'import-user-data'
         });
         showImportUserDataNotification('שגיאה בטעינת נתוני פתרון. מוצגים נתוני ניתוח זמניים.', 'warning');
@@ -3340,24 +3356,40 @@ async function loadProblemResolution() {
         const stepActions = document.getElementById('analysisStepActions');
         const continueBtn = document.getElementById('analysisContinueBtn');
         if (stepActions) {
-            stepActions.style.display = 'none';
+            stepActions.style.display = 'flex';
         }
         if (continueBtn) {
-            continueBtn.disabled = true;
-            continueBtn.setAttribute('aria-disabled', 'true');
+            continueBtn.disabled = false;
+            continueBtn.setAttribute('aria-disabled', 'false');
         }
     } else {
         showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה.', 'error');
         setAnalysisLoadingState(false);
+        const stepActions = document.getElementById('analysisStepActions');
+        const continueBtn = document.getElementById('analysisContinueBtn');
+        if (stepActions) {
+            stepActions.style.display = 'flex';
+        }
+        if (continueBtn) {
+            continueBtn.disabled = false;
+            continueBtn.setAttribute('aria-disabled', 'false');
+        }
     }
 }
 
-function proceedToProblemResolution() {
+function proceedToProblemResolution(autoTriggered = false) {
     if (!currentSessionId) {
-        showImportUserDataNotification('לא נמצא סשן פעיל להמשך', 'warning');
+        if (!autoTriggered) {
+            showImportUserDataNotification('לא נמצא סשן פעיל להמשך', 'warning');
+        }
         return;
     }
-    loadProblemResolution();
+    const continueBtn = document.getElementById('analysisContinueBtn');
+    if (continueBtn) {
+        continueBtn.disabled = true;
+        continueBtn.setAttribute('aria-disabled', 'true');
+    }
+    loadProblemResolution(autoTriggered);
 }
 
 function proceedToPreviewFromProblems() {
@@ -3450,6 +3482,7 @@ function displayPreviewData(data) {
     const taskType = (data.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions').toLowerCase();
     const recordsToImport = data.records_to_import || [];
     const recordsToSkip = data.records_to_skip || [];
+    const summary = data.summary || {};
 
     const importCount = recordsToImport.length;
     const skipCount = recordsToSkip.length;
@@ -3465,17 +3498,19 @@ function displayPreviewData(data) {
     if (importRateEl) importRateEl.textContent = `${importRate}%`;
     
     if (taskType === 'cashflows') {
-        renderCashflowPreviewTables(recordsToImport, recordsToSkip);
+        renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary, importCount, skipCount);
+        updateSummaryStats();
         return;
     }
 
     if (taskType === 'account_reconciliation') {
-        renderAccountReconciliationPreview(recordsToImport, recordsToSkip, data.summary || {});
+        renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary, importCount, skipCount);
+        updateSummaryStats();
         return;
     }
 
     renderExecutionPreviewTables(recordsToImport, recordsToSkip);
-    updateActiveSessionFromPreview(data);
+    updateSummaryStats();
 }
 
 function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
@@ -3564,7 +3599,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
     }
 }
 
-function renderCashflowPreviewTables(recordsToImport, recordsToSkip) {
+function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
         importTableHeadRow.innerHTML = `
@@ -3635,14 +3670,18 @@ function renderCashflowPreviewTables(recordsToImport, recordsToSkip) {
         });
     }
 
-    updateActiveSessionFromPreview({
-        records_to_import: recordsToImport,
-        records_to_skip: recordsToSkip,
-        task_type: 'cashflows'
+    const readyRecords = importCountFallback ?? summary.records_to_import ?? summary.cashflow_records ?? recordsToImport.length;
+    const skippedRecords = skipCountFallback ?? summary.records_to_skip ?? summary.invalid_records ?? recordsToSkip.length;
+
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords: skippedRecords,
+        taskType: 'cashflows',
+        status: activeSessionInfo?.status || 'מוכן לייבוא'
     });
 }
 
-function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary) {
+function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     const importTableBody = document.getElementById('importTableBody');
     if (importTableHeadRow) {
@@ -3715,10 +3754,14 @@ function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summ
         });
     }
 
-    updateActiveSessionFromPreview({
-        records_to_import: recordsToImport,
-        records_to_skip: recordsToSkip,
-        task_type: 'account_reconciliation'
+    const readyRecords = importCountFallback ?? summary.valid_records ?? summary.records_to_import ?? recordsToImport.length;
+    const skippedRecords = skipCountFallback ?? summary.invalid_records ?? summary.records_to_skip ?? recordsToSkip.length;
+
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords: skippedRecords,
+        taskType: 'account_reconciliation',
+        status: activeSessionInfo?.status || 'מוכן לייבוא'
     });
 }
 
@@ -3825,18 +3868,53 @@ function displayConfirmationData(analysisResults, previewData) {
     const fileName = window.selectedFile?.name || 'קובץ לא ידוע';
     const accountSelect = document.getElementById('tradingAccountSelect');
     const accountName = accountSelect?.selectedOptions[0]?.text || 'חשבון לא ידוע';
+
+    const previewSummary = previewData.summary || {};
+    const analysisSummary = analysisResults.summary || {};
+    const cashflowSummary = analysisResults.cashflow_summary || {};
+    const accountSummary = analysisResults.account_validation_results || {};
     
-    let totalRecords = analysisResults.total_records || 0;
-    let importCount = previewData.records_to_import?.length || 0;
-    let skipCount = previewData.records_to_skip?.length || 0;
+    let totalRecords = analysisResults.total_records
+        ?? previewSummary.total_records
+        ?? cashflowSummary.record_count
+        ?? previewSummary.record_count
+        ?? 0;
+    
+    let importCount = previewData.records_to_import?.length
+        ?? previewSummary.records_to_import
+        ?? previewSummary.valid_records
+        ?? cashflowSummary.record_count
+        ?? 0;
+    
+    let skipCount = previewData.records_to_skip?.length
+        ?? previewSummary.records_to_skip
+        ?? previewSummary.invalid_records
+        ?? 0;
 
     if (taskType === 'cashflows') {
-        const summary = analysisResults.cashflow_summary || {};
-        totalRecords = analysisResults.total_records ?? summary.record_count ?? importCount + skipCount;
+        totalRecords = analysisResults.total_records
+            ?? previewSummary.total_records
+            ?? cashflowSummary.record_count
+            ?? importCount + skipCount;
+        importCount = previewSummary.records_to_import
+            ?? previewSummary.cashflow_records
+            ?? cashflowSummary.record_count
+            ?? importCount;
+        skipCount = previewSummary.records_to_skip
+            ?? previewSummary.invalid_records
+            ?? (Array.isArray(previewSummary.currency_issues) ? previewSummary.currency_issues.length : skipCount);
     }
 
     if (taskType === 'account_reconciliation') {
-        totalRecords = analysisResults.total_records || importCount + skipCount;
+        totalRecords = analysisResults.total_records
+            ?? previewSummary.total_records
+            ?? importCount + skipCount;
+        importCount = previewSummary.valid_records
+            ?? accountSummary.valid_records
+            ?? importCount;
+        skipCount = previewSummary.invalid_records
+            ?? accountSummary.invalid_records
+            ?? skipCount;
     }
     
     const confirmFileNameEl = document.getElementById('confirmFileName');
@@ -3850,6 +3928,13 @@ function displayConfirmationData(analysisResults, previewData) {
     if (confirmTotalRecordsEl) confirmTotalRecordsEl.textContent = totalRecords;
     if (confirmImportRecordsEl) confirmImportRecordsEl.textContent = importCount;
     if (confirmSkipRecordsEl) confirmSkipRecordsEl.textContent = skipCount;
+    
+    updateActiveSessionInfo({
+        readyRecords: importCount,
+        skipRecords: skipCount,
+        taskType,
+        status: 'מוכן לייבוא'
+    });
     
     window.Logger.info('[Import Modal] Confirmation data displayed successfully', { 
         fileName, 
@@ -4283,11 +4368,31 @@ function updateSummaryStats() {
     const skipCount = document.getElementById('skipCount');
     const importRate = document.getElementById('importRate');
     
-    if (importCount) importCount.textContent = previewData.summary?.records_to_import || 0;
-    if (skipCount) skipCount.textContent = previewData.summary?.records_to_skip || 0;
-    if (importRate) importRate.textContent = `${previewData.summary?.import_rate || 0}%`;
-    
-    updateActiveSessionFromPreview(previewData);
+    const summary = previewData.summary || {};
+    const readyRecords = summary.records_to_import
+        ?? summary.cashflow_records
+        ?? summary.valid_records
+        ?? previewData.records_to_import?.length
+        ?? 0;
+    const skippedRecords = summary.records_to_skip
+        ?? summary.invalid_records
+        ?? previewData.records_to_skip?.length
+        ?? 0;
+    const total = summary.total_records
+        ?? summary.record_count
+        ?? (readyRecords + skippedRecords);
+    const rate = total > 0 ? Math.round((readyRecords / total) * 100) : 0;
+
+    if (importCount) importCount.textContent = readyRecords;
+    if (skipCount) skipCount.textContent = skippedRecords;
+    if (importRate) importRate.textContent = `${rate}%`;
+
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords: skippedRecords,
+        status: activeSessionInfo?.status || 'מוכן לייבוא',
+        taskType: previewData.task_type || selectedDataTypeKey
+    });
 }
 
 /**
@@ -4346,6 +4451,7 @@ function performImport(generateReport = false) {
         return;
     }
     
+    setAnalysisLoadingState(true, 'מייבא נתונים...', 15);
     showImportUserDataNotification('מתחיל ייבוא נתונים...', 'info');
     
     fetch(`/api/user-data-import/session/${currentSessionId}/execute`, {
@@ -4373,6 +4479,7 @@ function performImport(generateReport = false) {
         const apiSucceeded = data.success === true || data.status === 'success';
 
         if (apiSucceeded && importedCount > 0) {
+            setAnalysisLoadingState(true, 'מסכם תהליך הייבוא...', 90);
             let successMessage = `ייבוא הנתונים הושלם בהצלחה! נוספו ${importedCount} רשומות חדשות.`;
             if (skippedCount > 0) {
                 successMessage += ` ${skippedCount} רשומות הושמטו (שגיאות/כפילויות).`;
@@ -4408,6 +4515,7 @@ function performImport(generateReport = false) {
             // Clear cache to show new data - use centralized cache clearing
             clearImportCacheLayers({ reason: 'import-user-data:execute' });
             clearStoredActiveSession();
+            window.refreshDataImportHistory?.();
             // LEGACY (pre Stage B-Lite) flow:
             // if (typeof window.clearCacheQuick === 'function') {
             //     window.clearCacheQuick(null, { source: 'import-user-data' });
@@ -4448,6 +4556,10 @@ function performImport(generateReport = false) {
     .catch(error => {
         window.Logger.error('Import error:', error);
         showImportUserDataNotification('שגיאה בייבוא הנתונים', 'error');
+    })
+    .finally(() => {
+        setAnalysisLoadingState(false);
+        window.refreshDataImportHistory?.();
     });
 }
 

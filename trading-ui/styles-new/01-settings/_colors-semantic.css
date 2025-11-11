@@ -13,40 +13,55 @@
 :root {
   /* ===== צבעים סמנטיים ===== */
   
+  /* צבעים מספריים (חיובי / שלילי / ניטרלי) */
+  --numeric-positive-light: #d4edda;
+  --numeric-positive-medium: #28a745;
+  --numeric-positive-dark: #155724;
+  --numeric-positive-border: #c3e6cb;
+  
+  --numeric-negative-light: #f8d7da;
+  --numeric-negative-medium: #dc3545;
+  --numeric-negative-dark: #721c24;
+  --numeric-negative-border: #f5c6cb;
+  
+  --numeric-zero-light: #e2e3e5;
+  --numeric-zero-medium: #6c757d;
+  --numeric-zero-dark: #383d41;
+  --numeric-zero-border: #d6d8db;
+  
   /* הצלחה - Success */
-  --color-success: #28a745;
-  --color-success-light: #d4edda;
-  --color-success-border: #c3e6cb;
+  --color-success: var(--numeric-positive-medium, #28a745);
+  --color-success-light: var(--numeric-positive-light, #d4edda);
+  --color-success-dark: var(--numeric-positive-dark, #155724);
+  --color-success-border: var(--numeric-positive-border, #c3e6cb);
+  --color-success-bg: var(--numeric-positive-light, #d4edda);
   
   /* שגיאה - Danger */
-  --color-danger: #dc3545;
-  --color-danger-light: #f8d7da;
-  --color-danger-border: #f5c6cb;
+  --color-danger: var(--numeric-negative-medium, #dc3545);
+  --color-danger-light: var(--numeric-negative-light, #f8d7da);
+  --color-danger-dark: var(--numeric-negative-dark, #721c24);
+  --color-danger-border: var(--numeric-negative-border, #f5c6cb);
+  --color-danger-bg: var(--numeric-negative-light, #f8d7da);
   
   /* אזהרה - Warning */
   --color-warning: #ffc107;
   --color-warning-light: #fff3cd;
+  --color-warning-dark: #856404;
   --color-warning-border: #ffeaa7;
+  --color-warning-bg: #fff3cd;
   
   /* מידע - Info */
   --color-info: var(--brand-primary-color, #26baac);
   --color-info-light: #d2f4ef;
+  --color-info-dark: #0c5460;
   --color-info-border: #a8e8de;
+  --color-info-bg: #d2f4ef;
   
   /* ===== צבעי ערכים מספריים ===== */
   
-  /* חיובי - Positive */
-  --numeric-positive-light: #d4edda;
-  --numeric-positive-medium: #28a745;
-  --numeric-positive-border: #c3e6cb;
-  
-  /* שלילי - Negative */
-  --numeric-negative-light: #f8d7da;
-  --numeric-negative-medium: #dc3545;
-  --numeric-negative-border: #f5c6cb;
-  
-  /* אפס - Zero */
-  --numeric-zero-light: #e2e3e5;
-  --numeric-zero-medium: #6c757d;
-  --numeric-zero-border: #d6d8db;
+  /* התאמות נגזרות */
+  --color-neutral: var(--numeric-zero-medium, #6c757d);
+  --color-neutral-light: var(--numeric-zero-light, #e2e3e5);
+  --color-neutral-border: var(--numeric-zero-border, #d6d8db);
+  --color-neutral-bg: var(--numeric-zero-light, #e2e3e5);
 }

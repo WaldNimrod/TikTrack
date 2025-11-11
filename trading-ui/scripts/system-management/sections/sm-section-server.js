@@ -510,10 +510,13 @@ class SMServerSection extends SMBaseSection {
    * קבלת צבע פס התקדמות
    */
   getProgressColor(percent) {
-    if (percent >= 90) return '#dc3545'; // Red
-    if (percent >= 75) return '#ffc107'; // Yellow
-    if (percent >= 50) return '#17a2b8'; // Blue
-    return '#28a745'; // Green
+    if (window.SMUIComponents && typeof window.SMUIComponents.getProgressColor === 'function') {
+      return window.SMUIComponents.getProgressColor(percent);
+    }
+    if (percent >= 90) return 'var(--color-danger, #dc3545)';
+    if (percent >= 75) return 'var(--color-warning, #ffc107)';
+    if (percent >= 50) return 'var(--color-info, #17a2b8)';
+    return 'var(--color-success, #28a745)';
   }
 }
 

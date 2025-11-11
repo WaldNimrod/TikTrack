@@ -791,8 +791,15 @@ async function renderCashFlowsTable() {
     const isExchange = isCurrencyExchange(cashFlow);
     const exchangeId = isExchange ? getExchangeIdFromCashFlow(cashFlow) : null;
 
-    // קבלת סוג עם צבע
-    let typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
+    // קבלת סוג בעזרת מערכת הרינדור הכללית
+    const parsedAmount = typeof cashFlow.amount === 'number'
+      ? cashFlow.amount
+      : parseFloat(cashFlow.amount);
+    const amountForColor = Number.isFinite(parsedAmount) ? parsedAmount : null;
+    const baseTypeDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function')
+      ? window.FieldRendererService.renderType(cashFlow.type, amountForColor)
+      : getCashFlowTypeWithColor(cashFlow.type);
+    const typeDisplay = isExchange ? `🔄 ${baseTypeDisplay}` : baseTypeDisplay;
     
     // Trade column - show trade ID with link button if exists
     const tradeCell = cashFlow.trade_id 
@@ -868,7 +875,7 @@ async function renderCashFlowsTable() {
                     </span>
                 </div>
             </td>
-            <td class="col-type type-cell" data-type="${cashFlow.type || ''}">${typeDisplay}</td>
+            <td class="col-type type-cell" data-type="${cashFlow.type || ''}" dir="rtl">${typeDisplay}</td>
             <td class="col-amount text-end">
                 ${amountDisplay}
             </td>

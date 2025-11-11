@@ -401,6 +401,229 @@ function escapeAttribute(value) {
     return escapeHtml(value);
 }
 
+const CASHFLOW_TYPE_LABELS = {
+    deposit: 'הפקדות',
+    withdrawal: 'משיכות',
+    dividend: 'דיבידנדים',
+    dividend_accrual: 'שינויים בצבירת דיבידנד',
+    interest: 'ריבית',
+    interest_accrual: 'שינויים בצבירת ריבית',
+    tax: 'ניכויי מס',
+    fee: 'עמלות',
+    borrow_fee: 'Borrow Fee',
+    syep_activity: 'פעילות SYEP',
+    syep_interest: 'ריבית SYEP',
+    forex_conversion: 'המרות מט"ח',
+    transfer: 'העברות פנימיות',
+    cash_adjustment: 'התאמות מזומן',
+    unknown: 'סוג לא מזוהה'
+};
+
+function resolveCashflowTypeLabel(typeKey) {
+    if (!typeKey) {
+        return CASHFLOW_TYPE_LABELS.unknown;
+    }
+    const normalised = String(typeKey).toLowerCase();
+    return CASHFLOW_TYPE_LABELS[normalised] || CASHFLOW_TYPE_LABELS.unknown;
+}
+
+function safeToNumber(value) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function formatNumber(value, fractionDigits = 0) {
+    const numeric = safeToNumber(value);
+    return numeric.toLocaleString('he-IL', {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+    });
+}
+
+function formatAmount(value) {
+    return formatNumber(value, 2);
+}
+
+function setAnalysisCardLabel(valueElementId, labelText) {
+    if (!valueElementId) {
+        return;
+    }
+    const valueElement = document.getElementById(valueElementId);
+    if (!valueElement) {
+        return;
+    }
+    const card = valueElement.closest('.analysis-card');
+    if (!card) {
+        return;
+    }
+    const labelElement = card.querySelector('.card-label');
+    if (labelElement && labelText) {
+        labelElement.textContent = labelText;
+    }
+}
+
+function clearCashflowAnalysisSections() {
+    const sections = [
+        { section: 'cashflowTypeSummarySection', content: 'cashflowTypeSummaryCards' },
+        { section: 'cashflowCurrencySummarySection', content: 'cashflowCurrencySummaryCards' },
+        { section: 'cashflowIssuesSummarySection', content: 'cashflowIssuesSummaryList' }
+    ];
+
+    sections.forEach(({ section, content }) => {
+        const sectionElement = document.getElementById(section);
+        const contentElement = content ? document.getElementById(content) : null;
+        if (contentElement) {
+            contentElement.innerHTML = '';
+        }
+        if (sectionElement) {
+            sectionElement.style.display = 'none';
+        }
+    });
+}
+
+function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
+    const section = document.getElementById('cashflowTypeSummarySection');
+    const container = document.getElementById('cashflowTypeSummaryCards');
+    if (!section || !container) {
+        return;
+    }
+
+    container.innerHTML = '';
+    const entries = Object.entries(typeStats);
+    if (!entries.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    entries
+        .sort((a, b) => (b[1]?.total_records || 0) - (a[1]?.total_records || 0))
+        .forEach(([typeKey, stats]) => {
+            const total = safeToNumber(stats.total_records);
+            const valid = safeToNumber(stats.valid_records);
+            const invalid = safeToNumber(stats.invalid_records ?? Math.max(0, total - safeToNumber(stats.valid_records)));
+            const amount = safeToNumber(stats.total_amount ?? totalsByType?.[typeKey]);
+            const primaryCurrencyEntry = Object.entries(stats.currencies || {})
+                .sort(([, amountA], [, amountB]) => Math.abs(amountB) - Math.abs(amountA))[0];
+
+            const card = document.createElement('div');
+            card.className = 'analysis-card';
+            card.innerHTML = `
+                <div class="card-icon"><i class="bi bi-diagram-3"></i></div>
+                <div class="card-content">
+                    <div class="card-number">${formatNumber(total)}</div>
+                    <div class="card-label">${resolveCashflowTypeLabel(typeKey)}</div>
+                    <small>✅ ${formatNumber(valid)} | ⚠️ ${formatNumber(invalid)}</small>
+                    <small>סה״כ סכום: ${formatAmount(amount)}</small>
+                    ${primaryCurrencyEntry ? `<small>מטבע מוביל: ${primaryCurrencyEntry[0]} ${formatAmount(primaryCurrencyEntry[1])}</small>` : ''}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    section.style.display = 'block';
+}
+
+function renderCashflowCurrencyCards(totalsByCurrency = {}) {
+    const section = document.getElementById('cashflowCurrencySummarySection');
+    const container = document.getElementById('cashflowCurrencySummaryCards');
+    if (!section || !container) {
+        return;
+    }
+
+    container.innerHTML = '';
+    const entries = Object.entries(totalsByCurrency)
+        .filter(([currency]) => currency && currency !== 'undefined');
+
+    if (!entries.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    entries
+        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+        .forEach(([currency, amount]) => {
+            const card = document.createElement('div');
+            card.className = 'analysis-card';
+            card.innerHTML = `
+                <div class="card-icon"><i class="bi bi-cash-stack"></i></div>
+                <div class="card-content">
+                    <div class="card-number">${currency}</div>
+                    <div class="card-label">${formatAmount(amount)}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    section.style.display = 'block';
+}
+
+function renderCashflowIssuesSummary({
+    issuesByType = {},
+    missingAccountDetails = [],
+    currencyIssues = []
+} = {}) {
+    const section = document.getElementById('cashflowIssuesSummarySection');
+    const list = document.getElementById('cashflowIssuesSummaryList');
+    if (!section || !list) {
+        return;
+    }
+
+    list.innerHTML = '';
+    const items = [];
+
+    if (Array.isArray(missingAccountDetails) && missingAccountDetails.length > 0) {
+        items.push({
+            title: 'חשבונות חסרים',
+            count: missingAccountDetails.length,
+            description: 'רשומות הדורשות שיוך חשבון לפני הייבוא.',
+            icon: 'bi-people-fill'
+        });
+    }
+
+    if (Array.isArray(currencyIssues) && currencyIssues.length > 0) {
+        items.push({
+            title: 'בעיות מטבע',
+            count: currencyIssues.length,
+            description: 'נמצאו קודי מטבע שגויים או לא נתמכים בקובץ.',
+            icon: 'bi-currency-exchange'
+        });
+    }
+
+    Object.entries(issuesByType || {}).forEach(([typeKey, entries]) => {
+        if (!Array.isArray(entries) || entries.length === 0) {
+            return;
+        }
+        items.push({
+            title: `שגיאות בסוג ${resolveCashflowTypeLabel(typeKey)}`,
+            count: entries.length,
+            description: 'הרשומות הללו הושמטו בשלב הניתוח ודורשות טיפול ידני.',
+            icon: 'bi-exclamation-octagon'
+        });
+    });
+
+    if (!items.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    items.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'summary-card';
+        card.innerHTML = `
+            <div class="summary-header">
+                <div class="summary-title"><i class="bi ${item.icon}"></i> ${item.title}</div>
+                <div class="summary-subtitle">${formatNumber(item.count)}</div>
+            </div>
+            <div class="summary-body">
+                <p>${item.description}</p>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+
+    section.style.display = 'block';
+}
+
 function sanitizeRichText(html) {
     if (window.RichTextEditorService && typeof window.RichTextEditorService.sanitizeHTML === 'function') {
         return window.RichTextEditorService.sanitizeHTML(html);
@@ -1440,11 +1663,6 @@ async function openImportUserDataModal() {
     
     // Initialize step 1
     goToStep(1);
-    
-    if (window.modalNavigationManager?.manageBackdrop) {
-        window.modalNavigationManager.manageBackdrop();
-        setTimeout(() => window.modalNavigationManager?.manageBackdrop(), 50);
-    }
 }
 
 /**
@@ -1479,10 +1697,6 @@ function closeImportUserDataModal() {
         backdrops.forEach(backdrop => backdrop.remove());
     }
     
-    if (window.modalNavigationManager?.manageBackdrop) {
-        setTimeout(() => window.modalNavigationManager.manageBackdrop(), 50);
-    }
-
     setTimeout(() => {
         window.refreshDataImportHistory?.();
     }, 250);
@@ -2985,6 +3199,10 @@ function setAnalysisCardValue(elementId, value) {
 }
 
 function renderExecutionAnalysisSummary(results) {
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'טיקרים חסרים');
+    setAnalysisCardLabel('missingTickerRecords', 'רשומות עם טיקר חסר');
+
     const totalRecords = results.total_records || 0;
     const missingTickersCountValue = Array.isArray(results.missing_tickers)
         ? results.missing_tickers.length
@@ -3003,37 +3221,58 @@ function renderExecutionAnalysisSummary(results) {
 }
 
 function renderCashflowAnalysisSummary(results) {
-    const summary = results.cashflow_summary || {};
-    const detectedTasks = results.detected_tasks
-        || results.summary?.detected_tasks
-        || results.summary_data?.detected_tasks
-        || {};
-    const missingAccounts = results.missing_accounts || summary.missing_accounts || [];
-    const currencyIssues = results.currency_issues || summary.currency_issues || [];
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'חשבונות חסרים');
+    setAnalysisCardLabel('missingTickerRecords', 'בעיות מטבע');
 
-    const detectedCashflows = Number(
-        detectedTasks.cashflows?.records ??
-        results.cashflow_records ??
-        summary.record_count ??
-        results.valid_records ??
+    const summary = results.cashflow_summary || {};
+    const typeStats = results.cashflow_type_stats || summary.type_stats || {};
+    const totalsByType = summary.totals_by_type || {};
+    const totalsByCurrency = summary.totals_by_currency || {};
+    const missingAccountDetails = results.missing_account_details || summary.missing_account_details || [];
+    const currencyIssues = results.currency_issues || summary.currency_issues || [];
+    const issuesByType = results.cashflow_issues_by_type || results.issues_by_type || {};
+
+    const aggregatedValid = Object.values(typeStats).reduce(
+        (acc, stats) => acc + safeToNumber(stats.valid_records ?? Math.max(0, safeToNumber(stats.total_records) - safeToNumber(stats.invalid_records))),
         0
     );
-
-    const totalRecords = results.total_records ?? detectedCashflows;
-    const validRecords = detectedCashflows;
-    const invalidRecords = results.invalid_records ?? (summary.invalid_records ?? 0);
-    const duplicateRecords = results.duplicate_records ?? 0;
+    const aggregatedInvalid = Object.values(typeStats).reduce(
+        (acc, stats) => acc + safeToNumber(stats.invalid_records),
+        0
+    );
+    const totalRecords = safeToNumber(
+        results.total_records ??
+        summary.record_count ??
+        (aggregatedValid + aggregatedInvalid)
+    );
+    const validRecords = aggregatedValid || safeToNumber(results.valid_records ?? summary.valid_records);
+    const invalidRecords = aggregatedInvalid || safeToNumber(results.invalid_records ?? summary.invalid_records);
+    const duplicateRecords = safeToNumber(results.duplicate_records ?? summary.duplicate_records);
+    const existingRecords = safeToNumber(results.existing_records ?? summary.existing_records);
 
     setAnalysisCardValue('totalRecords', totalRecords);
     setAnalysisCardValue('validRecords', validRecords);
     setAnalysisCardValue('invalidRecords', invalidRecords);
     setAnalysisCardValue('duplicateRecords', duplicateRecords);
-    setAnalysisCardValue('missingTickersCount', missingAccounts.length || 0);
+    setAnalysisCardValue('missingTickersCount', missingAccountDetails.length || 0);
     setAnalysisCardValue('missingTickerRecords', currencyIssues.length || 0);
-    setAnalysisCardValue('existingRecords', results.existing_records || 0);
+    setAnalysisCardValue('existingRecords', existingRecords);
+
+    renderCashflowTypeCards(typeStats, totalsByType);
+    renderCashflowCurrencyCards(totalsByCurrency);
+    renderCashflowIssuesSummary({
+        issuesByType,
+        missingAccountDetails,
+        currencyIssues
+    });
 }
 
 function renderAccountReconciliationAnalysisSummary(results) {
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'חשבונות חסרים');
+    setAnalysisCardLabel('missingTickerRecords', 'הרשאות חסרות');
+
     const issues = results.account_validation_results
         || results.reconciliation_summary
         || results.summary

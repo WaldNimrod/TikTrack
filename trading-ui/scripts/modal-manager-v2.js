@@ -1439,24 +1439,23 @@ class ModalManagerV2 {
                 }
             }, 150);
             
-            // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
-            if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-                // קריאה מיידית ואחת נוספת אחרי זמן קצר (למקרה ש-Bootstrap יוצר backdrop אחרי show())
-                window.modalNavigationManager.manageBackdrop();
-                setTimeout(() => {
-                    window.modalNavigationManager.manageBackdrop();
-                }, 100);
+            const navigationMetadata = {
+                modalId,
+                modalType: 'crud-modal',
+                entityType: modalInfo.config.entityType,
+                entityId: mode === 'edit' && entityData ? entityData.id : null,
+                title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
+                mode
+            };
+
+            if (window.ModalNavigationService?.registerModalOpen) {
+                await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+            } else if (window.pushModalToNavigation) {
+                await window.pushModalToNavigation(modalElement, navigationMetadata);
             }
-            
-            // הוספה למערכת ניהול הניווט
-            if (window.modalNavigationManager) {
-                const modalNavInfo = {
-                    type: 'crud-modal',
-                    entityType: modalInfo.config.entityType,
-                    entityId: mode === 'edit' && entityData ? entityData.id : null,
-                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || ''
-                };
-                window.modalNavigationManager.pushModal(modalElement, modalNavInfo);
+
+            if (window.modalNavigationManager?.updateModalNavigation) {
+                window.modalNavigationManager.updateModalNavigation(modalElement);
             }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
@@ -4160,11 +4159,6 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
-        // ניקוי backdrops כפולים - Bootstrap עלול ליצור backdrop גם אחרי shown event
-        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-            window.modalNavigationManager.manageBackdrop();
-        }
-        
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
         if (firstInput) {
@@ -4910,9 +4904,10 @@ class ModalManagerV2 {
             this.clearValidationErrors(form);
         }
         
-        // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
-        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-            window.modalNavigationManager.manageBackdrop();
+        if (window.ModalNavigationService?.registerModalClose) {
+            window.ModalNavigationService.registerModalClose(modalId);
+        } else if (window.registerModalNavigationClose) {
+            window.registerModalNavigationClose(modalId);
         }
     }
 
@@ -5019,14 +5014,11 @@ class ModalManagerV2 {
         titleElement.textContent = title;
         
         // עדכון navigation UI אחרי עדכון הכותרת
-        if (window.modalNavigationManager) {
-            // עדכון המידע במודול הנוכחי
-            const currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === modalElement);
-            if (currentIndex >= 0 && currentIndex !== 0) {
-                // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
-                window.modalNavigationManager.modalHistory[currentIndex].info.title = title;
-            }
-            // עדכון UI
+        if (window.ModalNavigationService?.updateModalMetadata) {
+            window.ModalNavigationService.updateModalMetadata(modalElement.id, { title });
+        }
+
+        if (window.modalNavigationManager?.updateModalNavigation) {
             window.modalNavigationManager.updateModalNavigation(modalElement);
         }
     }

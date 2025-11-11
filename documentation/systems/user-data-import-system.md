@@ -164,10 +164,20 @@ class BaseImportConnector(ABC):
 
 מטפל בקבצי IBKR Activity Statement ומיישם כעת Multi-Section parsing לפי Task:
 
+#### כיסוי מקטעים בייבוא תזרימי מזומנים (עדכון 2025-11-11)
+
+- **העברות והפקדות**: `Deposits & Withdrawals`, `Transfers` – הפקת כיוון תזרים, חשבון יעד, מזהה חברה מעבירה.
+- **דיבידנדים**: `Dividends`, `Change in Dividend Accruals` – שמירת סכום ברוטו/נטו, תאריכי Ex/Pay, סימון קוד פעולה (Po/Re).
+- **ריביות**: `Interest`, `Interest Accruals`, `Stock Yield Enhancement Program Securities Lent Interest Details`.
+- **SYEP**: `Stock Yield Enhancement Program Securities Lent Activity` כולל `transaction_id` וערך בטחונות.
+- **מסים ועמלות**: `Withholding Tax`, `Borrow Fee Details`, סעיפי `Cash Report` הרלוונטיים.
+- **המרות מט"ח**: רשומות `Trades,Data,Order,Forex` ממופות ל-`cashflow_type=forex_conversion` עם בסיס/צמד מטבעות ועמלות נלוות.
+- לכל רשומה נשמרת גרסת מקור מלאה ב-`_raw_row` ותוספת `metadata` המועברת לשכבת ה-UI ולדוחות.
+
 | Task | מקטעים נצרכים | פונקציות Parsing עיקריות | פלט ראשוני |
 | ---- | -------------- | ------------------------- | ----------- |
 | `executions` | `Trades,Header` + `Trades,Data` | `_parse_trades_section` | רשומות ביצועים |
-| `cashflows` | `Cash Report`, `Deposits & Withdrawals`, `Interest`, `Dividends`, `Withholding Tax` | `_parse_cash_report`, `_parse_interest`, `_parse_dividends`, `_parse_withdrawals` | רשומות תזרים עם סוג תזרים |
+| `cashflows` | `Deposits & Withdrawals`, `Transfers`, `Dividends`, `Change in Dividend Accruals`, `Interest`, `Interest Accruals`, `Withholding Tax`, `Borrow Fee Details`, `Stock Yield Enhancement Program Securities Lent Activity`, `Stock Yield Enhancement Program Securities Lent Interest Details`, רשומות Forex (`Trades,Data,Order,Forex`) | `_parse_cashflow_sections`, `_build_cashflow_record`, `_build_forex_cashflows` | רשומות תזרים עם `cashflow_type`, שיוך חשבון ו-`metadata` |
 | `account_reconciliation` | `Account Information`, `Account Configuration`, `Base Currency`, `Account Summary` | `_parse_account_configuration`, `_parse_base_currency` | נתוני חשבון ומטבע בסיס |
 
 #### אובייקטי נורמליזציה
@@ -212,6 +222,7 @@ class BaseImportConnector(ABC):
 - הקונקטורים מחזירים `datetime` מודע לאיזור זמן (UTC), וה-`ImportOrchestrator` ממיר אותם ל-**DateEnvelope** באמצעות `DateNormalizationService`.
 - נקודות הקצה ב-`production/Backend/routes/api/user_data_import.py` מחשבות את איזור הזמן של המשתמש ומריצות `_project_storage_payload` לפני החזרת JSON.
 - ה-UI (ב-`production/trading-ui/scripts/import-user-data.js`) משתמש בפונקציות `renderImportDate()` ו-`showImportUserDataNotification()` כדי להציג תאריכים בהתאם להעדפות המשתמש ולמנוע לולאות במערכת ההודעות.
+- החל מנובמבר 2025 החותמות בטבלת `import_sessions` נשמרות ב-UTC (`created_at`/`completed_at`), וה-API מחזיר אותן באמצעות `DateEnvelope` כדי למנוע פערי תצוגה או חותמות ללא איזור זמן.
 
 ### Orchestrator + Task Plugins (2025-11)
 
@@ -236,7 +247,7 @@ class BaseImportConnector(ABC):
 | Task | שדות חובה | שדות אופציונליים | הערות |
 | ---- | ---------- | ---------------- | ------ |
 | Executions | `symbol`, `action`, `date`, `quantity`, `price`, `fee`, `external_id`, `source` | `realized_pl`, `mtm_pl`, `currency`, `asset_category` | בהתאם לסטנדרט הקיים |
-| Cashflows | `cashflow_type`, `amount`, `currency`, `effective_date`, `source_account`, `external_id`, `source` | `target_account`, `asset_symbol`, `memo`, `tax_country` | סכום ≠ 0, DateEnvelope מלא |
+| Cashflows | `cashflow_type`, `amount`, `currency`, `effective_date`, `external_id`, `source` | `source_account`, `target_account`, `asset_symbol`, `memo`, `tax_country`, `metadata` | סכום ≠ 0, DateEnvelope מלא; `metadata` שומר ערכי מקור + `original_cashflow_type`, `storage_cashflow_type`, `mapping_note`, `notes`, `original_source_account` (אם בוצעה המרה לחשבון הסשן) |
 | Account Reconciliation | `account_id`, `base_currency`, `external_id`, `source` | `margin_status`, `entitlements`, `missing_documents`, `account_aliases`, `risk_profile` | מזהה חיצוני ייחודי לפי חשבון + תאריך דיווח |
 
 ### Validation Service
@@ -245,16 +256,42 @@ class BaseImportConnector(ABC):
 
 - Executions: כמתועד.
 - Cashflows:
-  - סכום חיובי/שלילי בהתאם לסוג (הפקדה חיובית, משיכה שלילית).
-  - מטבע קיים במערכת (`currency_service`).
-  - חשבון מקור נמצא במערכת; עבור קבלת מידע חסר הוספת פריט ל-`missing_accounts`.
-  - סיווג תזרים מוכר (`cashflow_type`).
-  - תאריך אפקטיבי תקין (`DateEnvelope`).
+  - סכום חיובי/שלילי בהתאם לסוג (הפקדה חיובית, משיכה שלילית) וערך מספרי תקין.
+  - מטבע קיים במערכת (`currency_service`) והתרעות על קודים שאינם בני 3 תווים (`currency_issues`).
+  - ניסיון שיוך `source_account`; כשחסר או לא קיים מתקבל פריט ב-`missing_account_details` עם סטטוס (`missing`/`not_found`).
+  - סיווג תזרים מוכר (`cashflow_type`) וסטטיסטיקות לפי סוג (`type_stats`) הכוללות סך רשומות, סכום מצטבר וחלוקת מטבעות/סעיפים.
+  - `issues_by_type` מרכז את רשומות ה-invalid לכל סוג תזרים להצגת כרטיסי התראה בפרונטנד.
 - Account Reconciliation:
   - חשבון קיים במערכת.
   - מטבע בסיס תואם להגדרת החשבון (או מסומן כחריגה).
   - רשימת הרשאות (entitlements) אינה ריקה – אחרת flagged.
   - מסמכים חסרים מדווחים ב-`missing_documents`.
+
+### Cashflow Type Mapping (עדכון 2025-11)
+
+- לאחר שלב הוולידציה ה-Orchestrator מפעיל את `_resolve_cashflow_storage_type()` שמתרגם את סוגי IBKR לערכי האנום של `cash_flows.type`.
+- התוצאה נשמרת ב-`storage_type` ומתווספת למטא-דאטה (`storage_cashflow_type`, `mapping_note`, רשימת `notes`).
+- בזמן הייבוא מתווסף לתיאור התזרימי הטקסט `מקור תזרים: …` כדי לשמר את הקשר (SYEP, Borrow Fee, Forex וכו').
+- טבלת המיפוי העדכנית:
+
+| סוג מקור (`cashflow_type`) | סוג שמור (`storage_type`) | הערות נוספות |
+|----------------------------|---------------------------|--------------|
+| `deposit`                  | `deposit`                 | סכומים חיוביים בלבד |
+| `withdrawal`               | `withdrawal`              | סכומים שליליים בלבד |
+| `transfer`                 | `transfer_in` / `transfer_out` | נגזר מסימן הסכום |
+| `forex_conversion`         | `transfer_in` / `transfer_out` | `mapping_note` = `Forex conversion` |
+| `dividend`                 | `dividend`                | — |
+| `dividend_accrual`         | `other_positive` / `other_negative` | על פי סימן הסכום |
+| `interest`                 | `interest`                | — |
+| `interest_accrual`         | `other_positive` / `other_negative` | על פי סימן הסכום |
+| `tax`                      | `tax`                     | — |
+| `fee`                      | `fee`                     | — |
+| `borrow_fee`               | `fee`                     | `mapping_note` = `Borrow fee` |
+| `syep_interest`            | `interest`                | `mapping_note` = `SYEP interest` |
+| `cash_adjustment`          | `other_positive` / `other_negative` | על פי סימן הסכום |
+| ערכים אחרים               | `other_positive` / `other_negative` | שם המקור נשמר ב-`mapping_note` |
+
+- אם `_ensure_cashflow_account_binding` מחליף את `source_account`, הערך המקורי נשמר תחת `metadata.original_source_account` כדי לאפשר ביקורת עתידית.
 
 ### Duplicate Detection Service
 
@@ -278,9 +315,23 @@ class BaseImportConnector(ABC):
 
 1. **יצירת סשן**: `create_import_session()` – שומר `task_type`, `parsed_sections`, `raw_metadata`.
 2. **ניתוח קובץ**: `analyze_file(task_type)` – מפעיל Pipeline ייעודי ומחזיר שדות מותאמים (`analysis_results`, `cashflow_summary`, `reconciliation_summary`).
-3. **הכנת תצוגה מקדימה**: `generate_preview(task_type)` – משחזר נתונים מהתהליך, מפיק סטטיסטיקות וטבלאות.
-4. **ביצוע ייבוא**: `execute_import(task_type)` – מפעיל persister בהתאם (Executions → `Execution`, Cashflows → `CashFlow`/`CashFlowAdjustment`, Account Reconciliation → `AccountAuditReport`/עדכוני חשבון).
-5. **דוחות לייב**: `create_live_report()` מעדכן כעת גם `cashflow_records`, `cashflow_duplicates`, `missing_accounts`, `account_reconciliation_flags`.
+3. **הכנת תצוגה מקדימה**: `generate_preview(task_type)` – משחזר נתונים מהתהליך, מפיק סטטיסטיקות וטבלאות, מוסיף `storage_type`, `mapping_note` ומעתיק את המיפוי גם לרשימת ההשמטות/כפילויות.
+4. **ביצוע ייבוא**: `execute_import(task_type)` – מפעיל persister בהתאם (Executions → `Execution`, Cashflows → `CashFlow`/`CashFlowAdjustment`, Account Reconciliation → `AccountAuditReport`/עדכוני חשבון) תוך שימוש ב-`storage_type` לכתיבת האנום הסופי והוספת שורת מקור בתיאור הרשומה.
+5. **דוחות לייב**: `create_live_report()` מעדכן כעת גם:
+   - `cashflow_records`, `cashflow_summary`, `totals_by_currency` ו-`cashflow_type_stats`.
+   - `missing_accounts` ו-`missing_account_details` (כולל סטטוס וקטגוריית הבעיה).
+   - `cashflow_issues_by_type` ו-`currency_issues` לצורך הצגת כרטיסי התראה בשלב 2.
+   - `account_reconciliation_flags` עבור תסריטי בדיקת חשבון.
+
+## ממשק משתמש - שלב 2: ניתוח וסטטיסטיקות
+
+- כרטיסי KPI כלליים (סה״כ, תקינות, שגיאות, כפילויות) מעודכנים לפי סוג התהליך.
+- עבור **Cashflows** מתווסף לוח כרטיסים דינמי:
+  - חלוקה לפי סוג תזרים (`cashflow_type_stats`) כולל סכומים מצטברים, סטטוס תקין/שגוי וחלוקת מטבעות.
+  - כרטיסי מטבע (`totals_by_currency`) המציגים יתרות נטו לכל קוד.
+  - אזור התראות קריטיות עם מספר חשבונות חסרים, בעיות מטבע והערות ממוקדות על פי `issues_by_type`.
+- עבור **Executions** ו-**Account Reconciliation** התוויות בכרטיסים מתעדכנות אוטומטית (לדוגמה “חשבונות חסרים” במקום “טיקרים חסרים”).
+- כפתור ההמשך בשלב זה מוביל כעת ישירות לתצוגה המקדימה, לאחר טעינת נתוני פתרון הבעיות.
 
 ## ממשק משתמש - שלב 3: פתרון בעיות
 

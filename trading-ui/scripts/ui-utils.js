@@ -254,11 +254,6 @@ function showModal(modalId, options = {}) {
   // הצגת המודל
   const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
   bootstrapModal.show();
-  
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
 }
 
 /**

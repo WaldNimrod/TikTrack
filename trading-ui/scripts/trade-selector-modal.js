@@ -133,17 +133,13 @@ class TradeSelectorModal {
 
             // Find parent modal BEFORE creating new modal to get sourceInfo
             let parentModal = null;
-            let lastModalInHistory = null;
-            
-            // Check modalHistory first (most reliable)
-            if (window.modalNavigationManager && window.modalNavigationManager.modalHistory.length > 0) {
-                lastModalInHistory = window.modalNavigationManager.modalHistory[window.modalNavigationManager.modalHistory.length - 1];
-                if (lastModalInHistory && lastModalInHistory.element && lastModalInHistory.element.id !== this.modalId) {
-                    parentModal = lastModalInHistory.element;
-                }
+            let parentEntry = null;
+
+            if (window.ModalNavigationService?.getActiveEntry) {
+                parentEntry = window.ModalNavigationService.getActiveEntry();
+                parentModal = parentEntry?.element || (parentEntry?.modalId ? document.getElementById(parentEntry.modalId) : null);
             }
-            
-            // Fallback: check DOM for open modals
+
             if (!parentModal) {
                 const allModals = document.querySelectorAll('.modal.show');
                 for (const modal of allModals) {
@@ -153,35 +149,33 @@ class TradeSelectorModal {
                     }
                 }
             }
-            
-            // Create sourceInfo for nested modal
+
             let sourceInfo = null;
-            if (parentModal) {
-                const parentModalId = parentModal.id || '';
-                if (lastModalInHistory && lastModalInHistory.info) {
-                    sourceInfo = {
-                        type: lastModalInHistory.info.type || 'crud-modal',
-                        entityType: lastModalInHistory.info.entityType || null,
-                        entityId: lastModalInHistory.info.entityId || null,
-                        modalId: parentModalId
-                    };
-                } else if (parentModalId.includes('cashFlow') || parentModalId.includes('CashFlow')) {
-                    sourceInfo = {
-                        type: 'crud-modal',
-                        entityType: 'cash_flow',
-                        modalId: parentModalId
-                    };
-                } else if (parentModalId.includes('execution') || parentModalId.includes('Execution')) {
-                    sourceInfo = {
-                        type: 'crud-modal',
-                        entityType: 'execution',
-                        modalId: parentModalId
-                    };
-                }
+            const parentModalId = parentModal?.id || parentEntry?.modalId || '';
+
+            if (parentEntry) {
+                sourceInfo = {
+                    type: parentEntry.modalType || 'modal',
+                    entityType: parentEntry.entityType || null,
+                    entityId: parentEntry.entityId ?? null,
+                    modalId: parentModalId
+                };
+            } else if (parentModalId.includes('cashFlow') || parentModalId.includes('CashFlow')) {
+                sourceInfo = {
+                    type: 'crud-modal',
+                    entityType: 'cash_flow',
+                    modalId: parentModalId
+                };
+            } else if (parentModalId.includes('execution') || parentModalId.includes('Execution')) {
+                sourceInfo = {
+                    type: 'crud-modal',
+                    entityType: 'execution',
+                    modalId: parentModalId
+                };
             }
 
-            // Create modalInfo for navigation manager BEFORE creating modal
-            const modalInfo = {
+            // Create sourceInfo for nested modal
+            const navigationMetadata = {
                 type: 'selector-modal',
                 entityType: 'trade_selector',
                 entityId: null,
@@ -215,20 +209,26 @@ class TradeSelectorModal {
                 throw new Error('Modal element not found after creation');
             }
 
-            // Register with ModalNavigationManager IMMEDIATELY after modal is created
-            // This ensures z-index is set correctly before modal is shown
-            if (window.modalNavigationManager && window.modalNavigationManager.pushModal) {
-                // Push modal to history BEFORE shown event
-                await window.modalNavigationManager.pushModal(modalElement, modalInfo);
-                // Ensure backdrop is managed after pushModal
-                if (window.modalNavigationManager.manageBackdrop) {
-                    window.modalNavigationManager.manageBackdrop();
-                }
-                // Update z-index immediately after registration
-                if (window.modalNavigationManager.updateModalZIndex) {
-                    window.modalNavigationManager.updateModalZIndex(modalElement);
-                }
+            navigationMetadata.modalId = this.modalId;
+            navigationMetadata.modalType = 'selector-modal';
+
+            if (window.ModalNavigationService?.registerModalOpen) {
+                await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+            } else if (window.pushModalToNavigation) {
+                await window.pushModalToNavigation(modalElement, navigationMetadata);
             }
+
+            if (window.modalNavigationManager?.updateModalNavigation) {
+                window.modalNavigationManager.updateModalNavigation(modalElement);
+            }
+
+            modalElement.addEventListener('hidden.bs.modal', () => {
+                if (window.ModalNavigationService?.registerModalClose) {
+                    window.ModalNavigationService.registerModalClose(this.modalId);
+                } else if (window.registerModalNavigationClose) {
+                    window.registerModalNavigationClose(this.modalId);
+                }
+            }, { once: true });
 
             // Load content AFTER modal is created and registered
             await this.loadContent();
@@ -257,33 +257,32 @@ class TradeSelectorModal {
             let tradingAccountId = null;
             let tickerId = null;
             
-            if (window.modalNavigationManager && window.modalNavigationManager.modalHistory.length > 0) {
-                const parentModalInfo = window.modalNavigationManager.modalHistory[window.modalNavigationManager.modalHistory.length - 1];
-                const parentModal = parentModalInfo?.element;
-                const entityType = parentModalInfo?.info?.entityType;
-                
-                if (parentModal && entityType) {
-                    if (entityType === 'cash_flow') {
-                        // For cash flows: filter by trading_account_id only
-                        const accountField = parentModal.querySelector('#cashFlowAccount, #currencyExchangeAccount');
-                        if (accountField && accountField.value) {
-                            tradingAccountId = parseInt(accountField.value);
-                            console.log('🔵 [Cash Flow] Filtering trades by trading_account_id:', tradingAccountId);
-                        }
-                    } else if (entityType === 'execution') {
-                        // For executions: filter by both trading_account_id AND ticker_id
-                        const accountField = parentModal.querySelector('#executionAccount');
-                        const tickerField = parentModal.querySelector('#executionTicker');
-                        
-                        if (accountField && accountField.value) {
-                            tradingAccountId = parseInt(accountField.value);
-                            console.log('🔵 [Execution] Filtering trades by trading_account_id:', tradingAccountId);
-                        }
-                        
-                        if (tickerField && tickerField.value) {
-                            tickerId = parseInt(tickerField.value);
-                            console.log('🔵 [Execution] Filtering trades by ticker_id:', tickerId);
-                        }
+            const parentEntry = window.ModalNavigationService?.getParentEntry
+                ? window.ModalNavigationService.getParentEntry(this.modalId)
+                : null;
+
+            const parentModal = parentEntry?.element || (parentEntry?.modalId ? document.getElementById(parentEntry.modalId) : null);
+            const parentEntityType = parentEntry?.entityType || null;
+
+            if (parentModal && parentEntityType) {
+                if (parentEntityType === 'cash_flow') {
+                    const accountField = parentModal.querySelector('#cashFlowAccount, #currencyExchangeAccount');
+                    if (accountField && accountField.value) {
+                        tradingAccountId = parseInt(accountField.value);
+                        console.log('🔵 [Cash Flow] Filtering trades by trading_account_id:', tradingAccountId);
+                    }
+                } else if (parentEntityType === 'execution') {
+                    const accountField = parentModal.querySelector('#executionAccount');
+                    const tickerField = parentModal.querySelector('#executionTicker');
+
+                    if (accountField && accountField.value) {
+                        tradingAccountId = parseInt(accountField.value);
+                        console.log('🔵 [Execution] Filtering trades by trading_account_id:', tradingAccountId);
+                    }
+
+                    if (tickerField && tickerField.value) {
+                        tickerId = parseInt(tickerField.value);
+                        console.log('🔵 [Execution] Filtering trades by ticker_id:', tickerId);
                     }
                 }
             }

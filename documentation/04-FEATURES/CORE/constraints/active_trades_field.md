@@ -7,8 +7,8 @@ This feature adds an `active_trades` field to the tickers table that automatical
 ## ✅ Implementation Status
 
 **Status:** 🟢 Implemented  
-**Version:** 1.0  
-**Date:** 2025-08-25  
+**Version:** 2.0 (Ticker status unified triggers)  
+**Date:** 2025-11-11  
 
 ## 🎯 Purpose
 
@@ -21,56 +21,16 @@ This feature adds an `active_trades` field to the tickers table that automatical
 
 ### Database Schema
 
-```sql
--- Field in tickers table
-active_trades BOOLEAN DEFAULT FALSE
+- Field in `tickers` table: `active_trades BOOLEAN DEFAULT FALSE`
+- Unified trigger family (created via `create_clean_database.create_triggers`):
+  - `trigger_trade_insert_ticker_status`
+  - `trigger_trade_update_ticker_status`
+  - `trigger_trade_delete_ticker_status`
+  - `trigger_trade_plan_insert_ticker_status`
+  - `trigger_trade_plan_update_ticker_status`
+  - `trigger_trade_plan_delete_ticker_status`
 
--- Database triggers for automatic updates
-CREATE TRIGGER trigger_trade_insert_active_trades
-AFTER INSERT ON trades
-FOR EACH ROW
-BEGIN
-    UPDATE tickers 
-    SET active_trades = (
-        SELECT COUNT(*) > 0 
-        FROM trades 
-        WHERE trades.ticker_id = NEW.ticker_id 
-        AND trades.status = 'open'
-    ),
-    updated_at = datetime('now')
-    WHERE tickers.id = NEW.ticker_id;
-END;
-
-CREATE TRIGGER trigger_trade_update_active_trades
-AFTER UPDATE ON trades
-FOR EACH ROW
-BEGIN
-    UPDATE tickers 
-    SET active_trades = (
-        SELECT COUNT(*) > 0 
-        FROM trades 
-        WHERE trades.ticker_id = NEW.ticker_id 
-        AND trades.status = 'open'
-    ),
-    updated_at = datetime('now')
-    WHERE tickers.id = NEW.ticker_id;
-END;
-
-CREATE TRIGGER trigger_trade_delete_active_trades
-AFTER DELETE ON trades
-FOR EACH ROW
-BEGIN
-    UPDATE tickers 
-    SET active_trades = (
-        SELECT COUNT(*) > 0 
-        FROM trades 
-        WHERE trades.ticker_id = OLD.ticker_id 
-        AND trades.status = 'open'
-    ),
-    updated_at = datetime('now')
-    WHERE tickers.id = OLD.ticker_id;
-END;
-```
+These triggers simultaneously maintain `tickers.active_trades` and `tickers.status`, ensuring consistency between trading activity and the ticker lifecycle. The SQL definitions live in `Backend/scripts/create_clean_database.py` and are mirrored in the migrations `add_ticker_status_triggers.py`.
 
 ### Model Implementation
 
@@ -106,27 +66,12 @@ def trade_deleted(mapper, connection, target):
 ## 🔧 Implementation Details
 
 ### Migration Script
-- **File:** `Backend/migrations/add_active_trades_trigger.py`
-- **Status:** ✅ Completed
-- **Triggers Created:** 3 triggers for INSERT, UPDATE, DELETE operations
+- **File:** `Backend/migrations/add_ticker_status_triggers.py`
+- **Status:** ✅ Completed (supersedes `add_active_trades_trigger.py`)
+- **Triggers Created:** 6 unified triggers covering trade and trade_plan INSERT/UPDATE/DELETE operations
 
 ### Helper Functions
-```python
-def update_ticker_active_trades(session, ticker_id: int) -> None:
-    """Update the active_trades field for a specific ticker"""
-    # Count open trades for this ticker
-    open_trades_count = session.query(Trade).filter(
-        Trade.ticker_id == ticker_id,
-        Trade.status == 'open'
-    ).count()
-    
-    # Update the ticker's active_trades field
-    ticker = session.query(Ticker).filter(Ticker.id == ticker_id).first()
-    if ticker:
-        ticker.active_trades = open_trades_count > 0
-        ticker.updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        session.flush()
-```
+Trigger enforcement is fully handled at the database layer. Any legacy SQLAlchemy listeners (`update_ticker_active_trades`) are now considered deprecated and should not be reintroduced. The backend simply surfaces the persisted `active_trades` and `status` fields.
 
 ## 📊 Data Flow
 
@@ -185,10 +130,11 @@ WHERE active_trades = TRUE;
 ## 🧪 Testing Results
 
 ### Trigger Testing
-- ✅ INSERT trigger works correctly
-- ✅ UPDATE trigger works correctly  
-- ✅ DELETE trigger works correctly
-- ✅ Field updates automatically on status changes
+- ✅ Automated validation in `Backend/tests/test_db_trigger_conflicts.py`
+- ✅ Trade plan lifecycle scenarios covered (insert/update/delete)
+- ✅ Trade lifecycle scenarios covered (insert/update/delete)
+- ✅ Cancelled ticker guard rails verified
+- ✅ Bridge triggers verified for `entity_relation_types`
 
 ### Performance Testing
 - ✅ Query performance improved significantly
@@ -205,9 +151,7 @@ WHERE active_trades = TRUE;
 - **API Response Time:** Improved by 60%
 
 ### Logging
-```python
-logger.info(f"Updated ticker {ticker.symbol} active_trades to: {ticker.active_trades}")
-```
+Leverage the unified logging system to capture anomalies raised by trigger failures (see `Backend/services/logger_service.py`).
 
 ## 🔄 Migration History
 
@@ -217,9 +161,8 @@ logger.info(f"Updated ticker {ticker.symbol} active_trades to: {ticker.active_tr
 - Updated existing data
 
 ### Phase 2: Application Updates ✅
-- Updated Ticker model
-- Added SQLAlchemy event listeners
-- Updated API responses
+- Updated Ticker model to expose `active_trades`
+- API responses aligned with persisted fields
 
 ### Phase 3: Validation ✅
 - Verified trigger functionality
@@ -238,13 +181,7 @@ GET /api/tickers/3
 ```
 
 ### Database Queries
-```sql
--- Get tickers with active trades
-SELECT * FROM tickers WHERE active_trades = TRUE;
-
--- Get count of active tickers
-SELECT COUNT(*) FROM tickers WHERE active_trades = TRUE;
-```
+- Use the unified trigger validation script `Backend/tools/db_trigger_validation.sql` for manual regression.
 
 ### Frontend Filtering
 ```javascript
@@ -268,20 +205,8 @@ const sortedTickers = tickers.sort((a, b) => {
 - Review update frequency
 
 ### Troubleshooting
-```sql
--- Check trigger status
-SELECT name FROM sqlite_master 
-WHERE type = 'trigger' 
-AND name LIKE '%active_trades%';
-
--- Verify data consistency
-SELECT t.id, t.symbol, t.active_trades,
-       COUNT(tr.id) as open_trades_count
-FROM tickers t
-LEFT JOIN trades tr ON t.id = tr.ticker_id AND tr.status = 'open'
-GROUP BY t.id
-HAVING t.active_trades != (open_trades_count > 0);
-```
+- Trigger inventory: `SELECT name FROM sqlite_master WHERE type = 'trigger' AND name LIKE '%ticker_status%';`
+- Consistency check (diagnostics only): compare `tickers.active_trades` with open trade counts using reporting queries or the analytics service.
 
 ## 🎯 Future Enhancements
 

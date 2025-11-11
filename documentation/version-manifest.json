@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.12.0",
+    "version": "1.0.13.0",
     "major": 1,
     "minor": 0,
-    "patch": 12,
+    "patch": 13,
     "build": 0,
-    "commit": "e4a6cbcbbfe687b72cc1b526db65faf2cd5744d3",
-    "updated_at": "2025-11-11T20:44:23+00:00",
-    "notes": "Expand dynamic color preferences across UI"
+    "commit": "d8b45f6369922c18badfabdb16fc0b6c3d7b26c6",
+    "updated_at": "2025-11-11T23:16:24+00:00",
+    "notes": "Document data import updates and sync local changes"
   }
 }

@@ -109,7 +109,7 @@ const emptyHtml = LinkedItemsService.renderEmptyLinkedItems('ticker', 123, '#019
 
 ### אינטגרציה עם UnifiedCacheManager
 
-- ✅ `ModalNavigationManager` שומר היסטוריה ב-`localStorage` (TTL: 1 שעה)
+- ✅ `ModalNavigationService` מנהל Stack וזיכרון ניווט דרך `PageStateManager`
 - ✅ `getLinkedItems()` שומר תוצאות ב-memory cache (TTL: 5 דקות)
 
 ### העברת מידע בין מודולים מקוננים

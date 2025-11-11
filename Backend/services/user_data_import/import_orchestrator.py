@@ -17,6 +17,7 @@ import logging
 import os
 import json
 import re
+from collections import Counter
 from html import escape
 from sqlalchemy.orm import Session
 
@@ -335,6 +336,12 @@ class ImportOrchestrator:
             len(normalization_result.get('normalized_records', []))
         )
 
+        if (task_type or '').lower() == 'cashflows':
+            self._ensure_cashflow_account_binding(
+                normalization_result.get('normalized_records', []),
+                session.trading_account_id
+            )
+
         logger.info(
             "🔍 [Import Pipeline] Validating records",
             extra={'session_id': session.id, 'normalized_records_count': len(normalization_result.get('normalized_records', []))}
@@ -365,6 +372,33 @@ class ImportOrchestrator:
             'duplicate_result': duplicate_result,
             'symbol_metadata': symbol_metadata
         }
+
+    @staticmethod
+    def _ensure_cashflow_account_binding(
+        normalized_records: List[Dict[str, Any]],
+        trading_account_id: Optional[int]
+    ) -> None:
+        """
+        Ensure that normalized cashflow records are bound to the selected trading account.
+
+        Args:
+            normalized_records: Cashflow records after normalization
+            trading_account_id: Active trading account ID for the session
+        """
+        if not normalized_records or trading_account_id is None:
+            return
+
+        account_identifier = str(trading_account_id)
+
+        for record in normalized_records:
+            original_account = record.get('source_account')
+            metadata = record.get('metadata')
+            if metadata is None or not isinstance(metadata, dict):
+                metadata = {}
+                record['metadata'] = metadata
+            if 'original_source_account' not in metadata and original_account not in (None, '', account_identifier):
+                metadata['original_source_account'] = original_account
+            record['source_account'] = account_identifier
 
     def _build_analysis_payload(
         self,
@@ -399,14 +433,21 @@ class ImportOrchestrator:
         }
 
         if task == 'cashflows':
-            cashflow_summary = self._summarize_cashflows(validation_result.get('valid_records', []))
+            type_stats = validation_result.get('type_stats', {})
+            cashflow_summary = self._summarize_cashflows(
+                validation_result.get('valid_records', []),
+                type_stats=type_stats
+            )
             cashflow_records = len(validation_result.get('valid_records', []))
             analysis_results = {
                 **base_stats,
                 'missing_accounts': validation_result.get('missing_accounts', []),
+                'missing_account_details': validation_result.get('missing_account_details', []),
                 'currency_issues': validation_result.get('currency_issues', []),
                 'cashflow_summary': cashflow_summary,
-                'cashflow_records': cashflow_records
+                'cashflow_records': cashflow_records,
+                'cashflow_type_stats': cashflow_summary.get('type_stats', {}),
+                'cashflow_issues_by_type': validation_result.get('issues_by_type', {})
             }
             summary_data = {
                 'task_type': task,
@@ -416,9 +457,12 @@ class ImportOrchestrator:
                 'clean_records': len(duplicate_result.get('clean_records', [])),
                 'duplicate_records': len(duplicate_result.get('within_file_duplicates', [])),
                 'missing_accounts': validation_result.get('missing_accounts', []),
+                'missing_account_details': validation_result.get('missing_account_details', []),
                 'currency_issues': validation_result.get('currency_issues', []),
                 'cashflow_summary': cashflow_summary,
                 'cashflow_records': cashflow_records,
+                'cashflow_type_stats': cashflow_summary.get('type_stats', {}),
+                'cashflow_issues_by_type': validation_result.get('issues_by_type', {}),
                 'duplicate_details': duplicate_result
             }
             return analysis_results, summary_data
@@ -509,7 +553,11 @@ class ImportOrchestrator:
 
         return analysis_results, summary_data
 
-    def _summarize_cashflows(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _summarize_cashflows(
+        self,
+        records: List[Dict[str, Any]],
+        type_stats: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         totals_by_type: Dict[str, float] = {}
         totals_by_currency: Dict[str, float] = {}
         accounts: Set[str] = set()
@@ -531,14 +579,122 @@ class ImportOrchestrator:
                 accounts.add(str(source_account))
 
         net_amount = sum(totals_by_type.values())
+        type_breakdown = self._build_type_breakdown(records) if type_stats is None else type_stats
 
         return {
             'record_count': len(records),
             'totals_by_type': totals_by_type,
             'totals_by_currency': totals_by_currency,
             'unique_accounts': sorted(accounts),
-            'net_amount': net_amount
+            'net_amount': net_amount,
+            'type_stats': type_breakdown
         }
+
+    def _build_type_breakdown(self, records: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+        stats: Dict[str, Dict[str, Any]] = {}
+        for record in records:
+            cashflow_type = str(record.get('cashflow_type') or 'unknown').lower()
+            currency = str(record.get('currency') or '').upper()
+            section = str(record.get('section') or '').strip() or 'unknown_section'
+
+            try:
+                amount = float(record.get('amount', 0))
+            except (TypeError, ValueError):
+                amount = 0.0
+
+            entry = stats.setdefault(
+                cashflow_type,
+                {
+                    'total_records': 0,
+                    'valid_records': 0,
+                    'invalid_records': 0,
+                    'total_amount': 0.0,
+                    'currencies': Counter(),
+                    'sections': Counter()
+                }
+            )
+            entry['total_records'] += 1
+            entry['valid_records'] += 1
+            entry['total_amount'] += amount
+            entry['currencies'][currency] += amount
+            entry['sections'][section] += 1
+
+        serializable: Dict[str, Dict[str, Any]] = {}
+        for cf_type, entry in stats.items():
+            serializable[cf_type] = {
+                **entry,
+                'currencies': dict(entry['currencies']),
+                'sections': dict(entry['sections'])
+            }
+
+        return serializable
+
+    @staticmethod
+    def _resolve_cashflow_storage_type(
+        record: Dict[str, Any]
+    ) -> Tuple[str, Optional[str]]:
+        """
+        Translate normalized cashflow types into system enum values.
+
+        Returns:
+            Tuple[str, Optional[str]]: (storage_type, mapping_note)
+        """
+        raw_type = str(record.get('cashflow_type') or 'cash_adjustment').lower()
+        mapping_note: Optional[str] = None
+
+        try:
+            amount_value = float(record.get('amount', 0))
+        except (TypeError, ValueError):
+            amount_value = 0.0
+
+        is_positive = amount_value >= 0
+
+        if raw_type == 'deposit':
+            storage_type = 'deposit'
+        elif raw_type == 'withdrawal':
+            storage_type = 'withdrawal'
+        elif raw_type == 'transfer':
+            storage_type = 'transfer_in' if is_positive else 'transfer_out'
+        elif raw_type == 'forex_conversion':
+            storage_type = 'transfer_in' if is_positive else 'transfer_out'
+            mapping_note = 'Forex conversion'
+        elif raw_type == 'dividend':
+            storage_type = 'dividend'
+        elif raw_type == 'dividend_accrual':
+            storage_type = 'other_positive' if is_positive else 'other_negative'
+            mapping_note = 'Dividend accrual'
+        elif raw_type == 'interest':
+            storage_type = 'interest'
+        elif raw_type == 'interest_accrual':
+            storage_type = 'other_positive' if is_positive else 'other_negative'
+            mapping_note = 'Interest accrual'
+        elif raw_type == 'tax':
+            storage_type = 'tax'
+        elif raw_type == 'fee':
+            storage_type = 'fee'
+        elif raw_type == 'borrow_fee':
+            storage_type = 'fee'
+            mapping_note = 'Borrow fee'
+        elif raw_type == 'syep_interest':
+            storage_type = 'interest'
+            mapping_note = 'SYEP interest'
+        elif raw_type == 'cash_adjustment':
+            storage_type = 'other_positive' if is_positive else 'other_negative'
+        else:
+            known_direct = {
+                'transfer_in',
+                'transfer_out',
+                'other_positive',
+                'other_negative'
+            }
+            if raw_type in known_direct:
+                storage_type = raw_type
+            else:
+                storage_type = 'other_positive' if is_positive else 'other_negative'
+                if raw_type:
+                    mapping_note = raw_type
+
+        return storage_type, mapping_note
 
     def _build_preview_payload(self, task_type: str, pipeline_result: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -552,28 +708,57 @@ class ImportOrchestrator:
 
         if task == 'cashflows':
             clean_records = duplicate_result.get('clean_records', [])
-            records_to_import = [
-                {
-                    'cashflow_type': entry['record'].get('cashflow_type'),
-                    'amount': entry['record'].get('amount'),
-                    'currency': entry['record'].get('currency'),
-                    'effective_date': entry['record'].get('effective_date'),
-                    'source_account': entry['record'].get('source_account'),
-                    'target_account': entry['record'].get('target_account'),
-                    'asset_symbol': entry['record'].get('asset_symbol'),
-                    'memo': entry['record'].get('memo'),
-                    'tax_country': entry['record'].get('tax_country'),
-                    'external_id': entry['record'].get('external_id')
-                }
-                for entry in clean_records
-            ]
+            records_to_import: List[Dict[str, Any]] = []
+            for entry in clean_records:
+                record = entry['record']
+                storage_type, mapping_note = self._resolve_cashflow_storage_type(record)
 
-            records_to_skip = []
+                metadata = dict(record.get('metadata') or {})
+                if 'original_cashflow_type' not in metadata and record.get('cashflow_type'):
+                    metadata['original_cashflow_type'] = record.get('cashflow_type')
+                metadata['storage_cashflow_type'] = storage_type
+                if mapping_note:
+                    existing_notes = metadata.get('notes')
+                    if isinstance(existing_notes, list):
+                        if mapping_note not in existing_notes:
+                            existing_notes.append(mapping_note)
+                    elif existing_notes in (None, ''):
+                        metadata['notes'] = [mapping_note]
+                    else:
+                        metadata['notes'] = [existing_notes, mapping_note]
+
+                    metadata['mapping_note'] = mapping_note
+
+                record_payload = {
+                    'cashflow_type': record.get('cashflow_type'),
+                    'storage_type': storage_type,
+                    'mapping_note': mapping_note,
+                    'amount': record.get('amount'),
+                    'currency': record.get('currency'),
+                    'effective_date': record.get('effective_date'),
+                    'source_account': record.get('source_account'),
+                    'target_account': record.get('target_account'),
+                    'asset_symbol': record.get('asset_symbol'),
+                    'memo': record.get('memo'),
+                    'tax_country': record.get('tax_country'),
+                    'external_id': record.get('external_id'),
+                    'section': record.get('section'),
+                    'metadata': metadata
+                }
+                records_to_import.append(record_payload)
+
+            records_to_skip: List[Dict[str, Any]] = []
             for error_info in validation_result.get('validation_errors', []):
+                storage_type, mapping_note = self._resolve_cashflow_storage_type(error_info.get('record') or {})
                 records_to_skip.append({
                     'record': error_info['record'],
                     'reason': 'validation_error',
-                    'errors': error_info['errors']
+                    'errors': error_info['errors'],
+                    'cashflow_type': (error_info['record'] or {}).get('cashflow_type'),
+                    'section': (error_info['record'] or {}).get('section'),
+                    'metadata': (error_info['record'] or {}).get('metadata', {}),
+                    'storage_type': storage_type,
+                    'mapping_note': mapping_note
                 })
 
             for account in validation_result.get('missing_accounts', []):
@@ -581,6 +766,13 @@ class ImportOrchestrator:
                     'record': None,
                     'reason': 'missing_account',
                     'account_id': account
+                })
+
+            for detail in validation_result.get('missing_account_details', []):
+                records_to_skip.append({
+                    'record': None,
+                    'reason': 'missing_account_detail',
+                    'detail': detail
                 })
 
             for issue in validation_result.get('currency_issues', []):
@@ -592,21 +784,36 @@ class ImportOrchestrator:
                 })
 
             for duplicate in duplicate_result.get('within_file_duplicates', []):
+                storage_type, mapping_note = self._resolve_cashflow_storage_type(duplicate.get('record') or {})
                 records_to_skip.append({
                     'record': duplicate['record'],
                     'reason': 'within_file_duplicate',
                     'confidence_score': duplicate.get('confidence_score'),
-                    'details': duplicate
+                    'details': duplicate,
+                    'cashflow_type': (duplicate.get('record') or {}).get('cashflow_type'),
+                    'section': (duplicate.get('record') or {}).get('section'),
+                    'metadata': (duplicate.get('record') or {}).get('metadata', {}),
+                    'storage_type': storage_type,
+                    'mapping_note': mapping_note
                 })
 
             for duplicate in duplicate_result.get('existing_records', []):
+                storage_type, mapping_note = self._resolve_cashflow_storage_type(duplicate.get('record') or {})
                 records_to_skip.append({
                     'record': duplicate['record'],
                     'reason': 'existing_record',
-                    'details': duplicate
+                    'details': duplicate,
+                    'cashflow_type': (duplicate.get('record') or {}).get('cashflow_type'),
+                    'section': (duplicate.get('record') or {}).get('section'),
+                    'metadata': (duplicate.get('record') or {}).get('metadata', {}),
+                    'storage_type': storage_type,
+                    'mapping_note': mapping_note
                 })
 
-            cashflow_summary = self._summarize_cashflows(validation_result.get('valid_records', []))
+            cashflow_summary = self._summarize_cashflows(
+                validation_result.get('valid_records', []),
+                type_stats=validation_result.get('type_stats', {})
+            )
 
             return {
                 'task_type': task,
@@ -621,7 +828,9 @@ class ImportOrchestrator:
                     'totals_by_type': cashflow_summary.get('totals_by_type', {}),
                     'totals_by_currency': cashflow_summary.get('totals_by_currency', {}),
                     'missing_accounts': validation_result.get('missing_accounts', []),
-                    'currency_issues': validation_result.get('currency_issues', [])
+                    'currency_issues': validation_result.get('currency_issues', []),
+                    'type_stats': cashflow_summary.get('type_stats', {}),
+                    'issues_by_type': validation_result.get('issues_by_type', {})
                 },
                 'cashflow_summary': cashflow_summary,
                 'cashflow_records': len(records_to_import)
@@ -1275,6 +1484,14 @@ class ImportOrchestrator:
 
         for index, record in enumerate(cashflow_records):
             try:
+                storage_type = record.get('storage_type')
+                mapping_note = record.get('mapping_note')
+
+                if not storage_type:
+                    storage_type, inferred_note = self._resolve_cashflow_storage_type(record)
+                    if mapping_note is None:
+                        mapping_note = inferred_note
+
                 amount = float(record.get('amount', 0))
                 if amount == 0:
                     raise ValueError('Amount cannot be zero')
@@ -1301,6 +1518,8 @@ class ImportOrchestrator:
                     description_parts.append(f"Target: {record['target_account']}")
                 if record.get('asset_symbol'):
                     description_parts.append(f"Asset: {record['asset_symbol']}")
+                if mapping_note:
+                    description_parts.append(f"מקור תזרים: {mapping_note}")
                 description = ' | '.join(description_parts) if description_parts else None
 
                 external_id = record.get('external_id') or (
@@ -1309,7 +1528,7 @@ class ImportOrchestrator:
 
                 cashflow = CashFlow(
                     trading_account_id=import_session.trading_account_id,
-                    type=record.get('cashflow_type', 'cash_adjustment'),
+                    type=storage_type or record.get('cashflow_type', 'cash_adjustment'),
                     amount=amount,
                     fee_amount=0.0,
                     date=effective_date,
@@ -1343,7 +1562,15 @@ class ImportOrchestrator:
 
         self.db_session.flush()
 
-        cashflow_summary = self._summarize_cashflows(cashflow_records)
+        preview_summary = preview_data.get('summary', {})
+        type_stats = (
+            (preview_summary or {}).get('type_stats')
+            or preview_data.get('cashflow_summary', {}).get('type_stats')
+        )
+        cashflow_summary = self._summarize_cashflows(
+            cashflow_records,
+            type_stats=type_stats
+        )
 
         return {
             'success': True,

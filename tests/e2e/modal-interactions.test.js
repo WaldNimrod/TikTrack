@@ -92,11 +92,12 @@ describe('Modal Interactions E2E Tests', () => {
     });
 
     test('should handle modal navigation', () => {
-        if (!window.ModalNavigationManager) {
+        if (!window.ModalNavigationService || typeof window.ModalNavigationService.getStack !== 'function') {
             return;
         }
 
-        expect(window.ModalNavigationManager.modalStack).toBeDefined();
+        const stack = window.ModalNavigationService.getStack();
+        expect(Array.isArray(stack)).toBe(true);
     });
 });
 

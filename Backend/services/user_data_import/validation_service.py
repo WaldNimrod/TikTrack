@@ -9,7 +9,8 @@ Version: 1.0
 Last Updated: 2025-01-16
 """
 
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Set
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 import logging
 from sqlalchemy.orm import Session
@@ -42,6 +43,13 @@ class ValidationService:
     - Format validation
     """
     
+    ZERO_AMOUNT_ALLOWED_TYPES: Set[str] = {
+        'syep_activity',
+        'syep_interest',
+        'interest_accrual',
+        'dividend_accrual'
+    }
+
     def __init__(self, db_session: Session = None, date_normalizer: Optional[DateNormalizationService] = None):
         """Initialize the validation service"""
         self.db_session = db_session
@@ -124,23 +132,44 @@ class ValidationService:
     # ------------------------------------------------------------------
 
     def _validate_cashflow_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
-        valid_records = []
-        invalid_records = []
-        validation_errors = []
+        valid_records: List[Dict[str, Any]] = []
+        invalid_records: List[Dict[str, Any]] = []
+        validation_errors: List[Dict[str, Any]] = []
         missing_accounts: Dict[str, int] = {}
+        missing_account_details: List[Dict[str, Any]] = []
         currency_issues: List[Dict[str, Any]] = []
+        type_stats: Dict[str, Dict[str, Any]] = {}
+        issues_by_type: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
         for i, record in enumerate(records):
             try:
                 errors = []
+                cashflow_type = str(record.get('cashflow_type') or 'unknown').lower()
+                stats_entry = type_stats.setdefault(
+                    cashflow_type,
+                    {
+                        'total_records': 0,
+                        'valid_records': 0,
+                        'invalid_records': 0,
+                        'total_amount': 0.0,
+                        'currencies': Counter(),
+                        'sections': Counter()
+                    }
+                )
+                stats_entry['total_records'] += 1
 
                 amount = record.get('amount')
+                amount_value = None
                 if amount is None:
                     errors.append("Missing amount")
                 else:
                     try:
                         amount_value = float(amount)
-                        if amount_value == 0:
+                        stats_entry['total_amount'] += amount_value
+                        section_name = str(record.get('section') or '').strip() or 'unknown_section'
+                        stats_entry['sections'][section_name] += 1
+                        allow_zero_amount = cashflow_type in self.ZERO_AMOUNT_ALLOWED_TYPES
+                        if amount_value == 0 and not allow_zero_amount:
                             errors.append("Amount cannot be zero")
                     except (TypeError, ValueError):
                         errors.append(f"Invalid amount value: {amount}")
@@ -156,8 +185,11 @@ class ValidationService:
                         currency_issues.append({
                             'record_index': i,
                             'currency': currency,
-                            'message': 'Currency code should be 3 characters'
+                            'message': 'Currency code should be 3 characters',
+                            'cashflow_type': cashflow_type
                         })
+                    if normalized_currency and amount_value is not None:
+                        stats_entry['currencies'][normalized_currency] += amount_value
 
                 if not record.get('cashflow_type'):
                     errors.append("cashflow_type is required")
@@ -165,12 +197,37 @@ class ValidationService:
                 if not record.get('effective_date'):
                     errors.append("effective_date envelope is required")
 
-                source_account = record.get('source_account')
+                source_account_raw = record.get('source_account')
+                source_account = str(source_account_raw).strip() if source_account_raw not in (None, '') else ''
+                if source_account:
+                    record['source_account'] = source_account
                 if not source_account:
                     errors.append("source_account is required")
+                    missing_accounts['__missing__'] = missing_accounts.get('__missing__', 0) + 1
+                    missing_account_details.append({
+                        'record_index': i,
+                        'cashflow_type': cashflow_type,
+                        'currency': record.get('currency'),
+                        'amount': record.get('amount'),
+                        'memo': record.get('memo'),
+                        'section': record.get('section'),
+                        'status': 'missing',
+                        'metadata': record.get('metadata', {})
+                    })
                 else:
                     if not self._account_exists(source_account):
                         missing_accounts[source_account] = missing_accounts.get(source_account, 0) + 1
+                        missing_account_details.append({
+                            'record_index': i,
+                            'cashflow_type': cashflow_type,
+                            'currency': record.get('currency'),
+                            'amount': record.get('amount'),
+                            'memo': record.get('memo'),
+                            'section': record.get('section'),
+                            'status': 'not_found',
+                            'account': source_account,
+                            'metadata': record.get('metadata', {})
+                        })
 
                 if errors:
                     invalid_records.append(record)
@@ -179,8 +236,15 @@ class ValidationService:
                         'record': record,
                         'errors': errors
                     })
+                    stats_entry['invalid_records'] += 1
+                    issues_by_type[cashflow_type].append({
+                        'record_index': i,
+                        'errors': errors,
+                        'record': record
+                    })
                 else:
                     valid_records.append(record)
+                    stats_entry['valid_records'] += 1
 
             except Exception as exc:
                 invalid_records.append(record)
@@ -191,16 +255,27 @@ class ValidationService:
                 })
                 logger.error("Failed to validate cashflow record %s: %s", i, exc)
 
+        serializable_type_stats: Dict[str, Dict[str, Any]] = {}
+        for cf_type, stats in type_stats.items():
+            serializable_type_stats[cf_type] = {
+                **stats,
+                'currencies': dict(stats['currencies']),
+                'sections': dict(stats['sections'])
+            }
+
         return {
             'valid_records': valid_records,
             'invalid_records': invalid_records,
             'validation_errors': validation_errors,
             'missing_accounts': sorted(missing_accounts.keys()),
+            'missing_account_details': missing_account_details,
             'currency_issues': currency_issues,
             'total_records': len(records),
             'valid_count': len(valid_records),
             'invalid_count': len(invalid_records),
-            'validation_rate': (len(valid_records) / len(records) * 100) if records else 0
+            'validation_rate': (len(valid_records) / len(records) * 100) if records else 0,
+            'type_stats': serializable_type_stats,
+            'issues_by_type': dict(issues_by_type)
         }
 
     # ------------------------------------------------------------------

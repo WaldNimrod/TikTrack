@@ -1054,10 +1054,7 @@ async function showDetailsModal(title, content, options = {}) {
   modal.style.display = 'block';
   modal.classList.add('show');
   
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
+  // Backdrop handled by Bootstrap
   
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
@@ -1106,11 +1103,6 @@ function hideModal(modalId) {
   
   if (backdrop) {
     backdrop.remove();
-  }
-  
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
   }
 }
 

@@ -2108,10 +2108,7 @@ window.createAndShowModal = function(modalHtml, modalId, options = {}) {
   // Show modal
   modal.show();
   
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
+  // Backdrop handled by Bootstrap
   
   // Stop observing only after modal is fully hidden (not after shown!)
   // This ensures we catch aria-hidden during close transition too
@@ -2784,10 +2781,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
   modal.style.display = 'block';
   modal.classList.add('show');
   
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
+  // Backdrop handled by Bootstrap
   
   // Copy button in header
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
@@ -3033,10 +3027,7 @@ function hideModal(modalId) {
     backdrop.remove();
   }
   
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
+  // Backdrop handled by Bootstrap
 }
 
 // Helper function to close all details modals

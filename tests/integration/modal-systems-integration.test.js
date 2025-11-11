@@ -72,31 +72,31 @@ describe('Modal Systems Integration', () => {
         eval(code);
     });
 
-    afterEach(() => {
+    afterEach(async () => {
         jest.clearAllMocks();
         if (window.ModalManagerV2) {
             window.ModalManagerV2.modals.clear();
             window.ModalManagerV2.activeModal = null;
         }
-        if (window.ModalNavigationManager) {
-            window.ModalNavigationManager.modalStack = [];
+        if (window.ModalNavigationService?.clear) {
+            await window.ModalNavigationService.clear();
         }
     });
 
     describe('Modal Manager + Modal Navigation Integration', () => {
-        test('should integrate ModalManagerV2 with ModalNavigationManager', () => {
+        test('should integrate ModalManagerV2 with ModalNavigationService', () => {
             expect(window.ModalManagerV2).toBeDefined();
-            expect(window.ModalNavigationManager).toBeDefined();
+            expect(window.ModalNavigationService).toBeDefined();
             
-            if (window.ModalManagerV2 && window.ModalNavigationManager) {
+            if (window.ModalManagerV2 && window.ModalNavigationService) {
                 // Both systems should be available
                 expect(window.ModalManagerV2.modals).toBeInstanceOf(Map);
-                expect(Array.isArray(window.ModalNavigationManager.modalStack)).toBe(true);
+                expect(Array.isArray(window.ModalNavigationService.getStack())).toBe(true);
             }
         });
 
         test('should handle modal stack navigation', async () => {
-            if (!window.ModalManagerV2 || !window.ModalNavigationManager) {
+            if (!window.ModalManagerV2 || !window.ModalNavigationService) {
                 return;
             }
 
@@ -133,12 +133,13 @@ describe('Modal Systems Integration', () => {
 
     describe('Modal Navigation + Entity Details Integration', () => {
         test('should handle modal navigation with entity details', () => {
-            if (!window.ModalNavigationManager || !window.showEntityDetailsModal) {
+            if (!window.ModalNavigationService || typeof window.ModalNavigationService.getStack !== 'function' || !window.showEntityDetailsModal) {
                 return;
             }
 
             // Navigation should handle entity details modals
-            expect(window.ModalNavigationManager.modalStack).toBeDefined();
+            const stack = window.ModalNavigationService.getStack();
+            expect(Array.isArray(stack)).toBe(true);
         });
     });
 

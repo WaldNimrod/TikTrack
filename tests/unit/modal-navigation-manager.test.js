@@ -40,8 +40,9 @@ describe('Modal Navigation Manager', () => {
     });
 
     describe('Initialization', () => {
-        test('should initialize ModalNavigationManager', () => {
-            expect(window.ModalNavigationManager || window.modalNavigationManager).toBeDefined();
+        test('should initialize ModalNavigationService', () => {
+            expect(window.ModalNavigationService).toBeDefined();
+            expect(window.modalNavigationManager).toBeDefined();
         });
     });
 });

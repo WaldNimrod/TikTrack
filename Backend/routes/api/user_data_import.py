@@ -394,11 +394,14 @@ def get_active_import_session():
             
             session_dict = session.to_dict()
             summary_stats = session.get_summary_stats()
-            
+
+            session_payload = _project_storage_payload(session_dict)
+            summary_payload = _project_storage_payload(summary_stats)
+
             return jsonify({
                 'success': True,
-                'session': session_dict,
-                'summary': summary_stats
+                'session': session_payload,
+                'summary': summary_payload
             }), 200
         
         finally:

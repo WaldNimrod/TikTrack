@@ -795,6 +795,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias
+  'data-import-page': 'cash_flow',
   
   // עמודי כלי פיתוח - כולם מקבלים צבע development
   'development-page': 'development',

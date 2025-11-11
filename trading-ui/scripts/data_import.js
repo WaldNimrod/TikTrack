@@ -147,7 +147,7 @@
             }
 
             if (typeof window.processButtons === 'function') {
-                window.processButtons();
+                window.processButtons(document);
             }
 
             if (typeof window.restoreAllSectionStates === 'function') {
@@ -190,8 +190,15 @@
                 Logger.warn('⚠️ No trading accounts found', { page: PAGE_NAME });
             }
 
-            const historyPromises = accounts.map(fetchHistoryForAccount);
-            const historyResults = await Promise.all(historyPromises);
+            const historyResults = [];
+            for (const account of accounts) {
+                // קריאה סדרתית כדי להפחית עומס וקונפליקטים על שכבת ה-DB
+                // המערכת המרכזית מנהלת לוגינג פנימי ב-fetchHistoryForAccount עבור שגיאות.
+                /* eslint-disable no-await-in-loop */
+                const accountHistory = await fetchHistoryForAccount(account);
+                /* eslint-enable no-await-in-loop */
+                historyResults.push(accountHistory);
+            }
 
             const sessions = historyResults
                 .flat()

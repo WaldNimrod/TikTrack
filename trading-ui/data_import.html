@@ -408,10 +408,25 @@
                                 </div>
                             </div>
 
+                            <div id="cashflowTypeSummarySection" style="display:none; margin-top:1.5rem;">
+                                <h4>חלוקת רשומות לפי סוג</h4>
+                                <div class="analysis-cards" id="cashflowTypeSummaryCards"></div>
+                            </div>
+
+                            <div id="cashflowCurrencySummarySection" style="display:none; margin-top:1.5rem;">
+                                <h4>סיכום לפי מטבע</h4>
+                                <div class="analysis-cards" id="cashflowCurrencySummaryCards"></div>
+                            </div>
+
+                            <div id="cashflowIssuesSummarySection" style="display:none; margin-top:1.5rem;">
+                                <h4>התראות קריטיות</h4>
+                                <div class="problem-card-container" id="cashflowIssuesSummaryList"></div>
+                            </div>
+
                             <div class="step-actions analysis-actions" id="analysisStepActions" style="display:none;">
                                 <button data-button-type="PRIMARY"
-                                        data-text="המשך לפתרון בעיות"
-                                        data-onclick="proceedToProblemResolution()"
+                                        data-text="המשך לתצוגה מקדימה"
+                                        data-onclick="proceedToPreviewFromProblems()"
                                         id="analysisContinueBtn"
                                         disabled></button>
                             </div>

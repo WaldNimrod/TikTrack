@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.16.0",
+    "version": "1.0.17.0",
     "major": 1,
     "minor": 0,
-    "patch": 16,
+    "patch": 17,
     "build": 0,
-    "commit": "8db9e77714e2f1fa1bae40a9bcfcde82fd33f486",
-    "updated_at": "2025-11-12T15:17:24+00:00",
-    "notes": "Full workspace sync"
+    "commit": "03f3c3fb05d5ed307607a28e07ba9ac727b70ada",
+    "updated_at": "2025-11-12T15:20:04+00:00",
+    "notes": "Integrate Option A table filtering with unified systems"
   }
 }

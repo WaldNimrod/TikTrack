@@ -768,6 +768,48 @@ async function setCurrentEntityColorFromPage() {
   }
 }
 
+async function setCurrentEntityColorForEntity(entityType, options = {}) {
+  try {
+    if (!entityType || !isValidEntityType(entityType)) {
+      window.Logger?.warn('⚠️ setCurrentEntityColorForEntity: invalid entity type', {
+        entityType,
+        page: 'color-scheme'
+      });
+      return;
+    }
+
+    await getEntityColorFromPreferences(entityType);
+
+    const primary = getEntityColor(entityType);
+    const light =
+      ENTITY_LIGHT_COLORS[entityType] ||
+      (primary ? lightenColor(primary, 10) : '');
+    const dark =
+      ENTITY_DARK_COLORS[entityType] ||
+      (primary ? darkenColor(primary, 20) : '');
+
+    if (primary) {
+      document.documentElement.style.setProperty('--current-entity-color', primary);
+    }
+    if (light) {
+      document.documentElement.style.setProperty('--current-entity-color-light', light);
+    }
+    if (dark) {
+      document.documentElement.style.setProperty('--current-entity-color-dark', dark);
+    }
+
+    if (options.updateHeaders !== false && typeof window.applyEntityColorsToHeaders === 'function') {
+      window.applyEntityColorsToHeaders(entityType, options.excludeWarningModals !== false);
+    }
+  } catch (error) {
+    window.Logger?.error('❌ setCurrentEntityColorForEntity failed', {
+      error,
+      entityType,
+      page: 'color-scheme'
+    });
+  }
+}
+
 function findPageClass(body) {
   const classList = Array.from(body.classList);
   return classList.find(cls => cls.endsWith('-page'));
@@ -1391,6 +1433,7 @@ window.generateNumericValueCSS = generateNumericValueCSS;
 
 window.loadDynamicColors = loadDynamicColors;
 window.setCurrentEntityColorFromPage = setCurrentEntityColorFromPage;
+window.setCurrentEntityColorForEntity = setCurrentEntityColorForEntity;
 window.getEntityColorFromPreferences = getEntityColorFromPreferences;
 window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
 

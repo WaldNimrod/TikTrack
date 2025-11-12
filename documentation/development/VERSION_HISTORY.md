@@ -25,3 +25,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-12T15:11:10+00:00 | 1.0.15.0 | 1.0.14.0 | 2e9b32ecacf9eeb0f13f191aed5997f92122de1e | a8a13c27f2bb3d6e56d269973c524f0ded1a225e | patch | Improve modal navigation restore handling |
 | 2025-11-12T15:17:24+00:00 | 1.0.16.0 | 1.0.15.0 | 8db9e77714e2f1fa1bae40a9bcfcde82fd33f486 | 2e9b32ecacf9eeb0f13f191aed5997f92122de1e | patch | Full workspace sync |
 | 2025-11-12T15:20:04+00:00 | 1.0.17.0 | 1.0.16.0 | 03f3c3fb05d5ed307607a28e07ba9ac727b70ada | 8db9e77714e2f1fa1bae40a9bcfcde82fd33f486 | patch | Integrate Option A table filtering with unified systems |
+| 2025-11-12T15:33:15+00:00 | 1.0.18.0 | 1.0.17.0 | d3c2bf075911e1b903d9067e31e06fd4ece7b2fb | 03f3c3fb05d5ed307607a28e07ba9ac727b70ada | patch | Entity modal color sync |

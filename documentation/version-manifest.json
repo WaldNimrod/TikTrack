@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.17.0",
+    "version": "1.0.18.0",
     "major": 1,
     "minor": 0,
-    "patch": 17,
+    "patch": 18,
     "build": 0,
-    "commit": "03f3c3fb05d5ed307607a28e07ba9ac727b70ada",
-    "updated_at": "2025-11-12T15:20:04+00:00",
-    "notes": "Integrate Option A table filtering with unified systems"
+    "commit": "d3c2bf075911e1b903d9067e31e06fd4ece7b2fb",
+    "updated_at": "2025-11-12T15:33:15+00:00",
+    "notes": "Entity modal color sync"
   }
 }

@@ -351,6 +351,9 @@ class EntityDetailsModal {
      */
     _applyInitialHeading(entityType, entityId) {
         this.updateModalHeaderColor(entityType);
+        if (window.setCurrentEntityColorForEntity) {
+            window.setCurrentEntityColorForEntity(entityType, { updateHeaders: false });
+        }
         const titleElement = document.getElementById(`${this.modalId}Label`);
         if (!titleElement) {
             return '';
@@ -648,6 +651,10 @@ class EntityDetailsModal {
 
         if (window.modalNavigationManager?.updateModalNavigation && this.modal) {
             window.modalNavigationManager.updateModalNavigation(this.modal);
+        }
+
+        if (window.setCurrentEntityColorForEntity) {
+            window.setCurrentEntityColorForEntity(finalEntityType, { updateHeaders: false });
         }
 
         // רנדור הנתונים - העברת sourceInfo ל-renderer דרך options

@@ -953,12 +953,9 @@ async function updateTradesTable(trades) {
             if (!window.createActionsMenu) {
               return '<!-- Actions menu not available -->';
             }
-            const entityName = trade?.ticker_symbol || trade?.symbol || trade?.ticker || trade?.name || '';
-            const manageConditionsAction = `window.ConditionsModalController && window.ConditionsModalController.open({ entityType: 'trade', entityId: ${trade.id}, entityName: ${JSON.stringify(entityName)} })`;
             const result = window.createActionsMenu([
               { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' },
               { type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' },
-              { type: 'MANAGE', onclick: manageConditionsAction, title: 'ניהול תנאים' },
               { type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' },
               { type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק' }
             ]);
@@ -2530,25 +2527,39 @@ function initializeTradeConditionsSystem() {
       return true;
     }
     
-    // Try to initialize using ConditionsInitializer class
-    if (typeof window.ConditionsInitializer !== 'undefined') {
-      try {
-        const initializer = new window.ConditionsInitializer();
-        if (initializer && typeof initializer.initialize === 'function') {
-          initializer.initialize().then(() => {
-            window.Logger?.info('✅ Trades conditions system initialized successfully', { page: "trades" });
-          }).catch(error => {
-            window.Logger?.error('Error initializing trades conditions system:', error, { page: "trades" });
-          });
-          if (window.conditionsCRUDManager) {
-            window.conditionsCRUDManager.setContext({ entityType: 'trade' });
-            window.conditionsCRUDManager.getTradingMethods();
-          }
-          return true;
-        }
-      } catch (error) {
-        window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trades" });
+    const initializerInstance = (() => {
+      if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
+        return window.conditionsInitializer;
       }
+      if (typeof window.ConditionsInitializer === 'function') {
+        try {
+          return new window.ConditionsInitializer();
+        } catch (error) {
+          window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trades" });
+          return null;
+        }
+      }
+      return null;
+    })();
+
+    if (initializerInstance && typeof initializerInstance.initialize === 'function') {
+      const afterInit = () => {
+        if (window.conditionsCRUDManager) {
+          window.conditionsCRUDManager.setContext({ entityType: 'trade' });
+          window.conditionsCRUDManager.getTradingMethods();
+        }
+        window.Logger?.info('✅ Trades conditions system initialized successfully', { page: "trades" });
+      };
+
+      const initResult = initializerInstance.initialize();
+      if (initResult && typeof initResult.then === 'function') {
+        initResult.then(afterInit).catch(error => {
+          window.Logger?.error('Error initializing trades conditions system:', error, { page: "trades" });
+        });
+      } else if (initResult !== false) {
+        afterInit();
+      }
+      return true;
     }
     
     // If not available immediately, try deferred check
@@ -3657,6 +3668,94 @@ async function deleteTrade(tradeId) {
 // REMOVED: window.showAddTradeModal - use window.showModalSafe('tradesModal', 'add') directly
 
 /**
+ * Bind conditions management controls inside the trade modal
+ * @param {HTMLElement} modalElement
+ */
+function setupTradeConditionsButton(modalElement) {
+    if (!modalElement) {
+        return;
+    }
+
+    const controlsWrapper = modalElement.querySelector('[data-conditions-controls="trade"]');
+    if (!controlsWrapper || controlsWrapper.dataset.initialized === 'true') {
+        return;
+    }
+
+    const openButton = controlsWrapper.querySelector('[data-action="open-conditions"]');
+    const disabledHint = controlsWrapper.querySelector('[data-conditions-disabled-hint]');
+    const tickerSelect = modalElement.querySelector('#tradeTicker');
+
+    const ensureEntityName = () => {
+        if (modalElement.dataset.entityName && modalElement.dataset.entityName.trim() !== '') {
+            return modalElement.dataset.entityName;
+        }
+        if (tickerSelect && tickerSelect.selectedOptions.length > 0) {
+            const tickerName = tickerSelect.selectedOptions[0].textContent?.trim();
+            if (tickerName) {
+                modalElement.dataset.entityName = tickerName;
+                return tickerName;
+            }
+        }
+        return '';
+    };
+
+    const updateButtonState = () => {
+        const mode = modalElement.dataset.modalMode || modalElement.dataset.mode || '';
+        const entityId = modalElement.dataset.entityId || '';
+        const isEnabled = mode === 'edit' && entityId;
+
+        if (openButton) {
+            openButton.disabled = !isEnabled;
+            openButton.classList.toggle('btn-outline-secondary', !isEnabled);
+            openButton.classList.toggle('btn-outline-primary', isEnabled);
+        }
+
+        if (disabledHint) {
+            disabledHint.classList.toggle('d-none', Boolean(isEnabled));
+        }
+    };
+
+    if (openButton) {
+        openButton.addEventListener('click', () => {
+            const entityId = modalElement.dataset.entityId;
+            if (!entityId) {
+                window.showNotification?.('ניתן לנהל תנאים רק לאחר שמירת הטרייד.', 'info');
+                return;
+            }
+
+            const entityName = ensureEntityName();
+            const context = {
+                entityType: 'trade',
+                entityId: Number(entityId),
+                entityName,
+                parentModalId: modalElement.id
+            };
+
+            if (window.ConditionsModalController && typeof window.ConditionsModalController.open === 'function') {
+                window.ConditionsModalController.open(context);
+            } else {
+                window.Logger?.error('ConditionsModalController לא זמין', { page: 'trades' });
+                window.showNotification?.('לא ניתן לפתוח את מודול התנאים כעת.', 'error');
+            }
+        });
+    }
+
+    if (tickerSelect && !tickerSelect.dataset.conditionsNameBound) {
+        tickerSelect.addEventListener('change', () => {
+            ensureEntityName();
+            updateButtonState();
+        });
+        tickerSelect.dataset.conditionsNameBound = 'true';
+    }
+
+    modalElement.addEventListener('modal:entity-context-changed', updateButtonState);
+    modalElement.addEventListener('modal:entity-context-reset', updateButtonState);
+
+    controlsWrapper.dataset.initialized = 'true';
+    updateButtonState();
+}
+
+/**
  * Show edit trade modal (wrapper for ModalManagerV2)
  * Maintains backward compatibility with HTML onclick handlers
  * @function showEditTradeModal
@@ -3677,6 +3776,7 @@ window.showEditTradeModal = function(tradeId) {
 window.saveTrade = saveTrade;
 window.deleteTrade = deleteTrade;
 window.performTradeDeletion = performTradeDeletion;
+window.setupTradeConditionsButton = setupTradeConditionsButton;
 
 /**
  * Register trades table with UnifiedTableSystem

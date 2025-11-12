@@ -727,6 +727,34 @@ class ModalManagerV2 {
                     </div>
                 `;
                 
+            case 'tag-multi-select':
+                const initialTags = Array.isArray(field.defaultValue)
+                    ? field.defaultValue.join(',')
+                    : (field.defaultValue || '');
+                const badgeContainerId = `${field.id}TagBadgeContainer`;
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <select 
+                            class="form-select tag-multi-select"
+                            id="${field.id}"
+                            name="${field.name || field.id}"
+                            multiple
+                            ${disabledAttr}
+                            ${readOnlyAttr}
+                            data-tag-category="${field.tagCategory ?? ''}"
+                            data-include-inactive="${field.includeInactive ? 'true' : 'false'}"
+                            data-initial-value="${initialTags}">
+                            <option value="" disabled>טוען תגיות...</option>
+                        </select>
+                        <div id="${badgeContainerId}" class="mt-2 tag-picker-badges text-start small"></div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
                         case 'number':
                 const numberStyle = field.style || (field.width ? `width: ${field.width}px` : '');
                 // Check if this is a fee field that needs currency label
@@ -1392,7 +1420,52 @@ class ModalManagerV2 {
                 throw new Error('Failed to create Bootstrap modal instance');
             }
             
+            modalElement.dataset.modalMode = mode;
             modal.show();
+            
+            if (mode === 'edit' && entityData) {
+                const entityId = entityData.id != null ? String(entityData.id) : '';
+                const derivedName = entityData.name
+                    || entityData.ticker_symbol
+                    || entityData.symbol
+                    || entityData.title
+                    || entityData.ticker?.symbol
+                    || '';
+                
+                modalElement.dataset.entityId = entityId;
+                if (derivedName) {
+                    modalElement.dataset.entityName = derivedName;
+                } else {
+                    delete modalElement.dataset.entityName;
+                }
+                
+                const formElement = modalElement.querySelector('form');
+                if (formElement) {
+                    formElement.dataset.mode = mode;
+                    formElement.dataset.entityId = entityId;
+                }
+                
+                modalElement.dispatchEvent(new CustomEvent('modal:entity-context-changed', {
+                    detail: {
+                        entityId,
+                        entityName: derivedName,
+                        entityData
+                    }
+                }));
+            } else {
+                delete modalElement.dataset.entityId;
+                delete modalElement.dataset.entityName;
+                
+                const formElement = modalElement.querySelector('form');
+                if (formElement) {
+                    formElement.dataset.mode = mode;
+                    delete formElement.dataset.entityId;
+                }
+                
+                modalElement.dispatchEvent(new CustomEvent('modal:entity-context-reset', {
+                    detail: { mode }
+                }));
+            }
             
             // בדיקה שהמודל נפתח בהצלחה
             console.log(`✅ Modal ${modalId} shown successfully`);
@@ -1849,7 +1922,7 @@ class ModalManagerV2 {
             'alert': 'alerts',
             'execution': 'executions',
             'ticker': 'tickers',
-            'trade_plan': 'trade_plans',
+            'trade_plan': 'trade-plans',
             'note': 'notes'
         };
         return pluralMap[entityType] || `${entityType}s`;
@@ -4159,6 +4232,14 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
+        if (window.TagUIManager && typeof window.TagUIManager.initializeModal === 'function') {
+            try {
+                window.TagUIManager.initializeModal(modalElement);
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
+            }
+        }
+        
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
         if (firstInput) {
@@ -4337,6 +4418,14 @@ class ModalManagerV2 {
         
         // For Trade Plans modal - handle ticker selection
         if (modalId === 'tradePlansModal') {
+            if (typeof window.setupTradePlanConditionsButton === 'function') {
+                try {
+                    window.setupTradePlanConditionsButton(modalElement);
+                } catch (error) {
+                    window.Logger?.warn('⚠️ Failed to initialize trade plan conditions controls', { error, page: 'modal-manager-v2' });
+                }
+            }
+
             const runResync = (forceFlag = true) => {
                 if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
                     const resyncPromise = window.InvestmentCalculationService.resync(modalElement, { force: forceFlag });
@@ -4554,6 +4643,14 @@ class ModalManagerV2 {
         
         // For Trades modal - handle ticker selection
         if (modalId === 'tradesModal') {
+            if (typeof window.setupTradeConditionsButton === 'function') {
+                try {
+                    window.setupTradeConditionsButton(modalElement);
+                } catch (error) {
+                    window.Logger?.warn('⚠️ Failed to initialize trade conditions controls', { error, page: 'modal-manager-v2' });
+                }
+            }
+
             const runTradeResync = (forceFlag = true) => {
                 if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
                     const resyncPromise = window.InvestmentCalculationService.resync(modalElement, { force: forceFlag });

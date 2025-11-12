@@ -20,3 +20,11 @@
 2025-11-12 13:29:03,836 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
 2025-11-12 13:29:03,850 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
 2025-11-12 13:29:03,850 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 17:36:34,844 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 17:36:34,844 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 17:36:34,845 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 17:36:34,845 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 17:36:34,903 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 17:36:34,903 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 17:36:34,916 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 17:36:34,916 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults

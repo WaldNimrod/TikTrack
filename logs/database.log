@@ -758,3 +758,525 @@
 2025-11-12 13:29:03,886 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
 2025-11-12 13:29:03,902 - services.alert_service - INFO - נטענו 1 התראות
 2025-11-12 13:29:03,902 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 17:36:32,375 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 17:36:32,375 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 17:36:32,375 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 17:36:32,376 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 17:36:32,376 - root - INFO - 🗄️ Initializing database...
+2025-11-12 17:36:32,376 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 17:36:32,382 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.006s
+2025-11-12 17:36:32,382 - root - INFO - ✅ Database initialized successfully
+2025-11-12 17:36:33,383 - utils.performance_monitor - INFO - System metrics: CPU: 7.6%, Memory: 51.4%, Disk: 4.8%
+2025-11-12 17:36:33,383 - root - INFO - ✅ Database initialized successfully
+2025-11-12 17:36:33,383 - root - INFO - ✅ Server initialization completed
+2025-11-12 17:36:33,439 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:33,450 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:33,458 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 17:36:33,458 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 17:36:33,458 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 17:36:33,458 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 17:36:33,458 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 17:36:33,458 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 17:36:33,459 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 17:36:33,459 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 17:36:33,459 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 17:36:33,459 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 17:36:33,459 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 17:36:33,488 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:39da73f845b69d9c86f545fc35040e0b
+2025-11-12 17:36:33,489 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 17:36:33,491 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 17:36:33,491 - services.data_refresh_scheduler - INFO - Refreshing 3 active tickers during trading hours
+2025-11-12 17:36:33,491 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 17:36:33,501 - services.data_refresh_scheduler - INFO - Group refresh started: active_trades/in_hours - 3 tickers (ID: 32305)
+2025-11-12 17:36:33,503 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:33,503 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:33,504 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:33,508 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:33,509 - services.data_refresh_scheduler - INFO - Refreshing batch of 3 tickers: AAPL, GOOGL, AMZN
+2025-11-12 17:36:33,509 - services.external_data.yahoo_finance_adapter - INFO - Processing 3 symbols in 1 batches
+2025-11-12 17:36:33,536 - services.background_tasks - INFO - Background Task Manager initialized with real-time notifications support
+2025-11-12 17:36:33,536 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler initialized with NY market clock
+2025-11-12 17:36:33,536 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 17:36:33,536 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 17:36:33,536 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 17:36:33,536 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 17:36:33,537 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 17:36:33,537 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 17:36:33,537 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 17:36:33,537 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 17:36:33,537 - root - INFO - 🗄️ Initializing database...
+2025-11-12 17:36:33,537 - root - INFO - 🗄️ Initializing database...
+2025-11-12 17:36:33,537 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 17:36:33,537 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 17:36:33,539 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.002s
+2025-11-12 17:36:33,539 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.002s
+2025-11-12 17:36:33,539 - root - INFO - ✅ Database initialized successfully
+2025-11-12 17:36:33,539 - root - INFO - ✅ Database initialized successfully
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $273.5
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Current price: $273.5
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 273.5 - 275.25 = -1.75
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_amount = 273.5 - 275.25 = -1.75
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (-1.75 / 275.25) * 100 = -0.64%
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Calculated change_pct = (-1.75 / 275.25) * 100 = -0.64%
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 14117390
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: volume = 14117390
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $273.5, change_pct: -0.64%, change_amount: $-1.75
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 📊 AAPL: Final quote data - price: $273.5, change_pct: -0.64%, change_amount: $-1.75
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-11-12 17:36:34,075 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-11-12 17:36:34,076 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-11-12 17:36:34,076 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-11-12 17:36:34,076 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $273.5 (USD)
+2025-11-12 17:36:34,076 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $273.5 (USD)
+2025-11-12 17:36:34,077 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-11-12 17:36:34,077 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-11-12 17:36:34,078 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $273.5
+2025-11-12 17:36:34,078 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $273.5
+2025-11-12 17:36:34,231 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-11-12 17:36:34,231 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $285.7
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Current price: $285.7
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 285.7 - 291.31 = -5.610000000000014
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_amount = 285.7 - 291.31 = -5.610000000000014
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (-5.610000000000014 / 291.31) * 100 = -1.93%
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Calculated change_pct = (-5.610000000000014 / 291.31) * 100 = -1.93%
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 7632489
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: volume = 7632489
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $285.7, change_pct: -1.93%, change_amount: $-5.61
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 📊 GOOGL: Final quote data - price: $285.7, change_pct: -1.93%, change_amount: $-5.61
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-11-12 17:36:34,232 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-11-12 17:36:34,233 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-11-12 17:36:34,233 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-11-12 17:36:34,233 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $285.7 (USD)
+2025-11-12 17:36:34,233 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $285.7 (USD)
+2025-11-12 17:36:34,233 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-11-12 17:36:34,233 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-11-12 17:36:34,234 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $285.7
+2025-11-12 17:36:34,234 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $285.7
+2025-11-12 17:36:34,397 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-11-12 17:36:34,397 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Available meta keys: ['currency', 'symbol', 'exchangeName', 'fullExchangeName', 'instrumentType', 'firstTradeDate', 'regularMarketTime', 'hasPrePostMarketData', 'gmtoffset', 'timezone', 'exchangeTimezoneName', 'regularMarketPrice', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'regularMarketDayHigh', 'regularMarketDayLow', 'regularMarketVolume', 'longName', 'shortName', 'chartPreviousClose', 'priceHint', 'currentTradingPeriod', 'dataGranularity', 'range', 'validRanges']
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $245.29
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Current price: $245.29
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 245.29 - 249.1 = -3.8100000000000023
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_amount = 245.29 - 249.1 = -3.8100000000000023
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (-3.8100000000000023 / 249.1) * 100 = -1.53%
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Calculated change_pct = (-3.8100000000000023 / 249.1) * 100 = -1.53%
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 7894981
+2025-11-12 17:36:34,398 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: volume = 7894981
+2025-11-12 17:36:34,399 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $245.29, change_pct: -1.53%, change_amount: $-3.81
+2025-11-12 17:36:34,399 - services.external_data.yahoo_finance_adapter - INFO - 📊 AMZN: Final quote data - price: $245.29, change_pct: -1.53%, change_amount: $-3.81
+2025-11-12 17:36:34,399 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-11-12 17:36:34,399 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-11-12 17:36:34,400 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-11-12 17:36:34,400 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-11-12 17:36:34,400 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $245.29 (USD)
+2025-11-12 17:36:34,400 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $245.29 (USD)
+2025-11-12 17:36:34,401 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-11-12 17:36:34,401 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-11-12 17:36:34,403 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $245.29
+2025-11-12 17:36:34,403 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $245.29
+2025-11-12 17:36:34,403 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-11-12 17:36:34,403 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AAPL
+2025-11-12 17:36:34,404 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-11-12 17:36:34,404 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AAPL (ID: 1) - proceeding to cache quote
+2025-11-12 17:36:34,404 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $273.5 (USD)
+2025-11-12 17:36:34,404 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AAPL = $273.5 (USD)
+2025-11-12 17:36:34,405 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-11-12 17:36:34,405 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AAPL
+2025-11-12 17:36:34,406 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $273.5
+2025-11-12 17:36:34,406 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AAPL: $273.5
+2025-11-12 17:36:34,406 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-11-12 17:36:34,406 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: GOOGL
+2025-11-12 17:36:34,406 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-11-12 17:36:34,406 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker GOOGL (ID: 2) - proceeding to cache quote
+2025-11-12 17:36:34,407 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $285.7 (USD)
+2025-11-12 17:36:34,407 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: GOOGL = $285.7 (USD)
+2025-11-12 17:36:34,407 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-11-12 17:36:34,407 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for GOOGL
+2025-11-12 17:36:34,408 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $285.7
+2025-11-12 17:36:34,408 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for GOOGL: $285.7
+2025-11-12 17:36:34,409 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-11-12 17:36:34,409 - services.external_data.yahoo_finance_adapter - INFO - 🔄 _cache_quote called for symbol: AMZN
+2025-11-12 17:36:34,409 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-11-12 17:36:34,409 - services.external_data.yahoo_finance_adapter - INFO - ✅ Found ticker AMZN (ID: 6) - proceeding to cache quote
+2025-11-12 17:36:34,410 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $245.29 (USD)
+2025-11-12 17:36:34,410 - services.external_data.yahoo_finance_adapter - INFO - 💾 Adding quote to database: AMZN = $245.29 (USD)
+2025-11-12 17:36:34,410 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-11-12 17:36:34,410 - services.external_data.yahoo_finance_adapter - INFO - 🔄 Committing transaction for AMZN
+2025-11-12 17:36:34,411 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $245.29
+2025-11-12 17:36:34,411 - services.external_data.yahoo_finance_adapter - INFO - ✅ Successfully cached quote for AMZN: $245.29
+2025-11-12 17:36:34,416 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-11-12 17:36:34,416 - services.external_data.yahoo_finance_adapter - INFO - Updated provider yahoo_finance health: True
+2025-11-12 17:36:34,422 - services.data_refresh_scheduler - INFO - Batch refresh completed: 3 successful, 0 failed
+2025-11-12 17:36:34,422 - services.data_refresh_scheduler - INFO - Batch refresh completed: 3 successful, 0 failed
+2025-11-12 17:36:34,424 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 32305 - 3 successful, 0 failed
+2025-11-12 17:36:34,424 - services.data_refresh_scheduler - INFO - Group refresh completed: ID 32305 - 3 successful, 0 failed
+2025-11-12 17:36:34,425 - services.data_refresh_scheduler - WARNING - Skipping ticker 12 due to missing symbol
+2025-11-12 17:36:34,425 - services.data_refresh_scheduler - WARNING - Skipping ticker 12 due to missing symbol
+2025-11-12 17:36:34,425 - services.data_refresh_scheduler - INFO - Refreshing 10 inactive tickers during trading hours
+2025-11-12 17:36:34,425 - services.data_refresh_scheduler - INFO - Refreshing 10 inactive tickers during trading hours
+2025-11-12 17:36:34,427 - services.data_refresh_scheduler - INFO - Group refresh started: no_active_trades/in_hours - 10 tickers (ID: 32307)
+2025-11-12 17:36:34,427 - services.data_refresh_scheduler - INFO - Group refresh started: no_active_trades/in_hours - 10 tickers (ID: 32307)
+2025-11-12 17:36:34,427 - services.data_refresh_scheduler - INFO - Refreshing batch of 10 tickers: TEST123, TEST999, TEST777, TEST666, UNIQUE123, NEWTEST, FRESH123, TST93463, TST50b0c, TST31605
+2025-11-12 17:36:34,427 - services.data_refresh_scheduler - INFO - Refreshing batch of 10 tickers: TEST123, TEST999, TEST777, TEST666, UNIQUE123, NEWTEST, FRESH123, TST93463, TST50b0c, TST31605
+2025-11-12 17:36:34,427 - services.external_data.yahoo_finance_adapter - INFO - Processing 10 symbols in 1 batches
+2025-11-12 17:36:34,427 - services.external_data.yahoo_finance_adapter - INFO - Processing 10 symbols in 1 batches
+2025-11-12 17:36:34,544 - utils.performance_monitor - INFO - System metrics: CPU: 24.0%, Memory: 51.5%, Disk: 4.8%
+2025-11-12 17:36:34,544 - utils.performance_monitor - INFO - System metrics: CPU: 24.0%, Memory: 51.5%, Disk: 4.8%
+2025-11-12 17:36:34,544 - root - INFO - ✅ Database initialized successfully
+2025-11-12 17:36:34,544 - root - INFO - ✅ Database initialized successfully
+2025-11-12 17:36:34,545 - root - INFO - ✅ Server initialization completed
+2025-11-12 17:36:34,545 - root - INFO - ✅ Server initialization completed
+2025-11-12 17:36:34,603 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 17:36:34,604 - services.external_data.yahoo_finance_adapter - WARNING - Request attempt 1 failed: 404 Client Error: Not Found for url: https://query1.finance.yahoo.com/v8/finance/chart/TEST123?interval=1d&range=1d&includePrePost=false
+2025-11-12 17:36:34,603 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 17:36:34,604 - services.external_data.yahoo_finance_adapter - WARNING - Request attempt 1 failed: 404 Client Error: Not Found for url: https://query1.finance.yahoo.com/v8/finance/chart/TEST123?interval=1d&range=1d&includePrePost=false
+2025-11-12 17:36:34,604 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 17:36:34,604 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 17:36:34,604 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 17:36:34,604 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 17:36:34,604 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 17:36:34,604 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 17:36:34,604 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 17:36:34,604 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 17:36:34,604 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 17:36:34,604 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 17:36:34,605 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 17:36:34,605 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 17:36:34,605 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 17:36:34,605 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 17:36:34,605 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 17:36:34,605 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 17:36:34,605 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 17:36:34,606 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 17:36:34,606 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 17:36:34,606 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 17:36:34,606 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 17:36:34,606 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:e565124ba8de41a208a40acdc198661b
+2025-11-12 17:36:34,606 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:e565124ba8de41a208a40acdc198661b
+2025-11-12 17:36:34,606 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 17:36:34,606 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 17:36:34,607 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 17:36:34,607 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 17:36:34,607 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 17:36:34,607 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 17:36:34,608 - services.data_refresh_scheduler - WARNING - Skipping ticker 12 due to missing symbol
+2025-11-12 17:36:34,608 - services.data_refresh_scheduler - WARNING - Skipping ticker 12 due to missing symbol
+2025-11-12 17:36:34,614 - services.data_refresh_scheduler - INFO - Refreshing 10 inactive tickers during trading hours
+2025-11-12 17:36:34,614 - services.data_refresh_scheduler - INFO - Refreshing 10 inactive tickers during trading hours
+2025-11-12 17:36:34,616 - services.data_refresh_scheduler - INFO - Group refresh started: no_active_trades/in_hours - 10 tickers (ID: 32308)
+2025-11-12 17:36:34,616 - services.data_refresh_scheduler - INFO - Group refresh started: no_active_trades/in_hours - 10 tickers (ID: 32308)
+2025-11-12 17:36:34,616 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,616 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,617 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,617 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,621 - Backend.models.trade - INFO - Trade model loaded - opened_at fix applied
+2025-11-12 17:36:34,621 - Backend.models.trade - INFO - Trade model loaded - opened_at fix applied
+2025-11-12 17:36:34,641 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,641 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,644 - services.data_refresh_scheduler - INFO - Refreshing batch of 10 tickers: TEST123, TEST999, TEST777, TEST666, UNIQUE123, NEWTEST, FRESH123, TST93463, TST50b0c, TST31605
+2025-11-12 17:36:34,644 - services.data_refresh_scheduler - INFO - Refreshing batch of 10 tickers: TEST123, TEST999, TEST777, TEST666, UNIQUE123, NEWTEST, FRESH123, TST93463, TST50b0c, TST31605
+2025-11-12 17:36:34,645 - services.external_data.yahoo_finance_adapter - INFO - Processing 10 symbols in 1 batches
+2025-11-12 17:36:34,645 - services.external_data.yahoo_finance_adapter - INFO - Processing 10 symbols in 1 batches
+2025-11-12 17:36:34,664 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,664 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,665 - Backend.services.advanced_cache_service - INFO - Cache cleanup thread started
+2025-11-12 17:36:34,665 - Backend.services.advanced_cache_service - INFO - Cache cleanup thread started
+2025-11-12 17:36:34,665 - Backend.services.advanced_cache_service - INFO - Advanced Cache Service initialized with 100MB limit
+2025-11-12 17:36:34,665 - Backend.services.advanced_cache_service - INFO - Advanced Cache Service initialized with 100MB limit
+2025-11-12 17:36:34,679 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,679 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,679 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,679 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,680 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,680 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,680 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,680 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,680 - constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,680 - constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,681 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,681 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,681 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,681 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,682 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,682 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,682 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,682 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,683 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,683 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,683 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,683 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,683 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,683 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,684 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,685 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,685 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,685 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,685 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,685 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,685 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,735 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,735 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,741 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 17:36:34,741 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 17:36:34,741 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 17:36:34,741 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 17:36:34,741 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 17:36:34,741 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 17:36:34,742 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,742 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,743 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert for condition 1 already active
+2025-11-12 17:36:34,743 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert for condition 1 already active
+2025-11-12 17:36:34,743 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 17:36:34,743 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 17:36:34,743 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 17:36:34,743 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 17:36:34,763 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,763 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,766 - Backend.services.condition_evaluation_task - INFO - ℹ️ Auto-generate alerts disabled for condition 1, skipping alert processing
+2025-11-12 17:36:34,766 - Backend.services.condition_evaluation_task - INFO - ℹ️ Auto-generate alerts disabled for condition 1, skipping alert processing
+2025-11-12 17:36:34,766 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 17:36:34,766 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 17:36:34,766 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 17:36:34,766 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 17:36:34,787 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,787 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,791 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert reactivated for condition 1
+2025-11-12 17:36:34,791 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert reactivated for condition 1
+2025-11-12 17:36:34,792 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 17:36:34,792 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 17:36:34,792 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 17:36:34,792 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 17:36:34,807 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,807 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 17:36:34,813 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 17:36:34,813 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 17:36:34,813 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 17:36:34,813 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 17:36:34,813 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 17:36:34,813 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 17:36:34,836 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-12 17:36:34,836 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-12 17:36:34,837 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-12 17:36:34,837 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-12 17:36:34,837 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-12 17:36:34,837 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-12 17:36:34,838 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-12 17:36:34,838 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-12 17:36:34,839 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-12 17:36:34,839 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-12 17:36:34,840 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-12 17:36:34,840 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-12 17:36:34,843 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-12 17:36:34,843 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-12 17:36:34,844 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 17:36:34,844 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 17:36:34,845 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 17:36:34,845 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,885 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,886 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,886 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,886 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,886 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>!
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>!
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>?
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>?
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4457653344'>
+2025-11-12 17:36:34,886 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4457653344'>
+2025-11-12 17:36:34,887 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> (via trading_account_id)
+2025-11-12 17:36:34,887 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> (via trading_account_id)
+2025-11-12 17:36:34,887 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> - checking database directly...
+2025-11-12 17:36:34,887 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> - checking database directly...
+2025-11-12 17:36:34,887 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,887 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,889 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 17:36:34,889 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 17:36:34,889 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 17:36:34,889 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 17:36:34,889 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4456909840'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 17:36:34,889 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4456909840'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,890 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,891 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,891 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>!
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>!
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>?
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>?
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4457653344'>
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4457653344'>
+2025-11-12 17:36:34,891 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> (via trading_account_id)
+2025-11-12 17:36:34,891 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> (via trading_account_id)
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> - checking database directly...
+2025-11-12 17:36:34,891 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'> - checking database directly...
+2025-11-12 17:36:34,891 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,891 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,892 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 17:36:34,892 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 17:36:34,892 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 17:36:34,892 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 17:36:34,892 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4456909840'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 17:36:34,892 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4456909840'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 17:36:34,892 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,892 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4461267024'>
+2025-11-12 17:36:34,893 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-12 17:36:34,893 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-12 17:36:34,897 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 17:36:34,897 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 17:36:34,901 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 17:36:34,901 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 17:36:34,902 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:6acef431f7783fab243b718a38420687
+2025-11-12 17:36:34,902 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:6acef431f7783fab243b718a38420687
+2025-11-12 17:36:34,902 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 17:36:34,902 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 17:36:34,903 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 17:36:34,903 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 17:36:34,903 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:6acef431f7783fab243b718a38420687
+2025-11-12 17:36:34,903 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:6acef431f7783fab243b718a38420687
+2025-11-12 17:36:34,903 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:6acef431f7783fab243b718a38420687
+2025-11-12 17:36:34,903 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:6acef431f7783fab243b718a38420687
+2025-11-12 17:36:34,903 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 17:36:34,903 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 17:36:34,914 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,914 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,915 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,915 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,915 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,915 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,916 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,916 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,916 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 17:36:34,916 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 17:36:34,923 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,923 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,923 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,923 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,923 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,923 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,924 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,924 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,925 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 17:36:34,925 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 17:36:34,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,926 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,926 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,927 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,927 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,927 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 17:36:34,927 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 17:36:34,928 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,928 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,928 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,928 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,929 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,929 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,929 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_d2fedbc9460347eab127c06640ec2667 - Test Provider
+2025-11-12 17:36:34,929 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_d2fedbc9460347eab127c06640ec2667 - Test Provider
+2025-11-12 17:36:34,929 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,929 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,929 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,929 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,930 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,930 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,936 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,936 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,936 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,936 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,937 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,937 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,938 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,938 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,938 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,938 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 17:36:34,938 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,938 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,938 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,938 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,939 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,939 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,940 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 17:36:34,940 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 17:36:34,941 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,941 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,941 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,941 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,942 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,942 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,942 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 17:36:34,942 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 17:36:34,943 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,943 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,943 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,943 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,944 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,944 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,944 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_eb03955135674c60a641e9e6c5ab56ec - Test Provider
+2025-11-12 17:36:34,944 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_eb03955135674c60a641e9e6c5ab56ec - Test Provider
+2025-11-12 17:36:34,945 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,945 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,945 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,945 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 17:36:34,945 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,945 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 17:36:34,955 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
+2025-11-12 17:36:34,955 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
+2025-11-12 17:36:34,974 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 17:36:34,974 - services.alert_service - INFO - נטענו 1 התראות

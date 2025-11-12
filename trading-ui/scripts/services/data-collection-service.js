@@ -50,6 +50,19 @@ class DataCollectionService {
                 continue;
             }
             
+            if (config.type === 'tags') {
+                let selectedTags = [];
+                if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
+                    selectedTags = window.TagUIManager.getSelectedValues(element);
+                } else {
+                    selectedTags = Array.from(element.selectedOptions || [])
+                        .map(option => parseInt(option.value, 10))
+                        .filter(value => !Number.isNaN(value));
+                }
+                data[key] = selectedTags;
+                continue;
+            }
+            
             // טיפול מיוחד ב-rich-text editor - לא משתמש ב-value
             if (config.type === 'rich-text') {
                 if (window.RichTextEditorService) {
@@ -195,6 +208,19 @@ class DataCollectionService {
             }
             
             // הגדרת ערך לפי סוג
+            if (config.type === 'tags') {
+                const tagValues = Array.isArray(value) ? value : [];
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(element, tagValues);
+                } else {
+                    const valuesSet = new Set(tagValues.map(v => String(v)));
+                    Array.from(element.options || []).forEach(option => {
+                        option.selected = valuesSet.has(option.value);
+                    });
+                }
+                continue;
+            }
+
             if (config.type === 'bool' || config.type === 'boolean' || config.type === 'checkbox') {
                 element.checked = Boolean(value);
             } else if (config.type === 'date' || config.type === 'dateOnly') {
@@ -316,6 +342,14 @@ class DataCollectionService {
                 } catch (e) {
                     return defaultValue;
                 }
+            
+            case 'tags':
+                if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
+                    return window.TagUIManager.getSelectedValues(element);
+                }
+                return Array.from(element.selectedOptions || [])
+                    .map(option => parseInt(option.value, 10))
+                    .filter(num => !Number.isNaN(num));
                 
             case 'bool':
             case 'boolean':
@@ -351,6 +385,18 @@ class DataCollectionService {
         }
         
         // הגדרת ערך לפי סוג
+        if (type === 'tags') {
+            if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                window.TagUIManager.setSelectedValues(element, Array.isArray(value) ? value : []);
+            } else if (Array.isArray(value)) {
+                const valuesSet = new Set(value.map(v => String(v)));
+                Array.from(element.options || []).forEach(option => {
+                    option.selected = valuesSet.has(option.value);
+                });
+            }
+            return;
+        }
+
         if (type === 'bool' || type === 'boolean' || type === 'checkbox') {
             element.checked = Boolean(value);
         } else if (type === 'date') {

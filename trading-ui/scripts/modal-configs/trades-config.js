@@ -195,6 +195,22 @@ const tradesModalConfig = {
             rowClass: 'row',
             colClass: 'col-12'
         },
+        {
+            type: 'custom',
+            id: 'tradeConditionsControls',
+            html: `
+                <div class="conditions-control-wrapper mt-3" data-conditions-controls="trade">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-primary" id="tradeOpenConditionsButton" data-action="open-conditions">
+                            ניהול תנאים
+                        </button>
+                    </div>
+                    <div class="text-muted small mt-2" data-conditions-disabled-hint>
+                        ניהול תנאים יהיה זמין לאחר שמירת העסקה.
+                    </div>
+                </div>
+            `
+        },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',

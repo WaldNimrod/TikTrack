@@ -2427,12 +2427,6 @@ function loadStep2Content() {
 /**
  * Load confirmation data (Step 5)
  */
-function loadConfirmationData() {
-    // The HTML content is already in the DOM, just need to display confirmation data
-    if (analysisResults && previewData) {
-        displayConfirmationData(analysisResults, previewData);
-    }
-}
 
 async function reanalyseSessionForTask(taskKey, loadingMessage = 'טוען ומעבד נתונים...') {
     if (!currentSessionId) {

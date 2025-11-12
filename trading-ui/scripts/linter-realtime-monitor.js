@@ -1038,67 +1038,6 @@ function getFileType(fileName) {
     }
 }
 
-function updateProblemFilesTable(stats) {
-    const tableBody = document.getElementById('problemFilesTableBody');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = '';
-    
-    // Get all issues from scanning results
-    const allIssues = (window.scanningResults?.errors || []).concat(window.scanningResults?.warnings || []);
-    
-    if (allIssues.length === 0) {
-        const row = tableBody.insertRow();
-        row.innerHTML = `<td colspan="6" class="text-center">אין קבצים בעייתיים - הכל תקין! 🎉</td>`;
-        return;
-    }
-
-    // Group issues by file
-    const filesWithIssues = {};
-    allIssues.forEach(issue => {
-        if (!filesWithIssues[issue.file]) {
-            filesWithIssues[issue.file] = {
-                file: issue.file,
-                errors: 0,
-                warnings: 0,
-                total: 0,
-                type: getFileType(issue.file)
-            };
-        }
-        
-        if (issue.type === 'error') {
-            filesWithIssues[issue.file].errors++;
-        } else if (issue.type === 'warning') {
-            filesWithIssues[issue.file].warnings++;
-        }
-        filesWithIssues[issue.file].total++;
-    });
-    
-    // Convert to array and sort by total issues (descending)
-    const sortedFiles = Object.values(filesWithIssues).sort((a, b) => b.total - a.total);
-    
-    // Update problem files count
-    const problemFilesCountElement = document.getElementById('problemFilesCount');
-    if (problemFilesCountElement) {
-        problemFilesCountElement.textContent = `${sortedFiles.length} קבצים`;
-    }
-    
-    // Display files with issues
-    sortedFiles.forEach(fileInfo => {
-        const row = tableBody.insertRow();
-        const severity = fileInfo.errors > 0 ? 'danger' : 'warning';
-        const severityText = fileInfo.errors > 0 ? 'קריטי' : 'אזהרה';
-        
-        row.innerHTML = `
-            <td>${fileInfo.file}</td>
-            <td>${fileInfo.type.toUpperCase()}</td>
-            <td>${fileInfo.errors}</td>
-            <td>${fileInfo.warnings}</td>
-            <td>${fileInfo.total}</td>
-            <td><span class="badge bg-${severity}">${severityText}</span></td>
-        `;
-    });
-}
 
 // ========================================
 // Scanning Functions

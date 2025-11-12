@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.18.0",
+    "version": "1.0.19.0",
     "major": 1,
     "minor": 0,
-    "patch": 18,
+    "patch": 19,
     "build": 0,
-    "commit": "d3c2bf075911e1b903d9067e31e06fd4ece7b2fb",
-    "updated_at": "2025-11-12T15:33:15+00:00",
-    "notes": "Entity modal color sync"
+    "commit": "3aba628529e222b0552c8559b3bc7104b2b1e6a8",
+    "updated_at": "2025-11-12T16:32:29+00:00",
+    "notes": "Adjust import session warning layout"
   }
 }

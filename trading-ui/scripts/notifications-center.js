@@ -256,73 +256,46 @@ async function loadPreferencesOverview() {
       { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
       { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
       { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' },
-      { key: 'console_logs_ui_components_enabled', title: 'לוגי רכיבי ממשק', type: 'boolean' },
-      { key: 'console_logs_cache_enabled', title: 'לוגי מטמון', type: 'boolean' },
-      { key: 'console_logs_notifications_enabled', title: 'לוגי התראות', type: 'boolean' }
+      { key: 'console_logs_development_enabled', title: 'לוגים למפתחים', type: 'boolean' },
+      { key: 'console_logs_performance_enabled', title: 'לוגי ביצועים', type: 'boolean' }
     ];
 
-    let html = '<div class="preferences-list">';
-    
-    // הגדרות בסיסיות
-    html += '<div class="mb-4">';
-    html += '<h6 class="text-primary mb-3">הגדרות בסיסיות:</h6>';
-    basicSettings.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+    const preferencesHtml = `
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <i class="fas fa-sliders-h me-2"></i>הגדרות בסיסיות
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(basicSettings, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-
-    // קטגוריות התראות
-    html += '<div class="row">';
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-primary mb-3">התראות מערכת:</h6>';
-    notificationCategories.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        <div class="col-lg-4 col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <i class="fas fa-layer-group me-2"></i>קטגוריות התראות
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(notificationCategories, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-
-    // לוגים לקונסול
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-success mb-3">לוגים לקונסול:</h6>';
-    consoleLogs.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        <div class="col-lg-4 col-md-12 mb-3">
+          <div class="card">
+            <div class="card-header bg-warning text-white">
+              <i class="fas fa-terminal me-2"></i>לוגים וקונסול
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(consoleLogs, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
+      </div>
+    `;
 
-    container.innerHTML = html;
-    console.log('✅ Preferences overview loaded with correct data');
+    container.innerHTML = preferencesHtml;
   } catch (error) {
     console.error('❌ Error loading preferences overview:', error);
   }
@@ -2137,72 +2110,46 @@ async function loadPreferencesOverview() {
       { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
       { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
       { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' },
-      { key: 'console_logs_ui_components_enabled', title: 'לוגי רכיבי ממשק', type: 'boolean' },
-      { key: 'console_logs_cache_enabled', title: 'לוגי מטמון', type: 'boolean' },
-      { key: 'console_logs_notifications_enabled', title: 'לוגי התראות', type: 'boolean' }
+      { key: 'console_logs_development_enabled', title: 'לוגים למפתחים', type: 'boolean' },
+      { key: 'console_logs_performance_enabled', title: 'לוגי ביצועים', type: 'boolean' }
     ];
 
-    let html = '<div class="preferences-list">';
-    
-    // הגדרות בסיסיות
-    html += '<div class="mb-4">';
-    html += '<h6 class="text-primary mb-3">הגדרות בסיסיות:</h6>';
-    basicSettings.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+    const preferencesHtml = `
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <i class="fas fa-sliders-h me-2"></i>הגדרות בסיסיות
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(basicSettings, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-
-    // קטגוריות התראות
-    html += '<div class="row">';
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-primary mb-3">התראות מערכת:</h6>';
-    notificationCategories.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        <div class="col-lg-4 col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <i class="fas fa-layer-group me-2"></i>קטגוריות התראות
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(notificationCategories, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-
-    // לוגים לקונסול
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-success mb-3">לוגים לקונסול:</h6>';
-    consoleLogs.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        <div class="col-lg-4 col-md-12 mb-3">
+          <div class="card">
+            <div class="card-header bg-warning text-white">
+              <i class="fas fa-terminal me-2"></i>לוגים וקונסול
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(consoleLogs, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-    html += '</div>';
+      </div>
+    `;
 
-    container.innerHTML = html;
-    console.log('✅ Preferences overview loaded with correct data');
+    container.innerHTML = preferencesHtml;
   } catch (error) {
     console.error('❌ Error loading preferences overview:', error);
   }

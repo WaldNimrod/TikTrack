@@ -318,6 +318,7 @@ class ConditionsInitializer {
 }
 
 // Create global instance
+window.ConditionsInitializer = ConditionsInitializer;
 window.conditionsInitializer = new ConditionsInitializer();
 
 // Auto-initialize when DOM is ready

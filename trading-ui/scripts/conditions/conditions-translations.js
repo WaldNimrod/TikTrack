@@ -298,7 +298,6 @@ class ConditionsTranslations {
         
         return translated;
     }
-}
 
     _generateMethodKey(name) {
         if (!name) return '';
@@ -321,6 +320,7 @@ class ConditionsTranslations {
         }
         return parameters;
     }
+}
 
 // Create global instance
 window.conditionsTranslations = new ConditionsTranslations();

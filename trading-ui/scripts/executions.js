@@ -1287,6 +1287,15 @@ function updateExecutionsSummary(filteredDataOverride = null) {
       }
     } else if (typeof window.updatePageSummaryStats === 'function') {
       window.updatePageSummaryStats('executions', filteredData || window.executionsData);
+    } else {
+      const summaryStatsElement = document.getElementById('summaryStats');
+      if (summaryStatsElement) {
+        summaryStatsElement.innerHTML = `
+          <div style="color: #dc3545; font-weight: bold;">
+            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+          </div>
+        `;
+      }
     }
   } catch (error) {
     window.Logger?.warn('updateExecutionsSummary failed', { error });
@@ -2379,23 +2388,6 @@ function addNewTrade() {
  * עדכון סיכום נתונים לעסקעות
  * @param {Array} executions - מערך העסקעות
  */
-function updateExecutionsSummary(executions) {
-  // עדכון סיכום נתונים לעסקעות - מערכת מאוחדת
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.executions;
-    window.InfoSummarySystem.calculateAndRender(executions, config);
-  } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
-}
 
 // הגדרת הפונקציות כגלובליות
 window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;

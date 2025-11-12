@@ -2594,12 +2594,9 @@ function updateTradePlansTable(trade_plans) {
             }
             
             try {
-              const entityName = design?.ticker_symbol || design?.symbol || design?.ticker || design?.name || '';
-              const manageConditionsAction = `window.ConditionsModalController && window.ConditionsModalController.open({ entityType: 'plan', entityId: ${design.id}, entityName: ${JSON.stringify(entityName)} })`;
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
                 { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', ${design.id})`, title: 'ערוך' },
-                { type: 'MANAGE', onclick: manageConditionsAction, title: 'ניהול תנאים' },
                 { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
                 { type: 'DELETE', onclick: `if (typeof window.deleteTradePlan === 'function') { window.deleteTradePlan(${design.id}); }`, title: 'מחק' }
               ]);
@@ -2958,43 +2955,144 @@ function initializeTradePlanConditionsSystem() {
       window.Logger?.info('✅ Conditions system already initialized for trade plans', { page: "trade_plans" });
       return true;
     }
-    
-    // Try to initialize using ConditionsInitializer class
-    if (typeof window.ConditionsInitializer !== 'undefined') {
-      try {
-        const initializer = new window.ConditionsInitializer();
-        if (initializer && typeof initializer.initialize === 'function') {
-          initializer.initialize().then(() => {
-            window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
-          }).catch(error => {
-            window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
-          });
-          if (window.conditionsCRUDManager) {
-            window.conditionsCRUDManager.setContext({ entityType: 'plan' });
-            window.conditionsCRUDManager.getTradingMethods();
-          }
-          return true;
-        }
-      } catch (error) {
-        window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trade_plans" });
+
+    const initializerInstance = (() => {
+      if (window.conditionsInitializer && typeof window.conditionsInitializer.initialize === 'function') {
+        return window.conditionsInitializer;
       }
+      if (typeof window.ConditionsInitializer === 'function') {
+        try {
+          return new window.ConditionsInitializer();
+        } catch (error) {
+          window.Logger?.warn('Error creating ConditionsInitializer instance:', error, { page: "trade_plans" });
+          return null;
+        }
+      }
+      return null;
+    })();
+
+    if (initializerInstance && typeof initializerInstance.initialize === 'function') {
+      const afterInit = () => {
+        if (window.conditionsCRUDManager) {
+          window.conditionsCRUDManager.setContext({ entityType: 'plan' });
+          window.conditionsCRUDManager.getTradingMethods();
+        }
+        window.Logger?.info('✅ Trade plans conditions system initialized successfully', { page: "trade_plans" });
+      };
+
+      const initResult = initializerInstance.initialize();
+      if (initResult && typeof initResult.then === 'function') {
+        initResult.then(afterInit).catch(error => {
+          window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
+        });
+      } else if (initResult !== false) {
+        afterInit();
+      }
+      return true;
     }
-    
+
     // If not available immediately, try deferred check
     setTimeout(() => {
       if (window.conditionsSystem && window.conditionsSystem.initializer) {
         window.Logger?.info('✅ Conditions system initialized for trade plans (deferred check)', { page: "trade_plans" });
-        return true;
       } else {
         window.Logger?.warn('⚠️ ConditionsInitializer not available - conditions package may not be loaded', { page: "trade_plans" });
       }
     }, 500);
-    
+
     return false;
   } catch (error) {
     window.Logger?.error('Error in initializeTradePlanConditionsSystem:', error, { page: "trade_plans" });
     return false;
   }
+}
+
+/**
+ * Bind conditions management controls inside the trade plan modal
+ * @param {HTMLElement} modalElement
+ */
+function setupTradePlanConditionsButton(modalElement) {
+  if (!modalElement) {
+    return;
+  }
+
+  const controlsWrapper = modalElement.querySelector('[data-conditions-controls="trade-plan"]');
+  if (!controlsWrapper || controlsWrapper.dataset.initialized === 'true') {
+    return;
+  }
+
+  const openButton = controlsWrapper.querySelector('[data-action="open-conditions"]');
+  const disabledHint = controlsWrapper.querySelector('[data-conditions-disabled-hint]');
+  const tickerSelect = modalElement.querySelector('#tradePlanTicker');
+
+  const ensureEntityName = () => {
+    if (modalElement.dataset.entityName && modalElement.dataset.entityName.trim() !== '') {
+      return modalElement.dataset.entityName;
+    }
+    if (tickerSelect && tickerSelect.selectedOptions.length > 0) {
+      const tickerName = tickerSelect.selectedOptions[0].textContent?.trim();
+      if (tickerName) {
+        modalElement.dataset.entityName = tickerName;
+        return tickerName;
+      }
+    }
+    return '';
+  };
+
+  const updateButtonState = () => {
+    const mode = modalElement.dataset.modalMode || modalElement.dataset.mode || '';
+    const entityId = modalElement.dataset.entityId || '';
+    const isEnabled = mode === 'edit' && entityId;
+
+    if (openButton) {
+      openButton.disabled = !isEnabled;
+      openButton.classList.toggle('btn-outline-secondary', !isEnabled);
+      openButton.classList.toggle('btn-outline-primary', isEnabled);
+    }
+
+    if (disabledHint) {
+      disabledHint.classList.toggle('d-none', Boolean(isEnabled));
+    }
+  };
+
+  if (openButton) {
+    openButton.addEventListener('click', () => {
+      const entityId = modalElement.dataset.entityId;
+      if (!entityId) {
+        window.showNotification?.('ניתן לנהל תנאים רק לאחר שמירת התכנון.', 'info');
+        return;
+      }
+
+      const entityName = ensureEntityName();
+      const entityType = 'plan';
+
+      if (window.ConditionsModalController && typeof window.ConditionsModalController.open === 'function') {
+        window.ConditionsModalController.open({
+          entityType,
+          entityId: Number(entityId),
+          entityName,
+          parentModalId: modalElement.id
+        });
+      } else {
+        window.Logger?.error('ConditionsModalController לא זמין', { page: 'trade_plans' });
+        window.showNotification?.('לא ניתן לפתוח את מודול התנאים כעת.', 'error');
+      }
+    });
+  }
+
+  if (tickerSelect && !tickerSelect.dataset.conditionsNameBound) {
+    tickerSelect.addEventListener('change', () => {
+      ensureEntityName();
+      updateButtonState();
+    });
+    tickerSelect.dataset.conditionsNameBound = 'true';
+  }
+
+  modalElement.addEventListener('modal:entity-context-changed', updateButtonState);
+  modalElement.addEventListener('modal:entity-context-reset', updateButtonState);
+
+  controlsWrapper.dataset.initialized = 'true';
+  updateButtonState();
 }
 
 /**
@@ -3020,6 +3118,8 @@ window.restoreSortState = restoreSortState;
 window.initializeTradePlanConditionsSystem = initializeTradePlanConditionsSystem;
 window.setupPriceCalculation = setupPriceCalculation;
 window.setupEditPriceCalculation = setupEditPriceCalculation;
+window.setupTradePlanConditionsButton = setupTradePlanConditionsButton;
+window.setupTradePlanConditionsButton = setupTradePlanConditionsButton;
 /**
  * Restore planning section state for trade plans
  * Uses global restoreAllSectionStates function from ui-utils.js

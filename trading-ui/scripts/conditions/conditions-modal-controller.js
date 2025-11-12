@@ -16,6 +16,8 @@
             this.modalElement = null;
             this.bootstrapModal = null;
             this.isReady = false;
+            this.parentModalId = null;
+            this.parentModalInstance = null;
 
             this.initialize();
         }
@@ -57,8 +59,10 @@
             this.context = {
                 entityType: context.entityType || 'plan',
                 entityId: context.entityId,
-                entityName: context.entityName || ''
+                entityName: context.entityName || '',
+                parentModalId: context.parentModalId || null
             };
+            this.parentModalId = this.context.parentModalId || null;
 
             if (!this.context.entityId) {
                 console.error('[ConditionsModalController] Missing entityId in context');
@@ -76,6 +80,26 @@
                     this.setupModal();
                 } catch (error) {
                     console.error('[ConditionsModalController] Failed to create modal via ModalManagerV2', error);
+                }
+            }
+
+            if (this.parentModalId) {
+                const parentElement = document.getElementById(this.parentModalId);
+                if (parentElement) {
+                    try {
+                        const instance = bootstrap?.Modal?.getInstance(parentElement) || bootstrap?.Modal?.getOrCreateInstance(parentElement, { backdrop: false, keyboard: true });
+                        if (instance) {
+                            instance.hide();
+                            this.parentModalInstance = instance;
+                        } else {
+                            parentElement.classList.remove('show');
+                            parentElement.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.warn('[ConditionsModalController] Failed to hide parent modal', { error });
+                        parentElement.classList.remove('show');
+                        parentElement.style.display = 'none';
+                    }
                 }
             }
 
@@ -108,6 +132,8 @@
         }
 
         onModalHidden() {
+            this.restoreParentModal();
+
             this.context = null;
             if (this.managerInstance?.closeConditionForm) {
                 this.managerInstance.closeConditionForm();
@@ -123,7 +149,67 @@
             const titleElement = this.modalElement.querySelector('.modal-title');
             if (titleElement) {
                 const entityLabel = this.context.entityType === 'plan' ? 'תוכנית מסחר' : 'עסקה';
-                titleElement.textContent = `ניהול תנאים – ${entityLabel} #${this.context.entityId}`;
+                const entityName = this.context.entityName ? ` (${this.context.entityName})` : '';
+                titleElement.textContent = `ניהול תנאים – ${entityLabel} #${this.context.entityId}${entityName}`;
+            }
+
+            const entityLabelContainer = this.modalElement.querySelector('#conditionsModalEntityLabel');
+            if (entityLabelContainer) {
+                const entityLabel = this.context.entityType === 'plan' ? 'תוכנית מסחר' : 'עסקה';
+                const nameText = this.context.entityName ? ` – ${this.context.entityName}` : '';
+                entityLabelContainer.textContent = `${entityLabel} #${this.context.entityId}${nameText}`;
+            }
+
+            const backButton = this.modalElement.querySelector('[data-action="conditions-back"]');
+            if (backButton) {
+                if (this.parentModalId) {
+                    backButton.classList.remove('d-none');
+                    backButton.onclick = () => this.goBackToParent();
+                } else {
+                    backButton.classList.add('d-none');
+                    backButton.onclick = null;
+                }
+            }
+        }
+
+        goBackToParent() {
+            if (this.bootstrapModal) {
+                this.bootstrapModal.hide();
+            } else if (this.modalElement) {
+                this.modalElement.classList.remove('show');
+                this.modalElement.style.display = 'none';
+                this.restoreParentModal();
+            }
+        }
+
+        restoreParentModal() {
+            if (!this.parentModalId) {
+                return;
+            }
+
+            const parentId = this.parentModalId;
+            this.parentModalId = null;
+
+            const parentElement = document.getElementById(parentId);
+            if (!parentElement) {
+                this.parentModalInstance = null;
+                return;
+            }
+
+            try {
+                const instance = this.parentModalInstance || bootstrap?.Modal?.getInstance(parentElement) || bootstrap?.Modal?.getOrCreateInstance(parentElement, { backdrop: false, keyboard: true });
+                if (instance) {
+                    instance.show();
+                } else {
+                    parentElement.classList.add('show');
+                    parentElement.style.display = 'block';
+                }
+            } catch (error) {
+                console.warn('[ConditionsModalController] Failed to restore parent modal', { error });
+                parentElement.classList.add('show');
+                parentElement.style.display = 'block';
+            } finally {
+                this.parentModalInstance = null;
             }
         }
     }

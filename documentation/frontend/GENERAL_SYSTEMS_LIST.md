@@ -28,6 +28,7 @@
 | Field Renderer Service | `trading-ui/scripts/services/field-renderer-service.js` | [field-renderer-service.md](../03-API_REFERENCE/field-renderer-service.md) | רינדור Status/Amount/Date/Badges אחיד לכל הטבלאות |
 | Table Sort Value Adapter | `trading-ui/scripts/services/table-sort-value-adapter.js` | [TABLE_SORTING_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/TABLE_SORTING_SYSTEM.md) | המרת DateEnvelope/ISO/מספרים לערכי מיון יציבים עבור UnifiedTableSystem |
 | Linked Items Service | `trading-ui/scripts/services/linked-items-service.js` | [LINKED_ITEMS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LINKED_ITEMS_SYSTEM.md) | רשימות פריטים מקושרים, פורמט תצוגה וכפתורי פעולה אחידים |
+| Tag Service | `trading-ui/scripts/services/tag-service.js`<br>`trading-ui/scripts/tag-ui-manager.js` | [TAGGING_SYSTEM_SPEC.md](../03-DEVELOPMENT/TAGGING_SYSTEM_SPEC.md)<br>[TAG_SERVICE_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_SERVICE_DEVELOPER_GUIDE.md) | מערכת ניהול תגיות: קטגוריות, תגיות, שיוכים, אנליטיקה והצעות |
 | Alert Condition Renderer | `trading-ui/scripts/services/alert-condition-renderer.js` | [ALERT_CONDITION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/ALERT_CONDITION_SYSTEM.md) | רינדור תנאי התראות כולל תמיכה בשיטות המסחר |
 
 ### 🎨 מערכות תצוגה ו-UI

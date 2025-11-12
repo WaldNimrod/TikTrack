@@ -1591,11 +1591,18 @@ window.updatePageSummaryStats = updatePageSummaryStats;
  * @function addTrade
  * @returns {void}
  */
-function addTrade() {
+async function addTrade() {
   if (typeof showAddTradeModal === 'function') {
     // Use ModalManagerV2 directly
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      window.ModalManagerV2.showModal('tradesModal', 'add');
+      await window.ModalManagerV2.showModal('tradesModal', 'add');
+      const select = document.getElementById('tradeTags');
+      if (select) {
+        select.setAttribute('data-initial-value', '');
+        if (window.TagUIManager?.refreshSelectOptions) {
+          await window.TagUIManager.refreshSelectOptions(select);
+        }
+      }
     }
   } else {
     window.Logger?.error('showAddTradeModal not available', { page: "trades" });
@@ -1615,10 +1622,13 @@ window.addTrade = addTrade;
  * @param {number} tradeId - Trade ID to edit
  * @returns {void}
  */
-function editTrade(tradeId) {
+async function editTrade(tradeId) {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+    await window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
+    if (window.TagUIManager?.hydrateSelectForEntity) {
+      await window.TagUIManager.hydrateSelectForEntity('tradeTags', 'trade', tradeId, { force: true });
+    }
   } else {
     window.Logger?.error('showEditTradeModal not available', { page: "trades" });
     if (typeof window.showErrorNotification === 'function') {
@@ -3551,8 +3561,12 @@ async function saveTrade() {
             take_profit: { id: 'tradeTakeProfit', type: 'float', default: null },
             entry_date: { id: 'tradeEntryDate', type: 'date' },
             status: { id: 'tradeStatus', type: 'text' },
-            notes: { id: 'tradeNotes', type: 'rich-text', default: null }
+            notes: { id: 'tradeNotes', type: 'rich-text', default: null },
+            tag_ids: { id: 'tradeTags', type: 'tags', default: [] }
         });
+
+        const tagIds = Array.isArray(tradeData.tag_ids) ? tradeData.tag_ids : [];
+        delete tradeData.tag_ids;
 
         if (tradeData.side) {
             const normalizedSide = String(tradeData.side).trim().toLowerCase();
@@ -3652,6 +3666,20 @@ async function saveTrade() {
                 await window.PendingExecutionTradeCreation.handleTradeCreated(crudResult);
             }
         }
+
+        const resolvedTradeId = isEdit ? Number(tradeId) : Number(crudResult?.data?.id || crudResult?.id);
+        if (Number.isFinite(resolvedTradeId)) {
+            try {
+                await window.TagService.replaceEntityTags('trade', resolvedTradeId, tagIds);
+            } catch (tagError) {
+                window.Logger?.warn('⚠️ Failed to update trade tags', {
+                    error: tagError,
+                    tradeId: resolvedTradeId,
+                    page: 'trades'
+                });
+                window.showErrorNotification?.('שמירת תגיות', 'שמירת תגיות הטרייד נכשלה - הנתונים נשמרו ללא תגיות');
+            }
+        }
         
     } catch (error) {
         CRUDResponseHandler.handleError(error, 'שמירת טרייד');
@@ -3681,7 +3709,7 @@ function setupTradeConditionsButton(modalElement) {
         return;
     }
 
-    const openButton = controlsWrapper.querySelector('[data-action="open-conditions"]');
+    const openButton = controlsWrapper.querySelector('#tradeOpenConditionsButton');
     const disabledHint = controlsWrapper.querySelector('[data-conditions-disabled-hint]');
     const tickerSelect = modalElement.querySelector('#tradeTicker');
 
@@ -3716,10 +3744,27 @@ function setupTradeConditionsButton(modalElement) {
     };
 
     if (openButton) {
-        openButton.addEventListener('click', () => {
+        openButton.addEventListener('click', async () => {
             const entityId = modalElement.dataset.entityId;
             if (!entityId) {
                 window.showNotification?.('ניתן לנהל תנאים רק לאחר שמירת הטרייד.', 'info');
+                return;
+            }
+
+            try {
+                const initResult = typeof window.initializeTradeConditionsSystem === 'function'
+                    ? window.initializeTradeConditionsSystem()
+                    : false;
+                if (initResult && typeof initResult.then === 'function') {
+                    await initResult;
+                }
+            } catch (error) {
+                window.Logger?.warn('Failed to initialize trade conditions system before modal launch', { error, page: 'trades' });
+            }
+
+            if (!window.ConditionsModalController || typeof window.ConditionsModalController.open !== 'function') {
+                window.Logger?.error('ConditionsModalController לא זמין', { page: 'trades' });
+                window.showNotification?.('לא ניתן לפתוח את מודול התנאים כעת.', 'error');
                 return;
             }
 
@@ -3731,12 +3776,7 @@ function setupTradeConditionsButton(modalElement) {
                 parentModalId: modalElement.id
             };
 
-            if (window.ConditionsModalController && typeof window.ConditionsModalController.open === 'function') {
-                window.ConditionsModalController.open(context);
-            } else {
-                window.Logger?.error('ConditionsModalController לא זמין', { page: 'trades' });
-                window.showNotification?.('לא ניתן לפתוח את מודול התנאים כעת.', 'error');
-            }
+            window.ConditionsModalController.open(context);
         });
     }
 

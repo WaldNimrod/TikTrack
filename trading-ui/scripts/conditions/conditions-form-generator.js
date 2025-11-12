@@ -22,12 +22,25 @@ class ConditionsFormGenerator {
     constructor() {
         this.translator = window.conditionsTranslations;
         this.validator = window.conditionsValidator;
-        this.crudManager = window.conditionsCRUDManager;
+        this.crudManager = null;
         this.currentMethod = null;
         this.methods = [];
         this.methodsById = new Map();
         this.containerId = null;
         this.mode = 'create';
+    }
+
+    getCrudManager() {
+        if (!this.crudManager) {
+            if (window.conditionsCRUDManager) {
+                this.crudManager = window.conditionsCRUDManager;
+            } else {
+                const message = 'Conditions CRUD Manager not available';
+                window.Logger?.error(`[ConditionsFormGenerator] ${message}`, { page: 'conditions-form-generator' });
+                throw new Error(message);
+            }
+        }
+        return this.crudManager;
     }
 
     async generateConditionForm(containerId, options = {}) {
@@ -156,7 +169,8 @@ class ConditionsFormGenerator {
     }
 
     async loadMethods() {
-        this.methods = await this.crudManager.getTradingMethods(true);
+        const crudManager = this.getCrudManager();
+        this.methods = await crudManager.getTradingMethods(true);
         this.methodsById.clear();
         this.methods.forEach(method => {
             this.methodsById.set(String(method.id), method);

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="tag-management-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ניהול תגיות וקטגוריות במערכת TikTrack">
+    <meta name="keywords" content="TikTrack, תגיות, ניהול תגיות, קטגוריות, אנליטיקה">
+    <meta name="author" content="TikTrack">
+    <title>ניהול תגיות - TikTrack</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+
+    <!-- TikTrack ITCSS Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+</head>
+<body class="tag-management-page">
+    <div id="unified-header"></div>
+
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <div class="page-intro mb-4">
+                    <h1 class="page-title">
+                        <i class="bi bi-tags-fill text-success me-2"></i>
+                        ניהול תגיות
+                    </h1>
+                    <p class="text-muted">
+                        מסך מרכזי לניהול קטגוריות, תגיות, סינון מתקדם ונתוני שימוש בכל רחבי המערכת.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <button type="button"
+                                data-button-type="ADD"
+                                data-variant="primary"
+                                data-icon="➕"
+                                data-text="קטגוריה חדשה"
+                                data-onclick="window.TagManagementPage?.openCategoryModal('add')">
+                        </button>
+                        <button type="button"
+                                data-button-type="ADD"
+                                data-variant="outline"
+                                data-icon="🏷️"
+                                data-text="תגית חדשה"
+                                data-onclick="window.TagManagementPage?.openTagModal('add')">
+                        </button>
+                        <button type="button"
+                                data-button-type="REFRESH"
+                                data-icon="🔄"
+                                data-text="רענן נתונים"
+                                data-onclick="window.TagManagementPage?.refreshAll()">
+                        </button>
+                    </div>
+                </div>
+
+                <section class="content-section" id="tag-analytics-section" data-group="analytics">
+                    <div class="section-header">
+                        <h2>אנליטיקה</h2>
+                        <button type="button"
+                                data-button-type="REFRESH"
+                                data-variant="small"
+                                data-icon="🔄"
+                                data-onclick="window.TagManagementPage?.refreshAnalytics()">
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3" id="tagAnalyticsSummary">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-primary">
+                                    <div class="info-card-label">סה״כ תגיות פעילות</div>
+                                    <div class="info-card-value" id="totalActiveTags">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-secondary">
+                                    <div class="info-card-label">קטגוריות פעילות</div>
+                                    <div class="info-card-value" id="totalActiveCategories">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-success">
+                                    <div class="info-card-label">הצעות זמינות</div>
+                                    <div class="info-card-value" id="suggestionsAvailable">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-warning">
+                                    <div class="info-card-label">שימושים ב-30 ימים</div>
+                                    <div class="info-card-value" id="recentUsageCount">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-3">
+                            <table class="table table-sm table-striped align-middle" id="tagUsageLeaderboardTable" data-table-type="tag_usage_leaderboard">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable-header">תגית</th>
+                                        <th class="sortable-header">קטגוריה</th>
+                                        <th class="sortable-header">שימושים</th>
+                                        <th>ישויות מובילות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" class="text-center text-muted">טוען נתונים...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section" id="tag-categories-section" data-group="categories">
+                    <div class="section-header">
+                        <h2>קטגוריות תגיות</h2>
+                        <div class="section-header-controls">
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="small"
+                                    data-icon="➕"
+                                    data-onclick="window.TagManagementPage?.openCategoryModal('add')">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="tagCategoriesTable" data-table-type="tag_categories">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable-header">שם</th>
+                                        <th class="sortable-header">תיאור</th>
+                                        <th class="sortable-header">תגיות פעילות</th>
+                                        <th class="sortable-header">עודכן</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" class="text-center text-muted">טוען קטגוריות...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section" id="tags-section" data-group="tags">
+                    <div class="section-header">
+                        <h2>תגיות</h2>
+                        <div class="section-header-controls">
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="small"
+                                    data-icon="🏷️"
+                                    data-onclick="window.TagManagementPage?.openTagModal('add')">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label for="tagsCategoryFilter" class="form-label small">סינון לפי קטגוריה</label>
+                                <select id="tagsCategoryFilter" class="form-select">
+                                    <option value="">הצג הכול</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tagsSearchInput" class="form-label small">חיפוש תגית</label>
+                                <input type="search" id="tagsSearchInput" class="form-control" placeholder="שם תגית...">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button"
+                                        data-button-type="SECONDARY"
+                                        data-variant="full"
+                                        data-icon="🧹"
+                                        data-text="נקה סינון"
+                                        data-onclick="window.TagManagementPage?.resetFilters()">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="tagsTable" data-table-type="tags">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable-header">שם</th>
+                                        <th class="sortable-header">קטגוריה</th>
+                                        <th class="sortable-header">תיאור</th>
+                                        <th class="sortable-header">שימושים</th>
+                                        <th class="sortable-header">שימוש אחרון</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6" class="text-center text-muted">טוען תגיות...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Loading Order -->
+    <!-- Base Package -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
+    <script src="scripts/warning-system.js?v=1.0.0"></script>
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script>
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    <script src="scripts/header-system.js?v=1.0.0"></script>
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    <script src="scripts/button-icons.js?v=1.0.0"></script>
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script>
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+
+    <!-- Services Package -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script>
+
+    <!-- External Libraries for Services -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script>
+
+    <!-- Modules Package -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script>
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script>
+    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script>
+    <script src="scripts/tag-events.js?v=1.0.0"></script>
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script>
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script>
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script>
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script>
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script>
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script>
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script>
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script>
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script>
+    <script src="scripts/import-user-data.js?v=1.0.0"></script>
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script>
+
+    <!-- UI Advanced / CRUD -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <script src="scripts/pagination-system.js?v=1.0.0"></script>
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script>
+
+    <!-- Preferences & Validation -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script>
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script>
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script>
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script>
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script>
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script>
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script>
+    <script src="scripts/validation-utils.js?v=1.0.0"></script>
+
+    <!-- Initialization -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <script src="scripts/init-system-check.js?v=1.0.0"></script>
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+
+    <!-- Page Specific -->
+    <script src="scripts/tag-management-page.js?v=1.0.0"></script>
+</body>
+</html>
+
+

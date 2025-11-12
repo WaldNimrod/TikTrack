@@ -64,6 +64,37 @@ class TradeService:
         return db.query(Trade).filter(Trade.status == 'open').all()
     
     @staticmethod
+    def get_trades_without_plan(
+        db: Session,
+        status_filter: Optional[List[str]] = None,
+        *,
+        load_relationships: bool = False,
+    ) -> List[Trade]:
+        """
+        Get trades without an associated trade plan.
+
+        Args:
+            db: Database session.
+            status_filter: Optional list of statuses to include (defaults to ['open']).
+            load_relationships: When True, eager-load ticker, account, executions.
+        """
+        query = db.query(Trade)
+        if load_relationships:
+            query = query.options(
+                joinedload(Trade.account),
+                joinedload(Trade.ticker),
+                joinedload(Trade.executions),
+            )
+
+        query = query.filter(Trade.trade_plan_id.is_(None))
+
+        statuses = status_filter or ['open']
+        if statuses:
+            query = query.filter(Trade.status.in_(statuses))
+
+        return query.order_by(Trade.created_at.desc()).all()
+    
+    @staticmethod
     def get_by_status(db: Session, status: str) -> List[Trade]:
         """Get trades by status"""
         return db.query(Trade).filter(Trade.status == status).all()
@@ -196,6 +227,43 @@ class TradeService:
         db.commit()
         logger.info(f"Deleted trade: {trade_id}")
         return True
+    
+    @staticmethod
+    def assign_plan(
+        db: Session,
+        trade_id: int,
+        trade_plan_id: int,
+        *,
+        validate_ticker: bool = False
+    ) -> Optional[Trade]:
+        """
+        Assign a trade plan to a trade after validating constraints.
+
+        Args:
+            db: Database session.
+            trade_id: Trade identifier.
+            trade_plan_id: Trade plan identifier.
+            validate_ticker: When True, ensure ticker ids match.
+        """
+        trade = db.query(Trade).options(joinedload(Trade.ticker)).filter(Trade.id == trade_id).first()
+        if not trade:
+            return None
+
+        if trade.trade_plan_id is not None:
+            raise ValueError("Trade is already linked to a trade plan")
+
+        plan = db.query(TradePlan).filter(TradePlan.id == trade_plan_id).first()
+        if not plan:
+            raise ValueError("Trade plan not found")
+
+        if validate_ticker and trade.ticker_id != plan.ticker_id:
+            raise ValueError("Ticker mismatch between trade and trade plan")
+
+        trade.trade_plan_id = trade_plan_id
+        db.add(trade)
+        db.commit()
+        logger.info(f"Linked trade {trade_id} to trade plan {trade_plan_id}")
+        return trade
     
     @staticmethod
     def close_trade(db: Session, trade_id: int, close_data: Dict[str, Any]) -> Optional[Trade]:

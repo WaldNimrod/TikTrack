@@ -237,6 +237,18 @@ This guarantees:
 | `window.setSortState(tableType, columnIndex, direction)` | Set sort state |
 | `window.sortAnyTable(tableType, columnIndex, data, updateFunction)` | Sort any table |
 | `window.sortTable(tableType, columnIndex, dataArray, updateFunction)` | Legacy sort table |
+
+### 🏠 Dashboard Widgets (`pending-trade-plan-widget.js`)
+- **תכלית:** הצגת טריידים ללא תוכנית מסחר והצעת פעולות (שיוך לתוכנית קיימת או יצירת תוכנית חדשה).
+- **תלויות:** `FieldRendererService`, `ButtonSystem`, `ModalManagerV2`, `UnifiedCacheManager`, `CacheSyncManager.invalidateByAction('trade-plan-linked')`.
+- **מקורות נתונים:**  
+  - `/api/trades/pending-plan/assignments` – הצעות לשיוך לתוכנית קיימת.  
+  - `/api/trades/pending-plan/creations` – הצעות ליצירת תוכנית חדשה עם נתוני פרה-מילוי.
+- **ניהול מצב:** מצמיח קבוצה של הצעות שנדחו (`UnifiedCacheManager` עם TTL של שעה) ומרענן אוטומטית כל 60 שניות.
+- **פעולות:**  
+  - `assignTradeToPlan(tradeId, planId)` – מבצע POST ל-`/api/trades/<id>/link-plan` ומפעיל Cache invalidation.  
+  - `openPlanCreationModal(tradeId)` – טוען את תלויות מודל התוכניות, מציב נתוני פרה-מילוי ומסנכרן את כרטיס הסיכון באמצעות `applyTradePlanDefaultRiskLevels`.
+- **ייצוא גלובלי:** `window.initializePendingTradePlanWidget()` לאתחול מתוזמן, `window.refreshPendingTradePlanWidget()` לרענון כפוי (משמש את דף הבית והבדיקות).
 | `window.restoreAnyTableSort(tableType, data, updateFunction)` | Restore table sort |
 | `window.applyDefaultSort(tableType, data, updateFunction)` | Apply default sort |
 | `window.closeModal(modalId)` | Close modal |

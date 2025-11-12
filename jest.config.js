@@ -108,42 +108,6 @@ module.exports = {
         url: 'http://localhost:8080'
     },
     
-    // Globals
-    globals: {
-        'window': {},
-        'document': {},
-        'navigator': {},
-        'TextEncoder': {},
-        'TextDecoder': {},
-        'Logger': {},
-        'UnifiedCacheManager': {},
-        'showNotification': {},
-        'showSuccessNotification': {},
-        'showErrorNotification': {},
-        'showWarningNotification': {},
-        'showInfoNotification': {},
-        'FieldRendererService': {},
-        'ButtonSystem': {},
-        'TableSystem': {},
-        'ChartSystem': {}
-    },
-    
-    // Test suites
-    projects: [
-        {
-            displayName: 'unit',
-            testMatch: ['<rootDir>/tests/unit/**/*.test.js'],
-            testEnvironment: 'jsdom'
-        },
-        {
-            displayName: 'integration',
-            testMatch: ['<rootDir>/tests/integration/**/*.test.js'],
-            testEnvironment: 'jsdom'
-        },
-        {
-            displayName: 'e2e',
-            testMatch: ['<rootDir>/tests/e2e/**/*.test.js'],
-            testEnvironment: 'jsdom'
-        }
-    ]
+    // Additional Jest flags
+    detectOpenHandles: true
 };

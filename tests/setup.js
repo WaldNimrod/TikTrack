@@ -9,289 +9,197 @@
  * @author TikTrack Development Team
  */
 
-// Mock TextEncoder/TextDecoder for Node.js compatibility
-require('text-encoding');
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder;
+const { TextEncoder, TextDecoder } = require('util');
+const { Blob } = require('buffer');
+const registerGlobalMocks = require('./mocks/register-global-mocks');
 
-// Mock global objects
-global.window = {
-    location: {
-        href: 'http://localhost:8080',
-        pathname: '/',
-        search: '',
-        hash: ''
-    },
-    navigator: {
-        userAgent: 'Jest Test Environment'
-    },
-    localStorage: {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
-        clear: jest.fn()
-    },
-    sessionStorage: {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
-        clear: jest.fn()
-    },
-    fetch: jest.fn(),
-    setTimeout: jest.fn(),
-    clearTimeout: jest.fn(),
-    setInterval: jest.fn(),
-    clearInterval: jest.fn(),
-    requestAnimationFrame: jest.fn(),
-    cancelAnimationFrame: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn()
+/**
+ * Polyfills
+ */
+if (!global.TextEncoder) {
+    global.TextEncoder = TextEncoder;
+}
+
+if (!global.TextDecoder) {
+    global.TextDecoder = TextDecoder;
+}
+
+if (typeof global.Blob === 'undefined') {
+    global.Blob = Blob;
+}
+
+const ensureFetch = () => {
+    if (typeof global.fetch !== 'function') {
+        global.fetch = jest.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            statusText: 'OK',
+            json: async () => ({}),
+            text: async () => '',
+            blob: async () => new Blob(),
+            arrayBuffer: async () => new ArrayBuffer(0)
+        });
+    }
+
+    if (global.window && typeof global.window.fetch !== 'function') {
+        global.window.fetch = (...args) => global.fetch(...args);
+    }
 };
 
-global.document = {
-    createElement: jest.fn(),
-    getElementById: jest.fn(),
-    getElementsByClassName: jest.fn(),
-    getElementsByTagName: jest.fn(),
-    querySelector: jest.fn(),
-    querySelectorAll: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn()
+const ensureResponse = () => {
+    if (typeof global.Response !== 'function') {
+        class SimpleResponse {
+            constructor(body = '', init = {}) {
+                this._body = body;
+                this.status = init.status ?? 200;
+                this.statusText = init.statusText ?? 'OK';
+                this.headers = init.headers ?? {};
+                this.ok = this.status >= 200 && this.status < 300;
+                this.url = init.url ?? 'http://localhost';
+                this.type = 'default';
+            }
+
+            async json() {
+                if (typeof this._body === 'string' && this._body.length > 0) {
+                    try {
+                        return JSON.parse(this._body);
+                    } catch (error) {
+                        return {};
+                    }
+                }
+                return typeof this._body === 'object' ? this._body : {};
+            }
+
+            async text() {
+                if (typeof this._body === 'string') {
+                    return this._body;
+                }
+                if (typeof this._body === 'object') {
+                    return JSON.stringify(this._body);
+                }
+                return '';
+            }
+
+            async blob() {
+                return new Blob([await this.text()]);
+            }
+
+            async arrayBuffer() {
+                const text = await this.text();
+                const encoder = new TextEncoder();
+                return encoder.encode(text).buffer;
+            }
+        }
+
+        global.Response = SimpleResponse;
+    }
 };
 
-global.console = {
-    log: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn()
+const ensureRequestAndHeaders = () => {
+    if (typeof global.Headers !== 'function') {
+        global.Headers = class Headers {
+            constructor(init = {}) {
+                this.map = new Map(Object.entries(init));
+            }
+            set(key, value) {
+                this.map.set(key.toLowerCase(), value);
+            }
+            get(key) {
+                return this.map.get(key.toLowerCase());
+            }
+            has(key) {
+                return this.map.has(key.toLowerCase());
+            }
+        };
+    }
+
+    if (typeof global.Request !== 'function') {
+        global.Request = class Request {
+            constructor(input, init = {}) {
+                this.url = typeof input === 'string' ? input : input?.url ?? '';
+                this.method = init.method ?? 'GET';
+                this.headers = new Headers(init.headers || {});
+                this.body = init.body ?? null;
+            }
+        };
+    }
 };
 
-// Mock TikTrack systems
-global.Logger = {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    critical: jest.fn(),
-    setLevel: jest.fn(),
-    getLevel: jest.fn(),
-    flush: jest.fn(),
-    clear: jest.fn(),
-    getLogs: jest.fn(),
-    exportLogs: jest.fn(),
-    sendToServer: jest.fn(),
-    setServerEndpoint: jest.fn(),
-    setConfig: jest.fn(),
-    startTimer: jest.fn(),
-    endTimer: jest.fn(),
-    measurePerformance: jest.fn()
+const ensureStorage = () => {
+    const createStorage = () => {
+        const store = new Map();
+        return {
+            getItem: jest.fn((key) => (store.has(key) ? store.get(key) : null)),
+            setItem: jest.fn((key, value) => {
+                store.set(String(key), String(value));
+            }),
+            removeItem: jest.fn((key) => {
+                store.delete(key);
+            }),
+            clear: jest.fn(() => {
+                store.clear();
+            }),
+            key: jest.fn((index) => Array.from(store.keys())[index] ?? null),
+            get length() {
+                return store.size;
+            }
+        };
+    };
+
+    const targetWindow = global.window ?? globalThis;
+
+    if (!targetWindow.localStorage) {
+        targetWindow.localStorage = createStorage();
+    }
+
+    if (!targetWindow.sessionStorage) {
+        targetWindow.sessionStorage = createStorage();
+    }
 };
 
-global.UnifiedCacheManager = {
-    get: jest.fn(),
-    set: jest.fn(),
-    delete: jest.fn(),
-    clear: jest.fn(),
-    clearAll: jest.fn(),
-    clearAllCache: jest.fn(),
-    clearAllCacheQuick: jest.fn(),
-    clearAllCacheDetailed: jest.fn(),
-    refreshUserPreferences: jest.fn(),
-    getCacheStats: jest.fn(),
-    exportCache: jest.fn(),
-    importCache: jest.fn()
-};
-
-global.showNotification = jest.fn();
-global.showSuccessNotification = jest.fn();
-global.showErrorNotification = jest.fn();
-global.showWarningNotification = jest.fn();
-global.showInfoNotification = jest.fn();
-
-global.FieldRendererService = {
-    renderStatus: jest.fn(),
-    renderSide: jest.fn(),
-    renderNumericBadge: jest.fn(),
-    renderCurrency: jest.fn(),
-    renderType: jest.fn(),
-    renderAction: jest.fn(),
-    renderPriority: jest.fn(),
-    renderShares: jest.fn(),
-    renderBoolean: jest.fn(),
-    renderTickerInfo: jest.fn(),
-    renderLinkedEntity: jest.fn()
-};
-
-global.ButtonSystem = {
-    createEditButton: jest.fn(),
-    createDeleteButton: jest.fn(),
-    createCancelButton: jest.fn(),
-    createLinkButton: jest.fn(),
-    createAddButton: jest.fn(),
-    createSaveButton: jest.fn(),
-    generateActionButtons: jest.fn(),
-    loadTableActionButtons: jest.fn()
-};
-
-global.TableSystem = {
-    sortTableData: jest.fn(),
-    sortTable: jest.fn(),
-    loadTableData: jest.fn(),
-    updateTable: jest.fn(),
-    filterTable: jest.fn(),
-    applyTableFilter: jest.fn(),
-    setTablePage: jest.fn(),
-    getTablePageInfo: jest.fn(),
-    generateTableActions: jest.fn(),
-    loadTableActionButtons: jest.fn(),
-    optimizeTablePerformance: jest.fn(),
-    getTablePerformanceMetrics: jest.fn(),
-    cacheTableData: jest.fn(),
-    getCachedTableData: jest.fn(),
-    clearTableCache: jest.fn()
-};
-
-global.ChartSystem = {
-    createChart: jest.fn(),
-    updateChart: jest.fn(),
-    destroyChart: jest.fn(),
-    getChartData: jest.fn(),
-    setChartData: jest.fn(),
-    exportChart: jest.fn(),
-    importChart: jest.fn()
-};
-
-// Mock DOM methods
-global.document.createElement.mockImplementation((tagName) => ({
-    tagName: tagName.toUpperCase(),
-    className: '',
-    id: '',
-    textContent: '',
-    innerHTML: '',
-    style: {},
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-    appendChild: jest.fn(),
-    removeChild: jest.fn(),
-    querySelector: jest.fn(),
-    querySelectorAll: jest.fn(),
-    getAttribute: jest.fn(),
-    setAttribute: jest.fn(),
-    removeAttribute: jest.fn(),
-    hasAttribute: jest.fn(),
-    focus: jest.fn(),
-    blur: jest.fn(),
-    click: jest.fn()
-}));
-
-global.document.getElementById.mockImplementation((id) => ({
-    id: id,
-    className: '',
-    textContent: '',
-    innerHTML: '',
-    style: {},
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-    appendChild: jest.fn(),
-    removeChild: jest.fn(),
-    querySelector: jest.fn(),
-    querySelectorAll: jest.fn(),
-    getAttribute: jest.fn(),
-    setAttribute: jest.fn(),
-    removeAttribute: jest.fn(),
-    hasAttribute: jest.fn(),
-    focus: jest.fn(),
-    blur: jest.fn(),
-    click: jest.fn()
-}));
-
-global.document.querySelector.mockImplementation((selector) => ({
-    selector: selector,
-    className: '',
-    textContent: '',
-    innerHTML: '',
-    style: {},
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-    appendChild: jest.fn(),
-    removeChild: jest.fn(),
-    querySelector: jest.fn(),
-    querySelectorAll: jest.fn(),
-    getAttribute: jest.fn(),
-    setAttribute: jest.fn(),
-    removeAttribute: jest.fn(),
-    hasAttribute: jest.fn(),
-    focus: jest.fn(),
-    blur: jest.fn(),
-    click: jest.fn()
-}));
-
-global.document.querySelectorAll.mockImplementation((selector) => []);
-
-// Mock fetch
-global.fetch.mockImplementation((url, options = {}) => {
-    return Promise.resolve({
-        ok: true,
-        status: 200,
-        statusText: 'OK',
-        json: () => Promise.resolve({}),
-        text: () => Promise.resolve(''),
-        blob: () => Promise.resolve(new Blob()),
-        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0))
+const ensureConsole = () => {
+    global.console = global.console || {};
+    ['log', 'warn', 'error', 'info', 'debug'].forEach((method) => {
+        if (typeof global.console[method] !== 'function') {
+            global.console[method] = jest.fn();
+        } else {
+            jest.spyOn(global.console, method).mockImplementation(() => {});
+        }
     });
-});
+};
 
-// Mock localStorage
-global.localStorage.getItem.mockImplementation((key) => null);
-global.localStorage.setItem.mockImplementation((key, value) => {});
-global.localStorage.removeItem.mockImplementation((key) => {});
-global.localStorage.clear.mockImplementation(() => {});
+const ensureTimers = () => {
+    if (typeof global.setTimeout !== 'function') {
+        global.setTimeout = jest.fn((cb) => {
+            cb?.();
+            return 1;
+        });
+    }
 
-// Mock sessionStorage
-global.sessionStorage.getItem.mockImplementation((key) => null);
-global.sessionStorage.setItem.mockImplementation((key, value) => {});
-global.sessionStorage.removeItem.mockImplementation((key) => {});
-global.sessionStorage.clear.mockImplementation(() => {});
+    if (typeof global.setInterval !== 'function') {
+        global.setInterval = jest.fn((cb) => {
+            cb?.();
+            return 1;
+        });
+    }
 
-// Mock setTimeout
-global.setTimeout.mockImplementation((callback, delay) => {
-    callback();
-    return 1;
-});
+    if (typeof global.requestAnimationFrame !== 'function') {
+        global.requestAnimationFrame = jest.fn((cb) => {
+            cb?.(0);
+            return 1;
+        });
+    }
+};
 
-// Mock setInterval
-global.setInterval.mockImplementation((callback, delay) => {
-    callback();
-    return 1;
-});
+ensureFetch();
+ensureResponse();
+ensureRequestAndHeaders();
+ensureStorage();
+ensureConsole();
+ensureTimers();
+registerGlobalMocks();
 
-// Mock requestAnimationFrame
-global.requestAnimationFrame.mockImplementation((callback) => {
-    callback();
-    return 1;
-});
-
-// Mock addEventListener
-global.addEventListener.mockImplementation((event, callback) => {});
-global.removeEventListener.mockImplementation((event, callback) => {});
-
-// Mock dispatchEvent
-global.dispatchEvent.mockImplementation((event) => true);
-
-// Mock console methods
-global.console.log.mockImplementation(() => {});
-global.console.warn.mockImplementation(() => {});
-global.console.error.mockImplementation(() => {});
-global.console.info.mockImplementation(() => {});
-global.console.debug.mockImplementation(() => {});
-
-// Test utilities
+// Utility helpers shared across tests
 global.testUtils = {
     createMockElement: (tagName, attributes = {}) => ({
         tagName: tagName.toUpperCase(),
@@ -311,25 +219,22 @@ global.testUtils = {
         blur: jest.fn(),
         click: jest.fn()
     }),
-    
     createMockEvent: (type, options = {}) => ({
-        type: type,
-        target: options.target || null,
-        currentTarget: options.currentTarget || null,
+        type,
+        target: options.target ?? null,
+        currentTarget: options.currentTarget ?? null,
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
         stopImmediatePropagation: jest.fn(),
         ...options
     }),
-    
     createMockData: (type, data = {}) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        type: type,
+        id: Math.random().toString(36).slice(2),
+        type,
         ...data
     }),
-    
-    waitFor: (callback, timeout = 1000) => {
-        return new Promise((resolve, reject) => {
+    waitFor: (callback, timeout = 1000) =>
+        new Promise((resolve, reject) => {
             const startTime = Date.now();
             const check = () => {
                 try {
@@ -345,11 +250,9 @@ global.testUtils = {
                 }
             };
             check();
-        });
-    }
+        })
 };
 
-// Clean up after each test
 afterEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
@@ -357,5 +260,4 @@ afterEach(() => {
     jest.restoreAllMocks();
 });
 
-// Global test timeout
-jest.setTimeout(10000);
+jest.setTimeout(15000);

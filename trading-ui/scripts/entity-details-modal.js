@@ -654,7 +654,8 @@ class EntityDetailsModal {
         }
 
         if (window.setCurrentEntityColorForEntity) {
-            window.setCurrentEntityColorForEntity(finalEntityType, { updateHeaders: false });
+            const activeEntityType = this.currentEntityType || entityType;
+            window.setCurrentEntityColorForEntity(activeEntityType, { updateHeaders: false });
         }
 
         // רנדור הנתונים - העברת sourceInfo ל-renderer דרך options

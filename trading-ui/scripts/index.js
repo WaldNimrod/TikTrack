@@ -1067,6 +1067,12 @@ window.initializeIndexPage = async function() {
             window.initializePendingExecutionsWidget();
         }, 1500);
     }
+
+    if (typeof window.initializePendingTradePlanWidget === 'function') {
+        setTimeout(() => {
+            window.initializePendingTradePlanWidget();
+        }, 1600);
+    }
 };
 
 // Note: initializeIndexPage() is now called via PAGE_CONFIGS.index.customInitializers

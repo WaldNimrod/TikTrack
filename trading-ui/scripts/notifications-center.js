@@ -152,60 +152,9 @@ async function loadCategoriesOverview() {
 /**
  * Load category statistics
  */
-async function loadCategoryStats() {
-  try {
-    const container = document.getElementById('categoryStats');
-    if (!container) return;
-
-    // Get statistics from the notification system
-    let stats = { success: 0, error: 0, warning: 0, info: 0, total: 0 };
-    
-    if (window.notificationsCenter && window.notificationsCenter.stats) {
-      stats = window.notificationsCenter.stats;
-    }
-
-    const categories = [
-      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: 'var(--color-success, #28a745)' },
-      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: 'var(--color-danger, #dc3545)' },
-      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: 'var(--color-warning, #ffc107)' },
-      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: 'var(--color-info, #17a2b8)' }
-    ];
-
-    let html = '<div class="row">';
-    categories.forEach(category => {
-      const count = stats[category.name] || 0;
-      const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
-      
-      html += `
-        <div class="col-md-3 col-sm-6 mb-3">
-          <div class="stat-card text-center p-3 border rounded">
-            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
-            <h4 class="mb-1" style="color: ${category.color};">${count.toLocaleString()}</h4>
-            <p class="mb-1 text-muted">${category.title}</p>
-            <small class="text-muted">${percentage}% מהסך הכל</small>
-          </div>
-        </div>
-      `;
-    });
-    html += '</div>';
-
-    // Add total statistics
-    html += `
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="total-stats text-center p-3 bg-light border rounded">
-            <h5 class="mb-1">סך הכל: ${stats.total.toLocaleString()} הודעות</h5>
-            <small class="text-muted">עדכון אחרון: ${new Date().toLocaleString('he-IL')}</small>
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = html;
-    console.log('✅ Category statistics loaded');
-  } catch (error) {
-    console.error('❌ Error loading category statistics:', error);
-  }
+async function loadCategoryStatsLegacy() {
+  // Backwards compatibility wrapper; use main implementation.
+  return loadCategoryStats();
 }
 
 /**
@@ -2058,102 +2007,6 @@ window.testUnifiedLogSystem = testUnifiedLogSystem;
 window.loadNotificationLog = loadNotificationLog;
 window.initializeNotificationsCenter = initializeNotificationsCenter;
 
-// ===== OVERVIEW SECTION FUNCTIONS =====
-
-// Duplicate function removed - using the one at the top of the file
-
-/**
- * Load preferences overview
- */
-async function loadPreferencesOverview() {
-  try {
-    const container = document.getElementById('preferencesOverview');
-    if (!container) return;
-
-    // Get notification preferences from the correct group
-    // Get preferences from the system using built-in function
-    let preferences = {};
-    if (typeof window.getGroupPreferences === 'function') {
-      try {
-        const result = await window.getGroupPreferences('notification_settings');
-        if (result && result.success && result.data && result.data.preferences) {
-          preferences = result.data.preferences;
-        } else {
-          console.warn('Failed to get notification preferences from system');
-        }
-      } catch (error) {
-        console.error('Error loading notification preferences:', error);
-      }
-    }
-
-    // Get the most important notification preferences only - organized like preferences page
-    const basicSettings = [
-      { key: 'enableNotifications', title: 'הפעל התראות', type: 'boolean' },
-      { key: 'notificationPopup', title: 'חלון קופץ התראות', type: 'boolean' },
-      { key: 'notificationSound', title: 'צליל התראות', type: 'boolean' },
-      { key: 'notificationDuration', title: 'משך זמן הצגת התראה (שניות)', type: 'integer' },
-      { key: 'enableRealtimeNotifications', title: 'התראות בזמן אמת', type: 'boolean' },
-      { key: 'enableSystemEventNotifications', title: 'התראות על אירועי מערכת', type: 'boolean' },
-      { key: 'notifyOnTradeExecuted', title: 'התראה על ביצוע עסקה', type: 'boolean' },
-      { key: 'notifyOnStopLoss', title: 'התראה על stop loss', type: 'boolean' }
-    ];
-
-    const notificationCategories = [
-      { key: 'notifications_system_enabled', title: 'התראות מערכת', type: 'boolean' },
-      { key: 'notifications_business_enabled', title: 'התראות עסקיות', type: 'boolean' },
-      { key: 'notifications_ui_enabled', title: 'התראות ממשק משתמש', type: 'boolean' },
-      { key: 'notifications_development_enabled', title: 'התראות פיתוח', type: 'boolean' },
-      { key: 'notifications_performance_enabled', title: 'התראות ביצועים', type: 'boolean' }
-    ];
-
-    const consoleLogs = [
-      { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
-      { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
-      { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_development_enabled', title: 'לוגים למפתחים', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגי ביצועים', type: 'boolean' }
-    ];
-
-    const preferencesHtml = `
-      <div class="row">
-        <div class="col-lg-4 col-md-6 mb-3">
-          <div class="card">
-            <div class="card-header bg-primary text-white">
-              <i class="fas fa-sliders-h me-2"></i>הגדרות בסיסיות
-            </div>
-            <div class="card-body">
-              ${renderPreferenceList(basicSettings, preferences)}
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mb-3">
-          <div class="card">
-            <div class="card-header bg-success text-white">
-              <i class="fas fa-layer-group me-2"></i>קטגוריות התראות
-            </div>
-            <div class="card-body">
-              ${renderPreferenceList(notificationCategories, preferences)}
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-12 mb-3">
-          <div class="card">
-            <div class="card-header bg-warning text-white">
-              <i class="fas fa-terminal me-2"></i>לוגים וקונסול
-            </div>
-            <div class="card-body">
-              ${renderPreferenceList(consoleLogs, preferences)}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = preferencesHtml;
-  } catch (error) {
-    console.error('❌ Error loading preferences overview:', error);
-  }
-}
 
 /**
  * Load category statistics
@@ -2195,22 +2048,10 @@ async function loadCategoryStats() {
     });
     html += '</div>';
 
-    // Add total statistics
-    html += `
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="total-stats text-center p-3 bg-light border rounded">
-            <h5 class="mb-1">סך הכל: ${stats.total.toLocaleString()} הודעות</h5>
-            <small class="text-muted">עדכון אחרון: ${new Date().toLocaleString('he-IL')}</small>
-          </div>
-        </div>
-      </div>
-    `;
-
     container.innerHTML = html;
-    console.log('✅ Category statistics loaded');
+    console.log('✅ Categories overview loaded with statistics');
   } catch (error) {
-    console.error('❌ Error loading category statistics:', error);
+    console.error('❌ Error loading categories overview:', error);
   }
 }
 

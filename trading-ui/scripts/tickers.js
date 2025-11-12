@@ -95,10 +95,13 @@
  * @param {number|string} tickerId - ID of the ticker to edit
  * @returns {void}
  */
-function editTicker(tickerId) {
+async function editTicker(tickerId) {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
+    await window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
+    if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+      await window.TagUIManager.hydrateSelectForEntity('tickerTags', 'ticker', tickerId, { force: true });
+    }
   } else {
     window.Logger?.error('ModalManagerV2 לא זמין', { page: "tickers" });
     if (typeof window.showErrorNotification === 'function') {
@@ -685,8 +688,11 @@ async function saveTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
-    remarks: { id: 'tickerRemarks', type: 'text' }
+    remarks: { id: 'tickerRemarks', type: 'text' },
+    tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
+  const tagIds = Array.isArray(tickerData.tag_ids) ? tickerData.tag_ids : [];
+  delete tickerData.tag_ids;
 
   const tickerId = tickerData.id ? parseInt(tickerData.id) : null;
   const symbol = tickerData.symbol?.trim().toUpperCase();
@@ -764,13 +770,26 @@ async function saveTicker() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
+    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       entityName: 'טיקר',
       reloadFn: window.loadTickersData,
       requiresHardReload: false
     });
+    const newTickerId = Number(crudResult?.data?.id || crudResult?.id);
+    if (Number.isFinite(newTickerId) && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('ticker', newTickerId, tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update ticker tags', {
+          error: tagError,
+          tickerId: newTickerId,
+          page: 'tickers'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'הטיקר נשמר אך התגיות לא עודכנו');
+      }
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת טיקר');
@@ -797,10 +816,12 @@ async function updateTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
-    remarks: { id: 'tickerRemarks', type: 'text' }
+    remarks: { id: 'tickerRemarks', type: 'text' },
+    tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
 
-  const { id, symbol, name, type, currency_id, remarks } = tickerData;
+  const { id, symbol, name, type, currency_id, remarks, tag_ids = [] } = tickerData;
+  const tagIds = Array.isArray(tag_ids) ? tag_ids : [];
   
   // קבלת הסטטוס מהטיקר הקיים (הטופס החדש לא כולל שדה סטטוס)
   const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));
@@ -956,7 +977,7 @@ async function updateTicker() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleUpdateResponse(response, {
+    const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
@@ -964,6 +985,18 @@ async function updateTicker() {
       reloadFn: window.loadTickersData,
       requiresHardReload: false
     });
+    if (updateResult !== null && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('ticker', parseInt(id, 10), tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update ticker tags', {
+          error: tagError,
+          tickerId: id,
+          page: 'tickers'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'הטיקר עודכן אך שמירת התגיות נכשלה');
+      }
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'עדכון טיקר');

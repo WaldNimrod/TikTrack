@@ -15,6 +15,28 @@
  * - linter-export-system.js: Data export and versioning
  */
 
+/*
+ * ========================================
+ * FUNCTION INDEX (Highlights)
+ * ========================================
+ * SCANNING WORKFLOW
+ *   - startRealtimeMonitoring()
+ *   - processScanBatch()
+ *   - finalizeMonitoringSession()
+ * ISSUE MANAGEMENT
+ *   - ignoreAllIssues()
+ *   - resetFixedIssues()
+ *   - updateProblemFilesTable()
+ * UI UTILITIES
+ *   - toggleAllSections()
+ *   - toggleSection()
+ *   - refreshFixDetailsTable()
+ * COMPATIBILITY
+ *   - ignoreAllIssuesLegacy()
+ *   - resetFixedIssuesLegacy()
+ * ========================================
+ */
+
 // ========================================
 // Global Variables and Configuration
 // ========================================
@@ -2075,7 +2097,7 @@ async function updateChartTrendIndicators(latestDataPoint) {
 // ========================================
 
 window.refreshChartData = async function() {
-    addLogEntry('INFO', 'מרענן נתוני גרפים...');
+    addLogEntry('INFO', 'מרענן נתוני גרף...');
     
     if ((qualityChartRenderer || countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
         try {
@@ -2583,7 +2605,7 @@ function updateFixProgressSection() {
     updateFixResultsBreakdown();
     
     // Update fix details table
-    updateFixDetailsTable();
+    updateFixDetailsTablePagination();
 }
 
 // Update fix progress summary
@@ -2655,7 +2677,7 @@ function updateFixResultsBreakdown() {
 }
 
 // Update fix details table (now uses pagination)
-function updateFixDetailsTable() {
+function updateFixDetailsTablePagination() {
     if (paginationInstances.fixDetails) {
         paginationInstances.fixDetails.setData(fixData.fixDetails);
     } else {
@@ -2884,7 +2906,7 @@ function updateProgressTimeline() {
 }
 
 // Update progress details table
-function updateProgressDetailsTable() {
+function updateProgressDetailsTableLegacy() {
     const tbody = document.getElementById('progressDetailsBody');
     if (!tbody) return;
     
@@ -3536,313 +3558,27 @@ async function fixAllWarnings() {
 
 async function ignoreAllIssues() {
     addLogEntry('INFO', 'מתעלם מכל הבעיות...');
-    
-    const totalIssues = window.scanningResults.errors.length + window.scanningResults.warnings.length;
-    
-    // Clear all issues
-    window.scanningResults.errors = [];
-    window.scanningResults.warnings = [];
-    
-    // Update UI
-    updateRealtimeProgress();
-    updateProblemFilesTable();
-    
-    addLogEntry('SUCCESS', `הוסרו ${totalIssues} בעיות מהרשימה`);
-}
-
-function resetFixedIssues() {
-    window.fixedIssues.errors.clear();
-    window.fixedIssues.warnings.clear();
-    addLogEntry('SUCCESS', 'אופסו כל התיקונים - ניתן לתקן שוב');
-}
-
-async function saveFixedFile(fileName, content) {
-    try {
-        // Try to save via backend API first
-        const response = await fetch('/api/files/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                file: fileName,
-                content: content
-            })
-        });
-        
-        if (response.ok) {
-            // Add delay to prevent rate limiting
-            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
-            return true;
-        } else {
-            // Only log first failure to avoid spam
-            if (!window.saveFileWarningLogged) {
-                addLogEntry('WARNING', `שרת לא תומך בשמירת קבצים - ${response.status}`);
-                window.saveFileWarningLogged = true;
-            }
-            return false;
-            }
-        } catch (error) {
-        // Only log first error to avoid spam
-        if (!window.saveFileErrorLogged) {
-            addLogEntry('WARNING', `לא ניתן לשמור קובץ ${fileName} - ${error.message}`);
-            window.saveFileErrorLogged = true;
-        }
-        return false;
-    }
-}
-
-async function fixSingleIssue(issue) {
-    try {
-        // Get file content
-        const response = await fetch(issue.file);
-        if (!response.ok) {
-            // Only log first error to avoid spam
-            if (!window.readFileErrorLogged) {
-                addLogEntry('WARNING', `לא ניתן לקרוא קובץ ${issue.file} לתיקון`);
-                window.readFileErrorLogged = true;
-            }
-            return false;
-        }
-        
-        const content = await response.text();
-        const lines = content.split('\n');
-        
-        // Add delay to prevent rate limiting
-        await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-        
-        // Apply fix based on issue type
-        let fixed = false;
-        
-        if (issue.message.includes('console.log') || issue.message.includes('console.')) {
-            // Remove all console statements
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length) {
-                const originalLine = lines[lineIndex];
-                lines[lineIndex] = lines[lineIndex].replace(/console\.(log|warn|error|info|debug)\([^)]*\);?/g, '');
-                // If line is now empty or only whitespace, remove it entirely
-                if (lines[lineIndex].trim() === '') {
-                    lines[lineIndex] = '';
-                }
-                fixed = true;
-            }
-        } else if (issue.message.includes('alert(')) {
-            // Replace alert with notification system
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length) {
-                lines[lineIndex] = lines[lineIndex].replace(/alert\([^)]*\)/g, 'showNotification("הודעה", "info")');
-                fixed = true;
-            }
-        } else if (issue.message.includes('Missing semicolon') || issue.message.includes('semicolon')) {
-            // Add semicolon
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length && !lines[lineIndex].endsWith(';')) {
-                lines[lineIndex] = lines[lineIndex].trim() + ';';
-                fixed = true;
-            }
-        } else if (issue.message.includes('Line too long') || issue.message.includes('too long')) {
-            // Split long lines (simplified)
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length && lines[lineIndex].length > 150) {
-                // Simple split at comma or operator
-                const line = lines[lineIndex];
-                const splitPoint = line.lastIndexOf(',', 100) || line.lastIndexOf(' ', 100);
-                if (splitPoint > 50) {
-                    lines[lineIndex] = line.substring(0, splitPoint + 1) + '\n    ' + line.substring(splitPoint + 1);
-                    fixed = true;
-                }
-            }
-        } else if (issue.message.includes('var ') || issue.message.includes('let ') || issue.message.includes('const ')) {
-            // Fix variable declarations
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length) {
-                let line = lines[lineIndex];
-                // Replace var with let
-                line = line.replace(/\bvar\b/g, 'let');
-                // Add semicolon if missing
-                if (!line.endsWith(';')) {
-                    line = line.trim() + ';';
-                }
-                lines[lineIndex] = line;
-                fixed = true;
-            }
-        } else if (issue.message.includes('unused') || issue.message.includes('unreachable')) {
-            // Remove unused code or unreachable code
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length) {
-                lines[lineIndex] = '';
-                fixed = true;
-            }
-        } else if (issue.message.includes('indentation') || issue.message.includes('spacing')) {
-            // Fix indentation
-            const lineIndex = issue.line - 1;
-            if (lineIndex >= 0 && lineIndex < lines.length) {
-                const line = lines[lineIndex];
-                // Remove extra spaces and add proper indentation
-                const trimmed = line.trim();
-                const indent = '    '.repeat(Math.max(0, lineIndex > 0 ? 1 : 0));
-                lines[lineIndex] = indent + trimmed;
-                fixed = true;
-            }
-        }
-        
-        if (fixed) {
-            // Save fixed content back to file
-            const fixedContent = lines.join('\n');
-            const saveSuccess = await saveFixedFile(issue.file, fixedContent);
-            
-            // Add delay to prevent rate limiting
-            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
-            
-            if (saveSuccess) {
-                // Only log first success to avoid spam
-                if (!window.fixSuccessLogged) {
-                    addLogEntry('SUCCESS', `תוקן ${issue.file}:${issue.line} - ${issue.message}`);
-                    window.fixSuccessLogged = true;
-                }
-            // Add delay to prevent rate limiting
-            await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
-                return true;
-            } else {
-                // Only log first failure to avoid spam
-                if (!window.saveFileErrorLogged) {
-                    addLogEntry('ERROR', `לא ניתן לשמור קובץ ${issue.file} אחרי התיקון`);
-                    window.saveFileErrorLogged = true;
-                }
-                return false;
-            }
-        } else {
-            // Only log first failure to avoid spam
-            if (!window.fixWarningLogged) {
-                addLogEntry('WARNING', `לא ניתן לתקן ${issue.file}:${issue.line} - ${issue.message}`);
-                window.fixWarningLogged = true;
-            }
-            // Add delay to prevent rate limiting
-            await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-            return false;
-        }
-        
-        } catch (error) {
-        // Only log first error to avoid spam
-        if (!window.fixErrorLogged) {
-            addLogEntry('ERROR', `שגיאה בתיקון ${issue.file}:${issue.line}`, { error: error.message });
-            window.fixErrorLogged = true;
-        }
-        // Add delay to prevent rate limiting
-        await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-        return false;
-    }
-}
-
-// ========================================
-// Project Files Discovery
-// ========================================
-
-async function discoverProjectFiles() {
-    addLogEntry('INFO', 'מתחיל גילוי קבצי הפרויקט...');
-    
-    // Show progress indicator
-    const progressElement = document.getElementById('fileDiscoveryProgress');
-    if (progressElement) {
-        progressElement.style.display = 'block';
-        progressElement.textContent = 'מגלה קבצים...';
-    }
-    
-    try {
-        // Use global project files scanner if available
-        if (typeof window.projectFilesScanner !== 'undefined') {
-            addLogEntry('INFO', 'משתמש במנגנון סריקת קבצים גלובלי...');
-            const discoveredFiles = await window.projectFilesScanner.getProjectFiles();
-            const stats = await window.projectFilesScanner.getFileStatistics();
-            
-            console.log('📁 Discovered files:', discoveredFiles);
-            console.log('📊 File statistics:', stats);
-            
-            // Store in global variable for backward compatibility
-            window.projectFiles = discoveredFiles;
-            
-            // Update file scanning state
-            fileScanningState.updateDiscovered(discoveredFiles);
-            
-            // Update file type statistics immediately
-            updateFileTypeStatistics([]);
-            
-            // Update UI with new data
-            updateScanningProgressUI();
-            
-            // Use the new state management for logging
-            const messages = fileScanningState.getStatsMessage();
-            addLogEntry('INFO', messages.discovered);
-            
-            // Hide progress indicator
-            if (progressElement) {
-                progressElement.style.display = 'none';
-            }
-            
-            return discoveredFiles;
-            } else {
-            addLogEntry('WARNING', 'מנגנון סריקת קבצים גלובלי לא זמין - משתמש ברשימה סטטית');
-            return await discoverProjectFilesFallback();
-            }
-        } catch (error) {
-        addLogEntry('ERROR', 'שגיאה בגילוי קבצי הפרויקט', { error: error.message });
-        
-        // Hide progress indicator on error
-        if (progressElement) {
-            progressElement.style.display = 'none';
-        }
-        
-        return await discoverProjectFilesFallback();
-    }
-}
-
-async function discoverProjectFilesFallback() {
-    // Fallback to static discovery (simplified version)
-    const discoveredFiles = {
-        js: ['trading-ui/scripts/main.js', 'trading-ui/scripts/ui-utils.js'],
-        html: ['trading-ui/index.html', 'trading-ui/accounts.html'],
-        css: ['trading-ui/styles/main-styles.css'],
-        python: ['Backend/app.py', 'Backend/dev_server.py'],
-        other: ['README.md']
-    };
-    
-    window.projectFiles = discoveredFiles;
-    
-    // Update file type statistics immediately
-    updateFileTypeStatistics([]);
-    
-    const totalFiles = Object.values(discoveredFiles).reduce((sum, files) => sum + files.length, 0);
-    addLogEntry('SUCCESS', `גילוי חלופי הושלם - נמצאו ${totalFiles} קבצים`);
-    
-    return discoveredFiles;
-}
-
-// ========================================
-// Module References
-// ========================================
-
-// Testing system functions moved to linter-testing-system.js module
-// Functions: runComprehensiveTests, testSystemComponents, testPerformance, testSecurity, testFunctionality, testDataIntegrity, generateTestRecommendations, saveTestResults, displayTestResults, updateTestResultsDisplay, runQuickHealthCheck, updateHealthCheckDisplay
-
-// Export system functions moved to linter-export-system.js module  
-// Functions: exportChartData, exportComprehensiveReport, exportCSVData, createVersionSnapshot, restoreVersionSnapshot, listAvailableVersions, deleteVersionSnapshot, calculateExportStatistics, createCSVContent, generateRecommendations, generateVersionId, updateVersionList
-
-// ========================================
-// Missing Functions - Added for UI compatibility
-// ========================================
-
-
-function ignoreAllIssues() {
-    addLogEntry('INFO', 'מתעלם מכל הבעיות...');
     // Implementation for ignoring all issues
     addLogEntry('SUCCESS', 'כל הבעיות הועברו להתעלמות');
 }
+
+/**
+ * Legacy compatibility alias for ignoreAllIssues.
+ * @returns {Promise<void>}
+ */
+const ignoreAllIssuesLegacy = async () => ignoreAllIssues();
 
 function resetFixedIssues() {
     addLogEntry('INFO', 'מאפס בעיות שתוקנו...');
     // Implementation for resetting fixed issues
     addLogEntry('SUCCESS', 'בעיות שתוקנו אופסו');
 }
+
+/**
+ * Legacy compatibility alias for resetFixedIssues.
+ * @returns {void}
+ */
+const resetFixedIssuesLegacy = () => resetFixedIssues();
 
 function loadIssues() {
     addLogEntry('INFO', 'טוען בעיות...');
@@ -3902,42 +3638,3 @@ function clearFiltersBtn() {
 
 // ========================================
 // Window Object Exports
-// ========================================
-
-window.addLogEntry = addLogEntry;
-window.getSelectedFileTypes = getSelectedFileTypes;
-window.scanJavaScriptFiles = scanJavaScriptFiles;
-// window.copyDetailedLog export removed - using local function only
-window.discoverProjectFiles = discoverProjectFiles;
-window.startFileScan = startFileScan;
-window.startMonitoring = startMonitoring;
-window.stopMonitoring = stopMonitoring;
-window.initializeCharts = initializeCharts;
-window.updateQualityChart = updateQualityChart;
-window.updateCountsChart = updateCountsChart;
-window.addDataPointToCharts = addDataPointToCharts;
-window.clearCharts = clearCharts;
-window.fixAllIssues = fixAllIssues;
-window.fixAllErrors = fixAllErrors;
-window.fixAllWarnings = fixAllWarnings;
-window.ignoreAllIssues = ignoreAllIssues;
-window.resetFixedIssues = resetFixedIssues;
-// window.refreshChartData is already defined above
-window.clearChartHistory = window.clearChartHistory;
-window.applyChartSettings = window.applyChartSettings;
-window.updateProblemFilesTable = updateProblemFilesTable;
-window.loadIssues = loadIssues;
-window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
-// toggleAllSections and toggleSection exports removed - use global functions directly
-window.runComprehensiveTests = runComprehensiveTests;
-window.runQuickHealthCheck = runQuickHealthCheck;
-window.exportChartData = exportChartData;
-window.clearFiltersBtn = clearFiltersBtn;
-window.updateRealtimeProgress = updateRealtimeProgress;
-window.updateFileTypeCardsProgress = updateFileTypeCardsProgress;
-window.initializeLinterRealtimeMonitorPage = initializeLinterRealtimeMonitorPage;
-// New fix progress functions
-window.updateFixProgressDisplay = updateFixProgressDisplay;
-window.showFixResults = showFixResults;
-window.resetFixProgress = resetFixProgress;
-window.hideFixProgress = hideFixProgress;

@@ -1,15 +1,51 @@
 # דוח מצב בדיקות - TikTrack
 ## Test Status Report
 
-**תאריך:** 2025-01-27  
+**תאריך:** 2025-11-12  
 **גרסה:** 2.0.0  
-**סטטוס כללי:** ✅ **תוכנית בדיקות מקיפה הושלמה**
+**סטטוס כללי:** ⚠️ נדרש ריפקטורינג מקיף – ראו עדכון להלן
 
 ---
 
-## 📊 סיכום כללי
+## 🔄 עדכון 2025-11-12 – סטטוס בפועל
 
-### תוצאות הבדיקות (עדכני)
+- `npm run test:ci` עדיין נכשל (מצופה) – טסטים ותיקים שלא שוכתבו ממשיכים לקרוס ולכן הכיסוי הכולל נשאר 0%.  
+- ✅ סוויטות אינטגרציה משוחזרות: `npx jest tests/integration/ui-systems-integration.test.js tests/integration/data-systems-integration.test.js tests/integration/api-systems-integration.test.js --no-coverage`  
+  - שלושת הקבצים הירוקים (16 טסטים) מטעינים את המערכות הכלליות החדשות ומסתמכים על ה־mocks המעודכנים.  
+- קטגוריות הכשרות העיקריות:
+  1. **קבצים חסרים/מותגרים** – טסטים עדיין מנסים לקרוא `trading-ui/scripts/button-system.js` ו-`table-system.js` שאינם קיימים במערכת החדשה.  
+  2. **Polyfills חסרים** – שימוש ב-`Response`, `fetch`, `TextEncoder` בסביבות Node ללא הגדרה (כשל ב-Modal/CRUD/E2E).  
+  3. **תלויות חיצוניות** – `@playwright/test` לא מותקן, אך טסטי E2E מסתמכים עליו.  
+  4. **Mocks שלא עודכנו** – `UnifiedCacheManager` נדרש כ־constructor בטסטים אך כיום מיוצא כאובייקט עם פונקציות סטטיות.  
+  5. **ציפיות נתונים לא מעודכנות** – לדוגמה, צבע ברירת מחדל ל־trade בטסטי `linked-items-service` עדיין #007bff במקום #26baac.  
+  6. **Load Order & Event Systems** – טסטים שמעריכים `button-system`/`table-system` ישנים לא מכסים את המערכות המשולבות (`button-system-demo-core` וכו').  
+  7. **JSDOM Limits** – טסטי E2E מבוססי `jsdom` נעצרים בגלל חוסר Polyfills ובגלל ניסיון להריץ תסריטים מלאים ללא Mock ל-API.  
+- `npm run check:all` נכשל – ESLint מדווח על אלפי שגיאות בקבצי `trading-ui/scripts` (ריווח/console/curly וכו'). הדרישה היא לנקות או לקבוע חריגות לאחר הריפקטורינג.  
+- בדיקות Backend (`python3 -m pytest`) ירוקות – 44 טסטים עברו בהצלחה (משמשים כבסיס השוואה תקין).
+
+### מיפוי כשלי הטסטים העיקריים
+| קובץ טסט | קטגוריה | אבחנה ראשונית |
+| --- | --- | --- |
+| `tests/integration/ui-systems-integration.test.js` | ✅ עודכן | נטען דרך `test-loader` עם `field-renderer-service`, `button-system-init` ו־`unified-table-system`; מכסה את טבלת הכפתורים והצבעים החדשות. |
+| `tests/integration/data-systems-integration.test.js` | ✅ עודכן | משתמש ב־`unified-cache-manager`, `unified-table-system` ו־`chart-system` החדשים לאימות זרימות נתונים וסנכרון. |
+| `tests/integration/api-systems-integration.test.js` | ✅ עודכן | בודק את `CacheTTLGuard`, `UnifiedCacheManager` ו־`CacheSyncManager` באמצעות fetch ו־mocks תואמים. |
+| `tests/integration/crud-flow-integration.test.js`<br/>`tests/integration/modal-systems-integration.test.js` | Polyfills | שימוש ב־`Response`/`fetch` ללא Polyfill; יש להגדיר בסביבת Jest. |
+| `tests/integration/notification-cache-integration.test.js` | Mocking | `window.UnifiedCacheManager.*` אינו עטוף ב־jest.fn – נדרש Mock מלא לשכבת cache. |
+| `tests/unit/linked-items-service.test.js` | ציפיות | צבעי ברירת מחדל עודכנו ל־#26baac – להתאים הערכים בהתאם למערכת FieldRendererService. |
+| `tests/unit/page-utils.test.js` | Mocking | טעינת state מחזירה undefined – לעדכן את Mock ל־PageStateManager/Storage. |
+| `tests/e2e/**/*.test.js` (עמודי משתמש) | Polyfills/תלויות | חסרות תלות `@playwright/test` ו־TextEncoder ב־JSDOM; יש לבחור אסטרטגיית E2E. |
+| `tests/e2e/crud-full-flow.test.js` | תלויות | מניח התקנת Playwright מלאה – נדרש להוסיף או להמיר לכלי אחר. |
+| `npm run check:all` (ESLint) | תקינות קוד | אלפי הפרות סטייל ב־`trading-ui/scripts` – לטפל במהלך שלב E של הריפקטורינג. |
+
+📌 המסקנה: תשתית האינטגרציה הראשית חזרה לעבוד על המערכות החדשות. כעת ממשיכים לשחזור סוויטות Component/E2E, להוסיף Polyfills שטרם נכתבו ולהרחיב כיסוי למסכים (משימות `page-coverage` ו־`measurement-docs`). שאר חלקי הדוח נשמרים כמצב היסטורי ויעודכנו מחדש בסיום השלבים הבאים.
+
+---
+
+## 📊 סיכום היסטורי (2025-01-27)
+
+> הפרק הבא משאיר את הדוח הקודם להקשר בלבד. נתוני ההצלחה שם אינם משקפים את המצב הנוכחי ויעודכנו מחדש בסוף תהליך הריפקטורינג.
+
+### תוצאות הבדיקות (ינואר 2025)
 ```
 Test Suites: 31+ passed (עם Integration ו-Backend)
 Tests:       220+ passed (72 טסטים חדשים נוספו)
@@ -18,7 +54,7 @@ Time:        ~5-10 seconds (עם כל הבדיקות)
 Success Rate: 100.00%
 ```
 
-### סטטיסטיקות
+### סטטיסטיקות (היסטורי)
 - ✅ **31+ Test Suites** - Unit Tests
 - ✅ **5 Integration Test Suites** - חדש
 - ✅ **17 Backend Test Suites** - חדש (Routes + Services + Models)

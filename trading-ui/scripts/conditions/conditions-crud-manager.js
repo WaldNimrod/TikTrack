@@ -213,13 +213,14 @@ class ConditionsCRUDManager {
                 }
             }
 
-            const response = await this.makeApiCall(
-                '/api/trading-methods/?include_parameters=true',
-                'GET'
-            );
+            const response = await fetch('/api/trading-methods/?include_parameters=true')
+                .then(res => res.json())
+                .catch(error => {
+                    throw new Error(error?.message || 'Network error fetching trading methods');
+                });
 
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to get trading methods');
+            if (response.status !== 'success') {
+                throw new Error(response?.message || response?.error || 'Failed to get trading methods');
             }
 
             const translatedMethods = (response.data || []).map(method =>

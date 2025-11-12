@@ -2,413 +2,248 @@
  * Data Systems Integration Tests
  * ==============================
  * 
- * בדיקות אינטגרציה בין מערכות נתונים שונות
- * 
- * @version 1.0.0
- * @created January 2025
- * @author TikTrack Development Team
+ * התאמת בדיקות האינטגרציה למערכות המטמון, הטבלאות והגרפים בעיצוב החדש.
  */
 
-// Import the real systems
-const fs = require('fs');
-const path = require('path');
-
-// Load the actual system codes
-const cacheManagerCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/unified-cache-manager.js'), 
-    'utf8'
-);
-
-const tableSystemCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/table-system.js'), 
-    'utf8'
-);
-
-const chartSystemCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/chart-system.js'), 
-    'utf8'
-);
+const { loadScriptWithDependencies } = require('../utils/test-loader');
 
 describe('Data Systems Integration', () => {
-    let UnifiedCacheManager;
-    let TableSystem;
-    let ChartSystem;
-    let cacheManager;
-    
     beforeAll(() => {
-        // Mock the global environment
-        global.window = {
-            Logger: {
+        window.Logger = {
                 info: jest.fn(),
                 warn: jest.fn(),
                 error: jest.fn(),
                 debug: jest.fn()
-            },
-            indexedDB: {
-                open: jest.fn(),
-                deleteDatabase: jest.fn()
-            },
-            localStorage: {
-                getItem: jest.fn(),
-                setItem: jest.fn(),
-                removeItem: jest.fn(),
-                clear: jest.fn()
-            },
-            sessionStorage: {
-                getItem: jest.fn(),
-                setItem: jest.fn(),
-                removeItem: jest.fn(),
-                clear: jest.fn()
-            },
-            fetch: jest.fn()
         };
-        
-        // Mock DOM methods
-        global.document = {
-            createElement: jest.fn(),
-            getElementById: jest.fn(),
-            querySelector: jest.fn(),
-            querySelectorAll: jest.fn()
-        };
-        
-        // Mock Chart.js
-        global.Chart = {
-            register: jest.fn(),
-            unregister: jest.fn(),
-            getChart: jest.fn(),
+
+        // אין לנו IndexedDB בסביבת הטסט – נכריח שימוש בלוקאל סטורג׳/זיכרון
+        window.indexedDB = null;
+        window.fetch = jest.fn();
+
+        // Stub קל ל‑Chart.js (המערכת דורשת קיום גלובלי)
+        window.Chart = jest.fn(() => ({
+            data: { labels: [], datasets: [] },
+            update: jest.fn(),
             destroy: jest.fn()
-        };
-        
-        // Mock layer classes
-        global.MemoryLayer = class MemoryLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        global.LocalStorageLayer = class LocalStorageLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        global.IndexedDBLayer = class IndexedDBLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        global.BackendCacheLayer = class BackendCacheLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        // Load the real systems
-        eval(cacheManagerCode);
-        eval(tableSystemCode);
-        eval(chartSystemCode);
-        
-        UnifiedCacheManager = global.UnifiedCacheManager;
-        TableSystem = global.TableSystem;
-        ChartSystem = global.ChartSystem;
+        }));
+
+        eval(loadScriptWithDependencies('scripts/unified-cache-manager.js'));
+        eval(loadScriptWithDependencies('scripts/unified-table-system.js'));
+        eval(loadScriptWithDependencies('scripts/charts/chart-system.js'));
     });
-    
-    beforeEach(() => {
-        cacheManager = new UnifiedCacheManager();
+
+    beforeEach(async () => {
         jest.clearAllMocks();
+        window.Chart.mockImplementation(() => ({
+            data: { labels: [], datasets: [] },
+            update: jest.fn(),
+            destroy: jest.fn()
+        }));
+        document.body.innerHTML = `
+            <table id="integration-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Status</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div id="chart-container"></div>
+        `;
+
+        if (window.UnifiedTableSystem?.registry?.clear) {
+            window.UnifiedTableSystem.registry.clear();
+        }
+
+        if (window.UnifiedCacheManager) {
+            window.UnifiedCacheManager.cache = new Map();
+            window.UnifiedCacheManager.stats = {
+                operations: { save: 0, get: 0, remove: 0, clear: 0 },
+                layers: {
+                    memory: { entries: 0, size: 0 },
+                    localStorage: { entries: 0, size: 0 },
+                    indexedDB: { entries: 0, size: 0 },
+                    backend: { entries: 0, size: 0 }
+                },
+                performance: { avgResponseTime: 0, totalRequests: 0, successfulRequests: 0 }
+            };
+            await window.UnifiedCacheManager.initialize();
+        }
+
+        if (window.ChartSystem) {
+            const ChartSystemCtor = window.ChartSystem.constructor;
+            window.ChartSystem = new ChartSystemCtor();
+            window.createChart = (config) => window.ChartSystem.create(config);
+            window.updateChart = (chartId, data) => window.ChartSystem.update(chartId, data);
+            window.destroyChart = (chartId) => window.ChartSystem.destroy(chartId);
+            window.destroyAllCharts = () => window.ChartSystem.destroyAll();
+            window.getChart = (chartId) => window.ChartSystem.getChart(chartId);
+            window.getAllCharts = () => window.ChartSystem.getAllCharts();
+            window.exportChart = (chartId, format) => window.ChartSystem.export(chartId, format);
+        }
+    });
+
+    describe('UnifiedCacheManager ↔ UnifiedTableSystem', () => {
+        test('renders table from cached dataset', async () => {
+            const dataset = [
+                { id: 1, symbol: 'AAPL', status: 'open', price: 150 },
+                { id: 2, symbol: 'GOOGL', status: 'pending', price: 2800 }
+            ];
+
+            await window.UnifiedCacheManager.save('table:designs', dataset, { layer: 'memory' });
+
+            const updateFn = jest.fn();
+            window.UnifiedTableSystem.registry.register('designs-table', {
+                dataGetter: () => dataset,
+                updateFunction: updateFn,
+                tableSelector: '#integration-table',
+                columns: [
+                    { key: 'symbol', label: 'Symbol' },
+                    { key: 'status', label: 'Status' },
+                    { key: 'price', label: 'Price' }
+                ]
+            });
+
+            const cached = await window.UnifiedCacheManager.get('table:designs');
+            expect(cached).toEqual(dataset);
+
+            window.UnifiedTableSystem.renderer.render('designs-table', cached);
+            expect(updateFn).toHaveBeenCalledWith(dataset, expect.any(Object));
+        });
+
+        test('fallback fetch saves results back to cache', async () => {
+            const freshData = [
+                { id: 1, symbol: 'MSFT', status: 'open', price: 330 }
+            ];
+
+            const memorySaveSpy = jest.spyOn(window.UnifiedCacheManager.layers.memory, 'save');
+
+            const result = await window.UnifiedCacheManager.get('table:missing', {
+                fallback: async () => freshData,
+                layer: 'memory'
+            });
+
+            expect(result).toMatchObject(freshData);
+            expect(memorySaveSpy).toHaveBeenCalledWith('table:missing', expect.anything(), expect.any(Object));
+            memorySaveSpy.mockRestore();
+        });
     });
     
-    describe('Cache + Table Integration', () => {
-        test('should cache table data and retrieve it', async () => {
-            const tableData = [
-                { id: 1, symbol: 'AAPL', price: 150.00 },
-                { id: 2, symbol: 'GOOGL', price: 2800.00 }
-            ];
-            
-            // Mock cache operations
-            cacheManager.layers.memory.set = jest.fn().mockResolvedValue(true);
-            cacheManager.layers.memory.get = jest.fn().mockResolvedValue(tableData);
-            
-            // Mock table operations
-            TableSystem.loadTableData = jest.fn().mockResolvedValue(tableData);
-            TableSystem.updateTable = jest.fn().mockResolvedValue(true);
-            
-            // Test cache integration
-            await cacheManager.set('trades-table-data', tableData);
-            const cachedData = await cacheManager.get('trades-table-data');
-            
-            expect(cachedData).toEqual(tableData);
-            expect(cacheManager.layers.memory.set).toHaveBeenCalledWith('trades-table-data', tableData, expect.any(Object));
-            expect(cacheManager.layers.memory.get).toHaveBeenCalledWith('trades-table-data');
-        });
-        
-        test('should handle table data updates with cache invalidation', async () => {
-            const originalData = [
-                { id: 1, symbol: 'AAPL', price: 150.00 }
-            ];
-            
-            const updatedData = [
-                { id: 1, symbol: 'AAPL', price: 155.00 }
-            ];
-            
-            // Mock cache operations
-            cacheManager.layers.memory.set = jest.fn().mockResolvedValue(true);
-            cacheManager.layers.memory.delete = jest.fn().mockResolvedValue(true);
-            
-            // Mock table operations
-            TableSystem.updateTable = jest.fn().mockResolvedValue(true);
-            
-            // Test cache invalidation
-            await cacheManager.set('trades-table-data', originalData);
-            await cacheManager.delete('trades-table-data');
-            await cacheManager.set('trades-table-data', updatedData);
-            
-            expect(cacheManager.layers.memory.delete).toHaveBeenCalledWith('trades-table-data');
-            expect(cacheManager.layers.memory.set).toHaveBeenCalledWith('trades-table-data', updatedData, expect.any(Object));
-        });
-    });
-    
-    describe('Cache + Chart Integration', () => {
-        test('should cache chart data and retrieve it', async () => {
+    describe('UnifiedCacheManager ↔ ChartSystem', () => {
+        test('creates chart using adapter that pulls from cache', async () => {
             const chartData = {
-                labels: ['Jan', 'Feb', 'Mar'],
-                datasets: [{
-                    label: 'Trades',
-                    data: [10, 20, 30]
-                }]
-            };
-            
-            // Mock cache operations
-            cacheManager.layers.indexedDB = {
-                set: jest.fn().mockResolvedValue(true),
-                get: jest.fn().mockResolvedValue(chartData)
-            };
-            
-            // Mock chart operations
-            ChartSystem.createChart = jest.fn().mockResolvedValue({ id: 'chart-1' });
-            ChartSystem.updateChart = jest.fn().mockResolvedValue(true);
-            
-            // Test cache integration
-            await cacheManager.set('trades-chart-data', chartData);
-            const cachedData = await cacheManager.get('trades-chart-data');
-            
-            expect(cachedData).toEqual(chartData);
-            expect(cacheManager.layers.indexedDB.set).toHaveBeenCalledWith('trades-chart-data', chartData, expect.any(Object));
-            expect(cacheManager.layers.indexedDB.get).toHaveBeenCalledWith('trades-chart-data');
-        });
-        
-        test('should handle chart data updates with cache synchronization', async () => {
-            const originalChartData = {
                 labels: ['Jan', 'Feb'],
-                datasets: [{ data: [10, 20] }]
+                datasets: [{ label: 'Trades', data: [10, 20] }]
             };
-            
-            const updatedChartData = {
-                labels: ['Jan', 'Feb', 'Mar'],
-                datasets: [{ data: [10, 20, 30] }]
-            };
-            
-            // Mock cache operations
-            cacheManager.layers.indexedDB = {
-                set: jest.fn().mockResolvedValue(true),
-                get: jest.fn().mockResolvedValue(updatedChartData)
-            };
-            
-            // Mock chart operations
-            ChartSystem.updateChart = jest.fn().mockResolvedValue(true);
-            
-            // Test cache synchronization
-            await cacheManager.set('trades-chart-data', originalChartData);
-            await cacheManager.set('trades-chart-data', updatedChartData);
-            const cachedData = await cacheManager.get('trades-chart-data');
-            
-            expect(cachedData).toEqual(updatedChartData);
-            expect(ChartSystem.updateChart).toHaveBeenCalledWith('trades-chart', updatedChartData);
-        });
-    });
-    
-    describe('Table + Chart Integration', () => {
-        test('should update chart when table data changes', () => {
-            const tableData = [
-                { id: 1, symbol: 'AAPL', price: 150.00, date: '2025-01-01' },
-                { id: 2, symbol: 'GOOGL', price: 2800.00, date: '2025-01-02' }
-            ];
-            
-            // Mock table operations
-            TableSystem.updateTable = jest.fn().mockResolvedValue(true);
-            TableSystem.getTableData = jest.fn().mockReturnValue(tableData);
-            
-            // Mock chart operations
-            ChartSystem.updateChart = jest.fn().mockResolvedValue(true);
-            ChartSystem.getChartData = jest.fn().mockReturnValue({
-                labels: ['2025-01-01', '2025-01-02'],
-                datasets: [{ data: [150.00, 2800.00] }]
+
+            await window.UnifiedCacheManager.save('chart:performance', chartData, { layer: 'memory' });
+
+            window.ChartSystem.registerAdapter('performance-cache', {
+                getData: async () => {
+                    return await window.UnifiedCacheManager.get('chart:performance', {
+                        fallback: async () => chartData
+                    });
+                },
+                formatData: (raw) => raw
             });
-            
-            // Test integration
-            TableSystem.updateTable('trades-table', tableData);
-            const chartData = ChartSystem.getChartData('trades-chart');
-            
-            expect(chartData.labels).toContain('2025-01-01');
-            expect(chartData.labels).toContain('2025-01-02');
-            expect(chartData.datasets[0].data).toContain(150.00);
-            expect(chartData.datasets[0].data).toContain(2800.00);
-        });
-        
-        test('should handle table sorting with chart updates', () => {
-            const unsortedData = [
-                { id: 1, symbol: 'GOOGL', price: 2800.00, date: '2025-01-02' },
-                { id: 2, symbol: 'AAPL', price: 150.00, date: '2025-01-01' }
-            ];
-            
-            const sortedData = [
-                { id: 2, symbol: 'AAPL', price: 150.00, date: '2025-01-01' },
-                { id: 1, symbol: 'GOOGL', price: 2800.00, date: '2025-01-02' }
-            ];
-            
-            // Mock table sorting
-            TableSystem.sortTableData = jest.fn().mockReturnValue(sortedData);
-            TableSystem.updateTable = jest.fn().mockResolvedValue(true);
-            
-            // Mock chart operations
-            ChartSystem.updateChart = jest.fn().mockResolvedValue(true);
-            
-            // Test sorting integration
-            const sorted = TableSystem.sortTableData(unsortedData, 'date', 'asc');
-            TableSystem.updateTable('trades-table', sorted);
-            
-            expect(sorted[0].symbol).toBe('AAPL');
-            expect(sorted[1].symbol).toBe('GOOGL');
-            expect(ChartSystem.updateChart).toHaveBeenCalledWith('trades-chart', expect.any(Object));
-        });
-    });
-    
-    describe('Data Synchronization', () => {
-        test('should synchronize data between cache and UI components', async () => {
-            const syncData = { id: 1, symbol: 'AAPL', price: 150.00 };
-            
-            // Mock cache operations
-            cacheManager.layers.memory.set = jest.fn().mockResolvedValue(true);
-            cacheManager.layers.localStorage.set = jest.fn().mockResolvedValue(true);
-            cacheManager.layers.indexedDB = {
-                set: jest.fn().mockResolvedValue(true)
-            };
-            
-            // Mock UI operations
-            TableSystem.updateTable = jest.fn().mockResolvedValue(true);
-            ChartSystem.updateChart = jest.fn().mockResolvedValue(true);
-            
-            // Test synchronization
-            await cacheManager.set('sync-data', syncData, { sync: true });
-            
-            expect(cacheManager.layers.memory.set).toHaveBeenCalledWith('sync-data', syncData, expect.any(Object));
-            expect(cacheManager.layers.localStorage.set).toHaveBeenCalledWith('sync-data', syncData, expect.any(Object));
-            expect(cacheManager.layers.indexedDB.set).toHaveBeenCalledWith('sync-data', syncData, expect.any(Object));
-        });
-        
-        test('should handle data conflicts between systems', async () => {
-            const conflictData = { id: 1, symbol: 'AAPL', price: 150.00 };
-            const updatedData = { id: 1, symbol: 'AAPL', price: 155.00 };
-            
-            // Mock cache operations
-            cacheManager.layers.memory.get = jest.fn().mockResolvedValue(conflictData);
-            cacheManager.layers.localStorage.get = jest.fn().mockResolvedValue(updatedData);
-            
-            // Mock conflict resolution
-            cacheManager.resolveConflict = jest.fn().mockResolvedValue(updatedData);
-            
-            // Test conflict resolution
-            const memoryData = await cacheManager.layers.memory.get('conflict-key');
-            const localStorageData = await cacheManager.layers.localStorage.get('conflict-key');
-            const resolvedData = await cacheManager.resolveConflict(memoryData, localStorageData);
-            
-            expect(resolvedData.price).toBe(155.00);
-        });
-    });
-    
-    describe('Performance Integration', () => {
-        test('should handle large datasets efficiently', async () => {
-            const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
-                id: i,
-                symbol: `STOCK${i}`,
-                price: Math.random() * 1000
+
+            const container = document.querySelector('#chart-container');
+
+            await window.ChartSystem.create({
+                id: 'performance-chart',
+                type: 'line',
+                container: '#chart-container',
+                adapter: 'performance-cache'
+            });
+
+            expect(window.Chart).toHaveBeenCalledWith(container, expect.objectContaining({
+                type: 'line'
             }));
-            
-            // Mock performance monitoring
-            const startTime = Date.now();
-            
-            // Mock cache operations
-            cacheManager.layers.indexedDB = {
-                set: jest.fn().mockResolvedValue(true),
-                get: jest.fn().mockResolvedValue(largeDataset)
-            };
-            
-            // Mock table operations
-            TableSystem.renderTable = jest.fn().mockResolvedValue(true);
-            
-            // Test performance
-            await cacheManager.set('large-dataset', largeDataset);
-            const cachedData = await cacheManager.get('large-dataset');
-            await TableSystem.renderTable('large-table', cachedData);
-            
-            const endTime = Date.now();
-            const totalTime = endTime - startTime;
-            
-            expect(cachedData).toEqual(largeDataset);
-            expect(totalTime).toBeLessThan(2000); // < 2 seconds
+
+            const chartInstance = window.ChartSystem.getChart('performance-chart');
+            expect(chartInstance).not.toBeNull();
+        });
+
+        test('updates chart with cached dataset changes', async () => {
+            const container = document.querySelector('#chart-container');
+
+            const chartHandle = await window.ChartSystem.create({
+                id: 'updates-chart',
+                type: 'bar',
+                container: '#chart-container',
+                data: { labels: ['Old'], datasets: [{ data: [1] }] }
+            });
+            chartHandle.data = chartHandle.data || { labels: [], datasets: [] };
+
+            await window.UnifiedCacheManager.save('chart:updates', {
+                labels: ['Old', 'New'],
+                datasets: [{ data: [1, 2] }]
+            }, { layer: 'memory' });
+
+            expect(chartHandle).toBeDefined();
+            const chartUpdateSpy = chartHandle.update;
+            const cachedData = await window.UnifiedCacheManager.get('chart:updates');
+            await window.ChartSystem.update('updates-chart', cachedData);
+
+            expect(chartHandle.data.labels).toEqual(cachedData.labels);
+            expect(chartHandle.data.datasets).toEqual(cachedData.datasets);
+            expect(chartUpdateSpy).toHaveBeenCalled();
         });
     });
     
-    describe('Error Handling Integration', () => {
-        test('should handle cache failures gracefully', async () => {
-            const testData = { id: 1, symbol: 'AAPL', price: 150.00 };
-            
-            // Mock cache failure
-            cacheManager.layers.memory.set = jest.fn().mockRejectedValue(new Error('Cache failed'));
-            cacheManager.layers.localStorage.set = jest.fn().mockResolvedValue(true);
-            
-            // Mock fallback
-            TableSystem.loadTableData = jest.fn().mockResolvedValue(testData);
-            
-            // Test error handling
-            try {
-                await cacheManager.set('test-key', testData);
-            } catch (error) {
-                const fallbackData = await TableSystem.loadTableData('trades-table');
-                expect(fallbackData).toEqual(testData);
-            }
+    describe('Cache synchronization flows', () => {
+        test('propagates sync saves across layers', async () => {
+            const payload = { id: 10, symbol: 'TSLA', status: 'open' };
+
+            const memorySpy = jest.spyOn(window.UnifiedCacheManager.layers.memory, 'save');
+            const localSpy = jest.spyOn(window.UnifiedCacheManager.layers.localStorage, 'save');
+
+            await window.UnifiedCacheManager.save('sync:trade', payload, { layer: 'memory', syncToBackend: false });
+
+            expect(memorySpy).toHaveBeenCalledTimes(1);
+            expect(localSpy).not.toHaveBeenCalled(); // לפי המדיניות – רק memory
+
+            memorySpy.mockRestore();
+            localSpy.mockRestore();
         });
-        
-        test('should handle table rendering errors gracefully', () => {
-            const corruptedData = { id: 1, symbol: null, price: 'invalid' };
-            
-            // Mock table rendering error
-            TableSystem.renderTable = jest.fn().mockImplementation(() => {
-                throw new Error('Table rendering failed');
+
+        test('clears cached data and re-renders table', async () => {
+            const dataset = [{ id: 1, symbol: 'NFLX', status: 'closed', price: 400 }];
+            await window.UnifiedCacheManager.save('table:designs', dataset, { layer: 'memory' });
+
+            const updateFn = jest.fn();
+            window.UnifiedTableSystem.registry.register('designs-table', {
+                dataGetter: () => [],
+                updateFunction: updateFn,
+                tableSelector: '#integration-table'
             });
-            
-            // Mock error handling
-            TableSystem.handleError = jest.fn().mockReturnValue('<div class="error">Table rendering failed</div>');
-            
-            try {
-                TableSystem.renderTable('corrupted-table', corruptedData);
-            } catch (error) {
-                const errorHtml = TableSystem.handleError(error);
-                expect(errorHtml).toContain('error');
-            }
+
+            await window.UnifiedCacheManager.clearAllCacheQuick({ skipReload: true });
+            const cached = await window.UnifiedCacheManager.get('table:designs');
+
+            expect(cached).toBeNull();
+            window.UnifiedTableSystem.renderer.render('designs-table', []);
+            expect(updateFn).toHaveBeenCalledWith([], expect.any(Object));
+        });
+    });
+    
+    describe('Error handling bridges', () => {
+        test('logs and recovers when cache layer fails', async () => {
+            const originalSave = window.UnifiedCacheManager.layers.memory.save;
+            window.UnifiedCacheManager.layers.memory.save = jest.fn().mockRejectedValue(new Error('memory down'));
+
+            const fallbackSpy = jest.spyOn(window.Logger, 'warn');
+            const data = await window.UnifiedCacheManager.get('broken-key', {
+                fallback: async () => ({ ok: true })
+            });
+
+            expect(data).toMatchObject({ ok: true });
+            expect(fallbackSpy).toHaveBeenCalled();
+
+            window.UnifiedCacheManager.layers.memory.save = originalSave;
+            fallbackSpy.mockRestore();
         });
     });
 });

@@ -829,17 +829,51 @@ class ModalManagerV2 {
                 }
                 
                 const selectStyle = field.style || (field.width ? `width: ${field.width}px` : '');
+                const selectClasses = ['form-select'];
+                if (field.additionalClasses) {
+                    if (Array.isArray(field.additionalClasses)) {
+                        selectClasses.push(...field.additionalClasses);
+                    } else {
+                        selectClasses.push(field.additionalClasses);
+                    }
+                }
+                if (field.classList && Array.isArray(field.classList)) {
+                    selectClasses.push(...field.classList);
+                }
+
+                const extraAttributes = [];
+                if (field.multiple) {
+                    extraAttributes.push('multiple');
+                }
+                if (field.attributes && typeof field.attributes === 'object') {
+                    Object.entries(field.attributes).forEach(([attrKey, attrValue]) => {
+                        if (attrValue === true) {
+                            extraAttributes.push(attrKey);
+                        } else if (attrValue !== false && attrValue !== null && attrValue !== undefined) {
+                            extraAttributes.push(`${attrKey}="${attrValue}"`);
+                        }
+                    });
+                }
+                if (field.dataset && typeof field.dataset === 'object') {
+                    Object.entries(field.dataset).forEach(([dataKey, dataValue]) => {
+                        if (dataValue !== undefined && dataValue !== null) {
+                            extraAttributes.push(`data-${dataKey}="${dataValue}"`);
+                        }
+                    });
+                }
+
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
                             ${field.label} ${requiredStar}
                         </label>
-                        <select class="form-select" 
+                        <select class="${selectClasses.join(' ')}" 
                                 id="${field.id}" 
                                 name="${field.name || field.id}"
                                 ${requiredAttr}
                                 ${disabledAttr}
-                                ${selectStyle ? `style="${selectStyle}"` : ''}>
+                                ${selectStyle ? `style="${selectStyle}"` : ''}
+                                ${extraAttributes.join(' ')}>
                             ${optionsHTML}
                         </select>
                         <div class="invalid-feedback"></div>

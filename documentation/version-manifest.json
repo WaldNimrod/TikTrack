@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.19.0",
+    "version": "1.0.20.0",
     "major": 1,
     "minor": 0,
-    "patch": 19,
+    "patch": 20,
     "build": 0,
-    "commit": "3aba628529e222b0552c8559b3bc7104b2b1e6a8",
-    "updated_at": "2025-11-12T16:32:29+00:00",
-    "notes": "Adjust import session warning layout"
+    "commit": "1bc839c5054387eac5dc6e7584b7758ee8fd60e5",
+    "updated_at": "2025-11-12T18:44:29+00:00",
+    "notes": "Finalize modal navigation refactor and tagging rollout"
   }
 }

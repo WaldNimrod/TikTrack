@@ -111,15 +111,22 @@
  * Opens modal for adding new execution
  * 
  * @function addExecution
- * @returns {void}
+ * @returns {Promise<void>} Resolves after modal interaction and tag hydration complete.
  */
-function addExecution() {
+async function addExecution() {
   try {
     window.Logger.info('➕ מוסיף ביצוע חדש', { page: "executions" });
     
     // פתיחת מודל הוספת ביצוע - שימוש במערכת הכללית
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      window.ModalManagerV2.showModal('executionsModal', 'add');
+      await window.ModalManagerV2.showModal('executionsModal', 'add');
+      const select = document.getElementById('executionTags');
+      if (select) {
+        select.setAttribute('data-initial-value', '');
+        if (window.TagUIManager?.refreshSelectOptions) {
+          await window.TagUIManager.refreshSelectOptions(select);
+        }
+      }
     } else {
       window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
     }
@@ -175,11 +182,19 @@ let tradesData = []; // נתוני טריידים לשמירת מפת חשבונ
 // פונקציות בסיסיות
 // REMOVED: openExecutionDetails - unused function, replaced by showAddExecutionModal
 
-function editExecution(id) {
+/**
+ * Open the execution edit modal and hydrate tag selections.
+ * @param {number|string} id - Execution identifier to edit.
+ * @returns {Promise<void>} Resolves after modal interaction and tag hydration complete.
+ */
+async function editExecution(id) {
   try {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('executionsModal', 'execution', id);
+    await window.ModalManagerV2.showEditModal('executionsModal', 'execution', id);
+    if (window.TagUIManager?.hydrateSelectForEntity) {
+      await window.TagUIManager.hydrateSelectForEntity('executionTags', 'execution', id, { force: true });
+    }
   } else {
     window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
   }
@@ -546,8 +561,12 @@ async function saveExecution() {
             notes: { id: 'executionNotes', type: 'rich-text', default: null },
             source: { id: 'executionSource', type: 'text', default: 'manual' },
             external_id: { id: 'executionExternalId', type: 'text', default: null },
-            trade_id: { id: 'trade_id', type: 'int', default: null }
+            trade_id: { id: 'trade_id', type: 'int', default: null },
+            tag_ids: { id: 'executionTags', type: 'tags', default: [] }
         });
+
+        const tagIds = Array.isArray(executionData.tag_ids) ? executionData.tag_ids : [];
+        delete executionData.tag_ids;
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -632,8 +651,9 @@ async function saveExecution() {
         });
         
         // Use CRUDResponseHandler for consistent response handling
+        let crudResult;
         if (isEdit) {
-            await CRUDResponseHandler.handleUpdateResponse(response, {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'executionsModal',
                 successMessage: 'ביצוע עודכן בהצלחה',
                 entityName: 'ביצוע',
@@ -641,13 +661,27 @@ async function saveExecution() {
                 requiresHardReload: false
             });
         } else {
-            await CRUDResponseHandler.handleSaveResponse(response, {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'executionsModal',
                 successMessage: 'ביצוע נוסף בהצלחה',
                 entityName: 'ביצוע',
                 reloadFn: window.loadExecutionsData,
                 requiresHardReload: false
             });
+        }
+
+        const executionRecordId = isEdit ? Number(executionId) : Number(crudResult?.data?.id || crudResult?.id);
+        if (Number.isFinite(executionRecordId)) {
+            try {
+                await window.TagService.replaceEntityTags('execution', executionRecordId, tagIds);
+            } catch (tagError) {
+                window.Logger?.warn('⚠️ Failed to update execution tags', {
+                    error: tagError,
+                    executionId: executionRecordId,
+                    page: 'executions'
+                });
+                window.showErrorNotification?.('שמירת תגיות', 'התגובה נשמרה אך עדכון התגיות נכשל');
+            }
         }
         
     } catch (error) {
@@ -3196,9 +3230,9 @@ window.loadExecutionsData = async function() {
   try {
     const tickers = await loadTickersSummaryData();
     updateTickersSummaryTable(tickers);
-    // window.Logger.info('✅ טבלת טיקרים חלקית נטענה בהצלחה', { page: "executions" });
+    // window.Logger.info('✅ טבלת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים', { page: "executions" });
   } catch (error) {
-    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error, { page: "executions" });
+    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקיים:', error, { page: "executions" });
     handleApiError(error, 'טבלת טיקרים חלקית');
   }
 };

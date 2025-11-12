@@ -1655,7 +1655,35 @@
 <a name='L1590'></a><a href='#L1590'>1590</a>
 <a name='L1591'></a><a href='#L1591'>1591</a>
 <a name='L1592'></a><a href='#L1592'>1592</a>
-<a name='L1593'></a><a href='#L1593'>1593</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1593'></a><a href='#L1593'>1593</a>
+<a name='L1594'></a><a href='#L1594'>1594</a>
+<a name='L1595'></a><a href='#L1595'>1595</a>
+<a name='L1596'></a><a href='#L1596'>1596</a>
+<a name='L1597'></a><a href='#L1597'>1597</a>
+<a name='L1598'></a><a href='#L1598'>1598</a>
+<a name='L1599'></a><a href='#L1599'>1599</a>
+<a name='L1600'></a><a href='#L1600'>1600</a>
+<a name='L1601'></a><a href='#L1601'>1601</a>
+<a name='L1602'></a><a href='#L1602'>1602</a>
+<a name='L1603'></a><a href='#L1603'>1603</a>
+<a name='L1604'></a><a href='#L1604'>1604</a>
+<a name='L1605'></a><a href='#L1605'>1605</a>
+<a name='L1606'></a><a href='#L1606'>1606</a>
+<a name='L1607'></a><a href='#L1607'>1607</a>
+<a name='L1608'></a><a href='#L1608'>1608</a>
+<a name='L1609'></a><a href='#L1609'>1609</a>
+<a name='L1610'></a><a href='#L1610'>1610</a>
+<a name='L1611'></a><a href='#L1611'>1611</a>
+<a name='L1612'></a><a href='#L1612'>1612</a>
+<a name='L1613'></a><a href='#L1613'>1613</a>
+<a name='L1614'></a><a href='#L1614'>1614</a>
+<a name='L1615'></a><a href='#L1615'>1615</a>
+<a name='L1616'></a><a href='#L1616'>1616</a>
+<a name='L1617'></a><a href='#L1617'>1617</a>
+<a name='L1618'></a><a href='#L1618'>1618</a>
+<a name='L1619'></a><a href='#L1619'>1619</a>
+<a name='L1620'></a><a href='#L1620'>1620</a>
+<a name='L1621'></a><a href='#L1621'>1621</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1740,6 +1768,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3533,25 +3589,32 @@ const PACKAGE_MANIFEST = <span class="cstat-no" title="statement not covered" >{
         loadOrder: 7
       },
       {
+        file: 'services/tag-service.js',
+        globalCheck: 'window.TagService',
+        description: 'שירות תגיות מרכזי (ניהול ואחזור תגיות)',
+        required: true,
+        loadOrder: 8
+      },
+      {
         file: 'services/table-sort-value-adapter.js',
         globalCheck: 'window.TableSortValueAdapter',
         description: 'Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy)',
         required: true,
-        loadOrder: 8
+        loadOrder: 9
       },
       {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false,
-        loadOrder: 9
+        loadOrder: 10
       },
       {
         file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
-        loadOrder: 10,
+        loadOrder: 11,
         external: true
       },
       {
@@ -3559,7 +3622,7 @@ const PACKAGE_MANIFEST = <span class="cstat-no" title="statement not covered" >{
         globalCheck: 'window.DOMPurify',
         description: 'DOMPurify - HTML Sanitizer',
         required: true,
-        loadOrder: 11,
+        loadOrder: 12,
         external: true
       },
       {
@@ -3567,7 +3630,7 @@ const PACKAGE_MANIFEST = <span class="cstat-no" title="statement not covered" >{
         globalCheck: 'window.RichTextEditorService',
         description: 'שירות עורך טקסט עשיר',
         required: true,
-        loadOrder: 12
+        loadOrder: 13
       }
     ],
     estimatedSize: '~180KB',
@@ -3649,39 +3712,53 @@ const PACKAGE_MANIFEST = <span class="cstat-no" title="statement not covered" >{
         loadOrder: 2
       },
       {
+        file: 'tag-ui-manager.js',
+        globalCheck: 'window.TagUIManager',
+        description: 'ניהול בחירת תגיות במודלים',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'tag-events.js',
+        globalCheck: 'window.TagEvents',
+        description: 'מערכת אירועים גלובלית לתגיות',
+        required: true,
+        loadOrder: 4
+      },
+      {
         file: 'modules/core-systems.js',
         globalCheck: 'window.CoreSystems',
         description: 'מערכות ליבה',
         required: true,
-        loadOrder: 3
+        loadOrder: 5
       },
       {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
         description: 'נתונים בסיסיים',
         required: true,
-        loadOrder: 4
+        loadOrder: 6
       },
       {
         file: 'modules/ui-basic.js',
         globalCheck: 'window.UIBasic',
         description: 'ממשק בסיסי',
         required: true,
-        loadOrder: 5
+        loadOrder: 7
       },
       {
         file: 'modules/data-advanced.js',
         globalCheck: 'window.DataAdvanced',
         description: 'נתונים מתקדמים',
         required: true,
-        loadOrder: 6
+        loadOrder: 8
       },
       {
         file: 'modules/ui-advanced.js',
         globalCheck: 'window.UIAdvanced',
         description: 'ממשק מתקדם',
         required: true,
-        loadOrder: 7,
+        loadOrder: 9,
         exports: ['window.loadUserPreferences'] // Explicitly document that this script exports loadUserPreferences
       },
       {
@@ -3689,98 +3766,105 @@ const PACKAGE_MANIFEST = <span class="cstat-no" title="statement not covered" >{
         globalCheck: 'window.CommunicationModule',
         description: 'מודול תקשורת',
         required: true,
-        loadOrder: 8
+        loadOrder: 10
       },
       {
         file: 'modules/business-module.js',
         globalCheck: 'window.BusinessModule',
         description: 'מודול עסקי',
         required: true,
-        loadOrder: 9
+        loadOrder: 11
       },
       {
         file: 'modules/localstorage-sync.js',
         globalCheck: 'window.LocalStorageSync',
         description: 'סנכרון localStorage',
         required: true,
-        loadOrder: 10
+        loadOrder: 12
       },
       {
         file: 'modules/dynamic-loader-config.js',
         globalCheck: 'window.DynamicLoaderConfig',
         description: 'תצורת טעינה דינמית',
         required: true,
-        loadOrder: 11
+        loadOrder: 13
       },
       {
         file: 'import-user-data.js',
         globalCheck: 'window.openImportUserDataModal',
         description: 'מודל ייבוא נתוני עסקאות',
         required: true,
-        loadOrder: 12
+        loadOrder: 14
       },
       {
         file: 'modal-configs/trading-accounts-config.js',
         globalCheck: 'window.tradingAccountsModalConfig',
         description: 'קונפיגורציית מודל חשבונות מסחר',
         required: false,
-        loadOrder: 13
+        loadOrder: 15
       },
       {
         file: 'modal-configs/alerts-config.js',
         globalCheck: 'window.alertsModalConfig',
         description: 'קונפיגורציית מודל התראות',
         required: false,
-        loadOrder: 14
+        loadOrder: 16
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
         description: 'קונפיגורציית מודל טריידים',
         required: true,
-        loadOrder: 15
+        loadOrder: 17
       },
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
         description: 'קונפיגורציית מודל ביצועים',
         required: false,
-        loadOrder: 16
+        loadOrder: 18
       },
       {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
         description: 'קונפיגורציית מודל תוכניות מסחר',
         required: true,
-        loadOrder: 17
+        loadOrder: 19
       },
       {
         file: 'modal-configs/tickers-config.js',
         globalCheck: 'window.tickersModalConfig',
         description: 'קונפיגורציית מודל טיקרים',
         required: false,
-        loadOrder: 18
+        loadOrder: 20
       },
       {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'קונפיגורציית מודל תזרימי מזומנים',
         required: false,
-        loadOrder: 19
+        loadOrder: 21
       },
       {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
         required: false,
-        loadOrder: 20
+        loadOrder: 22
+      },
+      {
+        file: 'modal-configs/tag-management-config.js',
+        globalCheck: 'window.tagModalConfig',
+        description: 'קונפיגורציית מודלים למערכת התגיות',
+        required: true,
+        loadOrder: 23
       },
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.tradeSelectorModal',
         description: 'מודל בחירת טרייד',
         required: false,
-        loadOrder: 21
+        loadOrder: 24
       }
     ],
     estimatedSize: '~250KB',
@@ -4846,7 +4930,7 @@ class PackageManifest {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-12T16:27:12.884Z
+                at 2025-11-12T18:06:24.820Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

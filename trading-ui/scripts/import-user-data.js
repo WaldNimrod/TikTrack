@@ -15,6 +15,31 @@
  * Last Updated: 2025-01-16
  */
 
+/*
+ * ==========================================
+ * FUNCTION INDEX (Key Sections)
+ * ==========================================
+ * INITIALIZATION & STATE
+ *   - createEmptyProblemState()
+ *   - resetImportModalState()
+ *   - initializeImportModal()
+ * DATA FLOW
+ *   - startImportAnalysis()
+ *   - displayPreviewData()
+ *   - executeFinalImport()
+ * PROBLEM RESOLUTION
+ *   - clearProblemSections()
+ *   - displayExistingRecords()
+ *   - renderMissingTickerCard()
+ * UI INTERACTION
+ *   - handleImportStepChange()
+ *   - updateImportProgressBar()
+ * COMPATIBILITY HELPERS
+ *   - clearProblemSectionsLegacy()
+ *   - displayExistingRecordsLegacy()
+ * ==========================================
+ */
+
 // Global state for import modal
 let currentSessionId = null;
 let currentStep = 1;
@@ -2472,31 +2497,6 @@ async function reanalyseSessionForTask(taskKey, loadingMessage = 'טוען ומ�
 }
 
 /**
- * Display problem resolution
- */
-function displayProblemResolution(data) {
-    const container = document.getElementById('problemResolution');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="problem-summary">
-            <h4>סיכום בעיות</h4>
-            <div class="problem-stats">
-                <div class="stat-item">
-                    <span class="stat-label">רשומות עם בעיות:</span>
-                    <span class="stat-value">${data.problematic_records || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">רשומות נקיות:</span>
-                    <span class="stat-value">${data.clean_records || 0}</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-
-/**
  * Clear problem sections
  */
 function clearProblemSections() {
@@ -2509,7 +2509,8 @@ function clearProblemSections() {
         'accountMissingAccountsSection',
         'accountCurrencyMismatchesSection',
         'accountEntitlementWarningsSection',
-        'accountMissingDocumentsSection'
+        'accountImportWarningsSection',
+        'accountExistingEntriesSection'
     ];
     
     sections.forEach(sectionId => {
@@ -2518,19 +2519,13 @@ function clearProblemSections() {
             section.style.display = 'none';
         }
     });
-
+    
     const containers = [
         'missingTickersContainer',
-        'withinFileDuplicatesContainer',
-        'existingRecordsContainer',
-        'cashflowMissingAccountsContainer',
-        'cashflowCurrencyIssuesContainer',
-        'accountMissingAccountsContainer',
-        'accountCurrencyMismatchesContainer',
-        'accountEntitlementWarningsContainer',
-        'accountMissingDocumentsContainer'
+        'missingAccountsContainer',
+        'missingCashflowAccountsContainer'
     ];
-
+    
     containers.forEach(containerId => {
         const container = document.getElementById(containerId);
         if (container) {
@@ -2546,91 +2541,29 @@ function displayExistingRecords(existingRecords) {
     const section = document.getElementById('existingRecordsSection');
     const container = document.getElementById('existingRecordsContainer');
     
-    if (!section || !container) {
-        window.Logger.warn('[Import Modal] Existing records section not found', { page: 'import-user-data' });
+    if (!section || !container) return;
+    
+    const tracking = trackProblemStatus(
+        'existingRecords',
+        existingRecords,
+        (record) => getDuplicateIdentifier(record, 'existing'),
+        (record) => buildDuplicateResolvedMeta(record, 'רשימה קיימת')
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (existingRecords || []).map((record, index) => 
+        renderDuplicateCard(record, 'existing_record', index)
+    );
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
         return;
     }
-    
-    section.style.display = 'block';
-    container.innerHTML = '';
-    
-    existingRecords.forEach((recordData, index) => {
-        const card = document.createElement('div');
-        card.className = 'problem-card existing-record-card';
-        
-        // Get the actual record data
-        const record = recordData.record || recordData;
-        const matches = recordData.matches || [];
-        
-        // Calculate confidence score from matches
-        let confidenceScore = 0;
-        if (matches.length > 0) {
-            confidenceScore = matches[0].confidence || 0;
-        }
-        
-        const semanticColors = {
-            success: 'var(--color-success, #28a745)',
-            warning: 'var(--color-warning, #ffc107)',
-            danger: 'var(--color-danger, #dc3545)'
-        };
 
-        const confidenceColor = confidenceScore >= 80
-            ? semanticColors.success
-            : confidenceScore >= 50
-                ? semanticColors.warning
-                : semanticColors.danger;
-        
-        card.innerHTML = `
-            <div class="problem-card-header">
-                <div class="problem-card-title">
-                    <i class="bi bi-database"></i>
-                    רשומה קיימת במערכת #${index + 1}
-                </div>
-                <div class="confidence-score" style="color: ${confidenceColor}">
-                    ${confidenceScore.toFixed(1)}% התאמה
-                </div>
-            </div>
-            <div class="problem-card-content">
-                <div class="record-details">
-                    <div class="detail-row">
-                        <span class="detail-label">סמל:</span>
-                        <span class="detail-value">${record.symbol || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">פעולה:</span>
-                        <span class="detail-value">${record.action || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">כמות:</span>
-                        <span class="detail-value">${record.quantity || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">מחיר:</span>
-                        <span class="detail-value">$${record.price || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">תאריך:</span>
-                        <span class="detail-value">${record.date || 'לא זמין'}</span>
-                    </div>
-                </div>
-                <div class="problem-card-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="importExistingRecord(${index})">
-                        <i class="bi bi-arrow-down-circle"></i> ייבוא בכל זאת
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="skipExistingRecord(${index})">
-                        <i class="bi bi-x-circle"></i> דלג
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(card);
-    });
-    
-    window.Logger.info('[Import Modal] Displayed existing records', { 
-        count: existingRecords.length, 
-        page: 'import-user-data' 
-    });
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -2813,11 +2746,14 @@ function updateAnalyzeButton() {
  * Format file size
  */
 function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    if (!bytes || bytes === 0) {
+        return '0 Bytes';
+    }
+
+    const UNITS = ['Bytes', 'KB', 'MB', 'GB'];
+    const unitIndex = Math.floor(Math.log(bytes) / Math.log(1024));
+    const value = bytes / Math.pow(1024, unitIndex);
+    return `${parseFloat(value.toFixed(2))} ${UNITS[unitIndex]}`;
 }
 
 /**
@@ -5085,15 +5021,7 @@ function performResetImportSession() {
 /**
  * Format file size
  */
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
+const formatFileSizeLegacy = (bytes) => formatFileSize(bytes);
 
 /**
  * Unified notification helper for import modal
@@ -5206,7 +5134,7 @@ function displayProblemResolutionDetailed(data) {
 /**
  * Clear all problem sections
  */
-function clearProblemSections() {
+function clearProblemSectionsForSession() {
     const sections = [
         'missingTickersSection',
         'withinFileDuplicatesSection', 
@@ -5216,7 +5144,8 @@ function clearProblemSections() {
         'accountMissingAccountsSection',
         'accountCurrencyMismatchesSection',
         'accountEntitlementWarningsSection',
-        'accountMissingDocumentsSection'
+        'accountImportWarningsSection',
+        'accountExistingEntriesSection'
     ];
     
     sections.forEach(sectionId => {
@@ -5225,19 +5154,13 @@ function clearProblemSections() {
             section.style.display = 'none';
         }
     });
-
+    
     const containers = [
         'missingTickersContainer',
-        'withinFileDuplicatesContainer',
-        'existingRecordsContainer',
-        'cashflowMissingAccountsContainer',
-        'cashflowCurrencyIssuesContainer',
-        'accountMissingAccountsContainer',
-        'accountCurrencyMismatchesContainer',
-        'accountEntitlementWarningsContainer',
-        'accountMissingDocumentsContainer'
+        'missingAccountsContainer',
+        'missingCashflowAccountsContainer'
     ];
-
+    
     containers.forEach(containerId => {
         const container = document.getElementById(containerId);
         if (container) {
@@ -5303,38 +5226,6 @@ function displayWithinFileDuplicates(duplicates) {
     const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
     const unresolvedCards = (duplicates || []).map((duplicate, index) => 
         renderDuplicateCard(duplicate, 'within_file', index)
-    );
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
-        section.style.display = 'none';
-        container.innerHTML = '';
-        return;
-    }
-
-    section.style.display = 'block';
-    container.innerHTML = cards.join('');
-}
-
-/**
- * Display existing records
- */
-function displayExistingRecords(existingRecords) {
-    const section = document.getElementById('existingRecordsSection');
-    const container = document.getElementById('existingRecordsContainer');
-    
-    if (!section || !container) return;
-    
-    const tracking = trackProblemStatus(
-        'existingRecords',
-        existingRecords,
-        (record) => getDuplicateIdentifier(record, 'existing'),
-        (record) => buildDuplicateResolvedMeta(record, 'רשומה קיימת')
-    );
-
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (existingRecords || []).map((record, index) => 
-        renderDuplicateCard(record, 'existing_record', index)
     );
     const cards = [...resolvedCards, ...unresolvedCards];
 
@@ -6164,3 +6055,7 @@ function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
         }
     });
 }
+
+const displayExistingRecordsLegacy = (records) => displayExistingRecords(records);
+
+const clearProblemSectionsLegacy = () => clearProblemSections();

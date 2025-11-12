@@ -151,6 +151,22 @@ const alertsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-4'
         },
+        {
+            type: 'select',
+            id: 'alertTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'alert'
+            },
+            description: 'הוסף תגיות שיופיעו לצד ההתראה'
+        },
         // הודעה - בסוף אחרי סטטוס ותאריכים
         {
             type: 'rich-text',

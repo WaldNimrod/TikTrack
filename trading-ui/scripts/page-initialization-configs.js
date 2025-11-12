@@ -270,6 +270,33 @@ const PAGE_CONFIGS = {
             }
         ]
     },
+
+    'tag-management': {
+        name: 'Tag Management',
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'init-system'],
+        requiredGlobals: [
+            'NotificationSystem',
+            'DataUtils',
+            'window.Logger',
+            'window.ModalManagerV2',
+            'window.TagService',
+            'window.TagUIManager',
+            'window.TagManagementPage'
+        ],
+        description: 'ניהול תגיות וקטגוריות - כולל אנליטיקה, סינון והצעות',
+        lastModified: '2025-11-12',
+        pageType: 'settings',
+        requiresFilters: false,
+        requiresValidation: true,
+        requiresTables: true,
+        customInitializers: [
+            async () => {
+                if (window.TagManagementPage && typeof window.TagManagementPage.init === 'function') {
+                    await window.TagManagementPage.init();
+                }
+            }
+        ]
+    },
     
     'preferences': {
         name: 'Preferences',
@@ -554,7 +581,7 @@ const PAGE_CONFIGS = {
         // - 'entity-details': מערכות פרטי ישויות
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'conditions', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [

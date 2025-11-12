@@ -1381,7 +1381,7 @@ function showOpenTradesWarning(tradingAccountId, tradingAccountName) {
  * @param {number|string} accountId - Trading account ID
  * @returns {void}
  */
-function showEditTradingAccountModalById(accountId) {
+async function showEditTradingAccountModalById(accountId) {
   if (window.Logger) {
     window.Logger.info(`🔧 showEditTradingAccountModalById called with accountId: ${accountId}`, { accountId, page: "trading_accounts" });
   }
@@ -1397,7 +1397,10 @@ function showEditTradingAccountModalById(accountId) {
     if (window.Logger) {
       window.Logger.info(`✅ Opening edit modal for account ${accountId}`, { accountId, page: "trading_accounts" });
     }
-    window.ModalManagerV2.showEditModal('tradingAccountsModal', 'trading_account', accountId);
+    await window.ModalManagerV2.showEditModal('tradingAccountsModal', 'trading_account', accountId);
+    if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+      await window.TagUIManager.hydrateSelectForEntity('accountTags', 'trading_account', accountId, { force: true });
+    }
   } else {
     if (window.Logger) {
       window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "trading_accounts" });
@@ -2271,8 +2274,11 @@ async function saveTradingAccount() {
             currency_id: { id: 'accountCurrency', type: 'int' }, // currency_id הוא integer - ID של מטבע
             opening_balance: { id: 'accountOpeningBalance', type: 'float', default: 0 },
             status: { id: 'accountStatus', type: 'text' },
-            notes: { id: 'accountNotes', type: 'rich-text', default: null }
+            notes: { id: 'accountNotes', type: 'rich-text', default: null },
+            tag_ids: { id: 'accountTags', type: 'tags', default: [] }
         });
+        const tagIds = Array.isArray(accountData.tag_ids) ? accountData.tag_ids : [];
+        delete accountData.tag_ids;
         
         const accountId = accountData.id ? parseInt(accountData.id) : null;
         const isEdit = !!accountId;
@@ -2349,8 +2355,9 @@ async function saveTradingAccount() {
         });
         
         // Use CRUDResponseHandler for consistent response handling
+        let crudResult;
         if (isEdit) {
-            await CRUDResponseHandler.handleUpdateResponse(response, {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'tradingAccountsModal',
                 successMessage: 'חשבון מסחר עודכן בהצלחה',
                 entityName: 'חשבון מסחר',
@@ -2358,13 +2365,27 @@ async function saveTradingAccount() {
                 requiresHardReload: false
             });
         } else {
-            await CRUDResponseHandler.handleSaveResponse(response, {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'tradingAccountsModal',
                 successMessage: 'חשבון מסחר נוסף בהצלחה',
                 entityName: 'חשבון מסחר',
                 reloadFn: window.loadTradingAccountsDataForTradingAccountsPage,
                 requiresHardReload: false
             });
+        }
+
+        const resolvedAccountId = isEdit ? accountId : Number(crudResult?.data?.id || crudResult?.id);
+        if (Number.isFinite(resolvedAccountId)) {
+            try {
+                await window.TagService.replaceEntityTags('trading_account', resolvedAccountId, tagIds);
+            } catch (tagError) {
+                window.Logger?.warn('⚠️ Failed to update trading account tags', {
+                    error: tagError,
+                    tradingAccountId: resolvedAccountId,
+                    page: 'trading_accounts'
+                });
+                window.showErrorNotification?.('שמירת תגיות', 'שמירת התגיות נכשלה - הנתונים נשמרו ללא תגיות');
+            }
         }
         
     } catch (error) {

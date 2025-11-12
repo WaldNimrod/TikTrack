@@ -77,6 +77,22 @@
                 rowClass: 'row',
                 colClass: 'col-md-6'
             },
+            {
+                type: 'select',
+                id: 'tickerTags',
+                label: 'תגיות',
+                options: [],
+                multiple: true,
+                includeEmpty: false,
+                additionalClasses: ['tag-multi-select'],
+                rowClass: 'row',
+                colClass: 'col-12',
+                attributes: {
+                    'data-initial-value': '',
+                    'data-tag-entity': 'ticker'
+                },
+                description: 'הוסף תגיות לטיקר לצורך סיווג ופילטרים'
+            },
             // שורה אחרונה: הערות (בשורה מלאה)
             {
                 type: 'textarea',

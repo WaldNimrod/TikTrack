@@ -1592,11 +1592,13 @@ async function saveCashFlow() {
             description: { id: 'cashFlowDescription', type: 'rich-text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
             external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
-            trade_id: { id: 'trade_id', type: 'int', default: null }  // Optional link to trade
+            trade_id: { id: 'trade_id', type: 'int', default: null },  // Optional link to trade
+            tag_ids: { id: 'cashFlowTags', type: 'tags', default: [] }
         });
         
         // Prepare data to send (trade_id is optional, can be null)
-        const dataToSend = { ...cashFlowData };
+        const { tag_ids: tagIdsRaw, ...dataToSend } = cashFlowData;
+        const tagIds = Array.isArray(tagIdsRaw) ? tagIdsRaw : [];
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -1701,9 +1703,10 @@ async function saveCashFlow() {
         
         // CRUDResponseHandler handles ALL response processing including errors
         // No need to pre-check or call response.json() here
+        let crudResult = null;
         if (isEdit) {
             console.log('🔵 saveCashFlow - Calling handleUpdateResponse...');
-            await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
                 entityName: 'תזרים מזומן',
@@ -1712,13 +1715,29 @@ async function saveCashFlow() {
             });
         } else {
             console.log('🔵 saveCashFlow - Calling handleSaveResponse...');
-            await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן',
                 reloadFn: window.loadCashFlowsData,
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
+        }
+        
+        const resolvedCashFlowId = isEdit
+            ? Number(cashFlowId)
+            : Number(crudResult?.data?.id || crudResult?.id);
+        if (Number.isFinite(resolvedCashFlowId) && window.TagService) {
+            try {
+                await window.TagService.replaceEntityTags('cash_flow', resolvedCashFlowId, tagIds);
+            } catch (tagError) {
+                window.Logger?.warn('⚠️ Failed to update cash flow tags', {
+                    error: tagError,
+                    cashFlowId: resolvedCashFlowId,
+                    page: 'cash_flows'
+                });
+                window.showErrorNotification?.('שמירת תגיות', 'התזרים נשמר אך התגיות לא עודכנו');
+            }
         }
         
         console.log('🔵 saveCashFlow - CRUDResponseHandler completed');
@@ -2274,10 +2293,13 @@ function initializeExternalIdFields() {
  * @param {string} id - Cash flow ID
  * @returns {void}
  */
-function editCashFlow(id) {
+async function editCashFlow(id) {
     // Use ModalManagerV2 directly
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-        window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
+        await window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
+        if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+            await window.TagUIManager.hydrateSelectForEntity('cashFlowTags', 'cash_flow', id, { force: true });
+        }
     } else {
         window.Logger?.error('ModalManagerV2 לא זמין', { page: "cash_flows" });
         if (typeof window.showErrorNotification === 'function') {

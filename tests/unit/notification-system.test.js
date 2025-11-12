@@ -67,11 +67,10 @@ describe('Notification System', () => {
 
         document.body.insertAdjacentHTML = jest.fn();
 
-        // Load with dependencies using test loader only if not already evaluated
-        if (typeof window.showNotification !== 'function') {
-            const code = loadScriptWithDependencies('scripts/notification-system.js');
-            eval(code);
-        }
+        // Load with dependencies using test loader (always reload to reflect latest implementation)
+        delete window.showNotification;
+        const code = loadScriptWithDependencies('scripts/notification-system.js');
+        eval(code);
     });
 
     afterEach(() => {
@@ -90,8 +89,8 @@ describe('Notification System', () => {
             
             await window.showNotification('Test message', 'info', 'Test Title', 5000, 'system', { userInitiated: true });
             
-            // Should create element if notification is shown
-            expect(document.createElement).toHaveBeenCalled();
+            const notifications = notificationContainer.querySelectorAll('.notification');
+            expect(notifications.length).toBeGreaterThan(0);
         });
 
         test('should handle different notification types', async () => {
@@ -104,7 +103,8 @@ describe('Notification System', () => {
                 await window.showNotification(`Test ${type}`, type, 'Test', 5000, 'system', { userInitiated: true });
             }
             
-            expect(document.createElement).toHaveBeenCalled();
+            const notifications = notificationContainer.querySelectorAll('.notification');
+            expect(notifications.length).toBeGreaterThan(0);
         });
 
         test('should check notification preferences before showing', async () => {

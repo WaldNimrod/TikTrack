@@ -185,6 +185,31 @@ const TABLE_COLUMN_MAPPINGS = {
     'created_at',       // 2 - נוצר ב
   ],
 
+  // מערכת תגיות - קטגוריות
+  'tag_categories': [
+    'name',           // 0 - שם קטגוריה
+    'description',    // 1 - תיאור
+    'tags_count',     // 2 - כמות תגיות פעילות
+    'updated_at'      // 3 - עודכן
+  ],
+
+  // מערכת תגיות - תגיות
+  'tags': [
+    'name',           // 0 - שם תגית
+    'category_name',  // 1 - קטגוריה
+    'description',    // 2 - תיאור
+    'usage_count',    // 3 - שימושים
+    'last_used_at'    // 4 - שימוש אחרון
+  ],
+
+  // מערכת תגיות - טבלת שימוש מובילה
+  'tag_usage_leaderboard': [
+    'tag_name',       // 0 - שם תגית
+    'category_name',  // 1 - קטגוריה
+    'usage_count',    // 2 - מספר שימושים
+    'top_entities'    // 3 - ישויות מובילות (מטופל ייעודית ברינדור)
+  ],
+
   // טבלת פוזיציות (Positions) - Positions by Account Table
   'positions': [
     'ticker_symbol',           // 0 - סימבול

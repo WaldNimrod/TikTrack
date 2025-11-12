@@ -155,6 +155,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>

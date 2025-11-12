@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
+from services.trade_plan_matching_service import TradePlanMatchingService
 from services.position_calculator_service import PositionCalculatorService
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
@@ -31,6 +32,92 @@ def _get_date_normalizer():
         preferences_service=preferences_service
     )
     return DateNormalizationService(timezone_name)
+
+
+@trades_bp.route('/pending-plan/assignments', methods=['GET'])
+@cache_with_deps(ttl=60, dependencies=['trades', 'trade-plans'])
+@handle_database_session()
+def get_trades_pending_plan_assignments():
+    """Return ranked suggestions for linking trades to existing trade plans."""
+    normalizer = None
+    try:
+        db: Session = g.db
+        normalizer = _get_date_normalizer()
+        limit = request.args.get('limit', type=int)
+        suggestions_limit = request.args.get('suggestions', default=3, type=int)
+
+        suggestions = TradePlanMatchingService.get_assignment_suggestions(
+            db,
+            max_items=limit,
+            max_suggestions_per_trade=max(suggestions_limit or 1, 1),
+        )
+
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=suggestions,
+            extra={"count": len(suggestions)},
+        )
+        return jsonify(payload), 200
+    except ValueError as exc:
+        logger.warning(f"Invalid trade-plan assignment request: {exc}")
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, str(exc))
+        return jsonify(error_payload), 400
+    except Exception as exc:
+        logger.error(f"Error building trade-plan assignment suggestions: {exc}")
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "Failed to build assignment suggestions"
+        )
+        return jsonify(error_payload), 500
+
+
+@trades_bp.route('/pending-plan/creations', methods=['GET'])
+@cache_with_deps(ttl=60, dependencies=['trades', 'trade-plans'])
+@handle_database_session()
+def get_trades_pending_plan_creations():
+    """Return suggestions for creating trade plans from trades without plans."""
+    normalizer = None
+    try:
+        db: Session = g.db
+        normalizer = _get_date_normalizer()
+        limit = request.args.get('limit', type=int)
+
+        assignment_preview = TradePlanMatchingService.get_assignment_suggestions(
+            db,
+            max_items=None,
+            max_suggestions_per_trade=3,
+        )
+        assignment_index = {
+            item["trade_id"]: item.get("best_score") or 0
+            for item in assignment_preview
+        }
+
+        creations = TradePlanMatchingService.get_creation_suggestions(
+            db,
+            max_items=limit,
+            assignment_index=assignment_index,
+        )
+
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=creations,
+            extra={
+                "count": len(creations),
+                "assignment_reference_count": len(assignment_index),
+            },
+        )
+        return jsonify(payload), 200
+    except ValueError as exc:
+        logger.warning(f"Invalid trade-plan creation request: {exc}")
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, str(exc))
+        return jsonify(error_payload), 400
+    except Exception as exc:
+        logger.error(f"Error building trade-plan creation suggestions: {exc}")
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "Failed to build creation suggestions"
+        )
+        return jsonify(error_payload), 500
 
 @trades_bp.route('/', methods=['GET'])
 @handle_database_session()
@@ -200,6 +287,42 @@ def create_trade():
             "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 400
+
+
+@trades_bp.route('/<int:trade_id>/link-plan', methods=['POST'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['trades', 'trade-plans', 'dashboard', 'positions', 'portfolio'])
+def link_trade_to_plan(trade_id: int):
+    """Link a trade without a plan to an existing trade plan."""
+    normalizer = None
+    try:
+        db: Session = g.db
+        normalizer = _get_date_normalizer()
+        payload = request.get_json() or {}
+        plan_id = payload.get('trade_plan_id')
+
+        if not isinstance(plan_id, int):
+            raise ValueError("trade_plan_id is required")
+
+        updated_trade = TradePlanMatchingService.link_trade_to_plan(db, trade_id, plan_id)
+
+        success_payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=updated_trade,
+            message="Trade linked to trade plan successfully",
+        )
+        return jsonify(success_payload), 200
+    except ValueError as exc:
+        logger.warning(f"Cannot link trade {trade_id} to trade plan: {exc}")
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, str(exc))
+        return jsonify(error_payload), 400
+    except Exception as exc:
+        logger.error(f"Error linking trade {trade_id} to trade plan: {exc}")
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            "Failed to link trade to trade plan"
+        )
+        return jsonify(error_payload), 500
 
 @trades_bp.route('/<int:trade_id>', methods=['PUT'])
 @handle_database_session(auto_commit=True, auto_close=True)

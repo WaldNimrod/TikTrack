@@ -52,6 +52,22 @@ const notesModalConfig = {
             type: 'separator',
             id: 'noteSeparator1'
         },
+        {
+            type: 'select',
+            id: 'noteTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'note'
+            },
+            description: 'הוסף תגיות להערה הזו לניהול משופר'
+        },
         // שורה שנייה: תוכן הערה (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',

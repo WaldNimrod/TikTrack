@@ -184,6 +184,22 @@ const executionsModalConfig = {
             colClass: 'col-md-6'
         },
         {
+            type: 'select',
+            id: 'executionTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'execution'
+            },
+            description: 'הוסף תגיות לתיעוד הביצוע'
+        },
+        {
             type: 'rich-text',
             id: 'executionNotes',
             label: 'הערות',

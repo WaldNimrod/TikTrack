@@ -278,7 +278,7 @@ describe('Linked Items Service', () => {
 
         test('should return default color for trade', () => {
             const result = LinkedItemsService.getLinkedItemColor('trade');
-            expect(result).toBe('#007bff');
+            expect(result).toBe('#26baac');
         });
 
         test('should return default color for ticker', () => {
@@ -303,7 +303,7 @@ describe('Linked Items Service', () => {
                 }
             };
             const result = LinkedItemsService.getLinkedItemColor('trade', options);
-            expect(result).toBe('#007bff'); // default
+            expect(result).toBe('#26baac'); // default
         });
 
         test('should return default color for unknown type', () => {

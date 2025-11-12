@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.22.0",
+    "version": "1.0.23.0",
     "major": 1,
     "minor": 0,
-    "patch": 22,
+    "patch": 23,
     "build": 0,
-    "commit": "0952f7612900529373f545ad12b163b2a09b489f",
-    "updated_at": "2025-11-12T22:49:10+00:00",
-    "notes": "Refine data import warning layout"
+    "commit": "be867cf327ed507677ede7e586b10e4f64221acc",
+    "updated_at": "2025-11-12T22:59:09+00:00",
+    "notes": "Fix data import navigation and dates"
   }
 }

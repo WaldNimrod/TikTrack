@@ -2370,20 +2370,18 @@ function setupImportModalEventListeners() {
         });
     }
 
-    const backButtons = modal?.querySelectorAll('[data-import-back-step]');
-    if (backButtons && backButtons.length) {
-        backButtons.forEach((button) => {
-            if (button.dataset.backListenerAttached === 'true') {
+    if (modal && modal.dataset.backDelegationAttached !== 'true') {
+        modal.addEventListener('click', (event) => {
+            const trigger = event.target?.closest?.('[data-import-back-step]');
+            if (!trigger || !modal.contains(trigger)) {
                 return;
             }
-            const targetStep = Number(button.getAttribute('data-import-back-step'));
-            button.addEventListener('click', (event) => {
-                event?.preventDefault?.();
-                event?.stopPropagation?.();
-                goToStep(Number.isNaN(targetStep) ? 1 : targetStep);
-            });
-            button.dataset.backListenerAttached = 'true';
+            const targetStep = Number(trigger.getAttribute('data-import-back-step'));
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            goToStep(Number.isNaN(targetStep) ? 1 : targetStep);
         });
+        modal.dataset.backDelegationAttached = 'true';
     }
     
     // Mark as set up

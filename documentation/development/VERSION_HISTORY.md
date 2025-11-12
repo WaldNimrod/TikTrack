@@ -30,3 +30,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-12T18:44:29+00:00 | 1.0.20.0 | 1.0.19.0 | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | 3aba628529e222b0552c8559b3bc7104b2b1e6a8 | patch | Finalize modal navigation refactor and tagging rollout |
 | 2025-11-12T20:40:00+00:00 | 1.0.21.0 | 1.0.20.0 | pending | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | patch | Legacy duplicate cleanup (import modal & linter) + docs update |
 | 2025-11-12T22:49:10+00:00 | 1.0.22.0 | 1.0.21.0 | 0952f7612900529373f545ad12b163b2a09b489f | pending | patch | Refine data import warning layout |
+| 2025-11-12T22:59:09+00:00 | 1.0.23.0 | 1.0.22.0 | be867cf327ed507677ede7e586b10e4f64221acc | 0952f7612900529373f545ad12b163b2a09b489f | patch | Fix data import navigation and dates |

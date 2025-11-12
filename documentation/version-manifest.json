@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.14.0",
+    "version": "1.0.15.0",
     "major": 1,
     "minor": 0,
-    "patch": 14,
+    "patch": 15,
     "build": 0,
-    "commit": "a8a13c27f2bb3d6e56d269973c524f0ded1a225e",
-    "updated_at": "2025-11-11T23:18:01+00:00",
-    "notes": "Update development database snapshot"
+    "commit": "2e9b32ecacf9eeb0f13f191aed5997f92122de1e",
+    "updated_at": "2025-11-12T15:11:10+00:00",
+    "notes": "Improve modal navigation restore handling"
   }
 }

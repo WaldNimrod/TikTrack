@@ -25,6 +25,18 @@
  * דוקומנטציה: documentation/features/entity-details-system/README.md
  */
 
+const ENTITY_DISPLAY_NAMES = {
+    ticker: 'טיקר',
+    trade: 'טרייד',
+    trade_plan: 'תכנית השקעה',
+    execution: 'ביצוע עסקה',
+    trading_account: 'חשבון מסחר',
+    account: 'חשבון',
+    alert: 'התראה',
+    cash_flow: 'תזרים מזומנים',
+    note: 'הערה'
+};
+
 // ===== ENTITY DETAILS MODAL CLASS =====
 
 /**
@@ -46,6 +58,8 @@ class EntityDetailsModal {
         this.currentEntityId = null;
         this.isInitialized = false;
         this.sourceInfo = null; // מידע על המודול המקור (אם נפתח ממודול אחר)
+        this.navigationInstanceId = null;
+        this.isNavigationRestoreInProgress = false;
         
         // אתחול המערכת
         this.init();
@@ -167,11 +181,22 @@ class EntityDetailsModal {
 
         this.modal.addEventListener('modal-navigation:restore', event => {
             const detail = event?.detail || {};
+            const entry = detail.entry || null;
+            if (!entry || entry.modalId !== this.modalId) {
+                return;
+            }
+            if (entry.instanceId) {
+                this.navigationInstanceId = entry.instanceId;
+            }
+            if (detail.stage === 'before-show') {
+                this._handleNavigationRestore(entry);
+            }
             window.Logger?.debug('EntityDetailsModal restore event received', {
                 stage: detail.stage || 'unknown',
-                entry: detail.entry || null,
+                entry,
                 currentEntityType: this.currentEntityType,
                 currentEntityId: this.currentEntityId,
+                navigationInstanceId: this.navigationInstanceId,
                 page: 'entity-details-modal'
             });
         });
@@ -229,26 +254,8 @@ class EntityDetailsModal {
             this.currentEntityType = entityType;
             this.currentEntityId = entityId;
 
-            // עדכון צבע כותרת המודל לפי סוג הישות (לפני טעינת הנתונים)
-            // זה מבטיח שהצבעים יהיו נכונים מיד בפתיחת המודול
-            this.updateModalHeaderColor(entityType);
-
-            // עדכון כותרת המודל (זמנית עד לטעינת הנתונים)
-            const titleElement = document.getElementById(`${this.modalId}Label`);
-            if (titleElement) {
-                const entityNames = {
-                    ticker: 'טיקר',
-                    trade: 'טרייד', 
-                    trade_plan: 'תכנית השקעה',
-                    execution: 'ביצוע עסקה',
-                    trading_account: 'חשבון מסחר',
-                    alert: 'התראה',
-                    cash_flow: 'תזרים מזומנים',
-                    note: 'הערה'
-                };
-                const entityName = entityNames[entityType] || 'ישות';
-                titleElement.textContent = `פרטי ${entityName} #${entityId}`;
-            }
+            const initialTitle = this._applyInitialHeading(entityType, entityId);
+            const navigationTitle = (initialTitle || '').trim();
 
             // שמירת sourceInfo לפני הצגת המודול (אם קיים)
             if (options.source) {
@@ -281,23 +288,25 @@ class EntityDetailsModal {
             const initialNavigationMetadata = {
                 modalId: this.modalId,
                 modalType: 'entity-details',
-                entityType,
-                entityId,
-                title: titleElement?.textContent?.trim() || '',
+                                entityType,
+                                entityId,
+                title: navigationTitle,
                 allowDuplicateEntries: true
             };
 
             if (window.ModalNavigationService?.registerModalOpen) {
-                await window.ModalNavigationService.registerModalOpen(this.modal, initialNavigationMetadata);
+                const navigationEntry = await window.ModalNavigationService.registerModalOpen(this.modal, initialNavigationMetadata);
+                this.navigationInstanceId = navigationEntry?.instanceId || null;
             } else if (window.pushModalToNavigation) {
                 await window.pushModalToNavigation(this.modal, initialNavigationMetadata);
+                this.navigationInstanceId = null;
             }
 
-            // הצגת המודל
-            await this.showModal();
+                // הצגת המודל
+                await this.showModal();
 
-            // טעינת הנתונים
-            await this.loadEntityData(entityType, entityId, options);
+                // טעינת הנתונים
+                await this.loadEntityData(entityType, entityId, options);
 
         } catch (error) {
             window.Logger.error('Error showing entity details modal:', error, { page: "entity-details-modal" });
@@ -330,6 +339,91 @@ class EntityDetailsModal {
             }
         } catch (error) {
             window.Logger.error('Error hiding entity details modal:', error, { page: "entity-details-modal" });
+        }
+    }
+
+    /**
+     * Apply temporary heading before data load or restore
+     * 
+     * @param {string} entityType
+     * @param {number|string} entityId
+     * @private
+     */
+    _applyInitialHeading(entityType, entityId) {
+        this.updateModalHeaderColor(entityType);
+        const titleElement = document.getElementById(`${this.modalId}Label`);
+        if (!titleElement) {
+            return '';
+        }
+        const entityName = ENTITY_DISPLAY_NAMES[entityType] || 'ישות';
+        const normalizedId = entityId !== undefined && entityId !== null ? entityId : '';
+        const heading = normalizedId !== ''
+            ? `פרטי ${entityName} #${normalizedId}`
+            : `פרטי ${entityName}`;
+        titleElement.textContent = heading;
+        return heading;
+    }
+
+    /**
+     * Restore modal content when חוזרים אחורה במערכת הניווט
+     * 
+     * @param {Object} entry - נתוני הניווט שנשמרו במערכת
+     * @private
+     */
+    async _handleNavigationRestore(entry) {
+        if (this.isNavigationRestoreInProgress) {
+            window.Logger?.debug('EntityDetailsModal restore skipped - already in progress', {
+                entry,
+                page: 'entity-details-modal'
+            });
+            return;
+        }
+
+        const entityType = entry?.entityType || null;
+        const entityId = entry?.entityId ?? null;
+        if (!entityType || entityId === null || entityId === undefined) {
+            window.Logger?.warn('EntityDetailsModal restore received entry without entity info', {
+                entry,
+                page: 'entity-details-modal'
+            });
+            return;
+        }
+
+        this.isNavigationRestoreInProgress = true;
+        try {
+            this.currentEntityType = entityType;
+            this.currentEntityId = entityId;
+            this.sourceInfo = entry?.sourceInfo || null;
+            this._applyInitialHeading(entityType, entityId);
+            this.showLoadingState();
+
+            const restoreOptions = {
+                mode: entry?.metadata?.mode ?? null,
+                includeLinkedItems: entry?.metadata?.includeLinkedItems,
+                includeMarketData: entry?.metadata?.includeMarketData,
+                forceRefresh: entry?.metadata?.forceRefresh === true,
+                source: entry?.sourceInfo || null,
+                navigationRestore: true
+            };
+
+            Object.keys(restoreOptions).forEach(key => {
+                if (restoreOptions[key] === undefined || restoreOptions[key] === null) {
+                    delete restoreOptions[key];
+                }
+            });
+
+            await this.loadEntityData(entityType, entityId, restoreOptions);
+        } catch (error) {
+            window.Logger?.error('EntityDetailsModal restore failed', {
+                error,
+                entry,
+                page: 'entity-details-modal'
+            });
+            if (window.showErrorNotification) {
+                window.showErrorNotification('אירעה שגיאה בשחזור פרטי הישות לאחר ניווט אחורה.');
+            }
+        } finally {
+            this.isNavigationRestoreInProgress = false;
         }
     }
 
@@ -525,12 +619,31 @@ class EntityDetailsModal {
 
         const finalTitle = this.getModalTitleText(entityType, entityData);
         if (window.ModalNavigationService?.updateModalMetadata) {
-            window.ModalNavigationService.updateModalMetadata(this.modalId, {
+            const metadataDetails = {
+                mode: options.mode ?? null,
+                includeLinkedItems: options.includeLinkedItems !== false,
+                includeMarketData: options.includeMarketData !== false,
+                forceRefresh: options.forceRefresh === true,
+                navigationRestore: options.navigationRestore === true,
+                lastLoadedAt: Date.now()
+            };
+            Object.keys(metadataDetails).forEach(key => {
+                if (metadataDetails[key] === null) {
+                    delete metadataDetails[key];
+                }
+            });
+
+            const metadataPayload = {
                 entityType,
                 entityId,
                 title: finalTitle,
-                sourceInfo: this.sourceInfo || null
-            });
+                sourceInfo: this.sourceInfo || null,
+                metadata: metadataDetails
+            };
+            if (this.navigationInstanceId) {
+                metadataPayload.instanceId = this.navigationInstanceId;
+            }
+            window.ModalNavigationService.updateModalMetadata(this.modalId, metadataPayload);
         }
 
         if (window.modalNavigationManager?.updateModalNavigation && this.modal) {
@@ -1117,11 +1230,11 @@ class EntityDetailsModal {
                 modalId: this.modal?.id,
                 timestamp: new Date().toISOString()
             });
-         } catch (error) {
-             window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
-             // fallback להצגה ישירה
-             this.modal.style.display = 'block';
-             this.modal.classList.add('show');
+        } catch (error) {
+            window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
+            // fallback להצגה ישירה
+            this.modal.style.display = 'block';
+            this.modal.classList.add('show');
         }
     }
 
@@ -1146,20 +1259,20 @@ class EntityDetailsModal {
         this.currentEntityType = null;
         this.currentEntityId = null;
         
-        if (window.ModalNavigationService?.registerModalClose) {
-            window.ModalNavigationService.registerModalClose(this.modalId);
-        } else if (window.registerModalNavigationClose) {
+        if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
             window.registerModalNavigationClose(this.modalId);
         }
 
-        const contentElement = document.getElementById('entityDetailsContent');
-        if (contentElement) {
-            contentElement.innerHTML = '';
-            if (window.Logger) {
+        this.navigationInstanceId = null;
+
+                const contentElement = document.getElementById('entityDetailsContent');
+                if (contentElement) {
+                    contentElement.innerHTML = '';
+                    if (window.Logger) {
                 window.Logger.debug('✅ Cleared modal content after hide', {
-                    modalId: this.modal?.id,
-                    page: "entity-details-modal"
-                });
+                            modalId: this.modal?.id,
+                            page: "entity-details-modal"
+                        });
             }
         }
     }

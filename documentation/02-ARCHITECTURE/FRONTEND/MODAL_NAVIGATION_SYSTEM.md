@@ -65,11 +65,14 @@ await window.ModalNavigationService.registerModalOpen(modalElement, {
 });
 ```
 
-### `registerModalClose(modalId)`
-הסרת מודול מה-stack (נדרש בעת `hidden.bs.modal`).
+### `registerModalClose(modalId, { instanceId })`
+הסרת מודול מה-stack. **בגרסה הנוכחית השירות קורא לפונקציה הזו אוטומטית** כאשר מתקבל אירוע `hidden.bs.modal`. השימוש הידני רלוונטי רק במודולים legacy שלא עודכנו לשירות.
 
 ```javascript
-window.ModalNavigationService.registerModalClose('entityDetailsModal');
+// שימוש ידני – רק אם אין חיבור לשירות (legacy):
+window.ModalNavigationService.registerModalClose('entityDetailsModal', {
+  instanceId: modalElement.dataset.modalNavigationInstanceId
+});
 ```
 
 ### `updateModalMetadata(modalId, updates)`
@@ -78,7 +81,12 @@ window.ModalNavigationService.registerModalClose('entityDetailsModal');
 ```javascript
 window.ModalNavigationService.updateModalMetadata('entityDetailsModal', {
   title: 'פרטי טרייד #456',
-  entityId: 456
+  entityId: 456,
+  metadata: {
+    mode: 'view',
+    includeLinkedItems: true,
+    lastLoadedAt: Date.now()
+  }
 });
 ```
 
@@ -91,6 +99,23 @@ const stack = window.ModalNavigationService.getStack({ includeElements: true });
 
 ### `goBack()` / `navigateTo(modalId)`
 פקודות ניווט חוזר או קפיצה למודול ספציפי. משמרות אירועי Bootstrap ומעדכנות את ה-stack בהתאם.
+
+### אירוע `modal-navigation:restore`
+האירוע נשלח ע"י השירות בשני שלבים:
+
+| Stage | תזמון | שימוש |
+|-------|-------|--------|
+| `before-show` | לפני שהמודול הקודם מוצג מחדש | מאפשר לטעון מחדש נתונים/להציג מצב טעינה |
+| `after-show` | לאחר שהמודול מוצג | עדכון final UI, שמירת `instanceId` על האובייקט |
+
+```javascript
+modalElement.addEventListener('modal-navigation:restore', event => {
+  const { stage, entry } = event.detail || {};
+  if (stage === 'before-show' && entry?.entityId) {
+    restoreContent(entry);
+  }
+});
+```
 
 ---
 
@@ -124,15 +149,17 @@ if (window.modalNavigationManager?.updateModalNavigation) {
 ### EntityDetailsModal (`entity-details-modal.js`)
 - רישום מוקדם ב-`registerModalOpen` עוד לפני טעינת הנתונים.
 - `updateModalMetadata` בסיום `loadEntityData()` כדי לעדכן כותרות ו-entityId.
-- `registerModalClose` ב-`onModalHidden()`.
+- מאזין ל-`modal-navigation:restore` ומרענן את הנתונים לפי ה-entry שנשמר, כולל טעינה מחדש של הנתונים מה-API.
+- אין קריאה ידנית ל-`registerModalClose` – השירות מטפל בסגירה דרך מאזין `hidden.bs.modal` שנרשם אוטומטית.
 
 ### ModalManagerV2 (`modal-manager-v2.js`)
 - רישום מודולי CRUD עם `entityType`, `entityId`, `mode`.
 - קריאה ל-`updateModalMetadata` לאחר שינוי כותרת.
-- `registerModalClose` ב-`handleModalHidden()`.
+- סגירה מנוהלת אוטומטית; אין צורך להוסיף מאזין גלובלי שסוגר את המופע.
 
 ### מודולים ייעודיים (Trade Selector, Linked Items, Import User Data)
-- מתקינים מאזין `hidden.bs.modal` וקריאות `registerModalOpen/Close` בהתאם.
+- קוראים ל-`registerModalOpen` בעת הצגה ומעדכנים מטא-נתונים לפי הצורך.
+- אין להוסיף קריאות ידניות ל-`registerModalClose`; השירות מנקה את המופע בעת `hidden.bs.modal`.
 - אינם מנהלים backdrop או HTML שמור.
 
 ### Utilities
@@ -146,18 +173,21 @@ if (window.modalNavigationManager?.updateModalNavigation) {
 ### פתיחת מודול
 1. יצירת ה-Modal (Bootstrap).
 2. קריאה ל-`ModalNavigationService.registerModalOpen` (לפני או מיד אחרי `show()`).
-3. ModalNavigationUI מאזינה ל-`shown.bs.modal` ומציגה breadcrumb + כפתור BACK.
-4. PageStateManager שומר את ה-stack המעודכן.
+3. השירות מצמיד מאזין `hidden.bs.modal` ייעודי ומעדכן את ה-`instanceId` על האלמנט.
+4. מודול הפרטים אחראי לעדכן מטא-נתונים (`updateModalMetadata`) עם כותרת/EntityId/מצב עדכני.
+5. ModalNavigationUI מאזינה ל-`shown.bs.modal` ומציגה breadcrumb + כפתור BACK.
+6. PageStateManager שומר את ה-stack המעודכן.
 
 ### סגירת מודול
-1. אירוע `hidden.bs.modal` → `registerModalClose`.
-2. PageStateManager מעדכן/מנקה מצב.
-3. ModalNavigationUI מסירה breadcrumb/כפתורי BACK רלוונטיים.
+1. Bootstrap מפעיל `hidden.bs.modal` (לחיצה על Close, `goBack`, או סגירה תכנית).
+2. המאזין האוטומטי של השירות קורא ל-`registerModalClose` עם ה-`instanceId` של המופע.
+3. PageStateManager מעדכן/מנקה מצב.
+4. ModalNavigationUI מסירה breadcrumb/כפתורי BACK רלוונטיים.
 
 ### חזרה אחורה
 1. `goBack()` → סגירה של המודול האחרון באמצעות Bootstrap.
-2. לאחר הסגירה, השירות מציג מחדש את המודול הקודם (אם קיים).
-3. ה-UI מתעדכן אוטומטית.
+2. האירוע `hidden.bs.modal` של המודול שנסגר מפעיל את המאזין האוטומטי.
+3. לאחר הסגירה, השירות מציג מחדש את המודול הקודם (אם קיים) וה-UI מתעדכן אוטומטית.
 
 ### טעינת מצב שמור
 - בעת `service.init()` נשלפת רשימת stack מ-PageStateManager (אם קיימת). אין פתיחה אוטומטית של מודולים; הנתונים משמשים לצורכי ניתור בלבד.
@@ -184,6 +214,24 @@ API חדש:
 
 ---
 
+## 📑 מבנה מטא-נתונים
+
+כל ערך stack (entry) מכיל:
+
+| שדה | תיאור |
+|-----|-------|
+| `instanceId` | מזהה ייחודי לכל פתיחה של מודל (גם אם `modalId` זהה) |
+| `modalId` | מזהה המודל (אלמנט DOM) |
+| `modalType` | טיפוס לוגי (למשל `entity-details`, `crud-modal`) |
+| `entityType` / `entityId` | ישות עסקית אליה שייך המודל |
+| `title` | הכותרת העדכנית להצגה ב-breadcrumb |
+| `sourceInfo` | אובייקט מקור (למשל מי פתח את המודל) |
+| `metadata` | שדות משלימים (מצב צפייה/עריכה, includeLinkedItems, lastLoadedAt וכו') |
+
+`ModalNavigationService.updateModalMetadata` מאחד את הערכים החדשים עם הנתון הקיים ולכן מומלץ לספק רק שדות שהשתנו.
+
+---
+
 ## 🧪 בדיקות מומלצות
 
 1. **שרשרת Entity → Plan → Note → Back** – ודא שהBreadcrumb והכפתור מתעדכנים בכל שלב.
@@ -200,7 +248,7 @@ API חדש:
 |---------|--------|
 | כפתור BACK לא מופיע | בדוק ש-`registerModalOpen` נקרא לפני אירוע `shown.bs.modal` ושיש לפחות שני פריטים ב-stack |
 | Breadcrumb ריק | ודא ש-`updateModalMetadata` כותב `title` וכי ה-UI מעודכן (`updateModalNavigation`) |
-| Stack לא מתנקה | וודא ש-`registerModalClose` מחובר ל-`hidden.bs.modal` |
+| Stack לא מתנקה | ודא שהמודול קרא ל-`registerModalOpen` ושאלמנט ה-Modal לא הוסר לפני אירוע `hidden.bs.modal` |
 | נתונים לא נשמרים | בדוק ש-`PageStateManager.saveModalNavigationState` זמין וש-`UnifiedCacheManager` מאותחל |
 
 ---
@@ -216,8 +264,8 @@ API חדש:
 ## 🧭 מדריך למפתחים (תמצית)
 
 1. **מודול חדש שרוצה להופיע ב-breadcrumb**
-   - הוסף קריאה ל-`registerModalOpen` עם מטא-נתונים רלוונטיים.
-   - הוסף `hidden.bs.modal` שמפעיל `registerModalClose`.
+   - הוסף קריאה ל-`registerModalOpen` עם מטא-נתונים רלוונטיים (לפני `show()`).
+   - אין לקרוא ל-`registerModalClose` ידנית; השירות יעשה זאת. ניתן להשתמש ב-`hidden.bs.modal` לניקוי מקומי כל עוד לא נקראת הפונקציה.
    - אם הכותרת משתנה לאחר טעינה – קרא ל-`updateModalMetadata`.
 
 2. **מודולים ותיקים**

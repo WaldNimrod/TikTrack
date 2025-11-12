@@ -22,11 +22,12 @@
 ## 2. Quick Start Checklist
 
 1. **ייבוא/הגדרה**: הקובץ `modal-navigation-manager.js` נטען מתוך ה-manifest הכללי. אין צורך לייבא ידנית.
-2. **רישום פתיחה**: כאשר מודול נוצר, קרא ל-`registerModalOpen()` עם המטא-נתונים הרלוונטיים.
-3. **רישום סגירה**: מאזין ל-`hidden.bs.modal` → `registerModalClose()`.
-4. **עדכון מידע**: לאחר טעינה דינמית (כותרת חדשה, מזהה ישות), קרא ל-`updateModalMetadata()`.
-5. **UI**: אם הכותרת משתנה לאחר פתיחה, קרא ל-`modalNavigationManager.updateModalNavigation(modalElement)`.
-6. **אין** קריאות ל-`manageBackdrop`, אין שמירת HTML בקוד מקומי.
+2. **רישום פתיחה**: כאשר מודול נוצר, קרא ל-`registerModalOpen()` עם מטא-נתונים הכוללים `modalId`, `modalType`, `entityType`, `entityId`, `title`, ו-`metadata` רלוונטי (מצב, includeLinkedItems וכו').
+3. **סגירה**: אין צורך בקריאה ל-`registerModalClose` – השירות נרשם אוטומטית ל-`hidden.bs.modal`. ניתן להאזין לאירוע לצורך ניקוי לוגי, כל עוד לא קוראים לפונקציה ידנית.
+4. **עדכון מידע**: לאחר טעינה דינמית (כותרת חדשה, מזהה ישות, שינוי במצב), קרא ל-`updateModalMetadata()` כולל `metadata` מעודכן.
+5. **שחזור ניווט**: אם המודול צריך לשחזר נתונים (למשל EntityDetails), האזן ל-`modal-navigation:restore` וטען מחדש על סמך ה-entry.
+6. **UI**: אם הכותרת משתנה לאחר פתיחה, קרא ל-`modalNavigationManager.updateModalNavigation(modalElement)`.
+7. **אין** קריאות ל-`manageBackdrop`, אין שמירת HTML בקוד מקומי.
 
 ---
 
@@ -51,11 +52,12 @@ async function openTradeDetails(tradeId) {
 }
 ```
 
-### 3.2 סגירת מודול
+### 3.2 סגירת מודול (ניקוי מקומי בלבד)
 
 ```javascript
 modalElement.addEventListener('hidden.bs.modal', () => {
-  window.ModalNavigationService.registerModalClose('tradeDetailsModal');
+  resetFormState();
+  // אין קריאה ל-registerModalClose – השירות מטפל בכך.
 }, { once: true });
 ```
 
@@ -75,6 +77,21 @@ await window.ModalNavigationService.goBack();
 await window.ModalNavigationService.navigateTo('entityDetailsModal');
 ```
 
+### 3.5 טיפול באירוע `modal-navigation:restore`
+
+```javascript
+modalElement.addEventListener('modal-navigation:restore', event => {
+  const { stage, entry } = event.detail || {};
+  if (stage === 'before-show' && entry?.entityType && entry?.entityId) {
+    reloadEntity(entry.entityType, entry.entityId, {
+      navigationRestore: true,
+      source: entry.sourceInfo,
+      ...entry.metadata
+    });
+  }
+});
+```
+
 ---
 
 ## 4. אינטגרציה עם מודולים קיימים
@@ -82,7 +99,8 @@ await window.ModalNavigationService.navigateTo('entityDetailsModal');
 ### EntityDetailsModal
 - רישום מידי ב-`show()`.
 - עדכון מידע ב-`loadEntityData()`.
-- רישום סגירה ב-`onModalHidden()`.
+- מטפל אוטומטית באירוע `modal-navigation:restore` לטעינה מחדש של הנתונים שנשמרו ב-stack.
+- אין קריאה ידנית ל-`registerModalClose`; האירוע `hidden.bs.modal` משמש רק לניקוי נתונים.
 
 ### ModalManagerV2 (CRUD)
 - רישום במקטע `showCrudModal` לאחר יצירת ה-Modal.
@@ -91,7 +109,7 @@ await window.ModalNavigationService.navigateTo('entityDetailsModal');
 
 ### מודולי שירות (trade-selector, linked-items וכו')
 - רישום פתיחה עם `sourceInfo` כדי לשמר הקשר.
-- listener ל-`hidden.bs.modal` לסגירה.
+- listener ל-`hidden.bs.modal` מותר לניקוי נתונים בלבד – אין קריאה ל-`registerModalClose`.
 
 ---
 
@@ -145,14 +163,17 @@ console.table(persisted?.stack || []);
 **ש:** מה קורה כאשר modalId אינו ייחודי?
 **ת:** חובה להעביר `modalId` ייחודי. השירות יתריע בקונסול אם מזהה כפילויות.
 
-**ש:** האם ניתן לדלג על `registerModalClose`?
-**ת:** לא מומלץ. ללא הקריאה stack יישאר עם רשומות "מתות".
+**ש:** האם צריך לקרוא ל-`registerModalClose`?
+**ת:** לא. השירות נרשם אוטומטית ל-`hidden.bs.modal`. קרא לפונקציה ידנית רק אם אתה עובד בסביבה legacy ללא השירות.
+
+**ש:** מה צריך לשמור ב-`metadata`?
+**ת:** שדות שמתארים את מצב המודול (mode, includeLinkedItems, lastLoadedAt וכו'). השירות מאחד את המטא-נתונים ולכן מספיק לספק רק את השדות שהשתנו.
 
 ---
 
 ## 9. To-do לפני Merge
 
-- [ ] בדוק שכל המודולים הרלוונטיים קוראים ל-`registerModalOpen/Close`.
+- [ ] ודא שכל המודולים הרלוונטיים קוראים ל-`registerModalOpen`.
 - [ ] עדכן בדיקות ידניות (שרשור, חזרה, סגירה מלאה).
 - [ ] ודא שאין שימוש ב-`manageBackdrop`.
 - [ ] וודא שהמסמכים הקשורים (Entity Details, Modal System V2) הותאמו.

@@ -13,6 +13,7 @@ Last Updated: 2025-01-16
 
 from typing import List, Dict, Any, Optional, Tuple, Set
 from datetime import datetime, timezone
+from decimal import Decimal
 import logging
 import os
 import json
@@ -115,9 +116,10 @@ class ImportOrchestrator:
                 }
             
             # Update current step
+            sanitized_step_data = self._make_payload_json_safe(data) if data else {}
             report["steps"][step] = {
                 "timestamp": self.utc_normalizer.now_envelope(),
-                "data": self.utc_normalizer.normalize_output(data) if data else {}
+                "data": self.utc_normalizer.normalize_output(sanitized_step_data) if sanitized_step_data else {}
             }
             
             # Update progress
@@ -147,6 +149,23 @@ class ImportOrchestrator:
             "confirmation": 6
         }
         return step_mapping.get(step, 0)
+    
+    def _make_payload_json_safe(self, payload: Any) -> Any:
+        """Recursively convert payload values to JSON-serializable primitives."""
+        if payload is None:
+            return None
+        if isinstance(payload, Decimal):
+            try:
+                return float(payload)
+            except (ValueError, TypeError):
+                return str(payload)
+        if isinstance(payload, (str, int, float, bool)):
+            return payload
+        if isinstance(payload, dict):
+            return {key: self._make_payload_json_safe(value) for key, value in payload.items()}
+        if isinstance(payload, (list, tuple, set)):
+            return [self._make_payload_json_safe(item) for item in payload]
+        return payload
     
     def create_import_session(
         self,
@@ -1037,48 +1056,31 @@ class ImportOrchestrator:
                 symbol_metadata=symbol_metadata
             )
 
-            analysis_results_storage = self.utc_normalizer.normalize_output(analysis_results_raw)
-            summary_data_storage = self.utc_normalizer.normalize_output(summary_data_raw)
-            logger.info("📊 Summary data before saving: task_type=%s", normalized_task)
-            
-            # Update session with minimal data
+            analysis_results_serializable = self._make_payload_json_safe(analysis_results_raw)
+            summary_data_serializable = self._make_payload_json_safe(summary_data_raw)
+            summary_data_storage = self.utc_normalizer.normalize_output(summary_data_serializable)
             session.add_summary_data(summary_data_storage)
             session.add_summary_data({'task_type': normalized_task})
-            session.update_status('ready')
-            self.db_session.commit()
-            
-            # Save to advanced cache service
+            session.total_records = summary_data_raw.get('total_records', session.total_records)
+            session.status = 'ready'
+            session.last_activity = datetime.now(timezone.utc)
+            cache_key = f"import_summary:{session.id}:{normalized_task}"
+            logger.info(f"💾 Saving summary_data to advanced_cache_service: {cache_key}")
             try:
-                from services.advanced_cache_service import advanced_cache_service
-                cache_key = f"import_session_{session_id}_summary"
                 advanced_cache_service.set(cache_key, summary_data_storage, ttl=3600)  # 1 hour TTL
                 logger.info(f"✅ Saved summary_data to advanced_cache_service: {cache_key}")
-            except Exception as e:
-                logger.error(f"❌ Failed to save to advanced_cache_service: {str(e)}")
-            
-            # Update live report with analysis results
-            user_id = 1  # TODO: Get actual user ID from session/auth
-            self.create_live_report(
-                session_id=session.id,
-                user_id=user_id,
-                step="analysis",
-                data=analysis_results_storage
-            )
-            
-            logger.info(
-                "🎉 [File Analysis] Analysis completed successfully",
-                extra={
-                    'session_id': session_id,
-                    'total_records': analysis_results_raw['total_records'],
-                    'valid_records': analysis_results_raw['valid_records'],
-                    'duplicate_records': analysis_results_raw['duplicate_records'],
-                    'task_type': normalized_task,
-                    'missing_tickers_count': len(analysis_results_raw.get('missing_tickers', []))
-                })
-            
+            except Exception as cache_error:
+                logger.warning(
+                    "⚠️ Failed to store summary_data in cache",
+                    extra={'error': str(cache_error), 'cache_key': cache_key}
+                )
+            self.db_session.commit()
+ 
+            logger.info(f"✅ [File Analysis] Analysis completed for session {session_id}")
+ 
             return {
                 'success': True,
-                'analysis_results': analysis_results_raw,
+                'analysis_results': analysis_results_serializable,
                 'session_status': session.status
             }
             
@@ -1145,7 +1147,8 @@ class ImportOrchestrator:
             preview_data_raw['task_type'] = normalized_task
 
             logger.info("🔄 Updating session with preview data...")
-            preview_data_storage = self.utc_normalizer.normalize_output(preview_data_raw)
+            preview_data_serializable = self._make_payload_json_safe(preview_data_raw)
+            preview_data_storage = self.utc_normalizer.normalize_output(preview_data_serializable)
             session.add_summary_data({'preview_data': preview_data_storage, 'task_type': normalized_task})
             self.db_session.commit()
 
@@ -1158,7 +1161,7 @@ class ImportOrchestrator:
 
             return {
                 'success': True,
-                'preview_data': preview_data_raw,
+                'preview_data': preview_data_serializable,
                 'session_id': session_id,
                 'task_type': normalized_task
             }
@@ -1604,7 +1607,8 @@ class ImportOrchestrator:
             'generated_at': self.utc_normalizer.now_envelope()
         }
 
-        import_session.add_summary_data({'account_reconciliation_result': result_payload})
+        safe_result_payload = self._make_payload_json_safe(result_payload)
+        import_session.add_summary_data({'account_reconciliation_result': safe_result_payload})
 
         return {
             'success': True,

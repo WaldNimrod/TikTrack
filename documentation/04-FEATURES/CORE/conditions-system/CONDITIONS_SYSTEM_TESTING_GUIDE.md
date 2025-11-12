@@ -11,6 +11,16 @@
 
 ---
 
+## עדכון 2025-11 – סט בדיקות חדש
+
+- נוספו שתי בדיקות pytest ליבה:
+  - `Backend/tests/test_conditions_master_data.py` – מאמת את זריעת נתוני המאסטר לשיטות ופרמטרים ומבטיח אידמפוטנטיות.
+  - `Backend/tests/test_condition_evaluation_task.py` – מכסה את מחזור החיים המלא של משימת הרקע, כולל יצירת התראות, ריאקטיבציה וקירור.
+- שתי הבדיקות משתמשות בסכמת SQLite מבודדת ולכן אינן דורשות מסד נתונים חיצוני.
+- חובה להריץ אותן כחלק מכל רגרסיה של מערכת התנאים/התראות.
+
+---
+
 ## סוגי בדיקות
 
 ### 1. בדיקות יחידה (Unit Tests)
@@ -37,6 +47,28 @@
 ---
 
 ## בדיקות יחידה - Backend
+
+### בדיקות חובה – Master Data & Background Alerts
+
+1. **Seed Data Validation**
+   ```
+   python3 -m pytest Backend/tests/test_conditions_master_data.py
+   ```
+   - מריץ סכמת SQLite זמנית.  
+   - מאמת שהסקריפט `seed_conditions_master_data.py` מוסיף את כל השיטות והפרמטרים פעם אחת בלבד.  
+   - בודק שהרצה כפולה אינה יוצרת כפילויות.
+
+2. **Condition Evaluation Task**
+   ```
+   python3 -m pytest Backend/tests/test_condition_evaluation_task.py
+   ```
+   - בונה נתוני דמה (חשבון, טיקר, תנאי, נתוני שוק) ומוודא:  
+     - יצירת התראה חדשה כאשר תנאי של תכנית או טרייד מתקיים.  
+     - כיבוד `auto_generate_alerts=False`.  
+     - ריאקטיבציה לאחר סיום ה־cooldown.  
+   - משתמש ב־monkeypatch ל־`ConditionEvaluator`, `AlertService` ו־`process_condition_alert_lifecycle` כדי לשמור על בדיקות מהירות וללא תלות בשירותים חיצוניים.
+
+> ⚠️ **בכל שינוי בלוגיקת ההתראות או במודלים** – יש לעדכן בדיקות אלו כדי למנוע רגרסיות.
 
 ### 1. בדיקת מודלים
 
@@ -740,6 +772,31 @@ describe('ConditionValidator', () => {
 
 ---
 
+## בדיקות משימת רקע והתראות (QA ידני)
+
+1. **הרצת המשימה**  
+   ```
+   python3 - <<'PY'
+   from Backend.services.condition_evaluation_task import condition_evaluation_task
+   print(condition_evaluation_task())
+   PY
+   ```
+   ודאו שהפלט כולל `alerts_created` חיובי כאשר תנאים פעילים עומדים.
+
+2. **הזרקת נתוני שוק**  
+   - צרפו רשומת `MarketDataQuote` עם `is_stale = 0` לטיקר הנבדק.  
+   - ניתן להשתמש בשירות ייבוא נתונים או להוסיף רשומה ידנית במהלך QA.
+
+3. **בדיקת קירור התראות**  
+   - עדכנו התראה קיימת ל־`is_triggered='true'` והגדירו `triggered_at` ישן.  
+   - הריצו את המשימה עם ערך קירור נמוך (למשל באמצעות שינוי זמני של ההעדפה ל־`5`) וודאו שההתראה חוזרת ל־`'new'` וסטטוס `open`.
+
+4. **צליבת טבלאות**  
+   - לשם תיעוד/בדיקה ניתן להריץ את `Backend/tools/db_trigger_validation.sql` (הסקריפט מתחיל וסוגר טרנזקציה משלו).  
+   - מעקב אחרי `alerts`, `plan_conditions`, `trade_conditions`, `condition_alerts_mapping` (אם פעיל) מומלץ לצילום מסך לדוח QA.
+
+---
+
 ## בדיקות אינטגרציה
 
 ### 1. בדיקת זרימה מלאה
@@ -1333,14 +1390,17 @@ class TestSecurity(unittest.TestCase):
 
 ```bash
 # Run all backend tests
-cd Backend
-python -m pytest tests/ -v
+python3 -m pytest Backend/tests/ -v
+
+# Core regressions (חובה למערכת התנאים)
+python3 -m pytest Backend/tests/test_conditions_master_data.py
+python3 -m pytest Backend/tests/test_condition_evaluation_task.py
 
 # Run specific test file
-python -m pytest tests/test_conditions_validation_service.py -v
+python3 -m pytest Backend/tests/test_conditions_validation_service.py -v
 
 # Run with coverage
-python -m pytest tests/ --cov=services --cov-report=html
+python3 -m pytest Backend/tests/ --cov=Backend.services --cov-report=html
 ```
 
 ### 2. Frontend Tests

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/562</span>
+                <span class='fraction'>0/564</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/540</span>
+                <span class='fraction'>0/542</span>
             </div>
         
             
@@ -1855,7 +1855,15 @@
 <a name='L1790'></a><a href='#L1790'>1790</a>
 <a name='L1791'></a><a href='#L1791'>1791</a>
 <a name='L1792'></a><a href='#L1792'>1792</a>
-<a name='L1793'></a><a href='#L1793'>1793</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1793'></a><a href='#L1793'>1793</a>
+<a name='L1794'></a><a href='#L1794'>1794</a>
+<a name='L1795'></a><a href='#L1795'>1795</a>
+<a name='L1796'></a><a href='#L1796'>1796</a>
+<a name='L1797'></a><a href='#L1797'>1797</a>
+<a name='L1798'></a><a href='#L1798'>1798</a>
+<a name='L1799'></a><a href='#L1799'>1799</a>
+<a name='L1800'></a><a href='#L1800'>1800</a>
+<a name='L1801'></a><a href='#L1801'>1801</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2213,7 +2221,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2258,9 +2266,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3084,6 +3092,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3099,7 +3109,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -3107,6 +3121,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -4005,8 +4021,8 @@ async function <span class="fstat-no" title="function not covered" >cancelItem(<
 &nbsp;
   // בדיקת פריטים מקושרים לפני הביטול
 <span class="cstat-no" title="statement not covered" >  try {</span>
-    const base = <span class="cstat-no" title="statement not covered" >location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';</span>
-    const response = <span class="cstat-no" title="statement not covered" >await fetch(`${base}/api/linked-items/${itemType}/${itemId}`);</span>
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/linked-items/${itemType}/${itemId}`);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (response.ok) {</span>
       const linkedItemsData = <span class="cstat-no" title="statement not covered" >await response.json();</span>
@@ -4051,7 +4067,7 @@ async function <span class="fstat-no" title="function not covered" >cancelItem(<
  */
 async function <span class="fstat-no" title="function not covered" >performItemCancellation(</span>itemType, itemId, _itemName) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
-    const base = <span class="cstat-no" title="statement not covered" >location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';</span>
+    // Use relative URL to work with both development (8080) and production (5001)
     let response;
     const entityLabel = <span class="cstat-no" title="statement not covered" >(window.LinkedItemsService &amp;&amp; window.LinkedItemsService.getEntityLabel) </span>
       ? window.LinkedItemsService.getEntityLabel(itemType) 
@@ -4060,7 +4076,7 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    switch (itemType) {</span>
     case 'trade_plan':
-<span class="cstat-no" title="statement not covered" >      response = await fetch(`${base}/api/trade_plans/${itemId}`, {</span>
+<span class="cstat-no" title="statement not covered" >      response = await fetch(`/api/trade-plans/${itemId}`, {</span>
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -4068,7 +4084,7 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 <span class="cstat-no" title="statement not covered" >      break;</span>
 &nbsp;
     case 'trade':
-<span class="cstat-no" title="statement not covered" >      response = await fetch(`${base}/api/trades/${itemId}/cancel`, {</span>
+<span class="cstat-no" title="statement not covered" >      response = await fetch(`/api/trades/${itemId}/cancel`, {</span>
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' }),
@@ -4076,7 +4092,7 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 <span class="cstat-no" title="statement not covered" >      break;</span>
 &nbsp;
     case 'ticker':
-<span class="cstat-no" title="statement not covered" >      response = await fetch(`${base}/api/tickers/${itemId}`, {</span>
+<span class="cstat-no" title="statement not covered" >      response = await fetch(`/api/tickers/${itemId}`, {</span>
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -4084,7 +4100,7 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 <span class="cstat-no" title="statement not covered" >      break;</span>
 &nbsp;
     case 'alert':
-<span class="cstat-no" title="statement not covered" >      response = await fetch(`${base}/api/alerts/${itemId}`, {</span>
+<span class="cstat-no" title="statement not covered" >      response = await fetch(`/api/alerts/${itemId}`, {</span>
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -4092,7 +4108,7 @@ async function <span class="fstat-no" title="function not covered" >performItemC
 <span class="cstat-no" title="statement not covered" >      break;</span>
 &nbsp;
     case 'account':
-<span class="cstat-no" title="statement not covered" >      response = await fetch(`${base}/api/trading-accounts/${itemId}`, {</span>
+<span class="cstat-no" title="statement not covered" >      response = await fetch(`/api/trading-accounts/${itemId}`, {</span>
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' }),
@@ -4892,13 +4908,21 @@ function <span class="fstat-no" title="function not covered" >loadTableActionBut
       finalConfig.showDelete
     );
 &nbsp;
+    // בדיקה אם כבר יש כפתורים - למנוע כפילות
+<span class="cstat-no" title="statement not covered" >    if (actionsCell.querySelector('.actions-menu-wrapper')) {</span>
+<span class="cstat-no" title="statement not covered" >      console.warn(`⚠️ Actions menu already exists in row ${index}, skipping`);</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+    
 <span class="cstat-no" title="statement not covered" >    actionsCell.innerHTML = buttonsHtml;</span>
   });
 &nbsp;
 }
 &nbsp;
-// Export the new function
-<span class="cstat-no" title="statement not covered" >window.loadTableActionButtons = loadTableActionButtons;</span>
+// Export the new function only if not already defined
+<span class="cstat-no" title="statement not covered" >if (!window.loadTableActionButtons) {</span>
+<span class="cstat-no" title="statement not covered" >  window.loadTableActionButtons = loadTableActionButtons;</span>
+}
 &nbsp;
 // Export demo functions for testing
 <span class="cstat-no" title="statement not covered" >window.viewTickerDetails = viewTickerDetails;</span>
@@ -5446,7 +5470,7 @@ function <span class="fstat-no" title="function not covered" >clearValidation(</
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.024Z
+                at 2025-11-12T15:11:43.520Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

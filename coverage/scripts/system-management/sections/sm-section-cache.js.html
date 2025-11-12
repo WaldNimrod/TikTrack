@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/143</span>
+                <span class='fraction'>0/146</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/120</span>
+                <span class='fraction'>0/134</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/137</span>
+                <span class='fraction'>0/143</span>
             </div>
         
             
@@ -743,7 +743,17 @@
 <a name='L678'></a><a href='#L678'>678</a>
 <a name='L679'></a><a href='#L679'>679</a>
 <a name='L680'></a><a href='#L680'>680</a>
-<a name='L681'></a><a href='#L681'>681</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L681'></a><a href='#L681'>681</a>
+<a name='L682'></a><a href='#L682'>682</a>
+<a name='L683'></a><a href='#L683'>683</a>
+<a name='L684'></a><a href='#L684'>684</a>
+<a name='L685'></a><a href='#L685'>685</a>
+<a name='L686'></a><a href='#L686'>686</a>
+<a name='L687'></a><a href='#L687'>687</a>
+<a name='L688'></a><a href='#L688'>688</a>
+<a name='L689'></a><a href='#L689'>689</a>
+<a name='L690'></a><a href='#L690'>690</a>
+<a name='L691'></a><a href='#L691'>691</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1285,8 +1295,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1320,6 +1337,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1962,10 +1982,17 @@ class SMCacheSection extends SMBaseSection {
    * קבלת צבע hit rate
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tHitRateColor(hitRate) {
-<span class="cstat-no" title="statement not covered" >    if (hitRate &gt;= 80) <span class="cstat-no" title="statement not covered" >return '#28a745'; </span></span>// Green
-<span class="cstat-no" title="statement not covered" >    if (hitRate &gt;= 60) <span class="cstat-no" title="statement not covered" >return '#ffc107'; </span></span>// Yellow
-<span class="cstat-no" title="statement not covered" >    if (hitRate &gt;= 40) <span class="cstat-no" title="statement not covered" >return '#fd7e14'; </span></span>// Orange
-<span class="cstat-no" title="statement not covered" >    return '#dc3545'; </span>// Red
+    const semanticColors = <span class="cstat-no" title="statement not covered" >window.SMUIColorUtils || null;</span>
+<span class="cstat-no" title="statement not covered" >    if (hitRate &gt;= 80) {</span>
+<span class="cstat-no" title="statement not covered" >      return semanticColors?.get('success', '#28a745') || '#28a745';</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (hitRate &gt;= 60) {</span>
+<span class="cstat-no" title="statement not covered" >      return semanticColors?.get('warning', '#ffc107') || '#ffc107';</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (hitRate &gt;= 40) {</span>
+<span class="cstat-no" title="statement not covered" >      return semanticColors?.getCSSVariableValue?.('--entity-cash_flow-color', '#fd7e14') || '#fd7e14';</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return semanticColors?.get('danger', '#dc3545') || '#dc3545';</span>
   }
 &nbsp;
   /**
@@ -2001,10 +2028,13 @@ class SMCacheSection extends SMBaseSection {
    * קבלת צבע פס התקדמות
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tProgressColor(percent) {
-<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 90) <span class="cstat-no" title="statement not covered" >return '#dc3545'; </span></span>// Red
-<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 75) <span class="cstat-no" title="statement not covered" >return '#ffc107'; </span></span>// Yellow
-<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 50) <span class="cstat-no" title="statement not covered" >return '#17a2b8'; </span></span>// Blue
-<span class="cstat-no" title="statement not covered" >    return '#28a745'; </span>// Green
+<span class="cstat-no" title="statement not covered" >    if (window.SMUIComponents &amp;&amp; typeof window.SMUIComponents.getProgressColor === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >      return window.SMUIComponents.getProgressColor(percent);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 90) <span class="cstat-no" title="statement not covered" >return 'var(--color-danger, #dc3545)';</span></span>
+<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 75) <span class="cstat-no" title="statement not covered" >return 'var(--color-warning, #ffc107)';</span></span>
+<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 50) <span class="cstat-no" title="statement not covered" >return 'var(--color-info, #17a2b8)';</span></span>
+<span class="cstat-no" title="statement not covered" >    return 'var(--color-success, #28a745)';</span>
   }
 &nbsp;
   /**
@@ -2110,7 +2140,7 @@ class SMCacheSection extends SMBaseSection {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.024Z
+                at 2025-11-12T15:11:43.520Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

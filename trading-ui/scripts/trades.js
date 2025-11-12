@@ -953,9 +953,12 @@ async function updateTradesTable(trades) {
             if (!window.createActionsMenu) {
               return '<!-- Actions menu not available -->';
             }
+            const entityName = trade?.ticker_symbol || trade?.symbol || trade?.ticker || trade?.name || '';
+            const manageConditionsAction = `window.ConditionsModalController && window.ConditionsModalController.open({ entityType: 'trade', entityId: ${trade.id}, entityName: ${JSON.stringify(entityName)} })`;
             const result = window.createActionsMenu([
               { type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' },
               { type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' },
+              { type: 'MANAGE', onclick: manageConditionsAction, title: 'ניהול תנאים' },
               { type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' },
               { type: 'DELETE', onclick: `deleteTradeRecord('${trade.id}')`, title: 'מחק' }
             ]);
@@ -2537,6 +2540,10 @@ function initializeTradeConditionsSystem() {
           }).catch(error => {
             window.Logger?.error('Error initializing trades conditions system:', error, { page: "trades" });
           });
+          if (window.conditionsCRUDManager) {
+            window.conditionsCRUDManager.setContext({ entityType: 'trade' });
+            window.conditionsCRUDManager.getTradingMethods();
+          }
           return true;
         }
       } catch (error) {

@@ -2594,9 +2594,12 @@ function updateTradePlansTable(trade_plans) {
             }
             
             try {
+              const entityName = design?.ticker_symbol || design?.symbol || design?.ticker || design?.name || '';
+              const manageConditionsAction = `window.ConditionsModalController && window.ConditionsModalController.open({ entityType: 'plan', entityId: ${design.id}, entityName: ${JSON.stringify(entityName)} })`;
               const result = window.createActionsMenu([
                 { type: 'VIEW', onclick: `window.showEntityDetails('trade_plan', ${design.id}, { mode: 'view' })`, title: 'צפה בפרטי תכנון' },
                 { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', ${design.id})`, title: 'ערוך' },
+                { type: 'MANAGE', onclick: manageConditionsAction, title: 'ניהול תנאים' },
                 { type: 'CANCEL', onclick: `if (typeof window.cancelTradePlan === 'function') { window.cancelTradePlan(${design.id}); }`, title: 'בטל' },
                 { type: 'DELETE', onclick: `if (typeof window.deleteTradePlan === 'function') { window.deleteTradePlan(${design.id}); }`, title: 'מחק' }
               ]);
@@ -2966,6 +2969,10 @@ function initializeTradePlanConditionsSystem() {
           }).catch(error => {
             window.Logger?.error('Error initializing trade plans conditions system:', error, { page: "trade_plans" });
           });
+          if (window.conditionsCRUDManager) {
+            window.conditionsCRUDManager.setContext({ entityType: 'plan' });
+            window.conditionsCRUDManager.getTradingMethods();
+          }
           return true;
         }
       } catch (error) {

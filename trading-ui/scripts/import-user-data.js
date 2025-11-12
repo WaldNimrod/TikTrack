@@ -33,40 +33,195 @@ const TICKER_REMARKS_EDITOR_ID = 'tickerRemarksRichText';
 const ACTIVE_SESSION_STORAGE_KEY = 'tiktrack_import_user_data_session';
 const ACTIVE_SESSION_SOURCE = 'import-user-data';
 let importModalBootstrapInstance = null;
+let problemTrackingSessionId = null;
 
 const IMPORT_DATA_TYPE_DEFINITIONS = {
     executions: {
         key: 'executions',
         label: 'ביצועי מסחר (Executions)',
         description: 'ייבוא רשומות ביצועי מסחר הכוללות תאריך, פעולה, כמות, מחיר ונתוני עמלות.',
-        documentationAnchor: '#import-executions-pipeline'
+        documentationAnchor: '#import-executions-pipeline',
+        entityType: 'execution'
     },
     cashflows: {
         key: 'cashflows',
         label: 'תזרימי מזומנים (Cash Flows)',
         description: 'ייבוא והצלבת תזרימי מזומנים: הפקדות, משיכות, דיבידנדים, ריביות והחזרי מס אל מול נתוני המערכת.',
-        documentationAnchor: '#import-cashflows-pipeline'
+        documentationAnchor: '#import-cashflows-pipeline',
+        entityType: 'cash_flow'
     },
     account_reconciliation: {
         key: 'account_reconciliation',
         label: 'בדיקת שיוך חשבון',
         description: 'אימות מלא של חשבון מסחר: מטבע בסיס, הרשאות, יתרות פתיחה וחיבורים פעילים לפני ייבוא.',
-        documentationAnchor: '#account-reconciliation-pipeline'
+        documentationAnchor: '#account-reconciliation-pipeline',
+        entityType: 'trading_account'
     },
     portfolio_positions: {
         key: 'portfolio_positions',
         label: 'השוואת פורטפוליו',
         description: 'פלייסהולדר: השוואת פוזיציות פתוחות, NAV ושווי שוק מול נתוני המערכת.',
-        documentationAnchor: '#portfolio-reconciliation-pipeline'
+        documentationAnchor: '#portfolio-reconciliation-pipeline',
+        entityType: 'position'
     },
     taxes_and_fx: {
         key: 'taxes_and_fx',
         label: 'ריביות, מיסים והפרשי מטבע',
         description: 'פלייסהולדר: זיהוי הפרשים בריביות, מיסים ותרגומי מטבע ביחס לנתוני הבסיס.',
-        documentationAnchor: '#taxes-and-fx-pipeline'
+        documentationAnchor: '#taxes-and-fx-pipeline',
+        entityType: 'cash_flow'
     }
 };
 const ACTIVE_IMPORT_DATA_TYPES = new Set(['executions', 'cashflows', 'account_reconciliation']);
+
+const PROBLEM_RESOLUTION_TTL = 5 * 60 * 1000; // 5 minutes
+
+function createEmptyProblemState() {
+    return {
+        missingTickers: new Map(),
+        withinFileDuplicates: new Map(),
+        existingRecords: new Map(),
+        cashflowMissingAccounts: new Map(),
+        cashflowCurrencyIssues: new Map(),
+        accountMissingAccounts: new Map(),
+        accountCurrencyMismatches: new Map(),
+        accountEntitlementWarnings: new Map(),
+        accountMissingDocuments: new Map()
+    };
+}
+
+const problemResolutionState = {
+    previous: createEmptyProblemState(),
+    resolved: createEmptyProblemState()
+};
+
+function clearProblemTrackingState() {
+    problemResolutionState.previous = createEmptyProblemState();
+    problemResolutionState.resolved = createEmptyProblemState();
+}
+
+function normalizeProblemTicker(value) {
+    if (!value) {
+        return null;
+    }
+    if (typeof value === 'string') {
+        return value.trim().toUpperCase();
+    }
+    if (typeof value === 'object') {
+        const symbol = value.symbol || value.ticker || value.display_symbol || value.code;
+        return symbol ? String(symbol).trim().toUpperCase() : null;
+    }
+    return null;
+}
+
+function normalizeAccountIdentifier(account) {
+    if (!account) {
+        return null;
+    }
+    if (typeof account === 'string') {
+        return account.trim();
+    }
+    const accountId = account.account_id
+        || account.accountId
+        || account.id
+        || account.trading_account_id
+        || account.account;
+    if (accountId) {
+        return String(accountId).trim();
+    }
+    const provider = account.provider || account.provider_name || account.connector;
+    const name = account.name || account.label || account.description || '';
+    const combined = [provider, name].filter(Boolean).join(':');
+    if (combined) {
+        return combined.trim();
+    }
+    try {
+        return JSON.stringify(account);
+    } catch (error) {
+        return String(account);
+    }
+}
+
+function buildGenericIdentifier(value, prefix) {
+    if (value === null || value === undefined) {
+        return null;
+    }
+    if (typeof value === 'string') {
+        return `${prefix}:${value.trim()}`;
+    }
+    try {
+        return `${prefix}:${JSON.stringify(value)}`;
+    } catch (error) {
+        return `${prefix}:${String(value)}`;
+    }
+}
+
+function trackProblemStatus(problemKey, items, identifierFn, metadataFn) {
+    if (problemTrackingSessionId !== currentSessionId) {
+        clearProblemTrackingState();
+        problemTrackingSessionId = currentSessionId;
+    }
+
+    const now = Date.now();
+    const prevMap = problemResolutionState.previous[problemKey] || new Map();
+    const resolvedMap = problemResolutionState.resolved[problemKey] || new Map();
+
+    const currentMap = new Map();
+    (items || []).forEach((item) => {
+        const id = identifierFn(item);
+        if (!id) {
+            return;
+        }
+        const meta = metadataFn ? metadataFn(item) : { id, title: id };
+        currentMap.set(id, meta);
+    });
+
+    prevMap.forEach((meta, id) => {
+        if (!currentMap.has(id)) {
+            resolvedMap.set(id, {
+                meta,
+                resolvedAt: now
+            });
+        }
+    });
+
+    currentMap.forEach((meta, id) => {
+        if (resolvedMap.has(id)) {
+            resolvedMap.delete(id);
+        }
+    });
+
+    resolvedMap.forEach((entry, id) => {
+        if (now - entry.resolvedAt > PROBLEM_RESOLUTION_TTL) {
+            resolvedMap.delete(id);
+        }
+    });
+
+    problemResolutionState.previous[problemKey] = currentMap;
+    problemResolutionState.resolved[problemKey] = resolvedMap;
+
+    return {
+        resolvedEntries: Array.from(resolvedMap.values()).map(entry => entry.meta),
+        currentMap
+    };
+}
+
+function renderResolvedProblemCard(meta = {}) {
+    const title = escapeHtml(meta.title || meta.id || 'בעיה טופלה');
+    const description = escapeHtml(meta.description || 'הבעיה טופלה בהצלחה.');
+    const icon = meta.icon || 'bi bi-check-circle';
+    return `
+        <div class="problem-card resolved-card">
+            <div class="problem-card-header">
+                <i class="${icon}"></i>
+                <span>${title}</span>
+            </div>
+            <div class="problem-card-body">
+                <p>${description}</p>
+            </div>
+        </div>
+    `;
+}
 
 if (typeof window !== 'undefined') {
     window.symbolMetadataCache = symbolMetadataCache;
@@ -263,34 +418,14 @@ function populateDataTypeSelect(select) {
 }
 
 function handleDataTypeSelectionChange(event) {
-    const select = event?.target || document.getElementById('importDataTypeSelect');
-    if (!select) {
-        return;
+    const select = event.target;
+    selectedDataTypeKey = select.value;
+    if (select) {
+        select.dataset.manualSelection = 'true';
+        select.dataset.serverValue = select.value;
     }
-
-    const newKey = select.value || '';
-    const previousKey = selectedDataTypeKey;
-
-    selectedDataTypeKey = newKey || null;
-
     updateSelectedDataTypeInfo();
-    updateAnalyzeButton();
-
-    if (!newKey) {
-        return;
-    }
-
-    if (currentSessionId && currentStep >= 2 && newKey !== previousKey) {
-        setAnalysisLoadingState(true, 'מנתח מחדש לפי התהליך שנבחר...', 65);
-        reanalyseSessionForTask(newKey, 'מנתח מחדש לפי התהליך שנבחר...')
-            .catch((error) => {
-                window.Logger?.error?.('[Import Modal] Failed to reanalyse after changing data type', {
-                    error: error?.message,
-                    page: 'import-user-data'
-                });
-                showImportUserDataNotification(`שגיאה בניתוח מחדש: ${error.message}`, 'error');
-            });
-    }
+    detectAvailableDataTypes();
 }
 
 function updateDataTypeAvailability(detected = []) {
@@ -336,6 +471,10 @@ function updateSelectedDataTypeInfo() {
     const titleEl = document.getElementById('dataTypeInfoTitle');
     const subtitleEl = document.getElementById('dataTypeInfoSubtitle');
     const contentEl = document.getElementById('dataTypeInfoContent');
+    const modal = document.getElementById('importUserDataModal');
+    const modalDialog = modal?.querySelector('.modal-dialog');
+    const stepContainer = document.getElementById('step-upload');
+    const headerActions = document.getElementById('stepsHeaderPrimaryActions');
 
     if (!infoCard || !titleEl || !contentEl) {
         return;
@@ -349,6 +488,10 @@ function updateSelectedDataTypeInfo() {
             subtitleEl.textContent = '';
         }
         contentEl.innerHTML = '<p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>';
+        applyEntityTypeToImportButtons('cash_flow');
+        if (modalDialog) modalDialog.setAttribute('data-entity-type', 'cash_flow');
+        if (stepContainer) stepContainer.setAttribute('data-entity-type', 'cash_flow');
+        if (headerActions) headerActions.setAttribute('data-entity-type', 'cash_flow');
         return;
     }
 
@@ -356,6 +499,7 @@ function updateSelectedDataTypeInfo() {
     const availability = dataTypeAvailabilityMap[currentKey];
     const status = availability?.status || (ACTIVE_IMPORT_DATA_TYPES.has(currentKey) ? 'available' : 'planned');
     const records = availability?.records ?? null;
+    const entityType = definition.entityType || getEntityTypeForImport(currentKey);
 
     titleEl.textContent = definition.label;
     if (subtitleEl) {
@@ -375,8 +519,23 @@ function updateSelectedDataTypeInfo() {
     contentEl.innerHTML = `
         <p>${definition.description}</p>
         ${statsHtml}
+        ${definition.documentationAnchor
+            ? `<p class="mt-2"><a href="${definition.documentationAnchor}" target="_blank">למידע נוסף בתיעוד</a></p>`
+            : ''}
     `;
+
+    if (modalDialog) {
+        modalDialog.setAttribute('data-entity-type', entityType);
+    }
+    if (stepContainer) {
+        stepContainer.setAttribute('data-entity-type', entityType);
+    }
+    if (headerActions) {
+        headerActions.setAttribute('data-entity-type', entityType);
+    }
+    applyEntityTypeToImportButtons(entityType);
 }
+
 function getSymbolMetadata(symbol) {
     const key = normaliseSymbolKey(symbol);
     if (!key) {
@@ -805,11 +964,6 @@ function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
     const resumeButton = document.getElementById('resumeImportSessionBtn');
     const hasSession = Boolean(currentSessionId);
-    const actionsContainer = document.getElementById('activeSessionActions');
-
-    if (actionsContainer) {
-        actionsContainer.style.display = hasSession ? 'flex' : 'none';
-    }
 
     if (!resetButton) {
         if (resumeButton) {
@@ -922,6 +1076,8 @@ function updateActiveSessionInfo(updates = {}) {
 
 function updateActiveSessionIndicator() {
     const indicator = document.getElementById('activeSessionIndicator');
+    const controlsRow = document.getElementById('activeSessionControlsRow');
+    const detailsRow = document.getElementById('activeSessionDetailsRow');
     if (!indicator) {
         return;
     }
@@ -929,11 +1085,23 @@ function updateActiveSessionIndicator() {
     if (!currentSessionId || !activeSessionInfo) {
         indicator.style.display = 'none';
         indicator.setAttribute('data-has-session', 'false');
+        if (controlsRow) {
+            controlsRow.style.display = 'none';
+        }
+        if (detailsRow) {
+            detailsRow.style.display = 'none';
+        }
         return;
     }
     
     indicator.style.display = 'block';
     indicator.setAttribute('data-has-session', 'true');
+    if (controlsRow) {
+        controlsRow.style.display = '';
+    }
+    if (detailsRow) {
+        detailsRow.style.display = '';
+    }
     
     const sessionIdEl = document.getElementById('activeSessionIdValue');
     const statusEl = document.getElementById('activeSessionStatusValue');
@@ -1721,6 +1889,8 @@ function resetImportModal() {
     selectedDataTypeKey = 'executions';
     activeSessionInfo = null;
     clearSymbolMetadataCache();
+    clearProblemTrackingState();
+    problemTrackingSessionId = null;
     if (window.destroyRichTextEditor) {
         try {
             window.destroyRichTextEditor(TICKER_REMARKS_EDITOR_ID);
@@ -2003,7 +2173,15 @@ function goToStep(step) {
         currentStep, 
         page: 'import-user-data' 
     });
-
+    
+    const headerActions = document.getElementById('stepsHeaderPrimaryActions');
+    if (headerActions) {
+        if (window.processButtons) {
+            window.processButtons(headerActions);
+        } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+            window.advancedButtonSystem.processButtons(headerActions);
+        }
+    }
 }
 
 /**
@@ -2082,6 +2260,8 @@ function showStepContent(step) {
             page: 'import-user-data' 
         });
     }
+
+    updateHeaderActions(step);
 }
 
 /**
@@ -2214,6 +2394,23 @@ function handleFileDrop(event) {
         } else {
             showImportUserDataNotification('אנא בחר קובץ CSV בלבד', 'error');
         }
+    }
+}
+
+function updateHeaderActions(step) {
+    const uploadActions = document.getElementById('uploadStepActions');
+    if (uploadActions) {
+        uploadActions.style.display = step === 1 ? 'flex' : 'none';
+    }
+
+    const analysisActions = document.getElementById('analysisStepActions');
+    if (analysisActions) {
+        analysisActions.style.display = step === 2 ? 'flex' : 'none';
+    }
+
+    const previewActions = document.getElementById('previewStepActions');
+    if (previewActions) {
+        previewActions.style.display = step === 3 ? 'flex' : 'none';
     }
 }
 
@@ -3055,9 +3252,11 @@ function analyzeFile() {
     const modal = document.getElementById('importUserDataModal');
     const connectorSelect = modal?.querySelector('#connectorSelect');
     const accountSelect = modal?.querySelector('#tradingAccountSelect');
+    const dataTypeSelect = modal?.querySelector('#importDataTypeSelect');
     
     const connectorValue = connectorSelect?.value;
     const accountValue = accountSelect?.value;
+    const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || 'executions';
     
     // Validate values
     if (!selectedFile || !connectorValue || !accountValue) {
@@ -3083,7 +3282,8 @@ function analyzeFile() {
     formData.append('file', selectedFile);
     formData.append('trading_account_id', accountValue);
     formData.append('connector_type', connectorValue);
-    formData.append('task_type', selectedDataTypeKey || 'executions');
+    selectedDataTypeKey = dataTypeValue;
+    formData.append('task_type', selectedDataTypeKey);
     
     // Debug: Log what's being sent
     window.Logger.debug('[Import Modal] FormData contents', {
@@ -3108,15 +3308,18 @@ function analyzeFile() {
             currentSessionId = data.session_id;
             window.currentSessionId = data.session_id; // Make it global
             analysisResults = data.analysis_results;
-            const responseTaskType = data.task_type || analysisResults?.task_type;
-            if (responseTaskType) {
-                selectedDataTypeKey = responseTaskType;
-                const dataTypeSelect = document.getElementById('importDataTypeSelect');
-                if (dataTypeSelect) {
-                    dataTypeSelect.value = responseTaskType;
-                }
-                updateSelectedDataTypeInfo();
+            const dataTypeSelect = document.getElementById('importDataTypeSelect');
+            if (!analysisResults?.task_type && dataTypeSelect?.dataset?.serverValue) {
+                selectedDataTypeKey = dataTypeSelect.dataset.serverValue;
             }
+            if (analysisResults?.task_type) {
+                selectedDataTypeKey = analysisResults.task_type;
+            }
+            if (dataTypeSelect) {
+                dataTypeSelect.value = selectedDataTypeKey;
+                dataTypeSelect.dataset.serverValue = selectedDataTypeKey;
+            }
+            updateSelectedDataTypeInfo();
             updateSymbolMetadataCache(data.analysis_results?.symbol_metadata);
             
             updateActiveSessionInfo({
@@ -4107,7 +4310,7 @@ function displayConfirmationData(analysisResults, previewData) {
     const fileName = window.selectedFile?.name || 'קובץ לא ידוע';
     const accountSelect = document.getElementById('tradingAccountSelect');
     const accountName = accountSelect?.selectedOptions[0]?.text || 'חשבון לא ידוע';
-
+    
     const previewSummary = previewData.summary || {};
     const analysisSummary = analysisResults.summary || {};
     const cashflowSummary = analysisResults.cashflow_summary || {};
@@ -4289,9 +4492,6 @@ function displayProblemResolution(data) {
             <div class="step-actions">
                 <button class="btn btn-secondary" onclick="goToStep(1)">
                     <i class="fas fa-arrow-left"></i> חזור לשלב העלאת הקובץ
-                </button>
-                <button class="btn btn-primary" onclick="proceedToPreviewFromProblems()">
-                    <i class="fas fa-arrow-right"></i> המשך לתצוגה מקדימה
                         </button>
                     </div>
                 </div>
@@ -5061,11 +5261,33 @@ function displayMissingTickers(missingTickers) {
     
     if (!section || !container) return;
     
+    const tracking = trackProblemStatus(
+        'missingTickers',
+        missingTickers,
+        (ticker) => normalizeProblemTicker(ticker),
+        (ticker) => {
+            const symbol = normalizeProblemTicker(ticker);
+            return {
+                id: symbol,
+                title: `${symbol} \u2013 טופל`,
+                description: `הטיקר ${symbol} נוסף למערכת והוסר מרשימת הבעיות.`,
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (missingTickers || []).map((ticker) => renderMissingTickerCard(ticker));
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
     section.style.display = 'block';
-    
-    container.innerHTML = missingTickers.map(ticker => 
-        renderMissingTickerCard(ticker)
-    ).join('');
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -5077,11 +5299,27 @@ function displayWithinFileDuplicates(duplicates) {
     
     if (!section || !container) return;
     
-    section.style.display = 'block';
-    
-    container.innerHTML = duplicates.map((duplicate, index) => 
+    const tracking = trackProblemStatus(
+        'withinFileDuplicates',
+        duplicates,
+        (duplicate) => getDuplicateIdentifier(duplicate, 'within'),
+        (duplicate) => buildDuplicateResolvedMeta(duplicate, 'כפילות בתוך הקובץ')
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (duplicates || []).map((duplicate, index) => 
         renderDuplicateCard(duplicate, 'within_file', index)
-    ).join('');
+    );
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -5093,11 +5331,27 @@ function displayExistingRecords(existingRecords) {
     
     if (!section || !container) return;
     
-    section.style.display = 'block';
-    
-    container.innerHTML = existingRecords.map((record, index) => 
+    const tracking = trackProblemStatus(
+        'existingRecords',
+        existingRecords,
+        (record) => getDuplicateIdentifier(record, 'existing'),
+        (record) => buildDuplicateResolvedMeta(record, 'רשומה קיימת')
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (existingRecords || []).map((record, index) => 
         renderDuplicateCard(record, 'existing_record', index)
-    ).join('');
+    );
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -5142,6 +5396,35 @@ function renderMissingTickerCard(ticker) {
             </div>
         </div>
     `;
+}
+
+/**
+ * Identify duplicate entries for tracking
+ */
+function getDuplicateIdentifier(duplicate, fallbackType = 'duplicate') {
+    const { record } = extractPreviewRecord(duplicate);
+    if (record?.external_id) {
+        return `${fallbackType}:${record.external_id}`;
+    }
+    const symbol = normalizeProblemTicker(record?.symbol || duplicate.symbol);
+    const date = record?.date || duplicate.date || '';
+    const action = record?.action || duplicate.action || '';
+    const amount = record?.amount || record?.quantity || duplicate.quantity || '';
+    return `${fallbackType}:${symbol || 'UNKNOWN'}|${date}|${action}|${amount}`;
+}
+
+function buildDuplicateResolvedMeta(duplicate, typeLabel = 'כפילות') {
+    const { record } = extractPreviewRecord(duplicate);
+    const symbol = normalizeProblemTicker(record?.symbol || duplicate.symbol) || 'N/A';
+    const dateValue = record?.date || duplicate.date || '';
+    return {
+        id: getDuplicateIdentifier(duplicate, typeLabel),
+        title: `${symbol} \u2013 ${typeLabel} טופלה`,
+        description: dateValue
+            ? `הרשומה מתאריך ${dateValue} הוסרה מרשימת הבעיות.`
+            : 'הכפילות הוסרה מרשימת הבעיות.',
+        icon: 'bi bi-check-circle'
+    };
 }
 
 /**
@@ -5245,7 +5528,9 @@ function refreshPreviewData() {
             updateSymbolMetadataCache(data.preview_data?.symbol_metadata || data.preview_data?.summary?.symbol_metadata);
             updateActiveSessionFromPreview(data.preview_data);
             // Refresh the current step display
-            if (currentStep === 3) {
+            if (currentStep === 2) {
+                displayProblemResolutionDetailed(data.preview_data);
+            } else if (currentStep === 3) {
                 displayProblemResolutionDetailed(data.preview_data);
             } else if (currentStep === 4) {
                 displayPreview(data.preview_data);
@@ -5375,9 +5660,7 @@ function renderExecutionProblemSections(data) {
         });
     });
 
-    if (uniqueMissing.length > 0) {
-        displayMissingTickers(uniqueMissing);
-    }
+    displayMissingTickers(uniqueMissing);
 
     renderExecutionStyleProblems(data);
 }
@@ -5387,50 +5670,34 @@ function renderExecutionStyleProblems(data) {
     const withinFileDuplicates = skipRecords.filter(record => 
         record.reason === 'within_file_duplicate' || record.reason === 'within_file_duplicate_match'
     );
-    if (withinFileDuplicates.length > 0) {
-        displayWithinFileDuplicates(withinFileDuplicates);
-    }
+    displayWithinFileDuplicates(withinFileDuplicates);
 
     const existingRecords = skipRecords.filter(record => record.reason === 'existing_record');
-    if (existingRecords.length > 0) {
-        displayExistingRecords(existingRecords);
-    }
+    displayExistingRecords(existingRecords);
 }
 
 function renderCashflowProblemSections(data) {
     const missingAccounts = data.missing_accounts || data.summary?.missing_accounts || [];
-    if (missingAccounts.length) {
-        displayCashflowMissingAccounts(missingAccounts);
-    }
+    displayCashflowMissingAccounts(missingAccounts);
 
     const currencyIssues = data.currency_issues || data.summary?.currency_issues || [];
-    if (currencyIssues.length) {
-        displayCashflowCurrencyIssues(currencyIssues);
-    }
+    displayCashflowCurrencyIssues(currencyIssues);
 }
 
 function renderAccountReconciliationProblems(data) {
     const issues = data.summary?.issues || {};
 
     const missingAccounts = data.missing_accounts || issues.missing_accounts || [];
-    if (missingAccounts.length) {
-        displayAccountMissingAccounts(missingAccounts);
-    }
+    displayAccountMissingAccounts(missingAccounts);
 
     const currencyMismatches = data.base_currency_mismatches || issues.base_currency_mismatches || [];
-    if (currencyMismatches.length) {
-        displayAccountCurrencyMismatches(currencyMismatches);
-    }
+    displayAccountCurrencyMismatches(currencyMismatches);
 
     const entitlementWarnings = data.entitlement_warnings || issues.entitlement_warnings || [];
-    if (entitlementWarnings.length) {
-        displayAccountEntitlementWarnings(entitlementWarnings);
-    }
+    displayAccountEntitlementWarnings(entitlementWarnings);
 
     const missingDocuments = data.missing_documents_report || issues.missing_documents_report || [];
-    if (missingDocuments.length) {
-        displayAccountMissingDocuments(missingDocuments);
-    }
+    displayAccountMissingDocuments(missingDocuments);
 }
 
 function displayCashflowMissingAccounts(accounts) {
@@ -5438,8 +5705,26 @@ function displayCashflowMissingAccounts(accounts) {
     const container = document.getElementById('cashflowMissingAccountsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = accounts.map(account => {
+    const tracking = trackProblemStatus(
+        'cashflowMissingAccounts',
+        accounts,
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account);
+            return identifier ? `cashflow-missing-account:${identifier}` : null;
+        },
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account) || 'חשבון';
+            return {
+                id: identifier,
+                title: `${identifier} \u2013 טופל`,
+                description: 'החשבון שויך או נוצר בהצלחה והוסר מרשימת הבעיות.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (accounts || []).map(account => {
         if (typeof account === 'string') {
             return `
                 <div class="problem-card cashflow-missing-account-card">
@@ -5468,7 +5753,17 @@ function displayCashflowMissingAccounts(accounts) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayCashflowCurrencyIssues(issues) {
@@ -5476,8 +5771,33 @@ function displayCashflowCurrencyIssues(issues) {
     const container = document.getElementById('cashflowCurrencyIssuesContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = issues.map(issue => {
+    const tracking = trackProblemStatus(
+        'cashflowCurrencyIssues',
+        issues,
+        (issue) => {
+            if (typeof issue === 'string') {
+                return buildGenericIdentifier(issue, 'cashflow-currency');
+            }
+            const currency = issue.currency || issue.currency_code || issue.reported || 'unknown';
+            const source = issue.source_account || issue.account || '';
+            const index = issue.record_index ?? '';
+            return `cashflow-currency:${currency}|${source}|${index}`;
+        },
+        (issue) => {
+            const currency = typeof issue === 'string'
+                ? issue
+                : (issue.currency || issue.currency_code || issue.reported || 'מטבע');
+            return {
+                id: typeof issue === 'string' ? issue : JSON.stringify(issue),
+                title: `${currency} \u2013 טופל`,
+                description: 'בעיית המטבע נפתרה והוסרה מהרשימה.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (issues || []).map(issue => {
         if (typeof issue === 'string') {
             return `
                 <div class="problem-card cashflow-currency-issue-card">
@@ -5508,7 +5828,17 @@ function displayCashflowCurrencyIssues(issues) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountMissingAccounts(accounts) {
@@ -5516,8 +5846,26 @@ function displayAccountMissingAccounts(accounts) {
     const container = document.getElementById('accountMissingAccountsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = accounts.map(account => {
+    const tracking = trackProblemStatus(
+        'accountMissingAccounts',
+        accounts,
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account);
+            return identifier ? `account-missing:${identifier}` : null;
+        },
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account) || 'חשבון';
+            return {
+                id: identifier,
+                title: `${identifier} \u2013 טופל`,
+                description: 'החשבון שויך או נוצר בהצלחה והוסר מרשימת הבעיות.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (accounts || []).map(account => {
         if (typeof account === 'string') {
             return `
                 <div class="problem-card account-missing-account-card">
@@ -5544,7 +5892,17 @@ function displayAccountMissingAccounts(accounts) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountCurrencyMismatches(items) {
@@ -5552,8 +5910,33 @@ function displayAccountCurrencyMismatches(items) {
     const container = document.getElementById('accountCurrencyMismatchesContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = items.map(item => {
+    const tracking = trackProblemStatus(
+        'accountCurrencyMismatches',
+        items,
+        (item) => {
+            if (typeof item === 'string') {
+                return buildGenericIdentifier(item, 'account-currency');
+            }
+            const accountId = item.account_id || item.accountId || 'unknown';
+            const expected = item.expected || item.expected_currency || '';
+            const reported = item.reported || item.reported_currency || '';
+            return `account-currency:${accountId}|${expected}|${reported}`;
+        },
+        (item) => {
+            const accountId = typeof item === 'string'
+                ? 'חשבון'
+                : (item.account_id || item.accountId || 'חשבון');
+            return {
+                id: accountId,
+                title: `${accountId} \u2013 טופל`,
+                description: 'אי ההתאמה במטבע נפתרה והוסרה מהרשימה.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (items || []).map(item => {
         if (typeof item === 'string') {
             return `
                 <div class="problem-card account-currency-mismatch-card">
@@ -5583,7 +5966,17 @@ function displayAccountCurrencyMismatches(items) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountEntitlementWarnings(items) {
@@ -5591,8 +5984,32 @@ function displayAccountEntitlementWarnings(items) {
     const container = document.getElementById('accountEntitlementWarningsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = items.map(item => {
+    const tracking = trackProblemStatus(
+        'accountEntitlementWarnings',
+        items,
+        (item) => {
+            if (typeof item === 'string') {
+                return buildGenericIdentifier(item, 'account-entitlement');
+            }
+            const accountId = item.account_id || item.accountId || 'unknown';
+            const restriction = item.restriction || item.restriction_type || '';
+            return `account-entitlement:${accountId}|${restriction}`;
+        },
+        (item) => {
+            const accountId = typeof item === 'string'
+                ? 'חשבון'
+                : (item.account_id || item.accountId || 'חשבון');
+            return {
+                id: accountId,
+                title: `${accountId} \u2013 הרשאות טופלו`,
+                description: 'אזהרת ההרשאות סומנה כפתורה.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (items || []).map(item => {
         if (typeof item === 'string') {
             return `
                 <div class="problem-card account-entitlement-warning-card">
@@ -5622,7 +6039,17 @@ function displayAccountEntitlementWarnings(items) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountMissingDocuments(items) {
@@ -5630,8 +6057,36 @@ function displayAccountMissingDocuments(items) {
     const container = document.getElementById('accountMissingDocumentsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = items.map(item => {
+    const tracking = trackProblemStatus(
+        'accountMissingDocuments',
+        items,
+        (item) => {
+            if (typeof item === 'string') {
+                return buildGenericIdentifier(item, 'account-doc');
+            }
+            const accountId = item.account_id || item.accountId || 'unknown';
+            const docs = Array.isArray(item.documents)
+                ? item.documents.join('|')
+                : Array.isArray(item.required_documents)
+                    ? item.required_documents.join('|')
+                    : '';
+            return `account-doc:${accountId}|${docs}`;
+        },
+        (item) => {
+            const accountId = typeof item === 'string'
+                ? 'חשבון'
+                : (item.account_id || item.accountId || 'חשבון');
+            return {
+                id: accountId,
+                title: `${accountId} \u2013 מסמכים הושלמו`,
+                description: 'המסמכים החסרים הועלו או אושרו.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (items || []).map(item => {
         let accountId = 'לא ידוע';
         let documents = [];
 
@@ -5664,5 +6119,54 @@ function displayAccountMissingDocuments(items) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
+}
+
+function getEntityTypeForImport(key) {
+    return IMPORT_DATA_TYPE_DEFINITIONS[key]?.entityType || 'cash_flow';
+}
+
+function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
+    const entityButtons = [
+        'analyzeBtn',
+        'analysisContinueBtn',
+        'confirmImportHeaderBtn',
+        'confirmImportAndReportHeaderBtn',
+        'resetImportSessionBtn'
+    ];
+
+    entityButtons.forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) {
+            return;
+        }
+
+        const current = button.getAttribute('data-entity-type');
+        if (current === entityType) {
+            return;
+        }
+
+        button.setAttribute('data-entity-type', entityType);
+
+        const buttonType = (button.getAttribute('data-button-type') || '').toUpperCase();
+        if (buttonType && window.advancedButtonSystem?.constructor?.ENTITY_VARIANT_BUTTONS?.includes(buttonType)) {
+            try {
+                window.advancedButtonSystem.applyEntityColors(button, entityType);
+            } catch (error) {
+                window.Logger?.debug?.('[Import Modal] Failed to apply entity colors directly', {
+                    error: error.message
+                });
+            }
+        }
+    });
 }

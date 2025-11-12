@@ -18,6 +18,10 @@ import os
 import sys
 from datetime import datetime
 
+# Re-use seed definition from migrations to keep master data consistent
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from migrations.seed_conditions_master_data import METHODS_DEFINITION  # noqa: E402
+
 def create_clean_database():
     """Create a clean database with current structure and essential data"""
     
@@ -236,6 +240,101 @@ def create_tables(cursor):
             condition_attribute TEXT,
             condition_operator TEXT,
             condition_number NUM
+        )
+    """)
+
+    # Trading Methods table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS trading_methods (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name_en VARCHAR(100) NOT NULL,
+            name_he VARCHAR(100) NOT NULL,
+            category VARCHAR(50) NOT NULL,
+            description_en TEXT,
+            description_he TEXT,
+            icon_class VARCHAR(50),
+            is_active BOOLEAN DEFAULT 1,
+            sort_order INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name_en),
+            UNIQUE(name_he)
+        )
+    """)
+
+    # Method Parameters table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS method_parameters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            method_id INTEGER NOT NULL,
+            parameter_key VARCHAR(50) NOT NULL,
+            parameter_name_en VARCHAR(100) NOT NULL,
+            parameter_name_he VARCHAR(100) NOT NULL,
+            parameter_type VARCHAR(20) NOT NULL,
+            default_value VARCHAR(100),
+            min_value VARCHAR(50),
+            max_value VARCHAR(50),
+            validation_rule TEXT,
+            is_required BOOLEAN DEFAULT 1,
+            sort_order INTEGER DEFAULT 0,
+            help_text_en TEXT,
+            help_text_he TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (method_id) REFERENCES trading_methods(id) ON DELETE CASCADE,
+            UNIQUE(method_id, parameter_key)
+        )
+    """)
+
+    # Plan Conditions table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS plan_conditions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            trade_plan_id INTEGER NOT NULL,
+            method_id INTEGER NOT NULL,
+            condition_group INTEGER DEFAULT 0,
+            parameters_json TEXT NOT NULL,
+            logical_operator VARCHAR(10) DEFAULT 'NONE',
+            is_active BOOLEAN DEFAULT 1,
+            auto_generate_alerts BOOLEAN DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (trade_plan_id) REFERENCES trade_plans(id) ON DELETE CASCADE,
+            FOREIGN KEY (method_id) REFERENCES trading_methods(id)
+        )
+    """)
+
+    # Trade Conditions table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS trade_conditions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            trade_id INTEGER NOT NULL,
+            method_id INTEGER NOT NULL,
+            condition_group INTEGER DEFAULT 0,
+            parameters_json TEXT NOT NULL,
+            logical_operator VARCHAR(10) DEFAULT 'NONE',
+            inherited_from_plan_condition_id INTEGER,
+            is_active BOOLEAN DEFAULT 1,
+            auto_generate_alerts BOOLEAN DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (trade_id) REFERENCES trades(id) ON DELETE CASCADE,
+            FOREIGN KEY (method_id) REFERENCES trading_methods(id),
+            FOREIGN KEY (inherited_from_plan_condition_id) REFERENCES plan_conditions(id)
+        )
+    """)
+
+    # Condition Alerts mapping table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS condition_alerts_mapping (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            condition_id INTEGER NOT NULL,
+            condition_type VARCHAR(10) NOT NULL,
+            alert_id INTEGER NOT NULL,
+            auto_created BOOLEAN DEFAULT 0,
+            is_active BOOLEAN DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (alert_id) REFERENCES alerts(id) ON DELETE CASCADE
         )
     """)
     
@@ -846,6 +945,20 @@ def create_indexes(cursor):
     cursor.execute("CREATE INDEX idx_alerts_related_type_id ON alerts(related_type_id)")
     cursor.execute("CREATE INDEX idx_alerts_created_at ON alerts(created_at)")
     
+    # Trading methods indexes
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_trading_methods_category ON trading_methods(category)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_trading_methods_active ON trading_methods(is_active)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_method_parameters_method_id ON method_parameters(method_id)")
+    
+    # Conditions indexes
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_plan_conditions_plan_id ON plan_conditions(trade_plan_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_plan_conditions_method_id ON plan_conditions(method_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_trade_conditions_trade_id ON trade_conditions(trade_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_trade_conditions_method_id ON trade_conditions(method_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_trade_conditions_inherited ON trade_conditions(inherited_from_plan_condition_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_condition_alerts_condition ON condition_alerts_mapping(condition_id, condition_type)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_condition_alerts_alert_id ON condition_alerts_mapping(alert_id)")
+    
     # Constraints indexes
     cursor.execute("CREATE INDEX idx_constraints_table_column ON constraints (table_name, column_name)")
     cursor.execute("CREATE INDEX idx_constraints_type ON constraints (constraint_type)")
@@ -927,6 +1040,97 @@ def insert_essential_data(cursor):
     """)
     
     print("✅ Essential data inserted successfully")
+
+    seed_conditions_master_data(cursor)
+
+
+def seed_conditions_master_data(cursor):
+    """Seed trading methods and parameters for conditions system"""
+
+    try:
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='trading_methods'")
+        if not cursor.fetchone():
+            print("ℹ️ Skipping conditions seed – trading_methods table not found")
+            return
+
+        cursor.execute("SELECT COUNT(*) FROM trading_methods")
+        existing_methods = cursor.fetchone()[0]
+        if existing_methods > 0:
+            print("ℹ️ Trading methods already seeded – skipping")
+            return
+
+        timestamp = datetime.utcnow().isoformat()
+
+        for method in METHODS_DEFINITION:
+            cursor.execute(
+                """
+                INSERT INTO trading_methods (
+                    name_en, name_he, category,
+                    description_en, description_he,
+                    icon_class, is_active, sort_order,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
+                """,
+                (
+                    method["name_en"],
+                    method["name_he"],
+                    method["category"],
+                    method["description_en"],
+                    method["description_he"],
+                    method["icon_class"],
+                    method["sort_order"],
+                    timestamp,
+                    timestamp,
+                ),
+            )
+
+            method_id = cursor.lastrowid
+
+            for param in method["parameters"]:
+                cursor.execute(
+                    """
+                    INSERT INTO method_parameters (
+                        method_id,
+                        parameter_key,
+                        parameter_name_en,
+                        parameter_name_he,
+                        parameter_type,
+                        default_value,
+                        min_value,
+                        max_value,
+                        validation_rule,
+                        is_required,
+                        sort_order,
+                        help_text_en,
+                        help_text_he,
+                        created_at,
+                        updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        method_id,
+                        param["parameter_key"],
+                        param["parameter_name_en"],
+                        param["parameter_name_he"],
+                        param["parameter_type"],
+                        param.get("default_value"),
+                        param.get("min_value"),
+                        param.get("max_value"),
+                        param.get("validation_rule"),
+                        1 if param.get("is_required", True) else 0,
+                        param.get("sort_order", 0),
+                        param.get("help_text_en"),
+                        param.get("help_text_he"),
+                        timestamp,
+                        timestamp,
+                    ),
+                )
+
+        print("✅ Trading methods master data seeded successfully")
+
+    except Exception as error:
+        print(f"❌ Failed to seed trading methods: {error}")
+        raise
 
 def get_table_count(cursor):
     """Get count of tables"""

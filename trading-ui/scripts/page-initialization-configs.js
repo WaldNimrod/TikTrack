@@ -362,7 +362,7 @@ const PAGE_CONFIGS = {
         // - 'validation': מערכת ולידציה מאוחדת
         // - 'info-summary': מערכת סיכום נתונים מאוחדת
         // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
-        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'conditions', 'entity-details', 'entity-services', 'info-summary', 'init-system'],
         
         // ← NEW: בדיקות תקינות
         requiredGlobals: [
@@ -376,7 +376,12 @@ const PAGE_CONFIGS = {
             'window.checkLinkedItemsBeforeAction',
             'window.RichTextEditorService',
             'window.Quill',
-            'window.DOMPurify'
+            'window.DOMPurify',
+            'window.conditionsCRUDManager',
+            'window.conditionsFormGenerator',
+            'window.ConditionsUIManager',
+            'window.ConditionsModalController',
+            'window.conditionsModalConfig'
         ],
         
         // ← NEW: מטאדאטה
@@ -507,7 +512,7 @@ const PAGE_CONFIGS = {
         name: 'Data Import',
         
         // 📦 Required packages for the Data Import dashboard
-        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
+        packages: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences', 'validation', 'conditions', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
         
         requiredGlobals: [
             'NotificationSystem',
@@ -560,7 +565,12 @@ const PAGE_CONFIGS = {
             'window.InvestmentCalculationService',
             'window.RichTextEditorService',
             'window.Quill',
-            'window.DOMPurify'
+            'window.DOMPurify',
+            'window.conditionsCRUDManager',
+            'window.conditionsFormGenerator',
+            'window.ConditionsUIManager',
+            'window.ConditionsModalController',
+            'window.conditionsModalConfig'
         ],
         
         requiresFilters: true,

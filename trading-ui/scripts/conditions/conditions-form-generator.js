@@ -24,108 +24,100 @@ class ConditionsFormGenerator {
         this.validator = window.conditionsValidator;
         this.crudManager = window.conditionsCRUDManager;
         this.currentMethod = null;
-        this.currentParameters = {};
+        this.methods = [];
+        this.methodsById = new Map();
+        this.containerId = null;
+        this.mode = 'create';
     }
-    
-    /**
-     * Generate condition form
-     * @function generateConditionForm
-     * @param {string} containerId - Container ID
-     * @param {Object} options - Form options
-     * @returns {void}
-     */
-    generateConditionForm(containerId, options = {}) {
+
+    async generateConditionForm(containerId, options = {}) {
+        this.containerId = containerId;
         const container = document.getElementById(containerId);
         if (!container) {
             console.error(`Container ${containerId} not found`);
             return;
         }
-        
-        const formHtml = this.buildFormHTML(options);
-        container.innerHTML = formHtml;
-        
-        // Setup event listeners
-        this.setupFormEventListeners(containerId);
-        
-        // Load trading methods
-        this.loadTradingMethods(containerId);
+
+        this.mode = options.isEdit ? 'edit' : 'create';
+
+        container.innerHTML = this.buildFormHTML(options);
+        this.attachEventListeners(container);
+
+        try {
+            await this.loadMethods();
+            this.populateMethodSelect(options.conditionData);
+            if (options.conditionData) {
+                this.populateForm(options.conditionData);
+            }
+        } catch (error) {
+            console.error('Failed to prepare condition form:', error);
+            this.showNotification('שגיאה בטעינת שיטות התנאים', 'error');
+        }
     }
-    
-    /**
-     * Build form HTML
-     * @function buildFormHTML
-     * @param {Object} options - Form options
-     * @returns {string} Form HTML
-     */
+
     buildFormHTML(options = {}) {
-        const isEdit = options.isEdit || false;
         const conditionData = options.conditionData || {};
-        
         return `
             <div class="condition-form" id="conditionForm">
                 <div class="condition-form-header">
-                    <h4 id="formTitle">${isEdit ? this.translator.getFormLabel('edit_condition') : this.translator.getFormLabel('add_condition')}</h4>
-                    <button class="btn btn-sm btn-secondary" id="closeFormBtn" type="button">
+                    <h4 id="formTitle">${options.isEdit ? this.translator.getFormLabel('edit_condition') : this.translator.getFormLabel('add_condition')}</h4>
+                    <button class="btn btn-sm btn-outline-secondary" id="closeFormBtn" type="button">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="condition-form-body">
-                    <form id="conditionFormElement">
-                        <!-- Method Selection -->
+                    <form id="conditionFormElement" novalidate>
                         <div class="mb-3">
                             <label for="methodSelect" class="form-label">
                                 ${this.translator.getFormLabel('select_method')}
+                                <span class="text-danger">*</span>
                             </label>
                             <select class="form-select" id="methodSelect" required>
                                 <option value="">${this.translator.getFormLabel('select_method')}...</option>
                             </select>
                             <div class="invalid-feedback" id="methodSelectError"></div>
                         </div>
-                        
-                        <!-- Method Parameters Container -->
-                        <div id="parametersContainer" class="mb-3">
+
+                        <div id="parametersContainer" class="mb-3" style="display: none;">
                             <label class="form-label">${this.translator.getFormLabel('method_parameters')}</label>
                             <div id="parametersFields"></div>
                         </div>
-                        
-                        <!-- Logical Operator -->
-                        <div class="mb-3">
-                            <label for="logicalOperator" class="form-label">
-                                ${this.translator.getFormLabel('logical_operator')}
-                            </label>
-                            <select class="form-select" id="logicalOperator">
-                                <option value="NONE">${this.translator.getOperator('NONE')}</option>
-                                <option value="AND">${this.translator.getOperator('AND')}</option>
-                                <option value="OR">${this.translator.getOperator('OR')}</option>
-                            </select>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="logicalOperator" class="form-label">
+                                    ${this.translator.getFormLabel('logical_operator')}
+                                </label>
+                                <select class="form-select" id="logicalOperator">
+                                    <option value="NONE">${this.translator.getOperator('NONE')}</option>
+                                    <option value="AND">${this.translator.getOperator('AND')}</option>
+                                    <option value="OR">${this.translator.getOperator('OR')}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="conditionGroup" class="form-label">
+                                    ${this.translator.getFormLabel('condition_group')}
+                                </label>
+                                <input type="number" class="form-control" id="conditionGroup"
+                                       value="${conditionData.condition_group || 0}"
+                                       min="0" max="99">
+                            </div>
                         </div>
-                        
-                        <!-- Condition Group -->
-                        <div class="mb-3">
-                            <label for="conditionGroup" class="form-label">
-                                ${this.translator.getFormLabel('condition_group')}
-                            </label>
-                            <input type="number" class="form-control" id="conditionGroup" 
-                                   value="${conditionData.condition_group || 0}" 
-                                   min="0" max="99">
-                        </div>
-                        
-                        <!-- Is Active -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="isActive" 
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="isActive"
                                    ${conditionData.is_active !== false ? 'checked' : ''}>
                             <label class="form-check-label" for="isActive">
                                 ${this.translator.getFormLabel('is_active')}
                             </label>
                         </div>
-                        
-                        <!-- Form Actions -->
-                        <div class="d-flex gap-2">
+
+                        <div class="d-flex gap-2 justify-content-end">
                             <button class="btn btn-primary" type="submit" id="saveConditionBtn">
                                 <i class="fas fa-save"></i>
                                 ${this.translator.getFormLabel('save_condition')}
                             </button>
-                            <button class="btn btn-secondary" type="button" id="cancelFormBtn">
+                            <button class="btn btn-outline-secondary" type="button" id="cancelFormBtn">
                                 <i class="fas fa-times"></i>
                                 ${this.translator.getFormLabel('cancel')}
                             </button>
@@ -135,442 +127,352 @@ class ConditionsFormGenerator {
             </div>
         `;
     }
-    
-    /**
-     * Setup form event listeners
-     * @function setupFormEventListeners
-     * @param {string} containerId - Container ID
-     * @returns {void}
-     */
-    setupFormEventListeners(containerId) {
-        const container = document.getElementById(containerId);
-        
-        // Method selection change
+
+    attachEventListeners(container) {
         const methodSelect = container.querySelector('#methodSelect');
         if (methodSelect) {
-            methodSelect.addEventListener('change', (e) => {
-                this.onMethodChange(e.target.value);
+            methodSelect.addEventListener('change', (event) => {
+                this.handleMethodChange(event.target.value);
             });
         }
-        
-        // Form submission
+
         const form = container.querySelector('#conditionFormElement');
         if (form) {
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.onFormSubmit();
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                await this.handleFormSubmit();
             });
         }
-        
-        // Cancel button
+
         const cancelBtn = container.querySelector('#cancelFormBtn');
         if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                this.onFormCancel();
-            });
+            cancelBtn.addEventListener('click', () => this.handleFormCancel());
         }
-        
-        // Close button
+
         const closeBtn = container.querySelector('#closeFormBtn');
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                this.onFormCancel();
+            closeBtn.addEventListener('click', () => this.handleFormCancel());
+        }
+    }
+
+    async loadMethods() {
+        this.methods = await this.crudManager.getTradingMethods(true);
+        this.methodsById.clear();
+        this.methods.forEach(method => {
+            this.methodsById.set(String(method.id), method);
+        });
+    }
+
+    populateMethodSelect(conditionData) {
+        const methodSelect = document.getElementById('methodSelect');
+        if (!methodSelect) return;
+
+        methodSelect.innerHTML = `<option value="">${this.translator.getFormLabel('select_method')}...</option>`;
+
+        this.methods
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+            .forEach(method => {
+                const option = document.createElement('option');
+                option.value = method.id;
+                option.dataset.methodKey = method.method_key;
+                option.dataset.category = method.category;
+                option.textContent = `${method.name} ${method.category_name ? `- ${method.category_name}` : ''}`;
+                methodSelect.appendChild(option);
             });
+
+        if (conditionData?.method_id) {
+            methodSelect.value = conditionData.method_id;
+            this.handleMethodChange(conditionData.method_id);
         }
     }
-    
-    /**
-     * Load trading methods
-     * טעינת שיטות מסחר
-     */
-    async loadTradingMethods(containerId) {
-        try {
-            const methods = await this.crudManager.getTradingMethods();
-            const methodSelect = document.querySelector('#methodSelect');
-            
-            if (methodSelect && methods) {
-                // Clear existing options except the first one
-                methodSelect.innerHTML = '<option value="">בחר שיטה...</option>';
-                
-                // Add method options
-                methods.forEach(method => {
-                    const option = document.createElement('option');
-                    option.value = method.id;
-                    option.textContent = method.name;
-                    option.dataset.methodKey = method.key;
-                    methodSelect.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error('Error loading trading methods:', error);
-            this.showNotification('שגיאה בטעינת שיטות מסחר', 'error');
-        }
-    }
-    
-    /**
-     * Handle method selection change
-     * טיפול בשינוי בחירת שיטה
-     */
-    async onMethodChange(methodId) {
+
+    handleMethodChange(methodId) {
         if (!methodId) {
+            this.currentMethod = null;
             this.clearParameters();
             return;
         }
-        
-        try {
-            // Get method data
-            const methods = await this.crudManager.getTradingMethods();
-            const method = methods.find(m => m.id == methodId);
-            
-            if (method) {
-                this.currentMethod = method;
-                this.generateParameterFields(method);
-            }
-        } catch (error) {
-            console.error('Error handling method change:', error);
-            this.showNotification('שגיאה בטעינת פרמטרי השיטה', 'error');
-        }
-    }
-    
-    /**
-     * Generate parameter fields
-     * יצירת שדות פרמטרים
-     */
-    generateParameterFields(method) {
-        const container = document.getElementById('parametersFields');
-        if (!container) {
+
+        const method = this.methodsById.get(String(methodId));
+        if (!method) {
+            console.warn(`[ConditionsFormGenerator] Method with id ${methodId} not found`);
+            this.clearParameters();
             return;
         }
-        
-        // Clear existing fields
-        container.innerHTML = '';
-        
-        // Get validation rules for this method
-        const methodKey = method.key;
-        const validationRules = this.validator.validationRules.methods[methodKey];
-        
-        if (!validationRules) {
-            container.innerHTML = '<div class="text-muted">אין פרמטרים נדרשים לשיטה זו</div>';
-            return;
-        }
-        
-        // Generate fields for required parameters
-        validationRules.required.forEach(paramName => {
-            const field = this.createParameterField(paramName, validationRules, true);
-            container.appendChild(field);
-        });
-        
-        // Generate fields for optional parameters
-        if (validationRules.optional) {
-            validationRules.optional.forEach(paramName => {
-                const field = this.createParameterField(paramName, validationRules, false);
-                container.appendChild(field);
-            });
-        }
+
+        this.currentMethod = method;
+        this.renderParameterFields(method);
     }
-    
-    /**
-     * Create parameter field
-     * יצירת שדה פרמטר
-     */
-    createParameterField(paramName, validationRules, isRequired) {
-        const fieldContainer = document.createElement('div');
-        fieldContainer.className = 'mb-3';
-        
-        const paramType = validationRules.types[paramName];
-        const paramRange = validationRules.ranges[paramName];
-        const translatedName = this.translator.getParameterName(paramName);
-        
-        let inputHtml = '';
-        
-        switch (paramType) {
-            case 'number':
-                inputHtml = this.createNumberInput(paramName, paramRange, isRequired);
-                break;
-            case 'string':
-                inputHtml = this.createStringInput(paramName, isRequired);
-                break;
-            case 'boolean':
-                inputHtml = this.createBooleanInput(paramName, isRequired);
-                break;
-            default:
-                inputHtml = this.createTextInput(paramName, isRequired);
-        }
-        
-        fieldContainer.innerHTML = `
-            <label for="${paramName}" class="form-label">
-                ${translatedName}
-                ${isRequired ? '<span class="text-danger">*</span>' : ''}
-            </label>
-            ${inputHtml}
-            <div class="invalid-feedback" id="${paramName}Error"></div>
-        `;
-        
-        return fieldContainer;
-    }
-    
-    /**
-     * Create number input
-     * יצירת שדה מספר
-     */
-    createNumberInput(paramName, paramRange, isRequired) {
-        const min = paramRange?.min || '';
-        const max = paramRange?.max || '';
-        const step = paramName.includes('threshold') || paramName.includes('sensitivity') ? '0.1' : '1';
-        
-        return `
-            <input type="number" class="form-control" id="${paramName}" 
-                   name="${paramName}" ${isRequired ? 'required' : ''}
-                   min="${min}" max="${max}" step="${step}"
-                   placeholder="הזן ${this.translator.getParameterName(paramName)}">
-        `;
-    }
-    
-    /**
-     * Create string input
-     * יצירת שדה טקסט
-     */
-    createStringInput(paramName, isRequired) {
-        return `
-            <input type="text" class="form-control" id="${paramName}" 
-                   name="${paramName}" ${isRequired ? 'required' : ''}
-                   placeholder="הזן ${this.translator.getParameterName(paramName)}">
-        `;
-    }
-    
-    /**
-     * Create boolean input
-     * יצירת שדה בוליאני
-     */
-    createBooleanInput(paramName, isRequired) {
-        return `
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="${paramName}" 
-                       name="${paramName}" ${isRequired ? 'required' : ''}>
-                <label class="form-check-label" for="${paramName}">
-                    ${this.translator.getParameterName(paramName)}
-                </label>
-            </div>
-        `;
-    }
-    
-    /**
-     * Create text input (fallback)
-     * יצירת שדה טקסט (ברירת מחדל)
-     */
-    createTextInput(paramName, isRequired) {
-        return `
-            <input type="text" class="form-control" id="${paramName}" 
-                   name="${paramName}" ${isRequired ? 'required' : ''}
-                   placeholder="הזן ${this.translator.getParameterName(paramName)}">
-        `;
-    }
-    
-    /**
-     * Clear parameters
-     * ניקוי פרמטרים
-     */
+
     clearParameters() {
         const container = document.getElementById('parametersFields');
+        const wrapper = document.getElementById('parametersContainer');
         if (container) {
-            container.innerHTML = '<div class="text-muted">בחר שיטת מסחר כדי לראות פרמטרים</div>';
+            container.innerHTML = '<div class="text-muted">בחר שיטת מסחר כדי להגדיר פרמטרים</div>';
+        }
+        if (wrapper) {
+            wrapper.style.display = 'none';
         }
         this.currentMethod = null;
-        this.currentParameters = {};
     }
-    
-    /**
-     * Handle form submission
-     * טיפול בשליחת טופס
-     */
-    async onFormSubmit() {
+
+    renderParameterFields(method) {
+        const wrapper = document.getElementById('parametersContainer');
+        const container = document.getElementById('parametersFields');
+        if (!container || !wrapper) return;
+
+        container.innerHTML = '';
+
+        if (!Array.isArray(method.parameters) || method.parameters.length === 0) {
+            container.innerHTML = '<div class="text-muted">אין פרמטרים לשיטה זו</div>';
+            wrapper.style.display = '';
+            return;
+        }
+
+        method.parameters
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+            .forEach(parameter => {
+                const field = this.createParameterField(parameter);
+                container.appendChild(field);
+            });
+
+        wrapper.style.display = '';
+    }
+
+    createParameterField(parameter) {
+        const fieldContainer = document.createElement('div');
+        fieldContainer.className = 'mb-3';
+
+        const label = this.translator.getParameterName(parameter.parameter_key)
+            || parameter.parameter_name_he
+            || parameter.parameter_name_en
+            || parameter.parameter_key;
+
+        const requiredIndicator = parameter.is_required ? '<span class="text-danger">*</span>' : '';
+        const input = this.buildInputForParameter(parameter);
+
+        fieldContainer.innerHTML = `
+            <label class="form-label" for="${parameter.parameter_key}">
+                ${label} ${requiredIndicator}
+            </label>
+            ${input}
+            <small class="form-text text-muted">${parameter.help_text_he || parameter.help_text_en || ''}</small>
+            <div class="invalid-feedback" id="${parameter.parameter_key}Error"></div>
+        `;
+
+        return fieldContainer;
+    }
+
+    buildInputForParameter(parameter) {
+        const id = parameter.parameter_key;
+        const requiredAttr = parameter.is_required ? 'required' : '';
+        const defaultValue = parameter.default_value ?? '';
+        const min = parameter.min_value || '';
+        const max = parameter.max_value || '';
+        const validation = this.safeParse(parameter.validation_rule);
+
+        switch (parameter.parameter_type) {
+            case 'number':
+            case 'price':
+            case 'percentage':
+                return `
+                    <input type="number" class="form-control" id="${id}" name="${id}"
+                           ${requiredAttr}
+                           value="${defaultValue}"
+                           min="${min}" max="${max}"
+                           step="${parameter.parameter_type === 'number' ? '1' : '0.01'}">
+                `;
+            case 'boolean':
+                return `
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="${id}" name="${id}"
+                               ${defaultValue ? 'checked' : ''}>
+                    </div>
+                `;
+            case 'dropdown': {
+                const options = (validation?.allowed_values || []).map(option => `
+                    <option value="${option}" ${option === defaultValue ? 'selected' : ''}>${option}</option>
+                `).join('');
+                return `
+                    <select class="form-select" id="${id}" name="${id}" ${requiredAttr}>
+                        <option value="">בחר...</option>
+                        ${options}
+                    </select>
+                `;
+            }
+            default:
+                return `
+                    <input type="text" class="form-control" id="${id}" name="${id}"
+                           ${requiredAttr}
+                           value="${defaultValue}">
+                `;
+        }
+    }
+
+    async handleFormSubmit() {
         try {
-            // Collect form data
             const formData = this.collectFormData();
-            
-            // Validate form data
             const validation = this.validator.validateCondition(formData);
+
             if (!validation.isValid) {
-                this.showValidationErrors(validation.errors);
+                this.presentValidationErrors(validation.errors);
                 return;
             }
-            
-            // Show loading state
+
             this.setFormLoading(true);
-            
-            // Submit data (this would be handled by the parent component)
-            if (this.onSubmitCallback) {
+
+            if (typeof this.onSubmitCallback === 'function') {
                 await this.onSubmitCallback(formData);
             }
-            
         } catch (error) {
-            console.error('Error submitting form:', error);
-            this.showNotification('שגיאה בשליחת הטופס', 'error');
+            console.error('Error submitting condition form:', error);
+            this.showNotification(error.message || 'שגיאה בשליחת הטופס', 'error');
         } finally {
             this.setFormLoading(false);
         }
     }
-    
-    /**
-     * Collect form data
-     * איסוף נתוני טופס
-     */
+
     collectFormData() {
-        const formData = {
-            method_id: document.getElementById('methodSelect')?.value,
-            logical_operator: document.getElementById('logicalOperator')?.value || 'NONE',
-            condition_group: parseInt(document.getElementById('conditionGroup')?.value) || 0,
-            is_active: document.getElementById('isActive')?.checked || false,
+        const methodSelect = document.getElementById('methodSelect');
+        const logicalOperator = document.getElementById('logicalOperator');
+        const conditionGroup = document.getElementById('conditionGroup');
+        const isActive = document.getElementById('isActive');
+
+        const data = {
+            method_id: methodSelect?.value,
+            logical_operator: logicalOperator?.value || 'NONE',
+            condition_group: Number(conditionGroup?.value) || 0,
+            is_active: Boolean(isActive?.checked),
             parameters_json: {}
         };
-        
-        // Collect parameter values
+
         if (this.currentMethod) {
-            const methodKey = this.currentMethod.key;
-            const validationRules = this.validator.validationRules.methods[methodKey];
-            
-            if (validationRules) {
-                const allParams = [...(validationRules.required || []), ...(validationRules.optional || [])];
-                
-                allParams.forEach(paramName => {
-                    const input = document.getElementById(paramName);
-                    if (input) {
-                        let value = input.value;
-                        
-                        // Convert value based on type
-                        const paramType = validationRules.types[paramName];
-                        if (paramType === 'number') {
-                            value = parseFloat(value) || 0;
-                        } else if (paramType === 'boolean') {
-                            value = input.checked;
-                        }
-                        
-                        if (value !== '' && value !== null && value !== undefined) {
-                            formData.parameters_json[paramName] = value;
-                        }
+            (this.currentMethod.parameters || []).forEach(parameter => {
+                const input = document.getElementById(parameter.parameter_key);
+                if (!input) return;
+
+                if (parameter.parameter_type === 'boolean') {
+                    data.parameters_json[parameter.parameter_key] = input.checked;
+                    return;
+                }
+
+                if (parameter.parameter_type === 'number' ||
+                    parameter.parameter_type === 'price' ||
+                    parameter.parameter_type === 'percentage') {
+                    const value = input.value;
+                    if (value !== '') {
+                        data.parameters_json[parameter.parameter_key] = Number(value);
                     }
-                });
-            }
+                    return;
+                }
+
+                if (parameter.parameter_type === 'dropdown') {
+                    if (input.value) {
+                        data.parameters_json[parameter.parameter_key] = input.value;
+                    }
+                    return;
+                }
+
+                if (input.value) {
+                    data.parameters_json[parameter.parameter_key] = input.value;
+                }
+            });
         }
-        
-        return formData;
+
+        return data;
     }
-    
-    /**
-     * Show validation errors
-     * הצגת שגיאות ולידציה
-     */
-    showValidationErrors(errors) {
-        // Clear previous errors
-        document.querySelectorAll('.invalid-feedback').forEach(el => {
+
+    presentValidationErrors(errors) {
+        document.querySelectorAll(`#${this.containerId} .invalid-feedback`).forEach(el => {
             el.textContent = '';
             el.style.display = 'none';
         });
-        
-        document.querySelectorAll('.form-control, .form-select').forEach(el => {
+        document.querySelectorAll(`#${this.containerId} .form-control, #${this.containerId} .form-select`).forEach(el => {
             el.classList.remove('is-invalid');
         });
-        
-        // Show new errors
-        errors.forEach(error => {
-            this.showNotification(error, 'error');
+
+        (errors || []).forEach(error => {
+            if (typeof error === 'string') {
+                this.showNotification(error, 'error');
+            } else if (error?.field) {
+                const input = document.getElementById(error.field);
+                const feedback = document.getElementById(`${error.field}Error`);
+                if (input) {
+                    input.classList.add('is-invalid');
+                }
+                if (feedback) {
+                    feedback.textContent = error.message || this.translator.getMessage('validation_failed');
+                    feedback.style.display = 'block';
+                }
+            }
         });
     }
-    
-    /**
-     * Set form loading state
-     * הגדרת מצב טעינה לטופס
-     */
+
     setFormLoading(loading) {
         const saveBtn = document.getElementById('saveConditionBtn');
-        if (saveBtn) {
-            saveBtn.disabled = loading;
-            if (loading) {
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> שומר...';
-            } else {
-                saveBtn.innerHTML = '<i class="fas fa-save"></i> שמור תנאי';
-            }
-        }
+        if (!saveBtn) return;
+
+        saveBtn.disabled = loading;
+        saveBtn.innerHTML = loading
+            ? '<i class="fas fa-spinner fa-spin"></i> שומר...'
+            : `<i class="fas fa-save"></i> ${this.translator.getFormLabel('save_condition')}`;
     }
-    
-    /**
-     * Handle form cancel
-     * טיפול בביטול טופס
-     */
-    onFormCancel() {
-        if (this.onCancelCallback) {
+
+    handleFormCancel() {
+        if (typeof this.onCancelCallback === 'function') {
             this.onCancelCallback();
-        } else {
-            // Default behavior - hide form
-            const form = document.getElementById('conditionForm');
-            if (form) {
-                form.style.display = 'none';
-            }
         }
     }
-    
-    /**
-     * Set form callbacks
-     * הגדרת callback functions
-     */
+
     setCallbacks(onSubmit, onCancel) {
         this.onSubmitCallback = onSubmit;
         this.onCancelCallback = onCancel;
     }
-    
-    /**
-     * Populate form with existing data
-     * מילוי טופס בנתונים קיימים
-     */
+
     populateForm(conditionData) {
-        // Set method
-        const methodSelect = document.getElementById('methodSelect');
-        if (methodSelect && conditionData.method_id) {
-            methodSelect.value = conditionData.method_id;
-            this.onMethodChange(conditionData.method_id);
-        }
-        
-        // Set other fields
         const logicalOperator = document.getElementById('logicalOperator');
         if (logicalOperator && conditionData.logical_operator) {
             logicalOperator.value = conditionData.logical_operator;
         }
-        
+
         const conditionGroup = document.getElementById('conditionGroup');
         if (conditionGroup && conditionData.condition_group !== undefined) {
             conditionGroup.value = conditionData.condition_group;
         }
-        
+
         const isActive = document.getElementById('isActive');
         if (isActive && conditionData.is_active !== undefined) {
             isActive.checked = conditionData.is_active;
         }
-        
-        // Set parameters (after method is loaded)
-        setTimeout(() => {
-            if (conditionData.parameters_json) {
-                const parameters = typeof conditionData.parameters_json === 'string' 
-                    ? JSON.parse(conditionData.parameters_json) 
-                    : conditionData.parameters_json;
-                
-                Object.entries(parameters).forEach(([key, value]) => {
-                    const input = document.getElementById(key);
-                    if (input) {
-                        if (input.type === 'checkbox') {
-                            input.checked = Boolean(value);
-                        } else {
-                            input.value = value;
-                        }
-                    }
-                });
-            }
-        }, 500);
+
+        const parameters = conditionData.parameters_json || conditionData.parameters;
+        if (parameters && this.currentMethod) {
+            const parsedParams = typeof parameters === 'string' ? this.safeParse(parameters, {}) : parameters;
+            Object.entries(parsedParams).forEach(([key, value]) => {
+                const input = document.getElementById(key);
+                if (!input) return;
+
+                if (input.type === 'checkbox') {
+                    input.checked = Boolean(value);
+                } else {
+                    input.value = value;
+                }
+            });
+        }
     }
-    
-    /**
-     * Show notification
-     * הצגת התראה
-     */
+
+    safeParse(value, fallback = null) {
+        if (!value || typeof value !== 'string') {
+            return value || fallback;
+        }
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.warn('[ConditionsFormGenerator] Failed to parse JSON value', value, error);
+            return fallback;
+        }
+    }
+
     showNotification(message, type = 'info') {
         if (window.showNotification && typeof window.showNotification === 'function') {
             window.showNotification(message, type);

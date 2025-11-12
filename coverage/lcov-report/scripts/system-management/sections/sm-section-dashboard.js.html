@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/86</span>
+                <span class='fraction'>0/89</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/97</span>
+                <span class='fraction'>0/111</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/71</span>
+                <span class='fraction'>0/77</span>
             </div>
         
             
@@ -508,7 +508,17 @@
 <a name='L443'></a><a href='#L443'>443</a>
 <a name='L444'></a><a href='#L444'>444</a>
 <a name='L445'></a><a href='#L445'>445</a>
-<a name='L446'></a><a href='#L446'>446</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a>
+<a name='L451'></a><a href='#L451'>451</a>
+<a name='L452'></a><a href='#L452'>452</a>
+<a name='L453'></a><a href='#L453'>453</a>
+<a name='L454'></a><a href='#L454'>454</a>
+<a name='L455'></a><a href='#L455'>455</a>
+<a name='L456'></a><a href='#L456'>456</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -814,8 +824,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -943,6 +960,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1256,10 +1276,17 @@ class SMDashboardSection extends SMBaseSection {
    * קבלת צבע ציון בריאות
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tHealthScoreColor(score) {
-<span class="cstat-no" title="statement not covered" >    if (score &gt;= 90) <span class="cstat-no" title="statement not covered" >return '#28a745'; </span></span>// Green
-<span class="cstat-no" title="statement not covered" >    if (score &gt;= 75) <span class="cstat-no" title="statement not covered" >return '#ffc107'; </span></span>// Yellow
-<span class="cstat-no" title="statement not covered" >    if (score &gt;= 50) <span class="cstat-no" title="statement not covered" >return '#fd7e14'; </span></span>// Orange
-<span class="cstat-no" title="statement not covered" >    return '#dc3545'; </span>// Red
+    const palette = <span class="cstat-no" title="statement not covered" >window.SMUIColorUtils || null;</span>
+<span class="cstat-no" title="statement not covered" >    if (score &gt;= 90) {</span>
+<span class="cstat-no" title="statement not covered" >      return palette?.get('success', '#28a745') || '#28a745';</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (score &gt;= 75) {</span>
+<span class="cstat-no" title="statement not covered" >      return palette?.get('warning', '#ffc107') || '#ffc107';</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (score &gt;= 50) {</span>
+<span class="cstat-no" title="statement not covered" >      return palette?.getCSSVariableValue?.('--entity-cash_flow-color', '#fd7e14') || '#fd7e14';</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return palette?.get('danger', '#dc3545') || '#dc3545';</span>
   }
 &nbsp;
   /**
@@ -1389,10 +1416,13 @@ class SMDashboardSection extends SMBaseSection {
    * קבלת צבע פס התקדמות
    */
 <span class="fstat-no" title="function not covered" >  ge</span>tProgressColor(percent) {
-<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 90) <span class="cstat-no" title="statement not covered" >return '#dc3545'; </span></span>// Red
-<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 75) <span class="cstat-no" title="statement not covered" >return '#ffc107'; </span></span>// Yellow
-<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 50) <span class="cstat-no" title="statement not covered" >return '#17a2b8'; </span></span>// Blue
-<span class="cstat-no" title="statement not covered" >    return '#28a745'; </span>// Green
+<span class="cstat-no" title="statement not covered" >    if (window.SMUIComponents &amp;&amp; typeof window.SMUIComponents.getProgressColor === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >      return window.SMUIComponents.getProgressColor(percent);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 90) <span class="cstat-no" title="statement not covered" >return 'var(--color-danger, #dc3545)';</span></span>
+<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 75) <span class="cstat-no" title="statement not covered" >return 'var(--color-warning, #ffc107)';</span></span>
+<span class="cstat-no" title="statement not covered" >    if (percent &gt;= 50) <span class="cstat-no" title="statement not covered" >return 'var(--color-info, #17a2b8)';</span></span>
+<span class="cstat-no" title="statement not covered" >    return 'var(--color-success, #28a745)';</span>
   }
 }
 &nbsp;
@@ -1405,7 +1435,7 @@ class SMDashboardSection extends SMBaseSection {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.331Z
+                at 2025-11-12T15:11:43.827Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

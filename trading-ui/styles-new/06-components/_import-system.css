@@ -16,6 +16,29 @@
     min-height: 300px;
 }
 
+.active-session-warning-card {
+    width: 100%;
+    background-color: rgba(253, 126, 20, 0.3);
+    background-color: color-mix(in srgb, var(--entity-cash-flow-color, #fd7e14) 30%, transparent);
+    border-color: color-mix(in srgb, var(--entity-cash-flow-color, #fd7e14) 45%, transparent);
+    color: var(--entity-cash-flow-text, #0c5460);
+}
+
+.active-session-warning-card .summary-title,
+.active-session-warning-card .detail-label,
+.active-session-warning-card .detail-value,
+.active-session-warning-card h4 {
+    color: var(--entity-cash-flow-text, #0c5460);
+}
+
+.active-session-warning-card #resetImportSessionBtn {
+    margin-inline-start: 50px;
+}
+
+.active-session-warning-card #resetImportSessionBtn[data-button-type] {
+    min-width: 0;
+}
+
 #importUserDataModal .analysis-cards {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--spacing-sm);
@@ -347,6 +370,21 @@
 .problem-card:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
+}
+
+.problem-card.resolved-card {
+    border-left: 4px solid var(--success-color);
+    background: var(--success-background);
+}
+
+.problem-card.resolved-card .problem-card-header {
+    background: var(--success-color);
+    color: var(--text-on-primary);
+}
+
+.problem-card.resolved-card .problem-card-body {
+    color: var(--success-color);
+    font-weight: 500;
 }
 
 .problem-card-header {

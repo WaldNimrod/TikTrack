@@ -4,6 +4,8 @@
 
 מערכת Info Summary System היא מערכת מאוחדת לניהול וצגת סטטיסטיקות סיכום בכל עמודי המשתמש ב-TikTrack. המערכת מחליפה את הלוגיקה הכפולה והמפוזרת שהייתה קיימת בכל עמוד בנפרד.
 
+> **עדכון 2025-11-12 (Option A):** כל מחשבון וסיכום משתמשים כעת בנתונים הקנוניים מתוך `TableDataRegistry`. המשמעות היא שכל פילטר (Header, פילטרי ישות, מודולי פרטים) משפיע אוטומטית על הסטטיסטיקות. כדי לאפשר זאת יש להגדיר לכל עמוד `tableType` תואם בקובץ `info-summary-configs.js`, והמערכת תבצע resolve של הנתונים דרך `UnifiedTableSystem.filter.apply` והמאזינים של ה-Registry.
+
 ## ארכיטקטורה
 
 ### קבצי ליבה
@@ -45,6 +47,7 @@
 ```javascript
 trades: {
   containerId: 'summaryStats',
+  tableType: 'trades',
   stats: [
     {
       id: 'totalTrades',
@@ -79,6 +82,7 @@ trades: {
 ```javascript
 executions: {
   containerId: 'summaryStats',
+  tableType: 'executions',
   stats: [
     {
       id: 'totalExecutions',
@@ -282,3 +286,20 @@ initializeFormatters() {
 ## סיכום
 
 מערכת Info Summary System מספקת פתרון מאוחד ויעיל לניהול סטטיסטיקות סיכום בכל עמודי TikTrack. המערכת מבטיחה עקביות, תחזוקה קלה וביצועים טובים, תוך שמירה על תאימות לאחור עם הקוד הקיים.
+
+## Canonical Data Resolution (2025-11)
+
+החל מגרסה 4.0 פונקציית `calculateAndRender()` משתמשת ב-`TableDataRegistry` כמקור ראשון לנתונים:
+
+1. אם קיים `config.tableType` והטבלה רשומה ב-Registry → נטען את `getFilteredData(tableType)`.
+2. אם אין נתונים מסוננים אך יש נתונים מלאים (`getFullData`) → אלו ישמשו לחישוב סטטיסטיקות.
+3. אם ה-Registry אינו זמין (למשל בתסריט בדיקות) → נעשה שימוש במערך שהועבר לפונקציה (fallback).
+
+> 💡 **טיפ למפתחים:** כאשר יוצרים קונפיגורציה חדשה ב-`info-summary-configs.js`, חובה להוסיף `tableType` תואם לסוג הנתונים ב-`UnifiedTableSystem`. הדבר מבטיח שהסטטיסטיקות יגיבו לפילטרים, פאג'ינציה ומצבי עמוד.
+
+### Developer Checklist
+
+- [ ] הטבלה נרשמה ב-`UnifiedTableSystem.registry` (כולל `dataGetter` מעודכן).
+- [ ] `TableDataRegistry.setFullData` נקרא לאחר טעינת הנתונים הראשונית.
+- [ ] `config.tableType` תואם לשם שבו הטבלה רשומה (לדוגמה `'trading_accounts'`).
+- [ ] אם נדרשת פעולה נוספת בעת שינוי פילטרים (כמו עדכון כרטיסיות בדשבורד), מומלץ להשתמש ב-`TableDataRegistry.subscribe(tableType, callback)`.

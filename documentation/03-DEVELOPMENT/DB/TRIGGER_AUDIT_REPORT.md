@@ -53,3 +53,4 @@
 - Extend automated coverage to run against migrated databases from backups to ensure legacy data passes the same trigger invariants.
 - Add pipeline step to parse trigger inventory and alert on drift from canonical definitions.
 
+

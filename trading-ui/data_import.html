@@ -206,8 +206,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="steps-header-bar" style="display:flex; align-items:center; gap:1.5rem; justify-content:space-between; flex-wrap:wrap;">
-                        <div class="import-steps-indicator" style="margin-inline:auto;">
+                    <div class="steps-header-bar d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="import-steps-indicator">
                             <div class="step" data-step="1">
                                 <div class="step-number">1</div>
                                 <div class="step-label">העלאה</div>
@@ -221,7 +221,7 @@
                                 <div class="step-label">תצוגה מקדימה + אישור</div>
                             </div>
                         </div>
-                        <div class="analysis-loading-indicator" id="analysisLoadingIndicator" style="display:none; align-items:center; gap:0.75rem; min-width:260px;">
+                        <div class="analysis-loading-indicator align-items-center gap-2 flex-wrap" id="analysisLoadingIndicator" style="display:none;">
                             <div class="spinner-border text-primary" role="status" aria-hidden="true" style="width:1.8rem;height:1.8rem;"></div>
                             <div class="flex-grow-1 d-flex flex-column gap-1">
                                 <span class="analysis-loading-text" style="font-weight:600;">טוען ומעבד נתונים...</span>
@@ -230,125 +230,177 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="steps-header-actions d-flex align-items-center gap-2 flex-wrap" id="stepsHeaderPrimaryActions">
+                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="uploadStepActions" style="display:none;">
+                                <button data-button-type="TERTIARY"
+                                        data-text="המשך סשן פעיל"
+                                        data-onclick="resumeActiveImportSession()"
+                                        id="resumeImportSessionBtn"
+                                        style="display:none;"></button>
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לניתוח"
+                                        data-onclick="analyzeFile()"
+                                        id="analyzeBtn"
+                                        disabled></button>
+                            </div>
+                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="analysisStepActions" style="display:none;">
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לתצוגה מקדימה"
+                                        data-onclick="proceedToPreviewFromProblems()"
+                                        id="analysisContinueBtn"
+                                        disabled></button>
+                            </div>
+                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="previewStepActions" style="display:none;">
+                                <button data-button-type="PRIMARY"
+                                        data-text="ביצוע ייבוא"
+                                        data-onclick="confirmImport()"
+                                        id="confirmImportHeaderBtn"></button>
+                                <button data-button-type="PRIMARY"
+                                        data-text="ביצוע ייבוא + דוח"
+                                        data-onclick="confirmImport(true)"
+                                        id="confirmImportAndReportHeaderBtn"></button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="import-step" id="step-upload" data-step="1">
                         <div class="step-content">
-                            <div class="connector-section">
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                    <label for="connectorSelect">בחר ספק נתונים:</label>
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <button data-button-type="TERTIARY" data-text="המשך סשן פעיל"
-                                                data-onclick="resumeActiveImportSession()" id="resumeImportSessionBtn"
+                            <div class="row g-3 align-items-center" id="activeSessionControlsRow" style="display:none;">
+                                <div class="col-12 col-lg-6 d-flex align-items-center justify-content-lg-start justify-content-center">
+                                    <div class="summary-card info-card d-flex align-items-center flex-wrap active-session-warning-card w-100">
+                                        <div class="summary-title flex-grow-1">קיים סשן פתוח, ניתן להמשיך או לנקות</div>
+                                        <button data-button-type="WARNING"
+                                                data-text="נקה סשן פעיל"
+                                                data-onclick="confirmResetImportSession()"
+                                                data-entity-type="cash_flow"
+                                                id="resetImportSessionBtn"
                                                 style="display:none;"></button>
-                                        <button data-button-type="SECONDARY" data-text="איפוס תהליך"
-                                                data-onclick="confirmResetImportSession()" id="resetImportSessionBtn"></button>
                                     </div>
                                 </div>
-                                <select id="connectorSelect" class="form-select">
-                                    <option value="">בחר ספק נתונים...</option>
-                                    <option value="ibkr">Interactive Brokers (IBKR)</option>
-                                    <option value="demo">Demo Data</option>
-                                </select>
-                                <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
-                            </div>
-
-                            <div class="data-type-section">
-                                <label for="importDataTypeSelect">בחר תהליך ייבוא:</label>
-                                <select id="importDataTypeSelect" class="form-select">
-                                    <option value="executions">ביצועי מסחר (Executions)</option>
-                                </select>
-                                <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
-                                    <div class="summary-header">
-                                        <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
-                                        <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
-                                    </div>
-                                    <div class="summary-body" id="dataTypeInfoContent">
-                                        <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
-                                    </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="d-flex justify-content-lg-start justify-content-center gap-2 flex-wrap" id="activeSessionActions"></div>
                                 </div>
                             </div>
 
-                            <div class="summary-card active-session-card" id="activeSessionIndicator" style="display:none;">
-                                <h4>
-                                    <i class="bi bi-activity"></i>
-                                    סשן ייבוא פעיל
-                                </h4>
-                                <div class="summary-details">
-                                    <div class="detail-item">
-                                        <span class="detail-label">מזהה סשן:</span>
-                                        <span class="detail-value" id="activeSessionIdValue"></span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">מצב:</span>
-                                        <span class="detail-value" id="activeSessionStatusValue"></span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">קובץ:</span>
-                                        <span class="detail-value" id="activeSessionFileValue"></span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">חשבון:</span>
-                                        <span class="detail-value" id="activeSessionAccountValue"></span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">ספק:</span>
-                                        <span class="detail-value" id="activeSessionProviderValue"></span>
-                                    </div>
-                                </div>
-                                <div class="summary-details">
-                                    <div class="detail-item">
-                                        <span class="detail-label">סה"כ רשומות:</span>
-                                        <span class="detail-value" id="activeSessionTotalRecords">0</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">לייבוא:</span>
-                                        <span class="detail-value" id="activeSessionReadyRecords">0</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">להשמטה:</span>
-                                        <span class="detail-value" id="activeSessionSkipRecords">0</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">טיקרים חסרים:</span>
-                                        <span class="detail-value" id="activeSessionMissingTickers">0</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">כפילויות:</span>
-                                        <span class="detail-value" id="activeSessionDuplicateRecords">0</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">רשומות קיימות:</span>
-                                        <span class="detail-value" id="activeSessionExistingRecords">0</span>
+                            <div class="row g-3" id="activeSessionDetailsRow" style="display:none;">
+                                <div class="col-12">
+                                    <div class="summary-card active-session-card active-session-warning-card" id="activeSessionIndicator" style="display:none;">
+                                        <h4>
+                                            <i class="bi bi-activity"></i>
+                                            סשן ייבוא פעיל
+                                        </h4>
+                                        <div class="summary-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">מזהה סשן:</span>
+                                                <span class="detail-value" id="activeSessionIdValue"></span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">מצב:</span>
+                                                <span class="detail-value" id="activeSessionStatusValue"></span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">קובץ:</span>
+                                                <span class="detail-value" id="activeSessionFileValue"></span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">חשבון:</span>
+                                                <span class="detail-value" id="activeSessionAccountValue"></span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">ספק:</span>
+                                                <span class="detail-value" id="activeSessionProviderValue"></span>
+                                            </div>
+                                        </div>
+                                        <div class="summary-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label">סה"כ רשומות:</span>
+                                                <span class="detail-value" id="activeSessionTotalRecords">0</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">לייבוא:</span>
+                                                <span class="detail-value" id="activeSessionReadyRecords">0</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">להשמטה:</span>
+                                                <span class="detail-value" id="activeSessionSkipRecords">0</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">טיקרים חסרים:</span>
+                                                <span class="detail-value" id="activeSessionMissingTickers">0</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">כפילויות:</span>
+                                                <span class="detail-value" id="activeSessionDuplicateRecords">0</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">רשומות קיימות:</span>
+                                                <span class="detail-value" id="activeSessionExistingRecords">0</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="upload-section">
-                                <div class="file-drop-zone" id="dropZone">
-                                    <i class="bi bi-cloud-upload"></i>
-                                    <p>גרור קובץ CSV או לחץ לבחירה</p>
-                                    <input type="file" id="fileInput" accept=".csv" hidden>
-                                </div>
-                                <div class="file-info" id="fileInfo" style="display:none;">
-                                    <div class="file-details">
-                                        <span class="file-name" id="fileName"></span>
-                                        <span class="file-size" id="fileSize"></span>
+                            <div class="row g-3 align-items-start">
+                                <div class="col-12 col-md-4">
+                                    <div class="connector-section">
+                                        <label for="connectorSelect">בחר ספק נתונים:</label>
+                                        <select id="connectorSelect" class="form-select">
+                                            <option value="">בחר ספק נתונים...</option>
+                                            <option value="ibkr">Interactive Brokers (IBKR)</option>
+                                            <option value="demo">Demo Data</option>
+                                        </select>
+                                        <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
                                     </div>
-                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" data-onclick="resetFile()"></button>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="account-section">
+                                        <label for="tradingAccountSelect">בחר חשבון מסחר:</label>
+                                        <select id="tradingAccountSelect" class="form-select">
+                                            <option value="">בחר חשבון מסחר...</option>
+                                        </select>
+                                        <small class="form-text text-muted">החשבון שאליו ישויכו כל הרשומות בקובץ</small>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="data-type-section">
+                                        <label for="importDataTypeSelect">בחר תהליך ייבוא:</label>
+                                        <select id="importDataTypeSelect" class="form-select">
+                                            <option value="executions">ביצועי מסחר (Executions)</option>
+                                        </select>
+                                        <small class="form-text text-muted">בחר את סוג הנתונים לניתוח הנוכחי</small>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="account-section">
-                                <label>בחר חשבון מסחר:</label>
-                                <select id="tradingAccountSelect" class="form-select">
-                                    <option value="">בחר חשבון מסחר...</option>
-                                </select>
-                            </div>
-
-                            <div class="step-actions">
-                                <button data-button-type="PRIMARY" data-text="המשך לניתוח"
-                                        data-onclick="analyzeFile()" id="analyzeBtn" disabled></button>
+                            <div class="row g-3 align-items-start">
+                                <div class="col-12 col-lg-6">
+                                    <div class="upload-section">
+                                        <div class="file-drop-zone" id="dropZone">
+                                            <i class="bi bi-cloud-upload"></i>
+                                            <p>גרור קובץ CSV או לחץ לבחירה</p>
+                                            <input type="file" id="fileInput" accept=".csv" hidden>
+                                        </div>
+                                        <div class="file-info" id="fileInfo" style="display:none;">
+                                            <div class="file-details">
+                                                <span class="file-name" id="fileName"></span>
+                                                <span class="file-size" id="fileSize"></span>
+                                            </div>
+                                        <button data-button-type="WARNING" data-text="החלף קובץ" data-onclick="resetFile()"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
+                                        <div class="summary-header">
+                                            <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
+                                            <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
+                                        </div>
+                                        <div class="summary-body" id="dataTypeInfoContent">
+                                            <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -420,15 +472,7 @@
 
                             <div id="cashflowIssuesSummarySection" style="display:none; margin-top:1.5rem;">
                                 <h4>התראות קריטיות</h4>
-                                <div class="problem-card-container" id="cashflowIssuesSummaryList"></div>
-                            </div>
-
-                            <div class="step-actions analysis-actions" id="analysisStepActions" style="display:none;">
-                                <button data-button-type="PRIMARY"
-                                        data-text="המשך לתצוגה מקדימה"
-                                        data-onclick="proceedToPreviewFromProblems()"
-                                        id="analysisContinueBtn"
-                                        disabled></button>
+                                <div class="problem-card-container problem-cards-container" id="cashflowIssuesSummaryList"></div>
                             </div>
 
                             <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
@@ -437,55 +481,55 @@
                                 <div class="problem-section" id="missingTickersSection" style="display:none;">
                                     <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
                                     <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
-                                    <div class="problem-card-container" id="missingTickersContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="missingTickersContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="cashflowMissingAccountsSection" style="display:none;">
                                     <h4><i class="bi bi-people"></i> חשבונות חסרים</h4>
                                     <p>החשבונות הבאים לא קיימים במערכת. יש לשייך אותם לפני המשך הייבוא:</p>
-                                    <div class="problem-card-container" id="cashflowMissingAccountsContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="cashflowMissingAccountsContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="cashflowCurrencyIssuesSection" style="display:none;">
                                     <h4><i class="bi bi-currency-exchange"></i> בעיות מטבע</h4>
                                     <p>נמצאו רשומות עם קודי מטבע לא מזוהים או שגויים:</p>
-                                    <div class="problem-card-container" id="cashflowCurrencyIssuesContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="cashflowCurrencyIssuesContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="accountMissingAccountsSection" style="display:none;">
                                     <h4><i class="bi bi-person-x"></i> חשבונות חסרים</h4>
                                     <p>חשבונות אלו לא קיימים במערכת או אינם משויכים. יש לטפל בהם לפני המשך התהליך:</p>
-                                    <div class="problem-card-container" id="accountMissingAccountsContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="accountMissingAccountsContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="accountCurrencyMismatchesSection" style="display:none;">
                                     <h4><i class="bi bi-cash-stack"></i> אי התאמות מטבע בסיס</h4>
                                     <p>החשבונות הבאים מכילים מטבע בסיס שונה מזה המוגדר במערכת:</p>
-                                    <div class="problem-card-container" id="accountCurrencyMismatchesContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="accountCurrencyMismatchesContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="accountEntitlementWarningsSection" style="display:none;">
                                     <h4><i class="bi bi-shield-exclamation"></i> הרשאות חסרות</h4>
                                     <p>החשבונות הבאים חסרים הרשאות נדרשות:</p>
-                                    <div class="problem-card-container" id="accountEntitlementWarningsContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="accountEntitlementWarningsContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="accountMissingDocumentsSection" style="display:none;">
                                     <h4><i class="bi bi-file-earmark-excel"></i> מסמכים חסרים</h4>
                                     <p>יש להשלים את המסמכים המופיעים להלן עבור חשבונות אלו:</p>
-                                    <div class="problem-card-container" id="accountMissingDocumentsContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="accountMissingDocumentsContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="existingRecordsSection" style="display:none;">
                                     <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
                                     <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
-                                    <div class="problem-card-container" id="existingRecordsContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="existingRecordsContainer"></div>
                                 </div>
 
                                 <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
                                     <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
                                     <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזה רשומה לייבא:</p>
-                                    <div class="problem-card-container" id="withinFileDuplicatesContainer"></div>
+                                    <div class="problem-card-container problem-cards-container" id="withinFileDuplicatesContainer"></div>
                                 </div>
                             </div>
 
@@ -584,9 +628,7 @@
 
                             <div class="step-actions">
                                 <button data-button-type="BACK" data-text="חזור" data-import-back-step="2" data-onclick="goToStep(2)"></button>
-                                <button data-button-type="CANCEL" data-text="ביטול" data-onclick="confirmResetImportSession()"></button>
-                                <button data-button-type="SAVE" data-text="ביצוע ייבוא" data-onclick="confirmImport()"></button>
-                                <button data-button-type="DOWNLOAD" data-text="ביצוע ייבוא + הורדת דוח" data-onclick="confirmImport(true)"></button>
+                                <button data-button-type="WARNING" data-text="ביטול" data-onclick="confirmResetImportSession()"></button>
                             </div>
                         </div>
                     </div>

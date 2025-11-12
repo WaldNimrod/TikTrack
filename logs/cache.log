@@ -1,270 +1,770 @@
-2025-11-11 02:24:37,664 - cache - INFO - Cache disabled - skipping set for key: services.ticker_service.get_all:36aa93c80ff3b7999410ed9d9301cc36
-2025-11-11 02:24:56,764 - cache - INFO - 🧹 Frontend cache action
-2025-11-11 03:43:19,255 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:43:19,255 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:43:19,256 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:43:19,256 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:43:19,256 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:43:19,256 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:43:19,259 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
-2025-11-11 03:43:19,259 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:43:20,265 - utils.performance_monitor - INFO - System metrics: CPU: 21.0%, Memory: 68.9%, Disk: 4.5%
-2025-11-11 03:43:20,266 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:43:20,270 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:44:53,277 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:44:53,277 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:44:53,277 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:44:53,277 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:44:53,277 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:44:53,277 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:44:53,280 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:44:53,280 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:44:54,286 - utils.performance_monitor - INFO - System metrics: CPU: 4.2%, Memory: 67.7%, Disk: 4.5%
-2025-11-11 03:44:54,286 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:44:54,286 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:45:48,150 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:45:48,151 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:45:48,151 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:45:48,151 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:45:48,151 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:45:48,151 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:45:48,154 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:45:48,154 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:45:49,160 - utils.performance_monitor - INFO - System metrics: CPU: 6.6%, Memory: 68.2%, Disk: 4.5%
-2025-11-11 03:45:49,161 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:45:49,161 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:45:49,227 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:45:49,239 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:45:49,247 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
-2025-11-11 03:45:49,247 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:45:49,247 - root - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:45:49,247 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
-2025-11-11 03:45:49,247 - root - INFO - ✅ Import sessions cleanup task registered successfully
-2025-11-11 03:45:49,247 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
-2025-11-11 03:45:49,248 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:45:49,248 - root - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:45:49,248 - root - INFO - 🚀 Starting background task scheduler...
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
-2025-11-11 03:45:49,248 - services.background_tasks - INFO - Background task scheduler started
-2025-11-11 03:45:49,248 - root - INFO - ✅ Background task scheduler started successfully
-2025-11-11 03:45:49,286 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:726a8109542089ad284d4715904e74cb
-2025-11-11 03:45:49,286 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:726a8109542089ad284d4715904e74cb
-2025-11-11 03:45:49,286 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
-2025-11-11 03:45:49,287 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
-2025-11-11 03:45:49,287 - root - INFO - ✅ External data refresh scheduler started successfully
-2025-11-11 03:45:49,296 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:45:55,584 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:45:55,584 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:45:55,584 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:45:55,584 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:45:55,584 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:45:55,585 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:45:55,587 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:45:55,587 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:45:56,593 - utils.performance_monitor - INFO - System metrics: CPU: 4.9%, Memory: 68.5%, Disk: 4.5%
-2025-11-11 03:45:56,594 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:45:56,594 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:45:56,652 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:45:56,663 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:45:56,670 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
-2025-11-11 03:45:56,670 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:45:56,671 - root - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
-2025-11-11 03:45:56,671 - root - INFO - ✅ Import sessions cleanup task registered successfully
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
-2025-11-11 03:45:56,671 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:45:56,671 - root - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:45:56,671 - root - INFO - 🚀 Starting background task scheduler...
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
-2025-11-11 03:45:56,671 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
-2025-11-11 03:45:56,672 - services.background_tasks - INFO - Background task scheduler started
-2025-11-11 03:45:56,672 - root - INFO - ✅ Background task scheduler started successfully
-2025-11-11 03:45:56,708 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:873f9ca0915c1d6cb8c32f98786bde04
-2025-11-11 03:45:56,708 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:873f9ca0915c1d6cb8c32f98786bde04
-2025-11-11 03:45:56,708 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
-2025-11-11 03:45:56,709 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
-2025-11-11 03:45:56,710 - root - INFO - ✅ External data refresh scheduler started successfully
-2025-11-11 03:45:56,717 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:03,704 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:46:03,705 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:46:03,705 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:46:03,705 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:46:03,705 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:46:03,705 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:46:03,708 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:46:03,708 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:46:04,713 - utils.performance_monitor - INFO - System metrics: CPU: 7.2%, Memory: 68.3%, Disk: 4.5%
-2025-11-11 03:46:04,714 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:46:04,714 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:46:04,769 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:04,780 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:04,787 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
-2025-11-11 03:46:04,787 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:46:04,787 - root - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:46:04,787 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
-2025-11-11 03:46:04,787 - root - INFO - ✅ Import sessions cleanup task registered successfully
-2025-11-11 03:46:04,787 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
-2025-11-11 03:46:04,788 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:46:04,788 - root - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:46:04,788 - root - INFO - 🚀 Starting background task scheduler...
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
-2025-11-11 03:46:04,788 - services.background_tasks - INFO - Background task scheduler started
-2025-11-11 03:46:04,788 - root - INFO - ✅ Background task scheduler started successfully
-2025-11-11 03:46:04,823 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a2148c75f392c78e150e86a8697fbdb9
-2025-11-11 03:46:04,823 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a2148c75f392c78e150e86a8697fbdb9
-2025-11-11 03:46:04,823 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
-2025-11-11 03:46:04,824 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
-2025-11-11 03:46:04,824 - root - INFO - ✅ External data refresh scheduler started successfully
-2025-11-11 03:46:04,832 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:11,828 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:46:11,828 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:46:11,828 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:46:11,828 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:46:11,828 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:46:11,828 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:46:11,831 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:46:11,831 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:46:12,835 - utils.performance_monitor - INFO - System metrics: CPU: 14.2%, Memory: 68.3%, Disk: 4.5%
-2025-11-11 03:46:12,835 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:46:12,835 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:46:12,869 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:12,879 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:12,886 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
-2025-11-11 03:46:12,886 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:46:12,886 - root - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
-2025-11-11 03:46:12,887 - root - INFO - ✅ Import sessions cleanup task registered successfully
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
-2025-11-11 03:46:12,887 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:46:12,887 - root - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:46:12,887 - root - INFO - 🚀 Starting background task scheduler...
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
-2025-11-11 03:46:12,887 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
-2025-11-11 03:46:12,888 - services.background_tasks - INFO - Background task scheduler started
-2025-11-11 03:46:12,888 - root - INFO - ✅ Background task scheduler started successfully
-2025-11-11 03:46:12,925 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:0c392d944f8b528538de123277dd29fe
-2025-11-11 03:46:12,925 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:0c392d944f8b528538de123277dd29fe
-2025-11-11 03:46:12,925 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
-2025-11-11 03:46:12,926 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
-2025-11-11 03:46:12,926 - root - INFO - ✅ External data refresh scheduler started successfully
-2025-11-11 03:46:12,936 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:12,937 - root - INFO - 🔵 HANDLE_DB_SESSION: Wrapping get_trading_accounts, auto_commit=True
-2025-11-11 03:46:12,937 - root - INFO - ✅ HANDLE_DB_SESSION: Got database session
-2025-11-11 03:46:12,937 - root - INFO - 🟢 HANDLE_DB_SESSION: Calling get_trading_accounts
-2025-11-11 03:46:12,938 - routes.api.base_entity.trading_accounts - INFO - Getting all trading_accounts records
-2025-11-11 03:46:12,941 - root - INFO - 🟢 HANDLE_DB_SESSION: get_trading_accounts completed
-2025-11-11 03:46:12,941 - root - INFO - 🔵 COMMIT: About to commit database transaction
-2025-11-11 03:46:12,941 - root - INFO - ✅ COMMIT: Database transaction committed successfully
-2025-11-11 03:46:38,261 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:46:38,262 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:46:38,262 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
-[Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:46:38,262 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:46:38,262 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:46:38,262 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:46:38,265 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:46:38,265 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:46:39,270 - utils.performance_monitor - INFO - System metrics: CPU: 25.7%, Memory: 68.0%, Disk: 4.5%
-2025-11-11 03:46:39,271 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:46:39,272 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:46:39,333 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:39,344 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:39,351 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
-2025-11-11 03:46:39,351 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:46:39,351 - root - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
-2025-11-11 03:46:39,352 - root - INFO - ✅ Import sessions cleanup task registered successfully
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
-2025-11-11 03:46:39,352 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:46:39,352 - root - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:46:39,352 - root - INFO - 🚀 Starting background task scheduler...
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
-2025-11-11 03:46:39,352 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
-2025-11-11 03:46:39,353 - services.background_tasks - INFO - Background task scheduler started
-2025-11-11 03:46:39,353 - root - INFO - ✅ Background task scheduler started successfully
-2025-11-11 03:46:39,388 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:95227ea87719bac41b1b8a1f3e603dd1
-2025-11-11 03:46:39,388 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:95227ea87719bac41b1b8a1f3e603dd1
-2025-11-11 03:46:39,388 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
-2025-11-11 03:46:39,389 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
-2025-11-11 03:46:39,389 - root - INFO - ✅ External data refresh scheduler started successfully
-2025-11-11 03:46:39,398 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:46:39,400 - services.user_data_import.import_orchestrator - ERROR - Failed to get import history: (sqlite3.OperationalError) no such column: import_sessions.connector_type
-[SQL: SELECT import_sessions.trading_account_id AS import_sessions_trading_account_id, import_sessions.provider AS import_sessions_provider, import_sessions.connector_type AS import_sessions_connector_type, import_sessions.task_type AS import_sessions_task_type, import_sessions.file_name AS import_sessions_file_name, import_sessions.total_records AS import_sessions_total_records, import_sessions.imported_records AS import_sessions_imported_records, import_sessions.skipped_records AS import_sessions_skipped_records, import_sessions.status AS import_sessions_status, import_sessions.summary_data AS import_sessions_summary_data, import_sessions.completed_at AS import_sessions_completed_at, import_sessions.id AS import_sessions_id, import_sessions.created_at AS import_sessions_created_at 
-FROM import_sessions 
-WHERE import_sessions.trading_account_id = ? ORDER BY import_sessions.created_at DESC
- LIMIT ? OFFSET ?]
-[parameters: (1, 10, 0)]
+2025-11-12 13:23:10,450 - Backend.routes.external_data.status - ERROR - Error in clear_data_logs: (sqlite3.OperationalError) no such table: data_refresh_logs
+[SQL: DELETE FROM data_refresh_logs]
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
-2025-11-11 03:59:04,419 - root - INFO - 🚀 Starting TikTrack server...
-2025-11-11 03:59:04,420 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
-2025-11-11 03:59:04,420 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+2025-11-12 13:23:10,450 - Backend.routes.external_data.status - ERROR - Error in clear_data_logs: (sqlite3.OperationalError) no such table: data_refresh_logs
+[SQL: DELETE FROM data_refresh_logs]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-11-12 13:23:10,457 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 13:23:10,457 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 13:24:26,626 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 13:24:26,626 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 13:24:26,626 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
 [Clang 17.0.0 (clang-1700.0.13.5)]
-2025-11-11 03:59:04,420 - root - INFO - 📦 Flask version: 2.3.3
-2025-11-11 03:59:04,420 - root - INFO - 🗄️ Initializing database...
-2025-11-11 03:59:04,420 - utils.performance_monitor - INFO - Starting operation: Database initialization
-2025-11-11 03:59:04,423 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
-2025-11-11 03:59:04,423 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:59:05,429 - utils.performance_monitor - INFO - System metrics: CPU: 7.0%, Memory: 68.2%, Disk: 4.5%
-2025-11-11 03:59:05,429 - root - INFO - ✅ Database initialized successfully
-2025-11-11 03:59:05,430 - root - INFO - ✅ Server initialization completed
-2025-11-11 03:59:05,505 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:59:05,517 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-11 03:59:05,524 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
-2025-11-11 03:59:05,524 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:59:05,524 - root - INFO - ✅ Condition evaluation task registered successfully
-2025-11-11 03:59:05,524 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
-2025-11-11 03:59:05,524 - root - INFO - ✅ Import sessions cleanup task registered successfully
-2025-11-11 03:59:05,524 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
-2025-11-11 03:59:05,524 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:59:05,524 - root - INFO - ✅ Alert expiry task registered successfully
-2025-11-11 03:59:05,524 - root - INFO - 🚀 Starting background task scheduler...
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
-2025-11-11 03:59:05,525 - services.background_tasks - INFO - Background task scheduler started
-2025-11-11 03:59:05,525 - root - INFO - ✅ Background task scheduler started successfully
-2025-11-11 03:59:05,561 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:9b3deed8c8d7c6587507099bd73cd941
-2025-11-11 03:59:05,561 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:9b3deed8c8d7c6587507099bd73cd941
-2025-11-11 03:59:05,562 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
-2025-11-11 03:59:05,563 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
-2025-11-11 03:59:05,563 - root - INFO - ✅ External data refresh scheduler started successfully
-2025-11-11 03:59:05,572 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
-2025-11-12 00:41:15,449 - cache - INFO - Cache disabled - skipping set for key: import_session_85_summary
-2025-11-12 00:56:19,867 - cache - INFO - Cache disabled - skipping set for key: import_session_86_summary
+2025-11-12 13:24:26,626 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 13:24:26,626 - root - INFO - 🗄️ Initializing database...
+2025-11-12 13:24:26,626 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 13:24:26,630 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.004s
+2025-11-12 13:24:26,630 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:24:27,636 - utils.performance_monitor - INFO - System metrics: CPU: 10.2%, Memory: 50.5%, Disk: 4.8%
+2025-11-12 13:24:27,636 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:24:27,636 - root - INFO - ✅ Server initialization completed
+2025-11-12 13:24:27,694 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:27,706 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:27,713 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 13:24:27,713 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:24:27,713 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:24:27,713 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 13:24:27,713 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 13:24:27,713 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 13:24:27,713 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:24:27,713 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:24:27,713 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 13:24:27,713 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 13:24:27,714 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 13:24:27,714 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 13:24:27,740 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a72252a628805605742bd21d2d892a75
+2025-11-12 13:24:27,740 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:a72252a628805605742bd21d2d892a75
+2025-11-12 13:24:27,740 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 13:24:27,741 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 13:24:27,741 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 13:24:27,771 - services.background_tasks - INFO - Background Task Manager initialized with real-time notifications support
+2025-11-12 13:24:27,771 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler initialized with NY market clock
+2025-11-12 13:24:27,772 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 13:24:27,772 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 13:24:27,772 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 13:24:27,772 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 13:24:27,772 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 13:24:27,772 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 13:24:27,772 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 13:24:27,772 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 13:24:27,772 - root - INFO - 🗄️ Initializing database...
+2025-11-12 13:24:27,772 - root - INFO - 🗄️ Initializing database...
+2025-11-12 13:24:27,772 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 13:24:27,772 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 13:24:27,774 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.002s
+2025-11-12 13:24:27,774 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.002s
+2025-11-12 13:24:27,774 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:24:27,774 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:24:28,779 - utils.performance_monitor - INFO - System metrics: CPU: 29.7%, Memory: 51.1%, Disk: 4.8%
+2025-11-12 13:24:28,779 - utils.performance_monitor - INFO - System metrics: CPU: 29.7%, Memory: 51.1%, Disk: 4.8%
+2025-11-12 13:24:28,781 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:24:28,781 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:24:28,781 - root - INFO - ✅ Server initialization completed
+2025-11-12 13:24:28,781 - root - INFO - ✅ Server initialization completed
+2025-11-12 13:24:28,856 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 13:24:28,856 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 13:24:28,856 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:24:28,856 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:24:28,857 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:24:28,857 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 13:24:28,857 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 13:24:28,857 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 13:24:28,857 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:24:28,857 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:24:28,857 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:24:28,857 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:24:28,857 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 13:24:28,857 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 13:24:28,857 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 13:24:28,858 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 13:24:28,858 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 13:24:28,858 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 13:24:28,859 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:6c5c1d6058d1b308c50aa0024b129c26
+2025-11-12 13:24:28,859 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:6c5c1d6058d1b308c50aa0024b129c26
+2025-11-12 13:24:28,859 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:6c5c1d6058d1b308c50aa0024b129c26
+2025-11-12 13:24:28,859 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 13:24:28,859 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 13:24:28,860 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 13:24:28,860 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 13:24:28,860 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 13:24:28,860 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 13:24:28,871 - Backend.models.trade - INFO - Trade model loaded - opened_at fix applied
+2025-11-12 13:24:28,871 - Backend.models.trade - INFO - Trade model loaded - opened_at fix applied
+2025-11-12 13:24:28,904 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,904 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,905 - Backend.services.advanced_cache_service - INFO - Cache cleanup thread started
+2025-11-12 13:24:28,905 - Backend.services.advanced_cache_service - INFO - Cache cleanup thread started
+2025-11-12 13:24:28,905 - Backend.services.advanced_cache_service - INFO - Advanced Cache Service initialized with 100MB limit
+2025-11-12 13:24:28,905 - Backend.services.advanced_cache_service - INFO - Advanced Cache Service initialized with 100MB limit
+2025-11-12 13:24:28,921 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,921 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,921 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,921 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,921 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,921 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,922 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,922 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,922 - constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,922 - constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,923 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,923 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,923 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,923 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,925 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,925 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,925 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,925 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,925 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,925 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,926 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,927 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,927 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,927 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,927 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:28,979 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:28,979 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:28,984 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:24:28,984 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:24:28,985 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 13:24:28,985 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 13:24:28,985 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:24:28,985 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:24:28,986 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:28,986 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:28,987 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert for condition 1 already active
+2025-11-12 13:24:28,987 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert for condition 1 already active
+2025-11-12 13:24:28,987 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:28,987 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:28,987 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:24:28,987 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:24:29,007 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:29,007 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:29,010 - Backend.services.condition_evaluation_task - INFO - ℹ️ Auto-generate alerts disabled for condition 1, skipping alert processing
+2025-11-12 13:24:29,010 - Backend.services.condition_evaluation_task - INFO - ℹ️ Auto-generate alerts disabled for condition 1, skipping alert processing
+2025-11-12 13:24:29,010 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:29,010 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:29,010 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:24:29,010 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:24:29,028 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:29,028 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:29,033 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert reactivated for condition 1
+2025-11-12 13:24:29,033 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert reactivated for condition 1
+2025-11-12 13:24:29,033 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:29,033 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:29,033 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:24:29,033 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:24:29,047 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:29,047 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:24:29,051 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:24:29,051 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:24:29,051 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:29,051 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:24:29,051 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:24:29,051 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:24:29,077 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-12 13:24:29,077 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-12 13:24:29,078 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-12 13:24:29,078 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-12 13:24:29,079 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-12 13:24:29,079 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-12 13:24:29,080 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-12 13:24:29,080 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-12 13:24:29,081 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-12 13:24:29,081 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-12 13:24:29,082 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-12 13:24:29,082 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-12 13:24:29,085 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-12 13:24:29,085 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-12 13:24:29,085 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 13:24:29,085 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 13:24:29,086 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 13:24:29,086 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 13:24:29,103 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,103 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,104 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>!
+2025-11-12 13:24:29,104 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>!
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>?
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>?
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4378450768'>
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4378450768'>
+2025-11-12 13:24:29,105 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> (via trading_account_id)
+2025-11-12 13:24:29,105 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> (via trading_account_id)
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> - checking database directly...
+2025-11-12 13:24:29,105 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> - checking database directly...
+2025-11-12 13:24:29,106 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,106 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,131 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:24:29,131 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:24:29,131 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:24:29,131 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:24:29,131 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4378657072'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:24:29,131 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4378657072'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,132 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,133 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,133 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,133 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,133 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>!
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>!
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>?
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>?
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4378450768'>
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4378450768'>
+2025-11-12 13:24:29,133 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> (via trading_account_id)
+2025-11-12 13:24:29,133 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> (via trading_account_id)
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> - checking database directly...
+2025-11-12 13:24:29,133 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'> - checking database directly...
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4378657072'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:24:29,134 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4378657072'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:24:29,134 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,134 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4375970144'>
+2025-11-12 13:24:29,135 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-12 13:24:29,135 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-12 13:24:29,138 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:24:29,138 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:24:29,142 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:24:29,142 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:24:29,143 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,143 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,143 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,143 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:24:29,143 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:24:29,144 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:24:29,144 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:24:29,145 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,145 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,145 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,145 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,145 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,145 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:98883060111b61a6d5f008f1cf392527
+2025-11-12 13:24:29,145 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 13:24:29,145 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 13:24:29,157 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,157 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,157 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,157 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,157 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,157 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,158 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,158 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,159 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 13:24:29,159 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 13:24:29,165 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,165 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,165 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,165 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,165 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,165 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,166 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,166 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,167 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:24:29,167 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:24:29,167 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,167 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,167 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,167 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,168 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,168 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,169 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:24:29,169 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:24:29,169 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,169 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,169 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,169 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,170 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,170 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,170 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_1d76ddfb1fa1473b9881aa8f2b25ebd1 - Test Provider
+2025-11-12 13:24:29,170 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_1d76ddfb1fa1473b9881aa8f2b25ebd1 - Test Provider
+2025-11-12 13:24:29,170 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,170 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,171 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,171 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,171 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,171 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,177 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,177 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,177 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,177 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,178 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,178 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,178 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,178 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,179 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,179 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:24:29,179 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,179 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,179 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,179 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,180 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,180 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,181 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:24:29,181 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:24:29,181 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,181 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,181 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,181 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,182 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,182 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,183 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:24:29,183 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:24:29,183 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,183 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,183 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,183 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,184 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,184 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,184 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_10f2eb594a2d496db0e31e03cd265250 - Test Provider
+2025-11-12 13:24:29,184 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_10f2eb594a2d496db0e31e03cd265250 - Test Provider
+2025-11-12 13:24:29,185 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,185 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,185 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,185 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:24:29,186 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,186 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:24:29,195 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
+2025-11-12 13:24:29,195 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
+2025-11-12 13:24:29,212 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 13:24:29,212 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 13:29:01,325 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 13:29:01,325 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 13:29:01,325 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 13:29:01,325 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 13:29:01,325 - root - INFO - 🗄️ Initializing database...
+2025-11-12 13:29:01,325 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 13:29:01,328 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.003s
+2025-11-12 13:29:01,328 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:29:02,334 - utils.performance_monitor - INFO - System metrics: CPU: 14.3%, Memory: 50.7%, Disk: 4.8%
+2025-11-12 13:29:02,334 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:29:02,334 - root - INFO - ✅ Server initialization completed
+2025-11-12 13:29:02,383 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:02,395 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:02,406 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 13:29:02,406 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:29:02,406 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:29:02,406 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 13:29:02,406 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 13:29:02,406 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 13:29:02,406 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:29:02,406 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:29:02,406 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 13:29:02,406 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 13:29:02,406 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 13:29:02,406 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 13:29:02,407 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 13:29:02,407 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 13:29:02,407 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 13:29:02,407 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 13:29:02,407 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 13:29:02,407 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 13:29:02,434 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:4ddfe40760f594a6ee307762f1f6f2e3
+2025-11-12 13:29:02,434 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:4ddfe40760f594a6ee307762f1f6f2e3
+2025-11-12 13:29:02,434 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 13:29:02,435 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 13:29:02,436 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 13:29:02,466 - services.background_tasks - INFO - Background Task Manager initialized with real-time notifications support
+2025-11-12 13:29:02,466 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler initialized with NY market clock
+2025-11-12 13:29:02,466 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 13:29:02,466 - root - INFO - 🚀 Starting TikTrack server...
+2025-11-12 13:29:02,466 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 13:29:02,466 - root - INFO - 📁 Current working directory: /Users/nimrod/Documents/TikTrack/TikTrackApp
+2025-11-12 13:29:02,467 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 13:29:02,467 - root - INFO - 🐍 Python version: 3.9.6 (default, Apr 30 2025, 02:07:17) 
+[Clang 17.0.0 (clang-1700.0.13.5)]
+2025-11-12 13:29:02,467 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 13:29:02,467 - root - INFO - 📦 Flask version: 2.3.3
+2025-11-12 13:29:02,467 - root - INFO - 🗄️ Initializing database...
+2025-11-12 13:29:02,467 - root - INFO - 🗄️ Initializing database...
+2025-11-12 13:29:02,467 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 13:29:02,467 - utils.performance_monitor - INFO - Starting operation: Database initialization
+2025-11-12 13:29:02,469 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.002s
+2025-11-12 13:29:02,469 - utils.performance_monitor - INFO - Completed operation: Database initialization - Duration: 0.002s
+2025-11-12 13:29:02,469 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:29:02,469 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:29:03,474 - utils.performance_monitor - INFO - System metrics: CPU: 9.1%, Memory: 50.7%, Disk: 4.8%
+2025-11-12 13:29:03,474 - utils.performance_monitor - INFO - System metrics: CPU: 9.1%, Memory: 50.7%, Disk: 4.8%
+2025-11-12 13:29:03,475 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:29:03,475 - root - INFO - ✅ Database initialized successfully
+2025-11-12 13:29:03,476 - root - INFO - ✅ Server initialization completed
+2025-11-12 13:29:03,476 - root - INFO - ✅ Server initialization completed
+2025-11-12 13:29:03,542 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 13:29:03,542 - services.background_tasks - INFO - Registered background task: condition_evaluation (20m)
+2025-11-12 13:29:03,542 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:29:03,542 - services.condition_evaluation_task - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:29:03,542 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:29:03,542 - root - INFO - ✅ Condition evaluation task registered successfully
+2025-11-12 13:29:03,542 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 13:29:03,542 - services.background_tasks - INFO - Registered background task: import_sessions_cleanup (1d)
+2025-11-12 13:29:03,542 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 13:29:03,542 - root - INFO - ✅ Import sessions cleanup task registered successfully
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: expire_alerts (1d)
+2025-11-12 13:29:03,543 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:29:03,543 - services.alert_expiry_task - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:29:03,543 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:29:03,543 - root - INFO - ✅ Alert expiry task registered successfully
+2025-11-12 13:29:03,543 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 13:29:03,543 - root - INFO - 🚀 Starting background task scheduler...
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: cleanup_expired_data (1d)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: cleanup_cache (1h)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: rotate_logs (1w)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: collect_metrics (30m)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: database_maintenance (1w)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 13:29:03,543 - services.background_tasks - INFO - Registered background task: system_health_check (1h)
+2025-11-12 13:29:03,544 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 13:29:03,544 - services.background_tasks - INFO - Registered background task: update_closed_tickers_daily (1d)
+2025-11-12 13:29:03,544 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 13:29:03,544 - services.background_tasks - INFO - Background task scheduler started
+2025-11-12 13:29:03,544 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 13:29:03,544 - root - INFO - ✅ Background task scheduler started successfully
+2025-11-12 13:29:03,545 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:3946cb355f02e69e2665a85795a3d752
+2025-11-12 13:29:03,545 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:3946cb355f02e69e2665a85795a3d752
+2025-11-12 13:29:03,545 - cache - INFO - Cache disabled - skipping set for key: services.system_settings_service.get_setting:3946cb355f02e69e2665a85795a3d752
+2025-11-12 13:29:03,545 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 13:29:03,545 - root - INFO - 🚀 Starting external data refresh scheduler (enabled by setting)...
+2025-11-12 13:29:03,545 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 13:29:03,545 - services.data_refresh_scheduler - INFO - Data Refresh Scheduler started
+2025-11-12 13:29:03,546 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 13:29:03,546 - root - INFO - ✅ External data refresh scheduler started successfully
+2025-11-12 13:29:03,564 - Backend.models.trade - INFO - Trade model loaded - opened_at fix applied
+2025-11-12 13:29:03,564 - Backend.models.trade - INFO - Trade model loaded - opened_at fix applied
+2025-11-12 13:29:03,598 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,598 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,599 - Backend.services.advanced_cache_service - INFO - Cache cleanup thread started
+2025-11-12 13:29:03,599 - Backend.services.advanced_cache_service - INFO - Cache cleanup thread started
+2025-11-12 13:29:03,599 - Backend.services.advanced_cache_service - INFO - Advanced Cache Service initialized with 100MB limit
+2025-11-12 13:29:03,599 - Backend.services.advanced_cache_service - INFO - Advanced Cache Service initialized with 100MB limit
+2025-11-12 13:29:03,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,617 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,618 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,618 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,618 - constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,618 - constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,619 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,619 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,619 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,619 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,620 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,620 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,620 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,620 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,621 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,622 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,622 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,622 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,622 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,622 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,622 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,672 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,672 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,677 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:29:03,677 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:29:03,678 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 13:29:03,678 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.01s
+2025-11-12 13:29:03,678 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:29:03,678 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:29:03,679 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,679 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,680 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert for condition 1 already active
+2025-11-12 13:29:03,680 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert for condition 1 already active
+2025-11-12 13:29:03,680 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,680 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,680 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:29:03,680 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:29:03,699 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,699 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,702 - Backend.services.condition_evaluation_task - INFO - ℹ️ Auto-generate alerts disabled for condition 1, skipping alert processing
+2025-11-12 13:29:03,702 - Backend.services.condition_evaluation_task - INFO - ℹ️ Auto-generate alerts disabled for condition 1, skipping alert processing
+2025-11-12 13:29:03,702 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,702 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,702 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:29:03,702 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:29:03,723 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,723 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,727 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert reactivated for condition 1
+2025-11-12 13:29:03,727 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert reactivated for condition 1
+2025-11-12 13:29:03,727 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,727 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,727 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:29:03,727 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 0 alerts created, 0 errors
+2025-11-12 13:29:03,742 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,742 - Backend.services.condition_evaluation_task - INFO - 🔄 Starting condition evaluation task...
+2025-11-12 13:29:03,747 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:29:03,747 - Backend.services.condition_evaluation_task - INFO - ✅ Alert processed for condition 1: Alert created for condition 1
+2025-11-12 13:29:03,747 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,747 - Backend.services.condition_evaluation_task - INFO - ✅ Condition evaluation task completed in 0.00s
+2025-11-12 13:29:03,747 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:29:03,747 - Backend.services.condition_evaluation_task - INFO - 📊 Results: 1 conditions met, 1 alerts created, 0 errors
+2025-11-12 13:29:03,770 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-12 13:29:03,770 - services.position_calculator_service - INFO - No executions found for trade 1
+2025-11-12 13:29:03,771 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-12 13:29:03,771 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 150.0, 'average_price': 50.69, 'total_cost': 7603.5, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 150.0, 'total_sold': 0.0}
+2025-11-12 13:29:03,772 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-12 13:29:03,772 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': -150.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 3.5, 'side': 'short', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 0.0, 'total_sold': 150.0}
+2025-11-12 13:29:03,773 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-12 13:29:03,773 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.01, 'total_cost': 10002.0, 'total_fees': 3.5, 'side': 'long', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 200.0, 'total_sold': 100.0}
+2025-11-12 13:29:03,774 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-12 13:29:03,774 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 50.02, 'total_cost': 5002.0, 'total_fees': 3.5, 'side': 'closed', 'last_updated': '2025-10-21T00:00:00', 'total_bought': 100.0, 'total_sold': 100.0}
+2025-11-12 13:29:03,775 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-12 13:29:03,775 - services.position_calculator_service - INFO - Calculated positions for 3 trades
+2025-11-12 13:29:03,778 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-12 13:29:03,778 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 100.0, 'average_price': 50.05, 'total_cost': 5005.0, 'total_fees': 5.0, 'side': 'long', 'last_updated': '2025-10-20T00:00:00', 'total_bought': 100.0, 'total_sold': 0.0}
+2025-11-12 13:29:03,778 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 13:29:03,778 - services.position_calculator_service - ERROR - Error calculating position for trade 1: Database error
+2025-11-12 13:29:03,779 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 13:29:03,779 - services.position_calculator_service - ERROR - Error calculating batch positions: Database error
+2025-11-12 13:29:03,818 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,818 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,818 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,818 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,818 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:29:03,818 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:29:03,819 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,819 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,819 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,819 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,819 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,819 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,819 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>!
+2025-11-12 13:29:03,819 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>!
+2025-11-12 13:29:03,819 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:29:03,819 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:29:03,819 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>?
+2025-11-12 13:29:03,819 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>?
+2025-11-12 13:29:03,820 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4594960368'>
+2025-11-12 13:29:03,820 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4594960368'>
+2025-11-12 13:29:03,820 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> (via trading_account_id)
+2025-11-12 13:29:03,820 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> (via trading_account_id)
+2025-11-12 13:29:03,820 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> - checking database directly...
+2025-11-12 13:29:03,820 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> - checking database directly...
+2025-11-12 13:29:03,821 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,821 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,822 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:29:03,822 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:29:03,822 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:29:03,822 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:29:03,822 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4593131424'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:29:03,822 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4593131424'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:29:03,823 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,823 - services.account_activity_service - INFO - 🔍 STARTING EXECUTION QUERY for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,823 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,823 - services.account_activity_service - INFO - 🔍 Using filter: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,823 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:29:03,823 - services.account_activity_service - INFO - 🔍 CRITICAL: Using Execution.trading_account_id (NOT account.account_id, NOT account_id)
+2025-11-12 13:29:03,824 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,824 - services.account_activity_service - INFO - 🔍 About to execute query: Execution.trading_account_id == <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,824 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,824 - services.account_activity_service - INFO - 📊 Loaded 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,824 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,824 - services.account_activity_service - INFO - 📊 Loaded 0 cash flows for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>!
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ NO EXECUTIONS FOUND for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>!
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ Check: Is Execution.trading_account_id correct?
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>?
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ Check: Are there executions in DB with trading_account_id=<MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>?
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4594960368'>
+2025-11-12 13:29:03,824 - services.account_activity_service - WARNING - ⚠️ Direct query count (no joins): <MagicMock name='get_db().__next__().query().filter().count()' id='4594960368'>
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> (via trading_account_id)
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 🔗 Loaded 0 executions directly linked to account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> (via trading_account_id)
+2025-11-12 13:29:03,825 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> - checking database directly...
+2025-11-12 13:29:03,825 - services.account_activity_service - WARNING - ⚠️ No executions found for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'> - checking database directly...
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 🔍 Direct query found 0 executions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 🔄 Processing 0 executions...
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:29:03,825 - services.account_activity_service - INFO - 📊 Sorting movements by currency...
+2025-11-12 13:29:03,826 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4593131424'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:29:03,826 - services.account_activity_service - INFO -   Currency <MagicMock name='get_db().__next__().query().options().filter().first().currency.symbol' id='4593131424'>: 1 total movements (1 cash flows, 0 executions)
+2025-11-12 13:29:03,826 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,826 - services.position_portfolio_service - INFO - Calculated 0 positions for account <MagicMock name='get_db().__next__().query().filter().options().first().trading_account_id' id='4598545280'>
+2025-11-12 13:29:03,826 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-12 13:29:03,826 - services.position_calculator_service - INFO - Calculated position for trade 1: {'quantity': 0.0, 'average_price': 0.0, 'total_cost': 0.0, 'total_fees': 0.0, 'side': 'closed', 'last_updated': None, 'total_bought': 0.0, 'total_sold': 0.0}
+2025-11-12 13:29:03,829 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:29:03,829 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:29:03,834 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:29:03,834 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:29:03,835 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,835 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,835 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,835 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:29:03,835 - services.entity_relationship_resolver - INFO - Fetching parents for trade 1: ['trading_account', 'ticker', 'trade_plan']
+2025-11-12 13:29:03,836 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:29:03,836 - services.entity_relationship_resolver - INFO - Fetching children for trade 1: ['execution', 'cash_flow', 'note', 'alert']
+2025-11-12 13:29:03,836 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,836 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,836 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_linked_items:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,836 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,836 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,836 - cache - INFO - Cache disabled - skipping set for key: services.entity_details_service.get_entity_details:fd86b14935654881ea8e9e1b12e7ba9f
+2025-11-12 13:29:03,836 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 13:29:03,836 - routes.api.entity_details - ERROR - Error getting entity details for trade 1: Object of type MagicMock is not JSON serializable
+2025-11-12 13:29:03,848 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,848 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,848 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,848 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,848 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,848 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,849 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,849 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,850 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 13:29:03,850 - services.external_data.cache_manager - ERROR - Error loading settings from preferences: get_user_preferences() missing 1 required positional argument: 'user_id', using defaults
+2025-11-12 13:29:03,855 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,855 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,856 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,856 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,856 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,856 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,857 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,857 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,858 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:29:03,858 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:29:03,858 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,858 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,858 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,858 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,859 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,859 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,859 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:29:03,859 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:29:03,859 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,859 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,860 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,860 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,860 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,860 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,861 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_3e340e6ea74b47078319ae8fca67dbec - Test Provider
+2025-11-12 13:29:03,861 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_3e340e6ea74b47078319ae8fca67dbec - Test Provider
+2025-11-12 13:29:03,861 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,861 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,861 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,861 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,862 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,862 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,868 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,868 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,868 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,868 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,869 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,869 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,870 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,870 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,870 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,870 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: yahoo_finance - Yahoo Finance
+2025-11-12 13:29:03,870 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,870 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,870 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,870 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,871 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,871 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,872 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:29:03,872 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: google_finance - Google Finance
+2025-11-12 13:29:03,872 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,872 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,872 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,872 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,873 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,873 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,874 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:29:03,874 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_853e47f7f9164bde90e0c611c3ff10fc - Test Provider
+2025-11-12 13:29:03,874 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,874 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,874 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,874 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,875 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,875 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,876 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_8b9a227388424d96a4cc19b6c1c8ac7a - Test Provider
+2025-11-12 13:29:03,876 - services.external_data.yahoo_finance_adapter - INFO - Loaded provider config: test_provider_8b9a227388424d96a4cc19b6c1c8ac7a - Test Provider
+2025-11-12 13:29:03,876 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,876 - services.constraint_service - INFO - ConstraintService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,876 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,876 - services.user_service - INFO - UserService initialized with database: /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/services/../db/simpleTrade_new.db
+2025-11-12 13:29:03,877 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,877 - services.external_data.yahoo_finance_adapter - INFO - Loaded user timezone: Asia/Jerusalem
+2025-11-12 13:29:03,886 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
+2025-11-12 13:29:03,886 - services.advanced_cache_service - INFO - Cache cleared: 0 entries removed
+2025-11-12 13:29:03,902 - services.alert_service - INFO - נטענו 1 התראות
+2025-11-12 13:29:03,902 - services.alert_service - INFO - נטענו 1 התראות

@@ -196,60 +196,18 @@ class ConditionsValidator {
         const warnings = [];
         
         try {
-            // Get method key from methodId (assuming methodId corresponds to method key)
-            const methodKey = this.getMethodKeyFromId(methodId);
-            if (!methodKey) {
-                errors.push('שיטת מסחר לא זוהתה');
+            const methodDefinition = this.getMethodDefinition(methodId);
+            const parameters = this.normalizeParameters(parametersJson);
+            
+            if (!parameters) {
+                errors.push('פרמטרים אינם אובייקט תקין');
                 return { errors, warnings };
             }
             
-            const rules = this.validationRules.methods[methodKey];
-            if (!rules) {
-                errors.push(`כללי ולידציה לא נמצאו עבור שיטה: ${methodKey}`);
-                return { errors, warnings };
-            }
-            
-            // Parse parameters if string
-            let parameters;
-            if (typeof parametersJson === 'string') {
-                try {
-                    parameters = JSON.parse(parametersJson);
-                } catch (e) {
-                    errors.push('פורמט פרמטרים לא תקין');
-                    return { errors, warnings };
-                }
+            if (methodDefinition) {
+                this.validateDynamicMethodParameters(methodDefinition, parameters, errors, warnings);
             } else {
-                parameters = parametersJson;
-            }
-            
-            // Validate required parameters
-            for (const requiredParam of rules.required) {
-                if (!(requiredParam in parameters)) {
-                    errors.push(`פרמטר נדרש חסר: ${requiredParam}`);
-                }
-            }
-            
-            // Validate parameter types and ranges
-            for (const [paramName, paramValue] of Object.entries(parameters)) {
-                const paramRules = rules.types[paramName];
-                if (paramRules) {
-                    // Type validation
-                    const typeValidation = this.validateParameterType(paramName, paramValue, paramRules);
-                    if (!typeValidation.isValid) {
-                        errors.push(typeValidation.error);
-                    }
-                    
-                    // Range validation
-                    const rangeRules = rules.ranges[paramName];
-                    if (rangeRules && typeof paramValue === 'number') {
-                        const rangeValidation = this.validateParameterRange(paramName, paramValue, rangeRules);
-                        if (!rangeValidation.isValid) {
-                            errors.push(rangeValidation.error);
-                        }
-                    }
-                } else if (!rules.optional.includes(paramName)) {
-                    warnings.push(`פרמטר לא מוכר: ${paramName}`);
-                }
+                this.validateFallbackMethodParameters(methodId, parameters, errors, warnings);
             }
             
             return { errors, warnings };
@@ -375,9 +333,12 @@ class ConditionsValidator {
      * @returns {string|null} Method key
      */
     getMethodKeyFromId(methodId) {
-        // This would typically come from the trading methods API
-        // For now, we'll use a simple mapping
-        const methodMapping = {
+        const definition = this.getMethodDefinition(methodId);
+        if (definition?.method_key) {
+            return definition.method_key;
+        }
+        
+        const legacyMapping = {
             1: 'moving_average',
             2: 'rsi',
             3: 'support_resistance',
@@ -386,7 +347,187 @@ class ConditionsValidator {
             6: 'fibonacci'
         };
         
-        return methodMapping[methodId];
+        const numericId = parseInt(methodId, 10);
+        if (!Number.isNaN(numericId) && legacyMapping[numericId]) {
+            return legacyMapping[numericId];
+        }
+        
+        if (this.validationRules.methods[methodId]) {
+            return methodId;
+        }
+        
+        return null;
+    }
+
+    getMethodDefinition(methodId) {
+        if (!this.crudManager || typeof this.crudManager.getCachedTradingMethods !== 'function') {
+            return null;
+        }
+        const methods = this.crudManager.getCachedTradingMethods();
+        if (!methods || methods.length === 0) {
+            return null;
+        }
+        return methods.find(method => String(method.id) === String(methodId));
+    }
+
+    normalizeParameters(parametersJson) {
+        if (!parametersJson) {
+            return {};
+        }
+        
+        if (typeof parametersJson === 'object' && !Array.isArray(parametersJson)) {
+            return parametersJson;
+        }
+        
+        if (typeof parametersJson === 'string') {
+            try {
+                const parsed = JSON.parse(parametersJson);
+                return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+            } catch (error) {
+                console.warn('[ConditionsValidator] Failed to parse parameters JSON', error);
+                return {};
+            }
+        }
+        
+        return {};
+    }
+
+    validateDynamicMethodParameters(methodDefinition, parameters, errors, warnings) {
+        const parameterDefs = Array.isArray(methodDefinition.parameters) ? methodDefinition.parameters : [];
+        
+        parameterDefs.forEach(parameter => {
+            const key = parameter.parameter_key;
+            const value = parameters[key];
+            const label = (window.conditionsTranslations?.getParameterName(key)) || parameter.parameter_name_he || key;
+            const validationRule = this.safeParse(parameter.validation_rule);
+            
+            if (parameter.is_required && (value === undefined || value === null || value === '')) {
+                errors.push(`הפרמטר ${label} הוא חובה`);
+                return;
+            }
+            
+            if (value === undefined || value === null || value === '') {
+                return;
+            }
+            
+            if (!this.validateDynamicParameterType(parameter.parameter_type, value)) {
+                errors.push(`ערך לא תקין לפרמטר ${label}`);
+                return;
+            }
+            
+            if (!this.validateDynamicParameterRange(parameter, value)) {
+                errors.push(`הערך לפרמטר ${label} מחוץ לטווח המותר`);
+            }
+            
+            if (parameter.parameter_type === 'dropdown' && validationRule?.allowed_values) {
+                const allowed = validationRule.allowed_values.map(String);
+                if (!allowed.includes(String(value))) {
+                    errors.push(`ערך לא חוקי עבור ${label}. ערכים מותרים: ${allowed.join(', ')}`);
+                }
+            }
+        });
+        
+        Object.keys(parameters).forEach(key => {
+            if (!parameterDefs.some(parameter => parameter.parameter_key === key)) {
+                warnings.push(`⚠️ הפרמטר ${key} אינו מוכר לשיטה ${methodDefinition.method_key || methodDefinition.name}`);
+            }
+        });
+    }
+
+    validateDynamicParameterType(parameterType, value) {
+        switch (parameterType) {
+            case 'number':
+            case 'price':
+            case 'percentage':
+                return typeof value === 'number' && !Number.isNaN(value);
+            case 'boolean':
+                return typeof value === 'boolean';
+            case 'dropdown':
+            case 'period':
+            case 'string':
+            case 'text':
+                return typeof value === 'string' || typeof value === 'number';
+            default:
+                return true;
+        }
+    }
+
+    validateDynamicParameterRange(parameter, value) {
+        if (value === undefined || value === null || value === '') {
+            return true;
+        }
+        
+        if (typeof value !== 'number' || Number.isNaN(value)) {
+            const numericTypes = ['number', 'price', 'percentage'];
+            if (!numericTypes.includes(parameter.parameter_type)) {
+                return true;
+            }
+        }
+        
+        const min = parameter.min_value !== undefined && parameter.min_value !== null ? Number(parameter.min_value) : null;
+        const max = parameter.max_value !== undefined && parameter.max_value !== null ? Number(parameter.max_value) : null;
+        
+        if (min !== null && value < min) {
+            return false;
+        }
+        
+        if (max !== null && value > max) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    validateFallbackMethodParameters(methodId, parameters, errors, warnings) {
+        const methodKey = this.getMethodKeyFromId(methodId);
+        if (!methodKey) {
+            errors.push('שיטת מסחר לא זוהתה');
+            return;
+        }
+        
+        const rules = this.validationRules.methods[methodKey];
+        if (!rules) {
+            warnings.push(`⚠️ אין כללי ולידציה לשיטה ${methodKey}`);
+            return;
+        }
+        
+        for (const requiredParam of rules.required) {
+            if (!(requiredParam in parameters)) {
+                errors.push(`פרמטר נדרש חסר: ${requiredParam}`);
+            }
+        }
+        
+        for (const [paramName, paramValue] of Object.entries(parameters)) {
+            const paramRules = rules.types[paramName];
+            if (paramRules) {
+                const typeValidation = this.validateParameterType(paramName, paramValue, paramRules);
+                if (!typeValidation.isValid) {
+                    errors.push(typeValidation.error);
+                }
+                
+                const rangeRules = rules.ranges[paramName];
+                if (rangeRules && typeof paramValue === 'number') {
+                    const rangeValidation = this.validateParameterRange(paramName, paramValue, rangeRules);
+                    if (!rangeValidation.isValid) {
+                        errors.push(rangeValidation.error);
+                    }
+                }
+            } else if (!rules.optional.includes(paramName)) {
+                warnings.push(`פרמטר לא מוכר: ${paramName}`);
+            }
+        }
+    }
+
+    safeParse(value) {
+        if (!value || typeof value !== 'string') {
+            return {};
+        }
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.warn('[ConditionsValidator] Failed to parse validation rule', error);
+            return {};
+        }
     }
     
     /**

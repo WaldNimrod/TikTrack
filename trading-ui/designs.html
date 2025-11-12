@@ -38,8 +38,6 @@
                     <div class="section-header">
                         <h1>🔘 מערכת הכפתורים המרכזית</h1>
                         <div class="section-actions">
-                            <button data-button-type="SEARCH" data-onclick="checkButtonColors()" data-classes="btn-sm" data-text="בדוק צבעים" data-attributes="title='בדוק צבעי כל הכפתורים'"></button>
-                            <button data-button-type="REACTIVATE" data-onclick="fixButtonColors()" data-classes="btn-sm" data-text="תקן צבעים" data-attributes="title='תקן אוטומטית בעיות צבעים'"></button>
                             <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="btn filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">▼ הצג/הסתר סקשן</button>
                         </div>
                     </div>
@@ -60,14 +58,10 @@
                                 <table class="table table-striped table-hover" id="buttonSystemTable">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 30%;">דוגמאות חיות</th>
+                                            <th style="width: 35%;">דוגמאות חיות</th>
                                             <th style="width: 20%;">שם הכפתור</th>
-                                            <th style="width: 30%;">תיאור</th>
-                                            <th style="width: 20%;">משתנה צבע</th>
-                                            <th style="display: none;">קוד HTML (ישן)</th>
-                                            <th style="display: none;">קוד HTML (חדש)</th>
-                                            <th style="display: none;">קוד JavaScript</th>
-                                            <th style="display: none;">פעולות</th>
+                                            <th style="width: 25%;">תיאור</th>
+                                            <th style="width: 20%;">מפת צבעים</th>
                                         </tr>
                                     </thead>
                                     <tbody id="buttonTableBody"></tbody>
@@ -140,6 +134,28 @@
                 </div>
                 <!-- UI Content Section 1 End -->   
 
+                <!-- Diagnostics Section -->
+                <div class="content-section" id="diagnosticsSection">
+                    <div class="section-header d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                        <div>
+                            <h2>🧪 דיאגנוסטיקה</h2>
+                            <p class="mb-0 text-muted">שמירת תוצאות הבדיקות האחרונות של מערכת הכפתורים</p>
+                        </div>
+                        <div class="section-actions d-flex gap-2">
+                            <button data-button-type="SEARCH" data-variant="small" data-onclick="checkButtonColors()" data-text="בדיקות צבע"></button>
+                            <button data-button-type="REACTIVATE" data-variant="small" data-onclick="fixButtonColors()" data-text="תיקון אוטומטי"></button>
+                            <button data-button-type="COPY" data-variant="small" data-onclick="window.copyButtonSystemDetailedLog && window.copyButtonSystemDetailedLog()" data-text="העתק לוג"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="diagnosticsOutput" class="card border-0 shadow-sm bg-light-subtle">
+                            <div class="card-body">
+                                <p class="text-muted mb-0">טרם הופעלו בדיקות צבעים בעמוד זה.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- UI Content Section 2 Start - וריאנטים מורחבים -->
                 <div class="content-section" id="section2">
                     <div class="section-header">
@@ -163,6 +179,29 @@
                     </div>
                 </div>
                 <!-- UI Content Section 2 End -->
+
+                <!-- Dynamic Color Map Section -->
+                <div class="content-section" id="colorMapSection">
+                    <div class="section-header d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                        <div>
+                            <h2>🎨 מפת צבעים דינאמית</h2>
+                            <p class="mb-0 text-muted">סקירה של כל משתני הצבעים הפעילים במערכת הכפתורים ובצבעי הישויות</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button data-button-type="REFRESH" data-variant="small" data-onclick="window.renderColorMaps && window.renderColorMaps()" data-text="רענון צבעים"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="mb-4">
+                            <h5 class="mb-3">צבעי פעולות כפתורים</h5>
+                            <div id="actionColorMap" class="row g-3"></div>
+                        </div>
+                        <div>
+                            <h5 class="mb-3">צבעי ישויות</h5>
+                            <div id="entityColorMap" class="row g-3"></div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- UI Content Section 3 - Entity Colors Demo -->
                 <div class="ui-content-section">

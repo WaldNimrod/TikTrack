@@ -512,10 +512,40 @@ function processDashboardData(data, source = 'network') {
         return;
     }
 
-    const trades = Array.isArray(data.trades) ? data.trades : [];
-    const alerts = Array.isArray(data.alerts) ? data.alerts : [];
-    const accounts = Array.isArray(data.accounts) ? data.accounts : [];
-    const cashFlows = Array.isArray(data.cashFlows) ? data.cashFlows : [];
+    let trades = Array.isArray(data.trades) ? data.trades : [];
+    let alerts = Array.isArray(data.alerts) ? data.alerts : [];
+    let accounts = Array.isArray(data.accounts) ? data.accounts : [];
+    let cashFlows = Array.isArray(data.cashFlows) ? data.cashFlows : [];
+    if (window.TableDataRegistry) {
+        const tradesSummary = window.TableDataRegistry.getSummary('trades');
+        if (tradesSummary) {
+            const registryTrades = window.TableDataRegistry.getFilteredData('trades', { asReference: false });
+            if (Array.isArray(registryTrades)) {
+                trades = registryTrades;
+            }
+        }
+        const alertsSummary = window.TableDataRegistry.getSummary('alerts');
+        if (alertsSummary) {
+            const registryAlerts = window.TableDataRegistry.getFilteredData('alerts', { asReference: false });
+            if (Array.isArray(registryAlerts)) {
+                alerts = registryAlerts;
+            }
+        }
+        const accountsSummary = window.TableDataRegistry.getSummary('trading_accounts');
+        if (accountsSummary) {
+            const registryAccounts = window.TableDataRegistry.getFilteredData('trading_accounts', { asReference: false });
+            if (Array.isArray(registryAccounts)) {
+                accounts = registryAccounts;
+            }
+        }
+        const cashFlowsSummary = window.TableDataRegistry.getSummary('cash_flows');
+        if (cashFlowsSummary) {
+            const registryCashFlows = window.TableDataRegistry.getFilteredData('cash_flows', { asReference: false });
+            if (Array.isArray(registryCashFlows)) {
+                cashFlows = registryCashFlows;
+            }
+        }
+    }
     const currencySymbol = determineCurrencySymbol(accounts, trades);
 
     updateSummaryStats({ trades, alerts, accounts, cashFlows }, currencySymbol);

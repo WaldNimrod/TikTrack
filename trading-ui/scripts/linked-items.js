@@ -260,9 +260,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   const modal = new bootstrap.Modal(modalElement);
   
   modalElement.addEventListener('hidden.bs.modal', () => {
-    if (window.ModalNavigationService?.registerModalClose) {
-      window.ModalNavigationService.registerModalClose(modalElement.id);
-    } else if (window.registerModalNavigationClose) {
+    if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
       window.registerModalNavigationClose(modalElement.id);
     }
   }, { once: true });

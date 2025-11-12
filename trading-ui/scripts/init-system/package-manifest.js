@@ -717,6 +717,27 @@ const PACKAGE_MANIFEST = {
         description: 'מאתחל תנאים',
         required: true,
         loadOrder: 6
+      },
+      {
+        file: 'modal-configs/conditions-config.js',
+        globalCheck: 'window.conditionsModalConfig',
+        description: 'קונפיגורציית מודל תנאים',
+        required: true,
+        loadOrder: 7
+      },
+      {
+        file: 'conditions/conditions-ui-manager.js',
+        globalCheck: 'window.ConditionsUIManager',
+        description: 'מנהל ממשק תנאים',
+        required: true,
+        loadOrder: 8
+      },
+      {
+        file: 'conditions/conditions-modal-controller.js',
+        globalCheck: 'window.ConditionsModalController',
+        description: 'בקר מודל תנאים',
+        required: true,
+        loadOrder: 9
       }
     ],
     estimatedSize: '~150KB',

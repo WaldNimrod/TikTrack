@@ -4904,9 +4904,7 @@ class ModalManagerV2 {
             this.clearValidationErrors(form);
         }
         
-        if (window.ModalNavigationService?.registerModalClose) {
-            window.ModalNavigationService.registerModalClose(modalId);
-        } else if (window.registerModalNavigationClose) {
+        if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
             window.registerModalNavigationClose(modalId);
         }
     }

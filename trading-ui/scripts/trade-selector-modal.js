@@ -223,9 +223,7 @@ class TradeSelectorModal {
             }
 
             modalElement.addEventListener('hidden.bs.modal', () => {
-                if (window.ModalNavigationService?.registerModalClose) {
-                    window.ModalNavigationService.registerModalClose(this.modalId);
-                } else if (window.registerModalNavigationClose) {
+                if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
                     window.registerModalNavigationClose(this.modalId);
                 }
             }, { once: true });

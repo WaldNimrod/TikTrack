@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.15.0",
+    "version": "1.0.16.0",
     "major": 1,
     "minor": 0,
-    "patch": 15,
+    "patch": 16,
     "build": 0,
-    "commit": "2e9b32ecacf9eeb0f13f191aed5997f92122de1e",
-    "updated_at": "2025-11-12T15:11:10+00:00",
-    "notes": "Improve modal navigation restore handling"
+    "commit": "8db9e77714e2f1fa1bae40a9bcfcde82fd33f486",
+    "updated_at": "2025-11-12T15:17:24+00:00",
+    "notes": "Full workspace sync"
   }
 }

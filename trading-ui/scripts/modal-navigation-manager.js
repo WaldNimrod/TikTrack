@@ -125,6 +125,10 @@ class ModalNavigationService {
     this.listeners = new Set();
     this.debugEnabled = false;
     this.debugUnsubscribe = null;
+    this.debugLevel = 'debug';
+    this.instanceBindings = new Map(); // instanceId -> { element, hiddenHandler }
+    this.elementInstanceMap = new WeakMap(); // HTMLElement -> instanceId
+    this.closedInstances = new Set(); // instanceIds closed manually before hidden event
     this.initialized = false;
   }
 
@@ -154,7 +158,7 @@ class ModalNavigationService {
           this.activeInstanceId = this.stack[this.stack.length - 1].instanceId;
         }
       }
-    } catch (error) {
+        } catch (error) {
       window.Logger?.warn('ModalNavigationService.init: failed to load persisted state', {
         error,
         page: 'modal-navigation-manager'
@@ -212,7 +216,7 @@ class ModalNavigationService {
         ...this.stack.slice(targetIndex + 1)
       ];
       this.activeInstanceId = mergedEntry.instanceId;
-    } else {
+            } else {
       const parentInstanceId = entry.parentInstanceId ?? (currentTop ? currentTop.instanceId : null);
       this.stack = [
         ...this.stack,
@@ -225,6 +229,7 @@ class ModalNavigationService {
     }
 
     this.openModals.set(entry.modalId, element || null);
+    const resolvedElement = element || resolveModalElement(entry.modalId);
     await this._persistState();
     this._emitState();
     this._logDebug('registerModalOpen', {
@@ -234,38 +239,81 @@ class ModalNavigationService {
       allowDuplicate,
       stackSummary: this._stackSummary()
     });
-    return cloneEntry(entry);
+    const storedEntry =
+      this.stack.find(item => item.instanceId === entry.instanceId) ||
+      this.stack.find((item, index) => index === this.stack.length - 1);
+    if (resolvedElement) {
+      const bindingSource = storedEntry || entry;
+      this._bindElementLifecycle(resolvedElement, bindingSource);
+    }
+    return storedEntry ? cloneEntry(storedEntry) : cloneEntry(entry);
   }
 
-  async registerModalClose(modalId) {
+  async registerModalClose(modalId, options = {}) {
     await this.init();
-    if (!modalId) {
+    const instanceId = options && typeof options === 'object' ? options.instanceId ?? null : null;
+    const internal = options && typeof options === 'object' ? options.internal === true : false;
+    if (!modalId && !instanceId) {
       return;
     }
-    const index = this._findLastIndexByModalId(modalId);
+    const index = instanceId
+      ? this.stack.findIndex(entry => entry.instanceId === instanceId)
+      : this._findLastIndexByModalId(modalId);
     if (index < 0) {
-      this._logDebug('registerModalClose:missing', {
-        modalId
-      }, 'warn');
+      this._logDebug(
+        'registerModalClose:missing',
+        {
+          modalId,
+          instanceId
+        },
+        'warn'
+      );
+                return;
+            }
+    const removedEntry = this.stack[index];
+    if (!removedEntry) {
+      this._logDebug(
+        'registerModalClose:entry-not-found',
+        {
+          modalId,
+          instanceId,
+          index,
+          stackLength: this.stack.length
+        },
+        'warn'
+      );
       return;
+    }
+    const removedModalId = removedEntry.modalId || modalId;
+    const removedInstanceId = removedEntry.instanceId;
+    if (instanceId && !internal) {
+      this.closedInstances.add(instanceId);
     }
     this.stack = [
       ...this.stack.slice(0, index),
       ...this.stack.slice(index + 1)
     ];
+    const previousActiveInstanceId = this.activeInstanceId;
     this.activeInstanceId = this.stack.length ? this.stack[this.stack.length - 1].instanceId : null;
-    const stillExists = this.stack.some(entry => entry.modalId === modalId);
+    const stillExists = this.stack.some(entry => entry.modalId === removedModalId);
     if (!stillExists) {
-      this.openModals.delete(modalId);
+      this.openModals.delete(removedModalId);
     }
+    this._cleanupElementBinding(removedInstanceId);
     if (this.stack.length === 0) {
       await window.PageStateManager?.clearModalNavigationState?.();
-    } else {
+      this._setGlobalInstanceId(null);
+            } else {
       await this._persistState();
+      const activeEntry = this.stack[this.stack.length - 1];
+      this._setGlobalInstanceId(activeEntry.instanceId);
     }
     this._emitState();
     this._logDebug('registerModalClose', {
-      modalId,
+      modalId: removedModalId,
+      instanceId,
+      removedEntry: this._summarizeEntry(removedEntry),
+      previousActiveInstanceId,
       stackSummary: this._stackSummary()
     });
   }
@@ -273,14 +321,14 @@ class ModalNavigationService {
   async updateModalMetadata(modalId, updates = {}) {
     await this.init();
     if (!modalId && !updates.instanceId) {
-      return;
-    }
+                return;
+            }
     const targetIndex = updates.instanceId
       ? this.stack.findIndex(entry => entry.instanceId === updates.instanceId)
       : this._findLastIndexByModalId(modalId);
     if (targetIndex < 0) {
-      return;
-    }
+                    return;
+                }
     const existing = this.stack[targetIndex];
     const merged = {
       ...existing,
@@ -426,9 +474,9 @@ class ModalNavigationService {
       target: this._summarizeEntry(targetEntry),
       stackSummary: this._stackSummary()
     });
-    return true;
-  }
-
+                return true;
+            }
+            
   async clear() {
     this.stack = [];
     this.activeInstanceId = null;
@@ -481,6 +529,7 @@ class ModalNavigationService {
       return this.debugUnsubscribe;
     }
     const level = options.level || 'debug';
+    this.debugLevel = level;
     const includeStack = options.includeStack !== false;
     const listener = snapshot => {
       this._logDebug(
@@ -513,9 +562,10 @@ class ModalNavigationService {
     }
     this.debugUnsubscribe = null;
     this.debugEnabled = false;
+    this.debugLevel = 'debug';
     this._logDebug('debugLoggingDisabled', {
       stackSummary: this._stackSummary()
-    });
+    }, 'info');
   }
 
   async _persistState() {
@@ -534,7 +584,7 @@ class ModalNavigationService {
     await window.PageStateManager.saveModalNavigationState(payload, {
       pageName: this._currentPageName()
     });
-    return true;
+            return true;
   }
 
   _emitState() {
@@ -546,7 +596,7 @@ class ModalNavigationService {
     this.listeners.forEach(listener => {
       try {
         listener(snapshot);
-      } catch (error) {
+        } catch (error) {
         window.Logger?.error('ModalNavigationService listener error', error, {
           page: 'modal-navigation-manager'
         });
@@ -597,7 +647,7 @@ class ModalNavigationService {
         modalId: entry.modalId,
         instanceId: entry.instanceId
       });
-      await this.registerModalClose(entry.modalId);
+      await this.registerModalClose(entry.modalId, { instanceId: entry.instanceId, internal: true });
       return;
     }
     await new Promise(resolve => {
@@ -636,6 +686,7 @@ class ModalNavigationService {
       });
       return;
     }
+    this._setElementInstanceId(element, entry.instanceId);
     await this._dispatchRestoreEvent(element, entry, 'before-show');
     if (!element.classList.contains('show')) {
       await new Promise(resolve => {
@@ -647,7 +698,7 @@ class ModalNavigationService {
         const instance = bootstrap?.Modal?.getOrCreateInstance(element, { backdrop: false });
         if (instance?.show) {
           instance.show();
-        } else {
+                } else {
           element.classList.add('show');
           onShown();
         }
@@ -706,9 +757,106 @@ class ModalNavigationService {
     };
   }
 
-  _logDebug(action, payload = {}, level = 'debug') {
+  _setElementInstanceId(element, instanceId) {
+    if (!element || !element.dataset) {
+      return;
+    }
+    if (instanceId) {
+      element.dataset.modalNavigationInstanceId = instanceId;
+    } else {
+      delete element.dataset.modalNavigationInstanceId;
+    }
+  }
+
+  _bindElementLifecycle(element, entry) {
+    if (!element || !entry?.instanceId) {
+      return;
+    }
+    const previousInstanceId = this.elementInstanceMap.get(element);
+    if (previousInstanceId && previousInstanceId !== entry.instanceId) {
+      this._cleanupElementBinding(previousInstanceId);
+    }
+    this._setElementInstanceId(element, entry.instanceId);
+    const hiddenHandler = () => {
+      if (this.closedInstances.has(entry.instanceId)) {
+        this.closedInstances.delete(entry.instanceId);
+        return;
+      }
+      this.registerModalClose(entry.modalId, {
+        instanceId: entry.instanceId,
+        internal: true
+      }).catch(error => {
+        window.Logger?.error('ModalNavigationService hidden handler error', {
+          error,
+          modalId: entry.modalId,
+          instanceId: entry.instanceId,
+          page: 'modal-navigation-manager'
+        });
+      });
+    };
+    element.addEventListener('hidden.bs.modal', hiddenHandler, { once: true });
+    this.instanceBindings.set(entry.instanceId, {
+      element,
+      hiddenHandler
+    });
+    this.elementInstanceMap.set(element, entry.instanceId);
+  }
+
+  _cleanupElementBinding(instanceId) {
+    if (!instanceId) {
+      return;
+    }
+    const binding = this.instanceBindings.get(instanceId);
+    if (binding) {
+      const { element, hiddenHandler } = binding;
+      if (element && hiddenHandler) {
+        try {
+          element.removeEventListener('hidden.bs.modal', hiddenHandler);
+        } catch (error) {
+          window.Logger?.debug('ModalNavigationService cleanup removeListener error', {
+            error,
+            instanceId,
+            page: 'modal-navigation-manager'
+          });
+        }
+        if (element.dataset?.modalNavigationInstanceId === instanceId) {
+          delete element.dataset.modalNavigationInstanceId;
+        }
+        this.elementInstanceMap.delete(element);
+      }
+      this.instanceBindings.delete(instanceId);
+    }
+    this.closedInstances.delete(instanceId);
+  }
+
+  _setGlobalInstanceId(instanceId) {
+    if (instanceId) {
+      const binding = this.instanceBindings.get(instanceId);
+      const element = binding?.element;
+      if (element) {
+        this._setElementInstanceId(element, instanceId);
+        return;
+      }
+      const activeEntry = this.stack.find(entry => entry.instanceId === instanceId);
+      const fallbackModalId = activeEntry?.modalId || this.getActiveModalId();
+      if (fallbackModalId) {
+        const fallbackElement = this.openModals.get(fallbackModalId) || resolveModalElement(fallbackModalId);
+        if (fallbackElement) {
+          this._setElementInstanceId(fallbackElement, instanceId);
+          return;
+        }
+      }
+    }
+    if (instanceId === null) {
+      document.querySelectorAll('.modal[data-modal-navigation-instance-id]').forEach(modalEl => {
+        delete modalEl.dataset.modalNavigationInstanceId;
+      });
+    }
+  }
+
+  _logDebug(action, payload = {}, level) {
     const logger = window.Logger;
-    const logLevel = level || 'debug';
+    const effectiveLevel = level || this.debugLevel || 'debug';
     const message = `ModalNavigationService.${action}`;
     const meta = {
       ...payload,
@@ -717,18 +865,18 @@ class ModalNavigationService {
       page: 'modal-navigation-manager'
     };
 
-    if (logger && typeof logger[logLevel] === 'function') {
+    if (logger && typeof logger[effectiveLevel] === 'function') {
       try {
-        logger[logLevel](message, meta);
-        return;
+        logger[effectiveLevel](message, meta);
+                return;
       } catch (error) {
         console.warn('ModalNavigationService._logDebug logger error', error, meta);
       }
     }
 
-    if (logLevel === 'error') {
+    if (effectiveLevel === 'error') {
       console.error(message, meta);
-    } else if (logLevel === 'warn') {
+    } else if (effectiveLevel === 'warn') {
       console.warn(message, meta);
     } else {
       console.debug(message, meta);
@@ -746,8 +894,8 @@ class ModalNavigationUI {
 
   async init() {
     if (this.initialized) {
-      return;
-    }
+                return;
+            }
     await this.service.init();
     this.unsubscribe = this.service.subscribe(() => this.refreshOpenModals());
     document.addEventListener('shown.bs.modal', event => {
@@ -771,8 +919,8 @@ class ModalNavigationUI {
 
   updateModalNavigation(modalElement) {
     if (!modalElement || !(modalElement instanceof HTMLElement)) {
-      return;
-    }
+                return;
+            }
     this._updateBreadcrumb(modalElement);
     this._updateBackButton(modalElement);
   }
@@ -843,8 +991,8 @@ class ModalNavigationUI {
     const handler = event => {
       const link = event.target.closest('.breadcrumb-link');
       if (!link) {
-        return;
-      }
+                return;
+            }
       event.preventDefault();
       event.stopPropagation();
       const modalId = link.getAttribute('data-modal-id');
@@ -859,8 +1007,8 @@ class ModalNavigationUI {
   _updateBackButton(modalElement) {
     const header = modalElement.querySelector('.modal-header');
     if (!header) {
-      return;
-    }
+                return;
+            }
     const canGoBack = this.service.canGoBack();
     let backButton = header.querySelector('[data-button-type="BACK"]') ||
                      header.querySelector('.modal-back-btn') ||
@@ -889,9 +1037,9 @@ class ModalNavigationUI {
     if (!canGoBack) {
       backButton.style.display = 'none';
       backButton.style.visibility = 'hidden';
-      return;
-    }
-
+                return;
+            }
+            
     backButton.disabled = !canGoBack;
     backButton.style.pointerEvents = canGoBack ? 'auto' : 'none';
     backButton.style.opacity = canGoBack ? '1' : '0.5';
@@ -927,8 +1075,8 @@ window.getModalBreadcrumb = function(modalElement = null) {
   return modalNavigationUI.getBreadcrumb(modalElement);
 };
 
-window.registerModalNavigationClose = async function(modalId) {
-  return modalNavigationService.registerModalClose(modalId);
+window.registerModalNavigationClose = async function(modalId, options = {}) {
+  return modalNavigationService.registerModalClose(modalId, options);
 };
 
 window.ModalNavigationDebug = {

@@ -815,9 +815,23 @@ function updateTradingAccountsTable(trading_accounts) {
  * @returns {void}
  */
 async function updateTradingAccountsSummary(trading_accounts) {
-  const accountsArray = Array.isArray(trading_accounts)
-    ? trading_accounts
-    : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('trading_accounts') : window.trading_accountsData || []);
+  let accountsArray = [];
+  let resolvedViaRegistry = false;
+
+  if (window.TableDataRegistry) {
+    const summary = window.TableDataRegistry.getSummary('trading_accounts');
+    if (summary) {
+      const registryData = window.TableDataRegistry.getFilteredData('trading_accounts', { asReference: false });
+      accountsArray = Array.isArray(registryData) ? registryData : [];
+      resolvedViaRegistry = true;
+    }
+  }
+
+  if (!resolvedViaRegistry) {
+    accountsArray = Array.isArray(trading_accounts)
+      ? trading_accounts
+      : (Array.isArray(window.trading_accountsData) ? window.trading_accountsData : []);
+  }
 
   console.log('🔍 updateTradingAccountsSummary called with:', { count: accountsArray?.length, hasSystem: !!window.InfoSummarySystem, hasConfigs: !!window.INFO_SUMMARY_CONFIGS });
   try {

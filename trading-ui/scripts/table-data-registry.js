@@ -25,6 +25,7 @@
     constructor() {
       this._tables = new Map();
       this._tableIdMap = new Map();
+      this._filteredListeners = new Map(); // tableType -> Set<callback>
     }
 
     /**
@@ -52,6 +53,7 @@
             filteredUpdatedAt: null,
             pageUpdatedAt: null,
             pageInfo: {},
+            activeFilters: null,
           },
         });
       }
@@ -215,10 +217,22 @@
 
       entry.filteredData = Array.isArray(data) ? [...data] : [];
       entry.meta.filteredUpdatedAt = Date.now();
+      if (options.filterContext) {
+        entry.meta.activeFilters = this._cloneFilterContext(options.filterContext);
+      } else if (options.clearFilters) {
+        entry.meta.activeFilters = null;
+      }
 
       if (!options.skipPageReset) {
         this.setPageData(tableType, [], { tableId: entry.meta.tableId, skipCounts: true });
       }
+
+      this._notifyFilteredChange(tableType, {
+        tableType,
+        data: entry.filteredData,
+        filters: entry.meta.activeFilters,
+        tableId: entry.meta.tableId || options.tableId || null,
+      });
 
       return entry.filteredData;
     }
@@ -286,6 +300,25 @@
       }
       const data = entry.filteredData.length > 0 ? entry.filteredData : entry.fullData;
       return options.asReference ? data : [...data];
+    }
+
+    /**
+     * Get active filter context for a table (if available)
+     * @param {string} identifier - tableType or tableId
+     * @param {Object} [options]
+     * @param {boolean} [options.asReference=false] - Return internal reference instead of clone
+     * @returns {Object|null}
+     */
+    getActiveFilters(identifier, options = {}) {
+      const tableType = this.resolveTableType(identifier) || identifier;
+      const entry = this._tables.get(tableType);
+      if (!entry || !entry.meta || !entry.meta.activeFilters) {
+        return null;
+      }
+      if (options.asReference) {
+        return entry.meta.activeFilters;
+      }
+      return this._cloneFilterContext(entry.meta.activeFilters);
     }
 
     getPageData(identifier, options = {}) {
@@ -367,6 +400,7 @@
       }
 
       this._tables.delete(tableType);
+      this._filteredListeners.delete(tableType);
     }
 
     /**
@@ -375,6 +409,112 @@
     clearAll() {
       this._tables.clear();
       this._tableIdMap.clear();
+      this._filteredListeners.clear();
+    }
+
+    /**
+     * Subscribe to filtered data changes
+     * @param {string} identifier - tableType or tableId
+     * @param {Function} callback
+     * @returns {Function} unsubscribe function
+     */
+    onFilteredDataChange(identifier, callback) {
+      if (typeof callback !== 'function') {
+        return () => {};
+      }
+      const tableType = this.resolveTableType(identifier) || identifier;
+      if (!tableType) {
+        return () => {};
+      }
+      const listeners = this._filteredListeners.get(tableType) || new Set();
+      listeners.add(callback);
+      this._filteredListeners.set(tableType, listeners);
+      return () => this.offFilteredDataChange(tableType, callback);
+    }
+
+    /**
+     * Unsubscribe from filtered data changes
+     * @param {string} identifier - tableType or tableId
+     * @param {Function} callback
+     */
+    offFilteredDataChange(identifier, callback) {
+      const tableType = this.resolveTableType(identifier) || identifier;
+      if (!tableType || !callback) {
+        return;
+      }
+      const listeners = this._filteredListeners.get(tableType);
+      if (listeners) {
+        listeners.delete(callback);
+        if (listeners.size === 0) {
+          this._filteredListeners.delete(tableType);
+        }
+      }
+    }
+
+    /**
+     * Notify listeners about filtered data changes
+     * @param {string} tableType
+     * @param {Object} payload
+     * @private
+     */
+    _notifyFilteredChange(tableType, payload) {
+      if (!tableType) {
+        return;
+      }
+      const listeners = this._filteredListeners.get(tableType);
+      if (listeners && listeners.size > 0) {
+        listeners.forEach((listener) => {
+          try {
+            listener(payload);
+          } catch (error) {
+            if (window.Logger?.warn) {
+              window.Logger.warn('TableDataRegistry listener failed', { tableType, error });
+            } else {
+              console.warn('TableDataRegistry listener failed', tableType, error);
+            }
+          }
+        });
+      }
+      const wildcardListeners = this._filteredListeners.get('*');
+      if (wildcardListeners && wildcardListeners.size > 0) {
+        wildcardListeners.forEach((listener) => {
+          try {
+            listener({ tableType, ...payload });
+          } catch (error) {
+            if (window.Logger?.warn) {
+              window.Logger.warn('TableDataRegistry wildcard listener failed', { tableType, error });
+            } else {
+              console.warn('TableDataRegistry wildcard listener failed', tableType, error);
+            }
+          }
+        });
+      }
+    }
+
+    /**
+     * Clone filter context into plain serializable structure
+     * @param {Object} context
+     * @returns {Object|null}
+     * @private
+     */
+    _cloneFilterContext(context) {
+      if (!context || typeof context !== 'object') {
+        return null;
+      }
+      const cloneArray = (value) => {
+        if (!Array.isArray(value)) {
+          return [];
+        }
+        return value.map((item) => (typeof item === 'object' ? String(item) : item)).filter((item) => item !== undefined && item !== null);
+      };
+      return {
+        status: cloneArray(context.status || context.statuses),
+        type: cloneArray(context.type || context.types),
+        account: cloneArray(context.account || context.accounts),
+        search: typeof context.search === 'string' ? context.search : '',
+        dateRange: context.dateRange ? { ...context.dateRange } : null,
+        custom: context.custom ? { ...context.custom } : {},
+      };
     }
   }
 

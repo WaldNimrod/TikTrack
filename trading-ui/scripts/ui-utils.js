@@ -1969,12 +1969,25 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
     let dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
 
     if (window.TableDataRegistry) {
-      const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
-      if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
-        dataToUse = registryFiltered;
-      } else {
+      const summary = window.TableDataRegistry.getSummary(pageName);
+      if (summary) {
+        const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
+        if (Array.isArray(registryFiltered)) {
+          dataToUse = registryFiltered;
+        }
+      } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
+        const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
+        if (resolvedType) {
+          const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
+          if (Array.isArray(registryFiltered)) {
+            dataToUse = registryFiltered;
+          }
+        }
+      }
+
+      if (!Array.isArray(dataToUse)) {
         const registryFull = window.TableDataRegistry.getFullData(pageName);
-        if ((!Array.isArray(dataToUse) || dataToUse.length === 0) && Array.isArray(registryFull) && registryFull.length > 0) {
+        if (Array.isArray(registryFull)) {
           dataToUse = registryFull;
         }
       }

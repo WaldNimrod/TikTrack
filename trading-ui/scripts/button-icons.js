@@ -22,6 +22,7 @@ const BUTTON_ICONS = {
   REFRESH: '🔄',
   EXPORT: '📤',
   IMPORT: '📥',
+  WARNING: '⚠️',
   SEARCH: '🔍',
   FILTER: '🔧',
   VIEW: '👁️',
@@ -54,6 +55,7 @@ const BUTTON_TEXTS = {
   REFRESH: 'רענן',
   EXPORT: 'ייצא',
   IMPORT: 'ייבא',
+  WARNING: 'אזהרה',
   SEARCH: 'חיפוש',
   FILTER: 'פילטר',
   VIEW: 'צפה',
@@ -113,7 +115,7 @@ function getButtonClass(type) {
 }
 
 // Buttons that support entity color variants
-window.ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE', 'MENU'];
+window.ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE', 'MENU', 'PRIMARY', 'WARNING'];
 
 window.supportsEntityVariant = function(buttonType) {
     return window.ENTITY_VARIANT_BUTTONS.includes(buttonType.toUpperCase());

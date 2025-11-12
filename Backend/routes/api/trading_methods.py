@@ -142,7 +142,7 @@ def get_categories():
                 result.append({
                     'value': category,
                     'display_name': category_display.get(category, category.title()),
-                    'display_name_he': self._get_category_hebrew_name(category)
+                    'display_name_he': _get_category_hebrew_name(category)
                 })
             
             return jsonify({

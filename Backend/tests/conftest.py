@@ -1,36 +1,29 @@
+import os
+import sys
+
 import pytest
 
-# Legacy test modules built for the pre-2025 architecture. They rely on models,
-# services and route structures that have since been replaced by the unified
-# systems (DateEnvelope, Service Registry, etc.). Until the new end-to-end
-# regression suite is finalised, we explicitly skip these files to prevent the
-# outdated assertions from blocking releases.
-LEGACY_TEST_PATH_SUFFIXES = [
-    "test_connectors_only.py",
-    "test_import_system_integration.py",
-    "test_import_system_new_architecture.py",
-    "test_user_data_import_comprehensive.py",
-    "test_user_data_import_simple.py",
-    "test_models/test_alert_model.py",
-    "test_models/test_trade_model.py",
-    "test_routes/test_alerts_routes.py",
-    "test_routes/test_cache_management_routes.py",
-    "test_routes/test_executions_routes.py",
-    "test_routes/test_preferences_routes.py",
-    "test_routes/test_trade_plans_routes.py",
-    "test_routes/test_trades_routes.py",
-    "test_routes/test_trading_accounts_routes.py",
-    "test_services/test_preferences_service.py",
-    "test_services/test_trade_service.py",
-    "test_services/test_validation_service.py",
-]
+# Ensure the project root is on sys.path for imports
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+BACKEND_ROOT = os.path.join(PROJECT_ROOT, "Backend")
+if BACKEND_ROOT not in sys.path:
+    sys.path.insert(0, BACKEND_ROOT)
+
+from Backend.app import create_app, db  # noqa: E402
+from Backend.config.settings import DATABASE_URL  # noqa: E402
 
 
-def pytest_collection_modifyitems(config, items):
-    for item in items:
-        path = str(item.fspath)
-        if any(path.endswith(suffix) for suffix in LEGACY_TEST_PATH_SUFFIXES):
-            item.add_marker(
-                pytest.mark.skip(reason="Legacy test suite pending migration to the new unified architecture")
-            )
-
+@pytest.fixture(autouse=True)
+def reset_database_binding():
+    """
+    Guarantee that each test starts and ends with the default project database
+    binding. This prevents tests that temporarily rebind to in-memory SQLite
+    from affecting subsequent tests that expect the full schema.
+    """
+    create_app({"SQLALCHEMY_DATABASE_URI": DATABASE_URL})
+    db.ensure()
+    yield
+    create_app({"SQLALCHEMY_DATABASE_URI": DATABASE_URL})
+    db.ensure()

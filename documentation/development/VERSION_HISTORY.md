@@ -28,3 +28,5 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-12T15:33:15+00:00 | 1.0.18.0 | 1.0.17.0 | d3c2bf075911e1b903d9067e31e06fd4ece7b2fb | 03f3c3fb05d5ed307607a28e07ba9ac727b70ada | patch | Entity modal color sync |
 | 2025-11-12T16:32:29+00:00 | 1.0.19.0 | 1.0.18.0 | 3aba628529e222b0552c8559b3bc7104b2b1e6a8 | d3c2bf075911e1b903d9067e31e06fd4ece7b2fb | patch | Adjust import session warning layout |
 | 2025-11-12T18:44:29+00:00 | 1.0.20.0 | 1.0.19.0 | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | 3aba628529e222b0552c8559b3bc7104b2b1e6a8 | patch | Finalize modal navigation refactor and tagging rollout |
+| 2025-11-12T20:40:00+00:00 | 1.0.21.0 | 1.0.20.0 | pending | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | patch | Legacy duplicate cleanup (import modal & linter) + docs update |
+| 2025-11-12T22:49:10+00:00 | 1.0.22.0 | 1.0.21.0 | 0952f7612900529373f545ad12b163b2a09b489f | pending | patch | Refine data import warning layout |

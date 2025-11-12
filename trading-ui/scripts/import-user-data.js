@@ -6027,7 +6027,8 @@ function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
         'analysisContinueBtn',
         'confirmImportHeaderBtn',
         'confirmImportAndReportHeaderBtn',
-        'resetImportSessionBtn'
+        'resetImportSessionBtn',
+        'cancelImportStepBtn'
     ];
 
     entityButtons.forEach((id) => {
@@ -6054,6 +6055,25 @@ function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
             }
         }
     });
+
+    const entityCssKey = String(entityType || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+    const entityColorVar = entityCssKey
+        ? `var(--entity-${entityCssKey}-color, var(--warning-color, #fd7e14))`
+        : `var(--warning-color, #fd7e14)`;
+    const entityTextVar = entityCssKey
+        ? `var(--entity-${entityCssKey}-text, var(--warning-text-color, #0c5460))`
+        : `var(--warning-text-color, #0c5460)`;
+
+    document
+        .querySelectorAll('.active-session-warning-card')
+        .forEach((card) => {
+            card.setAttribute('data-entity-type', entityType || '');
+            card.style.setProperty('--active-session-entity-color', entityColorVar);
+            card.style.setProperty('--active-session-entity-text', entityTextVar);
+        });
 }
 
 const displayExistingRecordsLegacy = (records) => displayExistingRecords(records);

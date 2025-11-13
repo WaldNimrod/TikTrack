@@ -5,9 +5,9 @@
     "minor": 1,
     "patch": 0,
     "build": 0,
-    "commit": "dd74aa6c8b7bface5f3b8bbe2e6f560cd9f8a56f",
-    "updated_at": "2025-11-13T12:05:28+00:00",
-    "notes": "Promote production baseline after stability overhaul"
+    "commit": "0187db4b35a732e55f6d84b8f4420bcd063b1ce2",
+    "updated_at": "2025-11-13T17:37:55+00:00",
+    "notes": "Finalize production isolation and DB alignment"
   },
   "development": {
     "version": "1.0.23.0",

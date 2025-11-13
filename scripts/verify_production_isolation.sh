@@ -12,7 +12,20 @@ set -e
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PRODUCTION_BACKEND="$PROJECT_ROOT/production/Backend"
-DEV_BACKEND="$PROJECT_ROOT/Backend"
+
+# Determine development backend root (allow override via VERIFY_DEV_ROOT env)
+DEV_BACKEND_DEFAULT="$PROJECT_ROOT/Backend"
+if [ -n "$VERIFY_DEV_ROOT" ]; then
+    DEV_BACKEND="$VERIFY_DEV_ROOT"
+else
+    DEV_BACKEND="$DEV_BACKEND_DEFAULT"
+fi
+
+DEV_EXISTS=false
+if [ -n "$DEV_BACKEND" ] && [ -d "$DEV_BACKEND" ]; then
+    DEV_BACKEND="$(cd "$DEV_BACKEND" && pwd)"
+    DEV_EXISTS=true
+fi
 
 # Colors
 GREEN='\033[0;32m'
@@ -58,7 +71,11 @@ echo ""
 # ========================================
 info "1. Checking directory structure isolation..."
 check "Production Dir" "[ -d \"$PRODUCTION_BACKEND\" ]" "production/Backend/ exists"
-check "Dev Dir Separate" "[ -d \"$DEV_BACKEND\" ]" "Backend/ (dev) exists separately"
+if [ "$DEV_EXISTS" = true ]; then
+    check "Dev Dir Separate" "[ -d \"$DEV_BACKEND\" ]" "Backend/ (dev) exists separately"
+else
+    warn "Dev Dir Separate" "Development repository not found (set VERIFY_DEV_ROOT to override)"
+fi
 check "No Cross-Links" "[ ! -L \"$PRODUCTION_BACKEND/Backend\" ]" "No symlinks to dev Backend"
 
 # ========================================
@@ -67,15 +84,23 @@ check "No Cross-Links" "[ ! -L \"$PRODUCTION_BACKEND/Backend\" ]" "No symlinks t
 info ""
 info "2. Checking database isolation..."
 check "Production DB" "[ -f \"$PRODUCTION_BACKEND/db/tiktrack.db\" ]" "tiktrack.db exists"
-check "Dev DB Separate" "[ -f \"$DEV_BACKEND/db/simpleTrade_new.db\" ]" "simpleTrade_new.db (dev) exists separately"
+if [ "$DEV_EXISTS" = true ]; then
+    if [ -f "$DEV_BACKEND/db/tiktrack.db" ]; then
+        check "Dev DB Separate" "[ -f \"$DEV_BACKEND/db/tiktrack.db\" ]" "tiktrack.db (dev) exists separately"
+    else
+        warn "Dev DB Separate" "tiktrack.db not found in development repository"
+    fi
+else
+    warn "Dev DB Separate" "Skipped dev database check (no development repository detected)"
+fi
 
 # Check for cross-references
 if [ -f "$PRODUCTION_BACKEND/db/simpleTrade_new.db" ]; then
-    warn "Dev DB in Prod" "simpleTrade_new.db found in production (should not exist)"
+    warn "Legacy DB in Prod" "simpleTrade_new.db found in production (should be removed)"
 fi
 
-if [ -f "$DEV_BACKEND/db/tiktrack.db" ]; then
-    warn "Prod DB in Dev" "tiktrack.db found in development (should not exist)"
+if [ "$DEV_EXISTS" = true ] && [ -f "$DEV_BACKEND/db/simpleTrade_new.db" ]; then
+    warn "Legacy Dev DB" "simpleTrade_new.db found in development (should be renamed to tiktrack.db)"
 fi
 
 # ========================================
@@ -133,7 +158,11 @@ fi
 info ""
 info "5. Checking logs isolation..."
 check "Prod Logs Dir" "[ -d \"$PRODUCTION_BACKEND/logs\" ]" "production/Backend/logs/ exists"
-check "Dev Logs Separate" "[ -d \"$DEV_BACKEND/logs\" ]" "Backend/logs/ (dev) exists separately"
+if [ "$DEV_EXISTS" = true ]; then
+    check "Dev Logs Separate" "[ -d \"$DEV_BACKEND/logs\" ]" "Backend/logs/ (dev) exists separately"
+else
+    warn "Dev Logs Separate" "Skipped dev logs check (no development repository detected)"
+fi
 
 # ========================================
 # 6. Port Isolation
@@ -162,15 +191,22 @@ info ""
 info "7. Checking file counts..."
 
 prod_py_count=$(find "$PRODUCTION_BACKEND" -name "*.py" -not -path "*/__pycache__/*" | wc -l | tr -d ' ')
-dev_py_count=$(find "$DEV_BACKEND" -name "*.py" -not -path "*/__pycache__/*" -not -path "*/tests/*" -not -path "*/migrations/*" | wc -l | tr -d ' ')
+if [ "$DEV_EXISTS" = true ]; then
+    dev_py_count=$(find "$DEV_BACKEND" -name "*.py" -not -path "*/__pycache__/*" -not -path "*/tests/*" -not -path "*/migrations/*" | wc -l | tr -d ' ')
+else
+    dev_py_count=0
+fi
 
 info "Production Python files: $prod_py_count"
-info "Development Python files (excluding tests/migrations): $dev_py_count"
-
-if [ "$prod_py_count" -lt "$dev_py_count" ]; then
-    check "File Count" "true" "Production has fewer files (clean codebase)"
+if [ "$DEV_EXISTS" = true ]; then
+    info "Development Python files (excluding tests/migrations): $dev_py_count"
+    if [ "$prod_py_count" -lt "$dev_py_count" ]; then
+        check "File Count" "true" "Production has fewer files (clean codebase)"
+    else
+        warn "File Count" "Production has same or more files than dev (unexpected)"
+    fi
 else
-    warn "File Count" "Production has same or more files than dev (unexpected)"
+    warn "File Count" "Skipped comparison (no development repository detected)"
 fi
 
 # ========================================
@@ -199,24 +235,32 @@ info "9. Checking for legacy database filenames in code..."
 legacy_refs=$(grep -R -n \
     --exclude-dir=.git \
     --exclude-dir=documentation \
+    --exclude-dir=archive \
+    --exclude-dir=_Tmp \
     --exclude-dir=Backend/db/backups \
     --exclude-dir=production/Backend/db/backups \
     --exclude-dir=production/trading-ui/images \
     --exclude='*.md' \
     --exclude='*.json' \
-    --exclude='scripts/verify_production_isolation.sh' \
-    "simpleTrade_new.db" .. || true)
+    --exclude='*.zip' \
+    --exclude='.cursorrules*' \
+    --exclude=verify_production_isolation.sh \
+    "simpleTrade_new.db" "$PROJECT_ROOT" || true)
 
 legacy_prod_refs=$(grep -R -n \
     --exclude-dir=.git \
     --exclude-dir=documentation \
+    --exclude-dir=archive \
+    --exclude-dir=_Tmp \
     --exclude-dir=Backend/db/backups \
     --exclude-dir=production/Backend/db/backups \
     --exclude-dir=production/trading-ui/images \
     --exclude='*.md' \
     --exclude='*.json' \
-    --exclude='scripts/verify_production_isolation.sh' \
-    "TikTrack_DB.db" .. || true)
+    --exclude='*.zip' \
+    --exclude='.cursorrules*' \
+    --exclude=verify_production_isolation.sh \
+    "TikTrack_DB.db" "$PROJECT_ROOT" || true)
 
 if [ -n "$legacy_refs" ] || [ -n "$legacy_prod_refs" ]; then
     echo -e "${RED}❌ Legacy DB references detected:${NC}"

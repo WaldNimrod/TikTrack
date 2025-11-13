@@ -68,6 +68,26 @@ git commit -m "Merge main into production: [תאריך/תיאור]"
 
 ---
 
+### שלב 2.5: גיבוי מסד נתונים לפני המשך התהליך (חובה!)
+
+לפני כל יציאה לעדכון יש לבצע snapshot למסד הנתונים הפעיל – כך שאם משהו משתבש ניתן לחזור אחורה בדקות.
+
+```bash
+# יצירת תיקיית גיבויים (אם לא קיימת)
+mkdir -p Backend/db/backups
+
+# גיבוי לפני עדכון (שם קובץ ברור עם תאריך ושעה)
+timestamp=$(date +%Y%m%d_%H%M%S)
+cp Backend/db/tiktrack.db Backend/db/backups/tiktrack_pre_update_${timestamp}.db
+```
+
+**המלצות נוספות:**
+- שמור את נתיב הגיבוי בפנקס כדי שיהיה קל לשחזר במידת הצורך.
+- אחרי גיבוי, הרץ `sqlite3 <קובץ> "PRAGMA integrity_check;"` כדי לוודא שהקובץ תקין.
+- אם נדרש לשחזר, עצור את השרת (`lsof -i :5001` → `kill <PID>`), והעבר את קובץ הגיבוי חזרה אל `Backend/db/tiktrack.db` ואל `production/Backend/db/tiktrack.db`.
+
+---
+
 ### שלב 3: סינכרון קוד לפרודקשן
 
 ```bash
@@ -132,6 +152,43 @@ Production: True
 # production/Backend/config/settings.py - ודא hardcoded production
 # production/Backend/config/logging.py - ודא log_dir = Path("logs")
 ```
+
+---
+
+### שלב 3.8: בניית בסיס נתונים נקי (אופציונלי אך מומלץ לפני שחרור גרסה)
+
+במידה שרוצים לפתוח גרסה על בסיס נתונים "ריק" או לוודא שהסכמה הרשמית לא נפגעה:
+
+1. **כבה את שרת הפרודקשן**:
+   ```bash
+   lsof -i :5001
+   kill <PID>
+   ```
+
+2. **גבה את הקובץ הנוכחי** (אם עדיין לא גיבית בשלב 2.5).
+
+3. **בנה סכמה נקייה** על בסיס הסכמה הרשמית (ללא נתוני פיתוח):
+   ```bash
+   sqlite3 _Tmp/simpleTrade_new.db ".schema" > /tmp/tiktrack_schema.sql
+   sqlite3 Backend/db/tiktrack.db ".read /tmp/tiktrack_schema.sql"
+   cp Backend/db/tiktrack.db production/Backend/db/tiktrack.db
+   ```
+
+   > `_Tmp/simpleTrade_new.db` מחזיק את סכמה שולחן-העזר הרשמית ללא נתונים. יש לוודא שהקובץ מעודכן לפני השימוש.
+
+4. **אמת שהטבלאות קיימות אך ריקות**:
+   ```bash
+   sqlite3 Backend/db/tiktrack.db <<'SQL'
+   SELECT 'accounts', COUNT(*) FROM trading_accounts;
+   SELECT 'tickers', COUNT(*) FROM tickers;
+   SELECT 'preferences', COUNT(*) FROM user_preferences;
+   SQL
+   ```
+
+5. **הפעל מחדש את השרת** (רק לאחר הזנת נתוני בסיס נחוצים):
+   ```bash
+   ./start_production.sh
+   ```
 
 ---
 

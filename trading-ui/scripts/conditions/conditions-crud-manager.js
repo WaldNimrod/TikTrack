@@ -33,7 +33,7 @@ class ConditionsCRUDManager {
 
     setContext({ entityType = 'plan' } = {}) {
         if (!this.baseUrls[entityType]) {
-            console.warn(`[ConditionsCRUDManager] Unsupported entity type "${entityType}", defaulting to "plan"`);
+            window.Logger?.warn('[ConditionsCRUDManager] Unsupported entity type, defaulting to plan', { entityType }, { page: 'conditions-crud-manager' });
             this.entityType = 'plan';
             return;
         }
@@ -77,7 +77,7 @@ class ConditionsCRUDManager {
 
             return this.translator.translateCondition(response.data, this.entityType);
         } catch (error) {
-            console.error('Error creating condition:', error);
+            window.Logger?.error('[ConditionsCRUDManager] Error creating condition', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
             this.showNotification(`שגיאה ביצירת תנאי: ${error.message}`, 'error');
             throw error;
         }
@@ -120,7 +120,7 @@ class ConditionsCRUDManager {
 
             return translated;
         } catch (error) {
-            console.error('Error reading conditions:', error);
+            window.Logger?.error('[ConditionsCRUDManager] Error reading conditions', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
             this.showNotification(`שגיאה בקריאת תנאים: ${error.message}`, 'error');
             throw error;
         }
@@ -158,7 +158,7 @@ class ConditionsCRUDManager {
             this.showNotification(this.translator.getMessage('condition_updated'), 'success');
             return this.translator.translateCondition(response.data, this.entityType);
         } catch (error) {
-            console.error('Error updating condition:', error);
+            window.Logger?.error('[ConditionsCRUDManager] Error updating condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
             this.showNotification(`שגיאה בעדכון תנאי: ${error.message}`, 'error');
             throw error;
         }
@@ -193,7 +193,7 @@ class ConditionsCRUDManager {
             this.showNotification(this.translator.getMessage('condition_deleted'), 'success');
             return true;
         } catch (error) {
-            console.error('Error deleting condition:', error);
+            window.Logger?.error('[ConditionsCRUDManager] Error deleting condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
             this.showNotification(`שגיאה במחיקת תנאי: ${error.message}`, 'error');
             throw error;
         }
@@ -234,7 +234,7 @@ class ConditionsCRUDManager {
 
             return translatedMethods;
         } catch (error) {
-            console.error('Error getting trading methods:', error);
+            window.Logger?.error('[ConditionsCRUDManager] Error getting trading methods', { error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });
             this.showNotification(`שגיאה בקבלת שיטות מסחר: ${error.message}`, 'error');
             throw error;
         }
@@ -273,7 +273,7 @@ class ConditionsCRUDManager {
             this.showNotification('התראה נוצרה בהצלחה', 'success');
             return response.data;
         } catch (error) {
-            console.error('Error creating alert:', error);
+            window.Logger?.error('[ConditionsCRUDManager] Error creating alert', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-crud-manager' });
             this.showNotification(`שגיאה ביצירת התראה: ${error.message}`, 'error');
             throw error;
         }
@@ -349,7 +349,7 @@ class ConditionsCRUDManager {
                 status: response.status
             };
         } catch (error) {
-            console.error(`API call failed (${method} ${endpoint}):`, error);
+            window.Logger?.error('[ConditionsCRUDManager] API call failed', { method, endpoint, error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });
             return {
                 success: false,
                 data: null,
@@ -375,7 +375,7 @@ class ConditionsCRUDManager {
         } else if (window.notificationSystem && window.notificationSystem.showNotification) {
             window.notificationSystem.showNotification(message, type);
         } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            window.Logger?.info?.('[ConditionsCRUDManager] showNotification fallback', { type, message }, { page: 'conditions-crud-manager' });
         }
     }
 

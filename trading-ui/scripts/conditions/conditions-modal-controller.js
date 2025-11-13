@@ -38,13 +38,13 @@
                         window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);
                         this.modalElement = document.getElementById(MODAL_ID);
                     } catch (error) {
-                        console.error('[ConditionsModalController] Failed to create modal from config', error);
+                        window.Logger?.error('[ConditionsModalController] Failed to create modal from config', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                     }
                 }
             }
 
             if (!this.modalElement) {
-                console.warn('[ConditionsModalController] Modal element not found');
+                window.Logger?.warn('[ConditionsModalController] Modal element not found', { page: 'conditions-modal-controller' });
                 return;
             }
 
@@ -65,7 +65,7 @@
             this.parentModalId = this.context.parentModalId || null;
 
             if (!this.context.entityId) {
-                console.error('[ConditionsModalController] Missing entityId in context');
+                window.Logger?.error('[ConditionsModalController] Missing entityId in context', { context }, { page: 'conditions-modal-controller' });
                 window.showNotification?.('לא הוגדרה ישות לניהול תנאים', 'error');
                 return;
             }
@@ -79,7 +79,7 @@
                     window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);
                     this.setupModal();
                 } catch (error) {
-                    console.error('[ConditionsModalController] Failed to create modal via ModalManagerV2', error);
+                    window.Logger?.error('[ConditionsModalController] Failed to create modal via ModalManagerV2', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                 }
             }
 
@@ -96,7 +96,7 @@
                             parentElement.style.display = 'none';
                         }
                     } catch (error) {
-                        console.warn('[ConditionsModalController] Failed to hide parent modal', { error });
+                        window.Logger?.warn('[ConditionsModalController] Failed to hide parent modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                         parentElement.classList.remove('show');
                         parentElement.style.display = 'none';
                     }
@@ -113,7 +113,7 @@
 
         async onModalShown() {
             if (!this.context) {
-                console.error('[ConditionsModalController] Modal opened without context');
+                window.Logger?.error('[ConditionsModalController] Modal opened without context', { page: 'conditions-modal-controller' });
                 return;
             }
 
@@ -205,7 +205,7 @@
                     parentElement.style.display = 'block';
                 }
             } catch (error) {
-                console.warn('[ConditionsModalController] Failed to restore parent modal', { error });
+                window.Logger?.warn('[ConditionsModalController] Failed to restore parent modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                 parentElement.classList.add('show');
                 parentElement.style.display = 'block';
             } finally {

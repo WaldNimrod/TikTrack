@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/216</span>
+                <span class='fraction'>0/221</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/208</span>
+                <span class='fraction'>0/213</span>
             </div>
         
             
@@ -575,7 +575,12 @@
 <a name='L510'></a><a href='#L510'>510</a>
 <a name='L511'></a><a href='#L511'>511</a>
 <a name='L512'></a><a href='#L512'>512</a>
-<a name='L513'></a><a href='#L513'>513</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L513'></a><a href='#L513'>513</a>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -904,21 +909,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1136,7 +1146,7 @@ class ConditionsFormGenerator {
 <span class="cstat-no" title="statement not covered" >        this.containerId = containerId;</span>
         const container = <span class="cstat-no" title="statement not covered" >document.getElementById(containerId);</span>
 <span class="cstat-no" title="statement not covered" >        if (!container) {</span>
-<span class="cstat-no" title="statement not covered" >            console.error(`Container ${containerId} not found`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsFormGenerator] Container not found', { containerId }, { page: 'conditions-form-generator' });</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
 &nbsp;
@@ -1152,7 +1162,7 @@ class ConditionsFormGenerator {
 <span class="cstat-no" title="statement not covered" >                this.populateForm(options.conditionData);</span>
             }
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to prepare condition form:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsFormGenerator] Failed to prepare condition form', { error: error?.message, stack: error?.stack }, { page: 'conditions-form-generator' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification('שגיאה בטעינת שיטות התנאים', 'error');</span>
         }
     }
@@ -1298,7 +1308,7 @@ class ConditionsFormGenerator {
 &nbsp;
         const method = <span class="cstat-no" title="statement not covered" >this.methodsById.get(String(methodId));</span>
 <span class="cstat-no" title="statement not covered" >        if (!method) {</span>
-<span class="cstat-no" title="statement not covered" >            console.warn(`[ConditionsFormGenerator] Method with id ${methodId} not found`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.warn('[ConditionsFormGenerator] Method not found by id', { methodId }, { page: 'conditions-form-generator' });</span>
 <span class="cstat-no" title="statement not covered" >            this.clearParameters();</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
@@ -1414,10 +1424,13 @@ class ConditionsFormGenerator {
 &nbsp;
 <span class="fstat-no" title="function not covered" >    as</span>ync handleFormSubmit() {
 <span class="cstat-no" title="statement not covered" >        try {</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('[ConditionsFormGenerator] handleFormSubmit triggered', {}, { page: 'conditions-form-generator' });</span>
             const formData = <span class="cstat-no" title="statement not covered" >this.collectFormData();</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.debug?.('[ConditionsFormGenerator] collected form data', { formData }, { page: 'conditions-form-generator' });</span>
             const validation = <span class="cstat-no" title="statement not covered" >this.validator.validateCondition(formData);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            if (!validation.isValid) {</span>
+<span class="cstat-no" title="statement not covered" >                window.Logger?.warn('[ConditionsFormGenerator] validation failed', { errors: validation.errors }, { page: 'conditions-form-generator' });</span>
 <span class="cstat-no" title="statement not covered" >                this.presentValidationErrors(validation.errors);</span>
 <span class="cstat-no" title="statement not covered" >                return;</span>
             }
@@ -1426,12 +1439,14 @@ class ConditionsFormGenerator {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            if (typeof this.onSubmitCallback === 'function') {</span>
 <span class="cstat-no" title="statement not covered" >                await this.onSubmitCallback(formData);</span>
+<span class="cstat-no" title="statement not covered" >                window.Logger?.info('[ConditionsFormGenerator] onSubmitCallback resolved', {}, { page: 'conditions-form-generator' });</span>
             }
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error submitting condition form:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('Error submitting condition form', { error: error?.message, stack: error?.stack }, { page: 'conditions-form-generator' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(error.message || 'שגיאה בשליחת הטופס', 'error');</span>
         } finally {
 <span class="cstat-no" title="statement not covered" >            this.setFormLoading(false);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.debug?.('[ConditionsFormGenerator] handleFormSubmit finished', {}, { page: 'conditions-form-generator' });</span>
         }
     }
 &nbsp;
@@ -1571,7 +1586,7 @@ class ConditionsFormGenerator {
 <span class="cstat-no" title="statement not covered" >        try {</span>
 <span class="cstat-no" title="statement not covered" >            return JSON.parse(value);</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.warn('[ConditionsFormGenerator] Failed to parse JSON value', value, error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.warn('[ConditionsFormGenerator] Failed to parse JSON value', { value, error: error?.message }, { page: 'conditions-form-generator' });</span>
 <span class="cstat-no" title="statement not covered" >            return fallback;</span>
         }
     }
@@ -1582,7 +1597,7 @@ class ConditionsFormGenerator {
         } else <span class="cstat-no" title="statement not covered" >if (window.notificationSystem &amp;&amp; window.notificationSystem.showNotification) {</span>
 <span class="cstat-no" title="statement not covered" >            window.notificationSystem.showNotification(message, type);</span>
         } else {
-<span class="cstat-no" title="statement not covered" >            console.log(`[${type.toUpperCase()}] ${message}`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info?.('[ConditionsFormGenerator] showNotification fallback', { type, message }, { page: 'conditions-form-generator' });</span>
         }
     }
 }
@@ -1606,7 +1621,7 @@ class ConditionsFormGenerator {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-12T18:06:24.820Z
+                at 2025-11-12T23:38:03.899Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

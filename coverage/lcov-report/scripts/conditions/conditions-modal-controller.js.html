@@ -543,13 +543,13 @@
 <span class="cstat-no" title="statement not covered" >                        window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);</span>
 <span class="cstat-no" title="statement not covered" >                        this.modalElement = document.getElementById(MODAL_ID);</span>
                     } catch (error) {
-<span class="cstat-no" title="statement not covered" >                        console.error('[ConditionsModalController] Failed to create modal from config', error);</span>
+<span class="cstat-no" title="statement not covered" >                        window.Logger?.error('[ConditionsModalController] Failed to create modal from config', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });</span>
                     }
                 }
             }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            if (!this.modalElement) {</span>
-<span class="cstat-no" title="statement not covered" >                console.warn('[ConditionsModalController] Modal element not found');</span>
+<span class="cstat-no" title="statement not covered" >                window.Logger?.warn('[ConditionsModalController] Modal element not found', { page: 'conditions-modal-controller' });</span>
 <span class="cstat-no" title="statement not covered" >                return;</span>
             }
 &nbsp;
@@ -570,7 +570,7 @@
 <span class="cstat-no" title="statement not covered" >            this.parentModalId = this.context.parentModalId || null;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            if (!this.context.entityId) {</span>
-<span class="cstat-no" title="statement not covered" >                console.error('[ConditionsModalController] Missing entityId in context');</span>
+<span class="cstat-no" title="statement not covered" >                window.Logger?.error('[ConditionsModalController] Missing entityId in context', { context }, { page: 'conditions-modal-controller' });</span>
 <span class="cstat-no" title="statement not covered" >                window.showNotification?.('לא הוגדרה ישות לניהול תנאים', 'error');</span>
 <span class="cstat-no" title="statement not covered" >                return;</span>
             }
@@ -584,7 +584,7 @@
 <span class="cstat-no" title="statement not covered" >                    window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);</span>
 <span class="cstat-no" title="statement not covered" >                    this.setupModal();</span>
                 } catch (error) {
-<span class="cstat-no" title="statement not covered" >                    console.error('[ConditionsModalController] Failed to create modal via ModalManagerV2', error);</span>
+<span class="cstat-no" title="statement not covered" >                    window.Logger?.error('[ConditionsModalController] Failed to create modal via ModalManagerV2', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });</span>
                 }
             }
 &nbsp;
@@ -601,7 +601,7 @@
 <span class="cstat-no" title="statement not covered" >                            parentElement.style.display = 'none';</span>
                         }
                     } catch (error) {
-<span class="cstat-no" title="statement not covered" >                        console.warn('[ConditionsModalController] Failed to hide parent modal', { error });</span>
+<span class="cstat-no" title="statement not covered" >                        window.Logger?.warn('[ConditionsModalController] Failed to hide parent modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });</span>
 <span class="cstat-no" title="statement not covered" >                        parentElement.classList.remove('show');</span>
 <span class="cstat-no" title="statement not covered" >                        parentElement.style.display = 'none';</span>
                     }
@@ -618,7 +618,7 @@
 &nbsp;
 <span class="fstat-no" title="function not covered" >        as</span>ync onModalShown() {
 <span class="cstat-no" title="statement not covered" >            if (!this.context) {</span>
-<span class="cstat-no" title="statement not covered" >                console.error('[ConditionsModalController] Modal opened without context');</span>
+<span class="cstat-no" title="statement not covered" >                window.Logger?.error('[ConditionsModalController] Modal opened without context', { page: 'conditions-modal-controller' });</span>
 <span class="cstat-no" title="statement not covered" >                return;</span>
             }
 &nbsp;
@@ -710,7 +710,7 @@
 <span class="cstat-no" title="statement not covered" >                    parentElement.style.display = 'block';</span>
                 }
             } catch (error) {
-<span class="cstat-no" title="statement not covered" >                console.warn('[ConditionsModalController] Failed to restore parent modal', { error });</span>
+<span class="cstat-no" title="statement not covered" >                window.Logger?.warn('[ConditionsModalController] Failed to restore parent modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });</span>
 <span class="cstat-no" title="statement not covered" >                parentElement.classList.add('show');</span>
 <span class="cstat-no" title="statement not covered" >                parentElement.style.display = 'block';</span>
             } finally {
@@ -730,7 +730,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-12T18:06:24.820Z
+                at 2025-11-12T23:38:03.899Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

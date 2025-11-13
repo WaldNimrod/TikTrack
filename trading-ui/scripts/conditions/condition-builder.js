@@ -64,7 +64,7 @@ class ConditionBuilder {
             this.render();
             this.attachEventListeners();
         } catch (error) {
-            console.error('Failed to initialize condition builder:', error);
+            window.Logger?.error('[ConditionBuilder] Failed to initialize condition builder', { error: error?.message, stack: error?.stack, entityType: this.entityType, entityId: this.entityId }, { page: 'condition-builder' });
             this.showNotification('conditions.error.load_methods', 'error');
         }
     }
@@ -151,7 +151,7 @@ class ConditionBuilder {
             // Group methods by category
             this.methodsByCategory = this.groupMethodsByCategory(this.methods);
         } catch (error) {
-            console.error('Error loading methods:', error);
+            window.Logger?.error('[ConditionBuilder] Error loading methods', { error: error?.message, stack: error?.stack }, { page: 'condition-builder' });
             throw error;
         }
     }
@@ -181,7 +181,7 @@ class ConditionBuilder {
     render() {
         const container = document.getElementById(this.containerId);
         if (!container) {
-            console.error(`Container ${this.containerId} not found`);
+            window.Logger?.error('[ConditionBuilder] Container not found', { containerId: this.containerId }, { page: 'condition-builder' });
             return;
         }
         
@@ -400,7 +400,7 @@ class ConditionBuilder {
             document.getElementById('parameterFormContainer').style.display = 'block';
             
         } catch (error) {
-            console.error('Error selecting method:', error);
+            window.Logger?.error('[ConditionBuilder] Error selecting method', { error: error?.message, stack: error?.stack, methodId }, { page: 'condition-builder' });
             this.showNotification('conditions.error.load_parameters', 'error');
         }
     }
@@ -425,7 +425,7 @@ class ConditionBuilder {
             
             this.renderParameterFields();
         } catch (error) {
-            console.error('Error loading method parameters:', error);
+            window.Logger?.error('[ConditionBuilder] Error loading method parameters', { error: error?.message, stack: error?.stack, methodId }, { page: 'condition-builder' });
             throw error;
         }
     }
@@ -621,7 +621,7 @@ class ConditionBuilder {
             this.showNotification('conditions.success.condition_saved', 'success');
             
         } catch (error) {
-            console.error('Error adding condition:', error);
+            window.Logger?.error('[ConditionBuilder] Error adding condition', { error: error?.message, stack: error?.stack }, { page: 'condition-builder' });
             this.showNotification('conditions.error.save_condition', 'error');
         }
     }
@@ -743,7 +743,7 @@ class ConditionBuilder {
                 }
             });
         } catch (error) {
-            console.error('Error populating parameter form:', error);
+            window.Logger?.error('[ConditionBuilder] Error populating parameter form', { error: error?.message, stack: error?.stack, parameters }, { page: 'condition-builder' });
         }
     }
     
@@ -782,7 +782,7 @@ class ConditionBuilder {
             this.showNotification('conditions.success.condition_saved', 'success');
             
         } catch (error) {
-            console.error('Error saving conditions:', error);
+            window.Logger?.error('[ConditionBuilder] Error saving conditions', { error: error?.message, stack: error?.stack, entityId: this.entityId, entityType: this.entityType }, { page: 'condition-builder' });
             this.showNotification('conditions.error.save_condition', 'error');
         }
     }
@@ -823,7 +823,7 @@ class ConditionBuilder {
             this.showNotification('conditions.success.condition_tested', 'success');
             
         } catch (error) {
-            console.error('Error testing conditions:', error);
+            window.Logger?.error('[ConditionBuilder] Error testing conditions', { error: error?.message, stack: error?.stack, entityId: this.entityId, entityType: this.entityType }, { page: 'condition-builder' });
             this.showNotification('conditions.error.test_condition', 'error');
         }
     }
@@ -853,7 +853,7 @@ class ConditionBuilder {
             this.attachEventListeners();
             
         } catch (error) {
-            console.error('Error loading existing conditions:', error);
+            window.Logger?.error('[ConditionBuilder] Error loading existing conditions', { error: error?.message, stack: error?.stack, entityId: this.entityId, entityType: this.entityType }, { page: 'condition-builder' });
             // Don't show error notification for initial load
         }
     }
@@ -892,7 +892,7 @@ class ConditionBuilder {
         } else if (window.showSuccessNotification && type === 'success') {
             window.showSuccessNotification(message);
         } else {
-            console.log(`${type.toUpperCase()}: ${message}`);
+            window.Logger?.info?.('[ConditionBuilder] showNotification fallback', { type, message }, { page: 'condition-builder' });
         }
     }
 }

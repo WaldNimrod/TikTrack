@@ -314,7 +314,7 @@ class ConditionsTranslations {
             try {
                 return JSON.parse(parameters);
             } catch (error) {
-                console.warn('[ConditionsTranslations] Failed to parse parameters_json', error);
+                window.Logger?.warn('[ConditionsTranslations] Failed to parse parameters_json', { error: error?.message, value: parameters }, { page: 'conditions-translations' });
                 return {};
             }
         }

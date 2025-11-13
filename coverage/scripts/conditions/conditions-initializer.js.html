@@ -791,12 +791,12 @@ class ConditionsInitializer {
      */
 <span class="fstat-no" title="function not covered" >    as</span>ync initialize() {
 <span class="cstat-no" title="statement not covered" >        if (this.isInitialized) {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('🔧 Conditions system already initialized');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('🔧 Conditions system already initialized', { page: 'conditions-initializer' });</span>
 <span class="cstat-no" title="statement not covered" >            return true;</span>
         }
         
 <span class="cstat-no" title="statement not covered" >        try {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('🚀 Initializing Conditions System...');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('🚀 Initializing Conditions System...', { page: 'conditions-initializer' });</span>
             
             // Check dependencies
 <span class="cstat-no" title="statement not covered" >            await this.checkDependencies();</span>
@@ -811,12 +811,12 @@ class ConditionsInitializer {
 <span class="cstat-no" title="statement not covered" >            this.registerWithUnifiedSystem();</span>
             
 <span class="cstat-no" title="statement not covered" >            this.isInitialized = true;</span>
-<span class="cstat-no" title="statement not covered" >            console.log('✅ Conditions System initialized successfully');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('✅ Conditions System initialized successfully', { page: 'conditions-initializer' });</span>
             
 <span class="cstat-no" title="statement not covered" >            return true;</span>
             
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('❌ Failed to initialize Conditions System:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('❌ Failed to initialize Conditions System', { error: error?.message, stack: error?.stack }, { page: 'conditions-initializer' });</span>
 <span class="cstat-no" title="statement not covered" >            return false;</span>
         }
     }
@@ -828,7 +828,7 @@ class ConditionsInitializer {
      * @returns {Promise&lt;void&gt;}
      */
 <span class="fstat-no" title="function not covered" >    as</span>ync checkDependencies() {
-<span class="cstat-no" title="statement not covered" >        console.log('🔍 Checking Conditions System dependencies...');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('🔍 Checking Conditions System dependencies...', { page: 'conditions-initializer' });</span>
         
         const missingDependencies = <span class="cstat-no" title="statement not covered" >[];</span>
         
@@ -842,7 +842,7 @@ class ConditionsInitializer {
 <span class="cstat-no" title="statement not covered" >            throw new Error(`Missing dependencies: ${missingDependencies.join(', ')}`);</span>
         }
         
-<span class="cstat-no" title="statement not covered" >        console.log('✅ All dependencies loaded');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('✅ All dependencies loaded', { page: 'conditions-initializer' });</span>
     }
     
     /**
@@ -868,12 +868,12 @@ class ConditionsInitializer {
      * @returns {Promise&lt;void&gt;}
      */
 <span class="fstat-no" title="function not covered" >    as</span>ync initializeComponents() {
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 Initializing Conditions System components...');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('🔧 Initializing Conditions System components...', { page: 'conditions-initializer' });</span>
         
         // Initialize translations
 <span class="cstat-no" title="statement not covered" >        if (window.conditionsTranslations) {</span>
 <span class="cstat-no" title="statement not covered" >            this.components.translations = window.conditionsTranslations;</span>
-<span class="cstat-no" title="statement not covered" >            console.log('✅ Translations component initialized');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('✅ Translations component initialized', { page: 'conditions-initializer' });</span>
         } else {
 <span class="cstat-no" title="statement not covered" >            throw new Error('Translations component not available');</span>
         }
@@ -881,7 +881,7 @@ class ConditionsInitializer {
         // Initialize validator
 <span class="cstat-no" title="statement not covered" >        if (window.conditionsValidator) {</span>
 <span class="cstat-no" title="statement not covered" >            this.components.validator = window.conditionsValidator;</span>
-<span class="cstat-no" title="statement not covered" >            console.log('✅ Validator component initialized');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('✅ Validator component initialized', { page: 'conditions-initializer' });</span>
         } else {
 <span class="cstat-no" title="statement not covered" >            throw new Error('Validator component not available');</span>
         }
@@ -889,7 +889,7 @@ class ConditionsInitializer {
         // Initialize CRUD manager
 <span class="cstat-no" title="statement not covered" >        if (window.conditionsCRUDManager) {</span>
 <span class="cstat-no" title="statement not covered" >            this.components.crudManager = window.conditionsCRUDManager;</span>
-<span class="cstat-no" title="statement not covered" >            console.log('✅ CRUD Manager component initialized');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('✅ CRUD Manager component initialized', { page: 'conditions-initializer' });</span>
         } else {
 <span class="cstat-no" title="statement not covered" >            throw new Error('CRUD Manager component not available');</span>
         }
@@ -897,7 +897,7 @@ class ConditionsInitializer {
         // Initialize form generator
 <span class="cstat-no" title="statement not covered" >        if (window.conditionsFormGenerator) {</span>
 <span class="cstat-no" title="statement not covered" >            this.components.formGenerator = window.conditionsFormGenerator;</span>
-<span class="cstat-no" title="statement not covered" >            console.log('✅ Form Generator component initialized');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info('✅ Form Generator component initialized', { page: 'conditions-initializer' });</span>
         } else {
 <span class="cstat-no" title="statement not covered" >            throw new Error('Form Generator component not available');</span>
         }
@@ -909,7 +909,7 @@ class ConditionsInitializer {
      * @returns {void}
      */
 <span class="fstat-no" title="function not covered" >    se</span>tupGlobalAccess() {
-<span class="cstat-no" title="statement not covered" >        console.log('🌐 Setting up global access...');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('🌐 Setting up global access...', { page: 'conditions-initializer' });</span>
         
         // Make components globally accessible
 <span class="cstat-no" title="statement not covered" >        window.conditionsSystem = {</span>
@@ -949,7 +949,7 @@ class ConditionsInitializer {
 <span class="cstat-no" title="statement not covered" >            return this.components.formGenerator.generateConditionForm(containerId, options);</span>
         };
         
-<span class="cstat-no" title="statement not covered" >        console.log('✅ Global access configured');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('✅ Global access configured', { page: 'conditions-initializer' });</span>
     }
     
     /**
@@ -958,7 +958,7 @@ class ConditionsInitializer {
      * @returns {void}
      */
 <span class="fstat-no" title="function not covered" >    re</span>gisterWithUnifiedSystem() {
-<span class="cstat-no" title="statement not covered" >        console.log('📋 Registering with Unified Initialization System...');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('📋 Registering with Unified Initialization System...', { page: 'conditions-initializer' });</span>
         
         // Register as a system component
 <span class="cstat-no" title="statement not covered" >        if (window.unifiedAppInitializer) {</span>
@@ -972,7 +972,7 @@ class ConditionsInitializer {
             });
         }
         
-<span class="cstat-no" title="statement not covered" >        console.log('✅ Registered with Unified Initialization System');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('✅ Registered with Unified Initialization System', { page: 'conditions-initializer' });</span>
     }
     
     /**
@@ -1002,7 +1002,7 @@ class ConditionsInitializer {
      */
 <span class="fstat-no" title="function not covered" >    ge</span>tComponent(componentName) {
 <span class="cstat-no" title="statement not covered" >        if (!this.isInitialized) {</span>
-<span class="cstat-no" title="statement not covered" >            console.warn('Conditions System not initialized');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.warn('Conditions System not initialized', { page: 'conditions-initializer' });</span>
 <span class="cstat-no" title="statement not covered" >            return null;</span>
         }
         
@@ -1015,7 +1015,7 @@ class ConditionsInitializer {
      * @returns {void}
      */
 <span class="fstat-no" title="function not covered" >    re</span>set() {
-<span class="cstat-no" title="statement not covered" >        console.log('🔄 Resetting Conditions System...');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('🔄 Resetting Conditions System...', { page: 'conditions-initializer' });</span>
         
 <span class="cstat-no" title="statement not covered" >        this.isInitialized = false;</span>
 <span class="cstat-no" title="statement not covered" >        this.components = {</span>
@@ -1030,7 +1030,7 @@ class ConditionsInitializer {
 <span class="cstat-no" title="statement not covered" >            delete window.conditionsSystem;</span>
         }
         
-<span class="cstat-no" title="statement not covered" >        console.log('✅ Conditions System reset');</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger?.info('✅ Conditions System reset', { page: 'conditions-initializer' });</span>
     }
     
     /**
@@ -1096,7 +1096,7 @@ class ConditionsInitializer {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-12T18:06:24.537Z
+                at 2025-11-12T23:38:03.562Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

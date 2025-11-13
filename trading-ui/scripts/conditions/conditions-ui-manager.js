@@ -32,12 +32,12 @@ class ConditionsUIManager {
         this.container = document.getElementById(options.containerId || 'conditionsManagerRoot');
 
         if (!this.container) {
-            console.error('[ConditionsUIManager] Container not found');
+            window.Logger?.error('[ConditionsUIManager] Container not found', { containerId: options.containerId }, { page: 'conditions-ui-manager' });
             return;
         }
 
         if (!this.entityId) {
-            console.error('[ConditionsUIManager] Missing entityId');
+            window.Logger?.error('[ConditionsUIManager] Missing entityId', { options }, { page: 'conditions-ui-manager' });
             this.renderError('לא הוגדר מזהה ישות לניהול תנאים');
             return;
         }
@@ -130,7 +130,7 @@ class ConditionsUIManager {
             this.conditions = await this.crudManager.readConditions(this.entityId, !force);
             this.renderConditions();
         } catch (error) {
-            console.error('[ConditionsUIManager] Failed to load conditions', error);
+            window.Logger?.error('[ConditionsUIManager] Failed to load conditions', { error: error?.message, stack: error?.stack }, { page: 'conditions-ui-manager' });
             this.renderError(error.message || 'שגיאה בטעינת התנאים');
         }
     }
@@ -242,7 +242,7 @@ class ConditionsUIManager {
                 await this.refreshConditions(true);
             }
         } catch (error) {
-            console.error('[ConditionsUIManager] Failed to delete condition', error);
+            window.Logger?.error('[ConditionsUIManager] Failed to delete condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
             this.showNotification(error.message || 'שגיאה במחיקת התנאי', 'error');
         }
     }
@@ -281,7 +281,7 @@ class ConditionsUIManager {
             this.closeConditionForm();
             await this.refreshConditions(true);
         } catch (error) {
-            console.error('[ConditionsUIManager] Failed to create condition', error);
+            window.Logger?.error('[ConditionsUIManager] Failed to create condition', { error: error?.message, stack: error?.stack, entityId: this.entityId }, { page: 'conditions-ui-manager' });
             this.showNotification(error.message || 'שגיאה ביצירת התנאי', 'error');
         }
     }
@@ -292,7 +292,7 @@ class ConditionsUIManager {
             this.closeConditionForm();
             await this.refreshConditions(true);
         } catch (error) {
-            console.error('[ConditionsUIManager] Failed to update condition', error);
+            window.Logger?.error('[ConditionsUIManager] Failed to update condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
             this.showNotification(error.message || 'שגיאה בעדכון התנאי', 'error');
         }
     }
@@ -313,7 +313,7 @@ class ConditionsUIManager {
         } else if (window.notificationSystem && window.notificationSystem.showNotification) {
             window.notificationSystem.showNotification(message, type);
         } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            window.Logger?.info?.('[ConditionsUIManager] showNotification fallback', { type, message }, { page: 'conditions-ui-manager' });
         }
     }
 }

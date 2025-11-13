@@ -1000,7 +1000,7 @@ class ConditionsCRUDManager {
 &nbsp;
 <span class="fstat-no" title="function not covered" >    se</span>tContext({ entityType = <span class="branch-0 cbranch-no" title="branch not covered" >'plan' </span>} = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
 <span class="cstat-no" title="statement not covered" >        if (!this.baseUrls[entityType]) {</span>
-<span class="cstat-no" title="statement not covered" >            console.warn(`[ConditionsCRUDManager] Unsupported entity type "${entityType}", defaulting to "plan"`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.warn('[ConditionsCRUDManager] Unsupported entity type, defaulting to plan', { entityType }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.entityType = 'plan';</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
@@ -1044,7 +1044,7 @@ class ConditionsCRUDManager {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            return this.translator.translateCondition(response.data, this.entityType);</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error creating condition:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] Error creating condition', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(`שגיאה ביצירת תנאי: ${error.message}`, 'error');</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
@@ -1087,7 +1087,7 @@ class ConditionsCRUDManager {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            return translated;</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error reading conditions:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] Error reading conditions', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(`שגיאה בקריאת תנאים: ${error.message}`, 'error');</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
@@ -1125,7 +1125,7 @@ class ConditionsCRUDManager {
 <span class="cstat-no" title="statement not covered" >            this.showNotification(this.translator.getMessage('condition_updated'), 'success');</span>
 <span class="cstat-no" title="statement not covered" >            return this.translator.translateCondition(response.data, this.entityType);</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error updating condition:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] Error updating condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(`שגיאה בעדכון תנאי: ${error.message}`, 'error');</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
@@ -1160,7 +1160,7 @@ class ConditionsCRUDManager {
 <span class="cstat-no" title="statement not covered" >            this.showNotification(this.translator.getMessage('condition_deleted'), 'success');</span>
 <span class="cstat-no" title="statement not covered" >            return true;</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error deleting condition:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] Error deleting condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(`שגיאה במחיקת תנאי: ${error.message}`, 'error');</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
@@ -1201,7 +1201,7 @@ class ConditionsCRUDManager {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >            return translatedMethods;</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error getting trading methods:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] Error getting trading methods', { error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(`שגיאה בקבלת שיטות מסחר: ${error.message}`, 'error');</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
@@ -1240,7 +1240,7 @@ class ConditionsCRUDManager {
 <span class="cstat-no" title="statement not covered" >            this.showNotification('התראה נוצרה בהצלחה', 'success');</span>
 <span class="cstat-no" title="statement not covered" >            return response.data;</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error creating alert:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] Error creating alert', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(`שגיאה ביצירת התראה: ${error.message}`, 'error');</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
@@ -1316,7 +1316,7 @@ class ConditionsCRUDManager {
                 status: response.status
             };
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error(`API call failed (${method} ${endpoint}):`, error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsCRUDManager] API call failed', { method, endpoint, error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            return {</span>
                 success: false,
                 data: null,
@@ -1342,7 +1342,7 @@ class ConditionsCRUDManager {
         } else <span class="cstat-no" title="statement not covered" >if (window.notificationSystem &amp;&amp; window.notificationSystem.showNotification) {</span>
 <span class="cstat-no" title="statement not covered" >            window.notificationSystem.showNotification(message, type);</span>
         } else {
-<span class="cstat-no" title="statement not covered" >            console.log(`[${type.toUpperCase()}] ${message}`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info?.('[ConditionsCRUDManager] showNotification fallback', { type, message }, { page: 'conditions-crud-manager' });</span>
         }
     }
 &nbsp;
@@ -1423,7 +1423,7 @@ class ConditionsCRUDManager {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-12T18:06:24.537Z
+                at 2025-11-12T23:38:03.562Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

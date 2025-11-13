@@ -123,3 +123,6 @@ def downgrade():
     op.drop_table("tag_categories")
 
 
+
+
+

@@ -47,7 +47,7 @@ class ConditionsFormGenerator {
         this.containerId = containerId;
         const container = document.getElementById(containerId);
         if (!container) {
-            console.error(`Container ${containerId} not found`);
+            window.Logger?.error('[ConditionsFormGenerator] Container not found', { containerId }, { page: 'conditions-form-generator' });
             return;
         }
 
@@ -63,7 +63,7 @@ class ConditionsFormGenerator {
                 this.populateForm(options.conditionData);
             }
         } catch (error) {
-            console.error('Failed to prepare condition form:', error);
+            window.Logger?.error('[ConditionsFormGenerator] Failed to prepare condition form', { error: error?.message, stack: error?.stack }, { page: 'conditions-form-generator' });
             this.showNotification('שגיאה בטעינת שיטות התנאים', 'error');
         }
     }
@@ -209,7 +209,7 @@ class ConditionsFormGenerator {
 
         const method = this.methodsById.get(String(methodId));
         if (!method) {
-            console.warn(`[ConditionsFormGenerator] Method with id ${methodId} not found`);
+            window.Logger?.warn('[ConditionsFormGenerator] Method not found by id', { methodId }, { page: 'conditions-form-generator' });
             this.clearParameters();
             return;
         }
@@ -325,10 +325,13 @@ class ConditionsFormGenerator {
 
     async handleFormSubmit() {
         try {
+            window.Logger?.info('[ConditionsFormGenerator] handleFormSubmit triggered', {}, { page: 'conditions-form-generator' });
             const formData = this.collectFormData();
+            window.Logger?.debug?.('[ConditionsFormGenerator] collected form data', { formData }, { page: 'conditions-form-generator' });
             const validation = this.validator.validateCondition(formData);
 
             if (!validation.isValid) {
+                window.Logger?.warn('[ConditionsFormGenerator] validation failed', { errors: validation.errors }, { page: 'conditions-form-generator' });
                 this.presentValidationErrors(validation.errors);
                 return;
             }
@@ -337,12 +340,14 @@ class ConditionsFormGenerator {
 
             if (typeof this.onSubmitCallback === 'function') {
                 await this.onSubmitCallback(formData);
+                window.Logger?.info('[ConditionsFormGenerator] onSubmitCallback resolved', {}, { page: 'conditions-form-generator' });
             }
         } catch (error) {
-            console.error('Error submitting condition form:', error);
+            window.Logger?.error('Error submitting condition form', { error: error?.message, stack: error?.stack }, { page: 'conditions-form-generator' });
             this.showNotification(error.message || 'שגיאה בשליחת הטופס', 'error');
         } finally {
             this.setFormLoading(false);
+            window.Logger?.debug?.('[ConditionsFormGenerator] handleFormSubmit finished', {}, { page: 'conditions-form-generator' });
         }
     }
 
@@ -482,7 +487,7 @@ class ConditionsFormGenerator {
         try {
             return JSON.parse(value);
         } catch (error) {
-            console.warn('[ConditionsFormGenerator] Failed to parse JSON value', value, error);
+            window.Logger?.warn('[ConditionsFormGenerator] Failed to parse JSON value', { value, error: error?.message }, { page: 'conditions-form-generator' });
             return fallback;
         }
     }
@@ -493,7 +498,7 @@ class ConditionsFormGenerator {
         } else if (window.notificationSystem && window.notificationSystem.showNotification) {
             window.notificationSystem.showNotification(message, type);
         } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            window.Logger?.info?.('[ConditionsFormGenerator] showNotification fallback', { type, message }, { page: 'conditions-form-generator' });
         }
     }
 }

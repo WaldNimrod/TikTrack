@@ -49,6 +49,7 @@
  * - showEmptyState()
  * - hideEmptyState()
  * - refreshSoon(delay)
+ * - clearCachesAfterLink()
  */
 
 (function () {
@@ -564,6 +565,13 @@
                     throw new Error(errorData?.error?.message || 'שיוך לתוכנית נכשל');
                 }
 
+                const payload = await response.json().catch(() => null);
+                if (!payload || payload.status !== 'success') {
+                    throw new Error(payload?.error?.message || 'שיוך לתוכנית נכשל');
+                }
+
+                await this.clearCachesAfterLink();
+
                 if (typeof window.showSuccessNotification === 'function') {
                     window.showSuccessNotification('שיוך הושלם', `טרייד #${tradeId} שויך לתוכנית #${planId}`);
                 }
@@ -571,10 +579,6 @@
                 const dismissKey = this.getDismissKey('assignment', tradeId, planId);
                 this.state.dismissed.add(dismissKey);
                 this.persistDismissedItems();
-
-                if (window.CacheSyncManager?.invalidateByAction) {
-                    await window.CacheSyncManager.invalidateByAction('trade-plan-linked');
-                }
 
                 this.refreshSoon();
             } catch (error) {
@@ -664,6 +668,73 @@
             window.setTimeout(() => {
                 this.fetchData({ force: true });
             }, delay);
+        },
+
+        async clearCachesAfterLink() {
+            const cacheKeys = [
+                'trades',
+                'trade-data',
+                'trades-data',
+                'dashboard',
+                'dashboard-data',
+                'pending-trade-plan-assignments',
+                'pending-trade-plan-creations'
+            ];
+
+            if (window.CacheSyncManager?.invalidateByAction) {
+                try {
+                    await window.CacheSyncManager.invalidateByAction('trade-plan-linked');
+                } catch (error) {
+                    window.Logger?.warn('⚠️ CacheSyncManager.invalidateByAction failed', { error: error?.message }, { page: 'index' });
+                }
+            }
+
+            if (window.UnifiedCacheManager?.remove) {
+                await Promise.allSettled(cacheKeys.map(async (key) => {
+                    try {
+                        await window.UnifiedCacheManager.remove(key);
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ UnifiedCacheManager.remove failed', { key, error: error?.message }, { page: 'index' });
+                    }
+                }));
+            }
+
+            if (window.dashboardDataState) {
+                window.dashboardDataState.lastLoadedAt = null;
+                window.dashboardDataState.source = null;
+            }
+
+            if (!this.state.pendingHardReload) {
+                const delayMs = 1500;
+
+                if (window.notificationSystem?.showNotification) {
+                    window.notificationSystem.showNotification(
+                        'העמוד ירוענן כדי להציג נתונים מעודכנים.',
+                        'info',
+                        'ריענון קשיח',
+                        delayMs + 1000,
+                        'system'
+                    );
+                } else if (typeof window.showInfoNotification === 'function') {
+                    window.showInfoNotification('ריענון קשיח', 'העמוד ירוענן כדי להציג נתונים מעודכנים.');
+                } else if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('ריענון קשיח', 'העמוד ירוענן כדי להציג נתונים מעודכנים.');
+                }
+
+                this.state.pendingHardReload = window.setTimeout(() => {
+                    this.state.pendingHardReload = null;
+                    try {
+                        if (typeof window.hardReload === 'function') {
+                            window.hardReload();
+                        } else {
+                            window.location.reload();
+                        }
+                    } catch (error) {
+                        window.Logger?.error('❌ Hard reload after trade-plan link failed', { error: error?.message }, { page: 'index' });
+                        window.location.reload();
+                    }
+                }, delayMs);
+            }
         },
 
         updateCounts() {

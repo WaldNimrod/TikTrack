@@ -142,3 +142,6 @@
 - `documentation/frontend/GENERAL_SYSTEMS_LIST.md` – רשימת המערכות הכלליות המעודכנת.
 
 
+
+
+

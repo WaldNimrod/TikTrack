@@ -384,7 +384,7 @@ class ConditionsValidator {
                 const parsed = JSON.parse(parametersJson);
                 return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
             } catch (error) {
-                console.warn('[ConditionsValidator] Failed to parse parameters JSON', error);
+                window.Logger?.warn('[ConditionsValidator] Failed to parse parameters JSON', { error: error?.message, value: parametersJson }, { page: 'conditions-validator' });
                 return {};
             }
         }
@@ -525,7 +525,7 @@ class ConditionsValidator {
         try {
             return JSON.parse(value);
         } catch (error) {
-            console.warn('[ConditionsValidator] Failed to parse validation rule', error);
+            window.Logger?.warn('[ConditionsValidator] Failed to parse validation rule', { error: error?.message, value }, { page: 'conditions-validator' });
             return {};
         }
     }

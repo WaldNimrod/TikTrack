@@ -743,12 +743,12 @@ class ConditionsUIManager {
 <span class="cstat-no" title="statement not covered" >        this.container = document.getElementById(options.containerId || 'conditionsManagerRoot');</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        if (!this.container) {</span>
-<span class="cstat-no" title="statement not covered" >            console.error('[ConditionsUIManager] Container not found');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsUIManager] Container not found', { containerId: options.containerId }, { page: 'conditions-ui-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        if (!this.entityId) {</span>
-<span class="cstat-no" title="statement not covered" >            console.error('[ConditionsUIManager] Missing entityId');</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsUIManager] Missing entityId', { options }, { page: 'conditions-ui-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.renderError('לא הוגדר מזהה ישות לניהול תנאים');</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
@@ -841,7 +841,7 @@ class ConditionsUIManager {
 <span class="cstat-no" title="statement not covered" >            this.conditions = await this.crudManager.readConditions(this.entityId, !force);</span>
 <span class="cstat-no" title="statement not covered" >            this.renderConditions();</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('[ConditionsUIManager] Failed to load conditions', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsUIManager] Failed to load conditions', { error: error?.message, stack: error?.stack }, { page: 'conditions-ui-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.renderError(error.message || 'שגיאה בטעינת התנאים');</span>
         }
     }
@@ -953,7 +953,7 @@ class ConditionsUIManager {
 <span class="cstat-no" title="statement not covered" >                await this.refreshConditions(true);</span>
             }
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('[ConditionsUIManager] Failed to delete condition', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsUIManager] Failed to delete condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(error.message || 'שגיאה במחיקת התנאי', 'error');</span>
         }
     }
@@ -992,7 +992,7 @@ class ConditionsUIManager {
 <span class="cstat-no" title="statement not covered" >            this.closeConditionForm();</span>
 <span class="cstat-no" title="statement not covered" >            await this.refreshConditions(true);</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('[ConditionsUIManager] Failed to create condition', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsUIManager] Failed to create condition', { error: error?.message, stack: error?.stack, entityId: this.entityId }, { page: 'conditions-ui-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(error.message || 'שגיאה ביצירת התנאי', 'error');</span>
         }
     }
@@ -1003,7 +1003,7 @@ class ConditionsUIManager {
 <span class="cstat-no" title="statement not covered" >            this.closeConditionForm();</span>
 <span class="cstat-no" title="statement not covered" >            await this.refreshConditions(true);</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('[ConditionsUIManager] Failed to update condition', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionsUIManager] Failed to update condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification(error.message || 'שגיאה בעדכון התנאי', 'error');</span>
         }
     }
@@ -1024,7 +1024,7 @@ class ConditionsUIManager {
         } else <span class="cstat-no" title="statement not covered" >if (window.notificationSystem &amp;&amp; window.notificationSystem.showNotification) {</span>
 <span class="cstat-no" title="statement not covered" >            window.notificationSystem.showNotification(message, type);</span>
         } else {
-<span class="cstat-no" title="statement not covered" >            console.log(`[${type.toUpperCase()}] ${message}`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info?.('[ConditionsUIManager] showNotification fallback', { type, message }, { page: 'conditions-ui-manager' });</span>
         }
     }
 }
@@ -1039,7 +1039,7 @@ class ConditionsUIManager {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-12T18:06:24.537Z
+                at 2025-11-12T23:38:03.562Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

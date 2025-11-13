@@ -2208,12 +2208,15 @@ class ModalManagerV2 {
                     const selectValue = value !== null && value !== undefined ? String(value) : '';
                     // Check if this is a dynamic select (Account, Currency, Ticker, TradePlan)
                     // Note: cashFlowAccount includes 'Account', so it will be detected
-                    const isDynamicSelect = field.id.includes('Ticker') || field.id.includes('Account') || 
-                                            field.id.includes('Currency') || field.id.includes('TradePlan') ||
-                                            field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' ||
-                                            field.id === 'executionAccount' || field.id === 'executionTicker' ||
-                                            field.id === 'tradeAccount' || field.id === 'tradeTicker' ||
-                                            field.id === 'tradePlanAccount' || field.id === 'tradePlanTicker';
+                    const isTagSelect = field.classList?.contains?.('tag-multi-select') || field.dataset?.tagEntity;
+                    const isDynamicSelect = !isTagSelect && (
+                        field.id.includes('Ticker') || field.id.includes('Account') || 
+                        field.id.includes('Currency') || field.id.includes('TradePlan') ||
+                        field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' ||
+                        field.id === 'executionAccount' || field.id === 'executionTicker' ||
+                        field.id === 'tradeAccount' || field.id === 'tradeTicker' ||
+                        field.id === 'tradePlanAccount' || field.id === 'tradePlanTicker'
+                    );
                     
                     console.log(`🎯 Setting SELECT field ${field.id}:`, {
                         tryingToSet: selectValue,
@@ -2257,7 +2260,9 @@ class ModalManagerV2 {
                                 // Convert empty string to null for defaultValue (empty string means "no selection")
                                 const defaultValueForSelect = (selectValue === '' || selectValue === null || selectValue === undefined) ? null : selectValue;
                                 
-                                if (field.id === 'cashFlowAccount' || field.id.includes('Account') || field.id.includes('account')) {
+                                const isTagMultiSelect = field.classList?.contains?.('tag-multi-select');
+
+                                if (!isTagMultiSelect && (field.id === 'cashFlowAccount' || field.id.includes('Account') || field.id.includes('account'))) {
                                     console.log(`   Populating accounts select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
                                     await window.SelectPopulatorService.populateAccountsSelect(field, {
                                         includeEmpty: true,
@@ -4222,7 +4227,7 @@ class ModalManagerV2 {
             else if (selectId.includes('Status') || selectId.includes('status')) {
                 console.log(`⏭️ Skipping ${selectId} - Status field with static options`);
             }
-            else if (selectId.includes('Account') || selectId.includes('account')) {
+                else if (!select.classList.contains('tag-multi-select') && (selectId.includes('Account') || selectId.includes('account'))) {
                 await window.SelectPopulatorService.populateAccountsSelect(select, {
                     defaultFromPreferences: shouldUseDefaultFromPrefs
                 });
@@ -4895,13 +4900,17 @@ class ModalManagerV2 {
         if (modalId === 'tradingAccountsModal') {
             const form = modalElement.querySelector('#tradingAccountsModalForm');
             const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+            const currencyField = modalElement.querySelector('#accountCurrency');
             
-            if (mode === 'edit') {
-                const currencyField = modalElement.querySelector('#accountCurrency');
-                if (currencyField) {
+            if (currencyField) {
+                if (mode === 'edit') {
                     currencyField.disabled = true;
                     currencyField.classList.add('form-control-disabled');
                     console.log(`✅ Disabled accountCurrency field in edit mode (initializeSpecialHandlers)`);
+                } else {
+                    currencyField.disabled = false;
+                    currencyField.classList.remove('form-control-disabled');
+                    console.log(`✅ Enabled accountCurrency field in add mode (initializeSpecialHandlers)`);
                 }
             }
         }

@@ -42,6 +42,7 @@
 | Info Summary System | `trading-ui/scripts/info-summary-system.js`<br>`trading-ui/scripts/services/statistics-calculator.js` | [INFO_SUMMARY_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/INFO_SUMMARY_SYSTEM.md) | חישובי KPI, תמיכה בסינונים, רינדור RTL |
 | Pagination System | `trading-ui/scripts/pagination-system.js` | [PAGINATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/PAGINATION_SYSTEM.md) | פאג’ינציה אחידה לטבלאות, תמיכה במצבי חיפוש |
 | Entity Details Modal | `trading-ui/scripts/entity-details-modal.js`<br>`trading-ui/scripts/entity-details-renderer.js`<br>`trading-ui/scripts/entity-details-api.js` | [entity-details-system/README.md](../features/entity-details-system/README.md) | מודל פרטי ישות מאוחד עם תמיכה ב-linked items והעדפות תצוגה |
+| Pending Trade Plan Widget | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט דשבורד להצעות שיוך/יצירה, כולל Prefill מודלים ועדכון מטמון מאוחד |
 
 ### 🔔 התראות, לוגים ומעקב
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |

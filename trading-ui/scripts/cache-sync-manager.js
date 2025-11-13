@@ -80,6 +80,16 @@ class CacheSyncManager {
             'trade-created': ['trades-data', 'dashboard-data'],
             'trade-updated': ['trades-data', 'dashboard-data'],
             'trade-deleted': ['trades-data', 'dashboard-data'],
+            'trade-plan-linked': [
+                'trades',
+                'trade-plans',
+                'trades-data',
+                'trade-data',
+                'dashboard',
+                'dashboard-data',
+                'pending-trade-plan-assignments',
+                'pending-trade-plan-creations'
+            ],
             'execution-created': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
             'execution-updated': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],
             'execution-deleted': ['executions-data', 'dashboard-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'positions-account-*', 'portfolio-*', 'portfolio-summary-*'],

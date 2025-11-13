@@ -64,6 +64,22 @@ const tradingAccountsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
+        {
+            type: 'select',
+            id: 'accountTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'trading_account'
+            },
+            description: 'סמן תגיות שיסייעו בניהול החשבונות'
+        },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
             type: 'rich-text',

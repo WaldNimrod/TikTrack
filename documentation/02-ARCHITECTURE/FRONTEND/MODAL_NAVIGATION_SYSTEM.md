@@ -1,348 +1,296 @@
 # מערכת ניווט מודולים מקוננים - TikTrack
-## Modal Navigation System
-
-**תאריך עדכון:** 2025-01-28  
-**גרסה:** 1.0.0  
-**סטטוס:** ✅ הושלם בהצלחה - מערכת פעילה  
-**מטרה:** מערכת ניהול מודולים מקוננים עם היסטוריית ניווט, backdrop גלובלי, ו-breadcrumb
-
-## 📋 סקירה כללית
-
-מערכת הניווט של מודולים מקוננים (Modal Navigation System) היא מערכת מרכזית שמנהלת את כל המודולים המקוננים במערכת TikTrack. המערכת מספקת פתרון אלגנטי לניהול מודולים מקוננים, עם תמיכה בהיסטוריית ניווט, backdrop גלובלי אחד, ו-breadcrumb trail.
-
-## 🎯 מטרה
-
-המערכת נועדה לפתור את הבעיות הבאות:
-- **Backdrop כפול/מיותר** - כל מודול יוצר backdrop נפרד
-- **אין דרך לחזור למודול קודם** - לא ניתן לנווט חזרה בשרשרת מודולים
-- **סגירת מודול משאירה backdrop** - העמוד נשאר חסום
-- **תמיכה עתידית** - הרחבה לאופציות מקוננות נוספות
-
-## 🏗️ ארכיטקטורה
-
-### קובץ מרכזי
-- **מיקום**: `trading-ui/scripts/modal-navigation-manager.js`
-- **תפקיד**: ניהול כל המודולים המקוננים במערכת
-
-### מערכות משולבות
-- **EntityDetailsModal**: מודלי פרטי ישויות
-- **ModalManagerV2**: מודלי CRUD (יצירה, עריכה, צפייה)
-
-### מבנה המערכת
-
-```
-ModalNavigationManager
-├── modalHistory (Array) - stack של מודולים פתוחים
-├── globalBackdrop (HTMLElement) - backdrop גלובלי אחד
-├── pushModal() - הוספת מודול ל-stack
-├── popModal() - הסרת מודול אחרון
-├── goBack() - חזרה למודול הקודם
-├── manageBackdrop() - ניהול backdrop גלובלי
-├── getBreadcrumb() - יצירת breadcrumb trail
-└── updateModalNavigation() - עדכון UI של הניווט
-```
-
-## 🔧 פונקציות עיקריות
-
-### `pushModal(modalElement, modalInfo)`
-הוספת מודול ל-stack והיסטוריה
-
-**לוגיקה:**
-- אם יש `sourceInfo` (מודול מקונן חדש) - תמיד מוסיף להיסטוריה, גם אם אותו element כבר קיים
-- שמירת תוכן המודול הקודם (אם עדיין לא נשמר) לפני הוספת מודול מקונן חדש
-- אם זה אותו מודול עם `sourceInfo` זהה - רק מעדכן את המידע והתוכן
-- אם זה מודול חדש ללא `sourceInfo` - מוסיף להיסטוריה
-
-**פרמטרים:**
-- `modalElement` (HTMLElement) - אלמנט המודול
-- `modalInfo` (Object) - מידע על המודול `{type, entityType, entityId, title}`
-
-**דוגמה:**
-```javascript
-window.modalNavigationManager.pushModal(modalElement, {
-    type: 'entity-details',
-    entityType: 'trade_plan',
-    entityId: 123,
-    title: 'פרטי תכנון מספר 123'
-});
-```
-
-### `popModal()`
-הסרת מודול אחרון, חזרה לקודם
-
-**החזרה:**
-- `Object|null` - המודול שהוסר או null אם אין מודולים
-
-**דוגמה:**
-```javascript
-const removed = window.modalNavigationManager.popModal();
-```
-
-### `goBack()`
-חזרה למודול הקודם
-
-**החזרה:**
-- `boolean` - true אם חזרנו בהצלחה, false אחרת
-
-**דוגמה:**
-```javascript
-window.modalNavigationManager.goBack();
-```
-
-### `getBreadcrumb(currentModal)`
-יצירת breadcrumb trail מההיסטוריה
-
-**פרמטרים:**
-- `currentModal` (HTMLElement|null) - מודול נוכחי (אופציונלי)
-
-**החזרה:**
-- `string` - HTML של breadcrumb
-
-**דוגמה:**
-```javascript
-const breadcrumb = window.modalNavigationManager.getBreadcrumb(modalElement);
-```
-
-### `updateModalNavigation(modalElement)`
-עדכון breadcrumb וכפתור חזור במודול
-
-**פרמטרים:**
-- `modalElement` (HTMLElement) - אלמנט המודול לעדכון
-
-**דוגמה:**
-```javascript
-window.modalNavigationManager.updateModalNavigation(modalElement);
-```
-
-## 🎨 עיצוב וסטיילינג
-
-### CSS Classes
-
-#### `.modal-navigation-breadcrumb`
-מיכל ל-breadcrumb trail בכותרת המודול
-
-```css
-.modal-navigation-breadcrumb {
-  width: 100%;
-  margin-bottom: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--current-entity-color-dark);
-  direction: rtl;
-  text-align: right;
-}
-```
-
-#### `.modal-back-btn`
-כפתור חזור בכותרת המודול
-
-```css
-.modal-back-btn,
-button[data-button-type="BACK"] {
-  width: 28px;
-  height: 28px;
-  display: none; /* יוצג רק אם יש היסטוריה */
-  border: 1px solid var(--current-entity-color-dark);
-  background: transparent;
-  color: var(--current-entity-color-dark);
-}
-```
-
-#### `#globalModalBackdrop`
-Backdrop גלובלי - תמיד רק אחד
-
-```css
-#globalModalBackdrop,
-.global-modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1040; /* Base z-index, יוגדל דינמית */
-}
-```
-
-## 📦 אינטגרציה
-
-### EntityDetailsModal
-
-**קובץ**: `trading-ui/scripts/entity-details-modal.js`
-
-**שינויים:**
-- קריאה ל-`pushModal()` ב-`showModal()`
-- הוספת breadcrumb + כפתור חזור בכותרת (אם יש היסטוריה)
-- הסרת ניהול backdrop עצמאי
-- עדכון navigation UI אחרי עדכון הכותרת
-
-### ModalManagerV2
-
-**קובץ**: `trading-ui/scripts/modal-manager-v2.js`
-
-**שינויים:**
-- קריאה ל-`pushModal()` ב-`showModal()`
-- הוספת breadcrumb + כפתור חזור בכותרת
-- הסרת ניהול backdrop עצמאי
-- עדכון navigation UI אחרי עדכון הכותרת
-
-## 🔄 זרימת עבודה
-
-### פתיחת מודול חדש
-1. המשתמש לוחץ על כפתור "פרטים" או "ערוך"
-2. `showModal()` נקרא ב-`EntityDetailsModal` או `ModalManagerV2`
-3. `ModalNavigationManager.pushModal()` נקרא עם מידע המודול (מ-`showModal()` או מ-`loadEntityData()`)
-   - אם יש `sourceInfo` (מודול מקונן), מוסיף אותו להיסטוריה גם אם אותו element כבר קיים
-   - שמירת תוכן המודול הקודם לפני הוספת מודול מקונן חדש
-4. Bootstrap Modal נפתח (`shown.bs.modal` event)
-5. `handleModalShown()` נקרא - בודק אם המודול כבר קיים בהיסטוריה
-   - בודק אם זה אותו מודול מקונן בדיוק (same entityType + entityId + sourceInfo) - אם כן, רק מעדכן
-   - אחרת, מוסיף מודול חדש להיסטוריה
-6. `manageBackdrop()` יוצר/מעדכן backdrop גלובלי
-7. `updateModalNavigation()` מעדכן breadcrumb וכפתור חזור
-
-### חזרה למודול קודם
-1. המשתמש לוחץ על כפתור "חזור"
-2. `goBack()` נקרא
-3. שמירת תוכן המודול הנוכחי (אם עדיין לא נשמר)
-4. הסרת המודול הנוכחי מה-history (`pop()`)
-5. סגירת המודול הנוכחי (`bootstrap.Modal.hide()`)
-6. **המתנה ל-`hidden.bs.modal` event** - חשוב מאוד!
-7. אחרי שהמודול הנוכחי נסגר לחלוטין, `_showPreviousModal()` נקרא:
-   - עדכון כותרת המודול הקודם
-   - שחזור תוכן המודול הקודם (אם נשמר)
-   - הצגת המודול הקודם (`bootstrap.Modal.show()`)
-   - עדכון navigation UI (breadcrumb וכפתור חזור)
-8. `handleModalHidden()` מטפל בעדכון backdrop (אם יש מודולים אחרים פתוחים)
-
-### סגירת מודול
-1. המשתמש לוחץ על כפתור "סגור"
-2. `bootstrap.Modal.hide()` נקרא
-3. `handleModalHidden()` מטפל בהסרה מה-stack
-4. `manageBackdrop()` מעדכן backdrop (מוסר אם אין מודולים)
-
-## 🚀 תכונות עתידיות
-
-המערכת תוכננה לתמוך בהרחבות עתידיות:
-
-1. **מודולים מקוננים נוספים** - תמיכה בסוגי מודולים נוספים
-2. **היסטוריית ניווט מתקדמת** - שמירת מצב מודולים, אפשרות לקפיצה ישירה למודול ספציפי
-3. **אנימציות מעבר** - אנימציות מעבר בין מודולים
-4. **שמירת מצב** - שמירת מצב מודולים ב-localStorage
-
-## 📝 דוגמאות שימוש
-
-### דוגמה בסיסית - פתיחת מודול מקונן
-
-```javascript
-// פתיחת מודול פרטי תכנון
-window.showEntityDetails('trade_plan', 123);
-
-// מתוך מודול התכנון, פתיחת מודול פרטי הערה מקושרת
-window.showEntityDetails('note', 456);
-// כעת יש breadcrumb: "תכנון #123 / הערה #456"
-// וכפתור חזור זמין
-```
-
-### דוגמה - חזרה למודול קודם
-
-```javascript
-// חזרה למודול הקודם
-window.modalNavigationManager.goBack();
-// או
-window.goBackInModalNavigation();
-```
-
-### דוגמה - קבלת breadcrumb
-
-```javascript
-// קבלת breadcrumb למודול נוכחי
-const breadcrumb = window.modalNavigationManager.getBreadcrumb(modalElement);
-// החזרה: "<div class='modal-breadcrumb-trail'>תכנון #123 / הערה #456</div>"
-```
-
-## 🔍 פונקציות עזר גלובליות
-
-המערכת מספקת פונקציות עזר גלובליות:
-
-### `window.pushModalToNavigation(modalElement, modalInfo)`
-הוספת מודול ל-stack
-
-### `window.goBackInModalNavigation()`
-חזרה למודול קודם
-
-### `window.getModalBreadcrumb(modalElement)`
-קבלת breadcrumb
-
-## 📊 תמיכה בכל עמודי המשתמש
-
-המערכת מיושמת בכל עמודי המשתמש באופן אוטומטי:
-- כל עמוד שכולל את חבילת `ui-advanced` מקבל את המערכת
-- כל מודול שנוצר דרך `EntityDetailsModal` או `ModalManagerV2` משולב אוטומטית
-
-## 🛠️ פתרון בעיות
-
-### Backdrop לא נעלם
-- **בעיה**: אחרי סגירת מודול, backdrop נשאר
-- **פתרון**: המערכת מנהלת backdrop מרכזית - וודא ש-`ModalNavigationManager` אותחל
-
-### כפתור חזור לא מופיע
-- **בעיה**: כפתור חזור לא מופיע במודול
-- **פתרון**: וודא שיש יותר ממודול אחד בהיסטוריה - הכפתור מופיע רק אם יש מודול קודם
-
-### Breadcrumb ריק
-- **בעיה**: Breadcrumb לא מוצג
-- **פתרון**: וודא ש-`updateModalNavigation()` נקרא אחרי עדכון הכותרת
-
-## 📚 קבצים רלוונטיים
-
-- `trading-ui/scripts/modal-navigation-manager.js` - המערכת המרכזית
-- `trading-ui/scripts/entity-details-modal.js` - אינטגרציה עם EntityDetailsModal
-- `trading-ui/scripts/modal-manager-v2.js` - אינטגרציה עם ModalManagerV2
-- `trading-ui/styles-new/06-components/_modals.css` - סגנונות navigation
-- `trading-ui/styles-new/06-components/_bootstrap-overrides.css` - סגנונות כפתור BACK
-
-## 🔗 קישורים רלוונטיים
-
-- [Modal Management System](./MODAL_MANAGEMENT_SYSTEM.md) - מערכת ניהול מודולים בסיסית
-- [Modal System V2](./MODAL_SYSTEM_V2.md) - מערכת מודולים V2
-- [Entity Details Modal](../FRONTEND/ENTITY_DETAILS_MODAL.md) - מודול פרטי ישויות
-
-## ✅ בדיקות
-
-### תרחישי בדיקה
-1. **שרשרת מודולים** (1→2→3→back→back→back) - וודא שכל המעברים עובדים
-2. **מודולי פרטים + עריכה מעורבים** - וודא שכל סוגי המודולים עובדים יחד
-3. **סגירה של כל המודולים** - וודא שהעמוד חוזר למצב רגיל
-4. **Breadcrumb** - וודא שה-breadcrumb מוצג נכון בכל מצב
-
-### רשימת בדיקה
-- [x] Backdrop גלובלי - רק אחד תמיד
-- [x] כפתור חזור - מופיע רק אם יש היסטוריה
-- [x] Breadcrumb - מוצג נכון
-- [x] סגירת מודול - מסיר מה-stack
-- [x] חזרה למודול קודם - עובד
-- [x] אינטגרציה עם EntityDetailsModal
-- [x] אינטגרציה עם ModalManagerV2
-
-## 📝 הערות למפתחים
-
-### הוספת תמיכה במודול חדש
-1. וודא שהמודול משתמש ב-Bootstrap Modal
-2. הוסף קריאה ל-`pushModal()` אחרי פתיחת המודול
-3. הוסף breadcrumb container בכותרת המודול
-4. הוסף כפתור BACK בכותרת המודול
-5. קרא ל-`updateModalNavigation()` אחרי עדכון הכותרת
-
-### שינויי CSS
-- כל הסגנונות נמצאים ב-`_modals.css`
-- שימוש ב-CSS variables לצבעים דינמיים
-- אין inline styles - הכל דרך classes
+## Modal Navigation System (Service Architecture)
+
+**תאריך עדכון:** 2025-11-11  
+**גרסה:** 2.0.0  
+**סטטוס:** ✅ פעילה בפרודקשן  
+**מטרה:** ניהול Stack של מודולים מקוננים באמצעות שירות כללי, אינטגרציה עם PageStateManager, ובקרת UI אחידה.
 
 ---
 
-**גרסה אחרונה:** 1.0.0  
-**תאריך עדכון:** 2025-01-28  
-**מחבר:** TikTrack Development Team
+## 📋 סקירה כללית
+
+מהדורה זו של מערכת הניווט מחליפה את המימוש המבוסס על `ModalNavigationManager` מקומי במערכת שירות כללית:
+
+- **ModalNavigationService** – שכבת הלוגיקה המרכזית (stack, התמPersistence, אירועים).
+- **ModalNavigationUI** – שכבת התצוגה (breadcrumb, כפתור BACK, אינטגרציה עם ButtonSystem).
+- **PageStateManager** – אחסון מצב הניווט ב-`UnifiedCacheManager` (חדש בגרסה זו).
+- **Compatibility Wrappers** – `window.modalNavigationManager` ו-`window.pushModalToNavigation()` עבור קוד קיים.
+
+המערכת מוותרת על ניהול ידני של backdrops ותוכן HTML שמור, מתמקדת ברשימת מטא-נתונים בלבד, ומספקת API עקבי לכל מודול שרוצה להצטרף לניווט.
+
+---
+
+## 🏗️ ארכיטקטורה
+
+| רכיב | קובץ | אחריות |
+|------|------|---------|
+| **ModalNavigationService** | `trading-ui/scripts/modal-navigation-manager.js` | Stack, קריאות API (`registerModalOpen`, `registerModalClose`, `updateModalMetadata`, `goBack`, `navigateTo`, `getStack`) | 
+| **ModalNavigationUI** | `trading-ui/scripts/modal-navigation-manager.js` | breadcrumb, כפתור BACK, רישום האזנה ל-`shown/hidden.bs.modal` |
+| **PageStateManager** | `trading-ui/scripts/page-state-manager.js` | שימור מצב (`saveModalNavigationState`, `loadModalNavigationState`, `clearModalNavigationState`) |
+| **Compatibility Layer** | `window.modalNavigationManager` | חשיפה מינימלית לפונקציות `goBack`, `updateModalNavigation`, `getBreadcrumb`, לצורכי תאימות לאחור |
+
+```
+ModalNavigationService
+├── state (stack, activeModalId)
+├── registerModalOpen()
+├── registerModalClose()
+├── updateModalMetadata()
+├── goBack()
+├── navigateTo()
+└── getStack(options)
+
+ModalNavigationUI
+├── updateModalNavigation(element)
+├── getBreadcrumb(element)
+└── subscribe לשינויים מהשירות
+```
+
+---
+
+## 🔧 API מרכזי – ModalNavigationService
+
+### `registerModalOpen(modalElement, metadata)`
+רישום מודול חדש או עדכון מודול קיים. מבטיח שהמודול יופיע ב-breadcrumb ויתויג במטא-נתונים הנכונים.
+
+```javascript
+await window.ModalNavigationService.registerModalOpen(modalElement, {
+  modalId: 'entityDetailsModal',
+  modalType: 'entity-details',
+  entityType: 'trade_plan',
+  entityId: 123,
+  title: 'פרטי תכנון #123',
+  sourceInfo: { type: 'entity-details', modalId: 'executionsModal' },
+  metadata: { mode: 'view' }
+});
+```
+
+### `registerModalClose(modalId, { instanceId })`
+הסרת מודול מה-stack. **בגרסה הנוכחית השירות קורא לפונקציה הזו אוטומטית** כאשר מתקבל אירוע `hidden.bs.modal`. השימוש הידני רלוונטי רק במודולים legacy שלא עודכנו לשירות.
+
+```javascript
+// שימוש ידני – רק אם אין חיבור לשירות (legacy):
+window.ModalNavigationService.registerModalClose('entityDetailsModal', {
+  instanceId: modalElement.dataset.modalNavigationInstanceId
+});
+```
+
+### `updateModalMetadata(modalId, updates)`
+עדכון מידע קיים (למשל כותרת, entityId) ללא שינוי סדר ה-stack.
+
+```javascript
+window.ModalNavigationService.updateModalMetadata('entityDetailsModal', {
+  title: 'פרטי טרייד #456',
+  entityId: 456,
+  metadata: {
+    mode: 'view',
+    includeLinkedItems: true,
+    lastLoadedAt: Date.now()
+  }
+});
+```
+
+### `getStack({ includeElements })`
+החזרת snapshot של המצב (עם/בלי אלמנטים פיזיים בר DOM).
+
+```javascript
+const stack = window.ModalNavigationService.getStack({ includeElements: true });
+```
+
+### `goBack()` / `navigateTo(modalId)`
+פקודות ניווט חוזר או קפיצה למודול ספציפי. משמרות אירועי Bootstrap ומעדכנות את ה-stack בהתאם.
+
+### אירוע `modal-navigation:restore`
+האירוע נשלח ע"י השירות בשני שלבים:
+
+| Stage | תזמון | שימוש |
+|-------|-------|--------|
+| `before-show` | לפני שהמודול הקודם מוצג מחדש | מאפשר לטעון מחדש נתונים/להציג מצב טעינה |
+| `after-show` | לאחר שהמודול מוצג | עדכון final UI, שמירת `instanceId` על האובייקט |
+
+```javascript
+modalElement.addEventListener('modal-navigation:restore', event => {
+  const { stage, entry } = event.detail || {};
+  if (stage === 'before-show' && entry?.entityId) {
+    restoreContent(entry);
+  }
+});
+```
+
+---
+
+## 🎨 שכבת ה-UI (ModalNavigationUI)
+
+- מאזינה ל-`shown.bs.modal` ו-`hidden.bs.modal` כדי לעדכן breadcrumb ו-Back button.
+- משתמשת ב-`Window.ButtonSystem` לעיצוב הכפתור.
+- חשופה כ-`window.modalNavigationManager.updateModalNavigation()` עבור מודולים שזקוקים לרענון ידני (למשל אחרי שינוי כותרת).
+
+```javascript
+if (window.modalNavigationManager?.updateModalNavigation) {
+  window.modalNavigationManager.updateModalNavigation(modalElement);
+}
+```
+
+---
+
+## 📦 תאימות לאחור
+
+| פונקציה ישנה | מצב בגרסה 2 | הערה |
+|--------------|-------------|-------|
+| `modalNavigationManager.pushModal()` | נתמכת דרך `window.pushModalToNavigation()` (wrapper לשירות) | מומלץ לעבור ל-`ModalNavigationService.registerModalOpen` |
+| `modalNavigationManager.goBack()` | ממשיך לעבוד (קורא ל-`service.goBack()`) | אין שינוי ב-API הציבורי |
+| `modalNavigationManager.manageBackdrop()` | **בטל** | ניהול backdrop מתבצע ע"י Bootstrap בלבד |
+| `modalNavigationManager.modalHistory` | **בוטל** | השתמשו ב-`ModalNavigationService.getStack()` |
+
+---
+
+## 🔗 אינטגרציה עם מערכות קיימות
+
+### EntityDetailsModal (`entity-details-modal.js`)
+- רישום מוקדם ב-`registerModalOpen` עוד לפני טעינת הנתונים.
+- `updateModalMetadata` בסיום `loadEntityData()` כדי לעדכן כותרות ו-entityId.
+- מאזין ל-`modal-navigation:restore` ומרענן את הנתונים לפי ה-entry שנשמר, כולל טעינה מחדש של הנתונים מה-API.
+- אין קריאה ידנית ל-`registerModalClose` – השירות מטפל בסגירה דרך מאזין `hidden.bs.modal` שנרשם אוטומטית.
+
+### ModalManagerV2 (`modal-manager-v2.js`)
+- רישום מודולי CRUD עם `entityType`, `entityId`, `mode`.
+- קריאה ל-`updateModalMetadata` לאחר שינוי כותרת.
+- סגירה מנוהלת אוטומטית; אין צורך להוסיף מאזין גלובלי שסוגר את המופע.
+
+### מודולים ייעודיים (Trade Selector, Linked Items, Import User Data)
+- קוראים ל-`registerModalOpen` בעת הצגה ומעדכנים מטא-נתונים לפי הצורך.
+- אין להוסיף קריאות ידניות ל-`registerModalClose`; השירות מנקה את המופע בעת `hidden.bs.modal`.
+- אינם מנהלים backdrop או HTML שמור.
+
+### Utilities
+- `createAndShowModal()` ב-`core-systems.js` אינו נוגע עוד לניווט; האחריות לרישום מוטלת על הקורא.
+- `ui-utils.js` ו-`notification-system.js` הפסיקו לקרוא ל-`manageBackdrop`.
+
+---
+
+## 🔄 זרימות עיקריות
+
+### פתיחת מודול
+1. יצירת ה-Modal (Bootstrap).
+2. קריאה ל-`ModalNavigationService.registerModalOpen` (לפני או מיד אחרי `show()`).
+3. השירות מצמיד מאזין `hidden.bs.modal` ייעודי ומעדכן את ה-`instanceId` על האלמנט.
+4. מודול הפרטים אחראי לעדכן מטא-נתונים (`updateModalMetadata`) עם כותרת/EntityId/מצב עדכני.
+5. ModalNavigationUI מאזינה ל-`shown.bs.modal` ומציגה breadcrumb + כפתור BACK.
+6. PageStateManager שומר את ה-stack המעודכן.
+
+### סגירת מודול
+1. Bootstrap מפעיל `hidden.bs.modal` (לחיצה על Close, `goBack`, או סגירה תכנית).
+2. המאזין האוטומטי של השירות קורא ל-`registerModalClose` עם ה-`instanceId` של המופע.
+3. PageStateManager מעדכן/מנקה מצב.
+4. ModalNavigationUI מסירה breadcrumb/כפתורי BACK רלוונטיים.
+
+### חזרה אחורה
+1. `goBack()` → סגירה של המודול האחרון באמצעות Bootstrap.
+2. האירוע `hidden.bs.modal` של המודול שנסגר מפעיל את המאזין האוטומטי.
+3. לאחר הסגירה, השירות מציג מחדש את המודול הקודם (אם קיים) וה-UI מתעדכן אוטומטית.
+
+### טעינת מצב שמור
+- בעת `service.init()` נשלפת רשימת stack מ-PageStateManager (אם קיימת). אין פתיחה אוטומטית של מודולים; הנתונים משמשים לצורכי ניתור בלבד.
+
+---
+
+## 🗂️ התמPersistence – PageStateManager
+
+```javascript
+await window.PageStateManager.saveModalNavigationState({
+  stack: [
+    { modalId: 'entityDetailsModal', modalType: 'entity-details', entityType: 'trade', entityId: 12, title: 'טרייד #12' }
+  ],
+  activeModalId: 'entityDetailsModal'
+});
+```
+
+API חדש:
+- `saveModalNavigationState(state, { pageName })`
+- `loadModalNavigationState({ pageName })`
+- `clearModalNavigationState({ pageName })`
+
+ברירת המחדל ל-`pageName` מגיעה מ-`window.getCurrentPageName()`.
+
+---
+
+## 📑 מבנה מטא-נתונים
+
+כל ערך stack (entry) מכיל:
+
+| שדה | תיאור |
+|-----|-------|
+| `instanceId` | מזהה ייחודי לכל פתיחה של מודל (גם אם `modalId` זהה) |
+| `modalId` | מזהה המודל (אלמנט DOM) |
+| `modalType` | טיפוס לוגי (למשל `entity-details`, `crud-modal`) |
+| `entityType` / `entityId` | ישות עסקית אליה שייך המודל |
+| `title` | הכותרת העדכנית להצגה ב-breadcrumb |
+| `sourceInfo` | אובייקט מקור (למשל מי פתח את המודל) |
+| `metadata` | שדות משלימים (מצב צפייה/עריכה, includeLinkedItems, lastLoadedAt וכו') |
+
+`ModalNavigationService.updateModalMetadata` מאחד את הערכים החדשים עם הנתון הקיים ולכן מומלץ לספק רק שדות שהשתנו.
+
+---
+
+## 🧪 בדיקות מומלצות
+
+1. **שרשרת Entity → Plan → Note → Back** – ודא שהBreadcrumb והכפתור מתעדכנים בכל שלב.
+2. **מודולי CRUD מקוננים** (ModalManagerV2) – ודא שמזהי הישות והכותרות משתקפים ב-stack.
+3. **Modal Selector (trade-selector)** – וודא שדנן מקור (`sourceInfo`) נשמר ומעודכן.
+4. **סגירה מהירה** – פתיחה וסגירה רצופים של מודולים אמורים להשאיר Stack נקי.
+5. **התאוששות לאחר רענון דף** – בדוק ש-`loadModalNavigationState` מחזיר נתונים (אבחון בלבד).
+
+---
+
+## 🛠️ פתרון בעיות
+
+| סימפטום | בדיקה |
+|---------|--------|
+| כפתור BACK לא מופיע | בדוק ש-`registerModalOpen` נקרא לפני אירוע `shown.bs.modal` ושיש לפחות שני פריטים ב-stack |
+| Breadcrumb ריק | ודא ש-`updateModalMetadata` כותב `title` וכי ה-UI מעודכן (`updateModalNavigation`) |
+| Stack לא מתנקה | ודא שהמודול קרא ל-`registerModalOpen` ושאלמנט ה-Modal לא הוסר לפני אירוע `hidden.bs.modal` |
+| נתונים לא נשמרים | בדוק ש-`PageStateManager.saveModalNavigationState` זמין וש-`UnifiedCacheManager` מאותחל |
+
+---
+
+## 📚 מסמכים נלווים
+
+- `Modal System V2` – פרטי ModalManagerV2 (`documentation/02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md`).
+- `Entity Details Modal` – אינטגרציה עם שירות הניווט (`documentation/02-ARCHITECTURE/FRONTEND/ENTITY_DETAILS_MODAL.md`).
+- **מדריך מפתחים חדש** – `documentation/frontend/guides/MODAL_NAVIGATION_DEVELOPER_GUIDE.md` (ראו להלן).
+
+---
+
+## 🧭 מדריך למפתחים (תמצית)
+
+1. **מודול חדש שרוצה להופיע ב-breadcrumb**
+   - הוסף קריאה ל-`registerModalOpen` עם מטא-נתונים רלוונטיים (לפני `show()`).
+   - אין לקרוא ל-`registerModalClose` ידנית; השירות יעשה זאת. ניתן להשתמש ב-`hidden.bs.modal` לניקוי מקומי כל עוד לא נקראת הפונקציה.
+   - אם הכותרת משתנה לאחר טעינה – קרא ל-`updateModalMetadata`.
+
+2. **מודולים ותיקים**
+   - הימנע מקריאה ל-`modalNavigationManager.manageBackdrop` או גישה ישירה ל-`modalHistory`.
+   - במקרה של קוד ישן שאינו בר־שינוי, ניתן להשתמש ב-`window.pushModalToNavigation` (wrapper הממיר לקריאה לשירות).
+
+3. **PageStateManager**
+   - אין צורך בהתערבות ידנית; השירות ינהל שמירה/טעינה.
+   - לשימוש ייעודי (לדוגמה אבחון) ניתן לקרוא ל-`PageStateManager.loadModalNavigationState()`.
+
+---
+
+## 🔄 צ'קליסט מעבר לגרסה 2
+
+- [x] ModalManagerV2 מעדכן `ModalNavigationService` במקום `pushModal`.
+- [x] EntityDetailsModal רושם/מעדכן/מנקה דרך השירות.
+- [x] שירותים חיצוניים (trade-selector, linked-items וכו') הוסבו.
+- [x] ניהול backdrops הוסר ממודולים מקומיים.
+- [x] PageStateManager תומך במצב ניווט.
+
+---
+
+**גרסה אחרונה:** 2.0.0  
+**תאריך עדכון:** 2025-11-11  
+**מחבר:** TikTrack Frontend Team
 
 
 

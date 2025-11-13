@@ -52,6 +52,13 @@ Usage notes:
 
 ## ✨ שינויים אחרונים
 
+### עדכון 2025-11-12 – אינטגרציה מלאה עם TableDataRegistry ו-TableFilter
+
+- ✅ טבלאות Linked Items נרשמות בזמן רינדור עם מזהה ייחודי (`linked_items__{entity}_{id}`) ומועלות ל-`TableDataRegistry` באמצעות `setFullData`.
+- ✅ `window.filterLinkedItemsByType` משתמש ב-`UnifiedTableSystem.filter.apply` כדי לשמר התאמה לפילטר הראשי, פאג'ינציה ו-InfoSummarySystem.
+- ✅ פילטרי המודול כעת שומרים state ב-`TableDataRegistry.meta.activeFilters.custom.relatedType`, מה שמאפשר טעינת מצב עמוד ב-PageStateManager.
+- ✅ fallback Array-based נשמר למצבי DEV, אך הנתיב הראשי הוא קנוני (TableFilter + custom.relatedType).
+
 ### עדכון 2025-01-12 - טיוב קוד והסרת wrappers + הרחבת בדיקות לכיסוי מלא
 
 **שינויים:**
@@ -109,7 +116,7 @@ const emptyHtml = LinkedItemsService.renderEmptyLinkedItems('ticker', 123, '#019
 
 ### אינטגרציה עם UnifiedCacheManager
 
-- ✅ `ModalNavigationManager` שומר היסטוריה ב-`localStorage` (TTL: 1 שעה)
+- ✅ `ModalNavigationService` מנהל Stack וזיכרון ניווט דרך `PageStateManager`
 - ✅ `getLinkedItems()` שומר תוצאות ב-memory cache (TTL: 5 דקות)
 
 ### העברת מידע בין מודולים מקוננים
@@ -838,125 +845,4 @@ const openPlans = linkedItemsData.child_entities ? linkedItemsData.child_entitie
 
 #### **4. בעיית קריאה לפונקציות גלובליות**
 **הבעיה**: `ReferenceError` בפונקציות כמו `showLinkedItemsWarning`
-**הסיבה**: קריאה ללא `window.` prefix
-**הפתרון**: הוספת `window.` prefix לכל הפונקציות הגלובליות
-
-```javascript
-// ❌ שגוי
-showLinkedItemsWarning('ticker', id);
-
-// ✅ נכון
-window.showLinkedItemsWarning('ticker', id);
-```
-
-### **🔧 שיפורים שבוצעו:**
-
-#### **1. מערכת ייצוא CSV**
-- **הוספת פונקציה גנרית**: `createCSVFromLinkedItems()`
-- **תרגום לעברית**: כותרות CSV בעברית
-- **הורדה אוטומטית**: `downloadCSV()` עם שם קובץ מתאים
-
-```javascript
-// פונקציה גנרית לייצוא CSV
-function createCSVFromLinkedItems(data, itemType, itemId) {
-    const headers = ['סוג פריט', 'מזהה', 'שם', 'סטטוס', 'תאריך יצירה', 'פרטים'];
-    const rows = data.child_entities.map(item => [
-        LinkedItemsService.getEntityLabel(item.type),
-        item.id,
-        item.title || `פריט ${item.id}`,
-        getStatusDisplayName(item.status),
-        formatDate(item.created_at),
-        item.description || ''
-    ]);
-    
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
-}
-```
-
-#### **2. עיצוב משופר לחלון המקושרים**
-- **רקע כותרת**: gradient כתום
-- **כפתור סגירה**: עיצוב כתום על לבן, מיושר לשמאל
-- **צמצום רווחים**: עיצוב קומפקטי יותר
-- **סולם צבעים**: צבעים עקביים לכרטיסי פריטים
-
-```css
-/* עיצוב כותרת */
-.modal-header {
-  background: linear-gradient(135deg, #ff9c05, #ff8c00);
-  color: white;
-  position: relative;
-  padding-left: 60px;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-}
-
-/* עיצוב כפתור סגירה */
-.modal-header .btn-close-custom {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: white;
-  color: #ff9c05;
-  border: 2px solid #ff9c05;
-  border-radius: 6px;
-  z-index: 1056;
-}
-```
-
-#### **3. תרגום מלא לעברית**
-- **כותרות**: "פריטים מקושרים לטיקר AAPL"
-- **תיאורים**: הוספת מזהה לכל פריט "(מזהה: 123)"
-- **תנאי התראות**: תרגום "price > 100" ל"מחיר גבוה מ-100"
-- **כפתורים**: "סגור", "ייצוא נתונים"
-
-#### **4. מערכת סטטוסים עקבית**
-- **סולם צבעים אחיד**: אותו סולם כמו בטבלאות הראשיות
-- **תרגום סטטוסים**: 'open' → 'פתוח', 'closed' → 'סגור'
-- **תמיכה בסטטוסים נוספים**: 'inactive', 'archived', 'pending'
-
-### **📋 כללי עבודה לעתיד:**
-
-#### **1. שימוש במערכת הגנרית**
-```javascript
-// ✅ תמיד להשתמש ב-API הגנרי
-const response = await fetch(`/api/linked-items/${entityType}/${entityId}`);
-const data = await response.json();
-
-// ✅ תמיד לסנן child_entities
-const openItems = data.child_entities.filter(entity => entity.status === 'open');
-```
-
-#### **2. קריאה לפונקציות גלובליות**
-```javascript
-// ✅ תמיד להוסיף window. prefix
-window.showLinkedItemsWarning(entityType, entityId);
-window.showLinkedItemsBlockingModal(data, entityType, entityId, actionType);
-```
-
-#### **3. עיצוב עקבי**
-```css
-/* ✅ להשתמש בסולם הצבעים הקיים */
-.status-badge.status-open { background-color: #28a745; }
-.status-badge.status-closed { background-color: #6c757d; }
-.status-badge.status-cancelled { background-color: #dc3545; }
-```
-
-#### **4. תרגום מלא**
-```javascript
-// ✅ תמיד לתרגם לעברית
-const statusTranslations = {
-    'open': 'פתוח',
-    'closed': 'סגור',
-    'cancelled': 'מבוטל'
-};
-```
-
-### **🎯 תוצאות הלמידה:**
-- **מערכת מקושרים מושלמת**: עובדת עם כל סוגי האובייקטים
-- **UI/UX עקבי**: עיצוב אחיד בכל המערכת
-- **תרגום מלא**: כל הטקסטים בעברית
-- **ביצועים משופרים**: שימוש במערכת מאופטמת
-- **תחזוקה קלה**: שינויים במרכז אחד
-
+**הסיבה**: קריאה ללא `

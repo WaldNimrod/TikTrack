@@ -133,6 +133,22 @@ const cashFlowModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
+        {
+            type: 'select',
+            id: 'cashFlowTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'cash_flow'
+            },
+            description: 'הוסף תגיות לתזרים זה'
+        },
         // שורה חמישית: תיאור לכל רוחב המודל
         {
             type: 'rich-text',
@@ -302,6 +318,22 @@ const cashFlowModalConfig = {
                     style: 'width: 300px; min-width: 200px;',
                     rowClass: 'row',
                     colClass: 'col-md-6'
+                },
+                {
+                    type: 'select',
+                    id: 'currencyExchangeTags',
+                    label: 'תגיות',
+                    options: [],
+                    multiple: true,
+                    includeEmpty: false,
+                    additionalClasses: ['tag-multi-select'],
+                    rowClass: 'row',
+                    colClass: 'col-12',
+                    attributes: {
+                        'data-initial-value': '',
+                        'data-tag-entity': 'cash_flow'
+                    },
+                    description: 'הוסף תגיות להמרת מטבע זו'
                 },
                 // שורה שביעית: תיאור (בשורה מלאה)
                 {

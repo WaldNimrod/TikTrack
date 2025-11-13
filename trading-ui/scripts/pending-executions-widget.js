@@ -61,9 +61,15 @@
             column.innerHTML = `
                 <div class="card h-100" id="pendingExecutionsHighlightsCard">
                     <div class="card-header d-flex align-items-center justify-content-between gap-2">
-                        <h5 class="mb-0 d-flex align-items-center gap-2">
-                            <img src="images/icons/executions.svg" alt="ביצועים" width="20" height="20">
-                            המלצות שיוך בולטות
+                        <h5 class="mb-0">
+                            <a
+                                href="executions.html"
+                                class="d-inline-flex align-items-center gap-2 widget-title-link"
+                                data-onclick="navigateToPage('executions', { preserveState: true })"
+                            >
+                                <img src="images/icons/executions.svg" alt="ביצועים" width="20" height="20">
+                                <span>המלצות שיוך בולטות</span>
+                            </a>
                         </h5>
                         <span class="badge entity-execution" id="pendingExecutionsHighlightsCount">0</span>
                     </div>

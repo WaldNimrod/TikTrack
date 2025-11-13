@@ -270,25 +270,32 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'services/tag-service.js',
+        globalCheck: 'window.TagService',
+        description: 'שירות תגיות מרכזי (ניהול ואחזור תגיות)',
+        required: true,
+        loadOrder: 8
+      },
+      {
         file: 'services/table-sort-value-adapter.js',
         globalCheck: 'window.TableSortValueAdapter',
         description: 'Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy)',
         required: true,
-        loadOrder: 8
+        loadOrder: 9
       },
       {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false,
-        loadOrder: 9
+        loadOrder: 10
       },
       {
         file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
-        loadOrder: 10,
+        loadOrder: 11,
         external: true
       },
       {
@@ -296,7 +303,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.DOMPurify',
         description: 'DOMPurify - HTML Sanitizer',
         required: true,
-        loadOrder: 11,
+        loadOrder: 12,
         external: true
       },
       {
@@ -304,7 +311,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.RichTextEditorService',
         description: 'שירות עורך טקסט עשיר',
         required: true,
-        loadOrder: 12
+        loadOrder: 13
       }
     ],
     estimatedSize: '~180KB',
@@ -386,39 +393,53 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
+        file: 'tag-ui-manager.js',
+        globalCheck: 'window.TagUIManager',
+        description: 'ניהול בחירת תגיות במודלים',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'tag-events.js',
+        globalCheck: 'window.TagEvents',
+        description: 'מערכת אירועים גלובלית לתגיות',
+        required: true,
+        loadOrder: 4
+      },
+      {
         file: 'modules/core-systems.js',
         globalCheck: 'window.CoreSystems',
         description: 'מערכות ליבה',
         required: true,
-        loadOrder: 3
+        loadOrder: 5
       },
       {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
         description: 'נתונים בסיסיים',
         required: true,
-        loadOrder: 4
+        loadOrder: 6
       },
       {
         file: 'modules/ui-basic.js',
         globalCheck: 'window.UIBasic',
         description: 'ממשק בסיסי',
         required: true,
-        loadOrder: 5
+        loadOrder: 7
       },
       {
         file: 'modules/data-advanced.js',
         globalCheck: 'window.DataAdvanced',
         description: 'נתונים מתקדמים',
         required: true,
-        loadOrder: 6
+        loadOrder: 8
       },
       {
         file: 'modules/ui-advanced.js',
         globalCheck: 'window.UIAdvanced',
         description: 'ממשק מתקדם',
         required: true,
-        loadOrder: 7,
+        loadOrder: 9,
         exports: ['window.loadUserPreferences'] // Explicitly document that this script exports loadUserPreferences
       },
       {
@@ -426,98 +447,105 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.CommunicationModule',
         description: 'מודול תקשורת',
         required: true,
-        loadOrder: 8
+        loadOrder: 10
       },
       {
         file: 'modules/business-module.js',
         globalCheck: 'window.BusinessModule',
         description: 'מודול עסקי',
         required: true,
-        loadOrder: 9
+        loadOrder: 11
       },
       {
         file: 'modules/localstorage-sync.js',
         globalCheck: 'window.LocalStorageSync',
         description: 'סנכרון localStorage',
         required: true,
-        loadOrder: 10
+        loadOrder: 12
       },
       {
         file: 'modules/dynamic-loader-config.js',
         globalCheck: 'window.DynamicLoaderConfig',
         description: 'תצורת טעינה דינמית',
         required: true,
-        loadOrder: 11
+        loadOrder: 13
       },
       {
         file: 'import-user-data.js',
         globalCheck: 'window.openImportUserDataModal',
         description: 'מודל ייבוא נתוני עסקאות',
         required: true,
-        loadOrder: 12
+        loadOrder: 14
       },
       {
         file: 'modal-configs/trading-accounts-config.js',
         globalCheck: 'window.tradingAccountsModalConfig',
         description: 'קונפיגורציית מודל חשבונות מסחר',
         required: false,
-        loadOrder: 13
+        loadOrder: 15
       },
       {
         file: 'modal-configs/alerts-config.js',
         globalCheck: 'window.alertsModalConfig',
         description: 'קונפיגורציית מודל התראות',
         required: false,
-        loadOrder: 14
+        loadOrder: 16
       },
       {
         file: 'modal-configs/trades-config.js',
         globalCheck: 'window.tradesModalConfig',
         description: 'קונפיגורציית מודל טריידים',
         required: true,
-        loadOrder: 15
+        loadOrder: 17
       },
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
         description: 'קונפיגורציית מודל ביצועים',
         required: false,
-        loadOrder: 16
+        loadOrder: 18
       },
       {
         file: 'modal-configs/trade-plans-config.js',
         globalCheck: 'window.tradePlansModalConfig',
         description: 'קונפיגורציית מודל תוכניות מסחר',
         required: true,
-        loadOrder: 17
+        loadOrder: 19
       },
       {
         file: 'modal-configs/tickers-config.js',
         globalCheck: 'window.tickersModalConfig',
         description: 'קונפיגורציית מודל טיקרים',
         required: false,
-        loadOrder: 18
+        loadOrder: 20
       },
       {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'קונפיגורציית מודל תזרימי מזומנים',
         required: false,
-        loadOrder: 19
+        loadOrder: 21
       },
       {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
         required: false,
-        loadOrder: 20
+        loadOrder: 22
+      },
+      {
+        file: 'modal-configs/tag-management-config.js',
+        globalCheck: 'window.tagModalConfig',
+        description: 'קונפיגורציית מודלים למערכת התגיות',
+        required: true,
+        loadOrder: 23
       },
       {
         file: 'trade-selector-modal.js',
         globalCheck: 'window.tradeSelectorModal',
         description: 'מודל בחירת טרייד',
         required: false,
-        loadOrder: 21
+        loadOrder: 24
       }
     ],
     estimatedSize: '~250KB',
@@ -664,14 +692,14 @@ const PACKAGE_MANIFEST = {
     scripts: [
       {
         file: 'conditions/conditions-translations.js',
-        globalCheck: 'window.ConditionsTranslations',
+        globalCheck: 'window.conditionsTranslations',
         description: 'תרגומי תנאים',
         required: true,
         loadOrder: 1
       },
       {
         file: 'conditions/conditions-validator.js',
-        globalCheck: 'window.ConditionsValidator',
+        globalCheck: 'window.conditionsValidator',
         description: 'ולידטור תנאים',
         required: true,
         loadOrder: 2
@@ -685,24 +713,45 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'conditions/conditions-form-generator.js',
-        globalCheck: 'window.ConditionsFormGenerator',
+        globalCheck: 'window.conditionsFormGenerator',
         description: 'מחולל טפסי תנאים',
         required: true,
         loadOrder: 4
       },
       {
         file: 'conditions/conditions-crud-manager.js',
-        globalCheck: 'window.ConditionsCrudManager',
+        globalCheck: 'window.conditionsCRUDManager',
         description: 'מנהל CRUD תנאים',
         required: true,
         loadOrder: 5
       },
       {
         file: 'conditions/conditions-initializer.js',
-        globalCheck: 'window.ConditionsInitializer',
+        globalCheck: 'window.conditionsInitializer',
         description: 'מאתחל תנאים',
         required: true,
         loadOrder: 6
+      },
+      {
+        file: 'modal-configs/conditions-config.js',
+        globalCheck: 'window.conditionsModalConfig',
+        description: 'קונפיגורציית מודל תנאים',
+        required: true,
+        loadOrder: 7
+      },
+      {
+        file: 'conditions/conditions-ui-manager.js',
+        globalCheck: 'window.ConditionsUIManager',
+        description: 'מנהל ממשק תנאים',
+        required: true,
+        loadOrder: 8
+      },
+      {
+        file: 'conditions/conditions-modal-controller.js',
+        globalCheck: 'window.ConditionsModalController',
+        description: 'בקר מודל תנאים',
+        required: true,
+        loadOrder: 9
       }
     ],
     estimatedSize: '~150KB',
@@ -1373,11 +1422,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1
       },
       {
+        file: 'pending-trade-plan-widget.js',
+        globalCheck: 'window.PendingTradePlanWidget',
+        description: 'ווידג׳ט שיוך תוכניות למסחר',
+        required: true,
+        loadOrder: 2
+      },
+      {
         file: 'index.js',
         globalCheck: 'window.initializeIndexPage',
         description: 'לוגיקת דף הבית',
         required: true,
-        loadOrder: 2
+        loadOrder: 3
       }
     ],
     estimatedSize: '~110KB',

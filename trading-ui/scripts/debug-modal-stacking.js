@@ -52,19 +52,6 @@ window.debugModalStacking = function() {
     console.log(`   נמצאו ${allBackdrops.length} backdrops (אמור להיות 1 בלבד!):`);
     if (allBackdrops.length === 0) {
         console.log('   ⚠️ אין backdrops ב-DOM!');
-        if (window.modalNavigationManager && window.modalNavigationManager.modalHistory.length > 0) {
-            console.log('   💡 יש מודולים ב-history - צריך backdrop! נוצר מחדש...');
-            if (window.modalNavigationManager.manageBackdrop) {
-                window.modalNavigationManager.manageBackdrop();
-                // בדיקה שוב
-                const newBackdrops = Array.from(document.querySelectorAll('.modal-backdrop'));
-                const newGlobalBackdrop = document.getElementById('globalModalBackdrop');
-                if (newGlobalBackdrop && !newBackdrops.includes(newGlobalBackdrop)) {
-                    newBackdrops.push(newGlobalBackdrop);
-                }
-                console.log(`   ✅ אחרי יצירה מחדש: ${newBackdrops.length} backdrops`);
-            }
-        }
     }
     allBackdrops.forEach((backdrop, index) => {
         const backdropId = backdrop.id || '(ללא ID)';
@@ -94,34 +81,29 @@ window.debugModalStacking = function() {
         console.warn('   כל ה-backdrops חוץ מה-global צריכים להימחק.');
     }
     
-    // 3. בדיקת ModalNavigationManager
-    console.log('📚 3. מצב ModalNavigationManager:');
-    if (window.modalNavigationManager) {
-        const manager = window.modalNavigationManager;
-        console.log(`   ✅ ModalNavigationManager זמין`);
-        console.log(`   - History length: ${manager.modalHistory ? manager.modalHistory.length : 0}`);
-        console.log(`   - Global backdrop: ${manager.globalBackdrop ? '✅ קיים' : '❌ לא קיים'}`);
-        
-        if (manager.modalHistory && manager.modalHistory.length > 0) {
-            console.log('   - מודולים ב-history:');
-            manager.modalHistory.forEach((item, index) => {
-                const modalId = item.element ? (item.element.id || '(ללא ID)') : 'N/A';
-                const entityType = item.info ? (item.info.entityType || 'N/A') : 'N/A';
-                const title = item.info ? (item.info.title || 'N/A') : 'N/A';
-                const sourceInfo = item.info && item.info.sourceInfo ? '✅ יש' : '❌ אין';
-                
-                console.log(`     ${index + 1}. ${modalId}`);
-                console.log(`        - Entity Type: ${entityType}`);
-                console.log(`        - Title: ${title}`);
-                console.log(`        - Source Info: ${sourceInfo}`);
-                console.log(`        - Element:`, item.element);
+    // 3. בדיקת ModalNavigationService
+    console.log('📚 3. מצב ModalNavigationService:');
+    if (window.ModalNavigationService) {
+        const stack = window.ModalNavigationService.getStack ? window.ModalNavigationService.getStack({ includeElements: true }) : [];
+        console.log('   ✅ ModalNavigationService זמין');
+        console.log(`   - Stack length: ${stack.length}`);
+        if (stack.length > 0) {
+            console.log('   - ערכים ב-stack:');
+            stack.forEach((entry, index) => {
+                console.log(`     ${index + 1}. ${entry.modalId || '(ללא ID)'}`);
+                console.log(`        - Modal Type: ${entry.modalType || 'N/A'}`);
+                console.log(`        - Entity Type: ${entry.entityType || 'N/A'}`);
+                console.log(`        - Entity ID: ${entry.entityId ?? 'N/A'}`);
+                console.log(`        - Title: ${entry.title || 'N/A'}`);
+                console.log(`        - Source Info: ${entry.sourceInfo ? '✅ יש' : '❌ אין'}`);
+                console.log(`        - Element:`, entry.element || null);
                 console.log('');
             });
         } else {
-            console.log('   - אין מודולים ב-history');
+            console.log('   - אין מודולים ב-stack');
         }
     } else {
-        console.log('   ❌ ModalNavigationManager לא זמין!');
+        console.log('   ❌ ModalNavigationService לא זמין!');
     }
     
     // 4. בדיקת מודולים פתוחים בפועל
@@ -133,9 +115,10 @@ window.debugModalStacking = function() {
         console.log(`   ${index + 1}. ${modalId}`);
         
         // בדיקה אם המודול רשום ב-ModalNavigationManager
-        if (window.modalNavigationManager && window.modalNavigationManager.modalHistory) {
-            const isInHistory = window.modalNavigationManager.modalHistory.some(item => item.element === modal);
-            console.log(`      - רשום ב-ModalNavigationManager: ${isInHistory ? '✅ כן' : '❌ לא'}`);
+        if (window.ModalNavigationService?.getStack) {
+            const stack = window.ModalNavigationService.getStack({ includeElements: true });
+            const isTracked = stack.some(entry => entry.element === modal || entry.modalId === modal.id);
+            console.log(`      - רשום ב-ModalNavigationService: ${isTracked ? '✅ כן' : '❌ לא'}`);
         }
     });
     
@@ -231,16 +214,17 @@ window.debugModalStacking = function() {
     
     const openModalsNotInHistory = [];
     openModals.forEach(modal => {
-        if (window.modalNavigationManager && window.modalNavigationManager.modalHistory) {
-            const isInHistory = window.modalNavigationManager.modalHistory.some(item => item.element === modal);
-            if (!isInHistory) {
+        if (window.ModalNavigationService?.getStack) {
+            const stack = window.ModalNavigationService.getStack({ includeElements: true });
+            const isTracked = stack.some(entry => entry.element === modal || entry.modalId === modal.id);
+            if (!isTracked) {
                 openModalsNotInHistory.push(modal.id || '(ללא ID)');
             }
         }
     });
     
     if (openModalsNotInHistory.length > 0) {
-        console.log('   ❌ יש מודולים פתוחים שלא רשומים ב-ModalNavigationManager!');
+        console.log('   ❌ יש מודולים פתוחים שלא רשומים ב-ModalNavigationService!');
         console.log('   ✅ מודולים:', openModalsNotInHistory);
     }
     
@@ -254,7 +238,7 @@ window.debugModalStacking = function() {
         openModals: openModals.length,
         backdrops: allBackdrops.length,
         hasMultipleBackdrops: allBackdrops.length > 1,
-        historyLength: window.modalNavigationManager ? (window.modalNavigationManager.modalHistory ? window.modalNavigationManager.modalHistory.length : 0) : 0,
+        historyLength: window.ModalNavigationService ? (window.ModalNavigationService.getStack ? window.ModalNavigationService.getStack({ includeElements: true }).length : 0) : 0,
         zIndexHierarchy: zIndexValues
     };
 };
@@ -278,9 +262,8 @@ window.fixDuplicateBackdrops = function() {
     console.log(`✅ הוסרו ${removed} backdrops כפולים`);
     
     // וידוא שיש backdrop גלובלי
-    if (!globalBackdrop && window.modalNavigationManager) {
-        console.log('   🔄 יוצר backdrop גלובלי חדש...');
-        window.modalNavigationManager.manageBackdrop();
+    if (!globalBackdrop) {
+        console.log('   ℹ️ אין backdrop גלובלי פעיל. Bootstrap ייצור אותו מחדש עם המודל הבא.');
     }
     
     return removed;
@@ -314,13 +297,12 @@ window.debugSpecificModal = function(modalId) {
         info.contentZIndex = window.getComputedStyle(info.content).zIndex;
     }
     
-    if (window.modalNavigationManager && window.modalNavigationManager.modalHistory) {
-        const index = window.modalNavigationManager.modalHistory.findIndex(item => item.element === modal);
-        info.isInHistory = index >= 0;
-        info.historyIndex = index;
-        
+    if (window.ModalNavigationService?.getStack) {
+        const stack = window.ModalNavigationService.getStack({ includeElements: true });
+        const index = stack.findIndex(entry => entry.element === modal);
         if (index >= 0) {
-            info.historyInfo = window.modalNavigationManager.modalHistory[index].info;
+            info.historyIndex = index;
+            info.historyInfo = stack[index];
         }
     }
     

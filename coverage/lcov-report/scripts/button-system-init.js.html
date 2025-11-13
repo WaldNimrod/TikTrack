@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/370</span>
+                <span class='fraction'>0/374</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/266</span>
+                <span class='fraction'>0/274</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/54</span>
+                <span class='fraction'>0/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/357</span>
+                <span class='fraction'>0/361</span>
             </div>
         
             
@@ -916,7 +916,14 @@
 <a name='L851'></a><a href='#L851'>851</a>
 <a name='L852'></a><a href='#L852'>852</a>
 <a name='L853'></a><a href='#L853'>853</a>
-<a name='L854'></a><a href='#L854'>854</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L854'></a><a href='#L854'>854</a>
+<a name='L855'></a><a href='#L855'>855</a>
+<a name='L856'></a><a href='#L856'>856</a>
+<a name='L857'></a><a href='#L857'>857</a>
+<a name='L858'></a><a href='#L858'>858</a>
+<a name='L859'></a><a href='#L859'>859</a>
+<a name='L860'></a><a href='#L860'>860</a>
+<a name='L861'></a><a href='#L861'>861</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -951,6 +958,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1807,6 +1821,13 @@ const BUTTON_SYSTEM_CONFIG = <span class="cstat-no" title="statement not covered
     }
 };
 &nbsp;
+const BUTTON_TOOLTIP_DEBUG_ENABLED = <span class="cstat-no" title="statement not covered" >window.ButtonTooltipDebugMode === true;</span>
+const buttonTooltipDebugLog = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(.</span>..args) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (BUTTON_TOOLTIP_DEBUG_ENABLED) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log(...args);</span>
+    }
+};
+&nbsp;
 class ButtonSystemLogger {
 <span class="fstat-no" title="function not covered" >    co</span>nstructor(config) {
 <span class="cstat-no" title="statement not covered" >        this.config = config;</span>
@@ -1934,7 +1955,7 @@ class AdvancedButtonSystem {
     };
 &nbsp;
     // Buttons that support entity variants
-    static ENTITY_VARIANT_BUTTONS = <span class="cstat-no" title="statement not covered" >['CLOSE', 'ADD', 'LINK', 'SAVE'];</span>
+    static ENTITY_VARIANT_BUTTONS = <span class="cstat-no" title="statement not covered" >['CLOSE', 'ADD', 'LINK', 'SAVE', 'PRIMARY', 'WARNING'];</span>
 &nbsp;
 <span class="fstat-no" title="function not covered" >    in</span>it() {
 <span class="cstat-no" title="statement not covered" >        if (this.initialized) {</span>
@@ -2107,7 +2128,7 @@ class AdvancedButtonSystem {
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        console.log('🔍 [Tooltip Debug] initializeTooltips called', {</span>
+<span class="cstat-no" title="statement not covered" >        buttonTooltipDebugLog('🔍 [Tooltip Debug] initializeTooltips called', {</span>
             container: container.id || container.className || 'unknown',
             containerTag: container.tagName
         });
@@ -2118,7 +2139,7 @@ class AdvancedButtonSystem {
                 // Find all buttons with data-tooltip attribute (supports both button system buttons and custom buttons)
                 const buttonsWithTooltips = <span class="cstat-no" title="statement not covered" >container.querySelectorAll('[data-tooltip]');</span>
                 
-<span class="cstat-no" title="statement not covered" >                console.log('🔍 [Tooltip Debug] Searching for buttons with data-tooltip', {</span>
+<span class="cstat-no" title="statement not covered" >                buttonTooltipDebugLog('🔍 [Tooltip Debug] Searching for buttons with data-tooltip', {</span>
                     container: container.id || container.className || 'unknown',
                     found: buttonsWithTooltips.length
                 });
@@ -2129,14 +2150,14 @@ class AdvancedButtonSystem {
                 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >                this.logger.debug(`initializeTooltips: Found ${buttonsWithTooltips.length} buttons with tooltips`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`🔍 [Tooltip Debug] Found ${buttonsWithTooltips.length} buttons with tooltips`);</span>
+<span class="cstat-no" title="statement not covered" >                buttonTooltipDebugLog(`🔍 [Tooltip Debug] Found ${buttonsWithTooltips.length} buttons with tooltips`);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >                buttonsWithTooltips.forEach(<span class="fstat-no" title="function not covered" >(b</span>utton, index) =&gt; {</span>
                     // Get tooltip config from data attributes
                     const tooltipText = <span class="cstat-no" title="statement not covered" >button.getAttribute('data-tooltip');</span>
                     const buttonId = <span class="cstat-no" title="statement not covered" >button.id || `button-${index}`;</span>
                     
-<span class="cstat-no" title="statement not covered" >                    console.log(`🔍 [Tooltip Debug] Processing button ${index + 1}/${buttonsWithTooltips.length}`, {</span>
+<span class="cstat-no" title="statement not covered" >                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Processing button ${index + 1}/${buttonsWithTooltips.length}`, {</span>
                         buttonId: buttonId,
                         tooltipText: tooltipText,
                         hasDataBsToggle: button.hasAttribute('data-bs-toggle'),
@@ -2150,10 +2171,10 @@ class AdvancedButtonSystem {
 &nbsp;
                     // Get configuration from data attributes
                     const config = <span class="cstat-no" title="statement not covered" >this._getTooltipConfig(button);</span>
-<span class="cstat-no" title="statement not covered" >                    console.log(`🔍 [Tooltip Debug] Config for button ${buttonId}:`, config);</span>
+<span class="cstat-no" title="statement not covered" >                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Config for button ${buttonId}:`, config);</span>
                     
 <span class="cstat-no" title="statement not covered" >                    if (config) {</span>
-<span class="cstat-no" title="statement not covered" >                        console.log(`🔍 [Tooltip Debug] Initializing tooltip for button ${buttonId}`);</span>
+<span class="cstat-no" title="statement not covered" >                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Initializing tooltip for button ${buttonId}`);</span>
 <span class="cstat-no" title="statement not covered" >                        this._initializeTooltip(button, config);</span>
                     } else {
 <span class="cstat-no" title="statement not covered" >                        console.warn(`🔍 [Tooltip Debug] No config returned for button ${buttonId}`);</span>
@@ -2374,7 +2395,7 @@ class AdvancedButtonSystem {
         const elementId = <span class="cstat-no" title="statement not covered" >element.id || 'unknown';</span>
         const tooltipText = <span class="cstat-no" title="statement not covered" >element.getAttribute('data-tooltip');</span>
         
-<span class="cstat-no" title="statement not covered" >        console.log(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {</span>
+<span class="cstat-no" title="statement not covered" >        buttonTooltipDebugLog(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {</span>
             tooltipText: tooltipText,
             hasDataTooltip: element.hasAttribute('data-tooltip')
         });
@@ -2401,7 +2422,7 @@ class AdvancedButtonSystem {
             offset: offset || '0,0'
         };
         
-<span class="cstat-no" title="statement not covered" >        console.log(`🔍 [Tooltip Debug] Config created for element ${elementId}:`, config);</span>
+<span class="cstat-no" title="statement not covered" >        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Config created for element ${elementId}:`, config);</span>
         
 <span class="cstat-no" title="statement not covered" >        return config;</span>
     }
@@ -2414,7 +2435,7 @@ class AdvancedButtonSystem {
      */
 <span class="fstat-no" title="function not covered" >    _i</span>nitializeTooltip(button, config) {
         const buttonId = <span class="cstat-no" title="statement not covered" >button.id || 'unknown';</span>
-<span class="cstat-no" title="statement not covered" >        console.log(`🔍 [Tooltip Debug] _initializeTooltip called for button ${buttonId}`, {</span>
+<span class="cstat-no" title="statement not covered" >        buttonTooltipDebugLog(`🔍 [Tooltip Debug] _initializeTooltip called for button ${buttonId}`, {</span>
             config: config,
             bootstrapAvailable: typeof bootstrap !== 'undefined',
             TooltipAvailable: typeof bootstrap !== 'undefined' &amp;&amp; !!bootstrap.Tooltip
@@ -2430,7 +2451,7 @@ class AdvancedButtonSystem {
         // Destroy existing tooltip if exists
         const existingTooltip = <span class="cstat-no" title="statement not covered" >bootstrap.Tooltip.getInstance(button);</span>
 <span class="cstat-no" title="statement not covered" >        if (existingTooltip) {</span>
-<span class="cstat-no" title="statement not covered" >            console.log(`🔍 [Tooltip Debug] Disposing existing tooltip for button ${buttonId}`);</span>
+<span class="cstat-no" title="statement not covered" >            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Disposing existing tooltip for button ${buttonId}`);</span>
 <span class="cstat-no" title="statement not covered" >            existingTooltip.dispose();</span>
         }
 &nbsp;
@@ -2456,7 +2477,7 @@ class AdvancedButtonSystem {
 <span class="cstat-no" title="statement not covered" >                tooltipOptions.offset = [x || 0, y || 0];</span>
             }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >            console.log(`🔍 [Tooltip Debug] Creating Bootstrap Tooltip for button ${buttonId}`, {</span>
+<span class="cstat-no" title="statement not covered" >            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Creating Bootstrap Tooltip for button ${buttonId}`, {</span>
                 options: tooltipOptions,
                 button: button
             });
@@ -2464,7 +2485,7 @@ class AdvancedButtonSystem {
             // Initialize Bootstrap tooltip
             const tooltipInstance = <span class="cstat-no" title="statement not covered" >new bootstrap.Tooltip(button, tooltipOptions);</span>
             
-<span class="cstat-no" title="statement not covered" >            console.log(`🔍 [Tooltip Debug] ✅ Tooltip created successfully for button ${buttonId}`, {</span>
+<span class="cstat-no" title="statement not covered" >            buttonTooltipDebugLog(`🔍 [Tooltip Debug] ✅ Tooltip created successfully for button ${buttonId}`, {</span>
                 instance: tooltipInstance,
                 enabled: tooltipInstance._isEnabled,
                 config: tooltipInstance._config
@@ -2530,16 +2551,16 @@ class AdvancedButtonSystem {
 <span class="cstat-no" title="statement not covered" >        element.outerHTML = fallbackButton;</span>
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    ad</span>dButton(container, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> id = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> variant = <span class="branch-0 cbranch-no" title="branch not covered" >'normal')</span> {
-        const buttonHtml = <span class="cstat-no" title="statement not covered" >this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, '');</span>
+<span class="fstat-no" title="function not covered" >    ad</span>dButton(container, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> id = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> variant = <span class="branch-0 cbranch-no" title="branch not covered" >'normal',</span> icon = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> {
+        const buttonHtml = <span class="cstat-no" title="statement not covered" >this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, icon);</span>
 <span class="cstat-no" title="statement not covered" >        container.insertAdjacentHTML('beforeend', buttonHtml);</span>
 <span class="cstat-no" title="statement not covered" >        this.logger.debug(`Added dynamic button: ${type}`);</span>
     }
 &nbsp;
-<span class="fstat-no" title="function not covered" >    up</span>dateButton(buttonId, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> variant = <span class="branch-0 cbranch-no" title="branch not covered" >'normal')</span> {
+<span class="fstat-no" title="function not covered" >    up</span>dateButton(buttonId, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> variant = <span class="branch-0 cbranch-no" title="branch not covered" >'normal',</span> icon = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> {
         const element = <span class="cstat-no" title="statement not covered" >document.getElementById(buttonId);</span>
 <span class="cstat-no" title="statement not covered" >        if (element) {</span>
-            const newButton = <span class="cstat-no" title="statement not covered" >this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, '');</span>
+            const newButton = <span class="cstat-no" title="statement not covered" >this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, icon);</span>
 <span class="cstat-no" title="statement not covered" >            element.outerHTML = newButton;</span>
 <span class="cstat-no" title="statement not covered" >            this.logger.debug(`Updated button: ${buttonId}`);</span>
         } else {
@@ -2575,12 +2596,12 @@ class AdvancedButtonSystem {
 <span class="cstat-no" title="statement not covered" >    window.advancedButtonSystem.initializeButtons();</span>
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >window.addDynamicButton = <span class="fstat-no" title="function not covered" >(c</span>ontainer, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> id = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    window.advancedButtonSystem.addButton(container, type, onClick, classes, attributes, text, id);</span>
+<span class="cstat-no" title="statement not covered" >window.addDynamicButton = <span class="fstat-no" title="function not covered" >(c</span>ontainer, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> id = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> variant = <span class="branch-0 cbranch-no" title="branch not covered" >'normal',</span> icon = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    window.advancedButtonSystem.addButton(container, type, onClick, classes, attributes, text, id, variant, icon);</span>
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >window.updateButton = <span class="fstat-no" title="function not covered" >(b</span>uttonId, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    window.advancedButtonSystem.updateButton(buttonId, type, onClick, classes, attributes, text);</span>
+<span class="cstat-no" title="statement not covered" >window.updateButton = <span class="fstat-no" title="function not covered" >(b</span>uttonId, type, onClick, classes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> attributes = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> text = <span class="branch-0 cbranch-no" title="branch not covered" >'',</span> variant = <span class="branch-0 cbranch-no" title="branch not covered" >'normal',</span> icon = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    window.advancedButtonSystem.updateButton(buttonId, type, onClick, classes, attributes, text, variant, icon);</span>
 };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >window.getButtonSystemStats = <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
@@ -2629,7 +2650,7 @@ class AdvancedButtonSystem {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.331Z
+                at 2025-11-12T23:38:03.899Z
             </div>
         <script src="../prettify.js"></script>
         <script>

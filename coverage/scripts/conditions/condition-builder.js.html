@@ -1929,7 +1929,7 @@ class ConditionBuilder {
 <span class="cstat-no" title="statement not covered" >            this.render();</span>
 <span class="cstat-no" title="statement not covered" >            this.attachEventListeners();</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Failed to initialize condition builder:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Failed to initialize condition builder', { error: error?.message, stack: error?.stack, entityType: this.entityType, entityId: this.entityId }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.error.load_methods', 'error');</span>
         }
     }
@@ -2016,7 +2016,7 @@ class ConditionBuilder {
             // Group methods by category
 <span class="cstat-no" title="statement not covered" >            this.methodsByCategory = this.groupMethodsByCategory(this.methods);</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error loading methods:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error loading methods', { error: error?.message, stack: error?.stack }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
     }
@@ -2046,7 +2046,7 @@ class ConditionBuilder {
 <span class="fstat-no" title="function not covered" >    re</span>nder() {
         const container = <span class="cstat-no" title="statement not covered" >document.getElementById(this.containerId);</span>
 <span class="cstat-no" title="statement not covered" >        if (!container) {</span>
-<span class="cstat-no" title="statement not covered" >            console.error(`Container ${this.containerId} not found`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Container not found', { containerId: this.containerId }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            return;</span>
         }
         
@@ -2265,7 +2265,7 @@ class ConditionBuilder {
 <span class="cstat-no" title="statement not covered" >            document.getElementById('parameterFormContainer').style.display = 'block';</span>
             
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error selecting method:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error selecting method', { error: error?.message, stack: error?.stack, methodId }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.error.load_parameters', 'error');</span>
         }
     }
@@ -2290,7 +2290,7 @@ class ConditionBuilder {
             
 <span class="cstat-no" title="statement not covered" >            this.renderParameterFields();</span>
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error loading method parameters:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error loading method parameters', { error: error?.message, stack: error?.stack, methodId }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            throw error;</span>
         }
     }
@@ -2486,7 +2486,7 @@ class ConditionBuilder {
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.success.condition_saved', 'success');</span>
             
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error adding condition:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error adding condition', { error: error?.message, stack: error?.stack }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.error.save_condition', 'error');</span>
         }
     }
@@ -2608,7 +2608,7 @@ class ConditionBuilder {
                 }
             });
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error populating parameter form:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error populating parameter form', { error: error?.message, stack: error?.stack, parameters }, { page: 'condition-builder' });</span>
         }
     }
     
@@ -2647,7 +2647,7 @@ class ConditionBuilder {
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.success.condition_saved', 'success');</span>
             
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error saving conditions:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error saving conditions', { error: error?.message, stack: error?.stack, entityId: this.entityId, entityType: this.entityType }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.error.save_condition', 'error');</span>
         }
     }
@@ -2688,7 +2688,7 @@ class ConditionBuilder {
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.success.condition_tested', 'success');</span>
             
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error testing conditions:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error testing conditions', { error: error?.message, stack: error?.stack, entityId: this.entityId, entityType: this.entityType }, { page: 'condition-builder' });</span>
 <span class="cstat-no" title="statement not covered" >            this.showNotification('conditions.error.test_condition', 'error');</span>
         }
     }
@@ -2718,7 +2718,7 @@ class ConditionBuilder {
 <span class="cstat-no" title="statement not covered" >            this.attachEventListeners();</span>
             
         } catch (error) {
-<span class="cstat-no" title="statement not covered" >            console.error('Error loading existing conditions:', error);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.error('[ConditionBuilder] Error loading existing conditions', { error: error?.message, stack: error?.stack, entityId: this.entityId, entityType: this.entityType }, { page: 'condition-builder' });</span>
             // Don't show error notification for initial load
         }
     }
@@ -2757,7 +2757,7 @@ class ConditionBuilder {
         } else <span class="cstat-no" title="statement not covered" >if (window.showSuccessNotification &amp;&amp; type === 'success') {</span>
 <span class="cstat-no" title="statement not covered" >            window.showSuccessNotification(message);</span>
         } else {
-<span class="cstat-no" title="statement not covered" >            console.log(`${type.toUpperCase()}: ${message}`);</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger?.info?.('[ConditionBuilder] showNotification fallback', { type, message }, { page: 'condition-builder' });</span>
         }
     }
 }
@@ -2770,7 +2770,7 @@ class ConditionBuilder {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.024Z
+                at 2025-11-12T23:38:03.562Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

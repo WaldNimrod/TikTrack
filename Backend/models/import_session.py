@@ -21,7 +21,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .base import BaseModel
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 class ImportSession(BaseModel):
     """
@@ -157,7 +157,7 @@ class ImportSession(BaseModel):
             
             # Set completed_at when status changes to completed or failed
             if new_status in ['completed', 'failed', 'cancelled']:
-                self.completed_at = datetime.now()
+                self.completed_at = datetime.now(timezone.utc)
             
             return True
         

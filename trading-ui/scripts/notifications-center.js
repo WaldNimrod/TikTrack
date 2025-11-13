@@ -67,19 +67,19 @@ async function loadCategoriesOverview() {
 
     // Get available categories from the system
     const categories = [
-      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: '#007bff' },
-      { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: '#28a745' },
-      { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: '#17a2b8' },
-      { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: '#6f42c1' },
-      { name: 'performance', title: 'ביצועים', icon: 'fas fa-tachometer-alt', color: '#fd7e14' },
-      { name: 'security', title: 'אבטחה', icon: 'fas fa-shield-alt', color: '#dc3545' },
-      { name: 'network', title: 'רשת', icon: 'fas fa-network-wired', color: '#20c997' },
-      { name: 'database', title: 'מסד נתונים', icon: 'fas fa-database', color: '#6c757d' },
-      { name: 'user', title: 'משתמש', icon: 'fas fa-user', color: '#e83e8c' },
-      { name: 'trade', title: 'עסקאות', icon: 'fas fa-chart-line', color: '#ffc107' },
-      { name: 'ticker', title: 'טיקרים', icon: 'fas fa-coins', color: '#fd7e14' },
-      { name: 'alert', title: 'התראות', icon: 'fas fa-bell', color: '#dc3545' },
-      { name: 'general', title: 'כללי', icon: 'fas fa-info-circle', color: '#6c757d' }
+      { name: 'system', title: 'מערכת', icon: 'fas fa-cog', color: 'var(--primary-color, #26baac)' },
+      { name: 'business', title: 'עסקי', icon: 'fas fa-briefcase', color: 'var(--color-success, #28a745)' },
+      { name: 'ui', title: 'ממשק משתמש', icon: 'fas fa-desktop', color: 'var(--color-info, #17a2b8)' },
+      { name: 'development', title: 'פיתוח', icon: 'fas fa-code', color: 'var(--entity-development-color, #fc5a06)' },
+      { name: 'performance', title: 'ביצועים', icon: 'fas fa-tachometer-alt', color: 'var(--entity-cash_flow-color, #fd7e14)' },
+      { name: 'security', title: 'אבטחה', icon: 'fas fa-shield-alt', color: 'var(--color-danger, #dc3545)' },
+      { name: 'network', title: 'רשת', icon: 'fas fa-network-wired', color: 'var(--entity-ticker-color, #20c997)' },
+      { name: 'database', title: 'מסד נתונים', icon: 'fas fa-database', color: 'var(--entity-preference-color, #6c757d)' },
+      { name: 'user', title: 'משתמש', icon: 'fas fa-user', color: 'var(--entity-constraint-color, #e83e8c)' },
+      { name: 'trade', title: 'עסקאות', icon: 'fas fa-chart-line', color: 'var(--entity-trade-color, #26baac)' },
+      { name: 'ticker', title: 'טיקרים', icon: 'fas fa-coins', color: 'var(--entity-ticker-color, #fd7e14)' },
+      { name: 'alert', title: 'התראות', icon: 'fas fa-bell', color: 'var(--entity-alert-color, #dc3545)' },
+      { name: 'general', title: 'כללי', icon: 'fas fa-info-circle', color: 'var(--color-neutral, #6c757d)' }
     ];
 
     let html = '<div class="row">';
@@ -152,60 +152,9 @@ async function loadCategoriesOverview() {
 /**
  * Load category statistics
  */
-async function loadCategoryStats() {
-  try {
-    const container = document.getElementById('categoryStats');
-    if (!container) return;
-
-    // Get statistics from the notification system
-    let stats = { success: 0, error: 0, warning: 0, info: 0, total: 0 };
-    
-    if (window.notificationsCenter && window.notificationsCenter.stats) {
-      stats = window.notificationsCenter.stats;
-    }
-
-    const categories = [
-      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: '#28a745' },
-      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: '#dc3545' },
-      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: '#ffc107' },
-      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: '#17a2b8' }
-    ];
-
-    let html = '<div class="row">';
-    categories.forEach(category => {
-      const count = stats[category.name] || 0;
-      const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
-      
-      html += `
-        <div class="col-md-3 col-sm-6 mb-3">
-          <div class="stat-card text-center p-3 border rounded">
-            <i class="${category.icon} fa-2x mb-2" style="color: ${category.color};"></i>
-            <h4 class="mb-1" style="color: ${category.color};">${count.toLocaleString()}</h4>
-            <p class="mb-1 text-muted">${category.title}</p>
-            <small class="text-muted">${percentage}% מהסך הכל</small>
-          </div>
-        </div>
-      `;
-    });
-    html += '</div>';
-
-    // Add total statistics
-    html += `
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="total-stats text-center p-3 bg-light border rounded">
-            <h5 class="mb-1">סך הכל: ${stats.total.toLocaleString()} הודעות</h5>
-            <small class="text-muted">עדכון אחרון: ${new Date().toLocaleString('he-IL')}</small>
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.innerHTML = html;
-    console.log('✅ Category statistics loaded');
-  } catch (error) {
-    console.error('❌ Error loading category statistics:', error);
-  }
+async function loadCategoryStatsLegacy() {
+  // Backwards compatibility wrapper; use main implementation.
+  return loadCategoryStats();
 }
 
 /**
@@ -256,73 +205,46 @@ async function loadPreferencesOverview() {
       { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
       { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
       { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' },
-      { key: 'console_logs_ui_components_enabled', title: 'לוגי רכיבי ממשק', type: 'boolean' },
-      { key: 'console_logs_cache_enabled', title: 'לוגי מטמון', type: 'boolean' },
-      { key: 'console_logs_notifications_enabled', title: 'לוגי התראות', type: 'boolean' }
+      { key: 'console_logs_development_enabled', title: 'לוגים למפתחים', type: 'boolean' },
+      { key: 'console_logs_performance_enabled', title: 'לוגי ביצועים', type: 'boolean' }
     ];
 
-    let html = '<div class="preferences-list">';
-    
-    // הגדרות בסיסיות
-    html += '<div class="mb-4">';
-    html += '<h6 class="text-primary mb-3">הגדרות בסיסיות:</h6>';
-    basicSettings.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+    const preferencesHtml = `
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <i class="fas fa-sliders-h me-2"></i>הגדרות בסיסיות
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(basicSettings, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-
-    // קטגוריות התראות
-    html += '<div class="row">';
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-primary mb-3">התראות מערכת:</h6>';
-    notificationCategories.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        <div class="col-lg-4 col-md-6 mb-3">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <i class="fas fa-layer-group me-2"></i>קטגוריות התראות
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(notificationCategories, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-
-    // לוגים לקונסול
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-success mb-3">לוגים לקונסול:</h6>';
-    consoleLogs.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
+        <div class="col-lg-4 col-md-12 mb-3">
+          <div class="card">
+            <div class="card-header bg-warning text-white">
+              <i class="fas fa-terminal me-2"></i>לוגים וקונסול
+            </div>
+            <div class="card-body">
+              ${renderPreferenceList(consoleLogs, preferences)}
+            </div>
+          </div>
         </div>
-      `;
-    });
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
+      </div>
+    `;
 
-    container.innerHTML = html;
-    console.log('✅ Preferences overview loaded with correct data');
+    container.innerHTML = preferencesHtml;
   } catch (error) {
     console.error('❌ Error loading preferences overview:', error);
   }
@@ -2085,128 +2007,6 @@ window.testUnifiedLogSystem = testUnifiedLogSystem;
 window.loadNotificationLog = loadNotificationLog;
 window.initializeNotificationsCenter = initializeNotificationsCenter;
 
-// ===== OVERVIEW SECTION FUNCTIONS =====
-
-// Duplicate function removed - using the one at the top of the file
-
-/**
- * Load preferences overview
- */
-async function loadPreferencesOverview() {
-  try {
-    const container = document.getElementById('preferencesOverview');
-    if (!container) return;
-
-    // Get notification preferences from the correct group
-    // Get preferences from the system using built-in function
-    let preferences = {};
-    if (typeof window.getGroupPreferences === 'function') {
-      try {
-        const result = await window.getGroupPreferences('notification_settings');
-        if (result && result.success && result.data && result.data.preferences) {
-          preferences = result.data.preferences;
-        } else {
-          console.warn('Failed to get notification preferences from system');
-        }
-      } catch (error) {
-        console.error('Error loading notification preferences:', error);
-      }
-    }
-
-    // Get the most important notification preferences only - organized like preferences page
-    const basicSettings = [
-      { key: 'enableNotifications', title: 'הפעל התראות', type: 'boolean' },
-      { key: 'notificationPopup', title: 'חלון קופץ התראות', type: 'boolean' },
-      { key: 'notificationSound', title: 'צליל התראות', type: 'boolean' },
-      { key: 'notificationDuration', title: 'משך זמן הצגת התראה (שניות)', type: 'integer' },
-      { key: 'enableRealtimeNotifications', title: 'התראות בזמן אמת', type: 'boolean' },
-      { key: 'enableSystemEventNotifications', title: 'התראות על אירועי מערכת', type: 'boolean' },
-      { key: 'notifyOnTradeExecuted', title: 'התראה על ביצוע עסקה', type: 'boolean' },
-      { key: 'notifyOnStopLoss', title: 'התראה על stop loss', type: 'boolean' }
-    ];
-
-    const notificationCategories = [
-      { key: 'notifications_system_enabled', title: 'התראות מערכת', type: 'boolean' },
-      { key: 'notifications_business_enabled', title: 'התראות עסקיות', type: 'boolean' },
-      { key: 'notifications_ui_enabled', title: 'התראות ממשק משתמש', type: 'boolean' },
-      { key: 'notifications_development_enabled', title: 'התראות פיתוח', type: 'boolean' },
-      { key: 'notifications_performance_enabled', title: 'התראות ביצועים', type: 'boolean' }
-    ];
-
-    const consoleLogs = [
-      { key: 'console_logs_initialization_enabled', title: 'לוגי אתחול מערכות', type: 'boolean' },
-      { key: 'console_logs_system_enabled', title: 'לוגים מערכתיים', type: 'boolean' },
-      { key: 'console_logs_business_enabled', title: 'לוגים עסקיים', type: 'boolean' },
-      { key: 'console_logs_performance_enabled', title: 'לוגים ביצועים', type: 'boolean' },
-      { key: 'console_logs_ui_components_enabled', title: 'לוגי רכיבי ממשק', type: 'boolean' },
-      { key: 'console_logs_cache_enabled', title: 'לוגי מטמון', type: 'boolean' },
-      { key: 'console_logs_notifications_enabled', title: 'לוגי התראות', type: 'boolean' }
-    ];
-
-    let html = '<div class="preferences-list">';
-    
-    // הגדרות בסיסיות
-    html += '<div class="mb-4">';
-    html += '<h6 class="text-primary mb-3">הגדרות בסיסיות:</h6>';
-    basicSettings.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
-        </div>
-      `;
-    });
-    html += '</div>';
-
-    // קטגוריות התראות
-    html += '<div class="row">';
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-primary mb-3">התראות מערכת:</h6>';
-    notificationCategories.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
-        </div>
-      `;
-    });
-    html += '</div>';
-
-    // לוגים לקונסול
-    html += '<div class="col-md-6">';
-    html += '<h6 class="text-success mb-3">לוגים לקונסול:</h6>';
-    consoleLogs.forEach(item => {
-      const value = preferences[item.key];
-      const displayValue = item.type === 'boolean' ? 
-        (value === true || value === 'true' ? '✅ פעיל' : '❌ כבוי') :
-        (value || 'לא מוגדר');
-      
-      html += `
-        <div class="preference-item d-flex justify-content-between align-items-center p-2 border-bottom">
-          <span class="preference-title">${item.title}</span>
-          <span class="preference-value ${item.type === 'boolean' ? (value === true || value === 'true' ? 'text-success' : 'text-danger') : 'text-info'}">${displayValue}</span>
-        </div>
-      `;
-    });
-    html += '</div>';
-    html += '</div>';
-
-    container.innerHTML = html;
-    console.log('✅ Preferences overview loaded with correct data');
-  } catch (error) {
-    console.error('❌ Error loading preferences overview:', error);
-  }
-}
 
 /**
  * Load category statistics
@@ -2224,10 +2024,10 @@ async function loadCategoryStats() {
     }
 
     const categories = [
-      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: '#28a745' },
-      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: '#dc3545' },
-      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: '#ffc107' },
-      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: '#17a2b8' }
+      { name: 'success', title: 'הצלחה', icon: 'fas fa-check-circle', color: 'var(--color-success, #28a745)' },
+      { name: 'error', title: 'שגיאה', icon: 'fas fa-times-circle', color: 'var(--color-danger, #dc3545)' },
+      { name: 'warning', title: 'אזהרה', icon: 'fas fa-exclamation-triangle', color: 'var(--color-warning, #ffc107)' },
+      { name: 'info', title: 'מידע', icon: 'fas fa-info-circle', color: 'var(--color-info, #17a2b8)' }
     ];
 
     let html = '<div class="row">';
@@ -2248,22 +2048,10 @@ async function loadCategoryStats() {
     });
     html += '</div>';
 
-    // Add total statistics
-    html += `
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="total-stats text-center p-3 bg-light border rounded">
-            <h5 class="mb-1">סך הכל: ${stats.total.toLocaleString()} הודעות</h5>
-            <small class="text-muted">עדכון אחרון: ${new Date().toLocaleString('he-IL')}</small>
-          </div>
-        </div>
-      </div>
-    `;
-
     container.innerHTML = html;
-    console.log('✅ Category statistics loaded');
+    console.log('✅ Categories overview loaded with statistics');
   } catch (error) {
-    console.error('❌ Error loading category statistics:', error);
+    console.error('❌ Error loading categories overview:', error);
   }
 }
 

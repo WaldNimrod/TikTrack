@@ -125,6 +125,7 @@ from routes.api import (
     cash_flows_bp,
     notes_bp,
     executions_bp,
+    tags_bp,
     users_bp,
     background_tasks_bp,
     entity_details_bp,
@@ -434,6 +435,7 @@ app.register_blueprint(alerts_bp)
 app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
+app.register_blueprint(tags_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)

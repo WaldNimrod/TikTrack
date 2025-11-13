@@ -75,6 +75,9 @@ class ActiveAlertsComponent extends HTMLElement {
     this.activeFilterType = 'all';
     this._currentFilteredAlerts = null;
     this._filtersInitialized = false;
+    this.cacheKey = 'alerts-data';
+    this.defaultTitleText = 'התראות פעילות';
+    this.emptyTitleText = 'אין התראות פעילות';
   }
 
   connectedCallback() {
@@ -113,25 +116,31 @@ class ActiveAlertsComponent extends HTMLElement {
       <div class="active-alerts" data-role="container">
         <div class="active-alerts__header">
           <div class="active-alerts__title-group">
-            <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
-            <span class="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
+            <button
+              type="button"
+              class="active-alerts__title-trigger"
+              data-onclick="navigateToPage('alerts')"
+              aria-label="פתח עמוד ההתראות">
+              <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
+              <span class="active-alerts__title-text" data-role="title-text">${this.defaultTitleText}</span>
+            </button>
             <span class="active-alerts__count-badge is-hidden" data-role="count" aria-live="polite">0</span>
-              </div>
+          </div>
           <div class="active-alerts__filters" data-role="filters" aria-label="סינון לפי סוג התראה"></div>
-            </div>
+        </div>
 
         <div class="active-alerts__body">
           <div class="active-alerts__loading is-hidden" data-role="loading">
             <span class="active-alerts__loading-spinner" aria-hidden="true"></span>
             <span class="active-alerts__loading-text">טוען התראות...</span>
-              </div>
+          </div>
           <div class="active-alerts__list is-hidden" data-role="list" role="list"></div>
           <div class="active-alerts__empty is-hidden" data-role="empty-state">
             <span class="active-alerts__empty-icon" aria-hidden="true">🔕</span>
             <span class="active-alerts__empty-text">אין התראות חדשות</span>
-            </div>
-              </div>
-            </div>
+          </div>
+        </div>
+      </div>
     `;
 
     this.cacheElements();
@@ -142,6 +151,8 @@ class ActiveAlertsComponent extends HTMLElement {
   cacheElements() {
     this._elements = {
       container: this.querySelector('[data-role="container"]'),
+      titleGroup: this.querySelector('.active-alerts__title-group'),
+      titleTrigger: this.querySelector('.active-alerts__title-trigger'),
       titleText: this.querySelector('[data-role="title-text"]'),
       countBadge: this.querySelector('[data-role="count"]'),
       filters: this.querySelector('[data-role="filters"]'),
@@ -330,7 +341,93 @@ class ActiveAlertsComponent extends HTMLElement {
       this._functionsChecked = true;
   }
 
-  async loadActiveAlerts() {
+  getCacheKey() {
+    return this.cacheKey;
+  }
+
+  getCacheManager() {
+    return window.UnifiedCacheManager || window.unifiedCacheManager || null;
+  }
+
+  getCacheTTL() {
+    const env = String(window.API_ENV || 'development').toLowerCase();
+    return env === 'production' ? 60000 : 0;
+  }
+
+  shouldUseCache() {
+    const manager = this.getCacheManager();
+    return Boolean(manager && manager.initialized === true && this.getCacheTTL() > 0);
+  }
+
+  async saveAlertsToCache(alerts) {
+    if (!this.shouldUseCache()) {
+      return;
+    }
+
+    const manager = this.getCacheManager();
+    if (typeof manager?.save !== 'function') {
+      return;
+    }
+
+    try {
+      await manager.save(this.getCacheKey(), alerts, {
+        layer: 'memory',
+        ttl: this.getCacheTTL(),
+        dependencies: ['accounts-data'],
+        compress: false,
+      });
+    } catch (error) {
+      this.log('warn', 'Failed to persist alerts data into cache', { error: error?.message });
+    }
+  }
+
+  async invalidateAlertsCache() {
+    const manager = this.getCacheManager();
+    const cacheKey = this.getCacheKey();
+
+    if (manager) {
+      try {
+        if (typeof manager.invalidate === 'function') {
+          await manager.invalidate(cacheKey);
+        } else if (typeof manager.clearByPattern === 'function') {
+          await manager.clearByPattern(cacheKey);
+        } else if (typeof manager.remove === 'function') {
+          await manager.remove(cacheKey);
+        }
+      } catch (error) {
+        this.log('warn', 'Failed to invalidate frontend alerts cache', { error: error?.message });
+      }
+    }
+
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('alert-updated');
+      } catch (error) {
+        this.log('warn', 'CacheSyncManager invalidateByAction failed', { error: error?.message });
+      }
+    }
+  }
+
+  async fetchAlertsFromApi() {
+    const response = await fetch('/api/alerts/unread', { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const apiData = await response.json();
+    return Array.isArray(apiData?.data) ? apiData.data : [];
+  }
+
+  applyAlertsState(alerts) {
+    this.alerts = Array.isArray(alerts) ? alerts : [];
+    this.resetFilteredAlertsCache();
+    this.renderAlerts();
+    this.updateHeaderState();
+    this.updateSectionHeaderAlertIcon();
+  }
+
+  async loadActiveAlerts(options = {}) {
+    const { force = false } = options;
     if (this.isLoading) {
       return;
     }
@@ -338,22 +435,61 @@ class ActiveAlertsComponent extends HTMLElement {
     this.isLoading = true;
     this.setLoadingState(true);
 
+    const cacheManager = this.getCacheManager();
+    const cacheEnabled = !force && this.shouldUseCache();
+
+    const finalize = async (alerts, source) => {
+      const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
+      await this.ensureRelatedData();
+      this.applyAlertsState(normalizedAlerts);
+      this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+    };
+
     try {
-      const response = await fetch('/api/alerts/unread');
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      if (cacheEnabled && typeof window.CacheTTLGuard?.ensure === 'function') {
+        let resolvedFromCache = false;
+        const cacheOptions = {
+          layer: 'memory',
+          ttl: this.getCacheTTL(),
+          dependencies: ['accounts-data'],
+          afterRead: () => { resolvedFromCache = true; },
+        };
+
+        const result = await window.CacheTTLGuard.ensure(this.getCacheKey(), async () => {
+          return await this.fetchAlertsFromApi();
+        }, cacheOptions);
+
+        await finalize(result, resolvedFromCache ? 'cache-hit' : 'api-refresh');
+        return;
       }
 
-      const apiData = await response.json();
-      this.alerts = Array.isArray(apiData?.data) ? apiData.data : [];
-      this.resetFilteredAlertsCache();
+      if (cacheEnabled && cacheManager) {
+        let alerts = [];
+        try {
+          alerts = await cacheManager.get?.(this.getCacheKey(), {
+            ttl: this.getCacheTTL(),
+            dependencies: ['accounts-data'],
+          });
+        } catch (error) {
+          this.log('warn', 'Failed to read alerts cache, falling back to API', { error: error?.message });
+        }
 
-      await this.ensureRelatedData();
+        if (Array.isArray(alerts) && alerts.length) {
+          await finalize(alerts, 'cache-hit');
+          return;
+        }
 
-      this.renderAlerts();
-      this.updateHeaderState();
-      this.updateSectionHeaderAlertIcon();
-      this.log('info', 'Active alerts loaded', { count: this.alerts.length });
+        const freshAlerts = await this.fetchAlertsFromApi();
+        await this.saveAlertsToCache(freshAlerts);
+        await finalize(freshAlerts, 'api-refresh');
+        return;
+      }
+
+      const freshAlerts = await this.fetchAlertsFromApi();
+      if (this.shouldUseCache()) {
+        await this.saveAlertsToCache(freshAlerts);
+      }
+      await finalize(freshAlerts, force ? 'api-force' : 'api-direct');
     } catch (error) {
       this.alerts = [];
       this.resetFilteredAlertsCache();
@@ -375,6 +511,10 @@ class ActiveAlertsComponent extends HTMLElement {
     const hasAnyAlerts = totalCount > 0;
     const hasFilteredAlerts = filteredCount > 0;
 
+    if (this._elements?.container) {
+      this._elements.container.classList.toggle('active-alerts--empty', !hasAnyAlerts);
+    }
+
     if (this._elements?.countBadge) {
       const countText = (!hasAnyAlerts || this.activeFilterType === 'all')
         ? String(totalCount)
@@ -389,6 +529,10 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     if (this._elements?.titleText) {
+      const targetText = hasAnyAlerts ? this.defaultTitleText : this.emptyTitleText;
+      if (this._elements.titleText.textContent !== targetText) {
+        this._elements.titleText.textContent = targetText;
+      }
       this._elements.titleText.classList.toggle('active-alerts__title-text--muted', !hasAnyAlerts);
     }
 
@@ -794,11 +938,13 @@ class ActiveAlertsComponent extends HTMLElement {
       this.updateHeaderState();
       this.updateSectionHeaderAlertIcon();
 
+      await this.invalidateAlertsCache();
+
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('התראה עודכנה', 'התראה סומנה כנקראה');
       }
 
-      await this.loadActiveAlerts();
+      await this.loadActiveAlerts({ force: true });
       this.log('info', 'Alert marked as read', { alertId });
     } catch (error) {
       this.log('error', 'Failed to mark alert as read', { alertId, error: error?.message });

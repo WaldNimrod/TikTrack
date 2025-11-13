@@ -727,6 +727,34 @@ class ModalManagerV2 {
                     </div>
                 `;
                 
+            case 'tag-multi-select':
+                const initialTags = Array.isArray(field.defaultValue)
+                    ? field.defaultValue.join(',')
+                    : (field.defaultValue || '');
+                const badgeContainerId = `${field.id}TagBadgeContainer`;
+                return `
+                    <div class="mb-3">
+                        <label for="${field.id}" class="form-label">
+                            ${field.label} ${requiredStar}
+                        </label>
+                        <select 
+                            class="form-select tag-multi-select"
+                            id="${field.id}"
+                            name="${field.name || field.id}"
+                            multiple
+                            ${disabledAttr}
+                            ${readOnlyAttr}
+                            data-tag-category="${field.tagCategory ?? ''}"
+                            data-include-inactive="${field.includeInactive ? 'true' : 'false'}"
+                            data-initial-value="${initialTags}">
+                            <option value="" disabled>טוען תגיות...</option>
+                        </select>
+                        <div id="${badgeContainerId}" class="mt-2 tag-picker-badges text-start small"></div>
+                        ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                        <div class="invalid-feedback"></div>
+                    </div>
+                `;
+                
                         case 'number':
                 const numberStyle = field.style || (field.width ? `width: ${field.width}px` : '');
                 // Check if this is a fee field that needs currency label
@@ -801,17 +829,51 @@ class ModalManagerV2 {
                 }
                 
                 const selectStyle = field.style || (field.width ? `width: ${field.width}px` : '');
+                const selectClasses = ['form-select'];
+                if (field.additionalClasses) {
+                    if (Array.isArray(field.additionalClasses)) {
+                        selectClasses.push(...field.additionalClasses);
+                    } else {
+                        selectClasses.push(field.additionalClasses);
+                    }
+                }
+                if (field.classList && Array.isArray(field.classList)) {
+                    selectClasses.push(...field.classList);
+                }
+
+                const extraAttributes = [];
+                if (field.multiple) {
+                    extraAttributes.push('multiple');
+                }
+                if (field.attributes && typeof field.attributes === 'object') {
+                    Object.entries(field.attributes).forEach(([attrKey, attrValue]) => {
+                        if (attrValue === true) {
+                            extraAttributes.push(attrKey);
+                        } else if (attrValue !== false && attrValue !== null && attrValue !== undefined) {
+                            extraAttributes.push(`${attrKey}="${attrValue}"`);
+                        }
+                    });
+                }
+                if (field.dataset && typeof field.dataset === 'object') {
+                    Object.entries(field.dataset).forEach(([dataKey, dataValue]) => {
+                        if (dataValue !== undefined && dataValue !== null) {
+                            extraAttributes.push(`data-${dataKey}="${dataValue}"`);
+                        }
+                    });
+                }
+
                 return `
                     <div class="mb-3">
                         <label for="${field.id}" class="form-label">
                             ${field.label} ${requiredStar}
                         </label>
-                        <select class="form-select" 
+                        <select class="${selectClasses.join(' ')}" 
                                 id="${field.id}" 
                                 name="${field.name || field.id}"
                                 ${requiredAttr}
                                 ${disabledAttr}
-                                ${selectStyle ? `style="${selectStyle}"` : ''}>
+                                ${selectStyle ? `style="${selectStyle}"` : ''}
+                                ${extraAttributes.join(' ')}>
                             ${optionsHTML}
                         </select>
                         <div class="invalid-feedback"></div>
@@ -1392,7 +1454,52 @@ class ModalManagerV2 {
                 throw new Error('Failed to create Bootstrap modal instance');
             }
             
+            modalElement.dataset.modalMode = mode;
             modal.show();
+            
+            if (mode === 'edit' && entityData) {
+                const entityId = entityData.id != null ? String(entityData.id) : '';
+                const derivedName = entityData.name
+                    || entityData.ticker_symbol
+                    || entityData.symbol
+                    || entityData.title
+                    || entityData.ticker?.symbol
+                    || '';
+                
+                modalElement.dataset.entityId = entityId;
+                if (derivedName) {
+                    modalElement.dataset.entityName = derivedName;
+                } else {
+                    delete modalElement.dataset.entityName;
+                }
+                
+                const formElement = modalElement.querySelector('form');
+                if (formElement) {
+                    formElement.dataset.mode = mode;
+                    formElement.dataset.entityId = entityId;
+                }
+                
+                modalElement.dispatchEvent(new CustomEvent('modal:entity-context-changed', {
+                    detail: {
+                        entityId,
+                        entityName: derivedName,
+                        entityData
+                    }
+                }));
+            } else {
+                delete modalElement.dataset.entityId;
+                delete modalElement.dataset.entityName;
+                
+                const formElement = modalElement.querySelector('form');
+                if (formElement) {
+                    formElement.dataset.mode = mode;
+                    delete formElement.dataset.entityId;
+                }
+                
+                modalElement.dispatchEvent(new CustomEvent('modal:entity-context-reset', {
+                    detail: { mode }
+                }));
+            }
             
             // בדיקה שהמודל נפתח בהצלחה
             console.log(`✅ Modal ${modalId} shown successfully`);
@@ -1439,24 +1546,23 @@ class ModalManagerV2 {
                 }
             }, 150);
             
-            // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
-            if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-                // קריאה מיידית ואחת נוספת אחרי זמן קצר (למקרה ש-Bootstrap יוצר backdrop אחרי show())
-                window.modalNavigationManager.manageBackdrop();
-                setTimeout(() => {
-                    window.modalNavigationManager.manageBackdrop();
-                }, 100);
+            const navigationMetadata = {
+                modalId,
+                modalType: 'crud-modal',
+                entityType: modalInfo.config.entityType,
+                entityId: mode === 'edit' && entityData ? entityData.id : null,
+                title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
+                mode
+            };
+
+            if (window.ModalNavigationService?.registerModalOpen) {
+                await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+            } else if (window.pushModalToNavigation) {
+                await window.pushModalToNavigation(modalElement, navigationMetadata);
             }
-            
-            // הוספה למערכת ניהול הניווט
-            if (window.modalNavigationManager) {
-                const modalNavInfo = {
-                    type: 'crud-modal',
-                    entityType: modalInfo.config.entityType,
-                    entityId: mode === 'edit' && entityData ? entityData.id : null,
-                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || ''
-                };
-                window.modalNavigationManager.pushModal(modalElement, modalNavInfo);
+
+            if (window.modalNavigationManager?.updateModalNavigation) {
+                window.modalNavigationManager.updateModalNavigation(modalElement);
             }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
@@ -1850,7 +1956,7 @@ class ModalManagerV2 {
             'alert': 'alerts',
             'execution': 'executions',
             'ticker': 'tickers',
-            'trade_plan': 'trade_plans',
+            'trade_plan': 'trade-plans',
             'note': 'notes'
         };
         return pluralMap[entityType] || `${entityType}s`;
@@ -4160,9 +4266,12 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
-        // ניקוי backdrops כפולים - Bootstrap עלול ליצור backdrop גם אחרי shown event
-        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-            window.modalNavigationManager.manageBackdrop();
+        if (window.TagUIManager && typeof window.TagUIManager.initializeModal === 'function') {
+            try {
+                window.TagUIManager.initializeModal(modalElement);
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
+            }
         }
         
         // פוקוס על השדה הראשון
@@ -4343,6 +4452,14 @@ class ModalManagerV2 {
         
         // For Trade Plans modal - handle ticker selection
         if (modalId === 'tradePlansModal') {
+            if (typeof window.setupTradePlanConditionsButton === 'function') {
+                try {
+                    window.setupTradePlanConditionsButton(modalElement);
+                } catch (error) {
+                    window.Logger?.warn('⚠️ Failed to initialize trade plan conditions controls', { error, page: 'modal-manager-v2' });
+                }
+            }
+
             const runResync = (forceFlag = true) => {
                 if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
                     const resyncPromise = window.InvestmentCalculationService.resync(modalElement, { force: forceFlag });
@@ -4560,6 +4677,14 @@ class ModalManagerV2 {
         
         // For Trades modal - handle ticker selection
         if (modalId === 'tradesModal') {
+            if (typeof window.setupTradeConditionsButton === 'function') {
+                try {
+                    window.setupTradeConditionsButton(modalElement);
+                } catch (error) {
+                    window.Logger?.warn('⚠️ Failed to initialize trade conditions controls', { error, page: 'modal-manager-v2' });
+                }
+            }
+
             const runTradeResync = (forceFlag = true) => {
                 if (window.InvestmentCalculationService && typeof window.InvestmentCalculationService.resync === 'function') {
                     const resyncPromise = window.InvestmentCalculationService.resync(modalElement, { force: forceFlag });
@@ -4910,9 +5035,8 @@ class ModalManagerV2 {
             this.clearValidationErrors(form);
         }
         
-        // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
-        if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-            window.modalNavigationManager.manageBackdrop();
+        if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
+            window.registerModalNavigationClose(modalId);
         }
     }
 
@@ -5019,14 +5143,11 @@ class ModalManagerV2 {
         titleElement.textContent = title;
         
         // עדכון navigation UI אחרי עדכון הכותרת
-        if (window.modalNavigationManager) {
-            // עדכון המידע במודול הנוכחי
-            const currentIndex = window.modalNavigationManager.modalHistory.findIndex(item => item.element === modalElement);
-            if (currentIndex >= 0 && currentIndex !== 0) {
-                // חשוב: לא נעדכן את המודול הראשון (index 0) - הוא חייב להישאר קבוע
-                window.modalNavigationManager.modalHistory[currentIndex].info.title = title;
-            }
-            // עדכון UI
+        if (window.ModalNavigationService?.updateModalMetadata) {
+            window.ModalNavigationService.updateModalMetadata(modalElement.id, { title });
+        }
+
+        if (window.modalNavigationManager?.updateModalNavigation) {
             window.modalNavigationManager.updateModalNavigation(modalElement);
         }
     }

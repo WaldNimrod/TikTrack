@@ -8,15 +8,21 @@
 const fs = require('fs');
 const path = require('path');
 
+const tableDataRegistryCode = fs.readFileSync(
+  path.join(__dirname, '../../trading-ui/scripts/table-data-registry.js'),
+  'utf8'
+);
+
 const unifiedTableSystemCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/unified-table-system.js'),
-    'utf8'
+  path.join(__dirname, '../../trading-ui/scripts/unified-table-system.js'),
+  'utf8'
 );
 
 describe('Unified Table System', () => {
     let UnifiedTableSystem;
     let updateFn;
     let tableConfig;
+    let cachedState;
 
     beforeAll(() => {
         const storage = {};
@@ -44,12 +50,24 @@ describe('Unified Table System', () => {
             trace: jest.fn()
         };
 
+        cachedState = null;
+
         global.window = {
             Logger: {
                 info: jest.fn(),
                 warn: jest.fn(),
                 error: jest.fn(),
                 debug: jest.fn()
+            },
+            TABLE_COLUMN_MAPPINGS: {
+                linked_items: ['type', 'related_type'],
+            },
+            UnifiedCacheManager: {
+                save: jest.fn((key, value) => {
+                    cachedState = value;
+                    return Promise.resolve();
+                }),
+                get: jest.fn(() => Promise.resolve(cachedState)),
             },
             filterSystem: {
                 applyFilter: jest.fn(),
@@ -80,6 +98,7 @@ describe('Unified Table System', () => {
             addEventListener: jest.fn()
         };
 
+        eval(tableDataRegistryCode);
         eval(unifiedTableSystemCode);
         UnifiedTableSystem = window.UnifiedTableSystem;
     });
@@ -87,9 +106,14 @@ describe('Unified Table System', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        window.filterSystem = {
-            applyFilter: jest.fn(),
-            clearFilters: jest.fn()
+        cachedState = null;
+
+        window.UnifiedCacheManager = {
+            save: jest.fn((key, value) => {
+                cachedState = value;
+                return Promise.resolve();
+            }),
+            get: jest.fn(() => Promise.resolve(cachedState)),
         };
 
         window.sortTableData = jest.fn((columnIndex, data, tableType, updateFunction) => {
@@ -121,6 +145,9 @@ describe('Unified Table System', () => {
         };
 
         UnifiedTableSystem.registry.clear();
+        if (window.TableDataRegistry?.clearAll) {
+            window.TableDataRegistry.clearAll();
+        }
         UnifiedTableSystem.registry.register('test_table', tableConfig);
         window._sortTableDataInProgress = false;
     });
@@ -150,14 +177,118 @@ describe('Unified Table System', () => {
         ]));
     });
 
-    test('filter.apply delegates to global filterSystem', () => {
-        UnifiedTableSystem.filter.apply('test_table', 'status', 'open');
-        expect(window.filterSystem.applyFilter).toHaveBeenCalledWith('status', 'open');
+    test('filter.apply filters data via TableDataRegistry context', () => {
+        const sampleData = [
+            { id: 1, status: 'open', name: 'Alpha' },
+            { id: 2, status: 'closed', name: 'Beta' },
+            { id: 3, status: 'open', name: 'Gamma' }
+        ];
+        tableConfig.dataGetter.mockReturnValue(sampleData);
+        if (window.TableDataRegistry?.setFullData) {
+            window.TableDataRegistry.setFullData('test_table', sampleData, { resetFiltered: false });
+        }
+
+        const result = UnifiedTableSystem.filter.apply('test_table', { status: ['open'] });
+
+        expect(result).toHaveLength(2);
+        expect(result.every(item => item.status === 'open')).toBe(true);
+
+        const registryFiltered = window.TableDataRegistry?.getFilteredData
+            ? window.TableDataRegistry.getFilteredData('test_table')
+            : [];
+        expect(registryFiltered).toHaveLength(2);
     });
 
-    test('filter.clear delegates to global filterSystem', () => {
-        UnifiedTableSystem.filter.clear('test_table');
-        expect(window.filterSystem.clearFilters).toHaveBeenCalled();
+    test('filter.apply merges with existing active filters when requested', () => {
+        const sampleData = [
+            { id: 1, status: 'open', type: 'investment', name: 'Alpha' },
+            { id: 2, status: 'open', type: 'swing', name: 'Beta' },
+            { id: 3, status: 'closed', type: 'investment', name: 'Gamma' }
+        ];
+        tableConfig.dataGetter.mockReturnValue(sampleData);
+        if (window.TableDataRegistry?.setFullData) {
+            window.TableDataRegistry.setFullData('test_table', sampleData, { resetFiltered: false });
+            window.TableDataRegistry.setFilteredData('test_table', sampleData.filter(item => item.status === 'open'), {
+                filterContext: {
+                    status: ['open'],
+                    type: [],
+                    account: [],
+                    search: '',
+                    dateRange: null,
+                    custom: {},
+                },
+            });
+        }
+
+        const result = UnifiedTableSystem.filter.apply(
+            'test_table',
+            { type: ['investment'] },
+            undefined,
+            { mergeWithActiveFilters: true }
+        );
+
+        expect(result).toHaveLength(1);
+        expect(result[0]).toMatchObject({ id: 1 });
+
+        const registryFiltered = window.TableDataRegistry?.getFilteredData
+            ? window.TableDataRegistry.getFilteredData('test_table')
+            : [];
+        expect(registryFiltered).toHaveLength(1);
+    });
+
+    test('filter.apply supports relatedType custom filtering', () => {
+        const linkedItemsData = [
+            { id: 10, type: 'trade', related_type_id: 2 },
+            { id: 11, type: 'trading_account', related_type_id: 1 },
+            { id: 12, type: 'note', related_type_id: null },
+        ];
+
+        UnifiedTableSystem.registry.register('linked_items__test', {
+            dataGetter: () => linkedItemsData,
+            updateFunction: jest.fn(),
+            tableSelector: '#linked-table',
+            columns: ['type', 'related_type_id'],
+            filterable: true,
+            sortable: false,
+        });
+
+        if (window.TableDataRegistry?.setFullData) {
+            window.TableDataRegistry.setFullData('linked_items__test', linkedItemsData, {
+                tableId: 'linked-table',
+                resetFiltered: true,
+            });
+        }
+
+        const result = UnifiedTableSystem.filter.apply('linked_items__test', { custom: { relatedType: 'trade' } });
+
+        expect(result).toHaveLength(1);
+        expect(result[0]).toMatchObject({ type: 'trade' });
+
+        const registryFiltered = window.TableDataRegistry?.getFilteredData
+            ? window.TableDataRegistry.getFilteredData('linked_items__test')
+            : [];
+        expect(registryFiltered).toHaveLength(1);
+        expect(registryFiltered[0]).toMatchObject({ type: 'trade' });
+    });
+
+    test('filter.clear resets filtered dataset', () => {
+        const sampleData = [
+            { id: 1, status: 'open', name: 'Alpha' },
+            { id: 2, status: 'closed', name: 'Beta' }
+        ];
+        tableConfig.dataGetter.mockReturnValue(sampleData);
+        if (window.TableDataRegistry?.setFullData) {
+            window.TableDataRegistry.setFullData('test_table', sampleData, { resetFiltered: false });
+            window.TableDataRegistry.setFilteredData('test_table', [sampleData[0]], { filterContext: { status: ['open'] } });
+        }
+
+        const cleared = UnifiedTableSystem.filter.clear('test_table');
+
+        expect(cleared).toEqual(sampleData);
+        const registryFiltered = window.TableDataRegistry?.getFilteredData
+            ? window.TableDataRegistry.getFilteredData('test_table')
+            : [];
+        expect(registryFiltered).toEqual(sampleData);
     });
 
     test('renderTable uses renderer to update table', () => {
@@ -174,11 +305,20 @@ describe('Unified Table System', () => {
         expect(updateFn).toHaveBeenCalledWith(data, expect.any(Object));
     });
 
-    test('state manager saves and loads table state from localStorage', () => {
+    test('state manager saves and loads table state from localStorage', async () => {
         const state = { page: 2, sort: { columnIndex: 1, direction: 'desc' } };
-        UnifiedTableSystem.state.save('test_table', state);
+        await UnifiedTableSystem.state.save('test_table', state);
+        expect(window.UnifiedCacheManager).toBeDefined();
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledTimes(1);
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledWith(
+            'tableState_test_table',
+            state,
+            expect.objectContaining({ layer: 'localStorage' })
+        );
 
-        const loaded = UnifiedTableSystem.state.load('test_table');
+        expect(cachedState).toEqual(state);
+
+        const loaded = await UnifiedTableSystem.state.load('test_table');
         expect(loaded).toEqual(state);
     });
 });

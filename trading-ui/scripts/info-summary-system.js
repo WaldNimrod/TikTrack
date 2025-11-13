@@ -415,6 +415,44 @@ class InfoSummarySystem {
     }
   }
 
+  _getRegistryData(config) {
+    if (!config || typeof config.tableType !== 'string') {
+      return { available: false, data: null };
+    }
+    if (!window.TableDataRegistry) {
+      return { available: false, data: null };
+    }
+    const summary = window.TableDataRegistry.getSummary(config.tableType);
+    if (!summary) {
+      return { available: false, data: null };
+    }
+    const filtered = window.TableDataRegistry.getFilteredData(config.tableType, { asReference: false });
+    if (Array.isArray(filtered)) {
+      return { available: true, data: filtered };
+    }
+    return { available: true, data: [] };
+  }
+
+  _resolveDataSource(data, config) {
+    const registry = this._getRegistryData(config);
+    if (registry.available) {
+      return Array.isArray(registry.data) ? registry.data : [];
+    }
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (config && typeof config.tableType === 'string' && window.TableDataRegistry) {
+      const fullData = window.TableDataRegistry.getFullData(config.tableType, { asReference: false });
+      if (Array.isArray(fullData)) {
+        return fullData;
+      }
+    }
+
+    return Array.isArray(data) ? data : [];
+  }
+
   /**
    * Main method: Calculate and render summary statistics
    * @param {Array} data - The data array
@@ -422,9 +460,16 @@ class InfoSummarySystem {
    * @returns {Promise<void>}
    */
   async calculateAndRender(data, config) {
-    console.log('🔍 InfoSummarySystem.calculateAndRender called with:', { dataLength: data?.length, statsCount: config?.stats?.length, containerId: config?.containerId });
+    const dataset = this._resolveDataSource(data, config);
+    console.log('🔍 InfoSummarySystem.calculateAndRender called with:', {
+      providedDataLength: Array.isArray(data) ? data.length : null,
+      resolvedDataLength: Array.isArray(dataset) ? dataset.length : null,
+      statsCount: config?.stats?.length,
+      containerId: config?.containerId,
+      tableType: config?.tableType || null,
+    });
     
-    if (!data || !Array.isArray(data)) {
+    if (!Array.isArray(dataset)) {
       console.warn('Invalid data provided to InfoSummarySystem');
       return;
     }
@@ -437,7 +482,7 @@ class InfoSummarySystem {
     try {
       // Calculate statistics (now async to support async calculators)
       console.log('⚙️ Calculating stats from data...');
-      const stats = await this.calculateStatsFromData(data, config.stats);
+      const stats = await this.calculateStatsFromData(dataset, config.stats);
       console.log('✅ Stats calculated:', stats);
       
       // Render the summary

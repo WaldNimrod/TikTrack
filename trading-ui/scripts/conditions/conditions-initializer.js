@@ -42,12 +42,12 @@ class ConditionsInitializer {
      */
     async initialize() {
         if (this.isInitialized) {
-            console.log('🔧 Conditions system already initialized');
+            window.Logger?.info('🔧 Conditions system already initialized', { page: 'conditions-initializer' });
             return true;
         }
         
         try {
-            console.log('🚀 Initializing Conditions System...');
+            window.Logger?.info('🚀 Initializing Conditions System...', { page: 'conditions-initializer' });
             
             // Check dependencies
             await this.checkDependencies();
@@ -62,12 +62,12 @@ class ConditionsInitializer {
             this.registerWithUnifiedSystem();
             
             this.isInitialized = true;
-            console.log('✅ Conditions System initialized successfully');
+            window.Logger?.info('✅ Conditions System initialized successfully', { page: 'conditions-initializer' });
             
             return true;
             
         } catch (error) {
-            console.error('❌ Failed to initialize Conditions System:', error);
+            window.Logger?.error('❌ Failed to initialize Conditions System', { error: error?.message, stack: error?.stack }, { page: 'conditions-initializer' });
             return false;
         }
     }
@@ -79,7 +79,7 @@ class ConditionsInitializer {
      * @returns {Promise<void>}
      */
     async checkDependencies() {
-        console.log('🔍 Checking Conditions System dependencies...');
+        window.Logger?.info('🔍 Checking Conditions System dependencies...', { page: 'conditions-initializer' });
         
         const missingDependencies = [];
         
@@ -93,7 +93,7 @@ class ConditionsInitializer {
             throw new Error(`Missing dependencies: ${missingDependencies.join(', ')}`);
         }
         
-        console.log('✅ All dependencies loaded');
+        window.Logger?.info('✅ All dependencies loaded', { page: 'conditions-initializer' });
     }
     
     /**
@@ -119,12 +119,12 @@ class ConditionsInitializer {
      * @returns {Promise<void>}
      */
     async initializeComponents() {
-        console.log('🔧 Initializing Conditions System components...');
+        window.Logger?.info('🔧 Initializing Conditions System components...', { page: 'conditions-initializer' });
         
         // Initialize translations
         if (window.conditionsTranslations) {
             this.components.translations = window.conditionsTranslations;
-            console.log('✅ Translations component initialized');
+            window.Logger?.info('✅ Translations component initialized', { page: 'conditions-initializer' });
         } else {
             throw new Error('Translations component not available');
         }
@@ -132,7 +132,7 @@ class ConditionsInitializer {
         // Initialize validator
         if (window.conditionsValidator) {
             this.components.validator = window.conditionsValidator;
-            console.log('✅ Validator component initialized');
+            window.Logger?.info('✅ Validator component initialized', { page: 'conditions-initializer' });
         } else {
             throw new Error('Validator component not available');
         }
@@ -140,7 +140,7 @@ class ConditionsInitializer {
         // Initialize CRUD manager
         if (window.conditionsCRUDManager) {
             this.components.crudManager = window.conditionsCRUDManager;
-            console.log('✅ CRUD Manager component initialized');
+            window.Logger?.info('✅ CRUD Manager component initialized', { page: 'conditions-initializer' });
         } else {
             throw new Error('CRUD Manager component not available');
         }
@@ -148,7 +148,7 @@ class ConditionsInitializer {
         // Initialize form generator
         if (window.conditionsFormGenerator) {
             this.components.formGenerator = window.conditionsFormGenerator;
-            console.log('✅ Form Generator component initialized');
+            window.Logger?.info('✅ Form Generator component initialized', { page: 'conditions-initializer' });
         } else {
             throw new Error('Form Generator component not available');
         }
@@ -160,7 +160,7 @@ class ConditionsInitializer {
      * @returns {void}
      */
     setupGlobalAccess() {
-        console.log('🌐 Setting up global access...');
+        window.Logger?.info('🌐 Setting up global access...', { page: 'conditions-initializer' });
         
         // Make components globally accessible
         window.conditionsSystem = {
@@ -200,7 +200,7 @@ class ConditionsInitializer {
             return this.components.formGenerator.generateConditionForm(containerId, options);
         };
         
-        console.log('✅ Global access configured');
+        window.Logger?.info('✅ Global access configured', { page: 'conditions-initializer' });
     }
     
     /**
@@ -209,7 +209,7 @@ class ConditionsInitializer {
      * @returns {void}
      */
     registerWithUnifiedSystem() {
-        console.log('📋 Registering with Unified Initialization System...');
+        window.Logger?.info('📋 Registering with Unified Initialization System...', { page: 'conditions-initializer' });
         
         // Register as a system component
         if (window.unifiedAppInitializer) {
@@ -223,7 +223,7 @@ class ConditionsInitializer {
             });
         }
         
-        console.log('✅ Registered with Unified Initialization System');
+        window.Logger?.info('✅ Registered with Unified Initialization System', { page: 'conditions-initializer' });
     }
     
     /**
@@ -253,7 +253,7 @@ class ConditionsInitializer {
      */
     getComponent(componentName) {
         if (!this.isInitialized) {
-            console.warn('Conditions System not initialized');
+            window.Logger?.warn('Conditions System not initialized', { page: 'conditions-initializer' });
             return null;
         }
         
@@ -266,7 +266,7 @@ class ConditionsInitializer {
      * @returns {void}
      */
     reset() {
-        console.log('🔄 Resetting Conditions System...');
+        window.Logger?.info('🔄 Resetting Conditions System...', { page: 'conditions-initializer' });
         
         this.isInitialized = false;
         this.components = {
@@ -281,7 +281,7 @@ class ConditionsInitializer {
             delete window.conditionsSystem;
         }
         
-        console.log('✅ Conditions System reset');
+        window.Logger?.info('✅ Conditions System reset', { page: 'conditions-initializer' });
     }
     
     /**
@@ -318,6 +318,7 @@ class ConditionsInitializer {
 }
 
 // Create global instance
+window.ConditionsInitializer = ConditionsInitializer;
 window.conditionsInitializer = new ConditionsInitializer();
 
 // Auto-initialize when DOM is ready

@@ -137,6 +137,18 @@ SELECT id, username, preferences FROM users WHERE id = 1;
 ```
 **תוצאה**: ✅ העדפות JSON נשמרות בבסיס הנתונים
 
+#### 4. בדיקות טריגרים אוטומטיות
+```bash
+python3 -m pytest Backend/tests/test_db_trigger_conflicts.py
+```
+**תוצאה**: ✅ אימות של כל טריגרי ה-SQLite (סטטוס טיקר, הגנות מטבע/חשבונות, גשר entity_relation_types) על-גבי סכמה נקייה שנוצרת דרך `create_clean_database`.
+
+#### 5. תרחיש SQL ידני לאימות טריגרים
+```bash
+sqlite3 Backend/db/simpleTrade_new.db < Backend/tools/db_trigger_validation.sql
+```
+**תוצאה**: ✅ סקריפט טרנזאקציוני שרץ ללא שינוי נתונים קבוע, כולל הוראות לביצוע ידני של טריגרי ההגנה (מעדכן/מוחק מטבע בסיס, מחיקת חשבון אחרון).
+
 ## בדיקות איכות קוד
 
 ### בדיקת כפילויות

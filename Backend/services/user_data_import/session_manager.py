@@ -10,7 +10,7 @@ Last Updated: 2025-01-27
 """
 
 from typing import Dict, Any, Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import logging
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -77,7 +77,7 @@ class ImportSessionManager:
                 file_size=file_size,
                 file_hash=file_hash,
                 status='created',
-                created_at=datetime.now()
+                created_at=datetime.now(timezone.utc)
             )
             
             self.db_session.add(session)
@@ -144,14 +144,13 @@ class ImportSessionManager:
                 return False
             
             old_status = session.status
-            session.status = status
-            
-            # Update timestamps based on status
-            if status == 'completed':
-                session.completed_at = datetime.now()
-            elif status == 'failed' and error_message:
+            status_changed = session.update_status(status)
+            if not status_changed and old_status != status:
+                return False
+
+            if status == 'failed' and error_message:
                 session.add_summary_data({'error_message': error_message})
-            
+
             self.db_session.commit()
             
             logger.info(f"✅ Updated session {session_id} status: {old_status} → {status}")

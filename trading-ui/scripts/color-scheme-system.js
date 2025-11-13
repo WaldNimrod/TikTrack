@@ -27,8 +27,19 @@
 ];
 
 // ===== COLOR DEFINITIONS =====
+const BRAND_PRIMARY = '#26baac';
+const BRAND_PRIMARY_TEXT = '#1a8f83';
+const BRAND_PRIMARY_LIGHT = '#6ed8ca';
+const BRAND_PRIMARY_BG = 'rgba(38, 186, 172, 0.1)';
+const BRAND_PRIMARY_BORDER = 'rgba(38, 186, 172, 0.3)';
+const BRAND_SECONDARY = '#fc5a06';
+const BRAND_SECONDARY_TEXT = '#d24d05';
+const BRAND_SECONDARY_LIGHT = '#ffb17a';
+const BRAND_SECONDARY_BG = 'rgba(252, 90, 6, 0.12)';
+const BRAND_SECONDARY_BORDER = 'rgba(252, 90, 6, 0.3)';
+
 const ENTITY_COLORS = {
-  trade: '#007bff',
+  trade: BRAND_PRIMARY,
   trade_plan: '#28a745',
   execution: '#17a2b8',
   account: '#6f42c1',
@@ -41,12 +52,12 @@ const ENTITY_COLORS = {
   design: '#6f42c1',
   research: '#17a2b8',
   preference: '#adb5bd',
-  development: '#26baac',
+  development: BRAND_SECONDARY,
   position: '#0d6efd'
 };
 
 const ENTITY_BACKGROUND_COLORS = {
-  trade: 'rgba(0, 123, 255, 0.1)',
+  trade: BRAND_PRIMARY_BG,
   trade_plan: 'rgba(40, 167, 69, 0.1)',
   execution: 'rgba(23, 162, 184, 0.1)',
   account: 'rgba(111, 66, 193, 0.1)',
@@ -59,12 +70,12 @@ const ENTITY_BACKGROUND_COLORS = {
   design: 'rgba(111, 66, 193, 0.1)',
   research: 'rgba(23, 162, 184, 0.1)',
   preference: 'rgba(173, 181, 189, 0.1)',
-  development: 'rgba(38, 186, 172, 0.1)',
+  development: BRAND_SECONDARY_BG,
   position: 'rgba(13, 110, 253, 0.12)'
 };
 
 const ENTITY_TEXT_COLORS = {
-  trade: '#0056b3',
+  trade: BRAND_PRIMARY_TEXT,
   trade_plan: '#1e7e34',
   execution: '#117a8b',
   account: '#59359a',
@@ -77,12 +88,12 @@ const ENTITY_TEXT_COLORS = {
   design: '#59359a',
   research: '#117a8b',
   preference: '#6c757d',
-  development: '#1a8f83',
+  development: BRAND_SECONDARY_TEXT,
   position: '#0b5ed7'
 };
 
 const ENTITY_BORDER_COLORS = {
-  trade: 'rgba(0, 123, 255, 0.3)',
+  trade: BRAND_PRIMARY_BORDER,
   trade_plan: 'rgba(40, 167, 69, 0.3)',
   execution: 'rgba(23, 162, 184, 0.3)',
   account: 'rgba(111, 66, 193, 0.3)',
@@ -95,12 +106,12 @@ const ENTITY_BORDER_COLORS = {
   design: 'rgba(111, 66, 193, 0.3)',
   research: 'rgba(23, 162, 184, 0.3)',
   preference: 'rgba(173, 181, 189, 0.3)',
-  development: 'rgba(38, 186, 172, 0.3)',
+  development: BRAND_SECONDARY_BORDER,
   position: 'rgba(13, 110, 253, 0.3)'
 };
 
 const ENTITY_LIGHT_COLORS = {
-  trade: '#cce5ff',
+  trade: BRAND_PRIMARY_LIGHT,
   trade_plan: '#c3e6cb',
   execution: '#bee5eb',
   account: '#e2d9f3',
@@ -113,12 +124,12 @@ const ENTITY_LIGHT_COLORS = {
   design: '#e2d9f3',
   research: '#bee5eb',
   preference: 'rgba(173, 181, 189, 0.1)',
-  development: '#6ed8ca',
+  development: BRAND_SECONDARY_LIGHT,
   position: '#d7e3ff'
 };
 
 const ENTITY_DARK_COLORS = {
-  trade: '#004085',
+  trade: BRAND_PRIMARY_TEXT,
   trade_plan: '#155724',
   execution: '#0c5460',
   account: '#383d41',
@@ -131,7 +142,7 @@ const ENTITY_DARK_COLORS = {
   design: '#383d41',
   research: '#0c5460',
   preference: '#6c757d',
-  development: '#1a8f83',
+  development: BRAND_SECONDARY_TEXT,
   position: '#0a58ca'
 };
 
@@ -149,9 +160,9 @@ const STATUS_COLORS = {
 
 const INVESTMENT_TYPE_COLORS = {
   swing: {
-    medium: '#007bff',
-    light: 'rgba(0, 123, 255, 0.1)',
-    border: 'rgba(0, 123, 255, 0.3)'
+    medium: BRAND_PRIMARY,
+    light: BRAND_PRIMARY_BG,
+    border: BRAND_PRIMARY_BORDER
   },
   day: {
     medium: '#28a745',
@@ -620,8 +631,8 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
 
 function applyLightScheme() {
   // Apply light theme colors
-  document.documentElement.style.setProperty('--primary-color', '#007bff');
-  document.documentElement.style.setProperty('--secondary-color', '#6c757d');
+  document.documentElement.style.setProperty('--primary-color', BRAND_PRIMARY);
+  document.documentElement.style.setProperty('--secondary-color', BRAND_SECONDARY);
   document.documentElement.style.setProperty('--success-color', '#28a745');
   document.documentElement.style.setProperty('--danger-color', '#dc3545');
   document.documentElement.style.setProperty('--warning-color', '#ffc107');
@@ -630,8 +641,8 @@ function applyLightScheme() {
 
 function applyDarkScheme() {
   // Apply dark theme colors
-  document.documentElement.style.setProperty('--primary-color', '#0d6efd');
-  document.documentElement.style.setProperty('--secondary-color', '#6c757d');
+  document.documentElement.style.setProperty('--primary-color', BRAND_PRIMARY_TEXT);
+  document.documentElement.style.setProperty('--secondary-color', BRAND_SECONDARY_TEXT);
   document.documentElement.style.setProperty('--success-color', '#198754');
   document.documentElement.style.setProperty('--danger-color', '#dc3545');
   document.documentElement.style.setProperty('--warning-color', '#ffc107');
@@ -757,6 +768,48 @@ async function setCurrentEntityColorFromPage() {
   }
 }
 
+async function setCurrentEntityColorForEntity(entityType, options = {}) {
+  try {
+    if (!entityType || !isValidEntityType(entityType)) {
+      window.Logger?.warn('⚠️ setCurrentEntityColorForEntity: invalid entity type', {
+        entityType,
+        page: 'color-scheme'
+      });
+      return;
+    }
+
+    await getEntityColorFromPreferences(entityType);
+
+    const primary = getEntityColor(entityType);
+    const light =
+      ENTITY_LIGHT_COLORS[entityType] ||
+      (primary ? lightenColor(primary, 10) : '');
+    const dark =
+      ENTITY_DARK_COLORS[entityType] ||
+      (primary ? darkenColor(primary, 20) : '');
+
+    if (primary) {
+      document.documentElement.style.setProperty('--current-entity-color', primary);
+    }
+    if (light) {
+      document.documentElement.style.setProperty('--current-entity-color-light', light);
+    }
+    if (dark) {
+      document.documentElement.style.setProperty('--current-entity-color-dark', dark);
+    }
+
+    if (options.updateHeaders !== false && typeof window.applyEntityColorsToHeaders === 'function') {
+      window.applyEntityColorsToHeaders(entityType, options.excludeWarningModals !== false);
+    }
+  } catch (error) {
+    window.Logger?.error('❌ setCurrentEntityColorForEntity failed', {
+      error,
+      entityType,
+      page: 'color-scheme'
+    });
+  }
+}
+
 function findPageClass(body) {
   const classList = Array.from(body.classList);
   return classList.find(cls => cls.endsWith('-page'));
@@ -784,6 +837,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias
+  'data-import-page': 'cash_flow',
   
   // עמודי כלי פיתוח - כולם מקבלים צבע development
   'development-page': 'development',
@@ -1123,6 +1177,73 @@ function updateEntityColors(preferences) {
 
 function updateCSSVariablesFromPreferences(preferences) {
   try {
+    const setVar = (name, value) => {
+      if (typeof value === 'string' && value.trim() !== '') {
+        document.documentElement.style.setProperty(name, value);
+      }
+    };
+
+    const computeVariant = (base, fallback, variant) => {
+      if (fallback) {
+        return fallback;
+      }
+      if (!base || typeof base !== 'string') {
+        return null;
+      }
+      try {
+        if (variant === 'light') {
+          return lightenColor(base, 25);
+        }
+        if (variant === 'dark') {
+          return darkenColor(base, 20);
+        }
+        if (variant === 'border') {
+          return lightenColor(base, 35);
+        }
+      } catch (variantError) {
+        if (window.Logger) {
+          window.Logger.warn('⚠️ Failed to compute color variant', { base, variant, error: variantError }, { page: "color-scheme" });
+        }
+      }
+      return null;
+    };
+
+    const applyNumericPalette = (key, tokens = {}, semanticBase = null) => {
+      const medium = tokens.medium;
+      const light = computeVariant(medium, tokens.light, 'light');
+      const dark = computeVariant(medium, tokens.dark, 'dark');
+      const border = computeVariant(medium, tokens.border, 'border') || medium;
+
+      setVar(`--numeric-${key}-medium`, medium);
+      setVar(`--numeric-${key}-light`, light);
+      setVar(`--numeric-${key}-dark`, dark);
+      setVar(`--numeric-${key}-border`, border);
+
+      if (semanticBase) {
+        setVar(`--color-${semanticBase}`, medium);
+        setVar(`--color-${semanticBase}-light`, light);
+        setVar(`--color-${semanticBase}-dark`, dark);
+        setVar(`--color-${semanticBase}-border`, border);
+        setVar(`--color-${semanticBase}-bg`, light || medium);
+      }
+    };
+
+    const applyThemeColor = (baseName, color, variants = {}) => {
+      if (!color || typeof color !== 'string') {
+        return;
+      }
+      const medium = color;
+      const light = computeVariant(medium, variants.light, 'light');
+      const dark = computeVariant(medium, variants.dark, 'dark');
+      const border = computeVariant(medium, variants.border, 'border') || medium;
+
+      setVar(`--color-${baseName}`, medium);
+      setVar(`--color-${baseName}-light`, light);
+      setVar(`--color-${baseName}-dark`, dark);
+      setVar(`--color-${baseName}-border`, border);
+      setVar(`--color-${baseName}-bg`, light || medium);
+    };
+
     if (preferences && preferences.colorScheme) {
       // Update CSS variables based on preferences
       if (preferences.colorScheme.entities) {
@@ -1151,6 +1272,62 @@ function updateCSSVariablesFromPreferences(preferences) {
           document.documentElement.style.setProperty(`--user-status-${statusType}-border`, borderColor);
         });
       }
+
+      if (preferences.colorScheme.numericValues) {
+        const numericValues = preferences.colorScheme.numericValues;
+
+        const positiveTokens = {
+          medium: preferences.valuePositiveColor || numericValues.positive?.medium,
+          light: preferences.valuePositiveColorLight || numericValues.positive?.light,
+          dark: preferences.valuePositiveColorDark || numericValues.positive?.dark,
+          border: numericValues.positive?.border
+        };
+        applyNumericPalette('positive', positiveTokens, 'success');
+
+        const negativeTokens = {
+          medium: preferences.valueNegativeColor || numericValues.negative?.medium,
+          light: preferences.valueNegativeColorLight || numericValues.negative?.light,
+          dark: preferences.valueNegativeColorDark || numericValues.negative?.dark,
+          border: numericValues.negative?.border
+        };
+        applyNumericPalette('negative', negativeTokens, 'danger');
+
+        const zeroTokens = {
+          medium: preferences.valueNeutralColor || numericValues.zero?.medium,
+          light: preferences.valueNeutralColorLight || numericValues.zero?.light,
+          dark: preferences.valueNeutralColorDark || numericValues.zero?.dark,
+          border: numericValues.zero?.border
+        };
+        applyNumericPalette('zero', zeroTokens, 'neutral');
+      }
+    }
+
+    // Theme-level semantic colors (warning/info/success/danger overrides)
+    const successOverride = preferences.successColor || preferences.valuePositiveColor;
+    const dangerOverride = preferences.dangerColor || preferences.valueNegativeColor;
+    const warningOverride = preferences.warningColor;
+    const infoOverride = preferences.infoColor || preferences.primaryColor || (preferences.colorScheme && preferences.colorScheme.entities && preferences.colorScheme.entities.info);
+
+    if (successOverride) {
+      applyThemeColor('success', successOverride, {
+        light: preferences.valuePositiveColorLight,
+        dark: preferences.valuePositiveColorDark
+      });
+    }
+
+    if (dangerOverride) {
+      applyThemeColor('danger', dangerOverride, {
+        light: preferences.valueNegativeColorLight,
+        dark: preferences.valueNegativeColorDark
+      });
+    }
+
+    if (warningOverride) {
+      applyThemeColor('warning', warningOverride);
+    }
+
+    if (infoOverride) {
+      applyThemeColor('info', infoOverride);
     }
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error updating CSS variables from preferences:', error, { page: "color-scheme" }); }
@@ -1256,6 +1433,7 @@ window.generateNumericValueCSS = generateNumericValueCSS;
 
 window.loadDynamicColors = loadDynamicColors;
 window.setCurrentEntityColorFromPage = setCurrentEntityColorFromPage;
+window.setCurrentEntityColorForEntity = setCurrentEntityColorForEntity;
 window.getEntityColorFromPreferences = getEntityColorFromPreferences;
 window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromPreferences;
 
@@ -1288,7 +1466,7 @@ function getTableColors() {
     success: ENTITY_COLORS.account || '#28a745',
     warning: ENTITY_COLORS.alert || '#ffc107',
     info: ENTITY_COLORS.execution || '#17a2b8',
-    primary: ENTITY_COLORS.trade || '#007bff',
+    primary: ENTITY_COLORS.trade || BRAND_PRIMARY,
   };
 }
 
@@ -1308,7 +1486,7 @@ function getTableColorsWithFallbacks() {
     success: colors.success || '#28a745',
     warning: colors.warning || '#ffc107',
     info: colors.info || '#17a2b8',
-    primary: colors.primary || '#007bff',
+    primary: colors.primary || BRAND_PRIMARY,
   };
 }
 

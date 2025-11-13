@@ -960,22 +960,22 @@ async function <span class="fstat-no" title="function not covered" >loadAllTable
   
   // API endpoints and their corresponding container IDs
   const tables = <span class="cstat-no" title="statement not covered" >[</span>
-    { api: 'constraints', container: 'constraintsContainer' },
-    { api: 'currencies', container: 'currenciesContainer' },
-    { api: 'preference_groups', container: 'preferenceGroupsContainer' },
-    { api: 'system_setting_groups', container: 'systemSettingGroupsContainer' },
-    { api: 'external_data_providers', container: 'externalDataProvidersContainer' },
-    { api: 'quotes_last', container: 'quotesLastContainer' },
-    { api: 'plan_conditions', container: 'planConditionsContainer' },
-    { api: 'user_preferences', container: 'userPreferencesContainer' }
+    { type: 'constraints', apiSlug: 'constraints', container: 'constraintsContainer' },
+    { type: 'currencies', apiSlug: 'currencies', container: 'currenciesContainer' },
+    { type: 'preference_groups', apiSlug: 'preference-groups', container: 'preferenceGroupsContainer' },
+    { type: 'system_setting_groups', apiSlug: 'system-setting-groups', container: 'systemSettingGroupsContainer' },
+    { type: 'external_data_providers', apiSlug: 'external-data-providers', container: 'externalDataProvidersContainer' },
+    { type: 'quotes_last', apiSlug: 'quotes-last', container: 'quotesLastContainer' },
+    { type: 'plan_conditions', apiSlug: 'plan-conditions', container: 'planConditionsContainer' },
+    { type: 'user_preferences', apiSlug: 'user-preferences', container: 'userPreferencesContainer' }
   ];
   
 <span class="cstat-no" title="statement not covered" >  totalRecords = 0;</span>
   
 <span class="cstat-no" title="statement not covered" >  for (const table of tables) {</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      console.log(`📊 Loading ${table.api}...`);</span>
-<span class="cstat-no" title="statement not covered" >      await loadTableData(table.api, table.container);</span>
+<span class="cstat-no" title="statement not covered" >      console.log(`📊 Loading ${table.type} (API: ${table.apiSlug})...`);</span>
+<span class="cstat-no" title="statement not covered" >      await loadTableData(table.type, table.apiSlug, table.container);</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      console.error(`Error loading ${table.api}:`, error);</span>
     }
@@ -993,7 +993,7 @@ async function <span class="fstat-no" title="function not covered" >loadAllTable
  * @param {string} tableType - The table type to load
  * @param {string} containerId - The container ID for the table
  */
-async function <span class="fstat-no" title="function not covered" >loadTableData(</span>tableType, containerId) {
+async function <span class="fstat-no" title="function not covered" >loadTableData(</span>tableType, apiSlug, containerId) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`📊 Loading data for table type: ${tableType}`);</span>
 &nbsp;
@@ -1001,7 +1001,7 @@ async function <span class="fstat-no" title="function not covered" >loadTableDat
 <span class="cstat-no" title="statement not covered" >    showLoadingState(tableType);</span>
 &nbsp;
     // Fetch data from server
-    const data = <span class="cstat-no" title="statement not covered" >await fetchTableData(tableType);</span>
+    const data = <span class="cstat-no" title="statement not covered" >await fetchTableData(apiSlug);</span>
 &nbsp;
     // Store data
 <span class="cstat-no" title="statement not covered" >    tableData[tableType] = data;</span>
@@ -1030,17 +1030,17 @@ async function <span class="fstat-no" title="function not covered" >loadTableDat
  * @param {string} tableType - The table type to fetch
  * @returns {Array} The table data
  */
-async function <span class="fstat-no" title="function not covered" >fetchTableData(</span>tableType) {
-<span class="cstat-no" title="statement not covered" >  console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);</span>
+async function <span class="fstat-no" title="function not covered" >fetchTableData(</span>apiSlug) {
+<span class="cstat-no" title="statement not covered" >  console.log(`🌐 Fetching data from /api/${apiSlug}/`);</span>
   
-  const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/${tableType}/`);</span>
+  const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/${apiSlug}/`);</span>
   
 <span class="cstat-no" title="statement not covered" >  if (!response.ok) {</span>
 <span class="cstat-no" title="statement not covered" >    throw new Error(`HTTP error! status: ${response.status}`);</span>
   }
   
   const result = <span class="cstat-no" title="statement not covered" >await response.json();</span>
-<span class="cstat-no" title="statement not covered" >  console.log(`📥 Received response for ${tableType}:`, result);</span>
+<span class="cstat-no" title="statement not covered" >  console.log(`📥 Received response for ${apiSlug}:`, result);</span>
   
 <span class="cstat-no" title="statement not covered" >  if (result.data &amp;&amp; Array.isArray(result.data)) {</span>
 <span class="cstat-no" title="statement not covered" >    return result.data;</span>
@@ -1357,7 +1357,7 @@ function <span class="fstat-no" title="function not covered" >toggleSection(</sp
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.024Z
+                at 2025-11-12T23:38:03.562Z
             </div>
         <script src="../prettify.js"></script>
         <script>

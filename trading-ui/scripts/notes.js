@@ -113,7 +113,13 @@ window.loadNotesData = async function() {
     window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "notes" });
 
     // שמירת הנתונים במשתנה גלובלי
-    window.notesData = data.data || data;
+    const rawNotes = data?.data || data;
+    window.notesData = Array.isArray(rawNotes)
+      ? rawNotes.map(note => ({
+          ...note,
+          updated_at: note.updated_at || note.modified_at || note.created_at || null
+        }))
+      : [];
     window.Logger.info('💾 נתונים נשמרו ב-window.notesData:', window.notesData.length, 'הערות', { page: "notes" });
 
     // עדכון הטבלה
@@ -481,14 +487,14 @@ function updateNotesTable(notes) {
       // בדיקה שהנתונים קיימים
       if (!notes || !Array.isArray(notes)) {
         window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">אין הערות להצגה</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
         return;
       }
 
       if (notes.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="text-center text-muted">
+            <td colspan="6" class="text-center text-muted">
             <div style="padding: 20px;">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
@@ -704,6 +710,25 @@ function updateNotesTable(notes) {
             <td>${contentDisplay}</td>
             <td data-date='${dateSortValue}'>${dateDisplay}</td>
             <td>${attachmentDisplay}</td>
+            ${(() => {
+              if (typeof window.renderUpdatedCell === 'function') {
+                return window.renderUpdatedCell(note, {
+                  fields: ['updated_at', 'created_at'],
+                  columnClass: 'col-updated'
+                });
+              }
+              const fallbackDate = window.toDateObject
+                ? window.toDateObject(note.updated_at || note.created_at)
+                : (note.updated_at || note.created_at ? new Date(note.updated_at || note.created_at) : null);
+              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+              const absolute = fallbackDate.toLocaleString('he-IL');
+              const duration = typeof window.getDurationSince === 'function'
+                ? window.getDurationSince(fallbackDate, { fallback: absolute })
+                : absolute;
+              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+            })()}
             <td class='actions-cell'>
               ${(() => {
                 if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
@@ -1163,53 +1188,54 @@ function _REMOVED_validateEditNoteForm(content, relationType, relatedId, attachm
 
 // פונקציות שמירה ומחיקה
 async function saveNote() {
-  // ניקוי מטמון לפני פעולת CRUD
-  // הערה: CRUDResponseHandler מטפל בניקוי מטמון אוטומטית, אבל אם רוצים לנקות ידנית:
+  const form = document.getElementById('notesModalForm') || document.getElementById('addNoteForm');
+  if (!form) {
+    window.Logger?.warn('⚠️ Notes form not found - aborting save', { page: 'notes' });
+    return;
+  }
+
   if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
     await window.UnifiedCacheManager.remove('notes');
   }
-  
-  // שימוש ב-DataCollectionService לאיסוף נתונים
+
   const noteData = DataCollectionService.collectFormData({
     content: { id: 'noteContent', type: 'rich-text' }, // Rich text editor - returns HTML
     related_type_id: { id: 'noteRelatedType', type: 'text' },
-    related_id: { id: 'noteRelatedObject', type: 'int' }
+    related_id: { id: 'noteRelatedObject', type: 'int' },
+    tag_ids: { id: 'noteTags', type: 'tags', default: [] }
   });
 
   const content = noteData.content || ''; // HTML content from rich text editor
   const related_type_id = noteData.related_type_id;
   const related_id = noteData.related_id;
+  const tagIds = Array.isArray(noteData.tag_ids) ? noteData.tag_ids : [];
   const attachmentFile = document.getElementById('noteAttachment')?.files[0];
 
-  // ולידציה בסיסית
-  // Check if content is empty (after stripping HTML tags for validation)
   const textContent = content.replace(/<[^>]*>/g, '').trim();
   if (!textContent || textContent.length === 0) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'תוכן ההערה חובה');
-    }
+    window.showErrorNotification?.('שגיאה', 'תוכן ההערה חובה');
     return;
   }
 
   if (!related_type_id || !related_id) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'יש לבחור סוג אובייקט ואובייקט מקושר');
-    }
+    window.showErrorNotification?.('שגיאה', 'יש לבחור סוג אובייקט ואובייקט מקושר');
     return;
   }
 
-  // Check content length (HTML can be longer than plain text)
   if (content.length > 10000) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'תוכן ההערה לא יכול להיות יותר מ-10000 תווים');
-    }
+    window.showErrorNotification?.('שגיאה', 'תוכן ההערה לא יכול להיות יותר מ-10000 תווים');
     return;
   }
+
+  const isEditMode = form.dataset.mode === 'edit';
+  const formEntityId = form.dataset.entityId || form.dataset.noteId || form.querySelector('input[name="id"]')?.value || null;
+  const noteId = isEditMode && formEntityId ? parseInt(formEntityId, 10) : null;
+  const method = noteId ? 'PUT' : 'POST';
+  const url = noteId ? `/api/notes/${noteId}` : '/api/notes/';
 
   try {
     let response;
-    
-    // אם יש קובץ מצורף, השתמש ב-FormData
+
     if (attachmentFile) {
       const formData = new FormData();
       formData.append('content', content);
@@ -1217,20 +1243,19 @@ async function saveNote() {
       formData.append('related_id', related_id);
       formData.append('attachment', attachmentFile);
 
-      response = await fetch('/api/notes/', {
-        method: 'POST',
+      response = await fetch(url, {
+        method,
         body: formData
       });
     } else {
-      // אחרת, השתמש ב-JSON
       const requestData = {
         content,
         related_type_id: parseInt(related_type_id),
         related_id: parseInt(related_id)
       };
 
-      response = await fetch('/api/notes/', {
-        method: 'POST',
+      response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1238,14 +1263,38 @@ async function saveNote() {
       });
     }
 
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
-      modalId: 'notesModal',
-      successMessage: 'הערה נשמרה בהצלחה!',
-      entityName: 'הערה',
-      reloadFn: window.loadNotesData,
-      requiresHardReload: false
-    });
+    let crudResult = null;
+    if (noteId) {
+      crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+        modalId: 'notesModal',
+        successMessage: 'הערה עודכנה בהצלחה!',
+        entityName: 'הערה',
+        reloadFn: window.loadNotesData,
+        requiresHardReload: false
+      });
+    } else {
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+        modalId: 'notesModal',
+        successMessage: 'הערה נשמרה בהצלחה!',
+        entityName: 'הערה',
+        reloadFn: window.loadNotesData,
+        requiresHardReload: false
+      });
+    }
+
+    const resolvedNoteId = noteId || Number(crudResult?.data?.id || crudResult?.id);
+    if (Number.isFinite(resolvedNoteId) && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('note', resolvedNoteId, tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update note tags', {
+          error: tagError,
+          noteId: resolvedNoteId,
+          page: 'notes'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'ההערה נשמרה אך התגיות לא עודכנו');
+      }
+    }
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת הערה');
   }
@@ -1263,13 +1312,15 @@ async function updateNoteFromModal() {
     id: { id: 'editNoteId', type: 'int' },
     content: { id: 'editNoteContent', type: 'rich-text' }, // Rich text editor
     relationType: { id: 'editNoteRelationType', type: 'text', isRadioChecked: true },
-    relatedId: { id: 'editNoteRelatedObjectSelect', type: 'int' }
+    relatedId: { id: 'editNoteRelatedObjectSelect', type: 'int' },
+    tagIds: { id: 'editNoteTags', type: 'tags', default: [] }
   });
 
   const noteId = noteData.id;
   const content = noteData.content || getEditorContent('edit'); // Use rich-text content or fallback
   const relationType = noteData.relationType;
   const relatedId = noteData.relatedId;
+  const tagIds = Array.isArray(noteData.tagIds) ? noteData.tagIds : [];
   const attachment = document.getElementById('editNoteAttachment').files[0];
 
   // בדיקה אם נדרשת מחיקת קובץ
@@ -1320,7 +1371,7 @@ async function updateNoteFromModal() {
     }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleUpdateResponse(response, {
+    const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'editNoteModal',
       successMessage: 'הערה עודכנה בהצלחה!',
       apiUrl: '/api/notes/',
@@ -1328,6 +1379,19 @@ async function updateNoteFromModal() {
       reloadFn: window.loadNotesData,
       requiresHardReload: false
     });
+
+    if (updateResult !== null && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('note', noteId, tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update note tags (legacy edit)', {
+          error: tagError,
+          noteId,
+          page: 'notes'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'ההערה עודכנה אך התגיות לא נשמרו');
+      }
+    }
 
     // ניקוי דגלים
     window.removeAttachmentFlag = false;
@@ -2464,9 +2528,13 @@ window.updateNotesTable = updateNotesTable;
  * @function showEditNoteModal
  * @param {number|string} noteId - ID of note to edit
  */
-window.showEditNoteModal = function(noteId) {
+window.showEditNoteModal = async function(noteId) {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-        window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+        await window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+        if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+            await window.TagUIManager.hydrateSelectForEntity('noteTags', 'note', noteId, { force: true });
+            await window.TagUIManager.hydrateSelectForEntity('editNoteTags', 'note', noteId, { force: true });
+        }
     } else {
         console.error('ModalManagerV2 not available');
         if (typeof window.showErrorNotification === 'function') {

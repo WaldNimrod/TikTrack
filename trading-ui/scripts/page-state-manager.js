@@ -30,6 +30,7 @@
 class PageStateManager {
   constructor() {
     this.initialized = false;
+    this.modalNavigationCacheKeyPrefix = 'modalNavigationState';
   }
 
   /**
@@ -397,6 +398,175 @@ class PageStateManager {
       }
       return false;
     }
+  }
+
+  /**
+   * שמירת מצב הניווט המודאלי (Modal Navigation)
+   * @param {Object} state - מצב הניווט { stack: Array, activeModalId: string|null }
+   * @param {Object} [options] - פרמטרים נוספים
+   * @param {string} [options.pageName] - שם העמוד (ברירת מחדל: getCurrentPageName)
+   * @returns {Promise<boolean>} הצלחת השמירה
+   */
+  async saveModalNavigationState(state, options = {}) {
+    if (!state || typeof state !== 'object' || !Array.isArray(state.stack)) {
+      window.Logger?.warn('PageStateManager.saveModalNavigationState: invalid state payload', {
+        state,
+        page: 'page-state-manager'
+      });
+      return false;
+    }
+
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    if (!window.UnifiedCacheManager) {
+      return false;
+    }
+
+    const pageName = this._resolvePageName(options.pageName);
+    const cacheKey = this._buildModalNavigationCacheKey(pageName);
+    const payload = {
+      stack: state.stack.map(entry => ({
+        modalId: entry.modalId,
+        modalType: entry.modalType || null,
+        entityType: entry.entityType || null,
+        entityId: entry.entityId ?? null,
+        title: entry.title || '',
+        sourceInfo: entry.sourceInfo || null,
+        pageName: entry.pageName || pageName,
+        parentModalId: entry.parentModalId ?? null,
+        openedAt: entry.openedAt || Date.now(),
+        metadata: entry.metadata || {}
+      })),
+      activeModalId: state.activeModalId ?? null,
+      pageName,
+      timestamp: Date.now()
+    };
+
+    try {
+      await window.UnifiedCacheManager.save(cacheKey, payload, {
+        layer: 'localStorage',
+        ttl: null,
+        syncToBackend: false
+      });
+      window.Logger?.debug('PageStateManager.saveModalNavigationState: state saved', {
+        pageName,
+        stackLength: payload.stack.length,
+        page: 'page-state-manager'
+      });
+      return true;
+    } catch (error) {
+      window.Logger?.error('PageStateManager.saveModalNavigationState: failed to persist state', error, {
+        cacheKey,
+        page: 'page-state-manager'
+      });
+      return false;
+    }
+  }
+
+  /**
+   * טעינת מצב הניווט המודאלי
+   * @param {Object} [options] - פרמטרים נוספים
+   * @param {string} [options.pageName] - שם העמוד (ברירת מחדל: getCurrentPageName)
+   * @returns {Promise<Object|null>} מצב הניווט או null אם לא נמצא
+   */
+  async loadModalNavigationState(options = {}) {
+    if (!this.initialized) {
+      await this.initialize();
+    }
+
+    if (!window.UnifiedCacheManager) {
+      return null;
+    }
+
+    const pageName = this._resolvePageName(options.pageName);
+    const cacheKey = this._buildModalNavigationCacheKey(pageName);
+
+    try {
+      const state = await window.UnifiedCacheManager.get(cacheKey, {
+        layer: 'localStorage'
+      });
+
+      if (!state || typeof state !== 'object') {
+        return null;
+      }
+
+      return {
+        stack: Array.isArray(state.stack) ? state.stack : [],
+        activeModalId: state.activeModalId ?? null,
+        pageName: state.pageName || pageName,
+        timestamp: state.timestamp || null
+      };
+    } catch (error) {
+      window.Logger?.error('PageStateManager.loadModalNavigationState: failed to load state', error, {
+        cacheKey,
+        page: 'page-state-manager'
+      });
+      return null;
+    }
+  }
+
+  /**
+   * ניקוי מצב הניווט המודאלי
+   * @param {Object} [options] - פרמטרים נוספים
+   * @param {string} [options.pageName] - שם העמוד (ברירת מחדל: getCurrentPageName)
+   * @returns {Promise<boolean>} הצלחת המחיקה
+   */
+  async clearModalNavigationState(options = {}) {
+    if (!window.UnifiedCacheManager) {
+      return false;
+    }
+
+    const pageName = this._resolvePageName(options.pageName);
+    const cacheKey = this._buildModalNavigationCacheKey(pageName);
+
+    try {
+      await window.UnifiedCacheManager.remove(cacheKey, {
+        layer: 'localStorage'
+      });
+      window.Logger?.debug('PageStateManager.clearModalNavigationState: cleared', {
+        pageName,
+        page: 'page-state-manager'
+      });
+      return true;
+    } catch (error) {
+      window.Logger?.error('PageStateManager.clearModalNavigationState: failed to clear state', error, {
+        cacheKey,
+        page: 'page-state-manager'
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Resolve page name safely
+   * @param {string|null} explicitPageName
+   * @returns {string}
+   * @private
+   */
+  _resolvePageName(explicitPageName = null) {
+    if (explicitPageName && typeof explicitPageName === 'string') {
+      return explicitPageName;
+    }
+    try {
+      if (typeof window.getCurrentPageName === 'function') {
+        return window.getCurrentPageName() || 'default';
+      }
+    } catch {
+      // ignore
+    }
+    return 'default';
+  }
+
+  /**
+   * Build cache key for modal navigation state
+   * @param {string} pageName
+   * @returns {string}
+   * @private
+   */
+  _buildModalNavigationCacheKey(pageName) {
+    return `${this.modalNavigationCacheKeyPrefix}_${pageName}`;
   }
 }
 

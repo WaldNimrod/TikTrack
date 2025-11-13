@@ -95,10 +95,13 @@
  * @param {number|string} tickerId - ID of the ticker to edit
  * @returns {void}
  */
-function editTicker(tickerId) {
+async function editTicker(tickerId) {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
+    await window.ModalManagerV2.showEditModal('tickersModal', 'ticker', tickerId);
+    if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+      await window.TagUIManager.hydrateSelectForEntity('tickerTags', 'ticker', tickerId, { force: true });
+    }
   } else {
     window.Logger?.error('ModalManagerV2 לא זמין', { page: "tickers" });
     if (typeof window.showErrorNotification === 'function') {
@@ -347,32 +350,6 @@ function getCurrencySymbol(currencyId) {
   } catch (error) {
     console.error('getCurrencySymbol failed:', error);
     return currencyId || 'N/A';
-  }
-}
-
-
-/**
- * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
- */
-function getTimeDuration(dateString) {
-  try {
-    if (!dateString) return 'N/A';
-    
-    const now = new Date();
-    const date = new Date(dateString);
-    
-    if (isNaN(date.getTime())) return 'N/A';
-    
-    const diffMs = now - date;
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
-    // פורמט אחיד: ימים:שעות:דקות
-    return `${diffDays.toString().padStart(2, '0')}:${diffHours.toString().padStart(2, '0')}:${diffMinutes.toString().padStart(2, '0')}`;
-  } catch (error) {
-    console.error('getTimeDuration failed:', error);
-    return 'N/A';
   }
 }
 
@@ -711,8 +688,11 @@ async function saveTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
-    remarks: { id: 'tickerRemarks', type: 'text' }
+    remarks: { id: 'tickerRemarks', type: 'text' },
+    tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
+  const tagIds = Array.isArray(tickerData.tag_ids) ? tickerData.tag_ids : [];
+  delete tickerData.tag_ids;
 
   const tickerId = tickerData.id ? parseInt(tickerData.id) : null;
   const symbol = tickerData.symbol?.trim().toUpperCase();
@@ -790,13 +770,26 @@ async function saveTicker() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
+    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       entityName: 'טיקר',
       reloadFn: window.loadTickersData,
       requiresHardReload: false
     });
+    const newTickerId = Number(crudResult?.data?.id || crudResult?.id);
+    if (Number.isFinite(newTickerId) && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('ticker', newTickerId, tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update ticker tags', {
+          error: tagError,
+          tickerId: newTickerId,
+          page: 'tickers'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'הטיקר נשמר אך התגיות לא עודכנו');
+      }
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת טיקר');
@@ -823,10 +816,12 @@ async function updateTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
-    remarks: { id: 'tickerRemarks', type: 'text' }
+    remarks: { id: 'tickerRemarks', type: 'text' },
+    tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
 
-  const { id, symbol, name, type, currency_id, remarks } = tickerData;
+  const { id, symbol, name, type, currency_id, remarks, tag_ids = [] } = tickerData;
+  const tagIds = Array.isArray(tag_ids) ? tag_ids : [];
   
   // קבלת הסטטוס מהטיקר הקיים (הטופס החדש לא כולל שדה סטטוס)
   const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));
@@ -982,7 +977,7 @@ async function updateTicker() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleUpdateResponse(response, {
+    const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
@@ -990,6 +985,18 @@ async function updateTicker() {
       reloadFn: window.loadTickersData,
       requiresHardReload: false
     });
+    if (updateResult !== null && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('ticker', parseInt(id, 10), tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update ticker tags', {
+          error: tagError,
+          tickerId: id,
+          page: 'tickers'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'הטיקר עודכן אך שמירת התגיות נכשלה');
+      }
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'עדכון טיקר');
@@ -1652,7 +1659,17 @@ async function loadTickersData() {
     const data = await response.json();
 
     // שמירת הנתונים
-    tickersData = data.data || data;
+    const rawTickers = data?.data || data;
+    tickersData = Array.isArray(rawTickers)
+      ? rawTickers.map(ticker => ({
+          ...ticker,
+          updated_at: ticker.updated_at
+            || ticker.yahoo_updated_at
+            || ticker.fetched_at
+            || ticker.last_updated_at
+            || null
+        }))
+      : [];
     window.tickersData = tickersData;
 
     // עדכון שדה active_trades
@@ -1769,7 +1786,6 @@ function renderTickersTableRows(tickers) {
       const priceValue = toFiniteNumber(ticker.current_price);
       const changePercentValue = toFiniteNumber(ticker.change_percent);
       const volumeValue = toFiniteNumber(ticker.volume);
-      const updatedAtDate = parseValidDate(ticker.yahoo_updated_at);
 
       const priceHtml = (typeof window.renderAmount === 'function' && priceValue !== null)
         ? window.renderAmount(priceValue, currencySymbol, 2, false)
@@ -1794,14 +1810,23 @@ function renderTickersTableRows(tickers) {
               ${statusLabel}
            </span>`;
 
-      // נתוני מחירים מהשירות החיצוני
-      const updatedAtDisplay = updatedAtDate ? updatedAtDate.toLocaleString('he-IL') : 'N/A';
-      const updatedAtIso = updatedAtDate ? updatedAtDate.toISOString().split('T')[0] : '';
-      const updatedAtCellContent = updatedAtDate
-        ? (typeof window.renderDate === 'function'
-            ? window.renderDate(updatedAtDate, true)
-            : `${updatedAtDate.toLocaleDateString('he-IL')} ${updatedAtDate.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`)
-        : 'N/A';
+      const updatedCellHtml = (() => {
+        if (typeof window.renderUpdatedCell === 'function') {
+          return window.renderUpdatedCell(ticker, {
+            fields: ['updated_at', 'yahoo_updated_at', 'fetched_at', 'last_updated_at'],
+            columnClass: 'col-updated'
+          });
+        }
+        const fallbackDate = parseValidDate(ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at);
+        if (!fallbackDate) {
+          return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+        }
+        const absolute = fallbackDate.toLocaleString('he-IL');
+        const duration = typeof window.getDurationSince === 'function'
+          ? window.getDurationSince(fallbackDate, { fallback: absolute })
+          : absolute;
+        return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+      })();
 
       return `
                 <tr>
@@ -1833,9 +1858,7 @@ function renderTickersTableRows(tickers) {
                     <td class="table-cell-center" title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}">
                         ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
                     </td>
-                    <td class="date-cell table-cell-center" data-date="${updatedAtIso}" title="${updatedAtDate ? `עודכן: ${updatedAtDisplay}` : 'אין נתוני עדכון'}">
-                        ${updatedAtCellContent}
-                    </td>
+                    ${updatedCellHtml}
                     <td class="actions-cell">
                         ${(() => {
                           if (!window.createActionsMenu) return '<!-- Actions menu not available -->';

@@ -18,6 +18,7 @@ Last Updated: 2025-01-16
 
 import csv
 import io
+import re
 from decimal import Decimal, InvalidOperation
 from typing import List, Dict, Any, Optional, Tuple, Iterable
 from datetime import datetime, timezone
@@ -35,12 +36,17 @@ class IBKRConnector(BaseConnector):
     trading data from the Trades section of the statement.
     """
     CASHFLOW_SECTION_NAMES = {
-        'Cash Report': 'cash_report',
         'Deposits & Withdrawals': 'deposit_withdrawal',
         'Interest': 'interest',
+        'Interest Accruals': 'interest_accrual',
         'Dividends': 'dividend',
+        'Change in Dividend Accruals': 'dividend_accrual',
         'Withholding Tax': 'tax',
-        'Other Fees': 'fee'
+        'Borrow Fee Details': 'borrow_fee',
+        'Stock Yield Enhancement Program Securities Lent Activity': 'syep_activity',
+        'Stock Yield Enhancement Program Securities Lent Interest Details': 'syep_interest',
+        'Transfers': 'transfer',
+        'Cash Report': 'cash_report'
     }
 
     ACCOUNT_SECTION_NAMES = {
@@ -54,6 +60,7 @@ class IBKRConnector(BaseConnector):
         super().__init__()
         self._last_symbol_metadata_entries: List[Dict[str, Any]] = []
         self._cached_sections: Dict[str, Any] = {}
+        self._pending_forex_rows: List[Dict[str, Any]] = []
 
     def identify_file(self, file_content: str, file_name: str) -> bool:
         """
@@ -158,9 +165,11 @@ class IBKRConnector(BaseConnector):
         cashflows = self._parse_cashflow_sections(lines)
         account_info = self._parse_account_sections(lines)
 
+        forex_cashflows = self._build_forex_cashflows()
+
         sections = {
             'executions': executions,
-            'cashflows': cashflows,
+            'cashflows': cashflows + forex_cashflows,
             'account_reconciliation': account_info
         }
 
@@ -179,6 +188,7 @@ class IBKRConnector(BaseConnector):
         Parse the Trades section and return raw execution rows.
         """
         records: List[Dict[str, Any]] = []
+        forex_rows: List[Dict[str, Any]] = []
         trades_start = None
 
         for idx, line in enumerate(lines):
@@ -210,8 +220,12 @@ class IBKRConnector(BaseConnector):
             for col_idx, header in enumerate(headers):
                 row[header] = values[col_idx].strip() if col_idx < len(values) else ''
             row['_row_number'] = rel_idx + 1
+            if str(row.get('Asset Category', '')).strip() == 'Forex' and row.get('DataDiscriminator') == 'Order':
+                forex_rows.append(row)
+                continue
             records.append(row)
 
+        self._pending_forex_rows = forex_rows
         return records
 
     def _parse_cashflow_sections(self, lines: List[str]) -> List[Dict[str, Any]]:
@@ -251,6 +265,9 @@ class IBKRConnector(BaseConnector):
                 value_idx = idx + 2  # Skip section & descriptor columns
                 row[header] = values[value_idx].strip() if value_idx < len(values) else ''
 
+            if self._should_skip_cashflow_row(current_section, row):
+                continue
+
             record = self._build_cashflow_record(current_section, row)
             if record:
                 records.append(record)
@@ -262,23 +279,41 @@ class IBKRConnector(BaseConnector):
         Convert raw row dictionary into a unified cashflow record dict.
         """
         try:
-            cashflow_type = self._resolve_cashflow_type(section_name, row)
-            amount, currency = self._extract_amount_and_currency(row)
+            section_key = self.CASHFLOW_SECTION_NAMES.get(section_name, '').lower()
 
-            if amount is None or amount == 0:
+            # Ignore SYEP activity rows – only the interest details translate to cash movements
+            if section_key == 'syep_activity':
+                return None
+            cashflow_type = self._resolve_cashflow_type(section_name, row)
+            amount, currency = self._extract_amount_and_currency(row, section_key)
+
+            if amount is None:
                 return None
 
             effective_date = self._extract_datetime(
                 row,
-                ['Date', 'Trade Date', 'Settle Date', 'Value Date']
+                ['Date', 'Trade Date', 'Settle Date', 'Value Date', 'Pay Date']
             )
 
-            source_account = row.get('Account') or row.get('Account ID') or ''
-            target_account = row.get('Transfer Account') or ''
+            memo = (
+                row.get('Description')
+                or row.get('Activity Description')
+                or row.get('Memo')
+                or row.get('Field Name')
+                or ''
+            )
+            source_account = row.get('Account') or row.get('Account ID') or row.get('Xfer Account') or ''
+            target_account = (
+                row.get('Transfer Account')
+                or row.get('Target Account')
+                or row.get('Xfer Company')
+                or ''
+            )
+            source_account = source_account or self._infer_account_from_row(section_key, row, memo)
+            target_account = target_account or self._infer_account_from_row(section_key, row, memo, target=True)
             asset_symbol = row.get('Symbol') or row.get('Underlying Symbol') or ''
-            memo = row.get('Description') or row.get('Activity Description') or row.get('Memo') or ''
 
-            record = {
+            record: Dict[str, Any] = {
                 'section': section_name,
                 'cashflow_type': cashflow_type,
                 'amount': amount,
@@ -291,10 +326,86 @@ class IBKRConnector(BaseConnector):
                 'tax_country': row.get('Withholding Tax Country') or row.get('Country') or '',
                 '_raw_row': row
             }
+
+            record.update(self._build_section_specific_fields(section_key, row))
+
+            retain_zero = record.pop('retain_zero_amount', False)
+            if amount == 0 and not retain_zero:
+                return None
+
             return record
         except Exception as exc:
             logger.debug("Failed to build cashflow record for section %s: %s", section_name, exc)
             return None
+
+    def _build_section_specific_fields(self, section_key: str, row: Dict[str, Any]) -> Dict[str, Any]:
+        extras: Dict[str, Any] = {}
+
+        if section_key == 'transfer':
+            extras.update({
+                'quantity': self._parse_float(row.get('Qty')),
+                'transfer_type': row.get('Type'),
+                'direction': row.get('Direction'),
+                'market_value': self._parse_float(row.get('Market Value')),
+                'cash_amount': self._parse_float(row.get('Cash Amount'))
+            })
+        elif section_key == 'dividend_accrual':
+            extras.update({
+                'gross_amount': self._parse_float(row.get('Gross Amount')),
+                'net_amount': self._parse_float(row.get('Net Amount')),
+                'tax': self._parse_float(row.get('Tax')),
+                'fee': self._parse_float(row.get('Fee')),
+                'ex_date': row.get('Ex Date'),
+                'pay_date': row.get('Pay Date')
+            })
+        elif section_key == 'borrow_fee':
+            extras.update({
+                'fee_rate_percent': self._parse_float(row.get('Fee Rate (%)')),
+                'underlying_value': self._parse_float(row.get('Value')),
+                'quantity': self._parse_float(row.get('Quantity'))
+            })
+        elif section_key == 'syep_activity':
+            extras.update({
+                'transaction_id': row.get('Transaction ID'),
+                'collateral_amount': self._parse_float(row.get('Collateral Amount')),
+                'quantity': self._parse_float(row.get('Quantity'))
+            })
+        elif section_key == 'syep_interest':
+            extras.update({
+                'transaction_id': row.get('Transaction ID'),
+                'collateral_amount': self._parse_float(row.get('Collateral Amount')),
+                'market_rate_percent': self._parse_float(row.get('Market-based Rate (%)')),
+                'customer_rate_percent': self._parse_float(row.get('Interest Rate on Customer Collateral (%)')),
+                'quantity': self._parse_float(row.get('Quantity'))
+            })
+        elif section_key == 'interest_accrual':
+            extras['retain_zero_amount'] = True
+
+        return extras
+
+    def _should_skip_cashflow_row(self, section_name: str, row: Dict[str, Any]) -> bool:
+        values = [str(value).strip() for value in row.values()]
+        first_value = next((value for value in values if value and value not in {'--'}), '')
+
+        if not first_value:
+            return True
+
+        lowered = first_value.lower()
+        if 'header' in lowered:
+            return True
+        if lowered.startswith('total') or lowered.endswith(' total') or lowered.endswith(' totals'):
+            return True
+        if lowered.startswith('starting') and 'dividend accrual' in lowered:
+            return True
+
+        if section_name == 'Dividends' and lowered in {'total', 'total in eur'}:
+            return True
+        if section_name == 'Borrow Fee Details' and lowered.startswith('total'):
+            return True
+        if section_name == 'Withholding Tax' and lowered.startswith('total'):
+            return True
+
+        return False
 
     def _parse_account_sections(self, lines: List[str]) -> Dict[str, Any]:
         """
@@ -434,7 +545,7 @@ class IBKRConnector(BaseConnector):
             return activity_code or 'cash_adjustment'
 
         if section_key == 'deposit_withdrawal':
-            amount, _ = self._extract_amount_and_currency(row)
+            amount, _ = self._extract_amount_and_currency(row, section_key)
             return 'deposit' if amount and amount > 0 else 'withdrawal'
 
         if section_key == 'interest':
@@ -448,20 +559,52 @@ class IBKRConnector(BaseConnector):
 
         return section_key or 'cash_adjustment'
 
-    def _extract_amount_and_currency(self, row: Dict[str, Any]) -> Tuple[Optional[float], Optional[str]]:
-        possible_amount_keys = [
-            'Amount', 'Settled Cash', 'Gross Amount', 'Net Amount',
-            'Amount (Base Currency)', 'Net Cash', 'Trade Amount', 'Value'
-        ]
-
+    def _extract_amount_and_currency(
+        self,
+        row: Dict[str, Any],
+        section_key: str = ''
+    ) -> Tuple[Optional[float], Optional[str]]:
         amount_decimal: Optional[Decimal] = None
-        for key in possible_amount_keys:
-            if key in row and row[key]:
-                amount_decimal = self._safe_decimal(row[key])
-                if amount_decimal is not None:
-                    break
 
-        currency = row.get('Currency') or row.get('Trade Currency') or row.get('Base Currency')
+        def set_amount(*keys: str) -> Optional[Decimal]:
+            for key in keys:
+                if key in row and row[key]:
+                    value = self._safe_decimal(row[key])
+                    if value is not None:
+                        return value
+            return None
+
+        if section_key == 'transfer':
+            amount_decimal = set_amount('Market Value', 'Cash Amount')
+        elif section_key == 'dividend_accrual':
+            amount_decimal = set_amount('Net Amount', 'Gross Amount')
+        elif section_key == 'borrow_fee':
+            amount_decimal = set_amount('Borrow Fee', 'Value')
+        elif section_key == 'syep_activity':
+            amount_decimal = set_amount('Collateral Amount')
+        elif section_key == 'syep_interest':
+            amount_decimal = set_amount('Interest Paid to Customer')
+        elif section_key == 'interest_accrual':
+            amount_decimal = set_amount('Field Value')
+        else:
+            amount_decimal = set_amount(
+                'Amount',
+                'Settled Cash',
+                'Gross Amount',
+                'Net Amount',
+                'Amount (Base Currency)',
+                'Net Cash',
+                'Trade Amount',
+                'Value'
+            )
+
+        currency = (
+            row.get('Currency')
+            or row.get('Trade Currency')
+            or row.get('Base Currency')
+            or row.get('Cash Currency')
+        )
+
         return (float(amount_decimal) if amount_decimal is not None else None, currency)
 
     def _extract_datetime(self, row: Dict[str, Any], keys: List[str]) -> Optional[datetime]:
@@ -504,6 +647,96 @@ class IBKRConnector(BaseConnector):
                 self._last_symbol_metadata_entries = []
 
         return list(self._last_symbol_metadata_entries)
+
+    def _build_forex_cashflows(self) -> List[Dict[str, Any]]:
+        forex_records: List[Dict[str, Any]] = []
+        if not self._pending_forex_rows:
+            return forex_records
+
+        for row in self._pending_forex_rows:
+            try:
+                amount = self._parse_float(row.get('Proceeds'))
+                effective_date = self._extract_datetime(
+                    row,
+                    ['Date/Time', 'Trade Date']
+                )
+                symbol = row.get('Symbol', '')
+                pair_base, pair_quote = self._split_currency_pair(symbol)
+                record = {
+                    'section': 'Trades',
+                    'cashflow_type': 'forex_conversion',
+                    'amount': amount,
+                    'currency': row.get('Currency') or pair_quote or '',
+                    'effective_date': effective_date,
+                    'source_account': row.get('Account') or '',
+                    'target_account': '',
+                    'asset_symbol': symbol,
+                    'memo': row.get('Code') or '',
+                    'tax_country': '',
+                    'quantity': self._parse_float(row.get('Quantity')),
+                    'trade_price': self._parse_float(row.get('T. Price')),
+                    'commission': self._parse_float(row.get('Comm/Fee')),
+                    'basis': self._parse_float(row.get('Basis')),
+                    'realized_pl': self._parse_float(row.get('Realized P/L')),
+                    'mtm_pl': self._parse_float(row.get('MTM P/L')),
+                    'source_currency': pair_base,
+                    'target_currency': pair_quote,
+                    '_raw_row': row
+                }
+                forex_records.append(record)
+            except Exception as exc:
+                logger.debug("Failed to build forex conversion record: %s", exc)
+
+        self._pending_forex_rows = []
+        return forex_records
+
+    @staticmethod
+    def _split_currency_pair(symbol: str) -> Tuple[str, str]:
+        if not symbol or '.' not in symbol:
+            return (symbol or '', '')
+        base, quote = symbol.split('.', 1)
+        return base.upper(), quote.upper()
+
+    ACCOUNT_TOKEN_REGEX = re.compile(r'U\d{6,}')
+
+    def _infer_account_from_row(
+        self,
+        section_key: str,
+        row: Dict[str, Any],
+        memo: str,
+        target: bool = False
+    ) -> str:
+        candidates = []
+        if section_key == 'transfer':
+            if target:
+                candidates.extend([
+                    row.get('Transfer Account'),
+                    row.get('Xfer Company')
+                ])
+            else:
+                candidates.extend([
+                    row.get('Xfer Account'),
+                    row.get('Account'),
+                    row.get('Account ID')
+                ])
+        elif section_key == 'deposit_withdrawal':
+            candidates.append(row.get('Account'))
+        elif section_key in {'dividend', 'dividend_accrual', 'interest', 'tax', 'borrow_fee'}:
+            candidates.append(row.get('Account'))
+
+        candidates.extend([
+            row.get('Account ID'),
+            row.get('Account'),
+            memo
+        ])
+
+        for candidate in candidates:
+            if not candidate:
+                continue
+            match = self.ACCOUNT_TOKEN_REGEX.search(str(candidate))
+            if match:
+                return match.group(0)
+        return ''
     
     def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
         """

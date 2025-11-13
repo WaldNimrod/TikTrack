@@ -201,8 +201,8 @@ class LinkedItemsService {
         }
         
         const defaultColors = {
-            'trade': '#007bff',
-            'trade_plan': '#007bff',
+            'trade': '#26baac',
+            'trade_plan': '#26baac',
             'execution': '#28a745',
             'trading_account': '#28a745',
             'ticker': '#17a2b8',

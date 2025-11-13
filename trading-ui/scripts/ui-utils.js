@@ -254,11 +254,6 @@ function showModal(modalId, options = {}) {
   // הצגת המודל
   const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
   bootstrapModal.show();
-  
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
 }
 
 /**
@@ -1974,12 +1969,25 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
     let dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
 
     if (window.TableDataRegistry) {
-      const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
-      if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
-        dataToUse = registryFiltered;
-      } else {
+      const summary = window.TableDataRegistry.getSummary(pageName);
+      if (summary) {
+        const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
+        if (Array.isArray(registryFiltered)) {
+          dataToUse = registryFiltered;
+        }
+      } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
+        const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
+        if (resolvedType) {
+          const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
+          if (Array.isArray(registryFiltered)) {
+            dataToUse = registryFiltered;
+          }
+        }
+      }
+
+      if (!Array.isArray(dataToUse)) {
         const registryFull = window.TableDataRegistry.getFullData(pageName);
-        if ((!Array.isArray(dataToUse) || dataToUse.length === 0) && Array.isArray(registryFull) && registryFull.length > 0) {
+        if (Array.isArray(registryFull)) {
           dataToUse = registryFull;
         }
       }
@@ -2023,6 +2031,59 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
   }
 }
 
+function renderUpdatedCell(entity, options = {}) {
+  const {
+    fields = ['updated_at', 'updatedAt'],
+    fallback = 'לא זמין',
+    columnClass = 'col-updated',
+    format = 'dhm',
+    includeSeconds = false
+  } = options || {};
+
+  let updatedDate = null;
+
+  if (typeof window.getLatestTimestamp === 'function') {
+    updatedDate = window.getLatestTimestamp(entity, fields);
+  } else if (typeof window.resolvePropertyPath === 'function') {
+    const paths = Array.isArray(fields) ? fields : [fields];
+    for (const path of paths) {
+      const candidate = window.resolvePropertyPath(entity, path);
+      const dateObj = typeof window.toDateObject === 'function'
+        ? window.toDateObject(candidate)
+        : (candidate instanceof Date ? candidate : new Date(candidate));
+      if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
+        if (!updatedDate || dateObj.getTime() > updatedDate.getTime()) {
+          updatedDate = dateObj;
+        }
+      }
+    }
+  }
+
+  const epoch = updatedDate instanceof Date && !Number.isNaN(updatedDate.getTime())
+    ? updatedDate.getTime()
+    : '';
+
+  let displayHtml = fallback;
+  if (updatedDate instanceof Date && !Number.isNaN(updatedDate.getTime())) {
+    if (typeof window.renderUpdatedTimestamp === 'function') {
+      displayHtml = window.renderUpdatedTimestamp(updatedDate, { fallback, format, includeSeconds });
+    } else if (typeof window.getDurationSince === 'function') {
+      const duration = window.getDurationSince(updatedDate, { format, includeSeconds, fallback });
+      const absolute = typeof window.formatDateTime === 'function'
+        ? window.formatDateTime(updatedDate)
+        : updatedDate.toLocaleString('he-IL');
+      const titleAttr = absolute ? ` title="${absolute}"` : '';
+      displayHtml = `<span class="updated-value" dir="ltr"${titleAttr}>${duration || absolute}</span>`;
+    } else {
+      displayHtml = `<span class="updated-value" dir="ltr">${updatedDate.toLocaleString('he-IL')}</span>`;
+    }
+  } else {
+    displayHtml = `<span class="updated-value-empty">${fallback}</span>`;
+  }
+
+  return `<td class="${columnClass}" data-epoch="${epoch}">${displayHtml}</td>`;
+}
+
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
@@ -2034,6 +2095,7 @@ window.loadSectionStates = loadSectionStates;
 window.updatePageSummaryStats = updatePageSummaryStats;
 window.loadScriptOnce = loadScriptOnce;
 window.loadScriptsOnce = loadScriptsOnce;
+window.renderUpdatedCell = renderUpdatedCell;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Load section states when DOM is ready

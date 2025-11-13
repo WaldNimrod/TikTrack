@@ -300,7 +300,7 @@ input[type="color"] {
 }
 
 input[type="color"]:hover {
-  border-color: #007bff !important;
+  border-color: var(--primary-color, #26baac) !important;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
 }
 
@@ -349,13 +349,13 @@ input[type="color"]::-moz-color-swatch {
 
 /* Hover effect */
 input[type="color"]:hover {
-  border-color: #007bff !important;
+  border-color: var(--primary-color, #26baac) !important;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
 }
 
 /* Focus effect */
 input[type="color"]:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--primary-color, #26baac);
   outline-offset: 2px;
 }
 

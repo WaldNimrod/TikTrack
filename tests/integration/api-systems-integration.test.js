@@ -1,480 +1,187 @@
 /**
- * API Systems Integration Tests
- * ==============================
- * 
- * בדיקות אינטגרציה בין מערכות API שונות
- * 
- * @version 1.0.0
- * @created January 2025
- * @author TikTrack Development Team
+ * API Systems Integration – TikTrack
+ *
+ * Covers integration between the unified cache systems, TTL guard and cache sync manager.
  */
 
-// Import the real systems
-const fs = require('fs');
-const path = require('path');
-
-// Load the actual system codes
-const cacheManagerCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/unified-cache-manager.js'), 
-    'utf8'
-);
-
-const loggerCode = fs.readFileSync(
-    path.join(__dirname, '../../trading-ui/scripts/logger-service.js'), 
-    'utf8'
-);
+const { setupBasicMocks, loadScriptWithDependencies } = require('../utils/test-loader');
 
 describe('API Systems Integration', () => {
-    let UnifiedCacheManager;
-    let Logger;
-    let cacheManager;
-    
+    let CacheManagerClass;
+    let CacheSyncManagerClass;
+    let infoSpy;
+    let warnSpy;
+    let errorSpy;
+
     beforeAll(() => {
-        // Mock the global environment
-        global.window = {
-            Logger: null,
-            indexedDB: {
-                open: jest.fn(),
-                deleteDatabase: jest.fn()
+        setupBasicMocks({
+            notificationSystem: {
+                showNotification: jest.fn()
             },
-            localStorage: {
-                getItem: jest.fn(),
-                setItem: jest.fn(),
-                removeItem: jest.fn(),
-                clear: jest.fn()
-            },
-            sessionStorage: {
-                getItem: jest.fn(),
-                setItem: jest.fn(),
-                removeItem: jest.fn(),
-                clear: jest.fn()
-            },
-            fetch: jest.fn()
-        };
-        
-        // Mock layer classes
-        global.MemoryLayer = class MemoryLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        global.LocalStorageLayer = class LocalStorageLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        global.IndexedDBLayer = class IndexedDBLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        global.BackendCacheLayer = class BackendCacheLayer {
-            async initialize() { return true; }
-            async get(key) { return null; }
-            async set(key, value, options) { return true; }
-            async delete(key) { return true; }
-            async clear() { return true; }
-            async getStats() { return { entries: 0, size: 0 }; }
-        };
-        
-        // Load the real systems
-        eval(cacheManagerCode);
-        eval(loggerCode);
-        
-        UnifiedCacheManager = global.UnifiedCacheManager;
-        Logger = global.window.Logger;
+            showNotification: jest.fn(),
+            showConfirmationDialog: jest.fn()
+        });
+
+        eval(loadScriptWithDependencies('scripts/logger-service.js'));
+        eval(loadScriptWithDependencies('scripts/unified-cache-manager.js'));
+        eval(loadScriptWithDependencies('scripts/cache-ttl-guard.js'));
+        eval(loadScriptWithDependencies('scripts/cache-sync-manager.js'));
+        eval(loadScriptWithDependencies('scripts/api-config.js'));
+
+        CacheManagerClass = window.UnifiedCacheManager.constructor;
+        CacheSyncManagerClass = window.CacheSyncManager.constructor;
     });
-    
-    beforeEach(() => {
-        cacheManager = new UnifiedCacheManager();
+
+    beforeEach(async () => {
         jest.clearAllMocks();
-    });
-    
-    describe('API Request Caching', () => {
-        test('should cache API responses', async () => {
-            const apiResponse = {
-                data: [
-                    { id: 1, symbol: 'AAPL', price: 150.00 },
-                    { id: 2, symbol: 'GOOGL', price: 2800.00 }
-                ],
-                status: 200,
-                timestamp: Date.now()
-            };
-            
-            // Mock fetch response
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve(apiResponse)
-            });
-            
-            // Mock cache operations
-            cacheManager.layers.backend.set = jest.fn().mockResolvedValue(true);
-            cacheManager.layers.backend.get = jest.fn().mockResolvedValue(apiResponse);
-            
-            // Test API caching
-            const response = await fetch('/api/trades');
-            const data = await response.json();
-            
-            await cacheManager.set('api-trades', data);
-            const cachedData = await cacheManager.get('api-trades');
-            
-            expect(cachedData).toEqual(apiResponse);
-            expect(cacheManager.layers.backend.set).toHaveBeenCalledWith('api-trades', data, expect.any(Object));
+
+        if (!global.fetch) {
+            global.fetch = jest.fn();
+        }
+        global.fetch.mockReset();
+        global.fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: async () => ({ success: true }),
+            text: async () => 'OK'
         });
-        
-        test('should handle API errors with cache fallback', async () => {
-            const cachedData = {
-                data: [{ id: 1, symbol: 'AAPL', price: 150.00 }],
-                status: 200,
-                timestamp: Date.now() - 3600000 // 1 hour ago
-            };
-            
-            // Mock fetch error
-            global.fetch = jest.fn().mockRejectedValue(new Error('API Error'));
-            
-            // Mock cache operations
-            cacheManager.layers.backend.get = jest.fn().mockResolvedValue(cachedData);
-            
-            // Test error handling
-            try {
-                await fetch('/api/trades');
-            } catch (error) {
-                const fallbackData = await cacheManager.get('api-trades');
-                expect(fallbackData).toEqual(cachedData);
-            }
-        });
+
+        infoSpy = jest.spyOn(window.Logger, 'info').mockImplementation(() => {});
+        warnSpy = jest.spyOn(window.Logger, 'warn').mockImplementation(() => {});
+        errorSpy = jest.spyOn(window.Logger, 'error').mockImplementation(() => {});
+        jest.spyOn(window.Logger, 'debug').mockImplementation(() => {});
+
+        window.UnifiedCacheManager = new CacheManagerClass();
+        await window.UnifiedCacheManager.initialize();
+
+        window.preferencesCache = {
+            clear: jest.fn().mockResolvedValue()
+        };
+        window.notificationCache = {
+            clear: jest.fn()
+        };
+        window.showNotification = jest.fn();
+
+        window.CacheSyncManager = new CacheSyncManagerClass();
+        window.CacheSyncManager.delay = jest.fn(() => Promise.resolve());
+        await window.CacheSyncManager.initialize();
+
+        window.notificationSystem = {
+            showNotification: jest.fn()
+        };
     });
-    
-    describe('API Request Logging', () => {
-        test('should log API requests', async () => {
-            const apiRequest = {
-                url: '/api/trades',
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+
+    afterEach(() => {
+        infoSpy.mockRestore();
+        warnSpy.mockRestore();
+        errorSpy.mockRestore();
+    });
+
+    describe('CacheTTLGuard + UnifiedCacheManager', () => {
+        test('returns cached payload without invoking loader', async () => {
+            const dataset = [
+                { id: 1, symbol: 'AAPL' },
+                { id: 2, symbol: 'GOOGL' }
+            ];
+
+            await window.UnifiedCacheManager.save('api::trades', dataset, { layer: 'memory', ttl: 120000 });
+
+            const loader = jest.fn();
+            const afterRead = jest.fn();
+
+            const result = await window.CacheTTLGuard.ensure('api::trades', loader, { afterRead });
+
+            expect(loader).not.toHaveBeenCalled();
+            expect(Array.isArray(result)).toBe(true);
+            expect(result._cacheMeta).toBeDefined();
+            expect(afterRead).toHaveBeenCalledWith(result);
+        });
+
+        test('fallback loader persists result into cache layer', async () => {
+            const loaderPayload = {
+                status: 'ok',
+                data: [{ id: 3, symbol: 'MSFT' }]
             };
-            
-            // Mock fetch
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve({ data: [] })
+
+            const loader = jest.fn().mockResolvedValue(loaderPayload);
+            const afterLoad = jest.fn();
+            const memorySaveSpy = jest.spyOn(window.UnifiedCacheManager.layers.memory, 'save');
+
+            const result = await window.CacheTTLGuard.ensure('api::alerts', loader, {
+                layer: 'memory',
+                ttl: 60000,
+                afterLoad
             });
-            
-            // Test API request logging
-            const response = await fetch(apiRequest.url, {
-                method: apiRequest.method,
-                headers: apiRequest.headers
-            });
-            
-            expect(Logger.info).toHaveBeenCalledWith(
-                'API request completed',
-                expect.objectContaining({
-                    url: '/api/trades',
-                    method: 'GET',
-                    status: 200
-                })
+
+            expect(loader).toHaveBeenCalledTimes(1);
+            expect(memorySaveSpy).toHaveBeenCalledWith(
+                'api::alerts',
+                expect.objectContaining({ status: 'ok' }),
+                expect.any(Object)
             );
-        });
-        
-        test('should log API errors', async () => {
-            // Mock fetch error
-            global.fetch = jest.fn().mockRejectedValue(new Error('Network Error'));
-            
-            // Test API error logging
-            try {
-                await fetch('/api/trades');
-            } catch (error) {
-                expect(Logger.error).toHaveBeenCalledWith(
-                    'API request failed',
-                    expect.objectContaining({
-                        url: '/api/trades',
-                        error: 'Network Error'
-                    })
-                );
-            }
+            expect(result._cacheMeta).toBeDefined();
+            expect(afterLoad).toHaveBeenCalledWith(result);
+            expect(result.data).toEqual([{ id: 3, symbol: 'MSFT' }]);
         });
     });
-    
-    describe('API Response Processing', () => {
-        test('should process API responses correctly', async () => {
-            const apiResponse = {
-                data: [
-                    { id: 1, symbol: 'AAPL', price: 150.00, status: 'active' },
-                    { id: 2, symbol: 'GOOGL', price: 2800.00, status: 'pending' }
-                ],
-                meta: {
-                    total: 2,
-                    page: 1,
-                    limit: 10
-                }
-            };
-            
-            // Mock fetch
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve(apiResponse)
-            });
-            
-            // Mock cache operations
-            cacheManager.layers.backend.set = jest.fn().mockResolvedValue(true);
-            
-            // Test API response processing
-            const response = await fetch('/api/trades');
-            const data = await response.json();
-            
-            await cacheManager.set('api-trades', data);
-            
-            expect(data.data).toHaveLength(2);
-            expect(data.meta.total).toBe(2);
-            expect(cacheManager.layers.backend.set).toHaveBeenCalledWith('api-trades', data, expect.any(Object));
-        });
-        
-        test('should handle malformed API responses', async () => {
-            const malformedResponse = {
-                data: null,
-                meta: undefined
-            };
-            
-            // Mock fetch
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve(malformedResponse)
-            });
-            
-            // Test malformed response handling
-            const response = await fetch('/api/trades');
-            const data = await response.json();
-            
-            expect(Logger.warn).toHaveBeenCalledWith(
-                'Malformed API response received',
-                expect.objectContaining({
-                    url: '/api/trades',
-                    data: malformedResponse
+
+    describe('CacheSyncManager queue flows', () => {
+        test('queues failed backend sync and replays successfully', async () => {
+            const syncManager = window.CacheSyncManager;
+
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: false,
+                    status: 503,
+                    statusText: 'Service Unavailable',
+                    json: async () => ({ success: false })
                 })
-            );
-        });
-    });
-    
-    describe('API Rate Limiting', () => {
-        test('should handle API rate limiting', async () => {
-            // Mock rate limit response
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: false,
-                status: 429,
-                statusText: 'Too Many Requests',
-                headers: {
-                    get: (header) => {
-                        if (header === 'Retry-After') return '60';
-                        return null;
-                    }
-                }
-            });
-            
-            // Test rate limiting
-            const response = await fetch('/api/trades');
-            
-            expect(Logger.warn).toHaveBeenCalledWith(
-                'API rate limit exceeded',
-                expect.objectContaining({
-                    url: '/api/trades',
-                    status: 429,
-                    retryAfter: 60
-                })
-            );
-        });
-        
-        test('should implement exponential backoff', async () => {
-            let attemptCount = 0;
-            
-            // Mock fetch with retry logic
-            global.fetch = jest.fn().mockImplementation(() => {
-                attemptCount++;
-                if (attemptCount < 3) {
-                    return Promise.reject(new Error('Network Error'));
-                }
-                return Promise.resolve({
+                .mockResolvedValueOnce({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({ data: [] })
+                    json: async () => ({ success: true })
                 });
-            });
-            
-            // Test exponential backoff
-            const response = await fetch('/api/trades');
-            const data = await response.json();
-            
-            expect(attemptCount).toBe(3);
-            expect(Logger.info).toHaveBeenCalledWith(
-                'API request succeeded after retry',
-                expect.objectContaining({
-                    url: '/api/trades',
-                    attempts: 3
-                })
-            );
+
+            const success = await syncManager.syncToBackend('accounts-data', { id: 99 });
+            expect(success).toBe(false);
+            expect(syncManager.syncQueue).toHaveLength(1);
+            expect(errorSpy).toHaveBeenCalled();
+
+            syncManager.isProcessing = true;
+            await syncManager.processQueue();
+
+            expect(syncManager.syncQueue).toHaveLength(0);
+            expect(global.fetch).toHaveBeenCalledTimes(2);
         });
-    });
-    
-    describe('API Authentication', () => {
-        test('should handle authentication errors', async () => {
-            // Mock authentication error
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: false,
-                status: 401,
-                statusText: 'Unauthorized'
-            });
-            
-            // Test authentication error
-            const response = await fetch('/api/trades');
-            
-            expect(Logger.error).toHaveBeenCalledWith(
-                'API authentication failed',
-                expect.objectContaining({
-                    url: '/api/trades',
-                    status: 401
+
+        test('invalidateBackend queues on failure and flushes on retry', async () => {
+            const syncManager = window.CacheSyncManager;
+
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: false,
+                    status: 500,
+                    statusText: 'Server Error',
+                    json: async () => ({ success: false })
                 })
-            );
-        });
-        
-        test('should refresh authentication tokens', async () => {
-            let tokenRefreshed = false;
-            
-            // Mock token refresh
-            global.fetch = jest.fn().mockImplementation((url) => {
-                if (url === '/api/refresh-token') {
-                    tokenRefreshed = true;
-                    return Promise.resolve({
-                        ok: true,
-                        status: 200,
-                        json: () => Promise.resolve({ token: 'new-token' })
-                    });
-                }
-                return Promise.resolve({
+                .mockResolvedValueOnce({
                     ok: true,
                     status: 200,
-                    json: () => Promise.resolve({ data: [] })
+                    json: async () => ({ success: true })
                 });
-            });
-            
-            // Test token refresh
-            await fetch('/api/refresh-token');
-            const response = await fetch('/api/trades');
-            
-            expect(tokenRefreshed).toBe(true);
-            expect(Logger.info).toHaveBeenCalledWith(
-                'Authentication token refreshed',
-                expect.objectContaining({
-                    url: '/api/refresh-token'
-                })
-            );
-        });
-    });
-    
-    describe('API Data Synchronization', () => {
-        test('should synchronize API data with cache', async () => {
-            const apiData = {
-                data: [{ id: 1, symbol: 'AAPL', price: 150.00 }],
-                timestamp: Date.now()
-            };
-            
-            // Mock fetch
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve(apiData)
-            });
-            
-            // Mock cache operations
-            cacheManager.layers.backend.set = jest.fn().mockResolvedValue(true);
-            cacheManager.layers.localStorage.set = jest.fn().mockResolvedValue(true);
-            
-            // Test data synchronization
-            const response = await fetch('/api/trades');
-            const data = await response.json();
-            
-            await cacheManager.set('api-trades', data, { sync: true });
-            
-            expect(cacheManager.layers.backend.set).toHaveBeenCalledWith('api-trades', data, expect.any(Object));
-            expect(cacheManager.layers.localStorage.set).toHaveBeenCalledWith('api-trades', data, expect.any(Object));
-        });
-        
-        test('should handle data conflicts between API and cache', async () => {
-            const apiData = {
-                data: [{ id: 1, symbol: 'AAPL', price: 155.00 }],
-                timestamp: Date.now()
-            };
-            
-            const cachedData = {
-                data: [{ id: 1, symbol: 'AAPL', price: 150.00 }],
-                timestamp: Date.now() - 3600000 // 1 hour ago
-            };
-            
-            // Mock fetch
-            global.fetch = jest.fn().mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve(apiData)
-            });
-            
-            // Mock cache operations
-            cacheManager.layers.backend.get = jest.fn().mockResolvedValue(cachedData);
-            cacheManager.layers.backend.set = jest.fn().mockResolvedValue(true);
-            
-            // Test conflict resolution
-            const response = await fetch('/api/trades');
-            const newData = await response.json();
-            const oldData = await cacheManager.layers.backend.get('api-trades');
-            
-            // API data is newer, should win
-            expect(newData.data[0].price).toBe(155.00);
-            expect(oldData.data[0].price).toBe(150.00);
-        });
-    });
-    
-    describe('API Performance Monitoring', () => {
-        test('should monitor API response times', async () => {
-            const startTime = Date.now();
-            
-            // Mock fetch with delay
-            global.fetch = jest.fn().mockImplementation(() => {
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        resolve({
-                            ok: true,
-                            status: 200,
-                            json: () => Promise.resolve({ data: [] })
-                        });
-                    }, 100);
-                });
-            });
-            
-            // Test performance monitoring
-            const response = await fetch('/api/trades');
-            const endTime = Date.now();
-            const responseTime = endTime - startTime;
-            
-            expect(responseTime).toBeGreaterThanOrEqual(100);
-            expect(Logger.debug).toHaveBeenCalledWith(
-                'API performance metric',
-                expect.objectContaining({
-                    url: '/api/trades',
-                    responseTime: expect.any(Number)
-                })
-            );
+
+            const result = await syncManager.invalidateBackend(['trades-data']);
+            expect(result).toBe(false);
+            expect(syncManager.syncQueue).toHaveLength(1);
+            expect(warnSpy).toHaveBeenCalled();
+
+            syncManager.isProcessing = true;
+            await syncManager.processQueue();
+
+            expect(syncManager.syncQueue).toHaveLength(0);
+            expect(global.fetch).toHaveBeenCalledTimes(2);
         });
     });
 });
+
+

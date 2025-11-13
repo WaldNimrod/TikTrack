@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/743</span>
+                <span class='fraction'>0/749</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/722</span>
+                <span class='fraction'>0/725</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/720</span>
+                <span class='fraction'>0/726</span>
             </div>
         
             
@@ -2705,7 +2705,15 @@
 <a name='L2640'></a><a href='#L2640'>2640</a>
 <a name='L2641'></a><a href='#L2641'>2641</a>
 <a name='L2642'></a><a href='#L2642'>2642</a>
-<a name='L2643'></a><a href='#L2643'>2643</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L2643'></a><a href='#L2643'>2643</a>
+<a name='L2644'></a><a href='#L2644'>2644</a>
+<a name='L2645'></a><a href='#L2645'>2645</a>
+<a name='L2646'></a><a href='#L2646'>2646</a>
+<a name='L2647'></a><a href='#L2647'>2647</a>
+<a name='L2648'></a><a href='#L2648'>2648</a>
+<a name='L2649'></a><a href='#L2649'>2649</a>
+<a name='L2650'></a><a href='#L2650'>2650</a>
+<a name='L2651'></a><a href='#L2651'>2651</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -4486,6 +4494,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -6767,7 +6783,7 @@ function <span class="fstat-no" title="function not covered" >getTableColorsWith
     success: colors.success || '#28a745',
     warning: colors.warning || '#ffc107',
     info: colors.info || '#17a2b8',
-    primary: colors.primary || '#007bff',
+    primary: colors.primary || '#26baac',
   };
 }
 &nbsp;
@@ -6785,13 +6801,13 @@ function <span class="fstat-no" title="function not covered" >getColorPreference
   // ברירת מחדל - צבעי מערכת בסיסיים
 <span class="cstat-no" title="statement not covered" >  return {</span>
     // צבעים ראשיים למערכת הגרפים (6-8 צבעים מרכזיים)
-    primaryColor: '#007bff',        // כחול ראשי - כותרות וכפתורים
-    chartPrimaryColor: '#1e40af',   // כחול כהה - צבע בסיס לגרפים עצמם
+    primaryColor: '#26baac',        // כחול ראשי - כותרות וכפתורים
+    chartPrimaryColor: '#1a8f83',   // גוון כהה של הצבע הראשי לגרפים
     successColor: '#28a745',        // ירוק - הצלחה, רווחים
     warningColor: '#ffc107',        // צהוב - אזהרות, ביצועים בינוניים
     dangerColor: '#dc3545',         // אדום - שגיאות, הפסדים
-    infoColor: '#17a2b8',           // כחול מידע - מידע נוסף
-    secondaryColor: '#6c757d',      // אפור - נתונים משניים
+    infoColor: '#26baac',           // צבע מידע - מותאם לזהות המותג
+    secondaryColor: '#fc5a06',      // כתום - נתונים משניים
     
     // צבעי ישויות לגרפים (תואמים לפרופיל ברירת המחדל במסד נתונים)
     entityTradeColor: '#26baac',    // טורקיז - טריידים
@@ -6806,7 +6822,7 @@ function <span class="fstat-no" title="function not covered" >getColorPreference
     chartTextColor: '#212529',       // כהה - טקסט גרפים
     chartGridColor: '#e9ecef',       // אפור בהיר - רשת גרפים
     chartBorderColor: '#dee2e6',     // אפור - גבול גרפים
-    chartPointColor: '#007bff',      // כחול - נקודות גרפים
+    chartPointColor: '#26baac',      // טורקיז - נקודות גרפים
     
     // צבעי רקע וטקסט
     cardBackground: '#ffffff',
@@ -7130,6 +7146,14 @@ function <span class="fstat-no" title="function not covered" >updateCSSVariables
     }
 <span class="cstat-no" title="statement not covered" >    if (preferences.inputBackground) {</span>
 <span class="cstat-no" title="statement not covered" >      document.documentElement.style.setProperty('--input-background', preferences.inputBackground);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (preferences.backgroundColor) {</span>
+<span class="cstat-no" title="statement not covered" >      document.documentElement.style.setProperty('--background-color', preferences.backgroundColor);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (preferences.linkColor) {</span>
+<span class="cstat-no" title="statement not covered" >      document.documentElement.style.setProperty('--link-color', preferences.linkColor);</span>
+      const linkHoverColor = <span class="cstat-no" title="statement not covered" >darkenColor(preferences.linkColor, 12);</span>
+<span class="cstat-no" title="statement not covered" >      document.documentElement.style.setProperty('--link-hover-color', linkHoverColor);</span>
     }
 <span class="cstat-no" title="statement not covered" >    if (preferences.textColor) {</span>
 <span class="cstat-no" title="statement not covered" >      document.documentElement.style.setProperty('--text-color', preferences.textColor);</span>
@@ -7497,7 +7521,7 @@ async function <span class="fstat-no" title="function not covered" >loadColorPre
         const statusOpen = <span class="cstat-no" title="statement not covered" >prefs.statusOpenColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-open-color') || '#28a745';</span>
         const statusClosed = <span class="cstat-no" title="statement not covered" >prefs.statusClosedColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-closed-color') || '#6c757d';</span>
         const statusCancelled = <span class="cstat-no" title="statement not covered" >prefs.statusCancelledColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-cancelled-color') || '#dc3545';</span>
-        const statusPending = <span class="cstat-no" title="statement not covered" >prefs.statusPendingColor || prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';</span>
+        const statusPending = <span class="cstat-no" title="statement not covered" >prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';</span>
 <span class="cstat-no" title="statement not covered" >        docStyle.setProperty('--status-open-color', String(statusOpen).trim());</span>
 <span class="cstat-no" title="statement not covered" >        docStyle.setProperty('--status-closed-color', String(statusClosed).trim());</span>
 <span class="cstat-no" title="statement not covered" >        docStyle.setProperty('--status-cancelled-color', String(statusCancelled).trim());</span>
@@ -7996,7 +8020,7 @@ async function <span class="fstat-no" title="function not covered" >loadDynamicC
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.331Z
+                at 2025-11-12T23:38:03.899Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -13,7 +13,6 @@ const { loadScriptWithDependencies, setupBasicMocks } = require('../utils/test-l
 const { createMockLocalStorage } = require('../utils/test-helpers');
 
 describe('Page Utils', () => {
-    let storage;
     let localStorageMock;
 
     beforeAll(() => {
@@ -22,19 +21,6 @@ describe('Page Utils', () => {
         
         // Override localStorage with working implementation using shared helper
         localStorageMock = createMockLocalStorage();
-        storage = {};
-        // Extend mock to expose underlying storage for assertions
-        localStorageMock.setItem.mockImplementation((key, value) => {
-            storage[key] = value;
-        });
-        localStorageMock.getItem.mockImplementation((key) => storage[key] || null);
-        localStorageMock.removeItem.mockImplementation((key) => {
-            delete storage[key];
-        });
-        localStorageMock.clear.mockImplementation(() => {
-            Object.keys(storage).forEach((key) => delete storage[key]);
-        });
-
         Object.defineProperty(global, 'localStorage', {
             value: localStorageMock,
             configurable: true,
@@ -56,41 +42,40 @@ describe('Page Utils', () => {
         localStorage.getItem.mockClear();
         localStorage.removeItem.mockClear();
         localStorage.clear.mockClear();
-        storage = {};
+        localStorage.clear();
     });
 
     describe('Page State Management', () => {
-        test('should save page state', () => {
+        test('should save page state', async () => {
             expect(window.savePageState).toBeDefined();
             if (window.savePageState) {
-                window.savePageState('test-key', { test: 'value' });
-                expect(localStorage.setItem).toHaveBeenCalledWith(
-                    'pageState_test-key',
-                    expect.stringContaining('"test":"value"')
-                );
-                expect(storage['pageState_test-key']).toBeDefined();
+                await window.savePageState('test-key', { test: 'value' });
+                expect(localStorage.setItem).toHaveBeenCalled();
+                const [, payload] = localStorage.setItem.mock.calls.at(-1);
+                const parsed = JSON.parse(payload);
+                expect(parsed).toMatchObject({
+                    test: 'value',
+                    pageName: 'test-key'
+                });
             }
         });
 
-        test('should load page state', () => {
+        test('should load page state', async () => {
             expect(window.loadPageState).toBeDefined();
             if (window.loadPageState) {
-                const mockState = JSON.stringify({ test: 'value', timestamp: Date.now(), pageName: 'test-key' });
-                storage['pageState_test-key'] = mockState;
-                
-                const state = window.loadPageState('test-key');
-                expect(state).toBeDefined();
-                expect(state?.test).toBe('value');
+                const mockState = { test: 'value', timestamp: Date.now(), pageName: 'test-key' };
+                localStorage.getItem.mockReturnValueOnce(JSON.stringify(mockState));
+                const state = await window.loadPageState('test-key');
+                expect(localStorage.getItem).toHaveBeenCalledWith('pageState_test-key');
+                expect(state).toMatchObject({ test: 'value', pageName: 'test-key' });
             }
         });
 
-        test('should clear page state', () => {
+        test('should clear page state', async () => {
             expect(window.clearPageState).toBeDefined();
             if (window.clearPageState) {
-                storage['pageState_test-key'] = JSON.stringify({ test: 'value' });
-                window.clearPageState('test-key');
+                await window.clearPageState('test-key');
                 expect(localStorage.removeItem).toHaveBeenCalledWith('pageState_test-key');
-                expect(storage['pageState_test-key']).toBeUndefined();
             }
         });
     });
@@ -157,18 +142,19 @@ describe('Page Utils', () => {
             }
         });
 
-        test('should handle invalid JSON in storage', () => {
+        test('should handle invalid JSON in storage', async () => {
             if (window.loadPageState) {
-                storage['pageState_test-key'] = 'invalid-json';
-                
-                const result = window.loadPageState('test-key');
+                localStorage.getItem.mockReturnValueOnce('invalid-json');
+
+                const result = await window.loadPageState('test-key');
                 expect(result === null || typeof result === 'object').toBe(true);
             }
         });
 
-        test('should handle missing state in storage', () => {
+        test('should handle missing state in storage', async () => {
             if (window.loadPageState) {
-                const result = window.loadPageState('non-existent-key');
+                localStorage.getItem.mockReturnValueOnce(null);
+                const result = await window.loadPageState('non-existent-key');
                 expect(result === null || typeof result === 'object').toBe(true);
             }
         });

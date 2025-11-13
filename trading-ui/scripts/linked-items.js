@@ -259,23 +259,33 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   
   const modal = new bootstrap.Modal(modalElement);
   
-  // Add event listener for backdrop cleanup when modal is hidden
   modalElement.addEventListener('hidden.bs.modal', () => {
-    // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
-    if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-      window.modalNavigationManager.manageBackdrop();
+    if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
+      window.registerModalNavigationClose(modalElement.id);
     }
-  });
+  }, { once: true });
   
-  // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
   modalElement.addEventListener('shown.bs.modal', () => {
-    if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-      window.modalNavigationManager.manageBackdrop();
-      setTimeout(() => {
-        window.modalNavigationManager.manageBackdrop();
-      }, 100);
+    if (window.ModalNavigationService?.registerModalOpen) {
+      window.ModalNavigationService.registerModalOpen(modalElement, {
+        modalId,
+        modalType: 'linked-items-modal',
+        entityType: itemType,
+        entityId: itemId ?? null,
+        title: modalTitle,
+        metadata: { mode }
+      });
+    } else if (window.pushModalToNavigation) {
+      window.pushModalToNavigation(modalElement, {
+        modalId,
+        modalType: 'linked-items-modal',
+        entityType: itemType,
+        entityId: itemId ?? null,
+        title: modalTitle,
+        metadata: { mode }
+      });
     }
-    
+
     // Initialize tooltips for filter buttons after modal is shown
     setTimeout(() => {
       if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
@@ -291,17 +301,9 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
         window.ButtonSystem.initializeButtons();
       }
     }, 200);
-  });
+  }, { once: true });
   
   modal.show();
-  
-  // ניקוי מיידי אחרי show() - Bootstrap עלול ליצור backdrop גם אחרי show()
-  if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-    window.modalNavigationManager.manageBackdrop();
-    setTimeout(() => {
-      window.modalNavigationManager.manageBackdrop();
-    }, 100);
-  }
 }
 
 /**
@@ -1442,7 +1444,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
       }
       relatedIcon = '📈';
       relatedClass = 'related-trade entity-trade-badge';
-      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
+      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#26baac';
       relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
       break;
     }

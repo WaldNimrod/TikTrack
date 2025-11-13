@@ -13,6 +13,7 @@ const { loadScriptWithDependencies, setupBasicMocks } = require('../utils/test-l
 
 describe('Event Handler Manager', () => {
     let buttonElement;
+    let addEventListenerSpy;
 
     beforeAll(() => {
         // Setup basic mocks
@@ -27,24 +28,8 @@ describe('Event Handler Manager', () => {
         buttonElement.id = 'test-button';
         document.body.appendChild(buttonElement);
 
-        // Mock closest method
-        buttonElement.closest = jest.fn((selector) => {
-            if (selector.includes('data-onclick')) {
-                return buttonElement;
-            }
-            return null;
-        });
-
-        // Mock getAttribute
-        buttonElement.getAttribute = jest.fn((attr) => {
-            if (attr === 'data-onclick') {
-                return 'testFunction()';
-            }
-            return null;
-        });
-
         // Mock document methods using spyOn instead of mockImplementation
-        const addEventListenerSpy = jest.spyOn(document, 'addEventListener').mockImplementation((event, callback) => {
+        addEventListenerSpy = jest.spyOn(document, 'addEventListener').mockImplementation((event, callback) => {
             if (event === 'click') {
                 // Store callback for testing
                 window._clickHandler = callback;
@@ -53,11 +38,12 @@ describe('Event Handler Manager', () => {
         
         const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener').mockImplementation(() => {});
 
-        // Load with dependencies using test loader only if not already loaded
-        if (!window.EventHandlerManager) {
-            const code = loadScriptWithDependencies('scripts/event-handler-manager.js');
-            eval(code);
-        }
+        // Load with dependencies using test loader (always reload latest implementation)
+        delete window.EventHandlerManager;
+        const code = loadScriptWithDependencies('scripts/event-handler-manager.js');
+        eval(code);
+        window.testFunction = jest.fn();
+        global.testFunction = window.testFunction;
         
         // Ensure clean state for tests
         if (window.EventHandlerManager) {
@@ -103,19 +89,19 @@ describe('Event Handler Manager', () => {
                 return; // Skip if not available
             }
 
-            const event = {
+            global.testFunction = jest.fn();
+            window.testFunction = global.testFunction;
+            const delegatedHandler = window._clickHandler;
+            expect(typeof delegatedHandler).toBe('function');
+            delegatedHandler({
                 target: buttonElement,
                 _ehmHandled: false,
                 preventDefault: jest.fn(),
                 stopPropagation: jest.fn()
-            };
+            });
 
-            window.EventHandlerManager.handleDelegatedClick(event);
-
-            // Should execute the onclick handler if available
-            if (window.testFunction) {
-                expect(window.testFunction).toHaveBeenCalled();
-            }
+            expect(global.testFunction).toHaveBeenCalled();
+            delete global.testFunction;
         });
 
         test('should not handle events twice', () => {
@@ -167,7 +153,8 @@ describe('Event Handler Manager', () => {
             const callback = jest.fn();
             window.EventHandlerManager.addEventListener('test-event', callback);
             expect(window.EventHandlerManager.listeners.size).toBeGreaterThan(0);
-            expect(document.addEventListener).toHaveBeenCalledWith('test-event', callback, {});
+            const key = `test-event:${callback.name || 'anonymous'}`;
+            expect(window.EventHandlerManager.listeners.has(key)).toBe(true);
         });
 
         test('should prevent duplicate listeners', () => {

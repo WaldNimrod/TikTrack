@@ -147,7 +147,7 @@
             }
 
             if (typeof window.processButtons === 'function') {
-                window.processButtons();
+                window.processButtons(document);
             }
 
             if (typeof window.restoreAllSectionStates === 'function') {
@@ -190,8 +190,15 @@
                 Logger.warn('⚠️ No trading accounts found', { page: PAGE_NAME });
             }
 
-            const historyPromises = accounts.map(fetchHistoryForAccount);
-            const historyResults = await Promise.all(historyPromises);
+            const historyResults = [];
+            for (const account of accounts) {
+                // קריאה סדרתית כדי להפחית עומס וקונפליקטים על שכבת ה-DB
+                // המערכת המרכזית מנהלת לוגינג פנימי ב-fetchHistoryForAccount עבור שגיאות.
+                /* eslint-disable no-await-in-loop */
+                const accountHistory = await fetchHistoryForAccount(account);
+                /* eslint-enable no-await-in-loop */
+                historyResults.push(accountHistory);
+            }
 
             const sessions = historyResults
                 .flat()
@@ -522,6 +529,32 @@
             return '';
         }
 
+        if (typeof value === 'string') {
+            const normalized = value.trim();
+            if (!normalized) {
+                return '';
+            }
+            if (normalized.toLowerCase() === 'invalid date' || normalized.toLowerCase() === 'nan') {
+                return 'לא זמין';
+            }
+            if (/^\d+$/.test(normalized)) {
+                const asNumber = Number(normalized);
+                if (Number.isFinite(asNumber)) {
+                    const numericDate = new Date(asNumber);
+                    if (!Number.isNaN(numericDate.getTime())) {
+                        return numericDate.toLocaleString('he-IL');
+                    }
+                }
+            }
+        }
+
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            const numericDate = new Date(value);
+            if (!Number.isNaN(numericDate.getTime())) {
+                return numericDate.toLocaleString('he-IL');
+            }
+        }
+
         if (typeof window.renderImportDate === 'function') {
             const rendered = window.renderImportDate(value, '');
             if (rendered) {
@@ -534,10 +567,24 @@
             if (window.FieldRendererService?.renderDate) {
                 const rendered = window.FieldRendererService.renderDate(envelope, true);
                 if (rendered) {
-                    return rendered;
+                    const renderedNormalized = rendered.trim();
+                    return renderedNormalized.toLowerCase() === 'invalid date'
+                        ? 'לא זמין'
+                        : renderedNormalized;
                 }
             }
-            return envelope.display || envelope.local || envelope.utc || '';
+            const candidate = envelope.utc || envelope.local || envelope.display || '';
+            if (candidate) {
+                const parsedCandidate = new Date(candidate);
+                if (!Number.isNaN(parsedCandidate.getTime())) {
+                    return parsedCandidate.toLocaleString('he-IL');
+                }
+                if (typeof candidate === 'string' && candidate.trim().toLowerCase() === 'invalid date') {
+                    return 'לא זמין';
+                }
+                return candidate;
+            }
+            return 'לא זמין';
         }
 
         if (window.dateUtils?.formatDateTime) {
@@ -550,7 +597,10 @@
 
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
-            return typeof value === 'string' ? value : '';
+            if (typeof value === 'string') {
+                return value.trim().toLowerCase() === 'invalid date' ? 'לא זמין' : value;
+            }
+            return 'לא זמין';
         }
 
         return date.toLocaleString('he-IL');
@@ -709,4 +759,8 @@
     window.refreshDataImportHistory = refreshDataImportHistory;
     window.registerDataImportTable = registerDataImportTable;
 })();
+
+
+
+
 

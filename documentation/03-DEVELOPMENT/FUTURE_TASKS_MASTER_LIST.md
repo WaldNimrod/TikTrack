@@ -17,14 +17,14 @@
 ### 1.1 FUTURE_DEVELOPMENT_ROADMAP – UI/UX כלליים
 - תיקון כפתורי סגירה במודולים.
 - יישור כפתורים בפוטרים (RTL).
-- צבעי כותרות דינמיים.
-- מינוח אחיד בכל המערכת.
+- ✅ **בוצע (11.2025):** צבעי כותרות דינמיים.
+- 🔶 **חשוב:** מינוח אחיד בכל המערכת.
 
 ### 1.2 FUTURE_DEVELOPMENT_ROADMAP – שיפורי נגישות
-- תמיכה בקוראי מסך.
-- ניווט במקלדת.
-- תמיכה בגדלי מסך שונים.
-- שיפור ניגודיות צבעים.
+- 🟦 **עתידי:** תמיכה בקוראי מסך.
+- 🟦 **עתידי:** ניווט במקלדת.
+- 🚨 **דחוף:** תמיכה בגדלי מסך שונים.
+- 🟦 **עתידי:** שיפור ניגודיות צבעים.
 
 ### 1.3 CENTRAL_TASKS_TODO – עמוד עסקעות `executions.js`
 - ניתוב לדף טיקר:
@@ -48,12 +48,12 @@
   - שמירה לשרת.
 
 ### 1.4 CENTRAL_TASKS_TODO – תצוגות נוספות
-- מודל פרטי היסטוריה ב-`background-tasks.js`:
+- ⚙️ **אחר (נדרש פתרון שמירת View State):** מודל פרטי היסטוריה ב-`background-tasks.js`:
   - עיצוב מודל מפורט.
   - הצגת מידע מפורט.
   - פעולות נוספות.
   - התאמת עיצוב לנתונים.
-- אימות משתמש והצטרפות לחדר ב-`realtime-notifications-client.js`:
+- ⚙️ **אחר (בוטל ומיועד להסרה):** אימות משתמש והצטרפות לחדר ב-`realtime-notifications-client.js`:
   - מערכת אימות משתמש.
   - חדרים אישיים.
   - אבטחת חיבור WebSocket.
@@ -66,11 +66,11 @@
   - אינדיקטורים ויזואליים לסטטוס.
   - עדכון רשימות בחירה.
   - הודעת "בפיתוח" זמנית.
-- מערכת תבניות מתקדמת:
+- 🔶 **חשוב:** מערכת תבניות מתקדמת:
   - תבניות למודולים שונים.
   - ממשק ניהול תבניות.
   - תבניות ברירת מחדל.
-- מערכת תגיות מתקדמת:
+- 🚨 **דחוף:** מערכת תגיות מתקדמת:
   - יצירת תגיות וניהולן.
   - סינון וחיפוש לפי תגיות.
   - אנליטיקה לשימוש.
@@ -86,26 +86,20 @@
   - ניהול גרסאות.
 
 ### 1.6 GLOBAL_UI_IMPROVEMENTS_TASKS – פריסת שדרוגים רוחביים
-- הוספת עמודת "עודכן" אחרי עמודת הערות בכל אחד מהעמודים:
+- ⚙️ **אחר (נדרש פתרון שמירת View State):** הוספת עמודת "עודכן" אחרי עמודת הערות בכל אחד מהעמודים:
   - `trades.html`, `accounts.html`, `alerts.html`, `cash-flows.html`, `notes.html`, `trade-plans.html`, `executions.html`.
-- עדכון CSS להבטחת רוחב טבלאות 100% ויישור כותרות למרכז.
-- יישום פונקציית `getTimeDuration` להצגת זמן שעבר מעדכון אחרון.
-- תיקון race condition במחלקות צבע כותרות באמצעות `color-scheme-system.js`.
-- עיצוב עמודת Has Trades עם אייקונים תואמי מערכת.
-- עיצוב מספרים עם שתי ספרות אחרי הנקודה.
-- הטמעת סגנונות RTL בטבלאות, מודלים ורכיבי linked items.
-- הבטחת שימוש ב-CSS variables לצבעי ישויות.
-- עדכון מפת עמודות ומערכת מיון גלובלית (`tables.js`, `table-mappings.js`).
-- קבצים לעדכון:
-  - `trading-ui/styles/table.css`.
-  - `trading-ui/styles/styles.css`.
-  - `trading-ui/styles/linked-items.css`.
-  - `trading-ui/scripts/tables.js`.
-  - `trading-ui/scripts/table-mappings.js`.
-  - `trading-ui/scripts/color-scheme-system.js`.
-  - `trading-ui/scripts/preferences-v2.js` (לתיקון שימוש בצבעים).
+- ✅ **בוצע (11.2025):** עדכון CSS להבטחת רוחב טבלאות 100% ויישור כותרות למרכז.
+- ✅ **בוצע (11.2025):** יישום פונקציית `getTimeDuration` להצגת זמן שעבר מעדכון אחרון.
+- ✅ **בוצע (11.2025):** תיקון race condition במחלקות צבע כותרות באמצעות `color-scheme-system.js`.
+- ✅ **בוצע (11.2025):** עיצוב עמודת Has Trades עם אייקונים תואמי מערכת.
+- ✅ **בוצע (11.2025):** עיצוב מספרים עם שתי ספרות אחרי הנקודה.
+- ✅ **בוצע (11.2025):** הטמעת סגנונות RTL בטבלאות, מודלים ורכיבי linked items.
+- ✅ **בוצע (11.2025):** הבטחת שימוש ב-CSS variables לצבעי ישויות.
+- ✅ **בוצע (11.2025):** עדכון מפת עמודות ומערכת מיון גלובלית (`tables.js`, `table-mappings.js`).
+- ✅ **בוצע (11.2025):** סט קבצים תומכים (table.css, styles.css, linked-items.css, tables.js, table-mappings.js, color-scheme-system.js, preferences-v2.js) סגור לעדכון.
 
 ### 1.7 DEVELOPMENT_TOOLS_STANDARDIZATION_TASKS – סטנדרטיזציה לעמודי כלי פיתוח
+- ⚙️ **אחר (מאוחד בפרויקט עמודי כלי פיתוח):** המעקב מתבצע כעת במסמך הפרויקט הייעודי, אך הסעיפים נשמרים כאן לעיון.
 - לכל אחד מהעמודים (`background-tasks.html`, `cache-test.html`, `db_display.html`, `db_extradata.html`, `linter-realtime-monitor.html`, `notifications-center.html`, `server-monitor.html`, `system-management.html`):
   - ניקוי CSS מיותר.
   - שיוך לכל קבצי ה-CSS המאוחדים (apple-theme, bootstrap, styles, header-system, typography, table, notification-system).
@@ -121,65 +115,65 @@
 ## 2. Backend, תשתיות ושרת
 
 ### 2.1 FUTURE_DEVELOPMENT_ROADMAP – מערכת ביצועים ואופטימיזציה
-- אופטימיזציה של טעינת נתונים.
-- שיפור זמני תגובה.
-- מיטוב שימוש בזיכרון.
+- ⬜ **טרם נקבע סטטוס:** אופטימיזציה של טעינת נתונים.
+- ⬜ **טרם נקבע סטטוס:** שיפור זמני תגובה.
+- ⬜ **טרם נקבע סטטוס:** מיטוב שימוש בזיכרון.
 - יישום מנגנון Cache חכם.
 
 ### 2.2 CENTRAL_TASKS_TODO – משימות תשתית כלליות
-- בדיקת תאימות SSL לפני עדכון תלות (`urllib3`): שמירת הגבלות גרסאות, בדיקת לוגים, בדיקות התאמה.
-- מערכת מיגרציות מתקדמת:
+- ⬜ **טרם נקבע סטטוס:** בדיקת תאימות SSL לפני עדכון תלות (`urllib3`): שמירת הגבלות גרסאות, בדיקת לוגים, בדיקות התאמה.
+- ⬜ **טרם נקבע סטטוס:** מערכת מיגרציות מתקדמת:
   - מיגרציות אוטומטיות בהפעלת השרת.
   - בדיקת תקינות ו-rollback.
   - לוגים מפורטים.
-- אופטימיזציית בסיס נתונים:
+- 🔶 **חשוב:** אופטימיזציית בסיס נתונים:
   - ניתוח ביצועי שאילתות.
   - יצירת אינדקסים מתקדמים.
   - אופטימיזציית סכמות וניטור ביצועים.
-- Advanced Security Features:
+- 🔶 **חשוב:** Advanced Security Features:
   - הצפנת נתונים רגישים.
   - ניהול מפתחות הצפנה (כולל backups).
   - הצפנה בזמן אמת וגיבויים מוצפנים.
   - מערכת הרשאות מתקדמת (ניהול הרשאות גרגולרי, קבוצות, לוג הרשאות).
   - ניהול API Keys (יצירה, הרשאות, מעקב שימוש, ביטול).
-- Performance and Scaling:
+- 🔶 **חשוב:** Performance and Scaling:
   - אינטגרציית Redis (התקנה, אינטגרציה, ניהול cache, ניטור).
   - Load Balancing (הגדרת load balancer, בריאות, failover).
   - Horizontal Scaling (ניהול state, סנכרון, ניטור).
-- Advanced Testing:
+- 🔶 **חשוב:** Advanced Testing:
   - Load Testing (תרחישים, סימולציה, ניתוח, אופטימיזציה).
   - Security Testing (penetration, vulnerability scanning, security audit, compliance).
 
 ### 2.3 SERVER_TASKS_LIST – שיפורי Backend ייעודיים (שאינם הושלמו)
-- השלמת Backend APIs למערכות קיימות:
+- 🔶 **חשוב:** השלמת Backend APIs למערכות קיימות:
   - Query Optimization – נתונים אמיתיים מהדאטהבייס.
   - External Data – נתונים אמיתיים.
   - Performance – מדדי מערכת אמיתיים.
   - בדיקות API מלאות עם נתונים אמיתיים.
-- מערכת Background Tasks מתקדמת:
+- 🟧 **בוצע חלקית:** מערכת Background Tasks מתקדמת:
   - `AdvancedBackgroundTaskManager`.
   - Task Queue עם עדיפויות.
   - Worker system וניהול התקדמות.
   - Error handling ו-API לניהול משימות.
   - UI לנהל משימות (`background-tasks.html`, CSS, JS).
-- מערכת Real-time Notifications:
+- ✅ **בוצע:** מערכת Real-time Notifications:
   - אינטגרציית Flask-SocketIO.
   - ניהול חדרים אישיים, שידור אירועים, הרשאות.
   - מנגנון subscribe/unsubscribe.
-- מערכת API Versioning חכמה:
+- 🔶 **חשוב:** מערכת API Versioning חכמה:
   - ניהול גרסאות.
   - תאימות לאחור.
   - כלי מיגרציה בין גרסאות.
   - זיהוי גרסה אוטומטי.
-- מערכת Data Validation מתקדמת:
+- 🔶 **חשוב:** מערכת Data Validation מתקדמת:
   - מנוע חוקים (rules engine).
   - מאמתים מותאמים אישית.
   - ולידציה לפי סכמות.
   - דיווח שגיאות מפורט.
-- מערכת Analytics מתקדמת:
+- 🟦 **עתידי:** מערכת Analytics מתקדמת:
   - Dashboard למדדי שימוש וביצועים.
   - איסוף metrics.
-- Plugin Architecture:
+- 🟦 **עתידי:** Plugin Architecture:
   - תכנון ארכיטקטורה מודולרית.
   - ממשקי הרחבה.
   - ניהול lifecycle של plugins.
@@ -189,56 +183,56 @@
 ## 3. בסיס נתונים, טריגרים ומיגרציות
 
 ### 3.1 TRIGGERS_AND_FUTURE_FEATURES_TASKS – סבב טריגרים (סבב ג)
-- השלמת טריגרי `active_trades`:
+- ✅ **בוצע:** השלמת טריגרי `active_trades`:
   - יצירת/השלמת `trigger_trade_insert_active_trades`.
   - `trigger_trade_update_active_trades`.
   - `trigger_trade_delete_active_trades`.
   - בדיקות תקינות וביצועים.
-- יצירת טריגרי סטטוס טיקר:
+- ✅ **בוצע:** יצירת טריגרי סטטוס טיקר:
   - טריגרים לכל CRUD על `trade` ו-`trade_plan`.
   - סנכרון `status` בטיקר.
-- בדיקת טריגרים קיימים למניעת התנגשויות.
-- תיעוד מלא של הטריגרים (כולל מדריך תחזוקה ודוגמאות).
+- ✅ **בוצע:** בדיקת טריגרים קיימים למניעת התנגשויות (ראו `documentation/03-DEVELOPMENT/DB/TRIGGER_AUDIT_REPORT.md`).
+- ✅ **בוצע:** תיעוד מלא של הטריגרים (כולל מדריך תחזוקה ודוגמאות מעודכנות).
 
 ### 3.2 TRIGGERS_AND_FUTURE_FEATURES_TASKS – משימות בסיס נתונים מתקדמות
-- יצירת טבלאות חדשות:
+- ✅ **בוצע:** יצירת טבלאות חדשות:
   - `users`.
   - `user_preferences`.
   - `quotes_last`.
   - `intraday_slots` (שלב אופציונלי).
-- העברת מודלים למיקומים נכונים ועדכון imports.
-- יצירת מודל `User` עם יצירה, אימות, הרשאות.
-- עדכון קשרים (Foreign Keys ו-relationships) בכל המודלים.
-- יצירת אינדקסים נדרשים (`ticker_id`, `user_id`, `timestamp`).
-- הוספת ולידציות מתקדמות (אימות אימייל, סיסמה, טלפון).
-- הוספת audit logs לשינויים.
-- אופטימיזציית ביצועים לשאילתות.
+- ✅ **בוצע:** העברת מודלים למיקומים נכונים ועדכון imports.
+- 🔶 **חשוב:** יצירת מודל `User` עם יצירה, אימות, הרשאות.
+- ✅ **בוצע:** עדכון קשרים (Foreign Keys ו-relationships) בכל המודלים.
+- 🔶 **חשוב:** יצירת אינדקסים נדרשים (`ticker_id`, `user_id`, `timestamp`).
+- ✅ **בוצע:** הוספת ולידציות מתקדמות (אימות אימייל, סיסמה, טלפון).
+- ✅ **בוצע:** הוספת audit logs לשינויים.
+- 🔶 **חשוב:** אופטימיזציית ביצועים לשאילתות.
 
 ### 3.3 CENTRAL_TASKS_TODO – משימות בסיס נתונים קריטיות
-- טבלת `users` עם כל השדות הנלווים.
-- טבלת `user_preferences` (קשר ל-users, preference_key/value).
-- מודל `User` ואז מערכת הרשאות בסיסית (admin/user/guest).
-- מערכת אימות משתמשים (login/logout, JWT, refresh).
-- ניהול פרופיל משתמש (עריכה, שינוי סיסמה, העדפות).
-- מערכת הרשאות מתקדמת (בסיס למערכת granular).
-- הוספת ולידציות מתקדמות, גיבוי אוטומטי, מערכת לוגים מתקדמת.
+- ⚙️ **אחר (מאוחד עם בניית מערכת משתמשים):** טבלת `users` עם כל השדות הנלווים.
+- ✅ **בוצע:** טבלת `user_preferences` (קשר ל-users, preference_key/value).
+- 🔶 **חשוב:** מודל `User` ואז מערכת הרשאות בסיסית (admin/user/guest).
+- ⚙️ **אחר (מאוחד עם בניית מערכת משתמשים):** מערכת אימות משתמשים (login/logout, JWT, refresh).
+- ⚙️ **אחר (מאוחד עם בניית מערכת משתמשים):** ניהול פרופיל משתמש (עריכה, שינוי סיסמה, העדפות).
+- ⚙️ **אחר (מאוחד עם בניית מערכת משתמשים):** מערכת הרשאות מתקדמת (בסיס למערכת granular).
+- ✅ **בוצע:** הוספת ולידציות מתקדמות, גיבוי אוטומטי, מערכת לוגים מתקדמת.
 
 ### 3.4 V2_CLEANUP_TASKS – ניקוי מערכת ההעדפות
-- גיבוי בסיס הנתונים לפני כל פעולה.
-- עדכון סקריפטי המיגרציה:
+- ✅ **בוצע:** גיבוי בסיס הנתונים לפני כל פעולה.
+- ✅ **בוצע:** עדכון סקריפטי המיגרציה:
   - `migrate_preferences_v1_to_v2.py` → `migrate_preferences.py` + עדכון שמות פונקציות.
   - `simple_migrate_v1_to_v2.py` → `simple_migrate_preferences.py`.
-- עדכון בדיקות:
+- ✅ **בוצע:** עדכון בדיקות:
   - `test_v2_system.py` → `test_preferences_system.py`.
   - תיקון התייחסויות לטבלאות V2.
-- ניקוי טבלת `user_data_preferences`.
-- בדיקת שלמות ואינטגריטי של טבלאות העדפות.
-- תיקון קבצי Frontend:
+- ✅ **בוצע:** ניקוי טבלת `user_data_preferences`.
+- ✅ **בוצע:** בדיקת שלמות ואינטגריטי של טבלאות העדפות.
+- ✅ **בוצע:** תיקון קבצי Frontend:
   - `preferences-v2.js` → `preferences.js`.
   - `preferences-v2-compatibility.js` → `preferences-compatibility.js`.
   - `preferences-v2.html` → `preferences.html`.
   - עדכון קישורים בכל העמודים (`index`, `tickers`, `executions`).
-- הסרת כל התייחסויות V1/V2 מדוקומנטציה:
+- ✅ **בוצע:** הסרת כל התייחסויות V1/V2 מדוקומנטציה:
   - `documentation/INDEX.md`.
   - `documentation/features/preferences/INDEX.md`.
   - `documentation/frontend/README.md`.
@@ -250,98 +244,98 @@
   - `JAVASCRIPT_ARCHITECTURE_ANALYSIS.md`.
   - `PREFERENCES_SYSTEM_ARCHITECTURE_SPECIFICATION.md`.
   - כל דוחות ה-V2 (`PREFERENCES_V2_*`, `SITE_WIDE_V2_SCAN_REPORT.md`).
-- עדכון קבצי תצורה (JSON, `js_map.py`, `pages.py`, `app.py`).
-- בדיקות נדרשות:
+- ✅ **בוצע:** עדכון קבצי תצורה (JSON, `js_map.py`, `pages.py`, `app.py`).
+- ✅ **בוצע:** בדיקות נדרשות:
   - בדיקות DB (מבנה, אינדקסים, constraints).
   - בדיקות API (Endpoints, error handling, performance).
   - בדיקות Frontend (HTML, CSS, JS, קישורים).
   - בדיקות אינטגרציה מלאות.
-- ניהול גיבויים (DB, Backend, Frontend) לפני כל שינוי.
-- תיקון שגיאות SQLAlchemy mapper המופיעות בלוגים.
+- ✅ **בוצע:** ניהול גיבויים (DB, Backend, Frontend) לפני כל שינוי.
+- ✅ **בוצע:** תיקון שגיאות SQLAlchemy mapper המופיעות בלוגים.
 
 ---
 
 ## 4. תכונות עתידיות ומודולים חדשים
 
 ### 4.1 FUTURE_DEVELOPMENT_ROADMAP – תכונות חדשות
-- מערכת דוחות מתקדמת.
-- אינטגרציה עם פלטפורמות נוספות.
-- מערכת התראות חכמה.
-- אנליטיקה מתקדמת.
+- 🟦 **עתידי:** מערכת דוחות מתקדמת.
+- 🔶 **חשוב:** אינטגרציה עם פלטפורמות נוספות.
+- 🟦 **עתידי:** מערכת התראות חכמה.
+- 🔶 **חשוב:** אנליטיקה מתקדמת.
 
 ### 4.2 CENTRAL_TASKS_TODO – תכונות עתידיות (עדיפות גבוהה)
-- כפילות תכניות וטריידים (כפתור "שכפל", דיאלוג אישור, שימור קשרים).
-- מערכת תבניות מתקדמת (יצירה, שמירה, תבניות ברירת מחדל).
-- חישוב אוטומטי של יעד וסטופ (RR, ATR, overrides, real-time updates).
-- Trading Journal Database Design (מבנה טבלה, קשרים, קטגוריות, חיפוש).
-- מערכת התראות מתקדמת (push, email, SMS, הגדרות אישיות).
-- מערכת דוחות מתקדמת (גרפים, ייצוא, שמירה).
+- 🚨 **דחוף:** כפילות תכניות וטריידים (כפתור "שכפל", דיאלוג אישור, שימור קשרים).
+- ✅ **בוצע:** מערכת תבניות מתקדמת (יצירה, שמירה, תבניות ברירת מחדל).
+- ✅ **בוצע:** חישוב אוטומטי של יעד וסטופ (RR, ATR, overrides, real-time updates).
+- ⚙️ **אחר (דורש שמירת View State):** Trading Journal Database Design (מבנה טבלה, קשרים, קטגוריות, חיפוש).
+- 🟦 **עתידי:** מערכת התראות מתקדמת (push, email, SMS, הגדרות אישיות).
+- 🔶 **חשוב:** מערכת דוחות מתקדמת (גרפים, ייצוא, שמירה).
 
 ### 4.3 CENTRAL_TASKS_TODO – תכונות עתידיות (עדיפות בינונית/נמוכה)
-- שדה `open_plans` לטיקרים (DB triggers, event listeners, UI, API, בדיקות).
-- מערכת קישור אובייקטים מתקדמת (קישורים מותאמים, פוליניווטיבה, היסטוריה).
-- מערכת הערות מתקדמת עם rich text.
-- מערכת היסטוריה מפורטת לכל הפעולות (חיפוש, סינון, ייצוא).
-- מערכת סינון מתקדמת (סינונים מורכבים, שמירת פילטרים, שיתוף).
-- מערכת חיפוש מתקדמת (Full-text, היסטוריה).
-- מערכת ייצוא מתקדמת (PDF, Excel, CSV, עיצובים).
-- מערכת אנליטיקה לתגיות/Linked Objects/Alerts.
-- Field rename "Reasons" → "Strategy" (DB, API, UI, תרגום).
-- Symbol Page ייעודי (מידע, גרפים, חדשות, אינטגרציות).
-- Rich comments system, trade alerts system, advanced entry conditions, advanced reasons/strategy system.
-- Linked Objects Modal Windows – שלב טבלה ושלב מודל עם דרישות UI, עדכוני נתונים בזמן אמת, bulk operations.
-- Transaction Association System (טבלת קשר, כלי bulk, ולידציה, UI).
-- Account Management Functions (עריכה, מחיקה, ולידציה, היסטוריה).
-- Data Update Verification Across All Pages (עדכונים בזמן אמת, polling fallback, כפתורי רענון, מסכי סטטוס).
-- Preferences Page bug – שמירת ברירות מחדל (API file write, לוגים, בדיקות לכל סוגי ההעדפות).
-- Price Data & Ticker Information API (אינטגרציות, נתונים היסטוריים, אחסון, caching, error handling).
-- Trading Journal Implementation מלא (עורך עשיר, קבצים מצורפים, תבניות, חיפוש, אנליטיקה, ייצוא).
-- Tagging System נרחב (ניהול, סינון, אנליטיקה, הצעות, צבעים, היררכיות, פעולות מרובות).
-- Trade Alerts System (יצירה, ניהול, היסטוריה, התראות).
-- Advanced Alert Types (נפח, תנאים מותאמים).
-- Advanced Template Features, General Functionality Placeholders.
-- Top Section Spacing Enhancement (מרווח עליון קבוע, בדיקות responsiveness, תאימות header).
+- ✅ **בוצע:** שדה `open_plans` לטיקרים (DB triggers, event listeners, UI, API, בדיקות).
+- ✅ **בוצע:** מערכת קישור אובייקטים מתקדמת (קישורים מותאמים, פוליניווטיבה, היסטוריה).
+- ✅ **בוצע:** מערכת הערות מתקדמת עם rich text.
+- ⚙️ **אחר (דורש פתרון שמירת View State):** מערכת היסטוריה מפורטת לכל הפעולות (חיפוש, סינון, ייצוא).
+- ✅ **בוצע:** מערכת סינון מתקדמת (סינונים מורכבים, שמירת פילטרים, שיתוף).
+- 🟦 **עתידי:** מערכת חיפוש מתקדמת (Full-text, היסטוריה).
+- 🔶 **חשוב:** מערכת ייצוא מתקדמת (PDF, Excel, CSV, עיצובים).
+- ⚙️ **אחר (משוייך לפרויקט תגיות):** מערכת אנליטיקה לתגיות/Linked Objects/Alerts.
+- ✅ **בוצע:** Field rename "Reasons" → "Strategy" (DB, API, UI, תרגום).
+- ⚙️ **אחר (הרחבת מודול פרטי טיקר – עתידי):** Symbol Page ייעודי (מידע, גרפים, חדשות, אינטגרציות).
+- ✅ **בוצע:** Linked Objects Modal Windows – שלב טבלה ושלב מודל עם דרישות UI, עדכוני נתונים בזמן אמת, bulk operations.
+- ✅ **בוצע:** Transaction Association System (טבלת קשר, כלי bulk, ולידציה, UI).
+- ⚙️ **אחר (בתהליך במסגרת מערכת הייבוא):** Account Management Functions (עריכה, מחיקה, ולידציה, היסטוריה).
+- ✅ **בוצע:** Data Update Verification Across All Pages (עדכונים בזמן אמת, polling fallback, כפתורי רענון, מסכי סטטוס).
+- ✅ **בוצע:** Preferences Page bug – שמירת ברירות מחדל (API file write, לוגים, בדיקות לכל סוגי ההעדפות).
+- 🔶 **חשוב:** Price Data & Ticker Information API (אינטגרציות, נתונים היסטוריים, אחסון, caching, error handling).
+- ⚙️ **אחר (דורש פתרון שמירת View State):** Trading Journal Implementation מלא (עורך עשיר, קבצים מצורפים, תבניות, חיפוש, אנליטיקה, ייצוא).
+- ⚙️ **אחר (משוייך לפרויקט תגיות):** Tagging System נרחב (ניהול, סינון, אנליטיקה, הצעות, צבעים, היררכיות, פעולות מרובות).
+- ✅ **בוצע:** Trade Alerts System (יצירה, ניהול, היסטוריה, התראות).
+- 🔶 **חשוב:** Advanced Alert Types (נפח, תנאים מותאמים).
+- 🟦 **עתידי:** Advanced Template Features, General Functionality Placeholders.
+- ✅ **בוצע:** Top Section Spacing Enhancement (מרווח עליון קבוע, בדיקות responsiveness, תאימות header).
+- 🔶 **קריטי – בתהליך:** דגשים למערכות תנאים, אסטרטגיות ותיוג (הרחבת מערכת סיבות ותנאים).
 
 ### 4.4 TRIGGERS_AND_FUTURE_FEATURES_TASKS – השלמה/דגשים נוספים
-- הדגשת הצורך בתנאי כניסה מתקדמים, מערכת אסטרטגיות, מערכת תיוג, אימות עדכון נתונים, עמוד סימבול, חלונות מודל לפריטים מקושרים, Real-time alerts, פונקציות ניהול בדיקות, שינוי שם שדות.
-- הרחבה על `open_plans` (מיגרציה, מודל, API, UI, בדיקות).
+- 🔶 **קריטי – בתהליך:** הדגשת הצורך בתנאי כניסה מתקדמים, מערכת אסטרטגיות, מערכת תיוג, אימות עדכון נתונים, עמוד סימבול, חלונות מודל לפריטים מקושרים, Real-time alerts, פונקציות ניהול בדיקות, שינוי שם שדות.
+- ✅ **בוצע:** הרחבה על `open_plans` (מיגרציה, מודל, API, UI, בדיקות).
 
 ---
 
 ## 5. איכות, בדיקות וכלי פיתוח
 
 ### 5.1 CENTRAL_TASKS_TODO – משימות בדיקה
-- בדיקות יחידה:
+- 🟧 **בוצע חלקית:** בדיקות יחידה:
   - מודלים, שירותים, API endpoints, רכיבי UI.
-- בדיקות אינטגרציה:
+- 🟧 **בוצע חלקית:** בדיקות אינטגרציה:
   - בין מודולים, End-to-End, בסיס נתונים, מערכת מלאה.
-- בדיקות UI/UX:
+- 🟧 **בוצע חלקית:** בדיקות UI/UX: _(סבב נגישות נובמבר 2025 הושלם – axe, התאמות צבעים ודוקומנטציה מעודכנת)_
   - תאימות דפדפנים, רספונסיביות, נגישות, ביצועים.
 
 ### 5.2 LINTER_IMPLEMENTATION_PLAN – אסטרטגיית ניקוי קוד
-- הפחתת אזהרות `no-console` ל-300 תוך החלפתם במערכת הלוגים המאוחדת.
-- טיפול ב-`class-methods-use-this` (המרה ל-static).
-- טיפול ב-`require-await`, `max-len`, `no-unused-vars`, `no-shadow`.
-- ניקוי קבצים עם אזהרות רבות (`header-system.js`, `system-test-center*.js`, `external-data-dashboard.js`, `server-monitor.js`, `realtime-notifications-client.js`, `notifications-center.js`, `db-extradata.js`, `notifications-center-backup.js`, `console-cleanup.js`).
-- השלמת ניקוי 5 קבצים לחלוטין (בכל גל עבודה).
-- יעדי טווח בינוני וארוך:
+- 🟧 **בוצע חלקית:** הפחתת אזהרות `no-console` ל-300 תוך החלפתם במערכת הלוגים המאוחדת.
+- 🟧 **בוצע חלקית:** טיפול ב-`class-methods-use-this` (המרה ל-static).
+- 🟧 **בוצע חלקית:** טיפול ב-`require-await`, `max-len`, `no-unused-vars`, `no-shadow`.
+- ✅ **בוצע:** ניקוי קבצים עם אזהרות רבות (`header-system.js`, `system-test-center*.js`, `external-data-dashboard.js`, `server-monitor.js`, `realtime-notifications-client.js`, `notifications-center.js`, `db-extradata.js`, `notifications-center-backup.js`, `console-cleanup.js`).
+- ✅ **בוצע:** השלמת ניקוי 5 קבצים לחלוטין (בכל גל עבודה).
+- ✅ **בוצע:** יעדי טווח בינוני וארוך:
   - הפחתת אזהרות ל-500 ואז ל-200.
   - ניקוי 15 קבצים נוספים ואז 80% מהקבצים.
   - השגת איכות קוד מקצועית תוך 60–80 שעות עבודה מצטברת.
 - שימוש בפקודות `eslint --fix`, דוחות מפורטים, קונבנציות תיעוד.
 
 ### 5.3 DEVELOPMENT_TOOLS_STANDARDIZATION_TASKS – סטנדרטיזציה של כלי פיתוח
-- הוספת העיצוב והמבנה החדשים לכל עמודי כלי הפיתוח.
-- הבטחת שימוש בסגנונות המאוחדים והכפתורים הסטנדרטיים.
-- אינטגרציה עם מערכת ההודעות להצלחות/שגיאות.
-- בדיקת כפתורי copyDetailedLog בכל עמוד ואימות הפלט.
-- סידור סדר עבודה מומלץ (תחילה עמודים עם עדכון חלקי, לאחר מכן מלאים).
+- ⚙️ **אחר (מתועד בפרויקט עמודי כלי פיתוח):** הוספת העיצוב והמבנה החדשים לכל עמודי כלי הפיתוח.
+- ⚙️ **אחר (מתועד בפרויקט עמודי כלי פיתוח):** הבטחת שימוש בסגנונות המאוחדים והכפתורים הסטנדרטיים.
+- ⚙️ **אחר (מתועד בפרויקט עמודי כלי פיתוח):** אינטגרציה עם מערכת ההודעות להצלחות/שגיאות.
+- ⚙️ **אחר (מתועד בפרויקט עמודי כלי פיתוח):** בדיקת כפתורי copyDetailedLog בכל עמוד ואימות הפלט.
+- ⚙️ **אחר (מתועד בפרויקט עמודי כלי פיתוח):** סידור סדר עבודה מומלץ (תחילה עמודים עם עדכון חלקי, לאחר מכן מלאים).
 
 ### 5.4 SERVER_TASKS_LIST – ניטור והמשך שיפורים
-- לאחר השלמת המערכות הקריטיות, להתמקד במערכת Background Tasks כמשימה הבאה.
-- ליישר קו על הפעלת APIs אמיתיים עבור Query Optimization/External Data/Performance.
-- להרחיב את Unified Test Center עם נתונים אמיתיים לאחר השלמת ה-APIs.
-- למדוד מדדי הצלחה (זמני תגובה, שימוש CPU/זיכרון, throughput, UX, אמינות, Maintainability, Scalability).
+- 🚨 **דחוף:** לאחר השלמת המערכות הקריטיות, להתמקד במערכת Background Tasks כמשימה הבאה.
+- ✅ **בוצע:** ליישר קו על הפעלת APIs אמיתיים עבור Query Optimization/External Data/Performance.
+- ✅ **בוצע:** להרחיב את Unified Test Center עם נתונים אמיתיים לאחר השלמת ה-APIs.
+- ✅ **בוצע:** למדוד מדדי הצלחה (זמני תגובה, שימוש CPU/זיכרון, throughput, UX, אמינות, Maintainability, Scalability).
 
 ---
 

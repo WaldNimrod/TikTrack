@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1073</span>
+                <span class='fraction'>0/1071</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/834</span>
+                <span class='fraction'>0/830</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1044</span>
+                <span class='fraction'>0/1042</span>
             </div>
         
             
@@ -5239,7 +5239,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -5679,7 +5679,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -6120,7 +6120,7 @@ function <span class="fstat-no" title="function not covered" >getInvestmentTypeC
 &nbsp;
   // השתמש במערכת הצבעים הכללית אם היא זמינה
   const typeColors = <span class="cstat-no" title="statement not covered" >{</span>
-    'swing': window.getEntityColor ? window.getEntityColor('trade') : '#007bff',
+    'swing': window.getEntityColor ? window.getEntityColor('trade') : '#26baac',
     'investment': window.getEntityColor ? window.getEntityColor('account') : '#28a745',
     'passive': window.getEntityColor ? window.getEntityColor('note') : '#6f42c1',
   };
@@ -6758,7 +6758,7 @@ async function <span class="fstat-no" title="function not covered" >_REMOVED_loa
     // טעינת חשבונות, תוכניות טרייד וטיקרים
     const [accountsResponse, tradePlansResponse, tickersResponse] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
       fetch('/api/trading-accounts/'),
-      fetch('/api/trade_plans/'),
+      fetch('/api/trade-plans/'),
       fetch('/api/tickers/'),
     ]);
 &nbsp;
@@ -6773,7 +6773,7 @@ async function <span class="fstat-no" title="function not covered" >_REMOVED_loa
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = <span class="cstat-no" title="statement not covered" >document.getElementById('editTradeAccountId');</span>
 <span class="cstat-no" title="statement not covered" >    if (accountSelect) {</span>
-<span class="cstat-no" title="statement not covered" >      accountSelect.innerHTML = '&lt;option value=""&gt;בחר חשבון&lt;/option&gt;';</span>
+<span class="cstat-no" title="statement not covered" >      accountSelect.innerHTML = '&lt;option value=""&gt;בחר חשבון מסחר...&lt;/option&gt;';</span>
       const openAccounts = <span class="cstat-no" title="statement not covered" >accounts.data.filter(<span class="fstat-no" title="function not covered" >ac</span>count =&gt; <span class="cstat-no" title="statement not covered" >account.status === 'open')</span>;</span>
 <span class="cstat-no" title="statement not covered" >      openAccounts.forEach(<span class="fstat-no" title="function not covered" >ac</span>count =&gt; {</span>
         const option = <span class="cstat-no" title="statement not covered" >document.createElement('option');</span>
@@ -7404,13 +7404,13 @@ async function <span class="fstat-no" title="function not covered" >loadModalDat
     const accounts = <span class="cstat-no" title="statement not covered" >await accountsResponse.json();</span>
 &nbsp;
     // טעינת תוכניות טרייד
-    const tradePlansResponse = <span class="cstat-no" title="statement not covered" >await fetch('/api/trade_plans/');</span>
+    const tradePlansResponse = <span class="cstat-no" title="statement not covered" >await fetch('/api/trade-plans/');</span>
     const tradePlans = <span class="cstat-no" title="statement not covered" >await tradePlansResponse.json();</span>
 &nbsp;
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = <span class="cstat-no" title="statement not covered" >document.getElementById('addTradeAccountId');</span>
 <span class="cstat-no" title="statement not covered" >    if (accountSelect) {</span>
-<span class="cstat-no" title="statement not covered" >      accountSelect.innerHTML = '&lt;option value=""&gt;בחר חשבון&lt;/option&gt;';</span>
+<span class="cstat-no" title="statement not covered" >      accountSelect.innerHTML = '&lt;option value=""&gt;בחר חשבון מסחר...&lt;/option&gt;';</span>
       const openAccounts = <span class="cstat-no" title="statement not covered" >accounts.data.filter(<span class="fstat-no" title="function not covered" >ac</span>count =&gt; <span class="cstat-no" title="statement not covered" >account.status === 'open')</span>;</span>
 <span class="cstat-no" title="statement not covered" >      openAccounts.forEach(<span class="fstat-no" title="function not covered" >ac</span>count =&gt; {</span>
         const option = <span class="cstat-no" title="statement not covered" >document.createElement('option');</span>
@@ -8121,7 +8121,7 @@ async function <span class="fstat-no" title="function not covered" >loadTradePla
     const planId = <span class="cstat-no" title="statement not covered" >link.getAttribute('data-plan-id');</span>
 <span class="cstat-no" title="statement not covered" >    if (planId) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
-        const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trade_plans/${planId}`);</span>
+        const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trade-plans/${planId}`);</span>
 <span class="cstat-no" title="statement not covered" >        if (response.ok) {</span>
           const data = <span class="cstat-no" title="statement not covered" >await response.json();</span>
 <span class="cstat-no" title="statement not covered" >          if (data.status === 'success' &amp;&amp; data.data) {</span>
@@ -8198,8 +8198,8 @@ async function <span class="fstat-no" title="function not covered" >validateTrad
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // קבלת פרטי התוכנית החדשה
-    const base = <span class="cstat-no" title="statement not covered" >location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';</span>
-    const url = <span class="cstat-no" title="statement not covered" >`${base}/api/trade_plans/${newTradePlanId}`;</span>
+    // Use relative URL to work with both development (8080) and production (5001)
+    const url = <span class="cstat-no" title="statement not covered" >`/api/trade-plans/${newTradePlanId}`;</span>
     const response = <span class="cstat-no" title="statement not covered" >await fetch(url);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (!response.ok) {</span>
@@ -8472,7 +8472,7 @@ async function <span class="fstat-no" title="function not covered" >validateTrad
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // קבלת פרטי תוכנית הטרייד
-    const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trade_plans/${tradePlanId}`);</span>
+    const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trade-plans/${tradePlanId}`);</span>
 <span class="cstat-no" title="statement not covered" >    if (!response.ok) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('שגיאה בקבלת פרטי תוכנית טרייד');</span>
     }
@@ -8519,7 +8519,7 @@ async function <span class="fstat-no" title="function not covered" >updateEditTr
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // קבלת פרטי התוכנית
-    const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trade_plans/${tradePlanId}`);</span>
+    const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trade-plans/${tradePlanId}`);</span>
 <span class="cstat-no" title="statement not covered" >    if (!response.ok) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('שגיאה בקבלת פרטי תוכנית טרייד');</span>
     }
@@ -8638,8 +8638,8 @@ async function <span class="fstat-no" title="function not covered" >reactivateTr
 <span class="cstat-no" title="statement not covered" >      throw new Error('טרייד לא נמצא');</span>
     }
 &nbsp;
-    const base = <span class="cstat-no" title="statement not covered" >location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';</span>
-    const response = <span class="cstat-no" title="statement not covered" >await fetch(`${base}/api/trades/${tradeId}`, {</span>
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = <span class="cstat-no" title="statement not covered" >await fetch(`/api/trades/${tradeId}`, {</span>
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -8947,7 +8947,7 @@ async function <span class="fstat-no" title="function not covered" >_REMOVED_cop
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.024Z
+                at 2025-11-12T23:38:03.562Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

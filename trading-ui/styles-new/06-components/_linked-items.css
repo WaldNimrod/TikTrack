@@ -131,7 +131,7 @@
   object-fit: contain;
 }
 
-.linked-items-table-icon.entity-trade { --linked-item-color: var(--entity-trade-color, #007bff); }
+.linked-items-table-icon.entity-trade { --linked-item-color: var(--entity-trade-color, #26baac); }
 .linked-items-table-icon.entity-trade_plan { --linked-item-color: var(--entity-trade-plan-color, #28a745); }
 .linked-items-table-icon.entity-execution { --linked-item-color: var(--entity-execution-color, #17a2b8); }
 .linked-items-table-icon.entity-trading_account { --linked-item-color: var(--entity-trading-account-color, #28a745); }

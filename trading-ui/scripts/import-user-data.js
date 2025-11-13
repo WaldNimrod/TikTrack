@@ -15,6 +15,31 @@
  * Last Updated: 2025-01-16
  */
 
+/*
+ * ==========================================
+ * FUNCTION INDEX (Key Sections)
+ * ==========================================
+ * INITIALIZATION & STATE
+ *   - createEmptyProblemState()
+ *   - resetImportModalState()
+ *   - initializeImportModal()
+ * DATA FLOW
+ *   - startImportAnalysis()
+ *   - displayPreviewData()
+ *   - executeFinalImport()
+ * PROBLEM RESOLUTION
+ *   - clearProblemSections()
+ *   - displayExistingRecords()
+ *   - renderMissingTickerCard()
+ * UI INTERACTION
+ *   - handleImportStepChange()
+ *   - updateImportProgressBar()
+ * COMPATIBILITY HELPERS
+ *   - clearProblemSectionsLegacy()
+ *   - displayExistingRecordsLegacy()
+ * ==========================================
+ */
+
 // Global state for import modal
 let currentSessionId = null;
 let currentStep = 1;
@@ -23,7 +48,7 @@ let selectedAccount = null;
 let selectedConnector = null;
 let analysisResults = null;
 let previewData = null;
-let detectedDataTypes = [];
+let dataTypeAvailabilityMap = {};
 let selectedDataTypeKey = 'executions';
 let currencyCacheByCode = null;
 let tickersModalConfigPromise = null;
@@ -33,40 +58,199 @@ const TICKER_REMARKS_EDITOR_ID = 'tickerRemarksRichText';
 const ACTIVE_SESSION_STORAGE_KEY = 'tiktrack_import_user_data_session';
 const ACTIVE_SESSION_SOURCE = 'import-user-data';
 let importModalBootstrapInstance = null;
+let problemTrackingSessionId = null;
 
 const IMPORT_DATA_TYPE_DEFINITIONS = {
     executions: {
         key: 'executions',
         label: 'ביצועי מסחר (Executions)',
         description: 'ייבוא רשומות ביצועי מסחר הכוללות תאריך, פעולה, כמות, מחיר ונתוני עמלות.',
-        documentationAnchor: '#import-executions-pipeline'
+        documentationAnchor: '#import-executions-pipeline',
+        entityType: 'execution'
     },
     cashflows: {
         key: 'cashflows',
         label: 'תזרימי מזומנים (Cash Flows)',
         description: 'ייבוא והצלבת תזרימי מזומנים: הפקדות, משיכות, דיבידנדים, ריביות והחזרי מס אל מול נתוני המערכת.',
-        documentationAnchor: '#import-cashflows-pipeline'
+        documentationAnchor: '#import-cashflows-pipeline',
+        entityType: 'cash_flow'
     },
     account_reconciliation: {
         key: 'account_reconciliation',
         label: 'בדיקת שיוך חשבון',
         description: 'אימות מלא של חשבון מסחר: מטבע בסיס, הרשאות, יתרות פתיחה וחיבורים פעילים לפני ייבוא.',
-        documentationAnchor: '#account-reconciliation-pipeline'
+        documentationAnchor: '#account-reconciliation-pipeline',
+        entityType: 'trading_account'
     },
     portfolio_positions: {
         key: 'portfolio_positions',
         label: 'השוואת פורטפוליו',
         description: 'פלייסהולדר: השוואת פוזיציות פתוחות, NAV ושווי שוק מול נתוני המערכת.',
-        documentationAnchor: '#portfolio-reconciliation-pipeline'
+        documentationAnchor: '#portfolio-reconciliation-pipeline',
+        entityType: 'position'
     },
     taxes_and_fx: {
         key: 'taxes_and_fx',
         label: 'ריביות, מיסים והפרשי מטבע',
         description: 'פלייסהולדר: זיהוי הפרשים בריביות, מיסים ותרגומי מטבע ביחס לנתוני הבסיס.',
-        documentationAnchor: '#taxes-and-fx-pipeline'
+        documentationAnchor: '#taxes-and-fx-pipeline',
+        entityType: 'cash_flow'
     }
 };
 const ACTIVE_IMPORT_DATA_TYPES = new Set(['executions', 'cashflows', 'account_reconciliation']);
+
+const PROBLEM_RESOLUTION_TTL = 5 * 60 * 1000; // 5 minutes
+
+function createEmptyProblemState() {
+    return {
+        missingTickers: new Map(),
+        withinFileDuplicates: new Map(),
+        existingRecords: new Map(),
+        cashflowMissingAccounts: new Map(),
+        cashflowCurrencyIssues: new Map(),
+        accountMissingAccounts: new Map(),
+        accountCurrencyMismatches: new Map(),
+        accountEntitlementWarnings: new Map(),
+        accountMissingDocuments: new Map()
+    };
+}
+
+const problemResolutionState = {
+    previous: createEmptyProblemState(),
+    resolved: createEmptyProblemState()
+};
+
+function clearProblemTrackingState() {
+    problemResolutionState.previous = createEmptyProblemState();
+    problemResolutionState.resolved = createEmptyProblemState();
+}
+
+function normalizeProblemTicker(value) {
+    if (!value) {
+        return null;
+    }
+    if (typeof value === 'string') {
+        return value.trim().toUpperCase();
+    }
+    if (typeof value === 'object') {
+        const symbol = value.symbol || value.ticker || value.display_symbol || value.code;
+        return symbol ? String(symbol).trim().toUpperCase() : null;
+    }
+    return null;
+}
+
+function normalizeAccountIdentifier(account) {
+    if (!account) {
+        return null;
+    }
+    if (typeof account === 'string') {
+        return account.trim();
+    }
+    const accountId = account.account_id
+        || account.accountId
+        || account.id
+        || account.trading_account_id
+        || account.account;
+    if (accountId) {
+        return String(accountId).trim();
+    }
+    const provider = account.provider || account.provider_name || account.connector;
+    const name = account.name || account.label || account.description || '';
+    const combined = [provider, name].filter(Boolean).join(':');
+    if (combined) {
+        return combined.trim();
+    }
+    try {
+        return JSON.stringify(account);
+    } catch (error) {
+        return String(account);
+    }
+}
+
+function buildGenericIdentifier(value, prefix) {
+    if (value === null || value === undefined) {
+        return null;
+    }
+    if (typeof value === 'string') {
+        return `${prefix}:${value.trim()}`;
+    }
+    try {
+        return `${prefix}:${JSON.stringify(value)}`;
+    } catch (error) {
+        return `${prefix}:${String(value)}`;
+    }
+}
+
+function trackProblemStatus(problemKey, items, identifierFn, metadataFn) {
+    if (problemTrackingSessionId !== currentSessionId) {
+        clearProblemTrackingState();
+        problemTrackingSessionId = currentSessionId;
+    }
+
+    const now = Date.now();
+    const prevMap = problemResolutionState.previous[problemKey] || new Map();
+    const resolvedMap = problemResolutionState.resolved[problemKey] || new Map();
+
+    const currentMap = new Map();
+    (items || []).forEach((item) => {
+        const id = identifierFn(item);
+        if (!id) {
+            return;
+        }
+        const meta = metadataFn ? metadataFn(item) : { id, title: id };
+        currentMap.set(id, meta);
+    });
+
+    prevMap.forEach((meta, id) => {
+        if (!currentMap.has(id)) {
+            resolvedMap.set(id, {
+                meta,
+                resolvedAt: now
+            });
+        }
+    });
+
+    currentMap.forEach((meta, id) => {
+        if (resolvedMap.has(id)) {
+            resolvedMap.delete(id);
+        }
+    });
+
+    resolvedMap.forEach((entry, id) => {
+        if (now - entry.resolvedAt > PROBLEM_RESOLUTION_TTL) {
+            resolvedMap.delete(id);
+        }
+    });
+
+    problemResolutionState.previous[problemKey] = currentMap;
+    problemResolutionState.resolved[problemKey] = resolvedMap;
+
+    return {
+        resolvedEntries: Array.from(resolvedMap.values()).map(entry => entry.meta),
+        currentMap
+    };
+}
+
+function renderResolvedProblemCard(meta = {}) {
+    const title = escapeHtml(meta.title || meta.id || 'בעיה טופלה');
+    const description = escapeHtml(meta.description || 'הבעיה טופלה בהצלחה.');
+    const icon = meta.icon || 'bi bi-check-circle';
+    return `
+        <div class="problem-card resolved-card">
+            <div class="problem-card-header">
+                <i class="${icon}"></i>
+                <span>${title}</span>
+            </div>
+            <div class="problem-card-body">
+                <p>${description}</p>
+            </div>
+        </div>
+    `;
+}
+
+if (typeof window !== 'undefined') {
+    window.symbolMetadataCache = symbolMetadataCache;
+}
 
 let processingOverlayElement = null;
 function showProcessingOverlay(message = 'טוען ומעבד נתונים...') {
@@ -116,6 +300,46 @@ function hideProcessingOverlay() {
     }
 }
 
+function setAnalysisLoadingState(isLoading, message = 'טוען ומעבד נתונים...', progress = null) {
+    const indicator = document.getElementById('analysisLoadingIndicator');
+    if (indicator) {
+        indicator.style.display = isLoading ? 'flex' : 'none';
+        const messageElement = indicator.querySelector('.analysis-loading-text');
+        if (messageElement && message) {
+            messageElement.textContent = message;
+        }
+        const progressBar = document.getElementById('analysisProgressBar');
+        if (progressBar) {
+            let percentValue = Number(progressBar.dataset.progressValue || 0);
+            if (typeof progress === 'number' && !Number.isNaN(progress)) {
+                percentValue = Math.max(0, Math.min(100, progress));
+                progressBar.dataset.progressValue = String(percentValue);
+            } else if (!isLoading) {
+                percentValue = 0;
+                progressBar.dataset.progressValue = '0';
+            }
+            progressBar.style.width = `${percentValue}%`;
+            progressBar.setAttribute('aria-valuenow', percentValue);
+            progressBar.classList.toggle('progress-bar-striped', isLoading);
+            progressBar.classList.toggle('progress-bar-animated', isLoading);
+        }
+    }
+
+    const analysisCards = document.querySelector('.analysis-cards');
+    if (analysisCards) {
+        analysisCards.style.opacity = isLoading ? '0.4' : '';
+    }
+
+    const dataTypeSelect = document.getElementById('importDataTypeSelect');
+    if (dataTypeSelect) {
+        if (currentStep >= 2) {
+            dataTypeSelect.disabled = Boolean(isLoading);
+        } else if (!isLoading) {
+            dataTypeSelect.disabled = false;
+        }
+    }
+}
+
 function normaliseSymbolKey(symbol) {
     return typeof symbol === 'string'
         ? symbol.trim().toUpperCase()
@@ -124,6 +348,9 @@ function normaliseSymbolKey(symbol) {
 
 function clearSymbolMetadataCache() {
     symbolMetadataCache = {};
+    if (typeof window !== 'undefined') {
+        window.symbolMetadataCache = symbolMetadataCache;
+    }
 }
 
 function updateSymbolMetadataCache(metadata) {
@@ -156,6 +383,182 @@ function updateSymbolMetadataCache(metadata) {
     if (typeof metadata === 'object') {
         Object.entries(metadata).forEach(([symbol, data]) => assignEntry(symbol, data));
     }
+
+    if (typeof window !== 'undefined') {
+        window.symbolMetadataCache = symbolMetadataCache;
+    }
+}
+
+function initializeDataTypeSelector() {
+    const select = document.getElementById('importDataTypeSelect');
+    if (!select) {
+        return;
+    }
+
+    populateDataTypeSelect(select);
+
+    if (!selectedDataTypeKey || !IMPORT_DATA_TYPE_DEFINITIONS[selectedDataTypeKey]) {
+        selectedDataTypeKey = 'executions';
+    }
+
+    select.value = selectedDataTypeKey;
+    selectedDataTypeKey = select.value || selectedDataTypeKey;
+
+    if (select.dataset.listenerAttached !== 'true') {
+        select.addEventListener('change', handleDataTypeSelectionChange);
+        select.dataset.listenerAttached = 'true';
+    }
+
+    if (Object.keys(dataTypeAvailabilityMap).length > 0) {
+        updateDataTypeAvailability(Object.values(dataTypeAvailabilityMap));
+    } else {
+        updateSelectedDataTypeInfo();
+    }
+}
+
+function populateDataTypeSelect(select) {
+    if (!select) {
+        return;
+    }
+
+    const previousValue = select.value;
+    select.innerHTML = '';
+
+    Object.values(IMPORT_DATA_TYPE_DEFINITIONS).forEach((definition) => {
+        const option = document.createElement('option');
+        option.value = definition.key;
+        const isActive = ACTIVE_IMPORT_DATA_TYPES.has(definition.key);
+        option.textContent = isActive ? definition.label : `${definition.label} (בפיתוח)`;
+        option.disabled = !isActive;
+        option.dataset.status = isActive ? 'available' : 'planned';
+        option.dataset.records = '';
+        select.appendChild(option);
+    });
+
+    if (previousValue && IMPORT_DATA_TYPE_DEFINITIONS[previousValue]) {
+        select.value = previousValue;
+    } else if (selectedDataTypeKey && IMPORT_DATA_TYPE_DEFINITIONS[selectedDataTypeKey]) {
+        select.value = selectedDataTypeKey;
+    }
+}
+
+function handleDataTypeSelectionChange(event) {
+    const select = event.target;
+    selectedDataTypeKey = select.value;
+    if (select) {
+        select.dataset.manualSelection = 'true';
+        select.dataset.serverValue = select.value;
+    }
+    updateSelectedDataTypeInfo();
+    detectAvailableDataTypes();
+}
+
+function updateDataTypeAvailability(detected = []) {
+    dataTypeAvailabilityMap = {};
+    detected.forEach((entry) => {
+        if (entry && entry.key) {
+            dataTypeAvailabilityMap[entry.key] = entry;
+        }
+    });
+
+    const select = document.getElementById('importDataTypeSelect');
+    if (select) {
+        const options = Array.from(select.options);
+        options.forEach((option) => {
+            const definition = IMPORT_DATA_TYPE_DEFINITIONS[option.value];
+            if (!definition) {
+                return;
+            }
+
+            const availability = dataTypeAvailabilityMap[option.value];
+            const isActive = ACTIVE_IMPORT_DATA_TYPES.has(option.value);
+            const status = availability?.status || (isActive ? 'available' : 'planned');
+            option.dataset.status = status;
+            option.dataset.records = availability?.records ?? '';
+            option.disabled = status !== 'available';
+        });
+
+        if (!select.value || select.options[select.selectedIndex]?.disabled) {
+            const fallbackOption = options.find((option) => !option.disabled);
+            if (fallbackOption) {
+                select.value = fallbackOption.value;
+                selectedDataTypeKey = fallbackOption.value;
+            }
+        }
+    }
+
+    updateSelectedDataTypeInfo();
+}
+
+function updateSelectedDataTypeInfo() {
+    const select = document.getElementById('importDataTypeSelect');
+    const infoCard = document.getElementById('dataTypeInfoCard');
+    const titleEl = document.getElementById('dataTypeInfoTitle');
+    const subtitleEl = document.getElementById('dataTypeInfoSubtitle');
+    const contentEl = document.getElementById('dataTypeInfoContent');
+    const modal = document.getElementById('importUserDataModal');
+    const modalDialog = modal?.querySelector('.modal-dialog');
+    const stepContainer = document.getElementById('step-upload');
+    const headerActions = document.getElementById('stepsHeaderPrimaryActions');
+
+    if (!infoCard || !titleEl || !contentEl) {
+        return;
+    }
+
+    const currentKey = (select && select.value) || selectedDataTypeKey;
+
+    if (!currentKey || !IMPORT_DATA_TYPE_DEFINITIONS[currentKey]) {
+        titleEl.textContent = 'בחר תהליך לקבלת מידע';
+        if (subtitleEl) {
+            subtitleEl.textContent = '';
+        }
+        contentEl.innerHTML = '<p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>';
+        applyEntityTypeToImportButtons('cash_flow');
+        if (modalDialog) modalDialog.setAttribute('data-entity-type', 'cash_flow');
+        if (stepContainer) stepContainer.setAttribute('data-entity-type', 'cash_flow');
+        if (headerActions) headerActions.setAttribute('data-entity-type', 'cash_flow');
+        return;
+    }
+
+    const definition = IMPORT_DATA_TYPE_DEFINITIONS[currentKey];
+    const availability = dataTypeAvailabilityMap[currentKey];
+    const status = availability?.status || (ACTIVE_IMPORT_DATA_TYPES.has(currentKey) ? 'available' : 'planned');
+    const records = availability?.records ?? null;
+    const entityType = definition.entityType || getEntityTypeForImport(currentKey);
+
+    titleEl.textContent = definition.label;
+    if (subtitleEl) {
+        const statusLabel = status === 'available' ? 'זמין לניתוח' : 'בפיתוח';
+        subtitleEl.textContent = statusLabel;
+    }
+
+    let statsHtml = '';
+    if (records !== null && !Number.isNaN(records)) {
+        const recordsNumber = Number(records);
+        const recordsLabel = recordsNumber === 0
+            ? '<span class="text-warning">לא נמצאו רשומות בקובץ עבור תהליך זה</span>'
+            : `רשומות שזוהו בקובץ: ${recordsNumber}`;
+        statsHtml = `<div class="data-type-stats">${recordsLabel}</div>`;
+    }
+
+    contentEl.innerHTML = `
+        <p>${definition.description}</p>
+        ${statsHtml}
+        ${definition.documentationAnchor
+            ? `<p class="mt-2"><a href="${definition.documentationAnchor}" target="_blank">למידע נוסף בתיעוד</a></p>`
+            : ''}
+    `;
+
+    if (modalDialog) {
+        modalDialog.setAttribute('data-entity-type', entityType);
+    }
+    if (stepContainer) {
+        stepContainer.setAttribute('data-entity-type', entityType);
+    }
+    if (headerActions) {
+        headerActions.setAttribute('data-entity-type', entityType);
+    }
+    applyEntityTypeToImportButtons(entityType);
 }
 
 function getSymbolMetadata(symbol) {
@@ -180,6 +583,229 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
     return escapeHtml(value);
+}
+
+const CASHFLOW_TYPE_LABELS = {
+    deposit: 'הפקדות',
+    withdrawal: 'משיכות',
+    dividend: 'דיבידנדים',
+    dividend_accrual: 'שינויים בצבירת דיבידנד',
+    interest: 'ריבית',
+    interest_accrual: 'שינויים בצבירת ריבית',
+    tax: 'ניכויי מס',
+    fee: 'עמלות',
+    borrow_fee: 'Borrow Fee',
+    syep_activity: 'פעילות SYEP',
+    syep_interest: 'ריבית SYEP',
+    forex_conversion: 'המרות מט"ח',
+    transfer: 'העברות פנימיות',
+    cash_adjustment: 'התאמות מזומן',
+    unknown: 'סוג לא מזוהה'
+};
+
+function resolveCashflowTypeLabel(typeKey) {
+    if (!typeKey) {
+        return CASHFLOW_TYPE_LABELS.unknown;
+    }
+    const normalised = String(typeKey).toLowerCase();
+    return CASHFLOW_TYPE_LABELS[normalised] || CASHFLOW_TYPE_LABELS.unknown;
+}
+
+function safeToNumber(value) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function formatNumber(value, fractionDigits = 0) {
+    const numeric = safeToNumber(value);
+    return numeric.toLocaleString('he-IL', {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+    });
+}
+
+function formatAmount(value) {
+    return formatNumber(value, 2);
+}
+
+function setAnalysisCardLabel(valueElementId, labelText) {
+    if (!valueElementId) {
+        return;
+    }
+    const valueElement = document.getElementById(valueElementId);
+    if (!valueElement) {
+        return;
+    }
+    const card = valueElement.closest('.analysis-card');
+    if (!card) {
+        return;
+    }
+    const labelElement = card.querySelector('.card-label');
+    if (labelElement && labelText) {
+        labelElement.textContent = labelText;
+    }
+}
+
+function clearCashflowAnalysisSections() {
+    const sections = [
+        { section: 'cashflowTypeSummarySection', content: 'cashflowTypeSummaryCards' },
+        { section: 'cashflowCurrencySummarySection', content: 'cashflowCurrencySummaryCards' },
+        { section: 'cashflowIssuesSummarySection', content: 'cashflowIssuesSummaryList' }
+    ];
+
+    sections.forEach(({ section, content }) => {
+        const sectionElement = document.getElementById(section);
+        const contentElement = content ? document.getElementById(content) : null;
+        if (contentElement) {
+            contentElement.innerHTML = '';
+        }
+        if (sectionElement) {
+            sectionElement.style.display = 'none';
+        }
+    });
+}
+
+function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
+    const section = document.getElementById('cashflowTypeSummarySection');
+    const container = document.getElementById('cashflowTypeSummaryCards');
+    if (!section || !container) {
+        return;
+    }
+
+    container.innerHTML = '';
+    const entries = Object.entries(typeStats);
+    if (!entries.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    entries
+        .sort((a, b) => (b[1]?.total_records || 0) - (a[1]?.total_records || 0))
+        .forEach(([typeKey, stats]) => {
+            const total = safeToNumber(stats.total_records);
+            const valid = safeToNumber(stats.valid_records);
+            const invalid = safeToNumber(stats.invalid_records ?? Math.max(0, total - safeToNumber(stats.valid_records)));
+            const amount = safeToNumber(stats.total_amount ?? totalsByType?.[typeKey]);
+            const primaryCurrencyEntry = Object.entries(stats.currencies || {})
+                .sort(([, amountA], [, amountB]) => Math.abs(amountB) - Math.abs(amountA))[0];
+
+            const card = document.createElement('div');
+            card.className = 'analysis-card';
+            card.innerHTML = `
+                <div class="card-icon"><i class="bi bi-diagram-3"></i></div>
+                <div class="card-content">
+                    <div class="card-number">${formatNumber(total)}</div>
+                    <div class="card-label">${resolveCashflowTypeLabel(typeKey)}</div>
+                    <small>✅ ${formatNumber(valid)} | ⚠️ ${formatNumber(invalid)}</small>
+                    <small>סה״כ סכום: ${formatAmount(amount)}</small>
+                    ${primaryCurrencyEntry ? `<small>מטבע מוביל: ${primaryCurrencyEntry[0]} ${formatAmount(primaryCurrencyEntry[1])}</small>` : ''}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    section.style.display = 'block';
+}
+
+function renderCashflowCurrencyCards(totalsByCurrency = {}) {
+    const section = document.getElementById('cashflowCurrencySummarySection');
+    const container = document.getElementById('cashflowCurrencySummaryCards');
+    if (!section || !container) {
+        return;
+    }
+
+    container.innerHTML = '';
+    const entries = Object.entries(totalsByCurrency)
+        .filter(([currency]) => currency && currency !== 'undefined');
+
+    if (!entries.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    entries
+        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+        .forEach(([currency, amount]) => {
+            const card = document.createElement('div');
+            card.className = 'analysis-card';
+            card.innerHTML = `
+                <div class="card-icon"><i class="bi bi-cash-stack"></i></div>
+                <div class="card-content">
+                    <div class="card-number">${currency}</div>
+                    <div class="card-label">${formatAmount(amount)}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+    section.style.display = 'block';
+}
+
+function renderCashflowIssuesSummary({
+    issuesByType = {},
+    missingAccountDetails = [],
+    currencyIssues = []
+} = {}) {
+    const section = document.getElementById('cashflowIssuesSummarySection');
+    const list = document.getElementById('cashflowIssuesSummaryList');
+    if (!section || !list) {
+        return;
+    }
+
+    list.innerHTML = '';
+    const items = [];
+
+    if (Array.isArray(missingAccountDetails) && missingAccountDetails.length > 0) {
+        items.push({
+            title: 'חשבונות חסרים',
+            count: missingAccountDetails.length,
+            description: 'רשומות הדורשות שיוך חשבון לפני הייבוא.',
+            icon: 'bi-people-fill'
+        });
+    }
+
+    if (Array.isArray(currencyIssues) && currencyIssues.length > 0) {
+        items.push({
+            title: 'בעיות מטבע',
+            count: currencyIssues.length,
+            description: 'נמצאו קודי מטבע שגויים או לא נתמכים בקובץ.',
+            icon: 'bi-currency-exchange'
+        });
+    }
+
+    Object.entries(issuesByType || {}).forEach(([typeKey, entries]) => {
+        if (!Array.isArray(entries) || entries.length === 0) {
+            return;
+        }
+        items.push({
+            title: `שגיאות בסוג ${resolveCashflowTypeLabel(typeKey)}`,
+            count: entries.length,
+            description: 'הרשומות הללו הושמטו בשלב הניתוח ודורשות טיפול ידני.',
+            icon: 'bi-exclamation-octagon'
+        });
+    });
+
+    if (!items.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    items.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'summary-card';
+        card.innerHTML = `
+            <div class="summary-header">
+                <div class="summary-title"><i class="bi ${item.icon}"></i> ${item.title}</div>
+                <div class="summary-subtitle">${formatNumber(item.count)}</div>
+            </div>
+            <div class="summary-body">
+                <p>${item.description}</p>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+
+    section.style.display = 'block';
 }
 
 function sanitizeRichText(html) {
@@ -361,10 +987,29 @@ function syncTickerRemarksEditorToField(modalElement) {
 
 function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
+    const resumeButton = document.getElementById('resumeImportSessionBtn');
+    const hasSession = Boolean(currentSessionId);
+
     if (!resetButton) {
+        if (resumeButton) {
+            resumeButton.style.display = hasSession ? 'inline-flex' : 'none';
+            resumeButton.disabled = !hasSession;
+            resumeButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
+        }
+        updateActiveSessionIndicator();
         return;
     }
-    resetButton.disabled = !currentSessionId;
+
+    resetButton.style.display = hasSession ? 'inline-flex' : 'none';
+    resetButton.disabled = !hasSession;
+    resetButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
+
+    if (resumeButton) {
+        resumeButton.style.display = hasSession ? 'inline-flex' : 'none';
+        resumeButton.disabled = !hasSession;
+        resumeButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
+    }
+
     updateActiveSessionIndicator();
 }
 
@@ -412,6 +1057,13 @@ function updateActiveSessionInfo(updates = {}) {
     activeSessionInfo.connector = connectorValue;
     activeSessionInfo.connectorName = connectorName;
     activeSessionInfo.taskType = taskType;
+    selectedDataTypeKey = taskType;
+    
+    const dataTypeSelect = document.getElementById('importDataTypeSelect');
+    if (dataTypeSelect) {
+        dataTypeSelect.value = taskType;
+    }
+    updateSelectedDataTypeInfo();
     
     const countKeys = [
         'totalRecords',
@@ -443,11 +1095,14 @@ function updateActiveSessionInfo(updates = {}) {
     }
     
     updateActiveSessionIndicator();
+    updateResetSessionButtonState();
     persistActiveSession();
 }
 
 function updateActiveSessionIndicator() {
     const indicator = document.getElementById('activeSessionIndicator');
+    const controlsRow = document.getElementById('activeSessionControlsRow');
+    const detailsRow = document.getElementById('activeSessionDetailsRow');
     if (!indicator) {
         return;
     }
@@ -455,11 +1110,23 @@ function updateActiveSessionIndicator() {
     if (!currentSessionId || !activeSessionInfo) {
         indicator.style.display = 'none';
         indicator.setAttribute('data-has-session', 'false');
+        if (controlsRow) {
+            controlsRow.style.display = 'none';
+        }
+        if (detailsRow) {
+            detailsRow.style.display = 'none';
+        }
         return;
     }
     
     indicator.style.display = 'block';
     indicator.setAttribute('data-has-session', 'true');
+    if (controlsRow) {
+        controlsRow.style.display = '';
+    }
+    if (detailsRow) {
+        detailsRow.style.display = '';
+    }
     
     const sessionIdEl = document.getElementById('activeSessionIdValue');
     const statusEl = document.getElementById('activeSessionStatusValue');
@@ -592,13 +1259,15 @@ function updateActiveSessionFromPreview(preview) {
         return;
     }
     
-    const readyRecords = Array.isArray(preview.records_to_import)
-        ? preview.records_to_import.length
-        : (preview.summary?.records_to_import || activeSessionInfo?.readyRecords || 0);
+    const summary = preview.summary || {};
+    const readyRecords = summary.records_to_import
+        ?? summary.cashflow_records
+        ?? summary.valid_records
+        ?? (Array.isArray(preview.records_to_import) ? preview.records_to_import.length : activeSessionInfo?.readyRecords || 0);
     
-    const skipRecords = Array.isArray(preview.records_to_skip)
-        ? preview.records_to_skip.length
-        : (preview.summary?.records_to_skip || activeSessionInfo?.skipRecords || 0);
+    const skipRecords = summary.records_to_skip
+        ?? summary.invalid_records
+        ?? (Array.isArray(preview.records_to_skip) ? preview.records_to_skip.length : activeSessionInfo?.skipRecords || 0);
     
     updateActiveSessionInfo({
         readyRecords,
@@ -865,6 +1534,26 @@ async function setCurrencySelectValue(selectElement, currencyCode) {
     }
 }
 
+async function ensureModalManagerReady(maxWaitMs = 5000) {
+    const start = Date.now();
+
+    const isReady = () => window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function';
+
+    if (isReady()) {
+        return true;
+    }
+
+    while (Date.now() - start < maxWaitMs) {
+        await new Promise((resolve) => setTimeout(resolve, 150));
+        if (isReady()) {
+            return true;
+        }
+    }
+
+    window.Logger?.error('[Import Modal] ModalManagerV2 not ready for tickers modal', { page: 'import-user-data' });
+    return false;
+}
+
 async function loadCurrencyCache() {
     if (currencyCacheByCode) {
         return currencyCacheByCode;
@@ -894,38 +1583,62 @@ async function loadCurrencyCache() {
     }
 }
 
-async function ensureTickersModalConfigLoaded() {
-    if (window.tickersModalConfig && typeof window.tickersModalConfig === 'object') {
+async function ensureTickersModalConfigLoaded(options = {}) {
+    const { forceReload = false, timeoutMs = 6000 } = options;
+
+    if (!window.tickersModalConfig && window.__TICKERS_MODAL_CONFIG_SOURCE__) {
+        window.tickersModalConfig = window.__TICKERS_MODAL_CONFIG_SOURCE__;
+    }
+
+    const isConfigReady = () => Boolean(window.tickersModalConfig && typeof window.tickersModalConfig === 'object');
+    if (!forceReload && isConfigReady()) {
         return true;
     }
 
-    if (tickersModalConfigPromise) {
+    if (!forceReload && tickersModalConfigPromise) {
         return tickersModalConfigPromise;
     }
 
-    tickersModalConfigPromise = (async () => {
-        const manifestEntry = window.PACKAGE_MANIFEST?.modules?.scripts?.find((script) => script.file === 'modal-configs/tickers-config.js');
-        const scriptPath = manifestEntry?.file || 'modal-configs/tickers-config.js';
-        const versionSuffix = getScriptVersionSuffix('modal-configs/trade-plans-config.js');
+    const manifestEntry = window.PACKAGE_MANIFEST?.modules?.scripts?.find((script) => script.file === 'modal-configs/tickers-config.js');
+    const scriptPath = manifestEntry?.file || 'modal-configs/tickers-config.js';
+    const versionSuffix = getScriptVersionSuffix('modal-configs/tickers-config.js');
 
-        const ensureScriptTag = () => {
-            let script = document.querySelector('script[data-modal-config="tickers"]');
-            if (!script) {
-                script = document.querySelector('script[src*="modal-configs/tickers-config.js"]');
-            }
+    const appendCacheBuster = (base) => {
+        const separator = base.includes('?') ? '&' : '?';
+        return `${base}${separator}reload=${Date.now()}`;
+    };
 
-            if (!script) {
-                script = document.createElement('script');
-                script.src = `scripts/${scriptPath}${versionSuffix || ''}`;
-                script.async = false;
-                script.setAttribute('data-modal-config', 'tickers');
-                document.head.appendChild(script);
-            }
+    const loadScript = () => {
+        let existingScript = document.querySelector('script[data-modal-config="tickers"]')
+            || document.querySelector('script[src*="modal-configs/tickers-config.js"]');
 
+        const requiresReload = forceReload || !existingScript || !isConfigReady();
+
+        if (existingScript && requiresReload) {
+            existingScript.remove();
+            existingScript = null;
+        }
+
+        if (!existingScript) {
+            const script = document.createElement('script');
+            const baseSrc = `scripts/${scriptPath}${versionSuffix || ''}`;
+            script.src = requiresReload ? appendCacheBuster(baseSrc) : baseSrc;
+            script.async = false;
+            script.setAttribute('data-modal-config', 'tickers');
+            document.head.appendChild(script);
             return script;
-        };
+        }
 
-        const scriptElement = ensureScriptTag();
+        if (requiresReload) {
+            const baseSrc = existingScript.getAttribute('src')?.split('?')[0] || `scripts/${scriptPath}`;
+            existingScript.src = appendCacheBuster(`${baseSrc}${versionSuffix || ''}`);
+        }
+
+        return existingScript;
+    };
+
+    const loaderPromise = (async () => {
+        const scriptElement = loadScript();
 
         return await new Promise((resolve) => {
             const complete = (success) => {
@@ -934,35 +1647,35 @@ async function ensureTickersModalConfigLoaded() {
                 resolve(success);
             };
 
-            const checkReady = () => window.tickersModalConfig && typeof window.tickersModalConfig === 'object';
+            const checkReady = () => {
+                if (isConfigReady()) {
+                    complete(true);
+                    return true;
+                }
+                return false;
+            };
 
             if (checkReady()) {
-                complete(true);
                 return;
             }
 
             const pollInterval = setInterval(() => {
-                if (checkReady()) {
-                    complete(true);
-                }
-            }, 100);
+                checkReady();
+            }, 150);
 
             const timeoutId = setTimeout(() => {
                 complete(checkReady());
-            }, 4000);
+            }, timeoutMs);
 
             scriptElement.addEventListener('load', () => {
-                if (checkReady()) {
-                    complete(true);
-                }
+                checkReady();
             }, { once: true });
 
-            scriptElement.addEventListener('error', () => {
-                complete(false);
-            }, { once: true });
+            scriptElement.addEventListener('error', () => complete(false), { once: true });
         });
     })();
 
+    tickersModalConfigPromise = loaderPromise;
     const loaded = await tickersModalConfigPromise;
     if (!loaded) {
         tickersModalConfigPromise = null;
@@ -1143,11 +1856,6 @@ async function openImportUserDataModal() {
     
     // Initialize step 1
     goToStep(1);
-    
-    if (window.modalNavigationManager?.manageBackdrop) {
-        window.modalNavigationManager.manageBackdrop();
-        setTimeout(() => window.modalNavigationManager?.manageBackdrop(), 50);
-    }
 }
 
 /**
@@ -1180,12 +1888,13 @@ function closeImportUserDataModal() {
         document.body.style.paddingRight = '';
         const backdrops = document.querySelectorAll('.modal-backdrop');
         backdrops.forEach(backdrop => backdrop.remove());
-        resetImportModal();
     }
     
-    if (window.modalNavigationManager?.manageBackdrop) {
-        setTimeout(() => window.modalNavigationManager.manageBackdrop(), 50);
-    }
+    setTimeout(() => {
+        window.refreshDataImportHistory?.();
+    }, 250);
+
+    resetImportModal();
 }
 
 /**
@@ -1201,10 +1910,12 @@ function resetImportModal() {
     selectedConnector = null;
     analysisResults = null;
     previewData = null;
-    detectedDataTypes = [];
-    selectedDataTypeKey = null;
+    dataTypeAvailabilityMap = {};
+    selectedDataTypeKey = 'executions';
     activeSessionInfo = null;
     clearSymbolMetadataCache();
+    clearProblemTrackingState();
+    problemTrackingSessionId = null;
     if (window.destroyRichTextEditor) {
         try {
             window.destroyRichTextEditor(TICKER_REMARKS_EDITOR_ID);
@@ -1245,6 +1956,14 @@ function resetImportModal() {
         dropZone.style.display = 'block';
     }
     
+    const dataTypeSelect = document.getElementById('importDataTypeSelect');
+    if (dataTypeSelect) {
+        populateDataTypeSelect(dataTypeSelect);
+        dataTypeSelect.disabled = false;
+        dataTypeSelect.value = selectedDataTypeKey;
+    }
+    updateSelectedDataTypeInfo();
+    
     // Reset event listener flags
     const elementsWithListeners = document.querySelectorAll('[data-listeners-setup]');
     elementsWithListeners.forEach(element => {
@@ -1259,11 +1978,7 @@ function resetImportModal() {
     clearProblemSections();
     updateActiveSessionIndicator();
     
-    const dataTypeCard = document.getElementById('dataTypeSelectionCard');
-    if (dataTypeCard) {
-        dataTypeCard.style.display = 'none';
-    }
-    setDataTypeActionsState(false);
+    setAnalysisLoadingState(false);
 }
 
 function finalizeImportReset(options = {}) {
@@ -1307,6 +2022,16 @@ function resetAnalysisDisplay() {
     const problemResolutionSection = document.getElementById('problemResolutionSection');
     if (problemResolutionSection) {
         problemResolutionSection.style.display = 'none';
+    }
+
+    const analysisActions = document.getElementById('analysisStepActions');
+    const continueBtn = document.getElementById('analysisContinueBtn');
+    if (analysisActions) {
+        analysisActions.style.display = 'none';
+    }
+    if (continueBtn) {
+        continueBtn.disabled = true;
+        continueBtn.setAttribute('aria-disabled', 'true');
     }
 }
 
@@ -1398,13 +2123,27 @@ function clearImportCacheLayers({ reason = 'import-user-data', autoRefresh = fal
  * Go to specific step
  */
 function goToStep(step) {
+    const targetStep = Number(step);
+    if (Number.isNaN(targetStep)) {
+        window.Logger.warn('[Import Modal] Invalid step navigation request', { requestedStep: step, page: 'import-user-data' });
+        return;
+    }
+
+    if (targetStep === 3) {
+        setAnalysisLoadingState(true, 'מכין תצוגה מקדימה...', 85);
+    }
+
     window.Logger.info('[Import Modal] Navigating to step', { 
         from: currentStep, 
-        to: step, 
+        to: targetStep, 
         page: 'import-user-data' 
     });
     
-    currentStep = step;
+    currentStep = targetStep;
+
+    if (typeof setAnalysisLoadingState === 'function' && targetStep !== 2) {
+        setAnalysisLoadingState(false);
+    }
     
     // Update step indicators
     updateStepIndicators();
@@ -1413,14 +2152,14 @@ function goToStep(step) {
     showStepContent(step);
     
     // Load step-specific content
-    if (step === 1) {
+    if (targetStep === 1) {
         window.Logger.debug('[Import Modal] Loading step 1 content', { page: 'import-user-data' });
         loadStep1Content();
-    } else if (step === 2) {
+    } else if (targetStep === 2) {
         window.Logger.debug('[Import Modal] Loading step 2 content (Analysis + Problems)', { page: 'import-user-data' });
         loadStep2Content();
         // loadProblemResolution will be called after analysis is complete
-                    } else if (step === 3) {
+                    } else if (targetStep === 3) {
                         window.Logger.debug('[Import Modal] Loading step 3 content (Preview + Confirmation)', { page: 'import-user-data' });
                         loadPreviewData();
                     }
@@ -1430,7 +2169,7 @@ function goToStep(step) {
     const modal = document.getElementById('importUserDataModal');
     if (modal) {
         // Get the current visible step container
-        const currentStepElement = modal.querySelector(`.import-step[data-step="${step}"]`);
+        const currentStepElement = modal.querySelector(`.import-step[data-step="${targetStep}"]`);
         if (currentStepElement) {
             if (window.processButtons) {
                 window.processButtons(currentStepElement);
@@ -1438,7 +2177,7 @@ function goToStep(step) {
                 window.advancedButtonSystem.processButtons(currentStepElement);
             }
             window.Logger.debug('[Import Modal] Buttons processed for step', { 
-                step, 
+                targetStep, 
                 page: 'import-user-data' 
             });
         } else {
@@ -1449,7 +2188,7 @@ function goToStep(step) {
                 window.advancedButtonSystem.processButtons(modal);
             }
             window.Logger.debug('[Import Modal] Buttons processed for entire modal', { 
-                step, 
+                step: targetStep, 
                 page: 'import-user-data' 
             });
         }
@@ -1459,21 +2198,43 @@ function goToStep(step) {
         currentStep, 
         page: 'import-user-data' 
     });
+    
+    const headerActions = document.getElementById('stepsHeaderPrimaryActions');
+    if (headerActions) {
+        if (window.processButtons) {
+            window.processButtons(headerActions);
+        } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+            window.advancedButtonSystem.processButtons(headerActions);
+        }
+    }
 }
 
 /**
  * Update step indicators
  */
 function updateStepIndicators() {
-    const indicators = document.querySelectorAll('.step-indicator');
+    const indicators = document.querySelectorAll('.import-steps-indicator .step');
     indicators.forEach((indicator, index) => {
         const stepNumber = index + 1;
+        indicator.classList.remove('active', 'completed');
+        const numberEl = indicator.querySelector('.step-number');
+        const labelEl = indicator.querySelector('.step-label');
+        if (numberEl) {
+            numberEl.classList.remove('active', 'completed');
+        }
+        if (labelEl) {
+            labelEl.classList.remove('active', 'completed');
+        }
         if (stepNumber < currentStep) {
             indicator.classList.add('completed');
             indicator.classList.remove('active');
+            if (numberEl) numberEl.classList.add('completed');
+            if (labelEl) labelEl.classList.add('completed');
         } else if (stepNumber === currentStep) {
             indicator.classList.add('active');
             indicator.classList.remove('completed');
+            if (numberEl) numberEl.classList.add('active');
+            if (labelEl) labelEl.classList.add('active');
     } else {
             indicator.classList.remove('active', 'completed');
         }
@@ -1524,6 +2285,8 @@ function showStepContent(step) {
             page: 'import-user-data' 
         });
     }
+
+    updateHeaderActions(step);
 }
 
 /**
@@ -1532,8 +2295,10 @@ function showStepContent(step) {
 function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
     // Event listeners are already set up during initialization
+    initializeDataTypeSelector();
     loadAccounts();
     updateResetSessionButtonState();
+    updateAnalyzeButton();
 }
 
 /**
@@ -1604,6 +2369,20 @@ function setupImportModalEventListeners() {
             page: 'import-user-data' 
         });
     }
+
+    if (modal && modal.dataset.backDelegationAttached !== 'true') {
+        modal.addEventListener('click', (event) => {
+            const trigger = event.target?.closest?.('[data-import-back-step]');
+            if (!trigger || !modal.contains(trigger)) {
+                return;
+            }
+            const targetStep = Number(trigger.getAttribute('data-import-back-step'));
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            goToStep(Number.isNaN(targetStep) ? 1 : targetStep);
+        });
+        modal.dataset.backDelegationAttached = 'true';
+    }
     
     // Mark as set up
     if (modal) {
@@ -1641,6 +2420,23 @@ function handleFileDrop(event) {
     }
 }
 
+function updateHeaderActions(step) {
+    const uploadActions = document.getElementById('uploadStepActions');
+    if (uploadActions) {
+        uploadActions.style.display = step === 1 ? 'flex' : 'none';
+    }
+
+    const analysisActions = document.getElementById('analysisStepActions');
+    if (analysisActions) {
+        analysisActions.style.display = step === 2 ? 'flex' : 'none';
+    }
+
+    const previewActions = document.getElementById('previewStepActions');
+    if (previewActions) {
+        previewActions.style.display = step === 3 ? 'flex' : 'none';
+    }
+}
+
 /**
  * Load step 2 content (File Analysis)
  */
@@ -1648,111 +2444,55 @@ function loadStep2Content() {
     // The HTML content is already in the DOM, just need to display analysis results
     if (analysisResults) {
         displayAnalysisResults(analysisResults);
-        if (!detectedDataTypes.length) {
-            prepareDataTypeSelection(analysisResults);
-        } else {
-            renderDataTypeSelection();
-        }
     }
 }
 
 /**
  * Load confirmation data (Step 5)
  */
-function loadConfirmationData() {
-    // The HTML content is already in the DOM, just need to display confirmation data
-    if (analysisResults && previewData) {
-        displayConfirmationData(analysisResults, previewData);
-    }
-}
 
-/**
- * Load problem resolution
- */
-function loadProblemResolution() {
-    if (!currentSessionId) {
-        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
-        return;
-    }
-
-    const taskKey = selectedDataTypeKey || analysisResults?.task_type || 'executions';
-    fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodeURIComponent(taskKey)}`, {
-        method: 'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success || data.status === 'success') {
-            previewData = data.preview_data;
-            displayProblemResolutionDetailed(data.preview_data);
-        } else {
-            showImportUserDataNotification(`שגיאה בטעינת נתוני בעיות: ${data.error}`, 'error');
-        }
-    })
-    .catch(error => {
-        window.Logger.error('Problem resolution error:', error);
-        showImportUserDataNotification('שגיאה בטעינת נתוני בעיות', 'error');
-    });
-}
-
-async function reanalyseSessionForTask(taskKey) {
+async function reanalyseSessionForTask(taskKey, loadingMessage = 'טוען ומעבד נתונים...') {
     if (!currentSessionId) {
         throw new Error('לא נמצא מזהה סשן פעיל');
     }
 
     const encodedTask = encodeURIComponent(taskKey);
-    const analysisResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/analyze?task_type=${encodedTask}`);
-    const analysisJson = await analysisResponse.json();
+    setAnalysisLoadingState(true, loadingMessage, 90);
 
-    if (!(analysisJson.success || analysisJson.status === 'success')) {
-        const message = getApiErrorMessage(analysisJson, 'ניתוח הקובץ נכשל');
-        throw new Error(message);
+    try {
+        const analysisResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/analyze?task_type=${encodedTask}`);
+        const analysisJson = await analysisResponse.json();
+
+        if (!(analysisJson.success || analysisJson.status === 'success')) {
+            const message = getApiErrorMessage(analysisJson, 'ניתוח הקובץ נכשל');
+            throw new Error(message);
+        }
+
+        analysisResults = analysisJson.analysis_results;
+        const responseTask = analysisResults?.task_type || taskKey;
+        selectedDataTypeKey = responseTask;
+        updateActiveSessionFromAnalysis(analysisResults);
+        displayAnalysisResults(analysisResults);
+        setAnalysisLoadingState(true, 'מעדכן תוצאות ניתוח...', 92);
+
+        const previewResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodedTask}`);
+        const previewJson = await previewResponse.json();
+
+        if (!(previewJson.success || previewJson.status === 'success')) {
+            const message = getApiErrorMessage(previewJson, 'טעינת התצוגה המקדימה נכשלה');
+            throw new Error(message);
+        }
+
+        previewData = previewJson.preview_data;
+        setAnalysisLoadingState(true, 'מכין תצוגה מקדימה...', 97);
+        displayProblemResolutionDetailed(previewData);
+        displayPreviewData(previewData);
+        displayConfirmationData(analysisResults, previewData);
+        updateActiveSessionFromPreview(previewData);
+    } finally {
+        setAnalysisLoadingState(false);
     }
-
-    analysisResults = analysisJson.analysis_results;
-    const responseTask = analysisResults?.task_type || taskKey;
-    selectedDataTypeKey = responseTask;
-    updateActiveSessionFromAnalysis(analysisResults);
-    displayAnalysisResults(analysisResults);
-
-    const previewResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodedTask}`);
-    const previewJson = await previewResponse.json();
-
-    if (!(previewJson.success || previewJson.status === 'success')) {
-        const message = getApiErrorMessage(previewJson, 'טעינת התצוגה המקדימה נכשלה');
-        throw new Error(message);
-    }
-
-    previewData = previewJson.preview_data;
-    displayProblemResolutionDetailed(previewData);
-    displayPreviewData(previewData);
-    displayConfirmationData(analysisResults, previewData);
-    updateActiveSessionFromPreview(previewData);
 }
-
-/**
- * Display problem resolution
- */
-function displayProblemResolution(data) {
-    const container = document.getElementById('problemResolution');
-    if (!container) return;
-    
-    container.innerHTML = `
-        <div class="problem-summary">
-            <h4>סיכום בעיות</h4>
-            <div class="problem-stats">
-                <div class="stat-item">
-                    <span class="stat-label">רשומות עם בעיות:</span>
-                    <span class="stat-value">${data.problematic_records || 0}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">רשומות נקיות:</span>
-                    <span class="stat-value">${data.clean_records || 0}</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
 
 /**
  * Clear problem sections
@@ -1767,7 +2507,8 @@ function clearProblemSections() {
         'accountMissingAccountsSection',
         'accountCurrencyMismatchesSection',
         'accountEntitlementWarningsSection',
-        'accountMissingDocumentsSection'
+        'accountImportWarningsSection',
+        'accountExistingEntriesSection'
     ];
     
     sections.forEach(sectionId => {
@@ -1776,19 +2517,13 @@ function clearProblemSections() {
             section.style.display = 'none';
         }
     });
-
+    
     const containers = [
         'missingTickersContainer',
-        'withinFileDuplicatesContainer',
-        'existingRecordsContainer',
-        'cashflowMissingAccountsContainer',
-        'cashflowCurrencyIssuesContainer',
-        'accountMissingAccountsContainer',
-        'accountCurrencyMismatchesContainer',
-        'accountEntitlementWarningsContainer',
-        'accountMissingDocumentsContainer'
+        'missingAccountsContainer',
+        'missingCashflowAccountsContainer'
     ];
-
+    
     containers.forEach(containerId => {
         const container = document.getElementById(containerId);
         if (container) {
@@ -1804,81 +2539,29 @@ function displayExistingRecords(existingRecords) {
     const section = document.getElementById('existingRecordsSection');
     const container = document.getElementById('existingRecordsContainer');
     
-    if (!section || !container) {
-        window.Logger.warn('[Import Modal] Existing records section not found', { page: 'import-user-data' });
+    if (!section || !container) return;
+    
+    const tracking = trackProblemStatus(
+        'existingRecords',
+        existingRecords,
+        (record) => getDuplicateIdentifier(record, 'existing'),
+        (record) => buildDuplicateResolvedMeta(record, 'רשימה קיימת')
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (existingRecords || []).map((record, index) => 
+        renderDuplicateCard(record, 'existing_record', index)
+    );
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
         return;
     }
-    
+
     section.style.display = 'block';
-    container.innerHTML = '';
-    
-    existingRecords.forEach((recordData, index) => {
-        const card = document.createElement('div');
-        card.className = 'problem-card existing-record-card';
-        
-        // Get the actual record data
-        const record = recordData.record || recordData;
-        const matches = recordData.matches || [];
-        
-        // Calculate confidence score from matches
-        let confidenceScore = 0;
-        if (matches.length > 0) {
-            confidenceScore = matches[0].confidence || 0;
-        }
-        
-        const confidenceColor = confidenceScore >= 80 ? '#28a745' : confidenceScore >= 50 ? '#ffc107' : '#dc3545';
-        
-        card.innerHTML = `
-            <div class="problem-card-header">
-                <div class="problem-card-title">
-                    <i class="bi bi-database"></i>
-                    רשומה קיימת במערכת #${index + 1}
-                </div>
-                <div class="confidence-score" style="color: ${confidenceColor}">
-                    ${confidenceScore.toFixed(1)}% התאמה
-                </div>
-            </div>
-            <div class="problem-card-content">
-                <div class="record-details">
-                    <div class="detail-row">
-                        <span class="detail-label">סמל:</span>
-                        <span class="detail-value">${record.symbol || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">פעולה:</span>
-                        <span class="detail-value">${record.action || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">כמות:</span>
-                        <span class="detail-value">${record.quantity || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">מחיר:</span>
-                        <span class="detail-value">$${record.price || 'לא זמין'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">תאריך:</span>
-                        <span class="detail-value">${record.date || 'לא זמין'}</span>
-                    </div>
-                </div>
-                <div class="problem-card-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="importExistingRecord(${index})">
-                        <i class="bi bi-arrow-down-circle"></i> ייבוא בכל זאת
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="skipExistingRecord(${index})">
-                        <i class="bi bi-x-circle"></i> דלג
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(card);
-    });
-    
-    window.Logger.info('[Import Modal] Displayed existing records', { 
-        count: existingRecords.length, 
-        page: 'import-user-data' 
-    });
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -1934,7 +2617,7 @@ function loadStep5Content() {
                         </div>
             
             <div class="step-actions">
-                <button class="btn btn-secondary" onclick="goToStep(4)">
+                <button class="btn btn-secondary" onclick="proceedToPreviewFromProblems()">
                     <i class="fas fa-arrow-right"></i> חזור לתצוגה מקדימה
                 </button>
                 <button class="btn btn-primary" onclick="showConfirmationModal()">
@@ -1995,7 +2678,10 @@ function updateAnalyzeButton() {
             return;
         }
     
-    const analyzeBtn = modal.querySelector('#analyzeBtn');
+    let analyzeBtn = modal.querySelector('#analyzeBtn');
+    if (!analyzeBtn) {
+        analyzeBtn = modal.querySelector('[data-onclick="analyzeFile()"]');
+    }
     if (!analyzeBtn) {
         window.Logger.warn('[Import Modal] Analyze button not found in modal', { page: 'import-user-data' });
         return;
@@ -2006,8 +2692,10 @@ function updateAnalyzeButton() {
         const connectorSelect = modal.querySelector('#connectorSelect');
         const accountSelect = modal.querySelector('#tradingAccountSelect');
         
+    const dataTypeSelect = modal.querySelector('#importDataTypeSelect');
     const connectorValue = connectorSelect?.value || '';
     const accountValue = accountSelect?.value || '';
+    const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || '';
     const accountSelectedIndex = accountSelect?.selectedIndex ?? -1;
     const accountSelectedOption = accountSelect?.options?.[accountSelectedIndex];
         
@@ -2015,7 +2703,8 @@ function updateAnalyzeButton() {
         const currentSelectedFile = selectedFile || window.selectedFile;
         
     const accountValid = Boolean(accountValue && accountValue !== '0' && !Number.isNaN(Number(accountValue)));
-    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && accountValid);
+    const dataTypeValid = Boolean(dataTypeValue && IMPORT_DATA_TYPE_DEFINITIONS[dataTypeValue]);
+    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && accountValid && dataTypeValid);
     
         const debugInfo = {
             selectedFile: !!currentSelectedFile,
@@ -2028,6 +2717,8 @@ function updateAnalyzeButton() {
             accountSelectedOptionText: accountSelectedOption?.text,
             accountSelectedOptionValue: accountSelectedOption?.value,
         accountValid,
+        dataTypeValue,
+        dataTypeValid,
             allFieldsFilled,
             page: 'import-user-data'
     };
@@ -2053,11 +2744,14 @@ function updateAnalyzeButton() {
  * Format file size
  */
 function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    if (!bytes || bytes === 0) {
+        return '0 Bytes';
+    }
+
+    const UNITS = ['Bytes', 'KB', 'MB', 'GB'];
+    const unitIndex = Math.floor(Math.log(bytes) / Math.log(1024));
+    const value = bytes / Math.pow(1024, unitIndex);
+    return `${parseFloat(value.toFixed(2))} ${UNITS[unitIndex]}`;
 }
 
 /**
@@ -2321,7 +3015,19 @@ function validateAllRequiredFields(options = {}) {
         errors.push('חובה לבחור חשבון מסחר');
     }
 
-    const isValid = fileValid && connectorValid && accountValid;
+    const dataTypeSelect = document.getElementById('importDataTypeSelect');
+    const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || '';
+    const dataTypeValid = Boolean(dataTypeValue && IMPORT_DATA_TYPE_DEFINITIONS[dataTypeValue]);
+    if (!dataTypeValid) {
+        errors.push('חובה לבחור תהליך ייבוא');
+        if (dataTypeSelect && window.showFieldError) {
+            window.showFieldError(dataTypeSelect, 'בחר תהליך ייבוא');
+        }
+    } else if (dataTypeSelect && window.showFieldSuccess) {
+        window.showFieldSuccess(dataTypeSelect);
+    }
+
+    const isValid = fileValid && connectorValid && accountValid && dataTypeValid;
 
     if (!isValid && showNotifications) {
         const uniqueErrors = [...new Set(errors.filter(Boolean))];
@@ -2474,9 +3180,11 @@ function analyzeFile() {
     const modal = document.getElementById('importUserDataModal');
     const connectorSelect = modal?.querySelector('#connectorSelect');
     const accountSelect = modal?.querySelector('#tradingAccountSelect');
+    const dataTypeSelect = modal?.querySelector('#importDataTypeSelect');
     
     const connectorValue = connectorSelect?.value;
     const accountValue = accountSelect?.value;
+    const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || 'executions';
     
     // Validate values
     if (!selectedFile || !connectorValue || !accountValue) {
@@ -2502,7 +3210,8 @@ function analyzeFile() {
     formData.append('file', selectedFile);
     formData.append('trading_account_id', accountValue);
     formData.append('connector_type', connectorValue);
-    formData.append('task_type', selectedDataTypeKey || 'executions');
+    selectedDataTypeKey = dataTypeValue;
+    formData.append('task_type', selectedDataTypeKey);
     
     // Debug: Log what's being sent
     window.Logger.debug('[Import Modal] FormData contents', {
@@ -2513,21 +3222,32 @@ function analyzeFile() {
         page: 'import-user-data'
     });
     
+    setAnalysisLoadingState(true, 'מעלה את הקובץ ומתחיל ניתוח...', 10);
+    
     fetch('/api/user-data-import/upload', {
             method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
+        setAnalysisLoadingState(true, 'מעבד את הנתונים שהתקבלו...', 55);
         if (data.success || data.status === 'success') {
             window.Logger.info('[Import Modal] File analysis completed', { data, page: 'import-user-data' });
             currentSessionId = data.session_id;
             window.currentSessionId = data.session_id; // Make it global
             analysisResults = data.analysis_results;
-            const responseTaskType = data.task_type || analysisResults?.task_type;
-            if (responseTaskType) {
-                selectedDataTypeKey = responseTaskType;
+            const dataTypeSelect = document.getElementById('importDataTypeSelect');
+            if (!analysisResults?.task_type && dataTypeSelect?.dataset?.serverValue) {
+                selectedDataTypeKey = dataTypeSelect.dataset.serverValue;
             }
+            if (analysisResults?.task_type) {
+                selectedDataTypeKey = analysisResults.task_type;
+            }
+            if (dataTypeSelect) {
+                dataTypeSelect.value = selectedDataTypeKey;
+                dataTypeSelect.dataset.serverValue = selectedDataTypeKey;
+            }
+            updateSelectedDataTypeInfo();
             updateSymbolMetadataCache(data.analysis_results?.symbol_metadata);
             
             updateActiveSessionInfo({
@@ -2547,9 +3267,6 @@ function analyzeFile() {
             // Display results
             displayAnalysisResults(data.analysis_results);
             
-            // Load problem resolution now that we have session ID
-            loadProblemResolution();
-            
             // Go to next step immediately (no artificial delay)
             goToStep(2);
     } else {
@@ -2557,6 +3274,7 @@ function analyzeFile() {
         }
     })
     .catch(error => {
+        setAnalysisLoadingState(false);
         window.Logger.error('Analysis error:', error);
         showImportUserDataNotification('שגיאה בניתוח הקובץ', 'error');
     });
@@ -2572,6 +3290,11 @@ function displayAnalysisResults(results) {
         const taskType = (results?.task_type || selectedDataTypeKey || 'executions').toLowerCase();
         updateSymbolMetadataCache(results?.symbol_metadata);
 
+        const dataTypeSelect = document.getElementById('importDataTypeSelect');
+        if (dataTypeSelect && selectedDataTypeKey) {
+            dataTypeSelect.value = selectedDataTypeKey;
+        }
+
         if (taskType === 'cashflows') {
             renderCashflowAnalysisSummary(results);
         } else if (taskType === 'account_reconciliation') {
@@ -2581,7 +3304,19 @@ function displayAnalysisResults(results) {
         }
 
         updateActiveSessionFromAnalysis(results);
-        prepareDataTypeSelection(results);
+        const availability = detectAvailableDataTypes(results);
+        updateDataTypeAvailability(availability);
+
+        const stepActions = document.getElementById('analysisStepActions');
+        const continueBtn = document.getElementById('analysisContinueBtn');
+        if (stepActions && continueBtn) {
+            stepActions.style.display = 'flex';
+            continueBtn.disabled = false;
+            continueBtn.setAttribute('aria-disabled', 'false');
+        }
+
+        // Auto-load problem resolution data after analysis completes
+        loadProblemResolution(true);
     } catch (error) {
         window.Logger.error('[Import Modal] Error displaying analysis results', { error: error.message, stack: error.stack, page: 'import-user-data' });
     }
@@ -2595,11 +3330,15 @@ function setAnalysisCardValue(elementId, value) {
 }
 
 function renderExecutionAnalysisSummary(results) {
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'טיקרים חסרים');
+    setAnalysisCardLabel('missingTickerRecords', 'רשומות עם טיקר חסר');
+
     const totalRecords = results.total_records || 0;
     const missingTickersCountValue = Array.isArray(results.missing_tickers)
         ? results.missing_tickers.length
         : (results.missing_tickers_count || 0);
-    const missingTickerRecordsCount = results.missing_ticker_records || 0;
+        const missingTickerRecordsCount = results.missing_ticker_records || 0;
     const cleanRecords = results.clean_records || results.valid_records || 0;
     const actualValidRecords = Math.max(0, cleanRecords - missingTickerRecordsCount);
 
@@ -2613,28 +3352,65 @@ function renderExecutionAnalysisSummary(results) {
 }
 
 function renderCashflowAnalysisSummary(results) {
-    const summary = results.cashflow_summary || {};
-    const missingAccounts = results.missing_accounts || summary.missing_accounts || [];
-    const currencyIssues = results.currency_issues || summary.currency_issues || [];
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'חשבונות חסרים');
+    setAnalysisCardLabel('missingTickerRecords', 'בעיות מטבע');
 
-    const totalRecords = results.total_records ?? summary.record_count ?? results.valid_records ?? 0;
-    const validRecords = summary.record_count ?? results.valid_records ?? 0;
-    const invalidRecords = results.invalid_records ?? (summary.invalid_records ?? 0);
-    const duplicateRecords = results.duplicate_records ?? 0;
+    const summary = results.cashflow_summary || {};
+    const typeStats = results.cashflow_type_stats || summary.type_stats || {};
+    const totalsByType = summary.totals_by_type || {};
+    const totalsByCurrency = summary.totals_by_currency || {};
+    const missingAccountDetails = results.missing_account_details || summary.missing_account_details || [];
+    const currencyIssues = results.currency_issues || summary.currency_issues || [];
+    const issuesByType = results.cashflow_issues_by_type || results.issues_by_type || {};
+
+    const aggregatedValid = Object.values(typeStats).reduce(
+        (acc, stats) => acc + safeToNumber(stats.valid_records ?? Math.max(0, safeToNumber(stats.total_records) - safeToNumber(stats.invalid_records))),
+        0
+    );
+    const aggregatedInvalid = Object.values(typeStats).reduce(
+        (acc, stats) => acc + safeToNumber(stats.invalid_records),
+        0
+    );
+    const totalRecords = safeToNumber(
+        results.total_records ??
+        summary.record_count ??
+        (aggregatedValid + aggregatedInvalid)
+    );
+    const validRecords = aggregatedValid || safeToNumber(results.valid_records ?? summary.valid_records);
+    const invalidRecords = aggregatedInvalid || safeToNumber(results.invalid_records ?? summary.invalid_records);
+    const duplicateRecords = safeToNumber(results.duplicate_records ?? summary.duplicate_records);
+    const existingRecords = safeToNumber(results.existing_records ?? summary.existing_records);
 
     setAnalysisCardValue('totalRecords', totalRecords);
     setAnalysisCardValue('validRecords', validRecords);
     setAnalysisCardValue('invalidRecords', invalidRecords);
     setAnalysisCardValue('duplicateRecords', duplicateRecords);
-    setAnalysisCardValue('missingTickersCount', missingAccounts.length || 0);
+    setAnalysisCardValue('missingTickersCount', missingAccountDetails.length || 0);
     setAnalysisCardValue('missingTickerRecords', currencyIssues.length || 0);
-    setAnalysisCardValue('existingRecords', results.existing_records || 0);
+    setAnalysisCardValue('existingRecords', existingRecords);
+
+    renderCashflowTypeCards(typeStats, totalsByType);
+    renderCashflowCurrencyCards(totalsByCurrency);
+    renderCashflowIssuesSummary({
+        issuesByType,
+        missingAccountDetails,
+        currencyIssues
+    });
 }
 
 function renderAccountReconciliationAnalysisSummary(results) {
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'חשבונות חסרים');
+    setAnalysisCardLabel('missingTickerRecords', 'הרשאות חסרות');
+
     const issues = results.account_validation_results
         || results.reconciliation_summary
         || results.summary
+        || {};
+    const detectedTasks = results.detected_tasks
+        || results.summary?.detected_tasks
+        || results.summary_data?.detected_tasks
         || {};
 
     const missingAccounts = results.missing_accounts || issues.missing_accounts || [];
@@ -2642,8 +3418,15 @@ function renderAccountReconciliationAnalysisSummary(results) {
     const entitlementWarnings = results.entitlement_warnings || issues.entitlement_warnings || [];
     const missingDocuments = results.missing_documents_report || issues.missing_documents_report || [];
 
-    const totalRecords = results.total_records || results.valid_records || missingAccounts.length || 0;
-    const validRecords = results.valid_records || (totalRecords - (missingAccounts.length + baseCurrencyMismatches.length));
+    const detectedAccounts = Number(
+        detectedTasks.account_reconciliation?.records ??
+        results.accounts_detected ??
+        results.valid_records ??
+        0
+    );
+
+    const totalRecords = results.total_records || detectedAccounts || missingAccounts.length || 0;
+    const validRecords = detectedAccounts || (totalRecords - (missingAccounts.length + baseCurrencyMismatches.length));
     const invalidRecords = results.invalid_records || missingDocuments.length || 0;
 
     setAnalysisCardValue('totalRecords', totalRecords);
@@ -2655,18 +3438,20 @@ function renderAccountReconciliationAnalysisSummary(results) {
     setAnalysisCardValue('existingRecords', (missingDocuments.length || 0));
 }
 
-function prepareDataTypeSelection(results = {}) {
-    detectedDataTypes = detectAvailableDataTypes(results);
-    const availableType = detectedDataTypes.find(type => type.status === 'available');
-    selectedDataTypeKey = availableType ? availableType.key : null;
-    renderDataTypeSelection();
-    setDataTypeActionsState(Boolean(availableType));
-}
-
 function detectAvailableDataTypes(results = {}) {
     const detected = [];
+    const detectedTasks =
+        results.detected_tasks ||
+        results.summary?.detected_tasks ||
+        results.summary_data?.detected_tasks ||
+        {};
     const executionsDefinition = IMPORT_DATA_TYPE_DEFINITIONS.executions;
-    const totalExecutions = Number(results.total_records ?? results.records_total ?? 0);
+    const totalExecutions = Number(
+        detectedTasks.executions?.records ??
+        results.total_records ??
+        results.records_total ??
+        0
+    );
     detected.push({
         ...executionsDefinition,
         records: totalExecutions,
@@ -2675,7 +3460,9 @@ function detectAvailableDataTypes(results = {}) {
     
     const cashflowsDefinition = IMPORT_DATA_TYPE_DEFINITIONS.cashflows;
     const cashflowsCount = Number(
+        detectedTasks.cashflows?.records ??
         results.cashflow_records ??
+        results.cashflow_summary?.record_count ??
         results.summary?.cashflows_total ??
         results.summary_data?.cashflows_total ??
         0
@@ -2687,7 +3474,13 @@ function detectAvailableDataTypes(results = {}) {
     });
     
     const accountDefinition = IMPORT_DATA_TYPE_DEFINITIONS.account_reconciliation;
-    const accountsDetected = Number(results.accounts_detected ?? results.summary?.accounts_detected ?? 0);
+    const accountsDetected = Number(
+        detectedTasks.account_reconciliation?.records ??
+        results.accounts_detected ??
+        results.summary?.accounts_detected ??
+        results.summary_data?.accounts_detected ??
+        0
+    );
     detected.push({
         ...accountDefinition,
         records: accountsDetected,
@@ -2709,143 +3502,6 @@ function detectAvailableDataTypes(results = {}) {
     });
     
     return detected;
-}
-
-function renderDataTypeSelection() {
-    const card = document.getElementById('dataTypeSelectionCard');
-    const listContainer = document.getElementById('dataTypeList');
-    const detectedLabel = document.getElementById('dataTypeDetectedLabel');
-    
-    if (!card || !listContainer) {
-        window.Logger.warn('[Import Modal] Data type selection container missing', { page: 'import-user-data' });
-        return;
-    }
-    
-    if (!detectedDataTypes || detectedDataTypes.length === 0) {
-        card.style.display = 'none';
-        setDataTypeActionsState(true);
-        return;
-    }
-    
-    card.style.display = 'block';
-    listContainer.innerHTML = '';
-    
-    const availableTypes = detectedDataTypes.filter(type => type.status === 'available');
-    if (!selectedDataTypeKey && availableTypes.length > 0) {
-        selectedDataTypeKey = availableTypes[0].key;
-    }
-    
-    detectedDataTypes.forEach(type => {
-        const optionWrapper = document.createElement('div');
-        optionWrapper.className = 'form-check';
-        if (type.status !== 'available') {
-            optionWrapper.classList.add('opacity-75');
-        }
-        
-        const input = document.createElement('input');
-        input.className = 'form-check-input';
-        input.type = 'radio';
-        input.name = 'importDataType';
-        input.id = `import-data-type-${type.key}`;
-        input.value = type.key;
-        input.disabled = type.status !== 'available';
-        input.checked = selectedDataTypeKey === type.key;
-        input.addEventListener('change', () => handleDataTypeRadioSelection(type.key));
-        
-        const label = document.createElement('label');
-        label.className = 'form-check-label d-flex flex-column gap-1';
-        label.setAttribute('for', input.id);
-        label.innerHTML = `
-            <div class="fw-bold">${type.label}</div>
-            <div class="small text-muted">${type.description}</div>
-            <div class="mt-1 d-flex flex-wrap gap-2 align-items-center">
-                <span class="badge bg-light text-dark">${type.records || 0} רשומות בקובץ</span>
-                ${type.status !== 'available' ? '<span class="badge bg-secondary">בפיתוח</span>' : ''}
-            </div>
-        `;
-        
-        optionWrapper.appendChild(input);
-        optionWrapper.appendChild(label);
-        listContainer.appendChild(optionWrapper);
-    });
-    
-    if (detectedLabel) {
-        const availableCount = availableTypes.length;
-        const plannedCount = detectedDataTypes.filter(type => type.status !== 'available').length;
-        detectedLabel.textContent = availableCount > 0
-            ? `נמצאו ${detectedDataTypes.length} סוגי נתונים בקובץ (${availableCount} זמינים, ${plannedCount} בהכנה)`
-            : `התהליכים החדשים עדיין נמצאים בשלבי אפיון – בחירת הביצועים זמינה להמשך`;
-    }
-    
-    setDataTypeActionsState(Boolean(availableTypes.length));
-}
-
-function handleDataTypeRadioSelection(typeKey) {
-    selectedDataTypeKey = typeKey;
-    setDataTypeActionsState(true);
-    window.Logger.info('[Import Modal] Data type selected', { selectedDataTypeKey, page: 'import-user-data' });
-}
-
-function setDataTypeActionsState(isEnabled) {
-    const confirmBtn = document.getElementById('confirmDataTypeBtn');
-    const continueBtn = document.querySelector('[data-id="btn-preview-continue"]');
-    const placeholderBtn = document.getElementById('dataTypePlaceholderBtn');
-    
-    [confirmBtn, continueBtn].forEach(button => {
-        if (button) {
-            button.disabled = !isEnabled;
-        }
-    });
-    
-    if (placeholderBtn) {
-        placeholderBtn.style.display = isEnabled ? 'none' : 'inline-flex';
-        if (!isEnabled) {
-            placeholderBtn.setAttribute('data-text', 'תהליכי ייבוא נוספים יתווספו בקרוב (פלייסהולדר)');
-        }
-    }
-}
-
-function confirmSelectedDataType() {
-    if (!selectedDataTypeKey) {
-        showImportUserDataNotification('בחר סוג נתונים לייבוא לפני המשך התהליך', 'warning');
-        return;
-    }
-    
-    const selectedType = detectedDataTypes.find(type => type.key === selectedDataTypeKey) || {
-        key: selectedDataTypeKey,
-        status: ACTIVE_IMPORT_DATA_TYPES.has(selectedDataTypeKey) ? 'available' : 'planned'
-    };
-    if (!selectedType || selectedType.status !== 'available') {
-        showImportUserDataNotification('התהליך שנבחר עדיין בהכנה. אנו מציגים פלייסהולדר ועדכון יישלח כאשר התהליך יהיה פעיל.', 'info');
-        return;
-    }
-
-    if (!currentSessionId) {
-        showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
-        return;
-    }
-
-    window.Logger.info('[Import Modal] Continuing with selected import data type', {
-        selectedDataTypeKey,
-        page: 'import-user-data'
-    });
-
-    if (analysisResults?.task_type === selectedDataTypeKey && previewData) {
-        goToStep(3);
-        return;
-    }
-
-    showProcessingOverlay('טוען ומעבד נתונים...');
-    reanalyseSessionForTask(selectedDataTypeKey)
-        .then(() => {
-            hideProcessingOverlay();
-            goToStep(3);
-        })
-        .catch(error => {
-            hideProcessingOverlay();
-            window.Logger.error('[Import Modal] Failed to switch task pipeline', { error: error.message, page: 'import-user-data' });
-            showImportUserDataNotification(`שגיאה בעדכון התהליך: ${error.message}`, 'error');
-        });
 }
 
 /**
@@ -2995,16 +3651,24 @@ function buildPreviewFromAnalysis(results) {
     };
 }
 
-async function loadProblemResolution() {
+async function loadProblemResolution(autoTriggered = false) {
     if (!currentSessionId) {
         showImportUserDataNotification('לא נמצא מזהה סשן', 'error');
         return;
     }
     
+    const taskKey = selectedDataTypeKey || analysisResults?.task_type || activeSessionInfo?.taskType || 'executions';
+    window.Logger.info('[Import Modal] Loading problem resolution data', {
+        sessionId: currentSessionId,
+        taskKey,
+        autoTriggered,
+        page: 'import-user-data'
+    });
     const analysisFallback = buildProblemResolutionFromAnalysis(analysisResults);
+    setAnalysisLoadingState(true, 'טוען נתוני פתרון בעיות...', 70);
 
     try {
-        const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview`, {
+        const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodeURIComponent(taskKey)}`, {
         method: 'GET'
         });
         const data = await response.json();
@@ -3012,6 +3676,22 @@ async function loadProblemResolution() {
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
             displayProblemResolutionDetailed(data.preview_data);
+            window.Logger.info('[Import Modal] Problem resolution data loaded', {
+                summary: data.preview_data?.summary,
+                autoTriggered,
+                page: 'import-user-data'
+            });
+            setAnalysisLoadingState(true, 'מאתר פטרונות והצעות לשיפור...', 82);
+            window.setTimeout(() => setAnalysisLoadingState(false), 1000);
+            const stepActions = document.getElementById('analysisStepActions');
+            const continueBtn = document.getElementById('analysisContinueBtn');
+            if (stepActions) {
+                stepActions.style.display = 'flex';
+            }
+            if (continueBtn) {
+                continueBtn.disabled = false;
+                continueBtn.setAttribute('aria-disabled', 'false');
+            }
             return;
         }
 
@@ -3020,10 +3700,16 @@ async function loadProblemResolution() {
             error: data.error || data.message,
             page: 'import-user-data'
         });
+        window.Logger.warn('[Import Modal] Using analysis-based problem resolution fallback', {
+            hasAnalysisFallback: Boolean(analysisFallback),
+            autoTriggered,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('לא ניתן לטעון את נתוני הפתרון המלאים. מוצגים נתוני ניתוח זמניים.', 'warning');
     } catch (error) {
         window.Logger.error('Problem resolution fetch error - using analysis fallback', {
             error: error.message,
+            autoTriggered,
             page: 'import-user-data'
         });
         showImportUserDataNotification('שגיאה בטעינת נתוני פתרון. מוצגים נתוני ניתוח זמניים.', 'warning');
@@ -3035,8 +3721,120 @@ async function loadProblemResolution() {
             records_to_skip: analysisFallback.records_to_skip,
             records_to_import: []
         });
+        setAnalysisLoadingState(true, 'מאתר פטרונות והצעות לשיפור...', 78);
+        window.setTimeout(() => setAnalysisLoadingState(false), 1000);
+        const stepActions = document.getElementById('analysisStepActions');
+        const continueBtn = document.getElementById('analysisContinueBtn');
+        if (stepActions) {
+            stepActions.style.display = 'flex';
+        }
+        if (continueBtn) {
+            continueBtn.disabled = false;
+            continueBtn.setAttribute('aria-disabled', 'false');
+        }
     } else {
         showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה.', 'error');
+        setAnalysisLoadingState(false);
+        const stepActions = document.getElementById('analysisStepActions');
+        const continueBtn = document.getElementById('analysisContinueBtn');
+        if (stepActions) {
+            stepActions.style.display = 'flex';
+        }
+        if (continueBtn) {
+            continueBtn.disabled = false;
+            continueBtn.setAttribute('aria-disabled', 'false');
+        }
+    }
+}
+
+function proceedToProblemResolution(autoTriggered = false) {
+    if (!currentSessionId) {
+        if (!autoTriggered) {
+            showImportUserDataNotification('לא נמצא סשן פעיל להמשך', 'warning');
+        }
+        return;
+    }
+    const continueBtn = document.getElementById('analysisContinueBtn');
+    if (continueBtn) {
+        continueBtn.disabled = true;
+        continueBtn.setAttribute('aria-disabled', 'true');
+    }
+    loadProblemResolution(autoTriggered);
+}
+
+function proceedToPreviewFromProblems() {
+    setAnalysisLoadingState(true, 'מכין תצוגה מקדימה...', 80);
+    goToStep(3);
+}
+
+async function resumeActiveImportSession() {
+    try {
+        const resumeBtn = document.getElementById('resumeImportSessionBtn');
+        if (resumeBtn) {
+            resumeBtn.disabled = true;
+            resumeBtn.setAttribute('aria-disabled', 'true');
+        }
+
+        if (!currentSessionId || !activeSessionInfo) {
+            await fetchLatestActiveSession();
+        }
+
+        if (!currentSessionId || !activeSessionInfo) {
+            showImportUserDataNotification('לא נמצא סשן ייבוא פעיל להמשך', 'warning');
+            return;
+        }
+
+        const modal = document.getElementById('importUserDataModal');
+        if (!modal) {
+            showImportUserDataNotification('מודול הייבוא אינו זמין כעת', 'error');
+            return;
+        }
+
+        const connectorKey = activeSessionInfo.connector
+            || (typeof activeSessionInfo.provider === 'string'
+                ? activeSessionInfo.provider.toLowerCase()
+                : null);
+
+        const connectorSelect = modal.querySelector('#connectorSelect');
+        if (connectorSelect && connectorKey) {
+            setSelectValue(connectorSelect, connectorKey);
+            selectedConnector = connectorKey;
+        }
+
+        const accountSelect = modal.querySelector('#tradingAccountSelect');
+        if (accountSelect && activeSessionInfo.accountId) {
+            setSelectValue(accountSelect, activeSessionInfo.accountId);
+            selectedAccount = activeSessionInfo.accountId;
+        }
+
+        const taskKey = activeSessionInfo.taskType || selectedDataTypeKey || 'executions';
+        selectedDataTypeKey = taskKey;
+        updateSelectedDataTypeInfo();
+        updateAnalyzeButton();
+
+        goToStep(2);
+        setAnalysisLoadingState(true, 'טוען נתוני סשן פעיל...', 55);
+
+        const encodedTask = encodeURIComponent(taskKey);
+        const analysisResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/analyze?task_type=${encodedTask}`);
+        const analysisJson = await analysisResponse.json();
+
+        if (!(analysisJson.success || analysisJson.status === 'success')) {
+            const message = getApiErrorMessage(analysisJson, 'טעינת נתוני הניתוח נכשלה');
+            throw new Error(message);
+        }
+
+        analysisResults = analysisJson.analysis_results;
+        displayAnalysisResults(analysisResults);
+
+        setAnalysisLoadingState(false);
+        showImportUserDataNotification('הסשן הופעל מחדש. ניתן להמשיך לפתרון בעיות.', 'success');
+        updateResetSessionButtonState();
+    } catch (error) {
+        setAnalysisLoadingState(false);
+        window.Logger?.error('[Import Modal] Failed to resume active session', { error: error?.message });
+        showImportUserDataNotification(`שגיאה בשחזור הסשן: ${error?.message || 'שגיאה לא ידועה'}`, 'error');
+        updateResetSessionButtonState();
     }
 }
 
@@ -3050,36 +3848,39 @@ function displayPreviewData(data) {
         window.Logger.warn('[Import Modal] No preview data to display', { page: 'import-user-data' });
         return;
     }
-
+    
     const taskType = (data.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions').toLowerCase();
     const recordsToImport = data.records_to_import || [];
     const recordsToSkip = data.records_to_skip || [];
+    const summary = data.summary || {};
 
     const importCount = recordsToImport.length;
     const skipCount = recordsToSkip.length;
     const totalCount = importCount + skipCount;
     const importRate = totalCount > 0 ? Math.round((importCount / totalCount) * 100) : 0;
-
+    
     const importCountEl = document.getElementById('previewImportCount');
     const skipCountEl = document.getElementById('previewSkipCount');
     const importRateEl = document.getElementById('previewImportRate');
-
+    
     if (importCountEl) importCountEl.textContent = importCount;
     if (skipCountEl) skipCountEl.textContent = skipCount;
     if (importRateEl) importRateEl.textContent = `${importRate}%`;
-
+    
     if (taskType === 'cashflows') {
-        renderCashflowPreviewTables(recordsToImport, recordsToSkip);
+        renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary, importCount, skipCount);
+        updateSummaryStats();
         return;
     }
 
     if (taskType === 'account_reconciliation') {
-        renderAccountReconciliationPreview(recordsToImport, recordsToSkip, data.summary || {});
+        renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary, importCount, skipCount);
+        updateSummaryStats();
         return;
     }
 
     renderExecutionPreviewTables(recordsToImport, recordsToSkip);
-    updateActiveSessionFromPreview(data);
+    updateSummaryStats();
 }
 
 function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
@@ -3138,7 +3939,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
             importTableBody.appendChild(row);
         });
     }
-
+    
     const skipTableBody = document.getElementById('skipTableBody');
     if (skipTableBody) {
         skipTableBody.innerHTML = '';
@@ -3168,7 +3969,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
     }
 }
 
-function renderCashflowPreviewTables(recordsToImport, recordsToSkip) {
+function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
         importTableHeadRow.innerHTML = `
@@ -3239,14 +4040,18 @@ function renderCashflowPreviewTables(recordsToImport, recordsToSkip) {
         });
     }
 
-    updateActiveSessionFromPreview({
-        records_to_import: recordsToImport,
-        records_to_skip: recordsToSkip,
-        task_type: 'cashflows'
+    const readyRecords = importCountFallback ?? summary.records_to_import ?? summary.cashflow_records ?? recordsToImport.length;
+    const skippedRecords = skipCountFallback ?? summary.records_to_skip ?? summary.invalid_records ?? recordsToSkip.length;
+
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords: skippedRecords,
+        taskType: 'cashflows',
+        status: activeSessionInfo?.status || 'מוכן לייבוא'
     });
 }
 
-function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary) {
+function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     const importTableBody = document.getElementById('importTableBody');
     if (importTableHeadRow) {
@@ -3319,10 +4124,14 @@ function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summ
         });
     }
 
-    updateActiveSessionFromPreview({
-        records_to_import: recordsToImport,
-        records_to_skip: recordsToSkip,
-        task_type: 'account_reconciliation'
+    const readyRecords = importCountFallback ?? summary.valid_records ?? summary.records_to_import ?? recordsToImport.length;
+    const skippedRecords = skipCountFallback ?? summary.invalid_records ?? summary.records_to_skip ?? recordsToSkip.length;
+
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords: skippedRecords,
+        taskType: 'account_reconciliation',
+        status: activeSessionInfo?.status || 'מוכן לייבוא'
     });
 }
 
@@ -3334,10 +4143,12 @@ function loadPreviewData() {
         currentSessionId, 
         page: 'import-user-data' 
     });
+    setAnalysisLoadingState(true, 'טוען תצוגה מקדימה...', 90);
     
     if (!currentSessionId) {
         window.Logger.error('[Import Modal] No session ID for preview', { page: 'import-user-data' });
         showImportUserDataNotification('שגיאה: אין מזהה הפעלה', 'error');
+        setAnalysisLoadingState(false);
         return;
     }
     
@@ -3350,12 +4161,14 @@ function loadPreviewData() {
     .then(data => {
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
+            setAnalysisLoadingState(true, 'מעבד תצוגה מקדימה...', 95);
             displayPreviewData(data.preview_data);
             displayConfirmationData(analysisResults, data.preview_data);
             window.Logger.info('[Import Modal] Preview and confirmation data loaded successfully', { 
                 data: data.preview_data, 
                 page: 'import-user-data' 
             });
+            setAnalysisLoadingState(false);
         } else {
             window.Logger.error('[Import Modal] Failed to load preview data', { 
                 error: data.error || data.message, 
@@ -3366,13 +4179,16 @@ function loadPreviewData() {
             const analysisFallback = buildPreviewFromAnalysis(analysisResults);
             if (analysisFallback) {
                 previewData = analysisFallback;
+                setAnalysisLoadingState(true, 'מעבד תצוגה מקדימה...', 95);
                 displayPreviewData(analysisFallback);
                 displayConfirmationData(analysisResults, analysisFallback);
                 window.Logger.warn('[Import Modal] Using analysis-based preview fallback', {
                     page: 'import-user-data'
                 });
+                setAnalysisLoadingState(false);
             } else {
                 showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה בתצוגה מקדימה.', 'error');
+                setAnalysisLoadingState(false);
             }
         }
     })
@@ -3382,13 +4198,16 @@ function loadPreviewData() {
         const analysisFallback = buildPreviewFromAnalysis(analysisResults);
         if (analysisFallback) {
             previewData = analysisFallback;
+            setAnalysisLoadingState(true, 'מעבד תצוגה מקדימה...', 95);
             displayPreviewData(analysisFallback);
             displayConfirmationData(analysisResults, analysisFallback);
             window.Logger.warn('[Import Modal] Using analysis-based preview fallback after fetch error', {
                 page: 'import-user-data'
             });
+            setAnalysisLoadingState(false);
         } else {
             showImportUserDataNotification('לא נמצאו נתוני ניתוח להצגה בתצוגה מקדימה.', 'error');
+            setAnalysisLoadingState(false);
         }
     });
 }
@@ -3420,17 +4239,52 @@ function displayConfirmationData(analysisResults, previewData) {
     const accountSelect = document.getElementById('tradingAccountSelect');
     const accountName = accountSelect?.selectedOptions[0]?.text || 'חשבון לא ידוע';
     
-    let totalRecords = analysisResults.total_records || 0;
-    let importCount = previewData.records_to_import?.length || 0;
-    let skipCount = previewData.records_to_skip?.length || 0;
+    const previewSummary = previewData.summary || {};
+    const analysisSummary = analysisResults.summary || {};
+    const cashflowSummary = analysisResults.cashflow_summary || {};
+    const accountSummary = analysisResults.account_validation_results || {};
+    
+    let totalRecords = analysisResults.total_records
+        ?? previewSummary.total_records
+        ?? cashflowSummary.record_count
+        ?? previewSummary.record_count
+        ?? 0;
+    
+    let importCount = previewData.records_to_import?.length
+        ?? previewSummary.records_to_import
+        ?? previewSummary.valid_records
+        ?? cashflowSummary.record_count
+        ?? 0;
+    
+    let skipCount = previewData.records_to_skip?.length
+        ?? previewSummary.records_to_skip
+        ?? previewSummary.invalid_records
+        ?? 0;
 
     if (taskType === 'cashflows') {
-        const summary = analysisResults.cashflow_summary || {};
-        totalRecords = analysisResults.total_records ?? summary.record_count ?? importCount + skipCount;
+        totalRecords = analysisResults.total_records
+            ?? previewSummary.total_records
+            ?? cashflowSummary.record_count
+            ?? importCount + skipCount;
+        importCount = previewSummary.records_to_import
+            ?? previewSummary.cashflow_records
+            ?? cashflowSummary.record_count
+            ?? importCount;
+        skipCount = previewSummary.records_to_skip
+            ?? previewSummary.invalid_records
+            ?? (Array.isArray(previewSummary.currency_issues) ? previewSummary.currency_issues.length : skipCount);
     }
 
     if (taskType === 'account_reconciliation') {
-        totalRecords = analysisResults.total_records || importCount + skipCount;
+        totalRecords = analysisResults.total_records
+            ?? previewSummary.total_records
+            ?? importCount + skipCount;
+        importCount = previewSummary.valid_records
+            ?? accountSummary.valid_records
+            ?? importCount;
+        skipCount = previewSummary.invalid_records
+            ?? accountSummary.invalid_records
+            ?? skipCount;
     }
     
     const confirmFileNameEl = document.getElementById('confirmFileName');
@@ -3444,6 +4298,13 @@ function displayConfirmationData(analysisResults, previewData) {
     if (confirmTotalRecordsEl) confirmTotalRecordsEl.textContent = totalRecords;
     if (confirmImportRecordsEl) confirmImportRecordsEl.textContent = importCount;
     if (confirmSkipRecordsEl) confirmSkipRecordsEl.textContent = skipCount;
+    
+    updateActiveSessionInfo({
+        readyRecords: importCount,
+        skipRecords: skipCount,
+        taskType,
+        status: 'מוכן לייבוא'
+    });
     
     window.Logger.info('[Import Modal] Confirmation data displayed successfully', { 
         fileName, 
@@ -3557,8 +4418,8 @@ function displayProblemResolution(data) {
                     </div>
             
             <div class="step-actions">
-                <button class="btn btn-primary" onclick="goToStep(4)">
-                    <i class="fas fa-arrow-right"></i> המשך לתצוגה מקדימה
+                <button class="btn btn-secondary" onclick="goToStep(1)">
+                    <i class="fas fa-arrow-left"></i> חזור לשלב העלאת הקובץ
                         </button>
                     </div>
                 </div>
@@ -3635,12 +4496,20 @@ function rejectDuplicate(index, type) {
 async function openAddTickerModal(symbol, currency = 'USD') {
     const normalizedSymbol = (symbol || '').toUpperCase().trim();
     const normalizedCurrency = (currency || 'USD').toUpperCase().trim();
+    const metadata = getSymbolMetadata(normalizedSymbol);
 
     ensureTickerSaveHook();
 
-    const showModal = window.showModalSafe || (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function'
-        ? window.ModalManagerV2.showModal.bind(window.ModalManagerV2)
-        : null);
+    const modalManagerReady = await ensureModalManagerReady();
+    if (!modalManagerReady) {
+        showImportUserDataNotification('מערכת המודלים אינה זמינה. רענן את הדף ונסה שוב.', 'error');
+        return;
+    }
+
+    const showModal = window.showModalSafe
+        || (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function'
+            ? window.ModalManagerV2.showModal.bind(window.ModalManagerV2)
+            : null);
 
     let canUseModal = Boolean(showModal);
 
@@ -3658,59 +4527,78 @@ async function openAddTickerModal(symbol, currency = 'USD') {
             await showModal('tickersModal', 'add');
 
             const modalElement = document.getElementById('tickersModal');
-    const metadata = getSymbolMetadata(normalizedSymbol);
+            if (modalElement) {
+                const applyPrefill = async () => {
+                    const symbolInput = modalElement.querySelector('#tickerSymbol');
+                    const nameInput = modalElement.querySelector('#tickerName');
+                    const typeSelect = modalElement.querySelector('#tickerType');
+                    const currencySelect = modalElement.querySelector('#tickerCurrency');
+                    const remarksField = modalElement.querySelector('#tickerRemarks');
+                    const externalDataResult = modalElement.querySelector('#tickerExternalDataResult');
+                    const externalDataWarning = modalElement.querySelector('#tickerExternalDataWarning');
 
-    if (modalElement) {
-                const symbolInput = modalElement.querySelector('#tickerSymbol');
-                const nameInput = modalElement.querySelector('#tickerName');
-                const typeSelect = modalElement.querySelector('#tickerType');
-                const currencySelect = modalElement.querySelector('#tickerCurrency');
-                const remarksField = modalElement.querySelector('#tickerRemarks');
-                const externalDataResult = modalElement.querySelector('#tickerExternalDataResult');
-                const externalDataWarning = modalElement.querySelector('#tickerExternalDataWarning');
+                    const remarksHtml = buildRichTextFromMetadata(metadata);
 
-                const remarksHtml = buildRichTextFromMetadata(metadata);
-
-                if (symbolInput) {
-                    setInputValue(symbolInput, normalizedSymbol);
-                }
-                if (nameInput) {
-                    if (metadata?.company_name) {
-                        setInputValue(nameInput, metadata.company_name);
-                    } else if (!nameInput.value) {
-                        setInputValue(nameInput, normalizedSymbol);
+                    if (symbolInput) {
+                        setInputValue(symbolInput, normalizedSymbol);
                     }
-                }
-                if (typeSelect) {
-                    setSelectValue(typeSelect, 'stock');
-                }
-                if (currencySelect) {
-                    await setCurrencySelectValue(currencySelect, normalizedCurrency);
-                }
-                if (remarksField) {
-                    remarksField.value = remarksHtml || '';
-                }
-
-                const editorId = ensureRichTextEditorForTickerRemarks(modalElement);
-                if (editorId && typeof window.setRichTextContent === 'function') {
-                    window.setRichTextContent(editorId, remarksHtml || '');
-                }
-
-                if (externalDataResult) {
-                    const summaryHtml = renderMetadataSummaryBlock(metadata);
-                    if (summaryHtml) {
-                        externalDataResult.innerHTML = summaryHtml;
-                        externalDataResult.style.display = 'block';
-                    } else {
-                        externalDataResult.innerHTML = '';
-                        externalDataResult.style.display = 'none';
+                    if (nameInput) {
+                        if (metadata?.company_name) {
+                            setInputValue(nameInput, metadata.company_name);
+                        } else if (!nameInput.value) {
+                            setInputValue(nameInput, normalizedSymbol);
+                        }
                     }
-                }
+                    if (typeSelect) {
+                        setSelectValue(typeSelect, metadata?.instrument_type || 'stock');
+                    }
+        if (currencySelect) {
+                        await setCurrencySelectValue(currencySelect, normalizedCurrency);
+                    }
+                    if (remarksField) {
+                        remarksField.value = remarksHtml || '';
+                    }
 
-                if (externalDataWarning && metadata) {
-                    externalDataWarning.style.display = 'none';
-                    externalDataWarning.innerHTML = '';
-                }
+                    const editorId = ensureRichTextEditorForTickerRemarks(modalElement);
+                    if (editorId && typeof window.setRichTextContent === 'function') {
+                        window.setRichTextContent(editorId, remarksHtml || '');
+                    }
+
+                    if (externalDataResult) {
+                        const summaryHtml = renderMetadataSummaryBlock(metadata);
+                        if (summaryHtml) {
+                            externalDataResult.innerHTML = summaryHtml;
+                            externalDataResult.style.display = 'block';
+    } else {
+                            externalDataResult.innerHTML = '';
+                            externalDataResult.style.display = 'none';
+                        }
+                    }
+
+                    if (externalDataWarning) {
+                        if (metadata) {
+                            externalDataWarning.style.display = 'none';
+                            externalDataWarning.innerHTML = '';
+                        } else {
+                            externalDataWarning.style.display = 'block';
+                            externalDataWarning.innerHTML = '<small>לא נמצאו נתוני רקע לטיקר זה. ניתן להוסיף ידנית.</small>';
+                        }
+                    }
+
+                    const headerElement = modalElement.querySelector('.modal-header');
+                    if (headerElement) {
+                        headerElement.classList.add('entity-ticker');
+                        if (!getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color').trim()) {
+                            headerElement.style.backgroundColor = '#26baac';
+                            headerElement.style.borderBottomColor = '#26baac';
+                            headerElement.style.color = '#ffffff';
+                        }
+                    }
+                };
+
+                await applyPrefill();
+                setTimeout(applyPrefill, 150);
+                window.ModalManagerV2?.applyUserColors?.(modalElement, 'ticker');
             }
         return;
         } catch (error) {
@@ -3719,15 +4607,7 @@ async function openAddTickerModal(symbol, currency = 'USD') {
         }
     }
 
-    const fallbackName = prompt(`הזן שם לטיקר ${normalizedSymbol}:`, metadata?.company_name || normalizedSymbol);
-    if (fallbackName || metadata?.company_name) {
-        await quickAddTicker(
-            normalizedSymbol,
-            fallbackName || metadata?.company_name || normalizedSymbol,
-            normalizedCurrency,
-            metadata
-        );
-    }
+    showImportUserDataNotification('לא ניתן לפתוח את מודול הטיקר הכללי. אנא רענן ונסה שוב.', 'error');
 }
 
 /**
@@ -3748,8 +4628,6 @@ function generatePreview() {
             previewData = data.preview_data;
             displayPreview(data.preview_data);
             
-            // Go to next step
-            setTimeout(() => goToStep(5), 1000);
         } else {
             showImportUserDataNotification(`שגיאה ביצירת תצוגה מקדימה: ${data.error}`, 'error');
         }
@@ -3857,11 +4735,31 @@ function updateSummaryStats() {
     const skipCount = document.getElementById('skipCount');
     const importRate = document.getElementById('importRate');
     
-    if (importCount) importCount.textContent = previewData.summary?.records_to_import || 0;
-    if (skipCount) skipCount.textContent = previewData.summary?.records_to_skip || 0;
-    if (importRate) importRate.textContent = `${previewData.summary?.import_rate || 0}%`;
-    
-    updateActiveSessionFromPreview(previewData);
+    const summary = previewData.summary || {};
+    const readyRecords = summary.records_to_import
+        ?? summary.cashflow_records
+        ?? summary.valid_records
+        ?? previewData.records_to_import?.length
+        ?? 0;
+    const skippedRecords = summary.records_to_skip
+        ?? summary.invalid_records
+        ?? previewData.records_to_skip?.length
+        ?? 0;
+    const total = summary.total_records
+        ?? summary.record_count
+        ?? (readyRecords + skippedRecords);
+    const rate = total > 0 ? Math.round((readyRecords / total) * 100) : 0;
+
+    if (importCount) importCount.textContent = readyRecords;
+    if (skipCount) skipCount.textContent = skippedRecords;
+    if (importRate) importRate.textContent = `${rate}%`;
+
+    updateActiveSessionInfo({
+        readyRecords,
+        skipRecords: skippedRecords,
+        status: activeSessionInfo?.status || 'מוכן לייבוא',
+        taskType: previewData.task_type || selectedDataTypeKey
+    });
 }
 
 /**
@@ -3920,6 +4818,7 @@ function performImport(generateReport = false) {
         return;
     }
     
+    setAnalysisLoadingState(true, 'מייבא נתונים...', 15);
     showImportUserDataNotification('מתחיל ייבוא נתונים...', 'info');
     
     fetch(`/api/user-data-import/session/${currentSessionId}/execute`, {
@@ -3947,6 +4846,7 @@ function performImport(generateReport = false) {
         const apiSucceeded = data.success === true || data.status === 'success';
 
         if (apiSucceeded && importedCount > 0) {
+            setAnalysisLoadingState(true, 'מסכם תהליך הייבוא...', 90);
             let successMessage = `ייבוא הנתונים הושלם בהצלחה! נוספו ${importedCount} רשומות חדשות.`;
             if (skippedCount > 0) {
                 successMessage += ` ${skippedCount} רשומות הושמטו (שגיאות/כפילויות).`;
@@ -3982,6 +4882,7 @@ function performImport(generateReport = false) {
             // Clear cache to show new data - use centralized cache clearing
             clearImportCacheLayers({ reason: 'import-user-data:execute' });
             clearStoredActiveSession();
+            window.refreshDataImportHistory?.();
             // LEGACY (pre Stage B-Lite) flow:
             // if (typeof window.clearCacheQuick === 'function') {
             //     window.clearCacheQuick(null, { source: 'import-user-data' });
@@ -4022,6 +4923,10 @@ function performImport(generateReport = false) {
     .catch(error => {
         window.Logger.error('Import error:', error);
         showImportUserDataNotification('שגיאה בייבוא הנתונים', 'error');
+    })
+    .finally(() => {
+        setAnalysisLoadingState(false);
+        window.refreshDataImportHistory?.();
     });
 }
 
@@ -4114,15 +5019,7 @@ function performResetImportSession() {
 /**
  * Format file size
  */
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
+const formatFileSizeLegacy = (bytes) => formatFileSize(bytes);
 
 /**
  * Unified notification helper for import modal
@@ -4235,7 +5132,7 @@ function displayProblemResolutionDetailed(data) {
 /**
  * Clear all problem sections
  */
-function clearProblemSections() {
+function clearProblemSectionsForSession() {
     const sections = [
         'missingTickersSection',
         'withinFileDuplicatesSection', 
@@ -4245,7 +5142,8 @@ function clearProblemSections() {
         'accountMissingAccountsSection',
         'accountCurrencyMismatchesSection',
         'accountEntitlementWarningsSection',
-        'accountMissingDocumentsSection'
+        'accountImportWarningsSection',
+        'accountExistingEntriesSection'
     ];
     
     sections.forEach(sectionId => {
@@ -4254,19 +5152,13 @@ function clearProblemSections() {
             section.style.display = 'none';
         }
     });
-
+    
     const containers = [
         'missingTickersContainer',
-        'withinFileDuplicatesContainer',
-        'existingRecordsContainer',
-        'cashflowMissingAccountsContainer',
-        'cashflowCurrencyIssuesContainer',
-        'accountMissingAccountsContainer',
-        'accountCurrencyMismatchesContainer',
-        'accountEntitlementWarningsContainer',
-        'accountMissingDocumentsContainer'
+        'missingAccountsContainer',
+        'missingCashflowAccountsContainer'
     ];
-
+    
     containers.forEach(containerId => {
         const container = document.getElementById(containerId);
         if (container) {
@@ -4284,11 +5176,33 @@ function displayMissingTickers(missingTickers) {
     
     if (!section || !container) return;
     
+    const tracking = trackProblemStatus(
+        'missingTickers',
+        missingTickers,
+        (ticker) => normalizeProblemTicker(ticker),
+        (ticker) => {
+            const symbol = normalizeProblemTicker(ticker);
+            return {
+                id: symbol,
+                title: `${symbol} \u2013 טופל`,
+                description: `הטיקר ${symbol} נוסף למערכת והוסר מרשימת הבעיות.`,
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (missingTickers || []).map((ticker) => renderMissingTickerCard(ticker));
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
     section.style.display = 'block';
-    
-    container.innerHTML = missingTickers.map(ticker => 
-        renderMissingTickerCard(ticker)
-    ).join('');
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -4300,27 +5214,27 @@ function displayWithinFileDuplicates(duplicates) {
     
     if (!section || !container) return;
     
-    section.style.display = 'block';
-    
-    container.innerHTML = duplicates.map((duplicate, index) => 
-        renderDuplicateCard(duplicate, 'within_file', index)
-    ).join('');
-}
+    const tracking = trackProblemStatus(
+        'withinFileDuplicates',
+        duplicates,
+        (duplicate) => getDuplicateIdentifier(duplicate, 'within'),
+        (duplicate) => buildDuplicateResolvedMeta(duplicate, 'כפילות בתוך הקובץ')
+    );
 
-/**
- * Display existing records
- */
-function displayExistingRecords(existingRecords) {
-    const section = document.getElementById('existingRecordsSection');
-    const container = document.getElementById('existingRecordsContainer');
-    
-    if (!section || !container) return;
-    
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (duplicates || []).map((duplicate, index) => 
+        renderDuplicateCard(duplicate, 'within_file', index)
+    );
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
     section.style.display = 'block';
-    
-    container.innerHTML = existingRecords.map((record, index) => 
-        renderDuplicateCard(record, 'existing_record', index)
-    ).join('');
+    container.innerHTML = cards.join('');
 }
 
 /**
@@ -4365,6 +5279,35 @@ function renderMissingTickerCard(ticker) {
             </div>
         </div>
     `;
+}
+
+/**
+ * Identify duplicate entries for tracking
+ */
+function getDuplicateIdentifier(duplicate, fallbackType = 'duplicate') {
+    const { record } = extractPreviewRecord(duplicate);
+    if (record?.external_id) {
+        return `${fallbackType}:${record.external_id}`;
+    }
+    const symbol = normalizeProblemTicker(record?.symbol || duplicate.symbol);
+    const date = record?.date || duplicate.date || '';
+    const action = record?.action || duplicate.action || '';
+    const amount = record?.amount || record?.quantity || duplicate.quantity || '';
+    return `${fallbackType}:${symbol || 'UNKNOWN'}|${date}|${action}|${amount}`;
+}
+
+function buildDuplicateResolvedMeta(duplicate, typeLabel = 'כפילות') {
+    const { record } = extractPreviewRecord(duplicate);
+    const symbol = normalizeProblemTicker(record?.symbol || duplicate.symbol) || 'N/A';
+    const dateValue = record?.date || duplicate.date || '';
+    return {
+        id: getDuplicateIdentifier(duplicate, typeLabel),
+        title: `${symbol} \u2013 ${typeLabel} טופלה`,
+        description: dateValue
+            ? `הרשומה מתאריך ${dateValue} הוסרה מרשימת הבעיות.`
+            : 'הכפילות הוסרה מרשימת הבעיות.',
+        icon: 'bi bi-check-circle'
+    };
 }
 
 /**
@@ -4468,7 +5411,9 @@ function refreshPreviewData() {
             updateSymbolMetadataCache(data.preview_data?.symbol_metadata || data.preview_data?.summary?.symbol_metadata);
             updateActiveSessionFromPreview(data.preview_data);
             // Refresh the current step display
-            if (currentStep === 3) {
+            if (currentStep === 2) {
+                displayProblemResolutionDetailed(data.preview_data);
+            } else if (currentStep === 3) {
                 displayProblemResolutionDetailed(data.preview_data);
             } else if (currentStep === 4) {
                 displayPreview(data.preview_data);
@@ -4506,6 +5451,36 @@ function confirmImport(withReport = false) {
         }
 }
 
+function getImportDebugState(symbol) {
+    const normalizedSymbol = typeof symbol === 'string' ? symbol.trim().toUpperCase() : null;
+    const cacheSnapshot = { ...symbolMetadataCache };
+    const analysisMeta = analysisResults?.symbol_metadata || {};
+    const previewMeta = previewData?.symbol_metadata || {};
+
+    return {
+        currentSessionId,
+        currentStep,
+        selectedDataTypeKey,
+        dataTypeAvailability: { ...dataTypeAvailabilityMap },
+        metadata: normalizedSymbol
+            ? {
+                symbol: normalizedSymbol,
+                cacheEntry: cacheSnapshot[normalizedSymbol] || null,
+                analysisEntry: analysisMeta[normalizedSymbol] || null,
+                previewEntry: previewMeta[normalizedSymbol] || null
+            }
+            : {
+                cacheKeys: Object.keys(cacheSnapshot),
+                analysisKeys: Object.keys(analysisMeta),
+                previewKeys: Object.keys(previewMeta)
+            },
+        raw: {
+            analysisResults,
+            previewData
+        }
+    };
+}
+
 // Export functions for global access
 window.openImportUserDataModal = openImportUserDataModal;
 window.closeImportUserDataModal = closeImportUserDataModal;
@@ -4524,13 +5499,51 @@ window.performImport = performImport;
 window.showImportUserDataNotification = showImportUserDataNotification;
 window.resetFile = resetFile;
 window.confirmImport = confirmImport;
-window.confirmSelectedDataType = confirmSelectedDataType;
-
+window.proceedToPreviewFromProblems = proceedToPreviewFromProblems;
+window.proceedToProblemResolution = proceedToProblemResolution;
+window.resumeActiveImportSession = resumeActiveImportSession;
+window.getImportDebugState = getImportDebugState;
 function renderExecutionProblemSections(data) {
     const summary = data.summary || {};
-    if (summary.missing_tickers && summary.missing_tickers.length > 0) {
-        displayMissingTickers(summary.missing_tickers);
-    }
+    const availableMissingTikcers = []
+        .concat(Array.isArray(data.missing_tickers) ? data.missing_tickers : [])
+        .concat(Array.isArray(summary.missing_tickers) ? summary.missing_tickers : []);
+
+    const missingFromSkip = (data.records_to_skip || [])
+        .filter(record => record.reason === 'missing_ticker')
+        .map(record => ({
+            symbol: record.missing_ticker || record.record?.symbol,
+            currency: record.record?.currency || 'USD'
+        }));
+
+    const combinedMissing = [...availableMissingTikcers, ...missingFromSkip];
+
+    const uniqueMissing = [];
+    const seenSymbols = new Set();
+
+    combinedMissing.forEach((entry) => {
+        if (!entry) {
+            return;
+        }
+        if (typeof entry === 'string') {
+            if (!seenSymbols.has(entry)) {
+                seenSymbols.add(entry);
+                uniqueMissing.push(entry);
+            }
+            return;
+        }
+        const symbol = entry.symbol || entry.ticker || entry.display_symbol;
+        if (!symbol || seenSymbols.has(symbol)) {
+            return;
+        }
+        seenSymbols.add(symbol);
+        uniqueMissing.push({
+            symbol,
+            currency: entry.currency || entry.currency_code || 'USD'
+        });
+    });
+
+    displayMissingTickers(uniqueMissing);
 
     renderExecutionStyleProblems(data);
 }
@@ -4540,50 +5553,34 @@ function renderExecutionStyleProblems(data) {
     const withinFileDuplicates = skipRecords.filter(record => 
         record.reason === 'within_file_duplicate' || record.reason === 'within_file_duplicate_match'
     );
-    if (withinFileDuplicates.length > 0) {
-        displayWithinFileDuplicates(withinFileDuplicates);
-    }
+    displayWithinFileDuplicates(withinFileDuplicates);
 
     const existingRecords = skipRecords.filter(record => record.reason === 'existing_record');
-    if (existingRecords.length > 0) {
-        displayExistingRecords(existingRecords);
-    }
+    displayExistingRecords(existingRecords);
 }
 
 function renderCashflowProblemSections(data) {
     const missingAccounts = data.missing_accounts || data.summary?.missing_accounts || [];
-    if (missingAccounts.length) {
-        displayCashflowMissingAccounts(missingAccounts);
-    }
+    displayCashflowMissingAccounts(missingAccounts);
 
     const currencyIssues = data.currency_issues || data.summary?.currency_issues || [];
-    if (currencyIssues.length) {
-        displayCashflowCurrencyIssues(currencyIssues);
-    }
+    displayCashflowCurrencyIssues(currencyIssues);
 }
 
 function renderAccountReconciliationProblems(data) {
     const issues = data.summary?.issues || {};
 
     const missingAccounts = data.missing_accounts || issues.missing_accounts || [];
-    if (missingAccounts.length) {
-        displayAccountMissingAccounts(missingAccounts);
-    }
+    displayAccountMissingAccounts(missingAccounts);
 
     const currencyMismatches = data.base_currency_mismatches || issues.base_currency_mismatches || [];
-    if (currencyMismatches.length) {
-        displayAccountCurrencyMismatches(currencyMismatches);
-    }
+    displayAccountCurrencyMismatches(currencyMismatches);
 
     const entitlementWarnings = data.entitlement_warnings || issues.entitlement_warnings || [];
-    if (entitlementWarnings.length) {
-        displayAccountEntitlementWarnings(entitlementWarnings);
-    }
+    displayAccountEntitlementWarnings(entitlementWarnings);
 
     const missingDocuments = data.missing_documents_report || issues.missing_documents_report || [];
-    if (missingDocuments.length) {
-        displayAccountMissingDocuments(missingDocuments);
-    }
+    displayAccountMissingDocuments(missingDocuments);
 }
 
 function displayCashflowMissingAccounts(accounts) {
@@ -4591,8 +5588,26 @@ function displayCashflowMissingAccounts(accounts) {
     const container = document.getElementById('cashflowMissingAccountsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = accounts.map(account => {
+    const tracking = trackProblemStatus(
+        'cashflowMissingAccounts',
+        accounts,
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account);
+            return identifier ? `cashflow-missing-account:${identifier}` : null;
+        },
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account) || 'חשבון';
+            return {
+                id: identifier,
+                title: `${identifier} \u2013 טופל`,
+                description: 'החשבון שויך או נוצר בהצלחה והוסר מרשימת הבעיות.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (accounts || []).map(account => {
         if (typeof account === 'string') {
             return `
                 <div class="problem-card cashflow-missing-account-card">
@@ -4621,7 +5636,17 @@ function displayCashflowMissingAccounts(accounts) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayCashflowCurrencyIssues(issues) {
@@ -4629,8 +5654,33 @@ function displayCashflowCurrencyIssues(issues) {
     const container = document.getElementById('cashflowCurrencyIssuesContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = issues.map(issue => {
+    const tracking = trackProblemStatus(
+        'cashflowCurrencyIssues',
+        issues,
+        (issue) => {
+            if (typeof issue === 'string') {
+                return buildGenericIdentifier(issue, 'cashflow-currency');
+            }
+            const currency = issue.currency || issue.currency_code || issue.reported || 'unknown';
+            const source = issue.source_account || issue.account || '';
+            const index = issue.record_index ?? '';
+            return `cashflow-currency:${currency}|${source}|${index}`;
+        },
+        (issue) => {
+            const currency = typeof issue === 'string'
+                ? issue
+                : (issue.currency || issue.currency_code || issue.reported || 'מטבע');
+            return {
+                id: typeof issue === 'string' ? issue : JSON.stringify(issue),
+                title: `${currency} \u2013 טופל`,
+                description: 'בעיית המטבע נפתרה והוסרה מהרשימה.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (issues || []).map(issue => {
         if (typeof issue === 'string') {
             return `
                 <div class="problem-card cashflow-currency-issue-card">
@@ -4661,7 +5711,17 @@ function displayCashflowCurrencyIssues(issues) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountMissingAccounts(accounts) {
@@ -4669,8 +5729,26 @@ function displayAccountMissingAccounts(accounts) {
     const container = document.getElementById('accountMissingAccountsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = accounts.map(account => {
+    const tracking = trackProblemStatus(
+        'accountMissingAccounts',
+        accounts,
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account);
+            return identifier ? `account-missing:${identifier}` : null;
+        },
+        (account) => {
+            const identifier = normalizeAccountIdentifier(account) || 'חשבון';
+            return {
+                id: identifier,
+                title: `${identifier} \u2013 טופל`,
+                description: 'החשבון שויך או נוצר בהצלחה והוסר מרשימת הבעיות.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (accounts || []).map(account => {
         if (typeof account === 'string') {
             return `
                 <div class="problem-card account-missing-account-card">
@@ -4697,7 +5775,17 @@ function displayAccountMissingAccounts(accounts) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountCurrencyMismatches(items) {
@@ -4705,8 +5793,33 @@ function displayAccountCurrencyMismatches(items) {
     const container = document.getElementById('accountCurrencyMismatchesContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = items.map(item => {
+    const tracking = trackProblemStatus(
+        'accountCurrencyMismatches',
+        items,
+        (item) => {
+            if (typeof item === 'string') {
+                return buildGenericIdentifier(item, 'account-currency');
+            }
+            const accountId = item.account_id || item.accountId || 'unknown';
+            const expected = item.expected || item.expected_currency || '';
+            const reported = item.reported || item.reported_currency || '';
+            return `account-currency:${accountId}|${expected}|${reported}`;
+        },
+        (item) => {
+            const accountId = typeof item === 'string'
+                ? 'חשבון'
+                : (item.account_id || item.accountId || 'חשבון');
+            return {
+                id: accountId,
+                title: `${accountId} \u2013 טופל`,
+                description: 'אי ההתאמה במטבע נפתרה והוסרה מהרשימה.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (items || []).map(item => {
         if (typeof item === 'string') {
             return `
                 <div class="problem-card account-currency-mismatch-card">
@@ -4736,7 +5849,17 @@ function displayAccountCurrencyMismatches(items) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountEntitlementWarnings(items) {
@@ -4744,8 +5867,32 @@ function displayAccountEntitlementWarnings(items) {
     const container = document.getElementById('accountEntitlementWarningsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = items.map(item => {
+    const tracking = trackProblemStatus(
+        'accountEntitlementWarnings',
+        items,
+        (item) => {
+            if (typeof item === 'string') {
+                return buildGenericIdentifier(item, 'account-entitlement');
+            }
+            const accountId = item.account_id || item.accountId || 'unknown';
+            const restriction = item.restriction || item.restriction_type || '';
+            return `account-entitlement:${accountId}|${restriction}`;
+        },
+        (item) => {
+            const accountId = typeof item === 'string'
+                ? 'חשבון'
+                : (item.account_id || item.accountId || 'חשבון');
+            return {
+                id: accountId,
+                title: `${accountId} \u2013 הרשאות טופלו`,
+                description: 'אזהרת ההרשאות סומנה כפתורה.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (items || []).map(item => {
         if (typeof item === 'string') {
             return `
                 <div class="problem-card account-entitlement-warning-card">
@@ -4775,7 +5922,17 @@ function displayAccountEntitlementWarnings(items) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
 
 function displayAccountMissingDocuments(items) {
@@ -4783,8 +5940,36 @@ function displayAccountMissingDocuments(items) {
     const container = document.getElementById('accountMissingDocumentsContainer');
     if (!section || !container) return;
 
-    section.style.display = 'block';
-    container.innerHTML = items.map(item => {
+    const tracking = trackProblemStatus(
+        'accountMissingDocuments',
+        items,
+        (item) => {
+            if (typeof item === 'string') {
+                return buildGenericIdentifier(item, 'account-doc');
+            }
+            const accountId = item.account_id || item.accountId || 'unknown';
+            const docs = Array.isArray(item.documents)
+                ? item.documents.join('|')
+                : Array.isArray(item.required_documents)
+                    ? item.required_documents.join('|')
+                    : '';
+            return `account-doc:${accountId}|${docs}`;
+        },
+        (item) => {
+            const accountId = typeof item === 'string'
+                ? 'חשבון'
+                : (item.account_id || item.accountId || 'חשבון');
+            return {
+                id: accountId,
+                title: `${accountId} \u2013 מסמכים הושלמו`,
+                description: 'המסמכים החסרים הועלו או אושרו.',
+                icon: 'bi bi-check-circle'
+            };
+        }
+    );
+
+    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
+    const unresolvedCards = (items || []).map(item => {
         let accountId = 'לא ידוע';
         let documents = [];
 
@@ -4817,5 +6002,78 @@ function displayAccountMissingDocuments(items) {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+    const cards = [...resolvedCards, ...unresolvedCards];
+
+    if (cards.length === 0) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = cards.join('');
 }
+
+function getEntityTypeForImport(key) {
+    return IMPORT_DATA_TYPE_DEFINITIONS[key]?.entityType || 'cash_flow';
+}
+
+function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
+    const entityButtons = [
+        'analyzeBtn',
+        'analysisContinueBtn',
+        'confirmImportHeaderBtn',
+        'confirmImportAndReportHeaderBtn',
+        'resetImportSessionBtn',
+        'cancelImportStepBtn'
+    ];
+
+    entityButtons.forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) {
+            return;
+        }
+
+        const current = button.getAttribute('data-entity-type');
+        if (current === entityType) {
+            return;
+        }
+
+        button.setAttribute('data-entity-type', entityType);
+
+        const buttonType = (button.getAttribute('data-button-type') || '').toUpperCase();
+        if (buttonType && window.advancedButtonSystem?.constructor?.ENTITY_VARIANT_BUTTONS?.includes(buttonType)) {
+            try {
+                window.advancedButtonSystem.applyEntityColors(button, entityType);
+            } catch (error) {
+                window.Logger?.debug?.('[Import Modal] Failed to apply entity colors directly', {
+                    error: error.message
+                });
+            }
+        }
+    });
+
+    const entityCssKey = String(entityType || '')
+        .trim()
+        .toLowerCase()
+        .replace(/_/g, '-');
+    const entityColorVar = entityCssKey
+        ? `var(--entity-${entityCssKey}-color, var(--warning-color, #fd7e14))`
+        : `var(--warning-color, #fd7e14)`;
+    const entityTextVar = entityCssKey
+        ? `var(--entity-${entityCssKey}-text, var(--warning-text-color, #0c5460))`
+        : `var(--warning-text-color, #0c5460)`;
+
+    document
+        .querySelectorAll('.active-session-warning-card')
+        .forEach((card) => {
+            card.setAttribute('data-entity-type', entityType || '');
+            card.style.setProperty('--active-session-entity-color', entityColorVar);
+            card.style.setProperty('--active-session-entity-text', entityTextVar);
+        });
+}
+
+const displayExistingRecordsLegacy = (records) => displayExistingRecords(records);
+
+const clearProblemSectionsLegacy = () => clearProblemSections();

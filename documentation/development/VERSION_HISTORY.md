@@ -15,3 +15,19 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-11T01:01:46+00:00 | 1.0.5.0 | 1.0.4.0 | ab26eb7a516afef0b851e4a08da7fabbb9e1197d | 01c735221df88555af989a0a718215c6a618ae70 | patch | Document active alerts component and add API path audit tool |
 | 2025-11-11T01:30:37+00:00 | 1.0.6.0 | 1.0.5.0 | b79e7f3216a3384aaf8c166b2141cb9efaebaae6 | ab26eb7a516afef0b851e4a08da7fabbb9e1197d | patch | Standardize API path naming to hyphen format |
 | 2025-11-11T01:47:48+00:00 | 1.0.7.0 | 1.0.6.0 | 5ff43ef8ae692a1622a83666d6947ced000802b5 | b79e7f3216a3384aaf8c166b2141cb9efaebaae6 | patch | Sync local update batch |
+| 2025-11-11T11:07:42+00:00 | 1.0.8.0 | 1.0.7.0 | 71acdafb71ffef4c7680a6c8805c2f969686748b | 5ff43ef8ae692a1622a83666d6947ced000802b5 | patch | Link homepage execution widgets to executions page |
+| 2025-11-11T16:10:41+00:00 | 1.0.9.0 | 1.0.8.0 | d6c4d76fc4aaba5dcb784d6ff43c0411beb2a9c0 | 71acdafb71ffef4c7680a6c8805c2f969686748b | patch | Active alerts empty state refinement |
+| 2025-11-11T18:04:02+00:00 | 1.0.10.0 | 1.0.9.0 | 05f649646e375ad5e769ae4cd27eb5a8990e1e63 | d6c4d76fc4aaba5dcb784d6ff43c0411beb2a9c0 | patch | Align brand color tokens across UI |
+| 2025-11-11T18:51:14+00:00 | 1.0.11.0 | 1.0.10.0 | 08d71320193ccf6f6e8dc8c75f95af1c96d95b44 | 05f649646e375ad5e769ae4cd27eb5a8990e1e63 | patch | Add accessibility smoke tests |
+| 2025-11-11T20:44:23+00:00 | 1.0.12.0 | 1.0.11.0 | e4a6cbcbbfe687b72cc1b526db65faf2cd5744d3 | 08d71320193ccf6f6e8dc8c75f95af1c96d95b44 | patch | Expand dynamic color preferences across UI |
+| 2025-11-11T23:16:24+00:00 | 1.0.13.0 | 1.0.12.0 | d8b45f6369922c18badfabdb16fc0b6c3d7b26c6 | e4a6cbcbbfe687b72cc1b526db65faf2cd5744d3 | patch | Document data import updates and sync local changes |
+| 2025-11-11T23:18:01+00:00 | 1.0.14.0 | 1.0.13.0 | a8a13c27f2bb3d6e56d269973c524f0ded1a225e | d8b45f6369922c18badfabdb16fc0b6c3d7b26c6 | patch | Update development database snapshot |
+| 2025-11-12T15:11:10+00:00 | 1.0.15.0 | 1.0.14.0 | 2e9b32ecacf9eeb0f13f191aed5997f92122de1e | a8a13c27f2bb3d6e56d269973c524f0ded1a225e | patch | Improve modal navigation restore handling |
+| 2025-11-12T15:17:24+00:00 | 1.0.16.0 | 1.0.15.0 | 8db9e77714e2f1fa1bae40a9bcfcde82fd33f486 | 2e9b32ecacf9eeb0f13f191aed5997f92122de1e | patch | Full workspace sync |
+| 2025-11-12T15:20:04+00:00 | 1.0.17.0 | 1.0.16.0 | 03f3c3fb05d5ed307607a28e07ba9ac727b70ada | 8db9e77714e2f1fa1bae40a9bcfcde82fd33f486 | patch | Integrate Option A table filtering with unified systems |
+| 2025-11-12T15:33:15+00:00 | 1.0.18.0 | 1.0.17.0 | d3c2bf075911e1b903d9067e31e06fd4ece7b2fb | 03f3c3fb05d5ed307607a28e07ba9ac727b70ada | patch | Entity modal color sync |
+| 2025-11-12T16:32:29+00:00 | 1.0.19.0 | 1.0.18.0 | 3aba628529e222b0552c8559b3bc7104b2b1e6a8 | d3c2bf075911e1b903d9067e31e06fd4ece7b2fb | patch | Adjust import session warning layout |
+| 2025-11-12T18:44:29+00:00 | 1.0.20.0 | 1.0.19.0 | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | 3aba628529e222b0552c8559b3bc7104b2b1e6a8 | patch | Finalize modal navigation refactor and tagging rollout |
+| 2025-11-12T20:40:00+00:00 | 1.0.21.0 | 1.0.20.0 | pending | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | patch | Legacy duplicate cleanup (import modal & linter) + docs update |
+| 2025-11-12T22:49:10+00:00 | 1.0.22.0 | 1.0.21.0 | 0952f7612900529373f545ad12b163b2a09b489f | pending | patch | Refine data import warning layout |
+| 2025-11-12T22:59:09+00:00 | 1.0.23.0 | 1.0.22.0 | be867cf327ed507677ede7e586b10e4f64221acc | 0952f7612900529373f545ad12b163b2a09b489f | patch | Fix data import navigation and dates |

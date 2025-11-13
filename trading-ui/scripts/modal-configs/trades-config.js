@@ -26,15 +26,29 @@ const tradesModalConfig = {
             required: true,
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
-            rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            rowClass: 'row g-3 align-items-end',
+            colClass: 'col-md-4 col-sm-12'
         },
         {
             type: 'display',
             id: 'tradeTickerInfoDisplay',
             label: 'נתוני שוק',
-            rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-4 col-sm-12'
+        },
+        {
+            type: 'custom',
+            id: 'tradeConditionsControls',
+            colClass: 'col-md-4 col-sm-12',
+            html: `
+                <div class="conditions-control-wrapper d-flex flex-column align-items-end gap-2" data-conditions-controls="trade">
+                    <button type="button" class="btn btn-outline-primary w-100" id="tradeOpenConditionsButton">
+                        ניהול תנאים
+                    </button>
+                    <div class="text-muted small text-start w-100" data-conditions-disabled-hint>
+                        ניהול תנאים יהיה זמין לאחר שמירת העסקה.
+                    </div>
+                </div>
+            `
         },
         // שורה שנייה: צד + חשבון מסחר
         {
@@ -194,6 +208,22 @@ const tradesModalConfig = {
             description: 'חישוב ריכוזי של נתוני ההשקעה, הסיכון והסיכוי',
             rowClass: 'row',
             colClass: 'col-12'
+        },
+        {
+            type: 'select',
+            id: 'tradeTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'trade'
+            },
+            description: 'בחר תגיות עבור טרייד זה לטובת סינון ואנליטיקה'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {

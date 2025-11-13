@@ -78,11 +78,11 @@ describe('Modal Manager V2', () => {
         global.console.warn = jest.fn();
         global.console.error = jest.fn();
 
-        // Load with dependencies using test loader only if not already loaded
-        if (!window.ModalManagerV2) {
-            const code = loadScriptWithDependencies('scripts/modal-manager-v2.js');
-            eval(code);
-        }
+        // Load with dependencies using test loader (always reload newest implementation)
+        delete window.ModalManagerV2;
+        delete window.ModalNavigationService;
+        const code = loadScriptWithDependencies('scripts/modal-manager-v2.js');
+        eval(code);
         
         // Ensure ModalManagerV2 is initialized (it should auto-initialize on DOMContentLoaded)
         // Trigger initialization manually if needed

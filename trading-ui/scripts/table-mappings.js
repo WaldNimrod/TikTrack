@@ -32,6 +32,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'reward',                // 8 - סיכוי (מחושב)
     'risk',                  // 9 - סיכון (מחושב)
     'ratio',                 // 10 - יחס (מחושב)
+    'updated_at',            // 11 - עודכן
   ],
 
   // טבלת טריידים (Trades) - Trades Page Structure (מוצג בפועל)
@@ -48,6 +49,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'account_name',          // 9 - חשבון מסחר
     'created_at',            // 10 - נוצר ב
     'closed_at',             // 11 - נסגר ב
+    'updated_at',            // 12 - עודכן
   ],
 
   // טבלת חשבונות מסחר (Trading Accounts) - Trading Accounts Page Structure (מוצג בפועל)
@@ -58,6 +60,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'positions_count',       // 3 - פוזיציות (מחושב)
     'total_pl',              // 4 - רווח/הפסד
     'status',                // 5 - סטטוס
+    'updated_at',            // 6 - עודכן
   ],
 
   // טבלת טיקרים (Tickers) - Tickers Page Structure (מוצג בפועל)
@@ -70,7 +73,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'type',                  // 5 - סוג
     'name',                  // 6 - שם החברה
     'currency_id',           // 7 - מטבע
-    'yahoo_updated_at',      // 8 - עודכן ב
+    'updated_at',            // 8 - עודכן ב
   ],
 
   // טבלת פריטים מקושרים (Linked Items) - Entity Details Modal
@@ -94,6 +97,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'mtm_pl',                // 7 - MTM P/L
     'date',                  // 8 - תאריך
     'source',                // 9 - מקור
+    'updated_at',            // 10 - עודכן
   ],
 
   // טבלת תזרימי מזומנים (Cash Flows) - Cash Flows Page Structure (מוצג בפועל)
@@ -104,6 +108,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'date',                  // 3 - תאריך
     'description',           // 4 - תיאור
     'source',                // 5 - מקור
+    'updated_at',            // 6 - עודכן
   ],
 
   // טבלת היסטוריית ייבוא נתונים (Data Import History)
@@ -131,6 +136,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'created_at',            // 6 - נוצר ב
     'triggered_at',          // 7 - הופעל ב
     'expiry_date',           // 8 - תאריך תפוגה
+    'updated_at',            // 9 - עודכן
   ],
 
   // טבלת הערות (Notes) - Notes Page Structure (מוצג בפועל)
@@ -140,6 +146,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'content',               // 1 - תוכן ההערה
     'created_at',            // 2 - תאריך (תאריך ההערה)
     'attachment',            // 3 - קובץ מצורף
+    'updated_at',            // 4 - עודכן
     // Note: actions column is not part of the mapping (handled separately)
   ],
 
@@ -176,6 +183,31 @@ const TABLE_COLUMN_MAPPINGS = {
     'id',              // 0 - מזהה
     'note_relation_type', // 1 - סוג קשר
     'created_at',       // 2 - נוצר ב
+  ],
+
+  // מערכת תגיות - קטגוריות
+  'tag_categories': [
+    'name',           // 0 - שם קטגוריה
+    'description',    // 1 - תיאור
+    'tags_count',     // 2 - כמות תגיות פעילות
+    'updated_at'      // 3 - עודכן
+  ],
+
+  // מערכת תגיות - תגיות
+  'tags': [
+    'name',           // 0 - שם תגית
+    'category_name',  // 1 - קטגוריה
+    'description',    // 2 - תיאור
+    'usage_count',    // 3 - שימושים
+    'last_used_at'    // 4 - שימוש אחרון
+  ],
+
+  // מערכת תגיות - טבלת שימוש מובילה
+  'tag_usage_leaderboard': [
+    'tag_name',       // 0 - שם תגית
+    'category_name',  // 1 - קטגוריה
+    'usage_count',    // 2 - מספר שימושים
+    'top_entities'    // 3 - ישויות מובילות (מטופל ייעודית ברינדור)
   ],
 
   // טבלת פוזיציות (Positions) - Positions by Account Table
@@ -234,6 +266,7 @@ const TABLE_COLUMN_SORT_TYPES = {
     created_at: 'dateEnvelope',
     triggered_at: 'dateEnvelope',
     expiry_date: 'dateEnvelope',
+    updated_at: 'dateEnvelope',
     status: 'string',
     is_triggered: 'string'
   },
@@ -249,17 +282,21 @@ const TABLE_COLUMN_SORT_TYPES = {
     match_reasons_text: 'string'
   },
   executions: {
-    date: 'date'
+    date: 'date',
+    updated_at: 'date'
   },
   trades: {
     created_at: 'date',
-    closed_at: 'date'
+    closed_at: 'date',
+    updated_at: 'date'
   },
   trade_plans: {
-    created_at: 'date'
+    created_at: 'date',
+    updated_at: 'date'
   },
   cash_flows: {
-    date: 'date'
+    date: 'date',
+    updated_at: 'date'
   },
   import_history: {
     id: 'numeric',
@@ -282,18 +319,17 @@ const TABLE_COLUMN_SORT_TYPES = {
     type: 'string',
     name: 'string',
     currency_id: 'string',
-    yahoo_updated_at: 'dateEnvelope'
-  },
-  alerts: {
-    created_at: 'dateEnvelope',
-    triggered_at: 'dateEnvelope',
-    expiry_date: 'dateEnvelope'
+    updated_at: 'dateEnvelope'
   },
   notes: {
-    created_at: 'date'
+    created_at: 'date',
+    updated_at: 'date'
   },
   linked_items: {
     created_at: 'date'
+  },
+  trading_accounts: {
+    updated_at: 'dateEnvelope'
   }
 };
 

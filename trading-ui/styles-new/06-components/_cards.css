@@ -32,7 +32,7 @@
 
 .small-row-card:hover {
   background: #e9ecef;
-  border-color: #007bff;
+  border-color: var(--primary-color, #26baac);
 }
 
 .small-row-card-icon {
@@ -49,7 +49,7 @@
 .small-row-card-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #007bff;
+  color: var(--primary-color, #26baac);
   min-width: 30px;
   text-align: center;
 }
@@ -68,7 +68,7 @@
 
 .stat-item:hover {
   background: #e9ecef;
-  border-color: #007bff;
+  border-color: var(--primary-color, #26baac);
 }
 
 .stat-icon {
@@ -85,7 +85,7 @@
 .stat-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #007bff;
+  color: var(--primary-color, #26baac);
   min-width: 30px;
   text-align: center;
 }
@@ -121,7 +121,7 @@
 }
 
 .summary-stats .stat-item i {
-  color: #007bff;
+  color: var(--primary-color, #26baac);
   font-size: 1rem;
 }
 
@@ -145,8 +145,8 @@
 }
 
 .mapping-item:hover {
-  border-color: #007bff;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+  border-color: var(--primary-color, #26baac);
+  box-shadow: 0 2px 8px rgba(38, 186, 172, 0.12);
 }
 
 .page-info {
@@ -165,7 +165,7 @@
 }
 
 .page-name i {
-  color: #007bff;
+  color: var(--primary-color, #26baac);
   font-size: 1.1rem;
 }
 

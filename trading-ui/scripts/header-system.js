@@ -155,6 +155,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
@@ -1218,7 +1219,8 @@ class HeaderSystem {
           dateRange: 'כל זמן',
           status: [],
           type: [],
-          account: []
+          account: [],
+          custom: {}
         },
         
         // שמירת פילטרים
@@ -1285,194 +1287,181 @@ class HeaderSystem {
         },
         
         // הפעלת פילטרים על כל הטבלאות
-        applyAllFilters() {
-          window.Logger.info('🔧 applyAllFilters called', { page: "header-system" });
-          
-          // רשימה של containers מתועדים
-          const knownContainers = [
-            'tradesContainer',
-            'trade_plansContainer',  // תיקון: tradePlansContainer → trade_plansContainer
-            'tickersContainer',
-            'alertsContainer',
-            'executionsContainer',
-            'accountsContainer',
-            'accountActivityContainer',  // טבלת תנועות חשבון (בעמוד חשבונות)
-            'cashFlowsContainer',
-            'notesContainer'
-          ];
-          
-          let processedTables = [];
-          
-          // עיבוד containers ידועים
-          knownContainers.forEach(containerId => {
-            const container = document.getElementById(containerId);
-            if (container) {
-              const table = container.querySelector('table');
-              if (table) {
-                const tableId = table.id || containerId.replace('Container', 'Table');
-                this.applyFiltersToTable(tableId);
-                processedTables.push(tableId);
-                window.Logger.info(`✅ Processed known container: ${containerId} → ${tableId}`, { page: "header-system" });
+        async applyAllFilters() {
+          const context = this.buildFilterContext();
+          const targets = this._resolveTargetTables();
+          const processed = [];
+
+          for (const target of targets) {
+            try {
+              const filteredData = await this.applyFiltersToTable(target.tableId, context, target.tableType);
+              processed.push({
+                tableId: target.tableId,
+                tableType: target.tableType,
+                filteredCount: Array.isArray(filteredData) ? filteredData.length : 0,
+              });
+            } catch (error) {
+              if (window.Logger) {
+                window.Logger.warn('⚠️ applyAllFilters: failed to process table', {
+                  tableId: target.tableId,
+                  error: error?.message || error,
+                  page: 'header-system',
+                });
               } else {
-                window.Logger.debug(`⚠️ No table found in container: ${containerId}`, { page: "header-system" });
+                console.warn('applyAllFilters: failed to process table', target.tableId, error);
               }
             }
-          });
-          
-          // עיבוד containers נוספים (לעתיד) - חיפוש כל ה-containers
-          // זה מטפל גם ב-variations בשמות (כמו tradePlansContainer vs trade_plansContainer)
-          const allContainers = document.querySelectorAll('[id$="Container"]');
-          allContainers.forEach(container => {
-            const containerId = container.id;
-            // דילוג אם כבר עיבדנו אותו
-            if (!knownContainers.includes(containerId)) {
-              const table = container.querySelector('table');
-              if (table) {
-                // משתמש ב-ID של הטבלה אם קיים, אחרת fallback ל-container ID
-                const tableId = table.id || containerId.replace('Container', 'Table');
-                this.applyFiltersToTable(tableId);
-                processedTables.push(tableId);
-                window.Logger.info(`✅ Processed additional container: ${containerId} → ${tableId}`, { page: "header-system" });
-              }
-            }
-          });
-          
-          window.Logger.info(`✅ Filter applied to ${processedTables.length} table(s): ${processedTables.join(', ')}`, { page: "header-system" });
+          }
+
+          if (window.Logger) {
+            window.Logger.info('✅ applyAllFilters summary', {
+              processedCount: processed.length,
+              processed,
+              page: 'header-system',
+            });
+          }
+
+          return processed;
         },
         
         // הפעלת פילטרים על טבלה ספציפית
-        applyFiltersToTable(tableId) {
-          const table = document.getElementById(tableId);
-          if (!table) {
-            window.Logger.debug(`⚠️ Table not found: ${tableId}`, { page: "header-system" });
-            return;
+        async applyFiltersToTable(tableId, filterContext = null, resolvedTableType = null) {
+          if (!tableId || !window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+            return null;
           }
-          
-          const rows = table.querySelectorAll('tbody tr');
-          let visibleCount = 0;
-          
-          rows.forEach(row => {
-            let shouldShow = true;
-            
-            // פילטר סטטוס
-            if (this.currentFilters.status.length > 0 && !this.currentFilters.status.includes('הכול')) {
-              const statusCell = row.querySelector('td[data-status]');
-              if (statusCell) {
-                const rowStatus = statusCell.getAttribute('data-status');
-                // תרגום סטטוס מאנגלית לעברית כדי להתאים לפילטר
-                const translatedRowStatus = rowStatus && (
-                  window.translateAccountStatus && window.translateAccountStatus(rowStatus) ||
-                  window.translateTickerStatus && window.translateTickerStatus(rowStatus) ||
-                  window.translateTradePlanStatus && window.translateTradePlanStatus(rowStatus) ||
-                  rowStatus
-                );
-                shouldShow = shouldShow && this.currentFilters.status.includes(translatedRowStatus);
-              } else {
-                // אין שדה סטטוס - התעלם מהפילטר (הצג הכל)
-                window.Logger.debug(`ℹ️ No status cell found in row, ignoring status filter`, { page: "header-system" });
-              }
+
+          const tableElement = document.getElementById(tableId);
+          const tableType =
+            resolvedTableType ||
+            window.TableDataRegistry?.resolveTableType?.(tableId) ||
+            tableElement?.getAttribute?.('data-table-type') ||
+            tableElement?.dataset?.tableType ||
+            null;
+
+          if (!tableType) {
+            if (window.Logger) {
+              window.Logger.debug(`⚠️ applyFiltersToTable: unable to resolve table type for ${tableId}`, { page: 'header-system' });
             }
-            
-            // פילטר סוג - רק אם יש שדה רלוונטי בטבלה
-            if (this.currentFilters.type.length > 0 && !this.currentFilters.type.includes('הכול')) {
-              // בדיקת שתי התכונות שונות - data-investment-type לטבלאות trades/trade_plans ו-data-type לטבלאות tickers
-              const typeCell = row.querySelector('td[data-investment-type]') || row.querySelector('td[data-type]');
-              if (typeCell) {
-                // יש שדה סוג - בדוק את הפילטר
-                const rowType = typeCell.getAttribute('data-investment-type') || typeCell.getAttribute('data-type');
-                const rowTypeText = typeCell.textContent.trim();
-                
-                // תרגום סוג מאנגלית לעברית כדי להתאים לפילטר
-                const translatedRowType = rowType && (
-                  window.translateTradePlanType && window.translateTradePlanType(rowType) ||
-                  window.translateTradeType && window.translateTradeType(rowType) ||
-                  rowType
-                );
-                
-                // בדיקה גם לפי data attribute וגם לפי טקסט
-                const typeMatches = this.currentFilters.type.includes(translatedRowType) || 
-                                  this.currentFilters.type.includes(rowTypeText);
-                
-                // לוג לדיבוג
-                console.log('🔍 Type filter:', {
-                  rowType,
-                  translatedRowType,
-                  rowTypeText,
-                  filterValues: this.currentFilters.type,
-                  typeMatches
+            return null;
+          }
+
+          const config = window.UnifiedTableSystem.registry.getConfig(tableType);
+          if (!config || typeof config.updateFunction !== 'function') {
+            if (window.Logger) {
+              window.Logger.debug(`⚠️ applyFiltersToTable: no updateFunction for ${tableType}`, { page: 'header-system' });
+            }
+            return null;
+          }
+
+          const context = filterContext || this.buildFilterContext();
+          const filteredData = window.UnifiedTableSystem.filter.apply(tableType, context);
+
+          const renderCallback = async (pageData) => {
+            try {
+              await Promise.resolve(config.updateFunction(pageData));
+            } catch (renderError) {
+              if (window.Logger) {
+                window.Logger.warn('⚠️ applyFiltersToTable: updateFunction failed', {
+                  tableType,
+                  tableId,
+                  error: renderError?.message || renderError,
+                  page: 'header-system',
                 });
-                
-                shouldShow = shouldShow && typeMatches;
               } else {
-                // אין שדה סוג - התעלם מהפילטר (הצג הכל)
-                window.Logger.debug(`ℹ️ No type cell found in row, ignoring type filter`, { page: "header-system" });
-              }
-              // אם אין שדה סוג - תמיד הצג (לא מסנן)
-            }
-            
-            // פילטר חשבון מסחר
-            if (this.currentFilters.account.length > 0 && !this.currentFilters.account.includes('הכול')) {
-              const accountCell = row.querySelector('td[data-account]');
-              if (accountCell) {
-                const rowAccount = accountCell.getAttribute('data-account');
-                shouldShow = shouldShow && this.currentFilters.account.includes(rowAccount);
-              } else {
-                // אין שדה חשבון - התעלם מהפילטר (הצג הכל)
-                window.Logger.debug(`ℹ️ No account cell found in row, ignoring account filter`, { page: "header-system" });
+                console.warn('applyFiltersToTable: updateFunction failed', tableType, renderError);
               }
             }
-            
-            // פילטר תאריכים
-            if (this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן') {
-              const dateCell = row.querySelector('td[data-date]');
-              if (dateCell) {
-                const rowDate = dateCell.getAttribute('data-date');
-                const isInRange = this.isDateInRange(rowDate, this.currentFilters.dateRange);
-                shouldShow = shouldShow && isInRange;
+          };
+
+          if (typeof window.updateTableWithPagination === 'function') {
+            await window.updateTableWithPagination({
+              tableId,
+              tableType,
+              data: filteredData,
+              render: async (pageData) => renderCallback(pageData),
+              skipRegistry: true,
+            });
               } else {
-                // אין שדה תאריך - התעלם מהפילטר (הצג הכל)
-                window.Logger.debug(`ℹ️ No date cell found in row, ignoring date filter`, { page: "header-system" });
-              }
+            await renderCallback(filteredData);
+          }
+
+          return filteredData;
+        },
+        
+        buildFilterContext() {
+          const cloneArray = (value) => (Array.isArray(value) ? [...value] : (value ? [value] : []));
+          return {
+            status: cloneArray(this.currentFilters.status),
+            type: cloneArray(this.currentFilters.type),
+            account: cloneArray(this.currentFilters.account),
+            dateRange: this.currentFilters.dateRange ?? null,
+            search: typeof this.currentFilters.search === 'string' ? this.currentFilters.search : '',
+            custom: this.currentFilters.custom && typeof this.currentFilters.custom === 'object' ? { ...this.currentFilters.custom } : {},
+          };
+        },
+        
+        _resolveTargetTables() {
+          const targets = [];
+          const seen = new Set();
+
+          const tableElements = document.querySelectorAll('table[data-table-type]');
+          tableElements.forEach((table) => {
+            const tableId = table.id || this._inferTableIdFromContainer(table);
+            if (!tableId || seen.has(tableId)) {
+              return;
             }
-            
-            // פילטר חיפוש
-            if (this.currentFilters.search && this.currentFilters.search.trim() !== '') {
-              const searchTerm = this.currentFilters.search.toLowerCase().trim();
-              const cells = row.querySelectorAll('td');
-              let foundMatch = false;
-              
-              cells.forEach(cell => {
-                const cellText = cell.textContent.toLowerCase().trim();
-                if (cellText.includes(searchTerm)) {
-                  foundMatch = true;
-                }
-              });
-              
-              shouldShow = shouldShow && foundMatch;
-            }
-            
-            // הצגה/הסתרה
-            if (shouldShow) {
-              row.style.display = '';
-              visibleCount++;
-            } else {
-              row.style.display = 'none';
-            }
+            const tableType =
+              table.getAttribute('data-table-type') ||
+              window.TableDataRegistry?.resolveTableType?.(tableId) ||
+              null;
+            targets.push({ tableId, tableType });
+            seen.add(tableId);
           });
-          
-          window.Logger.info(`✅ ${tableId}: ${visibleCount}/${rows.length} rows visible`, { page: "header-system" });
-          
-          // Update selectedDateRangeForFilter for compatibility with account-activity.js
-          if (this.currentFilters.dateRange !== undefined) {
-            window.selectedDateRangeForFilter = this.currentFilters.dateRange;
+
+          if (targets.length === 0) {
+            const fallbackContainers = [
+              'tradesContainer',
+              'trade_plansContainer',
+              'tickersContainer',
+              'alertsContainer',
+              'executionsContainer',
+              'accountsContainer',
+              'accountActivityContainer',
+              'cashFlowsContainer',
+              'notesContainer',
+            ];
+
+            fallbackContainers.forEach((containerId) => {
+              const container = document.getElementById(containerId);
+              const table = container?.querySelector('table');
+              if (!table) {
+                return;
+              }
+              const tableId = table.id || containerId.replace('Container', 'Table');
+              if (seen.has(tableId)) {
+                return;
+              }
+              const tableType =
+                table.getAttribute('data-table-type') ||
+                window.TableDataRegistry?.resolveTableType?.(tableId) ||
+                null;
+              targets.push({ tableId, tableType });
+              seen.add(tableId);
+            });
           }
-          
-          // If this is the account activity table, update the title date range
-          if (tableId === 'accountActivityTable' && typeof updateActivitySummary === 'function') {
-            setTimeout(() => {
-              updateActivitySummary(null);
-            }, 100);
+
+          return targets;
+        },
+        
+        _inferTableIdFromContainer(table) {
+          if (!table) {
+            return null;
           }
+          const container = table.closest('[id$="Container"]');
+          if (!container) {
+            return table.id || null;
+          }
+          return table.id || container.id.replace('Container', 'Table');
         },
         
         // פונקציה לבדיקת תאריך בטווח
@@ -1588,7 +1577,35 @@ class HeaderSystem {
             default:
               return true;
           }
-        }
+        },
+        triggerFilterUpdate(reason) {
+          try {
+            const maybePromise = this.applyAllFilters();
+            if (maybePromise && typeof maybePromise.catch === 'function') {
+              maybePromise.catch((error) => {
+                if (window.Logger) {
+                  window.Logger.warn('⚠️ triggerFilterUpdate failed', {
+                    reason,
+                    error: error?.message || error,
+                    page: 'header-system',
+                  });
+                } else {
+                  console.warn('triggerFilterUpdate failed', reason, error);
+                }
+              });
+            }
+          } catch (error) {
+            if (window.Logger) {
+              window.Logger.warn('⚠️ triggerFilterUpdate threw synchronously', {
+                reason,
+                error: error?.message || error,
+                page: 'header-system',
+              });
+            } else {
+              console.warn('triggerFilterUpdate threw synchronously', reason, error);
+            }
+          }
+        },
       };
       
       await window.filterSystem.loadFilters();
@@ -2263,18 +2280,14 @@ window.selectStatusOption = function(status) {
   
   if (clickedItem) {
     if (status === 'הכול') {
-      // בחירת "הכול" - ביטול כל הבחירות האחרות
       statusItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
     } else {
-      // בחירת סטטוס ספציפי - ביטול "הכול" אם נבחר
       const allItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
       if (allItem) {
         allItem.classList.remove('selected');
       }
       clickedItem.classList.toggle('selected');
-      
-      // אם לא נבחר אף סטטוס, חזור ל"הכול"
       const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
       if (selectedItems.length === 0 && allItem) {
         allItem.classList.add('selected');
@@ -2285,18 +2298,16 @@ window.selectStatusOption = function(status) {
   updateStatusFilterText();
   updatePortalSelections();
   
-  // עדכון מיידי של הפילטר במערכת
   console.log('🔧 window.filterSystem:', window.filterSystem ? 'exists' : 'NOT FOUND');
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
     const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.status = selectedStatuses;
     window.filterSystem.saveFilters();
-    console.log('🔧 Calling applyAllFilters...');
-    window.filterSystem.applyAllFilters();
+    console.log('🔧 Triggering filter pipeline for status change...');
+    window.filterSystem.triggerFilterUpdate('status-change');
   }
   
-  // סגירת התפריט
   const statusMenu = document.getElementById('statusFilterMenu');
   if (statusMenu) {
     statusMenu.classList.remove('show');
@@ -2322,8 +2333,6 @@ window.selectTypeOption = function(type) {
         allItem.classList.remove('selected');
       }
       clickedItem.classList.toggle('selected');
-      
-      // אם לא נבחר אף סוג, חזור ל"הכול"
       const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
       if (selectedItems.length === 0 && allItem) {
         allItem.classList.add('selected');
@@ -2334,14 +2343,13 @@ window.selectTypeOption = function(type) {
   updateTypeFilterText();
   updatePortalSelections();
   
-  console.log('🔧 window.filterSystem for type:', window.filterSystem ? 'exists' : 'NOT FOUND');
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
     const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.type = selectedTypes;
     window.filterSystem.saveFilters();
-    console.log('🔧 Calling applyAllFilters for type...');
-    window.filterSystem.applyAllFilters();
+    console.log('🔧 Triggering filter pipeline for type change...');
+    window.filterSystem.triggerFilterUpdate('type-change');
   }
   
   const typeMenu = document.getElementById('typeFilterMenu');
@@ -2395,7 +2403,8 @@ window.selectAccountOption = function(account) {
     const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.account = selectedAccounts;
     window.filterSystem.saveFilters();
-    window.filterSystem.applyAllFilters();
+    console.log('🔧 Triggering filter pipeline for account change...');
+    window.filterSystem.triggerFilterUpdate('account-change');
   }
   
   const accountMenu = document.getElementById('accountFilterMenu');
@@ -2409,10 +2418,8 @@ window.selectDateRangeOption = function(dateRange) {
 
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
   
-  // ביטול כל הבחירות (בחירה יחידה)
   dateRangeItems.forEach(item => item.classList.remove('selected'));
 
-  // בחירת התאריך החדש
   const clickedItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === dateRange);
   if (clickedItem) {
     clickedItem.classList.add('selected');
@@ -2424,7 +2431,8 @@ window.selectDateRangeOption = function(dateRange) {
   if (window.filterSystem) {
     window.filterSystem.currentFilters.dateRange = dateRange;
     window.filterSystem.saveFilters();
-    window.filterSystem.applyAllFilters();
+    console.log('🔧 Triggering filter pipeline for date range change...');
+    window.filterSystem.triggerFilterUpdate('date-range-change');
   }
 
   const dateMenu = document.getElementById('dateRangeFilterMenu');
@@ -2540,25 +2548,25 @@ window.updateDateRangeFilterText = function() {
 // פונקציות הפעלת פילטרים - פשוטות ויעילות
 window.applyStatusFilter = function() {
   if (window.filterSystem) {
-    window.filterSystem.applyAllFilters();
+    window.filterSystem.triggerFilterUpdate('status-apply');
   }
 };
 
 window.applyTypeFilter = function() {
   if (window.filterSystem) {
-    window.filterSystem.applyAllFilters();
+    window.filterSystem.triggerFilterUpdate('type-apply');
   }
 };
 
 window.applyAccountFilter = function() {
   if (window.filterSystem) {
-    window.filterSystem.applyAllFilters();
+    window.filterSystem.triggerFilterUpdate('account-apply');
   }
 };
 
 window.applyDateRangeFilter = function(dateRange) {
   if (window.filterSystem) {
-    window.filterSystem.applyAllFilters();
+    window.filterSystem.triggerFilterUpdate('date-range-apply');
   }
 };
 
@@ -2572,10 +2580,11 @@ window.clearAllFilters = function() {
       dateRange: 'כל זמן',
       status: [],
       type: [],
-      account: []
+      account: [],
+      custom: {}
     };
     window.filterSystem.saveFilters();
-    window.filterSystem.applyAllFilters();
+    window.filterSystem.triggerFilterUpdate('clear-all');
     
     // איפוס UI
     const searchInput = document.getElementById('searchFilterInput');
@@ -2769,7 +2778,8 @@ window.resetAllFilters = async function() {
       dateRange: defaultDateRange,
       status: Array.isArray(defaultStatus) ? defaultStatus : (defaultStatus === 'הכל' ? [] : [defaultStatus]),
       type: Array.isArray(defaultType) ? defaultType : (defaultType === 'הכל' ? [] : [defaultType]),
-      account: Array.isArray(defaultAccount) ? defaultAccount : (defaultAccount === 'כל החשבונות' ? [] : [defaultAccount])
+      account: Array.isArray(defaultAccount) ? defaultAccount : (defaultAccount === 'כל החשבונות' ? [] : [defaultAccount]),
+      custom: {}
     };
     
     window.Logger.info('↻ טוען הגדרות ברירת מחדל:', defaultFilters, { page: "header-system" });
@@ -2785,7 +2795,7 @@ window.resetAllFilters = async function() {
       console.log('✅ filterSystem קיים, מעדכן פילטרים');
       window.filterSystem.currentFilters = defaultFilters;
       window.filterSystem.saveFilters();
-      window.filterSystem.applyAllFilters();
+      window.filterSystem.triggerFilterUpdate('reset-defaults');
       
       // עדכון UI ישיר
       console.log('↻ מעדכן UI עם העדפות:', defaultFilters);
@@ -2835,7 +2845,7 @@ window.handleSearchInput = function(event) {
   if (window.filterSystem) {
     window.filterSystem.currentFilters.search = searchTerm;
     window.filterSystem.saveFilters();
-    window.filterSystem.applyAllFilters();
+    window.filterSystem.triggerFilterUpdate('search-change');
   }
 };
 
@@ -2846,7 +2856,7 @@ window.clearSearchFilter = function() {
     if (window.filterSystem) {
       window.filterSystem.currentFilters.search = '';
       window.filterSystem.saveFilters();
-      window.filterSystem.applyAllFilters();
+      window.filterSystem.triggerFilterUpdate('search-clear');
     }
     window.Logger.info('✅ חיפוש נוקה', { page: "header-system" });
     

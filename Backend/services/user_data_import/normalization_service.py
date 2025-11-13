@@ -134,6 +134,16 @@ class NormalizationService:
             'raw_row': raw_record.get('_raw_row') or raw_record
         }
 
+        metadata = self._extract_cashflow_metadata(raw_record)
+        if metadata is None:
+            metadata = {}
+
+        if 'original_cashflow_type' not in metadata and normalized.get('cashflow_type'):
+            metadata['original_cashflow_type'] = normalized['cashflow_type']
+
+        if metadata:
+            normalized['metadata'] = metadata
+
         normalized['external_id'] = self._generate_cashflow_external_id(normalized)
         return normalized
 
@@ -178,10 +188,31 @@ class NormalizationService:
             errors.append("Missing currency")
         if not record.get('effective_date'):
             errors.append("Missing effective_date")
-        if not record.get('source_account'):
-            errors.append("Missing source_account")
 
         return errors
+
+    @staticmethod
+    def _extract_cashflow_metadata(raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        base_keys = {
+            'section',
+            'cashflow_type',
+            'amount',
+            'currency',
+            'effective_date',
+            'source_account',
+            'target_account',
+            'asset_symbol',
+            'memo',
+            'tax_country',
+            '_raw_row'
+        }
+
+        metadata: Dict[str, Any] = {}
+        for key, value in raw_record.items():
+            if key not in base_keys and value not in (None, ''):
+                metadata[key] = value
+
+        return metadata
 
     def _validate_account_record(self, record: Dict[str, Any]) -> List[str]:
         errors: List[str] = []

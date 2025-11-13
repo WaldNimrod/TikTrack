@@ -55,8 +55,8 @@ class ColorManager {
             'chartBackgroundColor': '#ffffff',
             'chartBorderColor': '#e0e0e0',
             'chartGridColor': '#f0f0f0',
-            'chartPointColor': '#007bff',
-            'chartPrimaryColor': '#007bff',
+            'chartPointColor': '#26baac',
+            'chartPrimaryColor': '#1a8f83',
             'chartTextColor': '#333333',
             
             // Entity colors
@@ -69,9 +69,9 @@ class ColorManager {
             'entityNoteColor': '#607d8b',
             'entityNoteColorDark': '#455a64',
             'entityNoteColorLight': '#90a4ae',
-            'entityTradeColor': '#007bff',
-            'entityTradeColorDark': '#004085',
-            'entityTradeColorLight': '#0056b3',
+            'entityTradeColor': '#26baac',
+            'entityTradeColorDark': '#1a8f83',
+            'entityTradeColorLight': '#6ed8ca',
             'entityTickerColor': '#17a2b8',
             'entityTickerColorDark': '#138496',
             'entityTickerColorLight': '#20c997',
@@ -111,8 +111,8 @@ class ColorManager {
             'valueNeutralColorDark': '#495057',
             
             // Theme colors
-            'primaryColor': '#007bff',
-            'secondaryColor': '#6c757d',
+            'primaryColor': '#26baac',
+            'secondaryColor': '#fc5a06',
             'successColor': '#28a745',
             'dangerColor': '#dc3545',
             'warningColor': '#ffc107',
@@ -124,7 +124,7 @@ class ColorManager {
             'textColor': '#333333',
             'borderColor': '#dee2e6',
             'shadowColor': '#666666',
-            'highlightColor': '#007bff',
+            'highlightColor': '#26baac',
             
             // Notification colors
             'notificationSuccessColor': '#28a745',

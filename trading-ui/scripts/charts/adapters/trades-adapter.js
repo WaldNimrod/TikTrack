@@ -68,7 +68,7 @@ class TradesAdapter {
 
         // Get color palette for charts
         const colorPalette = window.getChartColorPalette ? window.getChartColorPalette() : [
-            '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'
+            '#26baac', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'
         ];
         
         return {
@@ -110,7 +110,7 @@ class TradesAdapter {
 
         // Get color palette for charts
         const colorPalette = window.getChartColorPalette ? window.getChartColorPalette() : [
-            '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'
+            '#26baac', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'
         ];
         
         return {
@@ -119,13 +119,13 @@ class TradesAdapter {
                 label: 'מספר טריידים לפי חשבון מסחר',
                 data: data,
                 backgroundColor: [
-                    colorPalette[0] || '#007bff', // primary
+                    colorPalette[0] || '#26baac', // primary
                     colorPalette[1] || '#28a745', // success
                     colorPalette[2] || '#ffc107', // warning
                     colorPalette[4] || '#17a2b8'  // info
                 ],
                 borderColor: [
-                    colorPalette[0] || '#007bff',
+                    colorPalette[0] || '#26baac',
                     colorPalette[1] || '#28a745',
                     colorPalette[2] || '#ffc107',
                     colorPalette[4] || '#17a2b8'
@@ -162,14 +162,14 @@ class TradesAdapter {
 
         // Get color palette for charts
         const colorPalette = window.getChartColorPalette ? window.getChartColorPalette() : [
-            '#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'
+            '#26baac', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'
         ];
         
         // Get colors with opacity
-        const primaryColor = colorPalette[0] || '#007bff';
+        const primaryColor = colorPalette[0] || '#26baac';
         const successColor = colorPalette[1] || '#28a745';
         const primaryWithOpacity = window.getChartColorWithOpacity ? 
-            window.getChartColorWithOpacity('primary', 0.2) : 'rgba(0, 123, 255, 0.2)';
+            window.getChartColorWithOpacity('primary', 0.2) : 'rgba(38, 186, 172, 0.2)';
         const successWithOpacity = window.getChartColorWithOpacity ? 
             window.getChartColorWithOpacity('success', 0.2) : 'rgba(40, 167, 69, 0.2)';
         

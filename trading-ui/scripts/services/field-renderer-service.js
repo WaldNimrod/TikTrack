@@ -143,6 +143,54 @@ class FieldRendererService {
     }
 
     /**
+     * Render duration since last update with optional tooltip
+     * @param {Date|string|object} value
+     * @param {Object} options
+     * @param {string} options.fallback
+     * @param {string} options.format
+     * @param {boolean} options.includeSeconds
+     * @param {boolean} options.showAbsolute
+     * @returns {string}
+     */
+    static renderUpdatedTimestamp(value, options = {}) {
+        const {
+            fallback = 'לא זמין',
+            format = 'dhm',
+            includeSeconds = false,
+            showAbsolute = true
+        } = options || {};
+
+        let candidate = value;
+        if (typeof window.ensureDateEnvelope === 'function') {
+            const envelope = window.ensureDateEnvelope(value);
+            if (envelope) {
+                candidate = envelope;
+            }
+        }
+
+        const dateObj = typeof window.toDateObject === 'function'
+            ? window.toDateObject(candidate)
+            : (value instanceof Date ? value : new Date(value));
+
+        if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) {
+            return `<span class="updated-value-empty">${fallback}</span>`;
+        }
+
+        const durationDisplay = typeof window.getDurationSince === 'function'
+            ? window.getDurationSince(dateObj, { format, includeSeconds, fallback: null })
+            : null;
+
+        const absoluteDisplay = typeof window.formatDateTime === 'function'
+            ? window.formatDateTime(dateObj)
+            : dateObj.toLocaleString('he-IL');
+
+        const content = durationDisplay || absoluteDisplay || fallback;
+        const titleAttr = showAbsolute && absoluteDisplay ? ` title="${absoluteDisplay}"` : '';
+
+        return `<span class="updated-value" dir="ltr"${titleAttr}>${content}</span>`;
+    }
+
+    /**
      * רנדור P&L (רווח/הפסד)
      * @deprecated - השתמש ב-renderNumericValue במקום
      */
@@ -1386,5 +1434,6 @@ window.renderBoolean = (value, size) => FieldRendererService.renderBoolean(value
 window.renderTickerInfo = (ticker, cssClass) => FieldRendererService.renderTickerInfo(ticker, cssClass);
 window.renderVolume = (volume, showMillions) => FieldRendererService.renderVolume(volume, showMillions);
 window.renderExecutionDate = (date) => FieldRendererService.renderExecutionDate(date);
+window.renderUpdatedTimestamp = (value, options) => FieldRendererService.renderUpdatedTimestamp(value, options);
 
 console.log('✅ field-renderer-service.js v=1.4.0 loaded - added renderTickerInfo() for ticker price display');

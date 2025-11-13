@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/392</span>
+                <span class='fraction'>0/397</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/279</span>
+                <span class='fraction'>0/275</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/45</span>
+                <span class='fraction'>0/46</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/366</span>
+                <span class='fraction'>0/371</span>
             </div>
         
             
@@ -854,7 +854,15 @@
 <a name='L789'></a><a href='#L789'>789</a>
 <a name='L790'></a><a href='#L790'>790</a>
 <a name='L791'></a><a href='#L791'>791</a>
-<a name='L792'></a><a href='#L792'>792</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L792'></a><a href='#L792'>792</a>
+<a name='L793'></a><a href='#L793'>793</a>
+<a name='L794'></a><a href='#L794'>794</a>
+<a name='L795'></a><a href='#L795'>795</a>
+<a name='L796'></a><a href='#L796'>796</a>
+<a name='L797'></a><a href='#L797'>797</a>
+<a name='L798'></a><a href='#L798'>798</a>
+<a name='L799'></a><a href='#L799'>799</a>
+<a name='L800'></a><a href='#L800'>800</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -873,7 +881,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1092,7 +1107,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1643,6 +1657,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
@@ -1664,16 +1680,23 @@
  * No manual initialization needed.
  */
 &nbsp;
+const ACTIONS_MENU_DEBUG_ENABLED = <span class="cstat-no" title="statement not covered" >window.ActionsMenuDebugMode === true;</span>
+const actionsMenuDebugLog = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(.</span>..args) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (ACTIONS_MENU_DEBUG_ENABLED) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log(...args);</span>
+    }
+};
+&nbsp;
 // הגדרת פונקציה גלובלית לבדיקה מיידית - זמינה מיד
-<span class="cstat-no" title="statement not covered" >console.log('🔧 ActionsMenuSystem: מגדיר את debugActionsMenu באופן גלובלי');</span>
-<span class="cstat-no" title="statement not covered" >console.log('🔧 ActionsMenuSystem: Script loaded at:', new Date().toISOString());</span>
+<span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('🔧 ActionsMenuSystem: מגדיר את debugActionsMenu באופן גלובלי');</span>
+<span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('🔧 ActionsMenuSystem: Script loaded at:', new Date().toISOString());</span>
 &nbsp;
 // וידוא שהפונקציה מוגדרת מיד
 <span class="cstat-no" title="statement not covered" >if (typeof window.debugActionsMenu === 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔧 ActionsMenuSystem: מגדיר debugActionsMenu לראשונה');</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('🔧 ActionsMenuSystem: מגדיר debugActionsMenu לראשונה');</span>
 <span class="cstat-no" title="statement not covered" >    window.debugActionsMenu = <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const allWrappers = <span class="cstat-no" title="statement not covered" >document.querySelectorAll('.actions-menu-wrapper');</span>
-<span class="cstat-no" title="statement not covered" >    console.log(`🔍 מצאתי ${allWrappers.length} actions menu wrappers`);</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog(`🔍 מצאתי ${allWrappers.length} actions menu wrappers`);</span>
     
 <span class="cstat-no" title="statement not covered" >    allWrappers.forEach(<span class="fstat-no" title="function not covered" >(w</span>rapper, index) =&gt; {</span>
         const popup = <span class="cstat-no" title="statement not covered" >wrapper.querySelector('.actions-menu-popup');</span>
@@ -1682,14 +1705,14 @@
         
 <span class="cstat-no" title="statement not covered" >        if (!popup || !actionsCell || !tableRow) <span class="cstat-no" title="statement not covered" >return;</span></span>
         
-<span class="cstat-no" title="statement not covered" >        console.log(`\n📊 Actions Menu ${index + 1}:`);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog(`\n📊 Actions Menu ${index + 1}:`);</span>
         
         // בדיקת styles בפועל
         const popupStyle = <span class="cstat-no" title="statement not covered" >window.getComputedStyle(popup);</span>
         const cellStyle = <span class="cstat-no" title="statement not covered" >window.getComputedStyle(actionsCell);</span>
         const rowStyle = <span class="cstat-no" title="statement not covered" >window.getComputedStyle(tableRow);</span>
         
-<span class="cstat-no" title="statement not covered" >        console.log('Popup styles:', {</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('Popup styles:', {</span>
             zIndex: popupStyle.zIndex,
             position: popupStyle.position,
             opacity: popupStyle.opacity,
@@ -1726,16 +1749,16 @@
         });
         
 <span class="cstat-no" title="statement not covered" >        if (higherZIndexElements.length &gt; 0) {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('⚠️ אלמנטים עם z-index גבוה מ-955 במיקום הפופאפ:', higherZIndexElements);</span>
+<span class="cstat-no" title="statement not covered" >            actionsMenuDebugLog('⚠️ אלמנטים עם z-index גבוה מ-955 במיקום הפופאפ:', higherZIndexElements);</span>
         }
         
-<span class="cstat-no" title="statement not covered" >        console.log('Actions Cell styles:', {</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('Actions Cell styles:', {</span>
             zIndex: cellStyle.zIndex,
             position: cellStyle.position,
             overflow: cellStyle.overflow
         });
         
-<span class="cstat-no" title="statement not covered" >        console.log('Table Row styles:', {</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('Table Row styles:', {</span>
             zIndex: rowStyle.zIndex,
             position: rowStyle.position,
             transform: rowStyle.transform,
@@ -1751,13 +1774,13 @@
         const cellHeight = <span class="cstat-no" title="statement not covered" >Math.round(cellRect.bottom - cellRect.top);</span>
         const popupHeight = <span class="cstat-no" title="statement not covered" >Math.round(popupRect.bottom - popupRect.top);</span>
         
-<span class="cstat-no" title="statement not covered" >        console.log('📏 גבהים:');</span>
-<span class="cstat-no" title="statement not covered" >        console.log(`   שורה: ${rowHeight}px`);</span>
-<span class="cstat-no" title="statement not covered" >        console.log(`   תא פעולות: ${cellHeight}px`);</span>
-<span class="cstat-no" title="statement not covered" >        console.log(`   תפריט פעולות: ${popupHeight}px`);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('📏 גבהים:');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog(`   שורה: ${rowHeight}px`);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog(`   תא פעולות: ${cellHeight}px`);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog(`   תפריט פעולות: ${popupHeight}px`);</span>
         
-<span class="cstat-no" title="statement not covered" >        console.log('מיקומים בפועל:');</span>
-<span class="cstat-no" title="statement not covered" >        console.log('Popup:', {</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('מיקומים בפועל:');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('Popup:', {</span>
             top: Math.round(popupRect.top),
             bottom: Math.round(popupRect.bottom),
             left: Math.round(popupRect.left),
@@ -1766,20 +1789,20 @@
             height: popupHeight
         });
         
-<span class="cstat-no" title="statement not covered" >        console.log('Cell:', {</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('Cell:', {</span>
             top: Math.round(cellRect.top),
             bottom: Math.round(cellRect.bottom),
             height: cellHeight
         });
         
-<span class="cstat-no" title="statement not covered" >        console.log('Row:', {</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('Row:', {</span>
             top: Math.round(rowRect.top),
             bottom: Math.round(rowRect.bottom),
             height: rowHeight
         });
     });
     
-<span class="cstat-no" title="statement not covered" >    console.log('\n💡 טיפ: הרץ את הפקודה הזו כשהתפריט פתוח (hover) כדי לראות את המיקומים במצב פתוח');</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('\n💡 טיפ: הרץ את הפקודה הזו כשהתפריט פתוח (hover) כדי לראות את המיקומים במצב פתוח');</span>
     
     // בדיקה נוספת - האם יש popups שמוצגים?
     const visiblePopups = <span class="cstat-no" title="statement not covered" >[];</span>
@@ -1794,9 +1817,9 @@
     });
     
 <span class="cstat-no" title="statement not covered" >    if (visiblePopups.length &gt; 0) {</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🎯 Popups הנראים כרגע:', visiblePopups);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('🎯 Popups הנראים כרגע:', visiblePopups);</span>
     } else {
-<span class="cstat-no" title="statement not covered" >        console.log('ℹ️ אין popups נראים כרגע (זה נורמלי כשמעכברים מחוץ ל-actions menu)');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('ℹ️ אין popups נראים כרגע (זה נורמלי כשמעכברים מחוץ ל-actions menu)');</span>
     }
     };
 } // סיום של ה-if שהתחיל בשורה 24
@@ -1804,7 +1827,7 @@
 // פונקציה נוספת לבדיקת hover state בזמן אמת
 <span class="cstat-no" title="statement not covered" >window.debugActionsMenuHover = <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const allWrappers = <span class="cstat-no" title="statement not covered" >document.querySelectorAll('.actions-menu-wrapper');</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔍 בדיקת hover state ל-actions menus...');</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('🔍 בדיקת hover state ל-actions menus...');</span>
     
 <span class="cstat-no" title="statement not covered" >    allWrappers.forEach(<span class="fstat-no" title="function not covered" >(w</span>rapper, index) =&gt; {</span>
         const popup = <span class="cstat-no" title="statement not covered" >wrapper.querySelector('.actions-menu-popup');</span>
@@ -1819,10 +1842,10 @@
                              rect.height &gt; 0;
             
 <span class="cstat-no" title="statement not covered" >            if (isVisible) {</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`✅ Actions Menu ${index + 1} נראה:`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`   Opacity: ${style.opacity}`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`   Visibility: ${style.visibility}`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`   Size: ${rect.width}x${rect.height}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`✅ Actions Menu ${index + 1} נראה:`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`   Opacity: ${style.opacity}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`   Visibility: ${style.visibility}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`   Size: ${rect.width}x${rect.height}`);</span>
             }
         }
     });
@@ -1831,7 +1854,7 @@
 // פונקציה לבדיקת overflow - מה שמסתיר את התפריט
 <span class="cstat-no" title="statement not covered" >window.debugActionsMenuOverflow = <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
     const allWrappers = <span class="cstat-no" title="statement not covered" >document.querySelectorAll('.actions-menu-wrapper');</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔍 בדיקת overflow - מה מסתיר את התפריט...');</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('🔍 בדיקת overflow - מה מסתיר את התפריט...');</span>
     
 <span class="cstat-no" title="statement not covered" >    allWrappers.forEach(<span class="fstat-no" title="function not covered" >(w</span>rapper, index) =&gt; {</span>
         const popup = <span class="cstat-no" title="statement not covered" >wrapper.querySelector('.actions-menu-popup');</span>
@@ -1846,7 +1869,7 @@
             const tagName = <span class="cstat-no" title="statement not covered" >element.tagName.toLowerCase();</span>
             const className = <span class="cstat-no" title="statement not covered" >element.className || 'no-class';</span>
             
-<span class="cstat-no" title="statement not covered" >            console.log(`${path}${tagName}.${className}:`, {</span>
+<span class="cstat-no" title="statement not covered" >            actionsMenuDebugLog(`${path}${tagName}.${className}:`, {</span>
                 overflow: style.overflow,
                 overflowX: style.overflowX,
                 overflowY: style.overflowY,
@@ -1862,12 +1885,12 @@
             }
         };
         
-<span class="cstat-no" title="statement not covered" >        console.log(`\n📊 Actions Menu ${index + 1} - בדיקת overflow:`);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog(`\n📊 Actions Menu ${index + 1} - בדיקת overflow:`);</span>
 <span class="cstat-no" title="statement not covered" >        checkOverflow(popup, '');</span>
     });
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >console.log('✅ ActionsMenuSystem: debugActionsMenu מוגדרת וזמינה');</span>
+<span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('✅ ActionsMenuSystem: debugActionsMenu מוגדרת וזמינה');</span>
 &nbsp;
 class ActionsMenuSystem {
 <span class="fstat-no" title="function not covered" >    co</span>nstructor() {
@@ -1875,19 +1898,18 @@ class ActionsMenuSystem {
     }
 &nbsp;
 <span class="fstat-no" title="function not covered" >    in</span>it() {
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 ActionsMenuSystem: מתחיל אתחול');</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 ActionsMenuSystem: DOM ready state:', document.readyState);</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 ActionsMenuSystem: Available elements:', document.querySelectorAll('.actions-menu-wrapper').length);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('🔧 ActionsMenuSystem: מתחיל אתחול');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('🔧 ActionsMenuSystem: DOM ready state:', document.readyState);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('🔧 ActionsMenuSystem: Available elements:', document.querySelectorAll('.actions-menu-wrapper').length);</span>
         
-<span class="cstat-no" title="statement not covered" >        if (window.consoleCleanup &amp;&amp; typeof window.consoleCleanup.debug === 'function') {</span>
-<span class="cstat-no" title="statement not covered" >            window.consoleCleanup.debug('✅ Actions Menu System initialized');</span>
-        } else {
-<span class="cstat-no" title="statement not covered" >            console.log('✅ Actions Menu System initialized');</span>
+<span class="cstat-no" title="statement not covered" >        if (window.Logger) {</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger.info('✅ Actions Menu System initialized', { page: "actions-menu-system", keepInfo: true });</span>
         }
-<span class="cstat-no" title="statement not covered" >        (window.consoleCleanup?.debug || console.log)('   → Fixed positioning to avoid table overflow clipping');</span>
-<span class="cstat-no" title="statement not covered" >        (window.consoleCleanup?.debug || console.log)('   → RTL aware positioning');</span>
-<span class="cstat-no" title="statement not covered" >        (window.consoleCleanup?.debug || console.log)('   → Supports 2-5 buttons dynamically');</span>
-<span class="cstat-no" title="statement not covered" >        (window.consoleCleanup?.debug || console.log)('   → Integrated with new button system');</span>
+        const debugPrinter = <span class="cstat-no" title="statement not covered" >window.consoleCleanup?.debug || actionsMenuDebugLog;</span>
+<span class="cstat-no" title="statement not covered" >        debugPrinter('   → Fixed positioning to avoid table overflow clipping');</span>
+<span class="cstat-no" title="statement not covered" >        debugPrinter('   → RTL aware positioning');</span>
+<span class="cstat-no" title="statement not covered" >        debugPrinter('   → Supports 2-5 buttons dynamically');</span>
+<span class="cstat-no" title="statement not covered" >        debugPrinter('   → Integrated with new button system');</span>
         
         // Set up hover event listeners to position popup dynamically
 <span class="cstat-no" title="statement not covered" >        this.attachHoverPositioning();</span>
@@ -1904,14 +1926,14 @@ class ActionsMenuSystem {
      * @returns {string} - HTML for the dropdown menu
      */
 <span class="fstat-no" title="function not covered" >    cr</span>eateActionsMenu(buttons) {
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 [ActionsMenuSystem] createActionsMenu called with buttons:', buttons);</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('🔧 [ActionsMenuSystem] createActionsMenu called with buttons:', buttons);</span>
 <span class="cstat-no" title="statement not covered" >        if (!buttons || buttons.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >            console.warn('⚠️ [ActionsMenuSystem] No buttons provided');</span>
 <span class="cstat-no" title="statement not covered" >            return '';</span>
         }
         
         const menuButtons = <span class="cstat-no" title="statement not covered" >buttons.map(<span class="fstat-no" title="function not covered" >(b</span>utton, index) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            console.log(`🔧 [ActionsMenuSystem] Processing button ${index + 1}:`, button);</span>
+<span class="cstat-no" title="statement not covered" >            actionsMenuDebugLog(`🔧 [ActionsMenuSystem] Processing button ${index + 1}:`, button);</span>
             // Handle both DOM elements and objects
             let buttonType, variant, onclick, text, title;
             
@@ -1958,7 +1980,7 @@ class ActionsMenuSystem {
             
             // Use single quotes for the data-onclick attribute value - allows double quotes inside without escaping
             const buttonHTML = <span class="cstat-no" title="statement not covered" >`&lt;button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' title="${title || ''}" style="margin-right: 4px;"&gt;${icon}&lt;/button&gt;`;</span>
-<span class="cstat-no" title="statement not covered" >            console.log(`✅ [ActionsMenuSystem] Created button ${index + 1}:`, {</span>
+<span class="cstat-no" title="statement not covered" >            actionsMenuDebugLog(`✅ [ActionsMenuSystem] Created button ${index + 1}:`, {</span>
                 type: buttonType,
                 onclick: onclick,
                 escapedOnclick: escapedOnclick,
@@ -1975,7 +1997,7 @@ class ActionsMenuSystem {
                 &lt;/div&gt;
             &lt;/div&gt;
         `;
-<span class="cstat-no" title="statement not covered" >        console.log('✅ [ActionsMenuSystem] Full menu HTML created:', fullHTML.substring(0, 200) + '...');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('✅ [ActionsMenuSystem] Full menu HTML created:', fullHTML.substring(0, 200) + '...');</span>
 <span class="cstat-no" title="statement not covered" >        return fullHTML;</span>
     }
     
@@ -2032,7 +2054,7 @@ class ActionsMenuSystem {
             const actionsCell = <span class="cstat-no" title="statement not covered" >btnEl.closest('.actions-cell');</span>
             const entityId = <span class="cstat-no" title="statement not covered" >actionsCell?.dataset?.entityId || arg || '';</span>
 &nbsp;
-            const logFn = (<span class="cstat-no" title="statement not covered" >window.consoleCleanup?.info || console.log)</span>;
+            const logFn = (<span class="cstat-no" title="statement not covered" >window.consoleCleanup?.info || actionsMenuDebugLog)</span>;
 <span class="cstat-no" title="statement not covered" >            logFn(`🔗 [LinkedItems] Click detected:`, {</span>
                 onclick: onclickAttr,
                 detectedEntityId: entityId,
@@ -2109,7 +2131,7 @@ class ActionsMenuSystem {
         // Add hover delay for better UX
 <span class="cstat-no" title="statement not covered" >        this.attachHoverDelay();</span>
         
-<span class="cstat-no" title="statement not covered" >        console.log('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');</span>
     }
 &nbsp;
     /**
@@ -2274,10 +2296,10 @@ class ActionsMenuSystem {
         
         // קוד קונסולה לבדיקת z-index וחתיכה
 <span class="cstat-no" title="statement not covered" >        window.debugActionsMenuZIndex = <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('🔍 בדיקת z-index וחתיכה של התפריט...');</span>
+<span class="cstat-no" title="statement not covered" >            actionsMenuDebugLog('🔍 בדיקת z-index וחתיכה של התפריט...');</span>
             
             const allWrappers = <span class="cstat-no" title="statement not covered" >document.querySelectorAll('.actions-menu-wrapper');</span>
-<span class="cstat-no" title="statement not covered" >            console.log(`מצאתי ${allWrappers.length} actions menu wrappers`);</span>
+<span class="cstat-no" title="statement not covered" >            actionsMenuDebugLog(`מצאתי ${allWrappers.length} actions menu wrappers`);</span>
             
 <span class="cstat-no" title="statement not covered" >            allWrappers.forEach(<span class="fstat-no" title="function not covered" >(w</span>rapper, index) =&gt; {</span>
                 const popup = <span class="cstat-no" title="statement not covered" >wrapper.querySelector('.actions-menu-popup');</span>
@@ -2287,7 +2309,7 @@ class ActionsMenuSystem {
                 
 <span class="cstat-no" title="statement not covered" >                if (!popup || !actionsCell || !tableRow || !table) <span class="cstat-no" title="statement not covered" >return;</span></span>
                 
-<span class="cstat-no" title="statement not covered" >                console.log(`\n=== Actions Menu ${index + 1} ===`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`\n=== Actions Menu ${index + 1} ===`);</span>
                 
                 // בדיקת z-index
                 const popupStyle = <span class="cstat-no" title="statement not covered" >window.getComputedStyle(popup);</span>
@@ -2295,17 +2317,17 @@ class ActionsMenuSystem {
                 const rowStyle = <span class="cstat-no" title="statement not covered" >window.getComputedStyle(tableRow);</span>
                 const tableStyle = <span class="cstat-no" title="statement not covered" >window.getComputedStyle(table);</span>
                 
-<span class="cstat-no" title="statement not covered" >                console.log('Z-Index Values:');</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Popup: ${popupStyle.zIndex} (${popupStyle.position})`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Actions Cell: ${cellStyle.zIndex} (${cellStyle.position})`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Table Row: ${rowStyle.zIndex} (${rowStyle.position})`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Table: ${tableStyle.zIndex} (${tableStyle.position})`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog('Z-Index Values:');</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Popup: ${popupStyle.zIndex} (${popupStyle.position})`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Actions Cell: ${cellStyle.zIndex} (${cellStyle.position})`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Table Row: ${rowStyle.zIndex} (${rowStyle.position})`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Table: ${tableStyle.zIndex} (${tableStyle.position})`);</span>
                 
                 // בדיקת overflow
-<span class="cstat-no" title="statement not covered" >                console.log('Overflow Values:');</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Actions Cell: ${cellStyle.overflow}`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Table Row: ${rowStyle.overflow}`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Table: ${tableStyle.overflow}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog('Overflow Values:');</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Actions Cell: ${cellStyle.overflow}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Table Row: ${rowStyle.overflow}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Table: ${tableStyle.overflow}`);</span>
                 
                 // בדיקת stacking context
                 const stackingContexts = <span class="cstat-no" title="statement not covered" >[];</span>
@@ -2328,9 +2350,9 @@ class ActionsMenuSystem {
 <span class="cstat-no" title="statement not covered" >                    element = element.parentElement;</span>
                 }
                 
-<span class="cstat-no" title="statement not covered" >                console.log('Stacking Contexts:');</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog('Stacking Contexts:');</span>
 <span class="cstat-no" title="statement not covered" >                stackingContexts.forEach(<span class="fstat-no" title="function not covered" >(c</span>tx, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >                    console.log(`  ${i + 1}. ${ctx.element}:`, ctx);</span>
+<span class="cstat-no" title="statement not covered" >                    actionsMenuDebugLog(`  ${i + 1}. ${ctx.element}:`, ctx);</span>
                 });
                 
                 // בדיקת מיקום ונראות
@@ -2338,10 +2360,10 @@ class ActionsMenuSystem {
                 const cellRect = <span class="cstat-no" title="statement not covered" >actionsCell.getBoundingClientRect();</span>
                 const rowRect = <span class="cstat-no" title="statement not covered" >tableRow.getBoundingClientRect();</span>
                 
-<span class="cstat-no" title="statement not covered" >                console.log('Position &amp; Visibility:');</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Popup: x=${popupRect.x}, y=${popupRect.y}, w=${popupRect.width}, h=${popupRect.height}`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Actions Cell: x=${cellRect.x}, y=${cellRect.y}, w=${cellRect.width}, h=${cellRect.height}`);</span>
-<span class="cstat-no" title="statement not covered" >                console.log(`  Table Row: x=${rowRect.x}, y=${rowRect.y}, w=${rowRect.width}, h=${rowRect.height}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog('Position &amp; Visibility:');</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Popup: x=${popupRect.x}, y=${popupRect.y}, w=${popupRect.width}, h=${popupRect.height}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Actions Cell: x=${cellRect.x}, y=${cellRect.y}, w=${cellRect.width}, h=${cellRect.height}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Table Row: x=${rowRect.x}, y=${rowRect.y}, w=${rowRect.width}, h=${rowRect.height}`);</span>
                 
                 // בדיקה אם התפריט חתוך
                 const isClipped = <span class="cstat-no" title="statement not covered" >popupRect.top &lt; rowRect.top || </span>
@@ -2349,37 +2371,37 @@ class ActionsMenuSystem {
                                  popupRect.left &lt; rowRect.left || 
                                  popupRect.right &gt; rowRect.right;
                 
-<span class="cstat-no" title="statement not covered" >                console.log(`  Is Popup Clipped: ${isClipped ? '❌ YES' : '✅ NO'}`);</span>
+<span class="cstat-no" title="statement not covered" >                actionsMenuDebugLog(`  Is Popup Clipped: ${isClipped ? '❌ YES' : '✅ NO'}`);</span>
                 
 <span class="cstat-no" title="statement not covered" >                if (isClipped) {</span>
-<span class="cstat-no" title="statement not covered" >                    console.log('🔍 Clipping Analysis:');</span>
-<span class="cstat-no" title="statement not covered" >                    if (popupRect.top &lt; rowRect.top) <span class="cstat-no" title="statement not covered" >console.log('  - Clipped from top');</span></span>
-<span class="cstat-no" title="statement not covered" >                    if (popupRect.bottom &gt; rowRect.bottom) <span class="cstat-no" title="statement not covered" >console.log('  - Clipped from bottom');</span></span>
-<span class="cstat-no" title="statement not covered" >                    if (popupRect.left &lt; rowRect.left) <span class="cstat-no" title="statement not covered" >console.log('  - Clipped from left');</span></span>
-<span class="cstat-no" title="statement not covered" >                    if (popupRect.right &gt; rowRect.right) <span class="cstat-no" title="statement not covered" >console.log('  - Clipped from right');</span></span>
+<span class="cstat-no" title="statement not covered" >                    actionsMenuDebugLog('🔍 Clipping Analysis:');</span>
+<span class="cstat-no" title="statement not covered" >                    if (popupRect.top &lt; rowRect.top) <span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('  - Clipped from top');</span></span>
+<span class="cstat-no" title="statement not covered" >                    if (popupRect.bottom &gt; rowRect.bottom) <span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('  - Clipped from bottom');</span></span>
+<span class="cstat-no" title="statement not covered" >                    if (popupRect.left &lt; rowRect.left) <span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('  - Clipped from left');</span></span>
+<span class="cstat-no" title="statement not covered" >                    if (popupRect.right &gt; rowRect.right) <span class="cstat-no" title="statement not covered" >actionsMenuDebugLog('  - Clipped from right');</span></span>
                 }
             });
         };
         
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 קוד debugActionsMenuZIndex() הותקן. הרץ debugActionsMenuZIndex() כדי לבדוק z-index וחתיכה');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('🔧 קוד debugActionsMenuZIndex() הותקן. הרץ debugActionsMenuZIndex() כדי לבדוק z-index וחתיכה');</span>
     }
 }
 &nbsp;
 // פונקציה גלובלית ליצירת תפריט פעולות
 <span class="cstat-no" title="statement not covered" >window.createActionsMenu = <span class="fstat-no" title="function not covered" >fu</span>nction(buttons) {</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔧 [window.createActionsMenu] Called with:', buttons);</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔧 [window.createActionsMenu] window.actionsMenuSystem exists?', !!window.actionsMenuSystem);</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔧 [window.createActionsMenu] ActionsMenuSystem class exists?', typeof ActionsMenuSystem);</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('🔧 [window.createActionsMenu] Called with:', buttons);</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('🔧 [window.createActionsMenu] window.actionsMenuSystem exists?', !!window.actionsMenuSystem);</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('🔧 [window.createActionsMenu] ActionsMenuSystem class exists?', typeof ActionsMenuSystem);</span>
     
     // Try to use instance first
 <span class="cstat-no" title="statement not covered" >    if (window.actionsMenuSystem) {</span>
-<span class="cstat-no" title="statement not covered" >        console.log('✅ [window.createActionsMenu] Using existing instance');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('✅ [window.createActionsMenu] Using existing instance');</span>
 <span class="cstat-no" title="statement not covered" >        return window.actionsMenuSystem.createActionsMenu(buttons);</span>
     }
     
     // Fallback: create instance on-the-fly if ActionsMenuSystem class is available
 <span class="cstat-no" title="statement not covered" >    if (typeof ActionsMenuSystem !== 'undefined') {</span>
-<span class="cstat-no" title="statement not covered" >        console.log('⚠️ [window.createActionsMenu] Creating new instance on-the-fly');</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog('⚠️ [window.createActionsMenu] Creating new instance on-the-fly');</span>
 <span class="cstat-no" title="statement not covered" >        if (!window.actionsMenuSystem) {</span>
 <span class="cstat-no" title="statement not covered" >            window.actionsMenuSystem = new ActionsMenuSystem();</span>
         }
@@ -2410,7 +2432,7 @@ class ActionsMenuSystem {
 <span class="cstat-no" title="statement not covered" >        if (escapedOnclick) {</span>
 <span class="cstat-no" title="statement not covered" >            escapedOnclick = escapedOnclick.replace(/'/g, '&amp;#39;');</span>
         }
-<span class="cstat-no" title="statement not covered" >        console.log(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick, escapedOnclick });</span>
+<span class="cstat-no" title="statement not covered" >        actionsMenuDebugLog(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick, escapedOnclick });</span>
 <span class="cstat-no" title="statement not covered" >        return `&lt;button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' title="${title || ''}" style="margin-right: 4px;"&gt;${icon}&lt;/button&gt;`;</span>
     }).join('');
     
@@ -2422,7 +2444,7 @@ class ActionsMenuSystem {
             &lt;/div&gt;
         &lt;/div&gt;
     `;
-<span class="cstat-no" title="statement not covered" >    console.log('✅ [window.createActionsMenu fallback] Generated HTML:', fallbackHTML.substring(0, 200) + '...');</span>
+<span class="cstat-no" title="statement not covered" >    actionsMenuDebugLog('✅ [window.createActionsMenu fallback] Generated HTML:', fallbackHTML.substring(0, 200) + '...');</span>
 <span class="cstat-no" title="statement not covered" >    return fallbackHTML;</span>
 };
 &nbsp;
@@ -2433,7 +2455,9 @@ class ActionsMenuSystem {
 // יצירת instance גלובלי אחרי שהקלאס מוגדר - רק אם עדיין לא קיים
 <span class="cstat-no" title="statement not covered" >if (!window.actionsMenuSystem) {</span>
 <span class="cstat-no" title="statement not covered" >    window.actionsMenuSystem = new ActionsMenuSystem();</span>
-<span class="cstat-no" title="statement not covered" >    console.log('✅ ActionsMenuSystem initialized manually');</span>
+<span class="cstat-no" title="statement not covered" >    if (window.Logger) {</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger.info('✅ ActionsMenuSystem initialized manually', { page: "actions-menu-system", keepInfo: true });</span>
+    }
 }
 &nbsp;
 &nbsp;</pre></td></tr></table></pre>
@@ -2443,7 +2467,7 @@ class ActionsMenuSystem {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.331Z
+                at 2025-11-12T23:38:03.899Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

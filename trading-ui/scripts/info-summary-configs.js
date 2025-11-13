@@ -12,6 +12,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Trades page configuration
   trades: {
     containerId: 'summaryStats',
+    tableType: 'trades',
     stats: [
       {
         id: 'totalTrades',
@@ -42,6 +43,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Executions page configuration
   executions: {
     containerId: 'summaryStats',
+    tableType: 'executions',
     stats: [
       {
         id: 'totalExecutions',
@@ -91,6 +93,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Trade Plans page configuration
   trade_plans: {
     containerId: 'summaryStats',
+    tableType: 'trade_plans',
     stats: [
       {
         id: 'totalDesigns',
@@ -124,6 +127,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Cash Flows page configuration
   cash_flows: {
     containerId: 'summaryStats',
+    tableType: 'cash_flows',
     stats: [
       {
         id: 'totalCashFlows',
@@ -159,6 +163,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Alerts page configuration
   alerts: {
     containerId: 'summaryStats',
+    tableType: 'alerts',
     stats: [
       {
         id: 'totalAlerts',
@@ -189,6 +194,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Notes page configuration
   notes: {
     containerId: 'summaryStats',
+    tableType: 'notes',
     stats: [
       {
         id: 'totalNotes',
@@ -222,6 +228,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Tickers page configuration
   tickers: {
     containerId: 'summaryStats',
+    tableType: 'tickers',
     stats: [
       {
         id: 'totalTickers',
@@ -252,6 +259,7 @@ const INFO_SUMMARY_CONFIGS = {
   // Trading Accounts page configuration
   trading_accounts: {
     containerId: 'summaryStats',
+    tableType: 'trading_accounts',
     stats: [
       {
         id: 'totalAccounts',

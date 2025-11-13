@@ -151,7 +151,7 @@ class EntityDetailsRenderer {
         // צבעי ברירת מחדל
         this.entityColors = {
             ticker: '#019193',
-            trade: '#007bff', 
+            trade: '#26baac', 
             trade_plan: '#0056b3',
             execution: '#17a2b8',
             account: '#28a745',
@@ -883,7 +883,7 @@ class EntityDetailsRenderer {
      */
     renderTrade(tradeData, options = {}) {
         try {
-        const entityColor = this.entityColors.trade || '#007bff';
+        const entityColor = this.entityColors.trade || '#26baac';
         
         // סטטוס - שימוש במערכת הרינדור הכללית
         const statusDisplay = window.FieldRendererService.renderStatus(tradeData.status, 'trade');
@@ -1008,7 +1008,7 @@ class EntityDetailsRenderer {
                                     page: "entity-details-renderer"
                                 });
                             }
-                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#007bff', 'trade', tradeData.id, options?.sourceInfo || null, options);
+                            return this.renderLinkedItems(tradeData.linked_items || [], this.entityColors.trade || '#26baac', 'trade', tradeData.id, options?.sourceInfo || null, options);
                         })()}
                     </div>
                 </div>
@@ -1030,7 +1030,7 @@ class EntityDetailsRenderer {
      */
     renderTradeSpecific(tradeData, tradeColor = null) {
         try {
-            const color = tradeColor || this.entityColors.trade || '#007bff';
+            const color = tradeColor || this.entityColors.trade || '#26baac';
             const FieldRenderer = window.FieldRendererService || null;
         
         // Trade Plan Link
@@ -2108,6 +2108,7 @@ class EntityDetailsRenderer {
             
             const sanitizedSuffix = `${parentEntityType || 'entity'}_${parentEntityId || '0'}`.replace(/[^a-zA-Z0-9_-]/g, '_');
             const tableId = `linkedItemsTable_${sanitizedSuffix}`;
+            const tableType = `linked_items__${sanitizedSuffix}`;
 
             let enrichedItems = this._enrichLinkedItems(items, parentEntityType, options);
             console.log('🔍 [renderLinkedItems] After enrichment', { 
@@ -2130,12 +2131,39 @@ class EntityDetailsRenderer {
             }
             window.linkedItemsTableData[tableId] = enrichedItems;
 
+            if (window.TableDataRegistry) {
+                window.TableDataRegistry.registerTable({ tableType, tableId, source: 'entity-details-renderer' });
+                window.TableDataRegistry.setFullData(tableType, enrichedItems, {
+                    tableId,
+                    resetFiltered: true,
+                });
+            }
+
+            if (window.UnifiedTableSystem?.registry && !window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+                const columns = window.TABLE_COLUMN_MAPPINGS?.linked_items || [];
+                window.UnifiedTableSystem.registry.register(tableType, {
+                    dataGetter: () => {
+                        if (window.TableDataRegistry) {
+                            return window.TableDataRegistry.getFullData(tableType, { asReference: true });
+                        }
+                        return window.linkedItemsTableData?.[tableId] || [];
+                    },
+                    updateFunction: (rows) => this.updateLinkedItemsTableBody(tableId, rows),
+                    tableSelector: `#${tableId}`,
+                    columns,
+                    filterable: true,
+                    sortable: true,
+                });
+            }
+
             if (!window.linkedItemsSortHandlers) {
                 window.linkedItemsSortHandlers = {};
             }
             window.linkedItemsSortHandlers[tableId] = (sortedData) => {
-                if (window.updateLinkedItemsTable) {
+                if (typeof window.updateLinkedItemsTable === 'function') {
                     window.updateLinkedItemsTable(tableId, sortedData);
+                } else if (window.entityDetailsRenderer && typeof window.entityDetailsRenderer.updateLinkedItemsTableBody === 'function') {
+                    window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, Array.isArray(sortedData) ? sortedData : []);
                 }
             };
 
@@ -2179,8 +2207,12 @@ class EntityDetailsRenderer {
             });
 
             const sortHandlerReference = `window.linkedItemsSortHandlers['${tableId}']`;
+            const hasRegistry = Boolean(window.TableDataRegistry);
+            const dataExpression = hasRegistry
+                ? `window.TableDataRegistry.getFilteredData('${tableType}')`
+                : `window.linkedItemsTableData['${tableId}'] || []`;
             const makeSortButton = (label, columnIndex, alignment = 'start') => `
-                <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="${label}" data-classes="btn-link sortable-header px-0 text-${alignment}" data-onclick="window.sortTableData(${columnIndex}, window.linkedItemsTableData['${tableId}'] || [], 'linked_items', ${sortHandlerReference})"></button>
+                <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="${label}" data-classes="btn-link sortable-header px-0 text-${alignment}" data-onclick="window.sortTableData(${columnIndex}, ${dataExpression}, '${tableType}', ${sortHandlerReference})"></button>
             `;
 
             // Get table headers based on entity types in the table
@@ -2231,7 +2263,7 @@ class EntityDetailsRenderer {
                             enrichedItems.length
                                 ? `
                             <div class="table-responsive entity-linked-items-table-wrapper">
-                                <table class="table table-sm table-hover mb-0 entity-linked-items-table" id="${tableId}" data-table-type="linked_items">
+                                <table class="table table-sm table-hover mb-0 entity-linked-items-table" id="${tableId}" data-table-type="${tableType}">
                                     <thead>
                                         <tr>
                                             ${tableHeaders}
@@ -4301,7 +4333,11 @@ class EntityDetailsRenderer {
         
         // עדכון אייקוני המיון
         if (window.updateSortIcons) {
-            window.updateSortIcons('linked_items', null, null, table);
+            const currentTableType =
+                table?.dataset?.tableType ||
+                (window.TableDataRegistry?.resolveTableType?.(tableId)) ||
+                'linked_items';
+            window.updateSortIcons(currentTableType, null, null, table);
         }
         
         // Initialize tooltips for filter buttons
@@ -4657,6 +4693,14 @@ class EntityDetailsRenderer {
 
         window.linkedItemsTableData = window.linkedItemsTableData || {};
         window.linkedItemsTableData[tableId] = updatedItems;
+
+        if (window.TableDataRegistry) {
+            const resolvedTableType = window.TableDataRegistry.resolveTableType?.(tableId) || tableId;
+            window.TableDataRegistry.setFullData(resolvedTableType, updatedItems, {
+                tableId,
+                resetFiltered: false,
+            });
+        }
 
         console.log('🔍 [_hydrateLinkedItemsAsync] About to update table body', {
             tableId,
@@ -5046,7 +5090,7 @@ class EntityDetailsRenderer {
             `;
         } else if (entityType === 'trade') {
             const FieldRenderer = window.FieldRendererService || null;
-            const color = this.entityColors.trade || '#007bff';
+            const color = this.entityColors.trade || '#26baac';
             
             // Side (Long/Short)
             const sideDisplay = FieldRenderer?.renderSide
@@ -5457,46 +5501,136 @@ window.filterLinkedItemsByType = async function(tableId, type) {
         });
     }
     
-    // Get original data
-    if (!window.linkedItemsTableData || !window.linkedItemsTableData[tableId]) {
-        console.warn(`[filterLinkedItemsByType] No data found for table:`, tableId);
-        return;
-    }
-    
-    const allItems = window.linkedItemsTableData[tableId];
-    
-    // Filter data
-    let filteredItems = allItems;
-    if (type !== 'all') {
-        const typeMapping = {
-            'trading_account': ['trading_account', 'account'],
-            'trade': ['trade'],
-            'trade_plan': ['trade_plan'],
-            'ticker': ['ticker'],
-            'alert': ['alert'],
-            'execution': ['execution'],
-            'cash_flow': ['cash_flow'],
-            'note': ['note']
-        };
-        
-        const allowedTypes = typeMapping[type] || [];
-        if (allowedTypes.length > 0) {
-            filteredItems = allItems.filter(item => {
-                const itemType = String(item.type || '').toLowerCase();
-                return allowedTypes.includes(itemType);
-            });
-        } else {
-            filteredItems = [];
+    const registry = window.TableDataRegistry;
+    const resolvedTableType = registry?.resolveTableType?.(tableId) || tableId;
+    const fullData = registry
+        ? registry.getFullData(resolvedTableType, { asReference: true })
+        : (window.linkedItemsTableData?.[tableId] || []);
+
+    const effectiveType = typeof type === 'string' ? type.trim() : 'all';
+    const filterPayload =
+        effectiveType === 'all'
+            ? { custom: { relatedType: 'all' } }
+            : { custom: { relatedType: effectiveType } };
+
+    let filteredItems = [];
+    let appliedViaUnified = false;
+    const canUseUnifiedFilter = Boolean(window.UnifiedTableSystem?.filter?.apply) && Boolean(resolvedTableType);
+
+    if (canUseUnifiedFilter) {
+        try {
+            filteredItems =
+                window.UnifiedTableSystem.filter.apply(resolvedTableType, filterPayload, undefined, {
+                    mergeWithActiveFilters: false,
+                    tableIdOverride: tableId,
+                }) || [];
+            appliedViaUnified = true;
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('[filterLinkedItemsByType] unified filter failed, falling back to legacy mode', {
+                    tableId,
+                    tableType: resolvedTableType,
+                    error: error?.message || error,
+                    page: 'entity-details-renderer',
+                });
+            } else {
+                console.warn('[filterLinkedItemsByType] unified filter failed, fallback to legacy mode', error);
+            }
+            filteredItems = legacyFilterLinkedItems(effectiveType, fullData);
         }
+    } else {
+        filteredItems = legacyFilterLinkedItems(effectiveType, fullData);
     }
-    
-    // Update table using EntityDetailsRenderer method
+
+    if (!appliedViaUnified && registry && resolvedTableType) {
+        const filterContext =
+            effectiveType === 'all'
+                ? {
+                    status: [],
+                    type: [],
+                    account: [],
+                    search: '',
+                    dateRange: null,
+                    custom: {},
+                }
+                : {
+                    status: [],
+                    type: [],
+                    account: [],
+                    search: '',
+                    dateRange: null,
+                    custom: { relatedType: effectiveType },
+                };
+
+        registry.setFilteredData(resolvedTableType, Array.isArray(filteredItems) ? filteredItems : [], {
+            tableId,
+            skipPageReset: false,
+            filterContext,
+            clearFilters: effectiveType === 'all',
+        });
+    }
+
     if (window.entityDetailsRenderer && typeof window.entityDetailsRenderer.updateLinkedItemsTableBody === 'function') {
-        window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, filteredItems);
+        window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, Array.isArray(filteredItems) ? filteredItems : []);
     } else {
         console.warn('[filterLinkedItemsByType] EntityDetailsRenderer.updateLinkedItemsTableBody not available');
     }
 };
+
+/**
+ * Legacy fallback filter for linked items when unified pipeline is unavailable
+ * @param {string} type - Requested entity type (or 'all')
+ * @param {Array} data - Linked items dataset
+ * @returns {Array} Filtered dataset
+ */
+function legacyFilterLinkedItems(type, data) {
+    const sourceArray = Array.isArray(data) ? data : [];
+    if (!Array.isArray(sourceArray) || sourceArray.length === 0 || type === 'all') {
+        return [...sourceArray];
+    }
+
+    const normalized = String(type || '').toLowerCase();
+    const normalizedCanonical = (() => {
+        if (normalized === 'account') {
+            return 'trading_account';
+        }
+        if (normalized === 'plan') {
+            return 'trade_plan';
+        }
+        return normalized;
+    })();
+
+    return sourceArray.filter((item) => {
+        if (!item || typeof item !== 'object') {
+            return false;
+        }
+        const itemType = String(
+            item.type ||
+            item.related_type ||
+            item.relatedType ||
+            item.related_object_type ||
+            ''
+        ).toLowerCase();
+
+        if (!itemType) {
+            return false;
+        }
+
+        if (itemType === normalizedCanonical) {
+            return true;
+        }
+
+        if (normalizedCanonical === 'trading_account' && (itemType === 'account' || itemType === 'trading_account')) {
+            return true;
+        }
+
+        if (normalizedCanonical === 'trade_plan' && itemType === 'plan') {
+            return true;
+        }
+
+        return false;
+    });
+}
 
 // ===== AUTO INITIALIZATION =====
 

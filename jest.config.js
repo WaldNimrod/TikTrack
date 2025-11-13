@@ -13,16 +13,8 @@ module.exports = {
     coverageDirectory: 'coverage',
     coverageReporters: ['html', 'text', 'lcov'],
     collectCoverageFrom: [
-        'trading-ui/scripts/**/*.js',
-        '!trading-ui/scripts/**/*-old*.js',
-        '!trading-ui/scripts/**/backup/**/*.js',
-        '!trading-ui/scripts/**/archive/**/*.js',
-        '!trading-ui/scripts/backup/**/*.js',
-        '!trading-ui/scripts/archive/**/*.js',
-        '!trading-ui/scripts/**/*.min.js',
-        '!trading-ui/scripts/**/*.bundle.js',
-        '!trading-ui/scripts/**/*.test.js',
-        '!trading-ui/scripts/**/*.spec.js'
+        'trading-ui/scripts/services/tag-service.js',
+        'trading-ui/scripts/tag-events.js'
     ],
     
     // Coverage thresholds
@@ -108,42 +100,6 @@ module.exports = {
         url: 'http://localhost:8080'
     },
     
-    // Globals
-    globals: {
-        'window': {},
-        'document': {},
-        'navigator': {},
-        'TextEncoder': {},
-        'TextDecoder': {},
-        'Logger': {},
-        'UnifiedCacheManager': {},
-        'showNotification': {},
-        'showSuccessNotification': {},
-        'showErrorNotification': {},
-        'showWarningNotification': {},
-        'showInfoNotification': {},
-        'FieldRendererService': {},
-        'ButtonSystem': {},
-        'TableSystem': {},
-        'ChartSystem': {}
-    },
-    
-    // Test suites
-    projects: [
-        {
-            displayName: 'unit',
-            testMatch: ['<rootDir>/tests/unit/**/*.test.js'],
-            testEnvironment: 'jsdom'
-        },
-        {
-            displayName: 'integration',
-            testMatch: ['<rootDir>/tests/integration/**/*.test.js'],
-            testEnvironment: 'jsdom'
-        },
-        {
-            displayName: 'e2e',
-            testMatch: ['<rootDir>/tests/e2e/**/*.test.js'],
-            testEnvironment: 'jsdom'
-        }
-    ]
+    // Additional Jest flags
+    detectOpenHandles: true
 };

@@ -170,7 +170,7 @@ class AdvancedButtonSystem {
     };
 
     // Buttons that support entity variants
-    static ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE'];
+    static ENTITY_VARIANT_BUTTONS = ['CLOSE', 'ADD', 'LINK', 'SAVE', 'PRIMARY', 'WARNING'];
 
     init() {
         if (this.initialized) {

@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/581</span>
+                <span class='fraction'>0/584</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/290</span>
+                <span class='fraction'>0/292</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/66</span>
+                <span class='fraction'>0/67</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/556</span>
+                <span class='fraction'>0/559</span>
             </div>
         
             
@@ -1595,7 +1595,13 @@
 <a name='L1530'></a><a href='#L1530'>1530</a>
 <a name='L1531'></a><a href='#L1531'>1531</a>
 <a name='L1532'></a><a href='#L1532'>1532</a>
-<a name='L1533'></a><a href='#L1533'>1533</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1533'></a><a href='#L1533'>1533</a>
+<a name='L1534'></a><a href='#L1534'>1534</a>
+<a name='L1535'></a><a href='#L1535'>1535</a>
+<a name='L1536'></a><a href='#L1536'>1536</a>
+<a name='L1537'></a><a href='#L1537'>1537</a>
+<a name='L1538'></a><a href='#L1538'>1538</a>
+<a name='L1539'></a><a href='#L1539'>1539</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1612,6 +1618,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1730,6 +1740,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2994,7 +3007,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -3143,6 +3155,13 @@
  */
 &nbsp;
 // ===== UNIFIED APP INITIALIZER SYSTEM =====
+&nbsp;
+const UNIFIED_INIT_DEBUG_ENABLED = <span class="cstat-no" title="statement not covered" >window.UnifiedInitializerDebugMode === true;</span>
+const unifiedInitDebugLog = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(.</span>..args) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (UNIFIED_INIT_DEBUG_ENABLED) {</span>
+<span class="cstat-no" title="statement not covered" >        console.log(...args);</span>
+    }
+};
 &nbsp;
 /**
  * Initialize the unified app system
@@ -3332,16 +3351,16 @@ class UnifiedAppInitializer {
      * Stage 1: Detect and analyze page and systems
      */
 <span class="fstat-no" title="function not covered" >    as</span>ync detectAndAnalyze() {
-<span class="cstat-no" title="statement not covered" >        console.log('🔍 Stage 1: Detecting and analyzing...');</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('🔍 Stage 1: Detecting and analyzing...');</span>
         const stageStart = <span class="cstat-no" title="statement not covered" >Date.now();</span>
         
         // Detect page information
 <span class="cstat-no" title="statement not covered" >        this.pageInfo = this.detectPageInfo();</span>
-<span class="cstat-no" title="statement not covered" >        console.log('📄 Detected page info:', this.pageInfo);</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('📄 Detected page info:', this.pageInfo);</span>
         
         // Detect available systems
 <span class="cstat-no" title="statement not covered" >        this.availableSystems = this.detectAvailableSystems();</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🔧 Detected available systems:', Array.from(this.availableSystems));</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('🔧 Detected available systems:', Array.from(this.availableSystems));</span>
         
         // Analyze page requirements
 <span class="cstat-no" title="statement not covered" >        this.analyzePageRequirements();</span>
@@ -3358,14 +3377,14 @@ class UnifiedAppInitializer {
      * Stage 2: Prepare optimal configuration
      */
 <span class="fstat-no" title="function not covered" >    pr</span>epareConfiguration() {
-<span class="cstat-no" title="statement not covered" >        console.log('⚙️ Stage 2: Preparing configuration...');</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('⚙️ Stage 2: Preparing configuration...');</span>
         const stageStart = <span class="cstat-no" title="statement not covered" >Date.now();</span>
         
         // Load page-specific configuration from page-initialization-configs.js
         let pageConfig = <span class="cstat-no" title="statement not covered" >null;</span>
         const pageName = <span class="cstat-no" title="statement not covered" >this.pageInfo?.name || 'unknown';</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🔍 Looking for config:', pageName);</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🔍 PAGE_CONFIGS exists:', typeof window.PAGE_CONFIGS !== 'undefined', 'Keys:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS).slice(0, 5) : 'none');</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('🔍 Looking for config:', pageName);</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('🔍 PAGE_CONFIGS exists:', typeof window.PAGE_CONFIGS !== 'undefined', 'Keys:', window.PAGE_CONFIGS ? Object.keys(window.PAGE_CONFIGS).slice(0, 5) : 'none');</span>
         
 <span class="cstat-no" title="statement not covered" >        if (typeof window.pageInitializationConfigs !== 'undefined' &amp;&amp; </span>
             window.pageInitializationConfigs[this.pageInfo?.name]) {
@@ -4497,7 +4516,7 @@ class UnifiedAppInitializer {
 <span class="cstat-no" title="statement not covered" >window.UnifiedAppInitializer = UnifiedAppInitializer;</span>
 <span class="cstat-no" title="statement not covered" >window.UnifiedAppInitializer = UnifiedAppInitializer;</span>
 <span class="cstat-no" title="statement not covered" >window.unifiedAppInit = new UnifiedAppInitializer();</span>
-<span class="cstat-no" title="statement not covered" >console.log('🔧 UnifiedAppInitializer created');</span>
+<span class="cstat-no" title="statement not covered" >unifiedInitDebugLog('🔧 UnifiedAppInitializer created');</span>
 }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >window.Logger.info('🔧 UnifiedAppInitializer created:', window.unifiedAppInit, { page: "unified-app-initializer" });</span>
@@ -4517,21 +4536,20 @@ class UnifiedAppInitializer {
 &nbsp;
 // Single DOMContentLoaded listener - replaces all others
 <span class="cstat-no" title="statement not covered" >document.addEventListener('DOMContentLoaded', <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');</span>
+<span class="cstat-no" title="statement not covered" >        unifiedInitDebugLog('🎯 DOM Content Loaded - Starting Unified App Initialization');</span>
 <span class="cstat-no" title="statement not covered" >        window.Logger.info('🎯 DOM Content Loaded - Starting Unified App Initialization', { page: "unified-app-initializer" });</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔍 Current URL:', window.location.href);</span>
-<span class="cstat-no" title="statement not covered" >    console.log('🔍 Current pathname:', window.location.pathname);</span>
+<span class="cstat-no" title="statement not covered" >    unifiedInitDebugLog('🔍 Current URL:', window.location.href);</span>
+<span class="cstat-no" title="statement not covered" >    unifiedInitDebugLog('🔍 Current pathname:', window.location.pathname);</span>
 <span class="cstat-no" title="statement not covered" >    window.Logger.info('🔍 Current URL:', window.location.href, { page: "unified-app-initializer" });</span>
 <span class="cstat-no" title="statement not covered" >    window.Logger.info('🔍 Current pathname:', window.location.pathname, { page: "unified-app-initializer" });</span>
     
 <span class="cstat-no" title="statement not covered" >    try {</span>
         // Delay to ensure all scripts are loaded and initialized
 <span class="cstat-no" title="statement not covered" >        setTimeout(<span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >            console.log('🚀 About to call initializeUnifiedApp...');</span>
+<span class="cstat-no" title="statement not covered" >            unifiedInitDebugLog('🚀 About to call initializeUnifiedApp...');</span>
 <span class="cstat-no" title="statement not covered" >            window.Logger.info('🚀 About to call initializeUnifiedApp...', { page: "unified-app-initializer" });</span>
 <span class="cstat-no" title="statement not covered" >            await window.initializeUnifiedApp();</span>
-<span class="cstat-no" title="statement not covered" >            console.log('✅ initializeUnifiedApp completed');</span>
-<span class="cstat-no" title="statement not covered" >            window.Logger.info('✅ initializeUnifiedApp completed', { page: "unified-app-initializer" });</span>
+<span class="cstat-no" title="statement not covered" >            window.Logger.info('✅ initializeUnifiedApp completed', { page: "unified-app-initializer", keepInfo: true });</span>
             
             // Handle page-specific functions
 <span class="cstat-no" title="statement not covered" >            await handlePageSpecificFunctions();</span>
@@ -4570,7 +4588,7 @@ async function <span class="fstat-no" title="function not covered" >handlePageSp
         // Handle other page-specific functions as needed
         // Add more function handling here in the future
         
-<span class="cstat-no" title="statement not covered" >        window.Logger.info('✅ Page-specific functions handled successfully', { page: "unified-app-initializer" });</span>
+<span class="cstat-no" title="statement not covered" >        window.Logger.info('✅ Page-specific functions handled successfully', { page: "unified-app-initializer", keepInfo: true });</span>
         
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >        window.Logger.error('❌ Failed to handle page-specific functions:', error, { page: "unified-app-initializer" });</span>
@@ -4666,7 +4684,7 @@ async function <span class="fstat-no" title="function not covered" >handlePageSp
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-08T18:05:39.331Z
+                at 2025-11-12T23:38:03.899Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -117,8 +117,14 @@ async function loadCashFlowsData() {
     console.log('🔥 loadCashFlowsData: First item:', data[0]);
       
     // עדכון הנתונים הגלובליים
-    window.cashFlowsData = data;
-    cashFlowsData = data;
+    const normalizedCashFlows = Array.isArray(data)
+      ? data.map(cf => ({
+          ...cf,
+          updated_at: cf.updated_at || cf.date || cf.created_at || null
+        }))
+      : [];
+    window.cashFlowsData = normalizedCashFlows;
+    cashFlowsData = normalizedCashFlows;
     
     console.log('🔥 loadCashFlowsData: Calling updateCashFlowsTable...');
     // עדכון הטבלה (ראשוני לפני החלת סידור ברירת מחדל/מצב שמור)
@@ -766,7 +772,7 @@ async function renderCashFlowsTable() {
   tbody.innerHTML = '';
 
   if (!cashFlowsData || cashFlowsData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
 
@@ -785,8 +791,15 @@ async function renderCashFlowsTable() {
     const isExchange = isCurrencyExchange(cashFlow);
     const exchangeId = isExchange ? getExchangeIdFromCashFlow(cashFlow) : null;
 
-    // קבלת סוג עם צבע
-    let typeDisplay = isExchange ? '🔄 ' + getCashFlowTypeWithColor(cashFlow.type) : getCashFlowTypeWithColor(cashFlow.type);
+    // קבלת סוג בעזרת מערכת הרינדור הכללית
+    const parsedAmount = typeof cashFlow.amount === 'number'
+      ? cashFlow.amount
+      : parseFloat(cashFlow.amount);
+    const amountForColor = Number.isFinite(parsedAmount) ? parsedAmount : null;
+    const baseTypeDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function')
+      ? window.FieldRendererService.renderType(cashFlow.type, amountForColor)
+      : getCashFlowTypeWithColor(cashFlow.type);
+    const typeDisplay = isExchange ? `🔄 ${baseTypeDisplay}` : baseTypeDisplay;
     
     // Trade column - show trade ID with link button if exists
     const tradeCell = cashFlow.trade_id 
@@ -862,7 +875,7 @@ async function renderCashFlowsTable() {
                     </span>
                 </div>
             </td>
-            <td class="col-type type-cell" data-type="${cashFlow.type || ''}">${typeDisplay}</td>
+            <td class="col-type type-cell" data-type="${cashFlow.type || ''}" dir="rtl">${typeDisplay}</td>
             <td class="col-amount text-end">
                 ${amountDisplay}
             </td>
@@ -871,6 +884,27 @@ async function renderCashFlowsTable() {
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
+            ${(() => {
+              if (typeof window.renderUpdatedCell === 'function') {
+                return window.renderUpdatedCell(cashFlow, {
+                  fields: ['updated_at', 'date', 'created_at'],
+                  columnClass: 'col-updated'
+                });
+              }
+              const fallbackDate = window.toDateObject
+                ? window.toDateObject(cashFlow.updated_at || cashFlow.date || cashFlow.created_at)
+                : (cashFlow.updated_at || cashFlow.date || cashFlow.created_at
+                    ? new Date(cashFlow.updated_at || cashFlow.date || cashFlow.created_at)
+                    : null);
+              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+              const absolute = fallbackDate.toLocaleString('he-IL');
+              const duration = typeof window.getDurationSince === 'function'
+                ? window.getDurationSince(fallbackDate, { fallback: absolute })
+                : absolute;
+              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+            })()}
             <td class="col-actions actions-cell actions-4-items">
               ${actionsMenu}
             </td>
@@ -1558,11 +1592,13 @@ async function saveCashFlow() {
             description: { id: 'cashFlowDescription', type: 'rich-text', default: null },
             source: { id: 'cashFlowSource', type: 'text' },
             external_id: { id: 'cashFlowExternalId', type: 'text', default: '0' },
-            trade_id: { id: 'trade_id', type: 'int', default: null }  // Optional link to trade
+            trade_id: { id: 'trade_id', type: 'int', default: null },  // Optional link to trade
+            tag_ids: { id: 'cashFlowTags', type: 'tags', default: [] }
         });
         
         // Prepare data to send (trade_id is optional, can be null)
-        const dataToSend = { ...cashFlowData };
+        const { tag_ids: tagIdsRaw, ...dataToSend } = cashFlowData;
+        const tagIds = Array.isArray(tagIdsRaw) ? tagIdsRaw : [];
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -1667,9 +1703,10 @@ async function saveCashFlow() {
         
         // CRUDResponseHandler handles ALL response processing including errors
         // No need to pre-check or call response.json() here
+        let crudResult = null;
         if (isEdit) {
             console.log('🔵 saveCashFlow - Calling handleUpdateResponse...');
-            await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
                 entityName: 'תזרים מזומן',
@@ -1678,13 +1715,29 @@ async function saveCashFlow() {
             });
         } else {
             console.log('🔵 saveCashFlow - Calling handleSaveResponse...');
-            await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן',
                 reloadFn: window.loadCashFlowsData,
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
+        }
+        
+        const resolvedCashFlowId = isEdit
+            ? Number(cashFlowId)
+            : Number(crudResult?.data?.id || crudResult?.id);
+        if (Number.isFinite(resolvedCashFlowId) && window.TagService) {
+            try {
+                await window.TagService.replaceEntityTags('cash_flow', resolvedCashFlowId, tagIds);
+            } catch (tagError) {
+                window.Logger?.warn('⚠️ Failed to update cash flow tags', {
+                    error: tagError,
+                    cashFlowId: resolvedCashFlowId,
+                    page: 'cash_flows'
+                });
+                window.showErrorNotification?.('שמירת תגיות', 'התזרים נשמר אך התגיות לא עודכנו');
+            }
         }
         
         console.log('🔵 saveCashFlow - CRUDResponseHandler completed');
@@ -2240,10 +2293,13 @@ function initializeExternalIdFields() {
  * @param {string} id - Cash flow ID
  * @returns {void}
  */
-function editCashFlow(id) {
+async function editCashFlow(id) {
     // Use ModalManagerV2 directly
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-        window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
+        await window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
+        if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+            await window.TagUIManager.hydrateSelectForEntity('cashFlowTags', 'cash_flow', id, { force: true });
+        }
     } else {
         window.Logger?.error('ModalManagerV2 לא זמין', { page: "cash_flows" });
         if (typeof window.showErrorNotification === 'function') {

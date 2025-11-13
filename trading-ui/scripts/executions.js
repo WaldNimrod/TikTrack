@@ -111,15 +111,22 @@
  * Opens modal for adding new execution
  * 
  * @function addExecution
- * @returns {void}
+ * @returns {Promise<void>} Resolves after modal interaction and tag hydration complete.
  */
-function addExecution() {
+async function addExecution() {
   try {
     window.Logger.info('➕ מוסיף ביצוע חדש', { page: "executions" });
     
     // פתיחת מודל הוספת ביצוע - שימוש במערכת הכללית
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      window.ModalManagerV2.showModal('executionsModal', 'add');
+      await window.ModalManagerV2.showModal('executionsModal', 'add');
+      const select = document.getElementById('executionTags');
+      if (select) {
+        select.setAttribute('data-initial-value', '');
+        if (window.TagUIManager?.refreshSelectOptions) {
+          await window.TagUIManager.refreshSelectOptions(select);
+        }
+      }
     } else {
       window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
     }
@@ -175,11 +182,19 @@ let tradesData = []; // נתוני טריידים לשמירת מפת חשבונ
 // פונקציות בסיסיות
 // REMOVED: openExecutionDetails - unused function, replaced by showAddExecutionModal
 
-function editExecution(id) {
+/**
+ * Open the execution edit modal and hydrate tag selections.
+ * @param {number|string} id - Execution identifier to edit.
+ * @returns {Promise<void>} Resolves after modal interaction and tag hydration complete.
+ */
+async function editExecution(id) {
   try {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('executionsModal', 'execution', id);
+    await window.ModalManagerV2.showEditModal('executionsModal', 'execution', id);
+    if (window.TagUIManager?.hydrateSelectForEntity) {
+      await window.TagUIManager.hydrateSelectForEntity('executionTags', 'execution', id, { force: true });
+    }
   } else {
     window.Logger.error('❌ ModalManagerV2 לא זמין במערכת הכללית', { page: "executions" });
   }
@@ -546,8 +561,12 @@ async function saveExecution() {
             notes: { id: 'executionNotes', type: 'rich-text', default: null },
             source: { id: 'executionSource', type: 'text', default: 'manual' },
             external_id: { id: 'executionExternalId', type: 'text', default: null },
-            trade_id: { id: 'trade_id', type: 'int', default: null }
+            trade_id: { id: 'trade_id', type: 'int', default: null },
+            tag_ids: { id: 'executionTags', type: 'tags', default: [] }
         });
+
+        const tagIds = Array.isArray(executionData.tag_ids) ? executionData.tag_ids : [];
+        delete executionData.tag_ids;
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -632,8 +651,9 @@ async function saveExecution() {
         });
         
         // Use CRUDResponseHandler for consistent response handling
+        let crudResult;
         if (isEdit) {
-            await CRUDResponseHandler.handleUpdateResponse(response, {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'executionsModal',
                 successMessage: 'ביצוע עודכן בהצלחה',
                 entityName: 'ביצוע',
@@ -641,13 +661,27 @@ async function saveExecution() {
                 requiresHardReload: false
             });
         } else {
-            await CRUDResponseHandler.handleSaveResponse(response, {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
                 modalId: 'executionsModal',
                 successMessage: 'ביצוע נוסף בהצלחה',
                 entityName: 'ביצוע',
                 reloadFn: window.loadExecutionsData,
                 requiresHardReload: false
             });
+        }
+
+        const executionRecordId = isEdit ? Number(executionId) : Number(crudResult?.data?.id || crudResult?.id);
+        if (Number.isFinite(executionRecordId)) {
+            try {
+                await window.TagService.replaceEntityTags('execution', executionRecordId, tagIds);
+            } catch (tagError) {
+                window.Logger?.warn('⚠️ Failed to update execution tags', {
+                    error: tagError,
+                    executionId: executionRecordId,
+                    page: 'executions'
+                });
+                window.showErrorNotification?.('שמירת תגיות', 'התגובה נשמרה אך עדכון התגיות נכשל');
+            }
         }
         
     } catch (error) {
@@ -1128,7 +1162,13 @@ async function loadExecutionsData() {
     });
     if (response.ok) {
       const data = await response.json();
-      executionsData = data.data || data;
+      const rawExecutions = data?.data || data;
+      executionsData = Array.isArray(rawExecutions)
+        ? rawExecutions.map(execution => ({
+            ...execution,
+            updated_at: execution.updated_at || execution.execution_date || execution.date || execution.created_at || null
+          }))
+        : [];
       window.executionsData = executionsData; // עדכון הנתונים הגלובליים
       // נטענו עסקעות
 
@@ -1281,6 +1321,15 @@ function updateExecutionsSummary(filteredDataOverride = null) {
       }
     } else if (typeof window.updatePageSummaryStats === 'function') {
       window.updatePageSummaryStats('executions', filteredData || window.executionsData);
+    } else {
+      const summaryStatsElement = document.getElementById('summaryStats');
+      if (summaryStatsElement) {
+        summaryStatsElement.innerHTML = `
+          <div style="color: #dc3545; font-weight: bold;">
+            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+          </div>
+        `;
+      }
     }
   } catch (error) {
     window.Logger?.warn('updateExecutionsSummary failed', { error });
@@ -1342,7 +1391,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו עסקעות</td></tr>';
     return;
   }
 
@@ -1500,6 +1549,27 @@ async function updateExecutionsTableMain(executions, options = {}) {
                     ${window.renderExecutionDate ? window.renderExecutionDate(execution.execution_date || execution.date) : window.renderDate ? window.renderDate(execution.execution_date || execution.date, true) : ((execution.execution_date || execution.date) ? new Date(execution.execution_date || execution.date).toLocaleDateString('he-IL') : '-')}
                 </td>
                 <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
+                ${(() => {
+                  if (typeof window.renderUpdatedCell === 'function') {
+                    return window.renderUpdatedCell(execution, {
+                      fields: ['updated_at', 'execution_date', 'date', 'created_at'],
+                      columnClass: 'col-updated'
+                    });
+                  }
+                  const fallbackDate = window.toDateObject
+                    ? window.toDateObject(execution.updated_at || execution.execution_date || execution.date || execution.created_at)
+                    : (execution.updated_at || execution.execution_date || execution.date || execution.created_at
+                        ? new Date(execution.updated_at || execution.execution_date || execution.date || execution.created_at)
+                        : null);
+                  if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                    return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                  }
+                  const absolute = fallbackDate.toLocaleString('he-IL');
+                  const duration = typeof window.getDurationSince === 'function'
+                    ? window.getDurationSince(fallbackDate, { fallback: absolute })
+                    : absolute;
+                  return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+                })()}
                 <td class="actions-cell">
                     <div class="d-flex gap-1 justify-content-center align-items-center table-flex-nowrap">
                       ${(() => {
@@ -2352,23 +2422,6 @@ function addNewTrade() {
  * עדכון סיכום נתונים לעסקעות
  * @param {Array} executions - מערך העסקעות
  */
-function updateExecutionsSummary(executions) {
-  // עדכון סיכום נתונים לעסקעות - מערכת מאוחדת
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.executions;
-    window.InfoSummarySystem.calculateAndRender(executions, config);
-  } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
-}
 
 // הגדרת הפונקציות כגלובליות
 window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;
@@ -3177,9 +3230,9 @@ window.loadExecutionsData = async function() {
   try {
     const tickers = await loadTickersSummaryData();
     updateTickersSummaryTable(tickers);
-    // window.Logger.info('✅ טבלת טיקרים חלקית נטענה בהצלחה', { page: "executions" });
+    // window.Logger.info('✅ טבלת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים', { page: "executions" });
   } catch (error) {
-    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error, { page: "executions" });
+    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקיים:', error, { page: "executions" });
     handleApiError(error, 'טבלת טיקרים חלקית');
   }
 };
@@ -3943,7 +3996,7 @@ function renderTradeSuggestionsSection(suggestionsData, flatList = null) {
                     </tr>
                 </thead>
                 <tbody id="tradeSuggestionsTableBody">
-                    <tr><td colspan="11" class="text-center text-muted">טוען נתונים...</td></tr>
+                    <tr><td colspan="12" class="text-center text-muted">טוען נתונים...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -4430,7 +4483,7 @@ function renderTradeSuggestionsPageRows(pageData) {
     const selectAllCheckbox = document.getElementById('selectAllSuggestions');
 
     if (!Array.isArray(pageData) || pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted">אין המלצות זמינות</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" class="text-center text-muted">אין המלצות זמינות</td></tr>';
         if (selectAllCheckbox) {
             selectAllCheckbox.checked = false;
         }

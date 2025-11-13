@@ -151,7 +151,13 @@ window.loadAlertsData = async function() {
       window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
 
       // שמירת הנתונים במשתנה גלובלי
-      window.alertsData = data.data || data;
+      const rawAlerts = data?.data || data;
+      window.alertsData = Array.isArray(rawAlerts)
+        ? rawAlerts.map(alert => ({
+            ...alert,
+            updated_at: alert.updated_at || alert.triggered_at || alert.created_at || alert.last_evaluated_at || null
+          }))
+        : [];
       window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
 
       // עדכון הטבלה
@@ -460,7 +466,7 @@ function renderAlertsTableRows(alerts) {
     // בדיקה שהנתונים קיימים
     if (!alerts || !Array.isArray(alerts)) {
       window.Logger.warn('⚠️ alerts parameter is not available or not an array', { page: "alerts" });
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין התראות להצגה</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין התראות להצגה</td></tr>';
       return;
     }
 
@@ -876,6 +882,27 @@ function renderAlertsTableRows(alerts) {
           <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
           <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
           <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
+          ${(() => {
+            if (typeof window.renderUpdatedCell === 'function') {
+              return window.renderUpdatedCell(alert, {
+                fields: ['updated_at', 'triggered_at', 'created_at'],
+                columnClass: 'col-updated'
+              });
+            }
+            const fallbackDate = window.toDateObject
+              ? window.toDateObject(alert.updated_at || alert.triggered_at || alert.created_at)
+              : (alert.updated_at || alert.triggered_at || alert.created_at
+                  ? new Date(alert.updated_at || alert.triggered_at || alert.created_at)
+                  : null);
+            if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+            const absolute = fallbackDate.toLocaleString('he-IL');
+            const duration = typeof window.getDurationSince === 'function'
+              ? window.getDurationSince(fallbackDate, { fallback: absolute })
+              : absolute;
+            return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+          })()}
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
               if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
@@ -1581,6 +1608,8 @@ async function saveAlert() {
   let relatedType, relatedId, conditionAttribute, conditionOperator, conditionNumber, message, status, isTriggered, expiryDate;
   let hasErrors = false;
   
+  let tagIds = [];
+
   if (isNewForm) {
     // New form structure (ModalManagerV2)
     relatedType = form.querySelector('#alertRelatedType')?.value || '';
@@ -1605,6 +1634,17 @@ async function saveAlert() {
     // Get expiry_date
     expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
     if (expiryDate === '') expiryDate = null;
+
+    const tagsSelect = form.querySelector('#alertTags');
+    if (tagsSelect) {
+      if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
+        tagIds = window.TagUIManager.getSelectedValues(tagsSelect);
+      } else {
+        tagIds = Array.from(tagsSelect.selectedOptions || [])
+          .map(option => parseInt(option.value, 10))
+          .filter(Number.isFinite);
+      }
+    }
   } else {
     // Old form structure (backward compatibility)
     const alertData = DataCollectionService.collectFormData({
@@ -1776,7 +1816,7 @@ async function saveAlert() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
+    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
       modalId: modalId,
       successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
       apiUrl: '/api/alerts/',
@@ -1784,6 +1824,19 @@ async function saveAlert() {
       reloadFn: window.loadAlertsData,
       requiresHardReload: false
     });
+    const alertRecordId = isEdit ? Number(alertId) : Number(crudResult?.data?.id || crudResult?.id);
+    if (Number.isFinite(alertRecordId) && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('alert', alertRecordId, tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update alert tags', {
+          error: tagError,
+          alertId: alertRecordId,
+          page: 'alerts'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'התראה נשמרה אך שמירת התגיות נכשלה');
+      }
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת התראה');
@@ -1803,10 +1856,14 @@ async function saveAlert() {
  * @param {number|string} alertId - מזהה ההתראה לעריכה
  * @returns {void}
  */
-function editAlert(alertId) {
+async function editAlert(alertId) {
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId);
+    await window.ModalManagerV2.showEditModal('alertsModal', 'alert', alertId);
+    if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+      await window.TagUIManager.hydrateSelectForEntity('alertTags', 'alert', alertId, { force: true });
+      await window.TagUIManager.hydrateSelectForEntity('editAlertTags', 'alert', alertId, { force: true });
+    }
   } else {
     window.Logger?.error('ModalManagerV2 לא זמין', { page: "alerts" });
     if (typeof window.showErrorNotification === 'function') {
@@ -2066,6 +2123,18 @@ async function updateAlert() {
   }
 
   const alertId = document.getElementById('editAlertId').value;
+  const tagsSelect = document.getElementById('editAlertTags');
+  let tagIds = [];
+  if (tagsSelect) {
+    if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
+      tagIds = window.TagUIManager.getSelectedValues(tagsSelect);
+    } else {
+      tagIds = Array.from(tagsSelect.selectedOptions || [])
+        .map(option => parseInt(option.value, 10))
+        .filter(Number.isFinite);
+    }
+  }
+
   const alertPayload = {
     related_type_id: relatedTypeId,
     related_id: relatedId,
@@ -2094,7 +2163,7 @@ async function updateAlert() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleUpdateResponse(response, {
+    const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'editAlertModal',
       successMessage: 'התראה עודכנה בהצלחה!',
       apiUrl: '/api/alerts/',
@@ -2102,6 +2171,18 @@ async function updateAlert() {
       reloadFn: window.loadAlertsData,
       requiresHardReload: false
     });
+    if (updateResult !== null && window.TagService) {
+      try {
+        await window.TagService.replaceEntityTags('alert', Number(alertId), tagIds);
+      } catch (tagError) {
+        window.Logger?.warn('⚠️ Failed to update alert tags (legacy form)', {
+          error: tagError,
+          alertId,
+          page: 'alerts'
+        });
+        window.showErrorNotification?.('שמירת תגיות', 'התראה עודכנה אך התגיות לא עודכנו');
+      }
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'עדכון התראה');

@@ -98,6 +98,11 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
+@pages_bp.route('/tag-management')
+def tag_management() -> Any:
+    """Tag management page"""
+    return send_from_directory(UI_DIR, "tag-management.html")
+
 @pages_bp.route('/preferences-new')
 def preferences_new() -> Any:
     """New preferences page"""

@@ -25,21 +25,23 @@ class ConditionsTranslations {
             // Trading Methods
             methods: {
                 'moving_average': 'ממוצע נע',
-                'rsi': 'RSI',
+                'moving_averages': 'ממוצעים נעים',
+                'volume_analysis': 'ניתוח נפח',
                 'support_resistance': 'תמיכה והתנגדות',
                 'trend_lines': 'קווי מגמה',
-                'technical_patterns': 'מבנים טכניים',
-                'fibonacci': 'פיבונצי'
+                'technical_patterns': 'דפוסים טכניים',
+                'fibonacci': 'פיבונאצ\'י',
+                'fibonacci_retracement': 'פיבונאצ\'י'
             },
             
             // Method Categories
             categories: {
-                'trend_following': 'מעקב מגמה',
-                'mean_reversion': 'חזרה לממוצע',
-                'momentum': 'מומנטום',
-                'volatility': 'תנודתיות',
-                'volume': 'נפח',
-                'pattern': 'מבנה'
+                'technical_indicators': 'אינדיקטורים טכניים',
+                'price_patterns': 'דפוסי מחיר',
+                'support_resistance': 'תמיכה והתנגדות',
+                'trend_analysis': 'ניתוח מגמות',
+                'volume_analysis': 'ניתוח נפח',
+                'fibonacci': 'פיבונאצ\'י'
             },
             
             // Parameters
@@ -49,7 +51,18 @@ class ConditionsTranslations {
                 'level': 'רמה',
                 'strength': 'עוצמה',
                 'timeframe': 'מסגרת זמן',
-                'sensitivity': 'רגישות'
+                'sensitivity': 'רגישות',
+                'ma_period': 'תקופת ממוצע נע',
+                'ma_type': 'סוג ממוצע נע',
+                'comparison_type': 'סוג השוואה',
+                'volume_period': 'תקופת נפח',
+                'volume_multiplier': 'מכפיל נפח',
+                'tolerance_pct': 'אחוז סבילות',
+                'trend_type': 'סוג מגמה',
+                'lookback_period': 'תקופת בדיקה',
+                'pattern_type': 'סוג דפוס',
+                'fib_type': 'סוג פיבונאצ\'י',
+                'level_price': 'מחיר רמה'
             },
             
             // Logical Operators
@@ -222,15 +235,29 @@ class ConditionsTranslations {
      * @param {Object} condition - Condition object
      * @returns {Object} Translated condition
      */
-    translateCondition(condition) {
+    translateCondition(condition, entityType = 'plan') {
         if (!condition) return null;
-        
+
+        const methodData = condition.method || {};
+        const methodKey = condition.method_key
+            || methodData.method_key
+            || methodData.key
+            || this._generateMethodKey(methodData.name_en);
+        const categoryKey = condition.category || methodData.category || '';
+        const status = condition.status
+            || (condition.is_active === false ? 'inactive' : 'active');
+
         return {
             ...condition,
-            method_name: this.getMethodName(condition.method_key),
-            category_name: this.getCategoryName(condition.category),
-            status_name: this.getStatus(condition.status),
-            logical_operator_name: this.getOperator(condition.logical_operator)
+            method_key: methodKey,
+            method_name: this.getMethodName(methodKey),
+            category: categoryKey,
+            category_name: this.getCategoryName(categoryKey),
+            status,
+            status_name: this.getStatus(status),
+            logical_operator_name: this.getOperator(condition.logical_operator),
+            parameters: this._normalizeParameters(condition.parameters_json || condition.parameters),
+            entity_type: entityType
         };
     }
     
@@ -243,10 +270,14 @@ class ConditionsTranslations {
     translateMethod(method) {
         if (!method) return null;
         
+        const methodKey = method.key || method.method_key || this._generateMethodKey(method.name_en);
         return {
             ...method,
-            name: this.getMethodName(method.key),
-            category_name: this.getCategoryName(method.category)
+            key: methodKey,
+            method_key: methodKey,
+            name: this.getMethodName(methodKey),
+            category_name: this.getCategoryName(method.category),
+            parameters: method.parameters || []
         };
     }
     
@@ -266,6 +297,28 @@ class ConditionsTranslations {
         }
         
         return translated;
+    }
+
+    _generateMethodKey(name) {
+        if (!name) return '';
+        return name
+            .toLowerCase()
+            .replace(/&/g, 'and')
+            .replace(/\s+/g, '_')
+            .replace(/[^a-z0-9_]/g, '');
+    }
+
+    _normalizeParameters(parameters) {
+        if (!parameters) return {};
+        if (typeof parameters === 'string') {
+            try {
+                return JSON.parse(parameters);
+            } catch (error) {
+                window.Logger?.warn('[ConditionsTranslations] Failed to parse parameters_json', { error: error?.message, value: parameters }, { page: 'conditions-translations' });
+                return {};
+            }
+        }
+        return parameters;
     }
 }
 

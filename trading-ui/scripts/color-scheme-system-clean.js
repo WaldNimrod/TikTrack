@@ -19,8 +19,19 @@ const VALID_ENTITY_TYPES = [
 ];
 
 // ===== COLOR DEFINITIONS =====
+const BRAND_PRIMARY = '#26baac';
+const BRAND_PRIMARY_TEXT = '#1a8f83';
+const BRAND_PRIMARY_LIGHT = '#6ed8ca';
+const BRAND_PRIMARY_BG = 'rgba(38, 186, 172, 0.1)';
+const BRAND_PRIMARY_BORDER = 'rgba(38, 186, 172, 0.3)';
+const BRAND_SECONDARY = '#fc5a06';
+const BRAND_SECONDARY_TEXT = '#d24d05';
+const BRAND_SECONDARY_LIGHT = '#ffb17a';
+const BRAND_SECONDARY_BG = 'rgba(252, 90, 6, 0.12)';
+const BRAND_SECONDARY_BORDER = 'rgba(252, 90, 6, 0.3)';
+
 const ENTITY_COLORS = {
-  trade: '#007bff',
+  trade: BRAND_PRIMARY,
   trade_plan: '#28a745',
   execution: '#17a2b8',
   account: '#6f42c1',
@@ -36,7 +47,7 @@ const ENTITY_COLORS = {
 };
 
 const ENTITY_BACKGROUND_COLORS = {
-  trade: 'rgba(0, 123, 255, 0.1)',
+  trade: BRAND_PRIMARY_BG,
   trade_plan: 'rgba(40, 167, 69, 0.1)',
   execution: 'rgba(23, 162, 184, 0.1)',
   account: 'rgba(111, 66, 193, 0.1)',
@@ -52,7 +63,7 @@ const ENTITY_BACKGROUND_COLORS = {
 };
 
 const ENTITY_TEXT_COLORS = {
-  trade: '#0056b3',
+  trade: BRAND_PRIMARY_TEXT,
   trade_plan: '#1e7e34',
   execution: '#117a8b',
   account: '#59359a',
@@ -68,7 +79,7 @@ const ENTITY_TEXT_COLORS = {
 };
 
 const ENTITY_BORDER_COLORS = {
-  trade: 'rgba(0, 123, 255, 0.3)',
+  trade: BRAND_PRIMARY_BORDER,
   trade_plan: 'rgba(40, 167, 69, 0.3)',
   execution: 'rgba(23, 162, 184, 0.3)',
   account: 'rgba(111, 66, 193, 0.3)',
@@ -97,9 +108,9 @@ const STATUS_COLORS = {
 
 const INVESTMENT_TYPE_COLORS = {
   swing: {
-    medium: '#007bff',
-    light: 'rgba(0, 123, 255, 0.1)',
-    border: 'rgba(0, 123, 255, 0.3)'
+    medium: BRAND_PRIMARY,
+    light: BRAND_PRIMARY_BG,
+    border: BRAND_PRIMARY_BORDER
   },
   day: {
     medium: '#28a745',
@@ -381,8 +392,8 @@ function applyColorScheme(schemeName = 'light', customColors = null) {
 
 function applyLightScheme() {
   // Apply light theme colors
-  document.documentElement.style.setProperty('--primary-color', '#007bff');
-  document.documentElement.style.setProperty('--secondary-color', '#6c757d');
+  document.documentElement.style.setProperty('--primary-color', BRAND_PRIMARY);
+  document.documentElement.style.setProperty('--secondary-color', BRAND_SECONDARY);
   document.documentElement.style.setProperty('--success-color', '#28a745');
   document.documentElement.style.setProperty('--danger-color', '#dc3545');
   document.documentElement.style.setProperty('--warning-color', '#ffc107');
@@ -391,8 +402,8 @@ function applyLightScheme() {
 
 function applyDarkScheme() {
   // Apply dark theme colors
-  document.documentElement.style.setProperty('--primary-color', '#0d6efd');
-  document.documentElement.style.setProperty('--secondary-color', '#6c757d');
+  document.documentElement.style.setProperty('--primary-color', BRAND_PRIMARY_TEXT);
+  document.documentElement.style.setProperty('--secondary-color', BRAND_SECONDARY_TEXT);
   document.documentElement.style.setProperty('--success-color', '#198754');
   document.documentElement.style.setProperty('--danger-color', '#dc3545');
   document.documentElement.style.setProperty('--warning-color', '#ffc107');
@@ -547,6 +558,70 @@ function updateEntityColors(preferences) {
 
 function updateCSSVariablesFromPreferences(preferences) {
   try {
+    const setVar = (name, value) => {
+      if (typeof value === 'string' && value.trim() !== '') {
+        document.documentElement.style.setProperty(name, value);
+      }
+    };
+
+    const computeVariant = (base, fallback, variant) => {
+      if (fallback) {
+        return fallback;
+      }
+      if (!base || typeof base !== 'string') {
+        return null;
+      }
+      try {
+        if (variant === 'light') {
+          return lightenColor(base, 25);
+        }
+        if (variant === 'dark') {
+          return darkenColor(base, 20);
+        }
+        if (variant === 'border') {
+          return lightenColor(base, 35);
+        }
+      } catch (variantError) {
+        console.warn('⚠️ Failed to compute color variant', { base, variant, error: variantError });
+      }
+      return null;
+    };
+
+    const applyNumericPalette = (key, tokens = {}, semanticBase = null) => {
+      const medium = tokens.medium;
+      const light = computeVariant(medium, tokens.light, 'light');
+      const dark = computeVariant(medium, tokens.dark, 'dark');
+      const border = computeVariant(medium, tokens.border, 'border') || medium;
+
+      setVar(`--numeric-${key}-medium`, medium);
+      setVar(`--numeric-${key}-light`, light);
+      setVar(`--numeric-${key}-dark`, dark);
+      setVar(`--numeric-${key}-border`, border);
+
+      if (semanticBase) {
+        setVar(`--color-${semanticBase}`, medium);
+        setVar(`--color-${semanticBase}-light`, light);
+        setVar(`--color-${semanticBase}-dark`, dark);
+        setVar(`--color-${semanticBase}-border`, border);
+        setVar(`--color-${semanticBase}-bg`, light || medium);
+      }
+    };
+
+    const applyThemeColor = (baseName, color, variants = {}) => {
+      if (!color) {
+        return;
+      }
+      const light = computeVariant(color, variants.light, 'light');
+      const dark = computeVariant(color, variants.dark, 'dark');
+      const border = computeVariant(color, variants.border, 'border') || color;
+
+      setVar(`--color-${baseName}`, color);
+      setVar(`--color-${baseName}-light`, light);
+      setVar(`--color-${baseName}-dark`, dark);
+      setVar(`--color-${baseName}-border`, border);
+      setVar(`--color-${baseName}-bg`, light || color);
+    };
+
     if (preferences && preferences.colorScheme) {
       // Update CSS variables based on preferences
       if (preferences.colorScheme.entities) {
@@ -554,7 +629,45 @@ function updateCSSVariablesFromPreferences(preferences) {
           document.documentElement.style.setProperty(`--entity-${entityType}-color`, color);
         });
       }
+
+      if (preferences.colorScheme.numericValues) {
+        const numericValues = preferences.colorScheme.numericValues;
+
+        applyNumericPalette('positive', {
+          medium: preferences.valuePositiveColor || numericValues.positive?.medium,
+          light: preferences.valuePositiveColorLight || numericValues.positive?.light,
+          dark: preferences.valuePositiveColorDark || numericValues.positive?.dark,
+          border: numericValues.positive?.border
+        }, 'success');
+
+        applyNumericPalette('negative', {
+          medium: preferences.valueNegativeColor || numericValues.negative?.medium,
+          light: preferences.valueNegativeColorLight || numericValues.negative?.light,
+          dark: preferences.valueNegativeColorDark || numericValues.negative?.dark,
+          border: numericValues.negative?.border
+        }, 'danger');
+
+        applyNumericPalette('zero', {
+          medium: preferences.valueNeutralColor || numericValues.zero?.medium,
+          light: preferences.valueNeutralColorLight || numericValues.zero?.light,
+          dark: preferences.valueNeutralColorDark || numericValues.zero?.dark,
+          border: numericValues.zero?.border
+        }, 'neutral');
+      }
     }
+
+    applyThemeColor('success', preferences.successColor || preferences.valuePositiveColor, {
+      light: preferences.valuePositiveColorLight,
+      dark: preferences.valuePositiveColorDark
+    });
+
+    applyThemeColor('danger', preferences.dangerColor || preferences.valueNegativeColor, {
+      light: preferences.valueNegativeColorLight,
+      dark: preferences.valueNegativeColorDark
+    });
+
+    applyThemeColor('warning', preferences.warningColor);
+    applyThemeColor('info', preferences.infoColor || preferences.brandPrimaryColor);
   } catch (error) {
     console.error('❌ Error updating CSS variables from preferences:', error);
   }

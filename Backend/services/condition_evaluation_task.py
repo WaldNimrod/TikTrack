@@ -65,16 +65,20 @@ def condition_evaluation_task():
                 
                 # Check if auto-generate alerts is enabled for this condition
                 auto_generate = True  # Default to True
+                condition = None
                 try:
                     if condition_type == 'plan':
                         from models.plan_condition import PlanCondition
                         condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
+                        if condition:
+                            auto_generate = condition.auto_generate_alerts
+                            result.setdefault('plan_id', getattr(condition, 'trade_plan_id', None))
                     else:
                         from models.trade_condition import TradeCondition
                         condition = db_session.query(TradeCondition).filter(TradeCondition.id == condition_id).first()
-                    
-                    if condition:
-                        auto_generate = condition.auto_generate_alerts
+                        if condition:
+                            auto_generate = condition.auto_generate_alerts
+                            result.setdefault('trade_id', getattr(condition, 'trade_id', None))
                 except Exception as e:
                     logger.warning(f"⚠️ Could not check auto_generate_alerts for condition {condition_id}: {str(e)}")
                 
@@ -145,6 +149,15 @@ def process_condition_alert_lifecycle(alert_service, result: Dict[str, Any], db_
             trade_condition_id=condition_id if condition_type == 'trade' else None
         )
         
+        related_type_id = 3 if condition_type == 'plan' else 2
+        related_id = None
+        if condition_type == 'plan':
+            related_id = result.get('plan_id')
+        else:
+            related_id = result.get('trade_id')
+        if related_id is None:
+            related_id = condition_id
+
         if not existing_alert:
             # No existing alert - create one if condition is met
             if condition_met:
@@ -155,8 +168,8 @@ def process_condition_alert_lifecycle(alert_service, result: Dict[str, Any], db_
                         result.get('details', {}),
                         condition_type
                     ),
-                    'related_id': condition_id,
-                    'related_type_id': 3 if condition_type == 'plan' else 2,  # trade_plan or trade
+                    'related_id': related_id,
+                    'related_type_id': related_type_id,
                     'condition_attribute': 'price',
                     'condition_operator': 'more_than',
                     'condition_number': str(result.get('current_price', 0)),

@@ -38,8 +38,6 @@
                     <div class="section-header">
                         <h1>🔘 מערכת הכפתורים המרכזית</h1>
                         <div class="section-actions">
-                            <button data-button-type="SEARCH" data-onclick="checkButtonColors()" data-classes="btn-sm" data-text="בדוק צבעים" data-attributes="title='בדוק צבעי כל הכפתורים'"></button>
-                            <button data-button-type="REACTIVATE" data-onclick="fixButtonColors()" data-classes="btn-sm" data-text="תקן צבעים" data-attributes="title='תקן אוטומטית בעיות צבעים'"></button>
                             <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="btn filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">▼ הצג/הסתר סקשן</button>
                         </div>
                     </div>
@@ -51,33 +49,39 @@
 
                 <!-- UI Content Section 1 Start -->
                 <div class="content-section" id="section1">
-                    <div class="section-header">
+                    <div class="section-header text-center">
                         <h2>📋 כל הכפתורים הזמינים במערכת</h2>
+                        <p class="section-subtitle text-muted mb-0">
+                            <small id="buttonTableCount">0 רשומות</small>
+                        </p>
                     </div>
                     <div class="section-body">
                         <div class="button-system-demo">
-                            <div class="table-responsive">
+                            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3 mb-3">
+                                <div id="buttonCategoryFilters" class="filter-toggle-group" role="group" aria-label="פילטר סוגי כפתורים"></div>
+                                <div class="d-flex gap-2 align-items-center w-100 w-lg-auto">
+                                    <input type="text" id="buttonFilter" class="form-control" placeholder="🔍 חפש לפי שם, תיאור או סוג..." oninput="filterButtons()">
+                                </div>
+                            </div>
+
+                            <div class="table-responsive mb-4">
                                 <table class="table table-striped table-hover" id="buttonSystemTable">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 30%;">דוגמאות חיות</th>
-                                            <th style="width: 20%;">שם הכפתור</th>
-                                            <th style="width: 30%;">תיאור</th>
-                                            <th style="width: 20%;">משתנה צבע</th>
-                                            <th style="display: none;">קוד HTML (ישן)</th>
-                                            <th style="display: none;">קוד HTML (חדש)</th>
-                                            <th style="display: none;">קוד JavaScript</th>
-                                            <th style="display: none;">פעולות</th>
+                                            <th style="width: 24%;">דוגמאות חיות</th>
+                                            <th style="width: 14%;">שם הכפתור</th>
+                                            <th style="width: 16%;">תיאור</th>
+                                            <th style="width: 12%;">משתנה צבע</th>
+                                            <th style="width: 10%;">HTML (ישן)</th>
+                                            <th style="width: 10%;">HTML (חדש)</th>
+                                            <th style="width: 10%;">JavaScript</th>
+                                            <th style="width: 4%;">פעולות</th>
                                         </tr>
                                     </thead>
                                     <tbody id="buttonTableBody"></tbody>
                                 </table>
                             </div>
-                            
-                            <div class="button-filter mb-3">
-                                <input type="text" id="buttonFilter" class="form-control" placeholder="🔍 חפש כפתור..." onkeyup="filterButtons()">
-                            </div>
-                            
+
                             <!-- Button Variants Demo -->
                             <div class="button-variants-demo mb-4">
                                 <h5>דוגמאות וריאציות כפתורים:</h5>
@@ -130,15 +134,37 @@
                                             <div class="card-body">
                                                 <h5 class="card-title" id="lastUpdate">עכשיו</h5>
                                                 <p class="card-text">עדכון אחרון</p>
-                    </div>
-                </div>
-                    </div>
-                    </div>
-                </div>
-                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- UI Content Section 1 End -->   
+
+                <!-- Diagnostics Section -->
+                <div class="content-section" id="diagnosticsSection">
+                    <div class="section-header d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                        <div>
+                            <h2>🧪 דיאגנוסטיקה</h2>
+                            <p class="mb-0 text-muted">שמירת תוצאות הבדיקות האחרונות של מערכת הכפתורים</p>
+                        </div>
+                        <div class="section-actions d-flex gap-2">
+                            <button data-button-type="SEARCH" data-variant="small" data-onclick="checkButtonColors()" data-text="בדיקות צבע"></button>
+                            <button data-button-type="REACTIVATE" data-variant="small" data-onclick="fixButtonColors()" data-text="תיקון אוטומטי"></button>
+                            <button data-button-type="COPY" data-variant="small" data-onclick="window.copyButtonSystemDetailedLog && window.copyButtonSystemDetailedLog()" data-text="העתק לוג"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="diagnosticsOutput" class="card border-0 shadow-sm bg-light-subtle">
+                            <div class="card-body">
+                                <p class="text-muted mb-0">טרם הופעלו בדיקות צבעים בעמוד זה.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- UI Content Section 2 Start - וריאנטים מורחבים -->
                 <div class="content-section" id="section2">
@@ -163,6 +189,43 @@
                     </div>
                 </div>
                 <!-- UI Content Section 2 End -->
+
+                <!-- Dynamic Color Map Section -->
+                <div class="content-section" id="colorMapSection">
+                    <div class="section-header d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                        <div>
+                            <h2>🎨 מפת צבעים דינאמית</h2>
+                            <p class="mb-0 text-muted">בחירת צבעים מדויקת למפתחים ולמעצבים</p>
+                            <p class="section-subtitle text-muted mb-0">
+                                <small id="colorTokensCount">0 צבעים</small>
+                            </p>
+                        </div>
+                        <div class="section-actions d-flex gap-2">
+                            <button data-button-type="REFRESH" data-variant="small" data-onclick="window.renderColorTables && window.renderColorTables()" data-text="רענון ערכים"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3 mb-3">
+                            <div id="colorGroupFilters" class="filter-toggle-group" role="group" aria-label="פילטר קבוצות צבעים"></div>
+                            <div class="text-muted small">הערכים מוצגים כפי שהדפדפן מיישם אותם לאחר ההעדפות.</div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="colorTokensTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 14%;">קבוצה</th>
+                                        <th style="width: 18%;">שם</th>
+                                        <th style="width: 20%;">מזהה / משתנה</th>
+                                        <th style="width: 18%;">ערך נוכחי</th>
+                                        <th style="width: 22%;">פרטים</th>
+                                        <th style="width: 8%;">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="colorTokensBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- UI Content Section 3 - Entity Colors Demo -->
                 <div class="ui-content-section">
@@ -226,97 +289,140 @@
 
     <!-- Button System Demo Styles -->
     <style>
+        .section-header.text-center {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+        }
+
         /* Button System Demo Styles */
         .button-system-demo {
-            width: 100% !important;
-            overflow-x: auto !important;
+            width: 100%;
         }
 
         .button-system-demo .table-responsive {
-            overflow-x: auto !important;
-            min-width: 100% !important;
-            width: 100% !important;
+            overflow-x: auto;
         }
 
         .button-system-demo table {
-            min-width: 800px !important;
-            table-layout: auto !important;
-            width: 100% !important;
+            min-width: 960px;
+            table-layout: auto;
         }
 
         .button-system-demo th,
         .button-system-demo td {
-            padding: 8px 12px !important;
+            padding: 8px 12px;
+            vertical-align: top;
         }
 
-        /* Live Examples Column */
-        .button-system-demo th:nth-child(1),
-        .button-system-demo td:nth-child(1) {
-            min-width: 250px;
-        }
-        
-        /* Hide code columns */
-        .button-system-demo th:nth-child(5),
-        .button-system-demo th:nth-child(6),
-        .button-system-demo th:nth-child(7),
-        .button-system-demo th:nth-child(8),
-        .button-system-demo td:nth-child(5),
-        .button-system-demo td:nth-child(6),
-        .button-system-demo td:nth-child(7),
-        .button-system-demo td:nth-child(8) {
-            display: none !important;
+        .button-system-demo .live-example-cell {
+            min-width: 240px;
         }
 
-        .button-variants-container {
+        .button-system-demo .variant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .variant-grid-item {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        /* Color Variable Column */
-        .button-system-demo th:nth-child(4),
-        .button-system-demo td:nth-child(4) {
-            min-width: 120px;
-            max-width: 120px;
-            font-size: 11px;
+        .variant-label {
+            font-size: 12px;
+            color: #6c757d;
         }
 
-        /* Code Columns - Narrow with word break */
-        .button-system-demo th:nth-child(5),
-        .button-system-demo th:nth-child(6),
-        .button-system-demo th:nth-child(7),
-        .button-system-demo td:nth-child(5),
-        .button-system-demo td:nth-child(6),
-        .button-system-demo td:nth-child(7) {
-            white-space: normal;
-            word-break: break-all;
-            max-width: 150px;
-            font-size: 11px;
+        .entity-variant-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
         }
 
-        .button-system-demo code {
-            font-size: 10px !important;
-            background: #f8f9fa !important;
-            padding: 2px 4px !important;
-            border-radius: 3px !important;
-            white-space: normal !important;
-            word-break: break-all !important;
-            display: block !important;
-            max-width: 100% !important;
-        }
-
-        /* Live Button Examples - Consistent Styling */
         .button-system-demo .btn {
-            font-size: 14px !important;
-            padding: 6px 12px !important;
-            height: 32px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 4px !important;
-            white-space: nowrap !important;
+            font-size: 14px;
+            padding: 6px 12px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
         }
 
-        /* Button Variants Demo */
+        .code-block {
+            font-size: 11px;
+            background: #f8f9fa;
+            padding: 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            word-break: break-all;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            direction: ltr;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .color-chip {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            display: inline-block;
+        }
+
+        .color-details-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .color-details-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .color-details-list code {
+            font-size: 11px;
+        }
+
+        .filter-toggle-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-toggle-group .btn {
+            min-width: 110px;
+        }
+
+        .filter-toggle-group .btn.active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-color);
+        }
+
         .button-variants-demo {
             background: #f8f9fa;
             padding: 20px;
@@ -336,7 +442,7 @@
         }
 
         .button-variants-demo .btn {
-            margin-right: 8px;
+            margin-inline-end: 8px;
             margin-bottom: 8px;
         }
     </style>
@@ -361,34 +467,40 @@
     <!-- Critical: YES | Version: 2.0.0 -->
 
     <!-- [1] Load Order: 1 -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
     <!-- [2] Load Order: 2 -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
     <!-- [3] Load Order: 3 -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
     <!-- [4] Load Order: 4 -->
-    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
-    <!-- [5] Load Order: 5 -->
-    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
-    <!-- [6] Load Order: 6 -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
-    <!-- [7] Load Order: 7 -->
     <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
     <!-- [8] Load Order: 8 -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- תפריט ניקוי מטמון Stage B-Lite -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL Guard לבקרת טעינות -->
     <!-- [11] Load Order: 11 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
     <!-- [12] Load Order: 12 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
     <!-- [13] Load Order: 13 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
     <!-- [14] Load Order: 14 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
     <!-- [15] Load Order: 15 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [17] Load Order: 17 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [18] Load Order: 18 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
 
     <!-- =============================================================== -->
@@ -417,13 +529,17 @@
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [21] Page-specific: designs -->
+    <!-- [21] Page-specific: button-system-demo-core -->
+    <script src="scripts/button-system-demo-core.js?v=1.0.0"></script> <!-- דמו מרכזי למערכת הכפתורים -->
+    <!-- [22] Page-specific: button-color-checker -->
+    <script src="scripts/button-color-checker.js?v=1.0.0"></script> <!-- בדיקות צבע לכפתורים -->
+    <!-- [23] Page-specific: designs -->
     <script src="scripts/designs.js?v=1.0.0"></script> <!-- Page-specific script for designs -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 21 | Unique Scripts Loaded: 21 -->
+    <!-- 📊 Total Scripts Processed: 23 | Unique Scripts Loaded: 23 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("designs") -->
 </body>
 </html>

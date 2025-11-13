@@ -260,7 +260,7 @@ await window.resetToDefaults(); // איפוס לברירות מחדל
 ## 🎨 מערכת צבעים
 
 ### צבעי מערכת בסיסיים:
-- `primaryColor` - צבע ראשי (#007bff)
+- `primaryColor` - צבע ראשי (#26baac)
 - `secondaryColor` - צבע משני (#6c757d)
 - `successColor` - צבע הצלחה (#28a745)
 - `warningColor` - צבע אזהרה (#ffc107)
@@ -269,18 +269,23 @@ await window.resetToDefaults(); // איפוס לברירות מחדל
 ### צבעי ישויות:
 - `entityAccountColor` - צבע חשבונות (#28a745)
 - `entityTickerColor` - צבע מטבעות (#17a2b8)
-- `entityTradeColor` - צבע עסקאות (#007bff)
+- `entityTradeColor` - צבע עסקאות (#26baac)
 - `entityCashFlowColor` - צבע תזרים מזומנים (#20c997)
 - `entityCashFlowColorLight` - צבע בהיר לתזרים (#20c997)
 - `entityCashFlowColorDark` - צבע כהה לתזרים (#138496)
 
-### צבעי ערכים מספריים - **עדכון 11/01/2025: צבע אחד לכל item**
-- `valuePositiveColor` - צבע ערכים חיוביים (#28a745) ✅
-- `valueNegativeColor` - צבע ערכים שליליים (#dc3545) ✅
-- `valueNeutralColor` - צבע ערכים ניטרליים (#6c757d) ✅
-- ~~`valuePositiveColorLight/Dark`~~ - **הוסרו** (11/01/2025) - משתמשים ב-`color-mix()`
-- ~~`valueNegativeColorLight/Dark`~~ - **הוסרו** (11/01/2025) - משתמשים ב-`color-mix()`
-- ~~`valueNeutralColorLight/Dark`~~ - **הוסרו** (11/01/2025) - משתמשים ב-`color-mix()`
+### צבעי ערכים מספריים - **עדכון 11/2025: מחוברים ישירות ל־UI**
+- `valuePositiveColor` - ערכים חיוביים (Medium) – מזין את `--numeric-positive-medium` ואת `--color-success`.
+- `valuePositiveColorLight` / `valuePositiveColorDark` *(אופציונלי)* – אם מוגדרים ישמשו כרקע וערך כהה; אחרת המחלקה מחשבת גוונים אוטומטיים.
+- `valueNegativeColor` + Light/Dark – מקביל ל-`--numeric-negative-*` ומזין את `--color-danger`.
+- `valueNeutralColor` + Light/Dark – למצב ניטרלי (טבלאות/מצבים ללא שינוי).
+
+### צבעי סמנטיקה נגזרת (Success / Danger / Warning / Info)
+- `--color-success*` ← נגזר מצבעי valuePositive / successColor (כולל רקע/מסגרת).
+- `--color-danger*` ← נגזר מצבעי valueNegative / dangerColor.
+- `--color-warning*` ← נגזר מ־`warningColor` (או מחושב על בסיס הצבע הראשי בעתיד).
+- `--color-info*` ← נגזר מ־`infoColor` (fallback ל־`primaryColor`).
+- כל ההגדרות זמינות ב־CSS (`var(--color-success)`, `var(--color-warning-bg)` וכו׳) ומוזנות גם לרכיבי JS באמצעות `SMUIColorUtils`.
 
 ### 🆕 צבעי סטטוסים - **חדש 11/01/2025:**
 - `statusOpenColor` - צבע סטטוס פתוח (#28a745) 🟢

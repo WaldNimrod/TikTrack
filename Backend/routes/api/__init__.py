@@ -30,6 +30,7 @@ from .wal_management import wal_bp
 from .quality_check import bp as quality_check_bp
 from .account_activity import account_activity_bp
 from .positions import positions_bp, portfolio_bp
+from .tags import tags_bp
 
 # Base classes for unified API
 from .base_entity import BaseEntityAPI
@@ -75,6 +76,7 @@ __all__ = [
     'quality_check_bp',
     'positions_bp',
     'portfolio_bp',
+    'tags_bp',
     
     # Base classes
     'BaseEntityAPI',

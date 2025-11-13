@@ -48,7 +48,8 @@ const LOADING_ORDER = {
         'scripts/translation-utils.js',
         'scripts/date-utils.js',
         'scripts/linked-items.js',
-        'scripts/warning-system.js'
+        'scripts/warning-system.js',
+        'scripts/tag-ui-manager.js'
     ],
     
     // Legacy/Standalone files that are loaded before modules in some cases
@@ -71,7 +72,9 @@ const LOADING_ORDER = {
         'scripts/services/select-populator-service.js',
         'scripts/services/crud-response-handler.js',
         'scripts/services/default-value-setter.js',
-        'scripts/services/linked-items-service.js'
+        'scripts/services/linked-items-service.js',
+        'scripts/tag-events.js',
+        'scripts/services/tag-service.js'
     ],
     // Stage 3: UI Advanced - loadOrder: 3
     'ui-advanced': [
@@ -98,7 +101,8 @@ const LOADING_ORDER = {
     // Special: Modal Manager V2 (needs services)
     'modal': [
         'scripts/modal-manager-v2.js',
-        'scripts/modal-navigation-manager.js'
+        'scripts/modal-navigation-manager.js',
+        'scripts/tag-ui-manager.js'
     ],
     // Special: Unified App Initializer (needs everything)
     'initializer': [

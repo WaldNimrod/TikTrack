@@ -11,34 +11,71 @@
 
 ---
 
+## עדכון 2025-11 – סט מצב נוכחי
+
+- **נתוני מאסטר** – הסקריפט `Backend/migrations/seed_conditions_master_data.py` מזריע את טבלאות `trading_methods` ו-`method_parameters` כחלק מ־`Backend/scripts/create_clean_database.py`. כל סביבת בדיקות/פיתוח חייבת להריץ את הזרע הזה לפני בדיקות ידניות.
+- **שירותי תנאים** – משתמשים במיקבץ השירותים הכללי:
+  - `Backend/services/condition_evaluator.py` – שירות הערכה לכל התנאים הפעילים.
+  - `Backend/services/condition_evaluation_task.py` – משימת רקע המנהלת הערכות ומחזור חיי התראות.
+  - `Backend/services/condition_evaluation_service.py` – API סינכרוני להערכות נקודתיות.
+  - `Backend/services/conditions_validation_service.py` – אימות צד שרת.
+  - `Backend/services/alert_service.py` – ניהול התראות כולל שדות הקישור לתנאים (`plan_condition_id` / `trade_condition_id`).
+- **מודלים מעודכנים** – `Backend/models/alert.py`, `Backend/models/plan_condition.py`, `Backend/models/trade_condition.py`, ו-`Backend/models/trading_method.py` כוללים עמודות וקשרים חדשים (למשל `auto_generate_alerts`, `expiry_date`).
+- **בדיקות ליבה** – כל שינוי במערכת חייב ללוות בהרצת:
+  - `python3 -m pytest Backend/tests/test_conditions_master_data.py`
+  - `python3 -m pytest Backend/tests/test_condition_evaluation_task.py`
+- **פרונט אנד** – המערכת נשענת על שירותי הליבה הכלליים:
+  - `trading-ui/scripts/conditions/conditions-initializer.js`
+  - `trading-ui/scripts/conditions/conditions-crud-manager.js`
+  - `trading-ui/scripts/conditions/conditions-ui-manager.js`
+  - `trading-ui/scripts/conditions/conditions-modal-controller.js`
+  - `trading-ui/scripts/modal-configs/conditions-config.js`
+  - חיבור למערכות כלליות קיימות: `ModalManagerV2`, `ActionsMenuSystem`, `UnifiedAppInitializer`.
+
+---
+
 ## מבנה הפרויקט
 
 ### Backend Structure
 ```
 Backend/
+├── migrations/
+│   └── seed_conditions_master_data.py          # זרע נתוני שיטות ופרמטרים
 ├── models/
-│   ├── trading_method.py          # מודל שיטות מסחר
-│   └── plan_condition.py          # מודל תנאים
+│   ├── trading_method.py                       # מודל שיטות ופרמטרים
+│   ├── plan_condition.py                       # תנאי תכנית (כולל auto_generate_alerts)
+│   ├── trade_condition.py                      # תנאי טרייד (כולל auto_generate_alerts)
+│   └── alert.py                                # קשר ישיר לתנאים + expiry_date
 ├── routes/api/
-│   ├── trading_methods.py         # API endpoints לשיטות מסחר
-│   ├── plan_conditions.py         # API endpoints לתנאי תכניות
-│   └── trade_conditions.py        # API endpoints לתנאי טריידים
+│   ├── trading_methods.py                      # API שיטות מסחר + לוקליזציה
+│   ├── plan_conditions.py                      # CRUD לתנאי תכניות
+│   └── trade_conditions.py                     # CRUD לתנאי טריידים
 ├── services/
-│   ├── conditions_validation_service.py  # שירות ולידציה
-│   └── conditions_evaluation_service.py  # שירות הערכה
-└── migrations/
-    └── add_conditions_constraints.py     # migration script
+│   ├── condition_evaluator.py                  # הערכת תנאים פעילים
+│   ├── condition_evaluation_task.py            # משימת רקע ליצירת התראות
+│   ├── condition_evaluation_service.py         # API סינכרוני להערכה
+│   ├── conditions_validation_service.py        # שירות ולידציה (ג'ייסון/פרמטרים)
+│   └── alert_service.py                        # מחזור חיי התראות
+└── tests/
+    ├── test_conditions_master_data.py          # בדיקת זריעת נתוני מאסטר
+    └── test_condition_evaluation_task.py       # כיסוי משימת הרקע וההתראות
 ```
 
 ### Frontend Structure
 ```
 trading-ui/
 ├── scripts/conditions/
-│   ├── conditions-translations.js # תרגומים
-│   ├── condition-validator.js     # ולידציה קליינט
-│   └── condition-builder.js       # בונה תנאים
-└── styles-new/06-components/
-    └── _conditions-system.css     # עיצוב מערכת
+│   ├── conditions-initializer.js                # רישום למערכת האתחול
+│   ├── conditions-translations.js               # תרגומים ודיפוי מפתחות
+│   ├── conditions-validator.js                  # ולידציה בצד לקוח (שימוש במערכות כלליות)
+│   ├── condition-builder.js                     # בנאי טפסים (legacy – בשימוש פנימי)
+│   ├── conditions-form-generator.js             # יצירת טפסים דינמיים
+│   ├── conditions-crud-manager.js               # חיבור ל-API והטמעת cache
+│   ├── conditions-ui-manager.js                 # רינדור רשימה, כרטיסים וטפסים
+│   └── conditions-modal-controller.js           # גשר ל-ModalManagerV2
+├── scripts/modal-configs/conditions-config.js   # קונפיגורציית מודל תנאים
+├── scripts/page-initialization-configs.js       # הוספת החבילה לעמודים רלוונטיים
+└── scripts/init-system/package-manifest.js      # טעינת חבילת conditions במערכת האתחול
 ```
 
 ---
@@ -351,6 +388,42 @@ class ConditionsValidationService:
         finally:
             db.close()
 ```
+
+---
+
+### ניהול מחזור חיים – משימת רקע והתראות
+
+1. **ConditionEvaluator**  
+   - אחראי למשיכת כל התנאים הפעילים (תכניות וטריידים) והערכתם מול נתוני שוק (`MarketDataQuote`).  
+   - חשיפה: `ConditionEvaluator.evaluate_all_active_conditions()` מחזירה רשימת תוצאות לוגיות.
+
+2. **ConditionEvaluationTask**  
+   - ממוקם ב־`Backend/services/condition_evaluation_task.py`.  
+   - מייצר חיבור DB יחיד (באמצעות `get_db`), כולל שירות התראות.  
+   - עבור כל תוצאה:
+     - בודק `auto_generate_alerts`.  
+     - מפעיל `process_condition_alert_lifecycle` (יצירה/טריגר/ריאקטיבציה).  
+     - סופר סטטיסטיקות (`alerts_created`, `conditions_met`).  
+   - ניתן להריץ ידנית עבור QA:  
+     ```
+     python3 - <<'PY'
+     from Backend.services.condition_evaluation_task import condition_evaluation_task
+     print(condition_evaluation_task())
+     PY
+     ```
+
+3. **AlertService**  
+   - חייב להישען על המערכות הקיימות (CRUDResponseHandler וכו').  
+   - הפונקציות `get_alert_by_condition`, `create_or_update_alert_for_condition`, `reactivate_alert` הן הנקודה היחידה ליצירת התראות עבור תנאים.
+
+4. **Cooldown ואוטומציה**  
+   - ערך ברירת המחדל מתקבל מ־`PreferencesService` (`condition_alert_cooldown_minutes`).  
+   - לוגיקת הקירור קיימת בפונקציה `should_reactivate_alert` (מימוש ברירת המחדל ניתן להחלפה באמצעות העדפות).
+
+#### best practices
+- אין לעקוף את AlertService – גם בתסריטים מותאמים.  
+- בעת הוספת תנאי חדש, תמיד לעדכן את התיעוד ואת בדיקות ה־pytest.  
+- שימוש קבוע ב־`auto_generate_alerts` כדי לאפשר שליטה למשתמשים.
 
 ---
 

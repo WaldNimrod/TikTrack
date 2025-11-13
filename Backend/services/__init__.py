@@ -2,6 +2,7 @@ from .ticker_service import TickerService
 from .trading_account_service import TradingAccountService
 from .trade_service import TradeService
 from .trade_plan_service import TradePlanService
+from .trade_plan_matching_service import TradePlanMatchingService
 from .currency_service import CurrencyService
 from .advanced_cache_service import (
     AdvancedCacheService, 
@@ -28,6 +29,7 @@ __all__ = [
     'TradingAccountService', 
     'TradeService',
     'TradePlanService',
+    'TradePlanMatchingService',
     'CurrencyService',
     'AdvancedCacheService',
     'advanced_cache_service',

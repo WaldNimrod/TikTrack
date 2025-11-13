@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.0.7.0",
+    "version": "1.1.0.0",
     "major": 1,
-    "minor": 0,
-    "patch": 7,
+    "minor": 1,
+    "patch": 0,
     "build": 0,
-    "commit": "a543d9141104085540f0e8c81ba79fdf2daa1310",
-    "updated_at": "2025-11-11T09:02:07+00:00",
-    "notes": "Sync production environment configuration"
+    "commit": "dd74aa6c8b7bface5f3b8bbe2e6f560cd9f8a56f",
+    "updated_at": "2025-11-13T12:05:28+00:00",
+    "notes": "Promote production baseline after stability overhaul"
   },
   "development": {
-    "version": "1.0.7.0",
+    "version": "1.0.23.0",
     "major": 1,
     "minor": 0,
-    "patch": 7,
+    "patch": 23,
     "build": 0,
-    "commit": "5ff43ef8ae692a1622a83666d6947ced000802b5",
-    "updated_at": "2025-11-11T01:47:48+00:00",
-    "notes": "Sync local update batch"
+    "commit": "be867cf327ed507677ede7e586b10e4f64221acc",
+    "updated_at": "2025-11-12T22:59:09+00:00",
+    "notes": "Fix data import navigation and dates"
   }
 }

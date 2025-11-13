@@ -161,7 +161,7 @@
       }
     },
     "entities": {
-      "trade": "#007bff",
+      "trade": "#26baac",
       "tradePlan": "#0056b3",
       "account": "#28a745",
       "cashFlow": "#20c997",
@@ -196,10 +196,10 @@
     },
     "investmentTypes": {
       "swing": {
-        "light": "rgba(0, 123, 255, 0.1)",
-        "medium": "#007bff",
-        "dark": "#0056b3",
-        "border": "rgba(0, 123, 255, 0.3)"
+        "light": "rgba(38, 186, 172, 0.1)",
+        "medium": "#26baac",
+        "dark": "#1a8f83",
+        "border": "rgba(38, 186, 172, 0.3)"
       },
       "investment": {
         "light": "rgba(40, 167, 69, 0.1)",

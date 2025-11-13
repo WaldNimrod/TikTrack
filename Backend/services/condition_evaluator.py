@@ -91,16 +91,26 @@ class ConditionEvaluator:
             # Evaluate based on method type
             evaluation_result = self._evaluate_by_method(condition, method, market_data)
             
+            condition_type = 'plan' if isinstance(condition, PlanCondition) else 'trade'
+            plan_id = None
+            trade_id = None
+            if condition_type == 'plan':
+                plan_id = getattr(condition, 'trade_plan_id', None)
+            else:
+                trade_id = getattr(condition, 'trade_id', None)
+
             return {
                 'condition_id': condition.id,
-                'condition_type': 'plan' if isinstance(condition, PlanCondition) else 'trade',
+                'condition_type': condition_type,
                 'method_id': method.id,
                 'method_name': method.name_en,
                 'met': evaluation_result['met'],
                 'evaluation_time': datetime.now(timezone.utc).isoformat(),
                 'details': evaluation_result['details'],
                 'ticker_id': ticker_id,
-                'current_price': market_data.get('price', 0)
+                'current_price': market_data.get('price', 0),
+                'plan_id': plan_id,
+                'trade_id': trade_id
             }
             
         except Exception as e:

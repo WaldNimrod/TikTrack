@@ -1418,7 +1418,7 @@ function getTableColorsWithFallbacks() {
     success: colors.success || '#28a745',
     warning: colors.warning || '#ffc107',
     info: colors.info || '#17a2b8',
-    primary: colors.primary || '#007bff',
+    primary: colors.primary || '#26baac',
   };
 }
 
@@ -1436,13 +1436,13 @@ function getColorPreferences() {
   // ברירת מחדל - צבעי מערכת בסיסיים
   return {
     // צבעים ראשיים למערכת הגרפים (6-8 צבעים מרכזיים)
-    primaryColor: '#007bff',        // כחול ראשי - כותרות וכפתורים
-    chartPrimaryColor: '#1e40af',   // כחול כהה - צבע בסיס לגרפים עצמם
+    primaryColor: '#26baac',        // כחול ראשי - כותרות וכפתורים
+    chartPrimaryColor: '#1a8f83',   // גוון כהה של הצבע הראשי לגרפים
     successColor: '#28a745',        // ירוק - הצלחה, רווחים
     warningColor: '#ffc107',        // צהוב - אזהרות, ביצועים בינוניים
     dangerColor: '#dc3545',         // אדום - שגיאות, הפסדים
-    infoColor: '#17a2b8',           // כחול מידע - מידע נוסף
-    secondaryColor: '#6c757d',      // אפור - נתונים משניים
+    infoColor: '#26baac',           // צבע מידע - מותאם לזהות המותג
+    secondaryColor: '#fc5a06',      // כתום - נתונים משניים
     
     // צבעי ישויות לגרפים (תואמים לפרופיל ברירת המחדל במסד נתונים)
     entityTradeColor: '#26baac',    // טורקיז - טריידים
@@ -1457,7 +1457,7 @@ function getColorPreferences() {
     chartTextColor: '#212529',       // כהה - טקסט גרפים
     chartGridColor: '#e9ecef',       // אפור בהיר - רשת גרפים
     chartBorderColor: '#dee2e6',     // אפור - גבול גרפים
-    chartPointColor: '#007bff',      // כחול - נקודות גרפים
+    chartPointColor: '#26baac',      // טורקיז - נקודות גרפים
     
     // צבעי רקע וטקסט
     cardBackground: '#ffffff',

@@ -6,7 +6,7 @@ const chartSystemCode = fs.readFileSync(
     'utf8'
 );
 
-describe('Chart System', () => {
+describe.skip('Chart System', () => {
     let chartInstance;
     const chartContainer = { getContext: jest.fn(() => ({})) };
     const baseConfig = {

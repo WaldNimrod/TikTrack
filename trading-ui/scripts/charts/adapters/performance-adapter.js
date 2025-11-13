@@ -67,7 +67,7 @@ class PerformanceAdapter {
             warning: window.getChartColor('warning'),
             danger: window.getChartColor('danger')
         } : {
-            primary: '#007bff',
+            primary: '#26baac',
             success: '#28a745',
             warning: '#ffc107',
             danger: '#dc3545'

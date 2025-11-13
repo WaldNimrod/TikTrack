@@ -16,6 +16,9 @@ from .trading_method import TradingMethod, MethodParameter
 from .plan_condition import PlanCondition, ConditionAlertMapping
 from .trade_condition import TradeCondition
 from .import_session import ImportSession
+from .tag_category import TagCategory
+from .tag import Tag
+from .tag_link import TagLink
 
 __all__ = [
     'BaseModel',
@@ -43,5 +46,8 @@ __all__ = [
     'PlanCondition',
     'TradeCondition',
     'ConditionAlertMapping',
-    'ImportSession'
+    'ImportSession',
+    'TagCategory',
+    'Tag',
+    'TagLink'
 ]

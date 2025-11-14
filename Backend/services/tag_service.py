@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import re
 from datetime import datetime, timedelta
-from typing import Dict, Iterable, List, Optional, Sequence, Set
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -374,6 +374,35 @@ class TagService:
         logger.info("Removed tag %s from %s:%s", tag_id, entity_type, entity_id)
         return True
 
+    @staticmethod
+    def remove_all_tags_for_entity(db: Session, entity_type: str, entity_id: int) -> int:
+        """Remove all tag associations for the specified entity."""
+        TagService._validate_entity_type(entity_type)
+        deleted = (
+            db.query(TagLink)
+            .filter(
+                TagLink.entity_type == entity_type,
+                TagLink.entity_id == entity_id,
+            )
+            .delete(synchronize_session=False)
+        )
+        if deleted:
+            logger.info("Removed %s tag links for %s:%s", deleted, entity_type, entity_id)
+        return deleted
+
+    @staticmethod
+    def remove_all_tags_for_type(db: Session, entity_type: str) -> int:
+        """Remove all tag associations for a given entity type."""
+        TagService._validate_entity_type(entity_type)
+        deleted = (
+            db.query(TagLink)
+            .filter(TagLink.entity_type == entity_type)
+            .delete(synchronize_session=False)
+        )
+        if deleted:
+            logger.info("Removed %s tag links for entity type %s", deleted, entity_type)
+        return deleted
+
     # --------------------------------------------------------------------- #
     # Suggestions & Analytics
     # --------------------------------------------------------------------- #
@@ -498,6 +527,65 @@ class TagService:
             "usage": usage,
         }
 
+    @staticmethod
+    def get_tag_usage(
+        db: Session, user_id: int, tag_id: int, *, limit: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Return entities associated with a specific tag for the active user.
+        """
+        tag = (
+            db.query(Tag)
+            .filter(Tag.id == tag_id, Tag.user_id == user_id)
+            .first()
+        )
+        if not tag:
+            raise ValueError("Tag not found for user")
+
+        total_links = (
+            db.query(func.count(TagLink.id))
+            .filter(TagLink.tag_id == tag_id)
+            .scalar()
+            or 0
+        )
+
+        query = (
+            db.query(
+                TagLink.id.label("tag_link_id"),
+                TagLink.entity_type,
+                TagLink.entity_id,
+                TagLink.created_at,
+                TagLink.updated_at,
+            )
+            .filter(TagLink.tag_id == tag_id)
+            .order_by(TagLink.created_at.desc())
+        )
+
+        if limit:
+            query = query.limit(limit)
+
+        rows = query.all()
+
+        entities: List[Dict[str, Any]] = []
+        for row in rows:
+            entities.append(
+                {
+                    "tag_link_id": row.tag_link_id,
+                    "entity_type": row.entity_type,
+                    "entity_id": row.entity_id,
+                    "linked_at": row.created_at,
+                    "created_at": row.created_at,
+                    "updated_at": row.updated_at,
+                }
+            )
+
+        return {
+            "tag": tag,
+            "entities": entities,
+            "total_entities": total_links,
+            "returned_entities": len(entities),
+        }
+
     # --------------------------------------------------------------------- #
     # Internal Helpers
     # --------------------------------------------------------------------- #
@@ -510,7 +598,19 @@ class TagService:
 
     @staticmethod
     def _slugify(name: str) -> str:
-        slug = re.sub(r"[^a-zA-Z0-9]+", "-", name.strip().lower()).strip("-")
+        """
+        Generate a slug that preserves non-ASCII characters (e.g. Hebrew) so that
+        different Unicode names don't collapse into the same empty slug.
+        """
+        normalized = name.strip().lower()
+        slug = re.sub(r"\s+", "-", normalized, flags=re.UNICODE)
+        slug = re.sub(r"[^\w\-]", "", slug, flags=re.UNICODE)
+        slug = re.sub(r"-{2,}", "-", slug).strip("-")
+
+        if not slug:
+            # Use punycode fallback to create deterministic ASCII slug
+            slug = normalized.encode("punycode").decode("ascii")
+
         return slug[:120]
 
     @staticmethod
@@ -557,8 +657,14 @@ class TagService:
         for tag_id in tag_ids:
             if tag_id is None:
                 continue
-            if not isinstance(tag_id, int):
+            if isinstance(tag_id, bool):
+                # Guard against booleans (subclass of int) sneaking in
                 raise ValueError("Tag IDs must be integers")
+            if not isinstance(tag_id, int):
+                try:
+                    tag_id = int(tag_id)
+                except (TypeError, ValueError):
+                    raise ValueError("Tag IDs must be integers") from None
             normalized.add(tag_id)
         return normalized
 

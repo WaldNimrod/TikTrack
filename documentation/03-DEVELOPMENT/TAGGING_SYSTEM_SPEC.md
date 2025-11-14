@@ -53,7 +53,7 @@
   - Unique constraints: `(user_id, lower(name))`.
 - `tags`:
   - Columns: id (PK), user_id, category_id (FK), name (varchar 100), slug (varchar 120), description (text), is_active (bool), usage_count (int default 0), last_used_at (datetime), created_at, updated_at.
-  - Unique constraints: `(user_id, lower(name))`, `(user_id, lower(slug))`.
+  - Unique constraints: `(user_id, lower(name))`, `(user_id, lower(slug))`. Slug generation שומר תווי Unicode (כולל עברית) ומספק fallback של punycode כדי למנוע התנגשות של שמות שאינם לטיניים.
 - `tag_links`:
   - Columns: id (PK), tag_id (FK), entity_type (varchar 40), entity_id (int), created_at, created_by (int).
   - Unique constraint: `(tag_id, entity_type, entity_id)`.
@@ -63,12 +63,13 @@
 - Category CRUD with ordering and cascading toggle of `is_active`.
 - Tag CRUD with slug auto-generation, validation, suggestion counters.
 - Assignment APIs (`assign_tags`, `remove_tags`, `replace_tags`).
+- Deletion helpers (`remove_all_tags_for_entity`, `remove_all_tags_for_type`) invoked before entity removals and bulk wipes to prevent orphaned tag links.
 - Analytics helpers (compute top tags per entity, fetch recently used).
 - Cache invalidation via `CacheSyncManager.invalidate_entity(entity_type, entity_id)`.
 
 ### 5.3 Validation Rules
 - No duplicate names per user (case-insensitive).
-- Max length 100 chars for names, slug generated via sanitized dash-case.
+- Max length 100 chars for names; slug generator שומר תווי Unicode, ממיר רווחים למקפים ומפעיל fallback של punycode כדי למנוע התנגשות ברגע שמות אינם לטיניים.
 - Allowed entity types enumerated constant ensuring eight entities only.
 - Bulk operations limited to 100 entries; reject duplicates before DB hit.
 - Foreign key-like checks implemented manually (user ownership matches).
@@ -78,7 +79,7 @@
 - `tag-service.js`:
   - Methods: `fetchCategories`, `fetchTags`, `createOrUpdateTag`, `assignTags`, `removeTags`, `getSuggestions`, `invalidateCache`.
   - Uses `UnifiedCacheManager` for caching & TTL.
-  - Emits structured errors for `CRUDResponseHandler`.
+  - מספק `formatTagErrorMessage`, מעדכן Analytics (usage/leaderboard), ופולט שגיאות עקביות עבור `CRUDResponseHandler`.
 - `tag-ui-manager.js`:
   - Controls multi-select component, inline creation, keyboard navigation, chip rendering.
   - Integrates with `SelectPopulatorService` for shared select logic.
@@ -87,7 +88,7 @@
 
 ### 6.2 UI Components
 - Tag Management Page:
-  - Two UnifiedTableSystem tables (Categories, Tags).
+  - Two UnifiedTableSystem tables (Categories, Tags) עם עמודת “Actions” המציגה כפתורי עריכה/מחיקה אחידים (ButtonSystem) לכל רשומה.
   - ModalManagerV2 configs (`tag-category-modal`, `tag-modal`) stored under `modal-configs/`.
   - Analytics summary section (top tags, total tags, orphan tags).
 - Tag Picker:
@@ -129,6 +130,7 @@
 ---
 
 *Prepared: November 2025 – TikTrack Development Team.*
+
 
 
 

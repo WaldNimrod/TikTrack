@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.25.0",
+    "version": "1.0.26.0",
     "major": 1,
     "minor": 0,
-    "patch": 25,
+    "patch": 26,
     "build": 0,
-    "commit": "a79537f7a21b7f45f1f5e75e502f869b842855ed",
-    "updated_at": "2025-11-14T13:48:39+00:00",
-    "notes": "Align trade data services and fix preferences version endpoint"
+    "commit": "00f790d4813722288f09f1de9a83dd6341248d04",
+    "updated_at": "2025-11-14T13:53:10+00:00",
+    "notes": "Allow Unicode tag slugs and expose tag action buttons"
   }
 }

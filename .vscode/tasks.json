@@ -7,7 +7,7 @@
         {
             "label": "TT: Start Server",
             "type": "shell",
-            "command": "cd Backend && python3 app.py",
+            "command": "./start_server.sh",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -29,7 +29,7 @@
         {
             "label": "TT: Start Server (Dev Mode)",
             "type": "shell",
-            "command": "cd Backend && TIKTRACK_DEV_MODE=true python3 app.py",
+            "command": "TIKTRACK_DEV_MODE=true ./start_server.sh",
             "group": "build",
             "presentation": {
                 "reveal": "always",
@@ -48,7 +48,7 @@
         {
             "label": "TT: Start Server (No Cache)",
             "type": "shell",
-            "command": "cd Backend && TIKTRACK_CACHE_DISABLED=true python3 app.py",
+            "command": "TIKTRACK_CACHE_DISABLED=true ./start_server.sh",
             "group": "build",
             "presentation": {
                 "reveal": "always",
@@ -86,7 +86,7 @@
         {
             "label": "TT: Restart Server",
             "type": "shell",
-            "command": "lsof -ti :8080 | xargs kill -9 2>/dev/null || true; sleep 1; cd Backend && python3 app.py",
+            "command": "lsof -ti :8080 | xargs kill -9 2>/dev/null || true; sleep 1; ./start_server.sh",
             "group": "build",
             "presentation": {
                 "reveal": "always",
@@ -535,7 +535,7 @@
         {
             "label": "TT: Quick Start + Monitor",
             "type": "shell",
-            "command": "cd Backend && python3 app.py & sleep 3 && open http://localhost:8080/server-monitor",
+            "command": "./start_server.sh && sleep 3 && open http://localhost:8080/server-monitor",
             "group": "build",
             "presentation": {
                 "reveal": "always",
@@ -619,7 +619,7 @@
         {
             "label": "TT: Start Production Server",
             "type": "shell",
-            "command": "cd production/Backend && python3 app.py",
+            "command": "./start_server.sh --env production",
             "group": "build",
             "presentation": {
                 "reveal": "always",
@@ -676,7 +676,7 @@
         {
             "label": "TT: Restart Production Server",
             "type": "shell",
-            "command": "lsof -ti :5001 | xargs kill -9 2>/dev/null || true; sleep 1; cd production/Backend && python3 app.py",
+            "command": "lsof -ti :5001 | xargs kill -9 2>/dev/null || true; sleep 1; ./start_server.sh --env production",
             "group": "build",
             "presentation": {
                 "reveal": "always",

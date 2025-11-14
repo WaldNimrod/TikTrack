@@ -16,3 +16,5 @@ This log records every production version update, including manual major/minor a
 | 2025-11-11T09:02:07+00:00 | 1.0.7.0 | 1.0.6.0 | a543d9141104085540f0e8c81ba79fdf2daa1310 | 842bf100763cc766c266d88db208b1626cb7eec5 | patch | Sync production environment configuration |
 | 2025-11-13T12:05:28+00:00 | 1.1.0.0 | 1.0.7.0 | dd74aa6c8b7bface5f3b8bbe2e6f560cd9f8a56f | a543d9141104085540f0e8c81ba79fdf2daa1310 | set | Promote production baseline after stability overhaul |
 | 2025-11-13T17:37:55+00:00 | 1.1.0.0 | 1.1.0.0 | 0187db4b35a732e55f6d84b8f4420bcd063b1ce2 | dd74aa6c8b7bface5f3b8bbe2e6f560cd9f8a56f | set | Finalize production isolation and DB alignment |
+| 2025-11-13T19:49:25+00:00 | 1.1.1.0 | 1.1.0.0 | 879589ab4605cc5529c1675e1c855414d51aa911 | 0187db4b35a732e55f6d84b8f4420bcd063b1ce2 | patch | Full release sync 2025-11-13 |
+| 2025-11-14T20:14:54+00:00 | 1.1.2.0 | 1.1.1.0 | 879589ab4605cc5529c1675e1c855414d51aa911 | 879589ab4605cc5529c1675e1c855414d51aa911 | patch | Improve server startup flow |

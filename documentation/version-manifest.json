@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.0.0",
+    "version": "1.1.2.0",
     "major": 1,
     "minor": 1,
-    "patch": 0,
+    "patch": 2,
     "build": 0,
-    "commit": "0187db4b35a732e55f6d84b8f4420bcd063b1ce2",
-    "updated_at": "2025-11-13T17:37:55+00:00",
-    "notes": "Finalize production isolation and DB alignment"
+    "commit": "879589ab4605cc5529c1675e1c855414d51aa911",
+    "updated_at": "2025-11-14T20:14:54+00:00",
+    "notes": "Improve server startup flow"
   },
   "development": {
     "version": "1.0.23.0",

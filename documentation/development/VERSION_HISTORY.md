@@ -42,3 +42,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-14T21:32:09+00:00 | 1.0.32.0 | 1.0.31.0 | 45e298f030000987077cbdde4cbe92111ecf5fd2 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | patch | Home tag widgets and smart suggestions |
 | 2025-11-14T22:18:29+00:00 | 1.0.33.0 | 1.0.32.0 | f7fd7213d0f16d60b4a9892540633a8e30fb41bc | 45e298f030000987077cbdde4cbe92111ecf5fd2 | patch | Polish tag widgets styling |
 | 2025-11-14T22:31:18+00:00 | 1.0.34.0 | 1.0.33.0 | 25696b0a38eb895c5eaf5f7e0f4ad73d24c36010 | f7fd7213d0f16d60b4a9892540633a8e30fb41bc | patch | Document conditions improvements and RTL buttons |
+| 2025-11-14T22:34:53+00:00 | 1.0.35.0 | 1.0.34.0 | a6e7aa81f22dcc7d1bae7d6f6127265ba8441d6c | 25696b0a38eb895c5eaf5f7e0f4ad73d24c36010 | patch | Load tag UI manager on trading accounts page |

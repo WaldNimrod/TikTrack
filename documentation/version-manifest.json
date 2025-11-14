@@ -10,13 +10,13 @@
     "notes": "Sync local updates before release"
   },
   "development": {
-    "version": "1.0.34.0",
+    "version": "1.0.35.0",
     "major": 1,
     "minor": 0,
-    "patch": 34,
+    "patch": 35,
     "build": 0,
-    "commit": "25696b0a38eb895c5eaf5f7e0f4ad73d24c36010",
-    "updated_at": "2025-11-14T22:31:18+00:00",
-    "notes": "Document conditions improvements and RTL buttons"
+    "commit": "a6e7aa81f22dcc7d1bae7d6f6127265ba8441d6c",
+    "updated_at": "2025-11-14T22:34:53+00:00",
+    "notes": "Load tag UI manager on trading accounts page"
   }
 }

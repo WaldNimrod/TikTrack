@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional
 
-LOG_DIR = Path("logs")  # Production logs stay inside production/Backend/logs
+LOG_DIR = Path("logs")
 
 
 def setup_logging() -> logging.Logger:
@@ -50,7 +50,7 @@ def setup_logging() -> logging.Logger:
     error_handler.setFormatter(log_format)
     logger.addHandler(error_handler)
     
-    # SQL queries log (only enabled if explicit env variable for debugging)
+    # SQL queries log (only when explicitly enabled)
     if os.getenv('TIKTRACK_SQL_DEBUG') == '1':
         sql_logger = logging.getLogger('sqlalchemy.engine')
         sql_logger.setLevel(logging.INFO)

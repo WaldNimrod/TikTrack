@@ -11,11 +11,60 @@ from typing import Dict, Any
 from models.trading_method import TradingMethod, MethodParameter
 from services.conditions_validation_service import ConditionsValidationService
 from config.database import get_db
+from services.trading_methods_seed_data import METHODS_DEFINITION
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 trading_methods_bp = Blueprint('trading_methods', __name__, url_prefix='/api/trading-methods')
+
+def _seed_trading_methods_if_empty(db_session) -> bool:
+    """Ensure trading methods master data exists"""
+    existing_count = db_session.query(TradingMethod).count()
+    if existing_count > 0:
+        return False
+
+    timestamp = datetime.utcnow()
+    for method_def in METHODS_DEFINITION:
+        method = TradingMethod(
+            name_en=method_def['name_en'],
+            name_he=method_def['name_he'],
+            category=method_def['category'],
+            description_en=method_def.get('description_en'),
+            description_he=method_def.get('description_he'),
+            icon_class=method_def.get('icon_class'),
+            is_active=True,
+            sort_order=method_def.get('sort_order', 0),
+        )
+        method.created_at = timestamp
+        method.updated_at = timestamp
+        db_session.add(method)
+        db_session.flush()
+
+        for param_def in method_def.get('parameters', []):
+            parameter = MethodParameter(
+                method_id=method.id,
+                parameter_key=param_def['parameter_key'],
+                parameter_name_en=param_def['parameter_name_en'],
+                parameter_name_he=param_def['parameter_name_he'],
+                parameter_type=param_def['parameter_type'],
+                default_value=param_def.get('default_value'),
+                min_value=param_def.get('min_value'),
+                max_value=param_def.get('max_value'),
+                validation_rule=param_def.get('validation_rule'),
+                is_required=param_def.get('is_required', True),
+                sort_order=param_def.get('sort_order', 0),
+                help_text_en=param_def.get('help_text_en'),
+                help_text_he=param_def.get('help_text_he'),
+            )
+            parameter.created_at = timestamp
+            parameter.updated_at = timestamp
+            db_session.add(parameter)
+
+    db_session.commit()
+    logger.info("Seeded trading methods master data (auto-recovery)")
+    return True
+
 
 @trading_methods_bp.route('/', methods=['GET'])
 def get_trading_methods():
@@ -43,6 +92,11 @@ def get_trading_methods():
             query = query.order_by(TradingMethod.sort_order, TradingMethod.name_en)
             
             methods = query.all()
+
+            if not methods:
+                seeded = _seed_trading_methods_if_empty(db_session)
+                if seeded:
+                    methods = query.all()
             
             # Convert to dictionary
             result = []
@@ -142,7 +196,7 @@ def get_categories():
                 result.append({
                     'value': category,
                     'display_name': category_display.get(category, category.title()),
-                    'display_name_he': self._get_category_hebrew_name(category)
+                    'display_name_he': _get_category_hebrew_name(category)
                 })
             
             return jsonify({

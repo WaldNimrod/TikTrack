@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.2.0.1",
+    "version": "1.2.1.0",
     "major": 1,
     "minor": 2,
-    "patch": 0,
-    "build": 1,
-    "commit": "b2b958eb3229f28afbb7c111f214f31bd11c40b0",
-    "updated_at": "2025-11-14T21:26:21+00:00",
-    "notes": "Fix production server import path"
+    "patch": 1,
+    "build": 0,
+    "commit": "6569933b32527b065aadf2f3b76243be6339302f",
+    "updated_at": "2025-11-14T23:14:46+00:00",
+    "notes": "Release 2025-11-14 main sync"
   },
   "development": {
     "version": "1.0.23.0",

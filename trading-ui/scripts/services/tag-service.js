@@ -11,9 +11,10 @@
  *
  * Function Index:
  * - fetchCategories, createCategory, updateCategory, deleteCategory
- * - fetchTags, createTag, updateTag, deleteTag
- * - loadEntityTags, replaceEntityTags, removeTagFromEntity
- * - getSuggestions, invalidateEntity, clearCache
+     * - fetchTags, createTag, updateTag, deleteTag
+     * - loadEntityTags, replaceEntityTags, removeTagFromEntity
+     * - getSuggestions, getTagCloudData, searchTags, getSmartSuggestions
+     * - invalidateEntity, clearCache
  */
 
 (function tagServiceFactory() {
@@ -23,8 +24,12 @@
         analytics: 'tags:analytics',
         tags: (categoryId = 'all') => `tags:list:${categoryId}`,
         entity: (entityType, entityId) => `tags:entity:${entityType}:${entityId}`,
-        suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`
+        suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`,
+        cloud: 'tags:cloud',
+        smartSuggestions: (entityType = 'all', entityId = 'all') => `tags:smart:${entityType}:${entityId}`
     };
+    const SEARCH_CACHE = new Map();
+    const SEARCH_CACHE_TTL = 60 * 1000;
 
     /**
      * Generic fetch helper with unified error handling.
@@ -353,11 +358,88 @@
         return analytics;
     }
 
+    async function getTagCloudData({ force = false, limit = 50 } = {}) {
+        const cacheKey = CACHE_KEYS.cloud;
+        if (!force) {
+            const cached = await getCached(cacheKey);
+            if (cached) {
+                return cached;
+            }
+        }
+
+        const params = new URLSearchParams();
+        if (limit) {
+            params.set('limit', String(limit));
+        }
+
+        const data = await requestJSON(`${API_BASE}/cloud?${params.toString()}`);
+        await setCached(cacheKey, data);
+        return data;
+    }
+
+    async function searchTags({ query, entityType = null, limit = 25, includeInactive = false } = {}) {
+        const sanitized = (query || '').trim();
+        if (sanitized.length < 2) {
+            throw new Error('יש להזין לפחות שני תווים לחיפוש תגיות');
+        }
+
+        const cacheKey = `search:${sanitized}:${entityType ?? 'all'}:${limit}:${includeInactive ? '1' : '0'}`;
+        const now = Date.now();
+        const cachedEntry = SEARCH_CACHE.get(cacheKey);
+        if (cachedEntry && now - cachedEntry.timestamp < SEARCH_CACHE_TTL) {
+            return cachedEntry.data;
+        }
+
+        const params = new URLSearchParams({ query: sanitized });
+        if (entityType) {
+            params.set('entity_type', entityType);
+        }
+        if (limit) {
+            params.set('limit', String(limit));
+        }
+        if (includeInactive) {
+            params.set('include_inactive', 'true');
+        }
+
+        const data = await requestJSON(`${API_BASE}/search?${params.toString()}`);
+        SEARCH_CACHE.set(cacheKey, { data, timestamp: now });
+        return data;
+    }
+
+    async function getSmartSuggestions({ entityType = null, entityId = null, limit = 6, force = false } = {}) {
+        const cacheKey = CACHE_KEYS.smartSuggestions(entityType ?? 'all', entityId ?? 'all');
+        if (!force) {
+            const cached = await getCached(cacheKey);
+            if (cached) {
+                return cached;
+            }
+        }
+
+        const params = new URLSearchParams();
+        if (entityType) {
+            params.set('entity_type', entityType);
+        }
+        if (entityId) {
+            params.set('entity_id', String(entityId));
+        }
+        if (limit) {
+            params.set('limit', String(limit));
+        }
+
+        const data = await requestJSON(`${API_BASE}/aggregations/suggestions?${params.toString()}`);
+        await setCached(cacheKey, data);
+        return data;
+    }
+
     async function invalidateEntity(entityType, entityId) {
         await removeCached(CACHE_KEYS.entity(entityType, entityId));
         await removeCached(CACHE_KEYS.tags('all'));
         await removeCached(CACHE_KEYS.suggestions('all'));
         await removeCached(CACHE_KEYS.suggestions(entityType));
+        await removeCached(CACHE_KEYS.cloud);
+        await removeCached(CACHE_KEYS.smartSuggestions('all', 'all'));
+        await removeCached(CACHE_KEYS.smartSuggestions(entityType || 'all', entityId || 'all'));
+        SEARCH_CACHE.clear();
         await removeCached(CACHE_KEYS.analytics);
     }
 
@@ -380,8 +462,11 @@
         replaceEntityTags,
         removeTagFromEntity,
         getSuggestions,
+        getSmartSuggestions,
         getTagUsage,
         getAnalytics,
+        getTagCloudData,
+        searchTags,
         invalidateEntity,
         clearCache,
         normalizeTagIds,

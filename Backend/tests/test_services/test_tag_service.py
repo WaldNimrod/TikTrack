@@ -13,10 +13,16 @@ from unittest.mock import MagicMock
 import os
 import sys
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
 from services.tag_service import TagService  # noqa: E402
 from models.tag_link import TagLink  # noqa: E402
+from models.tag import Tag  # noqa: E402
+from models.tag_category import TagCategory  # noqa: E402
+from models.base import Base  # noqa: E402
 
 
 class TestTagServiceNormalization(unittest.TestCase):
@@ -87,6 +93,93 @@ class TestTagServiceSlugify(unittest.TestCase):
         slug = TagService._slugify("🍕🍕")
         self.assertTrue(slug)
         self.assertEqual(slug, "vi8ha")
+
+
+class TestTagServiceAggregations(unittest.TestCase):
+    """Integration-style tests for aggregation helpers using in-memory SQLite."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = create_engine("sqlite:///:memory:")
+        cls.SessionLocal = sessionmaker(bind=cls.engine)
+
+    def setUp(self):
+        Base.metadata.drop_all(self.engine, checkfirst=True)
+        Base.metadata.create_all(self.engine)
+        self.session = self.SessionLocal()
+        self._seed_data()
+
+    def tearDown(self):
+        self.session.close()
+
+    def _seed_data(self):
+        category = TagCategory(user_id=1, name="אסטרטגיות", color_hex="#26baac")
+        self.session.add(category)
+        self.session.flush()
+
+        self.breakout_tag = Tag(
+            user_id=1,
+            category_id=category.id,
+            name="Breakout",
+            slug="breakout",
+            usage_count=5,
+        )
+        self.trend_tag = Tag(
+            user_id=1,
+            category_id=category.id,
+            name="Trend Following",
+            slug="trend-following",
+            usage_count=3,
+        )
+        self.recent_tag = Tag(
+            user_id=1,
+            category_id=category.id,
+            name="Recent Pick",
+            slug="recent-pick",
+            usage_count=1,
+        )
+        self.session.add_all([self.breakout_tag, self.trend_tag, self.recent_tag])
+        self.session.flush()
+
+        links = [
+            TagLink(tag_id=self.breakout_tag.id, entity_type="trade_plan", entity_id=101),
+            TagLink(tag_id=self.breakout_tag.id, entity_type="trade_plan", entity_id=102),
+            TagLink(tag_id=self.trend_tag.id, entity_type="trade", entity_id=201),
+            TagLink(tag_id=self.recent_tag.id, entity_type="trade_plan", entity_id=103),
+        ]
+        self.session.add_all(links)
+        self.session.commit()
+
+    def test_get_tag_cloud_returns_usage_data(self):
+        cloud = TagService.get_tag_cloud_data(self.session, user_id=1, limit=10)
+        self.assertEqual(len(cloud), 3)
+        self.assertEqual(cloud[0]["name"], "Breakout")
+        self.assertEqual(cloud[0]["usage_count"], 5)
+        self.assertEqual(cloud[0]["category_name"], "אסטרטגיות")
+
+    def test_search_tags_enforces_minimum_length(self):
+        with self.assertRaises(ValueError):
+            TagService.search_tags(self.session, user_id=1, query="ב")
+
+    def test_search_tags_returns_assignments(self):
+        results = TagService.search_tags(self.session, user_id=1, query="Break")
+        self.assertTrue(results)
+        first_entry = results[0]
+        self.assertEqual(first_entry["tag"]["name"], "Breakout")
+        self.assertGreaterEqual(len(first_entry["assignments"]), 1)
+
+    def test_get_smart_suggestions_by_entity(self):
+        payload = TagService.get_smart_suggestions(
+            self.session,
+            user_id=1,
+            entity_type="trade_plan",
+            entity_id=101,
+            limit=3,
+        )
+        self.assertIn("top_entity_tags", payload)
+        self.assertTrue(payload["top_entity_tags"])
+        self.assertIn("recent_tags", payload)
+        self.assertTrue(payload["recent_tags"])
 
 
 if __name__ == '__main__':

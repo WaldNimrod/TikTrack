@@ -16,7 +16,7 @@ import re
 from datetime import datetime, timedelta
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from models import TagCategory, Tag, TagLink
@@ -28,7 +28,8 @@ logger = logging.getLogger(__name__)
 # get_categories, create_category, update_category, delete_category
 # get_tags, create_tag, update_tag, delete_tag
 # get_tags_for_entity, replace_tags_for_entity, remove_tag_from_entity
-# get_suggestions and internal validation helpers
+# get_suggestions, get_tag_cloud_data, search_tags, get_smart_suggestions
+# and internal validation helpers
 
 
 SUPPORTED_ENTITY_TYPES: Set[str] = {
@@ -617,6 +618,243 @@ class TagService:
         }
 
     # --------------------------------------------------------------------- #
+    # Aggregations & Advanced Search
+    # --------------------------------------------------------------------- #
+    @staticmethod
+    def get_tag_cloud_data(
+        db: Session, user_id: int, *, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Return aggregated data for tag cloud widget (top N tags by usage).
+        """
+        limit = max(1, min(limit, 100))
+        rows = (
+            db.query(
+                Tag.id.label("tag_id"),
+                Tag.name.label("tag_name"),
+                Tag.slug.label("tag_slug"),
+                Tag.usage_count.label("usage_count"),
+                TagCategory.name.label("category_name"),
+                TagCategory.color_hex.label("category_color"),
+            )
+            .outerjoin(TagCategory, Tag.category_id == TagCategory.id)
+            .filter(Tag.user_id == user_id, Tag.is_active.is_(True))
+            .order_by(Tag.usage_count.desc(), Tag.name.asc())
+            .limit(limit)
+            .all()
+        )
+
+        cloud: List[Dict[str, Any]] = []
+        for row in rows:
+            cloud.append(
+                {
+                    "tag_id": row.tag_id,
+                    "name": row.tag_name,
+                    "slug": row.tag_slug,
+                    "usage_count": row.usage_count or 0,
+                    "category_name": row.category_name,
+                    "category_color": row.category_color,
+                }
+            )
+        return cloud
+
+    @staticmethod
+    def search_tags(
+        db: Session,
+        user_id: int,
+        query: str,
+        *,
+        limit: int = 25,
+        entity_type: Optional[str] = None,
+        include_inactive: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """
+        Perform slug-aware search for tags and return assignment summaries.
+        """
+        normalized_query = (query or "").strip()
+        if len(normalized_query) < 2:
+            raise ValueError("Search query must contain at least 2 characters")
+
+        limit = max(1, min(limit, 50))
+        pattern = f"%{normalized_query.lower()}%"
+
+        tag_query = db.query(Tag).filter(Tag.user_id == user_id)
+        if not include_inactive:
+            tag_query = tag_query.filter(Tag.is_active.is_(True))
+
+        tag_query = tag_query.filter(
+            or_(func.lower(Tag.name).like(pattern), func.lower(Tag.slug).like(pattern))
+        )
+
+        if entity_type:
+            TagService._validate_entity_type(entity_type)
+            tag_query = (
+                tag_query.join(TagLink, TagLink.tag_id == Tag.id)
+                .filter(TagLink.entity_type == entity_type)
+                .distinct()
+            )
+
+        tags = (
+            tag_query.order_by(Tag.usage_count.desc(), Tag.last_used_at.desc(), Tag.name.asc())
+            .limit(limit)
+            .all()
+        )
+
+        if not tags:
+            return []
+
+        assignment_cap_per_tag = 20
+        tag_ids = [tag.id for tag in tags]
+        assignments_by_tag: Dict[int, List[Dict[str, Any]]] = {tag_id: [] for tag_id in tag_ids}
+
+        assignment_rows = (
+            db.query(
+                TagLink.tag_id,
+                TagLink.entity_type,
+                TagLink.entity_id,
+                TagLink.created_at,
+            )
+            .filter(TagLink.tag_id.in_(tag_ids))
+            .order_by(TagLink.created_at.desc())
+            .all()
+        )
+
+        for row in assignment_rows:
+            bucket = assignments_by_tag.get(row.tag_id)
+            if bucket is None or len(bucket) >= assignment_cap_per_tag:
+                continue
+            bucket.append(
+                {
+                    "entity_type": row.entity_type,
+                    "entity_id": row.entity_id,
+                    "linked_at": row.created_at,
+                }
+            )
+
+        serialized_tags = TagService._serialize_tags_for_payload(tags)
+        serialized_lookup = {item["id"]: item for item in serialized_tags}
+
+        payload: List[Dict[str, Any]] = []
+        for tag in tags:
+            payload.append(
+                {
+                    "tag": serialized_lookup.get(tag.id, tag.to_dict()),
+                    "assignments": assignments_by_tag.get(tag.id, []),
+                }
+            )
+        return payload
+
+    @staticmethod
+    def get_smart_suggestions(
+        db: Session,
+        user_id: int,
+        *,
+        entity_type: Optional[str] = None,
+        entity_id: Optional[int] = None,
+        limit: int = 6,
+    ) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Return top tags per entity type/category + recent tags for suggestion panel.
+        """
+        if entity_type:
+            TagService._validate_entity_type(entity_type)
+
+        limit = max(1, min(limit, 12))
+        recent_window = datetime.utcnow() - timedelta(days=14)
+        base_filters = [Tag.user_id == user_id, Tag.is_active.is_(True)]
+        current_entity_tag_ids: Set[int] = set()
+
+        if entity_type and entity_id:
+            try:
+                assigned_tags = TagService.get_tags_for_entity(db, entity_type, entity_id, user_id)
+                current_entity_tag_ids = {tag.id for tag in assigned_tags}
+            except ValueError:
+                logger.warning(
+                    "Failed to load assigned tags for suggestions",
+                    exc_info=True,
+                    extra={"entity_type": entity_type, "entity_id": entity_id, "user_id": user_id},
+                )
+
+        # Top tags for entity type (usage driven)
+        entity_query = (
+            db.query(
+                Tag.id.label("tag_id"),
+                Tag.name.label("tag_name"),
+                Tag.slug.label("tag_slug"),
+                Tag.usage_count.label("usage_count"),
+                Tag.last_used_at.label("last_used_at"),
+                TagCategory.name.label("category_name"),
+                TagCategory.color_hex.label("category_color"),
+                func.count(TagLink.id).label("link_count"),
+                func.max(TagLink.created_at).label("last_linked_at"),
+            )
+            .join(TagLink, TagLink.tag_id == Tag.id)
+            .outerjoin(TagCategory, Tag.category_id == TagCategory.id)
+            .filter(*base_filters)
+        )
+        if entity_type:
+            entity_query = entity_query.filter(TagLink.entity_type == entity_type)
+
+        entity_rows = (
+            entity_query.group_by(
+                Tag.id,
+                Tag.name,
+                Tag.slug,
+                Tag.usage_count,
+                Tag.last_used_at,
+                TagCategory.name,
+                TagCategory.color_hex,
+            )
+            .order_by(func.count(TagLink.id).desc(), func.max(TagLink.created_at).desc())
+            .limit(limit * 3)
+            .all()
+        )
+
+        top_entity_tags = TagService._rows_to_suggestion_payload(
+            entity_rows, current_entity_tag_ids, limit
+        )
+
+        # Category diversity: ensure at least one suggestion per category
+        category_groups: Dict[str, Dict[str, Any]] = {}
+        for row in entity_rows:
+            category_key = row.category_name or "uncategorized"
+            if category_key in category_groups:
+                continue
+            serialized = TagService._build_tag_metadata(row)
+            if serialized["tag_id"] in current_entity_tag_ids:
+                continue
+            category_groups[category_key] = serialized
+            if len(category_groups) >= limit:
+                break
+        top_category_tags = list(category_groups.values())
+
+        recent_rows = (
+            db.query(
+                Tag.id.label("tag_id"),
+                Tag.name.label("tag_name"),
+                Tag.slug.label("tag_slug"),
+                TagCategory.name.label("category_name"),
+                TagCategory.color_hex.label("category_color"),
+                TagLink.created_at.label("last_linked_at"),
+            )
+            .join(TagLink, TagLink.tag_id == Tag.id)
+            .outerjoin(TagCategory, Tag.category_id == TagCategory.id)
+            .filter(*base_filters, TagLink.created_at >= recent_window)
+            .order_by(TagLink.created_at.desc())
+            .limit(limit * 3)
+            .all()
+        )
+        recent_tags = TagService._rows_to_suggestion_payload(
+            recent_rows, current_entity_tag_ids, limit, recent_mode=True
+        )
+
+        return {
+            "top_entity_tags": top_entity_tags,
+            "top_category_tags": top_category_tags,
+            "recent_tags": recent_tags,
+        }
+
+    # --------------------------------------------------------------------- #
     # Internal Helpers
     # --------------------------------------------------------------------- #
     @staticmethod
@@ -697,4 +935,64 @@ class TagService:
                     raise ValueError("Tag IDs must be integers") from None
             normalized.add(tag_id)
         return normalized
+
+    @staticmethod
+    def _serialize_tags_for_payload(tags: Sequence[Tag]) -> List[Dict[str, Any]]:
+        serialized: List[Dict[str, Any]] = []
+        for tag in tags:
+            data = tag.to_dict()
+            category = getattr(tag, "category", None)
+            if category:
+                data["category_name"] = getattr(category, "name", None)
+                data["category_color"] = getattr(category, "color_hex", None)
+            serialized.append(data)
+        return serialized
+
+    @staticmethod
+    def _rows_to_suggestion_payload(
+        rows: Sequence[Any],
+        excluded_ids: Set[int],
+        limit: int,
+        recent_mode: bool = False,
+    ) -> List[Dict[str, Any]]:
+        payload: List[Dict[str, Any]] = []
+        for row in rows:
+            metadata = TagService._build_tag_metadata(row)
+            if metadata["tag_id"] in excluded_ids:
+                continue
+            metadata["score"] = TagService._compute_suggestion_score(row, recent_mode=recent_mode)
+            payload.append(metadata)
+            if len(payload) >= limit:
+                break
+        return payload
+
+    @staticmethod
+    def _build_tag_metadata(row: Any) -> Dict[str, Any]:
+        return {
+            "tag_id": getattr(row, "tag_id"),
+            "name": getattr(row, "tag_name"),
+            "slug": getattr(row, "tag_slug"),
+            "category_name": getattr(row, "category_name", None),
+            "category_color": getattr(row, "category_color", None),
+            "usage_count": getattr(row, "usage_count", None),
+            "last_used_at": getattr(row, "last_used_at", getattr(row, "last_linked_at", None)),
+        }
+
+    @staticmethod
+    def _compute_suggestion_score(row: Any, *, recent_mode: bool = False) -> float:
+        usage_count = getattr(row, "usage_count", 0) or 0
+        link_count = getattr(row, "link_count", 0) or 0
+        last_linked_at = getattr(row, "last_linked_at", None)
+        last_used_at = getattr(row, "last_used_at", None)
+        recency_boost = 0.0
+        reference_date = last_linked_at or last_used_at
+        if reference_date:
+            hours_delta = max(
+                1,
+                (datetime.utcnow() - reference_date).total_seconds() / 3600.0,
+            )
+            recency_boost = 1 / hours_delta
+        if recent_mode:
+            recency_boost *= 2
+        return (usage_count * 0.6) + (link_count * 0.3) + recency_boost
 

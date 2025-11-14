@@ -131,9 +131,9 @@ class CodeQualityDashboard {
    * Setup duplicate detection filters
    */
   setupDuplicateFilters() {
-    const typeSelect = document.getElementById('duplicateTypeFilter');
-    const categorySelect = document.getElementById('duplicateCategoryFilter');
-    const similarityRange = document.getElementById('duplicateSimilarityRange');
+    const typeSelect = document.getElementById('duplicate-type-filter');
+    const categorySelect = document.getElementById('duplicate-category-filter');
+    const similarityRange = document.getElementById('duplicate-similarity-range');
 
     if (typeSelect) {
       typeSelect.addEventListener('change', () => {
@@ -443,7 +443,7 @@ class CodeQualityDashboard {
    * Display Error Handling results
    */
   displayErrorHandlingResults(data) {
-    const resultsElement = document.getElementById('errorHandlingResults');
+    const resultsElement = document.getElementById('error-handling-results');
     if (!resultsElement) return;
 
     if (!data || !data.data) {
@@ -513,9 +513,9 @@ class CodeQualityDashboard {
     resultsElement.innerHTML = html;
 
     // Update stats
-    const withCoverageElement = document.getElementById('errorHandlingWithCoverage');
-    const withoutCoverageElement = document.getElementById('errorHandlingWithoutCoverage');
-    const statusElement = document.getElementById('errorHandlingStatus');
+    const withCoverageElement = document.getElementById('error-handling-with-coverage');
+    const withoutCoverageElement = document.getElementById('error-handling-without-coverage');
+    const statusElement = document.getElementById('error-handling-status');
 
     if (withCoverageElement) withCoverageElement.textContent = summary.withCoverage;
     if (withoutCoverageElement) withoutCoverageElement.textContent = summary.withoutCoverage;
@@ -526,7 +526,7 @@ class CodeQualityDashboard {
    * Display JSDoc results
    */
   displayJSDocResults(data) {
-    const resultsElement = document.getElementById('jsdocResults');
+    const resultsElement = document.getElementById('jsdoc-results');
     if (!resultsElement) return;
 
     if (!data || !data.data) {
@@ -596,9 +596,9 @@ class CodeQualityDashboard {
     resultsElement.innerHTML = html;
 
     // Update stats
-    const withDocsElement = document.getElementById('jsdocWithDocs');
-    const withoutDocsElement = document.getElementById('jsdocWithoutDocs');
-    const statusElement = document.getElementById('jsdocStatus');
+    const withDocsElement = document.getElementById('jsdoc-with-docs');
+    const withoutDocsElement = document.getElementById('jsdoc-without-docs');
+    const statusElement = document.getElementById('jsdoc-status');
 
     if (withDocsElement) withDocsElement.textContent = summary.withJSDoc;
     if (withoutDocsElement) withoutDocsElement.textContent = summary.withoutJSDoc;
@@ -609,7 +609,7 @@ class CodeQualityDashboard {
    * Display Naming Conventions results
    */
   displayNamingResults(data) {
-    const resultsElement = document.getElementById('namingResults');
+    const resultsElement = document.getElementById('naming-results');
     if (!resultsElement) return;
 
     if (!data || !data.data) {
@@ -676,9 +676,9 @@ class CodeQualityDashboard {
     resultsElement.innerHTML = html;
 
     // Update stats
-    const compliantElement = document.getElementById('namingCompliant');
-    const violationsElement = document.getElementById('namingViolations');
-    const statusElement = document.getElementById('namingStatus');
+    const compliantElement = document.getElementById('naming-compliant');
+    const violationsElement = document.getElementById('naming-violations');
+    const statusElement = document.getElementById('naming-status');
 
     if (compliantElement) compliantElement.textContent = summary.compliant;
     if (violationsElement) violationsElement.textContent = summary.violations;
@@ -689,7 +689,7 @@ class CodeQualityDashboard {
    * Display Function Index results
    */
   displayFunctionIndexResults(data) {
-    const resultsElement = document.getElementById('functionIndexResults');
+    const resultsElement = document.getElementById('function-index-results');
     if (!resultsElement) return;
 
     if (data?.status === 'unavailable') {
@@ -772,9 +772,9 @@ class CodeQualityDashboard {
     resultsElement.innerHTML = html;
 
     // Update stats
-    const withIndexElement = document.getElementById('filesWithIndex');
-    const withoutIndexElement = document.getElementById('filesWithoutIndex');
-    const statusElement = document.getElementById('functionIndexStatus');
+    const withIndexElement = document.getElementById('files-with-index');
+    const withoutIndexElement = document.getElementById('files-without-index');
+    const statusElement = document.getElementById('function-index-status');
 
     if (withIndexElement) withIndexElement.textContent = summary.filesWithIndex;
     if (withoutIndexElement) withoutIndexElement.textContent = summary.filesWithoutIndex;
@@ -792,7 +792,7 @@ class CodeQualityDashboard {
       this.updateDuplicateSummary();
       this.updateDuplicateCategoryOptions();
       this.renderDuplicateTable();
-      const duplicatesTotalElement = document.getElementById('duplicatesTotal');
+      const duplicatesTotalElement = document.getElementById('duplicates-total');
       if (duplicatesTotalElement) {
         duplicatesTotalElement.textContent = '0';
       }
@@ -824,20 +824,20 @@ class CodeQualityDashboard {
       }
     };
 
-    setText('duplicateTotalCount', summary.totalDuplicates ?? 0);
-    setText('duplicateExactCount', summary.exactDuplicates ?? 0);
-    setText('duplicateNearCount', summary.nearDuplicates ?? 0);
-    setText('duplicateSimilarCount', summary.similarPatterns ?? 0);
-    setText('duplicatePotentialCount', summary.potentialDuplicates ?? 0);
+    setText('duplicate-total-count', summary.totalDuplicates ?? 0);
+    setText('duplicate-exact-count', summary.exactDuplicates ?? 0);
+    setText('duplicate-near-count', summary.nearDuplicates ?? 0);
+    setText('duplicate-similar-count', summary.similarPatterns ?? 0);
+    setText('duplicate-potential-count', summary.potentialDuplicates ?? 0);
 
     const categoryCount = summary.categories
       ? Object.keys(summary.categories).length
       : this.duplicateCategories.size;
-    setText('duplicateCategoryCount', categoryCount);
+    setText('duplicate-category-count', categoryCount);
   }
 
   updateDuplicateCategoryOptions() {
-    const categorySelect = document.getElementById('duplicateCategoryFilter');
+    const categorySelect = document.getElementById('duplicate-category-filter');
     if (!categorySelect) {
       return;
     }
@@ -880,7 +880,7 @@ class CodeQualityDashboard {
   }
 
   renderDuplicateTable() {
-    const tableBody = document.getElementById('duplicateTableBody');
+    const tableBody = document.getElementById('duplicate-table-body');
     if (!tableBody) {
       return;
     }
@@ -924,7 +924,7 @@ class CodeQualityDashboard {
   }
 
   bindDuplicateRowEvents() {
-    const tableBody = document.getElementById('duplicateTableBody');
+    const tableBody = document.getElementById('duplicate-table-body');
     if (!tableBody) {
       return;
     }
@@ -941,7 +941,7 @@ class CodeQualityDashboard {
   showDuplicateDetails(index) {
     this.activeDuplicateIndex = index;
 
-    const tableBody = document.getElementById('duplicateTableBody');
+    const tableBody = document.getElementById('duplicate-table-body');
     if (tableBody) {
       const rows = tableBody.querySelectorAll('[data-duplicate-index]');
       rows.forEach(row => {
@@ -955,7 +955,7 @@ class CodeQualityDashboard {
   }
 
   renderDuplicateDetails(duplicate) {
-    const panel = document.getElementById('duplicateDetailsPanel');
+    const panel = document.getElementById('duplicate-details-panel');
     if (!panel) {
       return;
     }
@@ -1016,8 +1016,8 @@ class CodeQualityDashboard {
   }
 
   updateSimilarityDisplay(rawValue) {
-    const slider = document.getElementById('duplicateSimilarityRange');
-    const display = document.getElementById('duplicateSimilarityValue');
+    const slider = document.getElementById('duplicate-similarity-range');
+    const display = document.getElementById('duplicate-similarity-value');
     const value = rawValue !== undefined ? rawValue : slider ? parseInt(slider.value, 10) : 70;
 
     if (slider && rawValue === undefined) {
@@ -1036,9 +1036,9 @@ class CodeQualityDashboard {
       minSimilarity: 0.7,
     };
 
-    const typeSelect = document.getElementById('duplicateTypeFilter');
-    const categorySelect = document.getElementById('duplicateCategoryFilter');
-    const similarityRange = document.getElementById('duplicateSimilarityRange');
+    const typeSelect = document.getElementById('duplicate-type-filter');
+    const categorySelect = document.getElementById('duplicate-category-filter');
+    const similarityRange = document.getElementById('duplicate-similarity-range');
 
     if (typeSelect) typeSelect.value = 'all';
     if (categorySelect) categorySelect.value = 'all';
@@ -1111,11 +1111,11 @@ class CodeQualityDashboard {
    * Update summary statistics
    */
   updateSummaryStats() {
-    const totalFunctionsElement = document.getElementById('totalFunctions');
-    const errorHandlingCoverageElement = document.getElementById('errorHandlingCoverage');
-    const jsdocCoverageElement = document.getElementById('jsdocCoverage');
-    const namingComplianceElement = document.getElementById('namingCompliance');
-    const duplicatesTotalElement = document.getElementById('duplicatesTotal');
+    const totalFunctionsElement = document.getElementById('total-functions');
+    const errorHandlingCoverageElement = document.getElementById('error-handling-coverage');
+    const jsdocCoverageElement = document.getElementById('jsdoc-coverage');
+    const namingComplianceElement = document.getElementById('naming-compliance');
+    const duplicatesTotalElement = document.getElementById('duplicates-total');
 
     if (this.lastCheckResults.errorHandling && this.lastCheckResults.errorHandling.data) {
       if (totalFunctionsElement)
@@ -1150,7 +1150,7 @@ class CodeQualityDashboard {
    * Update last update time
    */
   updateLastUpdateTime() {
-    const lastUpdateElement = document.getElementById('lastUpdateTime');
+    const lastUpdateElement = document.getElementById('last-update-time');
     if (lastUpdateElement) {
       lastUpdateElement.textContent = new Date().toLocaleTimeString('he-IL');
     }
@@ -1161,11 +1161,11 @@ class CodeQualityDashboard {
    */
   showLoadingState() {
     const sections = [
-      'errorHandlingResults',
-      'jsdocResults',
-      'namingResults',
-      'functionIndexResults',
-      'duplicateResults',
+      'error-handling-results',
+      'jsdoc-results',
+      'naming-results',
+      'function-index-results',
+      'duplicate-results',
     ];
     sections.forEach(sectionId => {
       const element = document.getElementById(sectionId);
@@ -1175,7 +1175,7 @@ class CodeQualityDashboard {
       }
     });
 
-    const duplicateDetails = document.getElementById('duplicateDetailsPanel');
+    const duplicateDetails = document.getElementById('duplicate-details-panel');
     if (duplicateDetails) {
       duplicateDetails.innerHTML =
         '<div class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> טוען כפילויות...</div>';
@@ -1187,11 +1187,11 @@ class CodeQualityDashboard {
    */
   showErrorState(message) {
     const sections = [
-      'errorHandlingResults',
-      'jsdocResults',
-      'namingResults',
-      'functionIndexResults',
-      'duplicateResults',
+      'error-handling-results',
+      'jsdoc-results',
+      'naming-results',
+      'function-index-results',
+      'duplicate-results',
     ];
     sections.forEach(sectionId => {
       const element = document.getElementById(sectionId);
@@ -1200,7 +1200,7 @@ class CodeQualityDashboard {
       }
     });
 
-    const duplicateDetails = document.getElementById('duplicateDetailsPanel');
+    const duplicateDetails = document.getElementById('duplicate-details-panel');
     if (duplicateDetails) {
       duplicateDetails.innerHTML = `<div class="text-center text-danger">❌ ${message}</div>`;
     }
@@ -1272,12 +1272,12 @@ window.runDuplicateCheck = async function () {
         }
       })
       .catch(() => {
-        const resultsElement = document.getElementById('duplicateResults');
+        const resultsElement = document.getElementById('duplicate-results');
         if (resultsElement) {
           resultsElement.innerHTML =
             '<div class="text-center text-danger">❌ שגיאה בהרצת בדיקת הכפילויות</div>';
         }
-        const detailsElement = document.getElementById('duplicateDetailsPanel');
+        const detailsElement = document.getElementById('duplicate-details-panel');
         if (detailsElement) {
           detailsElement.innerHTML =
             '<div class="text-center text-danger">❌ לא ניתן להציג פרטי כפילויות</div>';

@@ -58,6 +58,20 @@ def _serialize_tags(tags: List) -> List[Dict[str, Any]]:
     return serialized
 
 
+def _serialize_tag_cloud(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [
+        {
+            "tag_id": item.get("tag_id"),
+            "name": item.get("name"),
+            "slug": item.get("slug"),
+            "usage_count": item.get("usage_count", 0),
+            "category_name": item.get("category_name"),
+            "category_color": item.get("category_color"),
+        }
+        for item in items
+    ]
+
+
 @tags_bp.route("/categories", methods=["GET"])
 @handle_database_session()
 def list_categories():
@@ -648,4 +662,126 @@ def get_analytics():
             "version": "1.0",
         }
     )
+
+
+@tags_bp.route("/cloud", methods=["GET"])
+@handle_database_session()
+def get_tag_cloud():
+    """Return aggregated data for the Tag Cloud widget."""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _normalize_timestamp()
+    limit = request.args.get("limit", default=50, type=int)
+
+    cloud_data = TagService.get_tag_cloud_data(db, user_id, limit=limit)
+    return jsonify(
+        {
+            "status": "success",
+            "data": normalizer.normalize_output(_serialize_tag_cloud(cloud_data)),
+            "message": "Tag cloud data retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0",
+        }
+    )
+
+
+@tags_bp.route("/search", methods=["GET"])
+@handle_database_session()
+def search_tags():
+    """Search tags and return assignment summaries."""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _normalize_timestamp()
+
+    query_param = request.args.get("query", "").strip()
+    if not query_param:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "error": {"message": "Missing query parameter"},
+                    "version": "1.0",
+                }
+            ),
+            400,
+        )
+
+    limit = request.args.get("limit", default=25, type=int)
+    entity_type = request.args.get("entity_type")
+    include_inactive = request.args.get("include_inactive", "false").lower() == "true"
+
+    try:
+        search_results = TagService.search_tags(
+            db,
+            user_id,
+            query_param,
+            limit=limit,
+            entity_type=entity_type,
+            include_inactive=include_inactive,
+        )
+        normalized_results = normalizer.normalize_output(search_results)
+        return jsonify(
+            {
+                "status": "success",
+                "data": normalized_results,
+                "message": "Tag search completed successfully",
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0",
+            }
+        )
+    except ValueError as exc:
+        logger.warning("Tag search failed: %s", exc)
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "error": {"message": str(exc)},
+                    "version": "1.0",
+                }
+            ),
+            400,
+        )
+
+
+@tags_bp.route("/aggregations/suggestions", methods=["GET"])
+@handle_database_session()
+def get_smart_suggestions():
+    """Return smart tag suggestions for CRUD modals."""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _normalize_timestamp()
+
+    entity_type = request.args.get("entity_type")
+    entity_id = request.args.get("entity_id", type=int)
+    limit = request.args.get("limit", default=6, type=int)
+
+    try:
+        suggestions = TagService.get_smart_suggestions(
+            db,
+            user_id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            limit=limit,
+        )
+        return jsonify(
+            {
+                "status": "success",
+                "data": normalizer.normalize_output(suggestions),
+                "message": "Smart tag suggestions retrieved successfully",
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0",
+            }
+        )
+    except ValueError as exc:
+        logger.warning("Smart suggestion request failed: %s", exc)
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "error": {"message": str(exc)},
+                    "version": "1.0",
+                }
+            ),
+            400,
+        )
 

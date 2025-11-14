@@ -10,13 +10,13 @@
     "notes": "Sync local updates before release"
   },
   "development": {
-    "version": "1.0.31.0",
+    "version": "1.0.32.0",
     "major": 1,
     "minor": 0,
-    "patch": 31,
+    "patch": 32,
     "build": 0,
-    "commit": "5a7c30d00ebb0f8bc9397e5cd13da84d42044a35",
-    "updated_at": "2025-11-14T20:46:53+00:00",
-    "notes": "Sync local updates before release"
+    "commit": "45e298f030000987077cbdde4cbe92111ecf5fd2",
+    "updated_at": "2025-11-14T21:32:09+00:00",
+    "notes": "Home tag widgets and smart suggestions"
   }
 }

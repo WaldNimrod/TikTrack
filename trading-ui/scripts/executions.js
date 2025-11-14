@@ -739,72 +739,74 @@ function goToNote(noteId) {
  * @async
  * @returns {Promise<void>}
  */
-async function loadExecutionsData() {
+async function loadExecutionsData(options = {}) {
+  const { force = false, ttl = window.ExecutionsData?.TTL || 45000 } = options;
+
   try {
-    window.Logger.info('Loading executions data (bypass cache)', { page: "executions" });
-    
-    // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/executions/?_t=${Date.now()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
-    if (response.ok) {
-      const data = await response.json();
-      const rawExecutions = data?.data || data;
-      executionsData = Array.isArray(rawExecutions)
-        ? rawExecutions.map(execution => ({
-            ...execution,
-            updated_at: execution.updated_at || execution.execution_date || execution.date || execution.created_at || null
-          }))
-        : [];
-      window.executionsData = executionsData; // עדכון הנתונים הגלובליים
-      // נטענו עסקעות
+    window.Logger.info('Loading executions data via ExecutionsData service', { page: "executions" });
 
-      // בדיקה אם יש פילטרים פעילים
-      if (window.headerSystem && window.headerSystem.currentFilters) {
-        const filters = window.headerSystem.currentFilters;
-        const hasActiveFilters = filters.status && filters.status.length > 0 ||
-                    filters.type && filters.type.length > 0 ||
-                    filters.account && filters.account.length > 0 ||
-                    filters.dateRange && filters.dateRange !== '' ||
-                    filters.search && filters.search !== '';
-
-        if (hasActiveFilters) {
-          // יש פילטרים פעילים, מסנן נתונים מקומית
-          const filteredData = filterExecutionsLocally(
-            executionsData,
-            filters.status,
-            filters.type,
-            filters.account,
-            filters.dateRange,
-            filters.search,
-          );
-          syncExecutionsPagination(executionsData);
-          setExecutionsFilteredDataset(filteredData);
-          return;
-        }
-      }
-
-      // עדכון הטבלה
-      syncExecutionsPagination(executionsData);
-      
-      // Register table with UnifiedTableSystem after data is loaded
-      if (typeof window.registerExecutionsTables === 'function') {
-        window.registerExecutionsTables();
-      }
-
-      // Restore page state (filters, sort, sections, entity filters)
-      await restorePageState('executions');
-
+    let rawExecutions;
+    if (typeof window.ExecutionsData?.loadExecutionsData === 'function') {
+      rawExecutions = await window.ExecutionsData.loadExecutionsData({ force, ttl });
     } else {
-      const errorText = await response.text();
-      handleApiError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
-      handleApiError(new Error(`סטטוס: ${response.status} - ${errorText}`), 'עסקעות');
+      const base = window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+      const response = await fetch(`${base}/api/executions/?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`סטטוס: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      rawExecutions = data?.data || data;
     }
 
+    executionsData = Array.isArray(rawExecutions)
+      ? rawExecutions.map(execution => ({
+          ...execution,
+          updated_at: execution.updated_at || execution.execution_date || execution.date || execution.created_at || null
+        }))
+      : [];
+    window.executionsData = executionsData; // עדכון הנתונים הגלובליים
+
+    if (window.headerSystem && window.headerSystem.currentFilters) {
+      const filters = window.headerSystem.currentFilters;
+      const hasActiveFilters = !!(
+        (filters.status && filters.status.length > 0) ||
+        (filters.type && filters.type.length > 0) ||
+        (filters.account && filters.account.length > 0) ||
+        (filters.dateRange && filters.dateRange !== '') ||
+        (filters.search && filters.search !== '')
+      );
+
+      if (hasActiveFilters) {
+        const filteredData = filterExecutionsLocally(
+          executionsData,
+          filters.status,
+          filters.type,
+          filters.account,
+          filters.dateRange,
+          filters.search,
+        );
+        syncExecutionsPagination(executionsData);
+        setExecutionsFilteredDataset(filteredData);
+        return;
+      }
+    }
+
+    syncExecutionsPagination(executionsData);
+
+    if (typeof window.registerExecutionsTables === 'function') {
+      window.registerExecutionsTables();
+    }
+
+    await restorePageState('executions');
   } catch (error) {
     handleApiError(error, 'עסקעות');
   }

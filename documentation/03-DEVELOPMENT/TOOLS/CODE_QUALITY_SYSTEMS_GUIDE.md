@@ -2,10 +2,36 @@
 ## Code Quality & Control Systems Guide
 
 ### 📅 תאריך עדכון
-28 בינואר 2025 - עדכון לאחר השלמת סריקה מקיפה של כל המערכות
+14 בנובמבר 2025 – Code Quality Dashboard v2 (Function Index + Lint Monitor)
+
+> עדכון קודם: 28 בינואר 2025 (הסריקה המקיפה הראשונה)
 
 ### 🎯 מטרת המדריך
 מדריך מקיף לכל מערכות בקרה ואיכות הקוד במערכת TikTrack. המדריך משמש כקובץ עבודה מרכזי לנושא איכות הקוד ודיבגינג, ומספק למפתחים גישה מלאה לכל הכלים והתהליכים הקיימים.
+
+---
+
+## 🆕 עדכון 14.11.2025 – Code Quality Dashboard V2
+
+### נקודות מפתח
+- **Function Index Validator חי:** `POST /api/quality-check/function-index` הושלם ב-`Backend/routes/api/quality_check.py`. הפונקציה `build_function_index_report()` סורקת את `trading-ui/scripts` (ללא ספריות ארכיון/מודולרי) ומחזירה מטריקות חדשות: `filesWithIndex`, `filesWithoutIndex`, `coveragePercentage`, פירוט עמודים וחותמת `generatedAt`.
+- **כרטיס Timespan מחייב:** בדשבורד נוסף Alert עם תיעוד של מגבלת 30 הימים לדוחות Function Index. הרחבת timespan תחייב עדכון API, מסדי נתונים וקובצי report.
+- **Fallback "unavailable":** אם ה-API מושבת או עדיין לא נפרס, `code-quality-dashboard.js` מציג כרטיס מידע עם הודעה מוסברת ותאריך עדכון אחרון ולא עוצר את שאר הבדיקות.
+- **Lint Monitor מוטמע:** `linter-realtime-monitor.js` נטען רשמית בעמוד (`code-quality-dashboard.html`) וכל סקשני הסטטוס קיבלו מזהי section+toggle תואמים למערכת השמירה (PageStateManager).
+- **מודול שגיאה מפורט:** כשל ב-`npm run lint:collect` מפעיל את `showLintFailureModal()` (Notification System). המודול מציג סיכומים, משימות כושלות, סוגיות מובילות, CLI output והמסלולים `reports/linter/latest.json` + `reports/linter/history.json`.
+- **שיתוף מידע מהיר:** נוסף כפתור `data-action="copy-lint-failure-table"` במודול עצמו, יחד עם כפתורי "העתק דוח JSON" ו"הורד דוח" בראש הסקשן. שני הכפתורים משתמשים בשירותים `copyLatestReportToClipboard()` ו-`downloadLatestReport()` ומדווחים דרך ה-Notification System.
+- **אפס שגיאות לינט:** הקבצים המרכזיים (`code-quality-dashboard.js`, `linter-realtime-monitor.js`, `lint-status-service.js`, HTML/CSS נלווים) עברו יישור ESLint/HTMLHint/Prettier כדי למנוע עצירת הרצת `lint:collect`.
+
+### תזכור תפעולי
+1. הרצת לינט: `npm run lint:collect` (נשמר ב-`reports/linter/latest.json`).
+2. צפייה/העתקה: מהדשבורד, השתמש בכפתורי ההורדה/העתקה או פתח את קובץ ה-JSON ישירות.
+3. טיפול בשגיאה: במקרה של כשל, פתח את מודול הפרטים → העתק את הטבלה דרך הכפתור ייעודי ושלח ב-Slack/git issue.
+4. Function Index ידני: אם רוצים לעדכן את האינדקס עצמו, ניתן להריץ `node scripts/generators/generate-function-index.js` ורק אז להפעיל את הבדיקה מחדש.
+
+### רפרנסים מהירים
+- Frontend: `trading-ui/scripts/code-quality-dashboard.js`, `trading-ui/scripts/linter-realtime-monitor.js`, `trading-ui/code-quality-dashboard.html`
+- Backend: `Backend/routes/api/quality_check.py` (`build_function_index_report`, `run_script` helpers), `Backend/routes/api/quality_lint.py`
+- תיעוד משלים: `documentation/frontend/LINTER_REALTIME_MONITOR.md` (UI וזרימות מודול השגיאות)
 
 ---
 

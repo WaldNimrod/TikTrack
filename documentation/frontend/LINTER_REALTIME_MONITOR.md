@@ -10,6 +10,8 @@
 //   - trading-ui/scripts/linter-realtime-monitor.js (קובץ הסקריפט הראשי)
 //   - trading-ui/code-quality-dashboard.html (סקשן ניטור הלינטר)
 //   - documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md (רשימת משימות פיתוח)
+//   - ⚠️ החל מ-11/2025 הקובץ trading-ui/linter-realtime-monitor.html הוסר, והמערכת מוטמעת
+//     באופן מלא בתוך Code Quality Dashboard יחד עם מערכת PageStateManager.
 //
 // 🆕 עדכון 14.11.2025:
 //   - הוספת Failure Modal אחיד בעת כשל בהרצת lint:collect, כולל סיכומי CLI,
@@ -18,6 +20,10 @@
 //     והוספת copy-to-clipboard מבוקר עבור המודול.
 //   - סנכרון טבלת “סוגיות פעילות” עם UnifiedTableSystem: אם אין נתונים ממויינים,
 //     התצוגה נופלת מיד ל-renderIssuesTable כך שנשמרת זמינות מלאה אחרי כל ריצה.
+//   - כפתור data-action="copy-lint-failure-table" בתוך המודול מאפשר להעתיק ללוח
+//     תמצית מפורמטת של הכשל, כולל Totals, משימות כושלות וסוגיות מובילות.
+//   - Timestamp formatting תוקן: המערכת משתמשת ב-LintStatusService._formatTimestamp או
+//     ב-toLocaleString('he-IL') כ- fallback כדי למנוע הצגת [object Object].
 //
 // 📚 תוכן הקובץ:
 //   1. סקירה כללית והגדרות
@@ -379,7 +385,7 @@ const DiagnosticLog = {
  * תפקיד: רכיבי הממשק הגרפי והפקדים השונים
  *
  * @description כולל את כל רכיבי ה-HTML והאינטראקציות
- * @mainFile linter-realtime-monitor.html
+ * @mainFile trading-ui/code-quality-dashboard.html (סקשן lint-monitor המאוחד)
  */
 const UIComponents = {
     // רכיבי סטטיסטיקה

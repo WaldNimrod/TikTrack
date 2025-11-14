@@ -119,6 +119,76 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 col-xl-6">
+            <div class="card h-100" id="tagCloudCard">
+                <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                    <h5 class="mb-0 d-flex align-items-center gap-2">
+                        <img src="images/icons/tags.svg" alt="תגיות" width="20" height="20">
+                        <span>ענן תגיות</span>
+                    </h5>
+                    <button data-button-type="REFRESH"
+                            data-variant="small"
+                            data-text=""
+                            data-icon="⟳"
+                            data-onclick="TagSearchController?.refreshTagCloud({ force: true })"
+                            title="רענון נתוני תגיות"></button>
+                </div>
+                <div class="card-body d-flex flex-column gap-3">
+                    <div id="tagCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                        <span>טוען נתוני תגיות...</span>
+                    </div>
+                    <div id="tagCloudError" class="alert alert-danger d-none" role="alert"></div>
+                    <div id="tagCloudEmpty" class="alert alert-info d-none" role="status">
+                        אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
+                    </div>
+                    <div id="tagCloudContainer" class="d-flex flex-wrap gap-2 align-items-center"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-6">
+            <div class="card h-100" id="tagQuickSearchCard">
+                <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                    <h5 class="mb-0 d-flex align-items-center gap-2">
+                        <img src="images/icons/search.svg" alt="חיפוש תגיות" width="20" height="20">
+                        <span>חיפוש תגיות מהיר</span>
+                    </h5>
+                </div>
+                <div class="card-body d-flex flex-column gap-3">
+                    <form id="tagQuickSearchForm" class="d-flex flex-column gap-3">
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <label for="tagQuickSearchInput" class="visually-hidden">חיפוש תגית</label>
+                            <input id="tagQuickSearchInput"
+                                   type="search"
+                                   class="form-control flex-grow-1"
+                                   placeholder="לדוגמה: אסטרטגיה, סוג מניה, סטטוס..."
+                                   minlength="2"
+                                   autocomplete="off">
+                            <select id="tagQuickSearchEntityFilter" class="form-select w-auto">
+                                <option value="">כל היישויות</option>
+                                <option value="trade">טריידים</option>
+                                <option value="trade_plan">תכניות</option>
+                                <option value="execution">ביצועים</option>
+                                <option value="trading_account">חשבונות</option>
+                                <option value="alert">התראות</option>
+                                <option value="ticker">טיקרים</option>
+                                <option value="cash_flow">תזרימי מזומנים</option>
+                                <option value="note">הערות</option>
+                            </select>
+                            <button type="submit"
+                                    data-button-type="PRIMARY"
+                                    data-variant="small"
+                                    data-text="חפש"
+                                    title="הפעל חיפוש תגיות"></button>
+                        </div>
+                        <div class="text-muted small" id="tagQuickSearchHint">
+                            הקלד לפחות שני תווים ולחץ חפש. לחיצה על תגית בענן תמלא את השדה אוטומטית.
+                        </div>
+                        <div id="tagQuickSearchStatus" class="small text-muted"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-header"><h5>סטטוס טריידים</h5></div>
@@ -442,6 +512,10 @@
     <!-- [67] Load Order: 67 -->
     <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- ווידג׳ט שיוך תוכניות למסחר -->
     <!-- [68] Load Order: 68 -->
+    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- מודל תוצאות חיפוש תגיות -->
+    <!-- [69] Load Order: 69 -->
+    <script src="scripts/tag-search-controller.js?v=1.0.0"></script> <!-- בקר ענן תגיות וחיפוש מהיר -->
+    <!-- [70] Load Order: 70 -->
     <script src="scripts/index.js?v=1.0.0"></script> <!-- לוגיקת דף הבית -->
 
     <!-- =============================================================== -->
@@ -453,7 +527,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 68 | Unique Scripts Loaded: 68 -->
+    <!-- 📊 Total Scripts Processed: 70 | Unique Scripts Loaded: 70 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("index") -->
 </body>
 </html>

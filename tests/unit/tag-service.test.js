@@ -32,6 +32,66 @@ describe('TagService', () => {
         };
     });
 
+    test('getTagCloudData uses cache before network call', async () => {
+        const cached = [{ tag_id: 1, name: 'Breakout' }];
+        window.UnifiedCacheManager.get.mockResolvedValueOnce(cached);
+
+        const TagService = loadTagService();
+        const result = await TagService.getTagCloudData();
+
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(result).toEqual(cached);
+    });
+
+    test('getTagCloudData fetches and caches when forced', async () => {
+        const cloud = [{ tag_id: 2, name: 'Momentum' }];
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: cloud })
+        });
+
+        const TagService = loadTagService();
+        const result = await TagService.getTagCloudData({ force: true, limit: 10 });
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/cloud?limit=10',
+            expect.objectContaining({ credentials: 'same-origin' })
+        );
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledWith(
+            'tags:cloud',
+            cloud,
+            expect.any(Object)
+        );
+        expect(result).toEqual(cloud);
+    });
+
+    test('searchTags enforces minimum query length on client side', async () => {
+        const TagService = loadTagService();
+        await expect(TagService.searchTags({ query: 'א' })).rejects.toThrow('לפחות שני תווים');
+    });
+
+    test('getSmartSuggestions fetches data and caches per entity', async () => {
+        const payload = { top_entity_tags: [{ tag_id: 1, name: 'Breakout' }] };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: payload })
+        });
+
+        const TagService = loadTagService();
+        const result = await TagService.getSmartSuggestions({ entityType: 'trade', entityId: 7, force: true });
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            expect.stringContaining('/api/tags/aggregations/suggestions?entity_type=trade&entity_id=7&limit=6'),
+            expect.objectContaining({ credentials: 'same-origin' })
+        );
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledWith(
+            'tags:smart:trade:7',
+            payload,
+            expect.any(Object)
+        );
+        expect(result).toEqual(payload);
+    });
+
     test('replaceEntityTags invalidates caches and emits update event', async () => {
         const payload = { assigned: [5, 6] };
         global.fetch.mockResolvedValue({
@@ -64,6 +124,9 @@ describe('TagService', () => {
             'tags:list:all',
             'tags:suggestions:all',
             'tags:suggestions:trade',
+            'tags:cloud',
+            'tags:smart:all:all',
+            'tags:smart:trade:42',
             'tags:analytics'
         ]));
 
@@ -188,6 +251,9 @@ describe('TagService', () => {
             'tags:list:all',
             'tags:suggestions:all',
             'tags:suggestions:trade',
+            'tags:cloud',
+            'tags:smart:all:all',
+            'tags:smart:trade:13',
             'tags:analytics'
         ]));
 

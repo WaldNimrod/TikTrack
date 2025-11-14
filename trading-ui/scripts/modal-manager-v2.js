@@ -1957,7 +1957,7 @@ class ModalManagerV2 {
      * @private
      */
     async _hydrateTagFieldsForModal(modalElement, defaultEntityType, entityId) {
-        if (!modalElement || !entityId || !window.TagUIManager || typeof window.TagUIManager.hydrateSelectForEntity !== 'function') {
+        if (!modalElement || !window.TagUIManager) {
             return;
         }
 
@@ -1971,16 +1971,24 @@ class ModalManagerV2 {
             if (!targetEntityType || !select.id) {
                 continue;
             }
-
-            try {
-                await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
-            } catch (error) {
-                window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
-                    error,
-                    selectId: select.id,
+            if (entityId && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+                try {
+                    await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
+                        error,
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        entityId,
+                        page: 'modal-manager-v2'
+                    });
+                }
+            }
+            if (typeof window.TagUIManager.loadSuggestionsForSelect === 'function') {
+                const suggestionEntityId = entityId && targetEntityType === defaultEntityType ? entityId : null;
+                window.TagUIManager.loadSuggestionsForSelect(select, {
                     entityType: targetEntityType,
-                    entityId,
-                    page: 'modal-manager-v2'
+                    entityId: suggestionEntityId
                 });
             }
         }
@@ -4327,6 +4335,7 @@ class ModalManagerV2 {
                 window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
             }
         }
+        this._hydrateTagFieldsForModal(modalElement, modalElement.dataset.entityType || null, null);
         
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');

@@ -588,11 +588,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           if (typeof window.loadExecutionsData === 'function') {
-            if (window.CacheTTLGuard?.ensure) {
-              await window.CacheTTLGuard.ensure('executions-data', window.loadExecutionsData);
-            } else {
-              await window.loadExecutionsData();
-            }
+            await window.loadExecutionsData();
           }
 
           // Initialize import modal
@@ -897,15 +893,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               ? window.loadTradingAccountsDataForTradingAccountsPage
               : window.loadAccountsData;
           if (typeof loadTradingAccounts === 'function') {
-            console.log('📡 Calling trading accounts loader via CacheTTLGuard...');
-            window.Logger.info('📡 Calling trading accounts loader via CacheTTLGuard...', {
+            console.log('📡 Calling trading accounts loader via service...');
+            window.Logger.info('📡 Calling trading accounts loader via service...', {
               page: 'page-initialization-configs',
             });
-            if (window.CacheTTLGuard?.ensure) {
-              await window.CacheTTLGuard.ensure('accounts-data', loadTradingAccounts);
-            } else {
-              await loadTradingAccounts();
-            }
+            await loadTradingAccounts();
           } else {
             console.warn('⚠️ No suitable function found for loading trading accounts data');
             window.Logger.info('⚠️ No suitable function found for loading trading accounts data', {
@@ -1900,6 +1892,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Design Gallery',
       packages: ['base', 'init-system'],
       requiredGlobals: ['NotificationSystem', 'window.loadDesigns', 'window.DesignGallery'],
+      pageSpecificScripts: ['scripts/button-system-demo-core.js'],
       description: 'גלריית עיצובים',
       lastModified: '2025-10-19',
       pageType: 'utility',

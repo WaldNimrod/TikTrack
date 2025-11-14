@@ -10,6 +10,15 @@
 (function() {
   'use strict';
 
+  const CACHE_TTL_CONFIG = {
+    'trades-data': { ttl: 30 * 1000 },
+    'trade-plans-data': { ttl: 30 * 1000 },
+    'executions-data': { ttl: 45 * 1000 },
+    'trading-accounts-data': { ttl: 60 * 1000 },
+    'accounts-data': { ttl: 60 * 1000 },
+    'dashboard-data': { ttl: 60 * 1000 }
+  };
+
   async function ensure(key, loaderFn, options = {}) {
     if (typeof loaderFn !== 'function') {
       window.Logger?.warn?.('CacheTTLGuard.ensure called without loader function', { key, page: 'cache-ttl-guard' });
@@ -20,9 +29,11 @@
       return loaderFn();
     }
 
+    const configEntry = CACHE_TTL_CONFIG[key] || {};
+
     const cacheOptions = {
-      layer: options.layer || null,
-      ttl: options.ttl || null,
+      layer: options.layer ?? configEntry.layer ?? null,
+      ttl: options.ttl ?? configEntry.ttl ?? null,
       fallback: async () => {
         const result = await loaderFn();
         if (typeof options.afterLoad === 'function') {
@@ -47,8 +58,24 @@
     return cached;
   }
 
+  function setConfig(key, value) {
+    if (!key || typeof key !== 'string') {
+      return;
+    }
+    if (value === null) {
+      delete CACHE_TTL_CONFIG[key];
+      return;
+    }
+    CACHE_TTL_CONFIG[key] = {
+      ...(CACHE_TTL_CONFIG[key] || {}),
+      ...value,
+    };
+  }
+
   window.CacheTTLGuard = {
     ensure,
+    CONFIG: CACHE_TTL_CONFIG,
+    setConfig,
   };
 
   window.Logger?.info?.('✅ CacheTTLGuard initialized', { page: 'cache-ttl-guard' });

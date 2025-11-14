@@ -15,6 +15,7 @@
 (function tagUiManagerFactory() {
     const SELECT_CLASS = 'tag-multi-select';
     const BADGE_CONTAINER_SUFFIX = 'TagBadgeContainer';
+    const SUGGESTION_CONTAINER_SUFFIX = 'TagSuggestionContainer';
 
     const state = {
         allTags: null,
@@ -180,13 +181,138 @@
         }
     }
 
+    function getSuggestionContainer(select) {
+        const containerId = `${select.id}${SUGGESTION_CONTAINER_SUFFIX}`;
+        let container = document.getElementById(containerId);
+        if (!container) {
+            container = document.createElement('div');
+            container.id = containerId;
+            container.className = 'tag-suggestion-panel mt-3 d-flex flex-column gap-3';
+            select.insertAdjacentElement('afterend', container);
+        }
+        return container;
+    }
+
+    function buildSuggestionChip(tag, select) {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'btn btn-sm btn-outline-secondary';
+        chip.textContent = tag.name;
+        chip.dataset.tagId = tag.tag_id;
+        chip.addEventListener('click', () => applySuggestion(select, [tag.tag_id]));
+        return chip;
+    }
+
+    function applySuggestion(select, tagIds = []) {
+        if (!Array.isArray(tagIds) || !tagIds.length) {
+            return;
+        }
+        const currentValues = new Set(getSelectedValues(select));
+        let changed = false;
+        tagIds.forEach((tagId) => {
+            const normalizedId = Number.parseInt(tagId, 10);
+            if (!Number.isFinite(normalizedId)) {
+                return;
+            }
+            if (!currentValues.has(normalizedId)) {
+                currentValues.add(normalizedId);
+                changed = true;
+            }
+        });
+        if (!changed) {
+            return;
+        }
+        setSelectedValues(select, Array.from(currentValues));
+    }
+
+    function renderSuggestionGroup(container, title, tags, select) {
+        if (!Array.isArray(tags) || tags.length === 0) {
+            return;
+        }
+        const groupWrapper = document.createElement('div');
+        groupWrapper.className = 'd-flex flex-column gap-2';
+
+        const headerRow = document.createElement('div');
+        headerRow.className = 'd-flex align-items-center justify-content-between gap-2';
+        const titleEl = document.createElement('span');
+        titleEl.className = 'text-muted small';
+        titleEl.textContent = title;
+        headerRow.appendChild(titleEl);
+
+        const applyAllBtn = document.createElement('button');
+        applyAllBtn.type = 'button';
+        applyAllBtn.className = 'btn btn-link btn-sm text-decoration-none p-0';
+        applyAllBtn.textContent = 'הוסף הכול';
+        applyAllBtn.addEventListener('click', () => applySuggestion(select, tags.map(tag => tag.tag_id)));
+        headerRow.appendChild(applyAllBtn);
+
+        groupWrapper.appendChild(headerRow);
+
+        const chipsRow = document.createElement('div');
+        chipsRow.className = 'd-flex flex-wrap gap-2';
+        tags.forEach((tag) => chipsRow.appendChild(buildSuggestionChip(tag, select)));
+        groupWrapper.appendChild(chipsRow);
+
+        container.appendChild(groupWrapper);
+    }
+
+    function renderSuggestionPanel(select, payload) {
+        if (!payload) {
+            return;
+        }
+        const container = getSuggestionContainer(select);
+        container.innerHTML = '';
+        const groups = [
+            { key: 'top_entity_tags', title: 'הצעות לישות' },
+            { key: 'top_category_tags', title: 'פופולריות לפי קטגוריה' },
+            { key: 'recent_tags', title: 'תגיות שהשתמשת לאחרונה' }
+        ];
+
+        let rendered = false;
+        groups.forEach((group) => {
+            const tags = payload[group.key];
+            if (Array.isArray(tags) && tags.length) {
+                renderSuggestionGroup(container, group.title, tags, select);
+                rendered = true;
+            }
+        });
+
+        if (!rendered) {
+            container.innerHTML = '<span class="text-muted small">אין הצעות זמינות עדיין</span>';
+        }
+    }
+
+    async function loadSuggestionsForSelect(select, { entityType, entityId = null } = {}) {
+        if (!window.TagService?.getSmartSuggestions || !entityType) {
+            return;
+        }
+        try {
+            const payload = await window.TagService.getSmartSuggestions({
+                entityType,
+                entityId,
+                limit: 6
+            });
+            renderSuggestionPanel(select, payload);
+        } catch (error) {
+            window.Logger?.warn('⚠️ Failed to load tag suggestions', {
+                error,
+                selectId: select.id,
+                entityType,
+                entityId,
+                page: 'tag-ui-manager'
+            });
+        }
+    }
+
     window.TagUIManager = {
         initializeModal,
         refreshSelectOptions,
         getSelectedValues,
         setSelectedValues,
         updateBadgeDisplay,
-        hydrateSelectForEntity
+        hydrateSelectForEntity,
+        loadSuggestionsForSelect,
+        renderSuggestionPanel
     };
 })();
 

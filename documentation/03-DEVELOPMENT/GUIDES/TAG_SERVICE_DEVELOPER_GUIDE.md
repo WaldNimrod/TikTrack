@@ -50,6 +50,21 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 - **Cache Invalidation:** ensure `replaceEntityTags`/`removeTagFromEntity` responses reach the caller; they already clear entity/tag caches. Avoid custom cache calls.
 - **Debugging:** run `python3 scripts/tagging/monitor_tag_links.py --entity <type> --entity-id <id>` to inspect DB state when QA reports mismatched assignments.
 
+- **Home Tag Cloud (`index.html` / `tag-search-controller.js`):**  
+  - Fetch via `TagService.getTagCloudData()` (`/api/tags/cloud`).  
+  - Font tiers use existing Bootstrap utilities; colors originate from category metadata.  
+  - Clicking a tag auto-fills the Quick Search input and fires the drawer.
+- **Quick Tag Search Drawer:**  
+  - Powered by `TagSearchController` + modal config `modal-configs/tag-search-config.js`.  
+  - Uses `TagService.searchTags(options)` (`/api/tags/search`).  
+  - Drawer hydrates entity names asynchronously via `entityDetailsAPI`, renders actions with `LinkedItemsService` helpers, and debounces input at 250 ms.
+- **Smart Suggestions in Modals:**  
+  - `ModalManagerV2._hydrateTagFieldsForModal` invokes `TagService.getSmartSuggestions(entityType, entityId)` and passes payload to `TagUIManager.loadSuggestionsForSelect`.  
+  - Suggestion chips sit under every `tag-multi-select`, include “Apply” + “Apply All” actions, and update badge view immediately.  
+  - Suggestions cached per entity for 60 seconds and invalidated automatically after successful save/replacement.
+*** End Patch
+- **Backend Support:** ensure `TagService` exposes helpers: `get_tag_cloud_data`, `search_tags`, `get_smart_suggestions`. All must enforce user scope and reuse the slug normalization helpers added in 2025-11.
+
 ---
 
 ## 6. Testing Guidelines

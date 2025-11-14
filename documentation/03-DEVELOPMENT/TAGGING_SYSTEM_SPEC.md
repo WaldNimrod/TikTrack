@@ -135,6 +135,73 @@
 - Documentation: spec, developer guide, migration guide, production rollout manual, implementation report.
 - Tooling: lint/test integration, CI updates, data verification scripts.
 
+## 11. Phase 2 Enhancements (Roadmap)
+
+### 11.1 Home Dashboard Widgets
+- **Tag Cloud Widget**
+  - Location: `trading-ui/index.html` (`#tagCloudCard`) rendered via `trading-ui/scripts/tag-search-controller.js`.
+  - Data Source: `TagService.getTagCloudData()` returning `{ tag_id, name, slug, usage_count, category_color }`.
+  - Rendering Rules:
+    - Font-size tiers rely on Bootstrap utilities (`fs-2`..`fs-5`) computed from usage percentiles (0–30, 30–50, 50–75, 75–100).
+    - Color palette uses category colors; hover shows usage count through the standard tooltip helpers.
+    - Clicking a tag auto-fills the Quick Search input and fires a search.
+  - Performance: cached for 5 minutes (`tags:cloud`). `TagService.invalidateEntity()` clears the cloud cache whenever assignments change.
+- **Quick Tag Search Widget**
+  - UI: compact form (`#tagQuickSearchForm`) with search input, entity filter, and ButtonSystem primary button.
+  - Controller: `TagSearchController` (new module) orchestrates the widget + drawer, exposes `refreshTagCloud`, `loadMoreResults`, `navigateToTagManagement`, etc.
+  - Behavior:
+    - Client-side validation enforces minimum 2 characters; status line communicates errors/success.
+    - Executes `/api/tags/search` and opens the drawer modal (`tagSearchDrawer`, defined under `modal-configs/tag-search-config.js`) that lists entities with badges + actions.
+    - Each row exposes “Open” (deep-link to page) and “Details” (Linked Items modal). Results hydrate entity names via `entityDetailsAPI`.
+  - Result Pagination: default 25 rows, “Load more” increments the limit and re-fetches.
+  - Accessibility: input uses a hidden label, status text updates through `aria-live`, drawer table inherits UnifiedTableSystem keyboard affordances.
+
+### 11.2 Tag Search Flow
+- Endpoint: `GET /api/tags/search` (params: `query`, `limit` ≤ 50, `entity_type?`, `include_inactive?`).
+- Backend contract returns `{ tag: {...}, assignments: [{ entity_type, entity_id, linked_at }] }`.
+- Frontend Flow:
+  1. `TagService.searchTags(options)` fetches tags + assignments and caches them for 60 seconds (per query/entityType tuple).
+  2. `TagSearchController` hydrates `tagSearchDrawer` and asynchronously enriches each assignment with entity metadata via `entityDetailsAPI`.
+  3. Row actions trigger `navigateToPage` (opens entity page) or `showLinkedItemsModal` (full relationship context); drawer close handled by `TagSearchController.closeDrawer()`.
+- Validation: enforced client-side. Errors surface both via status line + global notification.
+- Caching: debounce handled in the widget; the search cache invalidates on any tag assignment change (see TagService.invalidateEntity).
+
+### 11.3 Smart Suggestions
+- Goal: surface Top N tags per entity in CRUD modals (panel under each `tag-multi-select`).
+- Algorithm:
+  - **Global Score** = `usage_count * 0.6 + link_count * 0.3 + recency_boost`. Recent assignments (<14 days) receive extra boost.
+  - Provide up to 6 tags per group (top entity tags, per-category diversity, recent usage). Fallback gracefully if group empty.
+- API Contract: `GET /api/tags/aggregations/suggestions?entity_type=trade_plan&entity_id=123` returning `{ top_entity_tags, top_category_tags, recent_tags }`.
+- Modal Integration:
+  - `ModalManagerV2` now calls `_hydrateTagFieldsForModal` on every modal show (create + edit). When entity_id exists it hydrates selections, then fetches suggestions.
+  - `TagUIManager.loadSuggestionsForSelect()` renders grouped chips with “Apply” + “Apply All” actions (ButtonSystem semantics). Chips toggle selection immediately and badge view updates in real time.
+  - When no data returned, helper copy (“אין הצעות – עדיין לא נעשה שימוש בתגיות”) is displayed in the suggestion panel.
+
+### 11.4 API Aggregations
+- New Service Methods (`TagService`):
+  - `get_tag_cloud_data(user_id)` – aggregates usage counts & category colors.
+  - `search_tags(query, user_id, limit, entity_type=None)` – slug-aware search with LIKE + transliteration fallback.
+  - `get_smart_suggestions(entity_type, entity_id, user_id)` – merges usage stats + recent assignments.
+  - `get_trending_tags(user_id, window_days=14)` – optional future widget.
+- API Routes (`Backend/routes/api/tags.py`):
+  - `GET /api/tags/cloud`
+  - `GET /api/tags/search`
+  - `GET /api/tags/aggregations/suggestions`
+  - All responses wrap with `CRUDResponseHandler.success`.
+- Caching Strategy:
+  - Reuse `UnifiedCacheManager` keys (`tag_cloud`, `tag_suggestions:<entity_type>:<entity_id>`).
+  - Invalidate on `TagService.replace_tags_for_entity`, `create_tag`, `delete_tag`.
+- Security: enforce user scoping for all queries; ensure search results omit entities user cannot access (leverage existing entity permission filters).
+
+### 11.5 Documentation & Runbook Additions
+- Extend this specification plus `GUIDES/TAG_SERVICE_DEVELOPER_GUIDE.md` with:
+  - Widget behavior, data contracts, and integration steps.
+  - Admin runbook for Tag Search troubleshooting (cache reset, DB inspection via `monitor_tag_links.py`).
+- Include QA checklist covering:
+  - Tag Cloud renders ≥1/≤50 tags gracefully.
+  - Search drawer returns accurate entity links.
+  - Smart suggestions show expected chips for entities with prior assignments.
+
 ---
 
 *Prepared: November 2025 – TikTrack Development Team.*

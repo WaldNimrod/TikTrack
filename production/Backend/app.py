@@ -28,9 +28,9 @@ No connection to testing system!
     /api/trading-accounts    # Trading Accounts
     /api/trades              # Trades
     /api/tickers             # Tickers
-    /api/trade_plans         # Plans
+    /api/trade-plans         # Plans
     /api/alerts              # Alerts
-    /api/cash_flows          # Cash flows
+    /api/cash-flows          # Cash flows
     /api/notes               # Notes
     /api/executions          # Executions
     /api/tests/run        # Run tests (testing system)
@@ -96,12 +96,13 @@ import os
 # Add both the external_data_integration_server directory and its parent to Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
+repo_root = os.path.dirname(project_root)
 external_data_path = os.path.join(project_root, 'external_data_integration_server')
+shared_backend_path = os.path.join(repo_root, 'Backend')
 
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-if external_data_path not in sys.path:
-    sys.path.insert(0, external_data_path)
+for path in (project_root, external_data_path, repo_root, shared_backend_path):
+    if path not in sys.path:
+        sys.path.insert(0, path)
 
 try:
     from services.data_refresh_scheduler import DataRefreshScheduler
@@ -125,6 +126,7 @@ from routes.api import (
     cash_flows_bp,
     notes_bp,
     executions_bp,
+    tags_bp,
     users_bp,
     background_tasks_bp,
     entity_details_bp,
@@ -434,6 +436,7 @@ app.register_blueprint(alerts_bp)
 app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
+app.register_blueprint(tags_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)

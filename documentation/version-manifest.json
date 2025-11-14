@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.2.0.0",
+    "version": "1.2.0.1",
     "major": 1,
     "minor": 2,
     "patch": 0,
-    "build": 0,
-    "commit": "b7d12c2d678edb97006b26f0391ab04d5a8af0b4",
-    "updated_at": "2025-11-14T21:05:43+00:00",
-    "notes": "Prod 1.2: lint monitor UX + tagging refresh"
+    "build": 1,
+    "commit": "b2b958eb3229f28afbb7c111f214f31bd11c40b0",
+    "updated_at": "2025-11-14T21:26:21+00:00",
+    "notes": "Fix production server import path"
   },
   "development": {
     "version": "1.0.23.0",

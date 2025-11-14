@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 # Production settings file - values are hardcoded for isolation
+ENVIRONMENT = "production"
 IS_PRODUCTION = True
 
 # Paths

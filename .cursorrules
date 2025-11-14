@@ -67,6 +67,7 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 - **NEVER RUN**: `python3 Backend/app.py` directly
 - **ALWAYS CHECK**: for running processes before starting
 - **IF PORT OCCUPIED**: Look for existing processes first
+- **ENVIRONMENT REMINDER**: בזמן עבודה בתיקיית `TikTrackApp-Production` נחשיב תמיד את ההרצה כפרודקשן (פורט 5001) אלא אם נאמר אחרת במפורש. סביבת dev (8080) מותרת רק כשהמשתמש מבקש אותה במפורש.
 
 ### Active Server Files (ONLY These):
 - **`Backend/app.py`** - Main server file (ONLY active server)

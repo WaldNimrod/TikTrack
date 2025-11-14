@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.0.8.0",
+    "version": "1.1.1.0",
     "major": 1,
-    "minor": 0,
-    "patch": 8,
+    "minor": 1,
+    "patch": 1,
     "build": 0,
-    "commit": "0d5f54c8d41e340b2105b04a094442ec6f8701f5",
-    "updated_at": "2025-11-14T22:50:56+00:00",
-    "notes": "Sync workspace changes for production release"
+    "commit": "87cdd25fd639298da485550f8bd5ee10917c034d",
+    "updated_at": "2025-11-14T22:52:17+00:00",
+    "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.0.37.0",
+    "version": "1.1.1.0",
     "major": 1,
-    "minor": 0,
-    "patch": 37,
+    "minor": 1,
+    "patch": 1,
     "build": 0,
-    "commit": "0d5f54c8d41e340b2105b04a094442ec6f8701f5",
-    "updated_at": "2025-11-14T22:51:27+00:00",
-    "notes": "Sync workspace changes for production release"
+    "commit": "87cdd25fd639298da485550f8bd5ee10917c034d",
+    "updated_at": "2025-11-14T22:53:46+00:00",
+    "notes": "Align development baseline to production 1.1.1"
   }
 }

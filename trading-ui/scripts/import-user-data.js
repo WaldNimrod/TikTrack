@@ -30,7 +30,7 @@
  * PROBLEM RESOLUTION
  *   - clearProblemSections()
  *   - displayExistingRecords()
- *   - renderMissingTickerCard()
+ *   - renderMissingTickerRow()
  * UI INTERACTION
  *   - handleImportStepChange()
  *   - updateImportProgressBar()
@@ -192,17 +192,18 @@ function trackProblemStatus(problemKey, items, identifierFn, metadataFn) {
     const resolvedMap = problemResolutionState.resolved[problemKey] || new Map();
 
     const currentMap = new Map();
-    (items || []).forEach((item) => {
-        const id = identifierFn(item);
+    (items || []).forEach((item, index) => {
+        const id = identifierFn(item, index);
         if (!id) {
             return;
         }
-        const meta = metadataFn ? metadataFn(item) : { id, title: id };
-        currentMap.set(id, meta);
+        const meta = metadataFn ? metadataFn(item, index) : { id, title: id };
+        currentMap.set(id, { item, meta, index });
     });
 
-    prevMap.forEach((meta, id) => {
+    prevMap.forEach((entry, id) => {
         if (!currentMap.has(id)) {
+            const meta = entry?.meta || entry;
             resolvedMap.set(id, {
                 meta,
                 resolvedAt: now
@@ -210,7 +211,7 @@ function trackProblemStatus(problemKey, items, identifierFn, metadataFn) {
         }
     });
 
-    currentMap.forEach((meta, id) => {
+    currentMap.forEach((entry, id) => {
         if (resolvedMap.has(id)) {
             resolvedMap.delete(id);
         }
@@ -226,26 +227,14 @@ function trackProblemStatus(problemKey, items, identifierFn, metadataFn) {
     problemResolutionState.resolved[problemKey] = resolvedMap;
 
     return {
-        resolvedEntries: Array.from(resolvedMap.values()).map(entry => entry.meta),
+        resolvedMetadata: Array.from(resolvedMap.values()).map(entry => entry.meta),
+        unresolvedItems: Array.from(currentMap.values()).map(entry => ({
+            item: entry.item,
+            meta: entry.meta,
+            index: entry.index
+        })),
         currentMap
     };
-}
-
-function renderResolvedProblemCard(meta = {}) {
-    const title = escapeHtml(meta.title || meta.id || 'בעיה טופלה');
-    const description = escapeHtml(meta.description || 'הבעיה טופלה בהצלחה.');
-    const icon = meta.icon || 'bi bi-check-circle';
-    return `
-        <div class="problem-card resolved-card">
-            <div class="problem-card-header">
-                <i class="${icon}"></i>
-                <span>${title}</span>
-            </div>
-            <div class="problem-card-body">
-                <p>${description}</p>
-            </div>
-        </div>
-    `;
 }
 
 if (typeof window !== 'undefined') {
@@ -1759,14 +1748,35 @@ function ensureTickerSaveHook(retry = 0) {
                 error: syncError?.message
             });
         }
+
         const result = await saveFn.apply(this, args);
-        if (currentSessionId && result) {
-            try {
-                refreshPreviewData();
+
+        if (currentSessionId) {
+            const scheduleRefresh = () => {
+                try {
+                    const refreshPromise = refreshPreviewData();
+                    if (refreshPromise?.catch) {
+                        refreshPromise.catch((error) => {
+                            window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save (async)', {
+                                error: error?.message
+                            });
+                        });
+                    }
             } catch (error) {
-                window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save', { error: error.message });
+                    window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save', {
+                        error: error?.message
+                    });
+                }
+            };
+
+            // הפעלת רענון לאחר השלמת פעולת השמירה, עם דילי קצר לביטחון
+            if (typeof window.requestAnimationFrame === 'function') {
+                window.requestAnimationFrame(() => setTimeout(scheduleRefresh, 150));
+            } else {
+                setTimeout(scheduleRefresh, 150);
             }
         }
+
         return result;
     };
 
@@ -2532,14 +2542,121 @@ function clearProblemSections() {
     });
 }
 
+function initializeButtonsForProblemTable(tableElement) {
+    if (!tableElement) {
+        return;
+    }
+
+    const target = tableElement.querySelector('tbody') || tableElement;
+    const processButtonsFn = window.ButtonSystem?.processButtons
+        ? window.ButtonSystem.processButtons.bind(window.ButtonSystem)
+        : (typeof window.processButtons === 'function' ? window.processButtons : null);
+    const initializeButtonsFn = window.ButtonSystem?.initializeButtons
+        ? window.ButtonSystem.initializeButtons.bind(window.ButtonSystem)
+        : (typeof window.initializeButtons === 'function' ? window.initializeButtons : null);
+
+    const runButtonProcessing = () => {
+        try {
+            if (processButtonsFn) {
+                processButtonsFn(target);
+            } else if (initializeButtonsFn) {
+                initializeButtonsFn(target);
+            }
+        } catch (error) {
+            window.Logger?.debug?.('[Import Modal] Failed to initialize buttons for problem table', {
+                tableId: tableElement.id,
+                error: error?.message
+            });
+        }
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(runButtonProcessing);
+    } else {
+        runButtonProcessing();
+    }
+}
+
+function markProblemTableReady(tableId) {
+    const tableElement = document.getElementById(tableId);
+    if (!tableElement) {
+        return;
+    }
+    tableElement.setAttribute('data-table-initialized', 'true');
+    initializeButtonsForProblemTable(tableElement);
+}
+
+function releaseProblemTables() {
+    const problemTableIds = [
+        'missingTickersTable',
+        'cashflowMissingAccountsTable',
+        'cashflowCurrencyIssuesTable',
+        'accountMissingAccountsTable',
+        'accountCurrencyMismatchesTable',
+        'accountEntitlementWarningsTable',
+        'accountMissingDocumentsTable',
+        'existingRecordsTable',
+        'withinFileDuplicatesTable'
+    ];
+
+    problemTableIds.forEach((tableId) => {
+        const tableElement = document.getElementById(tableId);
+        if (!tableElement) {
+            return;
+        }
+
+        const tableType = tableElement.getAttribute('data-table-type');
+        const initialized = tableElement.getAttribute('data-table-initialized');
+
+        if (!tableType) {
+            return;
+        }
+
+        try {
+            if (window.TableDataRegistry?.clear) {
+                window.TableDataRegistry.clear(tableType);
+            }
+            if (window.TableRegistry?.releaseTable) {
+                window.TableRegistry.releaseTable(tableType);
+                window.Logger?.debug?.('[Import Modal] Released table via TableRegistry', {
+                    tableId,
+                    tableType
+                });
+            } else if (window.UnifiedTableSystem?.releaseTable) {
+                window.UnifiedTableSystem.releaseTable(tableType);
+                window.Logger?.debug?.('[Import Modal] Released table via UnifiedTableSystem', {
+                    tableId,
+                    tableType
+                });
+            }
+        } catch (releaseError) {
+            window.Logger?.debug?.('[Import Modal] Failed to release table', {
+                tableId,
+                tableType,
+                error: releaseError?.message
+            });
+        }
+
+        if (initialized) {
+            tableElement.setAttribute('data-table-initialized', 'false');
+        }
+
+        const tbody = tableElement.querySelector('tbody');
+        if (tbody) {
+            const columnCount = tableElement.querySelectorAll('thead th').length || 1;
+            tbody.innerHTML = renderTableEmptyRow(columnCount, 'טוען נתונים...');
+        }
+    });
+}
+
 /**
  * Display existing records
  */
 function displayExistingRecords(existingRecords) {
     const section = document.getElementById('existingRecordsSection');
-    const container = document.getElementById('existingRecordsContainer');
+    const tableBody = document.getElementById('existingRecordsTableBody');
     
-    if (!section || !container) return;
+    if (!section || !tableBody) return;
     
     const tracking = trackProblemStatus(
         'existingRecords',
@@ -2548,20 +2665,20 @@ function displayExistingRecords(existingRecords) {
         (record) => buildDuplicateResolvedMeta(record, 'רשימה קיימת')
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (existingRecords || []).map((record, index) => 
-        renderDuplicateCard(record, 'existing_record', index)
-    );
-    const cards = [...resolvedCards, ...unresolvedCards];
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(7, 'אין רשומות קיימות למעקב.');
+        markProblemTableReady('existingRecordsTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map((entry) => renderDuplicateRow(entry.item, 'existing_record', entry.index))
+        .join('');
+    markProblemTableReady('existingRecordsTable');
 }
 
 /**
@@ -3666,6 +3783,13 @@ async function loadProblemResolution(autoTriggered = false) {
     });
     const analysisFallback = buildProblemResolutionFromAnalysis(analysisResults);
     setAnalysisLoadingState(true, 'טוען נתוני פתרון בעיות...', 70);
+    let overlayApplied = false;
+    try {
+        showProcessingOverlay('טוען נתוני פתרון בעיות...');
+        overlayApplied = true;
+    } catch (overlayError) {
+        window.Logger?.debug?.('[Import Modal] Failed to show processing overlay', { error: overlayError?.message });
+    }
 
     try {
         const response = await fetch(`/api/user-data-import/session/${currentSessionId}/preview?task_type=${encodeURIComponent(taskKey)}`, {
@@ -3692,6 +3816,10 @@ async function loadProblemResolution(autoTriggered = false) {
                 continueBtn.disabled = false;
                 continueBtn.setAttribute('aria-disabled', 'false');
             }
+            if (overlayApplied) {
+                hideProcessingOverlay();
+                overlayApplied = false;
+            }
             return;
         }
 
@@ -3716,6 +3844,10 @@ async function loadProblemResolution(autoTriggered = false) {
     }
 
     if (analysisFallback) {
+        if (overlayApplied) {
+            hideProcessingOverlay();
+            overlayApplied = false;
+        }
         displayProblemResolutionDetailed({
             summary: analysisFallback.summary,
             records_to_skip: analysisFallback.records_to_skip,
@@ -3744,6 +3876,10 @@ async function loadProblemResolution(autoTriggered = false) {
             continueBtn.disabled = false;
             continueBtn.setAttribute('aria-disabled', 'false');
         }
+    }
+
+    if (overlayApplied) {
+        hideProcessingOverlay();
     }
 }
 
@@ -3926,6 +4062,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
             const mtmPL = record.mtm_pl !== null && record.mtm_pl !== undefined 
                 ? (record.mtm_pl >= 0 ? `$${record.mtm_pl}` : `-$${Math.abs(record.mtm_pl)}`) 
                 : '-';
+        const dateDisplay = renderImportDate(record.date, 'N/A');
             row.innerHTML = `
                 <td>${record.symbol || record.ticker || 'N/A'}</td>
                 <td>${record.action || 'N/A'}</td>
@@ -3934,7 +4071,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
                 <td>${record.fee || record.commission || 'N/A'}</td>
                 <td>${realizedPL}</td>
                 <td>${mtmPL}</td>
-                <td>${record.date || 'N/A'}</td>
+            <td>${dateDisplay}</td>
             `;
             importTableBody.appendChild(row);
         });
@@ -3953,6 +4090,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
             const mtmPL = record.mtm_pl !== null && record.mtm_pl !== undefined 
                 ? (record.mtm_pl >= 0 ? `$${record.mtm_pl}` : `-$${Math.abs(record.mtm_pl)}`) 
                 : '-';
+        const dateDisplay = renderImportDate(record.date, 'N/A');
             row.innerHTML = `
                 <td>${record.symbol || record.ticker || 'N/A'}</td>
                 <td>${record.action || 'N/A'}</td>
@@ -3961,7 +4099,7 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
                 <td>${record.fee || record.commission || 'N/A'}</td>
                 <td>${realizedPL}</td>
                 <td>${mtmPL}</td>
-                <td>${record.date || 'N/A'}</td>
+            <td>${dateDisplay}</td>
                 <td>${wrapper.reason || 'N/A'}</td>
             `;
             skipTableBody.appendChild(row);
@@ -4356,7 +4494,7 @@ function displayProblemResolution(data) {
                         <div class="problem-card within-file-duplicate">
                             <div class="problem-card-header">
                                 <i class="fas fa-copy"></i>
-                                <span>${dup.symbol} - ${dup.date}</span>
+                                <span>${dup.symbol} - ${renderImportDate(dup.date || dup.record?.date, '—')}</span>
                                             </div>
                             <div class="problem-card-body">
                                 <div class="problem-card-details">
@@ -4390,7 +4528,7 @@ function displayProblemResolution(data) {
                         <div class="problem-card existing-record-card">
                             <div class="problem-card-header">
                                 <i class="fas fa-database"></i>
-                                <span>${record.symbol} - ${record.date}</span>
+                                <span>${record.symbol} - ${renderImportDate(record.date || record.record?.date, '—')}</span>
                             </div>
                             <div class="problem-card-body">
                                 <div class="problem-card-details">
@@ -4682,7 +4820,7 @@ function displayPreview(data) {
                                 ${data.records_to_import?.map(record => `
                                     <tr>
                 <td>${record.symbol}</td>
-                                        <td>${record.date}</td>
+                                        <td>${renderImportDate(record.date, '—')}</td>
                 <td>${record.quantity}</td>
                                         <td>${record.price}</td>
                                         <td>${record.fee}</td>
@@ -4710,7 +4848,7 @@ function displayPreview(data) {
                                 ${data.records_to_skip?.map(record => `
                                     <tr>
                 <td>${record.symbol}</td>
-                                        <td>${record.date}</td>
+                                        <td>${renderImportDate(record.date, '—')}</td>
                 <td>${record.quantity}</td>
                                         <td>${record.price}</td>
                                         <td>${record.reason}</td>
@@ -5108,6 +5246,7 @@ function displayProblemResolutionDetailed(data) {
 
     const taskType = (data.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions').toLowerCase();
     clearProblemSections();
+    releaseProblemTables();
     updateSymbolMetadataCache(data?.symbol_metadata || data?.summary?.symbol_metadata);
 
     if (taskType === 'cashflows') {
@@ -5172,9 +5311,9 @@ function clearProblemSectionsForSession() {
  */
 function displayMissingTickers(missingTickers) {
     const section = document.getElementById('missingTickersSection');
-    const container = document.getElementById('missingTickersContainer');
+    const tableBody = document.getElementById('missingTickersTableBody');
     
-    if (!section || !container) return;
+    if (!section || !tableBody) return;
     
     const tracking = trackProblemStatus(
         'missingTickers',
@@ -5191,28 +5330,30 @@ function displayMissingTickers(missingTickers) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (missingTickers || []).map((ticker) => renderMissingTickerCard(ticker));
-    const cards = [...resolvedCards, ...unresolvedCards];
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(5, 'אין טיקרים חסרים.');
+        markProblemTableReady('missingTickersTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map((entry) => renderMissingTickerRow(entry.item))
+        .join('');
+    markProblemTableReady('missingTickersTable');
 }
 
 /**
  * Display within-file duplicates
  */
-function displayWithinFileDuplicates(duplicates) {
+function displayWithinFileDuplicates(duplicates, activeMatchIndexSet = new Set()) {
     const section = document.getElementById('withinFileDuplicatesSection');
-    const container = document.getElementById('withinFileDuplicatesContainer');
+    const tableBody = document.getElementById('withinFileDuplicatesTableBody');
     
-    if (!section || !container) return;
+    if (!section || !tableBody) return;
     
     const tracking = trackProblemStatus(
         'withinFileDuplicates',
@@ -5221,63 +5362,209 @@ function displayWithinFileDuplicates(duplicates) {
         (duplicate) => buildDuplicateResolvedMeta(duplicate, 'כפילות בתוך הקובץ')
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (duplicates || []).map((duplicate, index) => 
-        renderDuplicateCard(duplicate, 'within_file', index)
-    );
-    const cards = [...resolvedCards, ...unresolvedCards];
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(7, 'אין כפילויות פעילות בקובץ.');
+        markProblemTableReady('withinFileDuplicatesTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map((entry) => renderDuplicateRow(entry.item, 'within_file', entry.index, activeMatchIndexSet))
+        .join('');
+    markProblemTableReady('withinFileDuplicatesTable');
 }
 
-/**
- * Render missing ticker card
- */
-function renderMissingTickerCard(ticker) {
-    const symbol = typeof ticker === 'string' ? ticker : ticker.symbol;
-    const currency = typeof ticker === 'string' ? 'USD' : ticker.currency;
-    const metadata = getSymbolMetadata(symbol);
-    const metadataSummary = metadata
-        ? `
-            <div class="missing-ticker-metadata">
-                ${metadata.company_name ? `<div class="missing-ticker-company"><i class="bi bi-building"></i> ${escapeHtml(metadata.company_name)}</div>` : ''}
-                ${buildMetadataLinksList(metadata, {
+function renderMissingTickerRow(ticker) {
+    const normalizedSymbol = normalizeProblemTicker(ticker) || 'לא ידוע';
+    const currency = typeof ticker === 'string'
+        ? 'USD'
+        : (ticker.currency || ticker.currency_code || '—');
+    const metadata = getSymbolMetadata(normalizedSymbol) || (typeof ticker === 'object' ? ticker.metadata : null);
+    const companyName = metadata?.company_name || ticker?.company_name || '—';
+    const linksBlock = metadata
+        ? buildMetadataLinksList(metadata, {
                     containerClass: 'missing-ticker-links',
                     listClass: 'missing-ticker-links-list',
                     statusClass: 'missing-ticker-links-status',
                     showStatus: true
-                })}
-            </div>
-        `
+        })
         : '';
-    
-    return `
-        <div class="problem-card missing-ticker-card">
-            <div class="problem-card-header">
-                <i class="bi bi-exclamation-circle"></i>
-                <span>${symbol}</span>
-            </div>
-            <div class="problem-card-body">
-                <div class="missing-ticker-info">
-                    <i class="bi bi-info-circle"></i>
-                    הטיקר ${symbol} לא קיים במערכת
-                </div>
-                ${metadataSummary}
-            </div>
-            <div class="problem-card-actions">
-                <button class="btn btn-sm btn-primary" onclick="openAddTickerModal('${symbol}', '${currency}')">
-                    <i class="bi bi-plus-circle"></i>
-                    הוסף טיקר
+    const linksHtml = linksBlock || '—';
+
+    const addTickerBtn = `
+        <button
+            data-button-type="ADD"
+            data-entity-type="ticker"
+            data-variant="full"
+            data-onclick="openAddTickerModal('${escapeAttribute(normalizedSymbol)}','${escapeAttribute(currency || 'USD')}')"
+            data-text="הוסף טיקר"
+            title="הוסף את הטיקר למערכת"
+            aria-label="הוסף את הטיקר ${escapeAttribute(normalizedSymbol)} למערכת">
                 </button>
-            </div>
-        </div>
+    `;
+
+    return `
+        <tr>
+            <td>${escapeHtml(normalizedSymbol)}</td>
+            <td>${escapeHtml(currency || '—')}</td>
+            <td>${escapeHtml(companyName || '—')}</td>
+            <td>${linksHtml}</td>
+            <td class="text-center">
+                ${addTickerBtn}
+            </td>
+        </tr>
+    `;
+}
+
+function renderCashflowMissingAccountRow(account) {
+    const identifier = typeof account === 'string'
+        ? account
+        : (normalizeAccountIdentifier(account) || account.account_id || account.accountId || 'לא ידוע');
+    const provider = typeof account === 'object'
+        ? (account.provider || account.provider_name || account.metadata?.provider || account.source || '—')
+        : '—';
+    const status = typeof account === 'object'
+        ? (account.status || account.account_status || account.state || 'missing')
+        : 'missing';
+    const detail = typeof account === 'object'
+        ? (account.memo || account.note || account.metadata?.note || account.metadata?.description || '')
+        : '';
+
+    return `
+        <tr>
+            <td>${escapeHtml(identifier || 'לא ידוע')}</td>
+            <td>${escapeHtml(provider || '—')}</td>
+            <td>${escapeHtml(status)}</td>
+            <td>${escapeHtml(detail || '—')}</td>
+        </tr>
+    `;
+}
+
+function renderCashflowCurrencyIssueRow(issue) {
+    if (typeof issue === 'string') {
+        return `
+            <tr>
+                <td>—</td>
+                <td>${escapeHtml(issue)}</td>
+                <td>—</td>
+                <td>—</td>
+            </tr>
+        `;
+    }
+
+    const currency = issue.currency || issue.currency_code || issue.reported || 'לא ידוע';
+    const message = issue.message || issue.detail || 'בעיה במטבע הרשומה';
+    const sourceAccount = issue.source_account || issue.account || '—';
+    const recordIndex = issue.record_index !== undefined ? issue.record_index : '—';
+
+    return `
+        <tr>
+            <td>${escapeHtml(currency)}</td>
+            <td>${escapeHtml(message)}</td>
+            <td>${escapeHtml(sourceAccount)}</td>
+            <td>${escapeHtml(recordIndex)}</td>
+        </tr>
+    `;
+}
+
+function renderAccountMissingAccountRow(account) {
+    const identifier = typeof account === 'string'
+        ? account
+        : (normalizeAccountIdentifier(account) || account.account_id || account.accountId || 'לא ידוע');
+    const status = typeof account === 'object'
+        ? (account.status || account.account_status || account.state || 'missing')
+        : 'missing';
+    const detail = typeof account === 'object'
+        ? (account.message || account.note || account.description || '')
+        : '';
+
+    return `
+        <tr>
+            <td>${escapeHtml(identifier || 'לא ידוע')}</td>
+            <td>${escapeHtml(status)}</td>
+            <td>${escapeHtml(detail || '—')}</td>
+        </tr>
+    `;
+}
+
+function renderAccountCurrencyMismatchRow(item) {
+    if (typeof item === 'string') {
+        return `
+            <tr>
+                <td>—</td>
+                <td>—</td>
+                <td>${escapeHtml(item)}</td>
+            </tr>
+        `;
+    }
+
+    const accountId = normalizeAccountIdentifier(item) || item.account_id || item.accountId || 'לא ידוע';
+    const expected = item.expected || item.expected_currency || '—';
+    const reported = item.reported || item.reported_currency || '—';
+
+    return `
+        <tr>
+            <td>${escapeHtml(accountId)}</td>
+            <td>${escapeHtml(expected)}</td>
+            <td>${escapeHtml(reported)}</td>
+        </tr>
+    `;
+}
+
+function renderAccountEntitlementWarningRow(item) {
+    if (typeof item === 'string') {
+        return `
+            <tr>
+                <td>—</td>
+                <td>${escapeHtml(item)}</td>
+                <td>—</td>
+            </tr>
+        `;
+    }
+
+    const accountId = normalizeAccountIdentifier(item) || item.account_id || item.accountId || 'לא ידוע';
+    const message = item.message || item.warning || 'חסרות הרשאות נדרשות';
+    const entitlements = Array.isArray(item.entitlements)
+        ? item.entitlements.join(', ')
+        : (Array.isArray(item.current_entitlements) ? item.current_entitlements.join(', ') : '—');
+
+    return `
+        <tr>
+            <td>${escapeHtml(accountId)}</td>
+            <td>${escapeHtml(message)}</td>
+            <td>${escapeHtml(entitlements || '—')}</td>
+        </tr>
+    `;
+}
+
+function renderAccountMissingDocumentsRow(item) {
+    let accountId = 'לא ידוע';
+    let documents = [];
+
+    if (typeof item === 'string') {
+        documents = [item];
+    } else if (item && typeof item === 'object') {
+        accountId = normalizeAccountIdentifier(item) || item.account_id || item.accountId || 'לא ידוע';
+        if (Array.isArray(item.documents)) {
+            documents = item.documents;
+        } else if (Array.isArray(item.required_documents)) {
+            documents = item.required_documents;
+        }
+    }
+
+    if (!documents.length) {
+        documents = ['—'];
+    }
+
+    return `
+        <tr>
+            <td>${escapeHtml(accountId)}</td>
+            <td>${documents.map(doc => escapeHtml(doc)).join('<br>')}</td>
+        </tr>
     `;
 }
 
@@ -5299,7 +5586,7 @@ function getDuplicateIdentifier(duplicate, fallbackType = 'duplicate') {
 function buildDuplicateResolvedMeta(duplicate, typeLabel = 'כפילות') {
     const { record } = extractPreviewRecord(duplicate);
     const symbol = normalizeProblemTicker(record?.symbol || duplicate.symbol) || 'N/A';
-    const dateValue = record?.date || duplicate.date || '';
+    const dateValue = renderImportDate(record?.date || duplicate.date, '');
     return {
         id: getDuplicateIdentifier(duplicate, typeLabel),
         title: `${symbol} \u2013 ${typeLabel} טופלה`,
@@ -5327,63 +5614,164 @@ function buildValueOrFallback(value, fallback = 'N/A') {
     if (value === null || value === undefined || value === '') {
         return fallback;
     }
+    if (typeof value === 'object') {
+        const hasDateEnvelopeShape = Boolean(
+            value &&
+            (
+                Object.prototype.hasOwnProperty.call(value, 'utc') ||
+                Object.prototype.hasOwnProperty.call(value, 'local') ||
+                Object.prototype.hasOwnProperty.call(value, 'display') ||
+                Object.prototype.hasOwnProperty.call(value, 'epochMs')
+            )
+        );
+        if (hasDateEnvelopeShape) {
+            const rendered = renderImportDate(value, fallback);
+            return rendered || fallback;
+        }
+    }
     return value;
 }
 
-function renderDuplicateCard(duplicate, type, index) {
+function renderTableEmptyRow(colspan, message) {
+    return `
+        <tr>
+            <td colspan="${colspan}" class="empty-row">${escapeHtml(message)}</td>
+        </tr>
+    `;
+}
+
+function getPreviewRecordIndex(record, duplicate, fallbackIndex) {
+    const candidates = [record, duplicate];
+    for (const candidate of candidates) {
+        if (!candidate || typeof candidate !== 'object') {
+            continue;
+        }
+        if (typeof candidate.record_index === 'number') {
+            return candidate.record_index;
+        }
+        if (typeof candidate.recordIndex === 'number') {
+            return candidate.recordIndex;
+        }
+    }
+    return typeof fallbackIndex === 'number' ? fallbackIndex : 0;
+}
+
+function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Set()) {
     const { record } = extractPreviewRecord(duplicate);
     const symbol = record?.symbol || record?.ticker || duplicate.symbol || 'לא ידוע';
     const action = record?.action || duplicate.action || 'לא ידוע';
-    const quantity = record?.quantity || duplicate.quantity || 'לא ידוע';
-    const price = record?.price || duplicate.price || 'לא ידוע';
-    const dateValue = record?.date || duplicate.date || 'לא ידוע';
+    const quantity = escapeHtml(buildValueOrFallback(record?.quantity ?? duplicate.quantity, '—'));
+    const price = escapeHtml(buildValueOrFallback(record?.price ?? duplicate.price, '—'));
+    const dateValue = escapeHtml(renderImportDate(record?.date || duplicate.date, '—'));
     const confidence = duplicate.confidence_score || duplicate.confidence || 0;
     const confidenceClass = getConfidenceClass(confidence);
-    
-    return `
-        <div class="problem-card ${type === 'within_file' ? 'within-file-duplicate' : 'existing-record-card'}">
-            <div class="problem-card-header">
-                <i class="bi ${type === 'within_file' ? 'bi-files' : 'bi-exclamation-triangle'}"></i>
-                <span>${symbol}</span>
-            </div>
-            <div class="problem-card-body">
-                <div class="problem-card-details">
-                    <div class="problem-card-detail">
-                        <span class="problem-card-detail-label">פעולה:</span>
-                        <span class="problem-card-detail-value">${action}</span>
-                    </div>
-                    <div class="problem-card-detail">
-                        <span class="problem-card-detail-label">כמות:</span>
-                        <span class="problem-card-detail-value">${quantity}</span>
-                    </div>
-                    <div class="problem-card-detail">
-                        <span class="problem-card-detail-label">מחיר:</span>
-                        <span class="problem-card-detail-value">${price}</span>
-                    </div>
-                    <div class="problem-card-detail">
-                        <span class="problem-card-detail-label">תאריך:</span>
-                        <span class="problem-card-detail-value">${dateValue}</span>
-                    </div>
-                </div>
-                <div class="problem-card-confidence ${confidenceClass}">
-                    <span class="confidence-text">רמת ביטחון: ${confidence}%</span>
-                    <div class="confidence-bar">
-                        <div class="confidence-fill" style="width: ${confidence}%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="problem-card-actions">
-                <button class="btn btn-sm btn-success" onclick="acceptDuplicate(${index}, '${type}')">
-                    <i class="bi bi-check-circle"></i>
-                    קבל
+    const resolvedIndex = getPreviewRecordIndex(record, duplicate, index);
+    const normalizedType = type === 'existing_record' ? 'existing_record' : 'within_file';
+    const duplicateReason = record?.reason || duplicate.reason || (normalizedType === 'existing_record' ? 'existing_record' : 'within_file_duplicate');
+    const matches = (duplicate?.details?.within_file_matches || []).filter(
+        match => typeof match?.record_index === 'number' && activeMatchIndexSet.has(match.record_index)
+    );
+    const matchRows = renderDuplicateMatchRows(matches);
+
+    const acceptButton = `
+        <button
+            data-button-type="APPROVE"
+            data-variant="small"
+            data-onclick="acceptDuplicate(${resolvedIndex}, '${duplicateReason}')"
+            data-text="אשר"
+            title="אשר רשומה זו"
+            aria-label="אשר רשומה עבור ${escapeAttribute(symbol)}">
                 </button>
-                <button class="btn btn-sm btn-danger" onclick="rejectDuplicate(${index}, '${type}')">
-                    <i class="bi bi-x-circle"></i>
-                    דחה
-                </button>
-            </div>
-        </div>
     `;
+
+    const rejectButton = `
+        <button
+            data-button-type="REJECT"
+            data-variant="small"
+            data-onclick="rejectDuplicate(${resolvedIndex}, '${duplicateReason}')"
+            data-text="דחה"
+            title="דחה רשומה זו"
+            aria-label="דחה רשומה עבור ${escapeAttribute(symbol)}">
+                </button>
+    `;
+
+    return `
+        <tr>
+            <td>${escapeHtml(symbol)}</td>
+            <td>${escapeHtml(action)}</td>
+            <td>${quantity}</td>
+            <td>${price}</td>
+            <td>${dateValue}</td>
+            <td><span class="confidence-text ${confidenceClass}">${confidence}%</span></td>
+            <td class="text-center table-action-buttons">
+                ${acceptButton}
+                ${rejectButton}
+            </td>
+        </tr>
+        ${matchRows}
+    `;
+}
+
+function renderDuplicateMatchRows(matches) {
+    if (matches.length === 0) {
+        return '';
+    }
+
+    return matches.map((match) => {
+        const { record } = extractPreviewRecord(match);
+        const matchSymbol = record?.symbol || match.symbol || 'לא ידוע';
+        const matchAction = record?.action || match.action || 'לא ידוע';
+        const matchQuantity = escapeHtml(buildValueOrFallback(record?.quantity ?? match.quantity, '—'));
+        const matchPrice = escapeHtml(buildValueOrFallback(record?.price ?? match.price, '—'));
+        const matchDate = escapeHtml(renderImportDate(record?.date || match.date, '—'));
+        const confidence = match.confidence_score || match.confidence || 0;
+        const confidenceClass = getConfidenceClass(confidence);
+        const matchIndex = getPreviewRecordIndex(record, match, match.record_index);
+
+        const acceptMatchButton = `
+            <button
+                data-button-type="APPROVE"
+                data-variant="small"
+                data-onclick="acceptDuplicate(${matchIndex}, 'within_file_duplicate_match')"
+                data-text="אשר"
+                title="אשר רשומה תואמת"
+                aria-label="אשר רשומה תואמת עבור ${escapeAttribute(matchSymbol)}">
+            </button>
+        `;
+
+        const rejectMatchButton = `
+            <button
+                data-button-type="REJECT"
+                data-variant="small"
+                data-onclick="rejectDuplicate(${matchIndex}, 'within_file_duplicate_match')"
+                data-text="דחה"
+                title="דחה רשומה תואמת"
+                aria-label="דחה רשומה תואמת עבור ${escapeAttribute(matchSymbol)}">
+            </button>
+        `;
+
+        return `
+            <tr class="duplicate-match-row">
+                <td colspan="7">
+                    <div class="duplicate-match-container">
+                        <div class="duplicate-match-details">
+                            <strong>רשומה תואמת:</strong>
+                            <span>${escapeHtml(matchSymbol)}</span>
+                            <span>${escapeHtml(matchAction)}</span>
+                            <span>${matchQuantity}</span>
+                            <span>${matchPrice}</span>
+                            <span>${matchDate}</span>
+                            <span class="confidence-text ${confidenceClass}">${confidence}%</span>
+                        </div>
+                        <div class="duplicate-match-actions">
+                            ${acceptMatchButton}
+                            ${rejectMatchButton}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 /**
@@ -5550,10 +5938,14 @@ function renderExecutionProblemSections(data) {
 
 function renderExecutionStyleProblems(data) {
     const skipRecords = data.records_to_skip || [];
-    const withinFileDuplicates = skipRecords.filter(record => 
-        record.reason === 'within_file_duplicate' || record.reason === 'within_file_duplicate_match'
+    const withinFileDuplicates = skipRecords.filter(record => record.reason === 'within_file_duplicate');
+    const activeMatchIndexSet = new Set(
+        skipRecords
+            .filter(record => record.reason === 'within_file_duplicate_match' && typeof record.record_index === 'number')
+            .map(record => record.record_index)
     );
-    displayWithinFileDuplicates(withinFileDuplicates);
+
+    displayWithinFileDuplicates(withinFileDuplicates, activeMatchIndexSet);
 
     const existingRecords = skipRecords.filter(record => record.reason === 'existing_record');
     displayExistingRecords(existingRecords);
@@ -5585,8 +5977,8 @@ function renderAccountReconciliationProblems(data) {
 
 function displayCashflowMissingAccounts(accounts) {
     const section = document.getElementById('cashflowMissingAccountsSection');
-    const container = document.getElementById('cashflowMissingAccountsContainer');
-    if (!section || !container) return;
+    const tableBody = document.getElementById('cashflowMissingAccountsTableBody');
+    if (!section || !tableBody) return;
 
     const tracking = trackProblemStatus(
         'cashflowMissingAccounts',
@@ -5606,53 +5998,26 @@ function displayCashflowMissingAccounts(accounts) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (accounts || []).map(account => {
-        if (typeof account === 'string') {
-            return `
-                <div class="problem-card cashflow-missing-account-card">
-                    <div class="problem-card-header">
-                        <i class="bi bi-person-dash"></i>
-                        <span>${escapeHtml(account)}</span>
-                    </div>
-                    <div class="problem-card-body">
-                        <p>חשבון זה לא נמצא במערכת. יש לשייך או ליצור אותו.</p>
-                    </div>
-                </div>
-            `;
-        }
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-        const accountId = account.account_id || account.accountId || account.id || 'לא ידוע';
-        const provider = account.provider || account.provider_name || '';
-        return `
-            <div class="problem-card cashflow-missing-account-card">
-                <div class="problem-card-header">
-                    <i class="bi bi-person-dash"></i>
-                    <span>${escapeHtml(accountId)}</span>
-                </div>
-                <div class="problem-card-body">
-                    <p>חשבון זה לא נמצא במערכת. יש לשייך או ליצור אותו.</p>
-                    ${provider ? `<p><small>ספק: ${escapeHtml(provider)}</small></p>` : ''}
-                </div>
-            </div>
-        `;
-    });
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(4, 'אין חשבונות חסרים.');
+        markProblemTableReady('cashflowMissingAccountsTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map(({ item }) => renderCashflowMissingAccountRow(item))
+        .join('');
+    markProblemTableReady('cashflowMissingAccountsTable');
 }
 
 function displayCashflowCurrencyIssues(issues) {
     const section = document.getElementById('cashflowCurrencyIssuesSection');
-    const container = document.getElementById('cashflowCurrencyIssuesContainer');
-    if (!section || !container) return;
+    const tableBody = document.getElementById('cashflowCurrencyIssuesTableBody');
+    if (!section || !tableBody) return;
 
     const tracking = trackProblemStatus(
         'cashflowCurrencyIssues',
@@ -5679,55 +6044,26 @@ function displayCashflowCurrencyIssues(issues) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (issues || []).map(issue => {
-        if (typeof issue === 'string') {
-            return `
-                <div class="problem-card cashflow-currency-issue-card">
-                    <div class="problem-card-header">
-                        <i class="bi bi-currency-exchange"></i>
-                        <span>מטבע לא מזוהה</span>
-                    </div>
-                    <div class="problem-card-body">
-                        <p>${escapeHtml(issue)}</p>
-                    </div>
-                </div>
-            `;
-        }
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-        const currency = issue.currency || issue.currency_code || 'לא ידוע';
-        const sourceAccount = issue.source_account || issue.account || '';
-        const message = issue.message || issue.detail || 'בעיה במטבע הרשומה';
-        return `
-            <div class="problem-card cashflow-currency-issue-card">
-                <div class="problem-card-header">
-                    <i class="bi bi-currency-exchange"></i>
-                    <span>${escapeHtml(currency)}</span>
-                </div>
-                <div class="problem-card-body">
-                    <p>${escapeHtml(message)}</p>
-                    ${sourceAccount ? `<p><small>חשבון מקור: ${escapeHtml(sourceAccount)}</small></p>` : ''}
-                    ${issue.record_index !== undefined ? `<p><small>אינדקס רשומה: ${issue.record_index}</small></p>` : ''}
-                </div>
-            </div>
-        `;
-    });
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(4, 'אין בעיות מטבע פעילות.');
+        markProblemTableReady('cashflowCurrencyIssuesTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map(({ item }) => renderCashflowCurrencyIssueRow(item))
+        .join('');
+    markProblemTableReady('cashflowCurrencyIssuesTable');
 }
 
 function displayAccountMissingAccounts(accounts) {
     const section = document.getElementById('accountMissingAccountsSection');
-    const container = document.getElementById('accountMissingAccountsContainer');
-    if (!section || !container) return;
+    const tableBody = document.getElementById('accountMissingAccountsTableBody');
+    if (!section || !tableBody) return;
 
     const tracking = trackProblemStatus(
         'accountMissingAccounts',
@@ -5747,51 +6083,26 @@ function displayAccountMissingAccounts(accounts) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (accounts || []).map(account => {
-        if (typeof account === 'string') {
-            return `
-                <div class="problem-card account-missing-account-card">
-                    <div class="problem-card-header">
-                        <i class="bi bi-person-x"></i>
-                        <span>${escapeHtml(account)}</span>
-                    </div>
-                    <div class="problem-card-body">
-                        <p>חשבון זה לא קיים במערכת. יש ליצור או לשייך אותו לפני המשך הייבוא.</p>
-                    </div>
-                </div>
-            `;
-        }
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-        const accountId = account.account_id || account.accountId || account.id || 'לא ידוע';
-        return `
-            <div class="problem-card account-missing-account-card">
-                <div class="problem-card-header">
-                    <i class="bi bi-person-x"></i>
-                    <span>${escapeHtml(accountId)}</span>
-                </div>
-                <div class="problem-card-body">
-                    <p>חשבון זה לא קיים במערכת. יש ליצור או לשייך אותו לפני המשך הייבוא.</p>
-                </div>
-            </div>
-        `;
-    });
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(3, 'אין חשבונות חסרים.');
+        markProblemTableReady('accountMissingAccountsTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map(({ item }) => renderAccountMissingAccountRow(item))
+        .join('');
+    markProblemTableReady('accountMissingAccountsTable');
 }
 
 function displayAccountCurrencyMismatches(items) {
     const section = document.getElementById('accountCurrencyMismatchesSection');
-    const container = document.getElementById('accountCurrencyMismatchesContainer');
-    if (!section || !container) return;
+    const tableBody = document.getElementById('accountCurrencyMismatchesTableBody');
+    if (!section || !tableBody) return;
 
     const tracking = trackProblemStatus(
         'accountCurrencyMismatches',
@@ -5818,54 +6129,26 @@ function displayAccountCurrencyMismatches(items) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (items || []).map(item => {
-        if (typeof item === 'string') {
-            return `
-                <div class="problem-card account-currency-mismatch-card">
-                    <div class="problem-card-header">
-                        <i class="bi bi-cash-stack"></i>
-                        <span>אי התאמה במטבע</span>
-                    </div>
-                    <div class="problem-card-body">
-                        <p>${escapeHtml(item)}</p>
-                    </div>
-                </div>
-            `;
-        }
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-        const accountId = item.account_id || item.accountId || 'לא ידוע';
-        const expected = item.expected || item.expected_currency || '—';
-        const reported = item.reported || item.reported_currency || '—';
-        return `
-            <div class="problem-card account-currency-mismatch-card">
-                <div class="problem-card-header">
-                    <i class="bi bi-cash-stack"></i>
-                    <span>${escapeHtml(accountId)}</span>
-                </div>
-                <div class="problem-card-body">
-                    <p>מטבע בסיס מדווח: <strong>${escapeHtml(reported)}</strong></p>
-                    <p>מטבע בסיס במערכת: <strong>${escapeHtml(expected)}</strong></p>
-                </div>
-            </div>
-        `;
-    });
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(3, 'אין אי התאמות במטבעי בסיס.');
+        markProblemTableReady('accountCurrencyMismatchesTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map(({ item }) => renderAccountCurrencyMismatchRow(item))
+        .join('');
+    markProblemTableReady('accountCurrencyMismatchesTable');
 }
 
 function displayAccountEntitlementWarnings(items) {
     const section = document.getElementById('accountEntitlementWarningsSection');
-    const container = document.getElementById('accountEntitlementWarningsContainer');
-    if (!section || !container) return;
+    const tableBody = document.getElementById('accountEntitlementWarningsTableBody');
+    if (!section || !tableBody) return;
 
     const tracking = trackProblemStatus(
         'accountEntitlementWarnings',
@@ -5891,54 +6174,26 @@ function displayAccountEntitlementWarnings(items) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (items || []).map(item => {
-        if (typeof item === 'string') {
-            return `
-                <div class="problem-card account-entitlement-warning-card">
-                    <div class="problem-card-header">
-                        <i class="bi bi-shield-exclamation"></i>
-                        <span>הרשאות חסרות</span>
-                    </div>
-                    <div class="problem-card-body">
-                        <p>${escapeHtml(item)}</p>
-                    </div>
-                </div>
-            `;
-        }
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-        const accountId = item.account_id || item.accountId || 'לא ידוע';
-        const message = item.message || 'חסרות הרשאות נדרשות';
-        const entitlements = Array.isArray(item.entitlements) ? item.entitlements : [];
-        return `
-            <div class="problem-card account-entitlement-warning-card">
-                <div class="problem-card-header">
-                    <i class="bi bi-shield-exclamation"></i>
-                    <span>${escapeHtml(accountId)}</span>
-                </div>
-                <div class="problem-card-body">
-                    <p>${escapeHtml(message)}</p>
-                    ${entitlements.length ? `<p><small>הרשאות קיימות: ${escapeHtml(entitlements.join(', '))}</small></p>` : ''}
-                </div>
-            </div>
-        `;
-    });
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(3, 'אין התראות הרשאות פעילות.');
+        markProblemTableReady('accountEntitlementWarningsTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map(({ item }) => renderAccountEntitlementWarningRow(item))
+        .join('');
+    markProblemTableReady('accountEntitlementWarningsTable');
 }
 
 function displayAccountMissingDocuments(items) {
     const section = document.getElementById('accountMissingDocumentsSection');
-    const container = document.getElementById('accountMissingDocumentsContainer');
-    if (!section || !container) return;
+    const tableBody = document.getElementById('accountMissingDocumentsTableBody');
+    if (!section || !tableBody) return;
 
     const tracking = trackProblemStatus(
         'accountMissingDocuments',
@@ -5968,51 +6223,20 @@ function displayAccountMissingDocuments(items) {
         }
     );
 
-    const resolvedCards = tracking.resolvedEntries.map(renderResolvedProblemCard);
-    const unresolvedCards = (items || []).map(item => {
-        let accountId = 'לא ידוע';
-        let documents = [];
+    const unresolvedEntries = tracking.unresolvedItems || [];
 
-        if (typeof item === 'string') {
-            documents = [item];
-        } else if (item && typeof item === 'object') {
-            accountId = item.account_id || item.accountId || 'לא ידוע';
-            if (Array.isArray(item.documents)) {
-                documents = item.documents;
-            } else if (Array.isArray(item.required_documents)) {
-                documents = item.required_documents;
-            }
-        }
-
-        if (!documents.length) {
-            documents = ['—'];
-        }
-
-        return `
-            <div class="problem-card account-missing-documents-card">
-                <div class="problem-card-header">
-                    <i class="bi bi-file-earmark-excel"></i>
-                    <span>${escapeHtml(accountId)}</span>
-                </div>
-                <div class="problem-card-body">
-                    <p>יש להשלים את המסמכים הבאים:</p>
-                    <ul>
-                        ${documents.map(doc => `<li>${escapeHtml(doc)}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>
-        `;
-    });
-    const cards = [...resolvedCards, ...unresolvedCards];
-
-    if (cards.length === 0) {
+    if (unresolvedEntries.length === 0) {
         section.style.display = 'none';
-        container.innerHTML = '';
+        tableBody.innerHTML = renderTableEmptyRow(2, 'אין מסמכים חסרים.');
+        markProblemTableReady('accountMissingDocumentsTable');
         return;
     }
 
     section.style.display = 'block';
-    container.innerHTML = cards.join('');
+    tableBody.innerHTML = unresolvedEntries
+        .map(({ item }) => renderAccountMissingDocumentsRow(item))
+        .join('');
+    markProblemTableReady('accountMissingDocumentsTable');
 }
 
 function getEntityTypeForImport(key) {

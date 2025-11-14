@@ -2269,7 +2269,6 @@ async function saveTradingAccount() {
         
         // Collect form data including hidden ID field (added in edit mode)
         const accountData = DataCollectionService.collectFormData({
-            id: { id: 'tradingAccountId', type: 'text' }, // Hidden ID field added in edit mode
             name: { id: 'accountName', type: 'text' },
             currency_id: { id: 'accountCurrency', type: 'int' }, // currency_id הוא integer - ID של מטבע
             opening_balance: { id: 'accountOpeningBalance', type: 'float', default: 0 },
@@ -2279,9 +2278,39 @@ async function saveTradingAccount() {
         });
         const tagIds = Array.isArray(accountData.tag_ids) ? accountData.tag_ids : [];
         delete accountData.tag_ids;
-        
-        const accountId = accountData.id ? parseInt(accountData.id) : null;
-        const isEdit = !!accountId;
+
+        const modalElement = form.closest('.modal');
+        const formMode = form.dataset?.mode || modalElement?.dataset?.modalMode || 'add';
+        const datasetEntityId = form.dataset?.entityId || modalElement?.dataset?.entityId || null;
+        let accountId = null;
+
+        if (datasetEntityId) {
+            const parsedDatasetId = Number.parseInt(datasetEntityId, 10);
+            if (!Number.isNaN(parsedDatasetId)) {
+                accountId = parsedDatasetId;
+            }
+        }
+
+        if (!Number.isInteger(accountId) || accountId <= 0) {
+            const hiddenIdInput = form.querySelector('input[name="id"]');
+            if (hiddenIdInput && hiddenIdInput.value) {
+                const parsedHiddenId = Number.parseInt(hiddenIdInput.value, 10);
+                if (!Number.isNaN(parsedHiddenId)) {
+                    accountId = parsedHiddenId;
+                }
+            }
+        }
+
+        const isEdit = formMode === 'edit' && Number.isInteger(accountId) && accountId > 0;
+        if (formMode === 'edit' && !isEdit) {
+            window.Logger?.error('❌ Missing trading account ID in edit mode', {
+                datasetEntityId,
+                hiddenIdValue: form.querySelector('input[name="id"]')?.value || null,
+                page: 'trading_accounts'
+            });
+            window.showErrorNotification?.('שמירת חשבון מסחר', 'לא נמצא מזהה חשבון תקף לעדכון החשבון. אנא רענן ונסה שוב.');
+            return;
+        }
         
         // ולידציה מפורטת
         let hasErrors = false;
@@ -2342,8 +2371,7 @@ async function saveTradingAccount() {
         const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
         const method = isEdit ? 'PUT' : 'POST';
         
-        // Remove id from payload (not needed in API request body)
-        const { id, ...payload } = accountData;
+        const payload = { ...accountData };
         
         // Send to API
         const response = await fetch(url, {
@@ -2374,17 +2402,29 @@ async function saveTradingAccount() {
             });
         }
 
-        const resolvedAccountId = isEdit ? accountId : Number(crudResult?.data?.id || crudResult?.id);
+        const resolvedAccountId = Number(isEdit ? accountId : (crudResult?.data?.id || crudResult?.id));
         if (Number.isFinite(resolvedAccountId)) {
             try {
-                await window.TagService.replaceEntityTags('trading_account', resolvedAccountId, tagIds);
+                if (window.TagService && typeof window.TagService.replaceEntityTags === 'function') {
+                    await window.TagService.replaceEntityTags('trading_account', resolvedAccountId, tagIds);
+                } else {
+                    window.Logger?.warn('⚠️ TagService unavailable for trading account tagging', {
+                        page: 'trading_accounts',
+                        tradingAccountId: resolvedAccountId,
+                        hasTagService: !!window.TagService
+                    });
+                    window.showErrorNotification?.('שמירת תגיות', 'החשבון נשמר, אך שירות התגיות לא זמין ולכן התגיות לא עודכנו.');
+                }
             } catch (tagError) {
                 window.Logger?.warn('⚠️ Failed to update trading account tags', {
                     error: tagError,
                     tradingAccountId: resolvedAccountId,
                     page: 'trading_accounts'
                 });
-                window.showErrorNotification?.('שמירת תגיות', 'שמירת התגיות נכשלה - הנתונים נשמרו ללא תגיות');
+                const errorMessage = window.TagService?.formatTagErrorMessage
+                    ? window.TagService.formatTagErrorMessage('שמירת התגיות נכשלה - הנתונים נשמרו ללא תגיות', tagError)
+                    : 'שמירת התגיות נכשלה - הנתונים נשמרו ללא תגיות';
+                window.showErrorNotification?.('שמירת תגיות', errorMessage);
             }
         }
         

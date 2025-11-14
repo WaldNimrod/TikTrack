@@ -8,11 +8,16 @@ IS_PRODUCTION = ENVIRONMENT == 'production'
 # Paths
 BASE_DIR = Path(__file__).parent.parent
 
-# Database path - different for production vs development
-if IS_PRODUCTION:
-    DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
-else:
-    DB_PATH = BASE_DIR / "db" / "simpleTrade_new.db"  # Development database
+# Database path - unified tiktrack.db for all environments (stored under Backend/db)
+DB_FILENAME = "tiktrack.db"
+LEGACY_DB_FILENAME = "simpleTrade_new.db"
+DB_DIR = BASE_DIR / "db"
+DB_PATH = DB_DIR / DB_FILENAME
+LEGACY_DB_PATH = DB_DIR / LEGACY_DB_FILENAME
+
+if not DB_PATH.exists() and LEGACY_DB_PATH.exists():
+    import shutil
+    shutil.copy2(LEGACY_DB_PATH, DB_PATH)
 
 UI_DIR = BASE_DIR.parent / "trading-ui"
 

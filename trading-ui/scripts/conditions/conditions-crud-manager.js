@@ -52,33 +52,36 @@ class ConditionsCRUDManager {
      * Create new condition
      */
     async createCondition(entityId, conditionData) {
+        const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
         try {
-            const validation = this.validator.validateForCreation(conditionData);
+            const entityField = this.entityType === 'plan' ? 'trade_plan_id' : 'trade_id';
+            const conditionWithContext = {
+                ...conditionData,
+                [entityField]: entityId
+            };
+
+            const validation = this.validator.validateForCreation(conditionWithContext);
             if (!validation.isValid) {
                 throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
             }
 
-            const preparedData = this.prepareConditionData(conditionData);
+            const preparedData = this.prepareConditionData(conditionWithContext);
             const baseUrl = this.getBaseUrl();
             const entitySegment = this.entityType === 'plan' ? 'trade-plans' : 'trades';
+            const endpoint = `${baseUrl}/${entitySegment}/${entityId}/conditions`;
 
-            const response = await this.makeApiCall(
-                `${baseUrl}/${entitySegment}/${entityId}/conditions`,
-                'POST',
-                preparedData
-            );
+            let payload;
 
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to create condition');
-            }
+            const json = await this.requestJson(endpoint, {
+                method: 'POST',
+                body: preparedData
+            });
+            payload = json.data ?? json;
 
             this.clearCache(this.getCacheKey(entityId));
-            this.showNotification(this.translator.getMessage('condition_created'), 'success');
-
-            return this.translator.translateCondition(response.data, this.entityType);
+            return this.translator.translateCondition(payload, this.entityType);
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error creating condition', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
-            this.showNotification(`שגיאה ביצירת תנאי: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -100,28 +103,27 @@ class ConditionsCRUDManager {
             const baseUrl = this.getBaseUrl();
             const entitySegment = this.entityType === 'plan' ? 'trade-plans' : 'trades';
 
-            const response = await this.makeApiCall(
+            const json = await this.requestJson(
                 `${baseUrl}/${entitySegment}/${entityId}/conditions`,
-                'GET'
+                { method: 'GET' }
             );
 
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to read conditions');
-            }
-
-            const translated = (response.data || []).map(condition =>
+            const translated = (json.data || []).map(condition =>
                 this.translator.translateCondition(condition, this.entityType)
             );
 
-            this.cache.set(cacheKey, {
-                data: translated,
-                timestamp: Date.now()
-            });
+            if (translated.length > 0) {
+                this.cache.set(cacheKey, {
+                    data: translated,
+                    timestamp: Date.now()
+                });
+            } else if (this.cache.has(cacheKey)) {
+                this.cache.delete(cacheKey);
+            }
 
             return translated;
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error reading conditions', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
-            this.showNotification(`שגיאה בקריאת תנאים: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -131,23 +133,33 @@ class ConditionsCRUDManager {
      */
     async updateCondition(conditionId, conditionData, entityId = null) {
         try {
-            const validation = this.validator.validateForUpdate(conditionData);
+            const entityField = this.entityType === 'plan' ? 'trade_plan_id' : 'trade_id';
+            const conditionWithContext = {
+                ...conditionData,
+                id: conditionId
+            };
+
+            if (entityId !== null) {
+                conditionWithContext[entityField] = entityId;
+            }
+
+            const validation = this.validator.validateForUpdate(conditionWithContext);
             if (!validation.isValid) {
                 throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
             }
 
-            const preparedData = this.prepareConditionData(conditionData);
+            const preparedData = this.prepareConditionData(conditionWithContext);
             const baseUrl = this.getBaseUrl();
+            const endpoint = `${baseUrl}/${conditionId}`;
+            const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
 
-            const response = await this.makeApiCall(
-                `${baseUrl}/${conditionId}`,
-                'PUT',
-                preparedData
-            );
+            let payload;
 
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to update condition');
-            }
+            const json = await this.requestJson(endpoint, {
+                method: 'PUT',
+                body: preparedData
+            });
+            payload = json.data ?? json;
 
             if (entityId !== null) {
                 this.clearCache(this.getCacheKey(entityId));
@@ -155,11 +167,9 @@ class ConditionsCRUDManager {
                 this.clearCache();
             }
 
-            this.showNotification(this.translator.getMessage('condition_updated'), 'success');
-            return this.translator.translateCondition(response.data, this.entityType);
+            return this.translator.translateCondition(payload, this.entityType);
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error updating condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
-            this.showNotification(`שגיאה בעדכון תנאי: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -175,13 +185,33 @@ class ConditionsCRUDManager {
             }
 
             const baseUrl = this.getBaseUrl();
-            const response = await this.makeApiCall(
-                `${baseUrl}/${conditionId}`,
-                'DELETE'
-            );
+            const endpoint = `${baseUrl}/${conditionId}`;
+            const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
 
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to delete condition');
+            if (window.CRUDResponseHandler?.handleDeleteResponse) {
+                const response = await fetch(endpoint, {
+                    method: 'DELETE'
+                });
+
+                const serviceSuccess = await window.CRUDResponseHandler.handleDeleteResponse(response, {
+                    entityName: entityLabel,
+                    successMessage: this.translator.getMessage('condition_deleted'),
+                    reloadFn: async () => {}
+                });
+
+                if (!serviceSuccess) {
+                    if (entityId !== null) {
+                        this.clearCache(this.getCacheKey(entityId));
+                    } else {
+                        this.clearCache();
+                    }
+                    const error = new Error(this.translator.getMessage('condition_delete_error'));
+                    error.silent = true;
+                    error.forceRefresh = true;
+                    throw error;
+                }
+            } else {
+                await this.requestJson(endpoint, { method: 'DELETE' });
             }
 
             if (entityId !== null) {
@@ -190,11 +220,9 @@ class ConditionsCRUDManager {
                 this.clearCache();
             }
 
-            this.showNotification(this.translator.getMessage('condition_deleted'), 'success');
             return true;
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error deleting condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
-            this.showNotification(`שגיאה במחיקת תנאי: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -213,29 +241,24 @@ class ConditionsCRUDManager {
                 }
             }
 
-            const response = await fetch('/api/trading-methods/?include_parameters=true')
-                .then(res => res.json())
-                .catch(error => {
-                    throw new Error(error?.message || 'Network error fetching trading methods');
-                });
+            const json = await this.requestJson('/api/trading-methods/?include_parameters=true', { method: 'GET' });
 
-            if (response.status !== 'success') {
-                throw new Error(response?.message || response?.error || 'Failed to get trading methods');
-            }
-
-            const translatedMethods = (response.data || []).map(method =>
+            const translatedMethods = (json.data || []).map(method =>
                 this.translator.translateMethod(method)
             );
 
-            this.cache.set(cacheKey, {
-                data: translatedMethods,
-                timestamp: Date.now()
-            });
+            if (translatedMethods.length > 0) {
+                this.cache.set(cacheKey, {
+                    data: translatedMethods,
+                    timestamp: Date.now()
+                });
+            } else if (this.cache.has(cacheKey)) {
+                this.cache.delete(cacheKey);
+            }
 
             return translatedMethods;
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error getting trading methods', { error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });
-            this.showNotification(`שגיאה בקבלת שיטות מסחר: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -260,21 +283,38 @@ class ConditionsCRUDManager {
                 ...alertData
             };
 
-            const response = await this.makeApiCall(
-                '/api/alerts/',
-                'POST',
-                preparedAlertData
-            );
+            if (window.CRUDResponseHandler?.handleSaveResponse) {
+                const response = await fetch('/api/alerts/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(preparedAlertData)
+                });
 
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to create alert');
+                const result = await window.CRUDResponseHandler.handleSaveResponse(response, {
+                    entityName: this.translator.getMessage('condition_entity_label') || 'תנאי',
+                    successMessage: 'התראה נוצרה בהצלחה',
+                    reloadFn: async () => {}
+                });
+
+                if (!result) {
+                    const error = new Error('שגיאה ביצירת התראה');
+                    error.silent = true;
+                    throw error;
+                }
+
+                return result.data ?? result;
             }
 
-            this.showNotification('התראה נוצרה בהצלחה', 'success');
-            return response.data;
+            const json = await this.requestJson('/api/alerts/', {
+                method: 'POST',
+                body: preparedAlertData
+            });
+
+            return json.data ?? json;
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error creating alert', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-crud-manager' });
-            this.showNotification(`שגיאה ביצירת התראה: ${error.message}`, 'error');
             throw error;
         }
     }
@@ -284,16 +324,8 @@ class ConditionsCRUDManager {
      */
     async getConditionById(conditionId) {
         const baseUrl = this.getBaseUrl();
-        const response = await this.makeApiCall(
-            `${baseUrl}/${conditionId}`,
-            'GET'
-        );
-
-        if (!response.success) {
-            throw new Error(response.message || 'Failed to get condition');
-        }
-
-        return this.translator.translateCondition(response.data, this.entityType);
+        const json = await this.requestJson(`${baseUrl}/${conditionId}`, { method: 'GET' });
+        return this.translator.translateCondition(json.data ?? json, this.entityType);
     }
 
     prepareConditionData(conditionData) {
@@ -301,6 +333,11 @@ class ConditionsCRUDManager {
 
         if (prepared.parameters_json && typeof prepared.parameters_json === 'object') {
             prepared.parameters_json = JSON.stringify(prepared.parameters_json);
+        }
+
+        if (prepared.method_id !== undefined && prepared.method_id !== null) {
+            const methodId = parseInt(prepared.method_id, 10);
+            prepared.method_id = Number.isNaN(methodId) ? null : methodId;
         }
 
         if (prepared.is_active !== undefined) {
@@ -311,10 +348,25 @@ class ConditionsCRUDManager {
             prepared.condition_group = parseInt(prepared.condition_group, 10) || 0;
         }
 
+        if (prepared.trade_plan_id !== undefined && prepared.trade_plan_id !== null) {
+            const planId = parseInt(prepared.trade_plan_id, 10);
+            prepared.trade_plan_id = Number.isNaN(planId) ? null : planId;
+        }
+
+        if (prepared.trade_id !== undefined && prepared.trade_id !== null) {
+            const tradeId = parseInt(prepared.trade_id, 10);
+            prepared.trade_id = Number.isNaN(tradeId) ? null : tradeId;
+        }
+
+        if (prepared.id !== undefined && prepared.id !== null) {
+            const conditionId = parseInt(prepared.id, 10);
+            prepared.id = Number.isNaN(conditionId) ? null : conditionId;
+        }
+
         return prepared;
     }
 
-    async makeApiCall(endpoint, method = 'GET', data = null) {
+    async requestJson(endpoint, { method = 'GET', body = null } = {}) {
         const options = {
             method,
             headers: {
@@ -322,41 +374,37 @@ class ConditionsCRUDManager {
             }
         };
 
-        if (data && method !== 'GET') {
-            options.body = JSON.stringify(data);
+        if (body && method !== 'GET') {
+            options.body = JSON.stringify(body);
         }
+
+        let response;
+        try {
+            response = await fetch(endpoint, options);
+        } catch (networkError) {
+            window.Logger?.error('[ConditionsCRUDManager] Network error during request', { endpoint, method, error: networkError?.message }, { page: 'conditions-crud-manager' });
+            throw new Error(networkError?.message || 'שגיאה ברשת בעת פנייה לשרת');
+        }
+        let json;
 
         try {
-            const response = await fetch(endpoint, options);
-            const json = await response.json();
-            const success = json?.status === 'success' || json?.success === true || response.ok;
-            const payload = json?.data !== undefined ? json.data : json;
-
-            if (!success) {
-                const message = json?.message || json?.error || `Request failed with status ${response.status}`;
-                return {
-                    success: false,
-                    data: payload,
-                    message,
-                    status: response.status
-                };
-            }
-
-            return {
-                success: true,
-                data: payload,
-                message: json?.message,
-                status: response.status
-            };
+            json = await response.json();
         } catch (error) {
-            window.Logger?.error('[ConditionsCRUDManager] API call failed', { method, endpoint, error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });
-            return {
-                success: false,
-                data: null,
-                message: error.message,
-                status: 0
-            };
+            window.Logger?.error('[ConditionsCRUDManager] Failed parsing JSON response', { endpoint, method, status: response.status, error: error?.message }, { page: 'conditions-crud-manager' });
+            throw new Error(`Invalid response from server (status ${response.status})`);
         }
+
+        const success = json?.status === 'success' || json?.success === true || response.ok;
+
+        if (!success) {
+            const message = json?.message || json?.error || `Request failed with status ${response.status}`;
+            const error = new Error(message);
+            error.response = json;
+            error.status = response.status;
+            throw error;
+        }
+
+        return json;
     }
 
     async confirmDeletion() {
@@ -367,16 +415,6 @@ class ConditionsCRUDManager {
             return window.confirm(this.translator.getMessage('confirm_delete'));
         }
         return true;
-    }
-
-    showNotification(message, type = 'info') {
-        if (window.showNotification && typeof window.showNotification === 'function') {
-            window.showNotification(message, type);
-        } else if (window.notificationSystem && window.notificationSystem.showNotification) {
-            window.notificationSystem.showNotification(message, type);
-        } else {
-            window.Logger?.info?.('[ConditionsCRUDManager] showNotification fallback', { type, message }, { page: 'conditions-crud-manager' });
-        }
     }
 
     getCachedTradingMethods() {

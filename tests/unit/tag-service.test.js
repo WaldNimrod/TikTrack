@@ -59,14 +59,13 @@ describe('TagService', () => {
         );
 
         const removedKeys = window.UnifiedCacheManager.remove.mock.calls.map(([key]) => key);
-        expect(removedKeys).toEqual(
-            expect.arrayContaining([
-                'tags:entity:trade:42',
-                'tags:list:all',
-                'tags:suggestions:all',
-                'tags:suggestions:trade'
-            ])
-        );
+        expect(removedKeys).toEqual(expect.arrayContaining([
+            'tags:entity:trade:42',
+            'tags:list:all',
+            'tags:suggestions:all',
+            'tags:suggestions:trade',
+            'tags:analytics'
+        ]));
 
         expect(window.TagEvents.emitEntityTagsUpdated).toHaveBeenCalledWith({
             entityType: 'trade',
@@ -184,14 +183,13 @@ describe('TagService', () => {
         await TagService.removeTagFromEntity(9, 'trade', 13);
 
         const removedKeys = window.UnifiedCacheManager.remove.mock.calls.map(([key]) => key);
-        expect(removedKeys).toEqual(
-            expect.arrayContaining([
-                'tags:entity:trade:13',
-                'tags:list:all',
-                'tags:suggestions:all',
-                'tags:suggestions:trade'
-            ])
-        );
+        expect(removedKeys).toEqual(expect.arrayContaining([
+            'tags:entity:trade:13',
+            'tags:list:all',
+            'tags:suggestions:all',
+            'tags:suggestions:trade',
+            'tags:analytics'
+        ]));
 
         expect(window.TagEvents.emitEntityTagsUpdated).toHaveBeenCalledWith({
             entityType: 'trade',
@@ -208,6 +206,7 @@ describe('TagService', () => {
 
         expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:categories');
         expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:list:all');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
     });
 
     test('getSuggestions returns cached value without fetch when available', async () => {
@@ -243,6 +242,197 @@ describe('TagService', () => {
             expect.stringContaining('⚠️ Failed to remove tag cache entry'),
             expect.objectContaining({ key: 'tags:entity:trade:1' })
         );
+    });
+
+    test('fetchCategories uses cache before network and caches fetched data', async () => {
+        const cachedCategories = [{ id: 1, name: 'Strategy' }];
+        window.UnifiedCacheManager.get.mockResolvedValueOnce(cachedCategories);
+
+        let TagService = loadTagService();
+        const fromCache = await TagService.fetchCategories();
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(fromCache).toEqual(cachedCategories);
+
+        window.UnifiedCacheManager.get.mockResolvedValueOnce(null);
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: cachedCategories })
+        });
+
+        TagService = loadTagService();
+        const fresh = await TagService.fetchCategories({ force: true });
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/categories',
+            expect.objectContaining({ credentials: 'same-origin' })
+        );
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledWith(
+            'tags:categories',
+            cachedCategories,
+            expect.any(Object)
+        );
+        expect(fresh).toEqual(cachedCategories);
+    });
+
+    test('fetchTags builds query parameters and caches response', async () => {
+        const tagsPayload = [{ id: 10, name: 'Momentum' }];
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: tagsPayload })
+        });
+
+        const TagService = loadTagService();
+        const result = await TagService.fetchTags({ categoryId: 99, includeInactive: true, force: true });
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/?category_id=99&include_inactive=true',
+            expect.objectContaining({ credentials: 'same-origin' })
+        );
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledWith(
+            'tags:list:99',
+            tagsPayload,
+            expect.any(Object)
+        );
+        expect(result).toEqual(tagsPayload);
+    });
+
+    test('createCategory invalidates caches and emits update event', async () => {
+        const category = { id: 5, name: 'Strategies' };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: category })
+        });
+
+        const TagService = loadTagService();
+        const created = await TagService.createCategory(category);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/categories',
+            expect.objectContaining({ method: 'POST', body: JSON.stringify(category) })
+        );
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:categories');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
+        expect(window.TagEvents.emitCategoryUpdated).toHaveBeenCalledWith({ action: 'create', category });
+        expect(created).toEqual(category);
+    });
+
+    test('updateCategory invalidates caches and emits update event', async () => {
+        const category = { id: 7, name: 'Risk' };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: category })
+        });
+
+        const TagService = loadTagService();
+        const updated = await TagService.updateCategory(7, category);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/categories/7',
+            expect.objectContaining({ method: 'PUT', body: JSON.stringify(category) })
+        );
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:categories');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
+        expect(window.TagEvents.emitCategoryUpdated).toHaveBeenCalledWith({ action: 'update', category });
+        expect(updated).toEqual(category);
+    });
+
+    test('deleteCategory invalidates caches and emits delete event', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: true })
+        });
+
+        const TagService = loadTagService();
+        await TagService.deleteCategory(4);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/categories/4',
+            expect.objectContaining({ method: 'DELETE' })
+        );
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:categories');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:list:4');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
+        expect(window.TagEvents.emitCategoryUpdated).toHaveBeenCalledWith({ action: 'delete', categoryId: 4 });
+    });
+    test('createTag invalidates tag cache and emits tag update event', async () => {
+        const tag = { id: 12, name: 'Breakout', category_id: 3 };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: tag })
+        });
+
+        const TagService = loadTagService();
+        const created = await TagService.createTag(tag);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/',
+            expect.objectContaining({ method: 'POST', body: JSON.stringify(tag) })
+        );
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:list:3');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
+        expect(window.TagEvents.emitTagUpdated).toHaveBeenCalledWith({ action: 'create', tag });
+        expect(created).toEqual(tag);
+    });
+
+    test('updateTag invalidates relevant caches and emits update event', async () => {
+        const tag = { id: 14, name: 'Mean Reversion', category_id: 8 };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: tag })
+        });
+
+        const TagService = loadTagService();
+        const updated = await TagService.updateTag(14, tag);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/14',
+            expect.objectContaining({ method: 'PUT', body: JSON.stringify(tag) })
+        );
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:list:8');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
+        expect(window.TagEvents.emitTagUpdated).toHaveBeenCalledWith({ action: 'update', tagId: 14, tag });
+        expect(updated).toEqual(tag);
+    });
+
+    test('deleteTag invalidates caches and emits delete event', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: true })
+        });
+
+        const TagService = loadTagService();
+        await TagService.deleteTag(15, { categoryId: 11 });
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/15',
+            expect.objectContaining({ method: 'DELETE' })
+        );
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:list:11');
+        expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
+        expect(window.TagEvents.emitTagUpdated).toHaveBeenCalledWith({ action: 'delete', tagId: 15, categoryId: 11 });
+    });
+
+    test('getAnalytics fetches data when cache empty and emits initialized event', async () => {
+        window.UnifiedCacheManager.get.mockResolvedValueOnce(null);
+        const analytics = { totals: { trades: 5 } };
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: analytics })
+        });
+
+        const TagService = loadTagService();
+        const result = await TagService.getAnalytics(true);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/analytics',
+            expect.objectContaining({ credentials: 'same-origin' })
+        );
+        expect(window.UnifiedCacheManager.save).toHaveBeenCalledWith(
+            'tags:analytics',
+            analytics,
+            expect.any(Object)
+        );
+        expect(window.TagEvents.emitInitialized).toHaveBeenCalledWith({ source: 'analytics', analytics });
+        expect(result).toEqual(analytics);
     });
 });
 

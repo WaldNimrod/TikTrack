@@ -295,40 +295,21 @@ function getInvestmentTypeColor(investmentType) {
  */
 async function loadTradesData() {
   try {
-    window.Logger.info('Loading trades data (bypass cache)', { page: "trades" });
+    window.Logger.info('Loading trades data via TradesData module', { page: "trades" });
 
-    // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/trades/?_t=${Date.now()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
+    const loader = window.TradesData?.loadTradesData;
+    const rawData = typeof loader === 'function'
+      ? await loader()
+      : [];
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const apiData = Array.isArray(rawData)
+      ? rawData
+      : Array.isArray(rawData?.data)
+        ? rawData.data
+        : [];
 
-    const responseData = await response.json();
-    window.Logger.info('📊 loadTradesData: Received response:', { 
-      status: responseData?.status, 
-      dataLength: responseData?.data?.length || 0,
-      hasData: !!responseData?.data,
-      responseKeys: Object.keys(responseData || {})
-    }, { page: "trades" });
-
-    if (responseData.status !== 'success') {
-      window.Logger.error('❌ API returned error status:', responseData, { page: "trades" });
-      throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
-    }
-
-    // בדיקה שהנתונים בפורמט הנכון
-    const apiData = responseData.data || responseData;
-    
-    if (!apiData || !Array.isArray(apiData)) {
-      window.Logger.warn('⚠️ API data is not an array:', { apiData, responseData }, { page: "trades" });
-      // אם אין נתונים, נגדיר מערך ריק
+    if (!Array.isArray(apiData)) {
+      window.Logger.warn('⚠️ Trades data loader returned non-array payload', { rawData }, { page: "trades" });
       window.tradesData = [];
       syncTradesPagination([]);
       return;
@@ -1184,63 +1165,39 @@ async function cancelTradeRecord(tradeId) {
       // window.Logger.warn('לא ניתן לטעון פרטי טרייד:', { page: "trades" });
     }
 
-    // אישור מהמשתמש באמצעות המערכת הגלובלית
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'ביטול טרייד',
-        `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
-        async () => {
-          // המשתמש אישר - בדיקת מקושרים ואז ביצוע הביטול
-          await checkLinkedItemsAndCancel(tradeId);
-        },
-        () => {
-          // המשתמש ביטל - לא עושים כלום
-        },
-      );
-    } else {
-      // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (typeof window.showConfirmationDialog === 'function') {
-        const confirmed = await new Promise(resolve => {
-          window.showConfirmationDialog(
-            'ביטול טרייד',
-            `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
-            () => resolve(true),
-            () => resolve(false),
-          );
-        });
-        if (!confirmed) {return;}
+    const executeCancellation = async () => {
+      if (typeof window.checkLinkedItemsAndPerformAction === 'function') {
+        await window.checkLinkedItemsAndPerformAction('trade', Number(tradeId), 'cancel', performTradeCancellation);
       } else {
-        if (typeof window.showConfirmationDialog === 'function') {
-          const confirmed = await new Promise(resolve => {
-            window.showConfirmationDialog(
-              'ביטול טרייד',
-              `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
-              () => resolve(true),
-              () => resolve(false),
-            );
-          });
-          if (!confirmed) {return;}
-        } else {
-          // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = typeof showConfirmationDialog === 'function' ? 
-            await new Promise(resolve => {
-              showConfirmationDialog(
-                `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
-                () => resolve(true),
-                () => resolve(false),
-                'ביטול טרייד',
-                'בטל',
-                'חזור'
-              );
-            }) : 
-            window.window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);
-          if (!confirmed) {
-            return;
-          }
-        }
+        await performTradeCancellation(tradeId);
       }
-      await checkLinkedItemsAndCancel(tradeId);
+    };
+
+    if (typeof window.showCancelWarning === 'function') {
+      window.showCancelWarning('trade', tradeDetails || `עסקה #${tradeId}`, 'טרייד', executeCancellation, () => {});
+      return;
     }
+
+    if (typeof window.showConfirmationDialog === 'function') {
+      const confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'ביטול טרייד',
+          `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
+          () => resolve(true),
+          () => resolve(false),
+        );
+      });
+      if (!confirmed) {
+        return;
+      }
+      await executeCancellation();
+      return;
+    }
+
+    if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
+      return;
+    }
+    await executeCancellation();
 
   } catch (error) {
     if (typeof handleSaveError === 'function') {
@@ -1249,21 +1206,6 @@ async function cancelTradeRecord(tradeId) {
       // window.Logger.error('Error canceling trade:', error, { page: "trades" });
     }
     window.showErrorNotification('שגיאה', error.message, 6000, 'system');
-  }
-}
-
-/**
- * בדיקת מקושרים וביצוע ביטול
- * @deprecated Use window.checkLinkedItemsAndPerformAction('trade', tradeId, 'cancel', performTradeCancellation) instead
- */
-async function checkLinkedItemsAndCancel(tradeId) {
-  try {
-    await window.checkLinkedItemsAndPerformAction('trade', tradeId, 'cancel', performTradeCancellation);
-  } catch (error) {
-    window.Logger.error('Error in checkLinkedItemsAndCancel:', error, { tradeId, page: "trades" });
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'שגיאה בבדיקת פריטים מקושרים');
-    }
   }
 }
 
@@ -1272,30 +1214,31 @@ async function checkLinkedItemsAndCancel(tradeId) {
  */
 async function performTradeCancellation(tradeId) {
   try {
-    // ניקוי מטמון לפני פעולת CRUD - ביטול    // שליחה לשרת
     const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'שגיאה בביטול הטרייד');
+    const handled = await window.handleApiResponseWithRefresh(response.clone(), {
+      loadDataFunction: window.loadTradesData,
+      operationName: 'ביטול',
+      itemName: 'הטרייד',
+      successMessage: 'הטרייד בוטל בהצלחה'
+    });
+
+    if (!handled) {
+      const errorText = await response.text();
+      const message = errorText || 'בקשת הביטול לא הצליחה';
+      window.showErrorNotification?.('שגיאה בביטול הטרייד', message);
     }
-
-    // הצלחה
-    window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
-    // רענון הטבלה
-    await loadTradesData();
-
   } catch (error) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'ביטול טרייד');
     } else {
       // window.Logger.error('Error canceling trade:', error, { page: "trades" });
     }
-    window.showErrorNotification('שגיאה', error.message, 6000, 'system');
+    window.showErrorNotification('שגיאה בביטול הטרייד', error?.message || 'שגיאה לא ידועה', 6000, 'system');
   }
 }
 
@@ -1443,12 +1386,6 @@ async function deleteTradeRecord(tradeId) {
  */
 async function performTradeDeletion(tradeId) {
   try {
-    // Clear cache before deletion to ensure fresh data after reload
-    if (window.unifiedCacheManager) {
-      await window.unifiedCacheManager.clearByPattern('trades-data');
-      await window.unifiedCacheManager.clearByPattern('dashboard-data');
-    }
-    
     // Send delete request
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
@@ -2059,12 +1996,12 @@ window.populateRelatedObjects = populateRelatedObjects;
  * @function restoreSortState
  * @returns {void}
  */
-function restoreSortState() {
+async function restoreSortState() {
   try {
     if (typeof window.pageUtils?.restoreSortState === 'function') {
-      window.pageUtils.restoreSortState('trades', null);
-    } else if (typeof window.restoreSortState === 'function') {
-      window.restoreSortState('trades', null);
+      await window.pageUtils.restoreSortState('trades');
+    } else if (window.UnifiedTableSystem?.sorter?.applyDefaultSort) {
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('trades');
     } else {
       window.Logger?.debug('restoreSortState not available - using setupSortableHeaders instead', { page: "trades" });
       // Fallback - setup sortable headers will restore state automatically
@@ -3677,7 +3614,10 @@ async function saveTrade() {
                     tradeId: resolvedTradeId,
                     page: 'trades'
                 });
-                window.showErrorNotification?.('שמירת תגיות', 'שמירת תגיות הטרייד נכשלה - הנתונים נשמרו ללא תגיות');
+                const errorMessage = window.TagService?.formatTagErrorMessage
+                    ? window.TagService.formatTagErrorMessage('שמירת תגיות הטרייד נכשלה - הנתונים נשמרו ללא תגיות', tagError)
+                    : 'שמירת תגיות הטרייד נכשלה - הנתונים נשמרו ללא תגיות';
+                window.showErrorNotification?.('שמירת תגיות', errorMessage);
             }
         }
         
@@ -3846,8 +3786,7 @@ window.registerTradesTables = function() {
         tableSelector: '#tradesTable',
         columns: getColumns('trades'),
         sortable: true,
-        filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+        filterable: true
     });
 };
 

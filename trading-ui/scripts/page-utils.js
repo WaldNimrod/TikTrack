@@ -139,35 +139,38 @@ async function initializePageFilters(pageName) {
  * Setup sortable headers
  * @function setupSortableHeaders
  * @param {string} pageName - Page name
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function setupSortableHeaders(pageName) {
-  // Setting up sortable headers for page
-
+async function setupSortableHeaders(pageName) {
   try {
-    // Find all sortable headers
-    const sortableHeaders = document.querySelectorAll('.sortable-header');
+    const tables = Array.from(document.querySelectorAll('table[data-table-type]'));
 
-    sortableHeaders.forEach((header, index) => {
-      header.addEventListener('click', e => {
-        e.preventDefault();
-        handleHeaderSort(pageName, index);
-      });
-    });
-
-    // Restore previous sort state
-    loadPageState(pageName).then(savedState => {
-      if (savedState && savedState.sort) {
-        // Restoring sort state
-        restoreSortState(pageName, savedState.sort);
+    tables.forEach((table) => {
+      const tableType = table.getAttribute('data-table-type');
+      if (!tableType) {
+        return;
       }
-    }).catch(() => {
-      // Error loading sort state
+
+      if (window.UnifiedTableSystem?.events?.setupSortHandlers) {
+        window.UnifiedTableSystem.events.setupSortHandlers(tableType);
+      } else {
+        const headers = table.querySelectorAll('.sortable-header');
+        headers.forEach((header, index) => {
+          header.addEventListener('click', (event) => {
+            event.preventDefault();
+            handleHeaderSort(pageName, index, event);
+          });
+        });
+      }
     });
 
-    // Sortable headers setup for page
-  } catch {
-    // Error setting up sortable headers
+    if (pageName) {
+      await restoreSortState(pageName);
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.warn('setupSortableHeaders: Failed to initialize sortable headers', error, { page: pageName || 'global' });
+    }
   }
 }
 
@@ -627,9 +630,35 @@ function setupFilterEventHandlers(_pageName) {
  * @param {number} columnIndex - Column index
  * @returns {void}
  */
-function handleHeaderSort(_pageName, _columnIndex) {
-  // Implementation for handling header sort
-  // Handling header sort for page
+function handleHeaderSort(pageName, columnIndex, event = null) {
+  try {
+    let tableType = null;
+
+    if (event?.currentTarget) {
+      const headerElement = event.currentTarget;
+      const owningTable = headerElement.closest('table[data-table-type]');
+      tableType = owningTable ? owningTable.getAttribute('data-table-type') : null;
+    }
+
+    if (!tableType) {
+      const activeTable = document.querySelector('table[data-table-type]');
+      tableType = activeTable ? activeTable.getAttribute('data-table-type') : null;
+    }
+
+    if (!tableType || typeof columnIndex !== 'number') {
+      return;
+    }
+
+    window.sortTable(tableType, columnIndex);
+
+    if (window.Logger) {
+      window.Logger.debug(`handleHeaderSort: Sorted table "${tableType}" by column ${columnIndex}`, { page: pageName || 'global' });
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.error('handleHeaderSort: Failed to sort table header click', error, { page: pageName || 'global' });
+    }
+  }
 }
 
 /**
@@ -645,9 +674,59 @@ function handleHeaderSort(_pageName, _columnIndex) {
  * @param {Object} sortState - Sort state
  * @returns {void}
  */
-function restoreSortState(_pageName, _sortState) {
-  // Implementation for restoring sort state
-  // Restoring sort state for page
+async function restoreSortState(pageName) {
+  try {
+    const tables = Array.from(document.querySelectorAll('table[data-table-type]'));
+    const tableTypes = tables
+      .map((table) => table.getAttribute('data-table-type'))
+      .filter((type) => typeof type === 'string' && type.length > 0);
+
+    if (tableTypes.length === 0) {
+      return;
+    }
+
+    const handledTables = new Set();
+    let sortStateMap = null;
+
+    if (window.PageStateManager && typeof window.PageStateManager.loadSort === 'function' && pageName) {
+      sortStateMap = await window.PageStateManager.loadSort(pageName);
+    }
+
+    if (sortStateMap && typeof sortStateMap === 'object') {
+      for (const [tableType, sortState] of Object.entries(sortStateMap)) {
+        if (!tableType || !sortState) {
+          continue;
+        }
+        handledTables.add(tableType);
+
+        if (Array.isArray(sortState.chain) && window.UnifiedTableSystem?.sorter?.sortByChain) {
+          await window.UnifiedTableSystem.sorter.sortByChain(tableType, sortState.chain, { saveState: true });
+        } else if (typeof sortState.columnIndex === 'number' && sortState.columnIndex >= 0) {
+          if (window.UnifiedTableSystem?.sorter?.sort) {
+            await window.UnifiedTableSystem.sorter.sort(tableType, sortState.columnIndex, {
+              direction: sortState.direction || 'asc',
+              saveState: true
+            });
+          } else {
+            await window.restoreAnyTableSort(tableType);
+          }
+        }
+      }
+    }
+
+    for (const tableType of tableTypes) {
+      if (handledTables.has(tableType)) {
+        continue;
+      }
+      if (window.UnifiedTableSystem?.sorter?.applyDefaultSort) {
+        await window.UnifiedTableSystem.sorter.applyDefaultSort(tableType);
+      }
+    }
+  } catch (error) {
+    if (window.Logger) {
+      window.Logger.warn('restoreSortState: Failed to restore sort state', error, { page: pageName || 'global' });
+    }
+  }
 }
 
 /**

@@ -9,9 +9,10 @@ API endpoints for running code quality checks
 import os
 import subprocess
 import json
-import tempfile
+import re
 from datetime import datetime
-from flask import Blueprint, request, jsonify
+from pathlib import Path
+from flask import Blueprint, jsonify
 import logging
 
 # Create blueprint
@@ -21,13 +22,25 @@ bp = Blueprint('quality_check', __name__)
 logger = logging.getLogger(__name__)
 
 # Configuration
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CONFIG = {
-    'scripts_dir': '../scripts',
-    'monitors_dir': '../scripts/monitors',
-    'generators_dir': '../scripts/generators',
-    'reports_dir': '../reports',
+    'scripts_dir': PROJECT_ROOT / 'scripts',
+    'monitors_dir': PROJECT_ROOT / 'scripts' / 'monitors',
+    'generators_dir': PROJECT_ROOT / 'scripts' / 'generators',
+    'reports_dir': PROJECT_ROOT / 'reports',
     'timeout': 30  # seconds
 }
+FUNCTION_INDEX_SCRIPTS_ROOT = PROJECT_ROOT / 'trading-ui' / 'scripts'
+FUNCTION_INDEX_EXCLUDED_PARTS = {
+    'archive',
+    'backup',
+    'backup-old-initialization-systems',
+    'coverage',
+    'node_modules',
+    '__pycache__'
+}
+FUNCTION_DECLARATION_PATTERN = re.compile(r'\bfunction\s+[A-Za-z_]\w*\s*\(')
+FUNCTION_INDEX_BLOCK_PATTERN = re.compile(r'/\*[\s\S]*?FUNCTION INDEX[\s\S]*?\*/', re.IGNORECASE)
 
 @bp.route('/error-handling', methods=['POST'])
 def check_error_handling():
@@ -127,44 +140,20 @@ def check_naming():
 
 @bp.route('/function-index', methods=['POST'])
 def check_function_index():
-    """Run Function Index Validator"""
+    """Validate Function Index coverage across scripts."""
     try:
-        logger.info("Running Function Index Validator")
-        
-        # For now, return mock data since we need to create the validator
-        data = {
-            'summary': {
-                'total': 12,
-                'filesWithIndex': 8,
-                'filesWithoutIndex': 4
-            },
-            'pages': [
-                {'file': 'index.js', 'hasIndex': True, 'totalFunctions': 7},
-                {'file': 'trades.js', 'hasIndex': True, 'totalFunctions': 34},
-                {'file': 'executions.js', 'hasIndex': True, 'totalFunctions': 66},
-                {'file': 'alerts.js', 'hasIndex': True, 'totalFunctions': 47},
-                {'file': 'trade_plans.js', 'hasIndex': True, 'totalFunctions': 54},
-                {'file': 'cash_flows.js', 'hasIndex': True, 'totalFunctions': 24},
-                {'file': 'notes.js', 'hasIndex': False, 'totalFunctions': 44},
-                {'file': 'research.js', 'hasIndex': True, 'totalFunctions': 11},
-                {'file': 'tickers.js', 'hasIndex': False, 'totalFunctions': 27},
-                {'file': 'trading_accounts.js', 'hasIndex': False, 'totalFunctions': 22},
-                {'file': 'database.js', 'hasIndex': False, 'totalFunctions': 19},
-                {'file': 'preferences-page.js', 'hasIndex': True, 'totalFunctions': 1}
-            ]
-        }
-        
+        logger.info("Running Function Index coverage scan")
+        data = build_function_index_report()
         return jsonify({
             'status': 'success',
             'data': data,
             'timestamp': datetime.now().isoformat()
         })
-            
-    except Exception as e:
-        logger.error(f"Error in function-index check: {e}")
+    except Exception as exc:
+        logger.error(f"Error in function index check: {exc}")
         return jsonify({
             'status': 'error',
-            'message': str(e),
+            'message': str(exc),
             'timestamp': datetime.now().isoformat()
         }), 500
 
@@ -224,11 +213,7 @@ def check_all():
                     if result['success']:
                         results[check] = parse_naming_output(result['output'])
                 elif check == 'function-index':
-                    # Mock data for now
-                    results[check] = {
-                        'summary': {'total': 12, 'filesWithIndex': 8, 'filesWithoutIndex': 4},
-                        'pages': []
-                    }
+                    results[check] = build_function_index_report()
                 elif check == 'duplicates':
                     result = run_script('advanced-duplicate-detector.js')
                     if result['success']:
@@ -254,21 +239,21 @@ def check_all():
 def run_script(script_name):
     """Run a Node.js script and return the result"""
     try:
-        script_path = os.path.join(CONFIG['monitors_dir'], script_name)
-        
-        if not os.path.exists(script_path):
+        script_path = _resolve_script_path(script_name)
+
+        if script_path is None:
             return {
                 'success': False,
-                'error': f'Script not found: {script_path}'
+                'error': f'Script not found: {script_name}'
             }
         
         # Run the script
         result = subprocess.run(
-            ['node', script_path],
+            ['node', str(script_path)],
             capture_output=True,
             text=True,
             timeout=CONFIG['timeout'],
-            cwd=os.getcwd()
+            cwd=str(PROJECT_ROOT)
         )
         
         if result.returncode == 0:
@@ -573,3 +558,128 @@ def check_duplicates():
             'error': str(e),
             'timestamp': datetime.now().isoformat()
         })
+
+
+def build_function_index_report():
+    """Scan project scripts and report Function Index coverage."""
+    scripts_root = FUNCTION_INDEX_SCRIPTS_ROOT
+    if not scripts_root.exists():
+        raise FileNotFoundError(f'Scripts directory not found: {scripts_root}')
+
+    pages = []
+    for file_path in sorted(scripts_root.rglob('*.js')):
+        relative = file_path.relative_to(scripts_root)
+        if any(part in FUNCTION_INDEX_EXCLUDED_PARTS for part in relative.parts):
+            continue
+
+        try:
+            content = file_path.read_text(encoding='utf-8')
+        except UnicodeDecodeError:
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+
+        has_index = 'FUNCTION INDEX' in content
+        total_functions = len(FUNCTION_DECLARATION_PATTERN.findall(content))
+
+        index_entries = []
+        if has_index:
+            block_match = FUNCTION_INDEX_BLOCK_PATTERN.search(content)
+            if block_match:
+                index_entries = re.findall(r'-\s+(.+)', block_match.group(0))
+
+        pages.append({
+            'file': f"trading-ui/scripts/{relative.as_posix()}",
+            'hasIndex': has_index,
+            'missingIndex': not has_index,
+            'indexEntries': len(index_entries),
+            'totalFunctions': total_functions,
+            'lastModified': datetime.utcfromtimestamp(file_path.stat().st_mtime).isoformat() + 'Z'
+        })
+
+    total_files = len(pages)
+    files_with_index = sum(1 for page in pages if page['hasIndex'])
+    summary = {
+        'total': total_files,
+        'filesWithIndex': files_with_index,
+        'filesWithoutIndex': total_files - files_with_index,
+        'coveragePercentage': f"{(files_with_index / total_files * 100):.2f}" if total_files else "0.00"
+    }
+
+    return {
+        'summary': summary,
+        'pages': pages,
+        'issues': {
+            'missingIndex': [page['file'] for page in pages if page['missingIndex']]
+        },
+        'generatedAt': datetime.utcnow().isoformat() + 'Z'
+    }
+
+
+def _resolve_script_path(script_name):
+    """Return the first existing script path from configured directories."""
+    search_roots = [
+        CONFIG['monitors_dir'],
+        CONFIG['generators_dir'],
+        CONFIG['scripts_dir']
+    ]
+
+    for root in search_roots:
+        candidate = Path(root) / script_name
+        if candidate.exists():
+            return candidate
+
+    return None
+
+        except UnicodeDecodeError:
+            content = file_path.read_text(encoding='utf-8', errors='ignore')
+
+        has_index = 'FUNCTION INDEX' in content
+        total_functions = len(FUNCTION_DECLARATION_PATTERN.findall(content))
+
+        index_entries = []
+        if has_index:
+            block_match = FUNCTION_INDEX_BLOCK_PATTERN.search(content)
+            if block_match:
+                index_entries = re.findall(r'-\s+(.+)', block_match.group(0))
+
+        pages.append({
+            'file': f"trading-ui/scripts/{relative.as_posix()}",
+            'hasIndex': has_index,
+            'missingIndex': not has_index,
+            'indexEntries': len(index_entries),
+            'totalFunctions': total_functions,
+            'lastModified': datetime.utcfromtimestamp(file_path.stat().st_mtime).isoformat() + 'Z'
+        })
+
+    total_files = len(pages)
+    files_with_index = sum(1 for page in pages if page['hasIndex'])
+    summary = {
+        'total': total_files,
+        'filesWithIndex': files_with_index,
+        'filesWithoutIndex': total_files - files_with_index,
+        'coveragePercentage': f"{(files_with_index / total_files * 100):.2f}" if total_files else "0.00"
+    }
+
+    return {
+        'summary': summary,
+        'pages': pages,
+        'issues': {
+            'missingIndex': [page['file'] for page in pages if page['missingIndex']]
+        },
+        'generatedAt': datetime.utcnow().isoformat() + 'Z'
+    }
+
+
+def _resolve_script_path(script_name):
+    """Return the first existing script path from configured directories."""
+    search_roots = [
+        CONFIG['monitors_dir'],
+        CONFIG['generators_dir'],
+        CONFIG['scripts_dir']
+    ]
+
+    for root in search_roots:
+        candidate = Path(root) / script_name
+        if candidate.exists():
+            return candidate
+
+    return None

@@ -185,9 +185,35 @@ class PageStateManager {
    */
   async saveSort(pageName, sort) {
     const currentState = await this.loadPageState(pageName) || {};
+
+    if (!sort || typeof sort !== 'object') {
+      return await this.savePageState(pageName, {
+        ...currentState,
+        sort: sort
+      });
+    }
+
+    const currentSortState =
+      currentState.sort && typeof currentState.sort === 'object' && !Array.isArray(currentState.sort)
+        ? { ...currentState.sort }
+        : {};
+
+    if (Array.isArray(sort)) {
+      currentSortState.__legacy = sort;
+    } else if (sort.tableType) {
+      currentSortState[sort.tableType] = {
+        columnIndex: sort.columnIndex ?? -1,
+        direction: sort.direction || 'asc',
+        chain: Array.isArray(sort.chain) ? sort.chain : null,
+        timestamp: Date.now()
+      };
+    } else {
+      currentSortState.__legacy = sort;
+    }
+
     return await this.savePageState(pageName, {
       ...currentState,
-      sort: sort
+      sort: currentSortState
     });
   }
 
@@ -234,9 +260,21 @@ class PageStateManager {
    * @param {string} pageName - שם העמוד
    * @returns {Promise<Object|null>} מצב סידור או null אם לא נמצא
    */
-  async loadSort(pageName) {
+  async loadSort(pageName, tableType = null) {
     const pageState = await this.loadPageState(pageName);
-    return pageState && pageState.sort ? pageState.sort : null;
+    if (!pageState || !pageState.sort) {
+      return null;
+    }
+
+    const sortState = pageState.sort;
+    if (tableType) {
+      if (sortState[tableType]) {
+        return sortState[tableType];
+      }
+      return null;
+    }
+
+    return sortState;
   }
 
   /**

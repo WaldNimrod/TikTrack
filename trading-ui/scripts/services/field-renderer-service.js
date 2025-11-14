@@ -1351,7 +1351,127 @@ class FieldRendererService {
         return compactDisplay;
     }
 
+    /**
+     * Render standardized tag badges block for any entity
+     *
+     * @param {Array<Object>} tags - Array of tag objects (as returned from TagService)
+     * @param {Object} options - Rendering options
+     * @param {boolean} [options.showTitle=true] - Whether to render the section title
+     * @param {string} [options.title='תגיות'] - Section title
+     * @param {string} [options.emptyMessage='אין תגיות משויכות'] - Message when no tags are present
+     * @param {string} [options.entityType='entity'] - Entity type identifier
+     * @param {string} [options.containerClasses=''] - Extra classes for outer container
+     * @param {boolean} [options.includeCategory=true] - Whether to prefix category name before tag name
+     * @returns {string} HTML string representing the tags block
+     */
+    static renderTagBadges(tags, options = {}) {
+        const {
+            showTitle = true,
+            title = 'תגיות',
+            emptyMessage = 'אין תגיות משויכות',
+            entityType = 'entity',
+            containerClasses = '',
+            includeCategory = true
+        } = options || {};
+
+        const normalizedTags = Array.isArray(tags) ? tags.filter(Boolean) : [];
+        const sectionTitle = this._escapeHtml(title);
+        const emptyLabel = this._escapeHtml(emptyMessage);
+        const normalizedEntityType = this._escapeHtml(entityType || 'entity');
+        const outerClasses = ['entity-tags-block', containerClasses].filter(Boolean).join(' ').trim();
+
+        const renderHeader = (hasTags) => {
+            if (!showTitle) {
+                return hasTags ? '' : `<span class="text-muted">${emptyLabel}</span>`;
+            }
+
+            if (hasTags) {
+                return `
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="fw-bold">${sectionTitle}:</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold">${sectionTitle}:</span>
+                    <span class="text-muted">${emptyLabel}</span>
+                </div>
+            `;
+        };
+
+        if (!normalizedTags.length) {
+            return `
+                <div class="${outerClasses}" data-entity-type="${normalizedEntityType}">
+                    ${renderHeader(false)}
+                </div>
+            `;
+        }
+
+        const badgesHtml = normalizedTags.map((tag) => {
+            const tagId = tag.id != null ? String(tag.id) : '';
+            const categoryId = tag.category_id != null
+                ? String(tag.category_id)
+                : (tag.category && tag.category.id != null ? String(tag.category.id) : '');
+
+            const tagName = tag.name || tag.label || tag.display_name || '';
+            const categoryName = includeCategory
+                ? (tag.category_name || (tag.category && tag.category.name) || '')
+                : '';
+
+            const label = [categoryName, tagName]
+                .filter(Boolean)
+                .join(includeCategory && categoryName && tagName ? ' • ' : '');
+
+            const displayLabel = this._escapeHtml(label || tagName || categoryName || '-');
+            const normalizedColor = this._normalizeTagColorValue(
+                tag.color_hex || tag.color || tag.category_color || (tag.category && tag.category.color_hex) || null
+            );
+
+            const dataAttrs = [
+                tagId ? `data-tag-id="${this._escapeHtml(tagId)}"` : '',
+                categoryId ? `data-category-id="${this._escapeHtml(categoryId)}"` : ''
+            ].filter(Boolean).join(' ');
+
+            return `
+                <span class="badge rounded-pill bg-light text-dark border me-1 mb-1"
+                      style="border-color: ${normalizedColor};"
+                      ${dataAttrs}>
+                    ${displayLabel}
+                </span>
+            `;
+        }).join('');
+
+        return `
+            <div class="${outerClasses}" data-entity-type="${normalizedEntityType}">
+                ${renderHeader(true)}
+                <div class="tag-badge-container d-flex flex-wrap gap-2">
+                    ${badgesHtml}
+                </div>
+            </div>
+        `;
+    }
+
     // ===== PRIVATE HELPER METHODS =====
+
+    /**
+     * Normalize hex color values for tag rendering
+     * @private
+     */
+    static _normalizeTagColorValue(colorCandidate, fallback = '#26baac') {
+        if (!colorCandidate) {
+            return fallback;
+        }
+
+        const trimmed = String(colorCandidate).trim();
+        const hexRegex = /^#([0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+        if (hexRegex.test(trimmed)) {
+            return trimmed;
+        }
+
+        return fallback;
+    }
 
     /**
      * תרגום סטטוס לעברית

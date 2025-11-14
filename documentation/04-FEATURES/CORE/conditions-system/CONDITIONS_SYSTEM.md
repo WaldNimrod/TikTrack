@@ -45,8 +45,11 @@ Backend/
 trading-ui/
 ├── scripts/conditions/
 │   ├── conditions-translations.js      # תרגומים
-│   ├── condition-validator.js          # ולידציה קליינט
-│   └── condition-builder.js            # בונה תנאים
+│   ├── conditions-validator.js         # ולידציה קליינט
+│   ├── conditions-form-generator.js    # טופס דינמי
+│   ├── conditions-crud-manager.js      # חיבור CRUD מאוחד
+│   ├── conditions-ui-manager.js        # רינדור ממשק תנאים
+│   └── conditions-modal-controller.js  # אינטגרציה עם ModalNavigationService
 └── styles-new/06-components/
     └── _conditions-system.css          # עיצוב מערכת
 ```
@@ -64,7 +67,7 @@ trading-ui/
 - **פיבונצי ואיזור הזהב** - Fibonacci & Golden Zone
 
 ### 2. פונקציונליות
-- **בניית תנאים** - ממשק גרפי לבניית תנאים מותאמים
+- **ניהול תנאים** - מודול אחוד למעבר בין תכניות, טריידים והתראות
 - **ולידציה** - בדיקת תקינות פרמטרים
 - **רשת תנאים** - העתקת תנאים מתכניות מסחר לטריידים
 - **התראות אוטומטיות** - יצירת התראות מתנאים
@@ -119,15 +122,24 @@ python3 create_fresh_database.py
 
 <!-- הוספת קבצי JS -->
 <script src="scripts/conditions/conditions-translations.js"></script>
-<script src="scripts/conditions/condition-validator.js"></script>
-<script src="scripts/conditions/condition-builder.js"></script>
+<script src="scripts/conditions/conditions-validator.js"></script>
+<script src="scripts/conditions/conditions-form-generator.js"></script>
+<script src="scripts/conditions/conditions-crud-manager.js"></script>
+<script src="scripts/conditions/conditions-initializer.js"></script>
+<script src="scripts/modal-configs/conditions-config.js"></script>
+<script src="scripts/conditions/conditions-ui-manager.js"></script>
+<script src="scripts/conditions/conditions-modal-controller.js"></script>
 ```
 
 ### 3. אתחול המערכת
 ```javascript
-// אתחול אוטומטי דרך המערכת המאוחדת
-// או אתחול ידני
-const conditionBuilder = new ConditionBuilder('plan', 'new', 'containerId');
+// פתיחת מודול התנאים מתוך מודל ההורה
+window.ConditionsModalController.open({
+  entityType: 'plan',
+  entityId: 42,
+  entityName: 'TSLA Swing Plan',
+  parentModalId: 'tradePlansModal'
+});
 ```
 
 ---

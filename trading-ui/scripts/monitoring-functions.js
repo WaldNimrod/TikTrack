@@ -424,11 +424,8 @@ async function checkForMismatches(pageName, pageConfig) {
             
             // Find where these scripts are actually loaded
             const pkgScriptPositions = pkgScripts.map(script => {
-                const actualIndex = loadedScripts.findIndex(loaded => {
-                    const loadedFilename = loaded.split('/').pop().split('?')[0];
-                    const scriptFilename = script.file.split('/').pop().split('?')[0];
-                    return loadedFilename === scriptFilename || loaded.includes(script.file);
-                });
+                const scriptFilename = script.file.split('/').pop().split('?')[0];
+                const actualIndex = loadedScripts.findIndex(loaded => loaded === scriptFilename);
                 return { 
                     script: script.file, 
                     scriptName: script.file.split('/').pop(),
@@ -444,6 +441,12 @@ async function checkForMismatches(pageName, pageConfig) {
                 
                 // If current script comes after next script, order is wrong
                 if (current.actualIndex > next.actualIndex) {
+                    console.warn('[init-monitor] Package script order mismatch detected', {
+                        packageName: pkg.name || pkg.id,
+                        currentScript: current,
+                        nextScript: next,
+                        loadedScripts
+                    });
                     loadOrderIssues.push({
                         type: 'loading_order',
                         message: `סדר טעינה שגוי בחבילה ${pkg.name || pkg.id}: ${current.scriptName} נטען אחרי ${next.scriptName} (צריך להיות לפני)`,
@@ -458,11 +461,8 @@ async function checkForMismatches(pageName, pageConfig) {
                 const nextPkgScripts = (nextPkg.scripts || [])
                     .filter(script => script.required !== false)
                     .map(script => {
-                        const actualIndex = loadedScripts.findIndex(loaded => {
-                            const loadedFilename = loaded.split('/').pop().split('?')[0];
-                            const scriptFilename = script.file.split('/').pop().split('?')[0];
-                            return loadedFilename === scriptFilename || loaded.includes(script.file);
-                        });
+                        const scriptFilename = script.file.split('/').pop().split('?')[0];
+                        const actualIndex = loadedScripts.findIndex(loaded => loaded === scriptFilename);
                         return { script: script.file, actualIndex };
                     })
                     .filter(pos => pos.actualIndex !== -1);
@@ -472,6 +472,13 @@ async function checkForMismatches(pageName, pageConfig) {
                     const firstNextPkgScript = Math.min(...nextPkgScripts.map(p => p.actualIndex));
                     
                     if (lastCurrentPkgScript > firstNextPkgScript) {
+                        console.warn('[init-monitor] Cross-package order mismatch detected', {
+                            currentPackage: pkg.name || pkg.id,
+                            nextPackage: nextPkg.name || nextPkg.id,
+                            currentPackageScripts: pkgScriptPositions,
+                            nextPackageScripts: nextPkgScripts,
+                            loadedScripts
+                        });
                         loadOrderIssues.push({
                             type: 'loading_order',
                             message: `סדר טעינה שגוי בין חבילות: סקריפטים מחבילה ${pkg.name || pkg.id} נטענו אחרי סקריפטים מחבילה ${nextPkg.name || nextPkg.id}`,

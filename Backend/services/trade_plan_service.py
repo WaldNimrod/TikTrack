@@ -207,7 +207,12 @@ class TradePlanService:
         plan.status = 'cancelled'  # Update status to cancelled
         db.commit()
         db.refresh(plan)
-        logger.info(f"Cancelled trade plan: {plan_id}")
+        logger.info(
+            "Cancelled trade plan %s (status=%s, cancelled_at=%s)",
+            plan_id,
+            plan.status,
+            plan.cancelled_at,
+        )
         
         # Update ticker active_trades status (triggers will handle this automatically)
         try:

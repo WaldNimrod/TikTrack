@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.26.0",
+    "version": "1.0.27.0",
     "major": 1,
     "minor": 0,
-    "patch": 26,
+    "patch": 27,
     "build": 0,
-    "commit": "00f790d4813722288f09f1de9a83dd6341248d04",
-    "updated_at": "2025-11-14T13:53:10+00:00",
-    "notes": "Allow Unicode tag slugs and expose tag action buttons"
+    "commit": "c9db737ab323aff110cd2e48556f7c9cb1f3288c",
+    "updated_at": "2025-11-14T15:16:34+00:00",
+    "notes": "Sync backlog prior to user pages standardization"
   }
 }

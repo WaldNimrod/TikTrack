@@ -22,6 +22,7 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
 from services.advanced_cache_service import cache_for, invalidate_cache
+from services.tag_service import TagService
 import logging
 from typing import Dict, Any, Optional
 
@@ -423,6 +424,15 @@ def delete_ticker(ticker_id: int):
                 "version": "1.0"
             }), 400
         
+        try:
+            TagService.remove_all_tags_for_entity(db, 'ticker', ticker_id)
+        except ValueError as tag_error:
+            logger.warning(
+                "Failed to remove tags for ticker %s before deletion: %s",
+                ticker_id,
+                tag_error,
+            )
+
         # Delete ticker
         success = TickerService.delete(db, ticker_id)
         if success:

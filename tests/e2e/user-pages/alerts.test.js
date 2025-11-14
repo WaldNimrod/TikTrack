@@ -9,41 +9,39 @@
  * @author TikTrack Development Team
  */
 
-const fs = require('fs');
-const path = require('path');
+const { loadPageTemplate } = require('../../utils/page-test-utils');
 
 describe('Alerts Page E2E Tests', () => {
-    let rawHtml;
+    let htmlContent;
 
     beforeAll(() => {
-        const htmlPath = path.join(__dirname, '../../../trading-ui/alerts.html');
-        rawHtml = fs.readFileSync(htmlPath, 'utf8');
+        htmlContent = loadPageTemplate('alerts');
     });
 
     test('should load alerts page successfully', () => {
-        expect(rawHtml.includes('alerts-page')).toBe(true);
+        expect(htmlContent.includes('alerts-page')).toBe(true);
     });
 
     test('should have alerts table', () => {
         expect(
-            rawHtml.includes('alertsTable') ||
-            rawHtml.includes('data-table-type="alerts"')
+            htmlContent.includes('alertsTable') ||
+            htmlContent.includes('data-table-type="alerts"')
         ).toBe(true);
     });
 
     test('should have table actions', () => {
-        expect(rawHtml.includes("showModalSafe('alertsModal','add')")).toBe(true);
+        expect(htmlContent.includes("showModalSafe('alertsModal','add')")).toBe(true);
     });
 
     test('should load required scripts', () => {
-        expect(rawHtml.includes('alerts.js')).toBe(true);
+        expect(htmlContent.includes('alerts.js')).toBe(true);
     });
 
     test('should have proper page structure', () => {
-        expect(rawHtml.includes('main-content')).toBe(true);
+        expect(htmlContent.includes('main-content')).toBe(true);
     });
 
     test('should be responsive', () => {
-        expect(rawHtml.includes('meta name="viewport"')).toBe(true);
+        expect(htmlContent.includes('meta name="viewport"')).toBe(true);
     });
 });

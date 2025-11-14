@@ -1,13 +1,13 @@
 /**
  * Account Service - Comprehensive Function Index
  * ==========================================
- * 
+ *
  * This file contains the account service for TikTrack.
  * Provides advanced account management functions with caching and status filtering.
- * 
+ *
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/ACCOUNT_SERVICE_SYSTEM.md
- * 
+ *
  * Author: TikTrack Development Team
  * Version: 1.0
  * Last Updated: 2025-01-27

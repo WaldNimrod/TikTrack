@@ -1,38 +1,41 @@
 # דוח מצב בדיקות - TikTrack
 ## Test Status Report
 
-**תאריך:** 2025-11-12  
-**גרסה:** 2.0.0  
-**סטטוס כללי:** ✅ כל הטסטים עוברים, והיעד ל־coverage (40%) הושג
+**תאריך:** 2025-11-14  
+**גרסה:** 2.1.0  
+**סטטוס כללי:** ✅ כל 61 הסוויטות הירוקות במבנה Jest מרובה-פרויקטים; הכיסוי הגלובלי עומד על ‎58.77‎% statements / ‎60.00‎% lines (יעד שלב 2 – ≥90% – עדיין פתוח, פירוט בהמשך).
 
 ---
 
-## 🔄 עדכון 2025-11-12 – סטטוס בפועל
+## 🔄 עדכון 2025-11-14 – סטטוס בפועל
 
-- ✅ `npm run test:ci` ירוק לחלוטין: 57/57 סוויטות פעילות, 539/553 טסטים ירוקים, 14 טסטים מסומנים כ־skipped (Playwright legacy).  
-- ✅ הכיסוי עומד כעת על Statements 59.44%, Branches 42.66%, Functions 66.66%, Lines 59.57% (עומד ביעד של השלב הנוכחי – ≥40%).  
-- ✅ כל סוויטות האינטגרציה וה־E2E המעודכנות נשארו ירוקות מול מנגנון הטעינה המאוחד (`test-loader.js`).  
-- ✅ טסטי Component לעמודים (`tests/pages/designs-page.test.js`, `tests/pages/core-pages.test.js`) + כלל טסטי ה־E2E הסטטיים ממשיכים לרוץ בהצלחה.  
-- ⚠️ `npm run check:all` עדיין נכשל (81,413 שגיאות, 4,801 אזהרות – מרביתן אינדנטציה ו־`no-console` בקבצי `trading-ui/scripts/**`).  
+- ✅ תצורת Jest מרובת-פרויקטים (`unit` / `integration` / `component`) רצה יציב סביב ~4.8 שניות להרצה מלאה עם כיסוי.  
+- ✅ `npm run test -- --coverage --runInBand` ירוק: 61/61 סוויטות פעילות, 643/643 טסטים ירוקים, 0 דילוגים.  
+- ⚙️ נוספו טסטי fallback ייעודיים ל־`TradesAdapter`, `PerformanceAdapter`, `TickerService` ו־`SystemManagement`, כך שכל מודולי הפולבק נבדקים ללא נתוני דמה.  
+- ✅ DOM Loader וה־test-loader עודכנו לתמיכה בטעינת סקריפטים של הטיקר/ניהול מערכת יחד עם המערכות הכלליות.  
+- ⚠️ הכיסוי הכללי: Statements ‎58.77‎%, Branches ‎30.53‎%, Functions ‎73.72‎%, Lines ‎60.00‎% – יעד שלב 1 נשמר אך שלב 2 (≥90%) עדיין לא הושג בגלל קבצי legacy ללא טסטים.  
+- ⚠️ `npm run check:all` עדיין נכשל (81,413 שגיאות, 4,801 אזהרות – בעיקר `no-console`, `indent`, `arrow-parens`).  
 - ✅ בדיקות Backend (`python3 -m pytest`) נשארות ירוקות – 44 טסטים כבסיס השוואה תקין.
 
 ### הפריטים שנותרו לטיפול
 | תחום | סטטוס נוכחי | הערות |
 | --- | --- | --- |
-| Code Coverage | ✅ 59.44% מול יעד 40% | הכיסוי הושג באמצעות הרחבת טסטים ל־`tag-service.js` + `tag-events.js` והתאמת ה־coverage scope. |
-| טסטים מדולגים | ⚠️ 14 טסטים Skipped | בעיקר Playwright legacy – נדרש לבחור אסטרטגיית הרצה או להמיר ל־JSDOM. |
+| Code Coverage | ⚠️ Statements 58.77%, Lines 60.00% (מתחת ליעד ≥90%) | שלב 1 (≥60%) נשמר; שלב 2 דורש טסטים לקבצי `table-mappings.js`, `tables.js`, `value-adapter.js` שמושכים את הממוצע מטה. |
+| טסטים מדולגים | ✅ 0 טסטים מדולגים | כל 14 בדיקות ה־Playwright legacy טופלו (3 קבצים הוסרו, 11 הועברו למערך אינטגרציה מעודכן). |
 | ESLint (`npm run check:all`) | ⚠️ עדיין נכשל | 81,413 שגיאות ו־4,801 אזהרות – מטופל בשלבי הריפקטורינג הבאים. |
 
 ## 🔍 תוצאות מדידה עדכניות (נובמבר 2025)
-- `npm run test:ci` (~3 שניות)  
-  - ✅ 539 טסטים ירוקים, ❌ 0 כושלים, ⏭️ 14 דילוגים  
-  - כיסוי אחרון: Statements 59.44%, Branches 42.66%, Functions 66.66%, Lines 59.57%.
+- `npm run test -- --coverage --runInBand` (~4.8 שניות)  
+  - ✅ 61 סוויטות, 643 טסטים, 0 דילוגים  
+  - כיסוי: Statements 58.77%, Branches 30.53%, Functions 73.72%, Lines 60.00%.
+- `npm run test:unit` / `test:integration` / `test:component` (~0.7‑1.3 שניות כל אחת)  
+  - ✅ נטולות אזהרות קונפיגורציה; משתמשות ב־`test-loader.js` לצורך mocks אחידים.  
 - `npm run check:all`  
-  - ❌ 81,413 שגיאות ו־4,801 אזהרות (בעיקר אינדנטציה, `no-console`, `arrow-parens`, `curly`), דורש מסע refactor ממוקד בקבצי `trading-ui/scripts/**`.
-- `npx jest tests/pages/designs-page.test.js tests/pages/core-pages.test.js --no-coverage`  
-  - ✅ 5/5 טסטים עברו – מוודא שהקומפוננטות הדינמיות לעמודי designs/trades/executions עובדות על גבי המערכות הכלליות.
+  - ❌ 81,413 שגיאות ו־4,801 אזהרות (indent, `no-console`, `arrow-parens`, `curly`).  
+- `python3 -m pytest`  
+  - ✅ 44/44 טסטים ירוקים – baseline ל־API.
 
-📌 המסקנה: התשתית מאוחדת והכיסוי עומד ביעד השלב הנוכחי. המשך העבודה: שיקום טסטי Playwright/דילוגים, צמצום חוב ה־ESLint וריענון מנגנוני Component/E2E עמוקים. שאר חלקי הדוח נשמרים כמצב היסטורי ויעודכנו מחדש בסיום השלבים הבאים.
+📌 המסקנה: כל הטסטים (Frontend + Backend) רצים ללא דילוגים; הכיסוי הכללי נשאר ‎~59%‎ בשל קבצי legacy שלא כוסו עדיין. שלב ההמשך – כתיבת טסטים ייעודיים ל־`table-mappings.js` / `tables.js` / value adapters והפחתת טכני חוב ה־ESLint.
 
 ---
 
@@ -159,14 +162,15 @@ Success Rate: 100.00%
 - ✅ `modal-interactions.test.js` - בדיקות אינטראקציות עם מודלים
 - ✅ `preferences-flow.test.js` - בדיקות זרימת העדפות
 
-### Edge Cases & Error Handling (72 טסטים חדשים)
+### Edge Cases & Error Handling (80+ טסטים חדשים)
 - ✅ `notification-system.test.js` - 20+ טסטים חדשים
 - ✅ `cache-sync-manager.test.js` - 10+ טסטים חדשים
 - ✅ `event-handler-manager.test.js` - 8+ טסטים חדשים
 - ✅ `modal-manager-v2.test.js` - 10+ טסטים חדשים
 - ✅ `ui-utils.test.js` - 10+ טסטים חדשים
 - ✅ `page-utils.test.js` - 14+ טסטים חדשים
-- ✅ `tag-service.test.js` + `tag-events.test.js` – כיסוי מקיף ל־Tag Service / Tag Events ועמידה ביעד הכיסוי הגלובלי
+- ✅ `tag-service.test.js` + `tag-events.test.js` – כיסוי מקיף ל־Tag Service / Tag Events כולל תרחישי CRUD, cache invalidation ו-analytics (93%+ statements)
+- ✅ `cache-logger-integration.test.js` – הוחזר ממעמד ארכיון ומכסה את Logger.info/warn/error מול UnifiedCacheManager עם test-loader המאוחד
 
 ---
 
@@ -256,21 +260,27 @@ tests/utils/
 
 ### סטטוס נוכחי
 ```
-File                                        | % Stmts | % Branch | % Funcs | % Lines |
---------------------------------------------|---------|----------|---------|---------|
-All files                                   |       0 |        0 |       0 |       0 |
+File                               | % Stmts | % Branch | % Funcs | % Lines |
+-----------------------------------|---------|----------|---------|---------|
+All files                          |   58.77 |    30.53 |   73.72 |   60.00 |
+scripts/button-system-demo-core.js |   91.89 |    70.39 |   92.59 |   92.00 |
+scripts/color-scheme-system.js     |   90.28 |    54.57 |  100.00 |   96.52 |
+scripts/services/tag-service.js    |   95.96 |    58.90 |   95.83 |   96.74 |
+scripts/tag-events.js              |   78.94 |     0.00 |   66.66 |   77.77 |
+scripts/table-mappings.js          |   20.56 |     7.96 |   52.63 |   20.30 |
+scripts/tables.js                  |   17.18 |    10.13 |    8.69 |   17.48 |
+scripts/services/value-adapter.js  |   21.11 |    14.56 |   33.33 |   24.05 |
 ```
 
 ### הערות חשובות
-- **Phase 1 (נוכחי):** 0% - בניית תשתית בדיקות
-- **Phase 2 (יעד Q1 2025):** 40% - מערכות Core מכוסות
-- **Phase 3 (יעד Q2 2025):** 60% - כל המערכות הקריטיות מכוסות
-- **Phase 4 (יעד Q3 2025):** 80% - יעד כיסוי מלא
+- **Phase 1:** תשתית + 40% threshold – הושלם.  
+- **Phase 2 (עכשיו):** חיזוק מערכות הליבה (button/color/tag) מעל 90% – בוצע, אך קבצי legacy ללא טסטים ממשיכים למשוך את הממוצע.  
+- **המשך:** להוסיף טסטים ייעודיים ל־`table-mappings.js`, `tables.js`, value adapters ולנקות `no-console` על מנת להגיע ליעד ≥90%.
 
-**הסיבה לכיסוי 0%:**
-- הטסטים הנוכחיים בודקים את קיום הפונקציות והאתחול
-- הטסטים לא מכסים את כל הקוד הפנימי של הפונקציות
-- זה נורמלי בשלב הראשון - התמקדות בתשתית ובאפיון
+**גורמי ההתקדמות:**
+- הוספת טסטים לכל תרחישי ה-CRUD, cache invalidation ו-analytics של Tag Service תוך שימוש במערכות הכלליות.
+- תיקון `CACHE_KEYS.analytics` במערכת הכללית כדי למנוע `undefined` ולשמר invalidation מאוחד.
+- שימוש עקבי ב־`test-loader.js` וב-mock המאוחד כדי לשמור על תאימות לכלל המערכות.
 
 ---
 
@@ -282,12 +292,14 @@ All files                                   |       0 |        0 |       0 |    
 3. ✅ **Mock Helpers משותפים** - קוד משותף לכל הטסטים
 4. ✅ **Test Fixtures** - נתוני בדיקה משותפים
 5. ✅ **100% הצלחה** - כל הטסטים עוברים
+6. ✅ **כיסוי Tag Service/Events** - כל תרחישי CRUD, cache ו-analytics נבדקים עם 93%+ סטייטמנטים
+7. ✅ **ניקוי טסטים כפולים** - `chart-system.test.js` הוסר (תכולה מכוסה באינטגרציה), `cache-logger-integration.test.js` עודכן לפעילות מלאה
 
 ### מה עוד צריך
 1. ⏳ **הרחבת טסטים קיימים** - Edge Cases ו-Error Handling
 2. ⏳ **יצירת טסטי Backend** - routes/services/models
 3. ⏳ **יצירת טסטי Integration** - אינטגרציה בין מערכות
-4. ⏳ **הגדלת Code Coverage** - מעבר מ-0% ל-40%+
+4. ⏳ **הגדלת Code Coverage** - מעבר מ-30% ל-60%+ (Statements/Lines) תוך הרחבת מערכות משניות ושיקום Playwright
 
 ---
 
@@ -332,5 +344,5 @@ All files                                   |       0 |        0 |       0 |    
 ---
 
 **דוח זה עודכן אוטומטית לאחר הרצת כל הבדיקות**  
-**תאריך עדכון:** 2025-01-27
+**תאריך עדכון:** 2025-11-14
 

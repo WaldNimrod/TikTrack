@@ -259,6 +259,16 @@ const TABLE_COLUMN_MAPPINGS = {
     { key: 'match_reasons_text', sortType: 'string' },  // 9 - סיבות התאמה (טקסט חופשי)
     { key: 'actions', sortable: false },                // 10 - פעולות (לא ניתן למיין)
   ],
+
+  // טבלת ניטור לינטר - Lint Monitor Issues
+  'lint_monitor_issues': [
+    { key: 'tool', sortType: 'string' },        // 0 - כלי הלינטר (ESLint / Stylelint וכו')
+    { key: 'severity', sortType: 'string' },    // 1 - חומרה (error/warning/info)
+    { key: 'file', sortType: 'string' },        // 2 - קובץ
+    { key: 'rule', sortType: 'string' },        // 3 - כלל שהופעל
+    { key: 'message', sortType: 'string' },     // 4 - הודעה
+    { key: 'line', sortType: 'numeric' },       // 5 - מיקום שורה
+  ],
 };
 
 const TABLE_COLUMN_SORT_TYPES = {
@@ -330,8 +340,47 @@ const TABLE_COLUMN_SORT_TYPES = {
   },
   trading_accounts: {
     updated_at: 'dateEnvelope'
+  },
+  lint_monitor_issues: {
+    tool: 'string',
+    severity: 'string',
+    file: 'string',
+    rule: 'string',
+    message: 'string',
+    line: 'numeric'
   }
 };
+
+const DEFAULT_DATE_KEYS = [
+  'updated_at',
+  'completed_at',
+  'triggered_at',
+  'closed_at',
+  'opened_at',
+  'trade_created_at',
+  'created_at',
+  'expiry_date',
+  'date',
+  'yahoo_updated_at'
+];
+
+const DEFAULT_STATUS_KEYS = [
+  'status',
+  'state',
+  'execution_status',
+  'order_status',
+  'is_triggered',
+  'severity'
+];
+
+const DEFAULT_TICKER_KEYS = [
+  'ticker_symbol',
+  'symbol',
+  'linked_to',
+  'account_name',
+  'name',
+  'related_object'
+];
 
 function normalizeColumnEntry(entry) {
   if (!entry) {
@@ -357,6 +406,87 @@ const TABLE_COLUMN_KEYS = Object.fromEntries(
     return [tableType, keys];
   })
 );
+
+function getColumnIndexByKey(tableType, columnKey) {
+  if (!columnKey) {
+    return -1;
+  }
+  const keys = TABLE_COLUMN_KEYS[tableType];
+  if (!keys) {
+    return -1;
+  }
+  return keys.indexOf(columnKey);
+}
+
+function findFirstMatchingColumn(tableType, candidates = []) {
+  if (!Array.isArray(candidates) || candidates.length === 0) {
+    return null;
+  }
+
+  for (const candidate of candidates) {
+    const columnIndex = getColumnIndexByKey(tableType, candidate);
+    if (columnIndex !== -1) {
+      return {
+        columnIndex,
+        key: candidate
+      };
+    }
+  }
+
+  return null;
+}
+
+function buildCanonDefaultSortChain(tableType) {
+  const seenIndices = new Set();
+  const chain = [];
+
+  const dateMatch = findFirstMatchingColumn(tableType, DEFAULT_DATE_KEYS);
+  if (dateMatch && !seenIndices.has(dateMatch.columnIndex)) {
+    seenIndices.add(dateMatch.columnIndex);
+    chain.push({
+      columnIndex: dateMatch.columnIndex,
+      direction: 'desc',
+      key: dateMatch.key,
+      priority: 'date'
+    });
+  }
+
+  const statusMatch = findFirstMatchingColumn(tableType, DEFAULT_STATUS_KEYS);
+  if (statusMatch && !seenIndices.has(statusMatch.columnIndex)) {
+    seenIndices.add(statusMatch.columnIndex);
+    chain.push({
+      columnIndex: statusMatch.columnIndex,
+      direction: 'asc',
+      key: statusMatch.key,
+      priority: 'status'
+    });
+  }
+
+  const tickerMatch = findFirstMatchingColumn(tableType, DEFAULT_TICKER_KEYS);
+  if (tickerMatch && !seenIndices.has(tickerMatch.columnIndex)) {
+    seenIndices.add(tickerMatch.columnIndex);
+    chain.push({
+      columnIndex: tickerMatch.columnIndex,
+      direction: 'asc',
+      key: tickerMatch.key,
+      priority: 'ticker'
+    });
+  }
+
+  if (chain.length === 0) {
+    const keys = TABLE_COLUMN_KEYS[tableType] || [];
+    if (keys.length > 0) {
+      chain.push({
+        columnIndex: 0,
+        direction: 'asc',
+        key: keys[0],
+        priority: 'fallback'
+      });
+    }
+  }
+
+  return chain;
+}
 
 function resolveUserTimezone() {
   if (window.currentPreferences && window.currentPreferences.timezone) {
@@ -1139,6 +1269,7 @@ function getColumnDefinition(tableName, columnName) {
     'planned_amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
     'stop_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
     'target_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'line': { ...defaultDefinition, type: 'number', sortable: true, display: 'number', sortType: resolvedSortType || 'numeric' },
 
     // Status columns
     'status': { ...defaultDefinition, type: 'status', sortable: true, display: 'status', filterable: true, sortType: resolvedSortType || 'string' },
@@ -1210,6 +1341,8 @@ window.getTableConfig = getTableConfig;
 window.getColumnDefinition = getColumnDefinition;
 window.getColumnSortType = getColumnSortType;
 window.getColumnKey = getColumnKey;
+window.getColumnIndexByKey = getColumnIndexByKey;
+window.getDefaultSortChain = buildCanonDefaultSortChain;
 
 // ייצוא המודול עצמו
 window.tableMappings = {
@@ -1222,6 +1355,8 @@ window.tableMappings = {
   getColumnSortType,
   buildDateEnvelope,
   getColumnKey,
+  getColumnIndexByKey,
+  getDefaultSortChain: buildCanonDefaultSortChain,
 };
 
 console.log('🔵 [table-mappings.js] Exported to window.TABLE_COLUMN_MAPPINGS');

@@ -680,7 +680,10 @@ async function saveExecution() {
                     executionId: executionRecordId,
                     page: 'executions'
                 });
-                window.showErrorNotification?.('שמירת תגיות', 'התגובה נשמרה אך עדכון התגיות נכשל');
+                const errorMessage = window.TagService?.formatTagErrorMessage
+                    ? window.TagService.formatTagErrorMessage('הביצוע נשמר אך עדכון התגיות נכשל', tagError)
+                    : 'הביצוע נשמר אך עדכון התגיות נכשל';
+                window.showErrorNotification?.('שמירת תגיות', errorMessage);
             }
         }
         
@@ -1964,7 +1967,11 @@ window.initializeExecutionsPage = async function() {
   setupExecutionsFilterFunctions();
 
   // שחזור מצב סידור
-  restoreSortState();
+  if (window.pageUtils?.restoreSortState) {
+    await window.pageUtils.restoreSortState('executions');
+  } else if (window.UnifiedTableSystem?.sorter?.applyDefaultSort) {
+    await window.UnifiedTableSystem.sorter.applyDefaultSort('executions');
+  }
 
   // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
   updateTickersList('add', false);
@@ -3800,8 +3807,7 @@ window.registerExecutionsTables = function() {
         tableSelector: '#executionsTable',
         columns: getColumns('executions'),
         sortable: true,
-        filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+        filterable: true
     });
     
     // Register trade suggestions table
@@ -3820,8 +3826,7 @@ window.registerExecutionsTables = function() {
         tableSelector: '#tradeSuggestionsTable',
         columns: getColumns('trade_suggestions'),
         sortable: true,
-        filterable: false,
-        defaultSort: { columnIndex: 1, direction: 'desc' }
+        filterable: false
     });
 };
 

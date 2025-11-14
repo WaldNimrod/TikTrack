@@ -9,55 +9,42 @@
  * @author TikTrack Development Team
  */
 
-const fs = require('fs');
-const path = require('path');
-const { JSDOM } = require('jsdom');
+const { loadPageTemplate, mountHtml, resetDom } = require('../../utils/page-test-utils');
 
 describe('Trading Accounts Page E2E Tests', () => {
-    let dom;
-    let document;
-    let window;
+    let htmlContent;
+    let documentRef;
 
-    beforeAll(async () => {
-        const htmlPath = path.join(__dirname, '../../../trading-ui/trading_accounts.html');
-        if (fs.existsSync(htmlPath)) {
-            const htmlContent = fs.readFileSync(htmlPath, 'utf8');
-            dom = new JSDOM(htmlContent, {
-                url: 'http://localhost:8080/trading_accounts.html',
-                pretendToBeVisual: true,
-                resources: 'usable'
-            });
-            document = dom.window.document;
-            window = dom.window;
-            global.window = window;
-            global.document = document;
-        }
+    beforeAll(() => {
+        htmlContent = loadPageTemplate('trading-accounts');
     });
 
-    afterAll(() => {
-        if (dom) {
-            dom.window.close();
-        }
+    beforeEach(() => {
+        ({ document: documentRef } = mountHtml(htmlContent, { url: '/trading-accounts' }));
+    });
+
+    afterEach(() => {
+        resetDom();
     });
 
     test('should load trading accounts page successfully', () => {
-        if (!document) return;
-        expect(document.title).toBeDefined();
-        expect(document.body).toBeDefined();
+        expect(documentRef.title).toBeDefined();
+        expect(documentRef.body).toBeDefined();
     });
 
     test('should have trading accounts table', () => {
-        if (!document) return;
-        const table = document.querySelector('table') || document.querySelector('[data-table-type="trading_account"]');
-        expect(table || document.body).toBeDefined();
+        const table =
+            documentRef.querySelector('table') ||
+            documentRef.querySelector('[data-table-type="trading_account"]');
+        expect(table || documentRef.body).toBeDefined();
     });
 
     test('should have add account button', () => {
-        if (!document) return;
-        const addButton = document.querySelector('[data-onclick*="add"]') || 
-                         document.querySelector('[data-onclick*="account"]') ||
-                         document.querySelector('button');
-        expect(addButton || document.body).toBeDefined();
+        const addButton =
+            documentRef.querySelector('[data-onclick*="add"]') ||
+            documentRef.querySelector('[data-onclick*="account"]') ||
+            documentRef.querySelector('button');
+        expect(addButton || documentRef.body).toBeDefined();
     });
 });
 

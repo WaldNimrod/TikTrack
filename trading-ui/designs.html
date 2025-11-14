@@ -452,11 +452,12 @@
     
     
     <!-- =============================================================== -->
+    <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: designs | Generated: 2025-11-07T22:30:33.551Z -->
+    <!-- 🎯 Page: designs | Generated: 2025-11-14T15:05:17.031Z -->
     <!-- 📦 Packages: base, init-system -->
 
     <!-- =============================================================== -->
@@ -483,9 +484,9 @@
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- תפריט ניקוי מטמון Stage B-Lite -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL Guard לבקרת טעינות -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [11] Load Order: 11 -->
     <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
     <!-- [12] Load Order: 12 -->
@@ -507,39 +508,33 @@
     <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
-    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, import -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [16] Load Order: 16 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [17] Load Order: 17 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [18] Load Order: 18 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
     <!-- [19] Load Order: 19 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
     <!-- [20] Load Order: 20 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [23] Load Order: 23 -->
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
-
-    <!-- =============================================================== -->
-    <!-- ===== END SCRIPT LOADING ORDER ===== -->
-    <!-- =============================================================== -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [21] Page-specific: button-system-demo-core -->
-    <script src="scripts/button-system-demo-core.js?v=1.0.0"></script> <!-- דמו מרכזי למערכת הכפתורים -->
-    <!-- [22] Page-specific: button-color-checker -->
-    <script src="scripts/button-color-checker.js?v=1.0.0"></script> <!-- בדיקות צבע לכפתורים -->
-    <!-- [23] Page-specific: designs -->
+    <!-- [24] Page-specific: designs -->
     <script src="scripts/designs.js?v=1.0.0"></script> <!-- Page-specific script for designs -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 23 | Unique Scripts Loaded: 23 -->
+    <!-- 📊 Total Scripts Processed: 24 | Unique Scripts Loaded: 24 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("designs") -->
+
+
 </body>
 </html>

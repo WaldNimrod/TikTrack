@@ -20,6 +20,7 @@
     const API_BASE = '/api/tags';
     const CACHE_KEYS = {
         categories: 'tags:categories',
+        analytics: 'tags:analytics',
         tags: (categoryId = 'all') => `tags:list:${categoryId}`,
         entity: (entityType, entityId) => `tags:entity:${entityType}:${entityId}`,
         suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`
@@ -229,26 +230,70 @@
         return tags;
     }
 
-    async function replaceEntityTags(entityType, entityId, tagIds) {
-        const result = await requestJSON(`${API_BASE}/assign`, {
-            method: 'POST',
-            body: JSON.stringify({ entity_type: entityType, entity_id: entityId, tag_ids: tagIds })
-        });
-        await invalidateEntity(entityType, entityId);
-        window.TagEvents?.emitEntityTagsUpdated({ entityType, entityId, tagIds, action: 'replace' });
-        return result;
+    function normalizeTagIds(tagIds) {
+        if (!Array.isArray(tagIds)) {
+            return [];
+        }
+        return tagIds
+            .map((value) => {
+                if (typeof value === 'number') {
+                    return Number.isFinite(value) ? value : NaN;
+                }
+                if (typeof value === 'string' && value.trim() !== '') {
+                    const parsed = Number.parseInt(value, 10);
+                    return Number.isNaN(parsed) ? NaN : parsed;
+                }
+                return NaN;
+            })
+            .filter(Number.isFinite);
     }
 
-    async function removeTagFromEntity(tagId, entityType, entityId) {
-        await requestJSON(`${API_BASE}/remove`, {
+    function formatTagErrorMessage(defaultMessage, error) {
+        const message = error?.message;
+        if (typeof message === 'string' && message.trim().length > 0) {
+            return `${defaultMessage} (${message.trim()})`;
+        }
+        return defaultMessage;
+    }
+
+    async function replaceEntityTags(entityType, entityId, tagIds) {
+        const normalizedTagIds = normalizeTagIds(tagIds);
+        const result = await requestJSON(`${API_BASE}/assign`, {
             method: 'POST',
-            body: JSON.stringify({ tag_id: tagId, entity_type: entityType, entity_id: entityId })
+            body: JSON.stringify({
+                entity_type: entityType,
+                entity_id: entityId,
+                tag_ids: normalizedTagIds
+            })
         });
         await invalidateEntity(entityType, entityId);
         window.TagEvents?.emitEntityTagsUpdated({
             entityType,
             entityId,
-            tagId,
+            tagIds: normalizedTagIds,
+            action: 'replace'
+        });
+        return result;
+    }
+
+    async function removeTagFromEntity(tagId, entityType, entityId) {
+        const sanitizedTagId = Number.parseInt(tagId, 10);
+        if (!Number.isFinite(sanitizedTagId)) {
+            throw new Error('Tag ID must be an integer');
+        }
+        await requestJSON(`${API_BASE}/remove`, {
+            method: 'POST',
+            body: JSON.stringify({
+                tag_id: sanitizedTagId,
+                entity_type: entityType,
+                entity_id: entityId
+            })
+        });
+        await invalidateEntity(entityType, entityId);
+        window.TagEvents?.emitEntityTagsUpdated({
+            entityType,
+            entityId,
+            tagId: sanitizedTagId,
             action: 'remove'
         });
         return true;
@@ -274,6 +319,23 @@
         const suggestions = await requestJSON(`${API_BASE}/suggestions?${params.toString()}`);
         await setCached(cacheKey, suggestions);
         return suggestions;
+    }
+
+    async function getTagUsage(tagId, { limit = null, signal } = {}) {
+        const normalizedId = Number.parseInt(tagId, 10);
+        if (!Number.isFinite(normalizedId)) {
+            throw new Error('Tag ID must be an integer');
+        }
+
+        const params = new URLSearchParams();
+        if (limit && Number.isFinite(Number(limit))) {
+            params.set('limit', String(limit));
+        }
+
+        const queryString = params.toString();
+        const endpoint = `${API_BASE}/${normalizedId}/usage${queryString ? `?${queryString}` : ''}`;
+
+        return requestJSON(endpoint, { signal });
     }
 
     async function getAnalytics(force = false) {
@@ -318,9 +380,12 @@
         replaceEntityTags,
         removeTagFromEntity,
         getSuggestions,
+        getTagUsage,
         getAnalytics,
         invalidateEntity,
-        clearCache
+        clearCache,
+        normalizeTagIds,
+        formatTagErrorMessage
     };
 })();
 

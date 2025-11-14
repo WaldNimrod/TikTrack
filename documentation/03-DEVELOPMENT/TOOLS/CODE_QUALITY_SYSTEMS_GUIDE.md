@@ -163,15 +163,15 @@
   ```
 
 ### **10. מערכת ניטור לינטר**
-- **מיקום**: `scripts/linter-realtime-monitor.js`
+- **מיקום**: `scripts/linter-realtime-monitor.js` (מוטמע בתוך `code-quality-dashboard.html`)
 - **תכונות**:
-  - סריקת קבצים וניתוח בזמן אמת
-  - ניהול charts וויזואליזציה של נתונים
-  - סטטיסטיקות ודוחות
+  - טעינת דוח `npm run lint:collect` ותרגומו לכרטיסי סטטוס, טבלת סוגיות והיסטוריה
+  - כפתורי פעולה מובנים (רענון, הרצת דוח מלא, הורדת JSON, העתקת לוג)
+  - אינטגרציה מלאה עם `LintStatusService` + UnifiedTableSystem
 - **שימוש**:
   ```javascript
-  // הרצת בדיקות מקיפות
-  runComprehensiveTests()
+  // אתחול מתוך הדשבורד
+  await window.initializeLintMonitor();
   ```
 
 ### **11. מערכת ניטור ביצועים**

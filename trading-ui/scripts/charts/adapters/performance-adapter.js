@@ -36,22 +36,37 @@ class PerformanceAdapter {
             return cached.data;
         }
 
-        try {
-            // Return empty data - no real performance data available yet
-            const emptyData = { dates: [], values: [] };
-            
-            // Cache the empty data
-            this.cache.set(cacheKey, {
-                data: emptyData,
-                timestamp: Date.now()
-            });
-            
-            console.log('📊 Performance data retrieved (empty - no real data available)');
-            return emptyData;
-        } catch (error) {
-            console.error('❌ Error fetching performance data:', error);
-            return { dates: [], values: [] };
+        const query = new URLSearchParams(params).toString();
+        const requestUrl = query ? `${this.dataSource}?${query}` : this.dataSource;
+
+        const response = await fetch(requestUrl, {
+            method: 'GET',
+            headers: { 'Cache-Control': 'no-store' }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load performance data (${response.status})`);
         }
+
+        const payload = await response.json();
+        const normalized = payload?.data ?? payload;
+
+        if (!normalized || !Array.isArray(normalized.dates) || !Array.isArray(normalized.values)) {
+            throw new Error('Invalid performance payload received from server');
+        }
+
+        const data = {
+            dates: normalized.dates,
+            values: normalized.values
+        };
+
+        this.cache.set(cacheKey, {
+            data,
+            timestamp: Date.now()
+        });
+
+        console.log('📊 Performance data retrieved successfully');
+        return data;
     }
 
     /**
@@ -89,33 +104,6 @@ class PerformanceAdapter {
                 pointHoverRadius: 6
             }]
         };
-    }
-
-    /**
-     * Generate mock data for testing
-     * צור נתוני דמה לבדיקה
-     * @param {Object} params - Parameters
-     * @returns {Object} Mock data
-     */
-    generateMockData(params = {}) {
-        const days = params.days || 30;
-        const dates = [];
-        const values = [];
-        
-        const today = new Date();
-        for (let i = days - 1; i >= 0; i--) {
-            const date = new Date(today);
-            date.setDate(date.getDate() - i);
-            dates.push(date.toLocaleDateString('he-IL'));
-            
-            // Generate realistic performance data
-            const baseValue = 100;
-            const variation = (Math.random() - 0.5) * 10;
-            const trend = (days - i) * 0.1;
-            values.push(Math.max(0, baseValue + variation + trend));
-        }
-        
-        return { dates, values };
     }
 
     /**

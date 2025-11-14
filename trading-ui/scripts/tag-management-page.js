@@ -805,21 +805,41 @@
             return;
         }
 
+        window.Logger?.info?.('📝 [TagManagement] saveTag request', {
+            mode,
+            tagId: Number.isFinite(tagId) ? tagId : null,
+            tagData,
+            snapshotId: tagSnapshot.timestamp
+        });
+
         try {
+            let savedTag = null;
             if (mode === 'edit' && tagId) {
-                await window.TagService.updateTag(tagId, tagData);
+                savedTag = await window.TagService.updateTag(tagId, tagData);
                 window.showSuccessNotification?.('תגית עודכנה בהצלחה');
             } else {
-                await window.TagService.createTag(tagData);
+                savedTag = await window.TagService.createTag(tagData);
                 window.showSuccessNotification?.('תגית נוצרה בהצלחה');
             }
             await loadTags({ force: true });
             await loadAnalytics(true);
+            window.Logger?.info?.('✅ [TagManagement] saveTag success', {
+                mode,
+                tagId: savedTag?.id || tagId || 'new',
+                categoryId: savedTag?.category_id ?? tagData.category_id ?? null,
+                snapshotId: tagSnapshot.timestamp
+            });
             closeTagModal('tagModal');
         } catch (error) {
             const message = window.TagService?.formatTagErrorMessage
                 ? window.TagService.formatTagErrorMessage('שמירת התגית נכשלה', error)
                 : 'שמירת התגית נכשלה';
+            window.Logger?.error?.('❌ [TagManagement] saveTag failure', {
+                mode,
+                tagId: Number.isFinite(tagId) ? tagId : null,
+                error: error?.message || error,
+                snapshot: tagSnapshot
+            });
             showError(message, { error, tagSnapshot });
         }
     }

@@ -1495,6 +1495,27 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
+    'test-header-only': {
+      name: 'Header System Test',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+      requiredGlobals: ['NotificationSystem'],
+      description: 'עמוד בדיקות לרכיבי ההדר המאוחדים',
+      lastModified: '2025-11-14',
+      pageType: 'development',
+      preloadAssets: ['header-demo'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        () => {
+          window.Logger.info('🧪 Initializing Header-only test page...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },
+
     'init-system-management': {
       name: 'Init System Management',
       packages: ['base', 'dev-tools', 'init-system'],

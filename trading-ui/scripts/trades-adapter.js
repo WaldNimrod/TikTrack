@@ -63,7 +63,7 @@ class TradesAdapter {
             return data;
         } catch (error) {
             console.error('❌ Failed to get trades data:', error);
-            return this.getFallbackData();
+            throw error;
         }
     }
 
@@ -89,36 +89,9 @@ class TradesAdapter {
             const data = await response.json();
             return data;
         } catch (error) {
-            console.warn('⚠️ API fetch failed, using fallback data:', error);
-            return this.getFallbackData();
+            console.warn('⚠️ API fetch failed:', error);
+            throw error;
         }
-    }
-
-    /**
-     * Get fallback data when API is unavailable
-     * קבל נתוני גיבוי כאשר API לא זמין
-     * @returns {Object} Fallback data
-     */
-    getFallbackData() {
-        return {
-            trades: [
-                { id: 1, symbol: 'AAPL', status: 'open', profit: 150.25 },
-                { id: 2, symbol: 'GOOGL', status: 'closed', profit: -75.50 },
-                { id: 3, symbol: 'MSFT', status: 'open', profit: 200.75 }
-            ],
-            summary: {
-                totalTrades: 3,
-                openTrades: 2,
-                closedTrades: 1,
-                totalProfit: 275.50,
-                winRate: 66.67
-            },
-            performance: {
-                daily: [100, 120, 95, 110, 125, 130, 140],
-                weekly: [500, 520, 515, 530, 545, 560, 575],
-                monthly: [2000, 2100, 2050, 2150, 2200, 2250, 2300]
-            }
-        };
     }
 
     /**
@@ -129,7 +102,11 @@ class TradesAdapter {
      */
     formatData(rawData) {
         try {
-            const trades = rawData.trades || [];
+            if (!rawData || typeof rawData !== 'object') {
+                throw new Error('No trade data received');
+            }
+
+            const trades = Array.isArray(rawData.trades) ? rawData.trades : [];
             const summary = rawData.summary || {};
             const performance = rawData.performance || {};
 
@@ -153,7 +130,7 @@ class TradesAdapter {
             };
         } catch (error) {
             console.error('❌ Failed to format data:', error);
-            return this.getDefaultChartData();
+            throw error;
         }
     }
 
@@ -274,58 +251,6 @@ class TradesAdapter {
                     borderWidth: 1
                 }
             ]
-        };
-    }
-
-    /**
-     * Get default chart data
-     * קבל נתוני גרף ברירת מחדל
-     * @returns {Object} Default chart data
-     */
-    getDefaultChartData() {
-        return {
-            status: {
-                labels: ['Open', 'Closed', 'Pending'],
-                datasets: [{
-                    label: 'Trades by Status',
-                    data: [2, 1, 0],
-                    backgroundColor: ['#28a745', '#dc3545', '#ffc107']
-                }]
-            },
-            performance: {
-                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'],
-                datasets: [{
-                    label: 'Performance',
-                    data: [100, 120, 95, 110, 125],
-                    borderColor: '#26baac',
-                    backgroundColor: 'rgba(38, 186, 172, 0.1)'
-                }]
-            },
-            account: {
-                labels: ['Total', 'Open', 'Closed'],
-                datasets: [{
-                    label: 'Account',
-                    data: [3, 2, 1],
-                    backgroundColor: ['#26baac', '#28a745', '#dc3545']
-                }]
-            },
-            mixed: {
-                labels: ['Period 1', 'Period 2', 'Period 3'],
-                datasets: [
-                    {
-                        label: 'Performance',
-                        data: [100, 120, 95],
-                        type: 'line',
-                        borderColor: '#26baac'
-                    },
-                    {
-                        label: 'Profits',
-                        data: [50, 75, 25],
-                        type: 'bar',
-                        backgroundColor: '#28a745'
-                    }
-                ]
-            }
         };
     }
 

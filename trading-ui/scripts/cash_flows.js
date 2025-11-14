@@ -1477,7 +1477,11 @@ async function initializeCashFlowsPage() {
     }
 
     // שחזור מצב סידור
-    restoreSortState();
+    if (window.pageUtils?.restoreSortState) {
+      await window.pageUtils.restoreSortState('cash_flows');
+    } else {
+      await window.restoreSortState?.('cash_flows');
+    }
 
     // הגדרת event listeners לשדות מקור
     setupSourceFieldListeners();
@@ -1736,7 +1740,10 @@ async function saveCashFlow() {
                     cashFlowId: resolvedCashFlowId,
                     page: 'cash_flows'
                 });
-                window.showErrorNotification?.('שמירת תגיות', 'התזרים נשמר אך התגיות לא עודכנו');
+                const errorMessage = window.TagService?.formatTagErrorMessage
+                    ? window.TagService.formatTagErrorMessage('התזרים נשמר אך התגיות לא עודכנו', tagError)
+                    : 'התזרים נשמר אך התגיות לא עודכנו';
+                window.showErrorNotification?.('שמירת תגיות', errorMessage);
             }
         }
         

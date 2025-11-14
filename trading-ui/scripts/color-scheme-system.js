@@ -841,7 +841,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   
   // עמודי כלי פיתוח - כולם מקבלים צבע development
   'development-page': 'development',
-  'linter-realtime-monitor-page': 'development',
+  'lint-monitor-page': 'development',
   'init-system-page': 'development',
   'system-management-page': 'development',
   'server-monitor-page': 'development',
@@ -1425,6 +1425,11 @@ window.getNumericValueColor = getNumericValueColor;
 window.getNumericValueBackgroundColor = getNumericValueBackgroundColor;
 window.getNumericValueTextColor = getNumericValueTextColor;
 window.getNumericValueBorderColor = getNumericValueBorderColor;
+window.isPositiveValue = isPositiveValue;
+window.isNegativeValue = isNegativeValue;
+window.isZeroValue = isZeroValue;
+window.getValueType = getValueType;
+window.getNumericValueCSSClass = getNumericValueCSSClass;
 
 window.generateEntityCSS = generateEntityCSS;
 window.generateStatusCSS = generateStatusCSS;
@@ -1441,6 +1446,8 @@ window.getAllEntityColorVariantsFromPreferences = getAllEntityColorVariantsFromP
 window.loadEntityColorsFromPreferences = loadEntityColorsFromPreferences;
 window.generateAndApplyEntityCSS = generateAndApplyEntityCSS;
 window.updateCSSVariablesFromPreferences = updateCSSVariablesFromPreferences;
+window.loadColorPreferences = loadColorPreferences;
+window.updateEntityColors = updateEntityColors;
 
 // Export header styling functions
 window.applyEntityColorsToHeaders = applyEntityColorsToHeaders;

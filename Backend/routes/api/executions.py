@@ -7,6 +7,7 @@ from services.advanced_cache_service import cache_for, cache_with_deps, invalida
 from services.execution_trade_matching_service import ExecutionTradeMatchingService
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.tag_service import TagService
 import logging
 
 # Import base classes
@@ -199,6 +200,14 @@ def delete_execution(execution_id: int):
         db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
+            try:
+                TagService.remove_all_tags_for_entity(db, 'execution', execution_id)
+            except ValueError as tag_error:
+                logger.warning(
+                    "Failed to remove tags for execution %s before deletion: %s",
+                    execution_id,
+                    tag_error,
+                )
             db.delete(execution)
             db.commit()
             normalizer = _get_date_normalizer()

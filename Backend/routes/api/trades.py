@@ -7,6 +7,7 @@ from services.position_calculator_service import PositionCalculatorService
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
+from services.tag_service import TagService
 import logging
 
 # Import base classes
@@ -480,6 +481,16 @@ def delete_trade(trade_id: int):
     try:
         normalizer = _get_date_normalizer()
         db: Session = g.db
+        # Remove tag associations before deleting the entity
+        try:
+            TagService.remove_all_tags_for_entity(db, 'trade', trade_id)
+        except ValueError as tag_error:
+            logger.warning(
+                "Failed to remove tags for trade %s before deletion: %s",
+                trade_id,
+                tag_error,
+            )
+
         success = TradeService.delete(db, trade_id)
         if success:
             return jsonify({

@@ -458,6 +458,14 @@ class AdvancedButtonSystem {
             this.logger.debug('Skipping button without data-button-type', { elementId: element.id });
             return;
         }
+
+        if (!element.parentNode) {
+            this.logger.warn('Skipping button without parent node', {
+                elementId: element.id || `anonymous-${index}`,
+                buttonType
+            });
+            return;
+        }
         
         const entityType = element.getAttribute('data-entity-type');
         const size = element.getAttribute('data-size');

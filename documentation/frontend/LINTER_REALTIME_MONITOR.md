@@ -8,7 +8,7 @@
 //
 // 🔗 קבצים קשורים:
 //   - trading-ui/scripts/linter-realtime-monitor.js (קובץ הסקריפט הראשי)
-//   - trading-ui/linter-realtime-monitor.html (ממשק המשתמש)
+//   - trading-ui/code-quality-dashboard.html (סקשן ניטור הלינטר)
 //   - documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md (רשימת משימות פיתוח)
 //
 // 📚 תוכן הקובץ:

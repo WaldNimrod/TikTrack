@@ -1292,7 +1292,10 @@ async function saveNote() {
           noteId: resolvedNoteId,
           page: 'notes'
         });
-        window.showErrorNotification?.('שמירת תגיות', 'ההערה נשמרה אך התגיות לא עודכנו');
+        const errorMessage = window.TagService?.formatTagErrorMessage
+          ? window.TagService.formatTagErrorMessage('ההערה נשמרה אך התגיות לא עודכנו', tagError)
+          : 'ההערה נשמרה אך התגיות לא עודכנו';
+        window.showErrorNotification?.('שמירת תגיות', errorMessage);
       }
     }
   } catch (error) {
@@ -1389,7 +1392,10 @@ async function updateNoteFromModal() {
           noteId,
           page: 'notes'
         });
-        window.showErrorNotification?.('שמירת תגיות', 'ההערה עודכנה אך התגיות לא נשמרו');
+        const errorMessage = window.TagService?.formatTagErrorMessage
+          ? window.TagService.formatTagErrorMessage('ההערה עודכנה אך התגיות לא נשמרו', tagError)
+          : 'ההערה עודכנה אך התגיות לא נשמרו';
+        window.showErrorNotification?.('שמירת תגיות', errorMessage);
       }
     }
 
@@ -1709,20 +1715,19 @@ function clearSelectedFile() {
  * שחזור מצב סידור - שימוש בפונקציה גלובלית
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
-function restoreSortState() {
+async function restoreSortState() {
   try {
-    // בדיקה אם יש נתונים לפני שחזור סידור
-    if (!window.notesData || window.notesData.length === 0) {
-      // אין נתונים לשחזור סידור - ממתין לטעינת נתונים
+    if (typeof window.pageUtils?.restoreSortState === 'function') {
+      await window.pageUtils.restoreSortState('notes');
       return;
-  }
+    }
 
-  if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('notes', window.notesData || [], updateNotesTable);
-  } else {
-    handleFunctionNotFound('restoreAnyTableSort', 'פונקציית שחזור מיון טבלה לא נמצאה');
-  }
-  
+    if (window.UnifiedTableSystem?.sorter?.applyDefaultSort) {
+      await window.UnifiedTableSystem.sorter.applyDefaultSort('notes');
+      return;
+    }
+
+    window.Logger?.debug('restoreSortState (notes): fallback handler not available', { page: "notes" });
   } catch (error) {
     window.Logger.error('שגיאה בשחזור מצב סידור:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
@@ -2512,8 +2517,7 @@ window.registerNotesTables = function() {
         tableSelector: '#notesTable',
         columns: getColumns('notes'),
         sortable: true,
-        filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+        filterable: true
     });
 };
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });

@@ -3065,6 +3065,11 @@ class EntityDetailsRenderer {
         const notesHtml = accountData.notes && String(accountData.notes).trim()
             ? this.formatFieldValue(accountData.notes, 'text', accountColor, 'notes', accountData)
             : '<span class="text-muted">אין הערות</span>';
+        const tagsSection = this.renderTagsDisplay('trading_account', this._getEntityTags(accountData), {
+            containerClasses: 'mt-3',
+            title: 'תגיות',
+            emptyMessage: 'אין תגיות משויכות'
+        });
 
         const balancesListHtml = currencyBalances.length
             ? currencyBalances.map(item => {
@@ -3155,6 +3160,7 @@ class EntityDetailsRenderer {
                                         ${totalAccountValueHtml}
                             </div>
                             </div>
+                                ${tagsSection || ''}
                                 <div class="mt-4">
                                     <h6 class="text-muted mb-2">הערות</h6>
                                     <div class="border rounded p-3 bg-light">${notesHtml}</div>
@@ -5192,6 +5198,16 @@ class EntityDetailsRenderer {
                 </div>
             `;
         }
+
+        const tagsBlock = this.renderTagsDisplay(entityType, this._getEntityTags(entityData), {
+            entityType,
+            containerClasses: 'mb-3',
+            title: 'תגיות',
+            emptyMessage: 'אין תגיות משויכות'
+        });
+        if (tagsBlock) {
+            html += tagsBlock;
+        }
         
         html += `</div>`;
         
@@ -5224,6 +5240,109 @@ class EntityDetailsRenderer {
         html += `</div>`;
         
         return html;
+    }
+
+    /**
+     * Resolve entity tags from API payload without colliding with legacy fields
+     * @param {Object} entityData
+     * @returns {Array<Object>}
+     * @private
+     */
+    _getEntityTags(entityData) {
+        if (!entityData) {
+            return [];
+        }
+
+        if (Array.isArray(entityData.tag_assignments)) {
+            return entityData.tag_assignments;
+        }
+
+        if (Array.isArray(entityData.tags)) {
+            return entityData.tags;
+        }
+
+        return [];
+    }
+    
+    /**
+     * Render standardized tags display with graceful fallback
+     * @param {string} entityType
+     * @param {Array<Object>} tags
+     * @param {Object} options
+     * @returns {string}
+     */
+    renderTagsDisplay(entityType, tags, options = {}) {
+        const renderOptions = Object.assign({
+            entityType: entityType || 'entity',
+            containerClasses: '',
+            title: 'תגיות',
+            emptyMessage: 'אין תגיות משויכות',
+            showTitle: true,
+            includeCategory: true
+        }, options || {});
+
+        if (window.FieldRendererService?.renderTagBadges) {
+            return window.FieldRendererService.renderTagBadges(tags, renderOptions) || '';
+        }
+
+        const tagItems = Array.isArray(tags) ? tags.filter(Boolean) : [];
+        const tagNames = tagItems.map((tag) => {
+            if (tag && typeof tag === 'object') {
+                const name = tag.name || tag.display_name || tag.title || '';
+                const categoryName = renderOptions.includeCategory !== false
+                    ? (tag.category_name || (tag.category && tag.category.name) || '')
+                    : '';
+                if (categoryName && name) {
+                    return `${categoryName} • ${name}`;
+                }
+                return name || categoryName || '';
+            }
+            return String(tag || '');
+        }).filter((name) => Boolean(name && name.trim()));
+
+        const titleHtml = this._escapeHtml(renderOptions.title);
+        const containerClass = ['entity-tags-block', renderOptions.containerClasses].filter(Boolean).join(' ').trim();
+
+        if (!tagNames.length) {
+            if (renderOptions.showTitle === false) {
+                return '';
+            }
+            return `
+                <div class="${containerClass}">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">${titleHtml}:</span>
+                        <span class="text-muted">${this._escapeHtml(renderOptions.emptyMessage)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        const badges = tagNames.map((name) => `
+            <span class="badge rounded-pill bg-light text-dark border me-1 mb-1">
+                ${this._escapeHtml(name)}
+            </span>
+        `).join('');
+
+        if (renderOptions.showTitle === false) {
+            return `
+                <div class="${containerClass}">
+                    <div class="tag-badge-container d-flex flex-wrap gap-2">
+                        ${badges}
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="${containerClass}">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="fw-bold">${titleHtml}:</span>
+                </div>
+                <div class="tag-badge-container d-flex flex-wrap gap-2">
+                    ${badges}
+                </div>
+            </div>
+        `;
     }
     
     /**
@@ -5639,7 +5758,9 @@ function legacyFilterLinkedItems(type, data) {
  */
 try {
     // אתחול מערכת Renderer והצמדה ל-window בצורה מאובטחת
-    if (!window.entityDetailsRenderer || !(window.entityDetailsRenderer instanceof EntityDetailsRenderer)) {
+    window.EntityDetailsRenderer = window.EntityDetailsRenderer || EntityDetailsRenderer;
+
+    if (!window.entityDetailsRenderer || !(window.entityDetailsRenderer instanceof window.EntityDetailsRenderer)) {
         window.entityDetailsRenderer = new EntityDetailsRenderer();
         if (typeof window.Logger !== 'undefined' && window.Logger.info) {
             window.Logger.info('Entity Details Renderer system loaded and ready', { page: "entity-details-renderer" });

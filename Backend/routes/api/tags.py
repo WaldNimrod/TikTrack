@@ -399,6 +399,82 @@ def get_entity_tags(entity_type: str, entity_id: int):
         )
 
 
+@tags_bp.route("/<int:tag_id>/usage", methods=["GET"])
+@handle_database_session()
+def get_tag_usage(tag_id: int):
+    """Return entities associated with a specific tag."""
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _normalize_timestamp()
+    limit = request.args.get("limit", type=int)
+
+    try:
+        usage_result = TagService.get_tag_usage(
+            db, user_id=user_id, tag_id=tag_id, limit=limit
+        )
+    except ValueError as exc:
+        logger.warning("Tag usage lookup failed for tag %s: %s", tag_id, exc)
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "error": {"message": str(exc)},
+                    "version": "1.0",
+                }
+            ),
+            404,
+        )
+    except Exception as exc:
+        logger.exception("Unexpected error fetching usage for tag %s", tag_id)
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "error": {"message": str(exc)},
+                    "version": "1.0",
+                }
+            ),
+            500,
+        )
+
+    tag = usage_result.get("tag")
+    entities = usage_result.get("entities", [])
+    total_entities = usage_result.get("total_entities", len(entities))
+    returned_entities = usage_result.get("returned_entities", len(entities))
+
+    response_entities: List[Dict[str, Any]] = []
+    for entity in entities:
+        response_entities.append(
+            {
+                "tag_link_id": entity.get("tag_link_id"),
+                "entity_type": entity.get("entity_type"),
+                "entity_id": entity.get("entity_id"),
+                "id": entity.get("entity_id"),
+                "linked_at": entity.get("linked_at"),
+                "created_at": entity.get("created_at"),
+                "updated_at": entity.get("updated_at"),
+            }
+        )
+
+    normalized_entities = normalizer.normalize_output(response_entities)
+    normalized_tag = normalizer.normalize_output(tag.to_dict()) if tag else None
+
+    return jsonify(
+        {
+            "status": "success",
+            "data": {
+                "tag": normalized_tag,
+                "child_entities": normalized_entities,
+                "total_entities": total_entities,
+                "returned_entities": returned_entities,
+            },
+            "message": "Tag usage retrieved successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0",
+        }
+    )
+
+
 @tags_bp.route("/assign", methods=["POST"])
 @handle_database_session()
 def assign_tags():

@@ -26,7 +26,7 @@ SERVER_DIR="Backend"
 SERVER_FILE="$SERVER_DIR/app.py"
 LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
 SERVER_PORT=8080
-DB_PATH="$SERVER_DIR/db/simpleTrade_new.db"
+DB_PATH="$SERVER_DIR/db/tiktrack.db"
 
 # Colors for output
 RED='\033[0;31m'
@@ -242,7 +242,7 @@ main() {
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=8080
-            DB_PATH="$SERVER_DIR/db/simpleTrade_new.db"
+            DB_PATH="$SERVER_DIR/db/tiktrack.db"
             ;;
         *)
             log_error "Unknown environment: $ENVIRONMENT"

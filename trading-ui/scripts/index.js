@@ -756,6 +756,9 @@ async function createTradesStatusChart() {
         // window.Logger.info('✅ Trades status chart created successfully', { page: "index" });
     } catch (error) {
         window.Logger.error('❌ Error creating trades status chart:', error, { page: "index" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת תרשים סטטוס טריידים', error.message || 'לא התקבלה תשובה מהשרת');
+        }
     }
 }
 
@@ -801,6 +804,9 @@ async function createPerformanceChart() {
         // window.Logger.info('✅ Performance chart created successfully', { page: "index" });
     } catch (error) {
         window.Logger.error('❌ Error creating performance chart:', error, { page: "index" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת תרשים ביצועים', error.message || 'לא התקבלה תשובה מהשרת');
+        }
     }
 }
 
@@ -842,6 +848,9 @@ async function createAccountChart() {
         // window.Logger.info('✅ Account chart created successfully', { page: "index" });
     } catch (error) {
         window.Logger.error('❌ Error creating account chart:', error, { page: "index" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת תרשים חשבונות', error.message || 'לא התקבלה תשובה מהשרת');
+        }
     }
 }
 
@@ -886,6 +895,9 @@ async function createMixedChart() {
         // window.Logger.info('✅ Mixed chart created successfully', { page: "index" });
     } catch (error) {
         window.Logger.error('❌ Error creating mixed chart:', error, { page: "index" });
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת תרשים אנליטיקה', error.message || 'לא התקבלה תשובה מהשרת');
+        }
     }
 }
 

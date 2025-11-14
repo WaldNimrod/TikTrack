@@ -165,7 +165,11 @@ describe('Unified Table System', () => {
             1,
             expect.any(Array),
             'test_table',
-            expect.any(Function)
+            expect.any(Function),
+            expect.objectContaining({
+                columnIndex: 1,
+                tableType: 'test_table'
+            })
         );
 
         expect(updateFn).toHaveBeenCalledWith(expect.arrayContaining([

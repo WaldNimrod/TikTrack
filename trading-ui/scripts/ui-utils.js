@@ -360,6 +360,7 @@ window.uiUtils = {
  */
 async function cancelItem(itemType, itemId, itemName = null, currentStatus = null) {
   // Global cancel function called for
+  window.Logger?.info('cancelItem invoked', { itemType, itemId, itemName, currentStatus });
 
   // בדיקה אם האובייקט כבר מבוטל
   if (currentStatus === 'cancelled') {
@@ -373,44 +374,98 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
     return;
   }
 
-  // הגדרת הפעולה הנוכחית לביטול
-  window.currentAction = 'cancel';
-
-  // בדיקת פריטים מקושרים לפני הביטול
   try {
-    // Use relative URL to work with both development (8080) and production (5001)
-    const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
+    let hasLinkedItems = false;
 
-    if (response.ok) {
-      const linkedItemsData = await response.json();
-      const childEntities = linkedItemsData.child_entities || [];
-      const parentEntities = linkedItemsData.parent_entities || [];
-      const allEntities = [...childEntities, ...parentEntities];
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      window.Logger?.info('cancelItem using global checkLinkedItemsBeforeAction', { itemType, itemId });
+      hasLinkedItems = await window.checkLinkedItemsBeforeAction(itemType, itemId, 'cancel');
+      window.Logger?.info('cancelItem linked items result (global)', { itemType, itemId, hasLinkedItems });
+    } else {
+      window.currentAction = 'cancel';
 
-      if (allEntities.length > 0) {
-        // יש פריטים מקושרים - הצגת אזהרה
-        // Linked items found
+      const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
+      window.Logger?.info('cancelItem fallback linked-items fetch', {
+        itemType,
+        itemId,
+        ok: response.ok,
+        status: response.status,
+      });
 
-        if (typeof window.showLinkedItemsModal === 'function') {
-          window.showLinkedItemsModal(allEntities, itemType, itemId);
-        } else {
-          handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
-          if (window.showErrorNotification) {
-            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
-              ? window.LinkedItemsService.getEntityLabel(itemType) 
-              : itemType;
-            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
+      if (response.ok) {
+        const linkedItemsData = await response.json();
+        const childEntities = linkedItemsData.child_entities || [];
+        const parentEntities = linkedItemsData.parent_entities || [];
+
+        window.Logger?.info('cancelItem fallback linked-items counts', {
+          itemType,
+          itemId,
+          childCount: childEntities.length,
+          parentCount: parentEntities.length,
+        });
+
+        if (childEntities.length > 0) {
+          hasLinkedItems = true;
+          if (typeof window.showLinkedItemsModal === 'function') {
+            window.Logger?.info('cancelItem showing linked items modal (fallback)', { itemType, itemId });
+            window.showLinkedItemsModal(linkedItemsData, itemType, itemId, 'warningBlock');
+          } else {
+            handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
+            if (window.showErrorNotification) {
+              const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+                ? window.LinkedItemsService.getEntityLabel(itemType) 
+                : itemType;
+              window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
+            }
           }
         }
-        return;
       }
+
+      delete window.currentAction;
+    }
+
+    if (hasLinkedItems) {
+      window.Logger?.info('cancelItem aborted due to linked items', { itemType, itemId });
+      return;
     }
   } catch {
     // Linked items check failed, proceeding with cancellation
+    window.Logger?.warn('cancelItem linked-items check failed, proceeding', { itemType, itemId });
   }
 
-  // אין פריטים מקושרים - ביצוע הביטול
-  // No linked items found, proceeding with cancellation
+  const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+    ? window.LinkedItemsService.getEntityLabel(itemType) 
+    : itemType;
+  const displayName = itemName || `${entityLabel} ${itemId}`;
+
+  let confirmed = true;
+  if (typeof window.showCancelWarning === 'function') {
+    window.Logger?.info('cancelItem showing cancel warning modal', { itemType, itemId, itemName: displayName });
+    confirmed = await new Promise(resolve => {
+      window.showCancelWarning(itemType, displayName, entityLabel,
+        () => resolve(true),
+        () => resolve(false));
+    });
+  } else if (typeof window.showConfirmationDialog === 'function') {
+    window.Logger?.info('cancelItem showing confirmation dialog fallback', { itemType, itemId, itemName: displayName });
+    confirmed = await new Promise(resolve => {
+      window.showConfirmationDialog(
+        `ביטול ${entityLabel}`,
+        `האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
+        () => resolve(true),
+        () => resolve(false),
+        'warning'
+      );
+    });
+  } else {
+    confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
+  }
+
+  if (!confirmed) {
+    window.Logger?.info('cancelItem cancelled by user', { itemType, itemId });
+    return;
+  }
+
   await performItemCancellation(itemType, itemId, itemName);
 }
 
@@ -430,15 +485,18 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       ? window.LinkedItemsService.getEntityLabel(itemType) 
       : itemType;
     const successMessage = `${entityLabel} בוטל בהצלחה!`;
+    window.Logger?.info('performItemCancellation started', { itemType, itemId });
 
     switch (itemType) {
-    case 'trade_plan':
-      response = await fetch(`/api/trade-plans/${itemId}`, {
-        method: 'PUT',
+    case 'trade_plan': {
+      const payload = { cancel_reason: 'בוטל על ידי המשתמש דרך הממשק' };
+      response = await fetch(`/api/trade-plans/${itemId}/cancel`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'cancelled' }),
+        body: JSON.stringify(payload),
       });
       break;
+    }
 
     case 'trade':
       response = await fetch(`/api/trades/${itemId}/cancel`, {
@@ -476,24 +534,62 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       throw new Error(`לא נתמך ביטול עבור סוג: ${itemType}`);
     }
 
+    window.Logger?.info('performItemCancellation response received', {
+      itemType,
+      itemId,
+      ok: response?.ok,
+      status: response?.status,
+    });
+
     if (response.ok) {
+      let responseData;
+      try {
+        const responseText = await response.clone().text();
+        window.Logger?.info('performItemCancellation response raw text', {
+          itemType,
+          itemId,
+          responseText,
+        });
+        responseData = responseText ? JSON.parse(responseText) : undefined;
+        window.Logger?.info('performItemCancellation response payload parsed', {
+          itemType,
+          itemId,
+          responseData,
+          apiStatus: responseData?.data?.status,
+        });
+      } catch (jsonError) {
+        window.Logger?.warn('performItemCancellation: failed to parse response body', {
+          itemType,
+          itemId,
+          error: jsonError?.message,
+        });
+      }
+      const apiSuccessMessage = responseData?.message || responseData?.status_message;
+      const finalSuccessMessage = apiSuccessMessage || successMessage;
       // Item cancelled successfully
+      window.Logger?.info('performItemCancellation success', {
+        itemType,
+        itemId,
+        successMessage: finalSuccessMessage,
+      });
 
       // הצגת הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification(successMessage);
+        window.showSuccessNotification(finalSuccessMessage);
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification(successMessage, 'success');
+        window.showNotification(finalSuccessMessage, 'success');
       }
 
-      // רענון הנתונים
       if (typeof window.loadData === 'function') {
         await window.loadData();
       } else {
-        // נסיון לרענן לפי סוג האובייקט
-        const refreshFunction = window[`load${itemType.charAt(0).toUpperCase() + itemType.slice(1)}sData`];
-        if (typeof refreshFunction === 'function') {
-          await refreshFunction();
+        const basicRefresh = window[`load${itemType.charAt(0).toUpperCase() + itemType.slice(1)}sData`];
+        if (typeof basicRefresh === 'function') {
+          await basicRefresh();
+        } else if (typeof window.loadTradePlansData === 'function' && itemType === 'trade_plan') {
+          await window.loadTradePlansData();
+        } else if (typeof window.reloadPageData === 'function') {
+          await window.reloadPageData();
         }
       }
 

@@ -37,6 +37,8 @@ class ModalManagerV2 {
         this.attachmentPreviewError = null;
         this.attachmentPreviewTitleEl = null;
         this.modalQueue = [];
+        this.globalBackdrop = null;
+        this.backdropClickHandler = this.handleGlobalBackdropClick.bind(this);
         
         this.init();
     }
@@ -1456,6 +1458,8 @@ class ModalManagerV2 {
             
             modalElement.dataset.modalMode = mode;
             modal.show();
+            this.bindDismissButtons(modalElement);
+            this.ensureGlobalBackdrop();
             
             if (mode === 'edit' && entityData) {
                 const entityId = entityData.id != null ? String(entityData.id) : '';
@@ -4165,6 +4169,12 @@ class ModalManagerV2 {
         }
         
         try {
+            // Tag multi-select fields are handled by TagUIManager; skip auto population
+            if (select?.classList?.contains?.('tag-multi-select')) {
+                console.log(`⏭️ Skipping ${selectId} - Tag multi select handled by TagUIManager`);
+                return;
+            }
+
             // Check if field has options in config - if so, don't populate automatically
             let hasStaticOptions = false;
             if (fieldConfig && fieldConfig.options && Array.isArray(fieldConfig.options) && fieldConfig.options.length > 0) {
@@ -5047,6 +5057,8 @@ class ModalManagerV2 {
         if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
             window.registerModalNavigationClose(modalId);
         }
+
+        this.updateGlobalBackdropVisibility();
     }
 
     /**
@@ -5201,6 +5213,45 @@ class ModalManagerV2 {
         
         // יישום צבעים
         this.applyUserColors(modalElement, config.entityType);
+    }
+
+    bindDismissButtons(modalElement) {
+        if (!modalElement) {
+            return;
+        }
+
+        const dismissButtons = modalElement.querySelectorAll('[data-bs-dismiss="modal"]');
+        dismissButtons.forEach((button) => {
+            if (!button || button.dataset.modalDismissBound === 'true') {
+                return;
+            }
+
+            button.addEventListener('click', (event) => {
+                if (button.dataset && button.dataset.preventAutoClose === 'true') {
+                    return;
+                }
+
+                // אל תפריע לפעולות נוספות (למשל שמירה)
+                event.preventDefault();
+                event.stopPropagation();
+
+                const instance =
+                    bootstrap?.Modal?.getInstance(modalElement) ||
+                    bootstrap?.Modal?.getOrCreateInstance(modalElement, { backdrop: false, keyboard: true });
+
+                if (instance?.hide) {
+                    instance.hide();
+                } else {
+                    modalElement.classList.remove('show');
+                    modalElement.style.display = 'none';
+                    modalElement.setAttribute('aria-hidden', 'true');
+                    modalElement.removeAttribute('aria-modal');
+                    modalElement.dispatchEvent(new Event('hidden.bs.modal'));
+                }
+            });
+
+            button.dataset.modalDismissBound = 'true';
+        });
     }
 
     /**
@@ -5867,6 +5918,89 @@ class ModalManagerV2 {
         }
     }
 
+    ensureGlobalBackdrop() {
+        const activeCount = this._getActiveModalCount();
+        if (activeCount <= 0) {
+            this.updateGlobalBackdropVisibility();
+            return;
+        }
+
+        if (!this.globalBackdrop || !document.body.contains(this.globalBackdrop)) {
+            const existingBackdrop = document.getElementById('globalModalBackdrop');
+            if (existingBackdrop) {
+                this.globalBackdrop = existingBackdrop;
+            } else {
+                const backdrop = document.createElement('div');
+                backdrop.id = 'globalModalBackdrop';
+                backdrop.className = 'modal-backdrop fade global-modal-backdrop';
+                backdrop.addEventListener('click', this.backdropClickHandler, { passive: true });
+                document.body.appendChild(backdrop);
+                this.globalBackdrop = backdrop;
+            }
+        }
+
+        if (this.globalBackdrop) {
+            requestAnimationFrame(() => {
+                if (this.globalBackdrop) {
+                    this.globalBackdrop.classList.add('show');
+                }
+            });
+        }
+
+        document.body.classList.add('modal-open');
+        if (!document.body.style.overflow) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    updateGlobalBackdropVisibility() {
+        const activeCount = this._getActiveModalCount();
+        if (activeCount > 0) {
+            this.ensureGlobalBackdrop();
+            return;
+        }
+
+        if (this.globalBackdrop) {
+            const backdrop = this.globalBackdrop;
+            const removeBackdrop = () => {
+                backdrop.removeEventListener('transitionend', removeBackdrop);
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+                if (this.globalBackdrop === backdrop) {
+                    this.globalBackdrop = null;
+                }
+            };
+
+            backdrop.classList.remove('show');
+            backdrop.addEventListener('transitionend', removeBackdrop, { once: true });
+            setTimeout(removeBackdrop, 250);
+        }
+
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+    }
+
+    handleGlobalBackdropClick(event) {
+        if (!event || event.target !== this.globalBackdrop) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        this.closeActiveModal();
+    }
+
+    _getActiveModalCount() {
+        let count = 0;
+        this.modals.forEach((modalInfo) => {
+            if (modalInfo && modalInfo.isActive) {
+                count += 1;
+            }
+        });
+        return count;
+    }
+
     /**
      * Get modal info - קבלת מידע על מודל
      * 
@@ -5896,9 +6030,11 @@ class ModalManagerV2 {
                 const modal = bootstrap.Modal.getInstance(modalElement);
                 if (modal) {
                     modal.hide();
+                    return;
                 }
             }
         }
+        this.updateGlobalBackdropVisibility();
     }
 
     /**

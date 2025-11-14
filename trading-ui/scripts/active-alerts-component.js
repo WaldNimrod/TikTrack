@@ -338,7 +338,7 @@ class ActiveAlertsComponent extends HTMLElement {
    */
   checkGlobalFunctions() {
     if (this._functionsChecked) {return;}
-      this._functionsChecked = true;
+    this._functionsChecked = true;
   }
 
   getCacheKey() {
@@ -455,9 +455,7 @@ class ActiveAlertsComponent extends HTMLElement {
           afterRead: () => { resolvedFromCache = true; },
         };
 
-        const result = await window.CacheTTLGuard.ensure(this.getCacheKey(), async () => {
-          return await this.fetchAlertsFromApi();
-        }, cacheOptions);
+        const result = await window.CacheTTLGuard.ensure(this.getCacheKey(), async () => await this.fetchAlertsFromApi(), cacheOptions);
 
         await finalize(result, resolvedFromCache ? 'cache-hit' : 'api-refresh');
         return;
@@ -516,7 +514,7 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     if (this._elements?.countBadge) {
-      const countText = (!hasAnyAlerts || this.activeFilterType === 'all')
+      const countText = !hasAnyAlerts || this.activeFilterType === 'all'
         ? String(totalCount)
         : `${filteredCount}/${totalCount}`;
       this._elements.countBadge.textContent = countText;
@@ -804,7 +802,7 @@ class ActiveAlertsComponent extends HTMLElement {
           if (linkedElement) {
             linkedElement.classList.add('active-alerts__linked-entity');
             if (symbol) {
-              linkedElement.addEventListener('click', (event) => {
+              linkedElement.addEventListener('click', event => {
                 event.preventDefault();
                 this.handleSymbolClick(symbol);
               });
@@ -882,10 +880,10 @@ class ActiveAlertsComponent extends HTMLElement {
 
     try {
       const [accountsRes, tradesRes, tradePlansRes, tickersRes] = await Promise.all([
-        fetch('/api/trading-accounts/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
-        fetch('/api/trades/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
-        fetch('/api/trade-plans/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
-        fetch('/api/tickers/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
+        fetch('/api/trading-accounts/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch('/api/trades/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch('/api/trade-plans/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch('/api/tickers/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
       ]);
 
       this._relatedData = {
@@ -919,8 +917,8 @@ class ActiveAlertsComponent extends HTMLElement {
 
     try {
       const response = await fetch(`/api/alerts/${alertId}/mark-read`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -1318,7 +1316,7 @@ class ActiveAlertsComponent extends HTMLElement {
       : date.toLocaleString('he-IL');
 
     const relative = this.getRelativeTime(date);
-      return {
+    return {
       display: relative ? `${relative} · ${absolute}` : absolute,
       iso: date.toISOString(),
     };
@@ -1444,8 +1442,8 @@ class ActiveAlertsComponent extends HTMLElement {
 
     // הוספת event listener לאיקון
     bellButton.addEventListener('click', () => {
-        this.openSectionWithAlerts();
-      });
+      this.openSectionWithAlerts();
+    });
 
     // הוספה לכותרת הסקשן - בצד שמאל (ימין ב-RTL) ליד כפתור הסגירה
     const tableActions = this._sectionHeader.querySelector('.table-actions');
@@ -1666,35 +1664,33 @@ window.addEventListener('popstate', () => {
 
 // פונקציה גלובלית להצגת הודעה על אובייקט מקושר
 if (typeof window.showLinkedObjectMessage !== 'function') {
-window.showLinkedObjectMessage = function () {
+  window.showLinkedObjectMessage = function () {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('אובייקט מקושר', 'הקישור לאובייקט המקושר יופעל בהמשך');
-  }
-};
+    }
+  };
 }
 
 // פונקציה גלובלית לפתיחת דף טיקר
 if (typeof window.showTickerPage !== 'function') {
-window.showTickerPage = function (symbol) {
+  window.showTickerPage = function (symbol) {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('דף טיקר', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
-  }
-};
+    }
+  };
 }
 
 // פונקציה גלובלית להצגת מודל אובייקטים מקושרים
 if (typeof window.showRelatedObjectModal !== 'function') {
-window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
+  window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
     if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification(
-      'אובייקט מקושר',
+      window.showInfoNotification(
+        'אובייקט מקושר',
         `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`,
       );
-  }
-};
+    }
+  };
 }
 
 // הפונקציות formatAlertCondition ו-parseAlertCondition הועברו לקובץ alerts.js
-
-
 

@@ -8,6 +8,7 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.cash_flow_service import CashFlowService as CashFlowHelperService
 from services.account_activity_service import AccountActivityService
+from services.tag_service import TagService
 import logging
 import uuid
 from datetime import datetime
@@ -453,6 +454,14 @@ def delete_cash_flow(cash_flow_id: int):
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
+            try:
+                TagService.remove_all_tags_for_entity(db, 'cash_flow', cash_flow_id)
+            except ValueError as tag_error:
+                logger.warning(
+                    "Failed to remove tags for cash_flow %s before deletion: %s",
+                    cash_flow_id,
+                    tag_error,
+                )
             db.delete(cash_flow)
             # CRITICAL: Must commit here to make deletion visible to subsequent queries
             db.commit()
@@ -498,6 +507,11 @@ def delete_all_cash_flows():
                 "version": "1.0"
             }), 200
         
+        try:
+            TagService.remove_all_tags_for_type(db, 'cash_flow')
+        except ValueError as tag_error:
+            logger.warning("Failed to remove tags for all cash_flows before bulk deletion: %s", tag_error)
+
         # Delete all records
         deleted_count = db.query(CashFlow).delete()
         # CRITICAL: Must commit here to make deletion visible to subsequent queries

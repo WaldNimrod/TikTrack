@@ -31,6 +31,8 @@ from services.account_activity_service import AccountActivityService
 from services.position_portfolio_service import PositionPortfolioService
 from services.position_calculator_service import PositionCalculatorService
 from services.currency_service import CurrencyService
+from services.tag_service import TagService, SUPPORTED_ENTITY_TYPES as TAG_SUPPORTED_ENTITY_TYPES
+from services.user_service import UserService
 from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
@@ -63,6 +65,9 @@ class EntityDetailsService:
         >>> details = service.get_entity_details(db_session, 'ticker', 1)
         >>> linked = service.get_linked_items(db_session, 'ticker', 1)
     """
+    
+    USER_SERVICE = UserService()
+    _default_user_id_cache: Optional[int] = None
     
     # Entity type mappings
     ENTITY_MODELS = {
@@ -392,6 +397,16 @@ class EntityDetailsService:
                 # Default values when not provided
                 entity_dict['source'] = entity_dict.get('source') or 'manual'
                 entity_dict['external_id'] = entity_dict.get('external_id') or None
+
+            # Attach tags metadata from tagging system without overriding existing data
+            tag_assignments = EntityDetailsService._load_entity_tags(
+                db,
+                entity_type,
+                entity_id
+            )
+            entity_dict['tag_assignments'] = tag_assignments
+            if 'tags' not in entity_dict:
+                entity_dict['tags'] = tag_assignments
 
             # Add ticker object with market data for trade and trade_plan
             if entity_type in ['trade', 'trade_plan']:
@@ -786,6 +801,91 @@ class EntityDetailsService:
             raise
     
     # ===== PRIVATE HELPER METHODS =====
+
+    @classmethod
+    def _get_default_user_id(cls) -> Optional[int]:
+        """Resolve and cache the default user ID for tagging operations."""
+        if cls._default_user_id_cache is not None:
+            return cls._default_user_id_cache
+
+        try:
+            default_user = cls.USER_SERVICE.get_default_user()
+            if default_user and default_user.get('id'):
+                cls._default_user_id_cache = int(default_user['id'])
+                return cls._default_user_id_cache
+            logger.warning("Default user not found while attempting to load entity tags")
+        except Exception as exc:
+            logger.error("Failed to resolve default user id for tagging: %s", exc)
+
+        return None
+
+    @classmethod
+    def _load_entity_tags(cls, db: Session, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:
+        """
+        Load tags for the requested entity using the unified TagService.
+        Returns a list of serialized tags ready for the frontend renderer.
+        """
+        normalized_type = (entity_type or '').lower().strip()
+        if normalized_type == 'account':
+            normalized_type = 'trading_account'
+
+        if normalized_type not in TAG_SUPPORTED_ENTITY_TYPES:
+            return []
+
+        user_id = cls._get_default_user_id()
+        if not user_id:
+            return []
+
+        try:
+            tags = TagService.get_tags_for_entity(db, normalized_type, entity_id, user_id)
+            return [cls._serialize_tag(tag) for tag in tags]
+        except Exception as exc:
+            logger.warning(
+                "Failed to load tags for %s %s: %s",
+                normalized_type,
+                entity_id,
+                str(exc)
+            )
+            return []
+
+    @classmethod
+    def _serialize_tag(cls, tag) -> Dict[str, Any]:
+        """Serialize tag ORM object to JSON-friendly structure with category metadata."""
+        base = tag.to_dict() if hasattr(tag, 'to_dict') else dict(tag)
+        category = base.get('category') or {}
+
+        serialized = {
+            'id': base.get('id'),
+            'name': base.get('name'),
+            'slug': base.get('slug'),
+            'description': base.get('description'),
+            'category_id': base.get('category_id'),
+            'is_active': base.get('is_active', True),
+            'usage_count': base.get('usage_count', 0),
+            'last_used_at': cls._isoformat_if_possible(base.get('last_used_at')),
+            'created_at': cls._isoformat_if_possible(base.get('created_at')),
+            'updated_at': cls._isoformat_if_possible(base.get('updated_at')),
+            'display_name': base.get('name'),
+            'category_name': category.get('name'),
+            'category_color': category.get('color_hex'),
+            'color_hex': base.get('color_hex') or category.get('color_hex')
+        }
+
+        serialized['category'] = category if category else None
+
+        return serialized
+
+    @staticmethod
+    def _isoformat_if_possible(value: Any) -> Optional[str]:
+        """Convert datetime-like values to ISO strings when possible."""
+        if value is None:
+            return None
+        if hasattr(value, 'isoformat'):
+            try:
+                return value.isoformat()
+            except Exception:
+                return str(value)
+        return str(value)
     
     @staticmethod
     def _entity_to_dict(entity, entity_type: str) -> Dict[str, Any]:

@@ -5,14 +5,12 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 58
+ * Total Functions: 57
  * 
  * PAGE INITIALIZATION (2)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
- * - initializeAlertConditionBuilder() - * עדכון סטטיסטיקות הערכת תנאים
  * 
  * DATA LOADING (12)
- * - getDemoAlertsData() - getDemoAlertsData function
  * - loadAlertsData() - loadAlertsData function
  * - loadModalData() - loadModalData function
  * - getAlertState() - * עריכת התראה
@@ -58,7 +56,6 @@
  * - evaluateAllConditions() - evaluateAllConditions function
  * - refreshConditionEvaluations() - refreshConditionEvaluations function
  * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
- * - cleanupAlertConditionBuilder() - * קבלת מזהה שיטה מתנאי קיים
  * 
  * UI UPDATES (2)
  * - showEditAlertModal() - * ניקוי הממשק המתקדם
@@ -337,48 +334,6 @@ const demoAlerts = [
  * פונקציה זו מחזירה נתוני דמו להתראות
  * @returns {Array} מערך של התראות דמו
  */
-function getDemoAlertsData() {
-  try {
-    return [
-      {
-        id: 1,
-        title: 'התראה על מחיר AAPL',
-        status: 'open',
-        related_type_id: 4, // טיקר
-        related_id: 1, // מזהה טיקר AAPL
-        related_object_id: 1, // מזהה הטיקר הספציפי
-        ticker_id: 1, // מזהה הטיקר
-        condition: 'מחיר יותר מ 150',
-        condition_attribute: 'price',
-        condition_operator: 'more_than',
-        condition_number: 150,
-        message: 'מחיר AAPL עלה מעל 150$',
-        created_at: '2025-01-09T10:00:00Z',
-        is_triggered: false
-      },
-      {
-        id: 2,
-        title: 'התראה על שינוי TSLA',
-        status: 'closed',
-        related_type_id: 4, // טיקר
-        related_id: 2, // מזהה טיקר TSLA
-        related_object_id: 2, // מזהה הטיקר הספציפי
-        ticker_id: 2, // מזהה הטיקר
-        condition: 'שינוי יותר מ 5%',
-        condition_attribute: 'change',
-        condition_operator: 'more_than',
-        condition_number: 5,
-        message: 'שינוי TSLA מעל 5%',
-        created_at: '2025-01-09T09:30:00Z',
-        is_triggered: true
-      }
-    ];
-  } catch (error) {
-    window.Logger.error('שגיאה בקבלת נתוני דמו להתראות:', error, { page: "alerts" });
-    return [];
-  }
-}
-
 /**
  * REMOVED: Duplicate loadAlertsData function
  * This function has been replaced by window.loadAlertsData (defined above)
@@ -1834,7 +1789,10 @@ async function saveAlert() {
           alertId: alertRecordId,
           page: 'alerts'
         });
-        window.showErrorNotification?.('שמירת תגיות', 'התראה נשמרה אך שמירת התגיות נכשלה');
+        const errorMessage = window.TagService?.formatTagErrorMessage
+          ? window.TagService.formatTagErrorMessage('התראה נשמרה אך שמירת התגיות נכשלה', tagError)
+          : 'התראה נשמרה אך שמירת התגיות נכשלה';
+        window.showErrorNotification?.('שמירת תגיות', errorMessage);
       }
     }
 
@@ -2180,7 +2138,10 @@ async function updateAlert() {
           alertId,
           page: 'alerts'
         });
-        window.showErrorNotification?.('שמירת תגיות', 'התראה עודכנה אך התגיות לא עודכנו');
+        const errorMessage = window.TagService?.formatTagErrorMessage
+          ? window.TagService.formatTagErrorMessage('התראה עודכנה אך התגיות לא עודכנו', tagError)
+          : 'התראה עודכנה אך התגיות לא עודכנו';
+        window.showErrorNotification?.('שמירת תגיות', errorMessage);
       }
     }
 
@@ -2805,7 +2766,6 @@ window.onRelatedObjectChange = onRelatedObjectChange;
 window.enableConditionFields = enableConditionFields;
 window.disableConditionFields = disableConditionFields;
 window.populateRelatedObjects = populateRelatedObjects;
-window.getDemoAlertsData = getDemoAlertsData;
 // REMOVED: window.filterAlertsLocally - function removed
 // Note: saveAlert already exported above
 window.updateStatusAndTriggered = updateStatusAndTriggered;
@@ -2873,8 +2833,6 @@ async function saveAlertData() {
 
 window.evaluateAllConditions = evaluateAllConditions;
 window.updateEvaluationStats = updateEvaluationStats;
-window.initializeAlertConditionBuilder = initializeAlertConditionBuilder;
-window.cleanupAlertConditionBuilder = cleanupAlertConditionBuilder;
 // REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
 // REMOVED: window.showEditAlertModal - use window.ModalManagerV2.showEditModal('alertsModal', 'alert', id) directly
 window.saveAlertData = saveAlertData;
@@ -3227,40 +3185,35 @@ async function createAlertFromCondition() {
     }
     
     try {
-        const alertData = {
+        const crudManager = window.conditionsCRUDManager;
+        if (!crudManager?.createAlertFromCondition) {
+            throw new Error('מנהל תנאים אינו זמין');
+        }
+
+        const alertPayload = {
             condition_id: window.selectedConditionForAlert.id,
             condition_type: window.selectedConditionForAlert.sourceType,
-            message: message,
-            state: state,
+            message,
+            state,
             auto_created: false
         };
-        
-        const response = await fetch('/api/alerts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(alertData)
-        });
-        
-        if (!response.ok) throw new Error('Failed to create alert');
-        
-        const newAlert = await response.json();
-        
+
+        await crudManager.createAlertFromCondition(window.selectedConditionForAlert.id, alertPayload);
+
         showSuccessNotification('התראה נוצרה בהצלחה מתנאי קיים');
-        
-        // Close modal and refresh alerts list
+
         const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
-        modal.hide();
-        
-        // Refresh alerts data
+        modal?.hide();
+
         if (typeof loadAlertsData === 'function') {
             loadAlertsData();
         }
-        
+
     } catch (error) {
         window.Logger.error('Error creating alert from condition:', error, { page: "alerts" });
-        showErrorNotification('שגיאה ביצירת התראה מתנאי');
+        if (!error?.silent) {
+            showErrorNotification(error?.message || 'שגיאה ביצירת התראה מתנאי');
+        }
     }
 }
 
@@ -3321,13 +3274,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize edit alert modal
-    const editAlertModal = document.getElementById('editAlertModal');
-    if (editAlertModal) {
-        editAlertModal.addEventListener('hidden.bs.modal', function() {
-            // Clean up condition builder when modal is closed
-            cleanupAlertConditionBuilder();
-        });
-    }
 });
 
 // ===== CONDITION EVALUATION FUNCTIONS =====
@@ -3473,90 +3419,6 @@ function updateEvaluationSummary(data) {
     if (metConditions) metConditions.textContent = metCount;
     if (notMetConditions) notMetConditions.textContent = notMetCount;
     if (evaluationTime) evaluationTime.textContent = new Date().toLocaleTimeString('he-IL');
-}
-
-// ===== ADVANCED CONDITION BUILDER FUNCTIONS =====
-
-/**
- * אתחול הממשק המתקדם לבניית תנאי במודל העריכה
- * @param {Object} alert - נתוני ההתראה לעריכה
- */
-function initializeAlertConditionBuilder(alert) {
-    try {
-        window.Logger.info('🔧 Initializing alert condition builder for alert:', alert.id, { page: "alerts" });
-        
-        // בדיקה שהממשק המתקדם זמין
-        if (typeof ConditionBuilder === 'undefined') {
-            window.Logger.warn('⚠️ ConditionBuilder not available, using basic form', { page: "alerts" });
-            return false;
-        }
-        
-        const containerId = 'editAlertConditionBuilder';
-        const alertId = alert.id;
-        
-        // יצירת ConditionBuilder חדש
-        const conditionBuilder = new ConditionBuilder('alert', alertId, containerId);
-        
-        // שמירה בגלובל לנגישות
-        window.editAlertConditionBuilder = conditionBuilder;
-        
-        // טעינת תנאי קיים אם יש
-        if (alert.condition_attribute && alert.condition_operator && alert.condition_number) {
-            const existingCondition = {
-                method_id: getMethodIdFromCondition(alert.condition_attribute, alert.condition_operator),
-                parameters: {
-                    value: parseFloat(alert.condition_number),
-                    operator: alert.condition_operator,
-                    attribute: alert.condition_attribute
-                }
-            };
-            
-            // הוספת התנאי הקיים לממשק
-            conditionBuilder.addCondition(existingCondition);
-        }
-        
-        window.Logger.info('✅ Alert condition builder initialized successfully', { page: "alerts" });
-        return true;
-        
-    } catch (error) {
-        window.Logger.error('❌ Error initializing alert condition builder:', error, { page: "alerts" });
-        return false;
-    }
-}
-
-/**
- * קבלת מזהה שיטה מתנאי קיים
- * @param {string} attribute - מאפיין התנאי
- * @param {string} operator - אופרטור התנאי
- * @returns {number} מזהה השיטה
- */
-function getMethodIdFromCondition(attribute, operator) {
-    // מיפוי מאפיינים לשיטות
-    const methodMapping = {
-        'price': 1, // Moving Averages
-        'volume': 2, // Volume Analysis
-        'ma': 1, // Moving Averages
-        'change': 3 // Support/Resistance
-    };
-    
-    return methodMapping[attribute] || 1; // ברירת מחדל: Moving Averages
-}
-
-/**
- * ניקוי הממשק המתקדם
- */
-function cleanupAlertConditionBuilder() {
-    try {
-        if (window.editAlertConditionBuilder) {
-            // ניקוי אם יש פונקציית cleanup
-            if (typeof window.editAlertConditionBuilder.cleanup === 'function') {
-                window.editAlertConditionBuilder.cleanup();
-            }
-            window.editAlertConditionBuilder = null;
-        }
-    } catch (error) {
-        window.Logger.error('❌ Error cleaning up alert condition builder:', error, { page: "alerts" });
-    }
 }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
@@ -3832,8 +3694,7 @@ window.registerAlertsTables = function() {
         tableSelector: '#alertsTable',
         columns: getColumns('alerts'),
         sortable: true,
-        filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+        filterable: true
     });
 };
 window.clearAlertTickerInfo = clearAlertTickerInfo;

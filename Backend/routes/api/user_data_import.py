@@ -659,24 +659,27 @@ def refresh_preview(session_id):
         # Get database session
         db_session = next(get_db())
         try:
-            # Create import orchestrator
             orchestrator = ImportOrchestrator(db_session)
-            
-            # Generate fresh preview
-            result_raw = orchestrator.generate_preview(session_id)
-            
-            if result_raw['success']:
+
+            snapshot = orchestrator.get_preview_snapshot(session_id)
+            if not snapshot['success']:
+                # Fallback: regenerate preview if snapshot unavailable
+                snapshot = orchestrator.generate_preview(session_id)
+
+            if snapshot['success']:
                 normalizer = _get_date_normalizer()
-                result = normalizer.normalize_output(result_raw)
+                normalized_preview = normalizer.normalize_output({
+                    'preview_data': snapshot['preview_data']
+                })
                 return jsonify({
                     'success': True,
-                    'preview_data': result['preview_data']
+                    'preview_data': normalized_preview['preview_data']
                 })
-            else:
-                return jsonify({
-                    'success': False,
-                    'error': result_raw['error']
-                }), 400
+
+            return jsonify({
+                'success': False,
+                'error': snapshot.get('error', 'Failed to refresh preview')
+            }), 400
                 
         finally:
             db_session.close()

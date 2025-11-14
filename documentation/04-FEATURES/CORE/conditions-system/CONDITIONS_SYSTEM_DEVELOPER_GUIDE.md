@@ -68,11 +68,10 @@ trading-ui/
 │   ├── conditions-initializer.js                # רישום למערכת האתחול
 │   ├── conditions-translations.js               # תרגומים ודיפוי מפתחות
 │   ├── conditions-validator.js                  # ולידציה בצד לקוח (שימוש במערכות כלליות)
-│   ├── condition-builder.js                     # בנאי טפסים (legacy – בשימוש פנימי)
 │   ├── conditions-form-generator.js             # יצירת טפסים דינמיים
-│   ├── conditions-crud-manager.js               # חיבור ל-API והטמעת cache
-│   ├── conditions-ui-manager.js                 # רינדור רשימה, כרטיסים וטפסים
-│   └── conditions-modal-controller.js           # גשר ל-ModalManagerV2
+│   ├── conditions-crud-manager.js               # CRUD + אינטגרציה עם CRUDResponseHandler
+│   ├── conditions-ui-manager.js                 # רינדור רשימה, כרטיסים וטפסים + זרימת post-save
+│   └── conditions-modal-controller.js           # חיבור ל-ModalManagerV2 ול-ModalNavigationService
 ├── scripts/modal-configs/conditions-config.js   # קונפיגורציית מודל תנאים
 ├── scripts/page-initialization-configs.js       # הוספת החבילה לעמודים רלוונטיים
 └── scripts/init-system/package-manifest.js      # טעינת חבילת conditions במערכת האתחול
@@ -429,7 +428,22 @@ class ConditionsValidationService:
 
 ## Frontend Development
 
-### 1. ConditionBuilder Class
+### 1. Conditions UI Flow (2025-11 Update)
+
+מהדורה זו מחליפה לחלוטין את `condition-builder.js` ומבססת את מערכת התנאים על ארבעה רכיבים מרכזיים:
+
+1. **`conditions-ui-manager.js`** – אחראי על רינדור כרטיסי התנאים, פתיחת/סגירת הטופס, והצגת דיאלוג Post-Save. הזרימה נשענת על Warning System לצורך דיאלוג האישור, ועל Modal Navigation Service לחזרה בטוחה אל מודול המקור.
+2. **`conditions-form-generator.js`** – מייצר את הטופס הדינמי ומלווה אותו בלוגיקה של פרמטרים (input → JSON). הלוגים (`Logger.debug`) מסייעים בניטור ולידציות.
+3. **`conditions-crud-manager.js`** – מבצע את כל קריאות ה-CRUD דרך `CRUDResponseHandler`, שומר cache ממוקד ל-GET, ומציין חריגות באמצעות `error.silent` / `error.forceRefresh` כדי למנוע התראות כפולות ולחייב רענון במקרי קצה.
+4. **`conditions-modal-controller.js`** – רושם את המודל ב-`ModalNavigationService`, מעדכן מטא-נתונים, ומנהל חזרה למודול ההורה (`tradePlansModal`, `tradesModal`, Alerts וכו').
+
+> 🛈 **הנחיות אינטגרציה:**  
+> - ודאו שהחבילה נטענת דרך `package-manifest.js` או `page-initialization-configs.js`.  
+> - פתחו את מודול התנאים באמצעות `window.ConditionsModalController.open({ entityType, entityId, entityName, parentModalId })`.  
+> - אין ליצור מערכות טפסים פרטיות; השתמשו בטופס הכללי ובזמינות הפרמטרים שנשלפת מה-API.  
+> - במקרי שמירה מוצלחת, סמכו על `conditions-ui-manager` לטיפול בדיאלוג ההמשך.  
+
+### Legacy Appendix – ConditionBuilder Class (Removed)
 
 ```javascript
 class ConditionBuilder {
@@ -948,7 +962,8 @@ if __name__ == '__main__':
 
 #### Frontend Tests
 ```javascript
-// condition-builder.test.js
+// conditions-ui-manager.test.js (planned – covers post-save dialog & refresh flow)
+// conditions-ui-manager.test.js (planned – covers post-save dialog & refresh flow)
 describe('ConditionBuilder', () => {
     let conditionBuilder;
     let mockContainer;

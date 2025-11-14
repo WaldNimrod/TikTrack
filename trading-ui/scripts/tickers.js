@@ -441,12 +441,14 @@ function getTickerStatusLabel(status) {
 /**
  * פונקציה ליצירת אפשרויות מטבע בטופס
  */
+let currenciesUnavailableNotified = false;
+
 function generateTickerCurrencyOptions(ticker = null) {
   try {
     let options = '';
 
     // בדיקה אם יש נתוני מטבעות
-    if (window.currenciesData && window.currenciesData.length > 0) {
+    if (Array.isArray(window.currenciesData) && window.currenciesData.length > 0) {
       window.currenciesData.forEach(currency => {
         // בדיקה אם המטבע נבחר לטיקר הנוכחי
         const isSelected = ticker && (
@@ -458,19 +460,26 @@ function generateTickerCurrencyOptions(ticker = null) {
         options += `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
       });
     } else {
-      // fallback - רק דולר אמריקאי אם אין נתונים
-      const isSelected = ticker && (
-        ticker.currency_id === 1 ||
-              ticker.currency && ticker.currency.symbol === 'USD' ||
-              ticker.currency === 'USD'
-      );
-      options = `<option value="1" ${isSelected ? 'selected' : ''}>דולר אמריקאי (USD)</option>`;
+      if (!currenciesUnavailableNotified) {
+        currenciesUnavailableNotified = true;
+        window.Logger?.warn('⚠️ currencies data not available - currency selects disabled', { page: 'tickers' });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('נתוני מטבעות לא זמינים', 'לא ניתן לטעון את רשימת המטבעות מהשרת');
+        }
+      }
+      options = '<option value="" disabled>נתוני מטבעות לא זמינים</option>';
     }
 
     return options;
   } catch (error) {
     console.error('generateTickerCurrencyOptions failed:', error);
-    return '<option value="1">דולר אמריקאי (USD)</option>';
+    if (!currenciesUnavailableNotified) {
+      currenciesUnavailableNotified = true;
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בטעינת מטבעות', error.message || 'בדוק את החיבור לשרת');
+      }
+    }
+    return '<option value="" disabled>נתוני מטבעות לא זמינים</option>';
   }
 }
 
@@ -482,14 +491,20 @@ function updateCurrencyOptions(ticker = null) {
     const addSelect = document.getElementById('addTickerCurrency');
     const editSelect = document.getElementById('editTickerCurrency');
 
+    const currenciesAvailable = Array.isArray(window.currenciesData) && window.currenciesData.length > 0;
+
     if (addSelect) {
       const addOptions = generateTickerCurrencyOptions();
-      addSelect.innerHTML = '<option value="">בחר מטבע...</option>' + addOptions;
+      addSelect.innerHTML = currenciesAvailable
+        ? '<option value="">בחר מטבע...</option>' + addOptions
+        : addOptions;
     }
 
     if (editSelect) {
       const editOptions = generateTickerCurrencyOptions(ticker);
-      editSelect.innerHTML = '<option value="">בחר מטבע...</option>' + editOptions;
+      editSelect.innerHTML = currenciesAvailable
+        ? '<option value="">בחר מטבע...</option>' + editOptions
+        : editOptions;
     }
   } catch (error) {
     console.error('updateCurrencyOptions failed:', error);
@@ -787,7 +802,10 @@ async function saveTicker() {
           tickerId: newTickerId,
           page: 'tickers'
         });
-        window.showErrorNotification?.('שמירת תגיות', 'הטיקר נשמר אך התגיות לא עודכנו');
+        const errorMessage = window.TagService?.formatTagErrorMessage
+          ? window.TagService.formatTagErrorMessage('הטיקר נשמר אך התגיות לא עודכנו', tagError)
+          : 'הטיקר נשמר אך התגיות לא עודכנו';
+        window.showErrorNotification?.('שמירת תגיות', errorMessage);
       }
     }
 
@@ -987,14 +1005,17 @@ async function updateTicker() {
     });
     if (updateResult !== null && window.TagService) {
       try {
-        await window.TagService.replaceEntityTags('ticker', parseInt(id, 10), tagIds);
+        await window.TagService.replaceEntityTags('ticker', Number.parseInt(id, 10), tagIds);
       } catch (tagError) {
         window.Logger?.warn('⚠️ Failed to update ticker tags', {
           error: tagError,
           tickerId: id,
           page: 'tickers'
         });
-        window.showErrorNotification?.('שמירת תגיות', 'הטיקר עודכן אך שמירת התגיות נכשלה');
+        const errorMessage = window.TagService?.formatTagErrorMessage
+          ? window.TagService.formatTagErrorMessage('הטיקר עודכן אך שמירת התגיות נכשלה', tagError)
+          : 'הטיקר עודכן אך שמירת התגיות נכשלה';
+        window.showErrorNotification?.('שמירת תגיות', errorMessage);
       }
     }
 
@@ -2314,8 +2335,7 @@ window.registerTickersTables = function() {
         tableSelector: 'table[data-table-type="tickers"]',
         columns: getColumns('tickers'),
         sortable: true,
-        filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+        filterable: true
     });
 };
 // REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
@@ -2398,7 +2418,11 @@ async function loadColorsAndApplyToHeaders() {
   }
 
   // שחזור מצב סידור
-  restoreSortState();
+  if (window.pageUtils?.restoreSortState) {
+    window.pageUtils.restoreSortState('tickers');
+  } else if (window.UnifiedTableSystem?.sorter?.applyDefaultSort) {
+    window.UnifiedTableSystem.sorter.applyDefaultSort('tickers');
+  }
 
   // טעינת נתוני טיקרים
   (async () => {

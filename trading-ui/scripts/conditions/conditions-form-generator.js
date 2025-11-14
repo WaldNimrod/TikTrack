@@ -44,6 +44,7 @@ class ConditionsFormGenerator {
     }
 
     async generateConditionForm(containerId, options = {}) {
+        window.Logger?.info('[ConditionsFormGenerator] generateConditionForm called', { containerId, options }, { page: 'conditions-form-generator' });
         this.containerId = containerId;
         const container = document.getElementById(containerId);
         if (!container) {
@@ -58,13 +59,15 @@ class ConditionsFormGenerator {
 
         try {
             await this.loadMethods();
+            window.Logger?.info('[ConditionsFormGenerator] Methods loaded', { methodsCount: this.methods.length }, { page: 'conditions-form-generator' });
             this.populateMethodSelect(options.conditionData);
             if (options.conditionData) {
                 this.populateForm(options.conditionData);
             }
         } catch (error) {
             window.Logger?.error('[ConditionsFormGenerator] Failed to prepare condition form', { error: error?.message, stack: error?.stack }, { page: 'conditions-form-generator' });
-            this.showNotification('שגיאה בטעינת שיטות התנאים', 'error');
+            const message = this.translator.getMessage('condition_methods_error') || 'שגיאה בטעינת שיטות התנאים';
+            this.showNotification(message, 'error');
         }
     }
 
@@ -175,6 +178,7 @@ class ConditionsFormGenerator {
         this.methods.forEach(method => {
             this.methodsById.set(String(method.id), method);
         });
+        window.Logger?.debug?.('[ConditionsFormGenerator] loadMethods completed', { methodsCount: this.methods.length }, { page: 'conditions-form-generator' });
     }
 
     populateMethodSelect(conditionData) {
@@ -198,9 +202,12 @@ class ConditionsFormGenerator {
             methodSelect.value = conditionData.method_id;
             this.handleMethodChange(conditionData.method_id);
         }
+
+        window.Logger?.info('[ConditionsFormGenerator] Method select populated', { optionsCount: methodSelect.options.length }, { page: 'conditions-form-generator' });
     }
 
     handleMethodChange(methodId) {
+        window.Logger?.info('[ConditionsFormGenerator] handleMethodChange called', { methodId }, { page: 'conditions-form-generator' });
         if (!methodId) {
             this.currentMethod = null;
             this.clearParameters();
@@ -216,6 +223,7 @@ class ConditionsFormGenerator {
 
         this.currentMethod = method;
         this.renderParameterFields(method);
+        window.Logger?.info('[ConditionsFormGenerator] Parameters rendered for method', { methodId, parametersCount: method.parameters?.length || 0 }, { page: 'conditions-form-generator' });
     }
 
     clearParameters() {
@@ -357,8 +365,10 @@ class ConditionsFormGenerator {
         const conditionGroup = document.getElementById('conditionGroup');
         const isActive = document.getElementById('isActive');
 
+        const methodIdValue = methodSelect?.value ? Number(methodSelect.value) : null;
+
         const data = {
-            method_id: methodSelect?.value,
+            method_id: Number.isInteger(methodIdValue) ? methodIdValue : null,
             logical_operator: logicalOperator?.value || 'NONE',
             condition_group: Number(conditionGroup?.value) || 0,
             is_active: Boolean(isActive?.checked),

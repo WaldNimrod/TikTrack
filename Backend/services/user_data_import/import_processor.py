@@ -419,6 +419,7 @@ class ImportProcessor:
             # Add duplicate records
             for duplicate in within_file_duplicates:
                 records_to_skip.append({
+                    'record_index': duplicate.get('record_index'),
                     'symbol': duplicate['record'].get('symbol'),
                     'action': duplicate['record'].get('action'),
                     'quantity': duplicate['record'].get('quantity'),

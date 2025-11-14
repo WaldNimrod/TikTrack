@@ -192,11 +192,27 @@ class TagService:
             .first()
         )
         if existing:
+            logger.warning(
+                "Duplicate tag creation attempt rejected",
+                extra={
+                    "user_id": user_id,
+                    "category_id": existing.category_id,
+                    "tag_id": existing.id,
+                    "slug": slug,
+                },
+            )
             raise ValueError("Tag with this name already exists for the user")
 
         if category_id:
             TagService._assert_category_ownership(db, user_id, category_id)
 
+        logger.info(
+            "Creating tag '%s' for user %s (category=%s, is_active=%s)",
+            name.strip(),
+            user_id,
+            category_id,
+            is_active,
+        )
         tag = Tag(
             user_id=user_id,
             category_id=category_id,
@@ -208,7 +224,12 @@ class TagService:
         db.add(tag)
         db.commit()
         db.refresh(tag)
-        logger.info("Created tag %s for user %s", tag.id, user_id)
+        logger.info(
+            "Created tag %s for user %s (category=%s)",
+            tag.id,
+            user_id,
+            category_id,
+        )
         return tag
 
     @staticmethod
@@ -313,6 +334,13 @@ class TagService:
         """
         TagService._validate_entity_type(entity_type)
         normalized_ids = TagService._normalize_ids(tag_ids)
+        logger.info(
+            "Replacing tags for %s:%s (user=%s) => %s",
+            entity_type,
+            entity_id,
+            user_id,
+            sorted(normalized_ids),
+        )
         existing_links = (
             db.query(TagLink)
             .filter(TagLink.entity_type == entity_type, TagLink.entity_id == entity_id)
@@ -344,11 +372,13 @@ class TagService:
 
         db.commit()
         logger.info(
-            "Replaced tags for %s:%s (user %s) => %s",
+            "Tags updated for %s:%s (user=%s) | final=%s | added=%s | removed=%s",
             entity_type,
             entity_id,
             user_id,
-            list(normalized_ids),
+            sorted(normalized_ids),
+            sorted(new_ids),
+            sorted(existing_ids - normalized_ids),
         )
         return TagService.get_tags_for_entity(db, entity_type, entity_id, user_id)
 

@@ -23,9 +23,13 @@ class ConditionsUIManager {
         this.entityName = '';
         this.conditions = [];
         this.isInitialized = false;
+        this.postSavePromptElement = null;
+        this.postSaveModalElement = null;
+        this.postSaveBackdropElement = null;
     }
 
     async initialize(options = {}) {
+        window.Logger?.info('[ConditionsUIManager] initialize called', { options }, { page: 'conditions-ui-manager' });
         this.entityType = options.entityType || 'plan';
         this.entityId = options.entityId;
         this.entityName = options.entityName || '';
@@ -48,6 +52,7 @@ class ConditionsUIManager {
 
         await this.refreshConditions();
         this.isInitialized = true;
+        window.Logger?.info('[ConditionsUIManager] initialization complete', { entityId: this.entityId, entityType: this.entityType }, { page: 'conditions-ui-manager' });
     }
 
     renderLayout() {
@@ -243,11 +248,18 @@ class ConditionsUIManager {
             }
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to delete condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
-            this.showNotification(error.message || 'שגיאה במחיקת התנאי', 'error');
+            if (error?.forceRefresh) {
+                await this.refreshConditions(true);
+            }
+            if (!error?.silent) {
+                const message = error?.message || this.translator.getMessage('condition_delete_error') || 'שגיאה במחיקת התנאי';
+                this.showNotification(message, 'error');
+            }
         }
     }
 
     async openConditionForm(condition = null) {
+        window.Logger?.info('[ConditionsUIManager] openConditionForm called', { isEdit: Boolean(condition), conditionId: condition?.id }, { page: 'conditions-ui-manager' });
         const container = this.container.querySelector('#conditionsFormContainer');
         if (!container) return;
 
@@ -265,6 +277,7 @@ class ConditionsUIManager {
             isEdit: Boolean(condition),
             conditionData: condition
         });
+        window.Logger?.info('[ConditionsUIManager] Condition form rendered', { isEdit: Boolean(condition) }, { page: 'conditions-ui-manager' });
     }
 
     closeConditionForm() {
@@ -273,28 +286,48 @@ class ConditionsUIManager {
             container.innerHTML = '';
             container.style.display = 'none';
         }
+        this.removePostSavePrompt();
+        this.removePostSaveConfirmation();
     }
 
     async createCondition(formData) {
+        window.Logger?.info('[ConditionsUIManager] createCondition invoked', { entityId: this.entityId, formData }, { page: 'conditions-ui-manager' });
         try {
-            await this.crudManager.createCondition(this.entityId, formData);
-            this.closeConditionForm();
+            const savedCondition = await this.crudManager.createCondition(this.entityId, formData);
+            window.Logger?.info('[ConditionsUIManager] Condition created successfully', { entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+            this.showNotification(this.translator.getMessage('condition_created') || 'תנאי נוצר בהצלחה', 'success');
             await this.refreshConditions(true);
+            await this.handlePostSaveSuccess('create', savedCondition);
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to create condition', { error: error?.message, stack: error?.stack, entityId: this.entityId }, { page: 'conditions-ui-manager' });
-            this.showNotification(error.message || 'שגיאה ביצירת התנאי', 'error');
+            if (!error?.silent) {
+                const message = error?.message || this.translator.getMessage('condition_create_error') || 'שגיאה ביצירת התנאי';
+                this.showNotification(message, 'error');
+            }
         }
     }
 
     async updateCondition(conditionId, formData) {
+        window.Logger?.info('[ConditionsUIManager] updateCondition invoked', { entityId: this.entityId, conditionId, formData }, { page: 'conditions-ui-manager' });
         try {
-            await this.crudManager.updateCondition(conditionId, formData, this.entityId);
-            this.closeConditionForm();
+            const updatedCondition = await this.crudManager.updateCondition(conditionId, formData, this.entityId);
+            window.Logger?.info('[ConditionsUIManager] Condition updated successfully', { entityId: this.entityId, conditionId }, { page: 'conditions-ui-manager' });
+            this.showNotification(this.translator.getMessage('condition_updated') || 'תנאי עודכן בהצלחה', 'success');
             await this.refreshConditions(true);
+            await this.handlePostSaveSuccess('update', updatedCondition);
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to update condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
-            this.showNotification(error.message || 'שגיאה בעדכון התנאי', 'error');
+            if (!error?.silent) {
+                const message = error?.message || this.translator.getMessage('condition_update_error') || 'שגיאה בעדכון התנאי';
+                this.showNotification(message, 'error');
+            }
         }
+    }
+
+    async handlePostSaveSuccess(actionType, savedCondition) {
+        window.Logger?.info('[ConditionsUIManager] Handling post-save actions', { actionType, entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+        this.closeConditionForm();
+        this.showPostSaveConfirmation(actionType, savedCondition);
     }
 
     renderError(message) {
@@ -305,6 +338,221 @@ class ConditionsUIManager {
                 ${message}
             </div>
         `;
+    }
+
+    showPostSaveConfirmation(actionType = 'create', savedCondition = null) {
+        window.Logger?.info('[ConditionsUIManager] showPostSaveConfirmation invoked', { actionType, entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+        this.removePostSavePrompt();
+        this.removePostSaveConfirmation();
+
+        const entityLabel = this.entityType === 'plan' ? 'תוכנית המסחר' : 'העסקה';
+        const entityDescriptor = this.entityName ? `"${this.entityName}"` : `#${this.entityId}`;
+        const title = this.translator.getMessage('post_save_prompt_title') || 'שמירת תנאי';
+        const messageTemplate = this.translator.getMessage('post_save_prompt_base') || 'האם תרצה להוסיף תנאי נוסף ל{entityLabel} {entityName}?';
+        const confirmLabel = this.translator.getMessage('post_save_prompt_confirm_hint') || 'הוסף תנאי נוסף';
+        const cancelTemplate = this.translator.getMessage('post_save_prompt_cancel_hint') || 'חזרה למודול {entityLabel}';
+        const cancelLabel = cancelTemplate.replace('{entityLabel}', entityLabel);
+        const message = messageTemplate
+            .replace('{entityLabel}', entityLabel)
+            .replace('{entityName}', entityDescriptor);
+
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show conditions-confirm-backdrop';
+
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show conditions-confirm-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.style.display = 'block';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${title}</h5>
+                        <button type="button" class="btn-close conditions-confirm-close" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">${message}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary conditions-confirm-add">${confirmLabel}</button>
+                        <button type="button" class="btn btn-outline-secondary conditions-confirm-return">${cancelLabel}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const cleanup = () => {
+            try {
+                if (this.postSaveBackdropElement?.parentNode) {
+                    this.postSaveBackdropElement.parentNode.removeChild(this.postSaveBackdropElement);
+                }
+                if (this.postSaveModalElement?.parentNode) {
+                    this.postSaveModalElement.parentNode.removeChild(this.postSaveModalElement);
+                }
+            } catch (error) {
+                window.Logger?.warn('[ConditionsUIManager] Failed to remove post-save confirmation elements', { error: error?.message }, { page: 'conditions-ui-manager' });
+            }
+            this.postSaveBackdropElement = null;
+            this.postSaveModalElement = null;
+        };
+
+        const handleAddAnother = () => {
+            window.Logger?.info('[ConditionsUIManager] User chose to add another condition', { actionType, entityId: this.entityId, previousConditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+            cleanup();
+            this.openConditionForm();
+        };
+
+        const handleReturnToParent = () => {
+            window.Logger?.info('[ConditionsUIManager] User chose to return to parent module', { actionType, entityId: this.entityId, previousConditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+            cleanup();
+            if (window.ModalNavigationService?.goBack) {
+                window.ModalNavigationService.goBack();
+            } else if (window.ConditionsModalController?.goBackToParent) {
+                window.ConditionsModalController.goBackToParent();
+            } else {
+                const modalElement = document.getElementById('conditionsModal');
+                const modalInstance = modalElement ? bootstrap?.Modal?.getInstance(modalElement) : null;
+                modalInstance?.hide?.();
+            }
+        };
+
+        modal.querySelector('.conditions-confirm-add')?.addEventListener('click', handleAddAnother);
+        modal.querySelector('.conditions-confirm-return')?.addEventListener('click', handleReturnToParent);
+        modal.querySelector('.conditions-confirm-close')?.addEventListener('click', handleReturnToParent);
+
+        document.body.appendChild(backdrop);
+        document.body.appendChild(modal);
+
+        this.postSaveBackdropElement = backdrop;
+        this.postSaveModalElement = modal;
+        window.Logger?.info('[ConditionsUIManager] Post-save confirmation modal displayed', { actionType, entityId: this.entityId }, { page: 'conditions-ui-manager' });
+    }
+
+    removePostSavePrompt() {
+        if (this.postSavePromptElement?.parentNode) {
+            this.postSavePromptElement.parentNode.removeChild(this.postSavePromptElement);
+        }
+        this.postSavePromptElement = null;
+    }
+
+    removePostSaveConfirmation() {
+        if (this.postSaveBackdropElement?.parentNode) {
+            this.postSaveBackdropElement.parentNode.removeChild(this.postSaveBackdropElement);
+        }
+        if (this.postSaveModalElement?.parentNode) {
+            this.postSaveModalElement.parentNode.removeChild(this.postSaveModalElement);
+        }
+        this.postSaveBackdropElement = null;
+        this.postSaveModalElement = null;
+    }
+
+    /**
+     * Prompt user to choose next action after saving a condition.
+     * Falls back to opening another form when confirmation dialog is unavailable.
+     *
+     * @param {('create'|'update')} actionType
+     * @param {Object} savedCondition
+     * @returns {Promise<'add'|'return'>}
+     */
+    promptPostSaveAction(actionType = 'create', savedCondition = {}) {
+        const translator = this.translator || window.conditionsTranslations;
+        const getMessage = (key, fallback) => {
+            if (translator && typeof translator.getMessage === 'function') {
+                return translator.getMessage(key) || fallback;
+            }
+            return fallback;
+        };
+
+        const entityLabel = this.entityType === 'plan' ? 'תוכנית מסחר' : 'עסקה';
+        const entityDescriptor = this.entityName
+            || savedCondition.name
+            || savedCondition.display_name
+            || `#${savedCondition.id ?? this.entityId ?? ''}`;
+
+        const title = getMessage('post_save_prompt_title', 'שמירת תנאי');
+        const baseTemplate = getMessage(
+            'post_save_prompt_base',
+            'האם תרצה להוסיף תנאי נוסף ל{entityLabel} {entityName}?'
+        );
+        const confirmHint = getMessage(
+            'post_save_prompt_confirm_hint',
+            'אישור – הוסף תנאי נוסף'
+        );
+        const cancelHint = getMessage(
+            'post_save_prompt_cancel_hint',
+            'דחייה – חזרה למודול {entityLabel}'
+        );
+
+        const replaceTokens = (template) => template
+            .replace('{entityLabel}', entityLabel)
+            .replace('{entityName}', entityDescriptor);
+
+        const messageParts = [
+            replaceTokens(baseTemplate),
+            confirmHint ? replaceTokens(confirmHint) : '',
+            cancelHint ? replaceTokens(cancelHint) : ''
+        ].filter(Boolean);
+        const message = messageParts.join('\n');
+
+        const handleReturnNavigation = () => {
+            if (window.ModalNavigationService?.goBack) {
+                window.ModalNavigationService.goBack();
+            } else if (window.ConditionsModalController?.goBackToParent) {
+                window.ConditionsModalController.goBackToParent();
+            } else {
+                const modalElement = document.getElementById('conditionsModal');
+                const modalInstance = modalElement ? bootstrap?.Modal?.getInstance(modalElement) : null;
+                modalInstance?.hide?.();
+            }
+        };
+
+        return new Promise((resolve) => {
+            const handleAddAnother = () => {
+                window.Logger?.info?.(
+                    '[ConditionsUIManager] User confirmed add another condition',
+                    { actionType, entityId: this.entityId, previousConditionId: savedCondition?.id },
+                    { page: 'conditions-ui-manager' }
+                );
+                this.openConditionForm();
+                resolve('add');
+            };
+
+            const handleReturn = () => {
+                window.Logger?.info?.(
+                    '[ConditionsUIManager] User chose to return after saving condition',
+                    { actionType, entityId: this.entityId, previousConditionId: savedCondition?.id },
+                    { page: 'conditions-ui-manager' }
+                );
+                handleReturnNavigation();
+                resolve('return');
+            };
+
+            if (typeof window.showConfirmationDialog === 'function') {
+                try {
+                    window.showConfirmationDialog(
+                        title,
+                        message,
+                        handleAddAnother,
+                        handleReturn
+                    );
+                    return;
+                } catch (error) {
+                    window.Logger?.error?.(
+                        '[ConditionsUIManager] showConfirmationDialog threw error, defaulting to add another condition',
+                        { error: error?.message, actionType, entityId: this.entityId },
+                        { page: 'conditions-ui-manager' }
+                    );
+                }
+            } else {
+                window.Logger?.warn?.(
+                    '[ConditionsUIManager] showConfirmationDialog unavailable, defaulting to add another condition',
+                    { actionType, entityId: this.entityId },
+                    { page: 'conditions-ui-manager' }
+                );
+            }
+
+            handleAddAnother();
+        });
     }
 
     showNotification(message, type = 'info') {

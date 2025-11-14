@@ -377,6 +377,8 @@ class PreferencesCore {
         this.currentUserId = 1; // Nimrod
         this.currentProfileId = null; // Will be loaded from server
         this.latestProfileContext = null;
+        this.defaultPreferenceCache = new Map();
+        this.defaultPreferenceEndpointAvailable = true;
     }
     
     /**
@@ -393,8 +395,21 @@ class PreferencesCore {
      * @returns {Promise<any>} Default preference value
      */
     async getDefaultPreference(preferenceName) {
+        if (this.defaultPreferenceCache.has(preferenceName)) {
+            return this.defaultPreferenceCache.get(preferenceName);
+        }
+        if (this.defaultPreferenceEndpointAvailable === false) {
+            return null;
+        }
+
         try {
-            const response = await fetch(`/api/preferences/default?preference_name=${preferenceName}`);
+            const response = await fetch(`/api/preferences/default?preference_name=${encodeURIComponent(preferenceName)}`);
+            if (response.status === 404) {
+                this.defaultPreferenceEndpointAvailable = false;
+                this.defaultPreferenceCache.set(preferenceName, null);
+                window.Logger?.warn?.('⚠️ Default preferences API not available, falling back to local caches only', { page: 'preferences-core-new' });
+                return null;
+            }
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -404,9 +419,13 @@ class PreferencesCore {
                 throw new Error(result.error || 'Failed to get default preference');
             }
             
-            return result.data.default_value;
+            const defaultValue = result.data?.default_value ?? null;
+            this.defaultPreferenceCache.set(preferenceName, defaultValue);
+            return defaultValue;
         } catch (error) {
-            // window.Logger.error(`❌ Error getting default preference ${preferenceName}:`, error, { page: "preferences-core-new" });
+            this.defaultPreferenceEndpointAvailable = false;
+            this.defaultPreferenceCache.set(preferenceName, null);
+            window.Logger?.debug?.(`⚠️ Error getting default preference ${preferenceName}: ${error?.message}`, { page: 'preferences-core-new' });
             return null;
         }
     }
@@ -953,6 +972,67 @@ window.PreferencesCore = new PreferencesCore();
  */
 window.getPreference = async function(preferenceName, userId = null, profileId = null) {
     return await window.PreferencesCore.getPreference(preferenceName, userId, profileId);
+};
+
+/**
+ * Get current (cached) preference value with smart fallbacks.
+ * Used by systems that expect an immediate value for risk calculations and defaults.
+ * @param {string} preferenceName
+ * @param {Object} options
+ * @returns {Promise<any>}
+ */
+window.getCurrentPreference = async function(preferenceName, options = {}) {
+    const {
+        userId = null,
+        profileId = null,
+        fallbackValue = null,
+        includeDefaultValue = true,
+        fallbackToLocalStorage = true
+    } = options;
+
+    try {
+        if (window.currentPreferences && Object.prototype.hasOwnProperty.call(window.currentPreferences, preferenceName)) {
+            const currentValue = window.currentPreferences[preferenceName];
+            if (currentValue !== undefined) {
+                return currentValue;
+            }
+        }
+
+        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+            const value = await window.PreferencesCore.getPreference(preferenceName, userId, profileId);
+            if (value !== null && value !== undefined) {
+                return value;
+            }
+
+            if (includeDefaultValue !== false && typeof window.PreferencesCore.getDefaultPreference === 'function') {
+                const defaultValue = await window.PreferencesCore.getDefaultPreference(preferenceName);
+                if (defaultValue !== null && defaultValue !== undefined) {
+                    return defaultValue;
+                }
+            }
+        }
+    } catch (error) {
+        window.Logger?.warn?.('⚠️ getCurrentPreference failed, falling back to local storage', {
+            preferenceName,
+            error: error?.message
+        }, { page: 'preferences-core-new' });
+    }
+
+    if (fallbackToLocalStorage !== false) {
+        try {
+            const preferences = JSON.parse(localStorage.getItem('tikTrack_preferences') || '{}');
+            if (preferences.hasOwnProperty(preferenceName)) {
+                return preferences[preferenceName];
+            }
+        } catch (storageError) {
+            window.Logger?.warn?.('⚠️ getCurrentPreference localStorage fallback failed', {
+                preferenceName,
+                error: storageError?.message
+            }, { page: 'preferences-core-new' });
+        }
+    }
+
+    return fallbackValue;
 };
 
 /**

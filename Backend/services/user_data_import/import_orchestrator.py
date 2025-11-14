@@ -32,6 +32,8 @@ from .validation_service import ValidationService
 from .duplicate_detection_service import DuplicateDetectionService
 from .symbol_metadata_service import SymbolMetadataService
 from services.user_data_import.report_generator import ImportReportGenerator
+from services.user_data_import.session_manager import ImportSessionManager
+from services.user_data_import.import_processor import ImportProcessor
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
 from services.date_normalization_service import DateNormalizationService
@@ -68,6 +70,8 @@ class ImportOrchestrator:
         self.report_generator = ImportReportGenerator()
         self.utc_normalizer = DateNormalizationService("UTC")
         self.symbol_metadata_service = SymbolMetadataService(db_session)
+        self.session_manager = ImportSessionManager(db_session)
+        self.processor = ImportProcessor(db_session, advanced_cache_service)
         
         # Available connectors
         self.connectors = {
@@ -805,6 +809,7 @@ class ImportOrchestrator:
             for duplicate in duplicate_result.get('within_file_duplicates', []):
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(duplicate.get('record') or {})
                 records_to_skip.append({
+                'record_index': duplicate.get('record_index'),
                     'record': duplicate['record'],
                     'reason': 'within_file_duplicate',
                     'confidence_score': duplicate.get('confidence_score'),
@@ -819,6 +824,7 @@ class ImportOrchestrator:
             for duplicate in duplicate_result.get('existing_records', []):
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(duplicate.get('record') or {})
                 records_to_skip.append({
+                'record_index': duplicate.get('record_index'),
                     'record': duplicate['record'],
                     'reason': 'existing_record',
                     'details': duplicate,
@@ -938,6 +944,7 @@ class ImportOrchestrator:
 
         for duplicate in duplicate_result.get('within_file_duplicates', []):
             records_to_skip.append({
+                'record_index': duplicate.get('record_index'),
                 'record': duplicate['record'],
                 'reason': 'within_file_duplicate',
                 'confidence_score': duplicate.get('confidence_score', 0),
@@ -945,6 +952,7 @@ class ImportOrchestrator:
             })
             for match in duplicate.get('within_file_matches', []):
                 records_to_skip.append({
+                    'record_index': match.get('record_index'),
                     'record': match['record'],
                     'reason': 'within_file_duplicate_match',
                     'confidence_score': match.get('confidence', 0),
@@ -1956,8 +1964,8 @@ class ImportOrchestrator:
             if not session:
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get current preview data
-            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            # Get current preview data (with fallback)
+            preview_data = self._ensure_preview_data(session_id, session)
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
@@ -1998,7 +2006,7 @@ class ImportOrchestrator:
             ) if preview_data['summary']['total_records'] > 0 else 0
             
             # Cache updated preview data
-            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            self._update_preview_cache(session_id, preview_data, session=session)
             
             logger.info(f"✅ Accepted duplicate record {record_index} for session {session_id}")
             return {'success': True}
@@ -2025,8 +2033,8 @@ class ImportOrchestrator:
             if not session:
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get current preview data
-            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            # Get current preview data (with fallback)
+            preview_data = self._ensure_preview_data(session_id, session)
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
@@ -2039,7 +2047,7 @@ class ImportOrchestrator:
                     break
             
             # Cache updated preview data
-            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            self._update_preview_cache(session_id, preview_data, session=session)
             
             logger.info(f"✅ Rejected duplicate record {record_index} for session {session_id}")
             return {'success': True}
@@ -2065,8 +2073,8 @@ class ImportOrchestrator:
             if not session:
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get current preview data
-            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            # Get current preview data (with fallback)
+            preview_data = self._ensure_preview_data(session_id, session)
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
@@ -2108,7 +2116,7 @@ class ImportOrchestrator:
             ) if preview_data['summary']['total_records'] > 0 else 0
             
             # Cache updated preview data
-            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            self._update_preview_cache(session_id, preview_data, session=session)
             
             logger.info(f"✅ Allowed existing record {record_index} for session {session_id}")
             return {'success': True}
@@ -2116,3 +2124,118 @@ class ImportOrchestrator:
         except Exception as e:
             logger.error(f"❌ Failed to allow existing record for session {session_id}: {str(e)}")
             return {'success': False, 'error': str(e)}
+
+    def get_preview_snapshot(self, session_id: int) -> Dict[str, Any]:
+        """
+        Return the latest preview data without regenerating the entire pipeline.
+        """
+        try:
+            session = self.session_manager.get_session(session_id)
+            if not session:
+                return {'success': False, 'error': 'Session not found'}
+
+            preview_data = self._ensure_preview_data(session_id, session=session)
+            if not preview_data:
+                return {'success': False, 'error': 'Preview data not available'}
+
+            return {'success': True, 'preview_data': preview_data}
+
+        except Exception as error:
+            logger.error(f"❌ Failed to load preview snapshot for session {session_id}: {error}")
+            return {'success': False, 'error': str(error)}
+
+    def _upgrade_preview_data_structure(self, preview_data: Optional[Dict[str, Any]]) -> bool:
+        """
+        Upgrade legacy preview payloads (missing record_index values) to the new structure.
+        Returns True when mutating the preview_data dict.
+        """
+        if not preview_data:
+            return False
+
+        changed = False
+        buckets = ['records_to_skip', 'records_to_import']
+        existing_indexes: Set[int] = set()
+
+        for bucket in buckets:
+            for entry in preview_data.get(bucket, []) or []:
+                idx = entry.get('record_index')
+                if isinstance(idx, int):
+                    existing_indexes.add(idx)
+
+        next_index = (max(existing_indexes) + 1) if existing_indexes else 0
+
+        for bucket in buckets:
+            for entry in preview_data.get(bucket, []) or []:
+                idx = entry.get('record_index')
+                if not isinstance(idx, int):
+                    entry['record_index'] = next_index
+                    next_index += 1
+                    changed = True
+
+        return changed
+
+    def _finalize_preview_data(
+        self,
+        session_id: int,
+        preview_data: Optional[Dict[str, Any]],
+        session: Optional[ImportSession] = None
+    ) -> Optional[Dict[str, Any]]:
+        if preview_data and self._upgrade_preview_data_structure(preview_data):
+            self._update_preview_cache(session_id, preview_data, session=session)
+        return preview_data
+
+    def _ensure_preview_data(self, session_id: int, session: Optional[ImportSession] = None) -> Optional[Dict[str, Any]]:
+        """
+        Ensure preview data is available by checking cache, session summary, or regenerating as needed.
+        Returns a deep-copied structure safe for mutation.
+        """
+        # Attempt to read from cache
+        cached_preview = self.processor.get_cached_results(session_id, 'preview')
+        if cached_preview:
+            preview_copy = json.loads(json.dumps(cached_preview))
+            return self._finalize_preview_data(session_id, preview_copy, session=session)
+
+        session = session or self.session_manager.get_session(session_id)
+        if session:
+            stored_preview = session.get_summary_data('preview_data')
+            if stored_preview:
+                preview_copy = json.loads(json.dumps(stored_preview))
+                self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
+                return self._finalize_preview_data(session_id, preview_copy, session=session)
+
+        # Regenerate preview data when nothing cached or persisted
+        regenerate_result = self.generate_preview(session_id)
+        if not regenerate_result.get('success'):
+            logger.error(
+                "❌ Unable to regenerate preview data for session %s: %s",
+                session_id,
+                regenerate_result.get('error')
+            )
+            return None
+
+        regenerated_preview = regenerate_result.get('preview_data')
+        if not regenerated_preview:
+            logger.error("❌ Regenerated preview data was empty for session %s", session_id)
+            return None
+
+        preview_copy = json.loads(json.dumps(regenerated_preview))
+        self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
+
+        session = session or self.session_manager.get_session(session_id)
+        if session:
+            session.add_summary_data({'preview_data': self.utc_normalizer.normalize_output(preview_copy)})
+            self.db_session.commit()
+
+        return self._finalize_preview_data(session_id, preview_copy, session=session)
+
+    def _update_preview_cache(self, session_id: int, preview_data: Dict[str, Any], session: Optional[ImportSession] = None) -> None:
+        """
+        Persist updated preview data into the cache system and session summary.
+        """
+        preview_copy = json.loads(json.dumps(preview_data))
+        self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
+
+        session = session or self.session_manager.get_session(session_id)
+        if session:
+            session.add_summary_data({'preview_data': self.utc_normalizer.normalize_output(preview_copy)})
+            self.db_session.commit()

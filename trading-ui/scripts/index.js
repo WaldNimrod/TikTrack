@@ -283,6 +283,11 @@ function updateSummaryStats(data, currencySymbol) {
 }
 
 function updateRecentTrades(trades = [], currencySymbol) {
+    if (window.RecentTradesWidget?.render) {
+        window.RecentTradesWidget.render(trades, currencySymbol);
+        return;
+    }
+
     const container = document.getElementById('recentTrades');
     if (!container) {
         return;

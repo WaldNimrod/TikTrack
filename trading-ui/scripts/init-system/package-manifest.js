@@ -996,13 +996,6 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
-        file: 'active-alerts-component.js',
-        globalCheck: 'window.updateActiveAlertsComponent',
-        description: 'רכיב התראות פעילות',
-        required: true,
-        loadOrder: 6
-      },
-      {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
         description: 'מתרגם תנאים',
@@ -1423,32 +1416,60 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services', 'ui-advanced', 'entity-services'],
     scripts: [
       {
+        file: 'widgets/recent-trades-widget.js',
+        globalCheck: 'window.RecentTradesWidget',
+        description: 'ווידג׳ט טריידים אחרונים',
+        required: true,
+        loadOrder: 0
+      },
+      {
         file: 'pending-executions-widget.js',
         globalCheck: 'window.PendingExecutionsHighlights',
         description: 'ווידג׳ט המלצות שיוך',
         required: true,
-        loadOrder: 0
+        loadOrder: 1
       },
       {
         file: 'pending-execution-trade-creation.js',
         globalCheck: 'window.PendingExecutionTradeCreation',
         description: 'ממשק יצירת טרייד מביצועים',
         required: false,
-        loadOrder: 1
+        loadOrder: 2
       },
       {
         file: 'pending-trade-plan-widget.js',
         globalCheck: 'window.PendingTradePlanWidget',
         description: 'ווידג׳ט שיוך תוכניות למסחר',
         required: true,
-        loadOrder: 2
+        loadOrder: 3
+      },
+      {
+        file: 'active-alerts-component.js',
+        globalCheck: 'window.updateActiveAlertsComponent',
+        description: 'רכיב התראות פעילות',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'modal-configs/tag-search-config.js',
+        globalCheck: 'window.tagSearchDrawerConfig',
+        description: 'תצורת מגירת חיפוש תגיות',
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'tag-search-controller.js',
+        globalCheck: 'window.TagSearchController',
+        description: 'בקר חיפוש תגיות',
+        required: true,
+        loadOrder: 6
       },
       {
         file: 'index.js',
         globalCheck: 'window.initializeIndexPage',
         description: 'לוגיקת דף הבית',
         required: true,
-        loadOrder: 3
+        loadOrder: 7
       }
     ],
     estimatedSize: '~110KB',

@@ -210,6 +210,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.loadDashboardData',
+        'window.RecentTradesWidget',
         'window.PendingExecutionsHighlights',
         'window.PendingExecutionTradeCreation',
       ],

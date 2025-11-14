@@ -3,10 +3,8 @@
  * Handles content injection into locked template sections
  */
 
-// document.addEventListener('DOMContentLoaded', function() {
-//     console.log('=== Dynamic Colors Display Page Loaded ===');
-
-    // Initialize color scheme system
+;(function () {
+function renderColorSections() {
     if (window.generateNumericValueCSS) {
         window.generateNumericValueCSS();
     }
@@ -15,15 +13,11 @@
         window.generateEntityCSS();
     }
 
-    // Inject content into sections
     injectSection1Content();
     injectSection2Content();
     injectSection3Content();
     injectSection4Content();
-
-//     // Initialize section toggle functionality
-//     initializeSectionToggles();
-// });
+}
 
 /**
  * Inject content into Section 1 (Dynamic Colors - Numeric Values)
@@ -756,3 +750,60 @@ async function copyDetailedLogLocal() {
         }
     }
 }
+
+class ColorDisplayController {
+    constructor() {
+        this.initialized = false;
+    }
+
+    async init() {
+        if (!this.initialized) {
+            await this.ensureColorSystem();
+            renderColorSections();
+            this.initialized = true;
+            return;
+        }
+
+        renderColorSections();
+    }
+
+    async ensureColorSystem() {
+        if (window.colorSchemeSystemReady) {
+            return;
+        }
+
+        if (typeof window.loadColorPreferences === 'function' &&
+            typeof window.updateCSSVariablesFromPreferences === 'function') {
+            try {
+                const preferences = await window.loadColorPreferences();
+                if (preferences) {
+                    window.updateCSSVariablesFromPreferences(preferences);
+                }
+            } catch (error) {
+                window.Logger?.warn('ColorDisplayController: failed to load color preferences', { error });
+            }
+        }
+    }
+
+    refresh() {
+        renderColorSections();
+    }
+}
+
+const colorDisplayController = new ColorDisplayController();
+
+async function loadColorDisplay() {
+    await colorDisplayController.init();
+    return colorDisplayController;
+}
+
+window.ColorDisplayController = ColorDisplayController;
+window.loadColorDisplay = loadColorDisplay;
+window.copyDynamicColorsLog = copyDetailedLogLocal;
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadColorDisplay();
+    window.addEventListener('colorSchemeChanged', () => colorDisplayController.refresh());
+});
+
+})();

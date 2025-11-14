@@ -1220,6 +1220,26 @@ window.exportValidationReport = function() {
 window.initializeConstraints = function() {
     console.log('מוניטור אילוצים נטען');
     constraintsMonitor = new ConstraintsMonitor();
+    window.constraintsMonitor = constraintsMonitor;
+};
+
+window.ConstraintManager = ConstraintsMonitor;
+
+window.loadConstraints = async function loadConstraints() {
+    if (!(window.constraintsMonitor instanceof ConstraintsMonitor)) {
+        constraintsMonitor = new ConstraintsMonitor();
+        window.constraintsMonitor = constraintsMonitor;
+        return constraintsMonitor;
+    }
+
+    try {
+        await window.constraintsMonitor.loadData();
+        window.constraintsMonitor.renderCurrentLayer?.();
+    } catch (error) {
+        window.Logger?.warn('ConstraintsMonitor: failed to refresh data', { error });
+    }
+
+    return window.constraintsMonitor;
 };
 
 // פונקציה להעתקת לוג מפורט

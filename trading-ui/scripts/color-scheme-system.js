@@ -1458,6 +1458,34 @@ window.getSubHeaderOpacityHex = getSubHeaderOpacityHex;
 // Export page-to-entity mapping
 window.PAGE_TO_ENTITY_MAPPING = PAGE_TO_ENTITY_MAPPING;
 
+window.ColorSchemeSystem = {
+  isReady: () => window.colorSchemeSystemReady === true,
+  loadPreferences: loadColorPreferences,
+  applyPreferences: updateCSSVariablesFromPreferences,
+  updateColor: async (colorName, colorValue) => {
+    if (!colorName) {
+      return;
+    }
+
+    const payload = {
+      colorScheme: {
+        entities: {
+          [colorName]: colorValue,
+        },
+      },
+    };
+
+    updateEntityColors(payload);
+    generateEntityCSS();
+    generateNumericValueCSS();
+  },
+  generateEntityCSS,
+  generateNumericValueCSS,
+  refreshFromPage: setCurrentEntityColorFromPage,
+  getEntityColor,
+  getNumericValueColor,
+};
+
 // ===== TABLE COLORS FUNCTIONS =====
 
 /**

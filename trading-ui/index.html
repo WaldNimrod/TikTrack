@@ -123,7 +123,7 @@
             <div class="card h-100" id="tagCloudCard">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">
                     <h5 class="mb-0 d-flex align-items-center gap-2">
-                        <img src="images/icons/tags.svg" alt="תגיות" width="20" height="20">
+                        <img src="images/icons/home.svg" alt="סמל קונטיינר" class="section-icon">
                         <span>ענן תגיות</span>
                     </h5>
                     <button data-button-type="REFRESH"
@@ -150,7 +150,7 @@
             <div class="card h-100" id="tagQuickSearchCard">
                 <div class="card-header d-flex align-items-center justify-content-between gap-2">
                     <h5 class="mb-0 d-flex align-items-center gap-2">
-                        <img src="images/icons/search.svg" alt="חיפוש תגיות" width="20" height="20">
+                        <img src="images/icons/home.svg" alt="סמל קונטיינר" class="section-icon">
                         <span>חיפוש תגיות מהיר</span>
                     </h5>
                 </div>
@@ -177,7 +177,8 @@
                             </select>
                             <button type="submit"
                                     data-button-type="PRIMARY"
-                                    data-variant="small"
+                                    data-variant="full"
+                                    data-icon="🔍"
                                     data-text="חפש"
                                     title="הפעל חיפוש תגיות"></button>
                         </div>
@@ -454,16 +455,14 @@
     <!-- [50] Load Order: 50 -->
     <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
     <!-- [51] Load Order: 51 -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
-    <!-- [52] Load Order: 52 -->
     <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
-    <!-- [53] Load Order: 53 -->
+    <!-- [52] Load Order: 52 -->
     <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
-    <!-- [54] Load Order: 54 -->
+    <!-- [53] Load Order: 53 -->
     <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
-    <!-- [55] Load Order: 55 -->
+    <!-- [54] Load Order: 54 -->
     <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
-    <!-- [56] Load Order: 56 -->
+    <!-- [55] Load Order: 55 -->
     <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
 
     <!-- =============================================================== -->
@@ -473,11 +472,11 @@
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [57] Load Order: 57 -->
+    <!-- [56] Load Order: 56 -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
-    <!-- [58] Load Order: 58 -->
+    <!-- [57] Load Order: 57 -->
     <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
-    <!-- [59] Load Order: 59 -->
+    <!-- [58] Load Order: 58 -->
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
 
     <!-- =============================================================== -->
@@ -487,15 +486,15 @@
     <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [60] Load Order: 60 -->
+    <!-- [59] Load Order: 59 -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
-    <!-- [61] Load Order: 61 -->
+    <!-- [60] Load Order: 60 -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
-    <!-- [62] Load Order: 62 -->
+    <!-- [61] Load Order: 61 -->
     <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
-    <!-- [63] Load Order: 63 -->
+    <!-- [62] Load Order: 62 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
-    <!-- [64] Load Order: 64 -->
+    <!-- [63] Load Order: 63 -->
     <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
 
     <!-- =============================================================== -->
@@ -505,6 +504,8 @@
     <!-- Dependencies: base, services, ui-advanced, entity-services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
+    <!-- [64] Load Order: 64 -->
+    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- ווידג׳ט טריידים אחרונים -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- ווידג׳ט המלצות שיוך -->
     <!-- [66] Load Order: 66 -->
@@ -512,10 +513,12 @@
     <!-- [67] Load Order: 67 -->
     <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- ווידג׳ט שיוך תוכניות למסחר -->
     <!-- [68] Load Order: 68 -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- מודל תוצאות חיפוש תגיות -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
     <!-- [69] Load Order: 69 -->
-    <script src="scripts/tag-search-controller.js?v=1.0.0"></script> <!-- בקר ענן תגיות וחיפוש מהיר -->
+    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- מודל תוצאות חיפוש תגיות -->
     <!-- [70] Load Order: 70 -->
+    <script src="scripts/tag-search-controller.js?v=1.0.0"></script> <!-- בקר ענן תגיות וחיפוש מהיר -->
+    <!-- [71] Load Order: 71 -->
     <script src="scripts/index.js?v=1.0.0"></script> <!-- לוגיקת דף הבית -->
 
     <!-- =============================================================== -->
@@ -527,7 +530,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 70 | Unique Scripts Loaded: 70 -->
+    <!-- 📊 Total Scripts Processed: 71 | Unique Scripts Loaded: 71 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("index") -->
 </body>
 </html>

@@ -10,13 +10,13 @@
     "notes": "Sync local updates before release"
   },
   "development": {
-    "version": "1.0.35.0",
+    "version": "1.0.36.0",
     "major": 1,
     "minor": 0,
-    "patch": 35,
+    "patch": 36,
     "build": 0,
-    "commit": "a6e7aa81f22dcc7d1bae7d6f6127265ba8441d6c",
-    "updated_at": "2025-11-14T22:34:53+00:00",
-    "notes": "Load tag UI manager on trading accounts page"
+    "commit": "2e5e573a16d3b722e4a80c93ba3f36819f1b5ba5",
+    "updated_at": "2025-11-14T22:49:03+00:00",
+    "notes": "Limit rate limiter middleware to API routes"
   }
 }

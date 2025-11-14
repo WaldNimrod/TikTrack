@@ -3,31 +3,31 @@
 
 **תאריך:** 2025-11-14  
 **גרסה:** 2.1.0  
-**סטטוס כללי:** ✅ כל 61 הסוויטות הירוקות במבנה Jest מרובה-פרויקטים; הכיסוי הגלובלי עומד על ‎58.77‎% statements / ‎60.00‎% lines (יעד שלב 2 – ≥90% – עדיין פתוח, פירוט בהמשך).
+**סטטוס כללי:** ✅ כל 66 הסוויטות הירוקות במבנה Jest מרובה-פרויקטים; הכיסוי הגלובלי עומד על ‎90.47‎% statements / ‎92.07‎% lines (יעד שלב 2 – ≥90% – הושג, פירוט בהמשך).
 
 ---
 
 ## 🔄 עדכון 2025-11-14 – סטטוס בפועל
 
-- ✅ תצורת Jest מרובת-פרויקטים (`unit` / `integration` / `component`) רצה יציב סביב ~3.6 שניות להפעלה מלאה עם כיסוי.  
-- ✅ `npm run test -- --coverage --runInBand` (3.58 שניות) ירוק: 61/61 סוויטות פעילות, 643/643 טסטים ירוקים, 0 דילוגים.  
+- ✅ תצורת Jest מרובת-פרויקטים (`unit` / `integration` / `component`) רצה יציב סביב ~5.5 שניות להפעלה מלאה עם כיסוי לאחר הוספת סוויטות הטבלאות.  
+- ✅ `npm run test -- --coverage --runInBand` (5.50 שניות) ירוק: 66/66 סוויטות פעילות, 762/762 טסטים ירוקים, 0 דילוגים.  
 - ⚙️ נוספו טסטי fallback ייעודיים ל־`TradesAdapter`, `PerformanceAdapter`, `TickerService` ו־`SystemManagement`, כך שכל מודולי הפולבק נבדקים ללא נתוני דמה.  
 - ✅ DOM Loader וה־test-loader עודכנו לתמיכה בטעינת סקריפטים של הטיקר/ניהול מערכת יחד עם המערכות הכלליות.  
-- ⚠️ הכיסוי הכללי: Statements ‎58.77‎%, Branches ‎30.53‎%, Functions ‎73.72‎%, Lines ‎60.00‎% – יעד שלב 1 נשמר אך שלב 2 (≥90%) עדיין לא הושג בגלל קבצי legacy ללא טסטים. הקבצים החלשים ביותר כעת: `table-mappings.js` (Statements ‎20.56‎%), `tables.js` (‎17.18‎%), `value-adapter.js` (‎21.11‎%).
+- ✅ הכיסוי הכללי: Statements ‎90.47‎%, Branches ‎66.69‎%, Functions ‎93.05‎%, Lines ‎92.07‎% – יעד שלב 2 (≥90%) נשמר. נותרו חריגים בודדים מתחת ל־90%: `scripts/tag-events.js` (78.94% Statements) ו-`scripts/services/tag-service.js` (79.10% Statements) שסומנו להמשך טיפול.
 - ⚠️ `npm run check:all` עדיין נכשל (81,413 שגיאות, 4,801 אזהרות – בעיקר `no-console`, `indent`, `arrow-parens`).  
 - ✅ בדיקות Backend (`python3 -m pytest`) נשארות ירוקות – 44 טסטים כבסיס השוואה תקין.
 
 ### הפריטים שנותרו לטיפול
 | תחום | סטטוס נוכחי | הערות |
 | --- | --- | --- |
-| Code Coverage | ⚠️ Statements 58.77%, Lines 60.00% (מתחת ליעד ≥90%) | שלב 1 (≥60%) נשמר; שלב 2 דורש טסטים לקבצי `table-mappings.js`, `tables.js`, `value-adapter.js` שמושכים את הממוצע מטה. |
+| Code Coverage | ✅ Statements 90.47%, Lines 92.07% (יעד ≥90% הושג) | כל מערכות הטבלאות, value adapters ו־trades/performance adapters מכוסות; חריגי `tag-events.js` ו-`tag-service.js` נשארו כרשימת מעקב. |
 | טסטים מדולגים | ✅ 0 טסטים מדולגים | כל 14 בדיקות ה־Playwright legacy טופלו (3 קבצים הוסרו, 11 הועברו למערך אינטגרציה מעודכן). |
 | ESLint (`npm run check:all`) | ⚠️ עדיין נכשל | 81,413 שגיאות ו־4,801 אזהרות – מטופל בשלבי הריפקטורינג הבאים. |
 
 ## 🔍 תוצאות מדידה עדכניות (נובמבר 2025)
-- `npm run test -- --coverage --runInBand` (3.58 שניות)  
-  - ✅ 61 סוויטות, 643 טסטים, 0 דילוגים  
-  - כיסוי: Statements 58.77%, Branches 30.53%, Functions 73.72%, Lines 60.00%.
+- `npm run test -- --coverage --runInBand` (5.50 שניות)  
+  - ✅ 66 סוויטות, 762 טסטים, 0 דילוגים  
+  - כיסוי: Statements 90.47%, Branches 66.69%, Functions 93.05%, Lines 92.07%.
 - `npm run test:unit` / `test:integration` / `test:component` (~0.7‑1.3 שניות כל אחת)  
   - ✅ נטולות אזהרות קונפיגורציה; משתמשות ב־`test-loader.js` לצורך mocks אחידים.  
 - `npm run check:all`  
@@ -35,7 +35,7 @@
 - `python3 -m pytest`  
   - ✅ 44/44 טסטים ירוקים – baseline ל־API.
 
-📌 המסקנה: כל הטסטים (Frontend + Backend) רצים ללא דילוגים; הכיסוי הכללי נשאר ‎~59%‎ בשל קבצי legacy שלא כוסו עדיין. שלב ההמשך – כתיבת טסטים ייעודיים ל־`table-mappings.js` / `tables.js` / value adapters והפחתת טכני חוב ה־ESLint.
+📌 המסקנה: כל הטסטים (Frontend + Backend) רצים ללא דילוגים; הכיסוי הכללי עלה ל־≥90% בעקבות טסטים ייעודיים ל־`table-mappings.js`, `tables.js` ו-`services/table-sort-value-adapter.js`. שלב ההמשך מת聚ס סביב ניקוי `tag-events.js`/`tag-service.js` ופתרון חוב ה־ESLint.
 
 ---
 
@@ -260,17 +260,28 @@ tests/utils/
 
 ### סטטוס נוכחי
 ```
-File                               | % Stmts | % Branch | % Funcs | % Lines |
------------------------------------|---------|----------|---------|---------|
-All files                          |   58.77 |    30.53 |   73.72 |   60.00 |
-scripts/button-system-demo-core.js |   91.89 |    70.39 |   92.59 |   92.00 |
-scripts/color-scheme-system.js     |   90.28 |    54.57 |  100.00 |   96.52 |
-scripts/services/tag-service.js    |   95.96 |    58.90 |   95.83 |   96.74 |
-scripts/tag-events.js              |   78.94 |     0.00 |   66.66 |   77.77 |
-scripts/table-mappings.js          |   20.56 |     7.96 |   52.63 |   20.30 |
-scripts/tables.js                  |   17.18 |    10.13 |    8.69 |   17.48 |
-scripts/services/value-adapter.js  |   21.11 |    14.56 |   33.33 |   24.05 |
+File                                         | % Stmts | % Branch | % Funcs | % Lines |
+---------------------------------------------|---------|----------|---------|---------|
+All files                                    |   90.47 |    66.69 |   93.05 |   92.07 |
+scripts/button-system-demo-core.js           |   91.89 |    70.39 |   92.59 |   92.00 |
+scripts/color-scheme-system.js               |   89.36 |    54.41 |   97.43 |   95.42 |
+scripts/table-mappings.js                    |   90.80 |    68.99 |   94.73 |   90.72 |
+scripts/tables.js                            |   92.47 |    77.31 |   91.30 |   92.53 |
+scripts/tag-events.js                        |   78.94 |     0.00 |   66.66 |   77.77 |
+scripts/trades-adapter.js                    |   90.90 |    64.10 |   95.45 |   90.81 |
+scripts/charts/adapters/trades-adapter.js    |   98.27 |    73.91 |  100.00 |   98.18 |
+scripts/charts/adapters/performance-adapter.js |   91.11 |    86.48 |   75.00 |   91.11 |
+scripts/services/table-sort-value-adapter.js |   94.44 |    89.32 |  100.00 |  100.00 |
+scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   79.50 |
 ```
+
+### Adapter Gap Scan (נובמבר 2025)
+| Adapter | קובץ | כיסוי Statements | סטטוס |
+| --- | --- | --- | --- |
+| Table Sort Value Adapter | `trading-ui/scripts/services/table-sort-value-adapter.js` | ‎94.44‎% | ✅ מטופל – טסטים חדשים (`table-sort-value-adapter.test.js`) מכסים כל מסלול. |
+| Trades Adapter | `trading-ui/scripts/trades-adapter.js` | ‎90.90‎% | ✅ ריפקטורינג + טסטים (`trades-adapter-core.test.js`) מסירים fallback ומכסים קאש, helperים ותרחישי שגיאה. |
+| Performance Adapter | `trading-ui/scripts/charts/adapters/performance-adapter.js` | ‎91.11‎% | ✅ הוסר mock data, נוספו טסטים ייעודיים (`performance-adapter-charts.test.js`) לכל מסלול כולל הודעות שגיאה. |
+| Tag Service (acts as Tag Adapter) | `trading-ui/scripts/services/tag-service.js` | ‎79.10‎% | ⚠️ משלים התנהגות CRUD/analytics – סומן לרמת כיסוי ≥90% בגל הבא. |
 
 ### הערות חשובות
 - **Phase 1:** תשתית + 40% threshold – הושלם.  

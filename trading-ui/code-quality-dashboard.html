@@ -81,13 +81,13 @@
             </div>
             <div class="section-body">
               <!-- סיכום סטטיסטיקות מהיר -->
-              <div class="info-summary" id="overviewStats">
-                <div>פונקציות סה"כ: <strong id="totalFunctions">0</strong></div>
-                <div>Error Handling: <strong id="errorHandlingCoverage">0%</strong></div>
-                <div>JSDoc Coverage: <strong id="jsdocCoverage">0%</strong></div>
-                <div>Naming Compliance: <strong id="namingCompliance">0%</strong></div>
-                <div>כפילויות: <strong id="duplicatesTotal">0</strong></div>
-                <div>עדכון אחרון: <strong id="lastUpdateTime">-</strong></div>
+              <div class="info-summary" id="overview-stats">
+                <div>פונקציות סה"כ: <strong id="total-functions">0</strong></div>
+                <div>Error Handling: <strong id="error-handling-coverage">0%</strong></div>
+                <div>JSDoc Coverage: <strong id="jsdoc-coverage">0%</strong></div>
+                <div>Naming Compliance: <strong id="naming-compliance">0%</strong></div>
+                <div>כפילויות: <strong id="duplicates-total">0</strong></div>
+                <div>עדכון אחרון: <strong id="last-update-time">-</strong></div>
               </div>
 
               <!-- כרטיסי סטטוס כללי -->
@@ -97,7 +97,7 @@
                     <div class="card text-center">
                       <div class="card-body">
                         <h5 class="card-title text-primary">Error Handling</h5>
-                        <h6 class="text-primary" id="errorHandlingStatus">בדיקה...</h6>
+                        <h6 class="text-primary" id="error-handling-status">בדיקה...</h6>
                       </div>
                     </div>
                   </div>
@@ -105,7 +105,7 @@
                     <div class="card text-center">
                       <div class="card-body">
                         <h5 class="card-title text-info">JSDoc Coverage</h5>
-                        <h6 class="text-info" id="jsdocStatus">בדיקה...</h6>
+                        <h6 class="text-info" id="jsdoc-status">בדיקה...</h6>
                       </div>
                     </div>
                   </div>
@@ -113,7 +113,7 @@
                     <div class="card text-center">
                       <div class="card-body">
                         <h5 class="card-title text-secondary">Naming Conventions</h5>
-                        <h6 class="text-secondary" id="namingStatus">בדיקה...</h6>
+                        <h6 class="text-secondary" id="naming-status">בדיקה...</h6>
                       </div>
                     </div>
                   </div>
@@ -121,7 +121,7 @@
                     <div class="card text-center">
                       <div class="card-body">
                         <h5 class="card-title text-dark">Function Index</h5>
-                        <h6 class="text-dark" id="functionIndexStatus">בדיקה...</h6>
+                        <h6 class="text-dark" id="function-index-status">בדיקה...</h6>
                       </div>
                     </div>
                   </div>
@@ -164,7 +164,7 @@
                       </h5>
                     </div>
                     <div class="card-body">
-                      <div id="errorHandlingResults">
+                      <div id="error-handling-results">
                         <div class="text-center text-muted"> לחץ על "בדוק" כדי להריץ בדיקת Error Handling </div>
                       </div>
                     </div>
@@ -184,14 +184,14 @@
                       </p>
                       <div class="mt-3">
                         <h6 class="text-muted mb-2">סטטיסטיקות</h6>
-                        <div id="errorHandlingStats">
+                        <div id="error-handling-stats">
                           <div class="stat-item">
                             <span class="stat-label">פונקציות עם כיסוי:</span>
-                            <span class="stat-value" id="errorHandlingWithCoverage">0</span>
+                            <span class="stat-value" id="error-handling-with-coverage">0</span>
                           </div>
                           <div class="stat-item">
                             <span class="stat-label">פונקציות ללא כיסוי:</span>
-                            <span class="stat-value" id="errorHandlingWithoutCoverage">0</span>
+                            <span class="stat-value" id="error-handling-without-coverage">0</span>
                           </div>
                         </div>
                       </div>
@@ -230,7 +230,7 @@
                       </h5>
                     </div>
                     <div class="card-body">
-                      <div id="jsdocResults">
+                      <div id="jsdoc-results">
                         <div class="text-center text-muted"> לחץ על "בדוק" כדי להריץ בדיקת JSDoc </div>
                       </div>
                     </div>
@@ -248,14 +248,14 @@
                       <p class="card-text small"> בדיקה זו מזהה פונקציות ללא תיעוד JSDoc. המטרה: 100% כיסוי. </p>
                       <div class="mt-3">
                         <h6 class="text-muted mb-2">סטטיסטיקות</h6>
-                        <div id="jsdocStats">
+                        <div id="jsdoc-stats">
                           <div class="stat-item">
                             <span class="stat-label">פונקציות עם JSDoc:</span>
-                            <span class="stat-value" id="jsdocWithDocs">0</span>
+                            <span class="stat-value" id="jsdoc-with-docs">0</span>
                           </div>
                           <div class="stat-item">
                             <span class="stat-label">פונקציות ללא JSDoc:</span>
-                            <span class="stat-value" id="jsdocWithoutDocs">0</span>
+                            <span class="stat-value" id="jsdoc-without-docs">0</span>
                           </div>
                         </div>
                       </div>
@@ -299,7 +299,7 @@
                       </h5>
                     </div>
                     <div class="card-body">
-                      <div id="namingResults">
+                      <div id="naming-results">
                         <div class="text-center text-muted"> לחץ על "בדוק" כדי להריץ בדיקת Naming Conventions </div>
                       </div>
                     </div>
@@ -319,14 +319,14 @@
                       </p>
                       <div class="mt-3">
                         <h6 class="text-muted mb-2">סטטיסטיקות</h6>
-                        <div id="namingStats">
+                        <div id="naming-stats">
                           <div class="stat-item">
                             <span class="stat-label">עמידה בקונבנציות:</span>
-                            <span class="stat-value" id="namingCompliant">0</span>
+                            <span class="stat-value" id="naming-compliant">0</span>
                           </div>
                           <div class="stat-item">
                             <span class="stat-label">הפרות:</span>
-                            <span class="stat-value" id="namingViolations">0</span>
+                            <span class="stat-value" id="naming-violations">0</span>
                           </div>
                         </div>
                       </div>
@@ -366,14 +366,14 @@
                 </button>
               </div>
             </div>
-            <div class="section-body" id="duplicateSectionBody">
-              <div class="info-summary" id="duplicateSummary">
-                <div>סה"כ כפילויות: <strong id="duplicateTotalCount">0</strong></div>
-                <div>מדויקות: <strong id="duplicateExactCount">0</strong></div>
-                <div>קרובות: <strong id="duplicateNearCount">0</strong></div>
-                <div>דפוסים דומים: <strong id="duplicateSimilarCount">0</strong></div>
-                <div>פוטנציאליות: <strong id="duplicatePotentialCount">0</strong></div>
-                <div>קטגוריות ייחודיות: <strong id="duplicateCategoryCount">0</strong></div>
+            <div class="section-body" id="duplicate-section-body">
+              <div class="info-summary" id="duplicate-summary">
+                <div>סה"כ כפילויות: <strong id="duplicate-total-count">0</strong></div>
+                <div>מדויקות: <strong id="duplicate-exact-count">0</strong></div>
+                <div>קרובות: <strong id="duplicate-near-count">0</strong></div>
+                <div>דפוסים דומים: <strong id="duplicate-similar-count">0</strong></div>
+                <div>פוטנציאליות: <strong id="duplicate-potential-count">0</strong></div>
+                <div>קטגוריות ייחודיות: <strong id="duplicate-category-count">0</strong></div>
               </div>
 
               <div class="card mt-3">
@@ -383,8 +383,8 @@
                 <div class="card-body">
                   <div class="row g-3">
                     <div class="col-md-4">
-                      <label class="form-label" for="duplicateTypeFilter">סוג כפילות</label>
-                      <select class="form-select" id="duplicateTypeFilter">
+                      <label class="form-label" for="duplicate-type-filter">סוג כפילות</label>
+                      <select class="form-select" id="duplicate-type-filter">
                         <option value="all">הכל</option>
                         <option value="exact">מדויקות</option>
                         <option value="near">קרובות</option>
@@ -393,24 +393,24 @@
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label class="form-label" for="duplicateCategoryFilter">קטגוריה</label>
-                      <select class="form-select" id="duplicateCategoryFilter">
+                      <label class="form-label" for="duplicate-category-filter">קטגוריה</label>
+                      <select class="form-select" id="duplicate-category-filter">
                         <option value="all">הכל</option>
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label class="form-label" for="duplicateSimilarityRange">רמת דמיון מינימלית</label>
+                      <label class="form-label" for="duplicate-similarity-range">רמת דמיון מינימלית</label>
                       <input
                         type="range"
                         class="form-range"
-                        id="duplicateSimilarityRange"
+                        id="duplicate-similarity-range"
                         min="0"
                         max="100"
                         step="5"
                         value="70"
                       />
                       <div class="text-center text-muted small"
-                        >דמיון נוכחי: <span id="duplicateSimilarityValue">70%</span></div
+                        >דמיון נוכחי: <span id="duplicate-similarity-value">70%</span></div
                       >
                     </div>
                   </div>
@@ -422,7 +422,7 @@
                   <h5 class="card-title mb-0">כפילויות שנמצאו</h5>
                 </div>
                 <div class="card-body">
-                  <div class="table-responsive" id="duplicateResults">
+                  <div class="table-responsive" id="duplicate-results">
                     <table class="table table-sm align-middle">
                       <thead>
                         <tr>
@@ -434,14 +434,14 @@
                           <th>קטגוריה</th>
                         </tr>
                       </thead>
-                      <tbody id="duplicateTableBody">
+                      <tbody id="duplicate-table-body">
                         <tr>
                           <td colspan="6" class="text-center text-muted">אין נתונים זמינים</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
-                  <div class="mt-3" id="duplicateDetailsPanel">
+                  <div class="mt-3" id="duplicate-details-panel">
                     <div class="text-center text-muted">בחר רשומה כדי לראות פרטים מלאים</div>
                   </div>
                 </div>
@@ -489,7 +489,7 @@
                       </h5>
                     </div>
                     <div class="card-body">
-                      <div id="functionIndexResults">
+                      <div id="function-index-results">
                         <div class="text-center text-muted"> לחץ על "בדוק" כדי לבדוק את סטטוס Function Index </div>
                       </div>
                     </div>
@@ -508,19 +508,20 @@
                         בדיקה זו מאמתת שכל הקבצים מכילים Function Index מעודכן. ניתן לייצר אינדקס אוטומטית לכל הקבצים.
                       </p>
                       <div class="alert alert-warning p-2 small" role="alert">
-                        <strong>הערת Timespan:</strong> נכון להיום אנו שומרים היסטוריית Function Index ל־30 הימים האחרונים בלבד. בעתיד שנרצה להרחיב את
-                        ה-timespan יש לוודא שגם צד השרת ו־API הדוחות מתעדכנים בהתאם כדי שלא נאבד ריצות ישנות.
+                        <strong>הערת Timespan:</strong> נכון להיום אנו שומרים היסטוריית Function Index ל־30 הימים
+                        האחרונים בלבד. בעתיד שנרצה להרחיב את ה-timespan יש לוודא שגם צד השרת ו־API הדוחות מתעדכנים בהתאם
+                        כדי שלא נאבד ריצות ישנות.
                       </div>
                       <div class="mt-3">
                         <h6 class="text-muted mb-2">סטטיסטיקות</h6>
-                        <div id="functionIndexStats">
+                        <div id="function-index-stats">
                           <div class="stat-item">
                             <span class="stat-label">קבצים עם אינדקס:</span>
-                            <span class="stat-value" id="filesWithIndex">0</span>
+                            <span class="stat-value" id="files-with-index">0</span>
                           </div>
                           <div class="stat-item">
                             <span class="stat-label">קבצים ללא אינדקס:</span>
-                            <span class="stat-value" id="filesWithoutIndex">0</span>
+                            <span class="stat-value" id="files-without-index">0</span>
                           </div>
                         </div>
                       </div>
@@ -547,18 +548,10 @@
                 <button id="lint-copy-log-button" class="btn btn-sm btn-outline-secondary" type="button">
                   <i class="fas fa-clipboard-list"></i> העתק לוג מפורט
                 </button>
-                <button
-                  id="lint-copy-report-button"
-                  class="btn btn-sm btn-outline-secondary"
-                  type="button"
-                >
+                <button id="lint-copy-report-button" class="btn btn-sm btn-outline-secondary" type="button">
                   <i class="fas fa-copy"></i> העתק דוח JSON
                 </button>
-                <button
-                  id="lint-download-header-button"
-                  class="btn btn-sm btn-outline-secondary"
-                  type="button"
-                >
+                <button id="lint-download-header-button" class="btn btn-sm btn-outline-secondary" type="button">
                   <i class="fas fa-file-download"></i> הורד דוח
                 </button>
                 <button id="lint-refresh-button" class="btn btn-sm btn-primary" type="button">
@@ -782,41 +775,59 @@
     <!-- Critical: YES | Version: 2.0.0 -->
 
     <!-- [1] Load Order: 1 -->
-    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <script src="scripts/api-config.js?v=1.0.0"></script>
+    <!-- הגדרות API מרכזיות -->
     <!-- [2] Load Order: 2 -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script>
+    <!-- ניהול favicon -->
     <!-- [3] Load Order: 3 -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script>
+    <!-- מערכת התראות -->
     <!-- [4] Load Order: 4 -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
+    <!-- מנהל סנכרון מטמון -->
     <!-- [5] Load Order: 5 -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script>
+    <!-- כלי עזר UI -->
     <!-- [6] Load Order: 6 -->
-    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script>
+    <!-- מערכת אזהרות -->
     <!-- [7] Load Order: 7 -->
-    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- מערכת טיפול בשגיאות -->
     <!-- [8] Load Order: 8 -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script>
+    <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
+    <!-- TTL guard for entity loaders -->
     <!-- [11] Load Order: 11 -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    <!-- שירות לוגים מתקדם -->
     <!-- [12] Load Order: 12 -->
-    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <script src="scripts/header-system.js?v=1.0.0"></script>
+    <!-- מערכת כותרת -->
     <!-- [13] Load Order: 13 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script>
+    <!-- כלי עזר עמוד -->
     <!-- [14] Load Order: 14 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script>
+    <!-- תרגומים -->
     <!-- [15] Load Order: 15 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script>
+    <!-- מערכת איקונים וכפתורים -->
     <!-- [16] Load Order: 16 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script>
+    <!-- מערכת ניהול אירועים מרכזית -->
     <!-- [17] Load Order: 17 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script>
+    <!-- מערכת כפתורים -->
     <!-- [18] Load Order: 18 -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <!-- מערכת צבעים דינמית -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/6: SERVICES PACKAGE ===== -->
@@ -826,31 +837,44 @@
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [19] Load Order: 19 -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <!-- שירות איסוף נתונים -->
     <!-- [20] Load Order: 20 -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <!-- שירות רנדור שדות -->
     <!-- [21] Load Order: 21 -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
+    <!-- שירות מילוי select boxes -->
     <!-- [22] Load Order: 22 -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
+    <!-- מחשבון סטטיסטיקות -->
     <!-- [23] Load Order: 23 -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
+    <!-- שירות ברירות מחדל -->
     <!-- [24] Load Order: 24 -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
+    <!-- מטפל בתגובות CRUD -->
     <!-- [25] Load Order: 25 -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script>
+    <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [26] Load Order: 26 -->
-    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script>
+    <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
     <!-- [27] Load Order: 27 -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script>
+    <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
     <!-- [28] Load Order: 28 -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script>
+    <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
     <!-- [29] Load Order: 29 -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <!-- Quill.js - Rich Text Editor Library -->
     <!-- [30] Load Order: 30 -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <!-- DOMPurify - HTML Sanitizer -->
     <!-- [31] Load Order: 31 -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script>
+    <!-- שירות עורך טקסט עשיר -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/6: UI ADVANCED PACKAGE ===== -->
@@ -860,15 +884,20 @@
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [32] Load Order: 32 -->
-    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script>
+    <!-- מיפוי טבלאות -->
     <!-- [33] Load Order: 33 -->
-    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
+    <script src="scripts/tables.js?v=1.0.0"></script>
+    <!-- מערכת טבלאות -->
     <!-- [34] Load Order: 34 -->
-    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- רישום נתוני טבלאות -->
+    <script src="scripts/table-data-registry.js?v=1.0.0"></script>
+    <!-- רישום נתוני טבלאות -->
     <!-- [35] Load Order: 35 -->
-    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script>
+    <!-- מערכת עימוד -->
     <!-- [36] Load Order: 36 -->
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script>
+    <!-- מערכת תפריט פעולות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/6: CRUD OPERATIONS PACKAGE ===== -->
@@ -878,11 +907,14 @@
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [37] Load Order: 37 -->
-    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script>
+    <!-- כלי עזר תאריכים -->
     <!-- [38] Load Order: 38 -->
-    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script>
+    <!-- כלי עזר נתונים כלליים -->
     <!-- [39] Load Order: 39 -->
-    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script>
+    <!-- מערכת טבלאות מרכזית מאוחדת -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/6: PREFERENCES PACKAGE ===== -->
@@ -892,19 +924,26 @@
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [40] Load Order: 40 -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script>
+    <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [41] Load Order: 41 -->
-    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script>
+    <!-- מערכת צבעים (60+ העדפות) -->
     <!-- [42] Load Order: 42 -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script>
+    <!-- ניהול פרופילים -->
     <!-- [43] Load Order: 43 -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script>
+    <!-- lazy loading system -->
     <!-- [44] Load Order: 44 -->
-    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script>
+    <!-- validation system -->
     <!-- [45] Load Order: 45 -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script>
+    <!-- ממשק משתמש -->
     <!-- [46] Load Order: 46 -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script>
+    <!-- מנהל קבוצות העדפות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/6: INITIALIZATION PACKAGE ===== -->
@@ -914,32 +953,37 @@
     <!-- Critical: NO | Version: 2.0.0 -->
 
     <!-- [47] Load Order: 47 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <!-- מנפסט חבילות -->
     <!-- [48] Load Order: 48 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <!-- הגדרות אתחול עמודים -->
     <!-- [49] Load Order: 49 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script>
+    <!-- בדיקת מערכת איתחול -->
     <!-- [50] Load Order: 50 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
+    <!-- פונקציות ניטור עמודים -->
     <!-- [51] Load Order: 51 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- מאתחל אפליקציה מאוחד -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [52] Shared Module: Lint Monitor Controller -->
-    <script src="scripts/linter-realtime-monitor.js?v=1.0.0"></script> <!-- מודול ניטור לינטר -->
+    <script src="scripts/linter-realtime-monitor.js?v=1.0.0"></script>
+    <!-- מודול ניטור לינטר -->
 
     <!-- [52] Page-specific: code-quality-dashboard -->
-    <script src="scripts/code-quality-dashboard.js?v=1.0.0"></script> <!-- Page-specific script for code-quality-dashboard -->
+    <script src="scripts/code-quality-dashboard.js?v=1.0.0"></script>
+    <!-- Page-specific script for code-quality-dashboard -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
     <!-- 📊 Total Scripts Processed: 52 | Unique Scripts Loaded: 52 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("code-quality-dashboard") -->
-
-
   </body>
 </html>

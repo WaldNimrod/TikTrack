@@ -24,6 +24,7 @@ window.accountActivityState = {
   selectedAccountId: null,
   activityData: null,
   isLoading: false,
+  lastExecutionNoticeAccountId: null,
 };
 
 /**
@@ -248,14 +249,16 @@ async function loadAccountActivity(accountId) {
           execs.slice(0, 3).forEach(ex => {
             window.Logger.info(`    ✅ Execution ${ex.id}: ${ex.ticker_symbol || 'No ticker'}, action=${ex.sub_type || ex.action || ex.subtype || 'unknown'}, amount=${ex.amount}`, { page: 'trading_accounts' });
           });
-        } else {
-          window.Logger.warn(`    ⚠️ No executions found for currency ${currency.currency_symbol}`, { page: 'trading_accounts' });
+        } else if ((currency.movements?.length || 0) > 0) {
+          window.Logger.info(`    ℹ️ No executions returned for currency ${currency.currency_symbol}`, { page: 'trading_accounts' });
         }
       });
 
       if (executionCount === 0 && totalMovements > 0) {
-        window.Logger.error(`❌ PROBLEM: Received ${totalMovements} movements but 0 executions! All movements are cash flows.`, { page: 'trading_accounts' });
-        window.Logger.error('   This means executions are not being returned from the backend API.', { page: 'trading_accounts' });
+        if (window.accountActivityState.lastExecutionNoticeAccountId !== accountId) {
+          window.Logger.info('ℹ️ Account activity response did not include executions; displaying cash flows only', { page: 'trading_accounts' });
+          window.accountActivityState.lastExecutionNoticeAccountId = accountId;
+        }
       }
 
       // Cache the data

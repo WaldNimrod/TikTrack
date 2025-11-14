@@ -473,8 +473,15 @@ class IBKRConnector(BaseConnector):
             if not field or value is None:
                 return
             lowered = field.lower()
-            if lowered in {'account id', 'accountid'}:
-                accumulator['account_id'] = value
+            if lowered in {
+                'account id',
+                'accountid',
+                'account number',
+                'account #',
+                'account',
+                'account no.'
+            }:
+                accumulator['account_id'] = str(value).strip()
             elif lowered in {'base currency', 'basecurrency'}:
                 accumulator['base_currency'] = value
             elif lowered in {'margin type', 'account type'}:

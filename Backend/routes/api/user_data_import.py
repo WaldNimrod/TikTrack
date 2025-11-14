@@ -109,9 +109,17 @@ def upload_and_preview():
         
         # Analyze the file
         analysis_data_raw = orchestrator.analyze_file(session_id, task_type)
+        if not analysis_data_raw.get('success'):
+            status_code = 400 if analysis_data_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+            analysis_data_raw.setdefault('session_id', session_id)
+            return jsonify(analysis_data_raw), status_code
         
         # Generate preview
         preview_data_raw = orchestrator.generate_preview(session_id, task_type)
+        if not preview_data_raw.get('success'):
+            status_code = 400 if preview_data_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+            preview_data_raw.setdefault('session_id', session_id)
+            return jsonify(preview_data_raw), status_code
 
         normalizer = _get_date_normalizer()
         analysis_data = normalizer.normalize_output(analysis_data_raw)
@@ -236,12 +244,16 @@ def upload_file():
             analysis_result_raw = orchestrator.analyze_file(result['session_id'], task_type)
             logger.info(f"📊 Analysis result: {analysis_result_raw}")
             
-            if not analysis_result_raw['success']:
-                logger.error(f"❌ File analysis failed: {analysis_result_raw['error']}")
-                return jsonify({
-                    'success': False,
-                    'error': analysis_result_raw['error']
-                }), 500
+            if not analysis_result_raw.get('success'):
+                logger.warning(
+                    "⚠️ File analysis did not complete",
+                    extra={'session_id': result['session_id'], 'details': analysis_result_raw}
+                )
+                error_payload = dict(analysis_result_raw)
+                error_payload['success'] = False
+                error_payload.setdefault('session_id', result['session_id'])
+                status_code = 400 if error_payload.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+                return jsonify(error_payload), status_code
             
             logger.info("✅ File analysis completed successfully")
             
@@ -284,11 +296,9 @@ def analyze_session(session_id: int):
             orchestrator = ImportOrchestrator(db_session)
             result_raw = orchestrator.analyze_file(session_id, task_type)
             
-            if not result_raw['success']:
-                return jsonify({
-                    'status': 'error',
-                    'message': result_raw['error']
-                }), 400
+            if not result_raw.get('success'):
+                status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+                return jsonify(result_raw), status_code
 
             normalizer = _get_date_normalizer()
             result = normalizer.normalize_output(result_raw)
@@ -369,6 +379,33 @@ def get_session(session_id: int):
             'message': f'Failed to get session: {str(e)}'
         }), 500
 
+
+@user_data_import_bp.route('/session/<int:session_id>/link-account', methods=['POST'])
+def link_trading_account(session_id: int):
+    """
+    Link the selected trading account to the broker account number detected in the uploaded file.
+    The request body may include an optional `account_number` to override the detected value,
+    but the server will still validate that a number exists.
+    """
+    payload = request.get_json(silent=True) or {}
+    override_account_number = payload.get('account_number')
+
+    try:
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            result = orchestrator.link_trading_account_to_file(session_id, override_account_number)
+            status_code = 200 if result.get('success') else 400
+            return jsonify(result), status_code
+        finally:
+            db_session.close()
+    except Exception as exc:
+        logger.error("Failed to link trading account: %s", exc, exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': f'Failed to link account: {exc}'
+        }), 500
+
 @user_data_import_bp.route('/sessions/active', methods=['GET'])
 def get_active_import_session():
     """
@@ -435,11 +472,9 @@ def get_preview(session_id: int):
             orchestrator = ImportOrchestrator(db_session)
             result_raw = orchestrator.generate_preview(session_id, task_type)
             
-            if not result_raw['success']:
-                return jsonify({
-                    'status': 'error',
-                    'message': result_raw['error']
-                }), 400
+            if not result_raw.get('success'):
+                status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+                return jsonify(result_raw), status_code
 
             normalizer = _get_date_normalizer()
             result = normalizer.normalize_output(result_raw)
@@ -662,11 +697,11 @@ def refresh_preview(session_id):
             orchestrator = ImportOrchestrator(db_session)
 
             snapshot = orchestrator.get_preview_snapshot(session_id)
-            if not snapshot['success']:
+            if not snapshot or not snapshot.get('success'):
                 # Fallback: regenerate preview if snapshot unavailable
                 snapshot = orchestrator.generate_preview(session_id)
 
-            if snapshot['success']:
+            if snapshot and snapshot.get('success'):
                 normalizer = _get_date_normalizer()
                 normalized_preview = normalizer.normalize_output({
                     'preview_data': snapshot['preview_data']
@@ -676,10 +711,11 @@ def refresh_preview(session_id):
                     'preview_data': normalized_preview['preview_data']
                 })
 
-            return jsonify({
+            status_code = 400 if snapshot and snapshot.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+            return jsonify(snapshot or {
                 'success': False,
-                'error': snapshot.get('error', 'Failed to refresh preview')
-            }), 400
+                'error': 'Failed to refresh preview'
+            }), status_code
                 
         finally:
             db_session.close()
@@ -774,11 +810,9 @@ def execute_import(session_id: int):
             orchestrator = ImportOrchestrator(db_session)
             result_raw = orchestrator.execute_import(session_id, task_type)
             
-            if not result_raw['success']:
-                return jsonify({
-                    'status': 'error',
-                    'message': result_raw['error']
-                }), 400
+            if not result_raw.get('success'):
+                status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 400
+                return jsonify(result_raw), status_code
 
             normalizer = _get_date_normalizer()
             result = normalizer.normalize_output(result_raw)

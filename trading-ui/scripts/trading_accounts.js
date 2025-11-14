@@ -105,7 +105,8 @@ window.loadTradingAccountsDataForTradingAccountsPage = window.loadTradingAccount
 };
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
-window.loadTradingAccountsDataForTradingAccountsPage = async function() {
+window.loadTradingAccountsDataForTradingAccountsPage = async function(passedOptions) {
+  const options = passedOptions || {};
   console.log('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀');
   window.Logger.info('🚀🚀🚀 loadTradingAccountsDataForTradingAccountsPage התחיל 🚀🚀🚀', { page: "trading_accounts" });
   window.Logger.info('🔍 בדיקת זמינות פונקציות:', { page: "trading_accounts" });
@@ -2496,6 +2497,10 @@ window.showOpenTradesWarning = showOpenTradesWarning;
  */
 async function restorePageState(pageName) {
   try {
+    if (typeof window.ensurePageStateManagerReady === 'function') {
+      await window.ensurePageStateManagerReady();
+    }
+
     // אתחול PageStateManager אם לא מאותחל
     if (window.PageStateManager && !window.PageStateManager.initialized) {
       await window.PageStateManager.initialize();

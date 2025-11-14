@@ -21,6 +21,7 @@ import re
 from collections import Counter
 from html import escape
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from models.import_session import ImportSession
 from models.trading_account import TradingAccount
@@ -394,6 +395,208 @@ class ImportOrchestrator:
             'validation_result': validation_result,
             'duplicate_result': duplicate_result,
             'symbol_metadata': symbol_metadata
+        }
+
+    # ------------------------------------------------------------------
+    # Account linking helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _normalize_account_identifier(value: Optional[Any]) -> Optional[str]:
+        if value is None:
+            return None
+        normalized = str(value).strip().upper()
+        return normalized or None
+
+    def _resolve_file_account_metadata(
+        self,
+        session: ImportSession,
+        connector,
+        file_content: str
+    ) -> Dict[str, Any]:
+        cached_metadata = session.get_summary_data('account_metadata')
+        if cached_metadata:
+            return cached_metadata
+
+        metadata: Dict[str, Any] = {}
+        try:
+            if hasattr(connector, 'extract_account_metadata'):
+                metadata = connector.extract_account_metadata(file_content) or {}
+            elif hasattr(connector, 'parse_sections'):
+                sections = connector.parse_sections(file_content) or {}
+                metadata = sections.get('account_reconciliation') or {}
+        except Exception as exc:
+            logger.warning(
+                "⚠️ Failed to resolve account metadata from file: %s",
+                exc,
+                exc_info=True
+            )
+            metadata = {}
+
+        if metadata:
+            safe_metadata = self._make_payload_json_safe(metadata)
+            session.add_summary_data({'account_metadata': safe_metadata})
+            self.db_session.flush()
+
+        return metadata
+
+    def _build_account_link_error(
+        self,
+        session: ImportSession,
+        status: str,
+        message: str,
+        file_account_number: Optional[str],
+        current_account_number: Optional[str]
+    ) -> Dict[str, Any]:
+        return {
+            'success': False,
+            'error': message,
+            'error_code': 'ACCOUNT_LINK_REQUIRED',
+            'session_id': session.id,
+            'linking': {
+                'status': status,
+                'session_id': session.id,
+                'trading_account_id': session.trading_account_id,
+                'file_account_number': file_account_number,
+                'current_account_number': current_account_number
+            }
+        }
+
+    def _enforce_account_link(
+        self,
+        session: ImportSession,
+        connector,
+        file_content: str
+    ) -> Optional[Dict[str, Any]]:
+        trading_account = self.db_session.query(TradingAccount).filter(
+            TradingAccount.id == session.trading_account_id
+        ).first()
+
+        if not trading_account:
+            return self._build_account_link_error(
+                session,
+                status='missing_account',
+                message='Trading account not found. Please refresh and select a valid account.',
+                file_account_number=None,
+                current_account_number=None
+            )
+
+        metadata = self._resolve_file_account_metadata(session, connector, file_content)
+        file_account_number = self._normalize_account_identifier(metadata.get('account_id'))
+
+        if file_account_number:
+            session.add_summary_data({'file_account_number': file_account_number})
+            self.db_session.flush()
+        else:
+            return self._build_account_link_error(
+                session,
+                status='missing_in_file',
+                message='Account number is missing in the uploaded file. Run the account check task or verify the report.',
+                file_account_number=None,
+                current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
+            )
+
+        existing_binding = self.db_session.query(TradingAccount).filter(
+            TradingAccount.external_account_number == file_account_number
+        ).first()
+        if existing_binding and existing_binding.id != session.trading_account_id:
+            return self._build_account_link_error(
+                session,
+                status='mismatch',
+                message=(
+                    f"This broker account number already belongs to trading account "
+                    f"'{existing_binding.name}'. Please switch to that account or unlink it before continuing."
+                ),
+                file_account_number=file_account_number,
+                current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
+            )
+
+        existing_number = self._normalize_account_identifier(trading_account.external_account_number)
+
+        if not existing_number:
+            return self._build_account_link_error(
+                session,
+                status='unlinked',
+                message='This trading account is not linked to a broker account yet. Please link it before continuing.',
+                file_account_number=file_account_number,
+                current_account_number=None
+            )
+
+        if existing_number != file_account_number:
+            return self._build_account_link_error(
+                session,
+                status='mismatch',
+                message='The broker account number in the file does not match the linked account. Please review and update the linkage.',
+                file_account_number=file_account_number,
+                current_account_number=existing_number
+            )
+
+        return None
+
+    def link_trading_account_to_file(
+        self,
+        session_id: int,
+        override_account_number: Optional[str] = None
+    ) -> Dict[str, Any]:
+        session = self.db_session.query(ImportSession).filter(
+            ImportSession.id == session_id
+        ).first()
+
+        if not session:
+            return {'success': False, 'error': 'Session not found'}
+
+        connector_type = session.get_summary_data('connector_type')
+        file_content = session.get_summary_data('file_content')
+        connector = self.connectors.get(connector_type)
+
+        if not connector or not file_content:
+            return {'success': False, 'error': 'Session is missing connector or content data'}
+
+        metadata = self._resolve_file_account_metadata(session, connector, file_content)
+        file_account_number = override_account_number or metadata.get('account_id')
+        normalized_number = self._normalize_account_identifier(file_account_number)
+
+        if not normalized_number:
+            return {'success': False, 'error': 'Unable to determine account number from file'}
+
+        trading_account = self.db_session.query(TradingAccount).filter(
+            TradingAccount.id == session.trading_account_id
+        ).first()
+
+        if not trading_account:
+            return {'success': False, 'error': 'Trading account not found'}
+
+        existing_binding = self.db_session.query(TradingAccount).filter(
+            TradingAccount.external_account_number == normalized_number,
+            TradingAccount.id != trading_account.id
+        ).first()
+        if existing_binding:
+            return {
+                'success': False,
+                'error': (
+                    f"Account number already linked to trading account '{existing_binding.name}' "
+                    f"(ID {existing_binding.id}). Please use that account or unlink it first."
+                )
+            }
+
+        trading_account.external_account_number = normalized_number
+
+        try:
+            self.db_session.commit()
+        except IntegrityError:
+            self.db_session.rollback()
+            return {
+                'success': False,
+                'error': 'Account number already linked to another trading account'
+            }
+
+        session.add_summary_data({'file_account_number': normalized_number})
+        self.db_session.flush()
+
+        return {
+            'success': True,
+            'linked_account_number': normalized_number,
+            'trading_account_id': trading_account.id
         }
 
     @staticmethod
@@ -1040,6 +1243,14 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Connector not found'}
             
             logger.info(f"✅ Connector found: {connector.get_provider_name()}")
+
+            account_link_error = self._enforce_account_link(session, connector, file_content)
+            if account_link_error:
+                logger.warning(
+                    "⚠️ Account linking required before analysis",
+                    extra={'session_id': session.id, 'linking': account_link_error.get('linking')}
+                )
+                return account_link_error
             
             pipeline_result = self._process_import_pipeline(
                 session=session,
@@ -1143,6 +1354,14 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Connector not found'}
             
             logger.info(f"✅ Connector {connector_type} found")
+
+            account_link_error = self._enforce_account_link(session, connector, file_content)
+            if account_link_error:
+                logger.warning(
+                    "⚠️ Account linking required before preview",
+                    extra={'session_id': session.id, 'linking': account_link_error.get('linking')}
+                )
+                return account_link_error
             
             pipeline_result = self._process_import_pipeline(
                 session=session,

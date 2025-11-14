@@ -1,5 +1,6 @@
 /** @jest-environment node */
-
+/* eslint-env jest */
+/* global describe, test, expect, jest */
 describe('TableSortValueAdapter', () => {
   const loadAdapter = () => {
     jest.resetModules();
@@ -134,5 +135,3 @@ describe('TableSortValueAdapter', () => {
     expect(Adapter.getSortValue({ value: timestamp, type: 'date' })).toBe(timestamp);
   });
 });
-
-

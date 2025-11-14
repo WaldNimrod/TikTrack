@@ -96,9 +96,9 @@ class LintStatusService {
       const payload = await response.json();
       if (!response.ok) {
         if (response.status === 404 || response.status === 405) {
-          throw new Error(
-            'API להרצת דוח הלינטר אינו פעיל (404/405). יש להפעיל מחדש את השרת או לוודא שהעדכון האחרון נפרס.',
-          );
+          const apiUnavailableMessage =
+            'API להרצת דוח הלינטר אינו פעיל (404/405). יש להפעיל מחדש את השרת או לוודא שהעדכון האחרון נפרס.';
+          throw new Error(apiUnavailableMessage);
         }
         throw new Error(payload?.message || `HTTP ${response.status}`);
       }

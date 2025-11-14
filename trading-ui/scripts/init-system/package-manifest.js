@@ -178,46 +178,53 @@ const PACKAGE_MANIFEST = {
         loadOrder: 11
       },
       {
+        file: 'page-state-manager.js',
+        globalCheck: 'window.PageStateManager',
+        description: 'מנהל מצב עמודים מאוחד',
+        required: true,
+        loadOrder: 12
+      },
+      {
         file: 'page-utils.js',
         globalCheck: 'window.loadPageState',
         description: 'כלי עזר עמוד',
         required: true,
-        loadOrder: 12
+        loadOrder: 13
       },
       {
         file: 'translation-utils.js',
         globalCheck: 'window.translateStatus',
         description: 'תרגומים',
         required: true,
-        loadOrder: 13
+        loadOrder: 14
       },
       {
         file: 'button-icons.js',
         globalCheck: 'window.BUTTON_ICONS',
         description: 'מערכת איקונים וכפתורים',
         required: true,
-        loadOrder: 14
+        loadOrder: 15
       },
       {
         file: 'event-handler-manager.js',
         globalCheck: 'window.EventHandlerManager',
         description: 'מערכת ניהול אירועים מרכזית',
         required: true,
-        loadOrder: 15
+        loadOrder: 16
       },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
         required: true,
-        loadOrder: 16
+        loadOrder: 17
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
         required: true,
-        loadOrder: 17
+        loadOrder: 18
       }
     ],
     estimatedSize: '~280KB',

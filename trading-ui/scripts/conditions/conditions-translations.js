@@ -28,6 +28,7 @@ class ConditionsTranslations {
                 'moving_averages': 'ממוצעים נעים',
                 'volume_analysis': 'ניתוח נפח',
                 'support_resistance': 'תמיכה והתנגדות',
+                'support_and_resistance': 'תמיכה והתנגדות',
                 'trend_lines': 'קווי מגמה',
                 'technical_patterns': 'דפוסים טכניים',
                 'fibonacci': 'פיבונאצ\'י',

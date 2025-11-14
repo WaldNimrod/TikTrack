@@ -133,8 +133,26 @@ async function getAccountsByStatus(status) {
  * @returns {Promise<boolean>} Success status
  */
 async function cancelAccount(accountId) {
-  // ביטול חשבון מסחר
+  // ביטול חשבון מסחר – השתמש בתהליך המאוחד של trading_accounts
+  if (typeof window.cancelTradingAccountWithLinkedItemsCheck === 'function') {
+    await window.cancelTradingAccountWithLinkedItemsCheck(accountId);
+    return true;
+  }
 
+  if (
+    typeof window.checkLinkedItemsAndPerformAction === 'function' &&
+    typeof window.performTradingAccountCancellation === 'function'
+  ) {
+    await window.checkLinkedItemsAndPerformAction(
+      'account',
+      accountId,
+      'cancel',
+      window.performTradingAccountCancellation,
+    );
+    return true;
+  }
+
+  // Fallback legacy flow (should not be used anymore)
   const response = await fetch(`/api/accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -146,9 +164,7 @@ async function cancelAccount(accountId) {
     throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון מסחר');
   }
 
-  // ניקוי ה-cache
   clearCache();
-
   return true;
 }
 

@@ -61,6 +61,15 @@
 - כל נקודת קצה שמחזירה סשנים משתמשת ב-`_project_storage_payload` → `DateNormalizationService` כדי להחזיר `DateEnvelope`.
 - Frontend מסתמך על הפורמט הזה לצורך הצגות בלוח המוביל ובכרטיסי סטטוס.
 
+## Account Linking Prerequisite (Phase 1 – Nov 2025)
+- טבלת `trading_accounts` הורחבה עם העמודה `external_account_number` (טקסט ייחודי, Nullable). הערך הזה הוא המזהה הקנוני של החשבון אצל הברוקר.
+- בכל קריאה ל-`analyze_file`, `generate_preview` ו-`execute_import`, ה-`ImportOrchestrator` שולף את מספר החשבון מתוך קטעי `account_reconciliation` של הקובץ (IBKR: Account Information/Base Currency). אם המספר לא קיים או לא תואם ל-`external_account_number`, הפעולה נחסמת.
+- במצב חסימה מוחזר payload עם `error_code: ACCOUNT_LINK_REQUIRED` + אובייקט `linking` (סטטוס: `unlinked`/`mismatch`/`missing_in_file`, מספרים מהקובץ ומהמערכת, מזהה הסשן). הלקוח חייב לטפל בשגיאה לפני המשך התהליך.
+- Endpoint חדש: `POST /api/user-data-import/session/<id>/link-account` (body אופציונלי `account_number`). הקריאה מעדכנת את `trading_accounts.external_account_number` לערך שנמצא בקובץ ומאמתת שהערך אינו משויך לחשבון אחר.
+- לאחר שיוך מוצלח ה-UI מריץ מחדש את תהליך הניתוח כדי להישאר מסונכרן.
+- כל נקודות הקצה של הייבוא (upload/analyze/preview/execute/refresh-preview) עשויות להחזיר את אותה שגיאת ACCOUNT_LINK_REQUIRED, ולכן הקליינט חייב להאזין לערך `error_code` ולא רק לשדה `success`.
+- ממשק המשתמש מציב את תהליך "בדיקת שיוך חשבון" ראשון ברשימת התהליכים ופותח מודל ייעודי (`accountLinkingModal`) בכל פעם שנדרשת פעולה מצד המשתמש. הכפתור הראשי במודל משתמש ב-Button System ומזרים את הקריאה ל-Endpoint החדש.
+
 ## ממשק משתמש (עמוד `data_import.html`)
 - טוען את המערכת דרך סקריפט `trading-ui/scripts/import-user-data.js`:
   - משתמש ב-`CASHFLOW_TYPE_LABELS` כדי להציג את שמות הסוגים (אין להוסיף לייבל חדש בלי לעדכן כאן).
@@ -108,6 +117,12 @@
 - אסור לשמור תאריכים ללא timezone.
 - אסור לעקוף את Button/Modal/Notification systems.
 - אסור להכניס קוד לוגי לקובצי הדוקומנטציה (הם משקפים מצב קיים בלבד).
+
+## שלב 2 – הרחבת אובייקט חשבון (תכנון)
+- השדה `external_account_number` הוא הצעד הראשון במעבר לחיבור חשבונות דרך API. בשלב הבא נוסיף לטבלת `trading_accounts` עמודות עבור `margin_status`, `base_currency_code`, רשימות `entitlements` ו-`missing_documents` כדי לשמר את תוצאות תהליך ה-Account Reconciliation ללא תלות ב-session JSON.
+- נתוני ה-`summary_values` ו-`account_aliases` שעד כה נשמרו רק ב-`summary_data` יועברו לטבלת בת (או JSON column) שתזין את Dashboard החשבונות וה-Broker API sync.
+- אחרי הרחבת הסכמה נריץ sync דו-כיווני: Account Linking → Broker API (OAuth או session token) כדי למשוך נתונים חיים במקום קובצי CSV. המימוש הנוכחי כבר מכיל את ה-hook הדרוש (`link_trading_account_to_file`) כך שהחיבור יהיה backwards compatible.
+- מדריך זה יתעדכן מחדש כאשר העמודות החדשות יתווספו (שלב 2), כולל מדיניות מיגרציה, בדיקות רגרסיה ויישום Endpointים לחשיפת הסטטוס ל-UI ולקונסולת הפיתוח.
 
 ## הצעות להמשך
 - הוספת Task רשמי ל-`account_reconciliation` עם Persist מלא.

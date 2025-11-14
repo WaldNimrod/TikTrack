@@ -92,6 +92,85 @@
  * @refactoringPhase 6 - Modular Architecture
  */
 
+(function registerPageStateManagerLoader() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (typeof window.ensurePageStateManagerReady === 'function') {
+    return;
+  }
+
+  let pageStateManagerPromise = null;
+
+  function getAssetVersion() {
+    return (
+      window.__ASSET_VERSION__ ||
+      window.APP_VERSION_TOKEN ||
+      window.APP_BUILD_HASH ||
+      '1.0.0'
+    );
+  }
+
+  function buildScriptUrl() {
+    const version = getAssetVersion();
+    return `scripts/page-state-manager.js?v=${version}`;
+  }
+
+  function appendPageStateManagerScript(resolve, reject) {
+    const existingScript = document.querySelector('script[data-system="page-state-manager"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(window.PageStateManager));
+      existingScript.addEventListener('error', reject);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = buildScriptUrl();
+    script.async = true;
+    script.dataset.system = 'page-state-manager';
+    script.onload = () => {
+      window.Logger?.info?.('✅ PageStateManager script loaded on-demand', { page: 'page-utils' });
+      resolve(window.PageStateManager);
+    };
+    script.onerror = (event) => {
+      window.Logger?.error?.('❌ Failed to load PageStateManager script', event, { page: 'page-utils' });
+      reject(event);
+    };
+    document.head.appendChild(script);
+  }
+
+  window.ensurePageStateManagerReady = async function ensurePageStateManagerReady() {
+    if (window.PageStateManager) {
+      if (typeof window.PageStateManager.initialize === 'function' && !window.PageStateManager.initialized) {
+        await window.PageStateManager.initialize();
+      }
+      return window.PageStateManager;
+    }
+
+    if (!pageStateManagerPromise) {
+      pageStateManagerPromise = new Promise((resolve, reject) => {
+        try {
+          appendPageStateManagerScript(resolve, reject);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+
+    try {
+      await pageStateManagerPromise;
+      if (window.PageStateManager && typeof window.PageStateManager.initialize === 'function' && !window.PageStateManager.initialized) {
+        await window.PageStateManager.initialize();
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ ensurePageStateManagerReady failed', error, { page: 'page-utils' });
+    }
+
+    return window.PageStateManager || null;
+  };
+})();
+
 // ===== PAGE INITIALIZATION =====
 /**
  * Initialize page-specific filters
@@ -379,16 +458,22 @@ async function savePageState(pageName, state) {
  */
 async function loadPageState(pageName) {
   try {
+    const resolvedPageName = resolvePageName(pageName);
+    if (!resolvedPageName) {
+      window.Logger?.warn?.('loadPageState: missing page name, skipping', { page: 'page-utils' });
+      return null;
+    }
+
     // טעינה דרך PageStateManager אם זמין
     if (window.PageStateManager && window.PageStateManager.initialized) {
-      const state = await window.PageStateManager.loadPageState(pageName);
+      const state = await window.PageStateManager.loadPageState(resolvedPageName);
       if (state) {
         return state;
       }
     }
     
     // Fallback ל-localStorage רק אם PageStateManager לא זמין או אין מצב שמור
-    const key = `pageState_${pageName}`;
+    const key = `pageState_${resolvedPageName}`;
     const savedState = localStorage.getItem(key);
 
     if (savedState) {
@@ -419,19 +504,47 @@ async function loadPageState(pageName) {
  */
 async function clearPageState(pageName) {
   try {
+    const resolvedPageName = resolvePageName(pageName);
+    if (!resolvedPageName) {
+      window.Logger?.warn?.('clearPageState: missing page name, skipping', { page: 'page-utils' });
+      return;
+    }
+
     // מחיקה דרך PageStateManager אם זמין
     if (window.PageStateManager && window.PageStateManager.initialized) {
-      await window.PageStateManager.clearPageState(pageName);
+      await window.PageStateManager.clearPageState(resolvedPageName);
       return;
     }
     
     // Fallback ל-localStorage רק אם PageStateManager לא זמין
-    const key = `pageState_${pageName}`;
+    const key = `pageState_${resolvedPageName}`;
     localStorage.removeItem(key);
     // Page state cleared for page
   } catch {
     // Error clearing page state
   }
+}
+
+function resolvePageName(explicitPageName) {
+  if (explicitPageName && typeof explicitPageName === 'string') {
+    return explicitPageName;
+  }
+
+  if (typeof window?.getCurrentPageName === 'function') {
+    const current = window.getCurrentPageName();
+    if (current) {
+      return current;
+    }
+  }
+
+  if (typeof window?.location?.pathname === 'string') {
+    const path = window.location.pathname.replace(/^\//, '');
+    if (path) {
+      return path.replace('.html', '');
+    }
+  }
+
+  return null;
 }
 
 /**

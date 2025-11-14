@@ -259,6 +259,7 @@ class ConditionsUIManager {
             const success = await this.crudManager.deleteCondition(conditionId, this.entityId);
             if (success) {
                 await this.refreshConditions(true);
+                this.emitConditionsUpdated('delete', { conditionId });
             }
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to delete condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
@@ -314,6 +315,7 @@ class ConditionsUIManager {
             this.logEvent('create-success', { conditionId: savedCondition?.id });
             this.showNotification(this.translator.getMessage('condition_created') || 'תנאי נוצר בהצלחה', 'success');
             await this.refreshConditions(true);
+            this.emitConditionsUpdated('create', savedCondition);
             await this.handlePostSaveSuccess('create', savedCondition);
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to create condition', { error: error?.message, stack: error?.stack, entityId: this.entityId }, { page: 'conditions-ui-manager' });
@@ -334,6 +336,7 @@ class ConditionsUIManager {
             this.logEvent('update-success', { conditionId });
             this.showNotification(this.translator.getMessage('condition_updated') || 'תנאי עודכן בהצלחה', 'success');
             await this.refreshConditions(true);
+            this.emitConditionsUpdated('update', updatedCondition);
             await this.handlePostSaveSuccess('update', updatedCondition);
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to update condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
@@ -599,6 +602,20 @@ class ConditionsUIManager {
             ...details
         };
         window.Logger?.info?.('[ConditionsFlow] Event', payload, { page: 'conditions-ui-manager' });
+    }
+
+    emitConditionsUpdated(action, payload = {}) {
+        try {
+            const detail = {
+                action,
+                entityType: this.entityType,
+                tradePlanId: this.entityType === 'plan' ? this.entityId : null,
+                payload
+            };
+            window.dispatchEvent?.(new CustomEvent('tradePlanConditionsUpdated', { detail }));
+        } catch (error) {
+            window.Logger?.warn('[ConditionsUIManager] Failed to emit conditions update event', { error: error?.message }, { page: 'conditions-ui-manager' });
+        }
     }
 }
 

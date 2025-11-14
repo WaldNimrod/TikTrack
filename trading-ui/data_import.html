@@ -786,6 +786,65 @@
         </div>
     </div>
 
+    <!-- Account Linking Modal -->
+    <div class="modal" id="accountLinkingModal" tabindex="-1" role="dialog" aria-labelledby="accountLinkingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountLinkingModalLabel">
+                        <i class="bi bi-link-45deg"></i>
+                        שיוך חשבון למס' ברוקר
+                    </h5>
+                    <button
+                        data-button-type="CLOSE"
+                        data-variant="small"
+                        data-onclick="hideAccountLinkingModal()"
+                        data-text=""
+                        id="accountLinkingCloseBtn"
+                        title="סגירת חלון שיוך"
+                        aria-label="סגור חלון שיוך">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="summary-card info-card mb-3">
+                        <div class="summary-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <div class="summary-title">סטטוס שיוך</div>
+                                <div class="summary-subtitle" id="accountLinkingMessage">
+                                    חובה לשייך את חשבון המסחר למספר הברוקר שמופיע בקובץ לפני המשך הייבוא.
+                                </div>
+                            </div>
+                            <span class="badge bg-warning text-dark" id="accountLinkingStatusBadge" data-status="unlinked">חשבון לא משויך</span>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-details">
+                            <div class="detail-item">
+                                <span class="detail-label">מספר חשבון בקובץ:</span>
+                                <span class="detail-value" id="accountLinkingFileAccount">לא זמין</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">מספר חשבון במערכת:</span>
+                                <span class="detail-value" id="accountLinkingCurrentAccount">לא הוגדר</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <small class="text-muted">
+                        לאחר השיוך תבוצע בדיקת החשבון אוטומטית ותוכל להמשיך לייבוא.
+                    </small>
+                    <button
+                        data-button-type="PRIMARY"
+                        data-onclick="linkExternalAccountToTradingAccount()"
+                        data-text="שייך חשבון למערכת"
+                        id="accountLinkingActionBtn">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->

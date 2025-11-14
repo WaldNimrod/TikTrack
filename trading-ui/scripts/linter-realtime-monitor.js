@@ -59,6 +59,7 @@ class LintMonitorController {
 
     this.elements = {};
     this.tableRegistered = false;
+    this.lastFailureResult = null;
   }
 
   async init() {
@@ -220,7 +221,8 @@ class LintMonitorController {
     }
 
     try {
-      const sorted = await window.UnifiedTableSystem.sorter.applyDefaultSort(LINT_MONITOR_TABLE_TYPE);
+      const sorted =
+        await window.UnifiedTableSystem.sorter.applyDefaultSort(LINT_MONITOR_TABLE_TYPE);
       if (!sorted || sorted.length === 0) {
         this.renderIssuesTable(issues);
       }
@@ -468,27 +470,18 @@ class LintMonitorController {
 
     let displayText = 'מוכן להרצה';
 
-    switch (merged.status) {
-      case 'running':
-        displayText = 'מריץ דוח...';
-        break;
-      case 'success':
-        displayText = `הסתיים בהצלחה (${LintStatusService._formatTimestamp(merged.timestamp) || 'זמן לא זמין'})`;
-        break;
-      case 'failed':
-        displayText = `הסתיים עם כשלים (${LintStatusService._formatTimestamp(merged.timestamp) || 'זמן לא זמין'})`;
-        break;
-      case 'error':
-        displayText = `כשל בהרצה: ${merged.message || 'לא ידוע'}`;
-        break;
-      case 'empty':
-        displayText = 'טרם הופעלה הרצה.';
-        break;
-      default:
-        if (merged.timestamp) {
-          displayText = `עודכן: ${LintStatusService._formatTimestamp(merged.timestamp)}`;
-        }
-        break;
+    if (merged.status === 'running') {
+      displayText = 'מריץ דוח...';
+    } else if (merged.status === 'success') {
+      displayText = `הסתיים בהצלחה (${LintStatusService._formatTimestamp(merged.timestamp) || 'זמן לא זמין'})`;
+    } else if (merged.status === 'failed') {
+      displayText = `הסתיים עם כשלים (${LintStatusService._formatTimestamp(merged.timestamp) || 'זמן לא זמין'})`;
+    } else if (merged.status === 'error') {
+      displayText = `כשל בהרצה: ${merged.message || 'לא ידוע'}`;
+    } else if (merged.status === 'empty') {
+      displayText = 'טרם הופעלה הרצה.';
+    } else if (merged.timestamp) {
+      displayText = `עודכן: ${LintStatusService._formatTimestamp(merged.timestamp)}`;
     }
 
     this.elements.runStatusLabel.textContent = displayText;
@@ -508,10 +501,9 @@ class LintMonitorController {
 
       if (result.status === 'success') {
         if (typeof window.showSuccessNotification === 'function') {
-          window.showSuccessNotification(
-            'הרצת הלינטר הושלמה',
-            'הנתונים עודכנו בעמוד ניטור איכות הקוד'
-          );
+          const successTitle = 'הרצת הלינטר הושלמה';
+          const successMessage = 'הנתונים עודכנו בעמוד ניטור איכות הקוד';
+          window.showSuccessNotification(successTitle, successMessage);
         }
       } else {
         this.showLintFailureModal(result);
@@ -549,12 +541,27 @@ class LintMonitorController {
   }
 
   showLintFailureModal(result = {}) {
+    const latestReport = result.latestReport || this.state.latestReport || null;
+
     if (typeof window.showDetailsModal !== 'function') {
       if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בהרצת הלינטר', result.message || 'נדרש לבדוק את הלוגים');
+        const errorTitle = 'שגיאה בהרצת הלינטר';
+        const errorMessage = result.message || 'נדרש לבדוק את הלוגים';
+        window.showErrorNotification(errorTitle, errorMessage);
       }
       return;
     }
+
+    const formattedTimestamp = result.timestamp
+      ? LintStatusService._formatTimestamp(result.timestamp)
+      : latestReport?.generatedAt
+        ? LintStatusService._formatTimestamp(latestReport.generatedAt)
+        : new Date().toLocaleString('he-IL');
+    this.lastFailureResult = {
+      ...result,
+      latestReport,
+      formattedTimestamp,
+    };
 
     const content = this.buildFailureModalContent(result);
     window.showDetailsModal('שגיאת לינטר - פירוט ההרצה', content, {
@@ -565,12 +572,23 @@ class LintMonitorController {
   buildFailureModalContent(result = {}) {
     const latestReport = result.latestReport || this.state.latestReport || null;
     const totals = latestReport?.totals || {};
-    const timestamp =
-      (result.timestamp && LintStatusService._formatTimestamp(result.timestamp)) ||
-      (latestReport?.generatedAt && LintStatusService._formatTimestamp(latestReport.generatedAt)) ||
-      new Date().toLocaleString('he-IL');
+    const timestampRaw = result.timestamp
+      ? LintStatusService._formatTimestamp(result.timestamp)
+      : latestReport?.generatedAt
+        ? LintStatusService._formatTimestamp(latestReport.generatedAt)
+        : new Date().toLocaleString('he-IL');
+    const timestampText =
+      typeof timestampRaw === 'string'
+        ? timestampRaw
+        : typeof timestampRaw === 'number'
+          ? new Date(timestampRaw).toLocaleString('he-IL')
+          : timestampRaw?.toString
+            ? timestampRaw.toString()
+            : 'לא זמין';
     const exitCode =
-      result.exitCode !== undefined && result.exitCode !== null ? String(result.exitCode) : 'לא זמין';
+      result.exitCode !== undefined && result.exitCode !== null
+        ? String(result.exitCode)
+        : 'לא זמין';
     const summaryItems = [
       { label: 'סה״כ כלים', value: totals.tools ?? '—' },
       { label: 'עברו', value: totals.passed ?? 0 },
@@ -582,17 +600,20 @@ class LintMonitorController {
 
     const tasks = Array.isArray(latestReport?.tasks) ? latestReport.tasks : [];
     const failingTasks = tasks.filter(task => task.status !== 'passed');
+    /* eslint-disable indent, comma-dangle */
     const failingRows = failingTasks.length
       ? failingTasks
           .map(task => {
             const duration =
-              typeof task.durationMs === 'number' ? `${(task.durationMs / 1000).toFixed(2)} שניות` : '—';
+              typeof task.durationMs === 'number'
+                ? `${(task.durationMs / 1000).toFixed(2)} שניות`
+                : '—';
             const statusBadge = LintMonitorController.getStatusBadge(task.status);
             const errors = task.summary?.errors ?? 0;
             const warnings = task.summary?.warnings ?? 0;
             return `
               <tr>
-                <td>${this.escapeHtml(task.label || task.id || 'לא ידוע')}</td>
+                <td>${LintMonitorController.escapeHtml(task.label || task.id || 'לא ידוע')}</td>
                 <td>${statusBadge}</td>
                 <td>${errors}</td>
                 <td>${warnings}</td>
@@ -608,16 +629,22 @@ class LintMonitorController {
         </tr>
       `;
 
-    const issues = tasks.flatMap(task =>
-      (task.issues || []).map(issue => ({
-        tool: task.label,
-        file: issue.file,
-        message: issue.message,
-        rule: issue.rule,
-        severity: issue.severity || 'warning',
-        location: issue.line ? `${issue.line}:${issue.column ?? 0}` : '—',
-      })),
-    );
+    const issues = [];
+    tasks.forEach(task => {
+      if (!Array.isArray(task.issues)) {
+        return;
+      }
+      task.issues.forEach(issue => {
+        issues.push({
+          tool: task.label,
+          file: issue.file,
+          message: issue.message,
+          rule: issue.rule,
+          severity: issue.severity || 'warning',
+          location: issue.line ? `${issue.line}:${issue.column ?? 0}` : '—',
+        });
+      });
+    });
     const topIssues = issues.slice(0, 8);
     const issuesList = topIssues.length
       ? `
@@ -626,28 +653,30 @@ class LintMonitorController {
             .map(
               issue => `
                 <li class="mb-2">
-                  <div><strong>${this.escapeHtml(issue.tool || 'כלי לא ידוע')}</strong> · ${this.escapeHtml(issue.severity)}</div>
-                  <div class="text-muted small">${this.escapeHtml(issue.file || '—')} (${this.escapeHtml(issue.location)})</div>
-                  <div>${this.escapeHtml(issue.message || '—')}</div>
-                  <div class="text-muted small">כלל: ${this.escapeHtml(issue.rule || '—')}</div>
+                  <div><strong>${LintMonitorController.escapeHtml(issue.tool || 'כלי לא ידוע')}</strong> · ${LintMonitorController.escapeHtml(issue.severity)}</div>
+                  <div class="text-muted small">${LintMonitorController.escapeHtml(issue.file || '—')} (${LintMonitorController.escapeHtml(issue.location)})</div>
+                  <div>${LintMonitorController.escapeHtml(issue.message || '—')}</div>
+                  <div class="text-muted small">כלל: ${LintMonitorController.escapeHtml(issue.rule || '—')}</div>
                 </li>
-              `,
+              `
             )
             .join('')}
         </ol>
       `
       : '<p class="text-muted mb-0">אין פירוט סוגיות בדוח המצורף.</p>';
 
-    const stdout = this.formatCliOutput(result.stdout);
-    const stderr = this.formatCliOutput(result.stderr);
-    const noteMessage = result.message ? `<p class="mb-0">${this.escapeHtml(result.message)}</p>` : '';
+    const stdout = LintMonitorController.formatCliOutput(result.stdout);
+    const stderr = LintMonitorController.formatCliOutput(result.stderr);
+    const noteMessage = result.message
+      ? `<p class="mb-0">${LintMonitorController.escapeHtml(result.message)}</p>`
+      : '';
 
-    return `
+    const modalMarkup = `
       <div class="lint-run-details">
         <div class="alert alert-danger" role="alert">
-          <strong>ההרצה הסתיימה במצב ${this.escapeHtml(result.status || 'error')}.</strong>
-          <div>Exit Code: <span dir="ltr">${this.escapeHtml(exitCode)}</span></div>
-          <div>זמן הריצה: ${this.escapeHtml(timestamp || 'לא זמין')}</div>
+          <strong>ההרצה הסתיימה במצב ${LintMonitorController.escapeHtml(result.status || 'error')}.</strong>
+          <div>Exit Code: <span dir="ltr">${LintMonitorController.escapeHtml(exitCode)}</span></div>
+          <div>זמן הריצה: ${LintMonitorController.escapeHtml(timestampText)}</div>
           ${noteMessage}
         </div>
 
@@ -658,15 +687,26 @@ class LintMonitorController {
                 <div class="col-6 col-md-4">
                   <div class="p-3 border rounded bg-light h-100">
                     <div class="text-muted small">${item.label}</div>
-                    <div class="fw-bold fs-5">${this.escapeHtml(String(item.value))}</div>
+                    <div class="fw-bold fs-5">${LintMonitorController.escapeHtml(String(item.value))}</div>
                   </div>
                 </div>
-              `,
+              `
             )
             .join('')}
         </div>
 
-        <h5 class="mt-4">משימות שנכשלו</h5>
+        <div class="d-flex align-items-center justify-content-between mt-4 gap-3 flex-wrap">
+          <h5 class="mb-0">משימות שנכשלו</h5>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2"
+            data-action="copy-lint-failure-table"
+            title="העתק את תוצאות ההרצה ללוח"
+          >
+            <i class="fas fa-copy"></i>
+            <span>העתק ללוח</span>
+          </button>
+        </div>
         <div class="table-responsive">
           <table class="table table-sm table-striped align-middle">
             <thead>
@@ -707,22 +747,25 @@ class LintMonitorController {
         </div>
       </div>
     `;
+
+    /* eslint-enable indent, comma-dangle */
+    return modalMarkup;
   }
 
-  formatCliOutput(value) {
+  static formatCliOutput(value) {
     if (value === null || value === undefined) {
-      return this.escapeHtml('— אין פלט —');
+      return LintMonitorController.escapeHtml('— אין פלט —');
     }
     const raw = typeof value === 'string' ? value.trim() : JSON.stringify(value, null, 2);
     if (!raw) {
-      return this.escapeHtml('— אין פלט —');
+      return LintMonitorController.escapeHtml('— אין פלט —');
     }
     const limit = 1800;
     const output = raw.length > limit ? `${raw.slice(0, limit)}…` : raw;
-    return this.escapeHtml(output);
+    return LintMonitorController.escapeHtml(output);
   }
 
-  escapeHtml(text) {
+  static escapeHtml(text) {
     if (text === null || text === undefined) {
       return '';
     }
@@ -733,7 +776,10 @@ class LintMonitorController {
 
   async downloadLatestReport() {
     try {
-      const report = this.state.latestReport || (await LintStatusService.fetchLatestReport());
+      let report = this.state.latestReport;
+      if (!report) {
+        report = await LintStatusService.fetchLatestReport();
+      }
 
       if (!report) {
         if (typeof window.showNotification === 'function') {
@@ -774,7 +820,10 @@ class LintMonitorController {
 
   async copyLatestReportToClipboard() {
     try {
-      const report = this.state.latestReport || (await LintStatusService.fetchLatestReport());
+      let report = this.state.latestReport;
+      if (!report) {
+        report = await LintStatusService.fetchLatestReport();
+      }
       if (!report) {
         if (typeof window.showWarningNotification === 'function') {
           window.showWarningNotification('אין דוח להעתקה', 'הרץ lint:collect ורענן את העמוד.');
@@ -795,6 +844,88 @@ class LintMonitorController {
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בהעתקת הדוח', error.message);
       }
+    }
+  }
+
+  async copyFailureSummaryToClipboard() {
+    const failure = this.lastFailureResult;
+    const latestReport = failure?.latestReport || this.state.latestReport;
+
+    if (!failure || !latestReport) {
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אין נתוני הרצה זמינים להעתקה', 'הרץ בדיקת איכות חדשה');
+      }
+      return;
+    }
+
+    const totals = latestReport.totals || {};
+    const tasks = Array.isArray(latestReport.tasks) ? latestReport.tasks : [];
+    const issues = [];
+    tasks.forEach(task => {
+      if (!Array.isArray(task.issues)) {
+        return;
+      }
+      task.issues.forEach(issue => {
+        issues.push({
+          taskLabel: task.label || task.id || 'כלי לא ידוע',
+          file: issue.file || 'לא ידוע',
+          rule: issue.rule || 'לא ידוע',
+          severity: issue.severity || (task.status === 'failed' ? 'error' : 'warning'),
+          message: issue.message || '—',
+          location: issue.line ? `${issue.line}:${issue.column ?? 0}` : '—',
+        });
+      });
+    });
+
+    const timestampText =
+      failure.formattedTimestamp ||
+      failure.timestamp ||
+      latestReport.generatedAt ||
+      new Date().toLocaleString('he-IL');
+
+    const lines = [];
+    lines.push('=== תמצית כשל בדיקות איכות קוד ===');
+    lines.push(`סטטוס: ${failure.status || 'failed'} | Exit Code: ${failure.exitCode ?? 'N/A'}`);
+    lines.push(`זמן ריצה: ${timestampText}`);
+    if (failure.message) {
+      lines.push(`הערת מערכת: ${failure.message}`);
+    }
+    lines.push('');
+    lines.push('סיכום כלים:');
+    lines.push(`  • סה״כ כלים: ${totals.tools ?? 'N/A'}`);
+    lines.push(`  • עברו: ${totals.passed ?? 0}`);
+    lines.push(`  • אזהרות: ${totals.warning ?? totals.warnings ?? 0}`);
+    lines.push(`  • נכשלו: ${totals.failed ?? 0}`);
+    lines.push(`  • שגיאות קריטיות: ${totals.error ?? totals.errors ?? 0}`);
+    lines.push(`  • סה״כ סוגיות: ${totals.issues ?? issues.length}`);
+    lines.push('');
+    lines.push('סטטוס כלי לינטר:');
+    tasks.forEach(task => {
+      const duration =
+        typeof task.durationMs === 'number' ? `${(task.durationMs / 1000).toFixed(2)}s` : 'N/A';
+      const summaryLine = `  - ${task.label || task.id || 'כלי'} | מצב: ${
+        task.status || 'unknown'
+      } | שגיאות: ${task.summary?.errors ?? 0} | אזהרות: ${task.summary?.warnings ?? 0} | ExitCode: ${
+        task.exitCode ?? 'N/A'
+      } | משך: ${duration}`;
+      lines.push(summaryLine);
+    });
+    lines.push('');
+    lines.push('סוגיות בולטות:');
+    issues.slice(0, 10).forEach((issue, index) => {
+      const issueLine = `  ${index + 1}. [${issue.severity}] ${issue.taskLabel} | ${issue.file} (${
+        issue.location
+      }) | כלל: ${issue.rule} | ${issue.message}`;
+      lines.push(issueLine);
+    });
+    if (issues.length > 10) {
+      lines.push(`  ...ועוד ${issues.length - 10} סוגיות נוספות`);
+    }
+
+    await copyTextToClipboard(lines.join('\n'));
+
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('טבלת התוצאות הועתקה ללוח', 'ניתן לשתף את הפרטים המלאים');
     }
   }
 
@@ -1112,4 +1243,23 @@ window.LintMonitorActions = {
       await window.lintMonitorController.copyLatestReportToClipboard();
     }
   },
+  async copyFailureSummary(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    if (window.lintMonitorController) {
+      await window.lintMonitorController.copyFailureSummaryToClipboard();
+    }
+  },
 };
+
+document.addEventListener('click', event => {
+  const trigger = event.target.closest('[data-action="copy-lint-failure-table"]');
+  if (!trigger) {
+    return;
+  }
+  event.preventDefault();
+  if (window.lintMonitorController) {
+    window.lintMonitorController.copyFailureSummaryToClipboard();
+  }
+});

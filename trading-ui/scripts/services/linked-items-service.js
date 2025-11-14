@@ -454,7 +454,7 @@ class LinkedItemsService {
             const reactivateFunctions = {
                 'trade': `window.reactivateTrade(${id})`,
                 'trade_plan': `window.reactivateTradePlan(${id})`,
-                'trading_account': `window.reactivateAccount(${id})`,
+                'trading_account': `window.restoreTradingAccount(${id})`,
                 'alert': `window.reactivateAlert(${id})`
             };
             return reactivateFunctions[type] || null;
@@ -463,7 +463,7 @@ class LinkedItemsService {
             const cancelFunctions = {
                 'trade': `cancelTradeRecord('${id}')`,
                 'trade_plan': `window.openCancelTradePlanModal(${id})`,
-                'trading_account': `window.cancelAccount(${id})`,
+                'trading_account': `window.cancelTradingAccountWithLinkedItemsCheck(${id})`,
                 'alert': `window.cancelAlert(${id})`
             };
             return cancelFunctions[type] || null;

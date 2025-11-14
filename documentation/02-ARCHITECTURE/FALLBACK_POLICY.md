@@ -31,14 +31,14 @@ This document lists every identified fallback mechanism, their current behaviour
 | Module | Current Fallback | Required Fix |
 | --- | --- | --- |
 | `trading-ui/scripts/system-management.js` | `loadMockData()` injects fabricated health/alerts when API fails. | Remove mock data, surface error banner + notification. Add unit test for error branch. |
-| `trading-ui/scripts/trades-adapter.js` | Returns `getFallbackData()` & `getDefaultChartData()` with fake trades. | Remove fallbacks, rethrow errors, ensure charts handle gracefully. Add unit tests. |
+| `trading-ui/scripts/trades-adapter.js` | ✅ (Nov 2025) Removed `getFallbackData`/`getDefaultChartData`, now rethrows errors + notifies; covered by `trades-adapter-core.test.js` | — |
 | `trading-ui/scripts/trade-plan-service.js` | On fetch failure uses `getDemoTradePlansData()`. | Remove demo data, rethrow + notify. Unit tests. |
 | `trading-ui/scripts/trade_plans.js` | Multiple default fallbacks: mock ticker info, hard-coded risk % defaults, empty-array return on API error. | Remove / replace with explicit errors, ensure UI warns user. Add targeted tests. |
 | `trading-ui/scripts/constraints.js` | `getMockConstraints()` / `getMockTables()` invoked on API issues. | Remove mock data; display error state instead. Tests needed. |
 | `trading-ui/scripts/alerts.js` | `getDemoAlertsData()` still available. | Delete function & references. |
 | `trading-ui/scripts/tickers.js` | Falls back to USD option when currency data missing. | Replace with “not available” notice & notification. Add tests. |
 | `trading-ui/scripts/charts/chart-system.js` | Comments reference fallback data; adapters silently swallow failures. | Propagate adapter errors & notify. Tests to cover failure path. |
-| `trading-ui/scripts/charts/adapters/performance-adapter.js` | Always returns empty dataset; generates mock data helper. | Throw informative error instead of mock data. Unit tests. |
+| `trading-ui/scripts/charts/adapters/performance-adapter.js` | ✅ (Nov 2025) API errors bubble with notifications instead of mock data; covered by `performance-adapter-charts.test.js` | — |
 | `trading-ui/scripts/js-map.js` | Development tool loads fallback metadata. | Mark as dev-only, ensure production build not using it (documented). |
 | Backend `app.py` (`/api/indexeddb/*`) | Returns entirely mock IndexedDB statistics. | Replace with 503 + explicit message. Add API tests. |
 | Backend `routes/api/quality_check.py` (`/function-index`) | Responds with fabricated statistics. | Return 503 until validator implemented. Test route. |

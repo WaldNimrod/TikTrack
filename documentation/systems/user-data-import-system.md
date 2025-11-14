@@ -70,6 +70,12 @@ Task-specific Execution → Database Storage & Reporting
    - תכולה: כותרת "טוען ומעבד נתונים", Progress Bar אנימטיבי (Bootstrap), לוגים קצרים בזמן אמת (Client + Server), הודעת ביטול (Disabled).
    - הממשק ננעל עד קבלת תשובה מהשרת או הודעת שגיאה, ומאפשר שקיפות לגבי זמן העיבוד (לרבות Multi-Task).
 
+### תנאי קדם: שיוך חשבון למס' חיצוני
+- לכל `trading_account` נוסף השדה `external_account_number` (ייחודי, Nullable). לפני כל פעולה (upload/analyze/preview/execute/refresh-preview) ה-`ImportOrchestrator` משווה בין המספר שבקובץ (נשלף מקטעי `account_reconciliation`) לבין המספר שבמערכת.
+- אם החשבון לא משויך או שהמספר שגוי, כל נקודות הקצה מחזירות תגובה עם `error_code: ACCOUNT_LINK_REQUIRED` ואובייקט `linking` שמפרט את הסטטוס (`unlinked`/`mismatch`/`missing_in_file`), מספר הקובץ, המספר השמור ומזהה הסשן.
+- Endpoint חדש: `POST /api/user-data-import/session/<id>/link-account` מעדכן את השדה בטבלת `trading_accounts` ומוודא שאין התנגשויות. ה-UI מציג מודל ייעודי (`accountLinkingModal`) שמופעל אוטומטית כאשר חוזרת השגיאה, ומאפשר למשתמש ללחוץ על "שייך חשבון למערכת".
+- בממשק בחירת התהליך, "בדיקת שיוך חשבון" (account_reconciliation) מופיעה ראשונה ונבחרת כברירת מחדל כדי לעודד הפעלה לפני יבואי Executions/Cashflows.
+
 3. **שלב 3**: ניתוח קובץ (Task-specific)
    - קריאה ל-`/api/user-data-import/upload`
    - פרמטר חובה חדש: `import_task` (`executions`/`cashflows`/`account_reconciliation`)
@@ -87,7 +93,7 @@ Task-specific Execution → Database Storage & Reporting
    - כל כרטיס מציג פרטים מלאים: סמל, פעולה, כמות, מחיר, תאריך, עמלה
    - confidence scores לכפילויות עם אינדיקטור ויזואלי
    - ממשק להוספת טיקרים חדשים עם מודל Bootstrap
-    - רענון אוטומטי של התצוגה לאחר פעולות המשתמש (עבור כפילויות: באמצעות `POST /session/<id>/refresh-preview` שמחזיר Snapshot מעודכן ולא מריץ ניתוח מחדש).
+    - רענון אוטומטי של התצוגה לאחר פעולות המשתמש (עבור כפילויות: באמצעות `POST /session/<id>/refresh-preview` שמחזיר Snapshot מעודכן ולא מריץ ניתוח מחדש). אם מופעלת חסימת שיוך, מודל השיוך נפתח מתוך אותו זרם פעולה.
 
 5. **שלב 4**: תצוגה מקדימה
    - קריאה ל-`/api/user-data-import/session/{id}/preview`
@@ -591,6 +597,14 @@ await window.UnifiedCacheManager.delete('import_analysis_results');
 
 **טבלה 2**: רשומות שדולגו
 - עמודות: טיקר, צד, כמות, מחיר, עמלה, תאריך, סיבה, פרטים
+
+## שלב 2 – הרחבת מודול חשבון (תכנון)
+- השיוך הקשיח ל-`external_account_number` הוא בסיס לשלב הבא: העתקת נתוני Account Reconciliation (מטבע בסיס, סטטוס מרג'ין, הרשאות, מסמכים חסרים, אליאסים וערכי תקציר) מתוך `summary_data` לטבלת החשבונות עצמה או לטבלת satellite ייעודית.
+- שמירת הנתונים ברמת החשבון תאפשר:
+  - הצגת סטטוס חשבון עדכני בדשבורדים גם אחרי שהסשן נסגר.
+  - סנכרון עתידי מול Broker API (במקום קבצי CSV) תוך שימוש באותו מנגנון זיהוי חשבון.
+  - טריגרים אוטומטיים לאזהרות (לדוגמה: שינוי מטבע בסיס, מסמך שחסר יותר מ-X ימים).
+- ה-API החדש (`link-account`) והמודל ב-UI כבר מניחים את קיומו של מזהה חד-ערכי, ולכן תוספת השדות החדשים תהיה backwards compatible ותדרוש בעיקר מיגרציה של המידע הקיים מתוך סשנים היסטוריים.
 
 ## שדות חשובים
 

@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.0.7.0",
+    "version": "1.0.8.0",
     "major": 1,
     "minor": 0,
-    "patch": 7,
+    "patch": 8,
     "build": 0,
-    "commit": "5a7c30d00ebb0f8bc9397e5cd13da84d42044a35",
-    "updated_at": "2025-11-14T20:45:34+00:00",
-    "notes": "Sync local updates before release"
+    "commit": "0d5f54c8d41e340b2105b04a094442ec6f8701f5",
+    "updated_at": "2025-11-14T22:50:56+00:00",
+    "notes": "Sync workspace changes for production release"
   },
   "development": {
-    "version": "1.0.36.0",
+    "version": "1.0.37.0",
     "major": 1,
     "minor": 0,
-    "patch": 36,
+    "patch": 37,
     "build": 0,
-    "commit": "2e5e573a16d3b722e4a80c93ba3f36819f1b5ba5",
-    "updated_at": "2025-11-14T22:49:03+00:00",
-    "notes": "Limit rate limiter middleware to API routes"
+    "commit": "0d5f54c8d41e340b2105b04a094442ec6f8701f5",
+    "updated_at": "2025-11-14T22:51:27+00:00",
+    "notes": "Sync workspace changes for production release"
   }
 }

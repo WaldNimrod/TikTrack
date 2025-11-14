@@ -5,11 +5,13 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional
 
+LOG_DIR = Path("logs")  # Production logs stay inside production/Backend/logs
+
+
 def setup_logging() -> logging.Logger:
     """Setup logging system"""
     
-    # Log directory is fixed for production deployment
-    log_dir = Path("logs")
+    log_dir = LOG_DIR
     
     log_dir.mkdir(exist_ok=True)
     
@@ -48,8 +50,8 @@ def setup_logging() -> logging.Logger:
     error_handler.setFormatter(log_format)
     logger.addHandler(error_handler)
     
-    # SQL queries log (only in development)
-    if os.getenv('FLASK_ENV') == 'development':
+    # SQL queries log (only enabled if explicit env variable for debugging)
+    if os.getenv('TIKTRACK_SQL_DEBUG') == '1':
         sql_logger = logging.getLogger('sqlalchemy.engine')
         sql_logger.setLevel(logging.INFO)
     
@@ -96,8 +98,7 @@ def get_cache_logger() -> logging.Logger:
     
     # Only add handler if it doesn't exist
     if not cache_logger.handlers:
-        log_dir = Path("logs")
-        
+        log_dir = LOG_DIR
         log_dir.mkdir(exist_ok=True)
         
         log_format = logging.Formatter(

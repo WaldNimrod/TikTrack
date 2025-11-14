@@ -1,24 +1,28 @@
 import os
 from pathlib import Path
 
-# Production configuration is hardcoded. See documentation/production/PRODUCTION_SETUP.md
+# Production settings file - values are hardcoded for isolation
 IS_PRODUCTION = True
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
+
 DB_PATH = BASE_DIR / "db" / "tiktrack.db"
+
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings
 DEBUG = False
 HOST = '127.0.0.1'
+
+# Production port (permanent)
 PORT = 5001
 
-# Production-only flags
+# Production mode toggles
 DEVELOPMENT_MODE = False
 CACHE_DISABLED = False
 
-# Cache settings
+# Cache settings (production baseline)
 DEFAULT_CACHE_TTL = 300  # 5 דקות
 CACHE_ENABLED = not CACHE_DISABLED
 

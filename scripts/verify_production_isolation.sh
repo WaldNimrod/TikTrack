@@ -46,7 +46,7 @@ check() {
         echo -e "${GREEN}✅${NC} $name: $message"
     else
         echo -e "${RED}❌${NC} $name: $message"
-        ((errors++))
+        ((errors++)) || true
     fi
 }
 
@@ -54,7 +54,7 @@ warn() {
     local name="$1"
     local message="$2"
     echo -e "${YELLOW}⚠️${NC} $name: $message"
-    ((warnings++))
+    ((warnings++)) || true
 }
 
 info() {
@@ -181,7 +181,7 @@ fi
 if lsof -i :5001 > /dev/null 2>&1; then
     check "Prod Port" "true" "Production server running on port 5001"
 else
-    warn "Prod Port" "Production server not running on port 5001"
+    warn "Prod Port" "Production server not running on port 5001 (expected if server was stopped for maintenance)"
 fi
 
 # ========================================
@@ -240,6 +240,8 @@ legacy_refs=$(grep -R -n \
     --exclude-dir=Backend/db/backups \
     --exclude-dir=production/Backend/db/backups \
     --exclude-dir=production/trading-ui/images \
+    --exclude='scripts/release/verify_schema.py' \
+    --exclude='*verify_schema.py' \
     --exclude='*.md' \
     --exclude='*.json' \
     --exclude='*.zip' \
@@ -255,6 +257,8 @@ legacy_prod_refs=$(grep -R -n \
     --exclude-dir=Backend/db/backups \
     --exclude-dir=production/Backend/db/backups \
     --exclude-dir=production/trading-ui/images \
+    --exclude='scripts/release/verify_schema.py' \
+    --exclude='*verify_schema.py' \
     --exclude='*.md' \
     --exclude='*.json' \
     --exclude='*.zip' \

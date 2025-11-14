@@ -1,124 +1,121 @@
 # TikTrack Production Update Process - מדריך עדכון פרודקשן
 
-**תאריך:** 2025-11-09  
-**גרסה:** 1.2.0  
-**מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git
+**תאריך:** 2025-11-13  
+**גרסה:** 1.3.0  
+**מטרה:** תהליך מלא, אוטומטי ובטוח לעדכון קוד ונתונים בסביבת הפרודקשן המקומית.
 
-**⚠️ עדכון חשוב:** גרסה זו כוללת תיקונים קריטיים לבדיקת הגדרות production אחרי sync
+---
 
-**🆕 עדכון 1.2.0:** כל ה-hardcoded URLs הוחלפו ב-relative URLs - הקוד עובד אוטומטית בפיתוח ובפרודקשן
+## ⚡ TL;DR - רצף מהיר
+
+```bash
+# 0. עצירת השרת (אם רץ)
+lsof -i :5001 && kill <PID>
+
+# 1. סיכום שינויים מה-main
+git fetch origin main
+git log origin/main -10 --oneline > _Tmp/release_notes_main.log
+
+# 2. גיבוי ובדיקות מקדימות
+python scripts/release/run_release_checklist.py --label pre-update
+
+# 3. סנכרון קוד
+./scripts/sync_to_production.py
+
+# 4. בדיקות אחרי סנכרון
+python scripts/release/post_update_validation.py --health-url http://localhost:5001/api/health
+
+# 5. ניהול גרסה ו-Git
+python scripts/release/git_stage_release.py
+python scripts/versioning/bump-version.py --env production --bump patch --note "Release YYYY-MM-DD"
+git commit -m "chore: production release YYYY-MM-DD"
+git push origin production
+```
+
+> כל השלבים זמינים גם כ־Cursor Tasks (Cmd+Shift+P → Tasks: Run Task → TT:*).
+
+---
+
+## 🆕 חידושים בגרסה 1.3.0
+
+- 🧱 `scripts/release/create_db_backup.py` – גיבוי אוטומטי עם `PRAGMA integrity_check` וקובץ מטא-דאטה.
+- 🧬 `scripts/release/verify_schema.py` – שמירת סכמה מול `_Tmp/simpleTrade_new.db` ובדיקת נתוני רפרנס (מטבעות, `ibkr-int`).
+- ✅ `scripts/release/run_release_checklist.py` – צ'ק-ליסט מקיף (גיבוי→סכמה→בדיקות).
+- 🚦 `scripts/release/post_update_validation.py` – בדיקות אחרי העדכון, כולל ping ל־API אופציונלי.
+- 🧰 `scripts/release/git_stage_release.py` – Staging מהיר לקבצים הרלוונטיים בלי מאמץ ידני.
+- 📘 `documentation/03-DEVELOPMENT/PRODUCTION_RELEASE_PLAYBOOK.md` – מדריך מפורט למפתח/ת.
 
 ---
 
 ## 📋 תהליך עדכון פרודקשן - סקירה מהירה
 
-### תהליך מלא (6 שלבים):
-
-1. **עדכון main branch** - משיכת שינויים אחרונים
-2. **מיזוג main → production** - העברת שינויים לפרודקשן
-3. **סינכרון קוד** - העתקת קבצים פעילים לפרודקשן
-4. **בדיקות** - אימות שהכל עובד
-5. **עדכון גרסה** - קידום `Patch/Build` במערכת הגרסאות
-6. **Commit & Push** - שמירת שינויים ב-Git
+1. **איסוף שינויים מ-main** – יצוא תקציר הקומיטים האקטואליים לצורך רישום היסטורי.
+2. **עדכון main** – משיכת שינויים אחרונים.
+3. **מיזוג main → production** – שמירה על קונפליקטים נקיים.
+4. **גיבוי + הולידציות** – `run_release_checklist.py`.
+5. **סינכרון קוד** – `sync_to_production.py`.
+6. **בדיקות** – `post_update_validation.py` + בדיקות נוספות לפי הצורך.
+7. **עדכון גרסה** – `bump-version.py`.
+8. **Git Commit & Push** – עם סקריפט staging או ידנית.
 
 ---
 
 ## 🚀 תהליך מפורט
 
-### שלב 1: עדכון Main Branch
+### שלב 0: איסוף מידע מה-`main`
 
 ```bash
-# עבור לענף פיתוח
+git fetch origin main
+git log origin/main -15 --oneline > documentation/production/_Tmp_release_notes_main.log
+```
+
+- שמור את הפלט בקובץ זמני (למשל `documentation/production/_Tmp_release_notes_main.log`) כדי שניתן יהיה לתמצת את השינויים העיקריים עבור גרסת הפרודקשן.
+- ציין ב-commit message של הפרודקשן את התכולה העיקרית (לפי הקובץ) והעתק את הסיכום אל `documentation/production/VERSION_HISTORY.md`.
+- במידה והקומיטים אינם כוללים פרטים מספקים, שלח פינג לצוות הפיתוח לעדכן תיאור עשיר לפני המשך התהליך.
+
+### שלב 1: עדכון `main`
+
+```bash
 git checkout main
-
-# משוך עדכונים אחרונים
 git pull origin main
-
-# בדוק שיש שינויים חדשים
 git log --oneline -10
 ```
 
-**מטרה:** לוודא שיש את כל השינויים האחרונים לפני המיזוג.
-
----
-
-### שלב 2: מיזוג Main → Production
+### שלב 2: מיזוג ל-`production`
 
 ```bash
-# עבור לענף פרודקשן
 git checkout production
-
-# משוך עדכונים אחרונים של פרודקשן (אם יש)
 git pull origin production
-
-# מיזוג שינויים מ-main
 git merge main
-
-# אם יש קונפליקטים - פתור אותם ידנית
-# אחרי פתרון קונפליקטים:
-git add .
-git commit -m "Merge main into production: [תאריך/תיאור]"
 ```
 
-**⚠️ חשוב:**
-- אם יש קונפליקטים, פתור אותם בזהירות
-- **בקונפליקטים:** השתמש ב-`git checkout --theirs` עבור רוב הקבצים (לקחת מ-main)
-- ודא שהקבצים ב-`production/Backend/` לא נפגעו
-- **קריטי:** אחרי המיזוג, תמיד תקן את `production/Backend/config/settings.py` ו-`config/logging.py` (ראה שלב 3.5)
+⚠️ טיפי מיזוג:
+- השתמש ב־`git checkout --theirs` עבור רוב הקונפליקטים.
+- ודא ש־`production/Backend/config/settings.py` ו־`config/logging.py` נשארים ב-hardcode לפרודקשן.
 
----
-
-### שלב 2.5: גיבוי מסד נתונים לפני המשך התהליך (חובה!)
-
-לפני כל יציאה לעדכון יש לבצע snapshot למסד הנתונים הפעיל – כך שאם משהו משתבש ניתן לחזור אחורה בדקות.
+### שלב 2.5: גיבוי מסד נתונים (חובה!)
 
 ```bash
-# יצירת תיקיית גיבויים (אם לא קיימת)
-mkdir -p Backend/db/backups
-
-# גיבוי לפני עדכון (שם קובץ ברור עם תאריך ושעה)
-timestamp=$(date +%Y%m%d_%H%M%S)
-cp Backend/db/tiktrack.db Backend/db/backups/tiktrack_pre_update_${timestamp}.db
+python scripts/release/create_db_backup.py --label pre-update --notes "לפני שחרור 1.3"
 ```
 
-**המלצות נוספות:**
-- שמור את נתיב הגיבוי בפנקס כדי שיהיה קל לשחזר במידת הצורך.
-- אחרי גיבוי, הרץ `sqlite3 <קובץ> "PRAGMA integrity_check;"` כדי לוודא שהקובץ תקין.
-- אם נדרש לשחזר, עצור את השרת (`lsof -i :5001` → `kill <PID>`), והעבר את קובץ הגיבוי חזרה אל `Backend/db/tiktrack.db` ואל `production/Backend/db/tiktrack.db`.
+- מבצע `PRAGMA integrity_check`.
+- יוצר קובץ גיבוי ב־`Backend/db/backups/<db>_<label>_<timestamp>.db`.
+- מייצר קובץ מטא (`*.meta.json`) שמקל על שחזור.
 
----
+לשחזור: עצירה (`kill <PID>`), ואז `cp <backup> Backend/db/tiktrack.db` ו־`cp Backend/db/tiktrack.db production/Backend/db/tiktrack.db`.
 
-### שלב 3: סינכרון קוד לפרודקשן
+### שלב 3: סנכרון קוד
 
 ```bash
-# ודא שאתה ב-production branch
-git checkout production
-
-# הרץ סקריפט סינכרון (מעתיק Backend + UI)
 ./scripts/sync_to_production.py
 ```
 
-**מה הסקריפט עושה:**
-- מעתיק קבצים פעילים מ-`Backend/` ל-`production/Backend/`
-- מעתיק UI מ-`trading-ui/` ל-`production/trading-ui/`
-- שומר רק על קבצים פעילים (ללא tests/migrations)
+הסקריפט מעתיק רק קבצים פעילים ומוחק את התיקיה הקודמת כדי למנוע זבל.
 
-**תוצאה צפויה:**
-```
-✅ Backend sync completed: ~157 files copied
-✅ UI sync completed: ~490 files copied
-```
-
-**⚠️ חשוב:** הסקריפט `sync_to_production.py` מעתיק את `config/settings.py` מ-Backend, אבל הקובץ ב-production צריך להיות hardcoded ל-production mode!
-
----
-
-### שלב 3.5: תיקון הגדרות Production (קריטי!)
-
-**⚠️ שלב זה חובה!** אחרי sync, הקבצים `config/settings.py` ו-`config/logging.py` עלולים להיות לא נכונים.
+### שלב 3.5: תיקון הגדרות Production
 
 ```bash
-# בדוק את ההגדרות
 cd production/Backend
 python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
     print(f'UI: {UI_DIR}'); \
@@ -127,425 +124,168 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
     print(f'Production: {IS_PRODUCTION}')"
 ```
 
-**תוצאה צפויה:**
-```
-UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/tiktrack.db
-Port: 5001
-Production: True
-```
+הגדרות צפויות:
+- `IS_PRODUCTION = True`
+- `PORT = 5001`
+- `DB_PATH = BASE_DIR / "db" / "tiktrack.db"`
+- `UI_DIR = BASE_DIR.parent / "trading-ui"`
+- ב־`config/logging.py`: `log_dir = Path("logs")`
 
-**אם התוצאה לא נכונה (Port=8080 או Production=False):**
+### שלב 3.8: בניית DB נקי (אופציונלי)
 
-1. **תקן `production/Backend/config/settings.py`:**
-   - ודא ש-`IS_PRODUCTION = True` (hardcoded)
-   - ודא ש-`PORT = 5001` (hardcoded)
-   - ודא ש-`DB_PATH` מצביע על `tiktrack.db`
-   - ודא ש-`UI_DIR` מצביע על `production/trading-ui`
-
-2. **תקן `production/Backend/config/logging.py`:**
-   - ודא ש-`log_dir = Path("logs")` (לא `logs-production`)
-
-**דוגמה לתיקון מהיר:**
-```bash
-# אם ההגדרות לא נכונות, ערוך את הקבצים:
-# production/Backend/config/settings.py - ודא hardcoded production
-# production/Backend/config/logging.py - ודא log_dir = Path("logs")
-```
-
----
-
-### שלב 3.8: בניית בסיס נתונים נקי (אופציונלי אך מומלץ לפני שחרור גרסה)
-
-במידה שרוצים לפתוח גרסה על בסיס נתונים "ריק" או לוודא שהסכמה הרשמית לא נפגעה:
-
-1. **כבה את שרת הפרודקשן**:
-   ```bash
-   lsof -i :5001
-   kill <PID>
-   ```
-
-2. **גבה את הקובץ הנוכחי** (אם עדיין לא גיבית בשלב 2.5).
-
-3. **בנה סכמה נקייה** על בסיס הסכמה הרשמית (ללא נתוני פיתוח):
-   ```bash
-   sqlite3 _Tmp/simpleTrade_new.db ".schema" > /tmp/tiktrack_schema.sql
-   sqlite3 Backend/db/tiktrack.db ".read /tmp/tiktrack_schema.sql"
-   cp Backend/db/tiktrack.db production/Backend/db/tiktrack.db
-   ```
-
-   > `_Tmp/simpleTrade_new.db` מחזיק את סכמה שולחן-העזר הרשמית ללא נתונים. יש לוודא שהקובץ מעודכן לפני השימוש.
-
-4. **אמת שהטבלאות קיימות אך ריקות**:
-   ```bash
-   sqlite3 Backend/db/tiktrack.db <<'SQL'
-   SELECT 'accounts', COUNT(*) FROM trading_accounts;
-   SELECT 'tickers', COUNT(*) FROM tickers;
-   SELECT 'preferences', COUNT(*) FROM user_preferences;
-   SQL
-   ```
-
-5. **הפעל מחדש את השרת** (רק לאחר הזנת נתוני בסיס נחוצים):
-   ```bash
-   ./start_production.sh
-   ```
-
----
+1. `kill <PID>` לפורט 5001 (אם רץ).
+2. `python scripts/release/create_db_backup.py --label before-refresh`.
+3. `python scripts/release/verify_schema.py --skip-reference-data`.
+4. הזן נתוני בסיס (ראו Playbook).
+5. `./start_production.sh` לאחר הזנה.
 
 ### שלב 4: בדיקות ואימות
 
-#### בדיקה 1: אימות הפרדה
-
+#### 4.1 צ'ק-ליסט אוטומטי
 ```bash
-# בדיקת הפרדה מלאה
-./scripts/verify_production_isolation.sh
+python scripts/release/run_release_checklist.py --label pre-update
 ```
 
-**תוצאה צפויה:**
-```
-✅ Isolation verification passed
-```
-
-#### בדיקה 2: אימות מבנה
-
+#### 4.2 בדיקות נוספות
 ```bash
-# בדיקת מבנה כללי
-./scripts/verify_production.sh
+python scripts/release/post_update_validation.py --health-url http://localhost:5001/api/health
 ```
+- מריץ `verify_schema.py`, `verify_production_isolation.sh`, `verify_production.sh`.
+- מאפשר בדיקת בריאות HTTP אופציונלית.
 
-**תוצאה צפויה:**
-```
-✅ Verification passed
-```
-
-#### בדיקה 3: בדיקת הגדרות
-
-```bash
-cd production/Backend
-python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
-    print(f'UI: {UI_DIR}'); \
-    print(f'DB: {DB_PATH}'); \
-    print(f'Port: {PORT}'); \
-    print(f'Production: {IS_PRODUCTION}')"
-```
-
-**תוצאה צפויה:**
-```
-UI: /path/to/production/trading-ui
-DB: /path/to/production/Backend/db/tiktrack.db
-Port: 5001
-Production: True
-```
-
-#### בדיקה 4: בדיקת imports
-
-```bash
-cd production/Backend
-python3 -c "from services.preferences_service import PreferencesService; print('✅ OK')"
-```
-
-**תוצאה צפויה:** `✅ OK` (ללא שגיאות)
-
-#### בדיקה 5: בדיקת הפעלת שרת (אופציונלי)
-
-```bash
-cd production
-./start_production.sh --check-only
-```
-
-**תוצאה צפויה:**
-```
-✅ No conflicts found - server can start safely
-```
-
----
+#### בדיקות ידניות שכדאי לוודא
+- צפייה ב־`production/Backend/logs/app.log`.
+- פתיחת UI ובדיקת עמודים מרכזיים (trades, alerts, preferences).
 
 ### שלב 5: עדכון גרסה
 
 ```bash
-# קידום גרסת הפרודקשן אחרי סנכרון קוד
 python3 scripts/versioning/bump-version.py \
   --env production \
   --bump patch \
-  --note "Sync main into production - $(date +%Y-%m-%d)"
-
-# הפעלה נוספת של אותו קוד (בחירה)
-python3 scripts/versioning/bump-version.py \
-  --env production \
-  --bump build \
-  --note "Restart production server"
+  --note "Release YYYY-MM-DD"
 ```
 
-- כל הרצות הסקריפט מעדכנות את `documentation/version-manifest.json` ואת ההיסטוריה (`documentation/production/VERSION_HISTORY.md`).
-- **Major/Minor** מתקדמים רק באישור נמרוד (`--set-version ... --allow-major-minor`).
-- בתהליך הבא יש לציין בהערת הגרסה את הפעולה (מיזוג, הפעלה, hotfix וכו').
+- הסקריפט מעדכן את `documentation/version-manifest.json` ואת `documentation/production/VERSION_HISTORY.md`.
+- שימוש ב־`--set-version ... --allow-major-minor` רק באישור מפורש.
 
----
-
-### שלב 6: Commit & Push
+### שלב 6: Git Commit & Push
 
 ```bash
-# ודא שאתה ב-production branch
-git checkout production
-
-# בדוק מה השתנה
+python scripts/release/git_stage_release.py
 git status --short
-
-# הוסף את כל השינויים
-git add production/ scripts/ .vscode/tasks.json documentation/production/
-
-# Commit עם הודעה ברורה
-git commit -m "feat: Update production from main - [תאריך/גרסה]
-
-- Synced Backend code from main
-- Synced UI from trading-ui
-- Updated [רשימת שינויים עיקריים]
-- Verified isolation and functionality"
-
-# Push ל-remote
+git commit -m "chore: production release YYYY-MM-DD"
 git push origin production
 ```
 
-**⚠️ חשוב:**
-- אל תכלול קבצי DB או logs ב-commit
-- ודא ש-`.gitignore` מונע זאת
-- בדוק את ה-commit לפני push
+- הסקריפט מבצע staging לקבצים הרלוונטיים (תיעוד, release scripts, פריטי אימות).
+- ניתן להוסיף נתיב נוסף: `python scripts/release/git_stage_release.py --path production/trading-ui/index.html`.
+
+### שלב 7: הפעלת שרת פרודקשן
+
+```bash
+# אימות שהפורט פנוי
+lsof -i :5001 && kill <PID>
+
+# בדיקת מוכנות (ללא הפעלה)
+./start_production.sh --check-only
+
+# הפעלה ברקע (מומלץ)
+./start_production.sh > logs-production/start.log 2>&1 &
+```
+
+- בהפעלה ב-Cursor מומלץ להשתמש בפקודת Task הייעודית (`TT: Server - Start Production`) או להוסיף `is_background=true` כדי להשאיר את הטרמינל זמין.
+- לאחר ההפעלה אמת שהשרת מאזין: `lsof -i :5001`.
 
 ---
 
 ## 📝 תהליך מהיר (Quick Update)
 
-אם אתה בטוח שהכל תקין ורוצה תהליך מהיר:
-
 ```bash
-# 1. עדכון ומיזוג
 git checkout main && git pull origin main
 git checkout production && git pull origin production
 git merge main
-
-# 2. סינכרון
+python scripts/release/run_release_checklist.py --skip-schema
 ./scripts/sync_to_production.py
-
-# 3. בדיקה מהירה
-./scripts/verify_production_isolation.sh
-
-# 4. עדכון גרסה
-python3 scripts/versioning/bump-version.py \
-  --env production \
-  --bump patch \
-  --note "Quick update - $(date +%Y-%m-%d)"
-
-# 5. Commit & Push
-git add documentation/version-manifest.json \
-        documentation/production/VERSION_HISTORY.md \
-        scripts/versioning/ \
-        documentation/production/ \
-        scripts/
-git commit -m "feat: Update production from main"
+python scripts/release/post_update_validation.py --skip-schema --skip-isolation
+python scripts/versioning/bump-version.py --env production --bump patch --note "Quick update"
+python scripts/release/git_stage_release.py
+git commit -m "chore: production quick-update"
 git push origin production
+./start_production.sh > logs-production/start.log 2>&1 &
 ```
 
 ---
 
-## 🔍 פתרון בעיות
+## 🔍 פתרון בעיות נפוצות
 
-### בעיה: קונפליקטים במיזוג
-
-**פתרון:**
+### קונפליקטים במיזוג
 ```bash
-# בדוק את הקונפליקטים
 git status
-
-# פתור ידנית את הקבצים עם קונפליקטים
-# ודא שהקבצים ב-production/Backend/ נשארים נכונים
-
-# אחרי פתרון:
-git add .
+# פותר קבצים ידנית, במיוחד production/Backend/**
+git add <files>
 git commit -m "Resolve merge conflicts"
 ```
 
-### בעיה: קבצים חסרים אחרי sync
-
-**פתרון:**
+### קבצים חסרים אחרי sync
 ```bash
-# הרץ sync שוב
 ./scripts/sync_to_production.py
-
-# בדוק מה חסר
 ./scripts/verify_production.sh
-
-# אם צריך, הוסף ידנית קבצים ספציפיים
 ```
 
-### בעיה: שגיאות imports אחרי sync
-
-**פתרון:**
+### שגיאות import אחרי sync
 ```bash
-# בדוק את ההגדרות
 cd production/Backend
 python3 -c "from config.settings import DB_PATH, UI_DIR, PORT, IS_PRODUCTION; \
-    print(f'DB: {DB_PATH}'); \
-    print(f'UI: {UI_DIR}'); \
-    print(f'Port: {PORT}'); \
-    print(f'Production: {IS_PRODUCTION}')"
-
-# אם יש בעיה, תקן את config/settings.py
-# ודא ש-IS_PRODUCTION = True (hardcoded)
-# ודא ש-PORT = 5001 (hardcoded)
-# ודא ש-UI_DIR מצביע על production/trading-ui
-# ודא ש-DB_PATH מצביע על production/Backend/db/tiktrack.db
+    print(DB_PATH, UI_DIR, PORT, IS_PRODUCTION)"
 ```
 
-### בעיה: הגדרות production לא נכונות אחרי sync
-
-**זו בעיה נפוצה!** הסקריפט sync מעתיק את `config/settings.py` מ-Backend, אבל ב-production צריך hardcoded values.
-
-**פתרון:**
-1. פתח `production/Backend/config/settings.py`
-2. ודא שהקובץ מכיל:
-   ```python
-   IS_PRODUCTION = True  # Hardcoded!
-   PORT = 5001  # Hardcoded!
-   DB_PATH = BASE_DIR / "db" / "tiktrack.db"
-   UI_DIR = BASE_DIR.parent / "trading-ui"
-   ```
-3. פתח `production/Backend/config/logging.py`
-4. ודא ש-`log_dir = Path("logs")` (לא `logs-production`)
-
-### בעיה: שרת לא מתחיל
-
-**פתרון:**
+### שרת לא מתחיל
 ```bash
-# בדוק קונפליקטים על הפורט
 lsof -i :5001
-
-# בדוק את הלוגים
 tail -f production/Backend/logs/app.log
+python scripts/release/post_update_validation.py --skip-schema --skip-isolation
+```
 
-# בדוק את ההגדרות
-cd production/Backend
-python3 -c "from config.settings import PORT, DB_PATH, UI_DIR; \
-    print(f'Port: {PORT}'); \
-    print(f'DB exists: {DB_PATH.exists()}'); \
-    print(f'UI exists: {UI_DIR.exists()}')"
+### עבודה עם Git ב-Cursor
+```bash
+python scripts/release/git_stage_release.py
+```
+הסקריפט מטפל ב-staging נקי ומציג מצב לפני/אחרי.
+
+### שחזור גיבוי
+```bash
+python scripts/release/create_db_backup.py --label emergency --notes "לפני שחזור"
+cp Backend/db/backups/<backup>.db Backend/db/tiktrack.db
+cp Backend/db/tiktrack.db production/Backend/db/tiktrack.db
 ```
 
 ---
 
 ## ✅ Checklist לפני Commit
 
-לפני commit, ודא:
-
-- [ ] כל הבדיקות עברו בהצלחה
-- [ ] אין קבצי DB או logs ב-commit
-- [ ] **ההגדרות ב-`production/Backend/config/settings.py` נכונות (hardcoded production)**
-- [ ] **ההגדרות ב-`production/Backend/config/logging.py` נכונות (logs directory)**
-- [ ] UI_DIR מצביע על `production/trading-ui`
-- [ ] DB_PATH מצביע על `production/Backend/db/tiktrack.db`
-- [ ] PORT = 5001 (hardcoded)
-- [ ] IS_PRODUCTION = True (hardcoded)
-- [ ] ה-commit message ברור ומתאר את השינויים
-- [ ] אם יש מיגרציות חדשות, הן נוספו ל-`create_production_db.py`
+- [ ] `run_release_checklist.py` ו-`post_update_validation.py` עברו בהצלחה.
+- [ ] אין קבצי DB/לוגים ב־Git.
+- [ ] `config/settings.py` ב־production ב-hardcode.
+- [ ] `config/logging.py` מצביע על `logs`.
+- [ ] קיימים המטבעות USD/EUR/ILS וחשבון `ibkr-int`.
+- [ ] גרסה עודכנה (`version-manifest.json`, `VERSION_HISTORY.md`).
+- [ ] commit message ברור (מומלץ `chore: production release YYYY-MM-DD`).
 
 ---
 
-## 📊 דוגמה לתהליך מלא
+## 📚 נספחים ורפרנסים
 
-```bash
-# ============================================
-# תהליך עדכון פרודקשן - דוגמה מלאה
-# ============================================
-
-# 1. עדכון main
-git checkout main
-git pull origin main
-echo "✅ Main updated"
-
-# 2. מיזוג ל-production
-git checkout production
-git pull origin production
-git merge main
-echo "✅ Merged main into production"
-
-# 3. סינכרון קוד
-./scripts/sync_to_production.py
-echo "✅ Code synced"
-
-# 3.5. תיקון הגדרות Production (קריטי!)
-cd production/Backend
-python3 -c "from config.settings import PORT, IS_PRODUCTION; \
-    assert PORT == 5001, f'Port should be 5001, got {PORT}'; \
-    assert IS_PRODUCTION == True, f'Should be production, got {IS_PRODUCTION}'; \
-    print('✅ Production settings verified')"
-cd ../..
-echo "✅ Production settings verified"
-
-# 4. בדיקות
-./scripts/verify_production_isolation.sh
-./scripts/verify_production.sh
-echo "✅ Verification passed"
-
-# 5. Commit & Push
-git add production/ scripts/ documentation/production/
-git commit -m "feat: Update production from main - $(date +%Y-%m-%d)"
-git push origin production
-echo "✅ Pushed to remote"
-
-echo "🎉 Production update completed successfully!"
-```
-
----
-
-## 🔗 קבצים רלוונטיים
-
-- `scripts/sync_to_production.py` - סקריפט סינכרון קוד
-- `scripts/sync_ui_to_production.py` - סקריפט סינכרון UI
-- `scripts/verify_production_isolation.sh` - בדיקת הפרדה
-- `scripts/verify_production.sh` - בדיקת מבנה כללי
-- `production/Backend/config/settings.py` - **הגדרות פרודקשן (חייב להיות hardcoded!)**
-- `production/Backend/config/logging.py` - הגדרות לוגים (חייב להיות hardcoded!)
-- `production/Backend/routes/api/currencies.py` - **Endpoint מטבעות (משתמש ב-production DB)**
-- `production/trading-ui/scripts/trading_accounts.js` - **Rate limiting ו-debouncing**
-- `production/trading-ui/scripts/api-config.js` - הגדרות API מרכזיות
-- `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות)
-- `production/Backend/scripts/cleanup_import_sessions.py` - ניקוי סשני ייבוא ישנים
-- `production/start_production.sh` - הפעלת שרת
-
----
-
-## 📚 תיעוד נוסף
-
-- `CODE_SEPARATION.md` - מדריך הפרדת קוד
-- `ISOLATION_VERIFICATION.md` - בדיקות הפרדה
-- `PARALLEL_RUNNING.md` - הרצה במקביל
-- `PRODUCTION_SETUP.md` - הקמת סביבה
-
----
-
-**עודכן:** 2025-11-09  
-**גרסה:** 1.3.0  
-**מטרה:** תהליך עדכון מסודר ומובנה
-
-## 📝 שינויים בגרסה 1.3.0
-
-- ✅ **תיקון Rate Limiting:** הוספת debouncing למניעת קריאות API מרובות ב-`trading_accounts.js`
-- ✅ **תיקון Currencies Endpoint:** תיקון נתיב DB ב-`currencies.py` לשימוש ב-production DB
-- ✅ **מניעת קריאות כפולות:** הוספת flags למניעת קריאות סימולטניות
-- ✅ **טיפול בשגיאות Rate Limit:** הוספת טיפול אוטומטי בשגיאות 429 עם retry logic
-
-## 📝 שינויים בגרסה 1.2.0
-
-- ✅ **מרכזת כתובות API:** כל ה-hardcoded URLs הוחלפו ב-relative URLs (`/api/...`)
-- ✅ **קובץ api-config.js:** יצירת קובץ הגדרות מרכזי (מינימלי - רק window.API_BASE_URL)
-- ✅ **סקריפט בדיקה:** יצירת `scripts/check-hardcoded-urls.py` לבדיקת hardcoded URLs
-- ✅ **תמיכה אוטומטית:** הקוד עובד אוטומטית בפיתוח (8080) ובפרודקשן (5001)
-- ✅ **הסרת file protocol fallback:** לא נדרש בפרודקשן - פתיחה ישירה לא נתמכת
-
-## 📝 שינויים בגרסה 1.1.0
-
-- ✅ הוספת שלב 3.5: תיקון הגדרות Production (קריטי!)
-- ✅ עדכון פתרון בעיות עם תיקון הגדרות אחרי sync
-- ✅ עדכון checklist עם בדיקת הגדרות hardcoded
-- ✅ הוספת מידע על מיגרציות וסקריפטים חדשים
+- `documentation/03-DEVELOPMENT/PRODUCTION_RELEASE_PLAYBOOK.md`
+- `documentation/frontend/GENERAL_SYSTEMS_LIST.md`
+- `documentation/INDEX.md`
+- `scripts/release/create_db_backup.py`
+- `scripts/release/verify_schema.py`
+- `scripts/release/run_release_checklist.py`
+- `scripts/release/post_update_validation.py`
+- `scripts/release/git_stage_release.py`
+- `scripts/verify_production_isolation.sh`
+- `scripts/verify_production.sh`
+- `scripts/sync_to_production.py`
 
 

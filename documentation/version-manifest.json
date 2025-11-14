@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.2.0",
+    "version": "1.2.0.0",
     "major": 1,
-    "minor": 1,
-    "patch": 2,
+    "minor": 2,
+    "patch": 0,
     "build": 0,
-    "commit": "879589ab4605cc5529c1675e1c855414d51aa911",
-    "updated_at": "2025-11-14T20:14:54+00:00",
-    "notes": "Improve server startup flow"
+    "commit": "b7d12c2d678edb97006b26f0391ab04d5a8af0b4",
+    "updated_at": "2025-11-14T21:05:43+00:00",
+    "notes": "Prod 1.2: lint monitor UX + tagging refresh"
   },
   "development": {
     "version": "1.0.23.0",

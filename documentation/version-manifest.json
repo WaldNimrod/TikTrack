@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.1.0",
+    "version": "1.1.2.0",
     "major": 1,
     "minor": 1,
-    "patch": 1,
+    "patch": 2,
     "build": 0,
-    "commit": "87cdd25fd639298da485550f8bd5ee10917c034d",
-    "updated_at": "2025-11-14T22:53:46+00:00",
-    "notes": "Align development baseline to production 1.1.1"
+    "commit": "9b60c5da8d26e01e95376d60f95c2e9dc9efc739",
+    "updated_at": "2025-11-14T22:59:13+00:00",
+    "notes": "Force trading accounts reload after CRUD"
   }
 }

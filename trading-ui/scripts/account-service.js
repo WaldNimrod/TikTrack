@@ -165,6 +165,9 @@ async function cancelAccount(accountId) {
   }
 
   clearCache();
+  if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+    await window.loadTradingAccountsDataForTradingAccountsPage({ force: true });
+  }
   return true;
 }
 

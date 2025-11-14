@@ -41,3 +41,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-14T20:46:53+00:00 | 1.0.31.0 | 1.0.30.0 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | a0a0f3de4f8ea14c5c9b4efb0776f7c444b01c18 | patch | Sync local updates before release |
 | 2025-11-14T21:32:09+00:00 | 1.0.32.0 | 1.0.31.0 | 45e298f030000987077cbdde4cbe92111ecf5fd2 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | patch | Home tag widgets and smart suggestions |
 | 2025-11-14T22:18:29+00:00 | 1.0.33.0 | 1.0.32.0 | f7fd7213d0f16d60b4a9892540633a8e30fb41bc | 45e298f030000987077cbdde4cbe92111ecf5fd2 | patch | Polish tag widgets styling |
+| 2025-11-14T22:31:18+00:00 | 1.0.34.0 | 1.0.33.0 | 25696b0a38eb895c5eaf5f7e0f4ad73d24c36010 | f7fd7213d0f16d60b4a9892540633a8e30fb41bc | patch | Document conditions improvements and RTL buttons |

@@ -166,7 +166,8 @@
                 entityType: context.entityType || 'plan',
                 entityId: context.entityId,
                 entityName: context.entityName || '',
-                parentModalId: context.parentModalId || null
+                parentModalId: context.parentModalId || null,
+                focusConditionId: context.focusConditionId ?? null
             };
             this.parentModalId = this.context.parentModalId || null;
 
@@ -291,6 +292,19 @@
                 entityName: this.context.entityName,
                 containerId: 'conditionsManagerRoot'
             });
+
+            if (this.context.focusConditionId && typeof this.managerInstance?.handleEditCondition === 'function') {
+                const conditionIdToEdit = Number(this.context.focusConditionId);
+                if (!Number.isNaN(conditionIdToEdit)) {
+                    setTimeout(() => {
+                        try {
+                            this.managerInstance?.handleEditCondition(conditionIdToEdit);
+                        } catch (error) {
+                            window.Logger?.warn('[ConditionsModalController] Failed to auto-open condition edit form', { error: error?.message }, { page: 'conditions-modal-controller' });
+                        }
+                    }, 50);
+                }
+            }
 
             if (this.navigationInstanceId && window.ModalNavigationService?.updateModalMetadata) {
                 window.ModalNavigationService.updateModalMetadata(MODAL_ID, {

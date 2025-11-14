@@ -30,6 +30,7 @@
  * - renderAssignmentItem(item)
  * - renderCreations(list)
  * - renderCreationItem(item)
+ * - setupHoverDetails()
  *
  * ACTIONS
  * - handleAssignButton(tradeId, planId)
@@ -144,7 +145,7 @@
                                 <h6 class="mb-0 text-muted">שיוך לתוכנית קיימת</h6>
                                 <span class="badge bg-body-secondary text-body" id="pendingTradePlanAssignmentsCount">0</span>
                             </div>
-                            <ul class="list-group list-group-flush" id="pendingTradePlanAssignmentsList"></ul>
+                            <ul class="list-group list-group-flush pending-highlight-list" id="pendingTradePlanAssignmentsList"></ul>
                         </div>
                         <hr class="my-1 d-none" id="pendingTradePlanDivider">
                         <div class="d-flex flex-column gap-2 widget-section" id="pendingTradePlanCreationsSection">
@@ -152,7 +153,7 @@
                                 <h6 class="mb-0 text-muted">יצירת תוכנית חדשה</h6>
                                 <span class="badge bg-body-secondary text-body" id="pendingTradePlanCreationsCount">0</span>
                             </div>
-                            <ul class="list-group list-group-flush" id="pendingTradePlanCreationsList"></ul>
+                            <ul class="list-group list-group-flush pending-highlight-list" id="pendingTradePlanCreationsList"></ul>
                         </div>
                     </div>
                 </div>
@@ -378,6 +379,8 @@
             } else if (window.initializeButtons) {
                 window.initializeButtons(this.dom.card);
             }
+
+            this.setupHoverDetails();
         },
 
         renderAssignments(items) {
@@ -423,7 +426,7 @@
             const createdAt = this.formatDate(trade.created_at);
 
             return `
-                <li class="list-group-item d-flex flex-column gap-2" data-trade-id="${trade.id}">
+                <li class="list-group-item pending-highlight-item" data-trade-id="${trade.id}" data-kind="assignment">
                     <div class="d-flex align-items-start gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex flex-wrap align-items-center gap-2">
@@ -457,13 +460,19 @@
                             </button>
                         </div>
                     </div>
-                    <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small fw-semibold">תוכנית מומלצת:</span>
-                            ${planBadge}
-                            ${statusBadge || ''}
+                    <div class="pending-highlight-details">
+                        <div class="row g-2 align-items-stretch">
+                            <div class="col-12">
+                                <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small fw-semibold">תוכנית מומלצת:</span>
+                                        ${planBadge}
+                                        ${statusBadge || ''}
+                                    </div>
+                                    ${reasonsList}
+                                </div>
+                            </div>
                         </div>
-                        ${reasonsList}
                     </div>
                 </li>
             `;
@@ -479,6 +488,48 @@
             }
             const html = items.map(item => this.renderCreationItem(item)).join('');
             this.dom.creationsList.innerHTML = html;
+        },
+
+        setupHoverDetails() {
+            const lists = [this.dom.assignmentsList, this.dom.creationsList].filter(Boolean);
+            lists.forEach(list => {
+                const items = list.querySelectorAll('.pending-highlight-item');
+                items.forEach(item => {
+                    if (item.dataset.hoverBound === 'true') {
+                        return;
+                    }
+
+                    let hideTimer = null;
+                    const showDetails = () => {
+                        if (hideTimer) {
+                            clearTimeout(hideTimer);
+                            hideTimer = null;
+                        }
+                        item.classList.add('is-hovered');
+                    };
+
+                    const hideDetails = () => {
+                        if (hideTimer) {
+                            clearTimeout(hideTimer);
+                        }
+                        hideTimer = window.setTimeout(() => {
+                            item.classList.remove('is-hovered');
+                            hideTimer = null;
+                        }, 160);
+                    };
+
+                    item.addEventListener('mouseenter', showDetails);
+                    item.addEventListener('mouseleave', hideDetails);
+                    item.addEventListener('focusin', showDetails);
+                    item.addEventListener('focusout', (event) => {
+                        if (!item.contains(event.relatedTarget)) {
+                            hideDetails();
+                        }
+                    });
+
+                    item.dataset.hoverBound = 'true';
+                });
+            });
         },
 
         renderCreationItem(item) {
@@ -510,7 +561,7 @@
                 : '';
 
             return `
-                <li class="list-group-item d-flex flex-column gap-2" data-trade-id="${trade.id}">
+                <li class="list-group-item pending-highlight-item" data-trade-id="${trade.id}" data-kind="creation">
                     <div class="d-flex align-items-start gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex flex-wrap align-items-center gap-2">
@@ -542,15 +593,21 @@
                             </button>
                         </div>
                     </div>
-                    <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
-                        <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
-                            <span>כמות מוצעת: ${quantity}</span>
-                            <span>•</span>
-                            <span>סכום מתוכנן: ${amount || '-'} </span>
-                            <span>•</span>
-                            <span>תאריך כניסה: ${this.formatDate(prefill.entry_date)}</span>
+                    <div class="pending-highlight-details">
+                        <div class="row g-2 align-items-stretch">
+                            <div class="col-12">
+                                <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
+                                    <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+                                        <span>כמות מוצעת: ${quantity}</span>
+                                        <span>•</span>
+                                        <span>סכום מתוכנן: ${amount || '-'} </span>
+                                        <span>•</span>
+                                        <span>תאריך כניסה: ${this.formatDate(prefill.entry_date)}</span>
+                                    </div>
+                                    ${assignmentNotice}
+                                </div>
+                            </div>
                         </div>
-                        ${assignmentNotice}
                     </div>
                 </li>
             `;

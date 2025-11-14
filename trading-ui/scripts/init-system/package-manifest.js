@@ -1203,18 +1203,11 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1
       },
       {
-        file: 'server-monitor.js',
-        globalCheck: 'window.ServerMonitor',
-        description: 'ניטור שרת',
-        required: true,
-        loadOrder: 2
-      },
-      {
         file: 'background-tasks.js',
         globalCheck: 'window.startScheduler',
         description: 'משימות רקע',
         required: true,
-        loadOrder: 3
+        loadOrder: 2
       }
     ],
     estimatedSize: '~150KB',

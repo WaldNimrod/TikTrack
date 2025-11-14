@@ -63,3 +63,4 @@ This document lists every identified fallback mechanism, their current behaviour
 3. Update status report (`tests/TEST_STATUS_REPORT.md`) once ≥90% coverage maintained without fallback code.
 
 
+

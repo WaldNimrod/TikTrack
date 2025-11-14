@@ -175,6 +175,11 @@ async function checkForMismatches(pageName, pageConfig) {
     }
     
     const requiredScripts = [];
+    const pageSpecificScripts =
+        Array.isArray(pageConfig?.pageSpecificScripts) ? pageConfig.pageSpecificScripts.filter(Boolean) : [];
+    const normalizedPageSpecificScripts = pageSpecificScripts.map(script =>
+        script.split('/').pop().split('?')[0]
+    );
     const requiredGlobals = pageConfig.requiredGlobals || [];
     
     // Collect required scripts from packages
@@ -192,6 +197,12 @@ async function checkForMismatches(pageName, pageConfig) {
                     }
                 });
             }
+        });
+    }
+
+    if (pageSpecificScripts.length > 0) {
+        pageSpecificScripts.forEach(script => {
+            requiredScripts.push(script);
         });
     }
     
@@ -263,9 +274,9 @@ async function checkForMismatches(pageName, pageConfig) {
     loadedScripts.forEach(loadedScript => {
         // Check if this script is documented (either as full path or just filename)
         // Also check optional scripts (required: false)
+        const loadedFilename = loadedScript.split('/').pop().split('?')[0];
         let isDocumented = requiredScripts.some(requiredScript => {
             const requiredFilename = requiredScript.split('/').pop().split('?')[0];
-            const loadedFilename = loadedScript.split('/').pop().split('?')[0];
             return requiredScript === loadedScript || requiredFilename === loadedFilename || loadedScript.includes(requiredScript);
         });
         
@@ -302,6 +313,7 @@ async function checkForMismatches(pageName, pageConfig) {
         
         // Check if this is a page-specific script (same name as page)
         const isPageSpecificScript = loadedScript.includes(`${pageName}.js`);
+        const isCustomPageSpecificScript = normalizedPageSpecificScripts.includes(loadedFilename);
         
         // Allowed system scripts that don't need to be in manifest
         // Also check if script is part of entity-details package (modal-navigation-manager, modal-manager-v2)
@@ -325,6 +337,7 @@ async function checkForMismatches(pageName, pageConfig) {
         
         if (!isDocumented && !isOptionalScript &&
             !isPageSpecificScript &&
+            !isCustomPageSpecificScript &&
             !isAllowedSystemScript) {
             mismatches.push({
                 type: 'extra_script',
@@ -379,12 +392,26 @@ async function checkForMismatches(pageName, pageConfig) {
     const pageSpecificScript = `${pageName}.js`;
     const pageScriptIndex = loadedScripts.indexOf(pageSpecificScript);
     
+    const pageSpecificScriptLoadedViaPackage =
+        pageConfig.packages &&
+        window.PACKAGE_MANIFEST &&
+        pageConfig.packages.some(pkgName => {
+            const pkg = window.PACKAGE_MANIFEST[pkgName];
+            if (!pkg || !pkg.scripts) {
+                return false;
+            }
+            return pkg.scripts.some(script => {
+                const scriptFilename = script.file.split('/').pop().split('?')[0];
+                return scriptFilename === pageSpecificScript;
+            });
+        });
+    
     if (pageScriptIndex !== -1) {
         // Page-specific script should be loaded after initialization scripts
         const initScripts = ['package-manifest.js', 'page-initialization-configs.js', 'unified-app-initializer.js'];
         const lastInitIndex = Math.max(...initScripts.map(script => loadedScripts.indexOf(script)).filter(i => i !== -1));
         
-        if (lastInitIndex !== -1 && pageScriptIndex < lastInitIndex) {
+        if (!pageSpecificScriptLoadedViaPackage && lastInitIndex !== -1 && pageScriptIndex < lastInitIndex) {
             loadOrderIssues.push({
                 type: 'loading_order',
                 message: `סדר טעינה שגוי: ${pageSpecificScript} נטען לפני סקריפטי האתחול`,

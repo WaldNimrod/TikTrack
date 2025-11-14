@@ -1116,76 +1116,6 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   return result.isValid;
 }
 
-// ולידציה - משתמש במערכת הכללית window.validateEntityForm
-// REMOVED: validateEditNoteForm - deprecated wrapper, use window.validateEntityForm() instead
-/**
- * Validate edit note form
- * @param {string} content - Note content
- * @param {string} relationType - Type of relation
- * @param {string} relatedId - ID of related object
- * @param {File} attachment - Attachment file
- * @returns {boolean} Whether the form is valid
- */
-function _REMOVED_validateEditNoteForm(content, relationType, relatedId, attachment) {
-  try {
-    let isValid = true;
-
-    // ניקוי שגיאות קודמות
-    clearNoteValidationErrors();
-
-  // וולידציה של תוכן
-  if (!content) {
-    window.showValidationWarning('editContentError', 'תוכן הערה הוא שדה חובה');
-    isValid = false;
-  } else if (content.length < 1) {
-    window.showValidationWarning('editContentError', 'תוכן ההערה חייב להכיל לפחות תו אחד');
-    isValid = false;
-  } else if (content.length > 10000) {
-    window.showValidationWarning('editContentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
-    isValid = false;
-  }
-
-  // וולידציה של סוג קשר
-  if (!relationType) {
-    window.showValidationWarning('editRelationTypeError', 'יש לבחור סוג אובייקט לשיוך');
-    isValid = false;
-  }
-
-  // וולידציה של אובייקט קשור
-  if (!relatedId) {
-    window.showValidationWarning('editRelatedObjectError', 'יש לבחור אובייקט לשיוך');
-    isValid = false;
-  } else if (isNaN(parseInt(relatedId)) || parseInt(relatedId) <= 0) {
-    window.showValidationWarning('editRelatedObjectError', 'מזהה אובייקט לא תקין');
-    isValid = false;
-  }
-
-  // וולידציה של קובץ מצורף (אם קיים)
-  if (attachment) {
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (attachment.size > maxSize) {
-      window.showValidationWarning('editAttachmentError', 'קובץ מצורף גדול מדי (מקסימום 10MB)');
-      isValid = false;
-    }
-
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'application/pdf'];
-    if (!allowedTypes.includes(attachment.type)) {
-      window.showValidationWarning('editAttachmentError', 'סוג קובץ לא נתמך. מותרים: תמונות (JPG, PNG, GIF, BMP, WebP) ו-PDF בלבד');
-      isValid = false;
-    }
-  }
-
-  return isValid;
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בוולידציה של טופס עריכת הערה:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בוולידציה של טופס עריכת הערה', error.message);
-    }
-    return false;
-  }
-}
-
 // פונקציות שמירה ומחיקה
 async function saveNote() {
   const form = document.getElementById('notesModalForm') || document.getElementById('addNoteForm');
@@ -1495,7 +1425,7 @@ function clearNoteValidationErrors() {
   }
 }
 
-// _REMOVED_getFieldByErrorId - Function was commented out and is no longer in use
+// Legacy getFieldByErrorId function was removed; use validation-utils helpers instead
 // Original implementation was removed as part of code cleanup
 //     return document.getElementById('editNoteRelatedObjectSelect');
 //   default:

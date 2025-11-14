@@ -1,30 +1,367 @@
 {
-  "generatedAt": "2025-11-14T12:58:41.228Z",
+  "generatedAt": "2025-11-14T20:41:25.941Z",
   "nodeVersion": "v24.7.0",
   "totals": {
     "tools": 4,
-    "passed": 3,
-    "warning": 1,
-    "failed": 0,
+    "passed": 1,
+    "warning": 2,
+    "failed": 1,
     "error": 0,
-    "issues": 2,
-    "errors": 0,
-    "warnings": 2
+    "issues": 87,
+    "errors": 41,
+    "warnings": 46
   },
   "tasks": [
     {
       "id": "eslint",
       "label": "ESLint",
-      "status": "passed",
-      "exitCode": 0,
-      "durationMs": 585,
-      "issues": [],
+      "status": "failed",
+      "exitCode": 1,
+      "durationMs": 576,
+      "issues": [
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 472,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 6."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 473,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 474,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 475,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 6."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 476,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 477,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 478,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 6."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 479,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 480,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 481,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 6."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 482,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 483,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 484,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 6."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 485,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 486,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 487,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 6."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 488,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 489,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 8 spaces but found 10."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 490,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 491,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 8."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 513,
+          "column": 52,
+          "rule": "comma-dangle",
+          "severity": "error",
+          "message": "Missing trailing comma."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 569,
+          "column": 7,
+          "rule": "no-extra-parens",
+          "severity": "error",
+          "message": "Unnecessary parentheses around expression."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 570,
+          "column": 7,
+          "rule": "no-extra-parens",
+          "severity": "error",
+          "message": "Unnecessary parentheses around expression."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 587,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 8 spaces but found 10."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 588,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 10 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 590,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 10 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 591,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 10 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 592,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 10 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 593,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 10 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 603,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 8 spaces but found 10."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 604,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 8 spaces but found 10."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 626,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 627,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 14."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 635,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 636,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 656,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 657,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 6 spaces but found 14."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 665,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 666,
+          "column": 1,
+          "rule": "indent",
+          "severity": "error",
+          "message": "Expected indentation of 4 spaces but found 12."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 725,
+          "column": 3,
+          "rule": "class-methods-use-this",
+          "severity": "warning",
+          "message": "Expected 'this' to be used by class method 'escapeHtml'."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 736,
+          "column": 49,
+          "rule": "no-extra-parens",
+          "severity": "error",
+          "message": "Unnecessary parentheses around expression."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js",
+          "line": 777,
+          "column": 49,
+          "rule": "no-extra-parens",
+          "severity": "error",
+          "message": "Unnecessary parentheses around expression."
+        }
+      ],
       "summary": {
         "files": 2,
-        "errors": 0,
-        "warnings": 0
+        "errors": 41,
+        "warnings": 1
       },
-      "stdout": "[{\"filePath\":\"/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js\",\"messages\":[],\"suppressedMessages\":[],\"errorCount\":0,\"fatalErrorCount\":0,\"warningCount\":0,\"fixableErrorCount\":0,\"fixableWarningCount\":0,\"usedDeprecatedRules\":[{\"ruleId\":\"indent\",\"replacedBy\":[\"@stylistic/indent\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"indent\",\"url\":\"https://eslint.style/rules/indent\"}}]}},{\"ruleId\":\"quotes\",\"replacedBy\":[\"@stylistic/quotes\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"quotes\",\"url\":\"https://eslint.style/rules/quotes\"}}]}},{\"ruleId\":\"semi\",\"replacedBy\":[\"@stylistic/semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi\",\"url\":\"https://eslint.style/rules/semi\"}}]}},{\"ruleId\":\"comma-dangle\",\"replacedBy\":[\"@stylistic/comma-dangle\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-dangle\",\"url\":\"https://eslint.style/rules/comma-dangle\"}}]}},{\"ruleId\":\"no-new-object\",\"replacedBy\":[\"no-object-constructor\"],\"info\":{\"message\":\"The new rule flags more situations where object literal syntax can be used, and it does not report a problem when the `Object` constructor is invoked with an argument.\",\"url\":\"https://eslint.org/blog/2023/09/eslint-v8.50.0-released/\",\"deprecatedSince\":\"8.50.0\",\"availableUntil\":null,\"replacedBy\":[{\"rule\":{\"name\":\"no-object-constructor\",\"url\":\"https://eslint.org/docs/rules/no-object-constructor\"}}]}},{\"ruleId\":\"max-len\",\"replacedBy\":[\"@stylistic/max-len\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"max-len\",\"url\":\"https://eslint.style/rules/max-len\"}}]}},{\"ruleId\":\"spaced-comment\",\"replacedBy\":[\"@stylistic/spaced-comment\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"spaced-comment\",\"url\":\"https://eslint.style/rules/spaced-comment\"}}]}},{\"ruleId\":\"no-trailing-spaces\",\"replacedBy\":[\"@stylistic/no-trailing-spaces\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-trailing-spaces\",\"url\":\"https://eslint.style/rules/no-trailing-spaces\"}}]}},{\"ruleId\":\"no-multiple-empty-lines\",\"replacedBy\":[\"@stylistic/no-multiple-empty-lines\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-multiple-empty-lines\",\"url\":\"https://eslint.style/rules/no-multiple-empty-lines\"}}]}},{\"ruleId\":\"eol-last\",\"replacedBy\":[\"@stylistic/eol-last\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"eol-last\",\"url\":\"https://eslint.style/rules/eol-last\"}}]}},{\"ruleId\":\"no-mixed-spaces-and-tabs\",\"replacedBy\":[\"@stylistic/no-mixed-spaces-and-tabs\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-mixed-spaces-and-tabs\",\"url\":\"https://eslint.style/rules/no-mixed-spaces-and-tabs\"}}]}},{\"ruleId\":\"semi-spacing\",\"replacedBy\":[\"@stylistic/semi-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi-spacing\",\"url\":\"https://eslint.style/rules/semi-spacing\"}}]}},{\"ruleId\":\"no-extra-semi\",\"replacedBy\":[\"@stylistic/no-extra-semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-semi\",\"url\":\"https://eslint.style/rules/no-extra-semi\"}}]}},{\"ruleId\":\"comma-spacing\",\"replacedBy\":[\"@stylistic/comma-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-spacing\",\"url\":\"https://eslint.style/rules/comma-spacing\"}}]}},{\"ruleId\":\"comma-style\",\"replacedBy\":[\"@stylistic/comma-style\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-style\",\"url\":\"https://eslint.style/rules/comma-style\"}}]}},{\"ruleId\":\"arrow-spacing\",\"replacedBy\":[\"@stylistic/arrow-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-spacing\",\"url\":\"https://eslint.style/rules/arrow-spacing\"}}]}},{\"ruleId\":\"arrow-parens\",\"replacedBy\":[\"@stylistic/arrow-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-parens\",\"url\":\"https://eslint.style/rules/arrow-parens\"}}]}},{\"ruleId\":\"no-extra-parens\",\"replacedBy\":[\"@stylistic/no-extra-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-parens\",\"url\":\"https://eslint.style/rules/no-extra-parens\"}}]}}]},{\"filePath\":\"/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/lint-status-service.js\",\"messages\":[],\"suppressedMessages\":[],\"errorCount\":0,\"fatalErrorCount\":0,\"warningCount\":0,\"fixableErrorCount\":0,\"fixableWarningCount\":0,\"usedDeprecatedRules\":[{\"ruleId\":\"indent\",\"replacedBy\":[\"@stylistic/indent\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"indent\",\"url\":\"https://eslint.style/rules/indent\"}}]}},{\"ruleId\":\"quotes\",\"replacedBy\":[\"@stylistic/quotes\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"quotes\",\"url\":\"https://eslint.style/rules/quotes\"}}]}},{\"ruleId\":\"semi\",\"replacedBy\":[\"@stylistic/semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi\",\"url\":\"https://eslint.style/rules/semi\"}}]}},{\"ruleId\":\"comma-dangle\",\"replacedBy\":[\"@stylistic/comma-dangle\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-dangle\",\"url\":\"https://eslint.style/rules/comma-dangle\"}}]}},{\"ruleId\":\"no-new-object\",\"replacedBy\":[\"no-object-constructor\"],\"info\":{\"message\":\"The new rule flags more situations where object literal syntax can be used, and it does not report a problem when the `Object` constructor is invoked with an argument.\",\"url\":\"https://eslint.org/blog/2023/09/eslint-v8.50.0-released/\",\"deprecatedSince\":\"8.50.0\",\"availableUntil\":null,\"replacedBy\":[{\"rule\":{\"name\":\"no-object-constructor\",\"url\":\"https://eslint.org/docs/rules/no-object-constructor\"}}]}},{\"ruleId\":\"max-len\",\"replacedBy\":[\"@stylistic/max-len\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"max-len\",\"url\":\"https://eslint.style/rules/max-len\"}}]}},{\"ruleId\":\"spaced-comment\",\"replacedBy\":[\"@stylistic/spaced-comment\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"spaced-comment\",\"url\":\"https://eslint.style/rules/spaced-comment\"}}]}},{\"ruleId\":\"no-trailing-spaces\",\"replacedBy\":[\"@stylistic/no-trailing-spaces\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-trailing-spaces\",\"url\":\"https://eslint.style/rules/no-trailing-spaces\"}}]}},{\"ruleId\":\"no-multiple-empty-lines\",\"replacedBy\":[\"@stylistic/no-multiple-empty-lines\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-multiple-empty-lines\",\"url\":\"https://eslint.style/rules/no-multiple-empty-lines\"}}]}},{\"ruleId\":\"eol-last\",\"replacedBy\":[\"@stylistic/eol-last\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"eol-last\",\"url\":\"https://eslint.style/rules/eol-last\"}}]}},{\"ruleId\":\"no-mixed-spaces-and-tabs\",\"replacedBy\":[\"@stylistic/no-mixed-spaces-and-tabs\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-mixed-spaces-and-tabs\",\"url\":\"https://eslint.style/rules/no-mixed-spaces-and-tabs\"}}]}},{\"ruleId\":\"semi-spacing\",\"replacedBy\":[\"@stylistic/semi-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi-spacing\",\"url\":\"https://eslint.style/rules/semi-spacing\"}}]}},{\"ruleId\":\"no-extra-semi\",\"replacedBy\":[\"@stylistic/no-extra-semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-semi\",\"url\":\"https://eslint.style/rules/no-extra-semi\"}}]}},{\"ruleId\":\"comma-spacing\",\"replacedBy\":[\"@stylistic/comma-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-spacing\",\"url\":\"https://eslint.style/rules/comma-spacing\"}}]}},{\"ruleId\":\"comma-style\",\"replacedBy\":[\"@stylistic/comma-style\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-style\",\"url\":\"https://eslint.style/rules/comma-style\"}}]}},{\"ruleId\":\"arrow-spacing\",\"replacedBy\":[\"@stylistic/arrow-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-spacing\",\"url\":\"https://eslint.style/rules/arrow-spacing\"}}]}},{\"ruleId\":\"arrow-parens\",\"replacedBy\":[\"@stylistic/arrow-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-parens\",\"url\":\"https://eslint.style/rules/arrow-parens\"}}]}},{\"ruleId\":\"no-extra-parens\",\"replacedBy\":[\"@stylistic/no-extra-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-parens\",\"url\":\"https://eslint.style/rules/no-extra-parens\"}}]}}]}]\n",
+      "stdout": "[{\"filePath\":\"/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/linter-realtime-monitor.js\",\"messages\":[{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 6.\",\"line\":472,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":472,\"endColumn\":7,\"fix\":{\"range\":[14970,14976],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":473,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":473,\"endColumn\":9,\"fix\":{\"range\":[14992,15000],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":474,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":474,\"endColumn\":9,\"fix\":{\"range\":[15029,15037],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 6.\",\"line\":475,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":475,\"endColumn\":7,\"fix\":{\"range\":[15044,15050],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":476,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":476,\"endColumn\":9,\"fix\":{\"range\":[15066,15074],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":477,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":477,\"endColumn\":9,\"fix\":{\"range\":[15180,15188],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 6.\",\"line\":478,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":478,\"endColumn\":7,\"fix\":{\"range\":[15195,15201],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":479,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":479,\"endColumn\":9,\"fix\":{\"range\":[15216,15224],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":480,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":480,\"endColumn\":9,\"fix\":{\"range\":[15332,15340],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 6.\",\"line\":481,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":481,\"endColumn\":7,\"fix\":{\"range\":[15347,15353],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":482,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":482,\"endColumn\":9,\"fix\":{\"range\":[15367,15375],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":483,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":483,\"endColumn\":9,\"fix\":{\"range\":[15434,15442],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 6.\",\"line\":484,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":484,\"endColumn\":7,\"fix\":{\"range\":[15449,15455],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":485,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":485,\"endColumn\":9,\"fix\":{\"range\":[15469,15477],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":486,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":486,\"endColumn\":9,\"fix\":{\"range\":[15511,15519],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 6.\",\"line\":487,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":487,\"endColumn\":7,\"fix\":{\"range\":[15526,15532],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":488,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":488,\"endColumn\":9,\"fix\":{\"range\":[15541,15549],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 8 spaces but found 10.\",\"line\":489,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":489,\"endColumn\":11,\"fix\":{\"range\":[15573,15583],\"text\":\"        \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":490,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":490,\"endColumn\":9,\"fix\":{\"range\":[15663,15671],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 8.\",\"line\":491,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":491,\"endColumn\":9,\"fix\":{\"range\":[15673,15681],\"text\":\"      \"}},{\"ruleId\":\"comma-dangle\",\"severity\":2,\"message\":\"Missing trailing comma.\",\"line\":513,\"column\":52,\"nodeType\":\"Literal\",\"messageId\":\"missing\",\"endLine\":514,\"endColumn\":1,\"fix\":{\"range\":[16276,16327],\"text\":\"'הנתונים עודכנו בעמוד ניטור איכות הקוד',\\n          )\"}},{\"ruleId\":\"no-extra-parens\",\"severity\":2,\"message\":\"Unnecessary parentheses around expression.\",\"line\":569,\"column\":7,\"nodeType\":\"LogicalExpression\",\"messageId\":\"unexpected\",\"endLine\":569,\"endColumn\":8,\"fix\":{\"range\":[17958,18032],\"text\":\"result.timestamp && LintStatusService._formatTimestamp(result.timestamp)\"}},{\"ruleId\":\"no-extra-parens\",\"severity\":2,\"message\":\"Unnecessary parentheses around expression.\",\"line\":570,\"column\":7,\"nodeType\":\"LogicalExpression\",\"messageId\":\"unexpected\",\"endLine\":570,\"endColumn\":8,\"fix\":{\"range\":[18042,18133],\"text\":\"latestReport?.generatedAt && LintStatusService._formatTimestamp(latestReport.generatedAt)\"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 8 spaces but found 10.\",\"line\":587,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":587,\"endColumn\":11,\"fix\":{\"range\":[18958,18968],\"text\":\"        \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 10 spaces but found 12.\",\"line\":588,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":588,\"endColumn\":13,\"fix\":{\"range\":[18983,18995],\"text\":\"          \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 10 spaces but found 12.\",\"line\":590,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":590,\"endColumn\":13,\"fix\":{\"range\":[19118,19130],\"text\":\"          \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 10 spaces but found 12.\",\"line\":591,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":591,\"endColumn\":13,\"fix\":{\"range\":[19201,19213],\"text\":\"          \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 10 spaces but found 12.\",\"line\":592,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":592,\"endColumn\":13,\"fix\":{\"range\":[19255,19267],\"text\":\"          \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 10 spaces but found 12.\",\"line\":593,\"column\":1,\"nodeType\":\"Keyword\",\"messageId\":\"wrongIndentation\",\"endLine\":593,\"endColumn\":13,\"fix\":{\"range\":[19313,19325],\"text\":\"          \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 8 spaces but found 10.\",\"line\":603,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":603,\"endColumn\":11,\"fix\":{\"range\":[19666,19676],\"text\":\"        \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 8 spaces but found 10.\",\"line\":604,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":604,\"endColumn\":11,\"fix\":{\"range\":[19679,19689],\"text\":\"        \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 12.\",\"line\":626,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":626,\"endColumn\":13,\"fix\":{\"range\":[20316,20328],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 14.\",\"line\":627,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":627,\"endColumn\":15,\"fix\":{\"range\":[20334,20348],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 12.\",\"line\":635,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":635,\"endColumn\":13,\"fix\":{\"range\":[20859,20871],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 12.\",\"line\":636,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":636,\"endColumn\":13,\"fix\":{\"range\":[20873,20885],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 12.\",\"line\":656,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":656,\"endColumn\":13,\"fix\":{\"range\":[21659,21671],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 6 spaces but found 14.\",\"line\":657,\"column\":1,\"nodeType\":\"Identifier\",\"messageId\":\"wrongIndentation\",\"endLine\":657,\"endColumn\":15,\"fix\":{\"range\":[21677,21691],\"text\":\"      \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 12.\",\"line\":665,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":665,\"endColumn\":13,\"fix\":{\"range\":[22038,22050],\"text\":\"    \"}},{\"ruleId\":\"indent\",\"severity\":2,\"message\":\"Expected indentation of 4 spaces but found 12.\",\"line\":666,\"column\":1,\"nodeType\":\"Punctuator\",\"messageId\":\"wrongIndentation\",\"endLine\":666,\"endColumn\":13,\"fix\":{\"range\":[22052,22064],\"text\":\"    \"}},{\"ruleId\":\"class-methods-use-this\",\"severity\":1,\"message\":\"Expected 'this' to be used by class method 'escapeHtml'.\",\"line\":725,\"column\":3,\"nodeType\":\"FunctionExpression\",\"messageId\":\"missingThis\",\"endLine\":725,\"endColumn\":13},{\"ruleId\":\"no-extra-parens\",\"severity\":2,\"message\":\"Unnecessary parentheses around expression.\",\"line\":736,\"column\":49,\"nodeType\":\"AwaitExpression\",\"messageId\":\"unexpected\",\"endLine\":736,\"endColumn\":50,\"fix\":{\"range\":[24249,24294],\"text\":\"await LintStatusService.fetchLatestReport()\"}},{\"ruleId\":\"no-extra-parens\",\"severity\":2,\"message\":\"Unnecessary parentheses around expression.\",\"line\":777,\"column\":49,\"nodeType\":\"AwaitExpression\",\"messageId\":\"unexpected\",\"endLine\":777,\"endColumn\":50,\"fix\":{\"range\":[25660,25705],\"text\":\"await LintStatusService.fetchLatestReport()\"}}],\"suppressedMessages\":[],\"errorCount\":41,\"fatalErrorCount\":0,\"warningCount\":1,\"fixableErrorCount\":41,\"fixableWarningCount\":0,\"source\":\"/*\\n * ==========================================\\n * FUNCTION INDEX\\n * ==========================================\\n *\\n * INITIALIZATION\\n * - initializeLintMonitor()            - נקודת כניסה עיקרית לעמוד ניטור הלינטר\\n * - LintMonitorController.init()       - אתחול הבקר: טעינת נתונים, רישום טבלאות, אירועים\\n *\\n * DATA FLOW\\n * - LintMonitorController.loadData()   - טעינת דוח אחרון והיסטוריה מה-API\\n * - LintMonitorController.refreshIssuesTable() - רענון טבלת הסוגיות לאחר טעינה/מיון\\n *\\n * UI UPDATES\\n * - LintMonitorController.renderSummaryCards()  - סיכום עליון (תאריך אחרון, כמות שגיאות וכו')\\n * - LintMonitorController.renderTaskStatus()    - טבלת סטטוס לכלי הלינטר (ESLint וכו')\\n * - LintMonitorController.renderIssuesTable()   - עידכון טבלת הסוגיות\\n * - LintMonitorController.renderHistory()       - רשימת היסטוריה של ריצות\\n * - LintMonitorController.toggleEmptyState()    - הצגת מצב ללא נתונים\\n *\\n * UTILITIES\\n * - LintMonitorController.registerTables()      - רישום הטבלה במערכת UnifiedTableSystem\\n * - LintMonitorController.cacheElements()       - אחסון הפניות ל-DOM\\n * - LintMonitorController.attachEvents()        - חיבור כפתורי רענון/קישורים\\n * - LintMonitorController.setLoadingState()     - עדכון אינדיקציית טעינה וכפתורים\\n *\\n * ==========================================\\n */\\n\\n/**\\n * Linter Monitor Controller\\n * =========================\\n *\\n * מנהל את זרימת הנתונים ותצוגת ניטור הלינטר.\\n * נשען על LintStatusService לקבלת הנתונים מהשרת ועל UnifiedTableSystem להצגת הטבלאות.\\n *\\n * תיעוד ארכיטקטורי: documentation/02-ARCHITECTURE/FRONTEND/LINTER_MONITOR_REBUILD_PLAN.md\\n */\\n\\n/* global LintStatusService */\\n\\nconst LINT_MONITOR_TABLE_TYPE = 'lint_monitor_issues';\\nconst LINT_MONITOR_HOST_PAGE = 'code-quality-dashboard';\\n\\nclass LintMonitorController {\\n  constructor() {\\n    this.state = {\\n      latestReport: null,\\n      history: [],\\n      issues: [],\\n      isRunningCollect: false,\\n      runMeta: {\\n        status: 'idle',\\n        timestamp: null,\\n        exitCode: null,\\n        message: null,\\n      },\\n    };\\n\\n    this.elements = {};\\n    this.tableRegistered = false;\\n  }\\n\\n  async init() {\\n    this.cacheElements();\\n    this.attachEvents();\\n    this.registerTables();\\n    this.updateRunStatus({ status: 'idle', timestamp: null, exitCode: null, message: null });\\n    await this.loadData();\\n  }\\n\\n  cacheElements() {\\n    this.elements.summaryContainer = document.getElementById('lint-summary-cards');\\n    this.elements.taskTableBody = document.getElementById('lint-tool-status-body');\\n    this.elements.issuesTable = document.getElementById('lint-issues-table');\\n    this.elements.issuesTableBody = document.getElementById('lint-issues-table-body');\\n    this.elements.historyList = document.getElementById('lint-history-list');\\n    this.elements.emptyState = document.getElementById('lint-empty-state');\\n    this.elements.lastUpdatedLabel = document.getElementById('lint-last-updated');\\n    this.elements.refreshButton = document.getElementById('lint-refresh-button');\\n    this.elements.copyButton = document.getElementById('lint-copy-log-button');\\n    this.elements.loadingIndicator = document.getElementById('lint-loading-indicator');\\n    this.elements.runCollectButton = document.getElementById('lint-run-collect-button');\\n    this.elements.downloadReportButton = document.getElementById('lint-download-report-button');\\n    this.elements.runStatusLabel = document.getElementById('lint-run-status');\\n    this.elements.downloadHeaderButton = document.getElementById('lint-download-header-button');\\n    this.elements.copyReportButton = document.getElementById('lint-copy-report-button');\\n  }\\n\\n  attachEvents() {\\n    if (this.elements.refreshButton) {\\n      this.elements.refreshButton.addEventListener('click', async event => {\\n        event?.preventDefault();\\n        await this.loadData({ showToast: true });\\n      });\\n    }\\n\\n    if (this.elements.copyButton) {\\n      this.elements.copyButton.addEventListener('click', async event => {\\n        event?.preventDefault();\\n        if (typeof window.copyLintMonitorDetailedLog === 'function') {\\n          await window.copyLintMonitorDetailedLog();\\n        }\\n      });\\n    }\\n\\n    if (this.elements.runCollectButton) {\\n      this.elements.runCollectButton.addEventListener('click', async event => {\\n        event?.preventDefault();\\n        await this.runLintCollection();\\n      });\\n    }\\n\\n    if (this.elements.downloadReportButton) {\\n      this.elements.downloadReportButton.addEventListener('click', async event => {\\n        event?.preventDefault();\\n        await this.downloadLatestReport();\\n      });\\n    }\\n\\n    if (this.elements.downloadHeaderButton) {\\n      this.elements.downloadHeaderButton.addEventListener('click', async event => {\\n        event?.preventDefault();\\n        await this.downloadLatestReport();\\n      });\\n    }\\n\\n    if (this.elements.copyReportButton) {\\n      this.elements.copyReportButton.addEventListener('click', async event => {\\n        event?.preventDefault();\\n        await this.copyLatestReportToClipboard();\\n      });\\n    }\\n  }\\n\\n  registerTables() {\\n    if (this.tableRegistered || !window.UnifiedTableSystem) {\\n      return;\\n    }\\n\\n    const controller = this;\\n\\n    window.UnifiedTableSystem.registry.register(LINT_MONITOR_TABLE_TYPE, {\\n      dataGetter: () => controller.state.issues,\\n      updateFunction: data => controller.renderIssuesTable(data),\\n      tableSelector: '#lint-issues-table',\\n      columns: window.TABLE_COLUMN_MAPPINGS?.[LINT_MONITOR_TABLE_TYPE] || [],\\n      sortable: true,\\n      filterable: false,\\n      defaultSort: window.getDefaultSortChain\\n        ? window.getDefaultSortChain(LINT_MONITOR_TABLE_TYPE)\\n        : [{ columnIndex: 0, direction: 'desc' }],\\n    });\\n\\n    this.tableRegistered = true;\\n  }\\n\\n  async loadData(options = {}) {\\n    const { showToast = false } = options;\\n    this.setLoadingState(true);\\n\\n    try {\\n      const [latestReport, history] = await Promise.all([\\n        LintStatusService.fetchLatestReport(),\\n        LintStatusService.fetchHistory(),\\n      ]);\\n\\n      this.state.latestReport = latestReport;\\n      this.state.history = history;\\n      this.state.issues = latestReport ? LintStatusService.extractIssues(latestReport) : [];\\n\\n      if (!this.state.isRunningCollect) {\\n        const defaultStatus = this.state.latestReport ? 'ready' : 'empty';\\n        this.updateRunStatus({\\n          status: defaultStatus,\\n          timestamp: this.state.latestReport?.generatedAt || null,\\n          exitCode: null,\\n          message: null,\\n        });\\n      }\\n\\n      this.renderSummaryCards();\\n      this.renderTaskStatus();\\n      this.renderHistory();\\n      await this.refreshIssuesTable();\\n      this.toggleEmptyState();\\n      this.updateLastUpdatedLabel();\\n\\n      if (showToast && typeof window.showSuccessNotification === 'function') {\\n        window.showSuccessNotification('דוח הלינטר עודכן בהצלחה');\\n      }\\n    } catch (error) {\\n      if (typeof window.showErrorNotification === 'function') {\\n        window.showErrorNotification('נכשל בטעינת מצב הלינטר. בדוק את הלוגים ונסה שוב.');\\n      }\\n      window.Logger?.error('[LintMonitor] Failed to load lint data:', error, {\\n        page: LINT_MONITOR_HOST_PAGE,\\n      });\\n      this.updateRunStatus({\\n        status: 'error',\\n        message: error.message,\\n        timestamp: new Date().toISOString(),\\n      });\\n    } finally {\\n      this.setLoadingState(false);\\n    }\\n  }\\n\\n  async refreshIssuesTable() {\\n    const issues = Array.isArray(this.state.issues) ? this.state.issues : [];\\n\\n    if (!this.tableRegistered || !window.UnifiedTableSystem) {\\n      this.renderIssuesTable(issues);\\n      return;\\n    }\\n\\n    if (issues.length === 0) {\\n      this.renderIssuesTable([]);\\n      return;\\n    }\\n\\n    try {\\n      const sorted = await window.UnifiedTableSystem.sorter.applyDefaultSort(LINT_MONITOR_TABLE_TYPE);\\n      if (!sorted || sorted.length === 0) {\\n        this.renderIssuesTable(issues);\\n      }\\n    } catch (error) {\\n      window.Logger?.warn('[LintMonitor] Failed to apply default sort:', error, {\\n        page: LINT_MONITOR_HOST_PAGE,\\n      });\\n      this.renderIssuesTable(issues);\\n    }\\n  }\\n\\n  renderSummaryCards() {\\n    if (!this.elements.summaryContainer) {\\n      return;\\n    }\\n\\n    const summary = LintStatusService.buildSummaryTiles(this.state.latestReport);\\n    if (!summary.length) {\\n      this.elements.summaryContainer.innerHTML = `\\n        <div class=\\\"empty-summary\\\">\\n          <span>לא נמצאו נתונים. הרץ <code>npm run lint:collect</code> ושוב לרענון.</span>\\n        </div>\\n    `;\\n      return;\\n    }\\n\\n    const cardsHtml = summary\\n      .map(tile => {\\n        const value = tile.value === 'Invalid Date' || tile.value === '' ? 'לא זמין' : tile.value;\\n        return `\\n          <div class=\\\"lint-summary-card\\\">\\n            <div class=\\\"lint-summary-icon\\\">${tile.icon}</div>\\n            <div class=\\\"lint-summary-content\\\">\\n              <div class=\\\"lint-summary-value\\\">${value}</div>\\n              <div class=\\\"lint-summary-label\\\">${tile.label}</div>\\n            </div>\\n          </div>\\n        `;\\n      })\\n      .join('');\\n\\n    this.elements.summaryContainer.innerHTML = cardsHtml;\\n  }\\n\\n  renderTaskStatus() {\\n    if (!this.elements.taskTableBody) {\\n      return;\\n    }\\n\\n    const tasks = LintStatusService.buildTaskSummaries(this.state.latestReport);\\n\\n    if (!tasks.length) {\\n      this.elements.taskTableBody.innerHTML = `\\n        <tr>\\n          <td colspan=\\\"5\\\" class=\\\"lint-table-empty\\\">לא קיימים נתונים להצגה</td>\\n            </tr>\\n        `;\\n      return;\\n    }\\n\\n    const rows = tasks\\n      .map(task => {\\n        const statusBadge = LintMonitorController.getStatusBadge(task.status);\\n        const durationSeconds = (task.durationMs ?? 0) / 1000;\\n        return `\\n          <tr>\\n            <td class=\\\"lint-tool-name\\\">${task.label}</td>\\n            <td>${statusBadge}</td>\\n            <td>${task.errors}</td>\\n            <td>${task.warnings}</td>\\n            <td>${durationSeconds.toFixed(1)} שניות</td>\\n          </tr>\\n        `;\\n      })\\n      .join('');\\n\\n    this.elements.taskTableBody.innerHTML = rows;\\n  }\\n\\n  renderIssuesTable(data) {\\n    if (!this.elements.issuesTableBody) {\\n      return;\\n    }\\n\\n    if (!data || data.length === 0) {\\n      this.elements.issuesTableBody.innerHTML = `\\n        <tr>\\n          <td colspan=\\\"6\\\" class=\\\"lint-table-empty\\\">אין סוגיות פעילות כרגע 🎉</td>\\n            </tr>\\n        `;\\n      return;\\n    }\\n\\n    const rows = data\\n      .map(issue => {\\n        const location = issue.line ? `${issue.line}:${issue.column || 0}` : '—';\\n        return `\\n          <tr data-severity=\\\"${issue.severity}\\\">\\n            <td>${issue.tool}</td>\\n            <td>\\n              <span class=\\\"lint-severity lint-severity-${issue.severity}\\\">\\n                ${LintMonitorController.getSeverityLabel(issue.severity)}\\n              </span>\\n            </td>\\n            <td class=\\\"lint-issue-file\\\">${issue.file}</td>\\n            <td>${issue.rule}</td>\\n            <td class=\\\"lint-issue-message\\\">${issue.message}</td>\\n            <td>${location}</td>\\n          </tr>\\n        `;\\n      })\\n      .join('');\\n\\n    this.elements.issuesTableBody.innerHTML = rows;\\n  }\\n\\n  renderHistory() {\\n    if (!this.elements.historyList) {\\n      return;\\n    }\\n\\n    if (!this.state.history.length) {\\n      this.elements.historyList.innerHTML = `\\n        <li class=\\\"lint-history-empty\\\">אין היסטוריה זמינה</li>\\n      `;\\n      return;\\n    }\\n\\n    const historyItems = this.state.history\\n      .slice()\\n      .reverse()\\n      .map(entry => {\\n        const timestamp = LintStatusService._formatTimestamp(entry.generatedAt);\\n        const status = entry.totals?.failed || entry.totals?.error ? 'failed' : 'passed';\\n        const badge = LintMonitorController.getStatusBadge(status);\\n        const issues = entry.totals?.issues ?? 0;\\n\\n        return `\\n          <li class=\\\"lint-history-item\\\">\\n            <div class=\\\"lint-history-meta\\\">\\n              <span class=\\\"lint-history-date\\\">${timestamp}</span>\\n              ${badge}\\n            </div>\\n            <div class=\\\"lint-history-details\\\">\\n              <span>סה״כ סוגיות: ${issues}</span>\\n              <span>שגיאות: ${entry.totals?.errors ?? 0}</span>\\n              <span>אזהרות: ${entry.totals?.warnings ?? 0}</span>\\n            </div>\\n          </li>\\n        `;\\n      })\\n      .join('');\\n\\n    this.elements.historyList.innerHTML = historyItems;\\n  }\\n\\n  toggleEmptyState() {\\n    if (!this.elements.emptyState) {\\n      return;\\n    }\\n\\n    const hasData = Boolean(this.state.latestReport && this.state.issues.length);\\n    this.elements.emptyState.classList.toggle('hidden', hasData);\\n  }\\n\\n  updateLastUpdatedLabel() {\\n    if (!this.elements.lastUpdatedLabel) {\\n      return;\\n    }\\n\\n    const formatted = this.state.latestReport?.generatedAt\\n      ? LintStatusService._formatTimestamp(this.state.latestReport.generatedAt)\\n      : '';\\n\\n    this.elements.lastUpdatedLabel.textContent = formatted || 'לא זמין';\\n  }\\n\\n  setLoadingState(isLoading) {\\n    if (this.elements.loadingIndicator) {\\n      this.elements.loadingIndicator.classList.toggle('hidden', !isLoading);\\n    }\\n    if (this.elements.refreshButton) {\\n      this.elements.refreshButton.disabled = isLoading;\\n    }\\n    if (!this.state.isRunningCollect) {\\n      if (this.elements.runCollectButton) {\\n        this.elements.runCollectButton.disabled = isLoading;\\n      }\\n      if (this.elements.downloadReportButton) {\\n        this.elements.downloadReportButton.disabled = isLoading;\\n      }\\n      if (this.elements.downloadHeaderButton) {\\n        this.elements.downloadHeaderButton.disabled = isLoading;\\n      }\\n      if (this.elements.copyReportButton) {\\n        this.elements.copyReportButton.disabled = isLoading;\\n      }\\n    }\\n  }\\n\\n  toggleActionButtons(isDisabled) {\\n    if (this.elements.runCollectButton) {\\n      this.elements.runCollectButton.disabled = isDisabled;\\n    }\\n    if (this.elements.downloadReportButton) {\\n      this.elements.downloadReportButton.disabled = isDisabled;\\n    }\\n    if (this.elements.downloadHeaderButton) {\\n      this.elements.downloadHeaderButton.disabled = isDisabled;\\n    }\\n    if (this.elements.copyReportButton) {\\n      this.elements.copyReportButton.disabled = isDisabled;\\n    }\\n  }\\n\\n  updateRunStatus(update = {}) {\\n    const previous = this.state.runMeta || {};\\n    const merged = {\\n      status: update.status || previous.status || 'idle',\\n      timestamp:\\n        update.timestamp !== undefined\\n          ? update.timestamp\\n          : previous.timestamp !== undefined\\n            ? previous.timestamp\\n            : null,\\n      exitCode:\\n        update.exitCode !== undefined\\n          ? update.exitCode\\n          : previous.exitCode !== undefined\\n            ? previous.exitCode\\n            : null,\\n      message:\\n        update.message !== undefined\\n          ? update.message\\n          : previous.message !== undefined\\n            ? previous.message\\n            : null,\\n    };\\n\\n    this.state.runMeta = merged;\\n\\n    if (!this.elements.runStatusLabel) {\\n      return;\\n    }\\n\\n    let displayText = 'מוכן להרצה';\\n\\n    switch (merged.status) {\\n      case 'running':\\n        displayText = 'מריץ דוח...';\\n        break;\\n      case 'success':\\n        displayText = `הסתיים בהצלחה (${LintStatusService._formatTimestamp(merged.timestamp) || 'זמן לא זמין'})`;\\n        break;\\n      case 'failed':\\n        displayText = `הסתיים עם כשלים (${LintStatusService._formatTimestamp(merged.timestamp) || 'זמן לא זמין'})`;\\n        break;\\n      case 'error':\\n        displayText = `כשל בהרצה: ${merged.message || 'לא ידוע'}`;\\n        break;\\n      case 'empty':\\n        displayText = 'טרם הופעלה הרצה.';\\n        break;\\n      default:\\n        if (merged.timestamp) {\\n          displayText = `עודכן: ${LintStatusService._formatTimestamp(merged.timestamp)}`;\\n        }\\n        break;\\n    }\\n\\n    this.elements.runStatusLabel.textContent = displayText;\\n  }\\n\\n  async runLintCollection() {\\n    if (this.state.isRunningCollect) {\\n      return;\\n    }\\n\\n    this.state.isRunningCollect = true;\\n    this.updateRunStatus({ status: 'running', message: null });\\n    this.toggleActionButtons(true);\\n\\n    try {\\n      const result = await LintStatusService.runCollection('manual-ui-run');\\n\\n      if (result.status === 'success') {\\n        if (typeof window.showSuccessNotification === 'function') {\\n          window.showSuccessNotification(\\n            'הרצת הלינטר הושלמה',\\n            'הנתונים עודכנו בעמוד ניטור איכות הקוד'\\n          );\\n        }\\n      } else {\\n        this.showLintFailureModal(result);\\n      }\\n\\n      await this.loadData();\\n\\n      this.updateRunStatus({\\n        status: result.status === 'success' ? 'success' : 'failed',\\n        timestamp:\\n          result.latestReport?.generatedAt ||\\n          this.state.latestReport?.generatedAt ||\\n          result.timestamp ||\\n          null,\\n        exitCode: result.exitCode,\\n        message: result.status === 'success' ? null : result.stderr || result.stdout || '',\\n      });\\n    } catch (error) {\\n      this.updateRunStatus({\\n        status: 'error',\\n        message: error.message,\\n        timestamp: new Date().toISOString(),\\n      });\\n      this.showLintFailureModal({\\n        status: 'error',\\n        message: error.message,\\n        stderr: error.stack || '',\\n        stdout: '',\\n        timestamp: new Date().toISOString(),\\n      });\\n    } finally {\\n      this.state.isRunningCollect = false;\\n      this.toggleActionButtons(false);\\n    }\\n  }\\n\\n  showLintFailureModal(result = {}) {\\n    if (typeof window.showDetailsModal !== 'function') {\\n      if (typeof window.showErrorNotification === 'function') {\\n        window.showErrorNotification('שגיאה בהרצת הלינטר', result.message || 'נדרש לבדוק את הלוגים');\\n      }\\n      return;\\n    }\\n\\n    const content = this.buildFailureModalContent(result);\\n    window.showDetailsModal('שגיאת לינטר - פירוט ההרצה', content, {\\n      category: 'system',\\n    });\\n  }\\n\\n  buildFailureModalContent(result = {}) {\\n    const latestReport = result.latestReport || this.state.latestReport || null;\\n    const totals = latestReport?.totals || {};\\n    const timestamp =\\n      (result.timestamp && LintStatusService._formatTimestamp(result.timestamp)) ||\\n      (latestReport?.generatedAt && LintStatusService._formatTimestamp(latestReport.generatedAt)) ||\\n      new Date().toLocaleString('he-IL');\\n    const exitCode =\\n      result.exitCode !== undefined && result.exitCode !== null ? String(result.exitCode) : 'לא זמין';\\n    const summaryItems = [\\n      { label: 'סה״כ כלים', value: totals.tools ?? '—' },\\n      { label: 'עברו', value: totals.passed ?? 0 },\\n      { label: 'אזהרות', value: totals.warning ?? totals.warnings ?? 0 },\\n      { label: 'נכשלו', value: totals.failed ?? 0 },\\n      { label: 'שגיאות קריטיות', value: totals.error ?? totals.errors ?? 0 },\\n      { label: 'סה״כ סוגיות', value: totals.issues ?? this.state.issues.length ?? 0 },\\n    ];\\n\\n    const tasks = Array.isArray(latestReport?.tasks) ? latestReport.tasks : [];\\n    const failingTasks = tasks.filter(task => task.status !== 'passed');\\n    const failingRows = failingTasks.length\\n      ? failingTasks\\n          .map(task => {\\n            const duration =\\n              typeof task.durationMs === 'number' ? `${(task.durationMs / 1000).toFixed(2)} שניות` : '—';\\n            const statusBadge = LintMonitorController.getStatusBadge(task.status);\\n            const errors = task.summary?.errors ?? 0;\\n            const warnings = task.summary?.warnings ?? 0;\\n            return `\\n              <tr>\\n                <td>${this.escapeHtml(task.label || task.id || 'לא ידוע')}</td>\\n                <td>${statusBadge}</td>\\n                <td>${errors}</td>\\n                <td>${warnings}</td>\\n                <td>${duration}</td>\\n                <td>${task.exitCode ?? '—'}</td>\\n              </tr>\\n            `;\\n          })\\n          .join('')\\n      : `\\n        <tr>\\n          <td colspan=\\\"6\\\" class=\\\"text-center text-muted\\\">לא אותרו משימות כושלות בדוח האחרון</td>\\n        </tr>\\n      `;\\n\\n    const issues = tasks.flatMap(task =>\\n      (task.issues || []).map(issue => ({\\n        tool: task.label,\\n        file: issue.file,\\n        message: issue.message,\\n        rule: issue.rule,\\n        severity: issue.severity || 'warning',\\n        location: issue.line ? `${issue.line}:${issue.column ?? 0}` : '—',\\n      })),\\n    );\\n    const topIssues = issues.slice(0, 8);\\n    const issuesList = topIssues.length\\n      ? `\\n        <ol class=\\\"ps-3\\\">\\n          ${topIssues\\n            .map(\\n              issue => `\\n                <li class=\\\"mb-2\\\">\\n                  <div><strong>${this.escapeHtml(issue.tool || 'כלי לא ידוע')}</strong> · ${this.escapeHtml(issue.severity)}</div>\\n                  <div class=\\\"text-muted small\\\">${this.escapeHtml(issue.file || '—')} (${this.escapeHtml(issue.location)})</div>\\n                  <div>${this.escapeHtml(issue.message || '—')}</div>\\n                  <div class=\\\"text-muted small\\\">כלל: ${this.escapeHtml(issue.rule || '—')}</div>\\n                </li>\\n              `,\\n            )\\n            .join('')}\\n        </ol>\\n      `\\n      : '<p class=\\\"text-muted mb-0\\\">אין פירוט סוגיות בדוח המצורף.</p>';\\n\\n    const stdout = this.formatCliOutput(result.stdout);\\n    const stderr = this.formatCliOutput(result.stderr);\\n    const noteMessage = result.message ? `<p class=\\\"mb-0\\\">${this.escapeHtml(result.message)}</p>` : '';\\n\\n    return `\\n      <div class=\\\"lint-run-details\\\">\\n        <div class=\\\"alert alert-danger\\\" role=\\\"alert\\\">\\n          <strong>ההרצה הסתיימה במצב ${this.escapeHtml(result.status || 'error')}.</strong>\\n          <div>Exit Code: <span dir=\\\"ltr\\\">${this.escapeHtml(exitCode)}</span></div>\\n          <div>זמן הריצה: ${this.escapeHtml(timestamp || 'לא זמין')}</div>\\n          ${noteMessage}\\n        </div>\\n\\n        <div class=\\\"row g-3\\\">\\n          ${summaryItems\\n            .map(\\n              item => `\\n                <div class=\\\"col-6 col-md-4\\\">\\n                  <div class=\\\"p-3 border rounded bg-light h-100\\\">\\n                    <div class=\\\"text-muted small\\\">${item.label}</div>\\n                    <div class=\\\"fw-bold fs-5\\\">${this.escapeHtml(String(item.value))}</div>\\n                  </div>\\n                </div>\\n              `,\\n            )\\n            .join('')}\\n        </div>\\n\\n        <h5 class=\\\"mt-4\\\">משימות שנכשלו</h5>\\n        <div class=\\\"table-responsive\\\">\\n          <table class=\\\"table table-sm table-striped align-middle\\\">\\n            <thead>\\n              <tr>\\n                <th>כלי</th>\\n                <th>סטטוס</th>\\n                <th>שגיאות</th>\\n                <th>אזהרות</th>\\n                <th>משך</th>\\n                <th>Exit Code</th>\\n              </tr>\\n            </thead>\\n            <tbody>\\n              ${failingRows}\\n            </tbody>\\n          </table>\\n        </div>\\n\\n        <h5 class=\\\"mt-4\\\">סוגיות בולטות</h5>\\n        ${issuesList}\\n\\n        <h5 class=\\\"mt-4\\\">פלט CLI</h5>\\n        <div class=\\\"row g-3\\\">\\n          <div class=\\\"col-md-6\\\">\\n            <h6>stdout</h6>\\n            <pre dir=\\\"ltr\\\" class=\\\"lint-cli-output bg-dark text-white p-3 rounded\\\">${stdout}</pre>\\n          </div>\\n          <div class=\\\"col-md-6\\\">\\n            <h6>stderr</h6>\\n            <pre dir=\\\"ltr\\\" class=\\\"lint-cli-output bg-dark text-white p-3 rounded\\\">${stderr}</pre>\\n          </div>\\n        </div>\\n\\n        <div class=\\\"alert alert-info mt-4\\\" role=\\\"alert\\\">\\n          <p class=\\\"mb-1\\\">הדוח האחרון נשמר תמיד בקובץ <code>reports/linter/latest.json</code>.</p>\\n          <p class=\\\"mb-1\\\">היסטוריית הריצות נשמרת בקובץ <code>reports/linter/history.json</code>.</p>\\n          <p class=\\\"mb-0\\\">ניתן להוריד את הדוח גם מהכפתור “הורד דוח JSON” בסקשן “בדיקות ידניות ותהליכי תחזוקה”.</p>\\n        </div>\\n      </div>\\n    `;\\n  }\\n\\n  formatCliOutput(value) {\\n    if (value === null || value === undefined) {\\n      return this.escapeHtml('— אין פלט —');\\n    }\\n    const raw = typeof value === 'string' ? value.trim() : JSON.stringify(value, null, 2);\\n    if (!raw) {\\n      return this.escapeHtml('— אין פלט —');\\n    }\\n    const limit = 1800;\\n    const output = raw.length > limit ? `${raw.slice(0, limit)}…` : raw;\\n    return this.escapeHtml(output);\\n  }\\n\\n  escapeHtml(text) {\\n    if (text === null || text === undefined) {\\n      return '';\\n    }\\n    const div = document.createElement('div');\\n    div.textContent = String(text);\\n    return div.innerHTML;\\n  }\\n\\n  async downloadLatestReport() {\\n    try {\\n      const report = this.state.latestReport || (await LintStatusService.fetchLatestReport());\\n\\n      if (!report) {\\n        if (typeof window.showNotification === 'function') {\\n          window.showNotification('לא נמצא דוח זמין להורדה', 'warning');\\n        }\\n        return;\\n      }\\n\\n      const timestampRaw = report.generatedAt || new Date().toISOString();\\n      const safeTimestamp = timestampRaw.replace(/[:.]/g, '-').replace('T', '_').replace(/Z$/, '');\\n      const filename = `lint-report-${safeTimestamp}.json`;\\n\\n      const blob = new Blob([JSON.stringify(report, null, 2)], {\\n        type: 'application/json',\\n      });\\n      const url = URL.createObjectURL(blob);\\n\\n      const link = document.createElement('a');\\n      link.href = url;\\n      link.download = filename;\\n      document.body.appendChild(link);\\n      link.click();\\n      document.body.removeChild(link);\\n      URL.revokeObjectURL(url);\\n\\n      if (typeof window.showSuccessNotification === 'function') {\\n        window.showSuccessNotification('דוח הורד בהצלחה', filename);\\n      }\\n    } catch (error) {\\n      if (typeof window.showErrorNotification === 'function') {\\n        window.showErrorNotification('שגיאה בהורדת הדוח', error.message);\\n      }\\n      window.Logger?.error('[LintMonitor] Failed to download report:', error, {\\n        page: LINT_MONITOR_HOST_PAGE,\\n      });\\n    }\\n  }\\n\\n  async copyLatestReportToClipboard() {\\n    try {\\n      const report = this.state.latestReport || (await LintStatusService.fetchLatestReport());\\n      if (!report) {\\n        if (typeof window.showWarningNotification === 'function') {\\n          window.showWarningNotification('אין דוח להעתקה', 'הרץ lint:collect ורענן את העמוד.');\\n        }\\n        return;\\n      }\\n\\n      const serialized = JSON.stringify(report, null, 2);\\n      await copyTextToClipboard(serialized);\\n\\n      if (typeof window.showSuccessNotification === 'function') {\\n        window.showSuccessNotification('דוח הלינטר הועתק ללוח', 'ניתן להדביק בכל עורך טקסט');\\n      }\\n    } catch (error) {\\n      window.Logger?.error('[LintMonitor] Failed to copy report JSON:', error, {\\n        page: LINT_MONITOR_HOST_PAGE,\\n      });\\n      if (typeof window.showErrorNotification === 'function') {\\n        window.showErrorNotification('שגיאה בהעתקת הדוח', error.message);\\n      }\\n    }\\n  }\\n\\n  static getStatusBadge(status) {\\n    const normalized = status || 'unknown';\\n    const labels = {\\n      passed: { text: 'עבר', className: 'lint-status-success' },\\n      warning: { text: 'אזהרות', className: 'lint-status-warning' },\\n      failed: { text: 'נכשל', className: 'lint-status-error' },\\n      error: { text: 'שגיאה', className: 'lint-status-error' },\\n      unknown: { text: 'לא ידוע', className: 'lint-status-muted' },\\n    };\\n\\n    const badge = labels[normalized] || labels.unknown;\\n    return `<span class=\\\"lint-status-badge ${badge.className}\\\">${badge.text}</span>`;\\n  }\\n\\n  static getSeverityLabel(severity) {\\n    const labels = {\\n      error: 'שגיאה',\\n      warning: 'אזהרה',\\n      info: 'מידע',\\n    };\\n\\n    return labels[severity] || severity || 'לא ידוע';\\n  }\\n}\\n\\n// ===== GLOBAL INITIALIZER =====\\n\\nwindow.initializeLintMonitor = async function initializeLintMonitor() {\\n  if (!window.LintStatusService) {\\n    window.Logger?.error('[LintMonitor] LintStatusService לא נטען. בדוק את package-manifest.', {\\n      page: LINT_MONITOR_HOST_PAGE,\\n    });\\n    return;\\n  }\\n\\n  if (window.lintMonitorController) {\\n    await window.lintMonitorController.loadData();\\n    return;\\n  }\\n\\n  window.lintMonitorController = new LintMonitorController();\\n  await window.lintMonitorController.init();\\n};\\n\\nfunction buildLintDetailedLog() {\\n  const controller = window.lintMonitorController;\\n  const state = controller?.state || {};\\n  const report = state.latestReport;\\n  const tasks = Array.isArray(report?.tasks) ? report.tasks : [];\\n  const history = Array.isArray(state.history) ? state.history : [];\\n  const issues = Array.isArray(state.issues) ? state.issues : [];\\n  const timestamp = new Date().toLocaleString('he-IL');\\n  const log = [];\\n\\n  log.push('=== לוג מפורט - ניטור איכות קוד ===');\\n  log.push(`זמן יצירה: ${timestamp}`);\\n  log.push(`עמוד: ${window.location.href}`);\\n  log.push('');\\n\\n  log.push('--- מצב סקשנים ---');\\n  const sections = document.querySelectorAll('.top-section, .content-section');\\n  sections.forEach((section, index) => {\\n    const headerTitle = section.querySelector('.section-header .table-title, .section-header h2');\\n    const body = section.querySelector('.section-body');\\n    const title = headerTitle ? headerTitle.textContent.trim() : `סקשן ${index + 1}`;\\n    const isOpen = body && body.style.display !== 'none';\\n    log.push(`  ${index + 1}. \\\"${title}\\\": ${isOpen ? 'פתוח' : 'סגור'}`);\\n  });\\n\\n  const lastUpdatedElement = document.getElementById('lint-last-updated');\\n  const formattedLastUpdated =\\n    lastUpdatedElement?.textContent?.trim() &&\\n    lastUpdatedElement.textContent.trim() !== 'Invalid Date'\\n      ? lastUpdatedElement.textContent.trim()\\n      : LintStatusService._formatTimestamp(report?.generatedAt);\\n\\n  log.push('');\\n  log.push('--- סיכומי ממשק ---');\\n  log.push(`עודכן לאחרונה (UI): ${formattedLastUpdated || 'לא זמין'}`);\\n\\n  const summaryCards = document.querySelectorAll('#lint-summary-cards .lint-summary-card');\\n  if (summaryCards.length > 0) {\\n    summaryCards.forEach((card, index) => {\\n      const label =\\n        card.querySelector('.lint-summary-label')?.textContent?.trim() || `כרטיס ${index + 1}`;\\n      const value = card.querySelector('.lint-summary-value')?.textContent?.trim() || 'לא זמין';\\n      log.push(`  ${label}: ${value}`);\\n    });\\n  } else {\\n    log.push('  אין כרטיסי סיכום להצגה');\\n  }\\n\\n  log.push('');\\n  log.push('--- נתוני דוח אחרון ---');\\n  if (report) {\\n    const totals = report.totals || {};\\n    const formattedGeneratedAt =\\n      LintStatusService._formatTimestamp(report.generatedAt) || report.generatedAt || 'זמן לא זמין';\\n    const totalsSummaryLine = [\\n      `סה\\\"כ כלים: ${totals.tools ?? 'לא זמין'}`,\\n      ` | עברו: ${totals.passed ?? 0}`,\\n      ` | אזהרות: ${totals.warning ?? 0}`,\\n      ` | נכשלו: ${totals.failed ?? 0}`,\\n      ` | שגיאות: ${totals.error ?? 0}`,\\n    ].join('');\\n    const issuesSummaryLine = [\\n      `סה\\\"כ סוגיות: ${totals.issues ?? issues.length}`,\\n      ` | שגיאות קריטיות: ${totals.errors ?? 0}`,\\n      ` | אזהרות: ${totals.warnings ?? 0}`,\\n    ].join('');\\n\\n    log.push(`מצב דוח: נטען (${formattedGeneratedAt})`);\\n    log.push(totalsSummaryLine);\\n    log.push(issuesSummaryLine);\\n\\n    if (tasks.length > 0) {\\n      log.push('');\\n      log.push('--- סטטוס כלי לינטר ---');\\n      tasks.forEach((task, index) => {\\n        const durationSeconds = task.durationMs ? (task.durationMs / 1000).toFixed(2) : 'N/A';\\n        const errors = task.summary?.errors ?? 0;\\n        const warnings = task.summary?.warnings ?? 0;\\n        const taskLine = [\\n          `  ${index + 1}. ${task.label}`,\\n          ` | סטטוס: ${task.status}`,\\n          ` | שגיאות: ${errors}`,\\n          ` | אזהרות: ${warnings}`,\\n          ` | משך: ${durationSeconds} שניות`,\\n          ` | ExitCode: ${task.exitCode ?? 'N/A'}`,\\n        ].join('');\\n        log.push(taskLine);\\n      });\\n    } else {\\n      log.push('אין נתוני כלי לינטר להצגה');\\n    }\\n  } else {\\n    log.push('לא נטען דוח אחרון - ייתכן שהסריקה לא הורצה או נכשלה');\\n  }\\n\\n  log.push('');\\n  log.push('--- סוגיות פעילות (עד 10 ראשונות) ---');\\n  if (issues.length > 0) {\\n    log.push(`סה\\\"כ סוגיות: ${issues.length}`);\\n    issues.slice(0, 10).forEach((issue, index) => {\\n      const location = issue.line ? `${issue.line}:${issue.column || 0}` : 'N/A';\\n      const issueLine = [\\n        `  ${index + 1}. [${issue.severity}] ${issue.tool}`,\\n        ` | ${issue.file}`,\\n        ` | כלל: ${issue.rule}`,\\n        ` | מיקום: ${location}`,\\n      ].join('');\\n      log.push(issueLine);\\n      log.push(`     הודעה: ${issue.message}`);\\n    });\\n    if (issues.length > 10) {\\n      log.push(`  ...ועוד ${issues.length - 10} סוגיות נוספות`);\\n    }\\n  } else {\\n    log.push('אין סוגיות פעילות בדוח הנוכחי');\\n  }\\n\\n  log.push('');\\n  log.push('--- היסטוריית ריצות (עד 5 אחרונות) ---');\\n  if (history.length > 0) {\\n    log.push(`סה\\\"כ ריצות בהיסטוריה: ${history.length}`);\\n    history\\n      .slice(-5)\\n      .reverse()\\n      .forEach((entry, index) => {\\n        const totals = entry.totals || {};\\n        const entryTimestamp =\\n          LintStatusService._formatTimestamp(entry.generatedAt) ||\\n          entry.generatedAt ||\\n          'תאריך לא זמין';\\n        const historyLine = [\\n          `  ${index + 1}. ${entryTimestamp}`,\\n          ` | סטטוס: עברו ${totals.passed ?? 0}/${totals.tools ?? 0}`,\\n          ` | שגיאות: ${totals.errors ?? 0}`,\\n          ` | אזהרות: ${totals.warnings ?? 0}`,\\n        ].join('');\\n        log.push(historyLine);\\n      });\\n  } else {\\n    log.push('אין נתוני היסטוריה זמינים');\\n  }\\n\\n  log.push('');\\n  log.push('--- שגיאות והערות מהקונסולה ---');\\n  log.push('⚠️ חשוב: הלוג חייב לכלול שגיאות קונסולה כדי לפתור תקלות.');\\n  log.push('📋 פתח את Developer Tools (F12) → Console והוסף שגיאות רלוונטיות ללוג לפני שליחה.');\\n\\n  log.push('');\\n  log.push('--- שניוּנים בממשק ---');\\n  const refreshButtonDisabled = document.getElementById('lint-refresh-button')?.disabled\\n    ? 'מבוטל'\\n    : 'פעיל';\\n  const copyButtonVisible =\\n    document.getElementById('lint-copy-log-button')?.offsetParent !== null ? 'נראה' : 'לא נראה';\\n  log.push(`כפתור רענן נתונים: ${refreshButtonDisabled}`);\\n  log.push(`כפתור העתק לוג מפורט: ${copyButtonVisible}`);\\n\\n  log.push('');\\n  log.push('--- מידע טכני ---');\\n  log.push(`גרסת דפדפן: ${navigator.userAgent}`);\\n  log.push(`שפת דפדפן: ${navigator.language}`);\\n  log.push(`פלטפורמה: ${navigator.platform}`);\\n  log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);\\n  log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);\\n\\n  if (performance.timing) {\\n    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;\\n    if (!Number.isNaN(loadTime) && loadTime >= 0) {\\n      log.push(`זמן טעינת עמוד (performance.timing): ${loadTime}ms`);\\n    }\\n  }\\n\\n  if (window.performance && window.performance.memory) {\\n    const memoryUsed = Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024);\\n    log.push(`זיכרון JavaScript בשימוש: ${memoryUsed}MB`);\\n  }\\n\\n  log.push('');\\n  log.push('=== סוף הלוג ===');\\n  return log.join('\\\\n');\\n}\\n\\nasync function copyTextToClipboard(text) {\\n  if (!text) {\\n    throw new Error('לא נמצא טקסט להעתקה');\\n  }\\n\\n  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {\\n    await navigator.clipboard.writeText(text);\\n    return;\\n  }\\n\\n  const textarea = document.createElement('textarea');\\n  textarea.value = text;\\n  textarea.setAttribute('readonly', '');\\n  textarea.style.position = 'absolute';\\n  textarea.style.left = '-9999px';\\n  document.body.appendChild(textarea);\\n  textarea.select();\\n\\n  try {\\n    document.execCommand('copy');\\n  } finally {\\n    document.body.removeChild(textarea);\\n  }\\n}\\n\\nasync function copyLintMonitorDetailedLog() {\\n  try {\\n    const detailedLog = buildLintDetailedLog();\\n    await copyTextToClipboard(detailedLog);\\n\\n    if (typeof window.showSuccessNotification === 'function') {\\n      const successTitle = 'לוג מפורט הועתק ללוח';\\n      const successMessage = 'הלוג כולל נתונים עדכניים מעמוד ניטור איכות הקוד';\\n      window.showSuccessNotification(successTitle, successMessage);\\n    } else if (typeof window.showNotification === 'function') {\\n      window.showNotification('לוג מפורט הועתק ללוח', 'success');\\n    } else {\\n      alert('לוג מפורט הועתק ללוח!');\\n    }\\n  } catch (error) {\\n    window.Logger?.error('[LintMonitor] שגיאה בהעתקת הלוג המפורט:', error, {\\n      page: LINT_MONITOR_HOST_PAGE,\\n    });\\n    if (typeof window.showErrorNotification === 'function') {\\n      const errorTitle = 'שגיאה בהעתקת הלוג';\\n      window.showErrorNotification(errorTitle, error.message);\\n    } else if (typeof window.showNotification === 'function') {\\n      window.showNotification('שגיאה בהעתקת הלוג', 'error');\\n    } else {\\n      alert(`שגיאה בהעתקת הלוג: ${error.message}`);\\n    }\\n  }\\n}\\n\\nwindow.copyLintMonitorDetailedLog = copyLintMonitorDetailedLog;\\nwindow.copyDetailedLog = copyLintMonitorDetailedLog;\\n\\nwindow.LintMonitorActions = {\\n  async copyDetailedLog(event) {\\n    if (event) {\\n      event.preventDefault();\\n    }\\n    await copyLintMonitorDetailedLog();\\n  },\\n  async refreshData(event) {\\n    if (event) {\\n      event.preventDefault();\\n    }\\n    if (window.lintMonitorController) {\\n      await window.lintMonitorController.loadData({ showToast: true });\\n    }\\n  },\\n  async downloadReport(event) {\\n    if (event) {\\n      event.preventDefault();\\n    }\\n    if (window.lintMonitorController) {\\n      await window.lintMonitorController.downloadLatestReport();\\n    }\\n  },\\n  async copyReport(event) {\\n    if (event) {\\n      event.preventDefault();\\n    }\\n    if (window.lintMonitorController) {\\n      await window.lintMonitorController.copyLatestReportToClipboard();\\n    }\\n  },\\n};\\n\",\"usedDeprecatedRules\":[{\"ruleId\":\"indent\",\"replacedBy\":[\"@stylistic/indent\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"indent\",\"url\":\"https://eslint.style/rules/indent\"}}]}},{\"ruleId\":\"quotes\",\"replacedBy\":[\"@stylistic/quotes\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"quotes\",\"url\":\"https://eslint.style/rules/quotes\"}}]}},{\"ruleId\":\"semi\",\"replacedBy\":[\"@stylistic/semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi\",\"url\":\"https://eslint.style/rules/semi\"}}]}},{\"ruleId\":\"comma-dangle\",\"replacedBy\":[\"@stylistic/comma-dangle\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-dangle\",\"url\":\"https://eslint.style/rules/comma-dangle\"}}]}},{\"ruleId\":\"no-new-object\",\"replacedBy\":[\"no-object-constructor\"],\"info\":{\"message\":\"The new rule flags more situations where object literal syntax can be used, and it does not report a problem when the `Object` constructor is invoked with an argument.\",\"url\":\"https://eslint.org/blog/2023/09/eslint-v8.50.0-released/\",\"deprecatedSince\":\"8.50.0\",\"availableUntil\":null,\"replacedBy\":[{\"rule\":{\"name\":\"no-object-constructor\",\"url\":\"https://eslint.org/docs/rules/no-object-constructor\"}}]}},{\"ruleId\":\"max-len\",\"replacedBy\":[\"@stylistic/max-len\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"max-len\",\"url\":\"https://eslint.style/rules/max-len\"}}]}},{\"ruleId\":\"spaced-comment\",\"replacedBy\":[\"@stylistic/spaced-comment\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"spaced-comment\",\"url\":\"https://eslint.style/rules/spaced-comment\"}}]}},{\"ruleId\":\"no-trailing-spaces\",\"replacedBy\":[\"@stylistic/no-trailing-spaces\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-trailing-spaces\",\"url\":\"https://eslint.style/rules/no-trailing-spaces\"}}]}},{\"ruleId\":\"no-multiple-empty-lines\",\"replacedBy\":[\"@stylistic/no-multiple-empty-lines\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-multiple-empty-lines\",\"url\":\"https://eslint.style/rules/no-multiple-empty-lines\"}}]}},{\"ruleId\":\"eol-last\",\"replacedBy\":[\"@stylistic/eol-last\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"eol-last\",\"url\":\"https://eslint.style/rules/eol-last\"}}]}},{\"ruleId\":\"no-mixed-spaces-and-tabs\",\"replacedBy\":[\"@stylistic/no-mixed-spaces-and-tabs\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-mixed-spaces-and-tabs\",\"url\":\"https://eslint.style/rules/no-mixed-spaces-and-tabs\"}}]}},{\"ruleId\":\"semi-spacing\",\"replacedBy\":[\"@stylistic/semi-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi-spacing\",\"url\":\"https://eslint.style/rules/semi-spacing\"}}]}},{\"ruleId\":\"no-extra-semi\",\"replacedBy\":[\"@stylistic/no-extra-semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-semi\",\"url\":\"https://eslint.style/rules/no-extra-semi\"}}]}},{\"ruleId\":\"comma-spacing\",\"replacedBy\":[\"@stylistic/comma-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-spacing\",\"url\":\"https://eslint.style/rules/comma-spacing\"}}]}},{\"ruleId\":\"comma-style\",\"replacedBy\":[\"@stylistic/comma-style\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-style\",\"url\":\"https://eslint.style/rules/comma-style\"}}]}},{\"ruleId\":\"arrow-spacing\",\"replacedBy\":[\"@stylistic/arrow-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-spacing\",\"url\":\"https://eslint.style/rules/arrow-spacing\"}}]}},{\"ruleId\":\"arrow-parens\",\"replacedBy\":[\"@stylistic/arrow-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-parens\",\"url\":\"https://eslint.style/rules/arrow-parens\"}}]}},{\"ruleId\":\"no-extra-parens\",\"replacedBy\":[\"@stylistic/no-extra-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-parens\",\"url\":\"https://eslint.style/rules/no-extra-parens\"}}]}}]},{\"filePath\":\"/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/lint-status-service.js\",\"messages\":[],\"suppressedMessages\":[],\"errorCount\":0,\"fatalErrorCount\":0,\"warningCount\":0,\"fixableErrorCount\":0,\"fixableWarningCount\":0,\"usedDeprecatedRules\":[{\"ruleId\":\"indent\",\"replacedBy\":[\"@stylistic/indent\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"indent\",\"url\":\"https://eslint.style/rules/indent\"}}]}},{\"ruleId\":\"quotes\",\"replacedBy\":[\"@stylistic/quotes\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"quotes\",\"url\":\"https://eslint.style/rules/quotes\"}}]}},{\"ruleId\":\"semi\",\"replacedBy\":[\"@stylistic/semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi\",\"url\":\"https://eslint.style/rules/semi\"}}]}},{\"ruleId\":\"comma-dangle\",\"replacedBy\":[\"@stylistic/comma-dangle\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-dangle\",\"url\":\"https://eslint.style/rules/comma-dangle\"}}]}},{\"ruleId\":\"no-new-object\",\"replacedBy\":[\"no-object-constructor\"],\"info\":{\"message\":\"The new rule flags more situations where object literal syntax can be used, and it does not report a problem when the `Object` constructor is invoked with an argument.\",\"url\":\"https://eslint.org/blog/2023/09/eslint-v8.50.0-released/\",\"deprecatedSince\":\"8.50.0\",\"availableUntil\":null,\"replacedBy\":[{\"rule\":{\"name\":\"no-object-constructor\",\"url\":\"https://eslint.org/docs/rules/no-object-constructor\"}}]}},{\"ruleId\":\"max-len\",\"replacedBy\":[\"@stylistic/max-len\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"max-len\",\"url\":\"https://eslint.style/rules/max-len\"}}]}},{\"ruleId\":\"spaced-comment\",\"replacedBy\":[\"@stylistic/spaced-comment\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"spaced-comment\",\"url\":\"https://eslint.style/rules/spaced-comment\"}}]}},{\"ruleId\":\"no-trailing-spaces\",\"replacedBy\":[\"@stylistic/no-trailing-spaces\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-trailing-spaces\",\"url\":\"https://eslint.style/rules/no-trailing-spaces\"}}]}},{\"ruleId\":\"no-multiple-empty-lines\",\"replacedBy\":[\"@stylistic/no-multiple-empty-lines\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-multiple-empty-lines\",\"url\":\"https://eslint.style/rules/no-multiple-empty-lines\"}}]}},{\"ruleId\":\"eol-last\",\"replacedBy\":[\"@stylistic/eol-last\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"eol-last\",\"url\":\"https://eslint.style/rules/eol-last\"}}]}},{\"ruleId\":\"no-mixed-spaces-and-tabs\",\"replacedBy\":[\"@stylistic/no-mixed-spaces-and-tabs\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-mixed-spaces-and-tabs\",\"url\":\"https://eslint.style/rules/no-mixed-spaces-and-tabs\"}}]}},{\"ruleId\":\"semi-spacing\",\"replacedBy\":[\"@stylistic/semi-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"semi-spacing\",\"url\":\"https://eslint.style/rules/semi-spacing\"}}]}},{\"ruleId\":\"no-extra-semi\",\"replacedBy\":[\"@stylistic/no-extra-semi\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-semi\",\"url\":\"https://eslint.style/rules/no-extra-semi\"}}]}},{\"ruleId\":\"comma-spacing\",\"replacedBy\":[\"@stylistic/comma-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-spacing\",\"url\":\"https://eslint.style/rules/comma-spacing\"}}]}},{\"ruleId\":\"comma-style\",\"replacedBy\":[\"@stylistic/comma-style\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"comma-style\",\"url\":\"https://eslint.style/rules/comma-style\"}}]}},{\"ruleId\":\"arrow-spacing\",\"replacedBy\":[\"@stylistic/arrow-spacing\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-spacing\",\"url\":\"https://eslint.style/rules/arrow-spacing\"}}]}},{\"ruleId\":\"arrow-parens\",\"replacedBy\":[\"@stylistic/arrow-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"arrow-parens\",\"url\":\"https://eslint.style/rules/arrow-parens\"}}]}},{\"ruleId\":\"no-extra-parens\",\"replacedBy\":[\"@stylistic/no-extra-parens\"],\"info\":{\"message\":\"Formatting rules are being moved out of ESLint core.\",\"url\":\"https://eslint.org/blog/2023/10/deprecating-formatting-rules/\",\"deprecatedSince\":\"8.53.0\",\"availableUntil\":\"10.0.0\",\"replacedBy\":[{\"message\":\"ESLint Stylistic now maintains deprecated stylistic core rules.\",\"url\":\"https://eslint.style/guide/migration\",\"plugin\":{\"name\":\"@stylistic/eslint-plugin\",\"url\":\"https://eslint.style\"},\"rule\":{\"name\":\"no-extra-parens\",\"url\":\"https://eslint.style/rules/no-extra-parens\"}}]}}]}]\n",
       "stderr": "",
       "parserError": null
     },
@@ -33,7 +370,7 @@
       "label": "Stylelint",
       "status": "passed",
       "exitCode": 0,
-      "durationMs": 343,
+      "durationMs": 320,
       "issues": [],
       "summary": {
         "files": 0,
@@ -47,16 +384,353 @@
     {
       "id": "htmlhint",
       "label": "HTMLHint",
-      "status": "passed",
-      "exitCode": 0,
-      "durationMs": 199,
-      "issues": [],
+      "status": "warning",
+      "exitCode": 1,
+      "durationMs": 187,
+      "issues": [
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 84,
+          "column": 40,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 85,
+          "column": 44,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 86,
+          "column": 45,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 87,
+          "column": 45,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 88,
+          "column": 48,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 89,
+          "column": 39,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 90,
+          "column": 42,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 100,
+          "column": 49,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 108,
+          "column": 46,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 116,
+          "column": 51,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 124,
+          "column": 46,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 167,
+          "column": 27,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 187,
+          "column": 29,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 190,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 194,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 233,
+          "column": 27,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 251,
+          "column": 29,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 254,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 258,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 302,
+          "column": 27,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 322,
+          "column": 29,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 325,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 329,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 369,
+          "column": 38,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 370,
+          "column": 40,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 371,
+          "column": 44,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 372,
+          "column": 38,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 373,
+          "column": 37,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 374,
+          "column": 43,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 375,
+          "column": 42,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 376,
+          "column": 48,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 387,
+          "column": 50,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 397,
+          "column": 50,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 406,
+          "column": 1,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 413,
+          "column": 44,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 425,
+          "column": 48,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 437,
+          "column": 29,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 444,
+          "column": 36,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 492,
+          "column": 27,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 516,
+          "column": 29,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 519,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        },
+        {
+          "file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html",
+          "line": 523,
+          "column": 53,
+          "rule": "id-class-value",
+          "severity": "warning",
+          "message": "The id and class attribute values must be in lowercase and split by a dash."
+        }
+      ],
       "summary": {
-        "files": 0,
+        "files": 1,
         "errors": 0,
-        "warnings": 0
+        "warnings": 42
       },
-      "stdout": "[]\n",
+      "stdout": "[{\"file\":\"/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/code-quality-dashboard.html\",\"messages\":[{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"overviewStats\\\"\",\"evidence\":\"              <div class=\\\"info-summary\\\" id=\\\"overviewStats\\\">\",\"line\":84,\"col\":40,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"totalFunctions\\\"\",\"evidence\":\"                <div>פונקציות סה\\\"כ: <strong id=\\\"totalFunctions\\\">0</strong></div>\",\"line\":85,\"col\":44,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"errorHandlingCoverage\\\"\",\"evidence\":\"                <div>Error Handling: <strong id=\\\"errorHandlingCoverage\\\">0%</strong></div>\",\"line\":86,\"col\":45,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"jsdocCoverage\\\"\",\"evidence\":\"                <div>JSDoc Coverage: <strong id=\\\"jsdocCoverage\\\">0%</strong></div>\",\"line\":87,\"col\":45,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"namingCompliance\\\"\",\"evidence\":\"                <div>Naming Compliance: <strong id=\\\"namingCompliance\\\">0%</strong></div>\",\"line\":88,\"col\":48,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicatesTotal\\\"\",\"evidence\":\"                <div>כפילויות: <strong id=\\\"duplicatesTotal\\\">0</strong></div>\",\"line\":89,\"col\":39,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"lastUpdateTime\\\"\",\"evidence\":\"                <div>עדכון אחרון: <strong id=\\\"lastUpdateTime\\\">-</strong></div>\",\"line\":90,\"col\":42,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"errorHandlingStatus\\\"\",\"evidence\":\"                        <h6 class=\\\"text-primary\\\" id=\\\"errorHandlingStatus\\\">בדיקה...</h6>\",\"line\":100,\"col\":49,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"jsdocStatus\\\"\",\"evidence\":\"                        <h6 class=\\\"text-info\\\" id=\\\"jsdocStatus\\\">בדיקה...</h6>\",\"line\":108,\"col\":46,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"namingStatus\\\"\",\"evidence\":\"                        <h6 class=\\\"text-secondary\\\" id=\\\"namingStatus\\\">בדיקה...</h6>\",\"line\":116,\"col\":51,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"functionIndexStatus\\\"\",\"evidence\":\"                        <h6 class=\\\"text-dark\\\" id=\\\"functionIndexStatus\\\">בדיקה...</h6>\",\"line\":124,\"col\":46,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"errorHandlingResults\\\"\",\"evidence\":\"                      <div id=\\\"errorHandlingResults\\\">\",\"line\":167,\"col\":27,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"errorHandlingStats\\\"\",\"evidence\":\"                        <div id=\\\"errorHandlingStats\\\">\",\"line\":187,\"col\":29,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"errorHandlingWithCoverage\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"errorHandlingWithCoverage\\\">0</span>\",\"line\":190,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"errorHandlingWithoutCoverage\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"errorHandlingWithoutCoverage\\\">0</span>\",\"line\":194,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"jsdocResults\\\"\",\"evidence\":\"                      <div id=\\\"jsdocResults\\\">\",\"line\":233,\"col\":27,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"jsdocStats\\\"\",\"evidence\":\"                        <div id=\\\"jsdocStats\\\">\",\"line\":251,\"col\":29,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"jsdocWithDocs\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"jsdocWithDocs\\\">0</span>\",\"line\":254,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"jsdocWithoutDocs\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"jsdocWithoutDocs\\\">0</span>\",\"line\":258,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"namingResults\\\"\",\"evidence\":\"                      <div id=\\\"namingResults\\\">\",\"line\":302,\"col\":27,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"namingStats\\\"\",\"evidence\":\"                        <div id=\\\"namingStats\\\">\",\"line\":322,\"col\":29,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"namingCompliant\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"namingCompliant\\\">0</span>\",\"line\":325,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"namingViolations\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"namingViolations\\\">0</span>\",\"line\":329,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateSectionBody\\\"\",\"evidence\":\"            <div class=\\\"section-body\\\" id=\\\"duplicateSectionBody\\\">\",\"line\":369,\"col\":38,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateSummary\\\"\",\"evidence\":\"              <div class=\\\"info-summary\\\" id=\\\"duplicateSummary\\\">\",\"line\":370,\"col\":40,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateTotalCount\\\"\",\"evidence\":\"                <div>סה\\\"כ כפילויות: <strong id=\\\"duplicateTotalCount\\\">0</strong></div>\",\"line\":371,\"col\":44,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateExactCount\\\"\",\"evidence\":\"                <div>מדויקות: <strong id=\\\"duplicateExactCount\\\">0</strong></div>\",\"line\":372,\"col\":38,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateNearCount\\\"\",\"evidence\":\"                <div>קרובות: <strong id=\\\"duplicateNearCount\\\">0</strong></div>\",\"line\":373,\"col\":37,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateSimilarCount\\\"\",\"evidence\":\"                <div>דפוסים דומים: <strong id=\\\"duplicateSimilarCount\\\">0</strong></div>\",\"line\":374,\"col\":43,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicatePotentialCount\\\"\",\"evidence\":\"                <div>פוטנציאליות: <strong id=\\\"duplicatePotentialCount\\\">0</strong></div>\",\"line\":375,\"col\":42,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateCategoryCount\\\"\",\"evidence\":\"                <div>קטגוריות ייחודיות: <strong id=\\\"duplicateCategoryCount\\\">0</strong></div>\",\"line\":376,\"col\":48,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateTypeFilter\\\"\",\"evidence\":\"                      <select class=\\\"form-select\\\" id=\\\"duplicateTypeFilter\\\">\",\"line\":387,\"col\":50,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateCategoryFilter\\\"\",\"evidence\":\"                      <select class=\\\"form-select\\\" id=\\\"duplicateCategoryFilter\\\">\",\"line\":397,\"col\":50,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\"\\n                        id=\\\"duplicateSimilarityRange\\\"\",\"evidence\":\"                        id=\\\"duplicateSimilarityRange\\\"\",\"line\":406,\"col\":1,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateSimilarityValue\\\"\",\"evidence\":\"                        >דמיון נוכחי: <span id=\\\"duplicateSimilarityValue\\\">70%</span></div\",\"line\":413,\"col\":44,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateResults\\\"\",\"evidence\":\"                  <div class=\\\"table-responsive\\\" id=\\\"duplicateResults\\\">\",\"line\":425,\"col\":48,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateTableBody\\\"\",\"evidence\":\"                      <tbody id=\\\"duplicateTableBody\\\">\",\"line\":437,\"col\":29,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"duplicateDetailsPanel\\\"\",\"evidence\":\"                  <div class=\\\"mt-3\\\" id=\\\"duplicateDetailsPanel\\\">\",\"line\":444,\"col\":36,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"functionIndexResults\\\"\",\"evidence\":\"                      <div id=\\\"functionIndexResults\\\">\",\"line\":492,\"col\":27,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"functionIndexStats\\\"\",\"evidence\":\"                        <div id=\\\"functionIndexStats\\\">\",\"line\":516,\"col\":29,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"filesWithIndex\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"filesWithIndex\\\">0</span>\",\"line\":519,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}},{\"type\":\"warning\",\"message\":\"The id and class attribute values must be in lowercase and split by a dash.\",\"raw\":\" id=\\\"filesWithoutIndex\\\"\",\"evidence\":\"                            <span class=\\\"stat-value\\\" id=\\\"filesWithoutIndex\\\">0</span>\",\"line\":523,\"col\":53,\"rule\":{\"id\":\"id-class-value\",\"description\":\"The id and class attribute values must meet the specified rules.\",\"link\":\"https://htmlhint.com/rules/id-class-value\"}}],\"time\":5}]\n",
       "stderr": "",
       "parserError": null
     },
@@ -65,7 +739,7 @@
       "label": "Prettier",
       "status": "warning",
       "exitCode": 1,
-      "durationMs": 300,
+      "durationMs": 295,
       "issues": [
         {
           "file": "[warn] trading-ui/scripts/linter-realtime-monitor.js",
@@ -82,15 +756,23 @@
           "rule": "prettier",
           "severity": "warning",
           "message": "Formatting mismatch"
+        },
+        {
+          "file": "[warn] trading-ui/code-quality-dashboard.html",
+          "line": 0,
+          "column": 0,
+          "rule": "prettier",
+          "severity": "warning",
+          "message": "Formatting mismatch"
         }
       ],
       "summary": {
-        "files": 2,
+        "files": 3,
         "errors": 0,
-        "warnings": 2
+        "warnings": 3
       },
       "stdout": "Checking formatting...\n",
-      "stderr": "[warn] trading-ui/scripts/linter-realtime-monitor.js\n[warn] trading-ui/scripts/services/lint-status-service.js\n[warn] Code style issues found in 2 files. Run Prettier with --write to fix.\n",
+      "stderr": "[warn] trading-ui/scripts/linter-realtime-monitor.js\n[warn] trading-ui/scripts/services/lint-status-service.js\n[warn] trading-ui/code-quality-dashboard.html\n[warn] Code style issues found in 3 files. Run Prettier with --write to fix.\n",
       "parserError": null
     }
   ]

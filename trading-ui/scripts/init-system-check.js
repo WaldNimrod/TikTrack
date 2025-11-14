@@ -522,7 +522,9 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         // נחכה שהרשימה תהיה קיימת
         const waitForNavList = () => {
-            const navList = document.querySelector('.tiktrack-nav-list');
+            const navList =
+                document.querySelector('.tiktrack-nav-list') ||
+                document.querySelector('#unified-header');
             if (navList) {
                 initSystemCheck.init();
             } else {
@@ -534,7 +536,9 @@ if (document.readyState === 'loading') {
 } else {
     // נחכה שהרשימה תהיה קיימת
     const waitForNavList = () => {
-        const navList = document.querySelector('.tiktrack-nav-list');
+        const navList =
+            document.querySelector('.tiktrack-nav-list') ||
+            document.querySelector('#unified-header');
         if (navList) {
             initSystemCheck.init();
         } else {

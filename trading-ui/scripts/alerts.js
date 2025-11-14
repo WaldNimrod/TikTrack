@@ -886,8 +886,8 @@ function renderAlertsTableRows(alerts) {
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.alerts) {
       const config = window.INFO_SUMMARY_CONFIGS.alerts;
       window.InfoSummarySystem.calculateAndRender(alertsData || [], config);
-    } else if (typeof updatePageSummaryStats_LEGACY === 'function') {
-      updatePageSummaryStats_LEGACY();
+    } else {
+      window.Logger?.warn('InfoSummarySystem configuration for alerts not available; skipping summary update', { page: 'alerts' });
     }
     
     window.Logger.info('✅ טבלת התראות עודכנה בהצלחה עם', alerts.length, 'התראות', { page: "alerts" });
@@ -941,45 +941,6 @@ async function updateAlertsTable(alerts, options = {}) {
 
   renderAlertsTableRows(safeAlerts);
 }
-
-/**
- * Update page summary statistics wrapper
- * Uses global updatePageSummaryStats from ui-utils.js
- * 
- * IMPORTANT: We saved the global function reference at the top of the file before export
- * to avoid infinite recursion.
- * 
- * @function updatePageSummaryStats
- * @returns {void}
- */
-// REMOVED: updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
-async function updatePageSummaryStats_LEGACY() {
-  try {
-    // Get alerts data from global scope
-    const dataToUse = window.alertsData || alertsData || [];
-    
-    // Capture global function reference on first call if not already captured
-    if (!globalUpdatePageSummaryStats) {
-      // Check if global function exists and it's different from our local function
-      if (typeof window.updatePageSummaryStats === 'function' && 
-          window.updatePageSummaryStats !== updatePageSummaryStats) {
-        globalUpdatePageSummaryStats = window.updatePageSummaryStats;
-      } else {
-        // Global function not available or it's already us - skip to prevent recursion
-        window.Logger?.warn('Global updatePageSummaryStats not available or recursion detected', { page: "alerts" });
-        return;
-      }
-    }
-    
-    // Use the captured global function reference
-    if (globalUpdatePageSummaryStats) {
-      globalUpdatePageSummaryStats('alerts', dataToUse);
-    }
-  } catch (error) {
-    window.Logger?.error('Error updating page summary stats:', error, { page: "alerts" });
-  }
-}
-
 
 /**
  * הצגת מודל התראה (הוספה או עריכה)
@@ -1443,46 +1404,6 @@ function populateRelatedObjects(relationTypeId) {
     window.Logger.error('שגיאה במילוי אובייקטים קשורים:', error, { page: "alerts" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה במילוי אובייקטים קשורים', error.message);
-    }
-  }
-}
-
-// REMOVED: populateEditRelatedObjects - not used, ModalManagerV2 uses populateSelects instead
-/**
- * מילוי רשימת אובייקטים למודל העריכה
- * @param {number} relationTypeId - מזהה סוג השיוך
- */
-function _REMOVED_populateEditRelatedObjects(relationTypeId) {
-  try {
-    const selectElement = document.getElementById('editAlertRelatedObjectSelect');
-    if (!selectElement) {return;}
-
-    // ניקוי הרשימה
-    selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
-
-    // מילוי לפי סוג השיוך
-    switch (relationTypeId) {
-    case 1: // חשבון מסחר
-      populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון מסחר');
-      break;
-
-  case 2: // טרייד
-    populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
-    break;
-
-  case 3: // תכנון טרייד
-    populateSelect('editAlertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
-    break;
-
-  case 4: // טיקר
-    populateSelect('editAlertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
-    break;
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה במילוי אובייקטים קשורים בעריכה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במילוי אובייקטים קשורים בעריכה', error.message);
     }
   }
 }
@@ -2553,85 +2474,6 @@ window.reactivateAlert = reactivateAlert;
 // window.Logger.info('- clearAlertValidation:', typeof window.clearAlertValidation, { page: "alerts" });
 
 // REMOVED: checkAlertCondition - unused function
-
-// REMOVED: toggleAlert - not used
-/**
- * הפעלה/כיבוי התראה
- * מחליף את מצב ההפעלה של התראה
- * @param {number} alertId - מזהה ההתראה
- */
-function _REMOVED_toggleAlert(alertId) {
-  try {
-    window.Logger.info('🔄 מחליף מצב התראה:', alertId, { page: "alerts" });
-    
-    // חיפוש ההתראה בנתונים
-    const alert = (window.alertsData || alertsData).find(a => a.id === alertId);
-    if (!alert) {
-      throw new Error('התראה לא נמצאה');
-    }
-    
-    // החלפת מצב ההפעלה
-    const newStatus = alert.is_active ? 'inactive' : 'active';
-    const newIsActive = !alert.is_active;
-    
-    // עדכון בשרת
-    fetch('/api/alerts/' + alertId, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        is_active: newIsActive,
-        status: newStatus
-      })
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('שגיאה בעדכון מצב התראה');
-      }
-      return response.json();
-    })
-    .then(data => {
-      window.Logger.info('✅ מצב התראה עודכן:', data, { page: "alerts" });
-      
-      // עדכון הנתונים המקומיים
-      alert.is_active = newIsActive;
-      alert.status = newStatus;
-      
-      // רענון הטבלה
-      updateAlertsTable(alertsData);
-      
-      // עדכון סטטיסטיקות
-      if (typeof updateAlertsSummary === 'function') {
-        updateAlertsSummary(alertsData);
-      }
-      
-      // הודעת הצלחה
-      const statusText = newIsActive ? 'הופעלה' : 'כובתה';
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification(`התראה ${statusText} בהצלחה`);
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification(`התראה ${statusText} בהצלחה`, 'success');
-      }
-    })
-    .catch(error => {
-      window.Logger.error('שגיאה בעדכון מצב התראה:', error, { page: "alerts" });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בעדכון מצב התראה', error.message);
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification('שגיאה בעדכון מצב התראה', 'error');
-      }
-    });
-    
-  } catch (error) {
-    window.Logger.error('שגיאה בהחלפת מצב התראה:', error, { page: "alerts" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהחלפת מצב התראה', error.message);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהחלפת מצב התראה', 'error');
-    }
-  }
-}
 
 /**
  * עדכון סטטוס התראה

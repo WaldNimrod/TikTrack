@@ -383,48 +383,6 @@ async function ensureTradingAccountsLoaded() {
 // פונקציות API
 // ========================================
 
-// REMOVED: loadCashFlows - replaced by loadCashFlowsData
-/**
- * טעינת תזרימי מזומנים מהשרת
- */
-async function _REMOVED_loadCashFlows() {
-  try {
-
-    // Use relative URL to work with both development (8080) and production (5001)
-    const response = await fetch('/api/cash-flows/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    if (result.status === 'success') {
-      cashFlowsData = result.data;
-      await renderCashFlowsTable();
-      updatePageSummaryStats();
-      
-      // יישום צבעי ישויות על כותרות
-      if (window.applyEntityColorsToHeaders) {
-        window.applyEntityColorsToHeaders('cash_flow');
-      }
-    } else {
-      handleApiError('שגיאה בטעינת תזרימי מזומנים', result.error);
-
-      // הצגת הודעת שגיאה
-      if (window.showInfoNotification) {
-        window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת תזרימי מזומנים');
-      }
-    }
-  } catch (error) {
-    handleApiError(error, 'טעינת תזרימי מזומנים');
-
-    // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת תזרימי מזומנים');
-    }
-  }
-}
-
 /**
  * Helper validation function for cash flow amount
  * @param {string|number} value - Amount value to validate
@@ -2318,91 +2276,6 @@ async function editCashFlow(id) {
 
 // ===== TRADE AND TRADE PLAN LOADING FUNCTIONS =====
 
-// REMOVED: loadTradesForCashFlow - not used, ModalManagerV2 uses SelectPopulatorService
-/**
- * Load trades for cash flow modals
- * @param {string} selectId - ID של ה-select element
- */
-async function _REMOVED_loadTradesForCashFlow(selectId) {
-  try {
-    const response = await fetch('/api/trades/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const trades = data.data || [];
-    
-    // Sort trades by ticker symbol alphabetically
-    trades.sort((a, b) => {
-      const symbolA = a.ticker_symbol || '';
-      const symbolB = b.ticker_symbol || '';
-      return symbolA.localeCompare(symbolB, 'he');
-    });
-    
-    const tradeSelect = document.getElementById(selectId);
-    if (tradeSelect) {
-      // Clear existing options except the first one
-      tradeSelect.innerHTML = '<option value="">בחר טרייד (אופציונלי)</option>';
-      
-      // Add trade options
-      trades.forEach(trade => {
-        const option = document.createElement('option');
-        option.value = trade.id;
-        const tradeDate = trade.opened_at ? new Date(trade.opened_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-        const sideText = trade.side === 'buy' ? 'קנייה' : trade.side === 'sell' ? 'מכירה' : trade.side || 'לא מוגדר';
-        option.textContent = `${trade.ticker_symbol || 'לא מוגדר'} | ${tradeDate} | ${sideText}`;
-        tradeSelect.appendChild(option);
-      });
-    }
-  } catch (error) {
-    window.Logger.error('Error loading trades for cash flow modal', error, { page: 'cash_flows' });
-  }
-}
-
-// REMOVED: loadTradePlansForCashFlow - not used, ModalManagerV2 uses SelectPopulatorService
-/**
- * Load trade plans for cash flow modals
- * @param {string} selectId - ID של ה-select element
- */
-async function _REMOVED_loadTradePlansForCashFlow(selectId) {
-  try {
-    const response = await fetch('/api/trade-plans/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    const tradePlans = data.data || [];
-    
-    // Sort trade plans by ticker symbol alphabetically
-    tradePlans.sort((a, b) => {
-      const symbolA = a.ticker && a.ticker.symbol ? a.ticker.symbol : '';
-      const symbolB = b.ticker && b.ticker.symbol ? b.ticker.symbol : '';
-      return symbolA.localeCompare(symbolB, 'he');
-    });
-    
-    const tradePlanSelect = document.getElementById(selectId);
-    if (tradePlanSelect) {
-      // Clear existing options except the first one
-      tradePlanSelect.innerHTML = '<option value="">בחר תוכנית השקעה (אופציונלי)</option>';
-      
-      // Add trade plan options
-      tradePlans.forEach(plan => {
-        const option = document.createElement('option');
-        option.value = plan.id;
-        const planDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-        const sideText = plan.side === 'buy' ? 'קנייה' : plan.side === 'sell' ? 'מכירה' : plan.side || 'לא מוגדר';
-        const symbol = plan.ticker && plan.ticker.symbol ? plan.ticker.symbol : 'לא מוגדר';
-        option.textContent = `${symbol} | ${planDate} | ${sideText}`;
-        tradePlanSelect.appendChild(option);
-      });
-    }
-  } catch (error) {
-    window.Logger.error('Error loading trade plans for cash flow modal', error, { page: 'cash_flows' });
-  }
-}
-
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
 window.manageExternalIdField = manageExternalIdField;
@@ -2646,32 +2519,6 @@ function generateDetailedLog() {
     log.push('');
     log.push('=== סוף לוג מפורט ===');
     return log.join('\n');
-}
-
-// REMOVED: generateDetailedLogForCashFlows - not used, use global generateDetailedLog from logger-service.js
-// Local  function for cash_flows page
-async function _REMOVED_generateDetailedLogForCashFlows() {
-    try {
-        const detailedLog = await generateDetailedLog();
-        if (detailedLog) {
-            await navigator.clipboard.writeText(detailedLog);
-            
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח', 'הלוג מכיל את כל מה שרואה המשתמש בעמוד');
-            } else if (typeof window.showNotification === 'function') {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
-            }
-        }
-    } catch (error) {
-        window.Logger.error('Error copying detailed log', error, { page: 'cash_flows' });
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);
-        } else {
-            alert('שגיאה בהעתקת הלוג: ' + error.message);
-        }
-    }
 }
 
 // ===== מערכת טיפול בשגיאות =====

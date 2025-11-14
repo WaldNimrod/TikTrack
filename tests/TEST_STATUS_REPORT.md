@@ -9,11 +9,11 @@
 
 ## 🔄 עדכון 2025-11-14 – סטטוס בפועל
 
-- ✅ תצורת Jest מרובת-פרויקטים (`unit` / `integration` / `component`) רצה יציב סביב ~4.8 שניות להרצה מלאה עם כיסוי.  
-- ✅ `npm run test -- --coverage --runInBand` ירוק: 61/61 סוויטות פעילות, 643/643 טסטים ירוקים, 0 דילוגים.  
+- ✅ תצורת Jest מרובת-פרויקטים (`unit` / `integration` / `component`) רצה יציב סביב ~3.6 שניות להפעלה מלאה עם כיסוי.  
+- ✅ `npm run test -- --coverage --runInBand` (3.58 שניות) ירוק: 61/61 סוויטות פעילות, 643/643 טסטים ירוקים, 0 דילוגים.  
 - ⚙️ נוספו טסטי fallback ייעודיים ל־`TradesAdapter`, `PerformanceAdapter`, `TickerService` ו־`SystemManagement`, כך שכל מודולי הפולבק נבדקים ללא נתוני דמה.  
 - ✅ DOM Loader וה־test-loader עודכנו לתמיכה בטעינת סקריפטים של הטיקר/ניהול מערכת יחד עם המערכות הכלליות.  
-- ⚠️ הכיסוי הכללי: Statements ‎58.77‎%, Branches ‎30.53‎%, Functions ‎73.72‎%, Lines ‎60.00‎% – יעד שלב 1 נשמר אך שלב 2 (≥90%) עדיין לא הושג בגלל קבצי legacy ללא טסטים.  
+- ⚠️ הכיסוי הכללי: Statements ‎58.77‎%, Branches ‎30.53‎%, Functions ‎73.72‎%, Lines ‎60.00‎% – יעד שלב 1 נשמר אך שלב 2 (≥90%) עדיין לא הושג בגלל קבצי legacy ללא טסטים. הקבצים החלשים ביותר כעת: `table-mappings.js` (Statements ‎20.56‎%), `tables.js` (‎17.18‎%), `value-adapter.js` (‎21.11‎%).
 - ⚠️ `npm run check:all` עדיין נכשל (81,413 שגיאות, 4,801 אזהרות – בעיקר `no-console`, `indent`, `arrow-parens`).  
 - ✅ בדיקות Backend (`python3 -m pytest`) נשארות ירוקות – 44 טסטים כבסיס השוואה תקין.
 
@@ -25,7 +25,7 @@
 | ESLint (`npm run check:all`) | ⚠️ עדיין נכשל | 81,413 שגיאות ו־4,801 אזהרות – מטופל בשלבי הריפקטורינג הבאים. |
 
 ## 🔍 תוצאות מדידה עדכניות (נובמבר 2025)
-- `npm run test -- --coverage --runInBand` (~4.8 שניות)  
+- `npm run test -- --coverage --runInBand` (3.58 שניות)  
   - ✅ 61 סוויטות, 643 טסטים, 0 דילוגים  
   - כיסוי: Statements 58.77%, Branches 30.53%, Functions 73.72%, Lines 60.00%.
 - `npm run test:unit` / `test:integration` / `test:component` (~0.7‑1.3 שניות כל אחת)  

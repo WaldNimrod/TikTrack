@@ -12,6 +12,9 @@
 (function () {
     'use strict';
 
+    const STOP_PERCENT_RANGE = { min: 0.1, max: 95 };
+    const TARGET_PERCENT_RANGE = { min: 0.1, max: 500 };
+
     const DEFAULT_OPTIONS = {
         allowFractionalShares: false,
         amountDecimals: 2,
@@ -28,6 +31,8 @@
         summaryTitle: 'סיכום',
         stopPreferenceKey: 'defaultStopLoss',
         targetPreferenceKey: 'defaultTargetPrice',
+        stopPercentFallback: 2,
+        targetPercentFallback: 6,
         forceRiskOnBind: false,
         forceSyncOnBind: false,
         percentDecimals: 2,
@@ -738,7 +743,8 @@
     }
 
     async function loadDefaultRiskPercents(options) {
-        const cacheKey = getRiskCacheKey(options);
+        const effectiveOptions = Object.assign({}, DEFAULT_OPTIONS, options || {});
+        const cacheKey = getRiskCacheKey(effectiveOptions);
         if (riskCache.has(cacheKey)) {
             return riskCache.get(cacheKey);
         }
@@ -764,14 +770,34 @@
                 return null;
             };
 
-            const stopPref = await resolvePreference(options.stopPreferenceKey || DEFAULT_OPTIONS.stopPreferenceKey);
+            const stopPref = await resolvePreference(effectiveOptions.stopPreferenceKey || DEFAULT_OPTIONS.stopPreferenceKey);
             if (stopPref !== null && stopPref !== undefined && !Number.isNaN(parseFloat(stopPref))) {
                 stopPercent = Math.abs(parseFloat(stopPref));
             }
 
-            const targetPref = await resolvePreference(options.targetPreferenceKey || DEFAULT_OPTIONS.targetPreferenceKey);
+            const targetPref = await resolvePreference(effectiveOptions.targetPreferenceKey || DEFAULT_OPTIONS.targetPreferenceKey);
             if (targetPref !== null && targetPref !== undefined && !Number.isNaN(parseFloat(targetPref))) {
                 targetPercent = Math.abs(parseFloat(targetPref));
+            }
+
+            if ((stopPercent === null || stopPercent <= 0) && Number.isFinite(effectiveOptions.stopPercentFallback)) {
+                stopPercent = Math.abs(parseFloat(effectiveOptions.stopPercentFallback));
+            }
+
+            if ((targetPercent === null || targetPercent <= 0) && Number.isFinite(effectiveOptions.targetPercentFallback)) {
+                targetPercent = Math.abs(parseFloat(effectiveOptions.targetPercentFallback));
+            }
+
+            if (Number.isFinite(stopPercent)) {
+                stopPercent = Math.min(Math.max(stopPercent, STOP_PERCENT_RANGE.min), STOP_PERCENT_RANGE.max);
+            } else {
+                stopPercent = null;
+            }
+
+            if (Number.isFinite(targetPercent)) {
+                targetPercent = Math.min(Math.max(targetPercent, TARGET_PERCENT_RANGE.min), TARGET_PERCENT_RANGE.max);
+            } else {
+                targetPercent = null;
             }
 
             if ((stopPercent === null || targetPercent === null) && !riskDefaultsWarningShown) {

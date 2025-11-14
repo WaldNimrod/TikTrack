@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.0.6.0",
+    "version": "1.0.7.0",
     "major": 1,
     "minor": 0,
-    "patch": 6,
+    "patch": 7,
     "build": 0,
-    "commit": "71acdafb71ffef4c7680a6c8805c2f969686748b",
-    "updated_at": "2025-11-11T11:07:36+00:00",
-    "notes": "Link homepage execution widgets to executions page"
+    "commit": "5a7c30d00ebb0f8bc9397e5cd13da84d42044a35",
+    "updated_at": "2025-11-14T20:45:34+00:00",
+    "notes": "Sync local updates before release"
   },
   "development": {
-    "version": "1.0.30.0",
+    "version": "1.0.31.0",
     "major": 1,
     "minor": 0,
-    "patch": 30,
+    "patch": 31,
     "build": 0,
-    "commit": "a0a0f3de4f8ea14c5c9b4efb0776f7c444b01c18",
-    "updated_at": "2025-11-14T20:43:54+00:00",
-    "notes": "Lint monitor UX improvements"
+    "commit": "5a7c30d00ebb0f8bc9397e5cd13da84d42044a35",
+    "updated_at": "2025-11-14T20:46:53+00:00",
+    "notes": "Sync local updates before release"
   }
 }

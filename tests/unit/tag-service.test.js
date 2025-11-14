@@ -1,3 +1,5 @@
+/* eslint-env jest */
+
 const path = require('path');
 
 const TAG_SERVICE_PATH = path.resolve(__dirname, '../../trading-ui/scripts/services/tag-service.js');
@@ -184,6 +186,17 @@ describe('TagService', () => {
         await expect(TagService.fetchCategories()).rejects.toThrow('Server exploded');
     });
 
+    test('requestJSON falls back to default message when payload missing error text', async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 502,
+            json: async () => ({})
+        });
+
+        const TagService = loadTagService();
+        await expect(TagService.fetchTags({ force: true })).rejects.toThrow('TagService request failed (502)');
+    });
+
     test('loadEntityTags with force fetches fresh data and caches it', async () => {
         const payload = [{ id: 3, name: 'swing' }];
         global.fetch.mockResolvedValue({
@@ -284,6 +297,26 @@ describe('TagService', () => {
 
         expect(global.fetch).not.toHaveBeenCalled();
         expect(result).toEqual(cached);
+    });
+
+    test('searchTags caches identical requests within TTL window', async () => {
+        const nowSpy = jest.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValueOnce(2000);
+        const payload = [{ id: 31, name: 'screener' }];
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: payload })
+        });
+
+        const TagService = loadTagService();
+        await TagService.searchTags({ query: 'sc', entityType: 'trade', limit: 5, includeInactive: true });
+        await TagService.searchTags({ query: 'sc', entityType: 'trade', limit: 5, includeInactive: true });
+
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+        expect(global.fetch).toHaveBeenCalledWith(
+            expect.stringContaining('/api/tags/search?query=sc&entity_type=trade&limit=5&include_inactive=true'),
+            expect.any(Object)
+        );
+        nowSpy.mockRestore();
     });
 
     test('getAnalytics returns cached dataset when present', async () => {
@@ -475,6 +508,34 @@ describe('TagService', () => {
         expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:list:11');
         expect(window.UnifiedCacheManager.remove).toHaveBeenCalledWith('tags:analytics');
         expect(window.TagEvents.emitTagUpdated).toHaveBeenCalledWith({ action: 'delete', tagId: 15, categoryId: 11 });
+    });
+
+
+    test('normalizeTagIds filters invalid inputs and keeps numeric values', () => {
+        const TagService = loadTagService();
+        const result = TagService.normalizeTagIds([1, '2', '  ', null, 'abc', 3.5, '5']);
+        expect(result).toEqual([1, 2, 3.5, 5]);
+    });
+
+    test('formatTagErrorMessage appends message when available', () => {
+        const TagService = loadTagService();
+        expect(TagService.formatTagErrorMessage('Default', { message: ' server ' })).toBe('Default (server)');
+        expect(TagService.formatTagErrorMessage('Default', { message: '   ' })).toBe('Default');
+    });
+
+    test('getTagUsage validates tag id and builds query params', async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ data: [{ entity: 1 }] })
+        });
+        const TagService = loadTagService();
+        await expect(TagService.getTagUsage('abc')).rejects.toThrow('Tag ID must be an integer');
+        const usage = await TagService.getTagUsage('12', { limit: 30 });
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/tags/12/usage?limit=30',
+            expect.objectContaining({ credentials: 'same-origin' })
+        );
+        expect(usage).toEqual([{ entity: 1 }]);
     });
 
     test('getAnalytics fetches data when cache empty and emits initialized event', async () => {

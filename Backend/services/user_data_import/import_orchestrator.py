@@ -504,8 +504,8 @@ class ImportOrchestrator:
                 session,
                 status='mismatch',
                 message=(
-                    f"This broker account number already belongs to trading account "
-                    f"'{existing_binding.name}'. Please switch to that account or unlink it before continuing."
+                    f"מספר החשבון בקובץ כבר משויך לחשבון המסחר \"{existing_binding.name}\". "
+                    f"נא לבחור את החשבון הזה או לנתק את השיוך לפני המשך הייבוא."
                 ),
                 file_account_number=file_account_number,
                 current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
@@ -574,8 +574,8 @@ class ImportOrchestrator:
             return {
                 'success': False,
                 'error': (
-                    f"Account number already linked to trading account '{existing_binding.name}' "
-                    f"(ID {existing_binding.id}). Please use that account or unlink it first."
+                    f"מספר החשבון כבר משויך לחשבון \"{existing_binding.name}\" (ID {existing_binding.id}). "
+                    f"נא להשתמש בחשבון זה או לנתק את השיוך לפני המשך הפעולה."
                 )
             }
 
@@ -587,7 +587,7 @@ class ImportOrchestrator:
             self.db_session.rollback()
             return {
                 'success': False,
-                'error': 'Account number already linked to another trading account'
+                'error': 'מספר החשבון כבר משויך לחשבון מסחר אחר במערכת'
             }
 
         session.add_summary_data({'file_account_number': normalized_number})
@@ -641,6 +641,7 @@ class ImportOrchestrator:
         """
         task = (task_type or 'executions').lower()
         analysis_timestamp = datetime.now(timezone.utc)
+        file_account_number = session.get_summary_data('file_account_number')
 
         base_stats = {
             'task_type': task,
@@ -657,6 +658,8 @@ class ImportOrchestrator:
             'duplicate_details': duplicate_result,
             'analysis_timestamp': analysis_timestamp
         }
+        if file_account_number:
+            base_stats['file_account_number'] = file_account_number
 
         if task == 'cashflows':
             type_stats = validation_result.get('type_stats', {})
@@ -678,6 +681,7 @@ class ImportOrchestrator:
             summary_data = {
                 'task_type': task,
                 'analysis_timestamp': analysis_timestamp,
+                'file_account_number': file_account_number,
                 'valid_records': len(validation_result.get('valid_records', [])),
                 'invalid_records': len(validation_result.get('invalid_records', [])),
                 'clean_records': len(duplicate_result.get('clean_records', [])),
@@ -713,6 +717,7 @@ class ImportOrchestrator:
             summary_data = {
                 'task_type': task,
                 'analysis_timestamp': analysis_timestamp,
+                'file_account_number': file_account_number,
                 'valid_records': len(validation_result.get('valid_records', [])),
                 'invalid_records': len(validation_result.get('invalid_records', [])),
                 'missing_accounts': account_validation_results['missing_accounts'],
@@ -765,6 +770,7 @@ class ImportOrchestrator:
         summary_data = {
             'task_type': task,
             'analysis_timestamp': analysis_timestamp,
+            'file_account_number': file_account_number,
             'total_records': session.total_records,
             'valid_records': len(validation_result.get('valid_records', [])),
             'invalid_records': len(validation_result.get('invalid_records', [])),

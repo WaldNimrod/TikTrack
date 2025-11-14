@@ -310,6 +310,10 @@
                                                 <span class="detail-label">ספק:</span>
                                                 <span class="detail-value" id="activeSessionProviderValue"></span>
                                             </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label">מספר חשבון ברוקר:</span>
+                                                <span class="detail-value" id="activeSessionBrokerAccountValue">לא זמין</span>
+                                            </div>
                                         </div>
                                         <div class="summary-details">
                                             <div class="detail-item">
@@ -359,7 +363,8 @@
                                         <select id="tradingAccountSelect" class="form-select">
                                             <option value="">בחר חשבון מסחר...</option>
                                         </select>
-                                        <small class="form-text text-muted">החשבון שאליו ישויכו כל הרשומות בקובץ</small>
+                                        <small class="form-text text-muted">החשבון שאליו ישויכו כל הרשומות בקובץ</small>                                        
+                                        <small id="accountLockMessage" class="form-text text-warning" style="display:none;"></small>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-4">

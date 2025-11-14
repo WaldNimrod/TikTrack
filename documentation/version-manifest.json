@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.2.0",
+    "version": "1.1.1.0",
     "major": 1,
     "minor": 1,
-    "patch": 2,
+    "patch": 1,
     "build": 0,
-    "commit": "9b60c5da8d26e01e95376d60f95c2e9dc9efc739",
-    "updated_at": "2025-11-14T22:59:13+00:00",
-    "notes": "Force trading accounts reload after CRUD"
+    "commit": "d837de8977cd58d04d1d97a2a9cfe19dad3000c0",
+    "updated_at": "2025-11-14T23:06:17+00:00",
+    "notes": "Align dev build with account reconciliation checkpoint"
   }
 }

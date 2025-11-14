@@ -68,5 +68,31 @@ describe('TagEvents', () => {
             detail: expect.objectContaining(payload)
         }));
     });
+
+    test('category listeners can unsubscribe and receive payload', () => {
+        const handler = jest.fn();
+        const unsubscribe = window.TagEvents.onCategoryUpdated(handler);
+
+        window.TagEvents.emitCategoryUpdated({ categoryId: 3, mode: 'bulk' });
+        expect(handler).toHaveBeenCalledWith(expect.objectContaining({
+            detail: expect.objectContaining({ categoryId: 3, mode: 'bulk' })
+        }));
+
+        unsubscribe();
+        expect(window.removeEventListener).toHaveBeenCalledWith('tag-manager:category-updated', expect.any(Function));
+    });
+
+    test('emitTagUpdated injects triggeredAt timestamp when detail missing', () => {
+        const handler = jest.fn();
+        window.TagEvents.onTagUpdated(handler);
+
+        window.TagEvents.emitTagUpdated();
+
+        const event = handler.mock.calls[0][0];
+        expect(event.type).toBe('tag-manager:tag-updated');
+        expect(event.detail.triggeredAt).toBeDefined();
+        expect(() => new Date(event.detail.triggeredAt).toISOString()).not.toThrow();
+        expect(event.detail.id).toBeUndefined();
+    });
 });
 

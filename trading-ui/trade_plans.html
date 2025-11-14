@@ -249,12 +249,16 @@
     <!-- [26] Load Order: 8 -->
     <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
     <!-- [27] Load Order: 9 -->
+    <script src="scripts/services/trade-plans-data.js?v=1.0.0"></script> <!-- שכבת נתונים מאוחדת לתוכניות מסחר -->
+    <!-- [28] Load Order: 10 -->
     <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
-    <!-- [28] Load Order: 11 -->
+    <!-- [29] Load Order: 11 -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
+    <!-- [30] Load Order: 12 -->
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [29] Load Order: 12 -->
+    <!-- [31] Load Order: 13 -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [30] Load Order: 13 -->
+    <!-- [32] Load Order: 14 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
 
     <!-- =============================================================== -->
@@ -375,18 +379,16 @@
     <!-- [65] Load Order: 2 -->
     <script src="scripts/conditions/conditions-validator.js?v=1.0.0"></script> <!-- ולידטור תנאים -->
     <!-- [66] Load Order: 3 -->
-    <script src="scripts/conditions/condition-builder.js?v=1.0.0"></script> <!-- בונה תנאים -->
-    <!-- [67] Load Order: 4 -->
     <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0"></script> <!-- מחולל טפסי תנאים -->
-    <!-- [68] Load Order: 5 -->
+    <!-- [67] Load Order: 4 -->
     <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0"></script> <!-- מנהל CRUD תנאים -->
-    <!-- [69] Load Order: 6 -->
+    <!-- [68] Load Order: 5 -->
     <script src="scripts/conditions/conditions-initializer.js?v=1.0.0"></script> <!-- מאתחל תנאים -->
-    <!-- [70] Load Order: 7 -->
+    <!-- [69] Load Order: 6 -->
     <script src="scripts/modal-configs/conditions-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תנאים -->
-    <!-- [71] Load Order: 8 -->
+    <!-- [70] Load Order: 7 -->
     <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0"></script> <!-- מנהל ממשק תנאים -->
-    <!-- [72] Load Order: 9 -->
+    <!-- [71] Load Order: 8 -->
     <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0"></script> <!-- בקר מודל תנאים -->
 
     <!-- =============================================================== -->
@@ -471,7 +473,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 93 | Unique Non-CDN Scripts Loaded: 90 -->
+    <!-- 📊 Total Scripts Processed: 94 | Unique Non-CDN Scripts Loaded: 91 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("trade_plans") -->
     <!-- 🛠 Packages Sequence: base → services → modules → ui-advanced → crud → preferences → validation → conditions → entity-services → entity-details → info-summary → init-system -->
     <!-- ✅ Generated Automatically | Do not edit manually -->

@@ -12,10 +12,11 @@ Date: January 2025
 
 from flask import Blueprint, request, jsonify, g
 from services.preferences_service import preferences_service, ValidationError
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 import logging
 import json
 from datetime import datetime
+import sqlite3
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -23,6 +24,77 @@ from .base_entity_decorators import api_endpoint, handle_database_session, valid
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
+
+_PREFERENCES_UPDATED_COLUMN_AVAILABLE: Optional[bool] = None
+
+
+def _has_updated_at_column() -> bool:
+    """
+    Detect once whether user_preferences_v3 table contains an updated_at column.
+    Falls back to created_at when column is missing so older schemas keep working.
+    """
+    global _PREFERENCES_UPDATED_COLUMN_AVAILABLE
+    if _PREFERENCES_UPDATED_COLUMN_AVAILABLE is not None:
+        return _PREFERENCES_UPDATED_COLUMN_AVAILABLE
+
+    conn = sqlite3.connect(preferences_service.db_path)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(user_preferences_v3)")
+        columns = {row[1] for row in cursor.fetchall()}
+        _PREFERENCES_UPDATED_COLUMN_AVAILABLE = 'updated_at' in columns
+        if not _PREFERENCES_UPDATED_COLUMN_AVAILABLE:
+            logger.warning("user_preferences_v3.updated_at column not found – falling back to created_at for version tracking")
+    except Exception as exc:
+        logger.error(f"Failed to inspect user_preferences_v3 schema: {exc}")
+        _PREFERENCES_UPDATED_COLUMN_AVAILABLE = False
+    finally:
+        conn.close()
+
+    return _PREFERENCES_UPDATED_COLUMN_AVAILABLE
+# Internal helpers
+def _fetch_latest_preferences_timestamp(user_id: int, profile_id: Optional[int]) -> Tuple[Optional[str], Optional[int]]:
+    """
+    Retrieve the latest update timestamp for the given user/profile combination.
+    Returns the timestamp string (or None) and the resolved profile id.
+    """
+    db_path = preferences_service.db_path
+
+    resolved_profile_id = profile_id if profile_id is not None else preferences_service._get_active_profile_id(user_id)
+
+    conn = sqlite3.connect(db_path)
+    try:
+        cursor = conn.cursor()
+        timestamp_column = 'updated_at' if _has_updated_at_column() else 'created_at'
+        query = f'''
+            SELECT MAX({timestamp_column})
+            FROM user_preferences_v3
+            WHERE user_id = ? AND profile_id = ?
+        '''
+        params = (user_id, resolved_profile_id)
+
+        try:
+            cursor.execute(query, params)
+        except sqlite3.OperationalError as exc:
+            if 'updated_at' in str(exc).lower():
+                logger.warning("Falling back to created_at for preferences version query: %s", exc)
+                timestamp_column = 'created_at'
+                query = '''
+                    SELECT MAX(created_at)
+                    FROM user_preferences_v3
+                    WHERE user_id = ? AND profile_id = ?
+                '''
+                global _PREFERENCES_UPDATED_COLUMN_AVAILABLE
+                _PREFERENCES_UPDATED_COLUMN_AVAILABLE = False
+                cursor.execute(query, params)
+            else:
+                raise
+        result = cursor.fetchone()
+        last_update = result[0] if result and result[0] else None
+        return last_update, resolved_profile_id
+    finally:
+        conn.close()
+
 
 # Create blueprint
 preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/preferences')
@@ -900,66 +972,33 @@ def get_preferences_version() -> Any:
     try:
         user_id = request.args.get('user_id', 1, type=int)
         profile_id = request.args.get('profile_id', type=int)
-        
-        # קבלת timestamp של העדכון האחרון של העדפות
-        # אם אין עדכונים, נחזיר גרסה סטטית
-        try:
-            import sqlite3
-            
-            # Use preferences_service db_path
-            db_path = preferences_service.db_path
-            
-            # Get active profile if not specified
-            if profile_id is None:
-                profile_id = preferences_service._get_active_profile_id(user_id)
-            
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                SELECT MAX(updated_at) 
-                FROM user_preferences_v3 
-                WHERE user_id = ? AND profile_id = ?
-            ''', (user_id, profile_id))
-            
-            result = cursor.fetchone()
-            conn.close()
-            
-            last_update = result[0] if result and result[0] else None
-            
-            # אם יש עדכון אחרון, נשתמש בו כגרסה
-            # אחרת נשתמש בגרסה סטטית
-            if last_update:
-                # המרת timestamp למחרוזת ייחודית (format: YYYYMMDDTHHMMSS)
-                # Remove spaces, colons, and hyphens for a clean version string
-                version = last_update.replace(' ', 'T').replace(':', '').replace('-', '')
-            else:
-                # גרסה סטטית
-                version = "3.1.0"
-            
+
+        last_update, resolved_profile_id = _fetch_latest_preferences_timestamp(user_id, profile_id)
+
+        if not last_update:
             return jsonify({
-                "success": True,
+                "success": False,
+                "error": "No preference updates were found for the requested profile.",
                 "data": {
-                    "version": version,
-                    "last_update": last_update,
                     "user_id": user_id,
-                    "profile_id": profile_id
+                    "profile_id": resolved_profile_id
                 },
                 "timestamp": datetime.now().isoformat()
-            }), 200
-            
-        except Exception as db_error:
-            logger.warning(f"Could not get last update timestamp: {db_error}")
-            # Fallback to static version
-            return jsonify({
-                "success": True,
-                "data": {
-                    "version": "3.1.0",
-                    "last_update": None
-                },
-                "timestamp": datetime.now().isoformat()
-            }), 200
-        
+            }), 404
+
+        version = last_update.replace(' ', 'T').replace(':', '').replace('-', '')
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "version": version,
+                "last_update": last_update,
+                "user_id": user_id,
+                "profile_id": resolved_profile_id
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+
     except Exception as e:
         logger.error(f"Error getting preferences version: {e}")
         return jsonify({
@@ -1003,22 +1042,46 @@ def check_preferences_updates() -> Any:
     """
     try:
         user_id = request.args.get('user_id', 1, type=int)
-        
-        # בדיקה פשוטה - האם יש שינויים לאחרונה
-        # נשתמשטאמפ של העדפות אחרונות
-        
-        # פשוט נחזיר True - יש עדכונים
-        
-        # פשוט נחזיר True - יש עדכונים
-        has_updates = True
-        
+        profile_id = request.args.get('profile_id', type=int)
+        since_param = request.args.get('since')
+
+        last_update, resolved_profile_id = _fetch_latest_preferences_timestamp(user_id, profile_id)
+
+        if not last_update:
+            return jsonify({
+                "success": True,
+                "hasUpdates": False,
+                "lastUpdate": None,
+                "user_id": user_id,
+                "profile_id": resolved_profile_id,
+                "timestamp": datetime.now().isoformat()
+            }), 200
+
+        last_update_iso = last_update.replace(' ', 'T')
+        since_dt = None
+
+        if since_param:
+            try:
+                since_dt = datetime.fromisoformat(since_param.replace(' ', 'T'))
+            except ValueError:
+                return jsonify({
+                    "success": False,
+                    "error": "Invalid 'since' parameter format. Use ISO8601.",
+                    "timestamp": datetime.now().isoformat()
+                }), 400
+
+        last_update_dt = datetime.fromisoformat(last_update_iso)
+        has_updates = since_dt is None or last_update_dt > since_dt
+
         return jsonify({
             "success": True,
             "hasUpdates": has_updates,
-            "lastUpdate": datetime.now().isoformat(),
+            "lastUpdate": last_update_iso,
+            "user_id": user_id,
+            "profile_id": resolved_profile_id,
             "timestamp": datetime.now().isoformat()
         }), 200
-        
+
     except Exception as e:
         logger.error(f"Error checking preferences updates: {e}")
         return jsonify({

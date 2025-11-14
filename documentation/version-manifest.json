@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.23.0",
+    "version": "1.0.25.0",
     "major": 1,
     "minor": 0,
-    "patch": 23,
+    "patch": 25,
     "build": 0,
-    "commit": "be867cf327ed507677ede7e586b10e4f64221acc",
-    "updated_at": "2025-11-12T22:59:09+00:00",
-    "notes": "Fix data import navigation and dates"
+    "commit": "a79537f7a21b7f45f1f5e75e502f869b842855ed",
+    "updated_at": "2025-11-14T13:48:39+00:00",
+    "notes": "Align trade data services and fix preferences version endpoint"
   }
 }

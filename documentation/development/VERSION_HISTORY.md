@@ -31,3 +31,5 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-12T20:40:00+00:00 | 1.0.21.0 | 1.0.20.0 | pending | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | patch | Legacy duplicate cleanup (import modal & linter) + docs update |
 | 2025-11-12T22:49:10+00:00 | 1.0.22.0 | 1.0.21.0 | 0952f7612900529373f545ad12b163b2a09b489f | pending | patch | Refine data import warning layout |
 | 2025-11-12T22:59:09+00:00 | 1.0.23.0 | 1.0.22.0 | be867cf327ed507677ede7e586b10e4f64221acc | 0952f7612900529373f545ad12b163b2a09b489f | patch | Fix data import navigation and dates |
+| 2025-11-13T12:45:00+00:00 | 1.0.24.0 | 1.0.23.0 | pending | be867cf327ed507677ede7e586b10e4f64221acc | patch | Duplicate cleanup stage 4 QA + Jest multi-project release package |
+| 2025-11-14T13:48:39+00:00 | 1.0.25.0 | 1.0.24.0 | a79537f7a21b7f45f1f5e75e502f869b842855ed | pending | patch | Align trade data services and fix preferences version endpoint |

@@ -888,15 +888,15 @@ class PreferencesService:
                 # Update existing preference
                 cursor.execute('''
                     UPDATE user_preferences_v3 
-                    SET saved_value = ?
+                    SET saved_value = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE user_id = ? AND profile_id = ? AND preference_id = ?
                 ''', (string_value, user_id, profile_id, preference_id))
             else:
                 # Insert new preference
                 cursor.execute('''
                     INSERT INTO user_preferences_v3 
-                    (user_id, profile_id, preference_id, saved_value)
-                    VALUES (?, ?, ?, ?)
+                    (user_id, profile_id, preference_id, saved_value, updated_at)
+                    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                 ''', (user_id, profile_id, preference_id, string_value))
             
             conn.commit()
@@ -952,15 +952,15 @@ class PreferencesService:
                         # Update existing preference
                         cursor.execute('''
                             UPDATE user_preferences_v3 
-                            SET saved_value = ?
+                            SET saved_value = ?, updated_at = CURRENT_TIMESTAMP
                             WHERE user_id = ? AND profile_id = ? AND preference_id = ?
                         ''', (string_value, user_id, profile_id, preference_id))
                     else:
                         # Insert new preference
                         cursor.execute('''
                             INSERT INTO user_preferences_v3 
-                            (user_id, profile_id, preference_id, saved_value)
-                            VALUES (?, ?, ?, ?)
+                            (user_id, profile_id, preference_id, saved_value, updated_at)
+                            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                         ''', (user_id, profile_id, preference_id, string_value))
                 except Exception as e:
                     logger.warning(f"Failed to save preference {preference_name}: {e}")

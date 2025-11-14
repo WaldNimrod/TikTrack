@@ -1913,6 +1913,10 @@ class ModalManagerV2 {
             
             // הצגת מודל במצב עריכה
             await this.showModal(modalId, 'edit', entityData);
+
+            const modalInfo = this.modals.get(modalId);
+            const modalElement = modalInfo?.element || document.getElementById(modalId);
+            await this._hydrateTagFieldsForModal(modalElement, entityType, entityId);
             
         } catch (error) {
             console.error(`Error showing edit modal for ${entityType} ${entityId}:`, error);
@@ -1944,6 +1948,41 @@ class ModalManagerV2 {
         } catch (error) {
             console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
             return null;
+        }
+    }
+
+    /**
+     * Hydrate tag select fields inside a modal after entity data loads.
+     * Ensures edit modals show the tags already linked to the entity.
+     * @private
+     */
+    async _hydrateTagFieldsForModal(modalElement, defaultEntityType, entityId) {
+        if (!modalElement || !entityId || !window.TagUIManager || typeof window.TagUIManager.hydrateSelectForEntity !== 'function') {
+            return;
+        }
+
+        const tagSelects = modalElement.querySelectorAll('select.tag-multi-select');
+        if (!tagSelects.length) {
+            return;
+        }
+
+        for (const select of tagSelects) {
+            const targetEntityType = select.dataset.tagEntity || defaultEntityType;
+            if (!targetEntityType || !select.id) {
+                continue;
+            }
+
+            try {
+                await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
+            } catch (error) {
+                window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
+                    error,
+                    selectId: select.id,
+                    entityType: targetEntityType,
+                    entityId,
+                    page: 'modal-manager-v2'
+                });
+            }
         }
     }
     

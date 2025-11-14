@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.27.0",
+    "version": "1.0.28.0",
     "major": 1,
     "minor": 0,
-    "patch": 27,
+    "patch": 28,
     "build": 0,
-    "commit": "c9db737ab323aff110cd2e48556f7c9cb1f3288c",
-    "updated_at": "2025-11-14T15:16:34+00:00",
-    "notes": "Sync backlog prior to user pages standardization"
+    "commit": "8d726d218811effd64f826fb9604850a06f5d5eb",
+    "updated_at": "2025-11-14T15:44:30+00:00",
+    "notes": "Document tagging flow and hydrate edit modals"
   }
 }

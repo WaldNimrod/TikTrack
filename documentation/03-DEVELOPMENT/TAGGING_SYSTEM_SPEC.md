@@ -40,11 +40,12 @@
 | Layer | Component | Description |
 | --- | --- | --- |
 | Database | `tag_categories`, `tags`, `tag_links` | Core tables with indices on user and entity scope |
-| Backend Services | `TagService` | CRUD, assignment, suggestions, analytics counters |
-| API Layer | `routes/api/tags.py` | REST endpoints (categories, tags, links, suggestions) built on `BaseEntityAPI` |
-| Frontend Services | `tag-service.js`, `tag-ui-manager.js`, `tag-events.js` | Fetching, caching, UI coordination, analytics dispatch |
-| UI | `tag-management.html/.js` | Management dashboard leveraging ModalManagerV2 and UnifiedTableSystem |
-| Integration | Entity scripts (8 files) | Tag picker, table column, filter, details integration |
+| Backend Services | `TagService` | CRUD, assignment, suggestions, analytics counters, Unicode-safe slug generation, usage lookups (`get_tag_usage_details`) |
+| API Layer | `routes/api/tags.py` | REST endpoints (categories, tags, links, suggestions, `/usage`) built on `BaseEntityAPI` |
+| Frontend Services | `tag-service.js`, `tag-ui-manager.js`, `tag-events.js` | Fetching, caching, UI coordination, analytics dispatch, modal hydration |
+| UI | `tag-management.html/.js` | Management dashboard generated via `PageTemplateGenerator`, ITCSS stack, ModalManagerV2 |
+| Integration | Entity scripts (8 files) | Tag picker + CRUD wiring, EntityDetails renderer, linked-items modal |
+| Tooling | `scripts/tagging/monitor_tag_links.py` | CLI helper to inspect assignments directly in `tiktrack.db` |
 
 ## 5. Backend Design
 ### 5.1 Schema
@@ -77,23 +78,30 @@
 ## 6. Frontend Design
 ### 6.1 Services
 - `tag-service.js`:
-  - Methods: `fetchCategories`, `fetchTags`, `createOrUpdateTag`, `assignTags`, `removeTags`, `getSuggestions`, `invalidateCache`.
-  - Uses `UnifiedCacheManager` for caching & TTL.
-  - מספק `formatTagErrorMessage`, מעדכן Analytics (usage/leaderboard), ופולט שגיאות עקביות עבור `CRUDResponseHandler`.
+  - Methods: `fetchCategories`, `fetchTags`, `createTag`, `updateTag`, `deleteTag`, `loadEntityTags`, `replaceEntityTags`, `removeTagFromEntity`, `getTagUsage`, `getAnalytics`, `getSuggestions`, `invalidateEntity`.
+  - Uses `UnifiedCacheManager` for caching & TTL and exposes `formatTagErrorMessage` for uniform UI errors.
+  - Emits domain events (`TagEvents`) on every CRUD/assignment to keep tables, analytics widgets, and filters in sync.
 - `tag-ui-manager.js`:
-  - Controls multi-select component, inline creation, keyboard navigation, chip rendering.
-  - Integrates with `SelectPopulatorService` for shared select logic.
+  - Controls the reusable multi-select picker: option hydration, badge rendering, keyboard navigation, and preserving selection state via `data-initial-value`.
+  - Provides `hydrateSelectForEntity` used by ModalManagerV2 to pre-select tags when editing an entity.
 - `tag-events.js`:
-  - Wires global event handlers, default listeners for modals and filter updates.
+  - Wires global event handlers for tag CRUD responses, analytics refresh, and entity filter invalidation.
 
 ### 6.2 UI Components
-- Tag Management Page:
-  - Two UnifiedTableSystem tables (Categories, Tags) עם עמודת “Actions” המציגה כפתורי עריכה/מחיקה אחידים (ButtonSystem) לכל רשומה.
-  - ModalManagerV2 configs (`tag-category-modal`, `tag-modal`) stored under `modal-configs/`.
-  - Analytics summary section (top tags, total tags, orphan tags).
-- Tag Picker:
-  - Reusable component embeded in 8 modals.
-  - Chips style derived from existing badge system (`linked-object-badge` styling guidelines).
+- **Tag Management Page**
+  - Fully aligned with `PAGE_TEMPLATE_ENHANCED.md`: ITCSS layers (01–09), PageTemplateGenerator-controlled script stack, unified header/footer locks, section toggles hooked into `SectionToggleSystem`.
+  - Widgets: analytics summary cards, tag usage leaderboard with “top entities” preview, categories table, tags table (includes edit/delete buttons and link button to usage modal).
+  - Interaction pattern: all buttons leverage `ButtonSystem`, modals defined under `scripts/modal-configs/tag-management-config.js`, and linked-items modal for per-tag usage via `TagManagementPage.showTagUsage`.
+- **Tag Picker**
+  - Multi-select inserted into each CRUD modal using the `tag-multi-select` class.
+  - Populated by `TagUIManager.initializeModal` and re-hydrated in edit mode through ModalManagerV2 (see §6.3).
+  - Badge layout mirrors the global badge palette (`FieldRendererService.renderTagBadges` for read-only views).
+
+### 6.3 Modal & Details Integration
+- ModalManagerV2 skips auto-population for `tag-multi-select` fields, letting TagUIManager control the options.
+- After `showEditModal` completes, ModalManagerV2 now invokes `_hydrateTagFieldsForModal`, calling `TagUIManager.hydrateSelectForEntity` per select (entity type derived from `data-tag-entity` or modal type).
+- EntityDetails payloads include `tag_assignments`, rendered via `FieldRendererService.renderTagBadges`, and linked-items modal can display all entities referencing a tag (`/api/tags/<id>/usage` + `LinkedItemsService`).
+- `DataCollectionService` exposes `type: 'tags'` collectors; page scripts send `tag_ids` to `TagService.replaceEntityTags` immediately after their primary CRUD call, ensuring atomic sync and cache invalidation.
 
 ## 7. Entity Integration Checklist
 | Entity | Backend | Frontend |
@@ -118,7 +126,7 @@
 ## 9. Deployment & Migration Overview
 - Stage DB backup, run Alembic migration, verify schema.
 - Deploy backend services, restart (via standard server workflow).
-- Warm cache & run post-deploy validation script (tags endpoints).
+- Warm cache & run post-deploy validation script (tags endpoints) plus `scripts/tagging/monitor_tag_links.py --entity trade_plan --entity-id <id>` on sample data to confirm assignments.
 - Update documentation indices and release notes.
 
 ## 10. Deliverables

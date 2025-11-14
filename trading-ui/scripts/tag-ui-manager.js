@@ -187,8 +187,13 @@
         if (!container) {
             container = document.createElement('div');
             container.id = containerId;
-            container.className = 'tag-suggestion-panel mt-3 d-flex flex-column gap-3';
-            select.insertAdjacentElement('afterend', container);
+            container.className = 'mt-3 d-flex flex-column gap-3';
+            const badgeContainer = document.getElementById(`${select.id}${BADGE_CONTAINER_SUFFIX}`);
+            if (badgeContainer) {
+                badgeContainer.insertAdjacentElement('afterend', container);
+            } else {
+                select.insertAdjacentElement('afterend', container);
+            }
         }
         return container;
     }
@@ -196,8 +201,11 @@
     function buildSuggestionChip(tag, select) {
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = 'btn btn-sm btn-outline-secondary';
-        chip.textContent = tag.name;
+        chip.dataset.buttonType = 'FILTER';
+        chip.dataset.variant = 'full';
+        chip.dataset.icon = '🏷️';
+        chip.dataset.text = tag.name;
+        chip.dataset.classes = 'me-2 mb-2';
         chip.dataset.tagId = tag.tag_id;
         chip.addEventListener('click', () => applySuggestion(select, [tag.tag_id]));
         return chip;
@@ -239,13 +247,6 @@
         titleEl.textContent = title;
         headerRow.appendChild(titleEl);
 
-        const applyAllBtn = document.createElement('button');
-        applyAllBtn.type = 'button';
-        applyAllBtn.className = 'btn btn-link btn-sm text-decoration-none p-0';
-        applyAllBtn.textContent = 'הוסף הכול';
-        applyAllBtn.addEventListener('click', () => applySuggestion(select, tags.map(tag => tag.tag_id)));
-        headerRow.appendChild(applyAllBtn);
-
         groupWrapper.appendChild(headerRow);
 
         const chipsRow = document.createElement('div');
@@ -280,6 +281,41 @@
         if (!rendered) {
             container.innerHTML = '<span class="text-muted small">אין הצעות זמינות עדיין</span>';
         }
+
+        processButtons(container);
+    }
+
+    function filterSuggestionsBySelection(select, payload) {
+        if (!payload) {
+            return payload;
+        }
+        const selectedIds = new Set(getSelectedValues(select));
+        const normalizeId = (tag) => {
+            const candidate = tag?.tag_id ?? tag?.id ?? tag?.tagId;
+            const parsed = Number.parseInt(candidate, 10);
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+        const filterGroup = (group = []) =>
+            group.filter((tag) => {
+                const tagId = normalizeId(tag);
+                return tagId === null || !selectedIds.has(tagId);
+            });
+        return {
+            top_entity_tags: filterGroup(payload.top_entity_tags),
+            top_category_tags: filterGroup(payload.top_category_tags),
+            recent_tags: filterGroup(payload.recent_tags)
+        };
+    }
+
+    function processButtons(container) {
+        if (!container) {
+            return;
+        }
+        if (window.ButtonSystem?.processButtons) {
+            window.ButtonSystem.processButtons(container);
+        } else if (window.ButtonSystem?.hydrateButtons) {
+            window.ButtonSystem.hydrateButtons(container);
+        }
     }
 
     async function loadSuggestionsForSelect(select, { entityType, entityId = null } = {}) {
@@ -292,7 +328,8 @@
                 entityId,
                 limit: 6
             });
-            renderSuggestionPanel(select, payload);
+            const filtered = filterSuggestionsBySelection(select, payload);
+            renderSuggestionPanel(select, filtered);
         } catch (error) {
             window.Logger?.warn('⚠️ Failed to load tag suggestions', {
                 error,

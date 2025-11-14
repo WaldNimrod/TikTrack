@@ -173,17 +173,20 @@
             tags.forEach((tag) => {
                 const button = document.createElement('button');
                 button.type = 'button';
-                button.className = 'btn btn-link text-decoration-none tag-cloud-item p-0';
-                button.textContent = tag.name;
+                button.dataset.buttonType = 'FILTER';
+                button.dataset.variant = 'full';
+                button.dataset.icon = '🏷️';
+                button.dataset.text = tag.name;
+                button.dataset.classes = `${this.getTierClass((tag.usage_count || 0) / maxUsage)} me-2 mb-2`;
+                button.dataset.tooltip = `${tag.name} • ${(tag.usage_count || 0).toLocaleString('he-IL')} שיוכים`;
+                button.dataset.tooltipPlacement = 'top';
+                button.dataset.tooltipTrigger = 'hover';
                 button.dataset.tagId = tag.tag_id;
-                button.title = `לחץ כדי לחפש את התגית "${tag.name}"`;
-                button.classList.add(this.getTierClass((tag.usage_count || 0) / maxUsage));
-                if (tag.category_color) {
-                    button.style.color = tag.category_color;
-                }
                 button.addEventListener('click', () => this.applyTagFromCloud(tag));
                 elements.tagCloudContainer.appendChild(button);
             });
+
+            this.processButtons(elements.tagCloudContainer);
         },
 
         getTierClass(ratio) {
@@ -418,30 +421,30 @@
             dateCell.innerHTML = this.formatDate(linked_at);
             row.appendChild(dateCell);
 
-            const actionsCell = document.createElement('td');
-            actionsCell.className = 'text-end';
-            const actionsWrapper = document.createElement('div');
-            actionsWrapper.className = 'd-inline-flex gap-2';
-            const openBtn = document.createElement('button');
-            openBtn.type = 'button';
-            openBtn.dataset.buttonType = 'VIEW';
-            openBtn.dataset.variant = 'small';
-            openBtn.dataset.text = 'פתח';
-            openBtn.addEventListener('click', () => this.navigateToEntity(entity_type, entity_id));
-            actionsWrapper.appendChild(openBtn);
-            const modalBtn = document.createElement('button');
-            modalBtn.type = 'button';
-            modalBtn.dataset.buttonType = 'LINKED';
-            modalBtn.dataset.variant = 'small';
-            modalBtn.dataset.text = 'פרטים';
-            modalBtn.addEventListener('click', () => this.openEntityDetails(entity_type, entity_id));
-            actionsWrapper.appendChild(modalBtn);
-            actionsCell.appendChild(actionsWrapper);
-            row.appendChild(actionsCell);
+        const actionsCell = document.createElement('td');
+        actionsCell.className = 'text-end';
+        const actionsWrapper = document.createElement('div');
+        actionsWrapper.className = 'd-inline-flex gap-2';
+        const openBtn = document.createElement('button');
+        openBtn.type = 'button';
+        openBtn.dataset.buttonType = 'VIEW';
+        openBtn.dataset.variant = 'small';
+        openBtn.dataset.icon = '🔗';
+        openBtn.dataset.text = 'פתח';
+        openBtn.addEventListener('click', () => this.navigateToEntity(entity_type, entity_id));
+        actionsWrapper.appendChild(openBtn);
+        const modalBtn = document.createElement('button');
+        modalBtn.type = 'button';
+        modalBtn.dataset.buttonType = 'LINKED';
+        modalBtn.dataset.variant = 'small';
+        modalBtn.dataset.icon = '👁️';
+        modalBtn.dataset.text = 'פרטים';
+        modalBtn.addEventListener('click', () => this.openEntityDetails(entity_type, entity_id));
+        actionsWrapper.appendChild(modalBtn);
+        actionsCell.appendChild(actionsWrapper);
+        row.appendChild(actionsCell);
 
-            if (window.ButtonSystem?.hydrateButtons) {
-                window.ButtonSystem.hydrateButtons(actionsWrapper);
-            }
+        this.processButtons(actionsWrapper);
 
             return row;
         },
@@ -586,6 +589,17 @@
 
         closeDrawer() {
             window.ModalManagerV2?.closeActiveModal();
+        },
+
+        processButtons(container) {
+            if (!container) {
+                return;
+            }
+            if (window.ButtonSystem?.processButtons) {
+                window.ButtonSystem.processButtons(container);
+            } else if (window.ButtonSystem?.hydrateButtons) {
+                window.ButtonSystem.hydrateButtons(container);
+            }
         }
     };
 

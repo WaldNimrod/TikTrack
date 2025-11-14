@@ -4,6 +4,7 @@
 - מערכת הייבוא בנויה סביב `ImportOrchestrator` שמנהל תהליכי ניתוח, תצוגה מוקדמת וייבוא בפועל.
 - כל שכבה (Connector → Normalization → Validation → Duplicate Detection → Preview/Execute) צריכה להשתמש במערכות הכלליות הקיימות לפני כתיבת לוגיקה חדשה.
 - מטרת המדריך: לאפשר למפתח העתידי להרחיב או לתחזק את התהליך ללא שבירת הסטנדרטים שנקבעו.
+- **חוזה record_index (נובמבר 2025):** כל רשומה ב-`records_to_skip` מקבלת `record_index` יציב שמשמש את ה-UI ואת ה-API (`acceptDuplicate`, `rejectDuplicate`). חובה לשמר ערך זה בכל שלבי העיבוד ולוודא שהוא נחשף ל-frontend.
 
 ## ארכיטקטורת Back-End
 1. **Connectors** – קריאת מקטעי הדו"ח (IBKR כרגע):
@@ -24,11 +25,15 @@
 4. **Duplicate Detection Service** – חותמות (`signature`) ו-external_id:
    - עבור תזרימים – השוואה לפי (`cashflow_type`, `effective_date`, `abs(amount)`, `currency`, `source_account`).
    - הפלט כולל `clean_records`, `within_file_duplicates`, `existing_records`.
+   - כל רשומה שנכנסת ל-`records_to_skip` מקבלת `record_index` ייחודי (כולל `within_file_duplicate_match`) שנשמר מה-cache ועד פעולת המשתמש, ולכן אסור למחוק אותו.
 5. **ImportOrchestrator**:
    - `create_import_session()` – יוצר רשומה בטבלת `import_sessions`. חובה להשאיר את הערכים ב-UTC.
    - `_ensure_cashflow_account_binding()` – מוודא שכל התזרימים משויכים לחשבון שנבחר, ושומר את הערך המקורי במטא-דאטה.
    - `_resolve_cashflow_storage_type()` – מיפוי הסוגים הגולמיים ל-ENUM של `cash_flows.type`.
+   - `_upgrade_preview_data_structure()` – מריץ מעבר נתונים על cache קיים ומזריק `record_index` חסר (למשל בסשנים ישנים שנשמרו בלי מזהה זה).
    - `generate_preview()` – משחזר את הנתונים + מוסיף `storage_type`/`mapping_note` לכל רשומות הייבוא וההשהיה.
+   - `get_preview_snapshot(session_id)` – מחזיר את ה-preview האחרון מתוך cache/summary בלי להריץ עיבוד מחדש; משמש את `refresh-preview`.
+   - `refresh_preview()` – endpoint שמחזיר את snapshot העדכני (כולל השינויים שבוצעו דרך `acceptDuplicate`/`rejectDuplicate`) ולא בונה preview חדש שמאפס את הסטטוס.
    - `_execute_import_cashflows()` – משתמש ב-`storage_type` לצורך יצירת הישות הסופית ומוסיף לתיאור `מקור תזרים: …`.
 
 ## טבלת מיפוי רשמית (חיוני לשמירה)
@@ -60,6 +65,12 @@
 - טוען את המערכת דרך סקריפט `trading-ui/scripts/import-user-data.js`:
   - משתמש ב-`CASHFLOW_TYPE_LABELS` כדי להציג את שמות הסוגים (אין להוסיף לייבל חדש בלי לעדכן כאן).
   - `renderCashflowTypeCards()` מצפה לסטטיסטיקות הכוללות `storage_type` במטא-דאטה.
+  - מודול טיפול בכפילויות (נובמבר 2025):
+    - `deduplicateDuplicateRecords()` מסיר כפילויות לוגיות כך שכל `record_index` מוצג פעם אחת בלבד, בעוד ה-`within_file_duplicate_match` שלו מוצמד כ"שורת התאמה" מקוננת.
+    - `renderDuplicateRow()` מצמיד `duplicate_type` + `record_index` ל-`data-onclick` של כפתורי `acceptDuplicate` / `rejectDuplicate` ומוסיף תת-טבלה להצגת Matches.
+    - `initializeButtonsForProblemTable()` מפעיל את `window.ButtonSystem.processButtons(tbody)` בתוך `requestAnimationFrame` כדי למנוע אזהרות "Skipping button without parent node" ולשמור על סטנדרט Button System.
+    - `getPreviewRecordIndex()` הוא השכבה היחידה שמותר לה להמר את `record_index` מהמבנה שהשרת מחזיר – אין לבצע parsing נוסף מחוץ לפונקציה הזו.
+    - `refreshPreviewData()` שולח `POST /api/user-data-import/session/<id>/refresh-preview` (לא GET) כדי לקבל Snapshot עדכני שנבנה בשרת לאחר פעולות קודמות; קדימות מלאה לניקוי cache דרך `problemResolutionState` לפני הצגת התוצאה החדשה.
   - כל קריאה ל-`window.processButtons()` חייבת לקבל קונטיינר (document / modal) כדי למנוע התראות "No container provided".
 - שלב 2 ו-3 של המודל נשענים על הסכמה הבאה:
   - `analysis_results.cashflow_type_stats[typeKey]` – נתוני כרטיסים.

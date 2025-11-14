@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.28.0",
+    "version": "1.0.29.0",
     "major": 1,
     "minor": 0,
-    "patch": 28,
+    "patch": 29,
     "build": 0,
-    "commit": "8d726d218811effd64f826fb9604850a06f5d5eb",
-    "updated_at": "2025-11-14T15:44:30+00:00",
-    "notes": "Document tagging flow and hydrate edit modals"
+    "commit": "725df6113ad1ded45b0f99e80ff3f92593c7ac4f",
+    "updated_at": "2025-11-14T15:57:17+00:00",
+    "notes": "Documented data import duplicate handling improvements"
   }
 }

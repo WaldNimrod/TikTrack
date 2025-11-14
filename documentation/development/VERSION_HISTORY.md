@@ -36,3 +36,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-14T13:53:10+00:00 | 1.0.26.0 | 1.0.25.0 | 00f790d4813722288f09f1de9a83dd6341248d04 | a79537f7a21b7f45f1f5e75e502f869b842855ed | patch | Allow Unicode tag slugs and expose tag action buttons |
 | 2025-11-14T15:16:34+00:00 | 1.0.27.0 | 1.0.26.0 | c9db737ab323aff110cd2e48556f7c9cb1f3288c | 00f790d4813722288f09f1de9a83dd6341248d04 | patch | Sync backlog prior to user pages standardization |
 | 2025-11-14T15:44:30+00:00 | 1.0.28.0 | 1.0.27.0 | 8d726d218811effd64f826fb9604850a06f5d5eb | c9db737ab323aff110cd2e48556f7c9cb1f3288c | patch | Document tagging flow and hydrate edit modals |
+| 2025-11-14T15:57:17+00:00 | 1.0.29.0 | 1.0.28.0 | 725df6113ad1ded45b0f99e80ff3f92593c7ac4f | 8d726d218811effd64f826fb9604850a06f5d5eb | patch | Documented data import duplicate handling improvements |

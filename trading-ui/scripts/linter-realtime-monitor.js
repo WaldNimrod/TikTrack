@@ -83,6 +83,8 @@ class LintMonitorController {
     this.elements.runCollectButton = document.getElementById('lint-run-collect-button');
     this.elements.downloadReportButton = document.getElementById('lint-download-report-button');
     this.elements.runStatusLabel = document.getElementById('lint-run-status');
+    this.elements.downloadHeaderButton = document.getElementById('lint-download-header-button');
+    this.elements.copyReportButton = document.getElementById('lint-copy-report-button');
   }
 
   attachEvents() {
@@ -113,6 +115,20 @@ class LintMonitorController {
       this.elements.downloadReportButton.addEventListener('click', async event => {
         event?.preventDefault();
         await this.downloadLatestReport();
+      });
+    }
+
+    if (this.elements.downloadHeaderButton) {
+      this.elements.downloadHeaderButton.addEventListener('click', async event => {
+        event?.preventDefault();
+        await this.downloadLatestReport();
+      });
+    }
+
+    if (this.elements.copyReportButton) {
+      this.elements.copyReportButton.addEventListener('click', async event => {
+        event?.preventDefault();
+        await this.copyLatestReportToClipboard();
       });
     }
   }
@@ -191,23 +207,28 @@ class LintMonitorController {
   }
 
   async refreshIssuesTable() {
+    const issues = Array.isArray(this.state.issues) ? this.state.issues : [];
+
     if (!this.tableRegistered || !window.UnifiedTableSystem) {
-      this.renderIssuesTable(this.state.issues);
+      this.renderIssuesTable(issues);
       return;
     }
 
-    if (!this.state.issues.length) {
+    if (issues.length === 0) {
       this.renderIssuesTable([]);
       return;
     }
 
     try {
-      await window.UnifiedTableSystem.sorter.applyDefaultSort(LINT_MONITOR_TABLE_TYPE);
+      const sorted = await window.UnifiedTableSystem.sorter.applyDefaultSort(LINT_MONITOR_TABLE_TYPE);
+      if (!sorted || sorted.length === 0) {
+        this.renderIssuesTable(issues);
+      }
     } catch (error) {
       window.Logger?.warn('[LintMonitor] Failed to apply default sort:', error, {
         page: LINT_MONITOR_HOST_PAGE,
       });
-      this.renderIssuesTable(this.state.issues);
+      this.renderIssuesTable(issues);
     }
   }
 
@@ -391,6 +412,12 @@ class LintMonitorController {
       if (this.elements.downloadReportButton) {
         this.elements.downloadReportButton.disabled = isLoading;
       }
+      if (this.elements.downloadHeaderButton) {
+        this.elements.downloadHeaderButton.disabled = isLoading;
+      }
+      if (this.elements.copyReportButton) {
+        this.elements.copyReportButton.disabled = isLoading;
+      }
     }
   }
 
@@ -400,6 +427,12 @@ class LintMonitorController {
     }
     if (this.elements.downloadReportButton) {
       this.elements.downloadReportButton.disabled = isDisabled;
+    }
+    if (this.elements.downloadHeaderButton) {
+      this.elements.downloadHeaderButton.disabled = isDisabled;
+    }
+    if (this.elements.copyReportButton) {
+      this.elements.copyReportButton.disabled = isDisabled;
     }
   }
 
@@ -480,11 +513,8 @@ class LintMonitorController {
             'הנתונים עודכנו בעמוד ניטור איכות הקוד'
           );
         }
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification(
-          'ההרצה הסתיימה עם כשלים. בדוק את הטבלה והדוח לפרטים נוספים.',
-          'warning'
-        );
+      } else {
+        this.showLintFailureModal(result);
       }
 
       await this.loadData();
@@ -505,13 +535,200 @@ class LintMonitorController {
         message: error.message,
         timestamp: new Date().toISOString(),
       });
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בהרצת הלינטר', error.message);
-      }
+      this.showLintFailureModal({
+        status: 'error',
+        message: error.message,
+        stderr: error.stack || '',
+        stdout: '',
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       this.state.isRunningCollect = false;
       this.toggleActionButtons(false);
     }
+  }
+
+  showLintFailureModal(result = {}) {
+    if (typeof window.showDetailsModal !== 'function') {
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בהרצת הלינטר', result.message || 'נדרש לבדוק את הלוגים');
+      }
+      return;
+    }
+
+    const content = this.buildFailureModalContent(result);
+    window.showDetailsModal('שגיאת לינטר - פירוט ההרצה', content, {
+      category: 'system',
+    });
+  }
+
+  buildFailureModalContent(result = {}) {
+    const latestReport = result.latestReport || this.state.latestReport || null;
+    const totals = latestReport?.totals || {};
+    const timestamp =
+      (result.timestamp && LintStatusService._formatTimestamp(result.timestamp)) ||
+      (latestReport?.generatedAt && LintStatusService._formatTimestamp(latestReport.generatedAt)) ||
+      new Date().toLocaleString('he-IL');
+    const exitCode =
+      result.exitCode !== undefined && result.exitCode !== null ? String(result.exitCode) : 'לא זמין';
+    const summaryItems = [
+      { label: 'סה״כ כלים', value: totals.tools ?? '—' },
+      { label: 'עברו', value: totals.passed ?? 0 },
+      { label: 'אזהרות', value: totals.warning ?? totals.warnings ?? 0 },
+      { label: 'נכשלו', value: totals.failed ?? 0 },
+      { label: 'שגיאות קריטיות', value: totals.error ?? totals.errors ?? 0 },
+      { label: 'סה״כ סוגיות', value: totals.issues ?? this.state.issues.length ?? 0 },
+    ];
+
+    const tasks = Array.isArray(latestReport?.tasks) ? latestReport.tasks : [];
+    const failingTasks = tasks.filter(task => task.status !== 'passed');
+    const failingRows = failingTasks.length
+      ? failingTasks
+          .map(task => {
+            const duration =
+              typeof task.durationMs === 'number' ? `${(task.durationMs / 1000).toFixed(2)} שניות` : '—';
+            const statusBadge = LintMonitorController.getStatusBadge(task.status);
+            const errors = task.summary?.errors ?? 0;
+            const warnings = task.summary?.warnings ?? 0;
+            return `
+              <tr>
+                <td>${this.escapeHtml(task.label || task.id || 'לא ידוע')}</td>
+                <td>${statusBadge}</td>
+                <td>${errors}</td>
+                <td>${warnings}</td>
+                <td>${duration}</td>
+                <td>${task.exitCode ?? '—'}</td>
+              </tr>
+            `;
+          })
+          .join('')
+      : `
+        <tr>
+          <td colspan="6" class="text-center text-muted">לא אותרו משימות כושלות בדוח האחרון</td>
+        </tr>
+      `;
+
+    const issues = tasks.flatMap(task =>
+      (task.issues || []).map(issue => ({
+        tool: task.label,
+        file: issue.file,
+        message: issue.message,
+        rule: issue.rule,
+        severity: issue.severity || 'warning',
+        location: issue.line ? `${issue.line}:${issue.column ?? 0}` : '—',
+      })),
+    );
+    const topIssues = issues.slice(0, 8);
+    const issuesList = topIssues.length
+      ? `
+        <ol class="ps-3">
+          ${topIssues
+            .map(
+              issue => `
+                <li class="mb-2">
+                  <div><strong>${this.escapeHtml(issue.tool || 'כלי לא ידוע')}</strong> · ${this.escapeHtml(issue.severity)}</div>
+                  <div class="text-muted small">${this.escapeHtml(issue.file || '—')} (${this.escapeHtml(issue.location)})</div>
+                  <div>${this.escapeHtml(issue.message || '—')}</div>
+                  <div class="text-muted small">כלל: ${this.escapeHtml(issue.rule || '—')}</div>
+                </li>
+              `,
+            )
+            .join('')}
+        </ol>
+      `
+      : '<p class="text-muted mb-0">אין פירוט סוגיות בדוח המצורף.</p>';
+
+    const stdout = this.formatCliOutput(result.stdout);
+    const stderr = this.formatCliOutput(result.stderr);
+    const noteMessage = result.message ? `<p class="mb-0">${this.escapeHtml(result.message)}</p>` : '';
+
+    return `
+      <div class="lint-run-details">
+        <div class="alert alert-danger" role="alert">
+          <strong>ההרצה הסתיימה במצב ${this.escapeHtml(result.status || 'error')}.</strong>
+          <div>Exit Code: <span dir="ltr">${this.escapeHtml(exitCode)}</span></div>
+          <div>זמן הריצה: ${this.escapeHtml(timestamp || 'לא זמין')}</div>
+          ${noteMessage}
+        </div>
+
+        <div class="row g-3">
+          ${summaryItems
+            .map(
+              item => `
+                <div class="col-6 col-md-4">
+                  <div class="p-3 border rounded bg-light h-100">
+                    <div class="text-muted small">${item.label}</div>
+                    <div class="fw-bold fs-5">${this.escapeHtml(String(item.value))}</div>
+                  </div>
+                </div>
+              `,
+            )
+            .join('')}
+        </div>
+
+        <h5 class="mt-4">משימות שנכשלו</h5>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped align-middle">
+            <thead>
+              <tr>
+                <th>כלי</th>
+                <th>סטטוס</th>
+                <th>שגיאות</th>
+                <th>אזהרות</th>
+                <th>משך</th>
+                <th>Exit Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${failingRows}
+            </tbody>
+          </table>
+        </div>
+
+        <h5 class="mt-4">סוגיות בולטות</h5>
+        ${issuesList}
+
+        <h5 class="mt-4">פלט CLI</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6>stdout</h6>
+            <pre dir="ltr" class="lint-cli-output bg-dark text-white p-3 rounded">${stdout}</pre>
+          </div>
+          <div class="col-md-6">
+            <h6>stderr</h6>
+            <pre dir="ltr" class="lint-cli-output bg-dark text-white p-3 rounded">${stderr}</pre>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-4" role="alert">
+          <p class="mb-1">הדוח האחרון נשמר תמיד בקובץ <code>reports/linter/latest.json</code>.</p>
+          <p class="mb-1">היסטוריית הריצות נשמרת בקובץ <code>reports/linter/history.json</code>.</p>
+          <p class="mb-0">ניתן להוריד את הדוח גם מהכפתור “הורד דוח JSON” בסקשן “בדיקות ידניות ותהליכי תחזוקה”.</p>
+        </div>
+      </div>
+    `;
+  }
+
+  formatCliOutput(value) {
+    if (value === null || value === undefined) {
+      return this.escapeHtml('— אין פלט —');
+    }
+    const raw = typeof value === 'string' ? value.trim() : JSON.stringify(value, null, 2);
+    if (!raw) {
+      return this.escapeHtml('— אין פלט —');
+    }
+    const limit = 1800;
+    const output = raw.length > limit ? `${raw.slice(0, limit)}…` : raw;
+    return this.escapeHtml(output);
+  }
+
+  escapeHtml(text) {
+    if (text === null || text === undefined) {
+      return '';
+    }
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
   }
 
   async downloadLatestReport() {
@@ -552,6 +769,32 @@ class LintMonitorController {
       window.Logger?.error('[LintMonitor] Failed to download report:', error, {
         page: LINT_MONITOR_HOST_PAGE,
       });
+    }
+  }
+
+  async copyLatestReportToClipboard() {
+    try {
+      const report = this.state.latestReport || (await LintStatusService.fetchLatestReport());
+      if (!report) {
+        if (typeof window.showWarningNotification === 'function') {
+          window.showWarningNotification('אין דוח להעתקה', 'הרץ lint:collect ורענן את העמוד.');
+        }
+        return;
+      }
+
+      const serialized = JSON.stringify(report, null, 2);
+      await copyTextToClipboard(serialized);
+
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('דוח הלינטר הועתק ללוח', 'ניתן להדביק בכל עורך טקסט');
+      }
+    } catch (error) {
+      window.Logger?.error('[LintMonitor] Failed to copy report JSON:', error, {
+        page: LINT_MONITOR_HOST_PAGE,
+      });
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בהעתקת הדוח', error.message);
+      }
     }
   }
 
@@ -851,6 +1094,22 @@ window.LintMonitorActions = {
     }
     if (window.lintMonitorController) {
       await window.lintMonitorController.loadData({ showToast: true });
+    }
+  },
+  async downloadReport(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    if (window.lintMonitorController) {
+      await window.lintMonitorController.downloadLatestReport();
+    }
+  },
+  async copyReport(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    if (window.lintMonitorController) {
+      await window.lintMonitorController.copyLatestReportToClipboard();
     }
   },
 };

@@ -37,3 +37,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-14T15:16:34+00:00 | 1.0.27.0 | 1.0.26.0 | c9db737ab323aff110cd2e48556f7c9cb1f3288c | 00f790d4813722288f09f1de9a83dd6341248d04 | patch | Sync backlog prior to user pages standardization |
 | 2025-11-14T15:44:30+00:00 | 1.0.28.0 | 1.0.27.0 | 8d726d218811effd64f826fb9604850a06f5d5eb | c9db737ab323aff110cd2e48556f7c9cb1f3288c | patch | Document tagging flow and hydrate edit modals |
 | 2025-11-14T15:57:17+00:00 | 1.0.29.0 | 1.0.28.0 | 725df6113ad1ded45b0f99e80ff3f92593c7ac4f | 8d726d218811effd64f826fb9604850a06f5d5eb | patch | Documented data import duplicate handling improvements |
+| 2025-11-14T20:43:54+00:00 | 1.0.30.0 | 1.0.29.0 | a0a0f3de4f8ea14c5c9b4efb0776f7c444b01c18 | 725df6113ad1ded45b0f99e80ff3f92593c7ac4f | patch | Lint monitor UX improvements |

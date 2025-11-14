@@ -40,6 +40,7 @@ class EntityDetailsAPI {
     constructor() {
         this.baseUrl = '/api/entity-details';
         this.cache = new Map();
+        this.planConditionsCache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 דקות
         this.isInitialized = false;
         this.retryAttempts = 3;
@@ -56,7 +57,7 @@ class EntityDetailsAPI {
     init() {
         try {
             // ניקוי cache ישן
-            this.clearExpiredCache();
+        this.clearExpiredCache();
             
             // הגדרת interval לניקוי cache
             setInterval(() => {
@@ -254,6 +255,17 @@ class EntityDetailsAPI {
                     }
                 } catch (error) {
                     window.Logger.warn(`Failed to load trades and plans data for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                }
+            }
+
+            if (entityType === 'trade_plan') {
+                try {
+                    entityData.plan_conditions = await this.getTradePlanConditions(entityId, {
+                        forceRefresh: options.forceRefresh
+                    });
+                } catch (error) {
+                    window.Logger.warn(`Failed to load conditions for trade_plan ${entityId}:`, error, { page: "entity-details-api" });
+                    entityData.plan_conditions = Array.isArray(entityData.plan_conditions) ? entityData.plan_conditions : [];
                 }
             }
             
@@ -840,6 +852,13 @@ class EntityDetailsAPI {
                 deletedCount++;
             }
         }
+
+        for (const [key, entry] of this.planConditionsCache.entries()) {
+            if (now - entry.timestamp > this.cacheTimeout) {
+                this.planConditionsCache.delete(key);
+                deletedCount++;
+            }
+        }
         
         if (deletedCount > 0) {
             window.Logger.debug(`Cleared ${deletedCount} expired cache entries`, { page: "entity-details-api" });
@@ -854,7 +873,9 @@ class EntityDetailsAPI {
     clearCache() {
         const cacheSize = this.cache.size;
         this.cache.clear();
-        window.Logger.info(`Cleared ${cacheSize} cache entries`, { page: "entity-details-api" });
+        const conditionsSize = this.planConditionsCache.size;
+        this.planConditionsCache.clear();
+        window.Logger.info(`Cleared ${cacheSize} entity cache entries and ${conditionsSize} plan conditions entries`, { page: "entity-details-api" });
     }
 
     /**
@@ -870,6 +891,79 @@ class EntityDetailsAPI {
         
         if (deleted) {
             window.Logger.debug(`Cleared cache for ${cacheKey}`, { page: "entity-details-api" });
+        }
+
+        if (entityType === 'trade_plan') {
+            const conditionsKey = this.getPlanConditionsCacheKey(entityId);
+            if (this.planConditionsCache.delete(conditionsKey)) {
+                window.Logger.debug(`Cleared plan conditions cache for ${conditionsKey}`, { page: "entity-details-api" });
+            }
+        }
+    }
+
+    /**
+     * Get cache key for plan conditions
+     * @param {number|string} tradePlanId
+     * @returns {string}
+     * @private
+     */
+    getPlanConditionsCacheKey(tradePlanId) {
+        return `trade_plan_conditions_${tradePlanId}`;
+    }
+
+    /**
+     * Load trade plan conditions for entity details
+     * @param {number|string} tradePlanId
+     * @param {Object} options
+     * @returns {Promise<Array>}
+     * @private
+     */
+    async getTradePlanConditions(tradePlanId, options = {}) {
+        if (!tradePlanId && tradePlanId !== 0) {
+            return [];
+        }
+
+        const cacheKey = this.getPlanConditionsCacheKey(tradePlanId);
+
+        if (!options.forceRefresh && this.planConditionsCache.has(cacheKey)) {
+            const cached = this.planConditionsCache.get(cacheKey);
+            if (Date.now() - cached.timestamp < this.cacheTimeout) {
+                window.Logger.debug(`Using cached plan conditions for ${tradePlanId}`, { page: "entity-details-api" });
+                return cached.data;
+            }
+        }
+
+        try {
+            window.Logger.info(`Loading plan conditions for trade_plan ${tradePlanId}`, { page: "entity-details-api" });
+            const response = await fetch(`/api/plan-conditions/trade-plans/${tradePlanId}/conditions`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`שגיאה בטעינת תנאים (status ${response.status})`);
+            }
+
+            const payload = await response.json();
+            if (payload?.status !== 'success') {
+                throw new Error(payload?.message || 'שגיאה בטעינת תנאים');
+            }
+
+            const conditions = Array.isArray(payload.data) ? payload.data : [];
+
+            this.planConditionsCache.set(cacheKey, {
+                data: conditions,
+                timestamp: Date.now()
+            });
+
+            window.Logger.info(`Loaded ${conditions.length} plan conditions for trade_plan ${tradePlanId}`, { page: "entity-details-api" });
+            return conditions;
+        } catch (error) {
+            window.Logger.error(`Failed to load plan conditions for trade_plan ${tradePlanId}:`, error, { page: "entity-details-api" });
+            throw error;
         }
     }
 

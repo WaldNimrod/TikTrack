@@ -10,13 +10,13 @@
     "notes": "Link homepage execution widgets to executions page"
   },
   "development": {
-    "version": "1.0.29.0",
+    "version": "1.0.30.0",
     "major": 1,
     "minor": 0,
-    "patch": 29,
+    "patch": 30,
     "build": 0,
-    "commit": "725df6113ad1ded45b0f99e80ff3f92593c7ac4f",
-    "updated_at": "2025-11-14T15:57:17+00:00",
-    "notes": "Documented data import duplicate handling improvements"
+    "commit": "a0a0f3de4f8ea14c5c9b4efb0776f7c444b01c18",
+    "updated_at": "2025-11-14T20:43:54+00:00",
+    "notes": "Lint monitor UX improvements"
   }
 }

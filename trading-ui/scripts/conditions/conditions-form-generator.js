@@ -45,10 +45,12 @@ class ConditionsFormGenerator {
 
     async generateConditionForm(containerId, options = {}) {
         window.Logger?.info('[ConditionsFormGenerator] generateConditionForm called', { containerId, options }, { page: 'conditions-form-generator' });
+        this.logEvent('generate-form-start', { containerId, isEdit: Boolean(options.isEdit) });
         this.containerId = containerId;
         const container = document.getElementById(containerId);
         if (!container) {
             window.Logger?.error('[ConditionsFormGenerator] Container not found', { containerId }, { page: 'conditions-form-generator' });
+            this.logEvent('generate-form-error', { containerId, reason: 'container-not-found' });
             return;
         }
 
@@ -129,7 +131,8 @@ class ConditionsFormGenerator {
                         </div>
 
                         <div class="d-flex gap-2 justify-content-end">
-                            <button class="btn btn-primary" type="submit" id="saveConditionBtn">
+                            <!-- NOTE: Button stays type="button" to prevent GET submission that reloads trade_plans with query params -->
+                            <button class="btn btn-primary" type="button" id="saveConditionBtn">
                                 <i class="fas fa-save"></i>
                                 ${this.translator.getFormLabel('save_condition')}
                             </button>
@@ -156,6 +159,18 @@ class ConditionsFormGenerator {
         if (form) {
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+                event.stopPropagation();
+                this.logEvent('form-submit-event', { via: 'submit', mode: this.mode });
+                await this.handleFormSubmit();
+            });
+        }
+
+        const saveBtn = container.querySelector('#saveConditionBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                this.logEvent('form-submit-event', { via: 'button', mode: this.mode });
                 await this.handleFormSubmit();
             });
         }
@@ -334,12 +349,15 @@ class ConditionsFormGenerator {
     async handleFormSubmit() {
         try {
             window.Logger?.info('[ConditionsFormGenerator] handleFormSubmit triggered', {}, { page: 'conditions-form-generator' });
+            this.logEvent('submit-start', { mode: this.mode });
             const formData = this.collectFormData();
             window.Logger?.debug?.('[ConditionsFormGenerator] collected form data', { formData }, { page: 'conditions-form-generator' });
+            this.logEvent('submit-data-collected', { mode: this.mode, formData });
             const validation = this.validator.validateCondition(formData);
 
             if (!validation.isValid) {
                 window.Logger?.warn('[ConditionsFormGenerator] validation failed', { errors: validation.errors }, { page: 'conditions-form-generator' });
+                this.logEvent('submit-validation-failed', { errors: validation.errors });
                 this.presentValidationErrors(validation.errors);
                 return;
             }
@@ -347,15 +365,19 @@ class ConditionsFormGenerator {
             this.setFormLoading(true);
 
             if (typeof this.onSubmitCallback === 'function') {
+                this.logEvent('submit-callback-start', { mode: this.mode });
                 await this.onSubmitCallback(formData);
                 window.Logger?.info('[ConditionsFormGenerator] onSubmitCallback resolved', {}, { page: 'conditions-form-generator' });
+                this.logEvent('submit-callback-complete', { mode: this.mode });
             }
         } catch (error) {
             window.Logger?.error('Error submitting condition form', { error: error?.message, stack: error?.stack }, { page: 'conditions-form-generator' });
+            this.logEvent('submit-error', { error: error?.message });
             this.showNotification(error.message || 'שגיאה בשליחת הטופס', 'error');
         } finally {
             this.setFormLoading(false);
             window.Logger?.debug?.('[ConditionsFormGenerator] handleFormSubmit finished', {}, { page: 'conditions-form-generator' });
+            this.logEvent('submit-finish', { mode: this.mode });
         }
     }
 
@@ -449,6 +471,7 @@ class ConditionsFormGenerator {
 
     handleFormCancel() {
         if (typeof this.onCancelCallback === 'function') {
+            this.logEvent('form-cancelled', { mode: this.mode });
             this.onCancelCallback();
         }
     }
@@ -500,6 +523,16 @@ class ConditionsFormGenerator {
             window.Logger?.warn('[ConditionsFormGenerator] Failed to parse JSON value', { value, error: error?.message }, { page: 'conditions-form-generator' });
             return fallback;
         }
+    }
+
+    logEvent(action, details = {}) {
+        const payload = {
+            action,
+            timestamp: Date.now(),
+            mode: this.mode,
+            ...details
+        };
+        window.Logger?.info?.('[ConditionsFormFlow] Event', payload, { page: 'conditions-form-generator' });
     }
 
     showNotification(message, type = 'info') {

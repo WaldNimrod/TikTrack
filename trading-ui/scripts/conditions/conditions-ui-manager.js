@@ -30,6 +30,7 @@ class ConditionsUIManager {
 
     async initialize(options = {}) {
         window.Logger?.info('[ConditionsUIManager] initialize called', { options }, { page: 'conditions-ui-manager' });
+        this.logEvent('init-start', { options });
         this.entityType = options.entityType || 'plan';
         this.entityId = options.entityId;
         this.entityName = options.entityName || '';
@@ -37,12 +38,14 @@ class ConditionsUIManager {
 
         if (!this.container) {
             window.Logger?.error('[ConditionsUIManager] Container not found', { containerId: options.containerId }, { page: 'conditions-ui-manager' });
+            this.logEvent('init-error', { reason: 'container-not-found', containerId: options.containerId });
             return;
         }
 
         if (!this.entityId) {
             window.Logger?.error('[ConditionsUIManager] Missing entityId', { options }, { page: 'conditions-ui-manager' });
             this.renderError('לא הוגדר מזהה ישות לניהול תנאים');
+            this.logEvent('init-error', { reason: 'missing-entityId' });
             return;
         }
 
@@ -53,6 +56,7 @@ class ConditionsUIManager {
         await this.refreshConditions();
         this.isInitialized = true;
         window.Logger?.info('[ConditionsUIManager] initialization complete', { entityId: this.entityId, entityType: this.entityType }, { page: 'conditions-ui-manager' });
+        this.logEvent('init-complete');
     }
 
     renderLayout() {
@@ -89,11 +93,17 @@ class ConditionsUIManager {
         const addBtn = this.container.querySelector('#addConditionBtn');
 
         if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => this.refreshConditions(true));
+            refreshBtn.addEventListener('click', () => {
+                this.logEvent('refresh-click', { forced: true });
+                this.refreshConditions(true);
+            });
         }
 
         if (addBtn) {
-            addBtn.addEventListener('click', () => this.openConditionForm());
+            addBtn.addEventListener('click', () => {
+                this.logEvent('add-condition-click');
+                this.openConditionForm();
+            });
         }
 
         const listContainer = this.container.querySelector('#conditionsListContainer');
@@ -108,9 +118,11 @@ class ConditionsUIManager {
                 const action = actionBtn.getAttribute('data-action');
                 switch (action) {
                     case 'edit':
+                        this.logEvent('edit-click', { conditionId });
                         this.handleEditCondition(conditionId);
                         break;
                     case 'delete':
+                        this.logEvent('delete-click', { conditionId });
                         this.handleDeleteCondition(conditionId);
                         break;
                     default:
@@ -134,9 +146,11 @@ class ConditionsUIManager {
         try {
             this.conditions = await this.crudManager.readConditions(this.entityId, !force);
             this.renderConditions();
+            this.logEvent('refresh-success', { count: this.conditions?.length || 0 });
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to load conditions', { error: error?.message, stack: error?.stack }, { page: 'conditions-ui-manager' });
             this.renderError(error.message || 'שגיאה בטעינת התנאים');
+            this.logEvent('refresh-error', { error: error?.message });
         }
     }
 
@@ -260,6 +274,7 @@ class ConditionsUIManager {
 
     async openConditionForm(condition = null) {
         window.Logger?.info('[ConditionsUIManager] openConditionForm called', { isEdit: Boolean(condition), conditionId: condition?.id }, { page: 'conditions-ui-manager' });
+        this.logEvent('open-form', { mode: condition ? 'edit' : 'create', conditionId: condition?.id });
         const container = this.container.querySelector('#conditionsFormContainer');
         if (!container) return;
 
@@ -292,14 +307,17 @@ class ConditionsUIManager {
 
     async createCondition(formData) {
         window.Logger?.info('[ConditionsUIManager] createCondition invoked', { entityId: this.entityId, formData }, { page: 'conditions-ui-manager' });
+        this.logEvent('create-start', { formData });
         try {
             const savedCondition = await this.crudManager.createCondition(this.entityId, formData);
             window.Logger?.info('[ConditionsUIManager] Condition created successfully', { entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+            this.logEvent('create-success', { conditionId: savedCondition?.id });
             this.showNotification(this.translator.getMessage('condition_created') || 'תנאי נוצר בהצלחה', 'success');
             await this.refreshConditions(true);
             await this.handlePostSaveSuccess('create', savedCondition);
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to create condition', { error: error?.message, stack: error?.stack, entityId: this.entityId }, { page: 'conditions-ui-manager' });
+            this.logEvent('create-error', { error: error?.message });
             if (!error?.silent) {
                 const message = error?.message || this.translator.getMessage('condition_create_error') || 'שגיאה ביצירת התנאי';
                 this.showNotification(message, 'error');
@@ -309,14 +327,17 @@ class ConditionsUIManager {
 
     async updateCondition(conditionId, formData) {
         window.Logger?.info('[ConditionsUIManager] updateCondition invoked', { entityId: this.entityId, conditionId, formData }, { page: 'conditions-ui-manager' });
+        this.logEvent('update-start', { conditionId, formData });
         try {
             const updatedCondition = await this.crudManager.updateCondition(conditionId, formData, this.entityId);
             window.Logger?.info('[ConditionsUIManager] Condition updated successfully', { entityId: this.entityId, conditionId }, { page: 'conditions-ui-manager' });
+            this.logEvent('update-success', { conditionId });
             this.showNotification(this.translator.getMessage('condition_updated') || 'תנאי עודכן בהצלחה', 'success');
             await this.refreshConditions(true);
             await this.handlePostSaveSuccess('update', updatedCondition);
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to update condition', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-ui-manager' });
+            this.logEvent('update-error', { conditionId, error: error?.message });
             if (!error?.silent) {
                 const message = error?.message || this.translator.getMessage('condition_update_error') || 'שגיאה בעדכון התנאי';
                 this.showNotification(message, 'error');
@@ -326,6 +347,7 @@ class ConditionsUIManager {
 
     async handlePostSaveSuccess(actionType, savedCondition) {
         window.Logger?.info('[ConditionsUIManager] Handling post-save actions', { actionType, entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+        this.logEvent('post-save', { actionType, conditionId: savedCondition?.id });
         this.closeConditionForm();
         this.showPostSaveConfirmation(actionType, savedCondition);
     }
@@ -342,6 +364,7 @@ class ConditionsUIManager {
 
     showPostSaveConfirmation(actionType = 'create', savedCondition = null) {
         window.Logger?.info('[ConditionsUIManager] showPostSaveConfirmation invoked', { actionType, entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+        this.logEvent('post-save-prompt', { actionType, conditionId: savedCondition?.id });
         this.removePostSavePrompt();
         this.removePostSaveConfirmation();
 
@@ -398,12 +421,14 @@ class ConditionsUIManager {
 
         const handleAddAnother = () => {
             window.Logger?.info('[ConditionsUIManager] User chose to add another condition', { actionType, entityId: this.entityId, previousConditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+            this.logEvent('post-save-choice', { choice: 'add-another', actionType, previousConditionId: savedCondition?.id });
             cleanup();
             this.openConditionForm();
         };
 
         const handleReturnToParent = () => {
             window.Logger?.info('[ConditionsUIManager] User chose to return to parent module', { actionType, entityId: this.entityId, previousConditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
+            this.logEvent('post-save-choice', { choice: 'return', actionType, previousConditionId: savedCondition?.id });
             cleanup();
             if (window.ModalNavigationService?.goBack) {
                 window.ModalNavigationService.goBack();
@@ -563,6 +588,17 @@ class ConditionsUIManager {
         } else {
             window.Logger?.info?.('[ConditionsUIManager] showNotification fallback', { type, message }, { page: 'conditions-ui-manager' });
         }
+    }
+
+    logEvent(action, details = {}) {
+        const payload = {
+            action,
+            entityId: this.entityId,
+            entityType: this.entityType,
+            timestamp: Date.now(),
+            ...details
+        };
+        window.Logger?.info?.('[ConditionsFlow] Event', payload, { page: 'conditions-ui-manager' });
     }
 }
 

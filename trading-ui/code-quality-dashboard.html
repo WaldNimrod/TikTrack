@@ -532,7 +532,12 @@
           </div>
 
           <!-- Lint Monitor Section Start -->
-          <div class="top-section" data-section="lint-summary" data-table-type="code-quality-dashboard">
+          <div
+            class="top-section"
+            id="lint-summary-section"
+            data-section="lint-summary"
+            data-table-type="code-quality-dashboard"
+          >
             <div class="section-header">
               <div class="table-title">
                 <img src="images/icons/development.svg" alt="Lint Monitor" class="table-icon" />
@@ -542,9 +547,30 @@
                 <button id="lint-copy-log-button" class="btn btn-sm btn-outline-secondary" type="button">
                   <i class="fas fa-clipboard-list"></i> העתק לוג מפורט
                 </button>
+                <button
+                  id="lint-copy-report-button"
+                  class="btn btn-sm btn-outline-secondary"
+                  type="button"
+                >
+                  <i class="fas fa-copy"></i> העתק דוח JSON
+                </button>
+                <button
+                  id="lint-download-header-button"
+                  class="btn btn-sm btn-outline-secondary"
+                  type="button"
+                >
+                  <i class="fas fa-file-download"></i> הורד דוח
+                </button>
                 <button id="lint-refresh-button" class="btn btn-sm btn-primary" type="button">
                   <i class="fas fa-sync-alt"></i> רענן נתונים
                 </button>
+                <button
+                  data-button-type="TOGGLE"
+                  data-variant="small"
+                  data-onclick="toggleSection('lint-summary-section')"
+                  data-text="הצג/הסתר"
+                  title="הצג/הסתר ניטור איכות קוד"
+                ></button>
               </div>
             </div>
             <div class="section-body">
@@ -566,11 +592,23 @@
             </div>
           </div>
 
-          <div class="content-section" data-section="lint-tools" data-table-type="code-quality-dashboard">
+          <div
+            class="content-section"
+            id="lint-tools-section"
+            data-section="lint-tools"
+            data-table-type="code-quality-dashboard"
+          >
             <div class="section-header">
               <div class="table-title"> סטטוס כלי איכות קוד </div>
-              <div class="table-actions">
+              <div class="section-header-actions">
                 <span class="lint-section-hint">ESLint, Stylelint, HTMLHint, Prettier</span>
+                <button
+                  data-button-type="TOGGLE"
+                  data-variant="small"
+                  data-onclick="toggleSection('lint-tools-section')"
+                  data-text="הצג/הסתר"
+                  title="הצג/הסתר סטטוס כלי איכות קוד"
+                ></button>
               </div>
             </div>
             <div class="section-body">
@@ -595,11 +633,23 @@
             </div>
           </div>
 
-          <div class="content-section" data-section="lint-issues" data-table-type="lint_monitor_issues">
+          <div
+            class="content-section"
+            id="lint-issues-section"
+            data-section="lint-issues"
+            data-table-type="lint_monitor_issues"
+          >
             <div class="section-header">
               <div class="table-title"> סוגיות פעילות </div>
-              <div class="table-actions">
+              <div class="section-header-actions">
                 <span class="lint-section-hint">ממויין לפי חומרה ותאריך</span>
+                <button
+                  data-button-type="TOGGLE"
+                  data-variant="small"
+                  data-onclick="toggleSection('lint-issues-section')"
+                  data-text="הצג/הסתר"
+                  title="הצג/הסתר סוגיות פעילות"
+                ></button>
               </div>
             </div>
             <div class="section-body">
@@ -629,9 +679,23 @@
             </div>
           </div>
 
-          <div class="content-section" data-section="lint-actions" data-table-type="code-quality-dashboard">
+          <div
+            class="content-section"
+            id="lint-actions-section"
+            data-section="lint-actions"
+            data-table-type="code-quality-dashboard"
+          >
             <div class="section-header">
               <div class="table-title"> בדיקות ידניות ותהליכי תחזוקה </div>
+              <div class="section-header-actions">
+                <button
+                  data-button-type="TOGGLE"
+                  data-variant="small"
+                  data-onclick="toggleSection('lint-actions-section')"
+                  data-text="הצג/הסתר"
+                  title="הצג/הסתר בדיקות ידניות ותהליכי תחזוקה"
+                ></button>
+              </div>
             </div>
             <div class="section-body">
               <div class="lint-actions-grid">
@@ -672,9 +736,23 @@
             </div>
           </div>
 
-          <div class="content-section" data-section="lint-history" data-table-type="code-quality-dashboard">
+          <div
+            class="content-section"
+            id="lint-history-section"
+            data-section="lint-history"
+            data-table-type="code-quality-dashboard"
+          >
             <div class="section-header">
               <div class="table-title"> היסטוריית ריצות </div>
+              <div class="section-header-actions">
+                <button
+                  data-button-type="TOGGLE"
+                  data-variant="small"
+                  data-onclick="toggleSection('lint-history-section')"
+                  data-text="הצג/הסתר"
+                  title="הצג/הסתר היסטוריית ריצות"
+                ></button>
+              </div>
             </div>
             <div class="section-body">
               <ul id="lint-history-list" class="lint-history-list">
@@ -849,6 +927,9 @@
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
+
+    <!-- [52] Shared Module: Lint Monitor Controller -->
+    <script src="scripts/linter-realtime-monitor.js?v=1.0.0"></script> <!-- מודול ניטור לינטר -->
 
     <!-- [52] Page-specific: code-quality-dashboard -->
     <script src="scripts/code-quality-dashboard.js?v=1.0.0"></script> <!-- Page-specific script for code-quality-dashboard -->

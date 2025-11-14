@@ -11,6 +11,14 @@
 //   - trading-ui/code-quality-dashboard.html (סקשן ניטור הלינטר)
 //   - documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md (רשימת משימות פיתוח)
 //
+// 🆕 עדכון 14.11.2025:
+//   - הוספת Failure Modal אחיד בעת כשל בהרצת lint:collect, כולל סיכומי CLI,
+//     משימות שנכשלו, רשימת סוגיות מובילות וקישור גלוי לנתיבי reports/linter/latest.json + history.json.
+//   - הרחבת ממשקי ההורדה/העתקה: כפתורי “הורד דוח” ו“העתק דוח JSON” בסקשן הראשי,
+//     והוספת copy-to-clipboard מבוקר עבור המודול.
+//   - סנכרון טבלת “סוגיות פעילות” עם UnifiedTableSystem: אם אין נתונים ממויינים,
+//     התצוגה נופלת מיד ל-renderIssuesTable כך שנשמרת זמינות מלאה אחרי כל ריצה.
+//
 // 📚 תוכן הקובץ:
 //   1. סקירה כללית והגדרות
 //   2. רכיבי המערכת ופונקציונליות

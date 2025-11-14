@@ -705,6 +705,8 @@ class EntityDetailsRenderer {
                </div>`
             : '';
 
+        const planConditionsSection = this.renderPlanConditionsSection(tradePlanData.plan_conditions);
+
         return `
             <div class="trade-plan-specific">
                 <h6 class="border-bottom pb-2 mb-3" style="border-color: ${color} !important;">פרטי תוכנית</h6>
@@ -748,8 +750,126 @@ class EntityDetailsRenderer {
 
                 ${cancelInfo}
                 ${entryConditions}
+                ${planConditionsSection}
             </div>
         `;
+    }
+
+    renderPlanConditionsSection(planConditions) {
+        const conditionsList = Array.isArray(planConditions) ? planConditions : [];
+
+        if (!conditionsList.length) {
+            return `
+                <div class="mb-3">
+                    <label class="form-label fw-bold">תנאים מתקדמים:</label>
+                    <div class="alert alert-light border mb-0 text-muted">
+                        לא קיימים תנאים שמורים עבור תוכנית זו.
+                    </div>
+                </div>
+            `;
+        }
+
+        const cards = conditionsList.map((condition, index) => this.renderPlanConditionCard(condition, index)).join('');
+
+        return `
+            <div class="mb-3">
+                <label class="form-label fw-bold d-flex align-items-center gap-2">
+                    תנאים מתקדמים
+                    <span class="badge bg-secondary">${conditionsList.length}</span>
+                </label>
+                <div class="d-flex flex-column gap-2">
+                    ${cards}
+                </div>
+            </div>
+        `;
+    }
+
+    renderPlanConditionCard(condition, index = 0) {
+        if (!condition) {
+            return '';
+        }
+
+        const translator = window.conditionsTranslations;
+        const methodKey = condition.method?.method_key || condition.method_key;
+        const methodName = condition.method?.name_he
+            || condition.method?.name
+            || (methodKey && translator?.getMethodName(methodKey))
+            || condition.method?.name_en
+            || `תנאי ${index + 1}`;
+        const categoryKey = condition.method?.category;
+        const categoryName = categoryKey ? (translator?.getCategoryName(categoryKey) || categoryKey) : '';
+        const operatorLabel = translator?.getOperator(condition.logical_operator || 'NONE') || (condition.logical_operator || 'NONE');
+        const statusBadge = condition.is_active === false
+            ? '<span class="badge bg-secondary">מושבת</span>'
+            : '<span class="badge bg-success">פעיל</span>';
+        const conditionGroup = Number.isFinite(condition.condition_group) && condition.condition_group > 0
+            ? `<span class="ms-2 text-muted small">קבוצה: ${condition.condition_group}</span>`
+            : '';
+        const createdAt = condition.created_at?.display || condition.created_at || '';
+        const parametersHtml = this.renderPlanConditionParameters(condition);
+
+        return `
+            <div class="border rounded p-3 bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div>
+                        <div class="fw-bold">${this._escapeHtml(methodName)}</div>
+                        ${categoryName ? `<div class="text-muted small">${this._escapeHtml(categoryName)}</div>` : ''}
+                    </div>
+                    ${statusBadge}
+                </div>
+                <div class="text-muted small mt-2">
+                    <span>אופרטור: ${this._escapeHtml(operatorLabel)}</span>
+                    ${conditionGroup}
+                </div>
+                ${parametersHtml}
+                ${createdAt ? `<div class="text-muted small mt-2">נוצר: ${this._escapeHtml(createdAt)}</div>` : ''}
+            </div>
+        `;
+    }
+
+    renderPlanConditionParameters(condition) {
+        const parameters = this.extractConditionParameters(condition);
+        const translator = window.conditionsTranslations;
+        const entries = Object.entries(parameters || {});
+
+        if (!entries.length) {
+            return `<div class="text-muted small mt-2">אין פרמטרים להצגה עבור תנאי זה.</div>`;
+        }
+
+        const listItems = entries.map(([key, value]) => {
+            const label = translator?.getParameterName(key) || key;
+            const formattedValue = Array.isArray(value) ? value.join(', ') : value;
+            return `
+                <li class="d-flex justify-content-between gap-2">
+                    <span class="text-muted">${this._escapeHtml(label)}</span>
+                    <span class="fw-semibold text-end">${this._escapeHtml(String(formattedValue))}</span>
+                </li>
+            `;
+        }).join('');
+
+        return `<ul class="list-unstyled small mt-3 mb-0">${listItems}</ul>`;
+    }
+
+    extractConditionParameters(condition) {
+        if (condition && typeof condition.parameters === 'object' && !Array.isArray(condition.parameters)) {
+            return condition.parameters;
+        }
+
+        if (condition?.parameters_json) {
+            try {
+                const parsed = typeof condition.parameters_json === 'string'
+                    ? JSON.parse(condition.parameters_json)
+                    : condition.parameters_json;
+
+                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                    return parsed;
+                }
+            } catch (error) {
+                window.Logger?.warn('[EntityDetailsRenderer] Failed to parse condition parameters', { error: error?.message }, { page: 'entity-details-renderer' });
+            }
+        }
+
+        return {};
     }
     /**
      * Render ticker details - רנדור פרטי טיקר

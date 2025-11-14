@@ -54,6 +54,7 @@ class ConditionsCRUDManager {
     async createCondition(entityId, conditionData) {
         const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
         try {
+            this.logEvent('create-start', { entityId, conditionData });
             const entityField = this.entityType === 'plan' ? 'trade_plan_id' : 'trade_id';
             const conditionWithContext = {
                 ...conditionData,
@@ -79,9 +80,11 @@ class ConditionsCRUDManager {
             payload = json.data ?? json;
 
             this.clearCache(this.getCacheKey(entityId));
+            this.logEvent('create-success', { entityId, conditionId: payload?.id });
             return this.translator.translateCondition(payload, this.entityType);
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error creating condition', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('create-error', { entityId, error: error?.message });
             throw error;
         }
     }
@@ -91,11 +94,13 @@ class ConditionsCRUDManager {
      */
     async readConditions(entityId, useCache = true) {
         try {
+            this.logEvent('read-start', { entityId, useCache });
             const cacheKey = this.getCacheKey(entityId);
 
             if (useCache && this.cache.has(cacheKey)) {
                 const cached = this.cache.get(cacheKey);
                 if (Date.now() - cached.timestamp < this.cacheTimeout) {
+                    this.logEvent('read-cache-hit', { entityId });
                     return cached.data;
                 }
             }
@@ -117,13 +122,16 @@ class ConditionsCRUDManager {
                     data: translated,
                     timestamp: Date.now()
                 });
+                this.logEvent('read-success', { entityId, count: translated.length, cached: true });
             } else if (this.cache.has(cacheKey)) {
                 this.cache.delete(cacheKey);
+                this.logEvent('read-success', { entityId, count: 0, cached: false });
             }
 
             return translated;
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error reading conditions', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('read-error', { entityId, error: error?.message });
             throw error;
         }
     }
@@ -133,6 +141,7 @@ class ConditionsCRUDManager {
      */
     async updateCondition(conditionId, conditionData, entityId = null) {
         try {
+            this.logEvent('update-start', { conditionId, entityId });
             const entityField = this.entityType === 'plan' ? 'trade_plan_id' : 'trade_id';
             const conditionWithContext = {
                 ...conditionData,
@@ -167,9 +176,11 @@ class ConditionsCRUDManager {
                 this.clearCache();
             }
 
+            this.logEvent('update-success', { conditionId, entityId });
             return this.translator.translateCondition(payload, this.entityType);
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error updating condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('update-error', { conditionId, entityId, error: error?.message });
             throw error;
         }
     }
@@ -179,8 +190,10 @@ class ConditionsCRUDManager {
      */
     async deleteCondition(conditionId, entityId = null) {
         try {
+            this.logEvent('delete-start', { conditionId, entityId });
             const confirmed = await this.confirmDeletion();
             if (!confirmed) {
+                this.logEvent('delete-cancelled', { conditionId });
                 return false;
             }
 
@@ -220,9 +233,11 @@ class ConditionsCRUDManager {
                 this.clearCache();
             }
 
+            this.logEvent('delete-success', { conditionId, entityId });
             return true;
         } catch (error) {
             window.Logger?.error('[ConditionsCRUDManager] Error deleting condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('delete-error', { conditionId, entityId, error: error?.message });
             throw error;
         }
     }
@@ -380,9 +395,16 @@ class ConditionsCRUDManager {
 
         let response;
         try {
+            window.Logger?.info?.(
+                '[ConditionsCRUDManager] requestJson -> fetch',
+                { endpoint, method, hasBody: Boolean(body) },
+                { page: 'conditions-crud-manager' }
+            );
+            this.logEvent('request-start', { endpoint, method });
             response = await fetch(endpoint, options);
         } catch (networkError) {
             window.Logger?.error('[ConditionsCRUDManager] Network error during request', { endpoint, method, error: networkError?.message }, { page: 'conditions-crud-manager' });
+            this.logEvent('request-network-error', { endpoint, method, error: networkError?.message });
             throw new Error(networkError?.message || 'שגיאה ברשת בעת פנייה לשרת');
         }
         let json;
@@ -396,11 +418,19 @@ class ConditionsCRUDManager {
 
         const success = json?.status === 'success' || json?.success === true || response.ok;
 
+        window.Logger?.info?.(
+            '[ConditionsCRUDManager] requestJson <- response',
+            { endpoint, method, status: response.status, success },
+            { page: 'conditions-crud-manager' }
+        );
+        this.logEvent('request-response', { endpoint, method, status: response.status, success });
+
         if (!success) {
             const message = json?.message || json?.error || `Request failed with status ${response.status}`;
             const error = new Error(message);
             error.response = json;
             error.status = response.status;
+            this.logEvent('request-error', { endpoint, method, status: response.status, message });
             throw error;
         }
 
@@ -432,6 +462,16 @@ class ConditionsCRUDManager {
         } else {
             this.cache.clear();
         }
+    }
+
+    logEvent(action, details = {}) {
+        const payload = {
+            action,
+            entityType: this.entityType,
+            timestamp: Date.now(),
+            ...details
+        };
+        window.Logger?.info?.('[ConditionsCRUD] Event', payload, { page: 'conditions-crud-manager' });
     }
 
     getCacheStats() {

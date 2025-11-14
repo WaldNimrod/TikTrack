@@ -7,6 +7,74 @@
  * the appropriate context, and ensures the modal footer is hidden.
  */
 (function () {
+    const reloadBypassState = (() => {
+        const stateKey = '__conditionsReloadBypassState';
+        if (window[stateKey]) {
+            return window[stateKey];
+        }
+
+        if (typeof window.location?.reload !== 'function') {
+            window.Logger?.warn('[ConditionsModalController] Cannot override window.location.reload', { page: 'conditions-modal-controller' });
+            return null;
+        }
+
+        const originalReload = window.location.reload.bind(window.location);
+        const state = {
+            originalReload,
+            enabled: false,
+            reason: null,
+            blockCount: 0,
+            lastAttempt: null,
+            lastEnabledAt: null
+        };
+
+        window.location.reload = function patchedReload(forceReload) {
+            if (state.enabled) {
+                const attempt = {
+                    forceReload: Boolean(forceReload),
+                    timestamp: Date.now(),
+                    reason: state.reason,
+                    stack: new Error().stack
+                };
+                state.blockCount += 1;
+                state.lastAttempt = attempt;
+                window.Logger?.warn('[ConditionsReloadBypass] Prevented reload attempt', attempt, { page: 'conditions-modal-controller' });
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('חוסם ריענון אוטומטי לזמן דיבוג תנאים', 'info');
+                }
+                return;
+            }
+            return originalReload(forceReload);
+        };
+
+        window.ConditionsReloadBypass = {
+            enable: (reason = 'conditions-modal') => {
+                state.enabled = true;
+                state.reason = reason;
+                state.lastEnabledAt = Date.now();
+                window.Logger?.info('[ConditionsReloadBypass] Enabled', { reason }, { page: 'conditions-modal-controller' });
+            },
+            disable: (reason = null) => {
+                if (reason && state.reason && reason !== state.reason) {
+                    return;
+                }
+                state.enabled = false;
+                state.reason = null;
+                window.Logger?.info('[ConditionsReloadBypass] Disabled', { requestedBy: reason }, { page: 'conditions-modal-controller' });
+            },
+            state: () => ({
+                enabled: state.enabled,
+                reason: state.reason,
+                blockCount: state.blockCount,
+                lastAttempt: state.lastAttempt,
+                lastEnabledAt: state.lastEnabledAt
+            }),
+            runOriginal: (forceReload) => originalReload(forceReload)
+        };
+
+        window[stateKey] = state;
+        return state;
+    })();
     const MODAL_ID = 'conditionsModal';
 
     class ConditionsModalController {
@@ -20,6 +88,7 @@
             this.parentModalInstance = null;
             this.navigationInstanceId = null;
             this.parentNavigationInstanceId = null;
+            this.reloadBypassActive = false;
 
             this.initialize();
         }
@@ -193,6 +262,7 @@
             }
 
             requestAnimationFrame(() => this.ensureModalPosition());
+            this.activateReloadBypass();
         }
 
         async onModalShown() {
@@ -202,6 +272,7 @@
                 return;
             }
 
+            this.activateReloadBypass();
             this.configureModalUI();
 
             if (!this.managerInstance) {
@@ -247,6 +318,8 @@
             if (window.conditionsUIManager === this.managerInstance) {
                 window.conditionsUIManager = null;
             }
+
+            this.deactivateReloadBypass();
         }
 
         configureModalUI() {
@@ -338,6 +411,24 @@
             } finally {
                 this.parentModalInstance = null;
             }
+        }
+
+        activateReloadBypass() {
+            if (this.reloadBypassActive || !reloadBypassState) {
+                return;
+            }
+            window.ConditionsReloadBypass?.enable('conditions-modal');
+            window.Logger?.info('[ConditionsModalController] Reload bypass activated', { entityId: this.context?.entityId }, { page: 'conditions-modal-controller' });
+            this.reloadBypassActive = true;
+        }
+
+        deactivateReloadBypass() {
+            if (!this.reloadBypassActive || !reloadBypassState) {
+                return;
+            }
+            window.ConditionsReloadBypass?.disable('conditions-modal');
+            window.Logger?.info('[ConditionsModalController] Reload bypass deactivated', {}, { page: 'conditions-modal-controller' });
+            this.reloadBypassActive = false;
         }
     }
 

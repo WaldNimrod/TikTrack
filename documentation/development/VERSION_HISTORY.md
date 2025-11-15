@@ -54,3 +54,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-15T01:04:58+00:00 | 1.1.3.0 | 1.1.2.0 | e0e1c6c17b0485efedfce5ca609aef9216b15025 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | patch | Align table sorting/pagination pipeline |
 | 2025-11-15T01:14:18+00:00 | 1.1.3.1 | 1.1.3.0 | 05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6 | e0e1c6c17b0485efedfce5ca609aef9216b15025 | build | Account linking auto-detect |
 | 2025-11-15T01:26:29+00:00 | 1.1.4.0 | 1.1.3.1 | 05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6 | 05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6 | patch | Standardize cash flow and notes data services |
+| 2025-11-15T01:48:05+00:00 | 1.1.5.0 | 1.1.4.0 | 1e395783a97250f0f46e3ac8346ee348da4ab466 | 05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6 | patch | Conditions docs + footer alignment |

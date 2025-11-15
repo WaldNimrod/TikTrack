@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.4.0",
+    "version": "1.1.5.0",
     "major": 1,
     "minor": 1,
-    "patch": 4,
+    "patch": 5,
     "build": 0,
-    "commit": "05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6",
-    "updated_at": "2025-11-15T01:26:29+00:00",
-    "notes": "Standardize cash flow and notes data services"
+    "commit": "1e395783a97250f0f46e3ac8346ee348da4ab466",
+    "updated_at": "2025-11-15T01:48:05+00:00",
+    "notes": "Conditions docs + footer alignment"
   }
 }

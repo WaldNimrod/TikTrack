@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.2.0",
+    "version": "1.1.3.0",
     "major": 1,
     "minor": 1,
-    "patch": 2,
+    "patch": 3,
     "build": 0,
-    "commit": "2c7cb8cd23d931a560ce175caba3307dae18e406",
-    "updated_at": "2025-11-15T00:49:42+00:00",
-    "notes": "Fix tooltip loading and regenerate script sections"
+    "commit": "e0e1c6c17b0485efedfce5ca609aef9216b15025",
+    "updated_at": "2025-11-15T01:04:58+00:00",
+    "notes": "Align table sorting/pagination pipeline"
   }
 }

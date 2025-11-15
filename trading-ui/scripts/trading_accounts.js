@@ -2595,8 +2595,12 @@ window.registerTradingAccountsTables = function() {
             return window.positionsPortfolioState?.positionsData || [];
         },
         updateFunction: (data) => {
+            const safeData = Array.isArray(data) ? data : [];
+            if (typeof window.syncPositionsTablePagination === 'function') {
+                return window.syncPositionsTablePagination(safeData);
+            }
             if (typeof window.updatePositionsTable === 'function') {
-                window.updatePositionsTable(data);
+                window.updatePositionsTable(safeData);
             }
         },
         tableSelector: '#positionsTable',
@@ -2611,8 +2615,12 @@ window.registerTradingAccountsTables = function() {
             return window.positionsPortfolioState?.portfolioData?.positions || [];
         },
         updateFunction: (data) => {
+            const safeData = Array.isArray(data) ? data : [];
+            if (typeof window.syncPortfolioTablePagination === 'function') {
+                return window.syncPortfolioTablePagination(safeData);
+            }
             if (typeof window.updatePortfolioTable === 'function') {
-                window.updatePortfolioTable(data);
+                window.updatePortfolioTable(safeData);
             }
         },
         tableSelector: '#portfolioTable',
@@ -2648,29 +2656,12 @@ window.registerTradingAccountsTables = function() {
             return [];
         },
         updateFunction: (data) => {
-            // For account_activity, we need to reconstruct the currencies structure
-            // from sorted movements back to the original format
-            if (window.accountActivityState && window.accountActivityState.activityData) {
-                // Reconstruct the data structure from sorted movements
-                const activityData = { ...window.accountActivityState.activityData };
-                // Group movements back by currency
-                const currenciesMap = {};
-                data.forEach(movement => {
-                    const currencyId = movement.currency_id;
-                    if (!currenciesMap[currencyId]) {
-                        currenciesMap[currencyId] = {
-                            currency_id: currencyId,
-                            currency_symbol: movement.currency_symbol,
-                            movements: []
-                        };
-                    }
-                    currenciesMap[currencyId].movements.push(movement);
-                });
-                activityData.currencies = Object.values(currenciesMap);
-                // Call populateAccountActivityTable - now exported globally
-                if (typeof window.populateAccountActivityTable === 'function') {
-                    window.populateAccountActivityTable(activityData);
-                }
+            const safeData = Array.isArray(data) ? data : [];
+            if (typeof window.syncAccountActivityPagination === 'function') {
+                return window.syncAccountActivityPagination(safeData);
+            }
+            if (typeof window.populateAccountActivityTable === 'function' && window.accountActivityState?.activityData) {
+                window.populateAccountActivityTable(window.accountActivityState.activityData);
             }
         },
         tableSelector: '#accountActivityTable',

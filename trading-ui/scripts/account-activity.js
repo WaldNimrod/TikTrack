@@ -27,6 +27,8 @@ window.accountActivityState = {
   lastExecutionNoticeAccountId: null,
 };
 
+let accountActivityPaginationInstance = null;
+
 /**
  * Initialize account activity system
  */
@@ -298,6 +300,9 @@ function populateAccountActivityTable(data) {
 
   if (!data.currencies || data.currencies.length === 0) {
     tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+    syncAccountActivityPagination([]);
+    updateCurrencyBalancesFooter(data);
+    updateActivityStatistics();
     return;
   }
 
@@ -362,11 +367,12 @@ function populateAccountActivityTable(data) {
   // Store processed movements for statistics calculation
   window.accountActivityState.processedMovements = allMovements;
 
-  // Render rows
   allMovements.forEach(movement => {
-    const row = renderMovementRow(movement, balancesByMovement[movement.id]);
-    tbody.appendChild(row);
+    movement._runningBalance = balancesByMovement[movement.id];
   });
+
+  // Render rows with pagination
+  syncAccountActivityPagination(allMovements);
 
   // Update footer with currency balances
   updateCurrencyBalancesFooter(data);
@@ -547,6 +553,63 @@ function renderMovementRow(movement, runningBalance) {
 
   return row;
 }
+
+function renderAccountActivityRows(movements) {
+  const tbody = document.querySelector('#accountActivityTable tbody');
+  if (!tbody) {return;}
+
+  const safeMovements = Array.isArray(movements) ? movements : [];
+
+  if (!safeMovements.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  safeMovements.forEach(movement => {
+    const row = renderMovementRow(movement, movement?._runningBalance);
+    fragment.appendChild(row);
+  });
+
+  tbody.innerHTML = '';
+  tbody.appendChild(fragment);
+}
+
+function syncAccountActivityPagination(movements) {
+  const safeMovements = Array.isArray(movements) ? movements : [];
+
+  if (typeof window.updateTableWithPagination === 'function') {
+    try {
+      const paginationPromise = window.updateTableWithPagination({
+        tableId: 'accountActivityTable',
+        tableType: 'account_activity',
+        data: safeMovements,
+        render: (pageData) => renderAccountActivityRows(pageData),
+      });
+
+      if (paginationPromise && typeof paginationPromise.then === 'function') {
+        paginationPromise
+          .then(instance => {
+            accountActivityPaginationInstance = instance;
+          })
+          .catch(error => {
+            window.Logger?.warn('syncAccountActivityPagination: falling back to direct render', { error, page: 'trading_accounts' });
+            renderAccountActivityRows(safeMovements);
+          });
+      } else if (!paginationPromise) {
+        renderAccountActivityRows(safeMovements);
+      }
+
+      return;
+    } catch (error) {
+      window.Logger?.warn('syncAccountActivityPagination: pagination system error', { error, page: 'trading_accounts' });
+    }
+  }
+
+  renderAccountActivityRows(safeMovements);
+}
+
+window.syncAccountActivityPagination = syncAccountActivityPagination;
 
 /**
  * Update activity summary

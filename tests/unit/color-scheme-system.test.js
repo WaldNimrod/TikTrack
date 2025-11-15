@@ -79,6 +79,38 @@ describe('Color Scheme System', () => {
         window.localStorage.clear();
     });
 
+    test('updateCSSVariablesFromPreferences falls back to primary color for info overrides (infoColor missing)', () => {
+        setPropertyMock.mockClear();
+        window.updateCSSVariablesFromPreferences({ primaryColor: '#555555' });
+        expect(setPropertyMock).toHaveBeenCalledWith('--color-info', '#555555');
+        expect(setPropertyMock).toHaveBeenCalledWith('--color-info-light', expect.any(String));
+        expect(setPropertyMock).toHaveBeenCalledWith('--color-info-dark', expect.any(String));
+    });
+
+    test('updateCSSVariablesFromPreferences applies entity, status and numeric overrides', () => {
+        setPropertyMock.mockClear();
+        window.updateCSSVariablesFromPreferences({
+            colorScheme: {
+                entities: { trade: '#101010' },
+                status: { active: '#202020' },
+                numericValues: {
+                    positive: { medium: '#303030' },
+                    negative: { medium: '#404040' },
+                    zero: { medium: '#505050' }
+                }
+            },
+            successColor: '#606060',
+            dangerColor: '#707070',
+            warningColor: '#808080',
+            infoColor: '#909090'
+        });
+
+        expect(setPropertyMock).toHaveBeenCalledWith('--entity-trade-color', '#101010');
+        expect(setPropertyMock).toHaveBeenCalledWith('--user-status-active-color', '#202020');
+        expect(setPropertyMock).toHaveBeenCalledWith('--numeric-positive-medium', '#303030');
+        expect(setPropertyMock).toHaveBeenCalledWith('--color-success', '#606060');
+    });
+
     test('exposes color scheme API surface', () => {
         expect(window.colorSchemeSystem).toBeDefined();
         expect(typeof window.getEntityColor).toBe('function');
@@ -550,28 +582,20 @@ describe('Color Scheme System', () => {
         delete window.currentPreferences;
     });
 
-    test('updateCSSVariablesFromPreferences applies entity, status and numeric overrides', () => {
-        setPropertyMock.mockClear();
-        window.updateCSSVariablesFromPreferences({
-            colorScheme: {
-                entities: { trade: '#101010' },
-                status: { active: '#202020' },
-                numericValues: {
-                    positive: { medium: '#303030' },
-                    negative: { medium: '#404040' },
-                    zero: { medium: '#505050' }
-                }
-            },
-            successColor: '#606060',
-            dangerColor: '#707070',
-            warningColor: '#808080',
-            infoColor: '#909090'
+
+
+    test('getEntityColor handles missing Logger gracefully', () => {
+        const originalLogger = window.Logger;
+        delete window.Logger;
+        Object.keys(window.ENTITY_COLORS).forEach((key) => delete window.ENTITY_COLORS[key]);
+        const styleSpy = jest.spyOn(window, 'getComputedStyle').mockReturnValue({
+            getPropertyValue: () => ''
         });
 
-        expect(setPropertyMock).toHaveBeenCalledWith('--entity-trade-color', '#101010');
-        expect(setPropertyMock).toHaveBeenCalledWith('--user-status-active-color', '#202020');
-        expect(setPropertyMock).toHaveBeenCalledWith('--numeric-positive-medium', '#303030');
-        expect(setPropertyMock).toHaveBeenCalledWith('--color-success', '#606060');
+        expect(window.getEntityColor('missing')).toBe('');
+
+        styleSpy.mockRestore();
+        window.Logger = originalLogger;
     });
 
     test('DOMContentLoaded handler loads preferences when triggered', async () => {
@@ -623,6 +647,12 @@ describe('Color Scheme System', () => {
     test('darkenColor returns original string when hex invalid', () => {
         expect(window.colorSchemeSystem.darkenColor('invalid', 10)).toBe('invalid');
         expect(window.colorSchemeSystem.hexToRgb('invalid')).toBeNull();
+    });
+
+    test('updateCSSVariablesFromPreferences propagates invalid theme colors when no rgb conversion', () => {
+        setPropertyMock.mockClear();
+        window.updateCSSVariablesFromPreferences({ successColor: 'invalid' });
+        expect(setPropertyMock).toHaveBeenCalledWith('--color-success-light', 'invalid');
     });
 
     test('loadColorPreferences falls back to API response', async () => {

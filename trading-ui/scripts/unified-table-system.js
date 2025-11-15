@@ -195,9 +195,58 @@ class TableRegistry {
     }
 
     const normalizedDefaultSort = this._normalizeDefaultSort(tableType, config.defaultSort);
+    const resolvedTableId =
+      typeof config.tableSelector === 'string' && config.tableSelector.startsWith('#')
+        ? config.tableSelector.substring(1)
+        : null;
+
+    const originalDataGetter = config.dataGetter;
+    const registryAwareGetter = () => {
+      const registry = window.TableDataRegistry;
+      if (registry) {
+        const registryFiltered = registry.getFilteredData(tableType, { asReference: true });
+        if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+          return [...registryFiltered];
+        }
+
+        const registryFull = registry.getFullData(tableType, { asReference: true });
+        if (Array.isArray(registryFull) && registryFull.length > 0) {
+          return [...registryFull];
+        }
+      }
+
+      let localData = [];
+      try {
+        localData = originalDataGetter() || [];
+      } catch (error) {
+        if (window.Logger) {
+          window.Logger.warn(`TableRegistry.register: dataGetter threw for "${tableType}"`, error, { page: 'unified-table-system' });
+        }
+      }
+
+      if (!Array.isArray(localData)) {
+        return [];
+      }
+
+      if (registry && localData.length && config.autoSyncRegistry !== false) {
+        try {
+          registry.setFullData(tableType, localData, {
+            tableId: resolvedTableId,
+            resetFiltered: false,
+          });
+        } catch (registryError) {
+          if (window.Logger) {
+            window.Logger.warn(`TableRegistry.register: failed to sync registry for "${tableType}"`, registryError, { page: 'unified-table-system' });
+          }
+        }
+      }
+
+      return [...localData];
+    };
+
     const tableConfig = {
       ...config,
-      dataGetter: config.dataGetter,
+      dataGetter: registryAwareGetter,
       updateFunction: config.updateFunction,
       tableSelector: config.tableSelector,
       columns: config.columns || [],
@@ -207,19 +256,15 @@ class TableRegistry {
       filterable: config.filterable !== false,
       defaultSort: normalizedDefaultSort,
       defaultSortPrimary: normalizedDefaultSort.length > 0 ? normalizedDefaultSort[0] : null,
+      tableId: resolvedTableId,
     };
 
     this._tables.set(tableType, tableConfig);
 
     if (window.TableDataRegistry) {
-      let tableId = null;
-      if (config.tableSelector.startsWith('#')) {
-        tableId = config.tableSelector.substring(1);
-      }
-
       window.TableDataRegistry.registerTable({
         tableType,
-        tableId,
+        tableId: resolvedTableId,
         source: 'unified-table-system',
       });
     }

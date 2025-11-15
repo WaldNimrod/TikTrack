@@ -25,11 +25,140 @@ window.Logger.info('📁 positions-portfolio.js נטען', { page: "trading_acco
 window.positionsPortfolioState = {
     selectedAccountId: null,
     positionsData: null,
+    positionsPageData: [],
     portfolioData: null,
+    portfolioPagePositions: [],
     summaryData: null,
     isLoading: false,
-    summarySize: 'minimal' // 'minimal' or 'full'
+    summarySize: 'minimal', // 'minimal' or 'full'
+    portfolioDiagnostics: null,
+    positionsDiagnostics: null,
+    summaryDiagnostics: null,
+    missingExecutionsNotified: {
+        portfolio: false,
+        accounts: {}
+    }
 };
+
+let positionsPaginationInstance = null;
+let portfolioPaginationInstance = null;
+
+function normalizePositionsPayload(payload) {
+    if (!payload) {
+        return { positions: [], diagnostics: null };
+    }
+    if (Array.isArray(payload)) {
+        return { positions: payload, diagnostics: null };
+    }
+    if (Array.isArray(payload.positions)) {
+        return {
+            positions: payload.positions,
+            diagnostics: payload.diagnostics || null
+        };
+    }
+    return { positions: [], diagnostics: null };
+}
+
+function normalizePortfolioPayload(payload) {
+    if (!payload) {
+        return { positions: [], summary: {}, diagnostics: null };
+    }
+    return {
+        positions: Array.isArray(payload.positions) ? payload.positions : [],
+        summary: payload.summary || {},
+        diagnostics: payload.diagnostics || null
+    };
+}
+
+function notifyMissingExecutionsOnce(key, message) {
+    const tracker = window.positionsPortfolioState.missingExecutionsNotified || { portfolio: false, accounts: {} };
+    window.positionsPortfolioState.missingExecutionsNotified = tracker;
+    if (key === 'portfolio') {
+        if (tracker.portfolio) {
+            return;
+        }
+        tracker.portfolio = true;
+    } else {
+        const serializedKey = String(key);
+        if (tracker.accounts?.[serializedKey]) {
+            return;
+        }
+        tracker.accounts = tracker.accounts || {};
+        tracker.accounts[serializedKey] = true;
+    }
+    if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אין נתוני Executions', message);
+    }
+    window.Logger?.warn?.('⚠️ Missing executions detected', { context: key, message }, { page: 'positions-portfolio' });
+}
+
+function createDiagnosticsMessageFromPortfolio(diagnostics) {
+    if (!diagnostics || !Array.isArray(diagnostics.accounts_without_executions) || diagnostics.accounts_without_executions.length === 0) {
+        return null;
+    }
+    const missingCount = diagnostics.accounts_without_executions.length;
+    const ids = diagnostics.accounts_without_executions.slice(0, 5).join(', ');
+    const idsSuffix = missingCount > 5 ? ` ועוד ${missingCount - 5}` : '';
+    return `לא נמצאו Executions ב-${missingCount} חשבונות (${ids}${idsSuffix}). יש להעלות נתוני ביצוע (Buy/Sell) כדי לחשב פוזיציות ופורטפוליו.`;
+}
+
+function createDiagnosticsMessageFromAccount(diagnostics) {
+    if (!diagnostics || diagnostics.execution_pairs_count > 0) {
+        return null;
+    }
+    return `לא נמצאו Executions לחשבון ${diagnostics.account_id}. הוסף נתוני ביצוע כדי לראות פוזיציות פעילות.`;
+}
+
+function setPortfolioDiagnostics(diagnostics) {
+    window.positionsPortfolioState.portfolioDiagnostics = diagnostics || null;
+    const message = createDiagnosticsMessageFromPortfolio(diagnostics);
+    if (message) {
+        notifyMissingExecutionsOnce('portfolio', message);
+    }
+}
+
+function setPositionsDiagnostics(diagnostics) {
+    window.positionsPortfolioState.positionsDiagnostics = diagnostics || null;
+    const message = createDiagnosticsMessageFromAccount(diagnostics);
+    if (message && diagnostics?.account_id) {
+        notifyMissingExecutionsOnce(diagnostics.account_id, message);
+    }
+}
+
+function getNoPositionsMessage(diagnostics, context = 'portfolio') {
+    if (context === 'portfolio') {
+        const message = createDiagnosticsMessageFromPortfolio(diagnostics);
+        if (message) {
+            return `${message} לאחר הוספת הנתונים הטבלה תתעדכן אוטומטית.`;
+        }
+    } else if (context === 'account') {
+        const message = createDiagnosticsMessageFromAccount(diagnostics);
+        if (message) {
+            return message;
+        }
+    }
+    return 'אין פוזיציות להצגה';
+}
+
+function renderDiagnosticsBanner(targetElement, diagnostics) {
+    if (!targetElement) {
+        return;
+    }
+    const existing = targetElement.querySelector('.portfolio-diagnostics-banner');
+    if (existing) {
+        existing.remove();
+    }
+    const message =
+        createDiagnosticsMessageFromPortfolio(diagnostics) ||
+        createDiagnosticsMessageFromAccount(diagnostics);
+    if (!message) {
+        return;
+    }
+    const banner = document.createElement('div');
+    banner.className = 'alert alert-warning portfolio-diagnostics-banner mt-2 mb-0 small';
+    banner.textContent = message;
+    targetElement.appendChild(banner);
+}
 
 /**
  * Initialize positions & portfolio system
@@ -216,7 +345,7 @@ async function loadAccountPositions(accountId) {
         const cacheKey = `positions-account-${accountId}`;
         
         // Load from cache or API
-        const data = await window.UnifiedCacheManager.get(cacheKey, {
+        const payload = await window.UnifiedCacheManager.get(cacheKey, {
             fallback: async () => {
                 const response = await fetch(`/api/positions/account/${accountId}`);
                 if (!response.ok) {
@@ -224,18 +353,24 @@ async function loadAccountPositions(accountId) {
                 }
                 const result = await response.json();
                 if (result.status === 'success' && result.data) {
-                    return result.data.positions || [];
+                    return {
+                        positions: result.data.positions || [],
+                        diagnostics: result.data.diagnostics || null
+                    };
                 }
-                return [];
+                return { positions: [], diagnostics: null };
             },
             ttl: 300000, // 5 minutes
             dependencies: ['executions', 'market_data_quotes']
         });
         
-        window.positionsPortfolioState.positionsData = data;
+        const { positions, diagnostics } = normalizePositionsPayload(payload);
+        window.positionsPortfolioState.positionsData = positions;
+        window.positionsPortfolioState.positionsPageData = positions;
+        setPositionsDiagnostics(diagnostics);
         
         // Calculate totals - sum of all market values
-        const totalPositionsValue = data.reduce((sum, p) => sum + (p.market_value || 0), 0);
+        const totalPositionsValue = positions.reduce((sum, p) => sum + (p.market_value || 0), 0);
         
         // Get trading account cash balance for total trading account value
         let accountTotalValue = totalPositionsValue;
@@ -262,11 +397,11 @@ async function loadAccountPositions(accountId) {
         const accountTotalAmountElement = document.getElementById('positionsAccountTotalValueAmount');
         
         if (countTextElement) {
-            countTextElement.textContent = `${data.length} פוזיציות`;
+            countTextElement.textContent = `${positions.length} פוזיציות`;
         }
         
         // Show/hide elements based on data availability
-        if (data.length > 0) {
+        if (positions.length > 0) {
             if (separatorElement) separatorElement.style.display = 'inline';
             if (totalValueElement) totalValueElement.style.display = 'inline';
             if (totalValueAmountElement) {
@@ -284,11 +419,8 @@ async function loadAccountPositions(accountId) {
             if (accountTotalElement) accountTotalElement.style.display = 'none';
         }
         
-        // Store data in state for sorting
-        window.positionsPortfolioState.positionsData = data;
-        
         // Render table
-        renderPositionsTable(data);
+        await syncPositionsTablePagination(positions);
         
     } catch (error) {
         window.Logger.error('❌ Error loading trading account positions:', error, { page: "trading_accounts" });
@@ -339,6 +471,32 @@ function formatCurrencyHebrew(value, showSign = false, noDecimals = false) {
 }
 
 /**
+ * Sync positions table with pagination system
+ * @param {Array} positions
+ */
+async function syncPositionsTablePagination(positions) {
+    const safePositions = Array.isArray(positions) ? positions : [];
+
+    if (typeof window.updateTableWithPagination === 'function') {
+        try {
+            positionsPaginationInstance = await window.updateTableWithPagination({
+                tableId: 'positionsTable',
+                tableType: 'positions',
+                data: safePositions,
+                render: (pageData) => renderPositionsTable(pageData),
+            });
+            return;
+        } catch (error) {
+            window.Logger?.warn('syncPositionsTablePagination: fallback to direct render', { error, page: 'positions-portfolio' });
+        }
+    }
+
+    renderPositionsTable(safePositions);
+}
+
+window.syncPositionsTablePagination = syncPositionsTablePagination;
+
+/**
  * Render positions table
  * @param {Array} positions - Array of position objects
  */
@@ -348,16 +506,21 @@ function renderPositionsTable(positions) {
         return;
     }
     
-    // If positions provided, use them and update state
+    // Track last rendered page separately from canonical dataset
     if (positions && Array.isArray(positions)) {
-        window.positionsPortfolioState.positionsData = positions;
+        window.positionsPortfolioState.positionsPageData = positions;
     } else {
-        // If no positions provided, try to get from state
-        positions = window.positionsPortfolioState.positionsData || [];
+        // If no positions provided, try to get last rendered page
+        positions = window.positionsPortfolioState.positionsPageData || [];
+        if ((!positions || positions.length === 0) && Array.isArray(window.positionsPortfolioState.positionsData)) {
+            // Fallback to full dataset only if no page snapshot exists
+            positions = window.positionsPortfolioState.positionsData;
+        }
     }
     
     if (!positions || positions.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="empty">אין פוזיציות להצגה</td></tr>';
+        const message = getNoPositionsMessage(window.positionsPortfolioState.positionsDiagnostics, 'account');
+        tableBody.innerHTML = `<tr><td colspan="9" class="empty">${message}</td></tr>`;
         return;
     }
     
@@ -620,7 +783,7 @@ async function loadPortfolio() {
         const cacheKey = `portfolio-${params.toString()}`;
         
         // Load from cache or API
-        const data = await window.UnifiedCacheManager.get(cacheKey, {
+        const payload = await window.UnifiedCacheManager.get(cacheKey, {
             fallback: async () => {
                 const response = await fetch(`/api/positions/portfolio?${params.toString()}`);
                 if (!response.ok) {
@@ -630,22 +793,33 @@ async function loadPortfolio() {
                 if (result.status === 'success' && result.data) {
                     return result.data;
                 }
-                return { positions: [], summary: {} };
+                return { positions: [], summary: {}, diagnostics: null };
             },
             ttl: 300000, // 5 minutes
             dependencies: ['executions', 'market_data_quotes']
         });
         
-        window.positionsPortfolioState.portfolioData = data;
+        const normalized = normalizePortfolioPayload(payload);
+        window.positionsPortfolioState.portfolioData = normalized;
+        setPortfolioDiagnostics(normalized.diagnostics);
         
         // Update count
         const countElement = document.getElementById('portfolioCount');
         if (countElement) {
-            countElement.textContent = `${data.summary?.total_positions || 0} פוזיציות`;
+            const totalPositions = normalized.summary?.total_positions ?? normalized.positions.length ?? 0;
+            let countText = `${totalPositions} פוזיציות`;
+            if (normalized.diagnostics?.accounts_without_executions?.length) {
+                countText += ' • אין נתוני Executions בחלק מהחשבונות';
+            }
+            countElement.textContent = countText;
         }
         
-        // Render table
-        renderPortfolioTable(data.positions || []);
+        // Render table (Pagination System)
+        const portfolioPaginationRenderer =
+            typeof window.syncPortfolioTablePagination === 'function'
+                ? window.syncPortfolioTablePagination
+                : syncPortfolioTablePagination;
+        await portfolioPaginationRenderer(normalized.positions || []);
         
     } catch (error) {
         window.Logger.error('❌ Error loading portfolio:', error, { page: "trading_accounts" });
@@ -661,6 +835,32 @@ async function loadPortfolio() {
 }
 
 /**
+ * Sync portfolio table with pagination system
+ * @param {Array} positions
+ */
+async function syncPortfolioTablePagination(positions) {
+    const safePositions = Array.isArray(positions) ? positions : [];
+
+    if (typeof window.updateTableWithPagination === 'function') {
+        try {
+            portfolioPaginationInstance = await window.updateTableWithPagination({
+                tableId: 'portfolioTable',
+                tableType: 'portfolio',
+                data: safePositions,
+                render: (pageData) => renderPortfolioTable(pageData),
+            });
+            return;
+        } catch (error) {
+            window.Logger?.warn('syncPortfolioTablePagination: fallback to direct render', { error, page: 'positions-portfolio' });
+        }
+    }
+
+    renderPortfolioTable(safePositions);
+}
+
+window.syncPortfolioTablePagination = syncPortfolioTablePagination;
+
+/**
  * Render portfolio table
  * @param {Array} positions - Array of position objects
  */
@@ -672,17 +872,18 @@ function renderPortfolioTable(positions) {
     
     // If positions provided, use them and update state
     if (positions && Array.isArray(positions)) {
-        if (!window.positionsPortfolioState.portfolioData) {
-            window.positionsPortfolioState.portfolioData = {};
-        }
-        window.positionsPortfolioState.portfolioData.positions = positions;
+        window.positionsPortfolioState.portfolioPagePositions = positions;
     } else {
-        // If no positions provided, try to get from state
-        positions = window.positionsPortfolioState.portfolioData?.positions || [];
+        // If no positions provided, try to get from last rendered page
+        positions = window.positionsPortfolioState.portfolioPagePositions || [];
+        if ((!positions || positions.length === 0) && Array.isArray(window.positionsPortfolioState.portfolioData?.positions)) {
+            positions = window.positionsPortfolioState.portfolioData.positions;
+        }
     }
     
     if (!positions || positions.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="10" class="empty">אין פוזיציות להצגה</td></tr>';
+        const message = getNoPositionsMessage(window.positionsPortfolioState.portfolioDiagnostics, 'portfolio');
+        tableBody.innerHTML = `<tr><td colspan="10" class="empty">${message}</td></tr>`;
         return;
     }
     
@@ -868,16 +1069,20 @@ async function loadPortfolioSummary() {
                 if (result.status === 'success' && result.data) {
                     return result.data;
                 }
-                return { summary: {} };
+                return { summary: {}, diagnostics: null };
             },
             ttl: 300000, // 5 minutes
             dependencies: ['executions', 'market_data_quotes']
         });
         
         window.positionsPortfolioState.summaryData = data;
+        window.positionsPortfolioState.summaryDiagnostics = data.diagnostics || null;
+        if (!window.positionsPortfolioState.portfolioDiagnostics && data.diagnostics) {
+            setPortfolioDiagnostics(data.diagnostics);
+        }
         
         // Render summary (summary is already calculated object, not array)
-        renderPortfolioSummaryFallback(data.summary, size);
+        renderPortfolioSummaryFallback(data.summary || {}, size);
         
     } catch (error) {
         window.Logger.error('❌ Error loading portfolio summary:', error, { page: "trading_accounts" });
@@ -920,6 +1125,11 @@ function renderPortfolioSummaryFallback(summary, size) {
                 <div>סה"כ עמלות: <strong>${formatCurrencyHebrew(summary.total_fees || 0, false, false)}</strong></div>
             </div>
         `;
+    }
+    
+    const diagnosticsSource = window.positionsPortfolioState.portfolioDiagnostics || window.positionsPortfolioState.summaryDiagnostics;
+    if (diagnosticsSource) {
+        renderDiagnosticsBanner(summaryElement, diagnosticsSource);
     }
 }
 
@@ -1030,17 +1240,18 @@ window.debugPositionsPortfolio = function() {
         if (window.Logger) {
             window.Logger.debug('   - selectedAccountId:', window.positionsPortfolioState.selectedAccountId, { page: "positions-portfolio" });
             window.Logger.debug('   - isLoading:', window.positionsPortfolioState.isLoading, { page: "positions-portfolio" });
-            window.Logger.debug('   - positionsData:', window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
-            window.Logger.debug('     * Exists:', !!window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
-            window.Logger.debug('     * Type:', typeof window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
-            window.Logger.debug('     * Is Array:', Array.isArray(window.positionsPortfolioState.positionsData), { page: "positions-portfolio" });
-            window.Logger.debug('     * Length:', window.positionsPortfolioState.positionsData?.length || 0, { page: "positions-portfolio" });
+        window.Logger.debug('   - positionsData (full):', window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
+        window.Logger.debug('     * Exists:', !!window.positionsPortfolioState.positionsData, { page: "positions-portfolio" });
+        window.Logger.debug('     * Is Array:', Array.isArray(window.positionsPortfolioState.positionsData), { page: "positions-portfolio" });
+        window.Logger.debug('     * Length:', window.positionsPortfolioState.positionsData?.length || 0, { page: "positions-portfolio" });
+        window.Logger.debug('   - positionsPageData (last slice):', window.positionsPortfolioState.positionsPageData, { page: "positions-portfolio" });
+        window.Logger.debug('     * Length:', window.positionsPortfolioState.positionsPageData?.length || 0, { page: "positions-portfolio" });
             window.Logger.debug('   - portfolioData:', window.positionsPortfolioState.portfolioData, { page: "positions-portfolio" });
             window.Logger.debug('     * Exists:', !!window.positionsPortfolioState.portfolioData, { page: "positions-portfolio" });
-            window.Logger.debug('     * Positions:', window.positionsPortfolioState.portfolioData?.positions, { page: "positions-portfolio" });
-            window.Logger.debug('       - Exists:', !!window.positionsPortfolioState.portfolioData?.positions, { page: "positions-portfolio" });
-            window.Logger.debug('       - Is Array:', Array.isArray(window.positionsPortfolioState.portfolioData?.positions), { page: "positions-portfolio" });
-            window.Logger.debug('       - Length:', window.positionsPortfolioState.portfolioData?.positions?.length || 0, { page: "positions-portfolio" });
+        window.Logger.debug('     * Positions (full):', window.positionsPortfolioState.portfolioData?.positions, { page: "positions-portfolio" });
+        window.Logger.debug('       - Length:', window.positionsPortfolioState.portfolioData?.positions?.length || 0, { page: "positions-portfolio" });
+        window.Logger.debug('   - portfolioPagePositions (last slice):', window.positionsPortfolioState.portfolioPagePositions, { page: "positions-portfolio" });
+        window.Logger.debug('       - Length:', window.positionsPortfolioState.portfolioPagePositions?.length || 0, { page: "positions-portfolio" });
         }
     }
     

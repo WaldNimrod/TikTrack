@@ -1,7 +1,7 @@
 /**
  * Unified Table Management System - TikTrack
  * ==========================================
- * 
+ *
  * מערכת טבלאות מרכזית מאוחדת שתאחד את כל המנגנונים הקשורים לטבלאות:
  * - סידור (Sorting)
  * - מיפוי (Column Mapping)
@@ -11,11 +11,11 @@
  * - סגנונות (Styling)
  * - Event Handlers
  * - ניהול מצב (State Management)
- * 
+ *
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/TABLE_SYSTEM_ANALYSIS.md
  * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_TABLE_SYSTEM.md
- * 
+ *
  * Author: TikTrack Development Team
  * Version: 1.0.0
  * Last Updated: 2025-01-27
@@ -25,7 +25,7 @@
 
 /**
  * TableRegistry - רישום מרכזי של כל הטבלאות
- * 
+ *
  * כל טבלה נרשמת פעם אחת עם קונפיגורציה מלאה:
  * - dataGetter - פונקציה לקבלת נתונים
  * - updateFunction - פונקציה לעדכון טבלה
@@ -37,6 +37,127 @@
 class TableRegistry {
   constructor() {
     this._tables = new Map();
+  }
+
+  _normalizeDefaultSort(tableType, defaultSortConfig) {
+    const resolveChainSource = () => {
+      if (defaultSortConfig && typeof defaultSortConfig === 'object') {
+        return defaultSortConfig;
+      }
+      if (Array.isArray(defaultSortConfig)) {
+        return defaultSortConfig;
+      }
+
+      const resolver =
+        window.getDefaultSortChain ||
+        window.tableMappings && window.tableMappings.getDefaultSortChain;
+      if (typeof resolver === 'function') {
+        return resolver(tableType);
+      }
+      return null;
+    };
+
+    const chainSource = resolveChainSource();
+    if (!chainSource) {
+      return [];
+    }
+
+    const chainArray = Array.isArray(chainSource) ? chainSource : [chainSource];
+    const normalizedChain = [];
+
+    chainArray.forEach(entry => {
+      if (!entry) {
+        return;
+      }
+
+      const columnKeyCandidate = entry.key || entry.columnKey || entry.field || null;
+      let resolvedIndex = typeof entry.columnIndex === 'number' ? entry.columnIndex : -1;
+
+      if (resolvedIndex === -1 && columnKeyCandidate) {
+        const resolver =
+          window.getColumnIndexByKey ||
+          window.tableMappings && window.tableMappings.getColumnIndexByKey;
+        if (typeof resolver === 'function') {
+          resolvedIndex = resolver(tableType, columnKeyCandidate);
+        }
+      }
+
+      if (resolvedIndex === -1 && typeof entry.index === 'number') {
+        resolvedIndex = entry.index;
+      }
+
+      if (resolvedIndex === -1) {
+        return;
+      }
+
+      const direction =
+        entry.direction && entry.direction.toLowerCase() === 'desc' ? 'desc' : 'asc';
+
+      const keysSource =
+        window.tableMappings && window.tableMappings.TABLE_COLUMN_KEYS || {};
+      const fallbackKey =
+        columnKeyCandidate ||
+        (Array.isArray(keysSource[tableType])
+          ? keysSource[tableType][resolvedIndex] || null
+          : null);
+
+      normalizedChain.push({
+        columnIndex: resolvedIndex,
+        direction,
+        key: fallbackKey,
+        priority: entry.priority || null,
+      });
+    });
+
+    return normalizedChain;
+  }
+
+  static prepareUpdateFunction(tableType, config) {
+    const originalUpdateFunction = config.updateFunction;
+    const table = document.querySelector(config.tableSelector);
+    const sortableHeaders = table ? Array.from(table.querySelectorAll('.sortable-header')) : [];
+
+    const setHeadersDisabled = isDisabled => {
+      sortableHeaders.forEach(header => {
+        header.style.pointerEvents = isDisabled ? 'none' : '';
+      });
+    };
+
+    const release = () => {
+      setTimeout(() => {
+        setHeadersDisabled(false);
+        window._updateFunctionInProgress = false;
+      }, 150);
+    };
+
+    const safeUpdateFunction = sortedData => {
+      if (window._updateFunctionInProgress) {
+        console.warn(`[TableSorter] updateFunction already in progress for ${tableType}, skipping`);
+        console.trace('[TableSorter] Stack trace for updateFunction recursion');
+        return null;
+      }
+
+      window._updateFunctionInProgress = true;
+      setHeadersDisabled(true);
+
+      try {
+        console.log(`[TableSorter] Calling updateFunction for ${tableType} with ${sortedData?.length || 0} items`);
+        const result = originalUpdateFunction(sortedData);
+
+        if (result && typeof result.then === 'function') {
+          return result.finally(release);
+        }
+
+        release();
+        return result;
+      } catch (error) {
+        console.error(`[TableSorter] Error in updateFunction for ${tableType}:`, error);
+        release();
+        throw error;
+      }
+    };
+
+    return { safeUpdateFunction, release };
   }
 
   /**
@@ -73,8 +194,59 @@ class TableRegistry {
       throw new Error('TableRegistry.register: config.tableSelector must be a non-empty string');
     }
 
-    this._tables.set(tableType, {
-      dataGetter: config.dataGetter,
+    const normalizedDefaultSort = this._normalizeDefaultSort(tableType, config.defaultSort);
+    const resolvedTableId =
+      typeof config.tableSelector === 'string' && config.tableSelector.startsWith('#')
+        ? config.tableSelector.substring(1)
+        : null;
+
+    const originalDataGetter = config.dataGetter;
+    const registryAwareGetter = () => {
+      const registry = window.TableDataRegistry;
+      if (registry) {
+        const registryFiltered = registry.getFilteredData(tableType, { asReference: true });
+        if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+          return [...registryFiltered];
+        }
+
+        const registryFull = registry.getFullData(tableType, { asReference: true });
+        if (Array.isArray(registryFull) && registryFull.length > 0) {
+          return [...registryFull];
+        }
+      }
+
+      let localData = [];
+      try {
+        localData = originalDataGetter() || [];
+      } catch (error) {
+        if (window.Logger) {
+          window.Logger.warn(`TableRegistry.register: dataGetter threw for "${tableType}"`, error, { page: 'unified-table-system' });
+        }
+      }
+
+      if (!Array.isArray(localData)) {
+        return [];
+      }
+
+      if (registry && localData.length && config.autoSyncRegistry !== false) {
+        try {
+          registry.setFullData(tableType, localData, {
+            tableId: resolvedTableId,
+            resetFiltered: false,
+          });
+        } catch (registryError) {
+          if (window.Logger) {
+            window.Logger.warn(`TableRegistry.register: failed to sync registry for "${tableType}"`, registryError, { page: 'unified-table-system' });
+          }
+        }
+      }
+
+      return [...localData];
+    };
+
+    const tableConfig = {
+      ...config,
+      dataGetter: registryAwareGetter,
       updateFunction: config.updateFunction,
       tableSelector: config.tableSelector,
       columns: config.columns || [],
@@ -82,18 +254,17 @@ class TableRegistry {
       filters: config.filters || {},
       sortable: config.sortable !== false,
       filterable: config.filterable !== false,
-      ...config
-    });
+      defaultSort: normalizedDefaultSort,
+      defaultSortPrimary: normalizedDefaultSort.length > 0 ? normalizedDefaultSort[0] : null,
+      tableId: resolvedTableId,
+    };
+
+    this._tables.set(tableType, tableConfig);
 
     if (window.TableDataRegistry) {
-      let tableId = null;
-      if (config.tableSelector.startsWith('#')) {
-        tableId = config.tableSelector.substring(1);
-      }
-
       window.TableDataRegistry.registerTable({
         tableType,
-        tableId,
+        tableId: resolvedTableId,
         source: 'unified-table-system',
       });
     }
@@ -148,7 +319,7 @@ class TableRegistry {
 
 /**
  * TableSorter - סידור מרכזי של טבלאות
- * 
+ *
  * משתמש ב-TableRegistry לקבלת קונפיגורציה ומנתוני טבלאות
  * מחליף את window.sortTable הישן
  */
@@ -165,7 +336,7 @@ class TableSorter {
    * @param {number} columnIndex - אינדקס העמודה
    * @returns {Array|null} נתונים מסודרים או null אם שגיאה
    */
-  sort(tableType, columnIndex) {
+  sort(tableType, columnIndex, options = {}) {
     // CRITICAL: Prevent infinite recursion - check BOTH instance flag AND global flag
     // This prevents ANY sort from happening while a sort is in progress
     if (this._globalSortingFlag || window._sortTableDataInProgress) {
@@ -173,37 +344,41 @@ class TableSorter {
       console.trace('[TableSorter.sort] Stack trace for rejected call');
       return null;
     }
-    
+
     console.log(`[TableSorter.sort] Starting sort: tableType=${tableType}, columnIndex=${columnIndex}, flag=${this._globalSortingFlag}, globalFlag=${window._sortTableDataInProgress}`);
-    
+
     // Set instance flag to prevent recursion from this source
     this._globalSortingFlag = true;
 
-    const release = () => {
+    const releaseSorter = () => {
       console.log(`[TableSorter.sort] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}`);
       this._globalSortingFlag = false;
     };
 
     try {
       // CRITICAL: Always log to console to trace calls
-      console.log('🔍 [TableSorter.sort] FUNCTION CALLED', { 
-        tableType, 
+      console.log('🔍 [TableSorter.sort] FUNCTION CALLED', {
+        tableType,
         columnIndex,
         isRegistered: this.registry.isRegistered(tableType),
-        stackTrace: new Error().stack.split('\n').slice(0, 3).join('\n')
+        stackTrace: new Error().stack.split('\n').slice(0, 3).join('\n'),
       });
       const config = this.registry.getConfig(tableType);
       if (!config) {
         console.warn(`[TableSorter.sort] Table type "${tableType}" not registered`);
         // Log only if Logger is available, otherwise silent
         if (window.Logger) {
-          window.Logger.warn(`TableSorter.sort: Table type "${tableType}" not registered`, { page: "unified-table-system" });
+          window.Logger.warn(`TableSorter.sort: Table type "${tableType}" not registered`, { page: 'unified-table-system' });
         }
-        release();
+        releaseSorter();
         return null;
       }
 
       // קבלת נתונים
+      const sortOptions = typeof options === 'object' && options !== null ? { ...options } : {};
+      sortOptions.tableType = tableType;
+      sortOptions.columnIndex = columnIndex;
+
       let data = config.dataGetter();
       if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
         const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
@@ -216,84 +391,154 @@ class TableSorter {
       }
       if (!Array.isArray(data)) {
         if (window.Logger) {
-          window.Logger.warn(`TableSorter.sort: dataGetter for "${tableType}" did not return an array`, { page: "unified-table-system" });
+          window.Logger.warn(`TableSorter.sort: dataGetter for "${tableType}" did not return an array`, { page: 'unified-table-system' });
         }
-        release();
+        releaseSorter();
         return null;
       }
 
       if (data.length === 0) {
-        release();
+        releaseSorter();
         return [];
       }
 
       // שימוש ב-sortTableData הקיים
-      // CRITICAL: Temporarily disable event handlers during sort to prevent recursion
-      const originalUpdateFunction = config.updateFunction;
-      const safeUpdateFunction = (sortedData) => {
-        if (window._updateFunctionInProgress) {
-          console.warn(`[TableSorter.sort] updateFunction already in progress for ${tableType}, skipping`);
-          console.trace('[TableSorter.sort] Stack trace for updateFunction recursion');
-          return;
-        }
+      const { safeUpdateFunction, release: releaseUpdate } = TableSorter.prepareUpdateFunction(tableType, config);
 
-        window._updateFunctionInProgress = true;
-
-        const table = document.querySelector(config.tableSelector);
-        const sortableHeaders = table ? Array.from(table.querySelectorAll('.sortable-header')) : [];
-        sortableHeaders.forEach(header => {
-          header.style.pointerEvents = 'none';
-        });
-
-        const release = () => {
-          setTimeout(() => {
-            sortableHeaders.forEach(header => {
-              header.style.pointerEvents = '';
-            });
-            window._updateFunctionInProgress = false;
-          }, 150);
-        };
-
-        try {
-          console.log(`[TableSorter.sort] Calling updateFunction for ${tableType} with ${sortedData?.length || 0} items`);
-          const result = originalUpdateFunction(sortedData);
-
-          if (result && typeof result.then === 'function') {
-            return result.finally(release);
-          }
-
-          release();
-          return result;
-        } catch (error) {
-          console.error(`[TableSorter.sort] Error in updateFunction for ${tableType}:`, error);
-          release();
-          throw error;
-        }
-      };
-      
       if (typeof window.sortTableData === 'function') {
-        const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction);
+        const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction, sortOptions);
         if (sortResult && typeof sortResult.then === 'function') {
-          return sortResult.then(result => {
-            release();
-            return result;
-          }).catch(error => {
-            release();
-            throw error;
-          });
+          return sortResult
+            .finally(() => {
+              releaseUpdate();
+              releaseSorter();
+            })
+            .catch(error => {
+              throw error;
+            });
         }
-        release();
+        releaseUpdate();
+        releaseSorter();
         return sortResult;
       } else {
         if (window.Logger) {
-          window.Logger.error('TableSorter.sort: window.sortTableData not available', { page: "unified-table-system" });
+          window.Logger.error('TableSorter.sort: window.sortTableData not available', { page: 'unified-table-system' });
         }
         window._updateFunctionInProgress = false;
-        release();
+        releaseUpdate();
+        releaseSorter();
         return null;
       }
     } catch (error) {
-      release();
+      releaseSorter();
+      throw error;
+    }
+  }
+
+  sortByChain(tableType, sortChain = [], options = {}) {
+    if (!Array.isArray(sortChain) || sortChain.length === 0) {
+      return this.sort(tableType, options.fallbackColumnIndex ?? 0, options);
+    }
+
+    if (this._globalSortingFlag || window._sortTableDataInProgress) {
+      console.warn(`[TableSorter.sortByChain] Recursion guard: Sort already in progress, rejecting call for ${tableType}`);
+      console.trace('[TableSorter.sortByChain] Stack trace for rejected call');
+      return null;
+    }
+
+    console.log(`[TableSorter.sortByChain] Starting chained sort: tableType=${tableType}, chainLength=${sortChain.length}`);
+    this._globalSortingFlag = true;
+    window._sortTableDataInProgress = true;
+
+    const releaseSorter = () => {
+      console.log(`[TableSorter.sortByChain] Completed chained sort: tableType=${tableType}`);
+      this._globalSortingFlag = false;
+      window._sortTableDataInProgress = false;
+    };
+
+    try {
+      const config = this.registry.getConfig(tableType);
+      if (!config) {
+        releaseSorter();
+        return null;
+      }
+
+      let data = config.dataGetter();
+      if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
+        const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+        if (Array.isArray(registryData) && registryData.length > 0) {
+          data = registryData;
+        }
+      }
+
+      if (!Array.isArray(data)) {
+        releaseSorter();
+        return null;
+      }
+
+      if (data.length === 0) {
+        releaseSorter();
+        return [];
+      }
+
+      const { safeUpdateFunction, release: releaseUpdate } = TableSorter.prepareUpdateFunction(tableType, config);
+      const compareFn = typeof window.compareTableRows === 'function' ? window.compareTableRows : null;
+      const fallbackResolver = (row, colIndex) => {
+        if (window.tableMappings && typeof window.tableMappings.getColumnValue === 'function') {
+          return window.tableMappings.getColumnValue(row, colIndex, tableType);
+        }
+        return row;
+      };
+
+      const sortedData = [...data].sort((a, b) => {
+        for (const step of sortChain) {
+          if (typeof step !== 'object' || typeof step.columnIndex !== 'number') {
+            continue;
+          }
+          const stepDirection = step.direction === 'desc' ? 'desc' : 'asc';
+          if (compareFn) {
+            const comparison = compareFn(a, b, tableType, step.columnIndex, stepDirection);
+            if (comparison !== 0) {
+              return comparison;
+            }
+          } else {
+            // Fallback to basic string comparison if helper is unavailable
+            const aVal = fallbackResolver(a, step.columnIndex);
+            const bVal = fallbackResolver(b, step.columnIndex);
+            if (aVal < bVal) {
+              return stepDirection === 'asc' ? -1 : 1;
+            }
+            if (aVal > bVal) {
+              return stepDirection === 'asc' ? 1 : -1;
+            }
+          }
+        }
+        return 0;
+      });
+
+      const primary = sortChain[0];
+      if (typeof window.updateSortIcons === 'function' && primary) {
+        window.updateSortIcons(tableType, primary.columnIndex, primary.direction || 'asc');
+      }
+
+      if (options.saveState !== false && primary) {
+        this.saveSortState(tableType, primary.columnIndex, primary.direction || 'asc', { chain: sortChain });
+      }
+
+      const updateResult = safeUpdateFunction(sortedData);
+      const finalize = () => {
+        releaseUpdate();
+        releaseSorter();
+      };
+
+      if (updateResult && typeof updateResult.then === 'function') {
+        return updateResult.finally(finalize).then(() => sortedData);
+      }
+
+      finalize();
+      return sortedData;
+    } catch (error) {
+      releaseSorter();
       throw error;
     }
   }
@@ -316,9 +561,10 @@ class TableSorter {
    * @param {number} columnIndex - אינדקס העמודה
    * @param {string} direction - כיוון סידור ('asc' | 'desc')
    */
-  saveSortState(tableType, columnIndex, direction) {
+  saveSortState(tableType, columnIndex, direction, extras = {}) {
     if (typeof window.saveSortState === 'function') {
-      window.saveSortState(tableType, columnIndex, direction);
+      const options = typeof extras === 'object' && extras !== null ? extras : {};
+      window.saveSortState(tableType, columnIndex, direction, options);
     }
   }
 
@@ -337,8 +583,14 @@ class TableSorter {
       return null;
     }
 
+    const chain = Array.isArray(config.defaultSort)
+      ? config.defaultSort
+      : config.defaultSort
+        ? [config.defaultSort]
+        : [];
+
     // Check if table has defaultSort configuration
-    if (!config.defaultSort || typeof config.defaultSort !== 'object') {
+    if (chain.length === 0) {
       return null;
     }
 
@@ -352,25 +604,13 @@ class TableSorter {
         }
       } catch (err) {
         if (window.Logger) {
-          window.Logger.warn(`TableSorter.applyDefaultSort: Failed to check saved state for "${tableType}"`, err, { page: "unified-table-system" });
+          window.Logger.warn(`TableSorter.applyDefaultSort: Failed to check saved state for "${tableType}"`, err, { page: 'unified-table-system' });
         }
       }
     }
 
     // Apply default sort
-    const { columnIndex, direction } = config.defaultSort;
-    if (typeof columnIndex !== 'number' || columnIndex < 0) {
-      return null;
-    }
-
-    // Use the sort method with the default column and direction
-    // First, save the default sort state
-    if (window.saveSortState && typeof window.saveSortState === 'function') {
-      await window.saveSortState(tableType, columnIndex, direction);
-    }
-
-    // Then apply the sort
-    return this.sort(tableType, columnIndex);
+    return this.sortByChain(tableType, chain, { saveState: true });
   }
 }
 
@@ -378,7 +618,7 @@ class TableSorter {
 
 /**
  * TableRenderer - רינדור אחיד של טבלאות
- * 
+ *
  * אחראי על רינדור טבלאות בצורה אחידה
  * אינטגרציה עם FieldRendererService
  */
@@ -641,7 +881,7 @@ const SAFE_DATE_RANGE_HELPER = () => window.translateDateRangeToDates;
 
 function toArray(value) {
   if (Array.isArray(value)) {
-    return value.filter((item) => item !== undefined && item !== null);
+    return value.filter(item => item !== undefined && item !== null);
   }
   if (value === undefined || value === null) {
     return [];
@@ -651,7 +891,7 @@ function toArray(value) {
     if (!trimmed) {
       return [];
     }
-    return trimmed.split(',').map((part) => part.trim()).filter(Boolean);
+    return trimmed.split(',').map(part => part.trim()).filter(Boolean);
   }
   return [value];
 }
@@ -713,7 +953,7 @@ function flattenValue(value) {
     return '';
   }
   if (Array.isArray(value)) {
-    return value.map((item) => flattenValue(item)).join(' ');
+    return value.map(item => flattenValue(item)).join(' ');
   }
   if (typeof value === 'object') {
     if (value.value) {
@@ -723,7 +963,7 @@ function flattenValue(value) {
       return flattenValue(value.display);
     }
     return Object.values(value)
-      .map((v) => flattenValue(v))
+      .map(v => flattenValue(v))
       .join(' ');
   }
   return String(value);
@@ -873,7 +1113,7 @@ class TableFilter {
     const base = baseContext && typeof baseContext === 'object' ? baseContext : {};
     const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
 
-    const resolveValue = (keys) => {
+    const resolveValue = keys => {
       for (const key of keys) {
         if (hasOwn(contextInput, key)) {
           return contextInput[key];
@@ -887,9 +1127,9 @@ class TableFilter {
       return undefined;
     };
 
-    const statusRaw = toArray(resolveValue(['status', 'statuses'])).filter((item) => item !== undefined && item !== null);
-    const typeRaw = toArray(resolveValue(['type', 'types'])).filter((item) => item !== undefined && item !== null);
-    const accountRaw = toArray(resolveValue(['account', 'accounts'])).filter((item) => item !== undefined && item !== null);
+    const statusRaw = toArray(resolveValue(['status', 'statuses'])).filter(item => item !== undefined && item !== null);
+    const typeRaw = toArray(resolveValue(['type', 'types'])).filter(item => item !== undefined && item !== null);
+    const accountRaw = toArray(resolveValue(['account', 'accounts'])).filter(item => item !== undefined && item !== null);
 
     const searchValue = resolveValue(['search']);
     const searchRaw = typeof searchValue === 'string' ? searchValue.trim() : '';
@@ -902,7 +1142,7 @@ class TableFilter {
       const inputCustom = contextInput.custom && typeof contextInput.custom === 'object' ? contextInput.custom : {};
       const merged = { ...baseCustom, ...inputCustom };
 
-      Object.keys(merged).forEach((key) => {
+      Object.keys(merged).forEach(key => {
         const raw = merged[key];
         if (raw === undefined || raw === null) {
           delete merged[key];
@@ -911,7 +1151,7 @@ class TableFilter {
 
         if (Array.isArray(raw)) {
           const sanitized = raw
-            .filter((entry) => entry !== undefined && entry !== null && !ALL_KEYWORDS.has(normalizeText(entry)));
+            .filter(entry => entry !== undefined && entry !== null && !ALL_KEYWORDS.has(normalizeText(entry)));
           if (sanitized.length === 0) {
             delete merged[key];
           } else {
@@ -994,7 +1234,7 @@ class TableFilter {
     const englishValues = [];
     const universe = new Set(generalUniverse);
 
-    values.forEach((val) => {
+    values.forEach(val => {
       const normalized = this._reverseLookupValue(val, universe, translatorFactories);
       const normalizedKey = normalizeText(normalized);
       if (!ALL_KEYWORDS.has(normalizedKey) && normalizedKey) {
@@ -1006,7 +1246,7 @@ class TableFilter {
 
     const override = getTableOverride(tableType);
     if (override?.enumValues && Array.isArray(override.enumValues)) {
-      override.enumValues.forEach((val) => universe.add(val));
+      override.enumValues.forEach(val => universe.add(val));
     }
 
     return {
@@ -1020,7 +1260,7 @@ class TableFilter {
     const normalizedValues = [];
     const normalizedSet = new Set();
 
-    values.forEach((val) => {
+    values.forEach(val => {
       const str = String(val).trim();
       if (!str) {
         return;
@@ -1127,7 +1367,7 @@ class TableFilter {
       }
       if (Array.isArray(config.columns) && config.columns.length > 0) {
         const derived = config.columns
-          .map((column) => {
+          .map(column => {
             if (typeof column === 'string') {
               return column;
             }
@@ -1166,16 +1406,14 @@ class TableFilter {
 
     const filterConfig = this._resolveFilterConfig(tableType, config);
 
-    return dataArray.filter((item) => {
-      return (
-        this._matchesStatus(tableType, item, context.normalized, filterConfig) &&
+    return dataArray.filter(item =>
+      this._matchesStatus(tableType, item, context.normalized, filterConfig) &&
         this._matchesType(tableType, item, context.normalized, filterConfig) &&
         this._matchesAccount(item, context.normalized, filterConfig) &&
         this._matchesDateRange(item, context.normalized, filterConfig) &&
         this._matchesSearch(item, context.normalized, filterConfig) &&
-        this._matchesCustom(tableType, item, context, config)
-      );
-    });
+        this._matchesCustom(tableType, item, context, config),
+    );
   }
 
   _matchesStatus(tableType, item, normalized, filterConfig) {
@@ -1188,9 +1426,9 @@ class TableFilter {
       return false;
     }
 
-    const universe = new Set([...normalized.status.universe, ...candidates.map((value) => String(value))]);
+    const universe = new Set([...normalized.status.universe, ...candidates.map(value => String(value))]);
 
-    return candidates.some((candidate) => {
+    return candidates.some(candidate => {
       const englishValue = this._reverseLookupValue(candidate, universe, STATUS_TRANSLATORS);
       const key = normalizeText(englishValue);
       return key && normalized.status.set.has(key);
@@ -1207,9 +1445,9 @@ class TableFilter {
       return false;
     }
 
-    const universe = new Set([...normalized.type.universe, ...candidates.map((value) => String(value))]);
+    const universe = new Set([...normalized.type.universe, ...candidates.map(value => String(value))]);
 
-    return candidates.some((candidate) => {
+    return candidates.some(candidate => {
       const englishValue = this._reverseLookupValue(candidate, universe, TYPE_TRANSLATORS);
       const key = normalizeText(englishValue);
       return key && normalized.type.set.has(key);
@@ -1225,7 +1463,7 @@ class TableFilter {
     if (candidates.length === 0) {
       return false;
     }
-    return candidates.some((candidate) => normalized.account.set.has(normalizeText(candidate)));
+    return candidates.some(candidate => normalized.account.set.has(normalizeText(candidate)));
   }
 
   _matchesDateRange(item, normalized, filterConfig) {
@@ -1238,7 +1476,7 @@ class TableFilter {
     if (candidates.length === 0) {
       return false;
     }
-    return candidates.some((candidate) => {
+    return candidates.some(candidate => {
       const date = toDate(candidate);
       if (!date) {
         return false;
@@ -1258,7 +1496,7 @@ class TableFilter {
       return true;
     }
     const fields = filterConfig.searchFields && filterConfig.searchFields.length > 0 ? filterConfig.searchFields : FALLBACK_SEARCH_FIELDS;
-    return fields.some((field) => {
+    return fields.some(field => {
       const value = getValueByPath(item, field);
       if (value === undefined || value === null) {
         return false;
@@ -1329,14 +1567,14 @@ class TableFilter {
         return true;
       }
       const normalizedTargets = expected
-        .filter((entry) => entry !== undefined && entry !== null)
-        .map((entry) => normalizeText(entry))
+        .filter(entry => entry !== undefined && entry !== null)
+        .map(entry => normalizeText(entry))
         .filter(Boolean);
       if (normalizedTargets.length === 0) {
         return true;
       }
       const candidateArray = Array.isArray(candidate) ? candidate : [candidate];
-      return candidateArray.some((entry) => normalizedTargets.includes(normalizeText(entry)));
+      return candidateArray.some(entry => normalizedTargets.includes(normalizeText(entry)));
     }
 
     if (typeof expected === 'object') {
@@ -1353,7 +1591,7 @@ class TableFilter {
     }
 
     const candidateSet = new Set();
-    const register = (value) => {
+    const register = value => {
       const normalized = this._normalizeRelatedTypeKey(value);
       if (normalized && normalized !== 'all') {
         candidateSet.add(normalized);
@@ -1381,13 +1619,13 @@ class TableFilter {
       register(item.details.relatedType);
     }
 
-    return requiredTypes.some((required) => candidateSet.has(required));
+    return requiredTypes.some(required => candidateSet.has(required));
   }
 
   _normalizeRelatedTypeValues(rawValue) {
     const values = Array.isArray(rawValue) ? rawValue : [rawValue];
     const normalized = [];
-    values.forEach((value) => {
+    values.forEach(value => {
       const canonical = this._normalizeRelatedTypeKey(value);
       if (!canonical || canonical === 'all') {
         return;
@@ -1428,10 +1666,10 @@ class TableFilter {
 
   _extractFieldValues(item, fields) {
     const values = [];
-    fields.forEach((field) => {
+    fields.forEach(field => {
       const value = getValueByPath(item, field);
       if (Array.isArray(value)) {
-        value.forEach((entry) => {
+        value.forEach(entry => {
           if (entry !== undefined && entry !== null) {
             values.push(entry);
           }
@@ -1448,7 +1686,7 @@ class TableFilter {
 
 /**
  * TableStateManager - ניהול מצב מרכזי של טבלאות
- * 
+ *
  * אינטגרציה עם UnifiedCacheManager
  */
 class TableStateManager {
@@ -1469,7 +1707,7 @@ class TableStateManager {
     // שמירה רק דרך UnifiedCacheManager
     if (!window.UnifiedCacheManager) {
       if (window.Logger) {
-        window.Logger.warn(`TableStateManager.save: UnifiedCacheManager not available for "${tableType}"`, { page: "unified-table-system" });
+        window.Logger.warn(`TableStateManager.save: UnifiedCacheManager not available for "${tableType}"`, { page: 'unified-table-system' });
       }
       return;
     }
@@ -1479,11 +1717,11 @@ class TableStateManager {
       await window.UnifiedCacheManager.save(cacheKey, state, {
         layer: 'localStorage',
         ttl: null, // persistent
-        syncToBackend: false
+        syncToBackend: false,
       });
     } catch (err) {
       if (window.Logger) {
-        window.Logger.error(`TableStateManager.save: Cache save failed for "${tableType}"`, err, { page: "unified-table-system" });
+        window.Logger.error(`TableStateManager.save: Cache save failed for "${tableType}"`, err, { page: 'unified-table-system' });
       } else {
         console.error(`TableStateManager.save: Cache save failed for "${tableType}"`, err);
       }
@@ -1503,7 +1741,7 @@ class TableStateManager {
     // טעינה רק דרך UnifiedCacheManager
     if (!window.UnifiedCacheManager) {
       if (window.Logger) {
-        window.Logger.warn(`TableStateManager.load: UnifiedCacheManager not available for "${tableType}"`, { page: "unified-table-system" });
+        window.Logger.warn(`TableStateManager.load: UnifiedCacheManager not available for "${tableType}"`, { page: 'unified-table-system' });
       }
       return null;
     }
@@ -1511,12 +1749,12 @@ class TableStateManager {
     try {
       const cacheKey = `tableState_${tableType}`;
       const state = await window.UnifiedCacheManager.get(cacheKey, {
-        layer: 'localStorage'
+        layer: 'localStorage',
       });
       return state || null;
     } catch (err) {
       if (window.Logger) {
-        window.Logger.error(`TableStateManager.load: Cache load failed for "${tableType}"`, err, { page: "unified-table-system" });
+        window.Logger.error(`TableStateManager.load: Cache load failed for "${tableType}"`, err, { page: 'unified-table-system' });
       } else {
         console.error(`TableStateManager.load: Cache load failed for "${tableType}"`, err);
       }
@@ -1529,7 +1767,7 @@ class TableStateManager {
 
 /**
  * TableStyleManager - ניהול סגנונות מרכזי של טבלאות
- * 
+ *
  * ניהול רוחב עמודות דינמי
  * אינטגרציה עם CSS variables
  */
@@ -1579,7 +1817,7 @@ class TableStyleManager {
 
 /**
  * TableEventHandler - טיפול באירועים מרכזי של טבלאות
- * 
+ *
  * מחליף את event-handler-manager לטבלאות
  */
 class TableEventHandler {
@@ -1608,12 +1846,12 @@ class TableEventHandler {
     sortableHeaders.forEach((header, index) => {
       // הסרת onclick handlers קיימים
       header.removeAttribute('onclick');
-      
+
       // הוספת event listener חדש
-      header.addEventListener('click', (e) => {
+      header.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         // סידור לפי עמודה
         if (this.sorter) {
           this.sorter.sort(tableType, index);
@@ -1631,11 +1869,62 @@ class TableEventHandler {
   }
 }
 
+function tableSorterPrepareUpdateFunction(tableType, config) {
+  const originalUpdateFunction = config.updateFunction;
+  const table = document.querySelector(config.tableSelector);
+  const sortableHeaders = table ? Array.from(table.querySelectorAll('.sortable-header')) : [];
+
+  const setHeadersDisabled = isDisabled => {
+    sortableHeaders.forEach(header => {
+      header.style.pointerEvents = isDisabled ? 'none' : '';
+    });
+  };
+
+  const release = () => {
+    setTimeout(() => {
+      setHeadersDisabled(false);
+      window._updateFunctionInProgress = false;
+    }, 150);
+  };
+
+  const safeUpdateFunction = sortedData => {
+    if (window._updateFunctionInProgress) {
+      console.warn(`[TableSorter] updateFunction already in progress for ${tableType}, skipping`);
+      console.trace('[TableSorter] Stack trace for updateFunction recursion');
+      return null;
+    }
+
+    window._updateFunctionInProgress = true;
+    setHeadersDisabled(true);
+
+    try {
+      console.log(`[TableSorter] Calling updateFunction for ${tableType} with ${sortedData?.length || 0} items`);
+      const result = originalUpdateFunction(sortedData);
+
+      if (result && typeof result.then === 'function') {
+        return result.finally(release);
+      }
+
+      release();
+      return result;
+    } catch (error) {
+      console.error(`[TableSorter] Error in updateFunction for ${tableType}:`, error);
+      release();
+      throw error;
+    }
+  };
+
+  return { safeUpdateFunction, release };
+}
+
+TableSorter.prepareUpdateFunction = tableSorterPrepareUpdateFunction;
+TableSorter.prototype._prepareUpdateFunction = tableSorterPrepareUpdateFunction;
+
 // ===== UNIFIED TABLE SYSTEM =====
 
 /**
  * UnifiedTableSystem - מערכת טבלאות מרכזית מאוחדת
- * 
+ *
  * מאחדת את כל המנגנונים:
  * - TableRegistry - רישום טבלאות
  * - TableRenderer - רינדור
@@ -1661,7 +1950,7 @@ window.UnifiedTableSystem = (function() {
     filter,
     state: stateManager,
     styles: styleManager,
-    events: eventHandler
+    events: eventHandler,
   };
 })();
 
@@ -1699,7 +1988,7 @@ window.filterTable = function(tableType, filterType, value) {
 
 // System ready
 if (window.Logger) {
-  window.Logger.info('✅ UnifiedTableSystem loaded', { page: "unified-table-system" });
+  window.Logger.info('✅ UnifiedTableSystem loaded', { page: 'unified-table-system' });
 } else {
   console.log('✅ UnifiedTableSystem loaded');
 }

@@ -16,6 +16,7 @@
 3. **`UnifiedTableSystem.filter.apply`** resolves full dataset from `TableDataRegistry`, applies filters, saves `filteredData`, and returns the new array.
 4. **Pagination refresh** (`updateTableWithPagination` with `skipRegistry=true`) renders the appropriate slice and updates `TableDataRegistry.setPageData`.
 5. **Downstream subscribers** (InfoSummary, cards, widgets) call `TableDataRegistry.getFilteredData(tableType)` to recompute stats.
+6. **Sorting** (TableSorter) תמיד מושך את הנתונים מ־TableDataRegistry. ה־`updateFunction` של כל טבלה שמפעילה פאג׳ינציה חייב לקרוא חזרה ל־`sync<Table>Pagination` כדי להבטיח שהמיון ייושם על כלל הנתונים לפני חיתוכי העמודים.
 6. **State persistence**: `TableStateManager` + `UnifiedCacheManager` store active filters per table type.
 
 ### 2.2 Filter Context Contract

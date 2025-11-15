@@ -9,16 +9,14 @@
  * author TikTrack Development Team
  */
 
-const fs = require('fs');
-const path = require('path');
+const { loadPageTemplate } = require('../../utils/page-test-utils');
 
-function createPageTest(pageName, htmlFile) {
+function createPageTest(pageName, pageKey) {
     describe(`${pageName} Page E2E Tests`, () => {
         let htmlContent;
 
         beforeAll(() => {
-            const htmlPath = path.join(__dirname, `../../../trading-ui/${htmlFile}`);
-            htmlContent = fs.readFileSync(htmlPath, 'utf8');
+            htmlContent = loadPageTemplate(pageKey);
         });
 
         test(`should load ${pageName} page successfully`, () => {
@@ -46,10 +44,16 @@ function createPageTest(pageName, htmlFile) {
     });
 }
 
-createPageTest('Tickers', 'tickers.html');
-createPageTest('Trading Accounts', 'trading_accounts.html');
-createPageTest('Cash Flows', 'cash_flows.html');
-createPageTest('Notes', 'notes.html');
-createPageTest('Research', 'research.html');
-createPageTest('Database Display', 'db_display.html');
-createPageTest('Database Extra Data', 'db_extradata.html');
+const pages = [
+    { name: 'Tickers', key: 'tickers' },
+    { name: 'Trading Accounts', key: 'trading-accounts' },
+    { name: 'Cash Flows', key: 'cash-flows' },
+    { name: 'Notes', key: 'notes' },
+    { name: 'Research', key: 'research' },
+    { name: 'Database Display', key: 'db-display' },
+    { name: 'Database Extra Data', key: 'db-extradata' }
+];
+
+pages.forEach(({ name, key }) => {
+    createPageTest(name, key);
+});

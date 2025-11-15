@@ -37,6 +37,8 @@ class ModalManagerV2 {
         this.attachmentPreviewError = null;
         this.attachmentPreviewTitleEl = null;
         this.modalQueue = [];
+        this.globalBackdrop = null;
+        this.backdropClickHandler = this.handleGlobalBackdropClick.bind(this);
         
         this.init();
     }
@@ -1456,6 +1458,8 @@ class ModalManagerV2 {
             
             modalElement.dataset.modalMode = mode;
             modal.show();
+            this.bindDismissButtons(modalElement);
+            this.ensureGlobalBackdrop();
             
             if (mode === 'edit' && entityData) {
                 const entityId = entityData.id != null ? String(entityData.id) : '';
@@ -1909,6 +1913,10 @@ class ModalManagerV2 {
             
             // הצגת מודל במצב עריכה
             await this.showModal(modalId, 'edit', entityData);
+
+            const modalInfo = this.modals.get(modalId);
+            const modalElement = modalInfo?.element || document.getElementById(modalId);
+            await this._hydrateTagFieldsForModal(modalElement, entityType, entityId);
             
         } catch (error) {
             console.error(`Error showing edit modal for ${entityType} ${entityId}:`, error);
@@ -1940,6 +1948,49 @@ class ModalManagerV2 {
         } catch (error) {
             console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
             return null;
+        }
+    }
+
+    /**
+     * Hydrate tag select fields inside a modal after entity data loads.
+     * Ensures edit modals show the tags already linked to the entity.
+     * @private
+     */
+    async _hydrateTagFieldsForModal(modalElement, defaultEntityType, entityId) {
+        if (!modalElement || !window.TagUIManager) {
+            return;
+        }
+
+        const tagSelects = modalElement.querySelectorAll('select.tag-multi-select');
+        if (!tagSelects.length) {
+            return;
+        }
+
+        for (const select of tagSelects) {
+            const targetEntityType = select.dataset.tagEntity || defaultEntityType;
+            if (!targetEntityType || !select.id) {
+                continue;
+            }
+            if (entityId && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+                try {
+                    await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
+                        error,
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        entityId,
+                        page: 'modal-manager-v2'
+                    });
+                }
+            }
+            if (typeof window.TagUIManager.loadSuggestionsForSelect === 'function') {
+                const suggestionEntityId = entityId && targetEntityType === defaultEntityType ? entityId : null;
+                window.TagUIManager.loadSuggestionsForSelect(select, {
+                    entityType: targetEntityType,
+                    entityId: suggestionEntityId
+                });
+            }
         }
     }
     
@@ -2208,12 +2259,15 @@ class ModalManagerV2 {
                     const selectValue = value !== null && value !== undefined ? String(value) : '';
                     // Check if this is a dynamic select (Account, Currency, Ticker, TradePlan)
                     // Note: cashFlowAccount includes 'Account', so it will be detected
-                    const isDynamicSelect = field.id.includes('Ticker') || field.id.includes('Account') || 
-                                            field.id.includes('Currency') || field.id.includes('TradePlan') ||
-                                            field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' ||
-                                            field.id === 'executionAccount' || field.id === 'executionTicker' ||
-                                            field.id === 'tradeAccount' || field.id === 'tradeTicker' ||
-                                            field.id === 'tradePlanAccount' || field.id === 'tradePlanTicker';
+                    const isTagSelect = field.classList?.contains?.('tag-multi-select') || field.dataset?.tagEntity;
+                    const isDynamicSelect = !isTagSelect && (
+                        field.id.includes('Ticker') || field.id.includes('Account') || 
+                        field.id.includes('Currency') || field.id.includes('TradePlan') ||
+                        field.id === 'cashFlowAccount' || field.id === 'cashFlowCurrency' ||
+                        field.id === 'executionAccount' || field.id === 'executionTicker' ||
+                        field.id === 'tradeAccount' || field.id === 'tradeTicker' ||
+                        field.id === 'tradePlanAccount' || field.id === 'tradePlanTicker'
+                    );
                     
                     console.log(`🎯 Setting SELECT field ${field.id}:`, {
                         tryingToSet: selectValue,
@@ -2257,7 +2311,9 @@ class ModalManagerV2 {
                                 // Convert empty string to null for defaultValue (empty string means "no selection")
                                 const defaultValueForSelect = (selectValue === '' || selectValue === null || selectValue === undefined) ? null : selectValue;
                                 
-                                if (field.id === 'cashFlowAccount' || field.id.includes('Account') || field.id.includes('account')) {
+                                const isTagMultiSelect = field.classList?.contains?.('tag-multi-select');
+
+                                if (!isTagMultiSelect && (field.id === 'cashFlowAccount' || field.id.includes('Account') || field.id.includes('account'))) {
                                     console.log(`   Populating accounts select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
                                     await window.SelectPopulatorService.populateAccountsSelect(field, {
                                         includeEmpty: true,
@@ -4160,6 +4216,12 @@ class ModalManagerV2 {
         }
         
         try {
+            // Tag multi-select fields are handled by TagUIManager; skip auto population
+            if (select?.classList?.contains?.('tag-multi-select')) {
+                console.log(`⏭️ Skipping ${selectId} - Tag multi select handled by TagUIManager`);
+                return;
+            }
+
             // Check if field has options in config - if so, don't populate automatically
             let hasStaticOptions = false;
             if (fieldConfig && fieldConfig.options && Array.isArray(fieldConfig.options) && fieldConfig.options.length > 0) {
@@ -4222,7 +4284,7 @@ class ModalManagerV2 {
             else if (selectId.includes('Status') || selectId.includes('status')) {
                 console.log(`⏭️ Skipping ${selectId} - Status field with static options`);
             }
-            else if (selectId.includes('Account') || selectId.includes('account')) {
+                else if (!select.classList.contains('tag-multi-select') && (selectId.includes('Account') || selectId.includes('account'))) {
                 await window.SelectPopulatorService.populateAccountsSelect(select, {
                     defaultFromPreferences: shouldUseDefaultFromPrefs
                 });
@@ -4273,6 +4335,7 @@ class ModalManagerV2 {
                 window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
             }
         }
+        this._hydrateTagFieldsForModal(modalElement, modalElement.dataset.entityType || null, null);
         
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
@@ -4895,13 +4958,17 @@ class ModalManagerV2 {
         if (modalId === 'tradingAccountsModal') {
             const form = modalElement.querySelector('#tradingAccountsModalForm');
             const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+            const currencyField = modalElement.querySelector('#accountCurrency');
             
-            if (mode === 'edit') {
-                const currencyField = modalElement.querySelector('#accountCurrency');
-                if (currencyField) {
+            if (currencyField) {
+                if (mode === 'edit') {
                     currencyField.disabled = true;
                     currencyField.classList.add('form-control-disabled');
                     console.log(`✅ Disabled accountCurrency field in edit mode (initializeSpecialHandlers)`);
+                } else {
+                    currencyField.disabled = false;
+                    currencyField.classList.remove('form-control-disabled');
+                    console.log(`✅ Enabled accountCurrency field in add mode (initializeSpecialHandlers)`);
                 }
             }
         }
@@ -5038,6 +5105,8 @@ class ModalManagerV2 {
         if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
             window.registerModalNavigationClose(modalId);
         }
+
+        this.updateGlobalBackdropVisibility();
     }
 
     /**
@@ -5192,6 +5261,45 @@ class ModalManagerV2 {
         
         // יישום צבעים
         this.applyUserColors(modalElement, config.entityType);
+    }
+
+    bindDismissButtons(modalElement) {
+        if (!modalElement) {
+            return;
+        }
+
+        const dismissButtons = modalElement.querySelectorAll('[data-bs-dismiss="modal"]');
+        dismissButtons.forEach((button) => {
+            if (!button || button.dataset.modalDismissBound === 'true') {
+                return;
+            }
+
+            button.addEventListener('click', (event) => {
+                if (button.dataset && button.dataset.preventAutoClose === 'true') {
+                    return;
+                }
+
+                // אל תפריע לפעולות נוספות (למשל שמירה)
+                event.preventDefault();
+                event.stopPropagation();
+
+                const instance =
+                    bootstrap?.Modal?.getInstance(modalElement) ||
+                    bootstrap?.Modal?.getOrCreateInstance(modalElement, { backdrop: false, keyboard: true });
+
+                if (instance?.hide) {
+                    instance.hide();
+                } else {
+                    modalElement.classList.remove('show');
+                    modalElement.style.display = 'none';
+                    modalElement.setAttribute('aria-hidden', 'true');
+                    modalElement.removeAttribute('aria-modal');
+                    modalElement.dispatchEvent(new Event('hidden.bs.modal'));
+                }
+            });
+
+            button.dataset.modalDismissBound = 'true';
+        });
     }
 
     /**
@@ -5858,6 +5966,89 @@ class ModalManagerV2 {
         }
     }
 
+    ensureGlobalBackdrop() {
+        const activeCount = this._getActiveModalCount();
+        if (activeCount <= 0) {
+            this.updateGlobalBackdropVisibility();
+            return;
+        }
+
+        if (!this.globalBackdrop || !document.body.contains(this.globalBackdrop)) {
+            const existingBackdrop = document.getElementById('globalModalBackdrop');
+            if (existingBackdrop) {
+                this.globalBackdrop = existingBackdrop;
+            } else {
+                const backdrop = document.createElement('div');
+                backdrop.id = 'globalModalBackdrop';
+                backdrop.className = 'modal-backdrop fade global-modal-backdrop';
+                backdrop.addEventListener('click', this.backdropClickHandler, { passive: true });
+                document.body.appendChild(backdrop);
+                this.globalBackdrop = backdrop;
+            }
+        }
+
+        if (this.globalBackdrop) {
+            requestAnimationFrame(() => {
+                if (this.globalBackdrop) {
+                    this.globalBackdrop.classList.add('show');
+                }
+            });
+        }
+
+        document.body.classList.add('modal-open');
+        if (!document.body.style.overflow) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    updateGlobalBackdropVisibility() {
+        const activeCount = this._getActiveModalCount();
+        if (activeCount > 0) {
+            this.ensureGlobalBackdrop();
+            return;
+        }
+
+        if (this.globalBackdrop) {
+            const backdrop = this.globalBackdrop;
+            const removeBackdrop = () => {
+                backdrop.removeEventListener('transitionend', removeBackdrop);
+                if (backdrop.parentNode) {
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+                if (this.globalBackdrop === backdrop) {
+                    this.globalBackdrop = null;
+                }
+            };
+
+            backdrop.classList.remove('show');
+            backdrop.addEventListener('transitionend', removeBackdrop, { once: true });
+            setTimeout(removeBackdrop, 250);
+        }
+
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+    }
+
+    handleGlobalBackdropClick(event) {
+        if (!event || event.target !== this.globalBackdrop) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        this.closeActiveModal();
+    }
+
+    _getActiveModalCount() {
+        let count = 0;
+        this.modals.forEach((modalInfo) => {
+            if (modalInfo && modalInfo.isActive) {
+                count += 1;
+            }
+        });
+        return count;
+    }
+
     /**
      * Get modal info - קבלת מידע על מודל
      * 
@@ -5887,9 +6078,11 @@ class ModalManagerV2 {
                 const modal = bootstrap.Modal.getInstance(modalElement);
                 if (modal) {
                     modal.hide();
+                    return;
                 }
             }
         }
+        this.updateGlobalBackdropVisibility();
     }
 
     /**

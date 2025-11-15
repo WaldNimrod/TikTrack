@@ -40,7 +40,8 @@ function createCancelButtonHelper(container, itemType, itemId, status = 'open', 
                     onclick = `window.reactivateAlert && window.reactivateAlert(${itemId})`;
                     break;
                 case 'account':
-                    onclick = `window.reactivateAccount && window.reactivateAccount(${itemId})`;
+                case 'trading_account':
+                    onclick = `window.restoreTradingAccount && window.restoreTradingAccount(${itemId})`;
                     break;
                 case 'cash_flow':
                     onclick = `window.reactivateCashFlow && window.reactivateCashFlow(${itemId})`;
@@ -68,7 +69,8 @@ function createCancelButtonHelper(container, itemType, itemId, status = 'open', 
                     onclick = `window.cancelAlert && window.cancelAlert(${itemId})`;
                     break;
                 case 'account':
-                    onclick = `window.cancelAccount && window.cancelAccount(${itemId})`;
+                case 'trading_account':
+                    onclick = `window.cancelTradingAccountWithLinkedItemsCheck && window.cancelTradingAccountWithLinkedItemsCheck(${itemId})`;
                     break;
                 case 'cash_flow':
                     onclick = `window.cancelCashFlow && window.cancelCashFlow(${itemId})`;

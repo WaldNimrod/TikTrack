@@ -367,6 +367,18 @@ function updateSummaryStats() {
 // Export functions to global scope
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
+window.loadDatabaseInfo = async function loadDatabaseInfo() {
+  await loadAllTables();
+};
+
+if (typeof window.loadUserPreferences !== 'function') {
+  window.loadUserPreferences = async function loadUserPreferencesFallback(options = {}) {
+    if (window.PreferencesSystem?.initialize && !window.PreferencesSystem.initialized) {
+      await window.PreferencesSystem.initialize();
+    }
+    return window.PreferencesSystem?.getAllPreferences?.() || true;
+  };
+}
 
 
 // ===== INITIALIZATION =====

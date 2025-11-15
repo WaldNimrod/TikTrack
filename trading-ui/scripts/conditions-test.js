@@ -1592,6 +1592,34 @@ class ConditionsUIManager {
 let conditionsTestManager;
 let conditionsUIManager;
 
+// Expose manager constructor and loader to global scope for unified systems
+window.ConditionsTestManager = ConditionsTestManager;
+
+window.loadConditionsTest = async function loadConditionsTest() {
+  try {
+    if (!(window.conditionsTestManager instanceof ConditionsTestManager)) {
+      conditionsTestManager = new ConditionsTestManager();
+      window.conditionsTestManager = conditionsTestManager;
+    }
+
+    if (
+      window.conditionsTestManager &&
+      typeof window.conditionsTestManager.initialize === 'function' &&
+      !window.conditionsTestManager.initialized
+    ) {
+      await window.conditionsTestManager.initialize();
+    }
+
+    return window.conditionsTestManager;
+  } catch (error) {
+    window.Logger?.error('❌ Failed to load Conditions Test system', error, {
+      page: 'conditions-test',
+      source: 'loadConditionsTest',
+    });
+    throw error;
+  }
+};
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🔧 DOM Content Loaded, creating conditionsTestManager...');

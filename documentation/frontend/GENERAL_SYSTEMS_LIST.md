@@ -42,6 +42,7 @@
 | Info Summary System | `trading-ui/scripts/info-summary-system.js`<br>`trading-ui/scripts/services/statistics-calculator.js` | [INFO_SUMMARY_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/INFO_SUMMARY_SYSTEM.md) | חישובי KPI, תמיכה בסינונים, רינדור RTL |
 | Pagination System | `trading-ui/scripts/pagination-system.js` | [PAGINATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/PAGINATION_SYSTEM.md) | פאג’ינציה אחידה לטבלאות, תמיכה במצבי חיפוש |
 | Entity Details Modal | `trading-ui/scripts/entity-details-modal.js`<br>`trading-ui/scripts/entity-details-renderer.js`<br>`trading-ui/scripts/entity-details-api.js` | [entity-details-system/README.md](../features/entity-details-system/README.md) | מודל פרטי ישות מאוחד עם תמיכה ב-linked items והעדפות תצוגה |
+| Pending Trade Plan Widget | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט דשבורד להצעות שיוך/יצירה, כולל Prefill מודלים ועדכון מטמון מאוחד |
 
 ### 🔔 התראות, לוגים ומעקב
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
@@ -62,9 +63,8 @@
 ### 🧰 כלי פיתוח ומעקב איכות
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
-| Linter File Analysis Module | `trading-ui/scripts/linter-file-analysis.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | ניתוח קבצים, סריקת HTML/CSS/JS/Python והחזרת ממצאים ל-Dashboard |
-| Linter Testing System | `trading-ui/scripts/linter-testing-system.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | הרצת בדיקות זמינות, מדדי ביצועים וסטטוס מערכת |
-| Linter Export System | `trading-ui/scripts/linter-export-system.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | יצוא JSON/CSV, צילום snapshot של מצב המערכת |
+| Lint Status Service | `trading-ui/scripts/services/lint-status-service.js` | [LINTER_MONITOR_REBUILD_PLAN.md](../02-ARCHITECTURE/FRONTEND/LINTER_MONITOR_REBUILD_PLAN.md) | שליפת דוחות lint מאוחדים (ESLint/Stylelint/HTMLHint/Prettier) והמרתם למודל תצוגה |
+| Lint Monitor Dashboard | `trading-ui/scripts/linter-realtime-monitor.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | מוטמע בתוך `code-quality-dashboard.html`: מציג כרטיסי מצב, סטטוס כלי, סוגיות פעילות והיסטוריה |
 
 ### 🗄️ מערכות שהועברו לארכיון (לא בשימוש פעיל)
 | מערכת | מיקום ארכיון | הערה |

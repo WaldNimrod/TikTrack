@@ -5,6 +5,7 @@ from services.alert_service import AlertService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.tag_service import TagService
 import logging
 
 # Import base classes
@@ -125,6 +126,15 @@ def delete_alert(alert_id: int):
     """Delete alert"""
     try:
         db: Session = g.db
+        try:
+            TagService.remove_all_tags_for_entity(db, 'alert', alert_id)
+        except ValueError as tag_error:
+            logger.warning(
+                "Failed to remove tags for alert %s before deletion: %s",
+                alert_id,
+                tag_error,
+            )
+
         AlertService.delete(db, alert_id)
         normalizer = _get_date_normalizer()
         return jsonify({

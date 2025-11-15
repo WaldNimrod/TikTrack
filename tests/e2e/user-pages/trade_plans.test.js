@@ -9,15 +9,13 @@
  * @author TikTrack Development Team
  */
 
-const fs = require('fs');
-const path = require('path');
+const { loadPageTemplate } = require('../../utils/page-test-utils');
 
 describe('Trade Plans Page E2E Tests', () => {
     let htmlContent;
 
     beforeAll(() => {
-        const htmlPath = path.join(__dirname, '../../../trading-ui/trade_plans.html');
-        htmlContent = fs.readFileSync(htmlPath, 'utf8');
+        htmlContent = loadPageTemplate('trade-plans');
     });
 
     test('should load trade plans page successfully', () => {

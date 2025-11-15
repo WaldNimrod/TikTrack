@@ -70,6 +70,12 @@ Task-specific Execution → Database Storage & Reporting
    - תכולה: כותרת "טוען ומעבד נתונים", Progress Bar אנימטיבי (Bootstrap), לוגים קצרים בזמן אמת (Client + Server), הודעת ביטול (Disabled).
    - הממשק ננעל עד קבלת תשובה מהשרת או הודעת שגיאה, ומאפשר שקיפות לגבי זמן העיבוד (לרבות Multi-Task).
 
+### תנאי קדם: שיוך חשבון למס' חיצוני
+- לכל `trading_account` נוסף השדה `external_account_number` (ייחודי, Nullable). לפני כל פעולה (upload/analyze/preview/execute/refresh-preview) ה-`ImportOrchestrator` משווה בין המספר שבקובץ (נשלף מקטעי `account_reconciliation`) לבין המספר שבמערכת.
+- אם החשבון לא משויך או שהמספר שגוי, כל נקודות הקצה מחזירות תגובה עם `error_code: ACCOUNT_LINK_REQUIRED` ואובייקט `linking` שמפרט את הסטטוס (`unlinked`/`mismatch`/`missing_in_file`), מספר הקובץ, המספר השמור ומזהה הסשן.
+- Endpoint חדש: `POST /api/user-data-import/session/<id>/link-account` מעדכן את השדה בטבלת `trading_accounts` ומוודא שאין התנגשויות. ה-UI מציג מודל ייעודי (`accountLinkingModal`) שמופעל אוטומטית כאשר חוזרת השגיאה, ומאפשר למשתמש ללחוץ על "שייך חשבון למערכת".
+- בממשק בחירת התהליך, "בדיקת שיוך חשבון" (account_reconciliation) מופיעה ראשונה ונבחרת כברירת מחדל כדי לעודד הפעלה לפני יבואי Executions/Cashflows.
+
 3. **שלב 3**: ניתוח קובץ (Task-specific)
    - קריאה ל-`/api/user-data-import/upload`
    - פרמטר חובה חדש: `import_task` (`executions`/`cashflows`/`account_reconciliation`)
@@ -80,14 +86,14 @@ Task-specific Execution → Database Storage & Reporting
    - קריאה ל-`/api/user-data-import/session/{id}/preview` לקבלת נתוני הניתוח
    - הצגת בעיות בממשק אינטראקטיבי מפורט (ספציפי לסוג התהליך):
      - **טיקרים חסרים**: כרטיסים עם כפתור "הוסף טיקר"
-     - **כפילויות בקובץ**: כרטיסים עם כפתורי "קבל"/"דחה"
+    - **כפילויות בקובץ**: כל רשומה ב-`within_file_duplicates` מקבלת `record_index` ייחודי; ה-UI מציג שורה ראשית + שורות match מקוננות (מ-`within_file_duplicate_match`) עם ויזואליזציה של הזוגות, וכפתורי "קבל"/"דחה" מופעלים דרך Button System (`data-onclick="acceptDuplicate"`/`"rejectDuplicate"`) כך שכל פעולה מעדכנת את אותה רשומה ב-skip list.
      - **רשומות קיימות**: כרטיסים עם כפתורי "קבל"/"דחה"
      - **תזרימי מזומנים**: חשבונות חסרים, סוג תזרים לא ידוע, חוסר התאמת מטבע ⇒ כפתורי "שייך חשבון", "תקן מטבע"
      - **בדיקת חשבון**: בסיס מטבע לא תואם, חשבונות חסרי הרשאות, מסמכים חסרים ⇒ כפתורי "סמן כטופל", "פתח משימה"
    - כל כרטיס מציג פרטים מלאים: סמל, פעולה, כמות, מחיר, תאריך, עמלה
    - confidence scores לכפילויות עם אינדיקטור ויזואלי
    - ממשק להוספת טיקרים חדשים עם מודל Bootstrap
-   - רענון אוטומטי של התצוגה לאחר פעולות המשתמש
+    - רענון אוטומטי של התצוגה לאחר פעולות המשתמש (עבור כפילויות: באמצעות `POST /session/<id>/refresh-preview` שמחזיר Snapshot מעודכן ולא מריץ ניתוח מחדש). אם מופעלת חסימת שיוך, מודל השיוך נפתח מתוך אותו זרם פעולה.
 
 5. **שלב 4**: תצוגה מקדימה
    - קריאה ל-`/api/user-data-import/session/{id}/preview`
@@ -323,6 +329,8 @@ class BaseImportConnector(ABC):
    - `cashflow_issues_by_type` ו-`currency_issues` לצורך הצגת כרטיסי התראה בשלב 2.
    - `account_reconciliation_flags` עבור תסריטי בדיקת חשבון.
 
+> **עדכון נובמבר 2025:** ה-Orchestrator מפעיל `_upgrade_preview_data_structure()` כדי להבטיח שלכל `record_to_skip` יש `record_index` לפני שמירת preview ב-cache, ו-`get_preview_snapshot()` מחזיר את ה-preview העדכני מה-cache עבור `refresh-preview`, כך שפעולות `acceptDuplicate`/`rejectDuplicate` נשמרות בין רענונים.
+
 ## ממשק משתמש - שלב 2: ניתוח וסטטיסטיקות
 
 - כרטיסי KPI כלליים (סה״כ, תקינות, שגיאות, כפילויות) מעודכנים לפי סוג התהליך.
@@ -379,25 +387,16 @@ class BaseImportConnector(ABC):
 ```html
 המודל להוספת טיקר איננו קוד מקומי – הוא משתמש במערכת המכלול של **ModalManagerV2** עם הקונפיגורציה הכללית `tickersModal`. הקריאה מתבצעת דרך `showModalSafe('tickersModal', 'add')`, ערכי ברירת המחדל מתמלאים אוטומטית (סמל, שם, סוג, מטבע) והפעולה נשענת על `saveTicker` של מודול הטיקרים הכללי. לאחר שמירה מוצלחת, `CRUDResponseHandler` סוגר את המודל והייבוא מרענן את ה-Preview מחדש.
 
-### פונקציות JavaScript
+### פונקציות JavaScript (נובמבר 2025)
 
-#### `displayProblemResolutionDetailed(data)`
-מציג את כל הבעיות בממשק מפורט עם כרטיסים אינטראקטיביים.
-
-#### `renderMissingTickerCard(ticker)`
-יוצר כרטיס לטיקר חסר עם כפתור "הוסף טיקר".
-
-#### `renderDuplicateCard(duplicate, type, index)`
-יוצר כרטיס לכפילות/רשומה קיימת עם כפתורי "קבל"/"דחה".
-
-#### `acceptDuplicate(index, type)`
-מקבל כפילות ומעדכן את התצוגה.
-
-#### `rejectDuplicate(index, type)`
-דוחה כפילות ומעדכן את התצוגה.
-
-#### `prepareDataTypeSelection(results)`
-מבצע איתור של סוגי נתונים בקובץ ומציג למשתמש את רשימת התהליכים (זמינים ופלייסהולדרים). נשען על `detectAvailableDataTypes` ומעדכן את ממשק שלב 2.
+- **`displayProblemResolutionDetailed(data)`** – מפעיל את כל אזורי הבעיות ומשתמש ב-`problemResolutionState` כדי להציג מצבים ביניים ללא הבהובים.
+- **`displayWithinFileDuplicates(duplicates)`** – מפעיל `deduplicateDuplicateRecords()` לפני הרנדור כדי להבטיח הצגה חד-חד ערכית לכל `record_index`, ומחבר את ה-matches (אם קיימים) לשורה הראשית.
+- **`renderDuplicateRow(duplicate)`** – מייצר שורת טבלה ראשית ושורות match בהתאם לסוג (`within_file_duplicate` מול `within_file_duplicate_match`), כולל הצגת הערות, confidence, ושימוש ב-Button System ליצירת הכפתורים.
+- **`initializeButtonsForProblemTable(tbody)`** – מפעיל `window.ButtonSystem.processButtons(tbody)` בתוך `requestAnimationFrame` כדי להבטיח שהכפתורים נטענים רק אחרי שה-DOM הוצמד בפועל (מונע אזהרות Skipping Button).
+- **`getPreviewRecordIndex(recordOrWrapper)`** – יחידת המרה ייעודית שמחלצת את ה-`record_index` מכל מבנה Preview (רשומה ראשית או match). אין להשתמש בלוגיקה אחרת לניתוח מזהי רשומות.
+- **`deduplicateDuplicateRecords(records)`** – מסננת `within_file_duplicate_match` כאשר כבר קיימת רשומת `within_file_duplicate` לזהה זהה, ומצמידה את רשימת ה-matches ל-duplicate הראשי.
+- **`acceptDuplicate(recordIndex, duplicateType)` / `rejectDuplicate(recordIndex, duplicateType)`** – נרשמות דרך `data-onclick`, שולחות את ה-payload ל-API ומקפיצות התראות דרך Notification System. לאחר תשובה מוצלחת הן קוראות ל-`refreshPreviewData()`.
+- **`refreshPreviewData()`** – שולחת `POST /api/user-data-import/session/<id>/refresh-preview`, מעדכנת את `previewData` מתוך snapshot השרת ומרעננת את הטבלאות בהתאם, תוך שמירה על ה-state המקומי עד להשלמת הרענון.
 
 #### `confirmSelectedDataType()`
 מאשר את סוג הייבוא שנבחר. אם התהליך זמין – ממשיך לשלב התצוגה המקדימה; אחרת מציג לאדמין הודעת פלייסהולדר ומפנה למסמך האפיון הרלוונטי.
@@ -598,6 +597,14 @@ await window.UnifiedCacheManager.delete('import_analysis_results');
 
 **טבלה 2**: רשומות שדולגו
 - עמודות: טיקר, צד, כמות, מחיר, עמלה, תאריך, סיבה, פרטים
+
+## שלב 2 – הרחבת מודול חשבון (תכנון)
+- השיוך הקשיח ל-`external_account_number` הוא בסיס לשלב הבא: העתקת נתוני Account Reconciliation (מטבע בסיס, סטטוס מרג'ין, הרשאות, מסמכים חסרים, אליאסים וערכי תקציר) מתוך `summary_data` לטבלת החשבונות עצמה או לטבלת satellite ייעודית.
+- שמירת הנתונים ברמת החשבון תאפשר:
+  - הצגת סטטוס חשבון עדכני בדשבורדים גם אחרי שהסשן נסגר.
+  - סנכרון עתידי מול Broker API (במקום קבצי CSV) תוך שימוש באותו מנגנון זיהוי חשבון.
+  - טריגרים אוטומטיים לאזהרות (לדוגמה: שינוי מטבע בסיס, מסמך שחסר יותר מ-X ימים).
+- ה-API החדש (`link-account`) והמודל ב-UI כבר מניחים את קיומו של מזהה חד-ערכי, ולכן תוספת השדות החדשים תהיה backwards compatible ותדרוש בעיקר מיגרציה של המידע הקיים מתוך סשנים היסטוריים.
 
 ## שדות חשובים
 

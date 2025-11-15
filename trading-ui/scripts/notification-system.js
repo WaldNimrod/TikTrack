@@ -1066,8 +1066,44 @@ async function showDetailsModal(title, content, options = {}) {
   // כפתור העתקה
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
   if (copyButton) {
-    copyButton.addEventListener('click', () => {
-      copyToClipboard(textContent, title);
+    copyButton.type = 'button';
+    copyButton.addEventListener('click', event => {
+      event?.preventDefault();
+      if (typeof window.copyToClipboard === 'function') {
+        window.copyToClipboard(textContent, title);
+        return;
+      }
+      if (typeof copyToClipboard === 'function') {
+        copyToClipboard(textContent, title);
+        return;
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textContent);
+          if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('התוכן הועתק ללוח בהצלחה', title || 'העתקה');
+          }
+        } else {
+          const fallback = document.createElement('textarea');
+          fallback.value = textContent;
+          fallback.style.position = 'fixed';
+          fallback.style.opacity = '0';
+          document.body.appendChild(fallback);
+          fallback.select();
+          document.execCommand('copy');
+          document.body.removeChild(fallback);
+          if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('התוכן הועתק ללוח בהצלחה', title || 'העתקה');
+          }
+        }
+      } catch (error) {
+        window.Logger?.error('[NotificationSystem] Failed to copy modal content:', error, {
+          page: 'notification-system',
+        });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה בהעתקת התוכן', error.message);
+        }
+      }
     });
   }
   

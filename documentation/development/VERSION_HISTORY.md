@@ -31,3 +31,24 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-12T20:40:00+00:00 | 1.0.21.0 | 1.0.20.0 | pending | 1bc839c5054387eac5dc6e7584b7758ee8fd60e5 | patch | Legacy duplicate cleanup (import modal & linter) + docs update |
 | 2025-11-12T22:49:10+00:00 | 1.0.22.0 | 1.0.21.0 | 0952f7612900529373f545ad12b163b2a09b489f | pending | patch | Refine data import warning layout |
 | 2025-11-12T22:59:09+00:00 | 1.0.23.0 | 1.0.22.0 | be867cf327ed507677ede7e586b10e4f64221acc | 0952f7612900529373f545ad12b163b2a09b489f | patch | Fix data import navigation and dates |
+| 2025-11-13T12:45:00+00:00 | 1.0.24.0 | 1.0.23.0 | pending | be867cf327ed507677ede7e586b10e4f64221acc | patch | Duplicate cleanup stage 4 QA + Jest multi-project release package |
+| 2025-11-14T13:48:39+00:00 | 1.0.25.0 | 1.0.24.0 | a79537f7a21b7f45f1f5e75e502f869b842855ed | pending | patch | Align trade data services and fix preferences version endpoint |
+| 2025-11-14T13:53:10+00:00 | 1.0.26.0 | 1.0.25.0 | 00f790d4813722288f09f1de9a83dd6341248d04 | a79537f7a21b7f45f1f5e75e502f869b842855ed | patch | Allow Unicode tag slugs and expose tag action buttons |
+| 2025-11-14T15:16:34+00:00 | 1.0.27.0 | 1.0.26.0 | c9db737ab323aff110cd2e48556f7c9cb1f3288c | 00f790d4813722288f09f1de9a83dd6341248d04 | patch | Sync backlog prior to user pages standardization |
+| 2025-11-14T15:44:30+00:00 | 1.0.28.0 | 1.0.27.0 | 8d726d218811effd64f826fb9604850a06f5d5eb | c9db737ab323aff110cd2e48556f7c9cb1f3288c | patch | Document tagging flow and hydrate edit modals |
+| 2025-11-14T15:57:17+00:00 | 1.0.29.0 | 1.0.28.0 | 725df6113ad1ded45b0f99e80ff3f92593c7ac4f | 8d726d218811effd64f826fb9604850a06f5d5eb | patch | Documented data import duplicate handling improvements |
+| 2025-11-14T20:43:54+00:00 | 1.0.30.0 | 1.0.29.0 | a0a0f3de4f8ea14c5c9b4efb0776f7c444b01c18 | 725df6113ad1ded45b0f99e80ff3f92593c7ac4f | patch | Lint monitor UX improvements |
+| 2025-11-14T20:46:53+00:00 | 1.0.31.0 | 1.0.30.0 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | a0a0f3de4f8ea14c5c9b4efb0776f7c444b01c18 | patch | Sync local updates before release |
+| 2025-11-14T21:32:09+00:00 | 1.0.32.0 | 1.0.31.0 | 45e298f030000987077cbdde4cbe92111ecf5fd2 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | patch | Home tag widgets and smart suggestions |
+| 2025-11-14T22:18:29+00:00 | 1.0.33.0 | 1.0.32.0 | f7fd7213d0f16d60b4a9892540633a8e30fb41bc | 45e298f030000987077cbdde4cbe92111ecf5fd2 | patch | Polish tag widgets styling |
+| 2025-11-14T22:31:18+00:00 | 1.0.34.0 | 1.0.33.0 | 25696b0a38eb895c5eaf5f7e0f4ad73d24c36010 | f7fd7213d0f16d60b4a9892540633a8e30fb41bc | patch | Document conditions improvements and RTL buttons |
+| 2025-11-14T22:34:53+00:00 | 1.0.35.0 | 1.0.34.0 | a6e7aa81f22dcc7d1bae7d6f6127265ba8441d6c | 25696b0a38eb895c5eaf5f7e0f4ad73d24c36010 | patch | Load tag UI manager on trading accounts page |
+| 2025-11-14T22:49:03+00:00 | 1.0.36.0 | 1.0.35.0 | 2e5e573a16d3b722e4a80c93ba3f36819f1b5ba5 | a6e7aa81f22dcc7d1bae7d6f6127265ba8441d6c | patch | Limit rate limiter middleware to API routes |
+| 2025-11-14T22:51:27+00:00 | 1.0.37.0 | 1.0.36.0 | 0d5f54c8d41e340b2105b04a094442ec6f8701f5 | 2e5e573a16d3b722e4a80c93ba3f36819f1b5ba5 | patch | Sync workspace changes for production release |
+| 2025-11-14T22:53:46+00:00 | 1.1.1.0 | 1.0.37.0 | 87cdd25fd639298da485550f8bd5ee10917c034d | 0d5f54c8d41e340b2105b04a094442ec6f8701f5 | set | Align development baseline to production 1.1.1 |
+| 2025-11-14T22:59:13+00:00 | 1.1.2.0 | 1.1.1.0 | 9b60c5da8d26e01e95376d60f95c2e9dc9efc739 | 87cdd25fd639298da485550f8bd5ee10917c034d | patch | Force trading accounts reload after CRUD |
+| 2025-11-14T23:06:17+00:00 | 1.1.1.0 | 1.1.2.0 | d837de8977cd58d04d1d97a2a9cfe19dad3000c0 | 9b60c5da8d26e01e95376d60f95c2e9dc9efc739 | set | Align dev build with account reconciliation checkpoint |
+| 2025-11-15T00:01:23+00:00 | 1.1.1.1 | 1.1.1.0 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | d837de8977cd58d04d1d97a2a9cfe19dad3000c0 | build | Portfolio/tax import tasks |
+| 2025-11-15T00:26:24+00:00 | 1.1.1.2 | 1.1.1.1 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | build | Portfolio/tax import tests |
+| 2025-11-15T00:49:42+00:00 | 1.1.2.0 | 1.1.1.2 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | patch | Fix tooltip loading and regenerate script sections |
+| 2025-11-15T01:04:58+00:00 | 1.1.3.0 | 1.1.2.0 | e0e1c6c17b0485efedfce5ca609aef9216b15025 | 2c7cb8cd23d931a560ce175caba3307dae18e406 | patch | Align table sorting/pagination pipeline |

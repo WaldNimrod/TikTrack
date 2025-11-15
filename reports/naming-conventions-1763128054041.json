@@ -1,0 +1,261 @@
+{
+  "timestamp": "2025-11-14T13:47:34.010Z",
+  "pages": [
+    {
+      "file": "index.js",
+      "total": 6,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "class",
+          "name": "from",
+          "rule": "PascalCase",
+          "message": "Class \"from\" should be PascalCase (e.g., MyClass)"
+        },
+        {
+          "type": "class",
+          "name": "to",
+          "rule": "PascalCase",
+          "message": "Class \"to\" should be PascalCase (e.g., MyClass)"
+        }
+      ]
+    },
+    {
+      "file": "trades.js",
+      "total": 5,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "function",
+          "name": "_REMOVED_generateDetailedLogForTrades",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_generateDetailedLogForTrades\" should be camelCase (e.g., myFunction)"
+        }
+      ]
+    },
+    {
+      "file": "executions.js",
+      "total": 7,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "function",
+          "name": "_REMOVED_fillEditExecutionForm",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_fillEditExecutionForm\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_updateExecutionWrapper",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_updateExecutionWrapper\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "variable",
+          "name": "FieldRenderer",
+          "rule": "camelCase",
+          "message": "Variable \"FieldRenderer\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "alerts.js",
+      "total": 7,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "function",
+          "name": "updatePageSummaryStats_LEGACY",
+          "rule": "camelCase",
+          "message": "Function \"updatePageSummaryStats_LEGACY\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_populateEditRelatedObjects",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_populateEditRelatedObjects\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_toggleAlert",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_toggleAlert\" should be camelCase (e.g., myFunction)"
+        }
+      ]
+    },
+    {
+      "file": "trade_plans.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "cash_flows.js",
+      "total": 8,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "function",
+          "name": "_REMOVED_loadCashFlows",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_loadCashFlows\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_loadTradesForCashFlow",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_loadTradesForCashFlow\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_loadTradePlansForCashFlow",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_loadTradePlansForCashFlow\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_generateDetailedLogForCashFlows",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_generateDetailedLogForCashFlows\" should be camelCase (e.g., myFunction)"
+        }
+      ]
+    },
+    {
+      "file": "notes.js",
+      "total": 7,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "function",
+          "name": "_REMOVED_validateEditNoteForm",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_validateEditNoteForm\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "variable",
+          "name": "related_type_id",
+          "rule": "camelCase",
+          "message": "Variable \"related_type_id\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "related_id",
+          "rule": "camelCase",
+          "message": "Variable \"related_id\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "research.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "tickers.js",
+      "total": 7,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "function",
+          "name": "_REMOVED_viewTickerDetailsOld",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_viewTickerDetailsOld\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "function",
+          "name": "_REMOVED_refreshTickerData",
+          "rule": "camelCase",
+          "message": "Function \"_REMOVED_refreshTickerData\" should be camelCase (e.g., myFunction)"
+        },
+        {
+          "type": "variable",
+          "name": "currency_id",
+          "rule": "camelCase",
+          "message": "Variable \"currency_id\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "trading_accounts.js",
+      "total": 12,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accountsSection",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accountsSection\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "database.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "preferences-page.js",
+      "total": 5,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "PreferenceTypesAudit",
+          "rule": "camelCase",
+          "message": "Variable \"PreferenceTypesAudit\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 76,
+    "compliant": 48,
+    "violations": 28
+  },
+  "generatedAt": "2025-11-14T13:47:34.041Z",
+  "version": "1.0.0"
+}

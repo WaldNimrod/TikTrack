@@ -1,18 +1,18 @@
 /**
  * Page State Manager - TikTrack
  * ==============================
- * 
+ *
  * מנהל מצב מרכזי לכל עמודי המערכת
- * 
+ *
  * תכונות:
  * - שמירה/טעינה של מצב מלא לעמוד: filters, sort, sections, entityFilters
  * - שימוש רק ב-UnifiedCacheManager
  * - מפתחות cache: pageState_${pageName}
  * - API פשוט: savePageState(pageName, state), loadPageState(pageName)
- * 
+ *
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_CACHE_SYSTEM.md
- * 
+ *
  * Author: TikTrack Development Team
  * Version: 1.0.0
  * Last Updated: 2025-01-27
@@ -20,7 +20,7 @@
 
 /**
  * PageStateManager - מנהל מצב מרכזי לעמודים
- * 
+ *
  * מנהל את כל מצב העמודים:
  * - filters - מצב פילטרים ראשיים
  * - sort - מצב סידור טבלאות
@@ -39,7 +39,7 @@ class PageStateManager {
   async initialize() {
     if (!window.UnifiedCacheManager) {
       if (window.Logger) {
-        window.Logger.warn('PageStateManager: UnifiedCacheManager not available', { page: "page-state-manager" });
+        window.Logger.warn('PageStateManager: UnifiedCacheManager not available', { page: 'page-state-manager' });
       }
       return false;
     }
@@ -69,21 +69,21 @@ class PageStateManager {
 
     if (!window.UnifiedCacheManager) {
       if (window.Logger) {
-        window.Logger.warn(`PageStateManager.savePageState: UnifiedCacheManager not available for "${pageName}"`, { page: "page-state-manager" });
+        window.Logger.warn(`PageStateManager.savePageState: UnifiedCacheManager not available for "${pageName}"`, { page: 'page-state-manager' });
       }
       return false;
     }
 
     if (!pageName || typeof pageName !== 'string') {
       if (window.Logger) {
-        window.Logger.error('PageStateManager.savePageState: pageName must be a non-empty string', { page: "page-state-manager" });
+        window.Logger.error('PageStateManager.savePageState: pageName must be a non-empty string', { page: 'page-state-manager' });
       }
       return false;
     }
 
     if (!state || typeof state !== 'object') {
       if (window.Logger) {
-        window.Logger.error('PageStateManager.savePageState: state must be an object', { page: "page-state-manager" });
+        window.Logger.error('PageStateManager.savePageState: state must be an object', { page: 'page-state-manager' });
       }
       return false;
     }
@@ -95,23 +95,23 @@ class PageStateManager {
         sort: state.sort || null,
         sections: state.sections || {},
         entityFilters: state.entityFilters || {},
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       await window.UnifiedCacheManager.save(cacheKey, fullState, {
         layer: 'localStorage',
         ttl: null, // persistent
-        syncToBackend: false
+        syncToBackend: false,
       });
 
       if (window.Logger) {
-        window.Logger.debug(`PageStateManager.savePageState: Saved state for "${pageName}"`, { page: "page-state-manager" });
+        window.Logger.debug(`PageStateManager.savePageState: Saved state for "${pageName}"`, { page: 'page-state-manager' });
       }
 
       return true;
     } catch (err) {
       if (window.Logger) {
-        window.Logger.error(`PageStateManager.savePageState: Failed to save state for "${pageName}"`, err, { page: "page-state-manager" });
+        window.Logger.error(`PageStateManager.savePageState: Failed to save state for "${pageName}"`, err, { page: 'page-state-manager' });
       }
       return false;
     }
@@ -129,14 +129,14 @@ class PageStateManager {
 
     if (!window.UnifiedCacheManager) {
       if (window.Logger) {
-        window.Logger.warn(`PageStateManager.loadPageState: UnifiedCacheManager not available for "${pageName}"`, { page: "page-state-manager" });
+        window.Logger.warn(`PageStateManager.loadPageState: UnifiedCacheManager not available for "${pageName}"`, { page: 'page-state-manager' });
       }
       return null;
     }
 
     if (!pageName || typeof pageName !== 'string') {
       if (window.Logger) {
-        window.Logger.error('PageStateManager.loadPageState: pageName must be a non-empty string', { page: "page-state-manager" });
+        window.Logger.error('PageStateManager.loadPageState: pageName must be a non-empty string', { page: 'page-state-manager' });
       }
       return null;
     }
@@ -144,12 +144,12 @@ class PageStateManager {
     try {
       const cacheKey = `pageState_${pageName}`;
       const state = await window.UnifiedCacheManager.get(cacheKey, {
-        layer: 'localStorage'
+        layer: 'localStorage',
       });
 
       if (state && typeof state === 'object') {
         if (window.Logger) {
-          window.Logger.debug(`PageStateManager.loadPageState: Loaded state for "${pageName}"`, { page: "page-state-manager" });
+          window.Logger.debug(`PageStateManager.loadPageState: Loaded state for "${pageName}"`, { page: 'page-state-manager' });
         }
         return state;
       }
@@ -157,7 +157,7 @@ class PageStateManager {
       return null;
     } catch (err) {
       if (window.Logger) {
-        window.Logger.error(`PageStateManager.loadPageState: Failed to load state for "${pageName}"`, err, { page: "page-state-manager" });
+        window.Logger.error(`PageStateManager.loadPageState: Failed to load state for "${pageName}"`, err, { page: 'page-state-manager' });
       }
       return null;
     }
@@ -173,7 +173,7 @@ class PageStateManager {
     const currentState = await this.loadPageState(pageName) || {};
     return await this.savePageState(pageName, {
       ...currentState,
-      filters: filters
+      filters,
     });
   }
 
@@ -185,9 +185,35 @@ class PageStateManager {
    */
   async saveSort(pageName, sort) {
     const currentState = await this.loadPageState(pageName) || {};
+
+    if (!sort || typeof sort !== 'object') {
+      return await this.savePageState(pageName, {
+        ...currentState,
+        sort,
+      });
+    }
+
+    const currentSortState =
+      currentState.sort && typeof currentState.sort === 'object' && !Array.isArray(currentState.sort)
+        ? { ...currentState.sort }
+        : {};
+
+    if (Array.isArray(sort)) {
+      currentSortState.__legacy = sort;
+    } else if (sort.tableType) {
+      currentSortState[sort.tableType] = {
+        columnIndex: sort.columnIndex ?? -1,
+        direction: sort.direction || 'asc',
+        chain: Array.isArray(sort.chain) ? sort.chain : null,
+        timestamp: Date.now(),
+      };
+    } else {
+      currentSortState.__legacy = sort;
+    }
+
     return await this.savePageState(pageName, {
       ...currentState,
-      sort: sort
+      sort: currentSortState,
     });
   }
 
@@ -201,7 +227,7 @@ class PageStateManager {
     const currentState = await this.loadPageState(pageName) || {};
     return await this.savePageState(pageName, {
       ...currentState,
-      sections: sections
+      sections,
     });
   }
 
@@ -215,7 +241,7 @@ class PageStateManager {
     const currentState = await this.loadPageState(pageName) || {};
     return await this.savePageState(pageName, {
       ...currentState,
-      entityFilters: entityFilters
+      entityFilters,
     });
   }
 
@@ -234,9 +260,21 @@ class PageStateManager {
    * @param {string} pageName - שם העמוד
    * @returns {Promise<Object|null>} מצב סידור או null אם לא נמצא
    */
-  async loadSort(pageName) {
+  async loadSort(pageName, tableType = null) {
     const pageState = await this.loadPageState(pageName);
-    return pageState && pageState.sort ? pageState.sort : null;
+    if (!pageState || !pageState.sort) {
+      return null;
+    }
+
+    const sortState = pageState.sort;
+    if (tableType) {
+      if (sortState[tableType]) {
+        return sortState[tableType];
+      }
+      return null;
+    }
+
+    return sortState;
   }
 
   /**
@@ -285,7 +323,7 @@ class PageStateManager {
         sort: null,
         sections: {},
         entityFilters: {},
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       // מיגרציה של פילטרים ראשיים
@@ -297,7 +335,7 @@ class PageStateManager {
         }
       } catch (e) {
         if (window.Logger) {
-          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate headerFilters for "${pageName}"`, e, { page: "page-state-manager" });
+          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate headerFilters for "${pageName}"`, e, { page: 'page-state-manager' });
         }
       }
 
@@ -310,13 +348,13 @@ class PageStateManager {
           if (parsedSort.columnIndex !== undefined && parsedSort.direction) {
             migratedState.sort = {
               columnIndex: parsedSort.columnIndex,
-              direction: parsedSort.direction
+              direction: parsedSort.direction,
             };
           }
         }
       } catch (e) {
         if (window.Logger) {
-          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate sort state for "${pageName}"`, e, { page: "page-state-manager" });
+          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate sort state for "${pageName}"`, e, { page: 'page-state-manager' });
         }
       }
 
@@ -333,7 +371,7 @@ class PageStateManager {
         });
       } catch (e) {
         if (window.Logger) {
-          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate sections for "${pageName}"`, e, { page: "page-state-manager" });
+          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate sections for "${pageName}"`, e, { page: 'page-state-manager' });
         }
       }
 
@@ -352,17 +390,17 @@ class PageStateManager {
         }
       } catch (e) {
         if (window.Logger) {
-          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate entity filters for "${pageName}"`, e, { page: "page-state-manager" });
+          window.Logger.warn(`PageStateManager.migrateLegacyData: Failed to migrate entity filters for "${pageName}"`, e, { page: 'page-state-manager' });
         }
       }
 
       // שמירת המצב המיגרציה רק אם יש נתונים למיגרציה
-      if (migratedState.filters || migratedState.sort || 
-          Object.keys(migratedState.sections).length > 0 || 
+      if (migratedState.filters || migratedState.sort ||
+          Object.keys(migratedState.sections).length > 0 ||
           Object.keys(migratedState.entityFilters).length > 0) {
         await this.savePageState(pageName, migratedState);
         if (window.Logger) {
-          window.Logger.info(`PageStateManager.migrateLegacyData: Migrated legacy data for "${pageName}"`, { page: "page-state-manager" });
+          window.Logger.info(`PageStateManager.migrateLegacyData: Migrated legacy data for "${pageName}"`, { page: 'page-state-manager' });
         }
         return true;
       }
@@ -370,7 +408,7 @@ class PageStateManager {
       return false;
     } catch (err) {
       if (window.Logger) {
-        window.Logger.error(`PageStateManager.migrateLegacyData: Failed to migrate data for "${pageName}"`, err, { page: "page-state-manager" });
+        window.Logger.error(`PageStateManager.migrateLegacyData: Failed to migrate data for "${pageName}"`, err, { page: 'page-state-manager' });
       }
       return false;
     }
@@ -389,12 +427,12 @@ class PageStateManager {
     try {
       const cacheKey = `pageState_${pageName}`;
       await window.UnifiedCacheManager.remove(cacheKey, {
-        layer: 'localStorage'
+        layer: 'localStorage',
       });
       return true;
     } catch (err) {
       if (window.Logger) {
-        window.Logger.error(`PageStateManager.clearPageState: Failed to clear state for "${pageName}"`, err, { page: "page-state-manager" });
+        window.Logger.error(`PageStateManager.clearPageState: Failed to clear state for "${pageName}"`, err, { page: 'page-state-manager' });
       }
       return false;
     }
@@ -411,7 +449,7 @@ class PageStateManager {
     if (!state || typeof state !== 'object' || !Array.isArray(state.stack)) {
       window.Logger?.warn('PageStateManager.saveModalNavigationState: invalid state payload', {
         state,
-        page: 'page-state-manager'
+        page: 'page-state-manager',
       });
       return false;
     }
@@ -437,29 +475,29 @@ class PageStateManager {
         pageName: entry.pageName || pageName,
         parentModalId: entry.parentModalId ?? null,
         openedAt: entry.openedAt || Date.now(),
-        metadata: entry.metadata || {}
+        metadata: entry.metadata || {},
       })),
       activeModalId: state.activeModalId ?? null,
       pageName,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     try {
       await window.UnifiedCacheManager.save(cacheKey, payload, {
         layer: 'localStorage',
         ttl: null,
-        syncToBackend: false
+        syncToBackend: false,
       });
       window.Logger?.debug('PageStateManager.saveModalNavigationState: state saved', {
         pageName,
         stackLength: payload.stack.length,
-        page: 'page-state-manager'
+        page: 'page-state-manager',
       });
       return true;
     } catch (error) {
       window.Logger?.error('PageStateManager.saveModalNavigationState: failed to persist state', error, {
         cacheKey,
-        page: 'page-state-manager'
+        page: 'page-state-manager',
       });
       return false;
     }
@@ -485,7 +523,7 @@ class PageStateManager {
 
     try {
       const state = await window.UnifiedCacheManager.get(cacheKey, {
-        layer: 'localStorage'
+        layer: 'localStorage',
       });
 
       if (!state || typeof state !== 'object') {
@@ -496,12 +534,12 @@ class PageStateManager {
         stack: Array.isArray(state.stack) ? state.stack : [],
         activeModalId: state.activeModalId ?? null,
         pageName: state.pageName || pageName,
-        timestamp: state.timestamp || null
+        timestamp: state.timestamp || null,
       };
     } catch (error) {
       window.Logger?.error('PageStateManager.loadModalNavigationState: failed to load state', error, {
         cacheKey,
-        page: 'page-state-manager'
+        page: 'page-state-manager',
       });
       return null;
     }
@@ -523,17 +561,17 @@ class PageStateManager {
 
     try {
       await window.UnifiedCacheManager.remove(cacheKey, {
-        layer: 'localStorage'
+        layer: 'localStorage',
       });
       window.Logger?.debug('PageStateManager.clearModalNavigationState: cleared', {
         pageName,
-        page: 'page-state-manager'
+        page: 'page-state-manager',
       });
       return true;
     } catch (error) {
       window.Logger?.error('PageStateManager.clearModalNavigationState: failed to clear state', error, {
         cacheKey,
-        page: 'page-state-manager'
+        page: 'page-state-manager',
       });
       return false;
     }

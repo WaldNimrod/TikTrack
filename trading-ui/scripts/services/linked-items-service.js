@@ -209,7 +209,8 @@ class LinkedItemsService {
             'alert': '#ffc107',
             'cash_flow': '#6c757d',
             'position': '#0d6efd',
-            'note': '#343a40'
+            'note': '#343a40',
+            'tag': '#26baac'
         };
         
         return defaultColors[entityType] || '#6c757d';
@@ -240,7 +241,8 @@ class LinkedItemsService {
             'alert': 'התראה',
             'cash_flow': 'תזרים מזומנים',
             'position': 'פוזיציה',
-            'note': 'הערה'
+            'note': 'הערה',
+            'tag': 'תגית'
         };
         
         return labels[entityType] || entityType;
@@ -452,7 +454,7 @@ class LinkedItemsService {
             const reactivateFunctions = {
                 'trade': `window.reactivateTrade(${id})`,
                 'trade_plan': `window.reactivateTradePlan(${id})`,
-                'trading_account': `window.reactivateAccount(${id})`,
+                'trading_account': `window.restoreTradingAccount(${id})`,
                 'alert': `window.reactivateAlert(${id})`
             };
             return reactivateFunctions[type] || null;
@@ -461,7 +463,7 @@ class LinkedItemsService {
             const cancelFunctions = {
                 'trade': `cancelTradeRecord('${id}')`,
                 'trade_plan': `window.openCancelTradePlanModal(${id})`,
-                'trading_account': `window.cancelAccount(${id})`,
+                'trading_account': `window.cancelTradingAccountWithLinkedItemsCheck(${id})`,
                 'alert': `window.cancelAlert(${id})`
             };
             return cancelFunctions[type] || null;

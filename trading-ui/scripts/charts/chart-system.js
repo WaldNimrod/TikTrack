@@ -122,7 +122,7 @@ class ChartSystem {
                     chartData = adapter.formatData(rawData);
                 } catch (error) {
                     console.warn(`⚠️ Adapter '${config.adapter}' failed:`, error);
-                    // Use fallback data
+                    throw error;
                 }
             } else {
                 console.warn(`⚠️ Adapter '${config.adapter}' not found`);

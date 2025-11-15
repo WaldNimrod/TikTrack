@@ -9,22 +9,24 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 | Layer | Path | Notes |
 | --- | --- | --- |
 | Backend Models | `Backend/models/tag_category.py`, `tag.py`, `tag_link.py` | SQLAlchemy models with docstrings & indexes |
-| Backend Service | `Backend/services/tag_service.py` | Business logic, validation and analytics |
-| API | `Backend/routes/api/tags.py` | REST endpoints based on `BaseEntityAPI` |
-| Frontend Services | `trading-ui/scripts/services/tag-service.js`, `tag-ui-manager.js`, `tag-events.js` | Fetch, caching, UI orchestration |
-| UI | `trading-ui/tag-management.html`, `scripts/tag-management.js`, `scripts/modal-configs/tag*.js` | Management page & modals |
-| Entity Integrations | `trading-ui/scripts/{entity}.js` | Each of 8 entities includes tag picker + display |
-| Tests | `tests/backend/test_tag_service.py`, `tests/unit/tag-service.test.js` | Automated suites |
+| Backend Service | `Backend/services/tag_service.py` | Business logic, validation, analytics, Unicode-safe slugging |
+| API | `Backend/routes/api/tags.py` | REST endpoints + `/usage` handler |
+| Frontend Services | `trading-ui/scripts/services/tag-service.js`, `tag-ui-manager.js`, `tag-events.js` | Fetch, caching, modal hydration, analytics events |
+| UI | `trading-ui/tag-management.html`, `scripts/tag-management-page.js`, `scripts/modal-configs/tag*.js` | Management page & modals (PageTemplateGenerator driven) |
+| Entity Integrations | `trading-ui/scripts/{entity}.js` | Each of 8 entities wiring picker + `TagService.replaceEntityTags` |
+| Tooling | `scripts/tagging/monitor_tag_links.py` | SQLite inspector for live assignment debugging |
+| Tests | `Backend/tests/test_services/test_tag_service.py`, `tests/unit/tag-service.test.js`, `tests/e2e/crud-full-flow.test.js` | Automated suites |
 
 ---
 
 ## 3. Development Workflow
 1. **Create/Update Models:** add fields, maintain indexes; run `alembic revision --autogenerate`.
 2. **Service Logic:** extend `TagService` (keep public API documented via docstrings).
-3. **API Changes:** update endpoint schema & ensure compatibility with `CRUDResponseHandler`.
-4. **Frontend Sync:** adjust tag-service.js & UI components to match API payloads.
-5. **Docs Update:** refresh Specification and Migration Guide if the change affects schema or workflow.
-6. **Tests:** run backend + frontend suites; add new cases mirroring bug fixes.
+3. **API Changes:** update endpoint schema & ensure compatibility with `CRUDResponseHandler` plus `/usage` contract.
+4. **Frontend Sync:** adjust `tag-service.js`, `tag-ui-manager.js`, ModalManagerV2 hooks, and entity scripts to match payloads.
+5. **Docs Update:** refresh Specification, Developer Guide (this file) and Migration Guide when schema or flow changes.
+6. **Tests:** run backend + frontend suites; add new cases mirroring bug fixes (unit + JSDOM integration).
+7. **Verify in UI:** load `tag-management.html` (PageTemplateGenerator output) and exercise the relevant CRUD flow; confirm modals hydrate existing tags.
 
 ---
 
@@ -38,28 +40,50 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 5. Integration Points
-- **Cache Invalidation:** call `TagService.invalidate_entity(entityType, entityId)` after assignment changes.
-- **PageStateManager:** persist tag filters per page via `saveFilters` / `loadFilters`.
-- **Analytics:** update `StatisticsCalculator` consumers to include tag metrics when introducing new dashboards.
-- **Linked Items:** use `LinkedItemsService.decorateWithTags` to enrich modal content.
+- **CRUD Modals:**  
+  1. Add a field with `type: 'select'`, `id: '<entityName>Tags'`, `class: tag-multi-select`, and `data-tag-entity="<entity_type>"`.  
+  2. Extend `DataCollectionService.collectFormData` map with `{ id: '<entityName>Tags', type: 'tags' }`.  
+  3. After the main save (`create/update`), call `TagService.replaceEntityTags(entityType, entityId, tagIds)` and await it before reloading tables.  
+  4. No manual hydration is needed—ModalManagerV2 automatically invokes `TagUIManager.hydrateSelectForEntity` when opening in edit mode.
+- **EntityDetails Modal:** consume `tag_assignments` via `FieldRendererService.renderTagBadges` to keep display consistent.
+- **Linked Items & Analytics:** `TagManagementPage.showTagUsage` + `LinkedItemsService` use the `/usage` endpoint; any new widget should rely on `TagService.getTagUsage` / `getAnalytics`.
+- **Cache Invalidation:** ensure `replaceEntityTags`/`removeTagFromEntity` responses reach the caller; they already clear entity/tag caches. Avoid custom cache calls.
+- **Debugging:** run `python3 scripts/tagging/monitor_tag_links.py --entity <type> --entity-id <id>` to inspect DB state when QA reports mismatched assignments.
+
+- **Home Tag Cloud (`index.html` / `tag-search-controller.js`):**  
+  - Fetch via `TagService.getTagCloudData()` (`/api/tags/cloud`).  
+  - Font tiers use existing Bootstrap utilities; colors originate from category metadata.  
+  - Clicking a tag auto-fills the Quick Search input and fires the drawer.
+- **Quick Tag Search Drawer:**  
+  - Powered by `TagSearchController` + modal config `modal-configs/tag-search-config.js`.  
+  - Uses `TagService.searchTags(options)` (`/api/tags/search`).  
+  - Drawer hydrates entity names asynchronously via `entityDetailsAPI`, renders actions with `LinkedItemsService` helpers, and debounces input at 250 ms.
+- **Smart Suggestions in Modals:**  
+  - `ModalManagerV2._hydrateTagFieldsForModal` invokes `TagService.getSmartSuggestions(entityType, entityId)` and passes payload to `TagUIManager.loadSuggestionsForSelect`.  
+  - Suggestion chips sit under every `tag-multi-select`, include “Apply” + “Apply All” actions, and update badge view immediately.  
+  - Suggestions cached per entity for 60 seconds and invalidated automatically after successful save/replacement.
+*** End Patch
+- **Backend Support:** ensure `TagService` exposes helpers: `get_tag_cloud_data`, `search_tags`, `get_smart_suggestions`. All must enforce user scope and reuse the slug normalization helpers added in 2025-11.
 
 ---
 
 ## 6. Testing Guidelines
-- **Backend:** `pytest tests/backend/test_tag_service.py -q` plus entity-specific tests.
-- **Frontend:** `npm run test -- tag-service` (unit) and `npm run test:integration -- tagging`.
-- **Accessibility:** execute `npm run test:a11y -- tag-management` to verify ARIA, focus handling, contrast.
-- **Smoke:** after deployment, run `scripts/tagging/smoke_test.py` (creates sample tags, assigns to trade, verifies retrieval).
+- **Backend:** `pytest Backend/tests/test_services/test_tag_service.py -q` (slug + cleanup + usage) and any affected route tests.
+- **Frontend Unit:** `npm run test -- --runTestsByPath tests/unit/tag-service.test.js`.
+- **Frontend Integration:** `npm run test -- --runTestsByPath tests/e2e/crud-full-flow.test.js` (covers modal hydration + TagUIManager wiring).
+- **Accessibility:** `npm run test:a11y -- tag-management`.
+- **Manual Smoke:** in dev server, create a tag, assign it via a modal, and confirm it appears in EntityDetails + `monitor_tag_links.py`.
 
 ---
 
 ## 7. Troubleshooting
 | Symptom | Likely Cause | Resolution |
 | --- | --- | --- |
-| Tags don’t persist after save | Cache not invalidated | Ensure CRUD handler calls TagService.invalidate and `load*Data` bypass cache |
-| Duplicate tag names allowed | Validation rule missing | Re-run migrations; check `ValidationService` registration |
-| Tag picker empty | `tag-service.js` caching stale | Clear cache (`window.clearCacheQuick()`), confirm API responds |
-| 500 error on assignment | Entity/user mismatch | Verify request payload includes correct user_id context |
+| Tags don’t persist after save | `replaceEntityTags` not awaited / `tag_ids` not removed before POST | Await the promise, delete `tag_ids` from payload before hitting entity endpoint |
+| Tag picker empty | `TagUIManager.ensureTags` using stale cache | Call `TagUIManager.refreshSelectOptions(select)` or clear cache via cache menu |
+| Edit modal missing existing tags | ModalManagerV2 hook missing | Ensure you are on latest `modal-manager-v2.js`; `_hydrateTagFieldsForModal` must run after `showEditModal` |
+| “Tag already exists” for Unicode name | Legacy slug generator | Confirm `_slugify` changes deployed; slugs now allow Unicode + punycode fallback |
+| `monitor_tag_links.py` shows no rows | Wrong entity_type casing | Use API entity type (`trade_plan`, `cash_flow`, etc.), not table name |
 
 ---
 
@@ -68,11 +92,14 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 - Tag recommendation engine leveraging usage analytics.
 - Export/import tags per user profile.
 - Tag-based automation triggers (e.g., alert generation).
+- Inline tag creation inside CRUD modals (pending UX approval).
 
 ---
 
 Maintained by: TikTrack Engineering  
-Last Updated: November 2025
+Last Updated: November 2025 (post-modal hydration update)
+
+
 
 
 

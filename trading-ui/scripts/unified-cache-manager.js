@@ -119,6 +119,8 @@ const CACHE_DEPENDENCIES = {
     // Account Level  
     'accounts-data': ['user-preferences'],
     'account-{id}': ['accounts-data'],
+    'trading-accounts-data': ['user-preferences'],
+    'trading-account-{id}': ['trading-accounts-data'],
     
     // Trading Level
     'trades-data': ['accounts-data'],
@@ -148,6 +150,8 @@ const TTL_POLICIES = {
     'user-profile': 'long',          // 24 hours
     'accounts-data': 'medium',       // 30 minutes
     'account-{id}': 'medium',        // 30 minutes
+    'trading-accounts-data': 'medium',
+    'trading-account-{id}': 'medium',
     'trades-data': 'short',          // 5 minutes
     'trade-{id}': 'short',           // 5 minutes
     'executions-data': 'short',      // 5 minutes
@@ -207,6 +211,10 @@ class UnifiedCacheManager {
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'alerts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['accounts-data'] },
             'alert-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['alerts-data'] },
+            'trading-accounts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['user-preferences'] },
+            'trading-account-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['trading-accounts-data'] },
+            'executions-data': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['accounts-data'] },
+            'execution-{id}': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['executions-data'] },
             'trade-data': { layer: 'backend', ttl: 30000, compress: false },
             'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
             'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },

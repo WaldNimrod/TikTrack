@@ -23,82 +23,79 @@ class ConditionsValidator {
         this.validationRules = {
             // Method validation rules
             methods: {
-                'moving_average': {
-                    required: ['period', 'threshold'],
-                    optional: ['timeframe'],
+                'moving_averages': {
+                    required: ['ma_period', 'ma_type', 'comparison_type'],
+                    optional: [],
                     types: {
-                        period: 'number',
-                        threshold: 'number',
-                        timeframe: 'string'
+                        ma_period: 'number',
+                        ma_type: 'string',
+                        comparison_type: 'string'
                     },
                     ranges: {
-                        period: { min: 1, max: 200 },
-                        threshold: { min: 0.1, max: 10 }
+                        ma_period: { min: 1, max: 200 }
                     }
                 },
-                'rsi': {
-                    required: ['period', 'overbought', 'oversold'],
-                    optional: ['timeframe'],
+                'volume_analysis': {
+                    required: ['volume_period', 'volume_multiplier', 'comparison_type'],
+                    optional: [],
                     types: {
-                        period: 'number',
-                        overbought: 'number',
-                        oversold: 'number',
-                        timeframe: 'string'
+                        volume_period: 'number',
+                        volume_multiplier: 'number',
+                        comparison_type: 'string'
                     },
                     ranges: {
-                        period: { min: 2, max: 100 },
-                        overbought: { min: 70, max: 100 },
-                        oversold: { min: 0, max: 30 }
+                        volume_period: { min: 5, max: 200 },
+                        volume_multiplier: { min: 0.1, max: 10 }
                     }
                 },
-                'support_resistance': {
-                    required: ['strength', 'touches'],
-                    optional: ['timeframe'],
+                'support_and_resistance': {
+                    required: ['level_price', 'level_type', 'tolerance_pct', 'comparison_type'],
+                    optional: [],
                     types: {
-                        strength: 'number',
-                        touches: 'number',
-                        timeframe: 'string'
+                        level_price: 'number',
+                        level_type: 'string',
+                        tolerance_pct: 'number',
+                        comparison_type: 'string'
                     },
                     ranges: {
-                        strength: { min: 1, max: 10 },
-                        touches: { min: 2, max: 10 }
+                        tolerance_pct: { min: 0.1, max: 10 }
                     }
                 },
                 'trend_lines': {
-                    required: ['sensitivity', 'timeframe'],
-                    optional: ['min_touches'],
+                    required: ['trend_type', 'lookback_period', 'comparison_type'],
+                    optional: ['tolerance_pct'],
                     types: {
-                        sensitivity: 'number',
-                        timeframe: 'string',
-                        min_touches: 'number'
+                        trend_type: 'string',
+                        lookback_period: 'number',
+                        comparison_type: 'string',
+                        tolerance_pct: 'number'
                     },
                     ranges: {
-                        sensitivity: { min: 0.1, max: 1 },
-                        min_touches: { min: 2, max: 10 }
+                        lookback_period: { min: 10, max: 200 },
+                        tolerance_pct: { min: 0.5, max: 10 }
                     }
                 },
                 'technical_patterns': {
-                    required: ['pattern_type', 'confidence'],
-                    optional: ['timeframe'],
+                    required: ['pattern_type', 'lookback_period'],
+                    optional: [],
                     types: {
                         pattern_type: 'string',
-                        confidence: 'number',
-                        timeframe: 'string'
+                        lookback_period: 'number'
                     },
                     ranges: {
-                        confidence: { min: 0.1, max: 1 }
+                        lookback_period: { min: 10, max: 200 }
                     }
                 },
-                'fibonacci': {
-                    required: ['level', 'timeframe'],
-                    optional: ['sensitivity'],
+                'fibonacci_retracement': {
+                    required: ['lookback_period', 'comparison_type'],
+                    optional: ['fib_type'],
                     types: {
-                        level: 'string',
-                        timeframe: 'string',
-                        sensitivity: 'number'
+                        lookback_period: 'number',
+                        comparison_type: 'string',
+                        fib_type: 'string'
                     },
                     ranges: {
-                        sensitivity: { min: 0.1, max: 1 }
+                        lookback_period: { min: 10, max: 200 }
                     }
                 }
             },
@@ -339,12 +336,12 @@ class ConditionsValidator {
         }
         
         const legacyMapping = {
-            1: 'moving_average',
-            2: 'rsi',
-            3: 'support_resistance',
+            1: 'moving_averages',
+            2: 'volume_analysis',
+            3: 'support_and_resistance',
             4: 'trend_lines',
             5: 'technical_patterns',
-            6: 'fibonacci'
+            6: 'fibonacci_retracement'
         };
         
         const numericId = parseInt(methodId, 10);

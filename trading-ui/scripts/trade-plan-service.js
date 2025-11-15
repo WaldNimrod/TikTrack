@@ -57,48 +57,23 @@ let isDataLoaded = false;
  */
 async function loadTradePlansData() {
   try {
-    // Loading trade plans data from server...
+    const loader = window.TradePlansData?.loadTradePlansData;
+    const data = typeof loader === 'function'
+      ? await loader()
+      : [];
 
-    // Use relative URL to work with both development (8080) and production (5001)
-    const url = '/api/trade-plans/';
+    tradePlansData = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+        ? data.data
+        : [];
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-
-    if (!responseData.data) {
-      // Server response does not contain data field
-      tradePlansData = [];
-      isDataLoaded = true;
-      return [];
-    }
-
-    if (!Array.isArray(responseData.data)) {
-      // Server data is not an array
-      tradePlansData = [];
-      isDataLoaded = true;
-      return [];
-    }
-
-    tradePlansData = responseData.data;
     isDataLoaded = true;
-
-    // Loaded ${tradePlansData.length} trade plans
     return tradePlansData;
-
-  } catch {
-    // Error loading trade plans data
-
-    // Use demo data as fallback
-    tradePlansData = getDemoTradePlansData();
-    isDataLoaded = true;
-
-    // Using demo data: ${tradePlansData.length} trade plans
-    return tradePlansData;
+  } catch (error) {
+    isDataLoaded = false;
+    window.Logger?.error('❌ Failed to load trade plans data', error, { page: 'trade_plan_service' });
+    throw error;
   }
 }
 
@@ -304,51 +279,6 @@ function filterTradePlans(filters = {}) {
   return filteredData;
 }
 
-/**
- * נתוני דמו לתכניות מסחר
- */
-/**
- * Get demo trade plans data
- * @function getDemoTradePlansData
- * @returns {Array} Array of demo trade plans
- */
-function getDemoTradePlansData() {
-  return [
-    {
-      id: 1,
-      ticker_id: 1,
-      account_id: 1,
-      investment_type: 'stock',
-      status: 'open',
-      entry_conditions: 'מחיר מתחת ל-50$',
-      reasons: 'חברה יציבה עם פוטנציאל צמיחה',
-      created_at: '2025-08-01T10:00:00Z',
-      updated_at: '2025-08-01T10:00:00Z',
-      ticker: {
-        id: 1,
-        symbol: 'AAPL',
-        name: 'Apple Inc.',
-      },
-    },
-    {
-      id: 2,
-      ticker_id: 2,
-      account_id: 1,
-      investment_type: 'stock',
-      status: 'closed',
-      entry_conditions: 'מחיר מעל 100$',
-      reasons: 'חברה טכנולוגית עם ביצועים טובים',
-      created_at: '2025-07-15T14:30:00Z',
-      updated_at: '2025-08-15T16:45:00Z',
-      ticker: {
-        id: 2,
-        symbol: 'GOOGL',
-        name: 'Alphabet Inc.',
-      },
-    },
-  ];
-}
-
 // ===== Global Exports =====
 
 // Main service object
@@ -380,7 +310,6 @@ window.getTradePlansByAccount = getTradePlansByAccount;
 window.getTradePlansByTicker = getTradePlansByTicker;
 window.searchTradePlans = searchTradePlans;
 window.filterTradePlans = filterTradePlans;
-window.getDemoTradePlansData = getDemoTradePlansData;
 
 // Data access for backward compatibility
 Object.defineProperty(window, 'tradePlansData', {

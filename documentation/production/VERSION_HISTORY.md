@@ -11,14 +11,8 @@ This log records every production version update, including manual major/minor a
 | 2025-11-10T22:38:05+00:00 | 1.0.2.0 | 1.0.1.0 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Add data import page and history dashboard |
 | 2025-11-11T00:54:31+00:00 | 1.0.3.0 | 1.0.2.0 | 01c735221df88555af989a0a718215c6a618ae70 | 8b3f1d8af5fc366fd9af36470254b25be42700d4 | patch | Resync preferences page assets |
 | 2025-11-11T00:58:14+00:00 | 1.0.4.0 | 1.0.3.0 | fad1251215d82f64a73ff9e267d86fc75e98a8d1 | 01c735221df88555af989a0a718215c6a618ae70 | patch | Standardize button system across user pages |
-| 2025-11-11T01:30:58+00:00 | 1.0.5.0 | 1.0.4.0 | 4f8ac52d3e416f09d82d0c5340501b6a27404e36 | fad1251215d82f64a73ff9e267d86fc75e98a8d1 | patch | Sync main into production - 2025-11-11 |
-| 2025-11-11T08:55:25+00:00 | 1.0.6.0 | 1.0.5.0 | 842bf100763cc766c266d88db208b1626cb7eec5 | 4f8ac52d3e416f09d82d0c5340501b6a27404e36 | patch | Restore cache Stage B-Lite scripts |
-| 2025-11-11T09:02:07+00:00 | 1.0.7.0 | 1.0.6.0 | a543d9141104085540f0e8c81ba79fdf2daa1310 | 842bf100763cc766c266d88db208b1626cb7eec5 | patch | Sync production environment configuration |
-| 2025-11-13T12:05:28+00:00 | 1.1.0.0 | 1.0.7.0 | dd74aa6c8b7bface5f3b8bbe2e6f560cd9f8a56f | a543d9141104085540f0e8c81ba79fdf2daa1310 | set | Promote production baseline after stability overhaul |
-| 2025-11-13T17:37:55+00:00 | 1.1.0.0 | 1.1.0.0 | 0187db4b35a732e55f6d84b8f4420bcd063b1ce2 | dd74aa6c8b7bface5f3b8bbe2e6f560cd9f8a56f | set | Finalize production isolation and DB alignment |
-| 2025-11-13T19:49:25+00:00 | 1.1.1.0 | 1.1.0.0 | 879589ab4605cc5529c1675e1c855414d51aa911 | 0187db4b35a732e55f6d84b8f4420bcd063b1ce2 | patch | Full release sync 2025-11-13 |
-| 2025-11-14T20:14:54+00:00 | 1.1.2.0 | 1.1.1.0 | 879589ab4605cc5529c1675e1c855414d51aa911 | 879589ab4605cc5529c1675e1c855414d51aa911 | patch | Improve server startup flow |
-| 2025-11-14T21:05:43+00:00 | 1.2.0.0 | 1.1.2.0 | b7d12c2d678edb97006b26f0391ab04d5a8af0b4 | 879589ab4605cc5529c1675e1c855414d51aa911 | set | Prod 1.2: lint monitor UX + tagging refresh |
-| 2025-11-14T21:26:21+00:00 | 1.2.0.1 | 1.2.0.0 | b2b958eb3229f28afbb7c111f214f31bd11c40b0 | b7d12c2d678edb97006b26f0391ab04d5a8af0b4 | build | Fix production server import path |
-| 2025-11-14T23:14:46+00:00 | 1.2.1.0 | 1.2.0.1 | 6569933b32527b065aadf2f3b76243be6339302f | b2b958eb3229f28afbb7c111f214f31bd11c40b0 | patch | Release 2025-11-14 main sync |
-| 2025-11-15T01:22:42+00:00 | 1.2.1.1 | 1.2.1.0 | 54bca978ec181b22cc8b800f36ca3068374aab3c | 6569933b32527b065aadf2f3b76243be6339302f | build | Doc and UI sync updates |
+| 2025-11-11T02:26:15+00:00 | 1.0.5.0 | 1.0.4.0 | 43c635fb02951bd9d8391cc43b030fe974957226 | fad1251215d82f64a73ff9e267d86fc75e98a8d1 | patch | External data dashboard updates and backup |
+| 2025-11-11T11:07:36+00:00 | 1.0.6.0 | 1.0.5.0 | 71acdafb71ffef4c7680a6c8805c2f969686748b | 43c635fb02951bd9d8391cc43b030fe974957226 | patch | Link homepage execution widgets to executions page |
+| 2025-11-14T20:45:34+00:00 | 1.0.7.0 | 1.0.6.0 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | 71acdafb71ffef4c7680a6c8805c2f969686748b | patch | Sync local updates before release |
+| 2025-11-14T22:50:56+00:00 | 1.0.8.0 | 1.0.7.0 | 0d5f54c8d41e340b2105b04a094442ec6f8701f5 | 5a7c30d00ebb0f8bc9397e5cd13da84d42044a35 | patch | Sync workspace changes for production release |
+| 2025-11-14T22:52:17+00:00 | 1.1.1.0 | 1.0.8.0 | 87cdd25fd639298da485550f8bd5ee10917c034d | 0d5f54c8d41e340b2105b04a094442ec6f8701f5 | set | Production release 1.1.1 |

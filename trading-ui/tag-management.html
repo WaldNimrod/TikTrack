@@ -11,66 +11,155 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS (חובה ראשון) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
 
-    <!-- TikTrack ITCSS Styles -->
-    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
+    <!-- ITCSS Layer 1: Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=0da3519a_20251102_104906">
 
-    <!-- Header Styles -->
+    <!-- ITCSS Layer 2: Tools -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 3: Generic -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 4: Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 5: Objects -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 6: Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_actions-menu.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 7: Pages -->
+    <link rel="stylesheet" href="styles-new/07-pages/_tag-management.css?v=0da3519a_20251102_104906">
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 8: Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/08-themes/_high-contrast.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 9: Utilities -->
+    <link rel="stylesheet" href="styles-new/07-utilities/_common-patterns.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
 </head>
 <body class="tag-management-page">
-    <div id="unified-header"></div>
+    <!-- 
+        TikTrack Page Template
+        גרסה: 2.0
+        תאריך: 14 בנובמבר 2025
+        מערכת: 8 מודולי אתחול + ITCSS מלא
+        מטמון: 4 שכבות מאוחדות
+    -->
+    <!-- LOCK: DO NOT MODIFY - Page Structure -->
+    <div class="container-fluid page-container">
+        <header class="row g-0">
+            <div class="col-12">
+                <div id="unified-header"></div>
+            </div>
+        </header>
 
-    <div class="background-wrapper">
-        <div class="page-body">
-            <div class="main-content">
-                <div class="page-intro mb-4">
-                    <h1 class="page-title">
-                        <i class="bi bi-tags-fill text-success me-2"></i>
-                        ניהול תגיות
-                    </h1>
-                    <p class="text-muted">
-                        מסך מרכזי לניהול קטגוריות, תגיות, סינון מתקדם ונתוני שימוש בכל רחבי המערכת.
-                    </p>
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <button type="button"
-                                data-button-type="ADD"
-                                data-variant="primary"
-                                data-icon="➕"
-                                data-text="קטגוריה חדשה"
-                                data-onclick="window.TagManagementPage?.openCategoryModal('add')">
-                        </button>
-                        <button type="button"
-                                data-button-type="ADD"
-                                data-variant="outline"
-                                data-icon="🏷️"
-                                data-text="תגית חדשה"
-                                data-onclick="window.TagManagementPage?.openTagModal('add')">
-                        </button>
-                        <button type="button"
-                                data-button-type="REFRESH"
-                                data-icon="🔄"
-                                data-text="רענן נתונים"
-                                data-onclick="window.TagManagementPage?.refreshAll()">
-                        </button>
+        <main class="row g-0">
+            <div class="col-12">
+                <div class="background-wrapper">
+                    <div class="page-body">
+                        <div class="main-content">
+                <div class="top-section" id="tag-management-top">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <i class="bi bi-tags-fill section-icon text-success"></i>
+                            <span>ניהול תגיות</span>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tag-management-top')"
+                                    data-text="הצג/הסתר">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p class="text-muted mb-3">
+                            מסך מרכזי לניהול קטגוריות, תגיות, סינון מתקדם ונתוני שימוש בכל רחבי המערכת.
+                        </p>
+                        <div class="button-row d-flex flex-wrap gap-2">
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="primary"
+                                    data-icon="➕"
+                                    data-text="קטגוריה חדשה"
+                                    data-onclick="window.TagManagementPage?.openCategoryModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="outline"
+                                    data-icon="🏷️"
+                                    data-text="תגית חדשה"
+                                    data-onclick="window.TagManagementPage?.openTagModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="REFRESH"
+                                    data-icon="🔄"
+                                    data-text="רענן נתונים"
+                                    data-onclick="window.TagManagementPage?.refreshAll()">
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <section class="content-section" id="tag-analytics-section" data-group="analytics">
+                <section class="content-section" id="tag-analytics-section" data-group="analytics" data-section="tag-analytics">
                     <div class="section-header">
-                        <h2>אנליטיקה</h2>
-                        <button type="button"
-                                data-button-type="REFRESH"
-                                data-variant="small"
-                                data-icon="🔄"
-                                data-onclick="window.TagManagementPage?.refreshAnalytics()">
-                        </button>
+                        <div class="table-title">
+                            <i class="bi bi-graph-up section-icon text-primary"></i>
+                            <span>אנליטיקה</span>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button"
+                                    data-button-type="REFRESH"
+                                    data-variant="small"
+                                    data-icon="🔄"
+                                    data-onclick="window.TagManagementPage?.refreshAnalytics()">
+                            </button>
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tag-analytics-section')"
+                                    data-text="הצג/הסתר">
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <div class="row g-3" id="tagAnalyticsSummary">
@@ -117,15 +206,24 @@
                     </div>
                 </section>
 
-                <section class="content-section" id="tag-categories-section" data-group="categories">
+                <section class="content-section" id="tag-categories-section" data-group="categories" data-section="tag-categories">
                     <div class="section-header">
-                        <h2>קטגוריות תגיות</h2>
-                        <div class="section-header-controls">
+                        <div class="table-title">
+                            <i class="bi bi-collection section-icon text-secondary"></i>
+                            <span>קטגוריות תגיות</span>
+                        </div>
+                        <div class="table-actions">
                             <button type="button"
                                     data-button-type="ADD"
                                     data-variant="small"
                                     data-icon="➕"
                                     data-onclick="window.TagManagementPage?.openCategoryModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tag-categories-section')"
+                                    data-text="הצג/הסתר">
                             </button>
                         </div>
                     </div>
@@ -149,15 +247,24 @@
                     </div>
                 </section>
 
-                <section class="content-section" id="tags-section" data-group="tags">
+                <section class="content-section" id="tags-section" data-group="tags" data-section="tags-list">
                     <div class="section-header">
-                        <h2>תגיות</h2>
-                        <div class="section-header-controls">
+                        <div class="table-title">
+                            <i class="bi bi-tags section-icon text-success"></i>
+                            <span>תגיות</span>
+                        </div>
+                        <div class="table-actions">
                             <button type="button"
                                     data-button-type="ADD"
                                     data-variant="small"
                                     data-icon="🏷️"
                                     data-onclick="window.TagManagementPage?.openTagModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tags-section')"
+                                    data-text="הצג/הסתר">
                             </button>
                         </div>
                     </div>
@@ -202,88 +309,260 @@
                         </div>
                     </div>
                 </section>
+                            <div class="page-bottom-spacing"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
+
+        <footer class="row g-0" aria-hidden="true">
+            <div class="col-12"><!-- Space reserved for global footer system --></div>
+        </footer>
     </div>
 
-    <!-- Script Loading Order -->
-    <!-- Base Package -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script>
-    <script src="scripts/notification-system.js?v=1.0.0"></script>
-    <script src="scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="scripts/warning-system.js?v=1.0.0"></script>
-    <script src="scripts/error-handlers.js?v=1.0.0"></script>
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script>
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
-    <script src="scripts/logger-service.js?v=1.0.0"></script>
-    <script src="scripts/header-system.js?v=1.0.0"></script>
-    <script src="scripts/page-utils.js?v=1.0.0"></script>
-    <script src="scripts/translation-utils.js?v=1.0.0"></script>
-    <script src="scripts/button-icons.js?v=1.0.0"></script>
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script>
-    <script src="scripts/button-system-init.js?v=1.0.0"></script>
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <!-- LOCK: DO NOT MODIFY - Cache System Integration -->
+    <div class="notification-container" id="notificationContainer"></div>
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-    <!-- Services Package -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
-    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script>
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script>
-    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script>
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script>
-    <script src="scripts/services/tag-service.js?v=1.0.0"></script>
+    <!-- LOCK: DO NOT MODIFY - JavaScript Module Loading -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: tag-management | Generated: 2025-11-15T00:29:03.497Z -->
+    <!-- 📦 Packages: base, services, modules, ui-advanced, crud, tag-management, preferences, validation, init-system -->
 
-    <!-- External Libraries for Services -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/9: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
 
-    <!-- Modules Package -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script>
-    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script>
-    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script>
-    <script src="scripts/tag-events.js?v=1.0.0"></script>
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script>
-    <script src="scripts/modules/data-basic.js?v=1.0.0"></script>
-    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script>
-    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script>
-    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script>
-    <script src="scripts/modules/communication-module.js?v=1.0.0"></script>
-    <script src="scripts/modules/business-module.js?v=1.0.0"></script>
-    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script>
-    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script>
-    <script src="scripts/import-user-data.js?v=1.0.0"></script>
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script>
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
 
-    <!-- UI Advanced / CRUD -->
-    <script src="scripts/table-mappings.js?v=1.0.0"></script>
-    <script src="scripts/tables.js?v=1.0.0"></script>
-    <script src="scripts/pagination-system.js?v=1.0.0"></script>
-    <script src="scripts/date-utils.js?v=1.0.0"></script>
-    <script src="scripts/data-utils.js?v=1.0.0"></script>
-    <script src="scripts/unified-table-system.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/9: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: שירותים כלליים -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- Preferences & Validation -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0"></script>
-    <script src="scripts/preferences-colors.js?v=1.0.0"></script>
-    <script src="scripts/preferences-profiles.js?v=1.0.0"></script>
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script>
-    <script src="scripts/preferences-validation.js?v=1.0.0"></script>
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script>
-    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script>
-    <script src="scripts/validation-utils.js?v=1.0.0"></script>
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
+    <!-- [31] Load Order: 31 -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [32] Load Order: 32 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
 
-    <!-- Initialization -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
-    <script src="scripts/init-system-check.js?v=1.0.0"></script>
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/9: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: ממשק משתמש מתקדם -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- Page Specific -->
-    <script src="scripts/tag-management-page.js?v=1.0.0"></script>
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- רישום נתוני טבלאות -->
+    <!-- [37] Load Order: 37 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <!-- [38] Load Order: 38 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/9: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3.5 | Description: מודולים כלליים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- מערכת ניווט מודולים מקוננים -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- ניהול בחירת תגיות במודלים -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
+    <!-- [43] Load Order: 43 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- ממשק בסיסי -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- נתונים מתקדמים -->
+    <!-- [47] Load Order: 47 -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- ממשק מתקדם -->
+    <!-- [48] Load Order: 48 -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- מודול תקשורת -->
+    <!-- [49] Load Order: 49 -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- מודול עסקי -->
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- סנכרון localStorage -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני עסקאות -->
+    <!-- [53] Load Order: 53 -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
+    <!-- [54] Load Order: 54 -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
+    <!-- [55] Load Order: 55 -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/9: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: מערכות לניהול נתונים וטבלאות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
+    <!-- [57] Load Order: 57 -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
+    <!-- [58] Load Order: 58 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/9: TAG MANAGEMENT PAGE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4.2 | Description: לוגיקה ייעודית לעמוד ניהול תגיות -->
+    <!-- Dependencies: base, services, modules, ui-advanced, crud, preferences -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [59] Load Order: 59 -->
+    <script src="scripts/tag-management-page.js?v=1.0.0"></script> <!-- ניהול תצוגת עמוד ניהול התגיות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/9: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: מערכת העדפות משתמש v2.0 (6 קבצים) -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [60] Load Order: 60 -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
+    <!-- [61] Load Order: 61 -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
+    <!-- [62] Load Order: 62 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
+    <!-- [63] Load Order: 63 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [64] Load Order: 64 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <!-- [65] Load Order: 65 -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <!-- [66] Load Order: 66 -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/9: VALIDATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6 | Description: מערכות ולידציה -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [67] Load Order: 67 -->
+    <script src="scripts/validation-utils.js?v=1.0.0"></script> <!-- כלי ולידציה -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/9: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [68] Load Order: 68 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [69] Load Order: 69 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [70] Load Order: 70 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [71] Load Order: 71 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [72] Load Order: 72 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [73] Page-specific: tag-management -->
+    <script src="scripts/tag-management.js?v=1.0.0"></script> <!-- Page-specific script for tag-management -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 73 | Unique Scripts Loaded: 73 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("tag-management") -->
+
 </body>
 </html>
 

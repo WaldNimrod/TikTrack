@@ -54,7 +54,8 @@ async function loadAllTables() {
       console.log(`📊 Loading ${table.type} (API: ${table.apiSlug})...`);
       await loadTableData(table.type, table.apiSlug, table.container);
     } catch (error) {
-      console.error(`Error loading ${table.api}:`, error);
+      const identifier = table.apiSlug || table.type;
+      console.error(`Error loading ${identifier}:`, error);
     }
   }
   
@@ -95,7 +96,8 @@ async function loadTableData(tableType, apiSlug, containerId) {
     console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
   } catch (error) {
-    console.error(`❌ Error loading ${tableType}:`, error);
+    const identifier = apiSlug || tableType;
+    console.error(`❌ Error loading ${identifier}:`, error);
     // Show error state
     updateTableDisplay([], tableType, containerId);
     updateTableInfo(tableType, 0);
@@ -122,7 +124,7 @@ async function fetchTableData(apiSlug) {
   if (result.data && Array.isArray(result.data)) {
     return result.data;
   } else {
-    console.warn(`⚠️ No data array found in response for ${tableType}`);
+    console.warn(`⚠️ No data array found in response for ${apiSlug}`);
     return [];
   }
 }
@@ -203,7 +205,7 @@ function updateTableDisplay(data, tableType, containerId) {
   tbody.innerHTML = rows;
 
   // Update table count
-  updateTableCount(tableType, data.length);
+  // Count indicator handled by updateTableInfo()
 }
 
 /**
@@ -425,5 +427,17 @@ document.addEventListener('DOMContentLoaded', function() {
 // Export for global access
 window.initDatabaseExtraData = initDatabaseExtraData;
 window.toggleSection = toggleSection;
+window.loadExtraData = async function loadExtraData() {
+  await loadAllTables();
+};
+
+if (typeof window.loadUserPreferences !== 'function') {
+  window.loadUserPreferences = async function loadUserPreferencesFallback(options = {}) {
+    if (window.PreferencesSystem?.initialize && !window.PreferencesSystem.initialized) {
+      await window.PreferencesSystem.initialize();
+    }
+    return window.PreferencesSystem?.getAllPreferences?.() || true;
+  };
+}
 
 console.log('✅ DB Extra Data script loaded successfully');

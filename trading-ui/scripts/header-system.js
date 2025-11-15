@@ -22,10 +22,10 @@
  * ⚠️ IMPORTANT: This file contains ONLY filter-related toggle functions!
  * - toggleHeaderFilters() - Main filter panel toggle
  * - toggleStatusFilterMenu() - Status filter dropdown
- * - toggleTypeFilterMenu() - Type filter dropdown  
+ * - toggleTypeFilterMenu() - Type filter dropdown
  * - toggleAccountFilterMenu() - Account filter dropdown
  * - toggleDateRangeFilterMenu() - Date range filter dropdown
- * 
+ *
  * General section toggle functions are handled by ui-utils.js
  *
  * Dependencies:
@@ -39,8 +39,12 @@
  */
 
 // Logger will be available after initialization
-try { console.log('🚀 header-system.js loaded'); } catch(_) {}
-if (window.Logger) { window.Logger.info('🚀 Loading Header System v6.0.0...', { page: "header-system" }); }
+try {
+  console.log('🚀 header-system.js loaded');
+} catch (_) {}
+if (window.Logger) {
+  window.Logger.info('🚀 Loading Header System v6.0.0...', { page: 'header-system' });
+}
 
 /**
  * מערכת ראש דף מאוחדת עם פילטרים
@@ -59,7 +63,7 @@ class HeaderSystem {
 
     // יצירת אלמנט הכותרת
     HeaderSystem.createHeader();
-    
+
     // יצירת מערכת הפילטרים
     if (typeof HeaderSystem.createFilterSystem === 'function') {
       // קריאה async בתוך setTimeout כדי לא לעצור את האתחול
@@ -67,20 +71,18 @@ class HeaderSystem {
         await HeaderSystem.createFilterSystem();
       }, 0);
     }
-    
+
     // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר
     setTimeout(async () => {
       await HeaderSystem.loadAccountsForFilter();
     }, 100);
-    
-    
+
     // הגדרת event listeners
     HeaderSystem.setupEventListeners();
-    
+
     // טעינת מצב שמור - יקרא אחרי שמערכת הפילטרים תהיה מוכנה
     // HeaderSystem.loadSavedState();
-    
-    
+
     this.isInitialized = true;
   }
 
@@ -96,12 +98,18 @@ class HeaderSystem {
     // הוספת התוכן לאלמנט
     const headerHTML = HeaderSystem.getHeaderHTML();
     headerElement.innerHTML = headerHTML;
-    
+
     // בדיקה אם הפונקציות מוגדרות
     // window.Logger.info('🔧 Checking if filter functions are defined:', { page: "header-system" });
-    window.Logger.info('selectStatusOption:', typeof window.selectStatusOption, { page: "header-system" });
-    window.Logger.info('updateStatusFilterText:', typeof window.updateStatusFilterText, { page: "header-system" });
-    window.Logger.info('applyStatusFilter:', typeof window.applyStatusFilter, { page: "header-system" });
+    window.Logger.info('selectStatusOption:', typeof window.selectStatusOption, {
+      page: 'header-system',
+    });
+    window.Logger.info('updateStatusFilterText:', typeof window.updateStatusFilterText, {
+      page: 'header-system',
+    });
+    window.Logger.info('applyStatusFilter:', typeof window.applyStatusFilter, {
+      page: 'header-system',
+    });
   }
 
   static getHeaderHTML() {
@@ -176,10 +184,9 @@ class HeaderSystem {
 
                         <li class="separator"></li>
 
-                        <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 דשבורד איכות קוד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-management">💾 ניהול מטמון</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">🔍 ניטור Linter בזמן אמת</a></li>
 
                         <li class="separator"></li>
 
@@ -199,23 +206,27 @@ class HeaderSystem {
                     </li>
 
                     <li class="tiktrack-nav-item">
-                      <a href="#" class="tiktrack-nav-link" onclick="clearCacheForDevelopment(event)" 
+                      <a href="#" class="tiktrack-nav-link" data-onclick="CacheControlMenu.triggerAction('full', event)" 
                          title="ניקוי מטמון לפיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
                       <ul class="submenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 240px; z-index: 1000; padding: 0; margin: 0; list-style: none;">
-                        <li><a href="#" onclick="clearCacheComplete(event)" 
-                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: bold;"
-                               title="ניקוי מלא: כל שכבות המטמון + HTTP Cache + רענון אוטומטי">🧹 ניקוי מטמון מלא (מומלץ)</a></li>
-                        <li><a href="#" onclick="clearUIState(event)" 
+                        <li><a href="#" data-cache-action="memory"
+                               data-onclick="CacheControlMenu.triggerAction('memory', event)"
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee; font-weight: 500;"
+                               title="ניקוי שכבת הזיכרון בלבד (Memory)">🧠 ניקוי שכבת זיכרון</a></li>
+                        <li><a href="#" data-cache-action="local-storage"
+                               data-onclick="CacheControlMenu.triggerAction('local-storage', event)"
                                style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
-                               title="נקה העדפות UI בלבד">נקה העדפות UI</a></li>
-                        <li><a href="#" onclick="clearAllCacheForDevelopment(event)" 
-                               style="display: block; padding: 8px 12px; color: #666; text-decoration: none; font-size: 13px; border-bottom: 1px solid #eee; font-style: italic;"
-                               title="ניקוי מהיר - שימושי לפיתוח">ניקוי מהיר (legacy)</a></li>
-                        <li><a href="#" onclick="hardReload(event)" 
-                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px;"
-                               title="רענון קשיח של העמוד (עוקף cache)">רענון קשיח</a></li>
+                               title="ניקוי מטמון localStorage (כולל העדפות פרופיל)">💽 ניקוי localStorage</a></li>
+                        <li><a href="#" data-cache-action="indexeddb"
+                               data-onclick="CacheControlMenu.triggerAction('indexeddb', event)"
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; border-bottom: 1px solid #eee;"
+                               title="ניקוי המטמון המאוחסן ב-IndexedDB">🗃️ ניקוי IndexedDB</a></li>
+                        <li><a href="#" data-cache-action="full"
+                               data-onclick="CacheControlMenu.triggerAction('full', event)"
+                               style="display: block; padding: 8px 12px; color: #333; text-decoration: none; font-size: 14px; font-weight: bold;"
+                               title="ניקוי כל שכבות המטמון + רענון אוטומטי">🌀 ניקוי מלא + רענון</a></li>
                       </ul>
                     </li>
 
@@ -410,53 +421,53 @@ class HeaderSystem {
   static setupEventListeners() {
     // הגדרת מצב הכפתורים בהתאם למצב הפילטר
     window.updateToggleButtons();
-    
+
     // הוספת סגנונות CSS
     HeaderSystem.addStyles();
-    
+
     // עדכון מצב הכפתורים בטעינה הראשונית
     setTimeout(() => {
       window.updateToggleButtons();
     }, 100);
-    
+
     // עדכון נוסף לאחר טעינה מלאה
     setTimeout(() => {
       window.updateToggleButtons();
     }, 500);
-    
+
     // אין מאזיני click כפולים כאן. הטיפול מתבצע דרך data-onclick ע"י EventHandlerManager.
-    
+
     // בדיקת מעבר עכבר לכפתורי פילטר
     setTimeout(() => {
       const filterButtons = document.querySelectorAll('.filter-toggle[data-onclick]');
       console.log('🔍 Found filter buttons:', filterButtons.length);
-      
+
       filterButtons.forEach((btn, index) => {
         console.log(`🔍 Button ${index}:`, {
           id: btn.id,
           className: btn.className,
           dataOnclick: btn.getAttribute('data-onclick'),
           visible: btn.offsetParent !== null,
-          clickable: btn.offsetWidth > 0 && btn.offsetHeight > 0
+          clickable: btn.offsetWidth > 0 && btn.offsetHeight > 0,
         });
-        
+
         // בדיקת מעבר עכבר
         btn.addEventListener('mouseenter', () => {
           console.log('🖱️ Mouse ENTER on filter button:', btn.id, btn.getAttribute('data-onclick'));
         });
-        
-        btn.addEventListener('click', (e) => {
+
+        btn.addEventListener('click', e => {
           console.log('🖱️ CLICK on filter button:', btn.id, btn.getAttribute('data-onclick'));
           console.log('🖱️ Event details:', {
             target: e.target,
             currentTarget: e.currentTarget,
             bubbles: e.bubbles,
-            cancelable: e.cancelable
+            cancelable: e.cancelable,
           });
         });
       });
     }, 1000);
-    
+
     // הוספת event listeners לתפריט משנה של ניקוי
     setTimeout(() => {
       const cleanupItem = document.querySelector('.tiktrack-nav-item:has(.submenu)');
@@ -467,7 +478,7 @@ class HeaderSystem {
             submenu.style.display = 'block';
           }
         });
-        
+
         cleanupItem.addEventListener('mouseleave', () => {
           const submenu = cleanupItem.querySelector('.submenu');
           if (submenu) {
@@ -733,17 +744,7 @@ class HeaderSystem {
         box-sizing: border-box;
       }
 
-      .filters-container {
-        max-width: var(--container-xl, 1400px);
-        margin: 0 auto;
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        flex-wrap: nowrap;
-        padding: 0;
-        height: 100%;
-        overflow-x: auto;
-      }
+      /* Legacy filters-container styles moved to CSS */
 
       .filter-group {
         display: flex;
@@ -1036,14 +1037,13 @@ class HeaderSystem {
     `;
   }
 
-
   static async loadAccountsForFilter() {
     // window.Logger.info('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר', { page: "header-system" });
-    
+
     try {
       // שימוש בפונקציה מקובץ השירותים
       let accounts = [];
-      
+
       if (typeof window.loadTradingAccountsFromServer === 'function') {
         await window.loadTradingAccountsFromServer();
         accounts = window.trading_accountsData || [];
@@ -1053,39 +1053,40 @@ class HeaderSystem {
         const data = await response.json();
         accounts = data.data || data;
       }
-      
+
       const openAccounts = accounts.filter(account => account.status === 'open');
-      
+
       // window.Logger.info('🔧 נמצאו חשבונות:', openAccounts.length, openAccounts.map(a => a.name, { page: "header-system" }));
-      
+
       // עדכון תפריט החשבונות
       const accountMenu = document.getElementById('accountFilterMenu');
-        // window.Logger.info('🔧 accountMenu element:', accountMenu, { page: "header-system" });
-        
-        if (accountMenu) {
-          // מחיקת חשבונות קיימים (חוץ מ"הכול")
-          const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
-          // window.Logger.info('🔧 מוחק חשבונות קיימים:', existingItems.length, { page: "header-system" });
-          existingItems.forEach(item => item.remove());
-          
-          // הוספת חשבונות פתוחים
-          openAccounts.forEach(account => {
-            const accountItem = document.createElement('div');
-            accountItem.className = 'account-filter-item';
-            // שימוש ב-ID במקום שם - כפי ששמור בהעדפות (default_trading_account)
-            accountItem.setAttribute('data-value', account.id);
-            accountItem.onclick = () => selectAccountOption(account.id);
-            accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
-            accountMenu.appendChild(accountItem);
-            // window.Logger.info('🔧 הוספתי חשבון מסחר:', account.name, { page: "header-system" });
-          });
-          
-          // window.Logger.info(`✅ Loaded ${openAccounts.length} open trading accounts for filter`, { page: "header-system" });
-          // window.Logger.info('🔧 סה"כ פריטים בתפריט:', accountMenu.children.length, { page: "header-system" });
+      // window.Logger.info('🔧 accountMenu element:', accountMenu, { page: "header-system" });
+
+      if (accountMenu) {
+        // מחיקת חשבונות קיימים (חוץ מ"הכול")
+        const existingItems = accountMenu.querySelectorAll(
+          '.account-filter-item:not([data-value="הכול"])'
+        );
+        // window.Logger.info('🔧 מוחק חשבונות קיימים:', existingItems.length, { page: "header-system" });
+        existingItems.forEach(item => item.remove());
+
+        // הוספת חשבונות פתוחים
+        openAccounts.forEach(account => {
+          const accountItem = document.createElement('div');
+          accountItem.className = 'account-filter-item';
+          // שימוש ב-ID במקום שם - כפי ששמור בהעדפות (default_trading_account)
+          accountItem.setAttribute('data-value', account.id);
+          accountItem.onclick = () => selectAccountOption(account.id);
+          accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
+          accountMenu.appendChild(accountItem);
+          // window.Logger.info('🔧 הוספתי חשבון מסחר:', account.name, { page: "header-system" });
+        });
+
+        // window.Logger.info(`✅ Loaded ${openAccounts.length} open trading accounts for filter`, { page: "header-system" });
+        // window.Logger.info('🔧 סה"כ פריטים בתפריט:', accountMenu.children.length, { page: "header-system" });
       } else {
         // window.Logger.error('❌ accountFilterMenu לא נמצא!', { page: "header-system" });
       }
-      
     } catch (error) {
       // window.Logger.info('⚠️ Error loading trading accounts for filter:', error, { page: "header-system" });
     }
@@ -1093,30 +1094,39 @@ class HeaderSystem {
 
   static loadSavedState() {
     // window.Logger.info('🔧 Loading saved filter state...', { page: "header-system" });
-    
+
     // המתן שהמערכת תהיה מוכנה
     setTimeout(() => {
       if (window.filterSystem && window.filterSystem.currentFilters) {
         // window.Logger.info('🔧 Current filters from system:', window.filterSystem.currentFilters, { page: "header-system" });
-        
+
         // עדכון UI של פילטר הסטטוס
-        if (window.filterSystem.currentFilters.status && window.filterSystem.currentFilters.status.length > 0) {
+        if (
+          window.filterSystem.currentFilters.status &&
+          window.filterSystem.currentFilters.status.length > 0
+        ) {
           // window.Logger.info('🔧 Updating status filter UI with:', window.filterSystem.currentFilters.status, { page: "header-system" });
           HeaderSystem.updateFilterUI('status', window.filterSystem.currentFilters.status);
         }
-        
+
         // עדכון UI של פילטר הסוג
-        if (window.filterSystem.currentFilters.type && window.filterSystem.currentFilters.type.length > 0) {
+        if (
+          window.filterSystem.currentFilters.type &&
+          window.filterSystem.currentFilters.type.length > 0
+        ) {
           // window.Logger.info('🔧 Updating type filter UI with:', window.filterSystem.currentFilters.type, { page: "header-system" });
           HeaderSystem.updateFilterUI('type', window.filterSystem.currentFilters.type);
         }
-        
+
         // עדכון UI של פילטר החשבון מסחר
-        if (window.filterSystem.currentFilters.account && window.filterSystem.currentFilters.account.length > 0) {
+        if (
+          window.filterSystem.currentFilters.account &&
+          window.filterSystem.currentFilters.account.length > 0
+        ) {
           // window.Logger.info('🔧 Updating account filter UI with:', window.filterSystem.currentFilters.account, { page: "header-system" });
           HeaderSystem.updateFilterUI('account', window.filterSystem.currentFilters.account);
         }
-        
+
         // עדכון UI של פילטר התאריכים
         if (window.filterSystem.currentFilters.dateRange) {
           // window.Logger.info('🔧 Updating date range filter UI with:', window.filterSystem.currentFilters.dateRange, { page: "header-system" });
@@ -1125,82 +1135,90 @@ class HeaderSystem {
       }
     }, 500); // המתן 500ms שהמערכת תהיה מוכנה
   }
-  
+
   static updateFilterUI(filterType, selectedValues) {
     // window.Logger.info(`🔧 Updating ${filterType} filter UI with:`, selectedValues, { page: "header-system" });
-    
+
     if (filterType === 'status') {
       // ביטול כל הבחירות
       const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
       statusItems.forEach(item => item.classList.remove('selected'));
-      
+
       // בחירת הערכים השמורים
       selectedValues.forEach(value => {
-        const item = document.querySelector(`#statusFilterMenu .status-filter-item[data-value="${value}"]`);
+        const item = document.querySelector(
+          `#statusFilterMenu .status-filter-item[data-value="${value}"]`
+        );
         if (item) {
           item.classList.add('selected');
-          window.Logger.info(`🔧 Selected status item: ${value}`, { page: "header-system" });
+          window.Logger.info(`🔧 Selected status item: ${value}`, { page: 'header-system' });
         }
       });
-      
+
       // עדכון הטקסט
       if (typeof window.updateStatusFilterText === 'function') {
         window.updateStatusFilterText();
       }
     }
-    
+
     if (filterType === 'type') {
       // ביטול כל הבחירות
       const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
       typeItems.forEach(item => item.classList.remove('selected'));
-      
+
       // בחירת הערכים השמורים
       selectedValues.forEach(value => {
-        const item = document.querySelector(`#typeFilterMenu .type-filter-item[data-value="${value}"]`);
+        const item = document.querySelector(
+          `#typeFilterMenu .type-filter-item[data-value="${value}"]`
+        );
         if (item) {
           item.classList.add('selected');
-          window.Logger.info(`🔧 Selected type item: ${value}`, { page: "header-system" });
+          window.Logger.info(`🔧 Selected type item: ${value}`, { page: 'header-system' });
         }
       });
-      
+
       // עדכון הטקסט
       if (typeof window.updateTypeFilterText === 'function') {
         window.updateTypeFilterText();
       }
     }
-    
+
     if (filterType === 'account') {
       // ביטול כל הבחירות
       const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
       accountItems.forEach(item => item.classList.remove('selected'));
-      
+
       // בחירת הערכים השמורים
       selectedValues.forEach(value => {
-        const item = document.querySelector(`#accountFilterMenu .account-filter-item[data-value="${value}"]`);
+        const item = document.querySelector(
+          `#accountFilterMenu .account-filter-item[data-value="${value}"]`
+        );
         if (item) {
           item.classList.add('selected');
-          window.Logger.info(`🔧 Selected account item: ${value}`, { page: "header-system" });
+          window.Logger.info(`🔧 Selected account item: ${value}`, { page: 'header-system' });
         }
       });
-      
+
       // עדכון הטקסט
       if (typeof window.updateAccountFilterText === 'function') {
         window.updateAccountFilterText();
       }
     }
-    
+
     if (filterType === 'dateRange') {
       // ביטול כל הבחירות
       const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
       dateItems.forEach(item => item.classList.remove('selected'));
-      
+
       // בחירת הערך השמור
-      const item = document.querySelector(`#dateRangeFilterMenu .date-range-filter-item[data-value="${selectedValues}"]`);
+      const item = document.querySelector(
+        `#dateRangeFilterMenu .date-range-filter-item[data-value="${selectedValues}"]`
+      );
       if (item) {
         item.classList.add('selected');
         // window.Logger.info(`🔧 Selected date range item: ${selectedValues}`, { page: "header-system" });
       }
-      
+
       // עדכון הטקסט
       if (typeof window.updateDateRangeFilterText === 'function') {
         window.updateDateRangeFilterText();
@@ -1209,7 +1227,7 @@ class HeaderSystem {
   }
 
   // ===== SIMPLE FILTER SYSTEM =====
-  
+
   // מערכת פילטרים פשוטה ויעילה
   static async createFilterSystem() {
     if (!window.filterSystem) {
@@ -1220,22 +1238,31 @@ class HeaderSystem {
           status: [],
           type: [],
           account: [],
-          custom: {}
+          custom: {},
         },
-        
+
         // שמירת פילטרים
         async saveFilters() {
           // שמירה דרך PageStateManager אם זמין
           if (window.PageStateManager && window.PageStateManager.initialized) {
-            const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+            const pageName =
+              typeof window.getCurrentPageName === 'function'
+                ? window.getCurrentPageName()
+                : 'default';
             try {
               await window.PageStateManager.saveFilters(pageName, this.currentFilters);
               if (window.Logger) {
-                window.Logger.debug('🔧 Saved filters via PageStateManager', { page: "header-system" });
+                window.Logger.debug('🔧 Saved filters via PageStateManager', {
+                  page: 'header-system',
+                });
               }
             } catch (err) {
               if (window.Logger) {
-                window.Logger.warn('⚠️ Failed to save filters via PageStateManager, using localStorage fallback', err, { page: "header-system" });
+                window.Logger.warn(
+                  '⚠️ Failed to save filters via PageStateManager, using localStorage fallback',
+                  err,
+                  { page: 'header-system' }
+                );
               }
               // Fallback ל-localStorage
               localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
@@ -1243,49 +1270,67 @@ class HeaderSystem {
           } else {
             // Fallback ל-localStorage רק אם PageStateManager לא זמין
             if (window.Logger) {
-              window.Logger.debug('⚠️ PageStateManager not available, using localStorage fallback', { page: "header-system" });
+              window.Logger.debug(
+                '⚠️ PageStateManager not available, using localStorage fallback',
+                { page: 'header-system' }
+              );
             }
             localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
           }
         },
-        
+
         // טעינת פילטרים
         async loadFilters() {
           // טעינה דרך PageStateManager אם זמין
           if (window.PageStateManager && window.PageStateManager.initialized) {
-            const pageName = (typeof window.getCurrentPageName === 'function') ? window.getCurrentPageName() : 'default';
+            const pageName =
+              typeof window.getCurrentPageName === 'function'
+                ? window.getCurrentPageName()
+                : 'default';
             try {
               const savedFilters = await window.PageStateManager.loadFilters(pageName);
               if (savedFilters) {
                 this.currentFilters = { ...this.currentFilters, ...savedFilters };
                 if (window.Logger) {
-                  window.Logger.info('🔧 Loaded saved filters via PageStateManager:', this.currentFilters, { page: "header-system" });
+                  window.Logger.info(
+                    '🔧 Loaded saved filters via PageStateManager:',
+                    this.currentFilters,
+                    { page: 'header-system' }
+                  );
                 }
                 return;
               }
             } catch (err) {
               if (window.Logger) {
-                window.Logger.warn('⚠️ Failed to load filters via PageStateManager, trying localStorage fallback', err, { page: "header-system" });
+                window.Logger.warn(
+                  '⚠️ Failed to load filters via PageStateManager, trying localStorage fallback',
+                  err,
+                  { page: 'header-system' }
+                );
               }
             }
           }
-          
+
           // Fallback ל-localStorage רק אם PageStateManager לא זמין או אין מצב שמור
           const saved = localStorage.getItem('headerFilters');
           if (saved) {
             try {
               this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
               if (window.Logger) {
-                window.Logger.info('🔧 Loaded saved filters from localStorage:', this.currentFilters, { page: "header-system" });
+                window.Logger.info(
+                  '🔧 Loaded saved filters from localStorage:',
+                  this.currentFilters,
+                  { page: 'header-system' }
+                );
               }
             } catch (e) {
               if (window.Logger) {
-                window.Logger.info('⚠️ Error loading saved filters:', e, { page: "header-system" });
+                window.Logger.info('⚠️ Error loading saved filters:', e, { page: 'header-system' });
               }
             }
           }
         },
-        
+
         // הפעלת פילטרים על כל הטבלאות
         async applyAllFilters() {
           const context = this.buildFilterContext();
@@ -1294,7 +1339,11 @@ class HeaderSystem {
 
           for (const target of targets) {
             try {
-              const filteredData = await this.applyFiltersToTable(target.tableId, context, target.tableType);
+              const filteredData = await this.applyFiltersToTable(
+                target.tableId,
+                context,
+                target.tableType
+              );
               processed.push({
                 tableId: target.tableId,
                 tableType: target.tableType,
@@ -1323,7 +1372,7 @@ class HeaderSystem {
 
           return processed;
         },
-        
+
         // הפעלת פילטרים על טבלה ספציפית
         async applyFiltersToTable(tableId, filterContext = null, resolvedTableType = null) {
           if (!tableId || !window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
@@ -1340,7 +1389,10 @@ class HeaderSystem {
 
           if (!tableType) {
             if (window.Logger) {
-              window.Logger.debug(`⚠️ applyFiltersToTable: unable to resolve table type for ${tableId}`, { page: 'header-system' });
+              window.Logger.debug(
+                `⚠️ applyFiltersToTable: unable to resolve table type for ${tableId}`,
+                { page: 'header-system' }
+              );
             }
             return null;
           }
@@ -1348,7 +1400,9 @@ class HeaderSystem {
           const config = window.UnifiedTableSystem.registry.getConfig(tableType);
           if (!config || typeof config.updateFunction !== 'function') {
             if (window.Logger) {
-              window.Logger.debug(`⚠️ applyFiltersToTable: no updateFunction for ${tableType}`, { page: 'header-system' });
+              window.Logger.debug(`⚠️ applyFiltersToTable: no updateFunction for ${tableType}`, {
+                page: 'header-system',
+              });
             }
             return null;
           }
@@ -1356,7 +1410,7 @@ class HeaderSystem {
           const context = filterContext || this.buildFilterContext();
           const filteredData = window.UnifiedTableSystem.filter.apply(tableType, context);
 
-          const renderCallback = async (pageData) => {
+          const renderCallback = async pageData => {
             try {
               await Promise.resolve(config.updateFunction(pageData));
             } catch (renderError) {
@@ -1378,34 +1432,38 @@ class HeaderSystem {
               tableId,
               tableType,
               data: filteredData,
-              render: async (pageData) => renderCallback(pageData),
+              render: async pageData => renderCallback(pageData),
               skipRegistry: true,
             });
-              } else {
+          } else {
             await renderCallback(filteredData);
           }
 
           return filteredData;
         },
-        
+
         buildFilterContext() {
-          const cloneArray = (value) => (Array.isArray(value) ? [...value] : (value ? [value] : []));
+          const cloneArray = value => (Array.isArray(value) ? [...value] : value ? [value] : []);
           return {
             status: cloneArray(this.currentFilters.status),
             type: cloneArray(this.currentFilters.type),
             account: cloneArray(this.currentFilters.account),
             dateRange: this.currentFilters.dateRange ?? null,
-            search: typeof this.currentFilters.search === 'string' ? this.currentFilters.search : '',
-            custom: this.currentFilters.custom && typeof this.currentFilters.custom === 'object' ? { ...this.currentFilters.custom } : {},
+            search:
+              typeof this.currentFilters.search === 'string' ? this.currentFilters.search : '',
+            custom:
+              this.currentFilters.custom && typeof this.currentFilters.custom === 'object'
+                ? { ...this.currentFilters.custom }
+                : {},
           };
         },
-        
+
         _resolveTargetTables() {
           const targets = [];
           const seen = new Set();
 
           const tableElements = document.querySelectorAll('table[data-table-type]');
-          tableElements.forEach((table) => {
+          tableElements.forEach(table => {
             const tableId = table.id || this._inferTableIdFromContainer(table);
             if (!tableId || seen.has(tableId)) {
               return;
@@ -1431,7 +1489,7 @@ class HeaderSystem {
               'notesContainer',
             ];
 
-            fallbackContainers.forEach((containerId) => {
+            fallbackContainers.forEach(containerId => {
               const container = document.getElementById(containerId);
               const table = container?.querySelector('table');
               if (!table) {
@@ -1452,7 +1510,7 @@ class HeaderSystem {
 
           return targets;
         },
-        
+
         _inferTableIdFromContainer(table) {
           if (!table) {
             return null;
@@ -1463,26 +1521,26 @@ class HeaderSystem {
           }
           return table.id || container.id.replace('Container', 'Table');
         },
-        
+
         // פונקציה לבדיקת תאריך בטווח
         isDateInRange(dateString, dateRange) {
           if (!dateString || !dateRange || dateRange === 'כל זמן') {
             return true;
           }
-          
+
           const date = new Date(dateString);
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          
+
           switch (dateRange) {
             case 'היום':
               return date.toDateString() === today.toDateString();
-              
+
             case 'אתמול':
               const yesterday = new Date(today);
               yesterday.setDate(today.getDate() - 1);
               return date.toDateString() === yesterday.toDateString();
-              
+
             // השבוע = מתחילת השבוע הקלנדארי (יום ראשון) עד היום
             case 'השבוע': {
               const startOfWeek = new Date(today);
@@ -1492,7 +1550,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= startOfWeek && date <= today;
             }
-              
+
             // שבוע = 7 ימים אחורה מהיום
             case 'שבוע':
             case '7 ימים': {
@@ -1502,7 +1560,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= weekAgo && date <= today;
             }
-              
+
             // שבוע קודם = השבוע הקלנדארי הקודם (יום ראשון עד שבת של השבוע הקודם)
             case 'שבוע קודם':
             case 'שבוע שעבר': {
@@ -1516,7 +1574,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= lastWeekStart && date <= lastWeekEnd;
             }
-              
+
             // החודש = מתחילת החודש הקלנדארי (יום 1) עד היום
             case 'החודש': {
               const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -1524,7 +1582,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= startOfMonth && date <= today;
             }
-              
+
             // חודש = 30 ימים אחורה מהיום
             case 'חודש':
             case '30 ימים': {
@@ -1534,7 +1592,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= monthAgo && date <= today;
             }
-              
+
             // חודש קודם = החודש הקלנדארי הקודם (יום 1 עד היום האחרון של החודש הקודם)
             case 'חודש קודם': {
               const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
@@ -1544,7 +1602,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= lastMonthStart && date <= lastMonthEnd;
             }
-              
+
             // השנה = מתחילת השנה הקלנדארית (1 בינואר) עד היום
             case 'השנה': {
               const startOfYear = new Date(today.getFullYear(), 0, 1);
@@ -1552,7 +1610,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= startOfYear && date <= today;
             }
-              
+
             // שנה = 365 ימים אחורה מהיום
             case 'שנה':
             case '365 ימים': {
@@ -1562,7 +1620,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= yearAgo && date <= today;
             }
-              
+
             // שנה קודמת = השנה הקלנדארית הקודמת (1 בינואר עד 31 בדצמבר של השנה הקודמת)
             case 'שנה קודמת':
             case 'שנה שעברה': {
@@ -1573,7 +1631,7 @@ class HeaderSystem {
               date.setHours(0, 0, 0, 0);
               return date >= lastYearStart && date <= lastYearEnd;
             }
-              
+
             default:
               return true;
           }
@@ -1582,7 +1640,7 @@ class HeaderSystem {
           try {
             const maybePromise = this.applyAllFilters();
             if (maybePromise && typeof maybePromise.catch === 'function') {
-              maybePromise.catch((error) => {
+              maybePromise.catch(error => {
                 if (window.Logger) {
                   window.Logger.warn('⚠️ triggerFilterUpdate failed', {
                     reason,
@@ -1607,29 +1665,30 @@ class HeaderSystem {
           }
         },
       };
-      
+
       await window.filterSystem.loadFilters();
     }
     return window.filterSystem;
   }
 }
 
-
 // ===== FILTER SYSTEM TOGGLE FUNCTIONS =====
 // פונקציות פתיחה וסגירה של מערכת הפילטרים בלבד
 // ==========================================
 
 // פונקציה לפתיחה וסגירה של הפילטר הראשי
-window.toggleHeaderFilters = function() {
-  window.Logger.info('🔧 toggleHeaderFilters called - Header filter system only', { page: "header-system" });
+window.toggleHeaderFilters = function () {
+  window.Logger.info('🔧 toggleHeaderFilters called - Header filter system only', {
+    page: 'header-system',
+  });
   const section = document.getElementById('headerFilters');
   if (section) {
     const isVisible = section.style.display !== 'none';
     section.style.display = isVisible ? 'none' : 'block';
-    
+
     const toggleBtn = document.getElementById('headerFilterToggleBtn');
     const arrow = toggleBtn ? toggleBtn.querySelector('.header-filter-arrow') : null;
-    
+
     if (toggleBtn && arrow) {
       if (isVisible) {
         arrow.textContent = '▼';
@@ -1639,35 +1698,43 @@ window.toggleHeaderFilters = function() {
         toggleBtn.classList.remove('collapsed');
       }
     }
-    
-    window.Logger.info(`✅ Header filters ${isVisible ? 'hidden' : 'shown'}`, { page: "header-system" });
-    
+
+    window.Logger.info(`✅ Header filters ${isVisible ? 'hidden' : 'shown'}`, {
+      page: 'header-system',
+    });
+
     // עדכון מצב הכפתורים
     window.updateToggleButtons();
   }
 };
 
-window.toggleStatusFilterMenu = function() {
-  console.log('🚀 toggleStatusFilterMenu CALLED! (legacy click handler)', { timestamp: new Date().toISOString() });
-  window.Logger.info('🔧 toggleStatusFilterMenu called (legacy)', { page: "header-system" });
+window.toggleStatusFilterMenu = function () {
+  console.log('🚀 toggleStatusFilterMenu CALLED! (legacy click handler)', {
+    timestamp: new Date().toISOString(),
+  });
+  window.Logger.info('🔧 toggleStatusFilterMenu called (legacy)', { page: 'header-system' });
   const menu = document.getElementById('statusFilterMenu');
   const btn = document.getElementById('statusFilterToggle');
-  
+
   if (menu && btn) {
     const isCurrentlyOpen = menu.classList.contains('show');
-    
+
     if (isCurrentlyOpen) {
       // If currently open, close it
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
-      if (window.Logger) { window.Logger.info('🔧 Status filter menu closed (legacy)', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Status filter menu closed (legacy)', { page: 'header-system' });
+      }
       console.log('[header] toggleStatusFilterMenu -> closed (legacy)');
     } else {
       // If closed, close all other menus first, then open this one
       closeAllFilterMenus();
       menu.classList.add('show');
       openFilterMenuPortal(menu, btn, 'status');
-      if (window.Logger) { window.Logger.info('🔧 Status filter menu opened (legacy)', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Status filter menu opened (legacy)', { page: 'header-system' });
+      }
       console.log('[header] toggleStatusFilterMenu -> open (legacy)');
       logFilterMenuDiagnostics('statusFilterMenu');
     }
@@ -1676,17 +1743,19 @@ window.toggleStatusFilterMenu = function() {
   }
 };
 
-window.toggleTypeFilterMenu = function() {
-  window.Logger.info('🔧 toggleTypeFilterMenu called', { page: "header-system" });
+window.toggleTypeFilterMenu = function () {
+  window.Logger.info('🔧 toggleTypeFilterMenu called', { page: 'header-system' });
   const menu = document.getElementById('typeFilterMenu');
   if (menu) {
     const isCurrentlyOpen = menu.classList.contains('show');
-    
+
     if (isCurrentlyOpen) {
       // If currently open, close it
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
-      if (window.Logger) { window.Logger.info('🔧 Type filter menu closed', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Type filter menu closed', { page: 'header-system' });
+      }
       console.log('[header] toggleTypeFilterMenu -> closed');
     } else {
       // If closed, close all other menus first, then open this one
@@ -1696,24 +1765,28 @@ window.toggleTypeFilterMenu = function() {
       if (btn) {
         openFilterMenuPortal(menu, btn, 'type');
       }
-      if (window.Logger) { window.Logger.info('🔧 Type filter menu opened', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Type filter menu opened', { page: 'header-system' });
+      }
       console.log('[header] toggleTypeFilterMenu -> open');
       logFilterMenuDiagnostics('typeFilterMenu');
     }
   }
 };
 
-window.toggleAccountFilterMenu = function() {
-  window.Logger.info('🔧 toggleAccountFilterMenu called', { page: "header-system" });
+window.toggleAccountFilterMenu = function () {
+  window.Logger.info('🔧 toggleAccountFilterMenu called', { page: 'header-system' });
   const menu = document.getElementById('accountFilterMenu');
   if (menu) {
     const isCurrentlyOpen = menu.classList.contains('show');
-    
+
     if (isCurrentlyOpen) {
       // If currently open, close it
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
-      if (window.Logger) { window.Logger.info('🔧 Account filter menu closed', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Account filter menu closed', { page: 'header-system' });
+      }
       console.log('[header] toggleAccountFilterMenu -> closed');
     } else {
       // If closed, close all other menus first, then open this one
@@ -1723,24 +1796,28 @@ window.toggleAccountFilterMenu = function() {
       if (btn) {
         openFilterMenuPortal(menu, btn, 'account');
       }
-      if (window.Logger) { window.Logger.info('🔧 Account filter menu opened', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Account filter menu opened', { page: 'header-system' });
+      }
       console.log('[header] toggleAccountFilterMenu -> open');
       logFilterMenuDiagnostics('accountFilterMenu');
     }
   }
 };
 
-window.toggleDateRangeFilterMenu = function() {
-  window.Logger.info('🔧 toggleDateRangeFilterMenu called', { page: "header-system" });
+window.toggleDateRangeFilterMenu = function () {
+  window.Logger.info('🔧 toggleDateRangeFilterMenu called', { page: 'header-system' });
   const menu = document.getElementById('dateRangeFilterMenu');
   if (menu) {
     const isCurrentlyOpen = menu.classList.contains('show');
-    
+
     if (isCurrentlyOpen) {
       // If currently open, close it
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
-      if (window.Logger) { window.Logger.info('🔧 Date range filter menu closed', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Date range filter menu closed', { page: 'header-system' });
+      }
       console.log('[header] toggleDateRangeFilterMenu -> closed');
     } else {
       // If closed, close all other menus first, then open this one
@@ -1750,7 +1827,9 @@ window.toggleDateRangeFilterMenu = function() {
       if (btn) {
         openFilterMenuPortal(menu, btn, 'date');
       }
-      if (window.Logger) { window.Logger.info('🔧 Date range filter menu opened', { page: "header-system" }); }
+      if (window.Logger) {
+        window.Logger.info('🔧 Date range filter menu opened', { page: 'header-system' });
+      }
       console.log('[header] toggleDateRangeFilterMenu -> open');
       logFilterMenuDiagnostics('dateRangeFilterMenu');
     }
@@ -1778,22 +1857,25 @@ function logFilterMenuDiagnostics(menuId) {
     };
     const parent = el.parentElement;
     const parentCS = parent ? window.getComputedStyle(parent) : null;
-    const parentInfo = parent ? {
-      tag: parent.tagName,
-      class: parent.className,
-      id: parent.id,
-      position: parentCS.position,
-      zIndex: parentCS.zIndex,
-      overflow: parentCS.overflow,
-    } : null;
-    window.Logger && window.Logger.info('🔎 FilterMenu diagnostics', {
-      menuId,
-      rect: { x: rect.left, y: rect.top, w: rect.width, h: rect.height },
-      computed: stackInfo,
-      parent: parentInfo,
-      topElement: topEl ? { tag: topEl.tagName, class: topEl.className, id: topEl.id } : null,
-      page: 'header-system'
-    });
+    const parentInfo = parent
+      ? {
+          tag: parent.tagName,
+          class: parent.className,
+          id: parent.id,
+          position: parentCS.position,
+          zIndex: parentCS.zIndex,
+          overflow: parentCS.overflow,
+        }
+      : null;
+    window.Logger &&
+      window.Logger.info('🔎 FilterMenu diagnostics', {
+        menuId,
+        rect: { x: rect.left, y: rect.top, w: rect.width, h: rect.height },
+        computed: stackInfo,
+        parent: parentInfo,
+        topElement: topEl ? { tag: topEl.tagName, class: topEl.className, id: topEl.id } : null,
+        page: 'header-system',
+      });
   } catch (e) {
     console.error('Diagnostics error:', e);
   }
@@ -1821,7 +1903,7 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
       opacity: '0',
       pointerEvents: 'auto',
       zIndex: '2000',
-      transition: 'opacity 0.2s ease-in-out'
+      transition: 'opacity 0.2s ease-in-out',
     });
 
     // append first so measurements (offsetWidth/Height) are valid
@@ -1831,23 +1913,23 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
     portal.style.width = originalWidth + 'px';
     portal.style.minWidth = originalWidth + 'px';
     portal.style.maxWidth = originalWidth + 'px';
-    
+
     positionPortal(portal, anchorBtn);
 
     // Remember and wire cleanup
     __headerFilterPortals.set(originalMenuEl.id, portal);
     const reposition = () => positionPortal(portal, anchorBtn);
     portal.__repositionHandler = reposition;
-    
+
     // Update portal selections to match original
     updatePortalSelections();
-    
+
     // Remove onclick attributes from portal items (prevent duplicate events)
     portal.querySelectorAll('[onclick]').forEach(item => item.removeAttribute('onclick'));
-    
+
     // Add event listeners to portal items
     addPortalEventListeners(portal, originalMenuEl);
-    
+
     window.addEventListener('scroll', reposition, true);
     window.addEventListener('resize', reposition);
 
@@ -1856,7 +1938,10 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
       portal.style.opacity = '1';
     });
 
-    console.log(`🧩 Portal opened for ${kind} menu`, { id: originalMenuEl.id, portalId: portal.id });
+    console.log(`🧩 Portal opened for ${kind} menu`, {
+      id: originalMenuEl.id,
+      portalId: portal.id,
+    });
   } catch (e) {
     console.warn('⚠️ Failed to open portal menu:', e?.message);
   }
@@ -1866,7 +1951,7 @@ function closeFilterMenuPortal(originalMenuEl) {
   try {
     const portal = __headerFilterPortals.get(originalMenuEl.id);
     if (!portal) return;
-    
+
     // Fade out effect
     portal.style.opacity = '0';
     setTimeout(() => {
@@ -1900,7 +1985,12 @@ function positionPortal(portalEl, anchorBtn) {
 
 // ===== Auto-close other filter menus when opening one =====
 function closeAllFilterMenus() {
-  const menuIds = ['statusFilterMenu', 'typeFilterMenu', 'accountFilterMenu', 'dateRangeFilterMenu'];
+  const menuIds = [
+    'statusFilterMenu',
+    'typeFilterMenu',
+    'accountFilterMenu',
+    'dateRangeFilterMenu',
+  ];
   menuIds.forEach(id => {
     const menu = document.getElementById(id);
     if (menu && menu.classList.contains('show')) {
@@ -1908,7 +1998,7 @@ function closeAllFilterMenus() {
       closeFilterMenuPortal(menu);
     }
   });
-  
+
   // Also close any existing portals
   if (__headerFilterPortals) {
     __headerFilterPortals.forEach((portal, menuId) => {
@@ -1966,10 +2056,10 @@ function updateFilterSelections(filters) {
     last_7_days: '7 ימים אחרונים',
     last_30_days: '30 ימים אחרונים',
     last_90_days: '90 ימים אחרונים',
-    custom: 'מותאם אישית'
+    custom: 'מותאם אישית',
   };
 
-  const normalizeMulti = (val) => {
+  const normalizeMulti = val => {
     if (!val || (Array.isArray(val) && val.length === 0)) return [];
     if (Array.isArray(val)) {
       const mapped = val.map(v => mapToUi[v] || v).filter(Boolean);
@@ -1984,12 +2074,15 @@ function updateFilterSelections(filters) {
     return mapped === 'הכול' ? [] : [mapped];
   };
 
-  const normalizeDate = (val) => {
+  const normalizeDate = val => {
     if (!val) return 'כל זמן';
     const mapped = mapToUi[val] || val;
     // אם הערך עדיין באנגלית/לא קיים בתפריט – ננעל ל"כל זמן"
-    const uiValues = new Set(Array.from(document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item'))
-      .map(el => el.getAttribute('data-value')));
+    const uiValues = new Set(
+      Array.from(document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item')).map(
+        el => el.getAttribute('data-value')
+      )
+    );
     return uiValues.has(mapped) ? mapped : 'כל זמן';
   };
 
@@ -1997,14 +2090,29 @@ function updateFilterSelections(filters) {
     status: normalizeMulti(filters.status),
     type: normalizeMulti(filters.type),
     account: normalizeMulti(filters.account),
-    dateRange: normalizeDate(filters.dateRange)
+    dateRange: normalizeDate(filters.dateRange),
   };
-  
-  console.log('🔍 מיפוי ערכים - original status:', filters.status, 'mapped status:', uiFilters.status);
+
+  console.log(
+    '🔍 מיפוי ערכים - original status:',
+    filters.status,
+    'mapped status:',
+    uiFilters.status
+  );
   console.log('🔍 מיפוי ערכים - original type:', filters.type, 'mapped type:', uiFilters.type);
-  console.log('🔍 מיפוי ערכים - original account:', filters.account, 'mapped account:', uiFilters.account);
-  console.log('🔍 מיפוי ערכים - original dateRange:', filters.dateRange, 'mapped dateRange:', uiFilters.dateRange);
-  
+  console.log(
+    '🔍 מיפוי ערכים - original account:',
+    filters.account,
+    'mapped account:',
+    uiFilters.account
+  );
+  console.log(
+    '🔍 מיפוי ערכים - original dateRange:',
+    filters.dateRange,
+    'mapped dateRange:',
+    uiFilters.dateRange
+  );
+
   // עדכון סטטוס
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
   statusItems.forEach(item => {
@@ -2016,7 +2124,7 @@ function updateFilterSelections(filters) {
       if (value === 'הכול') item.classList.add('selected');
     }
   });
-  
+
   // עדכון סוג
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
   typeItems.forEach(item => {
@@ -2028,7 +2136,7 @@ function updateFilterSelections(filters) {
       if (value === 'הכול') item.classList.add('selected');
     }
   });
-  
+
   // עדכון חשבון
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
   accountItems.forEach(item => {
@@ -2040,7 +2148,7 @@ function updateFilterSelections(filters) {
       if (value === 'הכול') item.classList.add('selected');
     }
   });
-  
+
   // עדכון טווח תאריכים
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
   dateRangeItems.forEach(item => {
@@ -2071,7 +2179,7 @@ function updateFilterSelections(filters) {
 
     // Notify systems listening for filter updates
     const evt = new CustomEvent('tiktrack:filters-updated', {
-      detail: { filters: uiFilters, source: 'header-system' }
+      detail: { filters: uiFilters, source: 'header-system' },
     });
     document.dispatchEvent(evt);
   } catch (e) {
@@ -2082,18 +2190,18 @@ function updateFilterSelections(filters) {
 // ===== Add event listeners to portal items =====
 function addPortalEventListeners(portal, originalMenu) {
   const menuId = originalMenu.id;
-  
+
   // Add click listeners to portal items
   const portalItems = portal.querySelectorAll('[data-value]');
   portalItems.forEach(portalItem => {
     const value = portalItem.getAttribute('data-value');
-    
-    portalItem.addEventListener('click', (e) => {
+
+    portalItem.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       console.log(`🖱️ Portal item clicked:`, { value, menuId });
-      
+
       // Call the appropriate selection function based on menu type
       if (menuId === 'statusFilterMenu') {
         window.selectStatusOption(value);
@@ -2106,7 +2214,7 @@ function addPortalEventListeners(portal, originalMenu) {
       }
     });
   });
-  
+
   // Add hover listeners to portal to prevent premature closing
   portal.addEventListener('mouseenter', () => {
     // Clear any existing timeout for this menu
@@ -2115,7 +2223,7 @@ function addPortalEventListeners(portal, originalMenu) {
       hoverTimeouts.delete(menuId);
     }
   });
-  
+
   portal.addEventListener('mouseleave', () => {
     if (hoverTimeouts.has(menuId)) {
       clearTimeout(hoverTimeouts.get(menuId));
@@ -2123,18 +2231,26 @@ function addPortalEventListeners(portal, originalMenu) {
     }
 
     // Defer close with delay; only close if nothing is hovered
-    hoverTimeouts.set(menuId, setTimeout(() => {
-      const button = document.getElementById(menuId.replace('Menu', 'Toggle'));
-      const buttonHovered = button ? button.matches(':hover') : false;
-      const portalHovered = portal.matches(':hover');
-      const originalMenuHovered = originalMenu.matches(':hover');
-      
-      if (!buttonHovered && !portalHovered && !originalMenuHovered && originalMenu.classList.contains('show')) {
-        originalMenu.classList.remove('show');
-        closeFilterMenuPortal(originalMenu);
-        console.log(`🖱️ Portal hover closed ${menuId}`);
-      }
-    }, 300)); // Longer delay for portal
+    hoverTimeouts.set(
+      menuId,
+      setTimeout(() => {
+        const button = document.getElementById(menuId.replace('Menu', 'Toggle'));
+        const buttonHovered = button ? button.matches(':hover') : false;
+        const portalHovered = portal.matches(':hover');
+        const originalMenuHovered = originalMenu.matches(':hover');
+
+        if (
+          !buttonHovered &&
+          !portalHovered &&
+          !originalMenuHovered &&
+          originalMenu.classList.contains('show')
+        ) {
+          originalMenu.classList.remove('show');
+          closeFilterMenuPortal(originalMenu);
+          console.log(`🖱️ Portal hover closed ${menuId}`);
+        }
+      }, 300)
+    ); // Longer delay for portal
   });
 }
 
@@ -2147,19 +2263,24 @@ function updatePortalSelections() {
         // Copy selected state from original to portal
         const originalItems = originalMenu.querySelectorAll('[data-value]');
         const portalItems = portal.querySelectorAll('[data-value]');
-        
+
         console.log(`🔄 Updating portal selections for ${menuId}:`, {
           originalItems: originalItems.length,
           portalItems: portalItems.length,
-          selected: Array.from(originalItems).filter(item => item.classList.contains('selected')).map(item => item.getAttribute('data-value'))
+          selected: Array.from(originalItems)
+            .filter(item => item.classList.contains('selected'))
+            .map(item => item.getAttribute('data-value')),
         });
-        
+
         originalItems.forEach((originalItem, index) => {
           const portalItem = portalItems[index];
           if (portalItem) {
             if (originalItem.classList.contains('selected')) {
               portalItem.classList.add('selected');
-              console.log(`✅ Added selected to portal item:`, portalItem.getAttribute('data-value'));
+              console.log(
+                `✅ Added selected to portal item:`,
+                portalItem.getAttribute('data-value')
+              );
             } else {
               portalItem.classList.remove('selected');
             }
@@ -2175,26 +2296,30 @@ function setupHoverBehavior() {
     { buttonId: 'statusFilterToggle', menuId: 'statusFilterMenu', type: 'status' },
     { buttonId: 'typeFilterToggle', menuId: 'typeFilterMenu', type: 'type' },
     { buttonId: 'accountFilterToggle', menuId: 'accountFilterMenu', type: 'account' },
-    { buttonId: 'dateRangeFilterToggle', menuId: 'dateRangeFilterMenu', type: 'date' }
+    { buttonId: 'dateRangeFilterToggle', menuId: 'dateRangeFilterMenu', type: 'date' },
   ];
 
   filterButtons.forEach(({ buttonId, menuId, type }) => {
     const button = document.getElementById(buttonId);
     const menu = document.getElementById(menuId);
-    
+
     if (button && menu) {
       // Remove existing click handlers
       button.removeAttribute('data-onclick');
-      
+
       // Prevent click events from triggering toggle actions
-      button.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        console.log(`🚫 Click prevented on ${buttonId}`);
-        return false;
-      }, true); // Use capture phase to catch before other handlers
-      
+      button.addEventListener(
+        'click',
+        e => {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          console.log(`🚫 Click prevented on ${buttonId}`);
+          return false;
+        },
+        true
+      ); // Use capture phase to catch before other handlers
+
       // Add hover events
       button.addEventListener('mouseenter', () => {
         // Clear any existing timeout
@@ -2202,18 +2327,21 @@ function setupHoverBehavior() {
           clearTimeout(hoverTimeouts.get(buttonId));
           hoverTimeouts.delete(buttonId);
         }
-        
+
         // Open menu after short delay
-        hoverTimeouts.set(buttonId, setTimeout(() => {
-          if (!menu.classList.contains('show')) {
-            closeAllFilterMenus();
-            menu.classList.add('show');
-            openFilterMenuPortal(menu, button, type);
-            console.log(`🖱️ Hover opened ${menuId}`);
-          }
-        }, 150)); // 150ms delay
+        hoverTimeouts.set(
+          buttonId,
+          setTimeout(() => {
+            if (!menu.classList.contains('show')) {
+              closeAllFilterMenus();
+              menu.classList.add('show');
+              openFilterMenuPortal(menu, button, type);
+              console.log(`🖱️ Hover opened ${menuId}`);
+            }
+          }, 150)
+        ); // 150ms delay
       });
-      
+
       button.addEventListener('mouseleave', () => {
         // Clear open timeout
         if (hoverTimeouts.has(buttonId)) {
@@ -2222,19 +2350,27 @@ function setupHoverBehavior() {
         }
 
         // Defer close; only close if neither button nor portal is hovered
-        hoverTimeouts.set(buttonId, setTimeout(() => {
-          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
-          const buttonHovered = button.matches(':hover');
-          const portalHovered = portal ? portal.matches(':hover') : false;
-          const menuHovered = menu.matches(':hover');
-          if (!buttonHovered && !portalHovered && !menuHovered && menu.classList.contains('show')) {
-            menu.classList.remove('show');
-            closeFilterMenuPortal(menu);
-            console.log(`🖱️ Hover closed ${menuId}`);
-          }
-        }, 220)); // short defer to allow cursor to enter portal
+        hoverTimeouts.set(
+          buttonId,
+          setTimeout(() => {
+            const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+            const buttonHovered = button.matches(':hover');
+            const portalHovered = portal ? portal.matches(':hover') : false;
+            const menuHovered = menu.matches(':hover');
+            if (
+              !buttonHovered &&
+              !portalHovered &&
+              !menuHovered &&
+              menu.classList.contains('show')
+            ) {
+              menu.classList.remove('show');
+              closeFilterMenuPortal(menu);
+              console.log(`🖱️ Hover closed ${menuId}`);
+            }
+          }, 220)
+        ); // short defer to allow cursor to enter portal
       });
-      
+
       // Also handle menu hover to keep it open
       menu.addEventListener('mouseenter', () => {
         if (hoverTimeouts.has(buttonId)) {
@@ -2242,7 +2378,7 @@ function setupHoverBehavior() {
           hoverTimeouts.delete(buttonId);
         }
       });
-      
+
       menu.addEventListener('mouseleave', () => {
         if (hoverTimeouts.has(buttonId)) {
           clearTimeout(hoverTimeouts.get(buttonId));
@@ -2250,17 +2386,25 @@ function setupHoverBehavior() {
         }
 
         // Defer close; only close if neither menu/portal nor button is hovered
-        hoverTimeouts.set(buttonId, setTimeout(() => {
-          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
-          const buttonHovered = button.matches(':hover');
-          const portalHovered = portal ? portal.matches(':hover') : false;
-          const menuHovered = menu.matches(':hover');
-          if (!buttonHovered && !portalHovered && !menuHovered && menu.classList.contains('show')) {
-            menu.classList.remove('show');
-            closeFilterMenuPortal(menu);
-            console.log(`🖱️ Menu hover closed ${menuId}`);
-          }
-        }, 220));
+        hoverTimeouts.set(
+          buttonId,
+          setTimeout(() => {
+            const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+            const buttonHovered = button.matches(':hover');
+            const portalHovered = portal ? portal.matches(':hover') : false;
+            const menuHovered = menu.matches(':hover');
+            if (
+              !buttonHovered &&
+              !portalHovered &&
+              !menuHovered &&
+              menu.classList.contains('show')
+            ) {
+              menu.classList.remove('show');
+              closeFilterMenuPortal(menu);
+              console.log(`🖱️ Menu hover closed ${menuId}`);
+            }
+          }, 220)
+        );
       });
     }
   });
@@ -2269,66 +2413,76 @@ function setupHoverBehavior() {
 // ===== GLOBAL FILTER FUNCTIONS =====
 
 // פונקציות בחירת פילטרים (מולטיסלקט)
-window.selectStatusOption = function(status) {
-  window.Logger.info('🔧 selectStatusOption called with:', status, { page: "header-system" });
+window.selectStatusOption = function (status) {
+  window.Logger.info('🔧 selectStatusOption called with:', status, { page: 'header-system' });
   console.log('🔧 selectStatusOption called with:', status);
-  
+
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
   console.log('🔧 Found statusItems:', statusItems.length);
-  const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
+  const clickedItem = Array.from(statusItems).find(
+    item => item.getAttribute('data-value') === status
+  );
   console.log('🔧 clickedItem found:', clickedItem ? 'YES' : 'NO');
-  
+
   if (clickedItem) {
     if (status === 'הכול') {
       statusItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
     } else {
-      const allItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
+      const allItem = Array.from(statusItems).find(
+        item => item.getAttribute('data-value') === 'הכול'
+      );
       if (allItem) {
         allItem.classList.remove('selected');
       }
       clickedItem.classList.toggle('selected');
-      const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+      const selectedItems = document.querySelectorAll(
+        '#statusFilterMenu .status-filter-item.selected'
+      );
       if (selectedItems.length === 0 && allItem) {
         allItem.classList.add('selected');
       }
     }
   }
-  
+
   updateStatusFilterText();
   updatePortalSelections();
-  
+
   console.log('🔧 window.filterSystem:', window.filterSystem ? 'exists' : 'NOT FOUND');
   if (window.filterSystem) {
-    const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+    const selectedItems = document.querySelectorAll(
+      '#statusFilterMenu .status-filter-item.selected'
+    );
     const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.status = selectedStatuses;
     window.filterSystem.saveFilters();
     console.log('🔧 Triggering filter pipeline for status change...');
     window.filterSystem.triggerFilterUpdate('status-change');
   }
-  
+
   const statusMenu = document.getElementById('statusFilterMenu');
   if (statusMenu) {
     statusMenu.classList.remove('show');
   }
 };
 
-window.selectTypeOption = function(type) {
-  window.Logger.info('🔧 selectTypeOption called with:', type, { page: "header-system" });
+window.selectTypeOption = function (type) {
+  window.Logger.info('🔧 selectTypeOption called with:', type, { page: 'header-system' });
   console.log('🔧 selectTypeOption called with:', type);
-  
+
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
   console.log('🔧 Found typeItems:', typeItems.length);
   const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
   console.log('🔧 clickedItem found:', clickedItem ? 'YES' : 'NO');
-  
+
   if (clickedItem) {
     if (type === 'הכול') {
       typeItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
     } else {
-      const allItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
+      const allItem = Array.from(typeItems).find(
+        item => item.getAttribute('data-value') === 'הכול'
+      );
       if (allItem) {
         allItem.classList.remove('selected');
       }
@@ -2339,10 +2493,10 @@ window.selectTypeOption = function(type) {
       }
     }
   }
-  
+
   updateTypeFilterText();
   updatePortalSelections();
-  
+
   if (window.filterSystem) {
     const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
     const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
@@ -2351,83 +2505,93 @@ window.selectTypeOption = function(type) {
     console.log('🔧 Triggering filter pipeline for type change...');
     window.filterSystem.triggerFilterUpdate('type-change');
   }
-  
+
   const typeMenu = document.getElementById('typeFilterMenu');
   if (typeMenu) {
     typeMenu.classList.remove('show');
   }
 };
 
-window.selectAccountOption = function(account) {
-  window.Logger.info('🔧 selectAccountOption called with:', account, { page: "header-system" });
-  
+window.selectAccountOption = function (account) {
+  window.Logger.info('🔧 selectAccountOption called with:', account, { page: 'header-system' });
+
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
-  const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
-  
+  const clickedItem = Array.from(accountItems).find(
+    item => item.getAttribute('data-value') === account
+  );
+
   console.log('🔧 Account selection debug:', {
     account,
     accountItems: accountItems.length,
-    clickedItem: clickedItem ? clickedItem.getAttribute('data-value') : 'not found'
+    clickedItem: clickedItem ? clickedItem.getAttribute('data-value') : 'not found',
   });
-  
+
   if (clickedItem) {
     if (account === 'הכול') {
       accountItems.forEach(item => item.classList.remove('selected'));
       clickedItem.classList.add('selected');
       console.log('✅ Selected "הכול" - removed all others');
     } else {
-      const allItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
+      const allItem = Array.from(accountItems).find(
+        item => item.getAttribute('data-value') === 'הכול'
+      );
       if (allItem) {
         allItem.classList.remove('selected');
       }
       clickedItem.classList.toggle('selected');
-      
-      const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+
+      const selectedItems = document.querySelectorAll(
+        '#accountFilterMenu .account-filter-item.selected'
+      );
       if (selectedItems.length === 0 && allItem) {
         allItem.classList.add('selected');
       }
-      
+
       console.log('✅ Toggled account selection:', {
         account,
         isSelected: clickedItem.classList.contains('selected'),
-        totalSelected: selectedItems.length
+        totalSelected: selectedItems.length,
       });
     }
   }
-  
+
   updateAccountFilterText();
   updatePortalSelections();
-  
+
   if (window.filterSystem) {
-    const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+    const selectedItems = document.querySelectorAll(
+      '#accountFilterMenu .account-filter-item.selected'
+    );
     const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
     window.filterSystem.currentFilters.account = selectedAccounts;
     window.filterSystem.saveFilters();
     console.log('🔧 Triggering filter pipeline for account change...');
     window.filterSystem.triggerFilterUpdate('account-change');
   }
-  
+
   const accountMenu = document.getElementById('accountFilterMenu');
   if (accountMenu) {
     accountMenu.classList.remove('show');
   }
 };
 
-window.selectDateRangeOption = function(dateRange) {
-  window.Logger.info('🔧 selectDateRangeOption called with:', dateRange, { page: "header-system" });
+window.selectDateRangeOption = function (dateRange) {
+  window.Logger.info('🔧 selectDateRangeOption called with:', dateRange, { page: 'header-system' });
 
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
-  
+
   dateRangeItems.forEach(item => item.classList.remove('selected'));
 
-  const clickedItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === dateRange);
+  const clickedItem = Array.from(dateRangeItems).find(
+    item => item.getAttribute('data-value') === dateRange
+  );
   if (clickedItem) {
     clickedItem.classList.add('selected');
   }
 
   updateDateRangeFilterText();
   updatePortalSelections();
-  
+
   if (window.filterSystem) {
     window.filterSystem.currentFilters.dateRange = dateRange;
     window.filterSystem.saveFilters();
@@ -2442,14 +2606,17 @@ window.selectDateRangeOption = function(dateRange) {
 };
 
 // פונקציות עדכון טקסט פילטרים (מולטיסלקט)
-window.updateStatusFilterText = function() {
+window.updateStatusFilterText = function () {
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
   const statusElement = document.getElementById('selectedStatus');
-  
+
   console.log('🔄 updateStatusFilterText - selectedItems:', selectedItems.length);
-  
+
   if (statusElement) {
-    if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+    if (
+      selectedItems.length === 0 ||
+      (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')
+    ) {
       statusElement.textContent = 'כל סטטוס';
       console.log('✅ עדכנתי ל-"כל סטטוס"');
     } else if (selectedItems.length === 1) {
@@ -2464,17 +2631,22 @@ window.updateStatusFilterText = function() {
   }
 };
 
-window.updateTypeFilterText = function() {
+window.updateTypeFilterText = function () {
   const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
   const typeElement = document.getElementById('selectedType');
-  
+
   console.log('🔄 updateTypeFilterText - selectedItems:', selectedItems.length);
   Array.from(selectedItems).forEach((item, idx) => {
-    console.log(`  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`);
+    console.log(
+      `  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`
+    );
   });
-  
+
   if (typeElement) {
-    if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+    if (
+      selectedItems.length === 0 ||
+      (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')
+    ) {
       typeElement.textContent = 'כל סוג השקעה';
       console.log('✅ עדכנתי ל-"כל סוג השקעה"');
     } else if (selectedItems.length === 1) {
@@ -2489,23 +2661,32 @@ window.updateTypeFilterText = function() {
   }
 };
 
-window.updateAccountFilterText = function() {
-  const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+window.updateAccountFilterText = function () {
+  const selectedItems = document.querySelectorAll(
+    '#accountFilterMenu .account-filter-item.selected'
+  );
   const accountElement = document.getElementById('selectedAccount');
 
   console.log('🔄 updateAccountFilterText - selectedItems:', selectedItems.length);
   Array.from(selectedItems).forEach((item, idx) => {
-    console.log(`  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`);
+    console.log(
+      `  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`
+    );
   });
 
   if (accountElement) {
-    if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+    if (
+      selectedItems.length === 0 ||
+      (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')
+    ) {
       accountElement.textContent = 'כל חשבון מסחר';
       console.log('✅ עדכנתי ל-"כל חשבון מסחר"');
     } else if (selectedItems.length === 1) {
       // שימוש בטקסט האמיתי של הפריט (שם החשבון) במקום data-value (ID)
       const optionText = selectedItems[0].querySelector('.option-text');
-      const displayText = optionText ? optionText.textContent.trim() : selectedItems[0].getAttribute('data-value');
+      const displayText = optionText
+        ? optionText.textContent.trim()
+        : selectedItems[0].getAttribute('data-value');
       accountElement.textContent = displayText;
       console.log('✅ עדכנתי ל:', displayText);
     } else {
@@ -2517,13 +2698,17 @@ window.updateAccountFilterText = function() {
   }
 };
 
-window.updateDateRangeFilterText = function() {
-  const selectedItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
+window.updateDateRangeFilterText = function () {
+  const selectedItems = document.querySelectorAll(
+    '#dateRangeFilterMenu .date-range-filter-item.selected'
+  );
   const dateRangeElement = document.getElementById('selectedDateRange');
 
   console.log('🔄 updateDateRangeFilterText - selectedItems:', selectedItems.length);
   Array.from(selectedItems).forEach((item, idx) => {
-    console.log(`  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`);
+    console.log(
+      `  [${idx}] data-value: ${item.getAttribute('data-value')}, text: ${item.textContent.trim()}`
+    );
   });
 
   if (dateRangeElement) {
@@ -2546,34 +2731,34 @@ window.updateDateRangeFilterText = function() {
 };
 
 // פונקציות הפעלת פילטרים - פשוטות ויעילות
-window.applyStatusFilter = function() {
+window.applyStatusFilter = function () {
   if (window.filterSystem) {
     window.filterSystem.triggerFilterUpdate('status-apply');
   }
 };
 
-window.applyTypeFilter = function() {
+window.applyTypeFilter = function () {
   if (window.filterSystem) {
     window.filterSystem.triggerFilterUpdate('type-apply');
   }
 };
 
-window.applyAccountFilter = function() {
+window.applyAccountFilter = function () {
   if (window.filterSystem) {
     window.filterSystem.triggerFilterUpdate('account-apply');
   }
 };
 
-window.applyDateRangeFilter = function(dateRange) {
+window.applyDateRangeFilter = function (dateRange) {
   if (window.filterSystem) {
     window.filterSystem.triggerFilterUpdate('date-range-apply');
   }
 };
 
 // פונקציות כלליות - פשוטות ויעילות
-window.clearAllFilters = function() {
+window.clearAllFilters = function () {
   console.log('🧹 clearAllFilters - מוחק את כל הפילטרים');
-  window.Logger.info('🧹 clearAllFilters - מוחק את כל הפילטרים', { page: "header-system" });
+  window.Logger.info('🧹 clearAllFilters - מוחק את כל הפילטרים', { page: 'header-system' });
   if (window.filterSystem) {
     window.filterSystem.currentFilters = {
       search: '',
@@ -2581,71 +2766,81 @@ window.clearAllFilters = function() {
       status: [],
       type: [],
       account: [],
-      custom: {}
+      custom: {},
     };
     window.filterSystem.saveFilters();
     window.filterSystem.triggerFilterUpdate('clear-all');
-    
+
     // איפוס UI
     const searchInput = document.getElementById('searchFilterInput');
     if (searchInput) searchInput.value = '';
-    
+
     // איפוס בחירות בפילטרים
-    const allFilterItems = document.querySelectorAll('.status-filter-item, .type-filter-item, .account-filter-item, .date-range-filter-item');
+    const allFilterItems = document.querySelectorAll(
+      '.status-filter-item, .type-filter-item, .account-filter-item, .date-range-filter-item'
+    );
     allFilterItems.forEach(item => item.classList.remove('selected'));
-    
+
     // בחירת "הכול" בכל הפילטרים
-    const allStatusItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+    const allStatusItem = document.querySelector(
+      '#statusFilterMenu .status-filter-item[data-value="הכול"]'
+    );
     if (allStatusItem) allStatusItem.classList.add('selected');
-    
-    const allTypeItem = document.querySelector('#typeFilterMenu .type-filter-item[data-value="הכול"]');
+
+    const allTypeItem = document.querySelector(
+      '#typeFilterMenu .type-filter-item[data-value="הכול"]'
+    );
     if (allTypeItem) allTypeItem.classList.add('selected');
-    
-    const allAccountItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
+
+    const allAccountItem = document.querySelector(
+      '#accountFilterMenu .account-filter-item[data-value="הכול"]'
+    );
     if (allAccountItem) allAccountItem.classList.add('selected');
-    
-    const allDateItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="כל זמן"]');
+
+    const allDateItem = document.querySelector(
+      '#dateRangeFilterMenu .date-range-filter-item[data-value="כל זמן"]'
+    );
     if (allDateItem) allDateItem.classList.add('selected');
-    
+
     // עדכון פורטלים
     updatePortalSelections();
-    
+
     // עדכון בחירות בתפריטים
     updateFilterSelections({
       search: '',
       dateRange: 'כל זמן',
       status: [],
       type: [],
-      account: []
+      account: [],
     });
-    
+
     // עדכון טקסטים
     if (typeof window.updateStatusFilterText === 'function') window.updateStatusFilterText();
     if (typeof window.updateTypeFilterText === 'function') window.updateTypeFilterText();
     if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
     if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
-    
-    window.Logger.info('✅ כל הפילטרים נמחקו', { page: "header-system" });
-    
+
+    window.Logger.info('✅ כל הפילטרים נמחקו', { page: 'header-system' });
+
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
       window.showNotification('כל הפילטרים נמחקו בהצלחה', 'success', 'הצלחה', 2000, 'system');
     } else {
-      window.Logger.info('🔔 הודעת הצלחה: כל הפילטרים נמחקו בהצלחה', { page: "header-system" });
+      window.Logger.info('🔔 הודעת הצלחה: כל הפילטרים נמחקו בהצלחה', { page: 'header-system' });
     }
   }
 };
 
 // פונקציה לעדכון UI של הפילטרים
-window.updateFilterUI = function(filters) {
-  window.Logger.info('🎨 עדכון UI של הפילטרים:', filters, { page: "header-system" });
-  
+window.updateFilterUI = function (filters) {
+  window.Logger.info('🎨 עדכון UI של הפילטרים:', filters, { page: 'header-system' });
+
   // עדכון שדה החיפוש
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
     searchInput.value = filters.search || '';
   }
-  
+
   // עדכון פילטר סטטוס
   const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
   statusItems.forEach(item => {
@@ -2657,7 +2852,7 @@ window.updateFilterUI = function(filters) {
       item.classList.add('selected');
     }
   });
-  
+
   // עדכון פילטר סוג
   const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
   typeItems.forEach(item => {
@@ -2669,7 +2864,7 @@ window.updateFilterUI = function(filters) {
       item.classList.add('selected');
     }
   });
-  
+
   // עדכון פילטר חשבון מסחר
   const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
   accountItems.forEach(item => {
@@ -2681,7 +2876,7 @@ window.updateFilterUI = function(filters) {
       item.classList.add('selected');
     }
   });
-  
+
   // עדכון פילטר תאריכים
   const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
   dateItems.forEach(item => {
@@ -2691,13 +2886,13 @@ window.updateFilterUI = function(filters) {
       item.classList.add('selected');
     }
   });
-  
+
   // עדכון טקסטים של הפילטרים
   if (typeof window.updateStatusFilterText === 'function') window.updateStatusFilterText();
   if (typeof window.updateTypeFilterText === 'function') window.updateTypeFilterText();
   if (typeof window.updateAccountFilterText === 'function') window.updateAccountFilterText();
   if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
-}
+};
 
 // ===== Initialize Header System =====
 try {
@@ -2710,9 +2905,16 @@ try {
       window.headerSystemReady = true;
       // Setup hover behavior for filter menus
       setupHoverBehavior();
-      window.Logger && window.Logger.info('✅ HeaderSystem initialized with hover behavior', { page: 'header-system' });
+      window.Logger &&
+        window.Logger.info('✅ HeaderSystem initialized with hover behavior', {
+          page: 'header-system',
+        });
     } catch (e) {
-      window.Logger && window.Logger.error('❌ HeaderSystem init failed', { error: e?.message, page: 'header-system' });
+      window.Logger &&
+        window.Logger.error('❌ HeaderSystem init failed', {
+          error: e?.message,
+          page: 'header-system',
+        });
     }
   };
   if (document.readyState === 'loading') {
@@ -2724,26 +2926,44 @@ try {
   console.error('HeaderSystem bootstrap error:', e);
 }
 
-window.resetAllFilters = async function() {
+window.resetAllFilters = async function () {
   console.log('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות');
-  window.Logger.info('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות', { page: "header-system" });
-  window.Logger.info('↻ resetAllFilters - פונקציה נקראת!', { page: "header-system" });
-  
+  window.Logger.info('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות', {
+    page: 'header-system',
+  });
+  window.Logger.info('↻ resetAllFilters - פונקציה נקראת!', { page: 'header-system' });
+
   try {
     // Clear preference cache to ensure fresh values from database
-    const filterPrefNames = ['defaultSearchFilter', 'defaultDateRangeFilter', 'defaultStatusFilter', 'defaultTypeFilter', 'default_trading_account'];
+    const filterPrefNames = [
+      'defaultSearchFilter',
+      'defaultDateRangeFilter',
+      'defaultStatusFilter',
+      'defaultTypeFilter',
+      'default_trading_account',
+    ];
     for (const prefName of filterPrefNames) {
-      const cacheKey = `preference_${prefName}_1_0`; // user_id=1, profile_id=0
+      const cacheKey = window.PreferencesCore?.buildPreferenceCacheKey
+        ? window.PreferencesCore.buildPreferenceCacheKey(prefName, 0)
+        : window.UnifiedCacheManager?.buildPreferenceCacheKey
+          ? window.UnifiedCacheManager.buildPreferenceCacheKey(prefName, 0)
+          : `preference_${prefName}__profile_0`;
+      const legacyKey = `preference_${prefName}_1_0`;
       if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
         await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
+        if (legacyKey !== cacheKey) {
+          await window.UnifiedCacheManager.remove(legacyKey, { layer: 'localStorage' });
+        }
         console.log(`🗑️ Cleared cache for ${prefName}`);
       }
     }
-    
+
     // טעינת הגדרות ברירת מחדל מהעדפות באמצעות מערכת ההעדפות הקיימת
     console.log('↻ בודק אם getPreference קיימת:', typeof window.getPreference);
-    window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, { page: "header-system" });
-    
+    window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, {
+      page: 'header-system',
+    });
+
     if (typeof window.getPreference !== 'function') {
       console.log('❌ getPreference לא קיימת - לא מתבצע איפוס, מציג הודעה למשתמש');
       const msg = 'לא ניתן לאפס פילטרים: מערכת העדפות לא זמינה. נסה לרענן או לבדוק התחברות.';
@@ -2756,82 +2976,92 @@ window.resetAllFilters = async function() {
       }
       return; // אל תבצע ניקוי או ברירת מחדל
     }
-    
+
     // טעינת העדפות ברירת מחדל
-    const defaultSearch = await window.getPreference('defaultSearchFilter') || '';
-    const defaultDateRange = await window.getPreference('defaultDateRangeFilter') || 'כל זמן';
-    const defaultStatus = await window.getPreference('defaultStatusFilter') || [];
-    const defaultType = await window.getPreference('defaultTypeFilter') || [];
-    const defaultAccount = await window.getPreference('default_trading_account') || [];
-    
+    const defaultSearch = (await window.getPreference('defaultSearchFilter')) || '';
+    const defaultDateRange = (await window.getPreference('defaultDateRangeFilter')) || 'כל זמן';
+    const defaultStatus = (await window.getPreference('defaultStatusFilter')) || [];
+    const defaultType = (await window.getPreference('defaultTypeFilter')) || [];
+    const defaultAccount = (await window.getPreference('default_trading_account')) || [];
+
     console.log('↻ העדפות ברירת מחדל:', {
       search: defaultSearch,
       dateRange: defaultDateRange,
       status: defaultStatus,
       type: defaultType,
-      account: defaultAccount
+      account: defaultAccount,
     });
-    
+
     // הגדרות ברירת מחדל מהעדפות
     const defaultFilters = {
       search: defaultSearch,
       dateRange: defaultDateRange,
-      status: Array.isArray(defaultStatus) ? defaultStatus : (defaultStatus === 'הכל' ? [] : [defaultStatus]),
-      type: Array.isArray(defaultType) ? defaultType : (defaultType === 'הכל' ? [] : [defaultType]),
-      account: Array.isArray(defaultAccount) ? defaultAccount : (defaultAccount === 'כל החשבונות' ? [] : [defaultAccount]),
-      custom: {}
+      status: Array.isArray(defaultStatus)
+        ? defaultStatus
+        : defaultStatus === 'הכל'
+          ? []
+          : [defaultStatus],
+      type: Array.isArray(defaultType) ? defaultType : defaultType === 'הכל' ? [] : [defaultType],
+      account: Array.isArray(defaultAccount)
+        ? defaultAccount
+        : defaultAccount === 'כל החשבונות'
+          ? []
+          : [defaultAccount],
+      custom: {},
     };
-    
-    window.Logger.info('↻ טוען הגדרות ברירת מחדל:', defaultFilters, { page: "header-system" });
-    
+
+    window.Logger.info('↻ טוען הגדרות ברירת מחדל:', defaultFilters, { page: 'header-system' });
+
     // יצירת filterSystem אם לא קיים
     if (!window.filterSystem && typeof window.HeaderSystemClass !== 'undefined') {
       console.log('⚠️ filterSystem לא קיים - יוצר עכשיו');
       window.HeaderSystemClass.createFilterSystem();
     }
-    
+
     // עדכון הפילטרים הנוכחיים
     if (window.filterSystem) {
       console.log('✅ filterSystem קיים, מעדכן פילטרים');
       window.filterSystem.currentFilters = defaultFilters;
       window.filterSystem.saveFilters();
       window.filterSystem.triggerFilterUpdate('reset-defaults');
-      
+
       // עדכון UI ישיר
       console.log('↻ מעדכן UI עם העדפות:', defaultFilters);
-      
+
       // עדכון שדה החיפוש
       const searchInput = document.getElementById('searchFilterInput');
       if (searchInput) {
         searchInput.value = defaultFilters.search || '';
       }
-      
+
       // עדכון בחירות בתפריטים
       console.log('🔄 קורא ל-updateFilterSelections עם:', defaultFilters);
       updateFilterSelections(defaultFilters);
-      
+
       // updateFilterSelections כבר מעדכנת את הטקסטים, אין צורך לקרוא שוב
-      
     } else {
       console.error('❌ filterSystem לא קיים אחרי ניסיון יצירה');
     }
-    
-    window.Logger.info('✅ פילטרים אופסו לערכי ברירת מחדל', { page: "header-system" });
-    
+
+    window.Logger.info('✅ פילטרים אופסו לערכי ברירת מחדל', { page: 'header-system' });
+
     // עדכון פורטלים
     updatePortalSelections();
-    
+
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
       window.showNotification('פילטרים אופסו לערכי ברירת מחדל', 'success', 'הצלחה', 2000, 'system');
     } else {
-      window.Logger.info('🔔 הודעת הצלחה: פילטרים אופסו לערכי ברירת מחדל', { page: "header-system" });
+      window.Logger.info('🔔 הודעת הצלחה: פילטרים אופסו לערכי ברירת מחדל', {
+        page: 'header-system',
+      });
     }
-    
   } catch (error) {
     console.log('❌ שגיאה בטעינת העדפות:', error.message);
-    window.Logger && window.Logger.error('❌ שגיאה בטעינת העדפות:', error, { page: "header-system" });
-    window.Logger && window.Logger.error('❌ פרטי השגיאה:', error.message, error.stack, { page: "header-system" });
+    window.Logger &&
+      window.Logger.error('❌ שגיאה בטעינת העדפות:', error, { page: 'header-system' });
+    window.Logger &&
+      window.Logger.error('❌ פרטי השגיאה:', error.message, error.stack, { page: 'header-system' });
     const msg = 'לא ניתן לאפס פילטרים: שגיאה בקריאת העדפות. נסה שוב מאוחר יותר.';
     if (typeof window.showNotification === 'function') {
       window.showNotification(msg, 'error', 'שגיאה', 4000, 'system');
@@ -2840,7 +3070,7 @@ window.resetAllFilters = async function() {
   }
 };
 
-window.handleSearchInput = function(event) {
+window.handleSearchInput = function (event) {
   const searchTerm = event.target.value;
   if (window.filterSystem) {
     window.filterSystem.currentFilters.search = searchTerm;
@@ -2849,7 +3079,7 @@ window.handleSearchInput = function(event) {
   }
 };
 
-window.clearSearchFilter = function() {
+window.clearSearchFilter = function () {
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
     searchInput.value = '';
@@ -2858,13 +3088,13 @@ window.clearSearchFilter = function() {
       window.filterSystem.saveFilters();
       window.filterSystem.triggerFilterUpdate('search-clear');
     }
-    window.Logger.info('✅ חיפוש נוקה', { page: "header-system" });
-    
+    window.Logger.info('✅ חיפוש נוקה', { page: 'header-system' });
+
     // הצגת הודעת הצלחה
     if (typeof window.showNotification === 'function') {
       window.showNotification('חיפוש נוקה בהצלחה', 'success', 'הצלחה', 1500, 'system');
     } else {
-      window.Logger.info('🔔 הודעת הצלחה: חיפוש נוקה בהצלחה', { page: "header-system" });
+      window.Logger.info('🔔 הודעת הצלחה: חיפוש נוקה בהצלחה', { page: 'header-system' });
     }
   }
 };
@@ -2874,8 +3104,8 @@ window.HeaderSystemClass = HeaderSystem;
 
 // Create global HeaderSystem object for compatibility with unified initialization
 window.HeaderSystem = {
-  initialize: function() {
-    window.Logger.info('🚀 HeaderSystem.initialize called', { page: "header-system" });
+  initialize: function () {
+    window.Logger.info('🚀 HeaderSystem.initialize called', { page: 'header-system' });
     try {
       // Check if HeaderSystem class exists
       if (typeof window.HeaderSystemClass === 'function') {
@@ -2887,28 +3117,35 @@ window.HeaderSystem = {
         setupHoverBehavior();
         return true;
       } else {
-        window.Logger.info('⚠️ HeaderSystem class not available yet', { page: "header-system" });
+        window.Logger.info('⚠️ HeaderSystem class not available yet', { page: 'header-system' });
         return false;
       }
     } catch (error) {
-      window.Logger.info('⚠️ HeaderSystem.initialize error:', error.message, { page: "header-system" });
+      window.Logger.info('⚠️ HeaderSystem.initialize error:', error.message, {
+        page: 'header-system',
+      });
       return false;
     }
   },
-  createFilterSystem: function() {
+  createFilterSystem: function () {
     try {
-      if (typeof window.HeaderSystemClass === 'function' && typeof window.HeaderSystemClass.createFilterSystem === 'function') {
+      if (
+        typeof window.HeaderSystemClass === 'function' &&
+        typeof window.HeaderSystemClass.createFilterSystem === 'function'
+      ) {
         return window.HeaderSystemClass.createFilterSystem();
       }
       return false;
     } catch (error) {
-      window.Logger.info('⚠️ HeaderSystem.createFilterSystem error:', error.message, { page: "header-system" });
+      window.Logger.info('⚠️ HeaderSystem.createFilterSystem error:', error.message, {
+        page: 'header-system',
+      });
       return false;
     }
   },
-  init: function() {
+  init: function () {
     return this.initialize();
-  }
+  },
 };
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
@@ -2918,17 +3155,17 @@ window.HeaderSystem = {
 //   window.Logger.info('selectStatusOption:', typeof window.selectStatusOption, { page: "header-system" });
 //   window.Logger.info('updateStatusFilterText:', typeof window.updateStatusFilterText, { page: "header-system" });
 //   window.Logger.info('applyStatusFilter:', typeof window.applyStatusFilter, { page: "header-system" });
-//   
+//
 //   if (typeof window.HeaderSystemClass === 'function') {
 //     window.headerSystem = new window.HeaderSystemClass();
 //     if (typeof window.headerSystem.init === 'function') {
 //       window.headerSystem.init();
 //     }
-//     
+//
 //     // יצירת מערכת הפילטרים
 //     if (typeof window.HeaderSystemClass.createFilterSystem === 'function') {
 //       window.HeaderSystemClass.createFilterSystem();
-//       
+//
 //       // טעינת מצב שמור אחרי שמערכת הפילטרים נוצרה
 //       setTimeout(() => {
 //         if (typeof window.HeaderSystemClass.loadSavedState === 'function') {
@@ -2936,7 +3173,7 @@ window.HeaderSystem = {
 //         }
 //       }, 200);
 //     }
-//     
+//
 //     // בדיקה נוספת אחרי האתחול
 //     setTimeout(() => {
 //       // window.Logger.info('🔧 After init - checking filter functions again:', { page: "header-system" });
@@ -2950,24 +3187,24 @@ window.HeaderSystem = {
 // });
 
 // Update Toggle Buttons Function - עדכון מצב הכפתורים
-window.updateToggleButtons = function() {
+window.updateToggleButtons = function () {
   const headerFilters = document.querySelector('.header-filters');
   const mainBtn = document.querySelector('.filter-toggle-main');
   const secondaryBtn = document.querySelector('.filter-toggle-secondary');
-  
-        // window.Logger.info('🔧 updateToggleButtons called', { page: "header-system" });
+
+  // window.Logger.info('🔧 updateToggleButtons called', { page: "header-system" });
   // window.Logger.info('headerFilters:', headerFilters, { page: "header-system" });
   // window.Logger.info('mainBtn:', mainBtn, { page: "header-system" });
   // window.Logger.info('secondaryBtn:', secondaryBtn, { page: "header-system" });
-  
+
   if (!headerFilters || !mainBtn || !secondaryBtn) {
     // window.Logger.info('❌ Missing elements', { page: "header-system" });
     return;
   }
-  
+
   const isOpen = headerFilters.style.display !== 'none';
   // window.Logger.info('isOpen:', isOpen, { page: "header-system" });
-  
+
   if (isOpen) {
     // פילטר פתוח - הצג כפתור משני (בתוך הפילטר)
     // window.Logger.info('📤 Hiding main button, showing secondary button', { page: "header-system" });
@@ -2982,78 +3219,90 @@ window.updateToggleButtons = function() {
 };
 
 // Z-Index Debug Function - בדיקת מצב z-index בפועל
-window.debugZIndexStatus = function() {
-    window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: "header-system" });
-    window.Logger.info('=====================================', { page: "header-system" });
-    
-    // בדיקת אלמנטים רלוונטיים
-    const elements = [
-        { selector: '#unified-header', name: 'Header Container' },
-        { selector: '.header-top', name: 'Header Top' },
-        { selector: '.tiktrack-dropdown-menu', name: 'Dropdown Menus' },
-        { selector: '.filter-toggle-section', name: 'Filter Toggle Button' },
-        { selector: '.header-filter-toggle-btn', name: 'Filter Button' },
-        { selector: '.header-filters', name: 'Header Filters' },
-        { selector: '.filter-menu', name: 'Filter Menu' }
-    ];
-    
-    elements.forEach(element => {
-        const el = document.querySelector(element.selector);
-        if (el) {
-            const computedStyle = window.getComputedStyle(el);
-            const zIndex = computedStyle.zIndex;
-            const position = computedStyle.position;
-            const display = computedStyle.display;
-            const visibility = computedStyle.visibility;
-            
-            window.Logger.info(`📍 ${element.name}:`, { page: "header-system" });
-            window.Logger.info(`   Selector: ${element.selector}`, { page: "header-system" });
-            window.Logger.info(`   Z-Index: ${zIndex}`, { page: "header-system" });
-            window.Logger.info(`   Position: ${position}`, { page: "header-system" });
-            window.Logger.info(`   Display: ${display}`, { page: "header-system" });
-            window.Logger.info(`   Visibility: ${visibility}`, { page: "header-system" });
-            window.Logger.info(`   Visible: ${el.offsetParent !== null}`, { page: "header-system" });
-            window.Logger.info('---', { page: "header-system" });
-        } else {
-            window.Logger.info(`❌ ${element.name} (${element.selector}, { page: "header-system" }): לא נמצא`);
-        }
-    });
-    
-    // בדיקת כל התפריטים הפתוחים
-    window.Logger.info('🎯 בדיקת תפריטים פתוחים:', { page: "header-system" });
-    const openMenus = document.querySelectorAll('.tiktrack-dropdown-menu:not([style*="display: none"])');
-    window.Logger.info(`תפריטים פתוחים: ${openMenus.length}`, { page: "header-system" });
-    
-    openMenus.forEach((menu, index) => {
-        const computedStyle = window.getComputedStyle(menu);
-        window.Logger.info(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`, { page: "header-system" });
-    });
-    
-    // בדיקת כפתור הפילטר
-    window.Logger.info('🔘 בדיקת כפתור פילטר:', { page: "header-system" });
-    const filterBtn = document.querySelector('.header-filter-toggle-btn');
-    if (filterBtn) {
-        const computedStyle = window.getComputedStyle(filterBtn);
-        window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: "header-system" });
-        window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, { page: "header-system" });
-        window.Logger.info(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`, { page: "header-system" });
+window.debugZIndexStatus = function () {
+  window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: 'header-system' });
+  window.Logger.info('=====================================', { page: 'header-system' });
+
+  // בדיקת אלמנטים רלוונטיים
+  const elements = [
+    { selector: '#unified-header', name: 'Header Container' },
+    { selector: '.header-top', name: 'Header Top' },
+    { selector: '.tiktrack-dropdown-menu', name: 'Dropdown Menus' },
+    { selector: '.filter-toggle-section', name: 'Filter Toggle Button' },
+    { selector: '.header-filter-toggle-btn', name: 'Filter Button' },
+    { selector: '.header-filters', name: 'Header Filters' },
+    { selector: '.filter-menu', name: 'Filter Menu' },
+  ];
+
+  elements.forEach(element => {
+    const el = document.querySelector(element.selector);
+    if (el) {
+      const computedStyle = window.getComputedStyle(el);
+      const zIndex = computedStyle.zIndex;
+      const position = computedStyle.position;
+      const display = computedStyle.display;
+      const visibility = computedStyle.visibility;
+
+      window.Logger.info(`📍 ${element.name}:`, { page: 'header-system' });
+      window.Logger.info(`   Selector: ${element.selector}`, { page: 'header-system' });
+      window.Logger.info(`   Z-Index: ${zIndex}`, { page: 'header-system' });
+      window.Logger.info(`   Position: ${position}`, { page: 'header-system' });
+      window.Logger.info(`   Display: ${display}`, { page: 'header-system' });
+      window.Logger.info(`   Visibility: ${visibility}`, { page: 'header-system' });
+      window.Logger.info(`   Visible: ${el.offsetParent !== null}`, { page: 'header-system' });
+      window.Logger.info('---', { page: 'header-system' });
+    } else {
+      window.Logger.info(
+        `❌ ${element.name} (${element.selector}, { page: "header-system" }): לא נמצא`
+      );
     }
-    
-    // בדיקת תפריטי פילטר
-    window.Logger.info('🔍 בדיקת תפריטי פילטר:', { page: "header-system" });
-    const filterMenus = document.querySelectorAll('.filter-menu');
-    filterMenus.forEach((menu, index) => {
-        const computedStyle = window.getComputedStyle(menu);
-        window.Logger.info(`תפריט פילטר ${index + 1}: z-index = ${computedStyle.zIndex}`, { page: "header-system" });
+  });
+
+  // בדיקת כל התפריטים הפתוחים
+  window.Logger.info('🎯 בדיקת תפריטים פתוחים:', { page: 'header-system' });
+  const openMenus = document.querySelectorAll(
+    '.tiktrack-dropdown-menu:not([style*="display: none"])'
+  );
+  window.Logger.info(`תפריטים פתוחים: ${openMenus.length}`, { page: 'header-system' });
+
+  openMenus.forEach((menu, index) => {
+    const computedStyle = window.getComputedStyle(menu);
+    window.Logger.info(`תפריט ${index + 1}: z-index = ${computedStyle.zIndex}`, {
+      page: 'header-system',
     });
-    
-    window.Logger.info('=====================================', { page: "header-system" });
-    window.Logger.info('✅ בדיקת Z-Index הושלמה', { page: "header-system" });
+  });
+
+  // בדיקת כפתור הפילטר
+  window.Logger.info('🔘 בדיקת כפתור פילטר:', { page: 'header-system' });
+  const filterBtn = document.querySelector('.header-filter-toggle-btn');
+  if (filterBtn) {
+    const computedStyle = window.getComputedStyle(filterBtn);
+    window.Logger.info(`כפתור פילטר: z-index = ${computedStyle.zIndex}`, { page: 'header-system' });
+    window.Logger.info(`כפתור פילטר: position = ${computedStyle.position}`, {
+      page: 'header-system',
+    });
+    window.Logger.info(`כפתור פילטר: visible = ${filterBtn.offsetParent !== null}`, {
+      page: 'header-system',
+    });
+  }
+
+  // בדיקת תפריטי פילטר
+  window.Logger.info('🔍 בדיקת תפריטי פילטר:', { page: 'header-system' });
+  const filterMenus = document.querySelectorAll('.filter-menu');
+  filterMenus.forEach((menu, index) => {
+    const computedStyle = window.getComputedStyle(menu);
+    window.Logger.info(`תפריט פילטר ${index + 1}: z-index = ${computedStyle.zIndex}`, {
+      page: 'header-system',
+    });
+  });
+
+  window.Logger.info('=====================================', { page: 'header-system' });
+  window.Logger.info('✅ בדיקת Z-Index הושלמה', { page: 'header-system' });
 };
 
 // ===== CACHE CLEARING FUNCTIONS MOVED TO UNIFIED CACHE MANAGER =====
 // All cache clearing functions are now part of the UnifiedCacheManager system
-// and are available as global functions: clearCacheQuick, clearCacheLayer, 
+// and are available as global functions: clearCacheQuick, clearCacheLayer,
 // clearAllCacheAdvanced, clearCacheFull
 
 // ===== DEBUG FUNCTION FOR CACHE CLEARING =====
@@ -3061,35 +3310,41 @@ window.debugZIndexStatus = function() {
 /**
  * פונקציה לבדיקה שהפונקציות עובדות
  */
-window.testCacheClearingFunctions = function() {
-    window.Logger.info('🧪 בדיקת פונקציות ניקוי מטמון...', { page: "header-system" });
-    
-    const functions = [
-        'clearCacheQuick',
-        'clearCacheLayer', 
-        'clearAllCacheAdvanced',
-        'clearCacheFull',
-        'clearCacheBeforeCRUD'
-    ];
-    
-    functions.forEach(funcName => {
-        const exists = typeof window[funcName] === 'function';
-        window.Logger.info(`${funcName}: ${exists ? '✅ זמינה' : '❌ לא זמינה'}`, { page: "header-system" });
+window.testCacheClearingFunctions = function () {
+  window.Logger.info('🧪 בדיקת פונקציות ניקוי מטמון...', { page: 'header-system' });
+
+  const functions = [
+    'clearCacheQuick',
+    'clearCacheLayer',
+    'clearAllCacheAdvanced',
+    'clearCacheFull',
+    'clearCacheBeforeCRUD',
+  ];
+
+  functions.forEach(funcName => {
+    const exists = typeof window[funcName] === 'function';
+    window.Logger.info(`${funcName}: ${exists ? '✅ זמינה' : '❌ לא זמינה'}`, {
+      page: 'header-system',
     });
-    
-    // בדיקת מערכת המטמון המאוחדת
-    const unifiedCacheExists = window.UnifiedCacheManager !== undefined;
-    window.Logger.info(`UnifiedCacheManager: ${unifiedCacheExists ? '✅ זמין' : '❌ לא זמין'}`, { page: "header-system" });
-    
-    // בדיקת מערכת ההתראות
-    const notificationExists = typeof window.showSuccessNotification === 'function';
-    window.Logger.info(`showSuccessNotification: ${notificationExists ? '✅ זמין' : '❌ לא זמין'}`, { page: "header-system" });
-    
-    window.Logger.info('🧪 בדיקת פונקציות ניקוי מטמון הושלמה', { page: "header-system" });
+  });
+
+  // בדיקת מערכת המטמון המאוחדת
+  const unifiedCacheExists = window.UnifiedCacheManager !== undefined;
+  window.Logger.info(`UnifiedCacheManager: ${unifiedCacheExists ? '✅ זמין' : '❌ לא זמין'}`, {
+    page: 'header-system',
+  });
+
+  // בדיקת מערכת ההתראות
+  const notificationExists = typeof window.showSuccessNotification === 'function';
+  window.Logger.info(`showSuccessNotification: ${notificationExists ? '✅ זמין' : '❌ לא זמין'}`, {
+    page: 'header-system',
+  });
+
+  window.Logger.info('🧪 בדיקת פונקציות ניקוי מטמון הושלמה', { page: 'header-system' });
 };
 
 // בדיקה שה-Logger זמין לפני השימוש
 if (window.Logger && window.Logger.info) {
-    window.Logger.info('✅ Header System v6.0.0 loaded successfully!', { page: "header-system" });
+  window.Logger.info('✅ Header System v6.0.0 loaded successfully!', { page: 'header-system' });
 } else {
 }

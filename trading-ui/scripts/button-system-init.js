@@ -458,6 +458,14 @@ class AdvancedButtonSystem {
             this.logger.debug('Skipping button without data-button-type', { elementId: element.id });
             return;
         }
+
+        if (!element.parentNode) {
+            this.logger.warn('Skipping button without parent node', {
+                elementId: element.id || `anonymous-${index}`,
+                buttonType
+            });
+            return;
+        }
         
         const entityType = element.getAttribute('data-entity-type');
         const size = element.getAttribute('data-size');
@@ -472,8 +480,7 @@ class AdvancedButtonSystem {
         const id = element.getAttribute('data-id') || `btn-${index}`;
 
         // Read tooltip configuration from data attributes
-        const tooltipText = element.getAttribute('data-tooltip');
-        const tooltipConfig = tooltipText ? this._getTooltipConfig(element) : null;
+        const tooltipConfig = this._getTooltipConfig(element);
 
         // Preserve important Bootstrap attributes
         if (element.hasAttribute('data-bs-dismiss')) {
@@ -493,7 +500,15 @@ class AdvancedButtonSystem {
         }
 
         this.logger.debug(`Processing button ${index}: ${buttonType}`, {
-            onClick, classes, attributes, text, entityType, size, style, variant, hasTooltip: !!tooltipText
+            onClick,
+            classes,
+            attributes,
+            text,
+            entityType,
+            size,
+            style,
+            variant,
+            hasTooltip: !!tooltipConfig
         });
 
         const newButton = this.createButtonFromData(
@@ -608,7 +623,24 @@ class AdvancedButtonSystem {
      */
     _getTooltipConfig(element) {
         const elementId = element.id || 'unknown';
-        const tooltipText = element.getAttribute('data-tooltip');
+        const explicitTooltipAttr = element.hasAttribute('data-tooltip');
+        let tooltipText = element.getAttribute('data-tooltip');
+        if (!tooltipText) {
+            const fallbackTooltip =
+                element.getAttribute('title') ||
+                element.getAttribute('aria-label') ||
+                element.getAttribute('data-text');
+
+            if (fallbackTooltip) {
+                tooltipText = fallbackTooltip;
+                element.setAttribute('data-tooltip', tooltipText);
+                buttonTooltipDebugLog(`🔍 [Tooltip Debug] Derived tooltip text for element ${elementId} from fallback attributes`, {
+                    title: element.getAttribute('title'),
+                    ariaLabel: element.getAttribute('aria-label'),
+                    dataText: element.getAttribute('data-text')
+                });
+            }
+        }
         
         buttonTooltipDebugLog(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {
             tooltipText: tooltipText,
@@ -616,7 +648,11 @@ class AdvancedButtonSystem {
         });
         
         if (!tooltipText) {
-            console.warn(`🔍 [Tooltip Debug] No tooltip text found for element ${elementId}`);
+            if (explicitTooltipAttr) {
+                console.warn(`🔍 [Tooltip Debug] No tooltip text found for element ${elementId}`);
+            } else {
+                this.logger.debug('Skipping tooltip initialization - no tooltip text available', { elementId });
+            }
             return null;
         }
 

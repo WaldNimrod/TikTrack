@@ -12,6 +12,9 @@
 (function () {
     'use strict';
 
+    const STOP_PERCENT_RANGE = { min: 0.1, max: 95 };
+    const TARGET_PERCENT_RANGE = { min: 0.1, max: 500 };
+
     const DEFAULT_OPTIONS = {
         allowFractionalShares: false,
         amountDecimals: 2,
@@ -28,6 +31,8 @@
         summaryTitle: 'סיכום',
         stopPreferenceKey: 'defaultStopLoss',
         targetPreferenceKey: 'defaultTargetPrice',
+        stopPercentFallback: 2,
+        targetPercentFallback: 6,
         forceRiskOnBind: false,
         forceSyncOnBind: false,
         percentDecimals: 2,
@@ -37,6 +42,7 @@
     const boundContexts = new WeakMap();
     const riskCache = new Map();
     const riskPromises = new Map();
+    let riskDefaultsWarningShown = false;
 
     function resolveElement(root, ref) {
         if (!ref) {
@@ -737,7 +743,8 @@
     }
 
     async function loadDefaultRiskPercents(options) {
-        const cacheKey = getRiskCacheKey(options);
+        const effectiveOptions = Object.assign({}, DEFAULT_OPTIONS, options || {});
+        const cacheKey = getRiskCacheKey(effectiveOptions);
         if (riskCache.has(cacheKey)) {
             return riskCache.get(cacheKey);
         }
@@ -746,22 +753,59 @@
         }
 
         const promise = (async () => {
-            let stopPercent = 2.5;
-            let targetPercent = 5;
-            try {
-                if (typeof window.getUserPreference === 'function') {
-                    const stopPref = await window.getUserPreference(options.stopPreferenceKey || DEFAULT_OPTIONS.stopPreferenceKey, null);
-                    if (stopPref !== null && stopPref !== undefined && !Number.isNaN(parseFloat(stopPref))) {
-                        stopPercent = Math.abs(parseFloat(stopPref));
-                    }
+            let stopPercent = null;
+            let targetPercent = null;
 
-                    const targetPref = await window.getUserPreference(options.targetPreferenceKey || DEFAULT_OPTIONS.targetPreferenceKey, null);
-                    if (targetPref !== null && targetPref !== undefined && !Number.isNaN(parseFloat(targetPref))) {
-                        targetPercent = Math.abs(parseFloat(targetPref));
+            const resolvePreference = async (key) => {
+                try {
+                    if (typeof window.getUserPreference === 'function') {
+                        return await window.getUserPreference(key, null);
                     }
+                    if (typeof window.getPreference === 'function') {
+                        return await window.getPreference(key, null);
+                    }
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ Error loading risk preference', { key, error, source: 'InvestmentCalculationService' });
                 }
-            } catch (error) {
-                window.Logger?.warn?.('⚠️ Error loading risk preferences', { error, source: 'InvestmentCalculationService' });
+                return null;
+            };
+
+            const stopPref = await resolvePreference(effectiveOptions.stopPreferenceKey || DEFAULT_OPTIONS.stopPreferenceKey);
+            if (stopPref !== null && stopPref !== undefined && !Number.isNaN(parseFloat(stopPref))) {
+                stopPercent = Math.abs(parseFloat(stopPref));
+            }
+
+            const targetPref = await resolvePreference(effectiveOptions.targetPreferenceKey || DEFAULT_OPTIONS.targetPreferenceKey);
+            if (targetPref !== null && targetPref !== undefined && !Number.isNaN(parseFloat(targetPref))) {
+                targetPercent = Math.abs(parseFloat(targetPref));
+            }
+
+            if ((stopPercent === null || stopPercent <= 0) && Number.isFinite(effectiveOptions.stopPercentFallback)) {
+                stopPercent = Math.abs(parseFloat(effectiveOptions.stopPercentFallback));
+            }
+
+            if ((targetPercent === null || targetPercent <= 0) && Number.isFinite(effectiveOptions.targetPercentFallback)) {
+                targetPercent = Math.abs(parseFloat(effectiveOptions.targetPercentFallback));
+            }
+
+            if (Number.isFinite(stopPercent)) {
+                stopPercent = Math.min(Math.max(stopPercent, STOP_PERCENT_RANGE.min), STOP_PERCENT_RANGE.max);
+            } else {
+                stopPercent = null;
+            }
+
+            if (Number.isFinite(targetPercent)) {
+                targetPercent = Math.min(Math.max(targetPercent, TARGET_PERCENT_RANGE.min), TARGET_PERCENT_RANGE.max);
+            } else {
+                targetPercent = null;
+            }
+
+            if ((stopPercent === null || targetPercent === null) && !riskDefaultsWarningShown) {
+                riskDefaultsWarningShown = true;
+                window.Logger?.warn?.('⚠️ Missing default risk preferences. Automatic risk calculations are skipped.', { stopPercent, targetPercent, source: 'InvestmentCalculationService' });
+                if (typeof window.showWarningNotification === 'function') {
+                    window.showWarningNotification('הגדרות סיכון חסרות', 'אין ערכי יעד/סטופ ברירת מחדל. עדכן העדפות כדי לאפשר חישוב אוטומטי.');
+                }
             }
 
             const result = { stopPercent, targetPercent };

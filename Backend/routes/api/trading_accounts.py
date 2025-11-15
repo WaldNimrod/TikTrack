@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trading_account_service import TradingAccountService
+from services.tag_service import TagService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
@@ -226,6 +227,16 @@ def delete_trading_account(trading_account_id: int):
                 "version": "1.0"
             }), 400
         
+        # Remove tag associations before deleting the entity
+        try:
+            TagService.remove_all_tags_for_entity(db, 'trading_account', trading_account_id)
+        except ValueError as tag_error:
+            logger.warning(
+                "Failed to remove tags for trading_account %s before deletion: %s",
+                trading_account_id,
+                tag_error,
+            )
+
         # Try to delete (this will check for all linked items)
         success = TradingAccountService.delete(db, trading_account_id)
         if success:

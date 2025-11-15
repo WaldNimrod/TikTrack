@@ -72,7 +72,7 @@ def main():
         'trading-ui/notifications-center.html',
         'trading-ui/background-tasks.html',
         'trading-ui/server-monitor.html',
-        'trading-ui/linter-realtime-monitor.html',
+        'trading-ui/code-quality-dashboard.html',
         'trading-ui/css-management.html',
         'trading-ui/crud-testing-dashboard.html',
         'trading-ui/cache-management.html',

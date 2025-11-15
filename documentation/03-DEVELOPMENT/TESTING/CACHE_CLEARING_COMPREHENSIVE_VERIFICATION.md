@@ -633,11 +633,11 @@ try {
 **וידוא שהניקוי עבד:**
 ```javascript
 // לפני clear:
-const before = await window.UnifiedCacheManager.get('trades');
+const before = await window.UnifiedCacheManager.get('trades-data');
 console.log('Before:', before);  // יש data
 
 // אחרי clear:
-const after = await window.UnifiedCacheManager.get('trades');
+const after = await window.UnifiedCacheManager.get('trades-data');
 console.log('After:', after);  // אמור להיות null!
 ```
 

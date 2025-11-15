@@ -150,60 +150,89 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'cache-clear-menu.js',
+        globalCheck: 'window.CacheControlMenu',
+        description: 'שליטת ניקוי מטמון(Stage B-Lite)',
+        required: true,
+        loadOrder: 8
+      },
+      {
+        file: 'cache-ttl-guard.js',
+        globalCheck: 'window.CacheTTLGuard',
+        description: 'TTL guard for entity loaders',
+        required: true,
+        loadOrder: 9
+      },
+      {
         file: 'logger-service.js',
         globalCheck: 'window.Logger',
         description: 'שירות לוגים מתקדם',
         required: true,
-        loadOrder: 8
+        loadOrder: 10
       },
       {
         file: 'header-system.js',
         globalCheck: 'window.HeaderSystem',
         description: 'מערכת כותרת',
         required: true,
-        loadOrder: 9
+        loadOrder: 11
+      },
+      {
+        file: 'page-state-manager.js',
+        globalCheck: 'window.PageStateManager',
+        description: 'מנהל מצב עמודים מאוחד',
+        required: true,
+        loadOrder: 12
       },
       {
         file: 'page-utils.js',
         globalCheck: 'window.loadPageState',
         description: 'כלי עזר עמוד',
         required: true,
-        loadOrder: 10
+        loadOrder: 13
       },
       {
         file: 'translation-utils.js',
         globalCheck: 'window.translateStatus',
         description: 'תרגומים',
         required: true,
-        loadOrder: 11
+        loadOrder: 14
       },
       {
         file: 'button-icons.js',
         globalCheck: 'window.BUTTON_ICONS',
         description: 'מערכת איקונים וכפתורים',
         required: true,
-        loadOrder: 12
+        loadOrder: 15
+      },
+      {
+        file: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+        globalCheck: 'window.bootstrap',
+        description: 'Bootstrap JS Bundle (Tooltips & Modals)',
+        required: true,
+        loadOrder: 16,
+        external: true
       },
       {
         file: 'event-handler-manager.js',
         globalCheck: 'window.EventHandlerManager',
         description: 'מערכת ניהול אירועים מרכזית',
         required: true,
-        loadOrder: 13
+        loadOrder: 17
       },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
         required: true,
-        loadOrder: 14
+        loadOrder: 18
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
         required: true,
-        loadOrder: 15
+        loadOrder: 19
       }
     ],
     estimatedSize: '~280KB',
@@ -284,18 +313,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 9
       },
       {
+        file: 'services/lint-status-service.js',
+        globalCheck: 'window.LintStatusService',
+        description: 'שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים)',
+        required: true,
+        loadOrder: 10
+      },
+      {
         file: 'services/alert-condition-renderer.js',
         globalCheck: 'window.AlertConditionRenderer',
         description: 'מציג תנאי התראות',
         required: false,
-        loadOrder: 10
+        loadOrder: 11
       },
       {
         file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
-        loadOrder: 11,
+        loadOrder: 12,
         external: true
       },
       {
@@ -303,7 +339,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.DOMPurify',
         description: 'DOMPurify - HTML Sanitizer',
         required: true,
-        loadOrder: 12,
+        loadOrder: 13,
         external: true
       },
       {
@@ -311,7 +347,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.RichTextEditorService',
         description: 'שירות עורך טקסט עשיר',
         required: true,
-        loadOrder: 13
+        loadOrder: 14
       }
     ],
     estimatedSize: '~180KB',
@@ -588,6 +624,28 @@ const PACKAGE_MANIFEST = {
     initTime: '~80ms'
   },
 
+  // 4.2. TAG MANAGEMENT PAGE PACKAGE - ניהול תגיות
+  'tag-management': {
+    id: 'tag-management',
+    name: 'Tag Management Page Package',
+    description: 'לוגיקה ייעודית לעמוד ניהול תגיות',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 4.2,
+    dependencies: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences'],
+    scripts: [
+      {
+        file: 'tag-management-page.js',
+        globalCheck: 'window.TagManagementPage',
+        description: 'ניהול תצוגת עמוד ניהול התגיות',
+        required: true,
+        loadOrder: 1
+      }
+    ],
+    estimatedSize: '~45KB',
+    initTime: '~35ms'
+  },
+
   // 5. PREFERENCES PACKAGE - העדפות
   preferences: {
     id: 'preferences',
@@ -705,53 +763,46 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
-        file: 'conditions/condition-builder.js',
-        globalCheck: 'window.ConditionBuilder',
-        description: 'בונה תנאים',
-        required: true,
-        loadOrder: 3
-      },
-      {
         file: 'conditions/conditions-form-generator.js',
         globalCheck: 'window.conditionsFormGenerator',
         description: 'מחולל טפסי תנאים',
         required: true,
-        loadOrder: 4
+        loadOrder: 3
       },
       {
         file: 'conditions/conditions-crud-manager.js',
         globalCheck: 'window.conditionsCRUDManager',
         description: 'מנהל CRUD תנאים',
         required: true,
-        loadOrder: 5
+        loadOrder: 4
       },
       {
         file: 'conditions/conditions-initializer.js',
         globalCheck: 'window.conditionsInitializer',
         description: 'מאתחל תנאים',
         required: true,
-        loadOrder: 6
+        loadOrder: 5
       },
       {
         file: 'modal-configs/conditions-config.js',
         globalCheck: 'window.conditionsModalConfig',
         description: 'קונפיגורציית מודל תנאים',
         required: true,
-        loadOrder: 7
+        loadOrder: 6
       },
       {
         file: 'conditions/conditions-ui-manager.js',
         globalCheck: 'window.ConditionsUIManager',
         description: 'מנהל ממשק תנאים',
         required: true,
-        loadOrder: 8
+        loadOrder: 7
       },
       {
         file: 'conditions/conditions-modal-controller.js',
         globalCheck: 'window.ConditionsModalController',
         description: 'בקר מודל תנאים',
         required: true,
-        loadOrder: 9
+        loadOrder: 8
       }
     ],
     estimatedSize: '~150KB',
@@ -838,25 +889,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
-        file: 'charts/adapters/linter-adapter.js',
-        globalCheck: 'window.LinterAdapter',
-        description: 'מתאם לינטר',
-        required: true,
-        loadOrder: 5
-      },
-      {
         file: 'charts/adapters/performance-adapter.js',
         globalCheck: 'window.PerformanceAdapter',
         description: 'מתאם ביצועים',
         required: true,
-        loadOrder: 6
+        loadOrder: 5
       },
       {
         file: 'charts/adapters/trades-adapter.js',
         globalCheck: 'window.TradesAdapter',
         description: 'מתאם עסקאות',
         required: true,
-        loadOrder: 7
+        loadOrder: 6
       }
     ],
     estimatedSize: '~300KB',
@@ -967,9 +1011,9 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
-        file: 'active-alerts-component.js',
-        globalCheck: 'window.updateActiveAlertsComponent',
-        description: 'רכיב התראות פעילות',
+        file: 'services/trade-plans-data.js',
+        globalCheck: 'window.TradePlansData',
+        description: 'שירות נתוני תוכניות מסחר',
         required: true,
         loadOrder: 6
       },
@@ -1174,25 +1218,11 @@ const PACKAGE_MANIFEST = {
         loadOrder: 1
       },
       {
-        file: 'server-monitor.js',
-        globalCheck: 'window.ServerMonitor',
-        description: 'ניטור שרת',
-        required: true,
-        loadOrder: 2
-      },
-      {
         file: 'background-tasks.js',
         globalCheck: 'window.startScheduler',
         description: 'משימות רקע',
         required: true,
-        loadOrder: 3
-      },
-      {
-        file: 'system-management.js',
-        globalCheck: 'window.systemManagement',
-        description: 'ניהול מערכת כללי',
-        required: true,
-        loadOrder: 4
+        loadOrder: 2
       }
     ],
     estimatedSize: '~150KB',
@@ -1408,32 +1438,67 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services', 'ui-advanced', 'entity-services'],
     scripts: [
       {
+        file: 'services/dashboard-data.js',
+        globalCheck: 'window.DashboardData',
+        description: 'שירות נתוני דשבורד מאוחד',
+        required: true,
+        loadOrder: 0
+      },
+      {
+        file: 'widgets/recent-trades-widget.js',
+        globalCheck: 'window.RecentTradesWidget',
+        description: 'ווידג׳ט טריידים אחרונים',
+        required: true,
+        loadOrder: 1
+      },
+      {
         file: 'pending-executions-widget.js',
         globalCheck: 'window.PendingExecutionsHighlights',
         description: 'ווידג׳ט המלצות שיוך',
         required: true,
-        loadOrder: 0
+        loadOrder: 2
       },
       {
         file: 'pending-execution-trade-creation.js',
         globalCheck: 'window.PendingExecutionTradeCreation',
         description: 'ממשק יצירת טרייד מביצועים',
-        required: true,
-        loadOrder: 1
+        required: false,
+        loadOrder: 3
       },
       {
         file: 'pending-trade-plan-widget.js',
         globalCheck: 'window.PendingTradePlanWidget',
         description: 'ווידג׳ט שיוך תוכניות למסחר',
         required: true,
-        loadOrder: 2
+        loadOrder: 4
+      },
+      {
+        file: 'active-alerts-component.js',
+        globalCheck: 'window.updateActiveAlertsComponent',
+        description: 'רכיב התראות פעילות',
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'modal-configs/tag-search-config.js',
+        globalCheck: 'window.tagSearchDrawerConfig',
+        description: 'תצורת מגירת חיפוש תגיות',
+        required: true,
+        loadOrder: 6
+      },
+      {
+        file: 'tag-search-controller.js',
+        globalCheck: 'window.TagSearchController',
+        description: 'בקר חיפוש תגיות',
+        required: true,
+        loadOrder: 7
       },
       {
         file: 'index.js',
         globalCheck: 'window.initializeIndexPage',
         description: 'לוגיקת דף הבית',
         required: true,
-        loadOrder: 3
+        loadOrder: 8
       }
     ],
     estimatedSize: '~110KB',

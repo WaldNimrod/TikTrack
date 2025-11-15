@@ -154,37 +154,49 @@ if (filters) {
 ---
 
 #### `saveSort(pageName, sort)`
-שמירת מצב סידור בלבד.
+שמירת מצב סידור בלבד (פר טבלה).
 
 ```javascript
 await window.PageStateManager.saveSort('trades', {
-  columnIndex: 2,
-  direction: 'desc'
+  tableType: 'trades',
+  columnIndex: 12,
+  direction: 'desc',
+  chain: [
+    { columnIndex: 12, direction: 'desc', key: 'updated_at' },
+    { columnIndex: 6, direction: 'asc', key: 'status' },
+    { columnIndex: 0, direction: 'asc', key: 'ticker_symbol' }
+  ]
 });
 ```
 
 **Parameters:**
 - `pageName` (string) - שם העמוד
-- `sort` (Object) - מצב סידור `{ columnIndex, direction }`
+- `sort` (Object) - מצב סידור הכולל לפחות `tableType`, `columnIndex`, `direction`. ניתן לצרף `chain` (מערך הקריטריונים המלא).
 
 **Returns:** `Promise<boolean>` - הצלחת השמירה
 
 ---
 
-#### `loadSort(pageName)`
-טעינת מצב סידור בלבד.
+#### `loadSort(pageName, tableType?)`
+טעינת מצב סידור בלבד.  
+הפונקציה מחזירה מפה של כל מצבי הסידור לעמוד, או מצב יחיד אם הועבר `tableType`.
 
 ```javascript
-const sort = await window.PageStateManager.loadSort('trades');
-if (sort && sort.columnIndex >= 0) {
-  await window.UnifiedTableSystem.sorter.sort('trades', sort.columnIndex);
+const allSortStates = await window.PageStateManager.loadSort('trades');
+const tradesSortState = await window.PageStateManager.loadSort('trades', 'trades');
+
+if (tradesSortState?.columnIndex >= 0) {
+  await window.UnifiedTableSystem.sorter.sort('trades', tradesSortState.columnIndex, {
+    direction: tradesSortState.direction
+  });
 }
 ```
 
 **Parameters:**
 - `pageName` (string) - שם העמוד
+- `tableType` (string, optional) - סוג הטבלה. אם לא נמסר מוחזרת המפה המלאה.
 
-**Returns:** `Promise<Object|null>` - מצב סידור או null אם לא נמצא
+**Returns:** `Promise<Object|null>` - מצב סידור לתבלה המבוקשת או המפה המלאה, או null אם לא נמצא
 
 ---
 

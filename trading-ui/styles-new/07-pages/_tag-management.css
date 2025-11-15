@@ -1,0 +1,23 @@
+/**
+ * Tag Management Page Styles
+ * Layer: Pages (ITCSS stage 7)
+ */
+
+.tag-management-page .content-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(17, 24, 39, 0.08);
+}
+
+.tag-management-page .section-header .table-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.tag-management-page .page-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #f8f9fa;
+}
+

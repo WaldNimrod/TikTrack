@@ -45,8 +45,11 @@ Backend/
 trading-ui/
 ├── scripts/conditions/
 │   ├── conditions-translations.js      # תרגומים
-│   ├── condition-validator.js          # ולידציה קליינט
-│   └── condition-builder.js            # בונה תנאים
+│   ├── conditions-validator.js         # ולידציה קליינט
+│   ├── conditions-form-generator.js    # טופס דינמי
+│   ├── conditions-crud-manager.js      # חיבור CRUD מאוחד
+│   ├── conditions-ui-manager.js        # רינדור ממשק תנאים
+│   └── conditions-modal-controller.js  # אינטגרציה עם ModalNavigationService
 └── styles-new/06-components/
     └── _conditions-system.css          # עיצוב מערכת
 ```
@@ -64,17 +67,55 @@ trading-ui/
 - **פיבונצי ואיזור הזהב** - Fibonacci & Golden Zone
 
 ### 2. פונקציונליות
-- **בניית תנאים** - ממשק גרפי לבניית תנאים מותאמים
+- **ניהול תנאים** - מודול אחוד למעבר בין תכניות, טריידים והתראות
 - **ולידציה** - בדיקת תקינות פרמטרים
 - **רשת תנאים** - העתקת תנאים מתכניות מסחר לטריידים
 - **התראות אוטומטיות** - יצירת התראות מתנאים
 - **ניהול קבוצות** - ארגון תנאים בקבוצות לוגיות
 
-### 3. אינטגרציה
+### 3. חוויית משתמש ומעקב
+- **טבלת תקציר תנאים** – מוצגת במודל עריכת תכנית (66% מהרוחב), כוללת עמודות שיטה/אופרטור/פרמטרים/עודכן/פעולות ופועלת על בסיס הנתונים של `EntityDetailsAPI`.
+- **כפתורי פעולה אחידים** – כל הכפתורים (הוספה/עריכה/מחיקה) משתמשים ב-`ButtonSystem.processButtons` עם `data-variant="small"` להצגת איקונים בלבד (ללא טקסט) בכיוון RTL תקין.
+- **Modal Navigation Integration** – `ConditionsModalController` שומר על מודל האב, תומך ב-`focusConditionId` לעריכת תנאי מתוך התקציר ומונע ריענון דף באמצעות `ConditionsReloadBypass`.
+- **Post-Save Confirmation** – לאחר שמירה מוצג חלון ייעודי (“הוסף תנאי נוסף” / “חזרה לתכנון”) במקום סגירה כפולה של מודלים.
+
+### 4. אינטגרציה
 - **תכניות מסחר** - הגדרת תנאים לתכניות
 - **טריידים** - הגדרת תנאים לטריידים
 - **התראות** - יצירת התראות מתנאים קיימים
 - **נתונים חיצוניים** - שימוש בנתוני שוק אמיתיים
+
+---
+
+## עדכוני נובמבר 2025 (גרסה 1.1.0)
+
+> **מטרה:** תיעוד תוספות היציבות וה-UX שבוצעו בסבב האחרון (Backend + Frontend + DevEx).
+
+### Backend & DB
+- `_ensure_conditions_tables()` רץ בכל פעולה (GET/POST/PUT/DELETE) ומוודא קיום כל הטבלאות, העמודות והאינדקסים (כולל `method_key`, `auto_generate_alerts`).
+- `TradingMethod` מחזיר `method_key` מחושב (`_generate_method_key`) כדי להבטיח צימוד מלא לוולידציה בצד הלקוח.
+- `parameters_json` מתקבל כאובייקט ומומר ל-JSON string יחיד כדי למנוע stringify כפול ותקלות decoding.
+
+### ולידציה בצד הלקוח
+- `conditions-validator.js` מחובר ל-`conditionsCRUDManager` וקורא את רשימת השיטות מ-cache.
+- הוגדרו חוקים מפורטים לכל שש השיטות: חובה/רשות, טיפוסים, טווחי ערכים, הערות תרגום ויחידות מדידה.
+- פונקציית `safeParse` מוודאת JSON nested (למשל `validation_rule`) ומחזירה הודעות ברורות ללוגרים/משתמש.
+
+### UI & חוויית משתמש
+- `conditions-form-generator.js` הופך את כפתור “שמור” ל-`type="button"` ומונע submit טבעי כדי לשמור את המודלים פתוחים ולרשום לוגים.
+- `conditions-ui-manager.js` ו-`conditions-crud-manager.js` מנהלים עצמאית הצלחות/שגיאות, מונעים reliance על `CRUDResponseHandler` ומוסיפים מודל Post-Save מותאם.
+- `trade_plans.js` יוצר תקציר תנאים, מאזין ל-`tradePlanConditionsUpdated`, מפעיל `ButtonSystem` לכל כפתור פעולה ומאפשר עריכה/מחיקה ישירות מהטבלה.
+- כפתור “הוסף תנאי” הוצב לצד שדה התגיות בשורה משותפת (33%/66%), משתמש ב-`data-button-type="ADD"` + `data-variant="small"` ומוצג בצד שמאל (RTL) עם tooltip/aria-label.
+
+### לוגים והתראות
+- כלל התרחישים המרכזיים שולחים לוגים דרך `window.Logger` עם תגיות ייעודיות (`ConditionsFlow`, `ConditionsCRUD`, `ConditionsFormFlow`, `ConditionsReloadBypass`).
+- הודעות למשתמש מוצגות רק באמצעות `window.showNotification`, ללא נתוני ברירת מחדל/פיקטיביים (עמידה בכלל 48).
+- preferences נטענים דרך `window.getCurrentPreference` שמכניס cache לאחוד (UnifiedCacheManager + API + localStorage) ומפסיק spam ל-`/api/preferences/default`.
+
+### בדיקות מומלצות
+1. **UI** – לפתוח מודל תכנית, להוסיף תנאי לכל אחת מהשיטות, לוודא שהתקציר מעודכן ושכפתורי הפעולה פועלים.
+2. **Backend** – להריץ `pytest Backend/tests/test_conditions_master_data.py` לווידוא זריעת הנתונים.
+3. **DB** – לאמת שהטבלאות `plan_conditions` / `trade_conditions` כוללות את העמודות החדשות ולהריץ `.schema` מול `tiktrack.db`.
 
 ---
 
@@ -119,15 +160,24 @@ python3 create_fresh_database.py
 
 <!-- הוספת קבצי JS -->
 <script src="scripts/conditions/conditions-translations.js"></script>
-<script src="scripts/conditions/condition-validator.js"></script>
-<script src="scripts/conditions/condition-builder.js"></script>
+<script src="scripts/conditions/conditions-validator.js"></script>
+<script src="scripts/conditions/conditions-form-generator.js"></script>
+<script src="scripts/conditions/conditions-crud-manager.js"></script>
+<script src="scripts/conditions/conditions-initializer.js"></script>
+<script src="scripts/modal-configs/conditions-config.js"></script>
+<script src="scripts/conditions/conditions-ui-manager.js"></script>
+<script src="scripts/conditions/conditions-modal-controller.js"></script>
 ```
 
 ### 3. אתחול המערכת
 ```javascript
-// אתחול אוטומטי דרך המערכת המאוחדת
-// או אתחול ידני
-const conditionBuilder = new ConditionBuilder('plan', 'new', 'containerId');
+// פתיחת מודול התנאים מתוך מודל ההורה
+window.ConditionsModalController.open({
+  entityType: 'plan',
+  entityId: 42,
+  entityName: 'TSLA Swing Plan',
+  parentModalId: 'tradePlansModal'
+});
 ```
 
 ---

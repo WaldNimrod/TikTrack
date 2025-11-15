@@ -21,6 +21,7 @@ import re
 from collections import Counter
 from html import escape
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from models.import_session import ImportSession
 from models.trading_account import TradingAccount
@@ -32,6 +33,8 @@ from .validation_service import ValidationService
 from .duplicate_detection_service import DuplicateDetectionService
 from .symbol_metadata_service import SymbolMetadataService
 from services.user_data_import.report_generator import ImportReportGenerator
+from services.user_data_import.session_manager import ImportSessionManager
+from services.user_data_import.import_processor import ImportProcessor
 from connectors.user_data_import.ibkr_connector import IBKRConnector
 from connectors.user_data_import.demo_connector import DemoConnector
 from services.date_normalization_service import DateNormalizationService
@@ -68,6 +71,8 @@ class ImportOrchestrator:
         self.report_generator = ImportReportGenerator()
         self.utc_normalizer = DateNormalizationService("UTC")
         self.symbol_metadata_service = SymbolMetadataService(db_session)
+        self.session_manager = ImportSessionManager(db_session)
+        self.processor = ImportProcessor(db_session, advanced_cache_service)
         
         # Available connectors
         self.connectors = {
@@ -392,6 +397,208 @@ class ImportOrchestrator:
             'symbol_metadata': symbol_metadata
         }
 
+    # ------------------------------------------------------------------
+    # Account linking helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _normalize_account_identifier(value: Optional[Any]) -> Optional[str]:
+        if value is None:
+            return None
+        normalized = str(value).strip().upper()
+        return normalized or None
+
+    def _resolve_file_account_metadata(
+        self,
+        session: ImportSession,
+        connector,
+        file_content: str
+    ) -> Dict[str, Any]:
+        cached_metadata = session.get_summary_data('account_metadata')
+        if cached_metadata:
+            return cached_metadata
+
+        metadata: Dict[str, Any] = {}
+        try:
+            if hasattr(connector, 'extract_account_metadata'):
+                metadata = connector.extract_account_metadata(file_content) or {}
+            elif hasattr(connector, 'parse_sections'):
+                sections = connector.parse_sections(file_content) or {}
+                metadata = sections.get('account_reconciliation') or {}
+        except Exception as exc:
+            logger.warning(
+                "⚠️ Failed to resolve account metadata from file: %s",
+                exc,
+                exc_info=True
+            )
+            metadata = {}
+
+        if metadata:
+            safe_metadata = self._make_payload_json_safe(metadata)
+            session.add_summary_data({'account_metadata': safe_metadata})
+            self.db_session.flush()
+
+        return metadata
+
+    def _build_account_link_error(
+        self,
+        session: ImportSession,
+        status: str,
+        message: str,
+        file_account_number: Optional[str],
+        current_account_number: Optional[str]
+    ) -> Dict[str, Any]:
+        return {
+            'success': False,
+            'error': message,
+            'error_code': 'ACCOUNT_LINK_REQUIRED',
+            'session_id': session.id,
+            'linking': {
+                'status': status,
+                'session_id': session.id,
+                'trading_account_id': session.trading_account_id,
+                'file_account_number': file_account_number,
+                'current_account_number': current_account_number
+            }
+        }
+
+    def _enforce_account_link(
+        self,
+        session: ImportSession,
+        connector,
+        file_content: str
+    ) -> Optional[Dict[str, Any]]:
+        trading_account = self.db_session.query(TradingAccount).filter(
+            TradingAccount.id == session.trading_account_id
+        ).first()
+
+        if not trading_account:
+            return self._build_account_link_error(
+                session,
+                status='missing_account',
+                message='Trading account not found. Please refresh and select a valid account.',
+                file_account_number=None,
+                current_account_number=None
+            )
+
+        metadata = self._resolve_file_account_metadata(session, connector, file_content)
+        file_account_number = self._normalize_account_identifier(metadata.get('account_id'))
+
+        if file_account_number:
+            session.add_summary_data({'file_account_number': file_account_number})
+            self.db_session.flush()
+        else:
+            return self._build_account_link_error(
+                session,
+                status='missing_in_file',
+                message='Account number is missing in the uploaded file. Run the account check task or verify the report.',
+                file_account_number=None,
+                current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
+            )
+
+        existing_binding = self.db_session.query(TradingAccount).filter(
+            TradingAccount.external_account_number == file_account_number
+        ).first()
+        if existing_binding and existing_binding.id != session.trading_account_id:
+            return self._build_account_link_error(
+                session,
+                status='mismatch',
+                message=(
+                    f"מספר החשבון בקובץ כבר משויך לחשבון המסחר \"{existing_binding.name}\". "
+                    f"נא לבחור את החשבון הזה או לנתק את השיוך לפני המשך הייבוא."
+                ),
+                file_account_number=file_account_number,
+                current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
+            )
+
+        existing_number = self._normalize_account_identifier(trading_account.external_account_number)
+
+        if not existing_number:
+            return self._build_account_link_error(
+                session,
+                status='unlinked',
+                message='This trading account is not linked to a broker account yet. Please link it before continuing.',
+                file_account_number=file_account_number,
+                current_account_number=None
+            )
+
+        if existing_number != file_account_number:
+            return self._build_account_link_error(
+                session,
+                status='mismatch',
+                message='The broker account number in the file does not match the linked account. Please review and update the linkage.',
+                file_account_number=file_account_number,
+                current_account_number=existing_number
+            )
+
+        return None
+
+    def link_trading_account_to_file(
+        self,
+        session_id: int,
+        override_account_number: Optional[str] = None
+    ) -> Dict[str, Any]:
+        session = self.db_session.query(ImportSession).filter(
+            ImportSession.id == session_id
+        ).first()
+
+        if not session:
+            return {'success': False, 'error': 'Session not found'}
+
+        connector_type = session.get_summary_data('connector_type')
+        file_content = session.get_summary_data('file_content')
+        connector = self.connectors.get(connector_type)
+
+        if not connector or not file_content:
+            return {'success': False, 'error': 'Session is missing connector or content data'}
+
+        metadata = self._resolve_file_account_metadata(session, connector, file_content)
+        file_account_number = override_account_number or metadata.get('account_id')
+        normalized_number = self._normalize_account_identifier(file_account_number)
+
+        if not normalized_number:
+            return {'success': False, 'error': 'Unable to determine account number from file'}
+
+        trading_account = self.db_session.query(TradingAccount).filter(
+            TradingAccount.id == session.trading_account_id
+        ).first()
+
+        if not trading_account:
+            return {'success': False, 'error': 'Trading account not found'}
+
+        existing_binding = self.db_session.query(TradingAccount).filter(
+            TradingAccount.external_account_number == normalized_number,
+            TradingAccount.id != trading_account.id
+        ).first()
+        if existing_binding:
+            return {
+                'success': False,
+                'error': (
+                    f"מספר החשבון כבר משויך לחשבון \"{existing_binding.name}\" (ID {existing_binding.id}). "
+                    f"נא להשתמש בחשבון זה או לנתק את השיוך לפני המשך הפעולה."
+                )
+            }
+
+        trading_account.external_account_number = normalized_number
+
+        try:
+            self.db_session.commit()
+        except IntegrityError:
+            self.db_session.rollback()
+            return {
+                'success': False,
+                'error': 'מספר החשבון כבר משויך לחשבון מסחר אחר במערכת'
+            }
+
+        session.add_summary_data({'file_account_number': normalized_number})
+        self.db_session.flush()
+
+        return {
+            'success': True,
+            'linked_account_number': normalized_number,
+            'trading_account_id': trading_account.id
+        }
+
     @staticmethod
     def _ensure_cashflow_account_binding(
         normalized_records: List[Dict[str, Any]],
@@ -434,6 +641,7 @@ class ImportOrchestrator:
         """
         task = (task_type or 'executions').lower()
         analysis_timestamp = datetime.now(timezone.utc)
+        file_account_number = session.get_summary_data('file_account_number')
 
         base_stats = {
             'task_type': task,
@@ -450,6 +658,8 @@ class ImportOrchestrator:
             'duplicate_details': duplicate_result,
             'analysis_timestamp': analysis_timestamp
         }
+        if file_account_number:
+            base_stats['file_account_number'] = file_account_number
 
         if task == 'cashflows':
             type_stats = validation_result.get('type_stats', {})
@@ -471,6 +681,7 @@ class ImportOrchestrator:
             summary_data = {
                 'task_type': task,
                 'analysis_timestamp': analysis_timestamp,
+                'file_account_number': file_account_number,
                 'valid_records': len(validation_result.get('valid_records', [])),
                 'invalid_records': len(validation_result.get('invalid_records', [])),
                 'clean_records': len(duplicate_result.get('clean_records', [])),
@@ -506,6 +717,7 @@ class ImportOrchestrator:
             summary_data = {
                 'task_type': task,
                 'analysis_timestamp': analysis_timestamp,
+                'file_account_number': file_account_number,
                 'valid_records': len(validation_result.get('valid_records', [])),
                 'invalid_records': len(validation_result.get('invalid_records', [])),
                 'missing_accounts': account_validation_results['missing_accounts'],
@@ -558,6 +770,7 @@ class ImportOrchestrator:
         summary_data = {
             'task_type': task,
             'analysis_timestamp': analysis_timestamp,
+            'file_account_number': file_account_number,
             'total_records': session.total_records,
             'valid_records': len(validation_result.get('valid_records', [])),
             'invalid_records': len(validation_result.get('invalid_records', [])),
@@ -805,6 +1018,7 @@ class ImportOrchestrator:
             for duplicate in duplicate_result.get('within_file_duplicates', []):
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(duplicate.get('record') or {})
                 records_to_skip.append({
+                'record_index': duplicate.get('record_index'),
                     'record': duplicate['record'],
                     'reason': 'within_file_duplicate',
                     'confidence_score': duplicate.get('confidence_score'),
@@ -819,6 +1033,7 @@ class ImportOrchestrator:
             for duplicate in duplicate_result.get('existing_records', []):
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(duplicate.get('record') or {})
                 records_to_skip.append({
+                'record_index': duplicate.get('record_index'),
                     'record': duplicate['record'],
                     'reason': 'existing_record',
                     'details': duplicate,
@@ -938,6 +1153,7 @@ class ImportOrchestrator:
 
         for duplicate in duplicate_result.get('within_file_duplicates', []):
             records_to_skip.append({
+                'record_index': duplicate.get('record_index'),
                 'record': duplicate['record'],
                 'reason': 'within_file_duplicate',
                 'confidence_score': duplicate.get('confidence_score', 0),
@@ -945,6 +1161,7 @@ class ImportOrchestrator:
             })
             for match in duplicate.get('within_file_matches', []):
                 records_to_skip.append({
+                    'record_index': match.get('record_index'),
                     'record': match['record'],
                     'reason': 'within_file_duplicate_match',
                     'confidence_score': match.get('confidence', 0),
@@ -1032,6 +1249,14 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Connector not found'}
             
             logger.info(f"✅ Connector found: {connector.get_provider_name()}")
+
+            account_link_error = self._enforce_account_link(session, connector, file_content)
+            if account_link_error:
+                logger.warning(
+                    "⚠️ Account linking required before analysis",
+                    extra={'session_id': session.id, 'linking': account_link_error.get('linking')}
+                )
+                return account_link_error
             
             pipeline_result = self._process_import_pipeline(
                 session=session,
@@ -1135,6 +1360,14 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Connector not found'}
             
             logger.info(f"✅ Connector {connector_type} found")
+
+            account_link_error = self._enforce_account_link(session, connector, file_content)
+            if account_link_error:
+                logger.warning(
+                    "⚠️ Account linking required before preview",
+                    extra={'session_id': session.id, 'linking': account_link_error.get('linking')}
+                )
+                return account_link_error
             
             pipeline_result = self._process_import_pipeline(
                 session=session,
@@ -1956,8 +2189,8 @@ class ImportOrchestrator:
             if not session:
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get current preview data
-            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            # Get current preview data (with fallback)
+            preview_data = self._ensure_preview_data(session_id, session)
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
@@ -1998,7 +2231,7 @@ class ImportOrchestrator:
             ) if preview_data['summary']['total_records'] > 0 else 0
             
             # Cache updated preview data
-            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            self._update_preview_cache(session_id, preview_data, session=session)
             
             logger.info(f"✅ Accepted duplicate record {record_index} for session {session_id}")
             return {'success': True}
@@ -2025,8 +2258,8 @@ class ImportOrchestrator:
             if not session:
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get current preview data
-            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            # Get current preview data (with fallback)
+            preview_data = self._ensure_preview_data(session_id, session)
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
@@ -2039,7 +2272,7 @@ class ImportOrchestrator:
                     break
             
             # Cache updated preview data
-            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            self._update_preview_cache(session_id, preview_data, session=session)
             
             logger.info(f"✅ Rejected duplicate record {record_index} for session {session_id}")
             return {'success': True}
@@ -2065,8 +2298,8 @@ class ImportOrchestrator:
             if not session:
                 return {'success': False, 'error': 'Session not found'}
             
-            # Get current preview data
-            preview_data = self.processor.get_cached_results(session_id, 'preview')
+            # Get current preview data (with fallback)
+            preview_data = self._ensure_preview_data(session_id, session)
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
@@ -2108,7 +2341,7 @@ class ImportOrchestrator:
             ) if preview_data['summary']['total_records'] > 0 else 0
             
             # Cache updated preview data
-            self.processor.cache_results(session_id, 'preview', preview_data, ttl=3600)
+            self._update_preview_cache(session_id, preview_data, session=session)
             
             logger.info(f"✅ Allowed existing record {record_index} for session {session_id}")
             return {'success': True}
@@ -2116,3 +2349,118 @@ class ImportOrchestrator:
         except Exception as e:
             logger.error(f"❌ Failed to allow existing record for session {session_id}: {str(e)}")
             return {'success': False, 'error': str(e)}
+
+    def get_preview_snapshot(self, session_id: int) -> Dict[str, Any]:
+        """
+        Return the latest preview data without regenerating the entire pipeline.
+        """
+        try:
+            session = self.session_manager.get_session(session_id)
+            if not session:
+                return {'success': False, 'error': 'Session not found'}
+
+            preview_data = self._ensure_preview_data(session_id, session=session)
+            if not preview_data:
+                return {'success': False, 'error': 'Preview data not available'}
+
+            return {'success': True, 'preview_data': preview_data}
+
+        except Exception as error:
+            logger.error(f"❌ Failed to load preview snapshot for session {session_id}: {error}")
+            return {'success': False, 'error': str(error)}
+
+    def _upgrade_preview_data_structure(self, preview_data: Optional[Dict[str, Any]]) -> bool:
+        """
+        Upgrade legacy preview payloads (missing record_index values) to the new structure.
+        Returns True when mutating the preview_data dict.
+        """
+        if not preview_data:
+            return False
+
+        changed = False
+        buckets = ['records_to_skip', 'records_to_import']
+        existing_indexes: Set[int] = set()
+
+        for bucket in buckets:
+            for entry in preview_data.get(bucket, []) or []:
+                idx = entry.get('record_index')
+                if isinstance(idx, int):
+                    existing_indexes.add(idx)
+
+        next_index = (max(existing_indexes) + 1) if existing_indexes else 0
+
+        for bucket in buckets:
+            for entry in preview_data.get(bucket, []) or []:
+                idx = entry.get('record_index')
+                if not isinstance(idx, int):
+                    entry['record_index'] = next_index
+                    next_index += 1
+                    changed = True
+
+        return changed
+
+    def _finalize_preview_data(
+        self,
+        session_id: int,
+        preview_data: Optional[Dict[str, Any]],
+        session: Optional[ImportSession] = None
+    ) -> Optional[Dict[str, Any]]:
+        if preview_data and self._upgrade_preview_data_structure(preview_data):
+            self._update_preview_cache(session_id, preview_data, session=session)
+        return preview_data
+
+    def _ensure_preview_data(self, session_id: int, session: Optional[ImportSession] = None) -> Optional[Dict[str, Any]]:
+        """
+        Ensure preview data is available by checking cache, session summary, or regenerating as needed.
+        Returns a deep-copied structure safe for mutation.
+        """
+        # Attempt to read from cache
+        cached_preview = self.processor.get_cached_results(session_id, 'preview')
+        if cached_preview:
+            preview_copy = json.loads(json.dumps(cached_preview))
+            return self._finalize_preview_data(session_id, preview_copy, session=session)
+
+        session = session or self.session_manager.get_session(session_id)
+        if session:
+            stored_preview = session.get_summary_data('preview_data')
+            if stored_preview:
+                preview_copy = json.loads(json.dumps(stored_preview))
+                self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
+                return self._finalize_preview_data(session_id, preview_copy, session=session)
+
+        # Regenerate preview data when nothing cached or persisted
+        regenerate_result = self.generate_preview(session_id)
+        if not regenerate_result.get('success'):
+            logger.error(
+                "❌ Unable to regenerate preview data for session %s: %s",
+                session_id,
+                regenerate_result.get('error')
+            )
+            return None
+
+        regenerated_preview = regenerate_result.get('preview_data')
+        if not regenerated_preview:
+            logger.error("❌ Regenerated preview data was empty for session %s", session_id)
+            return None
+
+        preview_copy = json.loads(json.dumps(regenerated_preview))
+        self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
+
+        session = session or self.session_manager.get_session(session_id)
+        if session:
+            session.add_summary_data({'preview_data': self.utc_normalizer.normalize_output(preview_copy)})
+            self.db_session.commit()
+
+        return self._finalize_preview_data(session_id, preview_copy, session=session)
+
+    def _update_preview_cache(self, session_id: int, preview_data: Dict[str, Any], session: Optional[ImportSession] = None) -> None:
+        """
+        Persist updated preview data into the cache system and session summary.
+        """
+        preview_copy = json.loads(json.dumps(preview_data))
+        self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
+
+        session = session or self.session_manager.get_session(session_id)
+        if session:
+            session.add_summary_data({'preview_data': self.utc_normalizer.normalize_output(preview_copy)})
+            self.db_session.commit()

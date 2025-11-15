@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.2.1.0",
+    "version": "1.2.1.1",
     "major": 1,
     "minor": 2,
     "patch": 1,
-    "build": 0,
-    "commit": "6569933b32527b065aadf2f3b76243be6339302f",
-    "updated_at": "2025-11-14T23:14:46+00:00",
-    "notes": "Release 2025-11-14 main sync"
+    "build": 1,
+    "commit": "54bca978ec181b22cc8b800f36ca3068374aab3c",
+    "updated_at": "2025-11-15T01:22:42+00:00",
+    "notes": "Doc and UI sync updates"
   },
   "development": {
     "version": "1.0.23.0",

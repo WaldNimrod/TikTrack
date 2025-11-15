@@ -21,3 +21,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-14T21:05:43+00:00 | 1.2.0.0 | 1.1.2.0 | b7d12c2d678edb97006b26f0391ab04d5a8af0b4 | 879589ab4605cc5529c1675e1c855414d51aa911 | set | Prod 1.2: lint monitor UX + tagging refresh |
 | 2025-11-14T21:26:21+00:00 | 1.2.0.1 | 1.2.0.0 | b2b958eb3229f28afbb7c111f214f31bd11c40b0 | b7d12c2d678edb97006b26f0391ab04d5a8af0b4 | build | Fix production server import path |
 | 2025-11-14T23:14:46+00:00 | 1.2.1.0 | 1.2.0.1 | 6569933b32527b065aadf2f3b76243be6339302f | b2b958eb3229f28afbb7c111f214f31bd11c40b0 | patch | Release 2025-11-14 main sync |
+| 2025-11-15T01:22:42+00:00 | 1.2.1.1 | 1.2.1.0 | 54bca978ec181b22cc8b800f36ca3068374aab3c | 6569933b32527b065aadf2f3b76243be6339302f | build | Doc and UI sync updates |

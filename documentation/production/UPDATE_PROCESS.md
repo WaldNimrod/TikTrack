@@ -92,6 +92,7 @@ git merge main
 ⚠️ טיפי מיזוג:
 - השתמש ב־`git checkout --theirs` עבור רוב הקונפליקטים.
 - ודא ש־`production/Backend/config/settings.py` ו־`config/logging.py` נשארים ב-hardcode לפרודקשן.
+- כלל ברזל: במצב קונפליקט – גרסת `main` מנצחת. אם אין צורך בעדכון מקומי, הרץ `git checkout --theirs <path>` או `git restore --source=origin/main <path>` לכל קובץ שסומן בקונפליקט.
 
 ### שלב 2.5: גיבוי מסד נתונים (חובה!)
 

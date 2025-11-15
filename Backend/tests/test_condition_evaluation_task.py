@@ -21,6 +21,7 @@ def _create_test_schema(engine):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         currency_id INTEGER NOT NULL,
+        external_account_number TEXT,
         status TEXT DEFAULT 'open',
         cash_balance REAL DEFAULT 0,
         opening_balance REAL DEFAULT 0,

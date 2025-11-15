@@ -13,7 +13,7 @@ from unittest.mock import MagicMock
 import os
 import sys
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, CheckConstraint
 from sqlalchemy.orm import sessionmaker
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
@@ -23,6 +23,7 @@ from models.tag_link import TagLink  # noqa: E402
 from models.tag import Tag  # noqa: E402
 from models.tag_category import TagCategory  # noqa: E402
 from models.base import Base  # noqa: E402
+from models.ticker import Ticker  # noqa: E402
 
 
 class TestTagServiceNormalization(unittest.TestCase):
@@ -102,6 +103,16 @@ class TestTagServiceAggregations(unittest.TestCase):
     def setUpClass(cls):
         cls.engine = create_engine("sqlite:///:memory:")
         cls.SessionLocal = sessionmaker(bind=cls.engine)
+        cls._strip_sqlite_check_constraints()
+
+    @staticmethod
+    def _strip_sqlite_check_constraints():
+        """Remove unsupported CHECK constraints when using sqlite in-memory."""
+        removable_names = {"active_trades_consistency", "ticker_status_auto_update"}
+        table = Ticker.__table__
+        for constraint in list(table.constraints):
+            if isinstance(constraint, CheckConstraint) and constraint.name in removable_names:
+                table.constraints.remove(constraint)
 
     def setUp(self):
         Base.metadata.drop_all(self.engine, checkfirst=True)

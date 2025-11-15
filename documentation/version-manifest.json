@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.6.0",
+    "version": "1.1.7.0",
     "major": 1,
     "minor": 1,
-    "patch": 6,
+    "patch": 7,
     "build": 0,
-    "commit": "1e599c6a42910eff644b9970c8b3831b7e7e2c6b",
-    "updated_at": "2025-11-15T11:29:28+00:00",
-    "notes": "Add condition trigger actions and manual evaluation"
+    "commit": "f0d829446119bf084124c4de1460898f30d84ec9",
+    "updated_at": "2025-11-15T15:52:46+00:00",
+    "notes": "Conditions dev playbook"
   }
 }

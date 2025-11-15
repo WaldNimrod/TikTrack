@@ -57,3 +57,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-15T01:48:05+00:00 | 1.1.5.0 | 1.1.4.0 | 1e395783a97250f0f46e3ac8346ee348da4ab466 | 05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6 | patch | Conditions docs + footer alignment |
 | 2025-11-15T01:57:09+00:00 | 1.1.5.1 | 1.1.5.0 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | 1e395783a97250f0f46e3ac8346ee348da4ab466 | build | SYEP interest cashflow split |
 | 2025-11-15T11:29:28+00:00 | 1.1.6.0 | 1.1.5.1 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | patch | Add condition trigger actions and manual evaluation |
+| 2025-11-15T15:52:46+00:00 | 1.1.7.0 | 1.1.6.0 | f0d829446119bf084124c4de1460898f30d84ec9 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | patch | Conditions dev playbook |

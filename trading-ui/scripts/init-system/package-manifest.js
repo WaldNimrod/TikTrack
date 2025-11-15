@@ -206,25 +206,33 @@ const PACKAGE_MANIFEST = {
         loadOrder: 15
       },
       {
+        file: 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+        globalCheck: 'window.bootstrap',
+        description: 'Bootstrap JS Bundle (Tooltips & Modals)',
+        required: true,
+        loadOrder: 16,
+        external: true
+      },
+      {
         file: 'event-handler-manager.js',
         globalCheck: 'window.EventHandlerManager',
         description: 'מערכת ניהול אירועים מרכזית',
         required: true,
-        loadOrder: 16
+        loadOrder: 17
       },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
         description: 'מערכת כפתורים',
         required: true,
-        loadOrder: 17
+        loadOrder: 18
       },
       {
         file: 'color-scheme-system.js',
         globalCheck: 'window.loadDynamicColors',
         description: 'מערכת צבעים דינמית',
         required: true,
-        loadOrder: 18
+        loadOrder: 19
       }
     ],
     estimatedSize: '~280KB',
@@ -1003,6 +1011,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
+        file: 'services/trade-plans-data.js',
+        globalCheck: 'window.TradePlansData',
+        description: 'שירות נתוני תוכניות מסחר',
+        required: true,
+        loadOrder: 6
+      },
+      {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
         description: 'מתרגם תנאים',
@@ -1423,60 +1438,67 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services', 'ui-advanced', 'entity-services'],
     scripts: [
       {
+        file: 'services/dashboard-data.js',
+        globalCheck: 'window.DashboardData',
+        description: 'שירות נתוני דשבורד מאוחד',
+        required: true,
+        loadOrder: 0
+      },
+      {
         file: 'widgets/recent-trades-widget.js',
         globalCheck: 'window.RecentTradesWidget',
         description: 'ווידג׳ט טריידים אחרונים',
         required: true,
-        loadOrder: 0
+        loadOrder: 1
       },
       {
         file: 'pending-executions-widget.js',
         globalCheck: 'window.PendingExecutionsHighlights',
         description: 'ווידג׳ט המלצות שיוך',
         required: true,
-        loadOrder: 1
+        loadOrder: 2
       },
       {
         file: 'pending-execution-trade-creation.js',
         globalCheck: 'window.PendingExecutionTradeCreation',
         description: 'ממשק יצירת טרייד מביצועים',
         required: false,
-        loadOrder: 2
+        loadOrder: 3
       },
       {
         file: 'pending-trade-plan-widget.js',
         globalCheck: 'window.PendingTradePlanWidget',
         description: 'ווידג׳ט שיוך תוכניות למסחר',
         required: true,
-        loadOrder: 3
+        loadOrder: 4
       },
       {
         file: 'active-alerts-component.js',
         globalCheck: 'window.updateActiveAlertsComponent',
         description: 'רכיב התראות פעילות',
         required: true,
-        loadOrder: 4
+        loadOrder: 5
       },
       {
         file: 'modal-configs/tag-search-config.js',
         globalCheck: 'window.tagSearchDrawerConfig',
         description: 'תצורת מגירת חיפוש תגיות',
         required: true,
-        loadOrder: 5
+        loadOrder: 6
       },
       {
         file: 'tag-search-controller.js',
         globalCheck: 'window.TagSearchController',
         description: 'בקר חיפוש תגיות',
         required: true,
-        loadOrder: 6
+        loadOrder: 7
       },
       {
         file: 'index.js',
         globalCheck: 'window.initializeIndexPage',
         description: 'לוגיקת דף הבית',
         required: true,
-        loadOrder: 7
+        loadOrder: 8
       }
     ],
     estimatedSize: '~110KB',

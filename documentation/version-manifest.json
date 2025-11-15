@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.1.0",
+    "version": "1.1.2.0",
     "major": 1,
     "minor": 1,
-    "patch": 1,
+    "patch": 2,
     "build": 0,
-    "commit": "d837de8977cd58d04d1d97a2a9cfe19dad3000c0",
-    "updated_at": "2025-11-14T23:06:17+00:00",
-    "notes": "Align dev build with account reconciliation checkpoint"
+    "commit": "2c7cb8cd23d931a560ce175caba3307dae18e406",
+    "updated_at": "2025-11-15T00:49:42+00:00",
+    "notes": "Fix tooltip loading and regenerate script sections"
   }
 }

@@ -209,6 +209,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
+        'window.DashboardData',
         'window.loadDashboardData',
         'window.RecentTradesWidget',
         'window.PendingExecutionsHighlights',
@@ -263,13 +264,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             }
 
             // Load dashboard data
-            if (typeof window.loadDashboardData === 'function') {
-              if (window.CacheTTLGuard?.ensure) {
-                await window.CacheTTLGuard.ensure('dashboard-data', window.loadDashboardData);
-              } else {
-                await window.loadDashboardData();
-              }
-            }
+          if (typeof window.loadDashboardData === 'function') {
+            await window.loadDashboardData();
+          }
           }
 
           // Initialize positions & portfolio system
@@ -977,11 +974,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           if (typeof window.loadCashFlowsData === 'function') {
-            if (window.CacheTTLGuard?.ensure) {
-              await window.CacheTTLGuard.ensure('cash_flows-data', window.loadCashFlowsData);
-            } else {
-              await window.loadCashFlowsData();
-            }
+            await window.loadCashFlowsData();
           }
         },
       ],
@@ -1377,6 +1370,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'unified-logs-demo.html': {
       name: 'Unified Logs Demo',
+      packages: ['base', 'logs', 'init-system'],
+      requiredGlobals: ['NotificationSystem', 'window.UnifiedLogAPI'],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,

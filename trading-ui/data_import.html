@@ -850,12 +850,13 @@
         </div>
     </div>
 
-    <!-- =============================================================== -->
+        <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
-    <!-- 📋 Loading Order: BASE → SERVICES → UI-ADVANCED → MODULES → CRUD → PREFERENCES → VALIDATION → CONDITIONS → ENTITY-SERVICES → ENTITY-DETAILS → INFO-SUMMARY → INIT-SYSTEM -->
-    <!-- 🎯 Page: data_import | Updated: 2025-11-13T21:32:00.000Z -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: data_import | Generated: 2025-11-15T00:29:03.493Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, modules, crud, preferences, validation, conditions, entity-services, entity-details, info-summary, init-system -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/12: BASE PACKAGE ===== -->
@@ -881,24 +882,28 @@
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטה בניקוי מטמון Stage B-Lite -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
     <!-- [10] Load Order: 10 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard לטעינות נתונים -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
     <!-- [11] Load Order: 11 -->
     <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
     <!-- [12] Load Order: 12 -->
     <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
     <!-- [13] Load Order: 13 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
     <!-- [14] Load Order: 14 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
     <!-- [15] Load Order: 15 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
     <!-- [16] Load Order: 16 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
     <!-- [17] Load Order: 17 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
     <!-- [18] Load Order: 18 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
 
     <!-- =============================================================== -->
@@ -908,31 +913,31 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [19] Load Order: 19 -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
-    <!-- [20] Load Order: 20 -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
     <!-- [21] Load Order: 21 -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
     <!-- [22] Load Order: 22 -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
     <!-- [23] Load Order: 23 -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
     <!-- [24] Load Order: 24 -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
     <!-- [25] Load Order: 25 -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
     <!-- [26] Load Order: 26 -->
-    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [27] Load Order: 27 -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- מתאם ערכי מיון -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד -->
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
     <!-- [29] Load Order: 29 -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
     <!-- [30] Load Order: 30 -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
     <!-- [31] Load Order: 31 -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [32] Load Order: 32 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [33] Load Order: 33 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
 
     <!-- =============================================================== -->
@@ -942,15 +947,15 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [32] Load Order: 32 -->
-    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
-    <!-- [33] Load Order: 33 -->
-    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
     <!-- [34] Load Order: 34 -->
-    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- רישום נתוני טבלאות -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
     <!-- [35] Load Order: 35 -->
-    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
     <!-- [36] Load Order: 36 -->
+    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- רישום נתוני טבלאות -->
+    <!-- [37] Load Order: 37 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <!-- [38] Load Order: 38 -->
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
 
     <!-- =============================================================== -->
@@ -960,52 +965,40 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [37] Load Order: 37 -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- מערכת ניווט מודלים -->
-    <!-- [38] Load Order: 38 -->
-    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
     <!-- [39] Load Order: 39 -->
-    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- ניהול בחירת תגיות במודלים -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- מערכת ניווט מודולים מקוננים -->
     <!-- [40] Load Order: 40 -->
-    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועי תגיות גלובלית -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
     <!-- [41] Load Order: 41 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- ניהול בחירת תגיות במודלים -->
     <!-- [42] Load Order: 42 -->
-    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
+    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
     <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- ממשק בסיסי -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
     <!-- [44] Load Order: 44 -->
-    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- נתונים מתקדמים -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
-    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- ממשק מתקדם -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- ממשק בסיסי -->
     <!-- [46] Load Order: 46 -->
-    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- מודול תקשורת -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- נתונים מתקדמים -->
     <!-- [47] Load Order: 47 -->
-    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- מודול עסקי -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- ממשק מתקדם -->
     <!-- [48] Load Order: 48 -->
-    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- סנכרון localStorage -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- מודול תקשורת -->
     <!-- [49] Load Order: 49 -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- מודול עסקי -->
     <!-- [50] Load Order: 50 -->
-    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודול ייבוא נתוני עסקאות -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- סנכרון localStorage -->
     <!-- [51] Load Order: 51 -->
-    <script src="scripts/trade-selector-modal.js?v=1.0.0"></script> <!-- מודול בחירת טרייד -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
     <!-- [52] Load Order: 52 -->
-    <script src="scripts/modal-configs/trading-accounts-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל חשבונות מסחר -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני עסקאות -->
     <!-- [53] Load Order: 53 -->
-    <script src="scripts/modal-configs/alerts-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל התראות -->
-    <!-- [54] Load Order: 54 -->
     <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
-    <!-- [55] Load Order: 55 -->
-    <script src="scripts/modal-configs/executions-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל ביצועים -->
-    <!-- [56] Load Order: 56 -->
+    <!-- [54] Load Order: 54 -->
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
-    <!-- [57] Load Order: 57 -->
-    <script src="scripts/modal-configs/tickers-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טיקרים -->
-    <!-- [58] Load Order: 58 -->
-    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תזרימי מזומנים -->
-    <!-- [59] Load Order: 59 -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מערכת התגיות -->
+    <!-- [55] Load Order: 55 -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/12: CRUD OPERATIONS PACKAGE ===== -->
@@ -1014,11 +1007,11 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [60] Load Order: 60 -->
+    <!-- [56] Load Order: 56 -->
     <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
-    <!-- [61] Load Order: 61 -->
+    <!-- [57] Load Order: 57 -->
     <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
-    <!-- [62] Load Order: 62 -->
+    <!-- [58] Load Order: 58 -->
     <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
 
     <!-- =============================================================== -->
@@ -1028,19 +1021,19 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [63] Load Order: 63 -->
+    <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
-    <!-- [64] Load Order: 64 -->
+    <!-- [60] Load Order: 60 -->
     <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
-    <!-- [65] Load Order: 65 -->
+    <!-- [61] Load Order: 61 -->
     <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
-    <!-- [66] Load Order: 66 -->
+    <!-- [62] Load Order: 62 -->
     <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
-    <!-- [67] Load Order: 67 -->
+    <!-- [63] Load Order: 63 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
-    <!-- [68] Load Order: 68 -->
+    <!-- [64] Load Order: 64 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
-    <!-- [69] Load Order: 69 -->
+    <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
 
     <!-- =============================================================== -->
@@ -1050,7 +1043,7 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [70] Load Order: 70 -->
+    <!-- [66] Load Order: 66 -->
     <script src="scripts/validation-utils.js?v=1.0.0"></script> <!-- כלי ולידציה -->
 
     <!-- =============================================================== -->
@@ -1060,106 +1053,106 @@
     <!-- Dependencies: base, validation -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [71] Load Order: 71 -->
+    <!-- [67] Load Order: 67 -->
     <script src="scripts/conditions/conditions-translations.js?v=1.0.0"></script> <!-- תרגומי תנאים -->
-    <!-- [72] Load Order: 72 -->
+    <!-- [68] Load Order: 68 -->
     <script src="scripts/conditions/conditions-validator.js?v=1.0.0"></script> <!-- ולידטור תנאים -->
-    <!-- [73] Load Order: 73 -->
+    <!-- [69] Load Order: 69 -->
     <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0"></script> <!-- מחולל טפסי תנאים -->
-    <!-- [74] Load Order: 74 -->
+    <!-- [70] Load Order: 70 -->
     <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0"></script> <!-- מנהל CRUD תנאים -->
-    <!-- [75] Load Order: 75 -->
+    <!-- [71] Load Order: 71 -->
     <script src="scripts/conditions/conditions-initializer.js?v=1.0.0"></script> <!-- מאתחל תנאים -->
-    <!-- [76] Load Order: 76 -->
+    <!-- [72] Load Order: 72 -->
     <script src="scripts/modal-configs/conditions-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תנאים -->
-    <!-- [77] Load Order: 77 -->
+    <!-- [73] Load Order: 73 -->
     <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0"></script> <!-- מנהל ממשק תנאים -->
-    <!-- [78] Load Order: 78 -->
+    <!-- [74] Load Order: 74 -->
     <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0"></script> <!-- בקר מודל תנאים -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 9/12: ENTITY SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 7 | Description: שירותי ישויות -->
+    <!-- Load Order: 10 | Description: שירותי ישויות -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [79] Load Order: 79 -->
+    <!-- [75] Load Order: 75 -->
     <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
-    <!-- [80] Load Order: 80 -->
+    <!-- [76] Load Order: 76 -->
     <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
-    <!-- [81] Load Order: 81 -->
+    <!-- [77] Load Order: 77 -->
     <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
-    <!-- [82] Load Order: 82 -->
+    <!-- [78] Load Order: 78 -->
     <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
-    <!-- [83] Load Order: 83 -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
-    <!-- [84] Load Order: 84 -->
+    <!-- [79] Load Order: 79 -->
     <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
-    <!-- [85] Load Order: 85 -->
+    <!-- [80] Load Order: 80 -->
     <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
-    <!-- [86] Load Order: 86 -->
+    <!-- [81] Load Order: 81 -->
     <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
-    <!-- [87] Load Order: 87 -->
+    <!-- [82] Load Order: 82 -->
     <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
-    <!-- [88] Load Order: 88 -->
+    <!-- [83] Load Order: 83 -->
     <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 10/12: ENTITY DETAILS PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 8 | Description: מערכות פרטי ישויות -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [89] Load Order: 89 -->
+    <!-- [84] Load Order: 84 -->
     <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
-    <!-- [90] Load Order: 90 -->
+    <!-- [85] Load Order: 85 -->
     <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
-    <!-- [91] Load Order: 91 -->
+    <!-- [86] Load Order: 86 -->
     <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 11/12: INFO SUMMARY PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 9 | Description: מערכת סיכום נתונים -->
+    <!-- Load Order: 18 | Description: מערכת סיכום נתונים מאוחדת לכל העמודים -->
     <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [92] Load Order: 92 -->
-    <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- מערכת סיכום נתונים -->
-    <!-- [93] Load Order: 93 -->
-    <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- קונפיגורציית סיכום נתונים -->
+    <!-- [87] Load Order: 87 -->
+    <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- מערכת סיכום נתונים ליבה -->
+    <!-- [88] Load Order: 88 -->
+    <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- תצורות עמודים לסיכום נתונים -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 12/12: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 10 | Description: מערכת הפעלה -->
-    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services, info-summary -->
-    <!-- Critical: YES | Version: 2.0.0 -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- [94] Load Order: 94 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנהל מפרט חבילות -->
-    <!-- [95] Load Order: 95 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- קונפיגורציית הפעלה עמוד -->
-    <!-- [96] Load Order: 96 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת הפעלה -->
-    <!-- [97] Load Order: 97 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות מעקב -->
-    <!-- [98] Load Order: 98 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל יישום מאוחד -->
+    <!-- [89] Load Order: 89 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [90] Load Order: 90 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [91] Load Order: 91 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [92] Load Order: 92 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [93] Load Order: 93 -->
+    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
-    <!-- [99] Load Order: 99 -->
-    <script src="scripts/data_import.js?v=1.0.0"></script>
+
+    <!-- [94] Page-specific: data_import -->
+    <script src="scripts/data_import.js?v=1.0.0"></script> <!-- Page-specific script for data_import -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 99 | Unique Scripts Loaded: 99 -->
+    <!-- 📊 Total Scripts Processed: 94 | Unique Scripts Loaded: 94 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("data_import") -->
+
 </body>
 </html>
 

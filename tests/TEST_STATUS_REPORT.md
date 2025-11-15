@@ -23,6 +23,18 @@
 - ⚠️ `npm run check:all` עדיין נכשל (81,413 שגיאות, 4,801 אזהרות – בעיקר `no-console`, `indent`, `arrow-parens`).  
 - ✅ בדיקות Backend (`python3 -m pytest`) נשארות ירוקות – 44 טסטים כבסיס השוואה תקין.
 
+## ⚙️ איך להריץ את כל הטסטים (Front + Back)
+
+| מטרה | פקודה | הערות |
+| --- | --- | --- |
+| Jest מלא + כיסוי | `npm run test -- --coverage --runInBand` | מריץ את שלושת הפרויקטים (`unit` / `integration` / `component`). חובה אחרי שינוי Frontend כללי. |
+| Jest ממוקד | `npx jest --runTestsByPath tests/unit/<file>.test.js` | שימושי לפני PR למודול ספציפי (למשל `preferences`, `tables`). |
+| Pytest מלא | `python3 -m pytest` | מריץ את כל 91 הטסטים (routes + services + tasks). חובה אחרי שינוי Backend / DB. |
+| נתיבי העדפות (Frontend) | `npx jest --runTestsByPath tests/unit/preferences-page.test.js tests/integration/preferences-integration.test.js tests/component/preferences-flow.test.js` | מוודא UI/flow/async של Preferences v3. |
+| נתיבי העדפות (Backend) | `python3 -m pytest Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py` | מכסה `/api/preferences/version` ו־`/api/preferences/user/check-updates` מול DB אמיתי. |
+
+> 💡 **TIP:** לכל שינוי שמשפיע על העדפות (UI או API) חובה להריץ גם את שני הסטים לעיל ולציין את הפקודות בדוח ה-PR.
+
 ### הפריטים שנותרו לטיפול
 | תחום | סטטוס נוכחי | הערות |
 | --- | --- | --- |

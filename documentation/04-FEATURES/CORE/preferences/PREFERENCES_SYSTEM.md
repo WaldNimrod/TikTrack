@@ -20,6 +20,21 @@
 2. **הוספת קבוצה חדשה** - עדכן את `preference_groups` table  
 3. **שינוי מבנה** - עדכן את המודלים ב-`Backend/models/preferences.py`
 
+### 🧪 בדיקות חובה למודול העדפות
+- **Frontend**  
+  - `tests/unit/preferences-page.test.js` – לוגיקה של שמירה ועומס UI  
+  - `tests/integration/preferences-integration.test.js` – זרימת CRUD מלאה מול cache/unified systems  
+  - `tests/component/preferences-flow.test.js` – מסלול משתמש מלא בעמוד ההעדפות
+- **Backend**  
+  - `Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py` – `/api/preferences/version` ו-`/api/preferences/user/check-updates`  
+  - `Backend/tests/test_services/test_tag_service.py` – וידוא אינטגרציית cache + analytics שמוזנות להעדפות
+- **פקודות מומלצות:**  
+  ```
+  npm run test -- --coverage --runInBand
+  python3 -m pytest Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py
+  ```
+  יש לעדכן את `tests/TEST_STATUS_REPORT.md` בכל שינוי המשפיע על העדפות.
+
 ### סטטיסטיקות מערכת נוכחיות - **עדכון 31/01/2025:**
 - **123 העדפות** פעילות במערכת (עדכון מדויק לפי DB)
 - **7 קבוצות** העדפות מאורגנות

@@ -80,95 +80,94 @@
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
 
 /**
- * Load cash flows data from server
+ * Load cash flows data from server (via CashFlowsData service)
  * @function loadCashFlowsData
  * @async
- * @returns {Promise<void>}
+ * @param {Object} options - Loader options (force, ttl, signal, queryParams)
+ * @returns {Promise<Array>}
  */
-async function loadCashFlowsData() {
-  console.log('🔥🔥🔥 loadCashFlowsData CALLED');
-  try {
-    // Count records BEFORE refresh
-    const beforeTableCount = cashFlowsData ? cashFlowsData.length : 0;
-    console.log('📊 BEFORE REFRESH: Table has', beforeTableCount, 'records');
-    
-    console.log('🔥 loadCashFlowsData: Starting fetch...');
-    window.Logger.info('Loading cash flows data (bypass cache)', { page: 'cash_flows' });
-    
-    // קריאה ישירה לשרת עם timestamp למניעת cache
+async function loadCashFlowsData(options = {}) {
+  const loadOptions = {
+    force: Boolean(options.force),
+    ttl: options.ttl ?? window.CashFlowsData?.TTL,
+    signal: options.signal,
+    queryParams: options.queryParams,
+  };
+
+  const fallbackLoader = async () => {
     const response = await fetch(`/api/cash-flows/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
+        'Cache-Control': 'no-cache',
+      },
+      signal: loadOptions.signal,
     });
-    
-    console.log('🔥 loadCashFlowsData: Response status:', response.status);
-    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-      
-    const responseData = await response.json();
-    const data = responseData.data || responseData;
-    
-    console.log('🔥 loadCashFlowsData: Received data length:', data.length);
-    console.log('🔥 loadCashFlowsData: First item:', data[0]);
-      
-    // עדכון הנתונים הגלובליים
+    const payload = await response.json();
+    return Array.isArray(payload?.data) ? payload.data : payload;
+  };
+
+  try {
+    const beforeCount = Array.isArray(cashFlowsData) ? cashFlowsData.length : 0;
+    window.Logger.info('Loading cash flows data', {
+      page: 'cash_flows',
+      force: loadOptions.force,
+      beforeCount,
+    });
+
+    const useService = typeof window.CashFlowsData?.loadCashFlowsData === 'function';
+    const data = useService
+      ? await window.CashFlowsData.loadCashFlowsData(loadOptions)
+      : await fallbackLoader();
+
     const normalizedCashFlows = Array.isArray(data)
       ? data.map(cf => ({
           ...cf,
-          updated_at: cf.updated_at || cf.date || cf.created_at || null
+          updated_at: cf?.updated_at || cf?.date || cf?.created_at || null,
         }))
       : [];
+
     window.cashFlowsData = normalizedCashFlows;
     cashFlowsData = normalizedCashFlows;
-    
-    console.log('🔥 loadCashFlowsData: Calling updateCashFlowsTable...');
-    // עדכון הטבלה (ראשוני לפני החלת סידור ברירת מחדל/מצב שמור)
-    await syncCashFlowsPagination(data);
-    console.log('🔥 loadCashFlowsData: updateCashFlowsTable completed');
-    
-    // החלת סידור ברירת מחדל לפי מערכת המיון הכללית (תאריך יורד כברירת מחדל)
+
+    await syncCashFlowsPagination(normalizedCashFlows);
+
     if (typeof window.applyDefaultSort === 'function') {
       try {
-        await window.applyDefaultSort('cash_flows', data, updateCashFlowsTable);
-        console.log('✅ loadCashFlowsData: applyDefaultSort executed for cash_flows');
+        await window.applyDefaultSort('cash_flows', normalizedCashFlows, updateCashFlowsTable);
       } catch (sortError) {
-        console.warn('⚠️ loadCashFlowsData: applyDefaultSort failed, falling back to manual sort', sortError);
-        applyFallbackDateSort(data);
+        window.Logger?.warn('applyDefaultSort failed for cash_flows, using fallback sort', {
+          error: sortError,
+          page: 'cash_flows',
+        });
+        applyFallbackDateSort(normalizedCashFlows);
       }
     } else {
-      console.warn('⚠️ loadCashFlowsData: applyDefaultSort not available, using fallback sort');
-      applyFallbackDateSort(data);
+      applyFallbackDateSort(normalizedCashFlows);
     }
-    
-    // Count records AFTER refresh
-    const afterTableCount = data.length;
-    console.log('📊 AFTER REFRESH: Table now has', afterTableCount, 'records');
-    console.log('📊 CHANGE:', afterTableCount - beforeTableCount > 0 ? '+' : '', afterTableCount - beforeTableCount);
-    
-    // עדכון הסטטיסטיקות
+
     updatePageSummaryStats();
-    
-    // Register table with UnifiedTableSystem after data is loaded
+
     if (typeof window.registerCashFlowsTables === 'function') {
       window.registerCashFlowsTables();
     }
 
-    // Restore page state (filters, sort, sections, entity filters)
     await restorePageState('cash_flows');
-    
-    console.log('✅ loadCashFlowsData: Loaded', data.length, 'cash flows');
-    window.Logger.info(`✅ Loaded ${data.length} cash flows`, { page: 'cash_flows' });
+
+    window.Logger.info(`✅ Loaded ${normalizedCashFlows.length} cash flows`, {
+      page: 'cash_flows',
+      beforeCount,
+      afterCount: normalizedCashFlows.length,
+    });
+
+    return normalizedCashFlows;
   } catch (error) {
-    console.error('❌ loadCashFlowsData: Error:', error);
     window.Logger.error('Error loading cash flows data', error, { page: 'cash_flows' });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
-    }
+    window.showErrorNotification?.('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
+    throw error;
   }
 }
 
@@ -556,24 +555,20 @@ async function deleteCashFlow(id) {
  */
 async function performCashFlowDeletion(id) {
   try {
-    // Clear cache before deletion to ensure fresh data after reload
-    if (window.unifiedCacheManager) {
-      await window.unifiedCacheManager.clearByPattern('cash-flows-data');
-      await window.unifiedCacheManager.clearByPattern('account-activity-data');
-      await window.unifiedCacheManager.clearByPattern('account-activity-*');
-      await window.unifiedCacheManager.clearByPattern('account-balance-*');
+    let response;
+    if (typeof window.CashFlowsData?.deleteCashFlow === 'function') {
+      response = await window.CashFlowsData.deleteCashFlow(id);
+    } else {
+      response = await fetch(`/api/cash-flows/${id}`, {
+        method: 'DELETE',
+      });
     }
-
-    // שליחת בקשת מחיקה
-    const response = await fetch(`/api/cash-flows/${id}`, {
-      method: 'DELETE',
-    });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleDeleteResponse(response, {
       successMessage: 'תזרים המזומנים נמחק בהצלחה!',
       entityName: 'תזרים מזומנים',
-      reloadFn: window.loadCashFlowsData,
+      reloadFn: () => window.loadCashFlowsData({ force: true }),
       requiresHardReload: false
     });
   } catch (error) {
@@ -1149,9 +1144,12 @@ function formatCashFlowAmount(amount, type = null, currencySymbol = '$') {
   }
 
   const baseAmount = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
-    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 0, true)
+    ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 2, true)
     : (() => {
-        const absValue = Math.abs(effectiveAmount).toLocaleString('en-US', { maximumFractionDigits: 0, minimumFractionDigits: 0 });
+        const absValue = Math.abs(effectiveAmount).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
         const sign = effectiveAmount < 0 ? '-' : (effectiveAmount > 0 ? '+' : '');
         const colorClass = effectiveAmount > 0 ? 'numeric-value-positive' : (effectiveAmount < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
         const base = `${currencySymbol || '$'}${absValue}`;
@@ -1623,44 +1621,33 @@ async function saveCashFlow() {
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
         const cashFlowId = form.dataset.cashFlowId;
-        console.log('🔵 saveCashFlow - isEdit:', isEdit);
+        window.Logger.debug('saveCashFlow resolved mode', { page: 'cash_flows', isEdit, cashFlowId });
         
-        // CRUDResponseHandler will handle cache clearing automatically
-        // No need to call clearCacheBeforeCRUD here
+        let response;
+        if (isEdit && typeof window.CashFlowsData?.updateCashFlow === 'function') {
+            response = await window.CashFlowsData.updateCashFlow(cashFlowId, dataToSend);
+        } else if (!isEdit && typeof window.CashFlowsData?.createCashFlow === 'function') {
+            response = await window.CashFlowsData.createCashFlow(dataToSend);
+        } else {
+            const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
+            response = await fetch(url, {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend)
+            });
+        }
         
-        // Prepare API call
-        const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
-        const method = isEdit ? 'PUT' : 'POST';
-        console.log('🔵 saveCashFlow - Fetching to:', url, 'method:', method);
-        console.log('🔵 saveCashFlow - Data to send:', dataToSend);
-        console.log('🔵 saveCashFlow - Data to send (stringified):', JSON.stringify(dataToSend, null, 2));
-        
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToSend)
-        });
-        
-        console.log('🔵 saveCashFlow - Fetch completed, response ok:', response.ok);
-        console.log('🔵 saveCashFlow - Response status:', response.status);
-        
-        // Log response body for debugging (clone response first so it can be used later)
         let responseToHandle = response;
         if (!response.ok) {
             const responseClone = response.clone();
             const errorText = await responseClone.text();
-            console.error('❌ saveCashFlow - Error response:', errorText);
-            try {
-                const errorJson = JSON.parse(errorText);
-                console.error('❌ saveCashFlow - Error JSON:', errorJson);
-            } catch (e) {
-                console.error('❌ saveCashFlow - Error is not JSON:', errorText);
-            }
-            // Use original response for CRUDResponseHandler
-            responseToHandle = response;
+            window.Logger.error('saveCashFlow error response', {
+                page: 'cash_flows',
+                status: response.status,
+                body: errorText,
+            });
         }
         
         // CRUDResponseHandler handles ALL response processing including errors
@@ -1672,7 +1659,7 @@ async function saveCashFlow() {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
                 entityName: 'תזרים מזומן',
-                reloadFn: window.loadCashFlowsData,
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
         } else {
@@ -1681,7 +1668,7 @@ async function saveCashFlow() {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
                 entityName: 'תזרים מזומן',
-                reloadFn: window.loadCashFlowsData,
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
         }
@@ -1842,15 +1829,23 @@ async function saveCurrencyExchange() {
         let accountCurrencyId = null;
         if (exchangeData.trading_account_id) {
             try {
-                const accountResponse = await fetch(`/api/trading-accounts/${exchangeData.trading_account_id}`);
-                if (accountResponse.ok) {
-                    const accountData = await accountResponse.json();
-                    if (accountData.status === 'success' && accountData.data) {
-                        accountCurrencyId = accountData.data.currency_id || null;
+                if (typeof window.TradingAccountsData?.fetchTradingAccount === 'function') {
+                    const accountPayload = await window.TradingAccountsData.fetchTradingAccount(exchangeData.trading_account_id);
+                    const accountData = accountPayload?.data || accountPayload;
+                    accountCurrencyId = accountData?.currency_id || null;
+                } else {
+                    const accountResponse = await fetch(`/api/trading-accounts/${exchangeData.trading_account_id}`);
+                    if (accountResponse.ok) {
+                        const accountData = await accountResponse.json();
+                        const payload = accountData?.data || accountData;
+                        accountCurrencyId = payload?.currency_id || null;
                     }
                 }
             } catch (error) {
-                console.error('❌ saveCurrencyExchange - Failed to load account currency:', error);
+                window.Logger.error('saveCurrencyExchange - Failed to load account currency', error, {
+                    page: 'cash_flows',
+                    tradingAccountId: exchangeData.trading_account_id,
+                });
             }
         }
 
@@ -1869,26 +1864,31 @@ async function saveCurrencyExchange() {
         const isEdit = form.dataset.mode === 'edit';
         const exchangeId = form.dataset.exchangeId;
         
-        const url = isEdit ? `/api/cash-flows/exchange/${exchangeId}` : '/api/cash-flows/exchange';
-        const method = isEdit ? 'PUT' : 'POST';
-        
-        console.log('🔵 saveCurrencyExchange - Fetching to:', url, 'method:', method);
-        console.log('🔵 saveCurrencyExchange - Data to send:', exchangeData);
-        
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(exchangeData)
-        });
+        let response;
+        if (isEdit && typeof window.CashFlowsData?.updateCurrencyExchange === 'function') {
+            response = await window.CashFlowsData.updateCurrencyExchange(exchangeId, exchangeData);
+        } else if (!isEdit && typeof window.CashFlowsData?.createCurrencyExchange === 'function') {
+            response = await window.CashFlowsData.createCurrencyExchange(exchangeData);
+        } else {
+            const url = isEdit ? `/api/cash-flows/exchange/${exchangeId}` : '/api/cash-flows/exchange';
+            response = await fetch(url, {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(exchangeData)
+            });
+        }
         
         let responseToHandle = response;
         if (!response.ok) {
             const responseClone = response.clone();
             const errorText = await responseClone.text();
-            console.error('❌ saveCurrencyExchange - Error response:', errorText);
-            responseToHandle = response;
+            window.Logger.error('saveCurrencyExchange error response', {
+                page: 'cash_flows',
+                status: response.status,
+                body: errorText,
+            });
         }
         
         if (isEdit) {
@@ -1896,7 +1896,7 @@ async function saveCurrencyExchange() {
                 modalId: 'cashFlowModal',
                 successMessage: 'המרת מטבע עודכנה בהצלחה',
                 entityName: 'המרת מטבע',
-                reloadFn: window.loadCashFlowsData,
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
                 requiresHardReload: false
             });
         } else {
@@ -1904,7 +1904,7 @@ async function saveCurrencyExchange() {
                 modalId: 'cashFlowModal',
                 successMessage: 'המרת מטבע נוצרה בהצלחה',
                 entityName: 'המרת מטבע',
-                reloadFn: window.loadCashFlowsData,
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
                 requiresHardReload: false
             });
         }
@@ -1926,17 +1926,21 @@ async function loadCurrencyExchange(exchangeId) {
     try {
         console.log('🔵 loadCurrencyExchange - Loading exchange:', exchangeId);
         
-        const response = await fetch(`/api/cash-flows/exchange/${exchangeId}`);
-        if (!response.ok) {
-            throw new Error('Failed to load currency exchange');
+        let payload;
+        if (typeof window.CashFlowsData?.fetchCurrencyExchange === 'function') {
+            payload = await window.CashFlowsData.fetchCurrencyExchange(exchangeId);
+        } else {
+            const response = await fetch(`/api/cash-flows/exchange/${exchangeId}`);
+            if (!response.ok) {
+                throw new Error('Failed to load currency exchange');
+            }
+            payload = await response.json();
         }
         
-        const result = await response.json();
-        if (result.status !== 'success' || !result.data) {
+        const exchangeData = payload?.data || payload;
+        if (!exchangeData?.from_flow || !exchangeData?.to_flow) {
             throw new Error('Invalid response from server');
         }
-        
-        const exchangeData = result.data;
         const fromFlow = exchangeData.from_flow;
         const toFlow = exchangeData.to_flow;
         const feeAmount = exchangeData.fee_amount ?? (fromFlow ? Math.abs(fromFlow.fee_amount || 0) : 0);
@@ -2029,26 +2033,21 @@ async function deleteCurrencyExchange(exchangeId) {
         
         console.log('🔵 deleteCurrencyExchange - Deleting exchange:', exchangeId);
         
-        const response = await fetch(`/api/cash-flows/exchange/${exchangeId}`, {
-            method: 'DELETE'
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to delete currency exchange');
-        }
-        
-        const result = await response.json();
-        if (result.status === 'success') {
-            if (window.showNotification) {
-                window.showNotification('הצלחה', 'המרת מטבע נמחקה בהצלחה', 'success');
-            }
-            // Reload cash flows
-            if (window.loadCashFlowsData) {
-                await window.loadCashFlowsData();
-            }
+        let response;
+        if (typeof window.CashFlowsData?.deleteCurrencyExchange === 'function') {
+            response = await window.CashFlowsData.deleteCurrencyExchange(exchangeId);
         } else {
-            throw new Error(result.error?.message || 'Failed to delete currency exchange');
+            response = await fetch(`/api/cash-flows/exchange/${exchangeId}`, {
+                method: 'DELETE'
+            });
         }
+        
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'המרת מטבע נמחקה בהצלחה',
+            entityName: 'המרת מטבע',
+            reloadFn: () => window.loadCashFlowsData({ force: true }),
+            requiresHardReload: false
+        });
         
     } catch (error) {
         console.error('❌ deleteCurrencyExchange - Error:', error);
@@ -2688,7 +2687,6 @@ window.registerCashFlowsTables = function() {
         tableSelector: '#cashFlowsTable',
         columns: getColumns('cash_flows'),
         sortable: true,
-        filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל לפי עמודה ראשונה
+        filterable: true
     });
 };

@@ -84,6 +84,10 @@
 
 // ===== קובץ JavaScript פשוט לדף הערות =====
 
+if (!window.notesData) {
+  window.notesData = [];
+}
+
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadNotesData = window.loadNotesData || function() {
   // loadNotesData not yet defined, using placeholder
@@ -91,80 +95,90 @@ window.loadNotesData = window.loadNotesData || function() {
 };
 
 // הגדרת הפונקציה המלאה מיד אחרי ה-placeholder
-window.loadNotesData = async function() {
-  window.Logger.info('🔵🔵🔵 window.loadNotesData נקראה (שורה 99) 🔵🔵🔵', { page: "notes" });
+window.loadNotesData = async function(options = {}) {
+  const loadOptions = {
+    force: Boolean(options.force),
+    ttl: options.ttl ?? window.NotesData?.TTL,
+    signal: options.signal,
+    queryParams: options.queryParams,
+  };
 
-  try {
-    // קריאה לשרת לקבלת נתוני הערות
-    window.Logger.info('Loading notes data (bypass cache)', { page: "notes" });
-    // קריאה ישירה לשרת עם timestamp למניעת cache
+  const fallbackLoader = async () => {
     const response = await fetch(`/api/notes/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache'
-      }
+      },
+      signal: loadOptions.signal,
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const payload = await response.json();
+    return Array.isArray(payload?.data) ? payload.data : payload;
+  };
 
-    const data = await response.json();
-    window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "notes" });
+  try {
+    const beforeCount = Array.isArray(window.notesData) ? window.notesData.length : 0;
+    window.Logger.info('Loading notes data', {
+      page: 'notes',
+      force: loadOptions.force,
+      beforeCount,
+    });
 
-    // שמירת הנתונים במשתנה גלובלי
-    const rawNotes = data?.data || data;
-    window.notesData = Array.isArray(rawNotes)
-      ? rawNotes.map(note => ({
+    const useService = typeof window.NotesData?.loadNotesData === 'function';
+    const data = useService
+      ? await window.NotesData.loadNotesData(loadOptions)
+      : await fallbackLoader();
+
+    const normalizedNotes = Array.isArray(data)
+      ? data.map(note => ({
           ...note,
-          updated_at: note.updated_at || note.modified_at || note.created_at || null
+          updated_at: note?.updated_at || note?.modified_at || note?.created_at || null
         }))
       : [];
-    window.Logger.info('💾 נתונים נשמרו ב-window.notesData:', window.notesData.length, 'הערות', { page: "notes" });
 
-    // עדכון הטבלה
+    window.notesData = normalizedNotes;
+
     if (typeof window.updateNotesTable === 'function') {
-      window.Logger.info('📊 קורא ל-window.updateNotesTable מהפונקציה window.loadNotesData (שורה 99)', { page: "notes" });
-      window.updateNotesTable(window.notesData);
+      window.updateNotesTable(normalizedNotes);
     } else {
-      window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: "notes" });
+      window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: 'notes' });
     }
 
-    // עדכון סטטיסטיקות
     if (typeof window.updateNotesSummary === 'function') {
-      window.Logger.info('📈 מעדכן את סטטיסטיקות הערות', { page: "notes" });
-      window.updateNotesSummary(window.notesData);
+      window.updateNotesSummary(normalizedNotes);
     } else {
-      window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: "notes" });
+      window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: 'notes' });
     }
 
-    // עדכון מונה הטבלה
     const countElement = document.getElementById('notesCount');
     if (countElement) {
-      countElement.textContent = `${window.notesData.length} הערות`;
+      countElement.textContent = `${normalizedNotes.length} הערות`;
     }
-    
-    // Register table with UnifiedTableSystem after data is loaded
+
     if (typeof window.registerNotesTables === 'function') {
       window.registerNotesTables();
     }
 
-    // Restore page state (filters, sort, sections, entity filters)
     await restorePageState('notes');
 
-    window.Logger.info('✅ loadNotesData הושלם בהצלחה', { page: "notes", keepInfo: true });
+    window.Logger.info(`✅ Loaded ${normalizedNotes.length} notes`, {
+      page: 'notes',
+      beforeCount,
+      afterCount: normalizedNotes.length,
+    });
 
+    return normalizedNotes;
   } catch (error) {
-    window.Logger.error('❌ שגיאה ב-loadNotesData:', error, { page: "notes" });
-    
-    // הצגת הודעת שגיאה למשתמש
+    window.Logger.error('❌ loadNotesData: Error', error, { page: 'notes' });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני הערות', error.message);
     } else if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בטעינת נתוני הערות', 'error');
-    } else {
-      alert('שגיאה בטעינת נתוני הערות: ' + error.message);
     }
+    throw error;
   }
 };
 
@@ -1124,10 +1138,6 @@ async function saveNote() {
     return;
   }
 
-  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-    await window.UnifiedCacheManager.remove('notes');
-  }
-
   const noteData = DataCollectionService.collectFormData({
     content: { id: 'noteContent', type: 'rich-text' }, // Rich text editor - returns HTML
     related_type_id: { id: 'noteRelatedType', type: 'text' },
@@ -1162,9 +1172,11 @@ async function saveNote() {
   const noteId = isEditMode && formEntityId ? parseInt(formEntityId, 10) : null;
   const method = noteId ? 'PUT' : 'POST';
   const url = noteId ? `/api/notes/${noteId}` : '/api/notes/';
+  const reloadFn = () => window.loadNotesData({ force: true });
 
   try {
     let response;
+    let payload;
 
     if (attachmentFile) {
       const formData = new FormData();
@@ -1172,44 +1184,52 @@ async function saveNote() {
       formData.append('related_type_id', related_type_id);
       formData.append('related_id', related_id);
       formData.append('attachment', attachmentFile);
-
-      response = await fetch(url, {
-        method,
-        body: formData
-      });
+      payload = formData;
     } else {
       const requestData = {
         content,
         related_type_id: parseInt(related_type_id),
         related_id: parseInt(related_id)
       };
+      payload = requestData;
+    }
 
+    const useService = method === 'POST'
+      ? typeof window.NotesData?.createNote === 'function'
+      : typeof window.NotesData?.updateNote === 'function';
+
+    if (useService) {
+      response = noteId
+        ? await window.NotesData.updateNote(noteId, { payload })
+        : await window.NotesData.createNote({ payload });
+    } else if (attachmentFile) {
+      response = await fetch(url, {
+        method,
+        body: payload
+      });
+    } else {
       response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify(payload),
       });
     }
 
+    const crudOptions = {
+      modalId: 'notesModal',
+      successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
+      entityName: 'הערה',
+      reloadFn,
+      requiresHardReload: false
+    };
+
     let crudResult = null;
     if (noteId) {
-      crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
-        modalId: 'notesModal',
-        successMessage: 'הערה עודכנה בהצלחה!',
-        entityName: 'הערה',
-        reloadFn: window.loadNotesData,
-        requiresHardReload: false
-      });
+      crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
     } else {
-      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-        modalId: 'notesModal',
-        successMessage: 'הערה נשמרה בהצלחה!',
-        entityName: 'הערה',
-        reloadFn: window.loadNotesData,
-        requiresHardReload: false
-      });
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
     }
 
     const resolvedNoteId = noteId || Number(crudResult?.data?.id || crudResult?.id);
@@ -1234,11 +1254,6 @@ async function saveNote() {
 }
 
 async function updateNoteFromModal() {
-  
-  // ניקוי מטמון לפני פעולת CRUD - עריכה
-  if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-    await window.UnifiedCacheManager.remove('notes');
-  }
   
   // שימוש ב-DataCollectionService לאיסוף נתונים
   const noteData = DataCollectionService.collectFormData({
@@ -1266,6 +1281,7 @@ async function updateNoteFromModal() {
 
   try {
     let response;
+    let payload;
 
     // אם יש קובץ חדש או נדרשת מחיקת קובץ, השתמש ב-FormData
     if (attachment || shouldRemoveAttachment) {
@@ -1281,11 +1297,7 @@ async function updateNoteFromModal() {
       if (shouldRemoveAttachment) {
         formData.append('remove_attachment', 'true');
       }
-
-      response = await fetch(`/api/notes/${noteId}`, {
-        method: 'PUT',
-        body: formData,
-      });
+      payload = formData;
     } else {
       // אחרת, השתמש ב-JSON
       const data = {
@@ -1293,13 +1305,24 @@ async function updateNoteFromModal() {
         related_type_id: parseInt(relationType),
         related_id: parseInt(relatedId),
       };
+      payload = data;
+    }
 
+    const useService = typeof window.NotesData?.updateNote === 'function';
+    if (useService) {
+      response = await window.NotesData.updateNote(noteId, { payload });
+    } else if (payload instanceof FormData) {
+      response = await fetch(`/api/notes/${noteId}`, {
+        method: 'PUT',
+        body: payload,
+      });
+    } else {
       response = await fetch(`/api/notes/${noteId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
     }
 
@@ -1309,7 +1332,7 @@ async function updateNoteFromModal() {
       successMessage: 'הערה עודכנה בהצלחה!',
       apiUrl: '/api/notes/',
       entityName: 'הערה',
-      reloadFn: window.loadNotesData,
+      reloadFn: () => window.loadNotesData({ force: true }),
       requiresHardReload: false
     });
 
@@ -1352,26 +1375,22 @@ async function confirmDeleteNote(noteId) {
 }
 
 async function deleteNoteFromServer(noteId) {
-  // Clear cache before deletion to ensure fresh data after reload
-  if (window.unifiedCacheManager) {
-    await window.unifiedCacheManager.clearByPattern('notes-data');
-  }
-
   const maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {
     try {
-      const response = await fetch(`/api/notes/${noteId}`, {
-        method: 'DELETE',
-      });
+      const useService = typeof window.NotesData?.deleteNote === 'function';
+      const response = useService
+        ? await window.NotesData.deleteNote(noteId)
+        : await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
 
       // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
       await CRUDResponseHandler.handleDeleteResponse(response, {
         successMessage: 'הערה נמחקה בהצלחה!',
         apiUrl: '/api/notes/',
         entityName: 'הערה',
-        reloadFn: window.loadNotesData,
+        reloadFn: () => window.loadNotesData({ force: true }),
         requiresHardReload: false
       });
       return; // יציאה מוצלחת
@@ -2054,13 +2073,18 @@ function viewNote(noteId) {
 // פונקציה לטעינת נתוני הערה לצפייה
 async function loadNoteForViewing(noteId) {
   try {
-    const response = await fetch(`/api/notes/${noteId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    let payload;
+    if (typeof window.NotesData?.fetchNoteDetails === 'function') {
+      payload = await window.NotesData.fetchNoteDetails(noteId);
+    } else {
+      const response = await fetch(`/api/notes/${noteId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      payload = await response.json();
     }
 
-    const responseData = await response.json();
-    const note = responseData.data || responseData;
+    const note = payload.data || payload;
 
     // מילוי המודל
     document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);

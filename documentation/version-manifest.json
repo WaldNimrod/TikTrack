@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.3.0",
+    "version": "1.1.4.0",
     "major": 1,
     "minor": 1,
-    "patch": 3,
+    "patch": 4,
     "build": 0,
-    "commit": "e0e1c6c17b0485efedfce5ca609aef9216b15025",
-    "updated_at": "2025-11-15T01:04:58+00:00",
-    "notes": "Align table sorting/pagination pipeline"
+    "commit": "05ee769d166b7eadc4c6cd278bc73e2dd7c8b2e6",
+    "updated_at": "2025-11-15T01:26:29+00:00",
+    "notes": "Standardize cash flow and notes data services"
   }
 }

@@ -24,9 +24,11 @@ class TradeCondition(BaseModel):
     parameters_json = Column(Text, nullable=False)  # JSON string of parameter values
     logical_operator = Column(String(10), default='NONE', nullable=False)  # AND, OR, NONE
     
-    # Status
+    # Status & actions
     is_active = Column(Boolean, default=True, nullable=False)
     auto_generate_alerts = Column(Boolean, default=True, nullable=False)
+    trigger_action = Column(String(50), nullable=False, default='enter_trade_positive')
+    action_notes = Column(Text, nullable=True)
     
     # Timestamps
     created_at = Column(DateTime, default=func.now(), nullable=False)
@@ -96,6 +98,8 @@ class TradeCondition(BaseModel):
             'logical_operator': self.logical_operator,
             'is_active': self.is_active,
             'auto_generate_alerts': self.auto_generate_alerts,
+            'trigger_action': self.trigger_action,
+            'action_notes': self.action_notes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

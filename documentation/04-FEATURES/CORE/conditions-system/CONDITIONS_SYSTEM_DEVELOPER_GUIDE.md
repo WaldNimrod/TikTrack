@@ -61,6 +61,12 @@ Backend/
     └── test_condition_evaluation_task.py       # כיסוי משימת הרקע וההתראות
 ```
 
+#### Trigger Actions & Notes
+- `plan_conditions` ו-`trade_conditions` כוללים שני שדות חדשים:
+  - `trigger_action` (VARCHAR, חובה) – ערך Enum אחד מתוך: `enter_trade_positive`, `scale_in_positive`, `exit_trade_negative`, `scale_out_negative`.
+  - `action_notes` (TEXT) – הערות טקסט עשיר המסבירות את הפעולה שיש לבצע כאשר התנאי מתקיים. נעשה Sanitization ב-Backend (`BaseEntityUtils.sanitize_rich_text`) וב-Frontend (`RichTextEditorService`).
+- בעת רשת תנאים לתוך טרייד, השדות מועתקים אוטומטית כדי לשמור על כוונת התכנון.
+
 ### Frontend Structure
 ```
 trading-ui/
@@ -76,6 +82,8 @@ trading-ui/
 ├── scripts/page-initialization-configs.js       # הוספת החבילה לעמודים רלוונטיים
 └── scripts/init-system/package-manifest.js      # טעינת חבילת conditions במערכת האתחול
 ```
+- כל עמוד שמכיל תנאים טוען גם את `services/rich-text-editor-service.js` (Quill + DOMPurify) לטובת שדה ההערות בטופס.
+- מודל התכנון (`trade_plans.js`) כולל כפתור “בדיקת תנאים” שמפעיל את API `POST /api/plan-conditions/<id>/evaluate`, שומר את התוצאות ב-`tradePlanConditionEvaluations` ומציג Badge סטטוס בטבלה.
 
 ---
 

@@ -15,6 +15,7 @@
     'trade-plans-data': { ttl: 30 * 1000 },
     'cash-flows-data': { ttl: 60 * 1000 },
     'notes-data': { ttl: 90 * 1000 },
+    'research-data': { ttl: 120 * 1000 },
     'executions-data': { ttl: 45 * 1000 },
     'trading-accounts-data': { ttl: 60 * 1000 },
     'accounts-data': { ttl: 60 * 1000 },

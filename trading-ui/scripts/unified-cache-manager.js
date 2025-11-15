@@ -140,6 +140,9 @@ const CACHE_DEPENDENCIES = {
     'notes-data': [],
     'note-{id}': ['notes-data'],
     
+    // Research Level
+    'research-data': [],
+    
     // Market Level
     'tickers-data': ['accounts-data'],
     'ticker-{id}': ['tickers-data'],
@@ -181,6 +184,7 @@ const TTL_POLICIES = {
     'cash-flow-{id}': 'short',
     'notes-data': 'short',
     'note-{id}': 'short',
+    'research-data': 'medium',
     'market-data': 'very-short',     // 1 minute
     'quote-{symbol}': 'very-short',  // 1 minute
     'dashboard-data': 'medium',      // 30 minutes

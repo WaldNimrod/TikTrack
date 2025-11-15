@@ -60,6 +60,7 @@ class CacheSyncManager {
       'trade-plans-data': ['accounts-data'],
       'cash-flows-data': ['accounts-data'],
       'notes-data': ['accounts-data'],
+      'research-data': [],
       'market-data': ['tickers-data'],
       'dashboard-data': [
         'market-data',
@@ -107,6 +108,7 @@ class CacheSyncManager {
       'cash-flow-created': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'dashboard-data'],
       'cash-flow-updated': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'dashboard-data'],
       'cash-flow-deleted': ['cash-flows-data', 'account-activity-data', 'account-activity-*', 'account-balance-*', 'dashboard-data'],
+      'research-data-refresh': ['research-data'],
       'note-created': ['notes-data'],
       'note-updated': ['notes-data'],
       'note-deleted': ['notes-data'],

@@ -16,6 +16,13 @@ from services.validation_service import ValidationService
 logger = logging.getLogger(__name__)
 
 class ConditionsValidationService:
+    TRIGGER_ACTION_OPTIONS = {
+        'enter_trade_positive': {'label': 'Enter trade (positive)', 'polarity': 'positive'},
+        'scale_in_positive': {'label': 'Increase position (positive)', 'polarity': 'positive'},
+        'exit_trade_negative': {'label': 'Exit trade (negative)', 'polarity': 'negative'},
+        'scale_out_negative': {'label': 'Reduce position (negative)', 'polarity': 'negative'}
+    }
+    ACTION_NOTES_MAX_LENGTH = 20000
     """Validation service for conditions system"""
     
     def __init__(self, db_session: Session = None):
@@ -156,7 +163,7 @@ class ConditionsValidationService:
         table_name = 'plan_conditions' if condition_type == 'plan' else 'trade_conditions'
         
         # Required fields validation
-        required_fields = ['method_id', 'parameters_json']
+        required_fields = ['method_id', 'parameters_json', 'trigger_action']
         if condition_type == 'plan':
             required_fields.append('trade_plan_id')
         else:
@@ -201,6 +208,19 @@ class ConditionsValidationService:
             if data['condition_group'] < 0:
                 errors['condition_group'] = "Condition group must be non-negative"
         
+        # Validate trigger_action
+        trigger_action = data.get('trigger_action')
+        if trigger_action:
+            if trigger_action not in self.TRIGGER_ACTION_OPTIONS:
+                errors['trigger_action'] = f"Invalid trigger_action. Must be one of: {', '.join(self.TRIGGER_ACTION_OPTIONS.keys())}"
+        else:
+            errors['trigger_action'] = "trigger_action is required"
+
+        # Validate action notes length
+        if 'action_notes' in data and data['action_notes']:
+            if len(str(data['action_notes'])) > self.ACTION_NOTES_MAX_LENGTH:
+                errors['action_notes'] = f"action_notes exceeds maximum length of {self.ACTION_NOTES_MAX_LENGTH} characters"
+
         # Validate method_id exists
         if 'method_id' in data and data['method_id'] and self.db_session:
             method = self.db_session.query(TradingMethod).filter(

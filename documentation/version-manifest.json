@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.5.0",
+    "version": "1.1.6.0",
     "major": 1,
     "minor": 1,
-    "patch": 5,
+    "patch": 6,
     "build": 0,
-    "commit": "1e395783a97250f0f46e3ac8346ee348da4ab466",
-    "updated_at": "2025-11-15T01:48:05+00:00",
-    "notes": "Conditions docs + footer alignment"
+    "commit": "1e599c6a42910eff644b9970c8b3831b7e7e2c6b",
+    "updated_at": "2025-11-15T11:29:28+00:00",
+    "notes": "Add condition trigger actions and manual evaluation"
   }
 }

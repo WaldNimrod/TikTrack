@@ -57,6 +57,7 @@ class ConditionsFormGenerator {
         this.mode = options.isEdit ? 'edit' : 'create';
 
         container.innerHTML = this.buildFormHTML(options);
+        this.initializeActionNotesEditor(options.conditionData);
         if (window.ButtonSystem?.processButtons) {
             window.ButtonSystem.processButtons(container);
         } else if (window.ButtonSystem?.hydrateButtons) {
@@ -140,6 +141,29 @@ class ConditionsFormGenerator {
                                 <input type="number" class="form-control" id="conditionGroup"
                                        value="${conditionData.condition_group || 0}"
                                        min="0" max="99">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="triggerAction" class="form-label">
+                                    ${this.translator.getFormLabel('trigger_action')}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="triggerAction" required>
+                                    ${this.buildTriggerActionOptions(conditionData.trigger_action)}
+                                </select>
+                                <div class="invalid-feedback" id="triggerActionError"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conditionActionNotesEditor" class="form-label">
+                                    ${this.translator.getFormLabel('action_notes')}
+                                </label>
+                                <div class="rich-text-editor" id="conditionActionNotesEditor" aria-live="polite"></div>
+                                <small class="form-text text-muted">
+                                    ${this.translator.getMessage('action_notes_helper') || ''}
+                                </small>
+                                <div class="invalid-feedback" id="actionNotesError"></div>
                             </div>
                         </div>
 
@@ -312,6 +336,41 @@ class ConditionsFormGenerator {
         }
     }
 
+    buildTriggerActionOptions(selectedValue) {
+        const actions = this.translator.getTriggerActions();
+        const options = Object.entries(actions).map(([key, meta]) => {
+            const isSelected = key === selectedValue ? 'selected' : '';
+            const label = meta?.label || key;
+            return `<option value="${key}" ${isSelected}>${label}</option>`;
+        }).join('');
+        const placeholder = `<option value="">${this.translator.getFormLabel('trigger_action')}...</option>`;
+        return `${placeholder}${options}`;
+    }
+
+    initializeActionNotesEditor(conditionData = {}) {
+        const editorId = 'conditionActionNotesEditor';
+        if (!window.RichTextEditorService?.initEditor) {
+            return;
+        }
+        window.RichTextEditorService.destroyEditor?.(editorId);
+        const editor = window.RichTextEditorService.initEditor(editorId, {
+            placeholder: this.translator.getFormLabel('action_notes') || 'הכנס הערות',
+            maxLength: 20000
+        });
+        const existingContent = conditionData?.action_notes || conditionData?.actionNotes || '';
+        if (existingContent && window.RichTextEditorService?.setContent) {
+            window.RichTextEditorService.setContent(editorId, existingContent);
+        } else if (editor?.root) {
+            editor.root.innerHTML = '';
+        }
+    }
+
+    destroyActionNotesEditor() {
+        if (window.RichTextEditorService?.destroyEditor) {
+            window.RichTextEditorService.destroyEditor('conditionActionNotesEditor');
+        }
+    }
+
     getMethodKeyFromMethod(method) {
         if (!method) return '';
         if (method.method_key) return method.method_key;
@@ -459,6 +518,7 @@ class ConditionsFormGenerator {
         const logicalOperator = document.getElementById('logicalOperator');
         const conditionGroup = document.getElementById('conditionGroup');
         const isActive = document.getElementById('isActive');
+        const triggerAction = document.getElementById('triggerAction');
 
         const methodIdValue = methodSelect?.value ? Number(methodSelect.value) : null;
 
@@ -467,7 +527,8 @@ class ConditionsFormGenerator {
             logical_operator: logicalOperator?.value || 'NONE',
             condition_group: Number(conditionGroup?.value) || 0,
             is_active: Boolean(isActive?.checked),
-            parameters_json: {}
+            parameters_json: {},
+            trigger_action: triggerAction?.value || null
         };
 
         if (this.currentMethod) {
@@ -501,6 +562,11 @@ class ConditionsFormGenerator {
                     data.parameters_json[parameter.parameter_key] = input.value;
                 }
             });
+        }
+
+        if (window.RichTextEditorService?.getContent) {
+            const notesHtml = window.RichTextEditorService.getContent('conditionActionNotesEditor') || '';
+            data.action_notes = notesHtml.trim();
         }
 
         return data;
@@ -570,6 +636,11 @@ class ConditionsFormGenerator {
             isActive.checked = conditionData.is_active;
         }
 
+        const triggerAction = document.getElementById('triggerAction');
+        if (triggerAction && conditionData.trigger_action) {
+            triggerAction.value = conditionData.trigger_action;
+        }
+
         const parameters = conditionData.parameters_json || conditionData.parameters;
         if (parameters && this.currentMethod) {
             const parsedParams = typeof parameters === 'string' ? this.safeParse(parameters, {}) : parameters;
@@ -583,6 +654,10 @@ class ConditionsFormGenerator {
                     input.value = value;
                 }
             });
+        }
+
+        if (conditionData.action_notes && window.RichTextEditorService?.setContent) {
+            window.RichTextEditorService.setContent('conditionActionNotesEditor', conditionData.action_notes);
         }
     }
 

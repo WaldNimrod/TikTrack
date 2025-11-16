@@ -15,6 +15,7 @@ Flask==2.3.3
 Flask-CORS==4.0.0
 Werkzeug==2.3.7
 SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9
 
 # Real-time communications - ADVANCED VERSIONS
 Flask-SocketIO==5.3.6

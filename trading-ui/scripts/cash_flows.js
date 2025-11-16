@@ -130,10 +130,13 @@ async function loadCashFlowsData(options = {}) {
         }))
       : [];
 
-    window.cashFlowsData = normalizedCashFlows;
-    cashFlowsData = normalizedCashFlows;
+    const preparedCashFlows = ensureExchangePairsAdjacency(normalizedCashFlows);
+    window.cashFlowsData = preparedCashFlows;
+    window.allCashFlowsData = preparedCashFlows;
+    window.filteredCashFlowsData = preparedCashFlows;
+    cashFlowsData = preparedCashFlows;
 
-    await syncCashFlowsPagination(normalizedCashFlows);
+    await syncCashFlowsPagination(preparedCashFlows);
 
     if (typeof window.applyDefaultSort === 'function') {
       try {
@@ -156,6 +159,17 @@ async function loadCashFlowsData(options = {}) {
     }
 
     await restorePageState('cash_flows');
+
+    if (typeof reapplyCashFlowTypeFilter === 'function') {
+      try {
+        await reapplyCashFlowTypeFilter();
+      } catch (filterError) {
+        window.Logger?.warn('reapplyCashFlowTypeFilter failed during data load', {
+          error: filterError?.message || filterError,
+          page: 'cash_flows',
+        });
+      }
+    }
 
     window.Logger.info(`✅ Loaded ${normalizedCashFlows.length} cash flows`, {
       page: 'cash_flows',
@@ -205,8 +219,13 @@ function applyFallbackDateSort(data) {
 function calculateBalance() {
   try {
     window.Logger.info('Calculating balance', { page: 'cash_flows' });
-    
-    if (!window.cashFlowsData || window.cashFlowsData.length === 0) {
+    const balanceSource = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
+      ? window.filteredCashFlowsData
+      : (window.allCashFlowsData && window.allCashFlowsData.length > 0
+          ? window.allCashFlowsData
+          : window.cashFlowsData);
+
+    if (!balanceSource || balanceSource.length === 0) {
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אין נתוני תזרימי מזומנים', 'לא ניתן לחשב יתרה ללא נתונים', 5000, 'ui');
       } else if (typeof window.showNotification === 'function') {
@@ -220,7 +239,7 @@ function calculateBalance() {
     let incomeTotal = 0;
     let expenseTotal = 0;
     
-    window.cashFlowsData.forEach(flow => {
+    balanceSource.forEach(flow => {
       const amount = parseFloat(flow.amount) || 0;
       if (flow.type === 'income' || flow.type === 'הכנסה') {
         incomeTotal += amount;
@@ -294,9 +313,157 @@ function calculateBalance() {
 if (!window.cashFlowsData) {
   window.cashFlowsData = [];
 }
+if (!window.cashFlowsData) {
+  window.cashFlowsData = [];
+}
+if (!window.allCashFlowsData) {
+  window.allCashFlowsData = [];
+}
+if (!window.filteredCashFlowsData) {
+  window.filteredCashFlowsData = [];
+}
 let cashFlowsData = window.cashFlowsData;
 let cashFlowsPaginationInstance = null;
 let tradingAccountsData = [];
+let currentExchangeHighlightGroupId = null;
+const CASH_FLOW_TABLE_TYPE = 'cash_flows';
+const CASH_FLOWS_TABLE_ID = 'cashFlowsTable';
+const CASH_FLOW_TYPE_FILTERS = new Set([
+  'all',
+  'deposit',
+  'withdrawal',
+  'transfer_in',
+  'transfer_out',
+  'dividend',
+  'interest',
+  'syep_interest',
+  'fee',
+  'other_positive',
+  'other_negative',
+  'exchange',
+]);
+let activeCashFlowTypeFilter = 'all';
+const EXCHANGE_FROM_TYPES = new Set(['currency_exchange_from', 'other_negative']);
+const EXCHANGE_TO_TYPES = new Set(['currency_exchange_to', 'other_positive']);
+
+function resolveExchangeDirectionFromType(flowType) {
+  const normalized = typeof flowType === 'string' ? flowType.toLowerCase() : '';
+  if (EXCHANGE_FROM_TYPES.has(normalized)) {
+    return 'from';
+  }
+  if (EXCHANGE_TO_TYPES.has(normalized)) {
+    return 'to';
+  }
+  return null;
+}
+
+function getCashFlowsPaginationInstance() {
+  if (cashFlowsPaginationInstance) {
+    return cashFlowsPaginationInstance;
+  }
+  if (window.PaginationSystem?.get) {
+    const instance = window.PaginationSystem.get(CASH_FLOWS_TABLE_ID);
+    if (instance) {
+      cashFlowsPaginationInstance = instance;
+      return instance;
+    }
+  }
+  if (typeof window.getPagination === 'function') {
+    const instance = window.getPagination(CASH_FLOWS_TABLE_ID);
+    if (instance) {
+      cashFlowsPaginationInstance = instance;
+      return instance;
+    }
+  }
+  return null;
+}
+
+function setActiveCashFlowTypeButton(value) {
+  const container = document.getElementById('cashFlowTypeFilters');
+  if (!container) {
+    return;
+  }
+  const colors = window.getTableColors ? window.getTableColors() : { positive: '#26baac' };
+  const buttons = container.querySelectorAll('[data-flow-type]');
+  buttons.forEach((button) => {
+    if (button.getAttribute('data-flow-type') === value) {
+      button.classList.add('active');
+      button.style.backgroundColor = '#ffffff';
+      button.style.color = colors.positive;
+      button.style.borderColor = colors.positive;
+    } else {
+      button.classList.remove('active');
+      button.style.backgroundColor = '';
+      button.style.color = '';
+      button.style.borderColor = '';
+    }
+  });
+}
+
+function cashFlowMatchesType(item, normalizedType) {
+  if (normalizedType === 'all') {
+    return true;
+  }
+  if (normalizedType === 'exchange') {
+    if (!item) {
+      return false;
+    }
+    if (resolveExchangeDirectionFromType(item.type)) {
+      return true;
+    }
+    return Boolean(item.exchange_group_id || isCurrencyExchange(item));
+  }
+  const candidate = (item?.type || '').toString().toLowerCase();
+  return candidate === normalizedType;
+}
+
+async function filterCashFlowsByType(flowType, options = {}) {
+  const { skipButtonUpdate = false } = options || {};
+  const requestedType = typeof flowType === 'string' && flowType.trim() ? flowType.trim() : 'all';
+  const normalizedType = CASH_FLOW_TYPE_FILTERS.has(requestedType) ? requestedType : 'all';
+  activeCashFlowTypeFilter = normalizedType;
+
+  if (!skipButtonUpdate) {
+    setActiveCashFlowTypeButton(normalizedType);
+  }
+
+  const paginationInstance = getCashFlowsPaginationInstance();
+  const shouldReset = normalizedType === 'all';
+  const matcher = shouldReset ? null : (item) => cashFlowMatchesType(item, normalizedType);
+
+  if (paginationInstance && typeof paginationInstance.filter === 'function') {
+    paginationInstance.filter(matcher);
+    return;
+  }
+
+  const fallbackData = filterCashFlowsLocallyByType(normalizedType);
+  window.filteredCashFlowsData = fallbackData;
+  window.cashFlowsData = fallbackData;
+  if (window.TableDataRegistry?.setFilteredData) {
+    window.TableDataRegistry.setFilteredData(CASH_FLOW_TABLE_TYPE, fallbackData, {
+      tableId: CASH_FLOWS_TABLE_ID,
+      skipPageReset: false,
+      filterContext: { custom: { type: normalizedType } },
+      clearFilters: normalizedType === 'all',
+    });
+  }
+  await updateCashFlowsTable(fallbackData);
+}
+
+function filterCashFlowsLocallyByType(flowType) {
+  const sourceData = Array.isArray(window.allCashFlowsData) ? window.allCashFlowsData : (Array.isArray(window.cashFlowsData) ? window.cashFlowsData : []);
+  if (flowType === 'all') {
+    return [...sourceData];
+  }
+  const normalized = flowType.toLowerCase();
+  return sourceData.filter(item => {
+    return cashFlowMatchesType(item, normalized);
+  });
+}
+
+async function reapplyCashFlowTypeFilter() {
+  await filterCashFlowsByType(activeCashFlowTypeFilter, { skipButtonUpdate: true });
+}
 
 /**
  * Get account name by ID
@@ -743,6 +910,21 @@ async function renderCashFlowsTable() {
     // Check if this is a currency exchange
     const isExchange = isCurrencyExchange(cashFlow);
     const exchangeId = isExchange ? getExchangeIdFromCashFlow(cashFlow) : null;
+    const exchangeGroupId = cashFlow.exchange_group_id || (isExchange ? cashFlow.external_id : null);
+    const exchangeDirection = cashFlow.exchange_direction
+      || resolveExchangeDirectionFromType(cashFlow.type);
+
+    if (exchangeGroupId) {
+      row.dataset.exchangeGroupId = exchangeGroupId;
+      if (exchangeDirection) {
+        row.dataset.exchangeDirection = exchangeDirection;
+      } else {
+        row.removeAttribute('data-exchange-direction');
+      }
+    } else {
+      row.removeAttribute('data-exchange-group-id');
+      row.removeAttribute('data-exchange-direction');
+    }
 
     // קבלת סוג בעזרת מערכת הרינדור הכללית
     const parsedAmount = typeof cashFlow.amount === 'number'
@@ -752,7 +934,17 @@ async function renderCashFlowsTable() {
     const baseTypeDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function')
       ? window.FieldRendererService.renderType(cashFlow.type, amountForColor)
       : getCashFlowTypeWithColor(cashFlow.type);
-    const typeDisplay = isExchange ? `🔄 ${baseTypeDisplay}` : baseTypeDisplay;
+    const exchangeBadgeHtml = (window.FieldRendererService && typeof window.FieldRendererService.renderExchangeBadge === 'function' && exchangeGroupId)
+      ? window.FieldRendererService.renderExchangeBadge({
+          exchange_group_id: exchangeGroupId,
+          exchange_direction: exchangeDirection,
+          linked_exchange_summary: cashFlow.linked_exchange_summary,
+          exchange_pair_summary: cashFlow.exchange_pair_summary
+        })
+      : (isExchange ? '🔁 ' : '');
+    const typeDisplay = exchangeBadgeHtml
+      ? `${exchangeBadgeHtml}${baseTypeDisplay}`
+      : baseTypeDisplay;
     
     // Trade column - show trade ID with link button if exists
     const tradeCell = cashFlow.trade_id 
@@ -783,11 +975,21 @@ async function renderCashFlowsTable() {
     const actionsMenu = isExchange ? 
       (() => {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-        const result = window.createActionsMenu([
-          { type: 'VIEW', onclick: `showEntityDetails('cash_flow', ${cashFlow.id})`, title: 'הצג פרטי המרה' },
+        const menuItems = [
+          { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי המרה' }
+        ];
+        if (cashFlow.linked_exchange_cash_flow_id) {
+          menuItems.push({
+            type: 'LINK',
+            onclick: `showCashFlowDetails(${cashFlow.linked_exchange_cash_flow_id})`,
+            title: 'פתח רשומה צמודה'
+          });
+        }
+        menuItems.push(
           { type: 'EDIT', onclick: `window.loadCurrencyExchange && window.loadCurrencyExchange('${exchangeId}').then(() => { window.ModalManagerV2 && window.ModalManagerV2.showModal('cashFlowModal', 'edit'); })`, title: 'ערוך המרת מטבע' },
           { type: 'DELETE', onclick: `window.deleteCurrencyExchange && window.deleteCurrencyExchange('${exchangeId}')`, title: 'מחק המרת מטבע' }
-        ]);
+        );
+        const result = window.createActionsMenu(menuItems);
         return result || '';
       })() :
       (() => {
@@ -865,6 +1067,8 @@ async function renderCashFlowsTable() {
     tbody.appendChild(row);
   });
 
+  setupExchangeRowInteractions();
+
   // עדכון מספר הפריטים
   const countElement = document.querySelector('.table-count');
   if (countElement) {
@@ -880,25 +1084,31 @@ async function renderCashFlowsTable() {
  */
 function updatePageSummaryStats() {
   try {
+    const summarySource = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
+      ? window.filteredCashFlowsData
+      : (Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+          ? window.allCashFlowsData
+          : (cashFlowsData || []));
+
     // Use global InfoSummarySystem if available
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.cash_flows) {
       const config = window.INFO_SUMMARY_CONFIGS.cash_flows;
-      window.InfoSummarySystem.calculateAndRender(cashFlowsData || [], config);
+      window.InfoSummarySystem.calculateAndRender(summarySource, config);
       window.Logger.debug('Page summary stats updated via InfoSummarySystem', { 
-        count: cashFlowsData?.length || 0, 
+        count: summarySource?.length || 0, 
         page: 'cash_flows' 
       });
     } else {
       // Fallback to local implementation if global system not available
       const countElement = document.getElementById('cashFlowsCount');
-      if (countElement && cashFlowsData) {
-        countElement.textContent = cashFlowsData.length;
+      if (countElement && summarySource) {
+        countElement.textContent = summarySource.length;
       }
       
       const summaryElement = document.getElementById('cashFlowsSummary');
-      if (summaryElement && cashFlowsData) {
-        const totalAmount = cashFlowsData.reduce((sum, cf) => sum + (cf.amount || 0), 0);
-        summaryElement.textContent = `סה"כ: ${cashFlowsData.length} תזרימים, ${totalAmount.toFixed(2)} ₪`;
+      if (summaryElement && summarySource) {
+        const totalAmount = summarySource.reduce((sum, cf) => sum + (cf.amount || 0), 0);
+        summaryElement.textContent = `סה"כ: ${summarySource.length} תזרימים, ${totalAmount.toFixed(2)} ₪`;
       }
       
       window.Logger.warn('InfoSummarySystem not available - using fallback', { page: 'cash_flows' });
@@ -930,13 +1140,13 @@ async function syncCashFlowsPagination(cashFlows) {
           }
         },
         onFilteredDataChange: ({ filteredData }) => {
-          cashFlowsData = Array.isArray(filteredData) ? filteredData : [];
+          window.filteredCashFlowsData = Array.isArray(filteredData) ? filteredData : [];
           if (typeof updatePageSummaryStats === 'function') {
             updatePageSummaryStats();
           }
           const countElement = document.querySelector('.table-count');
           if (countElement) {
-            countElement.textContent = `${cashFlowsData.length} תזרימים`;
+            countElement.textContent = `${window.filteredCashFlowsData.length} תזרימים`;
           }
         },
       });
@@ -947,11 +1157,168 @@ async function syncCashFlowsPagination(cashFlows) {
   }
 
   if (window.setTableData) {
-    window.setTableData('cash_flows', safeCashFlows, { tableId: 'cashFlowsTable' });
-    window.setFilteredTableData?.('cash_flows', safeCashFlows, { tableId: 'cashFlowsTable', skipPageReset: true });
+    window.setTableData('cash_flows', safeCashFlows, { tableId: CASH_FLOWS_TABLE_ID });
+    window.setFilteredTableData?.('cash_flows', safeCashFlows, { tableId: CASH_FLOWS_TABLE_ID, skipPageReset: true });
   }
 
   await updateCashFlowsTable(safeCashFlows);
+}
+
+function ensureExchangePairsAdjacency(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  const lookup = new Map();
+  rows.forEach(row => {
+    if (row && typeof row === 'object' && row.id !== undefined) {
+      lookup.set(row.id, row);
+    }
+  });
+
+  const visited = new Set();
+  const ordered = [];
+
+  rows.forEach(row => {
+    if (!row) {
+      return;
+    }
+    const rowId = row.id;
+    if (rowId !== undefined && visited.has(rowId)) {
+      return;
+    }
+
+    const groupId = row.exchange_group_id;
+    const counterpartId = row.linked_exchange_cash_flow_id;
+    if (groupId && counterpartId) {
+      const counterpart = lookup.get(counterpartId);
+      const first = row.exchange_direction === 'to' && counterpart ? counterpart : row;
+      const second = first === row ? counterpart : row;
+
+      if (first && (first.id === undefined || !visited.has(first.id))) {
+        ordered.push(first);
+        if (first.id !== undefined) {
+          visited.add(first.id);
+        }
+      }
+
+      if (second && (second.id === undefined || !visited.has(second.id))) {
+        ordered.push(second);
+        if (second.id !== undefined) {
+          visited.add(second.id);
+        }
+      }
+    } else {
+      ordered.push(row);
+      if (rowId !== undefined) {
+        visited.add(rowId);
+      }
+    }
+  });
+
+  return ordered;
+}
+
+function setupExchangeRowInteractions() {
+  const table = document.getElementById('cashFlowsTable');
+  if (!table) return;
+
+  const rows = table.querySelectorAll('tbody tr[data-exchange-group-id]');
+  rows.forEach(row => {
+    if (row.dataset.exchangeInteractionBound === 'true') {
+      return;
+    }
+    const groupId = row.dataset.exchangeGroupId;
+    if (!groupId) {
+      return;
+    }
+
+    const highlight = () => highlightExchangeGroup(groupId);
+    const clear = () => clearExchangeHighlight(groupId);
+
+    row.addEventListener('mouseenter', highlight);
+    row.addEventListener('mouseleave', clear);
+    row.addEventListener('focus', highlight);
+    row.addEventListener('blur', clear);
+    row.dataset.exchangeInteractionBound = 'true';
+  });
+}
+
+function highlightExchangeGroup(groupId) {
+  if (!groupId) return;
+  if (currentExchangeHighlightGroupId && currentExchangeHighlightGroupId !== groupId) {
+    clearExchangeHighlight(currentExchangeHighlightGroupId);
+  }
+  const rows = document.querySelectorAll(`#cashFlowsTable tbody tr[data-exchange-group-id="${groupId}"]`);
+  rows.forEach(row => row.classList.add('table-warning'));
+  currentExchangeHighlightGroupId = groupId;
+}
+
+function clearExchangeHighlight(groupId) {
+  const targetGroup = groupId || currentExchangeHighlightGroupId;
+  if (!targetGroup) return;
+  const rows = document.querySelectorAll(`#cashFlowsTable tbody tr[data-exchange-group-id="${targetGroup}"]`);
+  rows.forEach(row => row.classList.remove('table-warning'));
+  if (!groupId || currentExchangeHighlightGroupId === targetGroup) {
+    currentExchangeHighlightGroupId = null;
+  }
+}
+
+function setCurrencyExchangeSummary(summary) {
+  const container = document.getElementById('currencyExchangeNetAmount');
+  if (!container) return;
+
+  if (!summary || !window.FieldRendererService || typeof window.FieldRendererService.renderExchangePairCards !== 'function') {
+    container.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+    return;
+  }
+
+  container.innerHTML = window.FieldRendererService.renderExchangePairCards(summary, {
+    renderAction: (flow) => {
+      if (!flow?.id) {
+        return '';
+      }
+      if (typeof showEntityDetails === 'function') {
+        return `<button class="btn btn-sm btn-outline-primary" onclick="showEntityDetails('cash_flow', ${flow.id}, { mode: 'view' })">פתח רשומה</button>`;
+      }
+      return '';
+    }
+  });
+}
+
+function hydrateCashFlowExchangeDisplay(cashFlowId) {
+  const container = document.getElementById('cashFlowExchangePairDisplay');
+  if (!container) return;
+
+  if (!window.FieldRendererService || typeof window.FieldRendererService.renderExchangePairCards !== 'function') {
+    container.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+    return;
+  }
+
+  const numericId = Number(cashFlowId);
+  if (!Number.isFinite(numericId)) {
+    container.innerHTML = '<div class="text-muted small">תזרים זה אינו חלק מהמרת מטבע.</div>';
+    return;
+  }
+
+  const record = Array.isArray(window.cashFlowsData)
+    ? window.cashFlowsData.find(flow => Number(flow.id) === numericId)
+    : null;
+
+  if (!record || !record.exchange_pair_summary) {
+    container.innerHTML = '<div class="text-muted small">תזרים זה אינו חלק מהמרת מטבע.</div>';
+    return;
+  }
+
+  container.innerHTML = window.FieldRendererService.renderExchangePairCards(record.exchange_pair_summary, {
+    currentId: record.id,
+    renderAction: (flow) => {
+      if (!flow?.id) {
+        return '';
+      }
+      return `<button class="btn btn-sm btn-outline-primary" onclick="showCashFlowDetails(${flow.id})">פתח רשומה</button>`;
+    }
+  });
 }
 
 // פונקציות הועברו ל-translation-utils.js:
@@ -1004,13 +1371,17 @@ function getCashFlowTypeWithColor(type) {
     case 'deposit':
     case 'dividend':
     case 'transfer_in':
+    case 'interest':
+    case 'syep_interest':
     case 'other_positive':
+    case 'currency_exchange_to':
       color = colors.positive;
       break;
     case 'withdrawal':
     case 'transfer_out':
     case 'fee':
     case 'other_negative':
+    case 'currency_exchange_from':
       color = colors.negative;
       break;
     default:
@@ -1026,13 +1397,17 @@ function getCashFlowTypeWithColor(type) {
   case 'deposit':
   case 'dividend':
   case 'transfer_in':
+  case 'interest':
+  case 'syep_interest':
   case 'other_positive':
+  case 'currency_exchange_to':
     cssClass = 'numeric-value-positive';
     break;
   case 'withdrawal':
   case 'transfer_out':
   case 'fee':
   case 'other_negative':
+  case 'currency_exchange_from':
     cssClass = 'numeric-value-negative';
     break;
   default:
@@ -1131,8 +1506,8 @@ function formatCashFlowAmount(amount, type = null, currencySymbol = '$') {
   if (Number.isNaN(numAmount)) {return '-';}
 
   const typeLower = type ? String(type).toLowerCase() : '';
-  const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive']);
-  const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
+  const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive', 'currency_exchange_to']);
+  const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative', 'currency_exchange_from']);
 
   let effectiveAmount = numAmount;
   if (typeLower) {
@@ -1213,10 +1588,11 @@ function showCashFlowDetails(cashFlowId) {
  * @returns {void}
  */
 async function updateCashFlowsTable(cashFlows) {
+  const prepared = ensureExchangePairsAdjacency(Array.isArray(cashFlows) ? [...cashFlows] : []);
 
   // עדכון הנתונים הגלובליים
-  window.cashFlowsData = cashFlows;
-  cashFlowsData = cashFlows;
+  window.cashFlowsData = prepared;
+  cashFlowsData = prepared;
 
   // רינדור הטבלה
   await renderCashFlowsTable();
@@ -1860,6 +2236,44 @@ async function saveCurrencyExchange() {
 
         exchangeData.fee_currency_id = accountCurrencyId;
 
+		// Normalize date to backend expected format (YYYY-MM-DD) - avoid sending Date/datetime objects
+		if (exchangeData.date) {
+			try {
+				// Handle cases where a Date object or complex object sneaks in
+				if (typeof exchangeData.date === 'object') {
+					const maybeValue = exchangeData.date.value || exchangeData.date.display || exchangeData.date.iso || exchangeData.date.toString?.();
+					exchangeData.date = String(maybeValue || '').split('T')[0];
+				} else {
+					exchangeData.date = String(exchangeData.date).split('T')[0];
+				}
+				// Final guard: enforce YYYY-MM-DD strictly
+				const ymd = /^\d{4}-\d{2}-\d{2}$/;
+				if (!ymd.test(exchangeData.date)) {
+					const d = new Date(exchangeData.date);
+					if (!isNaN(d.getTime())) {
+						const y = d.getFullYear();
+						const m = String(d.getMonth() + 1).padStart(2, '0');
+						const day = String(d.getDate()).padStart(2, '0');
+						exchangeData.date = `${y}-${m}-${day}`;
+					} else {
+						exchangeData.date = null;
+					}
+				}
+			} catch (e) {
+				exchangeData.date = null;
+			}
+		}
+
+		// Debug trace for payload (uses Logger, not console)
+		try {
+			window.Logger?.debug?.('saveCurrencyExchange - payload preview', {
+				page: 'cash_flows',
+				payloadKeys: Object.keys(exchangeData || {}),
+				dateType: typeof exchangeData.date,
+				dateValue: exchangeData.date
+			});
+		} catch (_) {}
+
         // Check if this is edit mode
         const isEdit = form.dataset.mode === 'edit';
         const exchangeId = form.dataset.exchangeId;
@@ -2008,6 +2422,10 @@ async function loadCurrencyExchange(exchangeId) {
             window.updateCurrencyExchangeDescription();
         }
         
+        if (typeof setCurrencyExchangeSummary === 'function') {
+            setCurrencyExchangeSummary(exchangeData.exchange_pair_summary || null);
+        }
+
         console.log('✅ loadCurrencyExchange - Exchange loaded successfully');
         
     } catch (error) {
@@ -2064,10 +2482,23 @@ async function deleteCurrencyExchange(exchangeId) {
  * @returns {boolean}
  */
 function isCurrencyExchange(cashFlow) {
-    if (!cashFlow || !cashFlow.external_id) {
+    if (!cashFlow) {
         return false;
     }
-    return cashFlow.external_id.startsWith('exchange_');
+    if (resolveExchangeDirectionFromType(cashFlow.type)) {
+        return true;
+    }
+    if (cashFlow.exchange_group_id) {
+        return true;
+    }
+    if (cashFlow.linked_exchange_cash_flow_id || cashFlow.linked_exchange_summary || cashFlow.exchange_pair_summary) {
+        return true;
+    }
+    if (cashFlow.source && String(cashFlow.source).toLowerCase() === 'currency_exchange') {
+        return true;
+    }
+    const externalId = cashFlow.external_id;
+    return typeof externalId === 'string' && externalId.startsWith('exchange_');
 }
 
 /**
@@ -2080,7 +2511,11 @@ function getExchangeIdFromCashFlow(cashFlow) {
     if (!isCurrencyExchange(cashFlow)) {
         return null;
     }
-    return cashFlow.external_id.replace('exchange_', '');
+    const groupId = cashFlow.exchange_group_id || cashFlow.external_id;
+    if (!groupId) {
+        return null;
+    }
+    return groupId.replace('exchange_', '');
 }
 
 // Export save function for ModalManagerV2
@@ -2264,6 +2699,7 @@ async function editCashFlow(id) {
         if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
             await window.TagUIManager.hydrateSelectForEntity('cashFlowTags', 'cash_flow', id, { force: true });
         }
+        hydrateCashFlowExchangeDisplay(id);
     } else {
         window.Logger?.error('ModalManagerV2 לא זמין', { page: "cash_flows" });
         if (typeof window.showErrorNotification === 'function') {
@@ -2280,6 +2716,8 @@ async function editCashFlow(id) {
 window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
+window.filterCashFlowsByType = filterCashFlowsByType;
+window.reapplyCashFlowTypeFilter = reapplyCashFlowTypeFilter;
 window.deleteCashFlow = deleteCashFlow;
 window.performCashFlowDeletion = performCashFlowDeletion;
 // REMOVED: window exports for removed modal wrapper functions
@@ -2290,6 +2728,7 @@ window.editCashFlow = editCashFlow;
 window.loadCashFlowsData = loadCashFlowsData;
 window.updateCashFlowsTable = updateCashFlowsTable;
 window.updateCashFlow = updateCashFlow;
+window.setCurrencyExchangeSummary = setCurrencyExchangeSummary;
 
 // window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal
 // window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר
@@ -2677,6 +3116,18 @@ window.registerCashFlowsTables = function() {
     // Register cash_flows table
     window.UnifiedTableSystem.registry.register('cash_flows', {
         dataGetter: () => {
+            if (window.TableDataRegistry?.getFullData) {
+                const registryData = window.TableDataRegistry.getFullData(CASH_FLOW_TABLE_TYPE);
+                if (Array.isArray(registryData)) {
+                    return registryData;
+                }
+            }
+            if (Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0) {
+                return window.filteredCashFlowsData;
+            }
+            if (Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0) {
+                return window.allCashFlowsData;
+            }
             return window.cashFlowsData || [];
         },
         updateFunction: (data) => {

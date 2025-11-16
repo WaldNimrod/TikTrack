@@ -13,31 +13,33 @@ from pathlib import Path
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
-DB_PATH = BASE_DIR / "db" / "TikTrack_DB.db"  # Production database
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings
 DEBUG = False
-HOST = '127.0.0.1'
-PORT = 5001  # Production port (different from development port 8080)
+HOST = "127.0.0.1"
+PORT = 5001
 
 # Production settings
-DEVELOPMENT_MODE = False  # Production mode
-CACHE_DISABLED = False  # Cache enabled in production for performance
+DEVELOPMENT_MODE = False
+CACHE_DISABLED = False
+DEFAULT_CACHE_TTL = 300
+CACHE_ENABLED = True
 
-# Cache settings - Production optimized
-DEFAULT_CACHE_TTL = 300  # 5 minutes - standard production cache
-
-# Cache enabled/disabled setting
-CACHE_ENABLED = True  # Cache enabled in production
-
-# Database settings
-DATABASE_URL = f"sqlite:///{DB_PATH}"
+# Database settings – force PostgreSQL in production
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "tiktrack_prod")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "tiktrack")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "change_me")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}",
+)
 
 # Logs directory for production
 LOG_DIR = BASE_DIR / "logs-production"
 
-# Checks (skip in testing mode)
-if not os.getenv('TESTING') and not UI_DIR.exists():
+if not os.getenv("TESTING") and not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 

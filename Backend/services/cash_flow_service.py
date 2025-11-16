@@ -11,9 +11,11 @@ Version: 1.0.0
 Date: January 2025
 """
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.cash_flow import CashFlow
-from typing import List, Optional
+from models.trading_account import TradingAccount
+from typing import List, Optional, Dict, Any, Union
+from decimal import Decimal
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,9 +26,19 @@ class CashFlowService:
     """
     
     EXCHANGE_PREFIX = "exchange_"
+    EXCHANGE_FROM_TYPE = "currency_exchange_from"
+    EXCHANGE_TO_TYPE = "currency_exchange_to"
+    LEGACY_EXCHANGE_FROM_TYPE = "other_negative"
+    LEGACY_EXCHANGE_TO_TYPE = "other_positive"
+    EXCHANGE_TYPES = {
+        EXCHANGE_FROM_TYPE,
+        EXCHANGE_TO_TYPE,
+        LEGACY_EXCHANGE_FROM_TYPE,
+        LEGACY_EXCHANGE_TO_TYPE,
+    }
     
     @staticmethod
-    def is_currency_exchange(external_id: Optional[str]) -> bool:
+    def is_currency_exchange(external_id: Optional[str], flow_type: Optional[str] = None) -> bool:
         """
         Check if external_id indicates a currency exchange operation
         
@@ -36,9 +48,35 @@ class CashFlowService:
         Returns:
             bool: True if external_id starts with 'exchange_'
         """
+        if flow_type and flow_type in CashFlowService.EXCHANGE_TYPES:
+            return True
         if not external_id:
             return False
         return external_id.startswith(CashFlowService.EXCHANGE_PREFIX)
+
+    @staticmethod
+    def is_exchange_type(flow_type: Optional[str]) -> bool:
+        return (flow_type or '') in CashFlowService.EXCHANGE_TYPES
+
+    @staticmethod
+    def get_exchange_direction(flow_type: Optional[str]) -> Optional[str]:
+        if not flow_type:
+            return None
+        if flow_type in (CashFlowService.EXCHANGE_FROM_TYPE, CashFlowService.LEGACY_EXCHANGE_FROM_TYPE):
+            return 'from'
+        if flow_type in (CashFlowService.EXCHANGE_TO_TYPE, CashFlowService.LEGACY_EXCHANGE_TO_TYPE):
+            return 'to'
+        return None
+
+    @staticmethod
+    def normalize_exchange_type(flow_type: Optional[str]) -> Optional[str]:
+        if not flow_type:
+            return None
+        if flow_type == CashFlowService.LEGACY_EXCHANGE_FROM_TYPE:
+            return CashFlowService.EXCHANGE_FROM_TYPE
+        if flow_type == CashFlowService.LEGACY_EXCHANGE_TO_TYPE:
+            return CashFlowService.EXCHANGE_TO_TYPE
+        return flow_type
     
     @staticmethod
     def get_exchange_flows(db: Session, exchange_id: str) -> List[CashFlow]:
@@ -56,7 +94,10 @@ class CashFlowService:
         if not exchange_id.startswith(CashFlowService.EXCHANGE_PREFIX):
             exchange_id = f"{CashFlowService.EXCHANGE_PREFIX}{exchange_id}"
         
-        flows = db.query(CashFlow).filter(
+        flows = db.query(CashFlow).options(
+            joinedload(CashFlow.account).joinedload(TradingAccount.currency),
+            joinedload(CashFlow.currency)
+        ).filter(
             CashFlow.external_id == exchange_id
         ).all()
         
@@ -83,15 +124,14 @@ class CashFlowService:
                 return False, "Currency exchange should not include a separate fee flow (legacy structure detected)"
             return False, "Currency exchange must include exactly 2 cash flows (from and to)"
         
-        # Check for other_negative (from currency - outgoing)
-        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
+        # Check for from/to flows using legacy + new types
+        from_flow = next((f for f in flows if CashFlowService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
         if not from_flow:
-            return False, "Currency exchange must have a 'from' flow with type 'other_negative'"
+            return False, "Currency exchange must have a 'from' flow with type 'currency_exchange_from'"
         
-        # Check for other_positive (to currency - incoming)
-        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        to_flow = next((f for f in flows if CashFlowService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
         if not to_flow:
-            return False, "Currency exchange must have a 'to' flow with type 'other_positive'"
+            return False, "Currency exchange must have a 'to' flow with type 'currency_exchange_to'"
         
         # Validate amounts
         if from_flow.amount >= 0:
@@ -153,4 +193,116 @@ class CashFlowService:
             str: External ID with prefix
         """
         return f"{CashFlowService.EXCHANGE_PREFIX}{uuid}"
+
+    @staticmethod
+    def _safe_number(value: Any) -> Optional[float]:
+        """Convert Decimal/str to float safely"""
+        if value is None:
+            return None
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, Decimal):
+            return float(value)
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def _cash_flow_payload(flow: Union[CashFlow, Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Normalize a cash flow model/dict into a plain dict with currency/account metadata.
+        """
+        if isinstance(flow, dict):
+            payload = dict(flow)
+        elif isinstance(flow, CashFlow):
+            payload = flow.to_dict()
+            account = getattr(flow, 'account', None)
+            currency = getattr(flow, 'currency', None)
+            if account:
+                payload.setdefault('account_name', getattr(account, 'name', None))
+                payload['account_currency_id'] = getattr(account, 'currency_id', None)
+                account_currency = getattr(account, 'currency', None)
+                payload['account_currency_symbol'] = getattr(account_currency, 'symbol', None)
+                payload['account_currency_name'] = getattr(account_currency, 'name', None)
+            if currency:
+                payload['currency_symbol'] = getattr(currency, 'symbol', payload.get('currency_symbol'))
+                payload['currency_name'] = getattr(currency, 'name', payload.get('currency_name'))
+        else:
+            payload = {}
+
+        # Fallback for account currency metadata if missing
+        if payload.get('account_currency_symbol') is None:
+            currency_obj = payload.get('account', {})
+            if isinstance(currency_obj, dict):
+                payload['account_currency_symbol'] = currency_obj.get('currency_symbol') or currency_obj.get('symbol')
+                payload['account_currency_id'] = currency_obj.get('currency_id')
+                payload['account_currency_name'] = currency_obj.get('currency_name')
+
+        return payload
+
+    @staticmethod
+    def build_exchange_pair_summary(
+        from_flow: Union[CashFlow, Dict[str, Any], None],
+        to_flow: Union[CashFlow, Dict[str, Any], None]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Build a structured summary for a currency exchange pair (from/to flows).
+        """
+        if not from_flow or not to_flow:
+            return None
+
+        from_payload = CashFlowService._cash_flow_payload(from_flow)
+        to_payload = CashFlowService._cash_flow_payload(to_flow)
+        from_payload['type'] = CashFlowService.normalize_exchange_type(from_payload.get('type'))
+        to_payload['type'] = CashFlowService.normalize_exchange_type(to_payload.get('type'))
+
+        from_amount = CashFlowService._safe_number(from_payload.get('amount'))
+        to_amount = CashFlowService._safe_number(to_payload.get('amount'))
+        fee_amount = CashFlowService._safe_number(from_payload.get('fee_amount')) or 0.0
+
+        if from_amount is None or to_amount is None:
+            return None
+
+        absolute_from = abs(from_amount)
+        exchange_rate = None
+        if from_amount not in (0, None):
+            try:
+                exchange_rate = abs(to_amount / from_amount) if from_amount != 0 else None
+            except ZeroDivisionError:
+                exchange_rate = None
+
+        summary = {
+            "group_id": from_payload.get('external_id') or to_payload.get('external_id'),
+            "exchange_rate": exchange_rate,
+            "fee_amount": fee_amount,
+            "fee_currency_id": from_payload.get('account_currency_id'),
+            "fee_currency_symbol": from_payload.get('account_currency_symbol'),
+            "fee_currency_name": from_payload.get('account_currency_name'),
+            "net_out_account_currency": absolute_from + (fee_amount or 0),
+            "net_in_target_currency": to_amount,
+            "from": {
+                "id": from_payload.get('id'),
+                "currency_id": from_payload.get('currency_id'),
+                "currency_symbol": from_payload.get('currency_symbol'),
+                "currency_name": from_payload.get('currency_name'),
+                "amount": absolute_from,
+                "raw_amount": from_amount,
+                "type": from_payload.get('type'),
+                "date": from_payload.get('date'),
+                "fee_amount": fee_amount
+            },
+            "to": {
+                "id": to_payload.get('id'),
+                "currency_id": to_payload.get('currency_id'),
+                "currency_symbol": to_payload.get('currency_symbol'),
+                "currency_name": to_payload.get('currency_name'),
+                "amount": to_amount,
+                "raw_amount": to_amount,
+                "type": to_payload.get('type'),
+                "date": to_payload.get('date')
+            }
+        }
+
+        return summary
 

@@ -352,15 +352,15 @@ const TABLE_COLUMN_SORT_TYPES = {
 };
 
 const DEFAULT_DATE_KEYS = [
-  'updated_at',
-  'completed_at',
-  'triggered_at',
-  'closed_at',
+  'date',
+  'created_at',
   'opened_at',
   'trade_created_at',
-  'created_at',
+  'closed_at',
+  'triggered_at',
+  'completed_at',
   'expiry_date',
-  'date',
+  'updated_at',
   'yahoo_updated_at'
 ];
 

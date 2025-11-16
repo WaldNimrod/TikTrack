@@ -41,12 +41,13 @@ class PreferencesService:
 
     CACHE_TTL = 24 * 60 * 60  # 24 hours
 
-    def __init__(self, db_path: str = None):
+    def __init__(self):
         self._SessionLocal = SessionLocal
         self.cache: Dict[str, Any] = {}
         self.cache_timestamps: Dict[str, float] = {}
-        self.db_path = db_path or str(LEGACY_DB_PATH)
-        self.constraint_service = ConstraintService(db_path=self.db_path)
+        self.constraint_service = ConstraintService()
+        # Legacy compatibility for scripts/tests still touching the sqlite path directly
+        self.db_path = str(LEGACY_DB_PATH)
 
     # ------------------------------------------------------------------ #
     # Session helpers
@@ -120,16 +121,24 @@ class PreferencesService:
         session.flush()
         return profile.id
 
-    def build_profile_context(self, user_id: int, profile_id: Optional[int] = None) -> Dict[str, Any]:
+    def build_profile_context(
+        self,
+        user_id: int,
+        profile_id: Optional[int] = None,
+        requested_profile_id: Optional[int] = None,
+        **_ignored_kwargs: Any,
+    ) -> Dict[str, Any]:
         with self._session_scope() as session:
-            profile_id = profile_id or self._get_active_profile_id(session, user_id)
-            profile = session.get(PreferenceProfile, profile_id)
+            resolved_profile_id = requested_profile_id or profile_id
+            resolved_profile_id = resolved_profile_id or self._get_active_profile_id(session, user_id)
+            profile = session.get(PreferenceProfile, resolved_profile_id)
             if not profile or profile.user_id != user_id:
-                raise ProfileNotFoundError(f"Profile {profile_id} not found for user {user_id}")
+                raise ProfileNotFoundError(f"Profile {resolved_profile_id} not found for user {user_id}")
 
             return {
                 "user_id": user_id,
                 "profile_id": profile.id,
+                "requested_profile_id": requested_profile_id,
                 "resolved_profile_id": profile.id,
                 "profile": {
                     "id": profile.id,
@@ -306,13 +315,23 @@ class PreferencesService:
             return payload["last_update"], profile_id
 
     def get_preferences_by_names(
-        self, user_id: int, names: List[str], profile_id: Optional[int] = None
+        self,
+        user_id: int,
+        names: Optional[List[str]] = None,
+        profile_id: Optional[int] = None,
+        preference_names: Optional[List[str]] = None,
+        use_cache: bool = True,
+        **_ignored_kwargs: Any,
     ) -> Dict[str, Any]:
+        _ = use_cache  # caching handled at higher layers for now
+        target_names = names or preference_names or []
+        if not target_names:
+            return {}
         with self._session_scope() as session:
             profile_id = profile_id or self._get_active_profile_id(session, user_id)
             pref_types = session.scalars(
                 select(PreferenceType).where(
-                    PreferenceType.preference_name.in_(names),
+                    PreferenceType.preference_name.in_(target_names),
                     PreferenceType.is_active.is_(True),
                 )
             ).all()

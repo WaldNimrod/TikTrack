@@ -321,7 +321,7 @@ class ProjectFilesScanner {
         'scripts/crud-utils.js',
 
         // Preferences System (only existing files)
-        'scripts/preferences.js',
+        'trading-ui/scripts/preferences.js',
         'scripts/preferences-admin.js',
         'scripts/preferences-page.js',
 

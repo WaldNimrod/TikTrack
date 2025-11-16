@@ -218,6 +218,135 @@ describe('Fallback Handling Integrity', () => {
     });
   });
 
+  describe('Ticker external currency resolution', () => {
+    beforeEach(() => {
+      jest.resetModules();
+      jest.clearAllMocks();
+      setupBasicMocks();
+      global.window.Logger = Object.assign(global.window.Logger || {}, {
+        warn: jest.fn(),
+      });
+      global.window.showWarningNotification = global.window.showWarningNotification || jest.fn();
+      global.window.showNotification = global.window.showNotification || jest.fn();
+      const code = loadScriptWithDependencies('scripts/ticker-service.js');
+      eval(code);
+      jest.spyOn(global.window.Logger, 'warn').mockImplementation(() => {});
+      jest.spyOn(global.window, 'showWarningNotification').mockImplementation(() => {});
+      jest.spyOn(global.window, 'showNotification').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      delete global.window.tickerService;
+      delete global.window.resolveExternalCurrencySymbol;
+      delete global.window.showWarningNotification;
+      delete global.window.showNotification;
+      jest.restoreAllMocks();
+    });
+
+    it('returns trimmed currency symbol when provided', () => {
+      const initialWarnCount = window.Logger.warn.mock.calls.length;
+      const result = window.resolveExternalCurrencySymbol(' ILS ', 'MSFT');
+
+      expect(result).toEqual({ symbol: 'ILS', hasCurrency: true });
+      expect(window.Logger.warn.mock.calls.length).toBe(initialWarnCount);
+      expect(window.showWarningNotification).not.toHaveBeenCalled();
+    });
+
+    it('warns and notifies when currency is missing', () => {
+      const result = window.resolveExternalCurrencySymbol('', 'AAPL');
+
+      expect(result).toEqual({ symbol: '', hasCurrency: false });
+      expect(window.Logger.warn).toHaveBeenCalledWith(
+        '⚠️ External quote missing currency value',
+        expect.objectContaining({ symbol: 'AAPL', page: 'tickers' })
+      );
+      expect(window.showWarningNotification).toHaveBeenCalledWith(
+        'נתוני מטבע חסרים',
+        expect.stringContaining('AAPL'),
+        6000,
+        'system'
+      );
+    });
+  });
+
+  describe('ChartSystem adapter enforcement', () => {
+    let containerElement;
+    let chartSystem;
+
+    beforeEach(async () => {
+      jest.resetModules();
+      jest.clearAllMocks();
+      setupBasicMocks();
+      containerElement = {
+        getContext: jest.fn(() => ({}))
+      };
+      global.document.querySelector = jest.fn(() => containerElement);
+      global.window.ChartLoader = { load: jest.fn().mockResolvedValue() };
+      global.window.ChartTheme = { getChartOptions: jest.fn(() => ({})) };
+      global.window.Chart = jest.fn().mockImplementation(() => ({
+        data: { labels: [], datasets: [] },
+        update: jest.fn(),
+        destroy: jest.fn()
+      }));
+      global.window.showErrorNotification = jest.fn();
+      global.window.showNotification = jest.fn();
+      const code = loadScriptWithDependencies('scripts/charts/chart-system.js');
+      eval(code);
+      const ChartSystemClass = window.ChartSystem.constructor;
+      window.ChartSystem = new ChartSystemClass();
+      chartSystem = window.ChartSystem;
+      await chartSystem.init();
+      jest.spyOn(window, 'showErrorNotification').mockImplementation(() => {});
+      jest.spyOn(window, 'showNotification').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      delete global.window.ChartSystem;
+      delete global.window.showErrorNotification;
+      delete global.window.showNotification;
+      jest.restoreAllMocks();
+    });
+
+    it('throws and notifies when adapter is missing', async () => {
+      await expect(chartSystem.create({
+        id: 'chart-adapter-missing',
+        type: 'bar',
+        container: '#missing-chart',
+        adapter: 'unknown-adapter'
+      })).rejects.toThrow("מתאם התרשימים 'unknown-adapter' לא קיים");
+
+      expect(window.showErrorNotification).toHaveBeenCalledWith(
+        'שגיאת תרשימים',
+        expect.stringContaining('unknown-adapter'),
+        6000,
+        'system'
+      );
+      expect(window.Chart).not.toHaveBeenCalled();
+    });
+
+    it('propagates adapter failures with notification', async () => {
+      chartSystem.registerAdapter('broken', {
+        getData: jest.fn().mockRejectedValue(new Error('adapter fail')),
+        formatData: jest.fn()
+      });
+
+      await expect(chartSystem.create({
+        id: 'chart-adapter-fail',
+        type: 'line',
+        container: '#fail-chart',
+        adapter: 'broken'
+      })).rejects.toThrow('adapter fail');
+
+      expect(window.showErrorNotification).toHaveBeenCalledWith(
+        'שגיאת תרשימים',
+        expect.stringContaining("מתאם 'broken'"),
+        6000,
+        'system'
+      );
+      expect(window.Chart).not.toHaveBeenCalled();
+    });
+  });
+
   describe('PerformanceAdapter', () => {
     let originalFetch;
 

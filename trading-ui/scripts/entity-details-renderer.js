@@ -3737,6 +3737,20 @@ class EntityDetailsRenderer {
             }, { page: 'entity-details-renderer' });
         }
         
+        const exchangePairSection = (window.FieldRendererService &&
+            typeof window.FieldRendererService.renderExchangePairCards === 'function' &&
+            cashFlowData.exchange_pair_summary)
+            ? window.FieldRendererService.renderExchangePairCards(cashFlowData.exchange_pair_summary, {
+                currentId: cashFlowData.id,
+                renderAction: (flow) => {
+                    if (!flow?.id) {
+                        return '';
+                    }
+                    return `<button class="btn btn-sm btn-outline-primary" onclick="showEntityDetails('cash_flow', ${flow.id}, { mode: 'view' })">פתח רשומה</button>`;
+                }
+            })
+            : '';
+
         return `
             <div class="entity-details-container cash-flow-details">
                 <div class="row g-3">
@@ -3747,6 +3761,14 @@ class EntityDetailsRenderer {
                         ${this.renderCashFlowSpecific(cashFlowData, { section: 'secondary' })}
                     </div>
                 </div>
+
+                ${exchangePairSection ? `
+                <div class="row g-3 mt-4">
+                    <div class="col-12">
+                        <h6 class="border-bottom pb-2 mb-3">צמד המרה</h6>
+                        ${exchangePairSection}
+                    </div>
+                </div>` : ''}
                 
                 <div class="row g-3 mt-4">
                     <div class="col-12">
@@ -3957,9 +3979,12 @@ class EntityDetailsRenderer {
             'withdrawal': 'משיכה',
             'transfer_in': 'העברה מחשבון אחר',
             'transfer_out': 'העברה לחשבון אחר',
+            'currency_exchange_from': 'המרת מט״ח - יציאה',
+            'currency_exchange_to': 'המרת מט״ח - כניסה',
             'fee': 'עמלה',
             'dividend': 'דיבידנד',
             'interest': 'ריבית',
+            'syep_interest': 'ריבית SYEP',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',
             'opening_balance': 'יתרת פתיחה'
@@ -5021,8 +5046,8 @@ class EntityDetailsRenderer {
             
             // Normalize amount based on type - same logic as in cash_flows.js formatCashFlowAmount
             const typeLower = (entityData.type || '').toLowerCase();
-            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive']);
-            const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
+            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive', 'currency_exchange_to']);
+            const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative', 'currency_exchange_from']);
             
             let effectiveAmount = amountValue;
             if (typeLower) {

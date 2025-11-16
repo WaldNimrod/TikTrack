@@ -78,6 +78,10 @@ class ValidationService:
             return self._validate_cashflow_records(records)
         if task == 'account_reconciliation':
             return self._validate_account_reconciliation_records(records)
+        if task == 'portfolio_positions':
+            return self._validate_portfolio_records(records)
+        if task == 'taxes_and_fx':
+            return self._validate_tax_fx_records(records)
         return self._validate_execution_records(records)
 
     # ------------------------------------------------------------------
@@ -360,6 +364,149 @@ class ValidationService:
             'base_currency_mismatches': base_currency_mismatches,
             'entitlement_warnings': entitlement_warnings,
             'missing_documents_report': missing_documents_report,
+            'total_records': len(records),
+            'valid_count': len(valid_records),
+            'invalid_count': len(invalid_records),
+            'validation_rate': (len(valid_records) / len(records) * 100) if records else 0
+        }
+
+    def _validate_portfolio_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        valid_records: List[Dict[str, Any]] = []
+        invalid_records: List[Dict[str, Any]] = []
+        validation_errors: List[Dict[str, Any]] = []
+        currency_totals: Dict[str, float] = defaultdict(float)
+        category_totals: Dict[str, float] = defaultdict(float)
+        zero_quantity_positions: List[Dict[str, Any]] = []
+
+        for i, record in enumerate(records):
+            errors: List[str] = []
+            record_type = (record.get('record_type') or '').lower()
+            currency = record.get('currency')
+
+            if record_type == 'open_position' and not record.get('symbol'):
+                errors.append("symbol is required for open positions")
+            if not currency:
+                errors.append("currency is required")
+            if not record.get('account_id'):
+                errors.append("account_id is required")
+            if not record.get('statement_period_end'):
+                errors.append("statement_period_end envelope is required")
+
+            market_value = record.get('market_value')
+            market_value_numeric: Optional[float] = None
+            try:
+                market_value_numeric = float(market_value)
+            except (TypeError, ValueError):
+                errors.append("market_value must be numeric")
+
+            if record_type == 'open_position':
+                quantity = record.get('quantity')
+                try:
+                    quantity_value = float(quantity)
+                    if quantity_value == 0 and (market_value_numeric is None or market_value_numeric == 0):
+                        zero_quantity_positions.append({
+                            'record_index': i,
+                            'symbol': record.get('symbol'),
+                            'currency': currency
+                        })
+                except (TypeError, ValueError):
+                    errors.append("quantity must be numeric")
+
+            if errors:
+                invalid_records.append(record)
+                validation_errors.append({
+                    'record_index': i,
+                    'record': record,
+                    'errors': errors
+                })
+            else:
+                valid_records.append(record)
+                category = record.get('asset_category') or 'unknown'
+                if market_value_numeric is not None:
+                    category_totals[category] += market_value_numeric
+                    if currency:
+                        currency_totals[currency] += market_value_numeric
+
+        return {
+            'valid_records': valid_records,
+            'invalid_records': invalid_records,
+            'validation_errors': validation_errors,
+            'currency_totals': dict(currency_totals),
+            'asset_category_totals': dict(category_totals),
+            'zero_quantity_positions': zero_quantity_positions,
+            'total_records': len(records),
+            'valid_count': len(valid_records),
+            'invalid_count': len(invalid_records),
+            'validation_rate': (len(valid_records) / len(records) * 100) if records else 0
+        }
+
+    def _validate_tax_fx_records(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        valid_records: List[Dict[str, Any]] = []
+        invalid_records: List[Dict[str, Any]] = []
+        validation_errors: List[Dict[str, Any]] = []
+        totals_by_currency: Dict[str, float] = defaultdict(float)
+        totals_by_type: Dict[str, float] = defaultdict(float)
+        nav_components: Dict[str, float] = defaultdict(float)
+        forex_trades: List[Dict[str, Any]] = []
+
+        amount_required_types = {'withholding_tax', 'tax_cashflow', 'forex_conversion'}
+
+        for i, record in enumerate(records):
+            errors: List[str] = []
+            record_type = (record.get('record_type') or '').lower()
+            currency = record.get('currency')
+
+            amount_value: Optional[float] = None
+            amount = record.get('amount')
+            if amount not in (None, ''):
+                try:
+                    amount_value = float(amount)
+                except (TypeError, ValueError):
+                    errors.append("amount must be numeric")
+            elif record_type in amount_required_types:
+                errors.append("amount must be numeric")
+
+            if record_type in amount_required_types and not currency:
+                errors.append("currency is required for monetary records")
+
+            if record_type == 'forex_conversion':
+                if not record.get('source_currency') or not record.get('target_currency'):
+                    errors.append("forex conversion requires source/target currencies")
+                forex_trades.append({
+                    'record_index': i,
+                    'symbol': record.get('symbol'),
+                    'source_currency': record.get('source_currency'),
+                    'target_currency': record.get('target_currency'),
+                    'quantity': record.get('quantity'),
+                    'trade_price': record.get('trade_price'),
+                    'amount': amount_value
+                })
+            elif record_type == 'nav_component' and amount_value is not None:
+                component = record.get('component') or 'nav'
+                nav_components[component] += amount_value
+
+            if amount_value is not None and currency and record_type in {'withholding_tax', 'tax_cashflow'}:
+                totals_by_currency[currency] += amount_value
+                totals_by_type[record_type] += amount_value
+
+            if errors:
+                invalid_records.append(record)
+                validation_errors.append({
+                    'record_index': i,
+                    'record': record,
+                    'errors': errors
+                })
+            else:
+                valid_records.append(record)
+
+        return {
+            'valid_records': valid_records,
+            'invalid_records': invalid_records,
+            'validation_errors': validation_errors,
+            'totals_by_currency': dict(totals_by_currency),
+            'totals_by_type': dict(totals_by_type),
+            'nav_components': dict(nav_components),
+            'forex_trades': forex_trades,
             'total_records': len(records),
             'valid_count': len(valid_records),
             'invalid_count': len(invalid_records),

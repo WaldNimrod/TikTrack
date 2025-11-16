@@ -5,14 +5,16 @@ Date: August 24, 2025
 Description: Add constraint to ensure closed_at is not before opened_at in trades table
 """
 
-import sqlite3
 import os
 import sys
 from datetime import datetime
 
 # Add the services directory to the path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'services'))
+from sqlalchemy import text
+
 from constraint_service import ConstraintService
+from config.database import SessionLocal
 
 def add_trade_date_constraint():
     """Add constraint to ensure closed_at is not before opened_at in trades table"""
@@ -45,24 +47,17 @@ def add_trade_date_constraint():
 def validate_trade_dates():
     """Validate existing trades to ensure they comply with the new constraint"""
     
-    constraint_service = ConstraintService()
-    conn = constraint_service.get_db_connection()
-    cursor = conn.cursor()
-    
+    session = SessionLocal()
     try:
-        # Find trades where closed_at is before opened_at
-        cursor.execute("""
+        invalid_trades = session.execute(text("""
             SELECT id, opened_at, closed_at 
             FROM trades 
             WHERE closed_at IS NOT NULL 
             AND opened_at IS NOT NULL 
             AND closed_at < opened_at
-        """)
-        
-        invalid_trades = cursor.fetchall()
+        """)).fetchall()
         
         if invalid_trades:
-            for trade in invalid_trades:
             return False
         else:
             return True
@@ -70,7 +65,7 @@ def validate_trade_dates():
     except Exception as e:
         return False
     finally:
-        conn.close()
+        session.close()
 
 if __name__ == "__main__":
     

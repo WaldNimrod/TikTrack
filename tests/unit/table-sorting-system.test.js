@@ -57,16 +57,19 @@ describe('Unified table sorting system', () => {
 
     const rows = [
       {
+        created_at: '2024-01-02T10:00:00Z',
         updated_at: '2024-01-02T10:00:00Z',
         status: 'open',
         ticker_symbol: 'AAA',
       },
       {
+        created_at: '2024-01-03T09:00:00Z',
         updated_at: '2024-01-03T09:00:00Z',
         status: 'closed',
         ticker_symbol: 'BBB',
       },
       {
+        created_at: '2024-01-01T15:00:00Z',
         updated_at: '2024-01-01T15:00:00Z',
         status: 'open',
         ticker_symbol: 'CCC',

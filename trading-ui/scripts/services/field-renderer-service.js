@@ -345,6 +345,8 @@ class FieldRendererService {
             'dividend': 'דיבידנד',
             'transfer_in': 'העברה פנימה',
             'transfer_out': 'העברה החוצה',
+            'currency_exchange_from': 'המרת מט״ח - יציאה',
+            'currency_exchange_to': 'המרת מט״ח - כניסה',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',
             'opening_balance': 'יתרת פתיחה',
@@ -362,8 +364,21 @@ class FieldRendererService {
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
         } else {
-            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive', 'opening_balance']);
-            const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
+            const positiveTypes = new Set([
+                'deposit',
+                'dividend',
+                'transfer_in',
+                'other_positive',
+                'opening_balance',
+                'currency_exchange_to'
+            ]);
+            const negativeTypes = new Set([
+                'withdrawal',
+                'fee',
+                'transfer_out',
+                'other_negative',
+                'currency_exchange_from'
+            ]);
             if (positiveTypes.has(typeLower)) {
                 colorClass = ' text-success';
             } else if (negativeTypes.has(typeLower)) {
@@ -372,6 +387,196 @@ class FieldRendererService {
         }
         
         return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${typeLower}">${typeHebrew}</span>`;
+    }
+
+    /**
+     * Render currency exchange badge
+     * @param {Object} meta - Exchange metadata
+     * @returns {string} badge HTML
+     */
+    static renderExchangeBadge(meta = {}) {
+        const groupId = meta.exchange_group_id || meta.group_id;
+        if (!groupId) {
+            return '';
+        }
+
+        const direction = (meta.exchange_direction || meta.direction || '').toLowerCase();
+        const directionLabel = direction === 'to' ? 'צד חיובי' : 'צד שלילי';
+
+        const summarySource = meta.exchange_pair_summary || meta.linked_exchange_summary || {};
+        const amountRaw = summarySource.amount ?? meta.amount;
+        const amountValue = typeof amountRaw === 'number' ? amountRaw : parseFloat(amountRaw);
+        const currencySymbol = this._normalizeCurrencySymbol(summarySource.currency_symbol || meta.currency_symbol) || '';
+
+        const amountDisplay = Number.isFinite(amountValue)
+            ? amountValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : null;
+
+        const tooltipParts = [directionLabel];
+        if (amountDisplay) {
+            tooltipParts.push(`${amountDisplay}${currencySymbol ? ` ${currencySymbol}` : ''}`);
+        }
+        const tooltip = tooltipParts.join(' • ');
+
+        const amountInline = amountDisplay
+            ? `<small class="exchange-badge-amount" dir="ltr">${amountDisplay}${currencySymbol}</small>`
+            : '';
+
+        return `<span class="status-badge exchange-badge" data-status-category="info" data-exchange-group="${groupId}" title="${tooltip}">
+            🔁 ${directionLabel}${amountInline}
+        </span>`;
+    }
+
+    /**
+     * Render stacked cards for currency exchange pair
+     * @param {Object} summary - Pair summary metadata
+     * @param {Object} options - Rendering options
+     * @param {number|string} options.currentId - Current cash flow ID (to highlight)
+     * @param {Function} options.renderAction - Callback to render action buttons per flow
+     * @returns {string} HTML string
+     */
+    static renderExchangePairCards(summary, options = {}) {
+        if (!summary) {
+            return '';
+        }
+
+        const currentId = options.currentId !== undefined && options.currentId !== null
+            ? Number(options.currentId)
+            : null;
+        const renderAction = typeof options.renderAction === 'function'
+            ? options.renderAction
+            : () => '';
+
+        const formatAmount = (value, symbol) => {
+            const numericValue = typeof value === 'number' ? value : parseFloat(value);
+            if (!Number.isFinite(numericValue)) {
+                return '<span class="text-muted">לא זמין</span>';
+            }
+            return this.renderAmount(numericValue, symbol || '', 2, true);
+        };
+
+        const formatDate = (raw) => {
+            if (!raw) {
+                return 'לא זמין';
+            }
+            try {
+                const date = new Date(raw);
+                if (Number.isNaN(date.getTime())) {
+                    return raw;
+                }
+                return date.toLocaleString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return raw;
+            }
+        };
+
+        const renderCard = (flowData = {}, direction = 'from') => {
+            const isFrom = direction === 'from';
+            const title = isFrom ? 'צד שלילי - מטבע מקור' : 'צד חיובי - מטבע יעד';
+            const amountValue = flowData.raw_amount !== undefined
+                ? flowData.raw_amount
+                : (isFrom ? -(flowData.amount || 0) : (flowData.amount || 0));
+            const amountHtml = formatAmount(amountValue, flowData.currency_symbol);
+            const currencyHtml = this.renderCurrency(
+                flowData.currency_id,
+                flowData.currency_name,
+                flowData.currency_symbol || ''
+            );
+            const dateText = formatDate(flowData.date);
+            const actionHtml = renderAction(flowData, direction) || '';
+            const isCurrent = flowData.id !== undefined && currentId !== null && Number(flowData.id) === currentId;
+            const badgeHtml = flowData.id
+                ? `<span class="badge ${isCurrent ? 'bg-secondary' : 'bg-info'} ms-2">
+                        ${isCurrent ? 'רשומה נוכחית' : 'רשומה צמודה'}
+                   </span>`
+                : '';
+
+            return `
+                <div class="card exchange-pair-card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <div class="fw-bold">${title}${badgeHtml}</div>
+                            ${actionHtml}
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="text-muted small">סכום</div>
+                                ${amountHtml}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">מטבע</div>
+                                ${currencyHtml || '<span class="text-muted">לא זמין</span>'}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">תאריך</div>
+                                <span class="text-muted" dir="ltr">${dateText}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const fromCard = renderCard(summary.from, 'from');
+        const toCard = renderCard(summary.to, 'to');
+
+        const exchangeRateDisplay = Number.isFinite(summary.exchange_rate)
+            ? `<span dir="ltr">${summary.exchange_rate.toFixed(6)}</span>`
+            : '<span class="text-muted">לא זמין</span>';
+        const feeHtml = summary.fee_amount !== undefined
+            ? formatAmount(summary.fee_amount, summary.fee_currency_symbol)
+            : '<span class="text-muted">לא זמין</span>';
+        const netOutValue = summary.net_out_account_currency !== undefined
+            ? -Math.abs(Number(summary.net_out_account_currency) || 0)
+            : null;
+        const netInValue = summary.net_in_target_currency !== undefined
+            ? Math.abs(Number(summary.net_in_target_currency) || 0)
+            : null;
+        const netOutHtml = netOutValue !== null
+            ? formatAmount(netOutValue, summary.fee_currency_symbol)
+            : '<span class="text-muted">לא זמין</span>';
+        const netInHtml = netInValue !== null
+            ? formatAmount(netInValue, (summary.to && summary.to.currency_symbol) || '')
+            : '<span class="text-muted">לא זמין</span>';
+
+        const footer = `
+            <div class="card exchange-pair-summary">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <div class="text-muted small">שער המרה</div>
+                            ${exchangeRateDisplay}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small">עמלה</div>
+                            ${feeHtml}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small">נטו במטבע חשבון</div>
+                            ${netOutHtml}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small">נטו במטבע יעד</div>
+                            ${netInHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return `
+            <div class="cash-flow-exchange-pair-cards">
+                ${fromCard}
+                ${toCard}
+                ${footer}
+            </div>
+        `;
     }
 
     /**
@@ -1538,6 +1743,8 @@ window.FieldRendererService = FieldRendererService;
 
 // Shortcuts למתודות נפוצות
 window.renderStatus = (status, entityType) => FieldRendererService.renderStatus(status, entityType);
+window.renderExchangeBadge = (meta) => FieldRendererService.renderExchangeBadge(meta);
+window.renderExchangePairCards = (summary, options) => FieldRendererService.renderExchangePairCards(summary, options);
 window.renderSide = (side) => FieldRendererService.renderSide(side);
 window.renderNumericValue = (value, suffix, showPrefix) => FieldRendererService.renderNumericValue(value, suffix, showPrefix);
 window.renderNumericBadge = (value, suffix, showPrefix) => FieldRendererService.renderNumericBadge(value, suffix, showPrefix);

@@ -299,49 +299,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// נתוני דמה
-const demoAlerts = [
-  {
-    id: 1,
-    title: 'התראה על מחיר AAPL',
-    type: 'price_alert',
-    status: 'open',
-    related_type_id: 4, // ticker
-    related_id: 1,
-    condition: 'מחיר > 210$',
-    message: 'AAPL הגיע ליעד מחיר',
-    created_at: '2024-01-15',
-    is_triggered: false,
-  },
-  {
-    id: 2,
-    title: 'סטופ לוס TSLA',
-    type: 'stop_loss',
-    status: 'open',
-    related_type_id: 2, // trade
-    related_id: 1,
-    condition: 'מחיר < 690$',
-    message: 'TSLA מתחת לסטופ',
-    created_at: '2024-01-14',
-    is_triggered: true,
-  },
-];
-
-
-/**
- * טעינת נתוני התראות מהשרת
- *
- * פונקציה זו מחזירה נתוני דמו להתראות
- * @returns {Array} מערך של התראות דמו
- */
-/**
- * REMOVED: Duplicate loadAlertsData function
- * This function has been replaced by window.loadAlertsData (defined above)
- * The new implementation includes proper guards to prevent multiple simultaneous calls
- * 
- * @deprecated Use window.loadAlertsData instead
- */
-
 // REMOVED: filterAlertsLocally - unused function
 
 /**

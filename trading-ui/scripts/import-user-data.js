@@ -69,6 +69,14 @@ const ACCOUNT_LINKING_MODAL_ID = 'accountLinkingModal';
 const ACCOUNT_LINKING_MODAL_TYPE = 'account-linking';
 let accountLinkingNavigationInstanceId = null;
 let activeFileAccountNumber = null;
+let linkedAccountInfo = null;
+let accountOptionsCache = null;
+let pendingOverwriteAccountId = null;
+let filePrecheckState = {
+    status: 'idle',
+    message: ''
+};
+let activeFilePrecheckRequestId = 0;
 
 const IMPORT_DATA_TYPE_DEFINITIONS = {
     executions: {
@@ -95,19 +103,25 @@ const IMPORT_DATA_TYPE_DEFINITIONS = {
     portfolio_positions: {
         key: 'portfolio_positions',
         label: 'השוואת פורטפוליו',
-        description: 'פלייסהולדר: השוואת פוזיציות פתוחות, NAV ושווי שוק מול נתוני המערכת.',
+        description: 'דו״ח השוואת פוזיציות פתוחות, חשיפות מטבע ו-NAV מול חשבון המסחר שנבחר.',
         documentationAnchor: '#portfolio-reconciliation-pipeline',
         entityType: 'position'
     },
     taxes_and_fx: {
         key: 'taxes_and_fx',
         label: 'ריביות, מיסים והפרשי מטבע',
-        description: 'פלייסהולדר: זיהוי הפרשים בריביות, מיסים ותרגומי מטבע ביחס לנתוני הבסיס.',
+        description: 'דו״ח ריכוז ניכויי מס, עמלות ורכיבי תרגום מט״ח (כולל עסקאות Forex מהקובץ).',
         documentationAnchor: '#taxes-and-fx-pipeline',
         entityType: 'cash_flow'
     }
 };
-const ACTIVE_IMPORT_DATA_TYPES = new Set(['executions', 'cashflows', 'account_reconciliation']);
+const ACTIVE_IMPORT_DATA_TYPES = new Set([
+    'executions',
+    'cashflows',
+    'account_reconciliation',
+    'portfolio_positions',
+    'taxes_and_fx'
+]);
 const IMPORT_DATA_TYPE_ORDER = [
     'account_reconciliation',
     'executions',
@@ -147,16 +161,106 @@ function getImportModalElement() {
 }
 
 function getSelectedAccountDisplayName() {
-    const modal = getImportModalElement();
-    const select = modal?.querySelector('#tradingAccountSelect');
-    const option = select?.selectedOptions?.[0];
-    if (option?.textContent) {
-        return option.textContent.trim();
+    if (linkedAccountInfo?.name) {
+        return linkedAccountInfo.name;
     }
     if (activeSessionInfo?.accountName) {
         return activeSessionInfo.accountName;
     }
     return '';
+}
+
+function setLinkedAccountInfo(account) {
+    if (account && (account.id || account.trading_account_id)) {
+        linkedAccountInfo = {
+            id: Number(account.id || account.trading_account_id),
+            name: account.name || account.account_name || '',
+            external_account_number: account.external_account_number || account.account_number || null
+        };
+        selectedAccount = linkedAccountInfo.id;
+    } else {
+        linkedAccountInfo = null;
+        selectedAccount = null;
+    }
+    updateAccountDetectionSummary();
+}
+
+function updateAccountDetectionSummary(statusOverride) {
+    const fileValueEl = document.getElementById('detectedFileAccountValue');
+    const systemValueEl = document.getElementById('detectedSystemAccountValue');
+    const statusValueEl = document.getElementById('detectedLinkingStatusValue');
+    const badgeEl = document.getElementById('accountDetectionStatusBadge');
+    const detectionCard = document.getElementById('accountDetectionCard');
+    const manageLinkBtn = document.getElementById('openAccountLinkingBtn');
+
+    const hasSessionContext = Boolean(currentSessionId || pendingAccountLinking || activeSessionInfo);
+    if (detectionCard) {
+        detectionCard.style.display = hasSessionContext ? '' : 'none';
+    }
+    if (manageLinkBtn) {
+        manageLinkBtn.style.display = hasSessionContext ? '' : 'none';
+        manageLinkBtn.disabled = !hasSessionContext;
+        manageLinkBtn.setAttribute('aria-disabled', hasSessionContext ? 'false' : 'true');
+    }
+
+    if (!hasSessionContext) {
+        if (fileValueEl) {
+            fileValueEl.textContent = 'ממתין לקובץ';
+        }
+        if (systemValueEl) {
+            systemValueEl.textContent = 'טרם זוהה';
+        }
+        if (statusValueEl) {
+            statusValueEl.textContent = 'ממתין לקובץ';
+        }
+        if (badgeEl) {
+            badgeEl.dataset.status = 'unknown';
+            badgeEl.textContent = 'ממתין לקובץ';
+            badgeEl.classList.remove('bg-warning', 'bg-success');
+            badgeEl.classList.add('bg-secondary');
+        }
+        return;
+    }
+
+    if (fileValueEl) {
+        fileValueEl.textContent = statusOverride === 'missing_in_file'
+            ? 'לא הופיע בקובץ'
+            : getActiveFileAccountNumber() || 'ממתין לזיהוי';
+    }
+
+    if (systemValueEl) {
+        const recognizedName = pendingAccountLinking?.recognizedAccount?.name
+            || linkedAccountInfo?.name
+            || activeSessionInfo?.accountName
+            || '';
+        systemValueEl.textContent = recognizedName || 'טרם זוהה';
+    }
+
+    const statusValue = statusOverride
+        || pendingAccountLinking?.status
+        || activeSessionInfo?.linkingStatus
+        || (linkedAccountInfo ? 'confirmed' : 'unknown');
+    const statusLabels = {
+        linked: 'משויך ומוכן לניתוח',
+        confirmed: 'משויך ומוכן לניתוח',
+        pending_confirmation: 'ממתין לאישור',
+        mismatch: 'נדרש לבחור חשבון מתאים',
+        unlinked: 'נדרש שיוך',
+        missing_in_file: 'חסר בקובץ',
+        unknown: 'ממתין לקובץ'
+    };
+
+    if (statusValueEl) {
+        statusValueEl.textContent = statusLabels[statusValue] || statusLabels.unknown;
+    }
+
+    if (badgeEl) {
+        badgeEl.dataset.status = statusValue || 'unknown';
+        badgeEl.textContent = statusLabels[statusValue] || statusLabels.unknown;
+        badgeEl.classList.toggle('bg-warning', statusValue === 'mismatch' || statusValue === 'unlinked');
+        badgeEl.classList.toggle('bg-success', statusValue === 'linked' || statusValue === 'confirmed');
+        badgeEl.classList.toggle('bg-secondary', !statusValue || statusValue === 'unknown');
+    }
 }
 
 function buildImportModalTitle() {
@@ -275,11 +379,10 @@ function applyImportModalRestoreState() {
         window.currentSessionId = metadata.sessionId;
     }
     if (metadata.accountId) {
-        selectedAccount = String(metadata.accountId);
-        const accountSelect = getImportModalElement()?.querySelector('#tradingAccountSelect');
-        if (accountSelect) {
-            setSelectValue(accountSelect, selectedAccount);
-        }
+        setLinkedAccountInfo({
+            id: metadata.accountId,
+            name: metadata.accountName || activeSessionInfo?.accountName || ''
+        });
     }
     if (metadata.connector) {
         selectedConnector = metadata.connector;
@@ -301,7 +404,142 @@ function setActiveFileAccountNumber(value) {
     if (brokerValueEl) {
         brokerValueEl.textContent = activeFileAccountNumber || 'לא זמין';
     }
-    syncAccountAndConnectorLockState();
+    updateAccountDetectionSummary();
+}
+
+const FILE_PRECHECK_STATUS_LABELS = {
+    idle: 'ממתין לקובץ',
+    pending: 'בודק קובץ',
+    success: 'קובץ תקין',
+    error: 'קובץ לא תקין'
+};
+
+const FILE_PRECHECK_STATUS_MESSAGES = {
+    idle: 'בחר קובץ לבדיקה ראשונית.',
+    pending: 'מבצע בדיקת מבנה בסיסית לקובץ...',
+    success: 'הקובץ עבר בדיקה ראשונית בהצלחה וניתן להמשיך לניתוח.',
+    error: 'בדיקת הקובץ נכשלה. אנא בדוק את הקובץ ונסה שוב.'
+};
+
+const FILE_PRECHECK_BADGE_VARIANTS = {
+    idle: 'bg-secondary',
+    pending: 'bg-info',
+    success: 'bg-success',
+    error: 'bg-danger'
+};
+
+function getFilePrecheckStatus() {
+    return filePrecheckState.status;
+}
+
+function setFilePrecheckStatus(status, message) {
+    filePrecheckState = {
+        status: status || 'idle',
+        message: message || FILE_PRECHECK_STATUS_MESSAGES[status] || FILE_PRECHECK_STATUS_MESSAGES.idle
+    };
+
+    const badgeEl = document.getElementById('filePrecheckStatusBadge');
+    const textEl = document.getElementById('filePrecheckStatusText');
+    const statusKey = filePrecheckState.status;
+
+    if (badgeEl) {
+        const variantClass = FILE_PRECHECK_BADGE_VARIANTS[statusKey] || FILE_PRECHECK_BADGE_VARIANTS.idle;
+        badgeEl.dataset.status = statusKey;
+        badgeEl.className = `badge ${variantClass}`;
+        badgeEl.textContent = FILE_PRECHECK_STATUS_LABELS[statusKey] || FILE_PRECHECK_STATUS_LABELS.idle;
+    }
+
+    if (textEl) {
+        textEl.textContent = filePrecheckState.message;
+    }
+
+    updateAnalyzeButton();
+}
+
+function getSelectedConnectorValue() {
+    if (selectedConnector) {
+        return selectedConnector;
+    }
+    const modal = getImportModalElement();
+    const connectorSelect = modal?.querySelector('#connectorSelect') || document.getElementById('connectorSelect');
+    return connectorSelect?.value || '';
+}
+
+function getSelectedDataTypeValue() {
+    const select = document.getElementById('importDataTypeSelect');
+    return select?.value || selectedDataTypeKey || '';
+}
+
+function triggerFilePrecheckIfReady(options = {}) {
+    const { file: explicitFile = null } = options;
+    const currentFile = explicitFile || selectedFile || window.selectedFile || null;
+    const hasFile = Boolean(currentFile);
+
+    if (!hasFile) {
+        activeFilePrecheckRequestId += 1;
+        setFilePrecheckStatus('idle', FILE_PRECHECK_STATUS_MESSAGES.idle);
+        return;
+    }
+
+    const connectorValue = getSelectedConnectorValue();
+    if (!connectorValue) {
+        activeFilePrecheckRequestId += 1;
+        setFilePrecheckStatus('idle', 'בחר ספק נתונים כדי להריץ בדיקה ראשונית.');
+        return;
+    }
+
+    runFilePrecheck(currentFile, connectorValue);
+}
+
+async function runFilePrecheck(file, connectorValueOverride = null) {
+    const connectorValue = connectorValueOverride || getSelectedConnectorValue();
+    if (!file || !connectorValue) {
+        setFilePrecheckStatus('idle', 'בחר ספק נתונים וקובץ כדי להריץ בדיקה ראשונית.');
+        return;
+    }
+
+    const requestId = ++activeFilePrecheckRequestId;
+    setFilePrecheckStatus('pending', FILE_PRECHECK_STATUS_MESSAGES.pending);
+
+    try {
+        const dataTypeValue = getSelectedDataTypeValue() || 'executions';
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('connector_type', connectorValue);
+        if (dataTypeValue) {
+            formData.append('task_type', dataTypeValue);
+        }
+
+        const response = await fetch('/api/user-data-import/precheck', {
+            method: 'POST',
+            body: formData
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (requestId !== activeFilePrecheckRequestId) {
+            return;
+        }
+
+        if (response.ok && (payload.success || payload.status === 'success')) {
+            const successMessage = payload.message || FILE_PRECHECK_STATUS_MESSAGES.success;
+            setFilePrecheckStatus('success', successMessage);
+            if (Array.isArray(payload.warnings) && payload.warnings.length) {
+                showImportUserDataNotification(payload.warnings.join('\n'), 'warning');
+            }
+            return;
+        }
+
+        const errorMessage = getApiErrorMessage(payload, payload?.errors?.[0] || 'בדיקת הקובץ נכשלה');
+        setFilePrecheckStatus('error', errorMessage);
+        showImportUserDataNotification(errorMessage, 'error');
+    } catch (error) {
+        if (requestId !== activeFilePrecheckRequestId) {
+            return;
+        }
+        window.Logger?.error('[Import Modal] File precheck failed', { error: error?.message, page: 'import-user-data' });
+        setFilePrecheckStatus('error', FILE_PRECHECK_STATUS_MESSAGES.error);
+        showImportUserDataNotification(FILE_PRECHECK_STATUS_MESSAGES.error, 'error');
+    }
 }
 
 function getActiveFileAccountNumber() {
@@ -314,58 +552,30 @@ function getActiveFileAccountNumber() {
 }
 
 function isAccountSelectionLocked() {
-    return Boolean(currentSessionId && activeSessionInfo?.accountId);
+    return Boolean(currentSessionId && (activeSessionInfo?.accountId || linkedAccountInfo?.id));
 }
 
 function syncAccountAndConnectorLockState() {
     const modal = document.getElementById('importUserDataModal');
     if (!modal) {
+        updateAccountDetectionSummary();
         return;
     }
-    const accountSelect = modal.querySelector('#tradingAccountSelect');
     const connectorSelect = modal.querySelector('#connectorSelect');
-    const lockMessage = document.getElementById('accountLockMessage');
-    const shouldLock = isAccountSelectionLocked();
-
-    if (accountSelect) {
-        accountSelect.disabled = shouldLock;
-        accountSelect.setAttribute('aria-disabled', shouldLock ? 'true' : 'false');
-        if (shouldLock && activeSessionInfo?.accountId) {
-            setSelectValue(accountSelect, String(activeSessionInfo.accountId));
-        }
-    }
-
+    // Lock provider selection only when a real session flow is in progress:
+    // - an existing active session AND one of: file loaded, pending account-linking, or analysis results
+    // This keeps the provider selectable for a fresh upload even if an old session exists in storage.
+    const lockConnector = Boolean(
+        currentSessionId && (selectedFile || pendingAccountLinking || analysisResults)
+    );
     if (connectorSelect) {
-        const lockConnector = shouldLock && Boolean(activeSessionInfo?.connector);
         connectorSelect.disabled = lockConnector;
         connectorSelect.setAttribute('aria-disabled', lockConnector ? 'true' : 'false');
         if (lockConnector && activeSessionInfo?.connector) {
             setSelectValue(connectorSelect, activeSessionInfo.connector);
         }
     }
-
-    if (lockMessage) {
-        if (shouldLock) {
-            const brokerNumber = getActiveFileAccountNumber();
-            const lockedAccountName =
-                activeSessionInfo?.accountName
-                || accountSelect?.selectedOptions?.[0]?.text?.trim()
-                || '';
-            const parts = [];
-            if (lockedAccountName) {
-                parts.push(`הסשן נעול לחשבון "${escapeHtml(lockedAccountName)}"`);
-            }
-            if (brokerNumber) {
-                parts.push(`מספר ברוקר: ${escapeHtml(String(brokerNumber))}`);
-            }
-            parts.push('לא ניתן להחליף חשבון לפני איפוס הסשן.');
-            lockMessage.innerHTML = parts.join(' · ');
-            lockMessage.style.display = 'block';
-        } else {
-            lockMessage.style.display = 'none';
-            lockMessage.textContent = '';
-        }
-    }
+    updateAccountDetectionSummary();
 }
 
 function enforceLockedAccountSelection(target) {
@@ -566,8 +776,21 @@ function handleAccountLinkRequired(response) {
             || null,
         status: linking.status || 'unlinked',
         message: response?.error || 'נדרש לקשר את חשבון המסחר למספר החשבון בקובץ לפני המשך הייבוא.',
-        taskType: selectedDataTypeKey || analysisResults?.task_type || 'executions'
+        taskType: selectedDataTypeKey || analysisResults?.task_type || 'executions',
+        requiresConfirmation: Boolean(linking.requires_confirmation),
+        recognizedAccount: linking.recognized_account || null,
+        matchedAccountId: linking.matched_account_id || null
     };
+    if (currentSessionId) {
+        updateActiveSessionInfo({
+            status: 'ממתין לאישור שיוך',
+            accountId: pendingAccountLinking.recognizedAccount?.id || pendingAccountLinking.tradingAccountId || activeSessionInfo?.accountId || null,
+            accountName: pendingAccountLinking.recognizedAccount?.name || activeSessionInfo?.accountName || '',
+            fileAccountNumber: pendingAccountLinking.fileAccountNumber || null,
+            linkingStatus: pendingAccountLinking.status
+        });
+    }
+    updateAccountDetectionSummary(linking.status);
     updateAccountLinkingModalContent();
     showAccountLinkingModal();
     showImportUserDataNotification(pendingAccountLinking.message, pendingAccountLinking.status === 'mismatch' ? 'warning' : 'error');
@@ -578,13 +801,22 @@ function handleAccountLinkRequired(response) {
 function updateAccountLinkingModalContent(linkInfo = pendingAccountLinking) {
     const statusBadge = document.getElementById('accountLinkingStatusBadge');
     const fileAccountEl = document.getElementById('accountLinkingFileAccount');
-    const currentAccountEl = document.getElementById('accountLinkingCurrentAccount');
     const messageEl = document.getElementById('accountLinkingMessage');
-    const actionBtn = document.getElementById('accountLinkingActionBtn');
+    const recognizedSection = document.getElementById('accountLinkingRecognizedSection');
+    const recognizedLabel = document.getElementById('accountLinkingRecognizedAccount');
+    const recognizedActions = document.getElementById('accountLinkingRecognizedActions');
+    const selectionSection = document.getElementById('accountLinkingSelectionSection');
+    const selectionActions = document.getElementById('accountLinkingSelectionActions');
 
     if (!linkInfo) {
         if (messageEl) {
             messageEl.textContent = 'לא זוהתה בעיית שיוך חשבון.';
+        }
+        if (recognizedSection) {
+            recognizedSection.classList.add('d-none');
+        }
+        if (selectionSection) {
+            selectionSection.classList.add('d-none');
         }
         return;
     }
@@ -593,29 +825,305 @@ function updateAccountLinkingModalContent(linkInfo = pendingAccountLinking) {
         unlinked: 'חשבון לא משויך',
         mismatch: 'מספר חשבון שגוי',
         missing_in_file: 'חסר בקובץ',
-        missing_account: 'חשבון לא נמצא'
+        missing_account: 'חשבון לא נמצא',
+        pending_confirmation: 'ממתין לאישור',
+        linked: 'משויך ומוכן',
+        confirmed: 'משויך ומוכן'
     };
 
+    const statusValue = linkInfo.status || 'unlinked';
+
     if (statusBadge) {
-        statusBadge.textContent = statusLabels[linkInfo.status] || 'שיוך נדרש';
-        statusBadge.dataset.status = linkInfo.status || 'unlinked';
+        statusBadge.textContent = statusLabels[statusValue] || 'שיוך נדרש';
+        statusBadge.dataset.status = statusValue;
     }
 
     if (fileAccountEl) {
         fileAccountEl.textContent = linkInfo.fileAccountNumber || 'לא זמין בקובץ';
     }
-    if (currentAccountEl) {
-        currentAccountEl.textContent = linkInfo.currentAccountNumber || 'לא הוגדר במערכת';
-    }
+
     if (messageEl && linkInfo.message) {
         messageEl.textContent = linkInfo.message;
     }
-    if (actionBtn) {
-        actionBtn.disabled = !linkInfo.sessionId || !linkInfo.fileAccountNumber || linkInfo.status === 'missing_in_file';
-        actionBtn.setAttribute('aria-disabled', actionBtn.disabled ? 'true' : 'false');
-        actionBtn.textContent = linkInfo.status === 'mismatch' ? 'עדכן מספר חשבון' : 'שייך חשבון למערכת';
+
+    const shouldShowRecognized = Boolean(
+        linkInfo.recognizedAccount
+        || linkInfo.requiresConfirmation
+        || statusValue === 'pending_confirmation'
+    );
+    const shouldShowSelection = !shouldShowRecognized
+        || statusValue === 'unlinked'
+        || statusValue === 'mismatch'
+        || statusValue === 'missing_account';
+
+    if (recognizedSection) {
+        recognizedSection.classList.toggle('d-none', !shouldShowRecognized);
+        if (shouldShowRecognized && recognizedLabel) {
+            const recognizedAccount = linkInfo.recognizedAccount;
+            if (recognizedAccount?.name) {
+                const accountParts = [recognizedAccount.name];
+                if (recognizedAccount.external_account_number) {
+                    accountParts.push(`(${recognizedAccount.external_account_number})`);
+                }
+                recognizedLabel.textContent = accountParts.join(' ');
+            } else {
+                recognizedLabel.textContent = 'לא זוהה חשבון תואם';
+            }
+        }
+        if (recognizedActions) {
+            recognizedActions.classList.toggle('d-none', !shouldShowRecognized);
+        }
     }
+
+    if (selectionSection) {
+        selectionSection.classList.toggle('d-none', !shouldShowSelection);
+        if (shouldShowSelection) {
+            prepareAccountLinkingSelection();
+        }
+        if (selectionActions) {
+            selectionActions.classList.toggle('d-none', !shouldShowSelection);
+        }
+    }
+
     updateAccountLinkingNavigation();
+}
+
+async function prepareAccountLinkingSelection() {
+    const select = document.getElementById('accountLinkingAccountSelect');
+    if (!select) {
+        return;
+    }
+    await loadAccountsForLinking(select);
+    const preferredAccountId = pendingAccountLinking?.tradingAccountId
+        || linkedAccountInfo?.id
+        || activeSessionInfo?.accountId
+        || null;
+    if (preferredAccountId) {
+        setSelectValue(select, String(preferredAccountId));
+    } else {
+        select.value = '';
+    }
+    select.removeEventListener('change', handleAccountLinkingSelectionChange);
+    select.addEventListener('change', handleAccountLinkingSelectionChange);
+    handleAccountLinkingSelectionChange();
+}
+
+async function loadAccountsForLinking(targetSelect) {
+    if (!targetSelect) {
+        return;
+    }
+    if (!accountOptionsCache) {
+        try {
+            const response = await fetch('/api/trading-accounts/');
+            const payload = await response.json();
+            const accounts = Array.isArray(payload?.data) ? payload.data : (payload || []);
+            accountOptionsCache = accounts.filter((account) => account.status === 'open' || account.status === 'OPEN');
+        } catch (error) {
+            window.Logger?.error('[Import Modal] Failed to load accounts for linking', { error, page: 'import-user-data' });
+            accountOptionsCache = [];
+        }
+    }
+    targetSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+    accountOptionsCache.forEach((account) => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = account.name || `חשבון #${account.id}`;
+        if (account.external_account_number) {
+            option.dataset.externalAccountNumber = account.external_account_number;
+        }
+        targetSelect.appendChild(option);
+    });
+}
+
+function handleAccountLinkingSelectionChange() {
+    const select = document.getElementById('accountLinkingAccountSelect');
+    const warning = document.getElementById('accountLinkingOverwriteWarning');
+    if (!select || !warning) {
+        return;
+    }
+    const selectedOption = select.selectedOptions?.[0];
+    const existingNumber = selectedOption?.dataset?.externalAccountNumber;
+    if (existingNumber && existingNumber !== (pendingAccountLinking?.fileAccountNumber || activeFileAccountNumber)) {
+        warning.textContent = `לחשבון זה קיים כבר מספר ${existingNumber}. לחיצה נוספת תאשר החלפת המספר.`;
+        warning.classList.remove('d-none');
+    } else {
+        warning.classList.add('d-none');
+        warning.textContent = '';
+        pendingOverwriteAccountId = null;
+    }
+}
+
+function showAccountLinkingSelection() {
+    const recognizedSection = document.getElementById('accountLinkingRecognizedSection');
+    const selectionSection = document.getElementById('accountLinkingSelectionSection');
+    const selectionActions = document.getElementById('accountLinkingSelectionActions');
+    if (recognizedSection) {
+        recognizedSection.classList.add('d-none');
+    }
+    if (selectionSection) {
+        selectionSection.classList.remove('d-none');
+        prepareAccountLinkingSelection();
+    }
+    if (selectionActions) {
+        selectionActions.classList.remove('d-none');
+    }
+}
+
+async function confirmAutoLinkedAccount() {
+    if (!pendingAccountLinking?.sessionId) {
+        showImportUserDataNotification('לא נמצא סשן לשיוך חשבון.', 'error');
+        return;
+    }
+    setAccountLinkingLoading(true);
+    const reanalysisTask = pendingAccountLinking?.taskType || selectedDataTypeKey || 'executions';
+    try {
+        const response = await fetch(`/api/user-data-import/session/${pendingAccountLinking.sessionId}/account-link/confirm`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            const message = getApiErrorMessage(data, 'אישור החשבון נכשל');
+            showImportUserDataNotification(message, 'error');
+            return;
+        }
+        setLinkedAccountInfo(data.linked_account);
+        setActiveFileAccountNumber(data.file_account_number || pendingAccountLinking?.fileAccountNumber || null);
+        updateActiveSessionInfo({
+            accountId: data.linked_account?.id || pendingAccountLinking?.tradingAccountId || selectedAccount,
+            accountName: data.linked_account?.name || activeSessionInfo?.accountName || '',
+            externalAccountNumber: data.file_account_number || data.linked_account?.external_account_number || null,
+            fileAccountNumber: data.file_account_number || pendingAccountLinking?.fileAccountNumber || null,
+            linkingStatus: 'confirmed',
+            status: 'שיוך אושר'
+        });
+        pendingAccountLinking = null;
+        updateImportModalNavigation();
+        hideAccountLinkingModal();
+        showImportUserDataNotification('החשבון אושר. מפעיל מחדש את תהליך הניתוח.', 'success');
+        await resumeImportFlowAfterLinking(reanalysisTask);
+    } catch (error) {
+        window.Logger?.error('[Import Modal] Failed to confirm linked account', { error: error.message });
+        showImportUserDataNotification('שגיאה באישור החשבון', 'error');
+    } finally {
+        setAccountLinkingLoading(false);
+    }
+}
+
+async function submitAccountLinkSelection(forceOverride = false) {
+    if (!pendingAccountLinking?.sessionId) {
+        showImportUserDataNotification('לא נמצא סשן לשיוך חשבון.', 'error');
+        return;
+    }
+    const select = document.getElementById('accountLinkingAccountSelect');
+    if (!select || !select.value) {
+        showImportUserDataNotification('אנא בחר חשבון לשיוך.', 'warning');
+        return;
+    }
+    const selectedValue = select.value;
+    const confirmOverwrite = forceOverride || pendingOverwriteAccountId === selectedValue;
+    const reanalysisTask = pendingAccountLinking?.taskType || selectedDataTypeKey || 'executions';
+
+    setAccountLinkingLoading(true);
+    try {
+        const response = await fetch(`/api/user-data-import/session/${pendingAccountLinking.sessionId}/account-link/select`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                trading_account_id: Number(selectedValue),
+                confirm_overwrite: confirmOverwrite
+            })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            if (data.error_code === 'ACCOUNT_LINK_OVERWRITE_REQUIRED') {
+                pendingOverwriteAccountId = selectedValue;
+                showImportUserDataNotification(
+                    data.error || 'לחשבון זה קיים כבר מספר חיצוני. לחץ שוב כדי לאשר החלפה.',
+                    'warning'
+                );
+                return;
+            }
+            const message = getApiErrorMessage(data, 'שיוך החשבון נכשל');
+            showImportUserDataNotification(message, 'error');
+            return;
+        }
+
+        pendingOverwriteAccountId = null;
+        setLinkedAccountInfo(data.linked_account);
+        setActiveFileAccountNumber(data.linked_account_number || pendingAccountLinking?.fileAccountNumber || null);
+        updateActiveSessionInfo({
+            accountId: data.trading_account_id || data.linked_account?.id || pendingAccountLinking?.tradingAccountId,
+            accountName: data.linked_account?.name || activeSessionInfo?.accountName || '',
+            externalAccountNumber: data.linked_account_number || data.linked_account?.external_account_number || null,
+            fileAccountNumber: data.linked_account_number || pendingAccountLinking?.fileAccountNumber || null,
+            linkingStatus: 'confirmed',
+            status: 'שיוך אושר'
+        });
+        pendingAccountLinking = null;
+        updateImportModalNavigation();
+        hideAccountLinkingModal();
+        showImportUserDataNotification('מספר החשבון שויך בהצלחה. מפעיל מחדש את תהליך הניתוח.', 'success');
+        await resumeImportFlowAfterLinking(reanalysisTask);
+    } catch (error) {
+        window.Logger?.error('[Import Modal] Failed to link account', { error: error.message });
+        showImportUserDataNotification('שגיאה בשיוך החשבון', 'error');
+    } finally {
+        setAccountLinkingLoading(false);
+    }
+}
+
+async function resumeImportFlowAfterLinking(taskType) {
+    syncAccountAndConnectorLockState();
+    if (!currentSessionId) {
+        showImportUserDataNotification('לא נמצא סשן פעיל להמשך הניתוח לאחר השיוך.', 'error');
+        return;
+    }
+    await reanalyseSessionForTask(taskType, 'בודק את חשבון המסחר לאחר שיוך...');
+    goToStep(2);
+}
+
+async function openAccountLinkingModalManually() {
+    if (!currentSessionId) {
+        showImportUserDataNotification('לא קיים סשן פעיל להצגת השיוך.', 'warning');
+        return;
+    }
+    try {
+        const response = await fetch(`/api/user-data-import/session/${currentSessionId}/account-link/status`);
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            const message = getApiErrorMessage(data, 'לא ניתן היה לקבל את סטטוס השיוך');
+            showImportUserDataNotification(message, 'error');
+            return;
+        }
+        const linking = data.linking || {};
+        pendingAccountLinking = {
+            sessionId: linking.session_id || currentSessionId,
+            tradingAccountId: linking.trading_account_id || linkedAccountInfo?.id || null,
+            fileAccountNumber: linking.file_account_number || activeFileAccountNumber || null,
+            currentAccountNumber: linking.current_account_number || null,
+            status: linking.status || 'unlinked',
+            message: data.message || pendingAccountLinking?.message || 'עדכן את שיוך החשבון לפני המשך התהליך.',
+            taskType: selectedDataTypeKey || 'executions',
+            requiresConfirmation: Boolean(linking.requires_confirmation),
+            recognizedAccount: linking.recognized_account || null,
+            matchedAccountId: linking.matched_account_id || null
+        };
+        updateAccountDetectionSummary(linking.status);
+        updateAccountLinkingModalContent();
+        showAccountLinkingModal();
+    } catch (error) {
+        window.Logger?.error('[Import Modal] Failed to load account link status', { error: error.message });
+        showImportUserDataNotification('שגיאה בטעינת סטטוס השיוך.', 'error');
+    }
+}
+
+async function linkExternalAccountToTradingAccount(forceOverride = false) {
+    return submitAccountLinkSelection(forceOverride);
 }
 
 async function showAccountLinkingModal() {
@@ -684,17 +1192,29 @@ function hideAccountLinkingModal(options = {}) {
 }
 
 function setAccountLinkingLoading(isLoading) {
-    const actionBtn = document.getElementById('accountLinkingActionBtn');
-    const closeBtn = document.getElementById('accountLinkingCloseBtn');
-    if (actionBtn) {
-        actionBtn.disabled = isLoading || actionBtn.dataset.disabled === 'true';
-        actionBtn.setAttribute('aria-disabled', actionBtn.disabled ? 'true' : 'false');
-        actionBtn.dataset.loading = isLoading ? 'true' : 'false';
-    }
-    if (closeBtn) {
-        closeBtn.disabled = isLoading;
-        closeBtn.setAttribute('aria-disabled', isLoading ? 'true' : 'false');
-    }
+    const selectionBtn = document.getElementById('accountLinkingActionBtn');
+    const confirmBtn = document.getElementById('accountLinkingConfirmBtn');
+    const closeButtons = [
+        document.getElementById('accountLinkingCloseBtn'),
+        document.getElementById('accountLinkingFooterCloseBtn')
+    ];
+
+    [selectionBtn, confirmBtn].forEach((button) => {
+        if (!button) {
+            return;
+        }
+        button.disabled = isLoading || button.dataset.disabled === 'true';
+        button.setAttribute('aria-disabled', button.disabled ? 'true' : 'false');
+        button.dataset.loading = isLoading ? 'true' : 'false';
+    });
+
+    closeButtons.forEach((button) => {
+        if (!button) {
+            return;
+        }
+        button.disabled = isLoading;
+        button.setAttribute('aria-disabled', isLoading ? 'true' : 'false');
+    });
 }
 
 async function linkExternalAccountToTradingAccount() {
@@ -1057,6 +1577,7 @@ function handleDataTypeSelectionChange(event) {
     }
     updateSelectedDataTypeInfo();
     detectAvailableDataTypes();
+    triggerFilePrecheckIfReady();
 }
 
 function updateDataTypeAvailability(detected = []) {
@@ -1416,6 +1937,59 @@ function renderCashflowIssuesSummary({
     section.style.display = 'block';
 }
 
+function renderKeyValueCards(sectionId, containerId, entries = {}, { labelPrefix = '', emptyLabel = '' } = {}) {
+    const section = document.getElementById(sectionId);
+    const container = document.getElementById(containerId);
+    if (!section || !container) {
+        return;
+    }
+
+    container.innerHTML = '';
+    const pairs = Object.entries(entries || {}).filter(([key]) => typeof key === 'string' && key.trim() !== '');
+    if (!pairs.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    pairs
+        .sort(([, valueA], [, valueB]) => Math.abs(valueB) - Math.abs(valueA))
+        .forEach(([key, value]) => {
+            const card = document.createElement('div');
+            card.className = 'analysis-card';
+            card.innerHTML = `
+                <div class="card-icon"><i class="bi bi-bar-chart-steps"></i></div>
+                <div class="card-content">
+                    <div class="card-number">${labelPrefix ? `${labelPrefix} ${key}` : key}</div>
+                    <div class="card-label">${formatAmount(value)}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+}
+
+function renderListSummary(sectionId, listId, items = [], formatter) {
+    const section = document.getElementById(sectionId);
+    const list = document.getElementById(listId);
+    if (!section || !list) {
+        return;
+    }
+
+    list.innerHTML = '';
+    if (!Array.isArray(items) || !items.length) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    items.slice(0, 10).forEach((item) => {
+        const li = document.createElement('li');
+        const text = formatter ? formatter(item) : String(item);
+        li.textContent = text;
+        list.appendChild(li);
+    });
+}
+
 function sanitizeRichText(html) {
     if (window.RichTextEditorService && typeof window.RichTextEditorService.sanitizeHTML === 'function') {
         return window.RichTextEditorService.sanitizeHTML(html);
@@ -1638,7 +2212,6 @@ function updateActiveSessionInfo(updates = {}) {
         return;
     }
     
-    const accountSelect = document.getElementById('tradingAccountSelect');
     const connectorSelect = document.getElementById('connectorSelect');
     
     activeSessionInfo = {
@@ -1649,7 +2222,6 @@ function updateActiveSessionInfo(updates = {}) {
     const fileName = updates.fileName ?? window.selectedFile?.name ?? activeSessionInfo.fileName ?? '';
     const fileSize = updates.fileSize ?? window.selectedFile?.size ?? activeSessionInfo.fileSize ?? null;
     const accountName = updates.accountName 
-        ?? accountSelect?.selectedOptions?.[0]?.text?.trim() 
         ?? activeSessionInfo.accountName 
         ?? '';
     const accountIdValue = updates.accountId ?? selectedAccount ?? activeSessionInfo.accountId ?? null;
@@ -1672,8 +2244,18 @@ function updateActiveSessionInfo(updates = {}) {
     activeSessionInfo.connectorName = connectorName;
     activeSessionInfo.taskType = taskType;
     activeSessionInfo.fileAccountNumber = fileAccountNumber;
+    activeSessionInfo.externalAccountNumber = updates.externalAccountNumber ?? activeSessionInfo.externalAccountNumber ?? null;
+    activeSessionInfo.linkingStatus = updates.linkingStatus ?? activeSessionInfo.linkingStatus ?? null;
     selectedDataTypeKey = taskType;
     setActiveFileAccountNumber(fileAccountNumber);
+
+    if (accountIdValue) {
+        setLinkedAccountInfo({
+            id: accountIdValue,
+            name: accountName,
+            external_account_number: activeSessionInfo.externalAccountNumber
+        });
+    }
     
     const dataTypeSelect = document.getElementById('importDataTypeSelect');
     if (dataTypeSelect) {
@@ -1832,7 +2414,8 @@ function updateActiveSessionFromAnalysis(results) {
             currencyIssues: currencyIssuesCount,
             duplicateRecords,
             status: activeSessionInfo?.status || 'ניתוח הושלם',
-            fileAccountNumber
+            fileAccountNumber,
+            linkingStatus: results.linking_status || 'confirmed'
         });
         return;
     }
@@ -1855,7 +2438,8 @@ function updateActiveSessionFromAnalysis(results) {
             entitlementWarnings,
             missingDocuments,
             status: activeSessionInfo?.status || 'ניתוח הושלם',
-            fileAccountNumber
+            fileAccountNumber,
+            linkingStatus: results.linking_status || 'confirmed'
         });
         return;
     }
@@ -1882,7 +2466,8 @@ function updateActiveSessionFromAnalysis(results) {
         duplicateRecords,
         existingRecords,
         status: activeSessionInfo?.status || 'ניתוח הושלם',
-        fileAccountNumber
+        fileAccountNumber,
+        linkingStatus: results.linking_status || 'confirmed'
     });
 }
 
@@ -2496,8 +3081,9 @@ async function openImportUserDataModal() {
         importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
         if (!importModalBootstrapInstance) {
             importModalBootstrapInstance = new bootstrap.Modal(modal, {
-                backdrop: false,
-                keyboard: true
+                backdrop: true,
+                keyboard: true,
+                focus: true
             });
         }
         importModalBootstrapInstance.show();
@@ -2559,13 +3145,19 @@ function closeImportUserDataModal() {
         return;
     }
     
+    modal.dataset.importClosing = 'true';
+    
     const legacyHide = () => {
         if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
             const instance = bootstrap.Modal.getInstance(modal) || importModalBootstrapInstance;
             if (instance) {
                 instance.hide();
             } else {
-                importModalBootstrapInstance = new bootstrap.Modal(modal, { backdrop: false, keyboard: true });
+                importModalBootstrapInstance = new bootstrap.Modal(modal, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
                 importModalBootstrapInstance.hide();
             }
         } else {
@@ -2585,6 +3177,7 @@ function closeImportUserDataModal() {
             window.refreshDataImportHistory?.();
         }, 250);
         resetImportModal();
+        modal.dataset.importClosing = 'false';
     };
     
     if (window.ModalNavigationService?.goBack && importNavigationInstanceId) {
@@ -2616,6 +3209,8 @@ function resetImportModal() {
     currentStep = 1;
     selectedFile = null;
     window.selectedFile = null; // Make it global
+    activeFilePrecheckRequestId += 1;
+    setFilePrecheckStatus('idle', FILE_PRECHECK_STATUS_MESSAGES.idle);
     selectedAccount = null;
     selectedConnector = null;
     analysisResults = null;
@@ -3063,7 +3658,7 @@ function setupImportModalEventListeners() {
             });
         }
     } else {
-        window.Logger.error('[Import Modal] Account select element not found in modal!', { page: 'import-user-data' });
+        window.Logger.debug('[Import Modal] Account select not rendered (auto-detect account flow active)', { page: 'import-user-data' });
     }
     
     // Connector select - look INSIDE the modal
@@ -3102,6 +3697,18 @@ function setupImportModalEventListeners() {
             goToStep(Number.isNaN(targetStep) ? 1 : targetStep);
         });
         modal.dataset.backDelegationAttached = 'true';
+    }
+    
+    if (modal && modal.dataset.hideDelegationAttached !== 'true') {
+        modal.addEventListener('hide.bs.modal', (event) => {
+            if (modal.dataset.importClosing === 'true') {
+                modal.dataset.importClosing = 'false';
+                return;
+            }
+            event?.preventDefault?.();
+            closeImportUserDataModal();
+        });
+        modal.dataset.hideDelegationAttached = 'true';
     }
     
     // Mark as set up
@@ -3501,6 +4108,7 @@ function handleFileSelect(event) {
     // Enable analyze button if account is also selected
     validateFileSelection({ showNotification: false });
     updateAnalyzeButton();
+    triggerFilePrecheckIfReady({ file });
 }
 
 /**
@@ -3525,35 +4133,24 @@ function updateAnalyzeButton() {
         // Check actual DOM values - more reliable than variables
         // Look for selects INSIDE the modal to avoid conflicts
         const connectorSelect = modal.querySelector('#connectorSelect');
-        const accountSelect = modal.querySelector('#tradingAccountSelect');
-        
     const dataTypeSelect = modal.querySelector('#importDataTypeSelect');
-    const connectorValue = connectorSelect?.value || '';
-    const accountValue = accountSelect?.value || '';
+    const connectorValue = connectorSelect?.value || getSelectedConnectorValue() || '';
     const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || '';
-    const accountSelectedIndex = accountSelect?.selectedIndex ?? -1;
-    const accountSelectedOption = accountSelect?.options?.[accountSelectedIndex];
         
         // Check both local and global selectedFile variables
         const currentSelectedFile = selectedFile || window.selectedFile;
-        
-    const accountValid = Boolean(accountValue && accountValue !== '0' && !Number.isNaN(Number(accountValue)));
+        const precheckPassed = getFilePrecheckStatus() === 'success';
     const dataTypeValid = Boolean(dataTypeValue && IMPORT_DATA_TYPE_DEFINITIONS[dataTypeValue]);
-    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && accountValid && dataTypeValid);
+    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && dataTypeValid && precheckPassed);
     
         const debugInfo = {
             selectedFile: !!currentSelectedFile,
             selectedFileName: currentSelectedFile?.name,
             connectorSelectExists: !!connectorSelect,
             connectorValue: connectorValue,
-            accountSelectExists: !!accountSelect,
-            accountValue: accountValue,
-        accountSelectedIndex,
-            accountSelectedOptionText: accountSelectedOption?.text,
-            accountSelectedOptionValue: accountSelectedOption?.value,
-        accountValid,
         dataTypeValue,
         dataTypeValid,
+        precheckPassed,
             allFieldsFilled,
             page: 'import-user-data'
     };
@@ -3564,7 +4161,6 @@ function updateAnalyzeButton() {
         analyzeBtn.disabled = false;
         analyzeBtn.setAttribute('aria-disabled', 'false');
             window.Logger.info('[Import Modal] Analyze button enabled', { 
-                accountValue: accountValue,
                 connectorValue: connectorValue,
                 page: 'import-user-data' 
             });
@@ -3621,64 +4217,15 @@ function resetFile() {
     // Update analyze button
     validateFileSelection({ showNotification: false });
     updateAnalyzeButton();
+    activeFilePrecheckRequestId += 1;
+    setFilePrecheckStatus('idle', FILE_PRECHECK_STATUS_MESSAGES.idle);
 }
 
 /**
  * Handle account selection
  */
-function handleAccountSelect(event) {
-    // Handle both event-based calls and direct calls
-    // Look for select INSIDE the modal to avoid conflicts
-    const modal = document.getElementById('importUserDataModal');
-    const target = event?.target || modal?.querySelector('#tradingAccountSelect');
-    const value = target?.value;
-    
-    if (isAccountSelectionLocked() && value && activeSessionInfo?.accountId
-        && String(value) !== String(activeSessionInfo.accountId)) {
-        enforceLockedAccountSelection(target);
-        return;
-    }
-    
-    window.Logger.info('[Import Modal] handleAccountSelect called', { 
-        event: event?.type || 'direct_call', 
-        target: target?.id,
-        value: value,
-        selectedIndex: target?.selectedIndex,
-        page: 'import-user-data' 
-    });
-    
-    const accountId = value;
-    window.Logger.info('[Import Modal] Account selected', { accountId, page: 'import-user-data' });
-    
-    if (!accountId) {
-        selectedAccount = null;
-                } else {
-        selectedAccount = accountId;
-    }
-    
-    // Update UI first
-    const accountInfo = document.getElementById('accountInfo');
-    if (accountInfo && target) {
-        const selectedOption = target.options[target.selectedIndex];
-        accountInfo.innerHTML = `
-            <div class="account-selected">
-                <i class="fas fa-user"></i>
-                <span>${selectedOption.textContent}</span>
-            </div>
-        `;
-    }
-    
-    // Wait a tick to ensure DOM is updated, then update button
-    // Use requestAnimationFrame to ensure DOM updates are complete
-    requestAnimationFrame(() => {
-        validateAccountSelection({ showNotification: false });
-        updateAnalyzeButton();
-    });
-    
-    updateImportModalNavigation();
-    syncAccountAndConnectorLockState();
-    
-    // Remove duplicate button update code below
+function handleAccountSelect() {
+    showImportUserDataNotification('בחירת החשבון מתבצעת דרך תהליך שיוך אוטומטי.', 'info');
 }
 
 /**
@@ -3704,6 +4251,7 @@ function handleConnectorSelect(event) {
     
     // Validate connector selection using central validation system
     validateConnectorSelection({ showNotification: false });
+    triggerFilePrecheckIfReady();
     
     // Wait a tick to ensure DOM is updated, then update button
     requestAnimationFrame(() => {
@@ -3770,56 +4318,15 @@ function validateConnectorSelection(options = {}) {
  * Validate all required fields before proceeding
  */
 function validateAccountSelection(options = {}) {
-    const { showNotification = false, touch = false } = options;
-    const accountSelect = document.getElementById('tradingAccountSelect');
-
-    if (!accountSelect) {
-        window.Logger.error('[Import Modal] Account select element not found for validation', { page: 'import-user-data' });
-        if (showNotification) {
-            showImportUserDataNotification('שדה חשבון מסחר לא נמצא', 'error', 'שגיאה');
-        }
-        return false;
+    const { showNotification = false } = options;
+    const hasLinkedAccount = Boolean(
+        linkedAccountInfo?.id
+        || pendingAccountLinking?.status === 'pending_confirmation'
+    );
+    if (!hasLinkedAccount && showNotification) {
+        showImportUserDataNotification('אנא השלם את תהליך שיוך החשבון לפני המשך הייבוא.', 'error');
     }
-
-    const value = accountSelect.value;
-    if (!value) {
-        if (touch) {
-            const validationResult = window.validateSelectField(accountSelect, {
-                required: true,
-                customValidation: () => 'חובה לבחור חשבון מסחר'
-            });
-            if (validationResult !== true) {
-                window.Logger.warn('[Import Modal] Account validation failed', { error: validationResult, page: 'import-user-data' });
-                if (showNotification) {
-                    showImportUserDataNotification(validationResult, 'error', 'שגיאה');
-                }
-            }
-        } else if (window.clearFieldValidation) {
-            window.clearFieldValidation(accountSelect);
-        }
-        return false;
-    }
-
-    const validationResult = window.validateSelectField(accountSelect, {
-            required: true,
-            customValidation: (value) => {
-                if (!value || value === '') {
-                return 'חובה לבחור חשבון מסחר';
-                }
-                return true;
-            }
-        });
-        
-    if (validationResult === true) {
-        window.Logger.debug('[Import Modal] Account validation passed', { page: 'import-user-data' });
-        return true;
-    }
-
-    window.Logger.warn('[Import Modal] Account validation failed', { error: validationResult, page: 'import-user-data' });
-    if (touch || showNotification) {
-        showImportUserDataNotification(validationResult, 'error', 'שגיאה');
-    }
-    return false;
+    return hasLinkedAccount;
 }
 
 function validateFileSelection(options = {}) {
@@ -3865,11 +4372,6 @@ function validateAllRequiredFields(options = {}) {
         errors.push('חובה לבחור ספק נתונים');
     }
 
-    const accountValid = validateAccountSelection({ showNotification: false, touch: true });
-    if (!accountValid) {
-        errors.push('חובה לבחור חשבון מסחר');
-    }
-
     const dataTypeSelect = document.getElementById('importDataTypeSelect');
     const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || '';
     const dataTypeValid = Boolean(dataTypeValue && IMPORT_DATA_TYPE_DEFINITIONS[dataTypeValue]);
@@ -3882,7 +4384,12 @@ function validateAllRequiredFields(options = {}) {
         window.showFieldSuccess(dataTypeSelect);
     }
 
-    const isValid = fileValid && connectorValid && accountValid && dataTypeValid;
+    const precheckPassed = getFilePrecheckStatus() === 'success';
+    if (!precheckPassed) {
+        errors.push('הקובץ חייב לעבור בדיקה ראשונית לפני המשך הניתוח');
+    }
+
+    const isValid = fileValid && connectorValid && dataTypeValid && precheckPassed;
 
     if (!isValid && showNotifications) {
         const uniqueErrors = [...new Set(errors.filter(Boolean))];
@@ -3908,7 +4415,7 @@ async function loadAccounts() {
     
     const accountSelect = modal.querySelector('#tradingAccountSelect');
     if (!accountSelect) {
-        window.Logger.error('[Import Modal] Account select not found in modal', { page: 'import-user-data' });
+        window.Logger.debug('[Import Modal] Account select not present in modal, skipping legacy account load', { page: 'import-user-data' });
         return;
     }
     
@@ -3980,7 +4487,7 @@ function loadAccountsFallback() {
     
     const accountSelect = modal.querySelector('#tradingAccountSelect');
     if (!accountSelect) {
-        window.Logger.error('[Import Modal] Account select not found in modal for fallback', { page: 'import-user-data' });
+        window.Logger.debug('[Import Modal] Account select not present in modal (fallback)', { page: 'import-user-data' });
         return;
     }
     
@@ -4034,19 +4541,16 @@ function analyzeFile() {
     // Get actual values from DOM - more reliable than variables
     const modal = document.getElementById('importUserDataModal');
     const connectorSelect = modal?.querySelector('#connectorSelect');
-    const accountSelect = modal?.querySelector('#tradingAccountSelect');
     const dataTypeSelect = modal?.querySelector('#importDataTypeSelect');
     
-    const connectorValue = connectorSelect?.value;
-    const accountValue = accountSelect?.value;
+    const connectorValue = connectorSelect?.value || getSelectedConnectorValue();
     const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || 'executions';
     
     // Validate values
-    if (!selectedFile || !connectorValue || !accountValue) {
+    if (!selectedFile || !connectorValue) {
         window.Logger.error('[Import Modal] Missing required values', {
             selectedFile: !!selectedFile,
             connectorValue: connectorValue,
-            accountValue: accountValue,
             page: 'import-user-data'
         });
         showImportUserDataNotification('אנא מלא את כל השדות הנדרשים', 'error');
@@ -4056,17 +4560,18 @@ function analyzeFile() {
     window.Logger.info('[Import Modal] Analysis starting with values', {
         selectedFile: selectedFile?.name,
         connectorValue: connectorValue,
-        accountValue: accountValue,
-        accountValueType: typeof accountValue,
         page: 'import-user-data'
     });
     
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('trading_account_id', accountValue);
     formData.append('connector_type', connectorValue);
     selectedDataTypeKey = dataTypeValue;
     formData.append('task_type', selectedDataTypeKey);
+    const inferredAccountId = linkedAccountInfo?.id || activeSessionInfo?.accountId || null;
+    if (inferredAccountId) {
+        formData.append('trading_account_id', inferredAccountId);
+    }
     
     // Debug: Log what's being sent
     window.Logger.debug('[Import Modal] FormData contents', {
@@ -4162,6 +4667,10 @@ function displayAnalysisResults(results) {
             renderCashflowAnalysisSummary(results);
         } else if (taskType === 'account_reconciliation') {
             renderAccountReconciliationAnalysisSummary(results);
+        } else if (taskType === 'portfolio_positions') {
+            renderPortfolioAnalysisSummary(results);
+        } else if (taskType === 'taxes_and_fx') {
+            renderTaxFxAnalysisSummary(results);
         } else {
             renderExecutionAnalysisSummary(results);
         }
@@ -4301,6 +4810,117 @@ function renderAccountReconciliationAnalysisSummary(results) {
     setAnalysisCardValue('existingRecords', (missingDocuments.length || 0));
 }
 
+function renderPortfolioAnalysisSummary(results = {}) {
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'מטבעות עם חשיפה');
+    setAnalysisCardLabel('missingTickerRecords', 'קטגוריות נכסים');
+
+    const totalRecords = safeToNumber(
+        results.total_records
+        ?? results.summary?.total_records
+        ?? results.summary_data?.total_records
+        ?? results.positions_detected
+        ?? results.summary?.positions_detected
+        ?? results.valid_records
+        ?? 0
+    );
+    const validRecords = safeToNumber(
+        results.valid_records
+        ?? results.positions_detected
+        ?? results.summary?.positions_detected
+        ?? 0
+    );
+    const invalidRecords = safeToNumber(results.invalid_records ?? 0);
+
+    setAnalysisCardValue('totalRecords', totalRecords);
+    setAnalysisCardValue('validRecords', validRecords);
+    setAnalysisCardValue('invalidRecords', invalidRecords);
+    setAnalysisCardValue('duplicateRecords', results.duplicate_records || 0);
+    setAnalysisCardValue('missingTickersCount', Object.keys(results.currency_totals || {}).length || 0);
+    setAnalysisCardValue('missingTickerRecords', Object.keys(results.asset_category_totals || {}).length || 0);
+    setAnalysisCardValue('existingRecords', (results.zero_quantity_positions || []).length);
+
+    renderKeyValueCards(
+        'cashflowTypeSummarySection',
+        'cashflowTypeSummaryCards',
+        results.currency_totals || {},
+        { labelPrefix: 'מטבע' }
+    );
+    renderKeyValueCards(
+        'cashflowCurrencySummarySection',
+        'cashflowCurrencySummaryCards',
+        results.asset_category_totals || {},
+        { labelPrefix: 'קטגוריה' }
+    );
+    renderListSummary(
+        'cashflowIssuesSummarySection',
+        'cashflowIssuesSummaryList',
+        results.zero_quantity_positions || [],
+        (item) => {
+            if (!item) {
+                return '';
+            }
+            const symbol = item.symbol || item.asset_symbol || 'N/A';
+            const currency = item.currency || item.account_currency || '';
+            return `סמל ${symbol} – כמות/שווי אפסיים (${currency})`;
+        }
+    );
+}
+
+function renderTaxFxAnalysisSummary(results = {}) {
+    clearCashflowAnalysisSections();
+    setAnalysisCardLabel('missingTickersCount', 'מטבעות מס/עמלות');
+    setAnalysisCardLabel('missingTickerRecords', 'רכיבי NAV');
+
+    const totalRecords = safeToNumber(
+        results.total_records
+        ?? results.summary?.total_records
+        ?? results.summary_data?.total_records
+        ?? 0
+    );
+    const validRecords = safeToNumber(
+        results.valid_records
+        ?? results.taxes_detected
+        ?? results.summary?.taxes_detected
+        ?? 0
+    );
+    const invalidRecords = safeToNumber(results.invalid_records ?? 0);
+
+    setAnalysisCardValue('totalRecords', totalRecords);
+    setAnalysisCardValue('validRecords', validRecords);
+    setAnalysisCardValue('invalidRecords', invalidRecords);
+    setAnalysisCardValue('duplicateRecords', results.duplicate_records || 0);
+    setAnalysisCardValue('missingTickersCount', Object.keys(results.totals_by_currency || {}).length || 0);
+    setAnalysisCardValue('missingTickerRecords', Object.keys(results.nav_components || {}).length || 0);
+    setAnalysisCardValue('existingRecords', (results.forex_trades || []).length);
+
+    renderKeyValueCards(
+        'cashflowTypeSummarySection',
+        'cashflowTypeSummaryCards',
+        results.totals_by_currency || {},
+        { labelPrefix: 'מטבע' }
+    );
+    renderKeyValueCards(
+        'cashflowCurrencySummarySection',
+        'cashflowCurrencySummaryCards',
+        results.totals_by_type || {},
+        { labelPrefix: 'סוג' }
+    );
+    const navEntries = Object.entries(results.nav_components || {});
+    renderListSummary(
+        'cashflowIssuesSummarySection',
+        'cashflowIssuesSummaryList',
+        navEntries,
+        (entry) => {
+            if (!Array.isArray(entry)) {
+                return '';
+            }
+            const [component, value] = entry;
+            return `${component}: ${formatAmount(value)}`;
+        }
+    );
+}
+
 function detectAvailableDataTypes(results = {}) {
     const detectedTasks =
         results.detected_tasks ||
@@ -4362,7 +4982,14 @@ function detectAvailableDataTypes(results = {}) {
             if (!definition) return null;
             return {
                 ...definition,
-                records: Number(results.positions_detected ?? 0),
+                records: Number(
+                    detectedTasks.portfolio_positions?.records ??
+                    results.positions_detected ??
+                    results.summary?.positions_detected ??
+                    results.summary_data?.positions_detected ??
+                    results.valid_records ??
+                    0
+                ),
                 status: ACTIVE_IMPORT_DATA_TYPES.has(definition.key) ? 'available' : 'planned'
             };
         },
@@ -4371,7 +4998,14 @@ function detectAvailableDataTypes(results = {}) {
             if (!definition) return null;
             return {
                 ...definition,
-                records: Number(results.taxes_detected ?? results.fx_adjustments ?? 0),
+                records: Number(
+                    detectedTasks.taxes_and_fx?.records ??
+                    results.taxes_detected ??
+                    results.summary?.taxes_detected ??
+                    results.summary_data?.taxes_detected ??
+                    results.valid_records ??
+                    0
+                ),
                 status: ACTIVE_IMPORT_DATA_TYPES.has(definition.key) ? 'available' : 'planned'
             };
         }
@@ -4802,6 +5436,18 @@ function displayPreviewData(data) {
         return;
     }
 
+    if (taskType === 'portfolio_positions') {
+        renderPortfolioPreviewTables(recordsToImport, recordsToSkip, summary, importCount, skipCount);
+        updateSummaryStats();
+        return;
+    }
+
+    if (taskType === 'taxes_and_fx') {
+        renderTaxFxPreviewTables(recordsToImport, recordsToSkip, summary, importCount, skipCount);
+        updateSummaryStats();
+        return;
+    }
+
     renderExecutionPreviewTables(recordsToImport, recordsToSkip);
     updateSummaryStats();
 }
@@ -4931,11 +5577,15 @@ function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {
             if (!record) return;
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${buildValueOrFallback(record.cashflow_type)}</td>
+                <td>${buildValueOrFallback(resolveCashflowTypeLabel(record.cashflow_type))}</td>
                 <td>${buildValueOrFallback(record.amount)}</td>
                 <td>${buildValueOrFallback(record.currency)}</td>
                 <td>${buildValueOrFallback(record.effective_date)}</td>
-                <td>${buildValueOrFallback(record.source_account)}</td>
+                <td>${
+                    (typeof window.getTradingAccountName === 'function' && record.source_account)
+                        ? escapeHtml(window.getTradingAccountName(record.source_account))
+                        : buildValueOrFallback(record.source_account)
+                }</td>
                 <td>${buildValueOrFallback(record.target_account)}</td>
                 <td>${buildValueOrFallback(record.asset_symbol)}</td>
                 <td>${buildValueOrFallback(record.memo)}</td>
@@ -4952,11 +5602,15 @@ function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {
             if (!record) return;
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${buildValueOrFallback(record.cashflow_type)}</td>
+                <td>${buildValueOrFallback(resolveCashflowTypeLabel(record.cashflow_type))}</td>
                 <td>${buildValueOrFallback(record.amount)}</td>
                 <td>${buildValueOrFallback(record.currency)}</td>
                 <td>${buildValueOrFallback(record.effective_date)}</td>
-                <td>${buildValueOrFallback(record.source_account)}</td>
+                <td>${
+                    (typeof window.getTradingAccountName === 'function' && record.source_account)
+                        ? escapeHtml(window.getTradingAccountName(record.source_account))
+                        : buildValueOrFallback(record.source_account)
+                }</td>
                 <td>${buildValueOrFallback(record.target_account)}</td>
                 <td>${buildValueOrFallback(record.asset_symbol)}</td>
                 <td>${buildValueOrFallback(wrapper.reason)}</td>
@@ -4974,6 +5628,156 @@ function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {
         taskType: 'cashflows',
         status: activeSessionInfo?.status || 'מוכן לייבוא'
     });
+}
+
+function renderPortfolioPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
+    const importTableHeadRow = document.querySelector('#importTable thead tr');
+    if (importTableHeadRow) {
+        importTableHeadRow.innerHTML = `
+            <th>סמל</th>
+            <th>קטגוריה</th>
+            <th>מטבע</th>
+            <th>כמות</th>
+            <th>שווי שוק</th>
+            <th>עלות כוללת</th>
+            <th>רווח/הפסד</th>
+            <th>תקופת דוח</th>
+        `;
+    }
+
+    const skipTableHeadRow = document.querySelector('#skipTable thead tr');
+    if (skipTableHeadRow) {
+        skipTableHeadRow.innerHTML = `
+            <th>סמל</th>
+            <th>קטגוריה</th>
+            <th>מטבע</th>
+            <th>כמות</th>
+            <th>שווי שוק</th>
+            <th>עלות כוללת</th>
+            <th>רווח/הפסד</th>
+            <th>תקופת דוח</th>
+            <th>סיבה</th>
+        `;
+    }
+
+    const importTableBody = document.getElementById('importTableBody');
+    if (importTableBody) {
+        importTableBody.innerHTML = '';
+        recordsToImport.forEach((entry) => {
+            const { record } = extractPreviewRecord(entry);
+            if (!record) {
+                return;
+            }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${escapeHtml(record.symbol || record.description || 'N/A')}</td>
+                <td>${escapeHtml(record.asset_category || 'N/A')}</td>
+                <td>${escapeHtml(record.currency || '')}</td>
+                <td>${formatNumber(record.quantity ?? 0, 2)}</td>
+                <td>${formatAmount(record.market_value ?? 0)}</td>
+                <td>${formatAmount(record.cost_basis ?? 0)}</td>
+                <td>${formatAmount(record.unrealized_pl ?? 0)}</td>
+                <td>${renderImportDate(record.statement_period_end, record.statement_period || '—')}</td>
+            `;
+            importTableBody.appendChild(row);
+        });
+    }
+
+    const skipTableBody = document.getElementById('skipTableBody');
+    if (skipTableBody) {
+        skipTableBody.innerHTML = '';
+        recordsToSkip.forEach((entry) => {
+            const { record, wrapper } = extractPreviewRecord(entry);
+            if (!record) {
+                return;
+            }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${escapeHtml(record.symbol || record.description || 'N/A')}</td>
+                <td>${escapeHtml(record.asset_category || 'N/A')}</td>
+                <td>${escapeHtml(record.currency || '')}</td>
+                <td>${formatNumber(record.quantity ?? 0, 2)}</td>
+                <td>${formatAmount(record.market_value ?? 0)}</td>
+                <td>${formatAmount(record.cost_basis ?? 0)}</td>
+                <td>${formatAmount(record.unrealized_pl ?? 0)}</td>
+                <td>${renderImportDate(record.statement_period_end, record.statement_period || '—')}</td>
+                <td>${escapeHtml(wrapper.reason || 'validation_error')}</td>
+            `;
+            skipTableBody.appendChild(row);
+        });
+    }
+}
+
+function renderTaxFxPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
+    const importTableHeadRow = document.querySelector('#importTable thead tr');
+    if (importTableHeadRow) {
+        importTableHeadRow.innerHTML = `
+            <th>סוג</th>
+            <th>מטבע</th>
+            <th>סכום</th>
+            <th>תיאור</th>
+            <th>תאריך</th>
+            <th>מטבע מקור</th>
+            <th>מטבע יעד</th>
+            <th>כמות</th>
+        `;
+    }
+
+    const skipTableHeadRow = document.querySelector('#skipTable thead tr');
+    if (skipTableHeadRow) {
+        skipTableHeadRow.innerHTML = `
+            <th>סוג</th>
+            <th>מטבע</th>
+            <th>סכום</th>
+            <th>תיאור</th>
+            <th>תאריך</th>
+            <th>סיבה</th>
+        `;
+    }
+
+    const importTableBody = document.getElementById('importTableBody');
+    if (importTableBody) {
+        importTableBody.innerHTML = '';
+        recordsToImport.forEach((entry) => {
+            const { record } = extractPreviewRecord(entry);
+            if (!record) {
+                return;
+            }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${escapeHtml(record.record_type || 'tax_cashflow')}</td>
+                <td>${escapeHtml(record.currency || '')}</td>
+                <td>${formatAmount(record.amount ?? 0)}</td>
+                <td>${escapeHtml(record.description || '')}</td>
+                <td>${renderImportDate(record.effective_date, record.statement_period || '—')}</td>
+                <td>${escapeHtml(record.source_currency || '')}</td>
+                <td>${escapeHtml(record.target_currency || '')}</td>
+                <td>${formatNumber(record.quantity ?? 0, 4)}</td>
+            `;
+            importTableBody.appendChild(row);
+        });
+    }
+
+    const skipTableBody = document.getElementById('skipTableBody');
+    if (skipTableBody) {
+        skipTableBody.innerHTML = '';
+        recordsToSkip.forEach((entry) => {
+            const { record, wrapper } = extractPreviewRecord(entry);
+            if (!record) {
+                return;
+            }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${escapeHtml(record.record_type || 'tax_cashflow')}</td>
+                <td>${escapeHtml(record.currency || '')}</td>
+                <td>${formatAmount(record.amount ?? 0)}</td>
+                <td>${escapeHtml(record.description || '')}</td>
+                <td>${renderImportDate(record.effective_date, record.statement_period || '—')}</td>
+                <td>${escapeHtml(wrapper.reason || 'validation_error')}</td>
+            `;
+            skipTableBody.appendChild(row);
+        });
+    }
 }
 
 function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summary, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
@@ -6054,6 +6858,35 @@ function displayProblemResolutionDetailed(data) {
     updateSymbolMetadataCache(data?.symbol_metadata || data?.summary?.symbol_metadata);
 
     if (taskType === 'cashflows') {
+        // Adjust duplicate/existing tables headers for cashflows context
+        try {
+            const existingHead = document.querySelector('#existingRecordsTable thead tr');
+            if (existingHead) {
+                existingHead.innerHTML = `
+                    <th>סוג</th>
+                    <th>סכום</th>
+                    <th>מטבע</th>
+                    <th>תאריך</th>
+                    <th>חשבון</th>
+                    <th>רמת ביטחון</th>
+                    <th class="text-center">פעולות</th>
+                `;
+            }
+            const withinHead = document.querySelector('#withinFileDuplicatesTable thead tr');
+            if (withinHead) {
+                withinHead.innerHTML = `
+                    <th>סוג</th>
+                    <th>סכום</th>
+                    <th>מטבע</th>
+                    <th>תאריך</th>
+                    <th>חשבון</th>
+                    <th>רמת ביטחון</th>
+                    <th class="text-center">פעולות</th>
+                `;
+            }
+        } catch (e) {
+            window.Logger?.warn('[Import Modal] Failed to set cashflow headers for duplicates tables', { error: e?.message });
+        }
         renderCashflowProblemSections(data);
         renderExecutionStyleProblems(data); // duplicates / existing
         updateActiveSessionFromPreview(data);
@@ -6462,11 +7295,28 @@ function getPreviewRecordIndex(record, duplicate, fallbackIndex) {
 
 function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Set()) {
     const { record } = extractPreviewRecord(duplicate);
-    const symbol = record?.symbol || record?.ticker || duplicate.symbol || 'לא ידוע';
-    const action = record?.action || duplicate.action || 'לא ידוע';
-    const quantity = escapeHtml(buildValueOrFallback(record?.quantity ?? duplicate.quantity, '—'));
-    const price = escapeHtml(buildValueOrFallback(record?.price ?? duplicate.price, '—'));
-    const dateValue = escapeHtml(renderImportDate(record?.date || duplicate.date, '—'));
+    const isCashflow = !!(record && (record.cashflow_type || typeof record.amount === 'number' || record.effective_date));
+    // Executions-style defaults
+    let col1 = record?.symbol || record?.ticker || duplicate.symbol || 'לא ידוע';
+    let col2 = record?.action || duplicate.action || 'לא ידוע';
+    let col3 = escapeHtml(buildValueOrFallback(record?.quantity ?? duplicate.quantity, '—'));
+    let col4 = escapeHtml(buildValueOrFallback(record?.price ?? duplicate.price, '—'));
+    let col5 = escapeHtml(renderImportDate(record?.date || duplicate.date, '—'));
+    // Cashflows-style mapping
+    if (isCashflow) {
+        const typeLabel = resolveCashflowTypeLabel(record?.cashflow_type);
+        const amountStr = formatAmount(record?.amount ?? duplicate.amount ?? 0);
+        const currencyStr = record?.currency || duplicate.currency || '—';
+        const dateStr = escapeHtml(renderImportDate(record?.effective_date || duplicate.effective_date, '—'));
+        const accountDisplay = (typeof window.getTradingAccountName === 'function' && record?.source_account)
+            ? escapeHtml(window.getTradingAccountName(record.source_account))
+            : escapeHtml(buildValueOrFallback(record?.source_account ?? duplicate.source_account, '-'));
+        col1 = typeLabel;
+        col2 = amountStr;
+        col3 = escapeHtml(currencyStr);
+        col4 = dateStr;
+        col5 = accountDisplay;
+    }
     const confidence = duplicate.confidence_score || duplicate.confidence || 0;
     const confidenceClass = getConfidenceClass(confidence);
     const resolvedIndex = getPreviewRecordIndex(record, duplicate, index);
@@ -6484,7 +7334,7 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
             data-onclick="acceptDuplicate(${resolvedIndex}, '${duplicateReason}')"
             data-text="אשר"
             title="אשר רשומה זו"
-            aria-label="אשר רשומה עבור ${escapeAttribute(symbol)}">
+            aria-label="אשר רשומה">
                 </button>
     `;
 
@@ -6495,17 +7345,17 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
             data-onclick="rejectDuplicate(${resolvedIndex}, '${duplicateReason}')"
             data-text="דחה"
             title="דחה רשומה זו"
-            aria-label="דחה רשומה עבור ${escapeAttribute(symbol)}">
+            aria-label="דחה רשומה">
                 </button>
     `;
 
     return `
         <tr>
-            <td>${escapeHtml(symbol)}</td>
-            <td>${escapeHtml(action)}</td>
-            <td>${quantity}</td>
-            <td>${price}</td>
-            <td>${dateValue}</td>
+            <td>${escapeHtml(col1)}</td>
+            <td>${escapeHtml(col2)}</td>
+            <td>${escapeHtml(col3)}</td>
+            <td>${escapeHtml(col4)}</td>
+            <td>${escapeHtml(col5)}</td>
             <td><span class="confidence-text ${confidenceClass}">${confidence}%</span></td>
             <td class="text-center table-action-buttons">
                 ${acceptButton}
@@ -6523,11 +7373,26 @@ function renderDuplicateMatchRows(matches) {
 
     return matches.map((match) => {
         const { record } = extractPreviewRecord(match);
-        const matchSymbol = record?.symbol || match.symbol || 'לא ידוע';
-        const matchAction = record?.action || match.action || 'לא ידוע';
-        const matchQuantity = escapeHtml(buildValueOrFallback(record?.quantity ?? match.quantity, '—'));
-        const matchPrice = escapeHtml(buildValueOrFallback(record?.price ?? match.price, '—'));
-        const matchDate = escapeHtml(renderImportDate(record?.date || match.date, '—'));
+        const isCashflow = !!(record && (record.cashflow_type || typeof record.amount === 'number' || record.effective_date));
+        let m1 = record?.symbol || match.symbol || 'לא ידוע';
+        let m2 = record?.action || match.action || 'לא ידוע';
+        let m3 = escapeHtml(buildValueOrFallback(record?.quantity ?? match.quantity, '—'));
+        let m4 = escapeHtml(buildValueOrFallback(record?.price ?? match.price, '—'));
+        let m5 = escapeHtml(renderImportDate(record?.date || match.date, '—'));
+        if (isCashflow) {
+            const typeLabel = resolveCashflowTypeLabel(record?.cashflow_type);
+            const amountStr = formatAmount(record?.amount ?? match.amount ?? 0);
+            const currencyStr = record?.currency || match.currency || '—';
+            const dateStr = escapeHtml(renderImportDate(record?.effective_date || match.effective_date, '—'));
+            const accountDisplay = (typeof window.getTradingAccountName === 'function' && record?.source_account)
+                ? escapeHtml(window.getTradingAccountName(record.source_account))
+                : escapeHtml(buildValueOrFallback(record?.source_account ?? match.source_account, '-'));
+            m1 = typeLabel;
+            m2 = amountStr;
+            m3 = escapeHtml(currencyStr);
+            m4 = dateStr;
+            m5 = accountDisplay;
+        }
         const confidence = match.confidence_score || match.confidence || 0;
         const confidenceClass = getConfidenceClass(confidence);
         const matchIndex = getPreviewRecordIndex(record, match, match.record_index);
@@ -6539,7 +7404,7 @@ function renderDuplicateMatchRows(matches) {
                 data-onclick="acceptDuplicate(${matchIndex}, 'within_file_duplicate_match')"
                 data-text="אשר"
                 title="אשר רשומה תואמת"
-                aria-label="אשר רשומה תואמת עבור ${escapeAttribute(matchSymbol)}">
+                aria-label="אשר רשומה תואמת">
             </button>
         `;
 
@@ -6550,7 +7415,7 @@ function renderDuplicateMatchRows(matches) {
                 data-onclick="rejectDuplicate(${matchIndex}, 'within_file_duplicate_match')"
                 data-text="דחה"
                 title="דחה רשומה תואמת"
-                aria-label="דחה רשומה תואמת עבור ${escapeAttribute(matchSymbol)}">
+                aria-label="דחה רשומה תואמת">
             </button>
         `;
 
@@ -6560,11 +7425,11 @@ function renderDuplicateMatchRows(matches) {
                     <div class="duplicate-match-container">
                         <div class="duplicate-match-details">
                             <strong>רשומה תואמת:</strong>
-                            <span>${escapeHtml(matchSymbol)}</span>
-                            <span>${escapeHtml(matchAction)}</span>
-                            <span>${matchQuantity}</span>
-                            <span>${matchPrice}</span>
-                            <span>${matchDate}</span>
+                            <span>${escapeHtml(m1)}</span>
+                            <span>${escapeHtml(m2)}</span>
+                            <span>${escapeHtml(m3)}</span>
+                            <span>${escapeHtml(m4)}</span>
+                            <span>${escapeHtml(m5)}</span>
                             <span class="confidence-text ${confidenceClass}">${confidence}%</span>
                         </div>
                         <div class="duplicate-match-actions">
@@ -6699,6 +7564,10 @@ window.proceedToProblemResolution = proceedToProblemResolution;
 window.resumeActiveImportSession = resumeActiveImportSession;
 window.getImportDebugState = getImportDebugState;
 window.linkExternalAccountToTradingAccount = linkExternalAccountToTradingAccount;
+window.confirmAutoLinkedAccount = confirmAutoLinkedAccount;
+window.openAccountLinkingModalManually = openAccountLinkingModalManually;
+window.showAccountLinkingSelection = showAccountLinkingSelection;
+window.submitAccountLinkSelection = submitAccountLinkSelection;
 window.hideAccountLinkingModal = hideAccountLinkingModal;
 function renderExecutionProblemSections(data) {
     const summary = data.summary || {};

@@ -2219,6 +2219,7 @@ async function saveTradingAccount() {
             opening_balance: { id: 'accountOpeningBalance', type: 'float', default: 0 },
             status: { id: 'accountStatus', type: 'text' },
             notes: { id: 'accountNotes', type: 'rich-text', default: null },
+            external_account_number: { id: 'brokerAccountNumber', type: 'text', default: null },
             tag_ids: { id: 'accountTags', type: 'tags', default: [] }
         });
         const tagIds = Array.isArray(accountData.tag_ids) ? accountData.tag_ids : [];

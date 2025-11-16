@@ -905,8 +905,11 @@ function getSubtypeDisplay(subtype) {
     'fee': 'עמלה',
     'dividend': 'דיבידנד',
     'interest': 'ריבית',
+    'syep_interest': 'ריבית SYEP',
     'transfer_in': 'העברה פנימה',
     'transfer_out': 'העברה החוצה',
+    'currency_exchange_from': 'המרת מט״ח - יציאה',
+    'currency_exchange_to': 'המרת מט״ח - כניסה',
     'other_positive': 'אחר חיובי',
     'other_negative': 'אחר שלילי',
     'opening_balance': 'יתרת פתיחה',
@@ -952,19 +955,26 @@ function normalizeAmountBySubtype(amount, type, subtype) {
     // Always positive (money coming in)
     if (subTypeValue === 'dividend' || subTypeValue === 'דיבידנד' ||
             subTypeValue === 'transfer_in' || subTypeValue === 'העברה פנימה' ||
-            subTypeValue === 'other_positive' || subTypeValue === 'אחר חיובי') {
+            subTypeValue === 'other_positive' || subTypeValue === 'אחר חיובי' ||
+            subTypeValue === 'currency_exchange_to') {
       return Math.abs(amountNum);
     }
 
     // Always negative (money going out)
     if (subTypeValue === 'fee' || subTypeValue === 'עמלה' ||
             subTypeValue === 'transfer_out' || subTypeValue === 'העברה החוצה' ||
-            subTypeValue === 'other_negative' || subTypeValue === 'אחר שלילי') {
+            subTypeValue === 'other_negative' || subTypeValue === 'אחר שלילי' ||
+            subTypeValue === 'currency_exchange_from') {
       return -Math.abs(amountNum);
     }
 
     // Interest can be positive or negative - keep original sign
-    if (subTypeValue === 'interest' || subTypeValue === 'ריבית') {
+    if (
+      subTypeValue === 'interest' ||
+      subTypeValue === 'syep_interest' ||
+      subTypeValue === 'ריבית' ||
+      subTypeValue === 'ריבית syep'
+    ) {
       return amountNum; // Keep original sign (can be positive or negative)
     }
 
@@ -1465,7 +1475,7 @@ function combineStatistics(cashFlowsStats, executionsStats) {
 /**
  * Split cash flows statistics by column
  * Column 1: deposits_withdrawals, fee, dividend
- * Column 2: interest, transfer, other
+ * Column 2: interest/SYEP interest, transfer, other
  * @param {Object} stats - Full cash flows statistics
  * @param {number} column - Column number (1 or 2)
  * @returns {Object} Filtered statistics object for the column
@@ -1476,7 +1486,7 @@ function splitCashFlowsByColumn(stats, column) {
   }
 
   const column1Subtypes = ['deposits_withdrawals', 'fee', 'dividend'];
-  const column2Subtypes = ['transfer', 'interest', 'other'];
+  const column2Subtypes = ['transfer', 'interest', 'syep_interest', 'other'];
 
   const targetSubtypes = column === 1 ? column1Subtypes : column2Subtypes;
 
@@ -2207,10 +2217,22 @@ function renderBreakdownBySubtype(stats, typeName, column) {
     // 2. fee (עמלה)
     // 3. dividend (דיבידנד)
     // 4. transfer (העברה)
-    // 5. interest (ריבית)
+    // 5. interest (ריבית) + syep_interest
     // 6. other (אחר)
     // For executions: keep alphabetical order (buy/sell)
-    const subtypeOrder = ['deposits_withdrawals', 'fee', 'dividend', 'transfer_in', 'transfer_out', 'interest', 'other_positive', 'other_negative'];
+    const subtypeOrder = [
+        'deposits_withdrawals',
+        'fee',
+        'dividend',
+        'transfer_in',
+        'transfer_out',
+        'currency_exchange_from',
+        'currency_exchange_to',
+        'interest',
+        'syep_interest',
+        'other_positive',
+        'other_negative'
+    ];
     const subtypes = Object.keys(stats.bySubtype).sort((a, b) => {
       if (isExecution) {
         // For executions: alphabetical order

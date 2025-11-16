@@ -1975,6 +1975,13 @@ async function checkTickerExternalData() {
         const quoteData = await window.ExternalDataService.getQuote(symbol, { forceRefresh: true });
         
         if (quoteData && quoteData.price) {
+            const currencyResolution = typeof window.resolveExternalCurrencySymbol === 'function'
+                ? window.resolveExternalCurrencySymbol(quoteData.currency, symbol)
+                : {
+                    symbol: (typeof quoteData.currency === 'string' && quoteData.currency.trim()) || '',
+                    hasCurrency: Boolean(quoteData.currency)
+                };
+
             // Success - Display ticker info
             // המרת נתונים לפורמט שמצפה FieldRendererService.renderTickerInfo
             // ExternalDataService מחזיר: price, change_amount_day, change_pct_day, volume, currency
@@ -1985,7 +1992,7 @@ async function checkTickerExternalData() {
                 daily_change: parseFloat(quoteData.change_amount_day || quoteData.change_amount || 0),
                 daily_change_percent: parseFloat(quoteData.change_pct_day || quoteData.change_percent || 0),
                 volume: parseInt(quoteData.volume || 0),
-                currency_symbol: (quoteData.currency === 'USD' || !quoteData.currency) ? '$' : quoteData.currency
+                currency_symbol: currencyResolution.symbol
             };
             
             // Render using FieldRendererService
@@ -2009,6 +2016,10 @@ async function checkTickerExternalData() {
                 `;
             }
             
+            const currencyNotice = currencyResolution.hasCurrency
+                ? ''
+                : `<div class="text-warning small mt-2">לא התקבל מטבע מהספק, המחיר מוצג ללא סמל מטבע.</div>`;
+
             resultDiv.innerHTML = `
                 <div class="alert alert-success mb-0">
                     <div class="d-flex align-items-center gap-2 mb-2">
@@ -2016,6 +2027,7 @@ async function checkTickerExternalData() {
                         <strong>נתונים נמצאו עבור ${symbol}</strong>
                     </div>
                     ${tickerInfoHTML}
+                    ${currencyNotice}
                 </div>
             `;
             resultDiv.style.display = 'block';

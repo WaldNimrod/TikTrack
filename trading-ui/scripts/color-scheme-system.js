@@ -1091,15 +1091,11 @@ async function loadColorPreferences() {
       }
     }
     
-    // Fallback: try direct API call
     try {
-      const response = await fetch('/api/preferences/user');
-      if (response.ok) {
-        const data = await response.json();
-        const preferences = data.data || data;
-        window.currentPreferences = preferences;
-        return preferences;
-      }
+      const payload = await window.PreferencesData.loadAllPreferencesRaw({ force: true });
+      const preferences = payload?.preferences || {};
+      window.currentPreferences = preferences;
+      return preferences;
     } catch (apiError) {
       if (window.Logger) { window.Logger.warn('⚠️ Could not load preferences from API', { page: "color-scheme" }); }
     }

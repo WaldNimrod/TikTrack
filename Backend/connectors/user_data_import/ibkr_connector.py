@@ -56,6 +56,21 @@ class IBKRConnector(BaseConnector):
         'Account Summary': 'account_summary'
     }
 
+    PORTFOLIO_SECTION_NAMES = {
+        'Open Positions': 'open_positions',
+        'Forex Balances': 'forex_balances',
+        'Net Asset Value': 'net_asset_value',
+        'Change in NAV': 'nav_changes',
+        'Mark-to-Market Performance Summary': 'mtm_summary'
+    }
+
+    TAX_FX_SECTION_NAMES = {
+        'Withholding Tax': 'withholding_tax',
+        'Change in NAV': 'nav_changes',
+        'Mark-to-Market Performance Summary': 'mtm_summary',
+        'Realized & Unrealized Performance Summary': 'realized_unrealized_summary'
+    }
+
     def __init__(self):
         super().__init__()
         self._last_symbol_metadata_entries: List[Dict[str, Any]] = []
@@ -113,6 +128,49 @@ class IBKRConnector(BaseConnector):
             
         except Exception:
             return False
+
+    def precheck_file(
+        self,
+        file_content: str,
+        *,
+        file_name: Optional[str] = None,
+        task_type: Optional[str] = None
+    ) -> Dict[str, Any]:
+        result = super().precheck_file(
+            file_content,
+            file_name=file_name or '',
+            task_type=task_type
+        )
+        warnings = result.get('warnings', []) if isinstance(result, dict) else []
+        if not result.get('success'):
+            return result
+
+        errors: List[str] = []
+        required_headers = [
+            'Trades,Header,DataDiscriminator',
+            'Statement,Header,Field Name,Field Value'
+        ]
+        missing_headers = [header for header in required_headers if header not in file_content]
+        if missing_headers:
+            errors.append(
+                "הקובץ חסר את הכותרות הנדרשות: " + ', '.join(missing_headers)
+            )
+
+        if 'Account Information,Data,Account ID' not in file_content:
+            warnings = warnings + ['לא נמצא מקטע Account Information. ייתכן שיידרש זיהוי חשבון ידני.']
+
+        if errors:
+            return {
+                'success': False,
+                'errors': errors,
+                'warnings': warnings
+            }
+
+        return {
+            'success': True,
+            'message': 'הקובץ זוהה כדוח IBKR תקין. ניתן להמשיך לניתוח.',
+            'warnings': warnings
+        }
     
     def parse_file(
         self,
@@ -137,6 +195,10 @@ class IBKRConnector(BaseConnector):
             account_data = sections.get('account_reconciliation') or {}
             # Account reconciliation returns a single struct rather than list
             return [account_data] if account_data else []
+        if task_type == 'portfolio_positions':
+            return sections.get('portfolio_positions', [])
+        if task_type == 'taxes_and_fx':
+            return sections.get('taxes_and_fx', [])
         return sections.get('executions', [])
 
     def parse_sections(self, file_content: str) -> Dict[str, Any]:
@@ -164,13 +226,28 @@ class IBKRConnector(BaseConnector):
         executions = self._parse_trades_section(lines)
         cashflows = self._parse_cashflow_sections(lines)
         account_info = self._parse_account_sections(lines)
+        statement_metadata = self._parse_statement_metadata(lines)
 
         forex_cashflows = self._build_forex_cashflows()
+        all_cashflows = cashflows + forex_cashflows
+        portfolio_positions = self._parse_portfolio_sections(
+            lines,
+            statement_metadata,
+            account_info
+        )
+        tax_fx_records = self._parse_tax_fx_sections(
+            lines,
+            statement_metadata,
+            all_cashflows
+        )
 
         sections = {
             'executions': executions,
-            'cashflows': cashflows + forex_cashflows,
-            'account_reconciliation': account_info
+            'cashflows': all_cashflows,
+            'account_reconciliation': account_info,
+            'portfolio_positions': portfolio_positions,
+            'taxes_and_fx': tax_fx_records,
+            'statement_metadata': statement_metadata
         }
 
         self._cached_sections = {
@@ -271,6 +348,385 @@ class IBKRConnector(BaseConnector):
             record = self._build_cashflow_record(current_section, row)
             if record:
                 records.append(record)
+
+        return records
+
+    def _parse_statement_metadata(self, lines: List[str]) -> Dict[str, Any]:
+        metadata: Dict[str, Any] = {
+            'period': None,
+            'period_start_date': None,
+            'period_end_date': None,
+            'generated_at': None
+        }
+
+        for line in lines:
+            if not line.startswith('Statement,Data'):
+                continue
+            try:
+                values = next(csv.reader(io.StringIO(line)))
+            except Exception:
+                continue
+            if len(values) < 4:
+                continue
+            field_name = values[2].strip()
+            field_value = values[3].strip()
+            if field_name == 'Period':
+                cleaned = field_value.strip('"')
+                metadata['period'] = cleaned
+                start, end = self._split_period_range(cleaned)
+                if start:
+                    metadata['period_start_date'] = start
+                if end:
+                    metadata['period_end_date'] = end
+            elif field_name == 'WhenGenerated':
+                metadata['generated_at'] = field_value.strip('"')
+
+        return metadata
+
+    def _split_period_range(self, value: str) -> Tuple[Optional[str], Optional[str]]:
+        if not value or '-' not in value:
+            return (None, None)
+        start_raw, end_raw = value.split('-', 1)
+        return (
+            self._parse_period_date(start_raw),
+            self._parse_period_date(end_raw)
+        )
+
+    def _parse_period_date(self, value: str) -> Optional[str]:
+        if not value:
+            return None
+        cleaned = value.replace('"', '').strip()
+        for fmt in ('%B %d, %Y', '%Y-%m-%d'):
+            try:
+                dt = datetime.strptime(cleaned, fmt)
+                return dt.date().isoformat()
+            except ValueError:
+                continue
+        return None
+
+    def _parse_simple_date(self, value: str) -> Optional[datetime]:
+        if not value:
+            return None
+        cleaned = value.replace('"', '').strip()
+        for fmt in ('%Y-%m-%d', '%d-%b-%Y', '%Y/%m/%d'):
+            try:
+                dt = datetime.strptime(cleaned, fmt)
+                return dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                continue
+        try:
+            return self._parse_ibkr_datetime(cleaned)
+        except Exception:
+            return None
+
+    def _iter_section_rows(
+        self,
+        lines: List[str],
+        section_name: str,
+        include_totals: bool = False
+    ) -> Iterable[Dict[str, Any]]:
+        capturing = False
+        current_headers: Optional[List[str]] = None
+
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+
+            if stripped.startswith(f'{section_name},Header'):
+                capturing = True
+                current_headers = self._parse_section_headers(stripped)
+                continue
+
+            if not capturing:
+                continue
+
+            if stripped.startswith(f'{section_name},Trailer'):
+                capturing = False
+                current_headers = None
+                continue
+
+            if include_totals and stripped.startswith(f'{section_name},Total'):
+                try:
+                    values = next(csv.reader(io.StringIO(stripped)))
+                except Exception:
+                    continue
+                row = {'__row_type': 'total'}
+                if current_headers:
+                    for idx, header in enumerate(current_headers):
+                        value_idx = idx + 2
+                        row[header] = values[value_idx].strip() if value_idx < len(values) else ''
+                yield row
+                continue
+
+            if not stripped.startswith(f'{section_name},Data'):
+                continue
+
+            if not current_headers:
+                continue
+
+            try:
+                values = next(csv.reader(io.StringIO(stripped)))
+            except Exception:
+                continue
+
+            row = {'__row_type': 'data'}
+            for idx, header in enumerate(current_headers):
+                value_idx = idx + 2  # Skip section & descriptor columns
+                row[header] = values[value_idx].strip() if value_idx < len(values) else ''
+            yield row
+
+    def _parse_portfolio_sections(
+        self,
+        lines: List[str],
+        statement_metadata: Dict[str, Any],
+        account_info: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        if not lines:
+            return []
+
+        records: List[Dict[str, Any]] = []
+        account_id = account_info.get('account_id') if isinstance(account_info, dict) else None
+        period_end = statement_metadata.get('period_end_date')
+        period_label = statement_metadata.get('period')
+
+        for row in self._iter_section_rows(lines, 'Open Positions', include_totals=True):
+            record = self._build_open_position_record(row, account_id, period_label, period_end)
+            if record:
+                records.append(record)
+
+        for row in self._iter_section_rows(lines, 'Forex Balances', include_totals=True):
+            record = self._build_forex_balance_record(row, account_id, period_label, period_end)
+            if record:
+                records.append(record)
+
+        return records
+
+    def _build_open_position_record(
+        self,
+        row: Dict[str, Any],
+        account_id: Optional[str],
+        period_label: Optional[str],
+        period_end: Optional[str]
+    ) -> Optional[Dict[str, Any]]:
+        if not row:
+            return None
+
+        symbol = row.get('Symbol') or row.get('Description') or ''
+        record_type = 'open_position_total' if row.get('__row_type') != 'data' else 'open_position'
+
+        if not symbol and record_type == 'open_position':
+            return None
+
+        return {
+            'record_type': record_type,
+            'account_id': account_id,
+            'asset_category': row.get('Asset Category') or row.get('DataDiscriminator'),
+            'currency': row.get('Currency'),
+            'symbol': symbol,
+            'quantity': self._parse_float(row.get('Quantity')),
+            'multiplier': self._parse_float(row.get('Mult')),
+            'cost_price': self._parse_float(row.get('Cost Price')),
+            'cost_basis': self._parse_float(row.get('Cost Basis')),
+            'close_price': self._parse_float(row.get('Close Price')),
+            'market_value': self._parse_float(row.get('Value')),
+            'unrealized_pl': self._parse_float(row.get('Unrealized P/L')),
+            'code': row.get('Code'),
+            'statement_period': period_label,
+            'statement_period_end': period_end,
+            '_raw_row': row
+        }
+
+    def _build_forex_balance_record(
+        self,
+        row: Dict[str, Any],
+        account_id: Optional[str],
+        period_label: Optional[str],
+        period_end: Optional[str]
+    ) -> Optional[Dict[str, Any]]:
+        if not row:
+            return None
+
+        description = row.get('Description') or row.get('Currency') or ''
+        record_type = 'forex_balance_total' if row.get('__row_type') != 'data' else 'forex_balance'
+
+        return {
+            'record_type': record_type,
+            'account_id': account_id,
+            'asset_category': row.get('Asset Category'),
+            'currency': row.get('Currency'),
+            'description': description,
+            'quantity': self._parse_float(row.get('Quantity')),
+            'cost_price': self._parse_float(row.get('Cost Price')),
+            'cost_basis': self._parse_float(row.get('Cost Basis in EUR') or row.get('Cost Basis')),
+            'close_price': self._parse_float(row.get('Close Price')),
+            'market_value': self._parse_float(row.get('Value in EUR') or row.get('Value')),
+            'unrealized_pl': self._parse_float(row.get('Unrealized P/L in EUR') or row.get('Unrealized P/L')),
+            'statement_period': period_label,
+            'statement_period_end': period_end,
+            '_raw_row': row
+        }
+
+    def _parse_tax_fx_sections(
+        self,
+        lines: List[str],
+        statement_metadata: Dict[str, Any],
+        cashflow_records: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        records: List[Dict[str, Any]] = []
+        if not lines:
+            return records
+
+        records.extend(self._build_withholding_tax_records(lines, statement_metadata))
+        records.extend(self._build_nav_change_records(lines, statement_metadata))
+        records.extend(self._build_mtm_summary_records(lines, statement_metadata))
+        records.extend(self._build_realized_unrealized_records(lines, statement_metadata))
+        records.extend(self._build_tax_cashflow_records(cashflow_records, statement_metadata))
+
+        return records
+
+    def _build_withholding_tax_records(
+        self,
+        lines: List[str],
+        statement_metadata: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        records: List[Dict[str, Any]] = []
+        for row in self._iter_section_rows(lines, 'Withholding Tax'):
+            amount = self._parse_float(row.get('Amount'))
+            record = {
+                'record_type': 'withholding_tax',
+                'currency': row.get('Currency'),
+                'amount': amount,
+                'description': row.get('Description') or '',
+                'tax_code': row.get('Code') or '',
+                'effective_date': self._parse_simple_date(row.get('Date')),
+                'statement_period': statement_metadata.get('period'),
+                'statement_period_end': statement_metadata.get('period_end_date'),
+                '_raw_row': row
+            }
+            records.append(record)
+        return records
+
+    def _build_nav_change_records(
+        self,
+        lines: List[str],
+        statement_metadata: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        records: List[Dict[str, Any]] = []
+        for row in self._iter_section_rows(lines, 'Change in NAV'):
+            field_name = row.get('Field Name') or row.get('Field')
+            if not field_name:
+                continue
+            value = self._parse_float(row.get('Field Value') or row.get('Value'))
+            record = {
+                'record_type': 'nav_component',
+                'component': field_name,
+                'amount': value,
+                'statement_period': statement_metadata.get('period'),
+                'statement_period_end': statement_metadata.get('period_end_date'),
+                '_raw_row': row
+            }
+            records.append(record)
+        return records
+
+    def _build_mtm_summary_records(
+        self,
+        lines: List[str],
+        statement_metadata: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        records: List[Dict[str, Any]] = []
+        for row in self._iter_section_rows(lines, 'Mark-to-Market Performance Summary'):
+            asset_category = row.get('Asset Category')
+            if asset_category and asset_category.lower() != 'forex':
+                continue
+            record = {
+                'record_type': 'mtm_forex',
+                'asset_category': asset_category,
+                'symbol': row.get('Symbol'),
+                'prior_quantity': self._parse_float(row.get('Prior Quantity')),
+                'current_quantity': self._parse_float(row.get('Current Quantity')),
+                'prior_price': self._parse_float(row.get('Prior Price')),
+                'current_price': self._parse_float(row.get('Current Price')),
+                'mtm_position': self._parse_float(row.get('Mark-to-Market P/L Position')),
+                'mtm_transaction': self._parse_float(row.get('Mark-to-Market P/L Transaction')),
+                'mtm_commissions': self._parse_float(row.get('Mark-to-Market P/L Commissions')),
+                'mtm_other': self._parse_float(row.get('Mark-to-Market P/L Other')),
+                'mtm_total': self._parse_float(row.get('Mark-to-Market P/L Total')),
+                'statement_period': statement_metadata.get('period'),
+                'statement_period_end': statement_metadata.get('period_end_date'),
+                '_raw_row': row
+            }
+            records.append(record)
+        return records
+
+    def _build_realized_unrealized_records(
+        self,
+        lines: List[str],
+        statement_metadata: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        records: List[Dict[str, Any]] = []
+        for row in self._iter_section_rows(lines, 'Realized & Unrealized Performance Summary'):
+            asset_category = row.get('Asset Category')
+            if asset_category and asset_category.lower() != 'forex':
+                continue
+            record = {
+                'record_type': 'realized_unrealized_forex',
+                'asset_category': asset_category,
+                'symbol': row.get('Symbol'),
+                'realized_pl': self._parse_float(row.get('Realized P/L')),
+                'unrealized_pl': self._parse_float(row.get('Unrealized P/L')),
+                'total_pl': self._parse_float(row.get('Total P/L')),
+                'statement_period': statement_metadata.get('period'),
+                'statement_period_end': statement_metadata.get('period_end_date'),
+                '_raw_row': row
+            }
+            records.append(record)
+        return records
+
+    def _build_tax_cashflow_records(
+        self,
+        cashflow_records: List[Dict[str, Any]],
+        statement_metadata: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        if not cashflow_records:
+            return []
+
+        relevant_sections = {'Withholding Tax', 'Cash Report', 'Trades'}
+        relevant_types = {'tax', 'forex_conversion'}
+        records: List[Dict[str, Any]] = []
+
+        for flow in cashflow_records:
+            section = str(flow.get('section') or '').strip()
+            cf_type = str(flow.get('cashflow_type') or '').lower()
+            if section not in relevant_sections and cf_type not in relevant_types:
+                continue
+
+            record_type = 'forex_conversion' if cf_type == 'forex_conversion' else 'tax_cashflow'
+            record = {
+                'record_type': record_type,
+                'currency': flow.get('currency'),
+                'amount': flow.get('amount'),
+                'effective_date': flow.get('effective_date'),
+                'description': flow.get('memo') or section or '',
+                'source_account': flow.get('source_account'),
+                'statement_period': statement_metadata.get('period'),
+                'statement_period_end': statement_metadata.get('period_end_date'),
+                '_raw_row': flow.get('_raw_row') or flow
+            }
+
+            if cf_type == 'forex_conversion':
+                record.update({
+                    'source_currency': flow.get('source_currency'),
+                    'target_currency': flow.get('target_currency'),
+                    'quantity': flow.get('quantity'),
+                    'trade_price': flow.get('trade_price'),
+                    'commission': flow.get('commission'),
+                    'basis': flow.get('basis'),
+                    'realized_pl': flow.get('realized_pl'),
+                    'mtm_pl': flow.get('mtm_pl')
+                })
+
+            records.append(record)
 
         return records
 
@@ -556,6 +1012,11 @@ class IBKRConnector(BaseConnector):
             return 'deposit' if amount and amount > 0 else 'withdrawal'
 
         if section_key == 'interest':
+            description = (row.get('Description') or row.get('Activity Description') or '').lower()
+            memo = (row.get('Memo') or row.get('Field Name') or '').lower()
+            text_blob = ' '.join(filter(None, [description, memo]))
+            if 'stock yield enhancement' in text_blob or 'syep' in text_blob:
+                return 'syep_interest'
             return 'interest'
         if section_key == 'dividend':
             return 'dividend'
@@ -563,6 +1024,9 @@ class IBKRConnector(BaseConnector):
             return 'tax'
         if section_key == 'fee':
             return 'fee'
+
+        if section_key == 'syep_interest':
+            return 'syep_interest'
 
         return section_key or 'cash_adjustment'
 

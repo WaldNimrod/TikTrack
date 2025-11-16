@@ -20,6 +20,17 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
+EXCHANGE_FROM_TYPE = CashFlowHelperService.EXCHANGE_FROM_TYPE
+EXCHANGE_TO_TYPE = CashFlowHelperService.EXCHANGE_TO_TYPE
+LEGACY_EXCHANGE_FROM_TYPE = CashFlowHelperService.LEGACY_EXCHANGE_FROM_TYPE
+LEGACY_EXCHANGE_TO_TYPE = CashFlowHelperService.LEGACY_EXCHANGE_TO_TYPE
+ALL_EXCHANGE_TYPES = {
+    EXCHANGE_FROM_TYPE,
+    EXCHANGE_TO_TYPE,
+    LEGACY_EXCHANGE_FROM_TYPE,
+    LEGACY_EXCHANGE_TO_TYPE,
+}
+
 cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash-flows')
 
 # Create a service class for cash flows
@@ -68,6 +79,33 @@ def get_cash_flows():
     
     # Enhance data with additional information and filter currency exchanges
     if response.get('status') == 'success' and response.get('data'):
+        def _apply_account_metadata(entry: dict, account_obj):
+            account_currency_id = None
+            account_currency_symbol = None
+            account_currency_name = None
+            if account_obj:
+                if isinstance(account_obj, dict):
+                    account_currency_id = account_obj.get('currency_id')
+                    account_currency_symbol = account_obj.get('currency_symbol')
+                    account_currency_name = account_obj.get('currency_name')
+                    currency_info = account_obj.get('currency')
+                    if isinstance(currency_info, dict):
+                        account_currency_symbol = currency_info.get('symbol', account_currency_symbol)
+                        account_currency_name = currency_info.get('name', account_currency_name)
+                else:
+                    account_currency_id = getattr(account_obj, 'currency_id', None)
+                    currency_info = getattr(account_obj, 'currency', None)
+                    if currency_info:
+                        account_currency_symbol = getattr(currency_info, 'symbol', None)
+                        account_currency_name = getattr(currency_info, 'name', None)
+
+            if account_currency_symbol:
+                entry['account_currency_symbol'] = account_currency_symbol
+            if account_currency_id is not None:
+                entry['account_currency_id'] = account_currency_id
+            if account_currency_name:
+                entry['account_currency_name'] = account_currency_name
+
         processed_flows = []
         exchange_pairs = {}
         
@@ -79,6 +117,7 @@ def get_cash_flows():
             account_info = cf_entry.pop('account', None)
             if account_info:
                 cf_entry['account_name'] = account_info.get('name', '')
+                _apply_account_metadata(cf_entry, account_info)
             
             currency_info = cf_entry.pop('currency', None)
             if currency_info:
@@ -86,15 +125,28 @@ def get_cash_flows():
                 cf_entry['currency_name'] = currency_info.get('name', '')
             
             external_id = cf_entry.get('external_id')
-            if CashFlowHelperService.is_currency_exchange(external_id):
-                cf_entry['exchange_group_id'] = external_id
-                cf_entry['exchange_direction'] = 'from' if cf_entry.get('type') == 'other_negative' else 'to'
+            flow_type = cf_entry.get('type')
+            is_exchange_flow = CashFlowHelperService.is_currency_exchange(external_id, flow_type)
+            if is_exchange_flow:
+                exchange_direction = CashFlowHelperService.get_exchange_direction(flow_type)
+                if not exchange_direction:
+                    try:
+                        amount_value = float(cf_entry.get('amount') or 0)
+                        exchange_direction = 'from' if amount_value < 0 else 'to'
+                    except (TypeError, ValueError):
+                        exchange_direction = None
+
+                if external_id:
+                    cf_entry['exchange_group_id'] = external_id
+                if exchange_direction:
+                    cf_entry['exchange_direction'] = exchange_direction
                 
-                pair = exchange_pairs.setdefault(external_id, {'from': None, 'to': None})
-                if cf_entry.get('type') == 'other_negative':
-                    pair['from'] = cf_entry
-                elif cf_entry.get('type') == 'other_positive':
-                    pair['to'] = cf_entry
+                if external_id and exchange_direction:
+                    pair = exchange_pairs.setdefault(external_id, {'from': None, 'to': None})
+                    if exchange_direction == 'from':
+                        pair['from'] = cf_entry
+                    elif exchange_direction == 'to':
+                        pair['to'] = cf_entry
             processed_flows.append(cf_entry)
         
         # Ensure completeness for each exchange group (fetch missing flows directly from DB if needed)
@@ -118,12 +170,15 @@ def get_cash_flows():
                     
                     if flow.account:
                         flow_entry['account_name'] = flow.account.name
+                        _apply_account_metadata(flow_entry, flow.account)
                     if flow.currency:
                         flow_entry['currency_symbol'] = flow.currency.symbol
                         flow_entry['currency_name'] = flow.currency.name
                     
                     flow_entry['exchange_group_id'] = exchange_id
-                    flow_entry['exchange_direction'] = 'from' if flow.type == 'other_negative' else 'to'
+                    flow_entry['exchange_direction'] = CashFlowHelperService.get_exchange_direction(flow.type) or (
+                        'from' if float(getattr(flow, 'amount', 0) or 0) < 0 else 'to'
+                    )
                     
                     processed_flows.append(flow_entry)
                     processed_by_id[flow.id] = flow_entry
@@ -162,6 +217,10 @@ def get_cash_flows():
                     "date": from_flow.get('date'),
                     "type": from_flow.get('type')
                 }
+                pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+                if pair_summary:
+                    from_flow['exchange_pair_summary'] = pair_summary
+                    to_flow['exchange_pair_summary'] = pair_summary
             else:
                 # If we only have one side, still expose linkage metadata without ID
                 if from_flow and not from_flow.get('linked_exchange_cash_flow_id'):
@@ -190,6 +249,18 @@ def get_cash_flow(cash_flow_id: int):
             if cash_flow.currency:
                 cf_dict['currency_symbol'] = cash_flow.currency.symbol
                 cf_dict['currency_name'] = cash_flow.currency.name
+
+            external_id = cf_dict.get('external_id')
+            if CashFlowHelperService.is_currency_exchange(external_id, cf_dict.get('type')):
+                flows = CashFlowHelperService.get_exchange_flows(db, external_id)
+                from_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+                to_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
+                pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+                if pair_summary:
+                    cf_dict['exchange_pair_summary'] = pair_summary
+                counterpart = next((f for f in flows if f.id != cash_flow.id), None)
+                if counterpart:
+                    cf_dict['linked_exchange_cash_flow_id'] = counterpart.id
             
             return jsonify({
                 "status": "success",
@@ -544,8 +615,8 @@ def create_currency_exchange():
     Create a currency exchange operation (atomic creation of two cash flows)
     
     Creates:
-    - From flow: type='other_negative', amount=-from_amount, currency_id=from_currency_id, stores fee_amount
-    - To flow: type='other_positive', amount=+to_amount, currency_id=to_currency_id
+    - From flow: type='currency_exchange_from', amount=-from_amount, currency_id=from_currency_id, stores fee_amount
+    - To flow: type='currency_exchange_to', amount=+to_amount, currency_id=to_currency_id
     
     All flows share the same external_id: 'exchange_<uuid>'
     """
@@ -678,7 +749,7 @@ def create_currency_exchange():
             # From flow (negative - outgoing)
             from_flow = CashFlow(
                 trading_account_id=trading_account_id,
-                type='other_negative',
+                type=EXCHANGE_FROM_TYPE,
                 amount=-from_amount,
                 fee_amount=fee_amount,
                 currency_id=from_currency_id,
@@ -693,7 +764,7 @@ def create_currency_exchange():
             # To flow (positive - incoming)
             to_flow = CashFlow(
                 trading_account_id=trading_account_id,
-                type='other_positive',
+                type=EXCHANGE_TO_TYPE,
                 amount=to_amount,
                 fee_amount=0.0,
                 currency_id=to_currency_id,
@@ -721,6 +792,9 @@ def create_currency_exchange():
                 "fee_amount": fee_amount,
                 "fee_currency_id": fee_currency_id
             }
+            pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+            if pair_summary:
+                result["exchange_pair_summary"] = pair_summary
             
             logger.info(f"✅ Currency exchange created successfully: {exchange_id}")
             
@@ -771,8 +845,8 @@ def get_currency_exchange(exchange_uuid: str):
             }), 400
         
         # Separate flows by type
-        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
-        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        from_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+        to_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
         
         # Calculate exchange rate from amounts
         exchange_rate = abs(to_flow.amount / from_flow.amount) if from_flow and to_flow else 0
@@ -788,6 +862,9 @@ def get_currency_exchange(exchange_uuid: str):
             "fee_amount": fee_amount,
             "fee_currency_id": fee_currency_id
         }
+        pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+        if pair_summary:
+            result["exchange_pair_summary"] = pair_summary
         
         return jsonify({
             "status": "success",
@@ -837,8 +914,8 @@ def update_currency_exchange(exchange_uuid: str):
             }), 400
         
         # Separate existing flows
-        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
-        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        from_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+        to_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
         # Validate required fields
         required_fields = ['trading_account_id', 'from_currency_id', 'to_currency_id',
                           'from_amount', 'exchange_rate', 'date']
@@ -961,6 +1038,7 @@ def update_currency_exchange(exchange_uuid: str):
             # Update from flow
             if from_flow:
                 from_flow.trading_account_id = trading_account_id
+                from_flow.type = EXCHANGE_FROM_TYPE
                 from_flow.amount = -from_amount
                 from_flow.fee_amount = fee_amount
                 from_flow.currency_id = from_currency_id
@@ -971,6 +1049,7 @@ def update_currency_exchange(exchange_uuid: str):
             # Update to flow
             if to_flow:
                 to_flow.trading_account_id = trading_account_id
+                to_flow.type = EXCHANGE_TO_TYPE
                 to_flow.amount = to_amount
                 to_flow.fee_amount = 0.0
                 to_flow.currency_id = to_currency_id
@@ -989,8 +1068,8 @@ def update_currency_exchange(exchange_uuid: str):
             
             # Get updated flows
             updated_flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
-            updated_from_flow = next((f for f in updated_flows if f.type == 'other_negative'), None)
-            updated_to_flow = next((f for f in updated_flows if f.type == 'other_positive'), None)
+            updated_from_flow = next((f for f in updated_flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+            updated_to_flow = next((f for f in updated_flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
             
             result = {
                 "exchange_id": exchange_uuid,
@@ -1000,6 +1079,9 @@ def update_currency_exchange(exchange_uuid: str):
                 "fee_amount": fee_amount,
                 "fee_currency_id": fee_currency_id
             }
+            pair_summary = CashFlowHelperService.build_exchange_pair_summary(updated_from_flow, updated_to_flow)
+            if pair_summary:
+                result["exchange_pair_summary"] = pair_summary
             
             logger.info(f"✅ Currency exchange updated successfully: {exchange_id}")
             

@@ -487,20 +487,12 @@ class PreferencesUI {
   async loadActiveProfile() {
     try {
       window.Logger.info('🔍 Loading active profile from server...', { page: 'preferences-ui' });
-      const response = await fetch('/api/preferences/profiles?user_id=1');
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to load profiles');
-      }
-
-      const profiles = result.data.profiles;
+      const { profiles, profileContext } = await window.PreferencesData.loadProfiles({
+        userId: this.currentUserId || 1,
+        force: true,
+      });
       window.Logger.info(`🔍 Loaded ${profiles.length} profiles from server`, { page: 'preferences-ui' });
 
-      const profileContext = result.data?.profile_context || null;
       if (profileContext) {
         await this.updateProfileContext(profileContext);
         const resolvedId = profileContext.resolved_profile_id;
@@ -1153,24 +1145,11 @@ class PreferencesUI {
         payload: requestData,
       });
 
-      const response = await fetch('/api/preferences/user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData),
+      const result = await window.PreferencesData.savePreferences({
+        preferences: changedPreferences,
+        userId: finalUserId,
+        profileId: finalProfileId,
       });
-
-      window.Logger?.info('🔍 Save response status', {
-        page: 'preferences-ui',
-        status: response.status,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        window.Logger?.error('❌ Save response returned error text', errorText, { page: 'preferences-ui' });
-        throw new Error(`Server error: ${response.status} - ${errorText}`);
-      }
-
-      const result = await response.json();
       window.Logger?.info('🔍 Save server response parsed', {
         page: 'preferences-ui',
         result,
@@ -1382,17 +1361,11 @@ class PreferencesUI {
 
       // Update groups count
       try {
-        const response = await fetch('/api/preferences/groups');
-        if (response.ok) {
-          const result = await response.json();
-          const groupsCount = result.data.groups.length;
-          const groupsCountElement = document.getElementById('groupsCount');
-          if (groupsCountElement) {
-            groupsCountElement.textContent = groupsCount;
-            window.Logger.info(`📊 Updated groups count: ${groupsCount}`, { page: 'preferences-ui' });
-          }
-        } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const { count: groupsCount } = await window.PreferencesData.loadPreferenceGroupsMetadata();
+        const groupsCountElement = document.getElementById('groupsCount');
+        if (groupsCountElement) {
+          groupsCountElement.textContent = groupsCount;
+          window.Logger.info(`📊 Updated groups count: ${groupsCount}`, { page: 'preferences-ui' });
         }
       } catch (error) {
         window.Logger.error('❌ Error loading groups count:', error, { page: 'preferences-ui' });
@@ -1795,19 +1768,7 @@ window.loadProfilesToDropdown = async function(userId = 1) {
   try {
     window.Logger.info('📂 Loading profiles to dropdown...', { page: 'preferences-ui', userId });
 
-    // Get profiles from API
-    const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to load profiles');
-    }
-
-    const profiles = Array.isArray(result.data?.profiles) ? result.data.profiles : [];
-    const profileContext = result.data?.profile_context || null;
+    const { profiles = [], profileContext = null } = await window.PreferencesData.loadProfiles({ userId, force: true });
     window.Logger.info('📋 Profiles API response', {
       page: 'preferences-ui',
       profilesCount: profiles.length,
@@ -2006,17 +1967,8 @@ window.loadProfilesToDropdown = async function(userId = 1) {
  */
 window.getUserProfiles = async function(userId = 1) {
   try {
-    const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to load profiles');
-    }
-
-    return result.data.profiles;
+    const result = await window.PreferencesData.loadProfiles({ userId });
+    return result.profiles || [];
   } catch (error) {
     window.Logger.error('❌ Error loading profiles:', error, { page: 'preferences-ui' });
     return [];

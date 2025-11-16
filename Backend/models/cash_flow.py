@@ -8,7 +8,11 @@ class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
     
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
-    type = Column(String(50), nullable=False, default='deposit')  # ENUM: deposit, withdrawal, fee, dividend, transfer_in, transfer_out, other_positive, other_negative
+    type = Column(
+        String(50),
+        nullable=False,
+        default='deposit'
+    )  # ENUM: deposit, withdrawal, fee, dividend, transfer_in, transfer_out, currency_exchange_from, currency_exchange_to, other_positive, other_negative
     amount = Column(Float, nullable=False)  # RANGE: amount != 0
     fee_amount = Column(Float, nullable=False, default=0)  # Fee in trading account base currency
     date = Column(Date, nullable=True)

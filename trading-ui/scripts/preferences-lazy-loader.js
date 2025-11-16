@@ -290,23 +290,13 @@ class LazyLoader {
     // window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
 
     try {
-      // Load all preferences at once from API
-      const url = new URL('/api/preferences/user', window.location.origin);
-      url.searchParams.append('user_id', userId);
-      if (profileId !== null && profileId !== undefined) {
-        url.searchParams.append('profile_id', profileId);
-      }
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      const payload = await window.PreferencesData.loadAllPreferencesRaw({
+        userId,
+        profileId,
+        force: true,
+      });
 
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to load preferences');
-      }
-
-      const allPreferences = result.data.preferences;
+      const allPreferences = payload?.preferences || {};
 
       // Mark critical preferences as loaded
       for (const prefName of criticalPrefs) {

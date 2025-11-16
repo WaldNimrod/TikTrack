@@ -1,26 +1,31 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import QueuePool
-from .settings import DATABASE_URL
-from typing import Generator
+from typing import Dict, Generator
+
+from .settings import DATABASE_URL, USING_SQLITE
 import logging
 
 logger = logging.getLogger(__name__)
 
-# יצירת engine עם Connection Pool מתקדם
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=QueuePool,
-    pool_size=10,           # מספר חיבורים קבועים
-    max_overflow=20,        # חיבורים נוספים בעת עומס
-    pool_timeout=60,        # זמן המתנה לחיבור (שניות) - הוגדל ל-60
-    pool_recycle=3600,      # רענון חיבורים כל שעה
-    pool_pre_ping=True,     # בדיקת חיבור לפני שימוש
-    echo=False
-)
 
-# יצירת session factory
+def _build_engine_kwargs() -> Dict:
+    kwargs: Dict = {
+        "poolclass": QueuePool,
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_timeout": 60,
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+        "echo": False,
+    }
+
+    if USING_SQLITE:
+        kwargs["connect_args"] = {"check_same_thread": False}
+    return kwargs
+
+
+engine = create_engine(DATABASE_URL, **_build_engine_kwargs())
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db() -> Generator[Session, None, None]:

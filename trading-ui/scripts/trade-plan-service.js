@@ -46,6 +46,26 @@
 let tradePlansData = [];
 let isDataLoaded = false;
 
+function normalizeTradePlansPayload(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  throw new Error('Invalid trade plans payload');
+}
+
+function notifyTradePlanLoadError(message, error, context = {}) {
+  const metadata = { page: 'trade_plan_service', ...context };
+  if (typeof window.Logger?.error === 'function') {
+    window.Logger.error(message, error, metadata);
+  }
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה בטעינת תכניות מסחר', message, 6000, 'system');
+  }
+}
+
 /**
  * טעינת נתוני תכניות מסחר מהשרת
  */
@@ -56,23 +76,22 @@ let isDataLoaded = false;
  * @returns {Promise<Array>} Array of trade plans
  */
 async function loadTradePlansData() {
+  const loader = window.TradePlansData?.loadTradePlansData;
+  if (typeof loader !== 'function') {
+    const error = new Error('TradePlansData loader unavailable');
+    isDataLoaded = false;
+    notifyTradePlanLoadError('שכבת הנתונים של תכניות המסחר לא זמינה', error, { stage: 'missing-loader' });
+    throw error;
+  }
+
   try {
-    const loader = window.TradePlansData?.loadTradePlansData;
-    const data = typeof loader === 'function'
-      ? await loader()
-      : [];
-
-    tradePlansData = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.data)
-        ? data.data
-        : [];
-
+    const payload = await loader();
+    tradePlansData = normalizeTradePlansPayload(payload);
     isDataLoaded = true;
     return tradePlansData;
   } catch (error) {
     isDataLoaded = false;
-    window.Logger?.error('❌ Failed to load trade plans data', error, { page: 'trade_plan_service' });
+    notifyTradePlanLoadError('טעינת נתוני תכניות המסחר נכשלה', error, { stage: 'load-failure' });
     throw error;
   }
 }

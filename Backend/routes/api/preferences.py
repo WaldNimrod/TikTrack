@@ -16,7 +16,6 @@ from typing import Any, Dict, List, Optional, Tuple
 import logging
 import json
 from datetime import datetime
-import sqlite3
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -25,75 +24,11 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-_PREFERENCES_UPDATED_COLUMN_AVAILABLE: Optional[bool] = None
-
-
-def _has_updated_at_column() -> bool:
-    """
-    Detect once whether user_preferences_v3 table contains an updated_at column.
-    Falls back to created_at when column is missing so older schemas keep working.
-    """
-    global _PREFERENCES_UPDATED_COLUMN_AVAILABLE
-    if _PREFERENCES_UPDATED_COLUMN_AVAILABLE is not None:
-        return _PREFERENCES_UPDATED_COLUMN_AVAILABLE
-
-    conn = sqlite3.connect(preferences_service.db_path)
-    try:
-        cursor = conn.cursor()
-        cursor.execute("PRAGMA table_info(user_preferences_v3)")
-        columns = {row[1] for row in cursor.fetchall()}
-        _PREFERENCES_UPDATED_COLUMN_AVAILABLE = 'updated_at' in columns
-        if not _PREFERENCES_UPDATED_COLUMN_AVAILABLE:
-            logger.warning("user_preferences_v3.updated_at column not found – falling back to created_at for version tracking")
-    except Exception as exc:
-        logger.error(f"Failed to inspect user_preferences_v3 schema: {exc}")
-        _PREFERENCES_UPDATED_COLUMN_AVAILABLE = False
-    finally:
-        conn.close()
-
-    return _PREFERENCES_UPDATED_COLUMN_AVAILABLE
-# Internal helpers
-def _fetch_latest_preferences_timestamp(user_id: int, profile_id: Optional[int]) -> Tuple[Optional[str], Optional[int]]:
+def _get_preferences_version(user_id: int, profile_id: Optional[int]) -> Tuple[Optional[str], int]:
     """
     Retrieve the latest update timestamp for the given user/profile combination.
-    Returns the timestamp string (or None) and the resolved profile id.
     """
-    db_path = preferences_service.db_path
-
-    resolved_profile_id = profile_id if profile_id is not None else preferences_service._get_active_profile_id(user_id)
-
-    conn = sqlite3.connect(db_path)
-    try:
-        cursor = conn.cursor()
-        timestamp_column = 'updated_at' if _has_updated_at_column() else 'created_at'
-        query = f'''
-            SELECT MAX({timestamp_column})
-            FROM user_preferences_v3
-            WHERE user_id = ? AND profile_id = ?
-        '''
-        params = (user_id, resolved_profile_id)
-
-        try:
-            cursor.execute(query, params)
-        except sqlite3.OperationalError as exc:
-            if 'updated_at' in str(exc).lower():
-                logger.warning("Falling back to created_at for preferences version query: %s", exc)
-                timestamp_column = 'created_at'
-                query = '''
-                    SELECT MAX(created_at)
-                    FROM user_preferences_v3
-                    WHERE user_id = ? AND profile_id = ?
-                '''
-                global _PREFERENCES_UPDATED_COLUMN_AVAILABLE
-                _PREFERENCES_UPDATED_COLUMN_AVAILABLE = False
-                cursor.execute(query, params)
-            else:
-                raise
-        result = cursor.fetchone()
-        last_update = result[0] if result and result[0] else None
-        return last_update, resolved_profile_id
-    finally:
-        conn.close()
+    return preferences_service.get_preferences_version_info(user_id, profile_id)
 
 
 # Create blueprint
@@ -404,38 +339,56 @@ def get_single_preference() -> Any:
         )
         resolved_profile_id = profile_context['resolved_profile_id']
         
-        # קבלת העדפה
-        value = preferences_service.get_preference(
-            user_id=user_id,
-            preference_name=preference_name,
-            profile_id=resolved_profile_id,
-            use_cache=use_cache
-        )
+        is_default_value = False
+        try:
+            value = preferences_service.get_preference(
+                user_id=user_id,
+                preference_name=preference_name,
+                profile_id=resolved_profile_id,
+                use_cache=use_cache
+            )
+        except ValidationError as validation_error:
+            logger.warning(
+                "Preference '%s' not found for user %s (profile %s): %s",
+                preference_name,
+                user_id,
+                resolved_profile_id,
+                validation_error,
+            )
+            value = None
         
-        # אם העדפה לא נמצאה (value is None), נסה לקבל default value
         if value is None:
             try:
                 default_value = preferences_service.get_default_preference(preference_name)
-                if default_value is not None:
-                    value = default_value
-                    logger.info(f"Using default value for preference '{preference_name}': {default_value}")
-                else:
-                    # גם default לא קיים - החזר 404
-                    return jsonify({
-                        "success": False,
-                        "error": f"Preference '{preference_name}' not found",
-                        "data": {
-                            "user_id": user_id,
-                            "preference_name": preference_name,
-                            "value": None,
-                            "profile_id": profile_id,
-                            "is_default": False
-                        },
-                        "timestamp": datetime.now().isoformat()
-                    }), 404
-            except Exception as default_error:
-                logger.warning(f"Could not get default value for '{preference_name}': {default_error}")
-                # המשך עם None
+            except ValidationError as default_error:
+                logger.warning(
+                    "Default value for preference '%s' unavailable: %s",
+                    preference_name,
+                    default_error,
+                )
+                default_value = None
+            
+            if default_value is None:
+                return jsonify({
+                    "success": False,
+                    "error": f"Preference '{preference_name}' not found",
+                    "data": {
+                        "user_id": user_id,
+                        "preference_name": preference_name,
+                        "value": None,
+                        "profile_id": resolved_profile_id,
+                        "is_default": False
+                    },
+                    "timestamp": datetime.now().isoformat()
+                }), 404
+            
+            value = default_value
+            is_default_value = True
+            logger.info(
+                "Using default value for preference '%s': %s",
+                preference_name,
+                default_value,
+            )
         
         return jsonify({
             "success": True,
@@ -445,7 +398,7 @@ def get_single_preference() -> Any:
                 "value": value,
                 "requested_profile_id": requested_profile_id,
                 "profile_id": resolved_profile_id,
-                "is_default": value is not None,
+                "is_default": is_default_value,
                 "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
@@ -559,7 +512,7 @@ def get_multiple_preferences() -> Any:
         logger.info(f"API: Getting preferences for user {user_id}, profile {profile_id}, use_cache={use_cache}")
         preferences = preferences_service.get_preferences_by_names(
             user_id=user_id,
-            preference_names=preference_names,
+            names=preference_names,
             profile_id=profile_id,
             use_cache=use_cache
         )
@@ -973,7 +926,7 @@ def get_preferences_version() -> Any:
         user_id = request.args.get('user_id', 1, type=int)
         profile_id = request.args.get('profile_id', type=int)
 
-        last_update, resolved_profile_id = _fetch_latest_preferences_timestamp(user_id, profile_id)
+        last_update, resolved_profile_id = _get_preferences_version(user_id, profile_id)
 
         if not last_update:
             return jsonify({
@@ -1045,7 +998,7 @@ def check_preferences_updates() -> Any:
         profile_id = request.args.get('profile_id', type=int)
         since_param = request.args.get('since')
 
-        last_update, resolved_profile_id = _fetch_latest_preferences_timestamp(user_id, profile_id)
+        last_update, resolved_profile_id = _get_preferences_version(user_id, profile_id)
 
         if not last_update:
             return jsonify({

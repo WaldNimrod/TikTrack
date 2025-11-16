@@ -346,7 +346,7 @@
                             </div>
 
                             <div class="row g-3 align-items-start">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-lg-4">
                                     <div class="connector-section">
                                         <label for="connectorSelect">בחר ספק נתונים:</label>
                                         <select id="connectorSelect" class="form-select">
@@ -357,23 +357,26 @@
                                         <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="account-section">
-                                        <label for="tradingAccountSelect">בחר חשבון מסחר:</label>
-                                        <select id="tradingAccountSelect" class="form-select">
-                                            <option value="">בחר חשבון מסחר...</option>
-                                        </select>
-                                        <small class="form-text text-muted">החשבון שאליו ישויכו כל הרשומות בקובץ</small>                                        
-                                        <small id="accountLockMessage" class="form-text text-warning" style="display:none;"></small>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-lg-4">
                                     <div class="data-type-section">
                                         <label for="importDataTypeSelect">בחר תהליך ייבוא:</label>
                                         <select id="importDataTypeSelect" class="form-select">
                                             <option value="executions">ביצועי מסחר (Executions)</option>
                                         </select>
                                         <small class="form-text text-muted">בחר את סוג הנתונים לניתוח הנוכחי</small>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-4">
+                                    <div class="data-type-section">
+                                        <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
+                                            <div class="summary-header">
+                                                <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
+                                                <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
+                                            </div>
+                                            <div class="summary-body" id="dataTypeInfoContent">
+                                                <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -393,16 +396,47 @@
                                             </div>
                                         <button data-button-type="WARNING" data-text="החלף קובץ" data-onclick="resetFile()"></button>
                                         </div>
+                                        <div class="file-precheck-status mt-3" id="filePrecheckStatusContainer">
+                                            <span class="badge bg-secondary" id="filePrecheckStatusBadge" data-status="idle">ממתין לקובץ</span>
+                                            <small class="form-text text-muted d-block mt-1" id="filePrecheckStatusText">בחר קובץ לבדיקה ראשונית.</small>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-lg-6">
-                                    <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
-                                        <div class="summary-header">
-                                            <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
-                                            <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
+                                    <div class="account-section" id="accountDetectionCard" style="display:none;">
+                                        <label>זיהוי חשבון מסחר:</label>
+                                        <div class="account-detection-card" id="accountDetectionSummary">
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                <div>
+                                                    <div class="detection-label">מספר בקובץ</div>
+                                                    <div class="detection-value" id="detectedFileAccountValue">ממתין לקובץ</div>
+                                                </div>
+                                                <span class="badge bg-secondary" id="accountDetectionStatusBadge" data-status="unknown">
+                                                    ממתין לקובץ
+                                                </span>
+                                            </div>
+                                            <div class="detection-details mt-3">
+                                                <div class="detail-item">
+                                                    <span class="detail-label">חשבון מזוהה במערכת:</span>
+                                                    <span class="detail-value" id="detectedSystemAccountValue">טרם זוהה</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <span class="detail-label">סטטוס שיוך:</span>
+                                                    <span class="detail-value" id="detectedLinkingStatusValue">ממתין לשיוך</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="summary-body" id="dataTypeInfoContent">
-                                            <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
+                                        <div class="d-flex gap-2 mt-2 flex-wrap">
+                                            <small class="form-text text-muted flex-grow-1">
+                                                המערכת מזהה אוטומטית את חשבון המסחר מתוך הדוח.
+                                                ניתן לעדכן שיוך דרך הכפתור הבא.
+                                            </small>
+                                            <button
+                                                data-button-type="SECONDARY"
+                                                data-onclick="openAccountLinkingModalManually()"
+                                                data-text="ניהול שיוך חשבון"
+                                                id="openAccountLinkingBtn">
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -778,7 +812,7 @@
                             </div>
 
                             <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" data-import-back-step="2" data-onclick="goToStep(2)"></button>
+                                <button data-button-type="BACK" data-text="חזור" data-import-back-step="1" data-onclick="goToStep(1)"></button>
                                 <button data-button-type="WARNING"
                                         data-text="ביטול"
                                         data-onclick="confirmResetImportSession()"
@@ -823,28 +857,75 @@
                         </div>
                     </div>
                     <div class="summary-card">
-                        <div class="summary-details">
-                            <div class="detail-item">
-                                <span class="detail-label">מספר חשבון בקובץ:</span>
-                                <span class="detail-value" id="accountLinkingFileAccount">לא זמין</span>
+                        <div id="accountLinkingRecognizedSection" class="linking-recognized-section">
+                            <div class="summary-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">מספר חשבון בקובץ:</span>
+                                    <span class="detail-value" id="accountLinkingFileAccount">לא זמין</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">חשבון מזוהה:</span>
+                                    <span class="detail-value" id="accountLinkingRecognizedAccount">לא זוהה חשבון תואם</span>
+                                </div>
                             </div>
-                            <div class="detail-item">
-                                <span class="detail-label">מספר חשבון במערכת:</span>
-                                <span class="detail-value" id="accountLinkingCurrentAccount">לא הוגדר</span>
+                            <div class="d-flex gap-2 mt-3 flex-wrap" id="accountLinkingRecognizedActions">
+                                <button
+                                    data-button-type="PRIMARY"
+                                    data-text="אשר חשבון מזוהה"
+                                    data-onclick="confirmAutoLinkedAccount()"
+                                    id="accountLinkingConfirmBtn">
+                                </button>
+                                <button
+                                    data-button-type="SECONDARY"
+                                    data-text="בחר חשבון אחר"
+                                    data-onclick="showAccountLinkingSelection()"
+                                    id="accountLinkingSwitchToSelectionBtn">
+                                </button>
                             </div>
+                        </div>
+
+                        <div id="accountLinkingSelectionSection" class="linking-selection-section d-none">
+                            <div class="form-group mb-3">
+                                <label for="accountLinkingAccountSelect">בחר חשבון לשיוך:</label>
+                                <select id="accountLinkingAccountSelect" class="form-select">
+                                    <option value="">טוען חשבונות...</option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    החשבון הנבחר יעודכן עם מספר הברוקר שזוהה בקובץ.
+                                </small>
+                                <small class="form-text text-warning d-none" id="accountLinkingOverwriteWarning">
+                                    לחשבון זה קיים מזהה חיצוני. דרוש אישור החלפה.
+                                </small>
+                            </div>
+                                <div class="d-flex gap-2 flex-wrap" id="accountLinkingSelectionActions">
+                                    <button
+                                        data-button-type="PRIMARY"
+                                        data-onclick="submitAccountLinkSelection()"
+                                        data-text="שמור שיוך"
+                                        id="accountLinkingActionBtn">
+                                    </button>
+                                    <button
+                                        data-button-type="SECONDARY"
+                                        data-onclick="hideAccountLinkingModal()"
+                                        data-text="ביטול"
+                                        id="accountLinkingCancelSelectionBtn">
+                                    </button>
+                                </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <small class="text-muted">
-                        לאחר השיוך תבוצע בדיקת החשבון אוטומטית ותוכל להמשיך לייבוא.
+                <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <small class="text-muted" id="accountLinkingFooterNote">
+                        לאחר אישור או שיוך מחדש, ניתן להמשיך לניתוח הקובץ.
                     </small>
-                    <button
-                        data-button-type="PRIMARY"
-                        data-onclick="linkExternalAccountToTradingAccount()"
-                        data-text="שייך חשבון למערכת"
-                        id="accountLinkingActionBtn">
-                    </button>
+                    <div class="d-flex gap-2 flex-wrap" id="accountLinkingFooterActions">
+                        <button
+                            data-button-type="SECONDARY"
+                            data-onclick="hideAccountLinkingModal()"
+                            data-text="סגור"
+                            id="accountLinkingFooterCloseBtn">
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

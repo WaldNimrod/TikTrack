@@ -40,6 +40,28 @@ let plansCache = null;
 let lastCacheUpdate = null;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 דקות
 
+function resolveExternalCurrencySymbol(quoteCurrency, symbol = '') {
+  const normalized = typeof quoteCurrency === 'string' ? quoteCurrency.trim() : '';
+  if (normalized) {
+    return { symbol: normalized, hasCurrency: true };
+  }
+
+  const metadata = { symbol, page: 'tickers' };
+  window.Logger?.warn?.('⚠️ External quote missing currency value', metadata);
+
+  const notificationMessage = symbol
+    ? `לא התקבל מטבע מהספק עבור ${symbol}`
+    : 'לא התקבל מטבע מהספק עבור הטיקר שנבדק';
+
+  if (typeof window.showWarningNotification === 'function') {
+    window.showWarningNotification('נתוני מטבע חסרים', notificationMessage, 6000, 'system');
+  } else if (typeof window.showNotification === 'function') {
+    window.showNotification('נתוני מטבע חסרים', 'warning');
+  }
+
+  return { symbol: '', hasCurrency: false };
+}
+
 /**
  * בדיקה אם ה-cache עדכני
  */
@@ -556,6 +578,7 @@ window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.updateAllTickerStatuses = updateAllTickerStatuses;
 window.updateTickerFromTradePlan = updateTickerFromTradePlan;
 window.updateTickersListForClosedTrades = updateTickersListForClosedTrades;
+window.resolveExternalCurrencySymbol = resolveExternalCurrencySymbol;
 
 // ===== TICKER SERVICE OBJECT =====
 /**
@@ -583,6 +606,7 @@ window.tickerService = {
     updateAllTickerStatuses: updateAllTickerStatuses,
     updateTickerFromTradePlan: updateTickerFromTradePlan,
     updateTickersListForClosedTrades: updateTickersListForClosedTrades,
+    resolveExternalCurrencySymbol: resolveExternalCurrencySymbol,
     isCacheValid: isCacheValid,
     clearCache: clearCache
 };

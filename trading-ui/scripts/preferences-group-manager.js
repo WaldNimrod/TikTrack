@@ -207,20 +207,42 @@ class PreferencesGroupManager {
       return;
     }
 
+    const normalizedPreferences = Array.isArray(preferences)
+      ? preferences.reduce((acc, pref, index) => {
+        const key = pref?.preference_name || pref?.preferenceName || pref?.name || pref?.html_id;
+        if (!key) {
+          window.Logger?.debug?.('⚠️ Skipping preference entry without name', { page: 'preferences-group-manager', index, pref });
+          return acc;
+        }
+        const value = pref?.saved_value ?? pref?.value ?? pref?.default_value ?? pref?.defaultValue ?? '';
+        acc[key] = value;
+        return acc;
+      }, {})
+      : preferences || {};
+
     let populatedCount = 0;
-    Object.keys(preferences).forEach(prefName => {
-      const field = section.querySelector(`[name="${prefName}"], #${prefName}`);
+    Object.keys(normalizedPreferences).forEach(prefName => {
+      if (!prefName) {return;}
+      const escapedName = typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function'
+        ? window.CSS.escape(prefName)
+        : prefName;
+      const selectorParts = [`[name="${prefName}"]`];
+      if (escapedName !== prefName) {
+        selectorParts.push(`[name="${escapedName}"]`);
+      }
+      selectorParts.push(`#${escapedName}`);
+      const field = section.querySelector(selectorParts.join(', '));
       if (field) {
         if (field.type === 'checkbox') {
-          field.checked = preferences[prefName] === 'true' || preferences[prefName] === true;
+          field.checked = normalizedPreferences[prefName] === 'true' || normalizedPreferences[prefName] === true;
         } else {
-          const normalizedValue = this.normalizePreferenceValue(prefName, preferences[prefName], 'toEnglish');
+          const normalizedValue = this.normalizePreferenceValue(prefName, normalizedPreferences[prefName], 'toEnglish');
           const previousValue = field.value;
           field.value = normalizedValue;
 
           // If direct assignment failed (option not found), try fallback to original value
-          if (field.value !== normalizedValue && preferences[prefName] !== undefined && preferences[prefName] !== null) {
-            field.value = preferences[prefName];
+          if (field.value !== normalizedValue && normalizedPreferences[prefName] !== undefined && normalizedPreferences[prefName] !== null) {
+            field.value = normalizedPreferences[prefName];
           }
 
           // If still empty and there was a previous value, restore it to avoid blank selection

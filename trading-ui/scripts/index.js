@@ -565,7 +565,7 @@ function processDashboardData(data, source = 'network') {
     window.dashboardData = dashboardDataState.data;
 }
 
-async function fetchDashboardDataFromApi() {
+async function legacyFetchDashboardDataFromApi() {
     const fetchJsonList = async (url, label) => {
         const response = await fetch(url, {
             headers: {
@@ -607,6 +607,24 @@ async function fetchDashboardDataFromApi() {
     return result;
 }
 
+async function loadDashboardDataFromService(options = {}) {
+    const { force = false } = options;
+
+    if (window.DashboardData?.load) {
+        if (force && typeof window.DashboardData.invalidate === 'function') {
+            try {
+                await window.DashboardData.invalidate();
+            } catch (error) {
+                window.Logger?.warn?.('⚠️ Failed to invalidate dashboard data cache', { error: error?.message }, { page: 'index' });
+            }
+        }
+        return window.DashboardData.load({ force });
+    }
+
+    window.Logger?.warn?.('⚠️ DashboardData service not available, using legacy fetch', { page: 'index' });
+    return legacyFetchDashboardDataFromApi();
+}
+
 window.loadDashboardData = async function(options = {}) {
     const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
 
@@ -615,26 +633,47 @@ window.loadDashboardData = async function(options = {}) {
     }
 
     const executeLoad = async () => {
-        if (force && window.UnifiedCacheManager?.clearByPattern) {
-            try {
-                await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
-            } catch (clearError) {
-                window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+        if (force) {
+            if (window.UnifiedCacheManager?.clearByPattern) {
+                try {
+                    await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
+                } catch (clearError) {
+                    window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+                }
+            }
+
+            const fresh = await loadDashboardDataFromService({ force: true });
+            processDashboardData(fresh, 'network');
+            return fresh;
+        }
+
+        if (window.CacheTTLGuard?.ensure) {
+            const cachedOrFresh = await window.CacheTTLGuard.ensure(
+                DASHBOARD_DATA_KEY,
+                () => loadDashboardDataFromService({ force: false }),
+                {
+                    ttl,
+                    afterRead: (cached) => {
+                        if (cached) {
+                            processDashboardData(cached, 'cache');
+                        }
+                    },
+                    afterLoad: (fresh) => {
+                        if (fresh) {
+                            processDashboardData(fresh, 'network');
+                        }
+                    }
+                }
+            );
+
+            if (cachedOrFresh) {
+                return cachedOrFresh;
             }
         }
 
-        if (window.CacheTTLGuard?.ensure && !force) {
-            return window.CacheTTLGuard.ensure(DASHBOARD_DATA_KEY, fetchDashboardDataFromApi, {
-                ttl,
-                afterRead: (cached) => {
-                    if (cached) {
-                        processDashboardData(cached, 'cache');
-                    }
-                }
-            });
-        }
-
-        return fetchDashboardDataFromApi();
+        const fallback = await loadDashboardDataFromService({ force: false });
+        processDashboardData(fallback, 'network');
+        return fallback;
     };
 
     dashboardDataPromise = executeLoad()

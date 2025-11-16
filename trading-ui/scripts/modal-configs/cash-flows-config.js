@@ -56,6 +56,14 @@ const cashFlowModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
+        {
+            type: 'display',
+            id: 'cashFlowExchangePairDisplay',
+            label: 'צמד המרה',
+            rowClass: 'row',
+            colClass: 'col-12',
+            description: 'כאשר התזרים הוא חלק מהמרת מטבע יוצג כאן הצמד המלא.'
+        },
         // שורה שנייה: סכום + מטבע (ברירת מחדל מהעדפות)
         {
             type: 'number',

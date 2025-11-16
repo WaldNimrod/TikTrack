@@ -135,22 +135,33 @@ async function loadAccountsForPreferences() {
         defaultValue: defaultAccountId,
       });
     } else {
-      window.Logger.warn('⚠️ SelectPopulatorService.populateAccountsSelect unavailable, falling back to direct fetch', { page: 'preferences-page' });
+      window.Logger.warn('⚠️ SelectPopulatorService.populateAccountsSelect unavailable, using TradingAccountsData service', { page: 'preferences-page' });
 
-      const response = await fetch(`/api/trading-accounts/open?_t=${Date.now()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
-        },
-      });
+      let accounts = [];
+      if (window.TradingAccountsData?.loadTradingAccountsData) {
+        const payload = await window.TradingAccountsData.loadTradingAccountsData({ force: true });
+        accounts = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+      } else {
+        window.Logger.warn('⚠️ TradingAccountsData service not available, falling back to direct fetch', { page: 'preferences-page' });
+        const response = await fetch(`/api/trading-accounts/open?_t=${Date.now()}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+          },
+        });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        accounts = result.data || result;
       }
-
-      const result = await response.json();
-      const accounts = result.data || result;
 
       accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
 
@@ -364,11 +375,10 @@ window.debugProfileSystem = async function debugProfileSystem() {
 
     // 2. Check profiles from API
     logInfo('2️⃣ Profiles from API - Fetching');
-    const profilesResponse = await fetch('/api/preferences/profiles?user_id=1');
-    const profilesResult = await profilesResponse.json();
-    logInfo('   API Response received', { success: profilesResult.success, total: profilesResult.data?.profiles?.length || 0 });
-    if (profilesResult.success) {
-      const profiles = profilesResult.data.profiles;
+    const profilesPayload = await window.PreferencesData.loadProfiles({ userId: 1, force: true });
+    logInfo('   API Response received', { total: profilesPayload.profiles?.length || 0 });
+    if (profilesPayload.profiles) {
+      const profiles = profilesPayload.profiles;
       logInfo('   Profiles summary', { totalProfiles: profiles.length });
       profiles.forEach(p => {
         logInfo('   - Profile details', {
@@ -619,45 +629,10 @@ const PreferenceTypesAudit = (() => {
     tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">טוען נתונים...</td></tr>';
 
     try {
-      const response = await fetch('/api/preferences/admin/types', { credentials: 'same-origin' });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const payload = await response.json();
-      if (!payload.success) {
-        throw new Error(payload.error || 'Unknown error');
-      }
-
-      const extractTypes = data => {
-        if (!data) {
-          return [];
-        }
-
-        if (Array.isArray(data.preference_types)) {
-          return data.preference_types;
-        }
-
-        if (Array.isArray(data.data?.preference_types)) {
-          return data.data.preference_types;
-        }
-
-        if (Array.isArray(data.data)) {
-          return data.data;
-        }
-
-        if (Array.isArray(data.results)) {
-          return data.results;
-        }
-
-        return [];
-      };
-
-      const types = extractTypes(payload);
+      const { types = [] } = await window.PreferencesData.loadPreferenceTypes({ force: true });
 
       window.Logger?.info('📋 Preference types audit payload received', {
         page: 'preferences-page',
-        hasDataKey: Boolean(payload.data),
         total: types.length,
       });
 

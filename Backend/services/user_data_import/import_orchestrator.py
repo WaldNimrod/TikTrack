@@ -21,7 +21,7 @@ import re
 from collections import Counter
 from html import escape
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from models.import_session import ImportSession
 from models.trading_account import TradingAccount
@@ -41,6 +41,7 @@ from services.date_normalization_service import DateNormalizationService
 from services.advanced_cache_service import advanced_cache_service
 from services.ticker_service import TickerService
 from services.currency_service import CurrencyService
+from services.cash_flow_service import CashFlowService as CashFlowHelperService
 
 from config.logging import get_logger
 logger = get_logger(__name__)
@@ -178,7 +179,8 @@ class ImportOrchestrator:
         file_name: str,
         file_content: str,
         connector_type: str,
-        task_type: str = 'executions'
+        task_type: str = 'executions',
+        linking_context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
         Create a new import session with specified connector.
@@ -249,6 +251,13 @@ class ImportOrchestrator:
                 'connector_type': connector_type,
                 'task_type': task_type_normalized
             })
+            if linking_context:
+                self._initialize_linking_state(
+                    session,
+                    file_account_number=linking_context.get('file_account_number'),
+                    matched_account_id=linking_context.get('matched_account_id'),
+                    account_metadata=linking_context.get('account_metadata')
+                )
             self.db_session.commit()
             logger.info("✅ File content stored successfully")
             
@@ -408,15 +417,13 @@ class ImportOrchestrator:
         normalized = str(value).strip().upper()
         return normalized or None
 
-    def _resolve_file_account_metadata(
+    def _extract_account_metadata(
         self,
-        session: ImportSession,
         connector,
         file_content: str
     ) -> Dict[str, Any]:
-        cached_metadata = session.get_summary_data('account_metadata')
-        if cached_metadata:
-            return cached_metadata
+        if not connector or not file_content:
+            return {}
 
         metadata: Dict[str, Any] = {}
         try:
@@ -427,11 +434,81 @@ class ImportOrchestrator:
                 metadata = sections.get('account_reconciliation') or {}
         except Exception as exc:
             logger.warning(
-                "⚠️ Failed to resolve account metadata from file: %s",
+                "⚠️ Failed to resolve account metadata from file without session: %s",
                 exc,
                 exc_info=True
             )
             metadata = {}
+        return metadata
+
+    def _serialize_account(self, account: TradingAccount) -> Dict[str, Any]:
+        if not account:
+            return {}
+        currency = account.currency
+        return {
+            'id': account.id,
+            'name': account.name,
+            'currency_id': account.currency_id,
+            'currency_symbol': getattr(currency, 'symbol', None),
+            'currency_name': getattr(currency, 'name', None),
+            'status': account.status,
+            'external_account_number': self._normalize_account_identifier(account.external_account_number)
+        }
+
+    def _initialize_linking_state(
+        self,
+        session: ImportSession,
+        *,
+        file_account_number: Optional[str],
+        matched_account_id: Optional[int] = None,
+        account_metadata: Optional[Dict[str, Any]] = None
+    ) -> None:
+        linking_status = 'recognized' if matched_account_id else (
+            'unlinked' if file_account_number else 'missing_in_file'
+        )
+        payload: Dict[str, Any] = {
+            'file_account_number': file_account_number,
+            'linking_status': linking_status,
+            'linking_confirmed': False,
+            'linking_matched_account_id': matched_account_id
+        }
+        if account_metadata:
+            payload['account_metadata'] = self._make_payload_json_safe(account_metadata)
+        session.add_summary_data(payload)
+        self.db_session.flush()
+
+    def detect_account_binding(
+        self,
+        connector_type: str,
+        file_content: str
+    ) -> Dict[str, Any]:
+        connector = self.connectors.get(connector_type)
+        metadata = self._extract_account_metadata(connector, file_content)
+        normalized_number = self._normalize_account_identifier(metadata.get('account_id'))
+
+        matched_account = None
+        if normalized_number:
+            matched_account = self.db_session.query(TradingAccount).filter(
+                TradingAccount.external_account_number == normalized_number
+            ).first()
+
+        return {
+            'file_account_number': normalized_number,
+            'matched_account': matched_account,
+            'account_metadata': metadata
+        }
+
+    def _resolve_file_account_metadata(
+        self,
+        session: ImportSession,
+        connector,
+        file_content: str
+    ) -> Dict[str, Any]:
+        cached_metadata = session.get_summary_data('account_metadata')
+        if cached_metadata:
+            return cached_metadata
+
+        metadata: Dict[str, Any] = self._extract_account_metadata(connector, file_content)
 
         if metadata:
             safe_metadata = self._make_payload_json_safe(metadata)
@@ -446,20 +523,28 @@ class ImportOrchestrator:
         status: str,
         message: str,
         file_account_number: Optional[str],
-        current_account_number: Optional[str]
+        current_account_number: Optional[str],
+        *,
+        recognized_account: Optional[TradingAccount] = None,
+        requires_confirmation: bool = False
     ) -> Dict[str, Any]:
+        linking_payload: Dict[str, Any] = {
+            'status': status,
+            'session_id': session.id,
+            'trading_account_id': session.trading_account_id,
+            'file_account_number': file_account_number,
+            'current_account_number': current_account_number,
+            'requires_confirmation': requires_confirmation
+        }
+        if recognized_account:
+            linking_payload['recognized_account'] = self._serialize_account(recognized_account)
+            linking_payload['matched_account_id'] = recognized_account.id
         return {
             'success': False,
             'error': message,
             'error_code': 'ACCOUNT_LINK_REQUIRED',
             'session_id': session.id,
-            'linking': {
-                'status': status,
-                'session_id': session.id,
-                'trading_account_id': session.trading_account_id,
-                'file_account_number': file_account_number,
-                'current_account_number': current_account_number
-            }
+            'linking': linking_payload
         }
 
     def _enforce_account_link(
@@ -488,6 +573,8 @@ class ImportOrchestrator:
             session.add_summary_data({'file_account_number': file_account_number})
             self.db_session.flush()
         else:
+            session.add_summary_data({'linking_status': 'missing_in_file'})
+            self.db_session.flush()
             return self._build_account_link_error(
                 session,
                 status='missing_in_file',
@@ -496,10 +583,37 @@ class ImportOrchestrator:
                 current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
             )
 
+        linking_confirmed = bool(session.get_summary_data('linking_confirmed'))
+        matched_account_id = session.get_summary_data('linking_matched_account_id')
+
+        if matched_account_id and not linking_confirmed:
+            matched_account = self.db_session.query(TradingAccount).filter(
+                TradingAccount.id == matched_account_id
+            ).first()
+            if matched_account:
+                if session.trading_account_id != matched_account.id:
+                    session.trading_account_id = matched_account.id
+                    self.db_session.flush()
+                return self._build_account_link_error(
+                    session,
+                    status='pending_confirmation',
+                    message='המערכת זיהתה את מספר החשבון בקובץ. אשר את החשבון לפני המשך הייבוא.',
+                    file_account_number=file_account_number,
+                    current_account_number=self._normalize_account_identifier(matched_account.external_account_number),
+                    recognized_account=matched_account,
+                    requires_confirmation=True
+                )
+
         existing_binding = self.db_session.query(TradingAccount).filter(
             TradingAccount.external_account_number == file_account_number
         ).first()
         if existing_binding and existing_binding.id != session.trading_account_id:
+            session.add_summary_data({
+                'linking_status': 'mismatch',
+                'linking_matched_account_id': existing_binding.id,
+                'linking_confirmed': False
+            })
+            self.db_session.flush()
             return self._build_account_link_error(
                 session,
                 status='mismatch',
@@ -508,12 +622,15 @@ class ImportOrchestrator:
                     f"נא לבחור את החשבון הזה או לנתק את השיוך לפני המשך הייבוא."
                 ),
                 file_account_number=file_account_number,
-                current_account_number=self._normalize_account_identifier(trading_account.external_account_number)
+                current_account_number=self._normalize_account_identifier(trading_account.external_account_number),
+                recognized_account=existing_binding
             )
 
         existing_number = self._normalize_account_identifier(trading_account.external_account_number)
 
         if not existing_number:
+            session.add_summary_data({'linking_status': 'unlinked'})
+            self.db_session.flush()
             return self._build_account_link_error(
                 session,
                 status='unlinked',
@@ -523,6 +640,8 @@ class ImportOrchestrator:
             )
 
         if existing_number != file_account_number:
+            session.add_summary_data({'linking_status': 'mismatch'})
+            self.db_session.flush()
             return self._build_account_link_error(
                 session,
                 status='mismatch',
@@ -531,12 +650,20 @@ class ImportOrchestrator:
                 current_account_number=existing_number
             )
 
+        session.add_summary_data({
+            'linking_status': 'confirmed',
+            'linking_confirmed': True,
+            'linking_matched_account_id': session.trading_account_id
+        })
+        self.db_session.flush()
         return None
 
     def link_trading_account_to_file(
         self,
         session_id: int,
-        override_account_number: Optional[str] = None
+        override_account_number: Optional[str] = None,
+        target_trading_account_id: Optional[int] = None,
+        confirm_overwrite: bool = False
     ) -> Dict[str, Any]:
         session = self.db_session.query(ImportSession).filter(
             ImportSession.id == session_id
@@ -559,8 +686,12 @@ class ImportOrchestrator:
         if not normalized_number:
             return {'success': False, 'error': 'Unable to determine account number from file'}
 
+        target_account_id = target_trading_account_id or session.trading_account_id
+        if not target_account_id:
+            return {'success': False, 'error': 'Target trading account not provided'}
+
         trading_account = self.db_session.query(TradingAccount).filter(
-            TradingAccount.id == session.trading_account_id
+            TradingAccount.id == target_account_id
         ).first()
 
         if not trading_account:
@@ -579,7 +710,21 @@ class ImportOrchestrator:
                 )
             }
 
+        current_external_number = self._normalize_account_identifier(trading_account.external_account_number)
+        if current_external_number and current_external_number != normalized_number and not confirm_overwrite:
+            return {
+                'success': False,
+                'error': (
+                    f"חשבונך כבר משויך למספר \"{current_external_number}\". "
+                    f"יש לאשר החלפה לפני המשך התהליך."
+                ),
+                'error_code': 'ACCOUNT_LINK_OVERWRITE_REQUIRED',
+                'existing_number': current_external_number,
+                'target_account': self._serialize_account(trading_account)
+            }
+
         trading_account.external_account_number = normalized_number
+        session.trading_account_id = trading_account.id
 
         try:
             self.db_session.commit()
@@ -590,13 +735,96 @@ class ImportOrchestrator:
                 'error': 'מספר החשבון כבר משויך לחשבון מסחר אחר במערכת'
             }
 
-        session.add_summary_data({'file_account_number': normalized_number})
+        session.add_summary_data({
+            'file_account_number': normalized_number,
+            'linking_status': 'linked',
+            'linking_confirmed': True,
+            'linking_matched_account_id': trading_account.id
+        })
         self.db_session.flush()
 
         return {
             'success': True,
             'linked_account_number': normalized_number,
-            'trading_account_id': trading_account.id
+            'trading_account_id': trading_account.id,
+            'linked_account': self._serialize_account(trading_account)
+        }
+
+    def confirm_account_link(self, session_id: int) -> Dict[str, Any]:
+        session = self.db_session.query(ImportSession).filter(
+            ImportSession.id == session_id
+        ).first()
+
+        if not session:
+            return {'success': False, 'error': 'Session not found'}
+
+        matched_account_id = session.get_summary_data('linking_matched_account_id')
+        if not matched_account_id:
+            return {
+                'success': False,
+                'error': 'No recognized account awaiting confirmation'
+            }
+
+        matched_account = self.db_session.query(TradingAccount).filter(
+            TradingAccount.id == matched_account_id
+        ).first()
+        if not matched_account:
+            return {
+                'success': False,
+                'error': 'Matched trading account no longer exists'
+            }
+
+        session.trading_account_id = matched_account.id
+        session.add_summary_data({
+            'linking_status': 'confirmed',
+            'linking_confirmed': True,
+            'linking_matched_account_id': matched_account.id
+        })
+        try:
+            self.db_session.commit()
+        except SQLAlchemyError as exc:
+            self.db_session.rollback()
+            return {
+                'success': False,
+                'error': f'Failed to confirm account link: {exc}'
+            }
+
+        return {
+            'success': True,
+            'linked_account': self._serialize_account(matched_account),
+            'file_account_number': session.get_summary_data('file_account_number')
+        }
+
+    def get_account_link_status(self, session_id: int) -> Dict[str, Any]:
+        session = self.db_session.query(ImportSession).filter(
+            ImportSession.id == session_id
+        ).first()
+
+        if not session:
+            return {'success': False, 'error': 'Session not found'}
+
+        linking_status = session.get_summary_data('linking_status') or 'unknown'
+        file_account_number = session.get_summary_data('file_account_number')
+        matched_account_id = session.get_summary_data('linking_matched_account_id')
+        matched_account = None
+        if matched_account_id:
+            matched_account = self.db_session.query(TradingAccount).filter(
+                TradingAccount.id == matched_account_id
+            ).first()
+
+        return {
+            'success': True,
+            'linking': {
+                'status': linking_status,
+                'session_id': session.id,
+                'trading_account_id': session.trading_account_id,
+                'file_account_number': file_account_number,
+                'current_account_number': self._normalize_account_identifier(
+                    matched_account.external_account_number
+                ) if matched_account else None,
+                'recognized_account': self._serialize_account(matched_account) if matched_account else None,
+                'linking_confirmed': bool(session.get_summary_data('linking_confirmed'))
+            }
         }
 
     @staticmethod
@@ -726,6 +954,48 @@ class ImportOrchestrator:
                 'missing_documents_report': account_validation_results['missing_documents_report'],
                 'accounts_detected': accounts_detected,
                 'account_validation_results': account_validation_results,
+                'duplicate_details': duplicate_result
+            }
+            return analysis_results, summary_data
+
+        if task == 'portfolio_positions':
+            positions_detected = len(validation_result.get('valid_records', []))
+            analysis_results = {
+                **base_stats,
+                'currency_totals': validation_result.get('currency_totals', {}),
+                'asset_category_totals': validation_result.get('asset_category_totals', {}),
+                'zero_quantity_positions': validation_result.get('zero_quantity_positions', []),
+                'positions_detected': positions_detected
+            }
+            summary_data = {
+                'task_type': task,
+                'analysis_timestamp': analysis_timestamp,
+                'currency_totals': validation_result.get('currency_totals', {}),
+                'asset_category_totals': validation_result.get('asset_category_totals', {}),
+                'zero_quantity_positions': validation_result.get('zero_quantity_positions', []),
+                'positions_detected': positions_detected,
+                'duplicate_details': duplicate_result
+            }
+            return analysis_results, summary_data
+
+        if task == 'taxes_and_fx':
+            taxes_detected = len(validation_result.get('valid_records', []))
+            analysis_results = {
+                **base_stats,
+                'totals_by_currency': validation_result.get('totals_by_currency', {}),
+                'totals_by_type': validation_result.get('totals_by_type', {}),
+                'nav_components': validation_result.get('nav_components', {}),
+                'forex_trades': validation_result.get('forex_trades', []),
+                'taxes_detected': taxes_detected
+            }
+            summary_data = {
+                'task_type': task,
+                'analysis_timestamp': analysis_timestamp,
+                'totals_by_currency': validation_result.get('totals_by_currency', {}),
+                'totals_by_type': validation_result.get('totals_by_type', {}),
+                'nav_components': validation_result.get('nav_components', {}),
+                'forex_trades': validation_result.get('forex_trades', []),
+                'taxes_detected': taxes_detected,
                 'duplicate_details': duplicate_result
             }
             return analysis_results, summary_data
@@ -888,7 +1158,10 @@ class ImportOrchestrator:
         elif raw_type == 'transfer':
             storage_type = 'transfer_in' if is_positive else 'transfer_out'
         elif raw_type == 'forex_conversion':
-            storage_type = 'transfer_in' if is_positive else 'transfer_out'
+            storage_type = (
+                CashFlowHelperService.EXCHANGE_TO_TYPE
+                if is_positive else CashFlowHelperService.EXCHANGE_FROM_TYPE
+            )
             mapping_note = 'Forex conversion'
         elif raw_type == 'dividend':
             storage_type = 'dividend'
@@ -908,7 +1181,7 @@ class ImportOrchestrator:
             storage_type = 'fee'
             mapping_note = 'Borrow fee'
         elif raw_type == 'syep_interest':
-            storage_type = 'interest'
+            storage_type = 'syep_interest'
             mapping_note = 'SYEP interest'
         elif raw_type == 'cash_adjustment':
             storage_type = 'other_positive' if is_positive else 'other_negative'
@@ -1094,6 +1367,63 @@ class ImportOrchestrator:
                 },
                 'account_validation_results': issues,
                 'accounts_detected': len(valid_records)
+            }
+
+        if task == 'portfolio_positions':
+            valid_records = validation_result.get('valid_records', [])
+            invalid_records = validation_result.get('invalid_records', [])
+            validation_errors = validation_result.get('validation_errors', [])
+
+            records_to_skip = [
+                {
+                    'record': error_info.get('record'),
+                    'reason': 'validation_error',
+                    'errors': error_info.get('errors', [])
+                }
+                for error_info in validation_errors
+            ]
+
+            return {
+                'task_type': task,
+                'records_to_import': valid_records,
+                'records_to_skip': records_to_skip,
+                'summary': {
+                    'total_records': len(raw_records),
+                    'valid_records': len(valid_records),
+                    'invalid_records': len(invalid_records),
+                    'currency_totals': validation_result.get('currency_totals', {}),
+                    'asset_category_totals': validation_result.get('asset_category_totals', {}),
+                    'zero_quantity_positions': validation_result.get('zero_quantity_positions', [])
+                }
+            }
+
+        if task == 'taxes_and_fx':
+            valid_records = validation_result.get('valid_records', [])
+            invalid_records = validation_result.get('invalid_records', [])
+            validation_errors = validation_result.get('validation_errors', [])
+
+            records_to_skip = [
+                {
+                    'record': error_info.get('record'),
+                    'reason': 'validation_error',
+                    'errors': error_info.get('errors', [])
+                }
+                for error_info in validation_errors
+            ]
+
+            return {
+                'task_type': task,
+                'records_to_import': valid_records,
+                'records_to_skip': records_to_skip,
+                'summary': {
+                    'total_records': len(raw_records),
+                    'valid_records': len(valid_records),
+                    'invalid_records': len(invalid_records),
+                    'totals_by_currency': validation_result.get('totals_by_currency', {}),
+                    'totals_by_type': validation_result.get('totals_by_type', {}),
+                    'nav_components': validation_result.get('nav_components', {}),
+                    'forex_trades': validation_result.get('forex_trades', [])
+                }
             }
 
         # Default executions preview
@@ -1469,6 +1799,8 @@ class ImportOrchestrator:
                 task_result = self._execute_import_cashflows(import_session, preview_data)
             elif requested_task_type == 'account_reconciliation':
                 task_result = self._execute_import_account_reconciliation(import_session, preview_data)
+            elif requested_task_type in {'portfolio_positions', 'taxes_and_fx'}:
+                task_result = self._execute_report_only(import_session, preview_data, requested_task_type)
             else:
                 task_result = self._execute_import_executions(import_session, preview_data)
 
@@ -1851,6 +2183,35 @@ class ImportOrchestrator:
             'cache_patterns': [],
             'account_validation_results': summary.get('issues', {}),
             'accounts_detected': len(records)
+        }
+
+    def _execute_report_only(
+        self,
+        import_session: ImportSession,
+        preview_data: Dict[str, Any],
+        task_type: str
+    ) -> Dict[str, Any]:
+        """
+        For analytical tasks (portfolio positions, taxes & FX) we don't write to the DB.
+        We still track counts for logging and UI feedback.
+        """
+        records_to_import = preview_data.get('records_to_import', []) or []
+        records_to_skip = preview_data.get('records_to_skip', []) or []
+
+        logger.info(
+            "ℹ️ Report-only execution for session %s (task=%s): %s records analyzed, %s skipped.",
+            import_session.id,
+            task_type,
+            len(records_to_import),
+            len(records_to_skip)
+        )
+
+        return {
+            'success': True,
+            'imported_count': len(records_to_import),
+            'skipped_count': len(records_to_skip),
+            'errors': [],
+            'cache_patterns': []
         }
 
     # ------------------------------------------------------------------

@@ -705,7 +705,11 @@ function getColumnValue(item, columnIndex, tableType) {
         item.type === 'withdrawal' ? 'משיכה' :
           item.type === 'dividend' ? 'דיבידנד' :
             item.type === 'fee' ? 'עמלה' :
-              item.type === 'interest' ? 'ריבית' : item.type;
+              item.type === 'interest'
+                ? 'ריבית'
+                : item.type === 'syep_interest'
+                  ? 'ריבית SYEP'
+                  : item.type;
       return typeDisplay;
     }
   }

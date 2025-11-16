@@ -62,6 +62,8 @@ class DuplicateDetectionService:
             return self._detect_cashflow_duplicates(records, trading_trading_account_id)
         if task == 'account_reconciliation':
             return self._detect_account_reconciliation_duplicates(records)
+        if task in {'portfolio_positions', 'taxes_and_fx'}:
+            return self._passthrough_duplicate_result(records)
         return self._detect_execution_duplicates(records, trading_trading_account_id)
 
     # ------------------------------------------------------------------
@@ -279,6 +281,23 @@ class DuplicateDetectionService:
                 results['clean_count'] += 1
 
         return results
+
+    def _passthrough_duplicate_result(self, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        clean_records = [
+            {
+                'record_index': index,
+                'record': record
+            }
+            for index, record in enumerate(records)
+        ]
+        return {
+            'within_file_duplicates': [],
+            'existing_records': [],
+            'clean_records': clean_records,
+            'total_checked': len(records),
+            'duplicate_count': 0,
+            'clean_count': len(clean_records)
+        }
     
     # ------------------------------------------------------------------
     # Helper methods for cashflow/account duplicate detection

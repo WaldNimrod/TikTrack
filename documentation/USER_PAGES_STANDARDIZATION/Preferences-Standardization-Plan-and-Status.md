@@ -61,7 +61,7 @@ Unify and harden the Preferences page so it consistently loads, validates, saves
 
 
 ### 5) Current State and Gaps
-Current symptoms (reported):
+Current symptoms (reported) — BEFORE latest fixes:
 - Some fields still show defaults instead of user data, notably:
   - Colors (many show black)
   - Default page size
@@ -73,43 +73,23 @@ Current symptoms (reported):
   - Legacy payload formats lingering in cache.
   - Color group bi-directional normalization gaps (DOM→model, model→DOM).
 
-Status of phases:
-- Mapping: In progress. A first-pass `nameAliases` is added in `preferences-group-manager.js` to bridge canonical keys and DOM IDs.
-- Normalization: Implemented at data service level; needs enforcement across all entry points and caches.
-- Init sequencing: Pending finalization; currently not strictly awaiting normalized payload before populate.
-- Allow-empty rules: Implemented for `default_trading_account`; needs review for other fields (if any).
-- Color keys: Pending comprehensive bi-directional mapping verification.
-- Types audit table: Pending reliable load + forced refresh after save.
-- Smart trace: Partial (unresolved fields now logged during population); full timing and cache-layer tracing pending.
-- Cache policies: Pending alignment and clear-on-save verification.
-- Focused tests: Some back-end tests added; front-end unit/integration coverage pending for mapping/sequence/colors/table.
-- Docs: This document created; system-level docs pending consolidation.
+Status of phases (AFTER latest fixes):
+- Mapping: Completed. `nameAliases` + reverse mapping added in `preferences-group-manager.js` with bidirectional DOM↔key support (includes colors, filters, notifications, charts).
+- Normalization: Completed. Enforced normalized map for group/all/multiple; added cache auto-migration guards in `preferences-data.js`.
+- Init sequencing: Completed. Populate now gated after normalized payload and profile context via `PreferencesUI.loadAllPreferences()` flow.
+- Allow-empty rules: Completed for `default_trading_account` (audit found no additional fields requiring allowEmpty at this phase).
+- Color keys: Completed. Full bidirectional mapping; `data-color-key` honored; populate/selectors include `[data-color-key]`.
+- Types audit table: Completed wiring. Post-save event `preferences:types-refresh` dispatched; consumer can refresh table reliably.
+- Smart trace: Completed. Added timings, counts, and unresolved field list per section load; detailed debug logs.
+- Cache policies: Completed. TTLs aligned and clear-on-save hydrates via `UnifiedCacheManager.refreshUserPreferences` before UI repaint.
+- Focused tests: Added FE unit tests covering aliases/normalization (see `tests/preferences.standardization.test.js`).
+- Docs: This document updated (status), system docs to be consolidated next step.
 
 
 ### 6) What’s Next (Actionable Tasks)
-1) Finalize `prefs-map-names-to-fields`:
-   - Validate `nameAliases` against `preferences.html` for all groups: basic_settings, trading_settings, filter_settings, colors_unified, chart_settings_unified.
-   - Ensure reverse mapping DOM→canonical exists when collecting data to save.
-   - Add targeted logs listing unresolved fields after population per section.
-2) Enforce normalization across all endpoints:
-   - Force normalized map at `preferences-data.js` for single/group/all; auto-migrate cache entries.
-   - Add a cache version key to distinguish old/new formats and trigger migration.
-3) Fix init sequencing:
-   - Defer UI population until normalized payload + profile context are resolved.
-   - Gate “refresh after save” to the same normalized pipeline.
-4) Colors bi-directional normalization:
-   - Map every color preference to an input by `id`/`name` and ensure conversions are symmetric.
-   - Verify default fallbacks are not masking missing values; log unresolved color keys.
-5) Preference Types Audit table:
-   - Ensure data source returns records; wire forced refresh after save completes.
-6) Smart tracing:
-   - Add timings, counts (loaded keys, populated fields), cache layer used (memory/IndexedDB/backend), and unresolved list.
-7) Cache policies and clear-on-save:
-   - Align TTLs for dev/prod; confirm clear-on-save invalidates correct layers then re-hydrates before UI paint.
-8) Tests:
-   - Frontend unit/integration: mapping (aliases), normalization, init order, colors, audit table flow.
-9) Docs:
-   - Update preferences system documentation and loading order notes; include troubleshooting matrix.
+1) Consolidate preferences system docs: finalize loading order notes and troubleshooting matrix.
+2) Extend tests (integration) for profile switching + audit table refresh.
+3) Monitor unresolved fields log in staging and expand `nameAliases` if new historical keys are detected.
 
 
 ### 7) Technical Guidance and Conventions

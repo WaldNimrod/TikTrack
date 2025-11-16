@@ -60,3 +60,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-15T15:52:46+00:00 | 1.1.7.0 | 1.1.6.0 | f0d829446119bf084124c4de1460898f30d84ec9 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | patch | Conditions dev playbook |
 | 2025-11-16T07:03:29+00:00 | 1.1.7.1 | 1.1.7.0 | 28fccde99df1fcf8a1f86c13ff2b4f5cf9a27e5f | f0d829446119bf084124c4de1460898f30d84ec9 | build | Phase5.1: Trade plans conditions table (per-row evaluate, alerts stats, toggle) + initial trades modal integration |
 | 2025-11-16T07:49:48+00:00 | 1.1.8.0 | 1.1.7.1 | bbd92b1581954eb8cc43ccfba2e1ba93efa4aa12 | 28fccde99df1fcf8a1f86c13ff2b4f5cf9a27e5f | patch | Docs: Conditions Trades guide + Test Plan + status updates |
+| 2025-11-16T08:31:24+00:00 | 1.1.9.0 | 1.1.8.0 | 083a89adb411ca6c8304202a583de052484fd7b5 | bbd92b1581954eb8cc43ccfba2e1ba93efa4aa12 | patch | Docs: index links for Conditions, GENERAL_SYSTEMS_LIST test plan, progress & remarks report |

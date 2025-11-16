@@ -343,8 +343,8 @@ const CASH_FLOW_TYPE_FILTERS = new Set([
   'exchange',
 ]);
 let activeCashFlowTypeFilter = 'all';
-const EXCHANGE_FROM_TYPES = new Set(['currency_exchange_from', 'other_negative']);
-const EXCHANGE_TO_TYPES = new Set(['currency_exchange_to', 'other_positive']);
+const EXCHANGE_FROM_TYPES = new Set(['currency_exchange_from']);
+const EXCHANGE_TO_TYPES = new Set(['currency_exchange_to']);
 
 function resolveExchangeDirectionFromType(flowType) {
   const normalized = typeof flowType === 'string' ? flowType.toLowerCase() : '';
@@ -408,9 +408,7 @@ function cashFlowMatchesType(item, normalizedType) {
     if (!item) {
       return false;
     }
-    if (resolveExchangeDirectionFromType(item.type)) {
-      return true;
-    }
+    // Exchange rows מזוהים רק אם יש exchange_group_id או external_id בפורמט exchange_
     return Boolean(item.exchange_group_id || isCurrencyExchange(item));
   }
   const candidate = (item?.type || '').toString().toLowerCase();
@@ -1074,6 +1072,13 @@ async function renderCashFlowsTable() {
   if (countElement) {
     countElement.textContent = `${cashFlowsData.length} תזרימים`;
   }
+
+  // Render unified forex exchanges table
+  try {
+    renderUnifiedForexExchangesTable(Array.isArray(window.filteredCashFlowsData) ? window.filteredCashFlowsData : cashFlowsData);
+  } catch (e) {
+    window.Logger?.warn('renderUnifiedForexExchangesTable failed', { error: e?.message, page: 'cash_flows' });
+  }
 }
 
 /**
@@ -1162,6 +1167,102 @@ async function syncCashFlowsPagination(cashFlows) {
   }
 
   await updateCashFlowsTable(safeCashFlows);
+}
+
+/**
+ * Group cash flows into unified forex exchanges (one row per exchange_<uuid>)
+ */
+function groupUnifiedExchanges(rows) {
+  const data = Array.isArray(rows) ? rows : [];
+  const groups = new Map();
+  const isExchangeExternal = (cf) => {
+    const id = cf?.exchange_group_id || cf?.external_id || '';
+    return typeof id === 'string' && id.startsWith('exchange_');
+  };
+  data.forEach(cf => {
+    if (!cf || !isExchangeExternal(cf)) return;
+    const groupId = cf.exchange_group_id || cf.external_id;
+    const bucket = groups.get(groupId) || { id: groupId, from: null, to: null, account_id: cf.trading_account_id };
+    // classify
+    const type = String(cf.type || '').toLowerCase();
+    if (EXCHANGE_FROM_TYPES.has(type)) {
+      if (!bucket.from || Math.abs(bucket.from.amount || 0) < Math.abs(cf.amount || 0)) {
+        bucket.from = cf;
+      }
+    } else if (EXCHANGE_TO_TYPES.has(type)) {
+      if (!bucket.to || Math.abs(bucket.to.amount || 0) < Math.abs(cf.amount || 0)) {
+        bucket.to = cf;
+      }
+    } else {
+      // fallback by exchange_direction if exists
+      if (cf.exchange_direction === 'from' && !bucket.from) bucket.from = cf;
+      if (cf.exchange_direction === 'to' && !bucket.to) bucket.to = cf;
+    }
+    if (!bucket.account_id && cf.trading_account_id) {
+      bucket.account_id = cf.trading_account_id;
+    }
+    groups.set(groupId, bucket);
+  });
+  return Array.from(groups.values());
+}
+
+/**
+ * Render unified forex exchanges table at page bottom
+ */
+function renderUnifiedForexExchangesTable(sourceRows) {
+  const tableBody = document.querySelector('#forexUnifiedTable tbody');
+  if (!tableBody) return;
+  const groups = groupUnifiedExchanges(sourceRows);
+  if (!groups || groups.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="7" class="text-center">אין המרות מטבע להצגה.</td></tr>`;
+    return;
+  }
+  const fmtAmt = (amt, curIdOrSymbol) => {
+    const symbol = typeof curIdOrSymbol === 'string' ? curIdOrSymbol : '';
+    if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+      return window.FieldRendererService.renderAmount(amt || 0, symbol || '$', 2, true);
+    }
+    const n = Number(amt || 0);
+    return `${(symbol || '$')}${n.toFixed(2)}`;
+  };
+  const getCurrencySymbol = (cf) => {
+    return (cf && (cf.currency_symbol || cf.currency || (cf.currency_id ? resolveCurrencyById?.(cf.currency_id)?.symbol : ''))) || '';
+  };
+  const getAccountName = (id) => {
+    return (typeof getAccountNameById === 'function' ? getAccountNameById(id) : null) || (id ? `חשבון מסחר ${id}` : '-');
+  };
+  const fmtDate = (d) => formatDate(d);
+  const buildActions = (groupId, fromId, toId) => {
+    if (!window.createActionsMenu) return '';
+    const items = [];
+    if (fromId) items.push({ type: 'VIEW', onclick: `showCashFlowDetails(${fromId})`, title: 'פתח צד From' });
+    if (toId) items.push({ type: 'VIEW', onclick: `showCashFlowDetails(${toId})`, title: 'פתח צד To' });
+    return window.createActionsMenu(items) || '';
+  };
+  tableBody.innerHTML = '';
+  groups.forEach(g => {
+    const date = g.to?.date || g.from?.date || g.to?.updated_at || g.from?.updated_at || null;
+    const fromAmt = g.from?.amount || 0;
+    const fromSym = getCurrencySymbol(g.from);
+    const toAmt = g.to?.amount || 0;
+    const toSym = getCurrencySymbol(g.to);
+    const rate = (Math.abs(fromAmt) > 0 && toAmt) ? (toAmt / Math.abs(fromAmt)) : null;
+    const rateDisplay = rate ? (rate.toFixed(6)) : '—';
+    const accountName = getAccountName(g.account_id);
+    const idDisplay = g.id || '-';
+    const actions = buildActions(g.id, g.from?.id, g.to?.id);
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="table-cell-center">${fmtDate(date)}</td>
+      <td>${accountName}</td>
+      <td dir="ltr">${fmtAmt(fromAmt, fromSym)}</td>
+      <td dir="ltr">${fmtAmt(toAmt, toSym)}</td>
+      <td dir="ltr">${rateDisplay}</td>
+      <td dir="ltr">${idDisplay}</td>
+      <td class="text-center">${actions}</td>
+    `;
+    tableBody.appendChild(row);
+  });
 }
 
 function ensureExchangePairsAdjacency(rows) {

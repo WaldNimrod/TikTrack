@@ -110,6 +110,19 @@
         `HTTP ${response.status}: ${response.statusText}`;
       const error = new Error(errorMessage);
       error.payload = payload;
+      // Authentication UX: show clear error and allow UI to react
+      if (response.status === 401 || response.status === 403) {
+        try {
+          const message = payload?.error?.message || payload?.message || 'דרושה התחברות למערכת';
+          if (window.NotificationSystem?.error) {
+            window.NotificationSystem.error(message, { context: 'preferences' });
+          } else if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification(message);
+          }
+        } catch (_) { /* noop */ }
+        error.isAuthError = true;
+        error.status = response.status;
+      }
       throw error;
     }
 
@@ -394,7 +407,13 @@
     if (!force) {
       const cached = await readCache(cacheKey, { ttl });
       if (cached) {
-        return cached;
+        // הגנה: מיגרציה אוטומטית של מערכים/פורמטים ישנים למפה נורמלית
+        if (Array.isArray(cached)) {
+          const { map } = normalizePreferenceEntries(cached);
+          await saveCache(cacheKey, map, { ttl, layer: 'localStorage' });
+          return map;
+        }
+        return typeof cached === 'object' ? cached : {};
       }
     }
 
@@ -407,9 +426,11 @@
       },
     });
 
-    const preferences = payload?.data?.preferences || {};
-    await saveCache(cacheKey, preferences, { ttl, layer: 'localStorage' });
-    return preferences;
+    // נורמליזציה: תמיכה גם במקרה שהשרת מחזיר מערך ערכים/רשומות
+    const raw = payload?.data?.preferences ?? payload?.preferences ?? payload?.data ?? {};
+    const { map: normalizedMap } = normalizePreferenceEntries(raw);
+    await saveCache(cacheKey, normalizedMap, { ttl, layer: 'localStorage' });
+    return normalizedMap;
   }
 
   async function loadAllPreferencesRaw({ userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.all } = {}) {

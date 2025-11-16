@@ -731,11 +731,17 @@ class PreferencesUI {
      * @param {Object|null} userInfo - Active user information
      */
   updateActiveUserDisplay(userInfo = null) {
-    const displayName = userInfo?.display_name?.trim?.() ||
+    const hasId = userInfo?.id !== undefined && userInfo?.id !== null;
+    let displayName = userInfo?.display_name?.trim?.() ||
             userInfo?.full_name?.trim?.() ||
             userInfo?.username?.trim?.() ||
-            'לא זמין';
-    const hasId = userInfo?.id !== undefined && userInfo?.id !== null;
+            null;
+    if (!displayName && hasId) {
+      displayName = `User #${userInfo.id}`;
+    }
+    if (!displayName) {
+      displayName = 'לא זמין';
+    }
     const idText = hasId ? `#${userInfo.id}` : '';
     const summaryNameEl = document.getElementById('activeUserName');
     const summaryIdEl = document.getElementById('activeUserId');
@@ -771,7 +777,14 @@ class PreferencesUI {
      * @param {Object|null} profile - Active profile data
      */
   updateActiveProfileDisplay(profile = null) {
-    const profileName = profile?.name || 'ברירת מחדל';
+    const hasId = profile?.id !== undefined && profile?.id !== null;
+    let profileName = profile?.name || null;
+    if (!profileName && hasId) {
+      profileName = `Profile #${profile.id}`;
+    }
+    if (!profileName) {
+      profileName = 'ברירת מחדל';
+    }
     const profileDescription = profile?.description || (profile?.id === 0 ? 'פרופיל ברירת מחדל של המערכת' : 'פרופיל משתמש');
 
     const summaryNameEl = document.getElementById('activeProfileName');

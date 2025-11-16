@@ -135,7 +135,25 @@ class PreferencesService:
             if not profile or profile.user_id != user_id:
                 raise ProfileNotFoundError(f"Profile {resolved_profile_id} not found for user {user_id}")
 
+            # Build minimal user object (we don't have full user table here)
+            user_obj = {
+                "id": user_id,
+                # username/display_name may be completed on the client if needed
+                "username": None,
+                "display_name": None,
+            }
+
+            # Build resolved profile object with stable naming and fallbacks
+            resolved_profile = {
+                "id": profile.id,
+                "name": profile.profile_name or f"Profile #{profile.id}",
+                "description": profile.description,
+                "is_default": bool(profile.is_default),
+                "is_active": bool(profile.is_active),
+            }
+
             return {
+                # Legacy shape (kept for backward compatibility)
                 "user_id": user_id,
                 "profile_id": profile.id,
                 "requested_profile_id": requested_profile_id,
@@ -149,6 +167,10 @@ class PreferencesService:
                     "last_used_at": profile.last_used_at,
                     "usage_count": profile.usage_count,
                 },
+                # New canonical fields expected by frontend plan
+                "user": user_obj,
+                "resolved_profile": resolved_profile,
+                # Versions payload
                 "versions": self._build_version_payload(
                     session=session, user_id=user_id, profile_id=profile.id
                 ),

@@ -1252,6 +1252,61 @@ class ImportOrchestrator:
                 }
                 records_to_import.append(record_payload)
 
+            # Pair forex conversions: assign shared exchange_<uuid> external_id for from/to sides
+            try:
+                from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
+                to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
+                # Build indices by date for simple same-day pairing
+                def extract_date_str(value):
+                    # value may be envelope or iso string
+                    if isinstance(value, dict):
+                        return value.get('date') or value.get('utc') or value.get('local')
+                    return value
+                # Create list of candidates with indices
+                from_indices = []
+                to_indices = []
+                for idx, rec in enumerate(records_to_import):
+                    st = rec.get('storage_type')
+                    if st == from_type:
+                        from_indices.append(idx)
+                    elif st == to_type:
+                        to_indices.append(idx)
+                used_to = set()
+                for fi in from_indices:
+                    f = records_to_import[fi]
+                    f_date = extract_date_str(f.get('effective_date'))
+                    # Find nearest TO on same date first, else any unused TO
+                    chosen_ti = None
+                    for ti in to_indices:
+                        if ti in used_to:
+                            continue
+                        t = records_to_import[ti]
+                        t_date = extract_date_str(t.get('effective_date'))
+                        if f_date and t_date and str(f_date)[:10] == str(t_date)[:10]:
+                            chosen_ti = ti
+                            break
+                    if chosen_ti is None:
+                        for ti in to_indices:
+                            if ti not in used_to:
+                                chosen_ti = ti
+                                break
+                    if chosen_ti is None:
+                        continue
+                    used_to.add(chosen_ti)
+                    # Assign shared external_id
+                    exchange_id = CashFlowHelperService.create_exchange_external_id()
+                    # Ensure metadata exists
+                    for rec in (f, records_to_import[chosen_ti]):
+                        meta = rec.get('metadata')
+                        if meta is None or not isinstance(meta, dict):
+                            meta = {}
+                            rec['metadata'] = meta
+                        meta['exchange_external_id'] = exchange_id
+                        # Favor shared external_id for import/storage
+                        rec['external_id'] = exchange_id
+            except Exception as pairing_error:
+                logger.warning("⚠️ Forex pairing step failed: %s", pairing_error)
+
             records_to_skip: List[Dict[str, Any]] = []
             for error_info in validation_result.get('validation_errors', []):
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(error_info.get('record') or {})
@@ -2047,8 +2102,83 @@ class ImportOrchestrator:
             else:
                 cashflow_records.append(entry)
 
+        # Ensure forex conversions have shared exchange_<uuid> external_id at import time as well
+        try:
+            from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
+            to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
+            def is_exchange_record(rec: Dict[str, Any]) -> bool:
+                st = (rec.get('storage_type') or rec.get('cashflow_type') or '').lower()
+                return st in {from_type, to_type} or (rec.get('cashflow_type') == 'forex_conversion')
+            def get_date_str(val):
+                if isinstance(val, dict):
+                    return str(val.get('date') or val.get('utc') or val.get('local') or '')
+                return str(val or '')
+            from_idxs: List[int] = []
+            to_idxs: List[int] = []
+            for idx, rec in enumerate(cashflow_records):
+                if not is_exchange_record(rec):
+                    continue
+                storage_type, _ = self._resolve_cashflow_storage_type(rec)
+                if storage_type == from_type:
+                    from_idxs.append(idx)
+                elif storage_type == to_type:
+                    to_idxs.append(idx)
+            used_to: set = set()
+            for fi in from_idxs:
+                f = cashflow_records[fi]
+                # skip if already has proper exchange external id
+                existing = (f.get('external_id') or '')
+                if isinstance(existing, str) and existing.startswith(CashFlowHelperService.EXCHANGE_PREFIX):
+                    continue
+                f_date = get_date_str(f.get('effective_date'))
+                chosen_ti = None
+                for ti in to_idxs:
+                    if ti in used_to:
+                        continue
+                    t = cashflow_records[ti]
+                    t_existing = (t.get('external_id') or '')
+                    if isinstance(t_existing, str) and t_existing.startswith(CashFlowHelperService.EXCHANGE_PREFIX):
+                        continue
+                    t_date = get_date_str(t.get('effective_date'))
+                    if f_date and t_date and f_date[:10] == t_date[:10]:
+                        chosen_ti = ti
+                        break
+                if chosen_ti is None:
+                    for ti in to_idxs:
+                        if ti not in used_to:
+                            chosen_ti = ti
+                            break
+                if chosen_ti is None:
+                    continue
+                used_to.add(chosen_ti)
+                exchange_id = CashFlowHelperService.create_exchange_external_id()
+                # assign to both sides
+                for rec in (f, cashflow_records[chosen_ti]):
+                    rec['external_id'] = exchange_id
+        except Exception as _pair_err:
+            logger.warning("⚠️ Import-time forex pairing failed: %s", _pair_err)
+
         imported_count = 0
         import_errors: List[str] = []
+
+        # Group exchange records by shared exchange external_id
+        exchange_groups: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        def is_exchange_external(ex_id: Optional[str]) -> bool:
+            return isinstance(ex_id, str) and ex_id.startswith(CashFlowHelperService.EXCHANGE_PREFIX)
+        for idx, rec in enumerate(cashflow_records):
+            ex_id = rec.get('external_id')
+            if is_exchange_external(ex_id):
+                storage_type, _ = self._resolve_cashflow_storage_type(rec)
+                group = exchange_groups.setdefault(ex_id, {})
+                direction = (
+                    'to' if storage_type == CashFlowHelperService.EXCHANGE_TO_TYPE else
+                    'from' if storage_type == CashFlowHelperService.EXCHANGE_FROM_TYPE else
+                    None
+                )
+                if direction:
+                    group[direction] = rec
+        # Remove grouped exchange records from flat list; they will be created atomically below
+        cashflow_records = [r for r in cashflow_records if not is_exchange_external(r.get('external_id'))]
 
         for index, record in enumerate(cashflow_records):
             try:
@@ -2117,6 +2247,71 @@ class ImportOrchestrator:
                     exc_info=True
                 )
                 import_errors.append(f"Cashflow #{index + 1} failed: {record_error}")
+
+        # Create grouped currency exchanges using a unified structure (align with manual creation)
+        for exchange_id, pair in exchange_groups.items():
+            try:
+                from_rec = pair.get('from')
+                to_rec = pair.get('to')
+                if not from_rec or not to_rec:
+                    raise ValueError(f"Incomplete exchange pair for {exchange_id}")
+                # Resolve currencies
+                from_currency_symbol = from_rec.get('currency')
+                to_currency_symbol = to_rec.get('currency')
+                if not from_currency_symbol or not to_currency_symbol:
+                    raise ValueError("Missing currency symbol for exchange")
+                from_currency = CurrencyService.get_by_symbol(self.db_session, from_currency_symbol)
+                to_currency = CurrencyService.get_by_symbol(self.db_session, to_currency_symbol)
+                if not from_currency or not to_currency:
+                    raise ValueError("Currency not found for exchange")
+                # Amounts: ensure sign convention (from negative, to positive)
+                from_amount = abs(float(from_rec.get('amount', 0)))
+                to_amount = abs(float(to_rec.get('amount', 0)))
+                # Date
+                effective_dt = self._resolve_datetime(from_rec.get('effective_date') or to_rec.get('effective_date'))
+                date_value = effective_dt.date() if effective_dt else None
+                # Description
+                description = from_rec.get('memo') or to_rec.get('memo')
+                # Fee amount (if any commission detected on source side metadata)
+                fee_amount = 0.0
+                meta = (from_rec.get('metadata') or {}) if isinstance(from_rec.get('metadata'), dict) else {}
+                commission_val = meta.get('commission') or from_rec.get('commission')
+                try:
+                    fee_amount = float(commission_val) if commission_val not in (None, '') else 0.0
+                except (TypeError, ValueError):
+                    fee_amount = 0.0
+                # Create from flow
+                from_flow = CashFlow(
+                    trading_account_id=import_session.trading_account_id,
+                    type=CashFlowHelperService.EXCHANGE_FROM_TYPE,
+                    amount=-from_amount,
+                    fee_amount=fee_amount,
+                    date=date_value,
+                    description=description,
+                    currency_id=from_currency.id,
+                    usd_rate=float(from_currency.usd_rate or 1.0),
+                    source='file_import',
+                    external_id=exchange_id
+                )
+                self.db_session.add(from_flow)
+                # Create to flow
+                to_flow = CashFlow(
+                    trading_account_id=import_session.trading_account_id,
+                    type=CashFlowHelperService.EXCHANGE_TO_TYPE,
+                    amount=to_amount,
+                    fee_amount=0.0,
+                    date=date_value,
+                    description=description,
+                    currency_id=to_currency.id,
+                    usd_rate=float(to_currency.usd_rate or 1.0),
+                    source='file_import',
+                    external_id=exchange_id
+                )
+                self.db_session.add(to_flow)
+                imported_count += 2
+            except Exception as exch_error:
+                logger.error("❌ Failed to create exchange %s: %s", exchange_id, exch_error, exc_info=True)
+                import_errors.append(f"Exchange {exchange_id} failed: {exch_error}")
 
         if imported_count == 0:
             self.db_session.rollback()

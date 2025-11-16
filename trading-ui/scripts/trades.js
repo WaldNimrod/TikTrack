@@ -1214,6 +1214,15 @@ async function cancelTradeRecord(tradeId) {
  */
 async function performTradeCancellation(tradeId) {
   try {
+    // Clear relevant caches before mutation
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+      try {
+        await window.UnifiedCacheManager.clearByPattern('trades');
+        await window.UnifiedCacheManager.clearByPattern('dashboard');
+      } catch (e) {
+        window.Logger?.warn('⚠️ Failed clearing cache before cancel', e, { page: 'trades' });
+      }
+    }
     const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1387,6 +1396,15 @@ async function deleteTradeRecord(tradeId) {
 async function performTradeDeletion(tradeId) {
   try {
     // Send delete request
+    // Clear relevant caches before mutation
+    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+      try {
+        await window.UnifiedCacheManager.clearByPattern('trades');
+        await window.UnifiedCacheManager.clearByPattern('dashboard');
+      } catch (e) {
+        window.Logger?.warn('⚠️ Failed clearing cache before delete', e, { page: 'trades' });
+      }
+    }
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -3988,6 +4006,16 @@ async function saveTrade() {
         const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
         const method = isEdit ? 'PUT' : 'POST';
         
+        // Clear relevant caches before mutation
+        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+            try {
+                await window.UnifiedCacheManager.clearByPattern('trades');
+                await window.UnifiedCacheManager.clearByPattern('dashboard');
+            } catch (e) {
+                window.Logger?.warn('⚠️ Failed clearing cache before save', e, { page: 'trades' });
+            }
+        }
+
         // Send to API
         const response = await fetch(url, {
             method: method,

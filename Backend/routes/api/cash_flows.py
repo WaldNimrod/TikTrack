@@ -12,6 +12,7 @@ from services.tag_service import TagService
 import logging
 import uuid
 from datetime import datetime
+from services.date_normalization_service import DateNormalizationService
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -324,17 +325,38 @@ def create_cash_flow():
 
         data['fee_amount'] = fee_amount_value
         
-        # Convert date string to date object
+        # Convert date to date object (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
         if 'date' in data and data['date']:
-            from datetime import datetime
             try:
-                logger.info(f"Converting date string: {data['date']}")
-                data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
-                logger.info(f"Converted to date object: {data['date']}")
-            except ValueError:
+                date_input = data['date']
+                date_obj = None
+                if isinstance(date_input, dict):
+                    normalizer = DateNormalizationService()
+                    normalized = normalizer.normalize_input_payload({"date": date_input})
+                    dt = normalized.get("date") if isinstance(normalized, dict) else None
+                    if isinstance(dt, datetime):
+                        date_obj = dt.date()
+                elif isinstance(date_input, datetime):
+                    date_obj = date_input.date()
+                elif isinstance(date_input, str):
+                    try:
+                        date_obj = datetime.strptime(date_input, '%Y-%m-%d').date()
+                    except ValueError:
+                        try:
+                            date_obj = datetime.fromisoformat(date_input.replace('Z', '+00:00')).date()
+                        except ValueError:
+                            date_obj = None
+                if not date_obj:
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
+                        "version": "1.0"
+                    }), 400
+                data['date'] = date_obj
+            except Exception:
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                    "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                     "version": "1.0"
                 }), 400
         
@@ -438,17 +460,38 @@ def update_cash_flow(cash_flow_id: int):
             else:
                 data['fee_amount'] = cash_flow.fee_amount if cash_flow.fee_amount is not None else 0.0
             
-            # Convert date string to date object
+            # Convert date to date object (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
             if 'date' in data and data['date']:
-                from datetime import datetime
                 try:
-                    logger.info(f"Converting date string: {data['date']}")
-                    data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
-                    logger.info(f"Converted to date object: {data['date']}")
-                except ValueError:
+                    date_input = data['date']
+                    date_obj = None
+                    if isinstance(date_input, dict):
+                        normalizer = DateNormalizationService()
+                        normalized = normalizer.normalize_input_payload({"date": date_input})
+                        dt = normalized.get("date") if isinstance(normalized, dict) else None
+                        if isinstance(dt, datetime):
+                            date_obj = dt.date()
+                    elif isinstance(date_input, datetime):
+                        date_obj = date_input.date()
+                    elif isinstance(date_input, str):
+                        try:
+                            date_obj = datetime.strptime(date_input, '%Y-%m-%d').date()
+                        except ValueError:
+                            try:
+                                date_obj = datetime.fromisoformat(date_input.replace('Z', '+00:00')).date()
+                            except ValueError:
+                                date_obj = None
+                    if not date_obj:
+                        return jsonify({
+                            "status": "error",
+                            "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
+                            "version": "1.0"
+                        }), 400
+                    data['date'] = date_obj
+                except Exception:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                        "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                         "version": "1.0"
                     }), 400
             
@@ -716,13 +759,33 @@ def create_currency_exchange():
                 "version": "1.0"
             }), 400
 
-        # Convert date
+        # Convert date (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
+        date_obj = None
         try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
+            if isinstance(date_str, dict):
+                normalizer = DateNormalizationService()
+                normalized = normalizer.normalize_input_payload({"date": date_str})
+                dt = normalized.get("date") if isinstance(normalized, dict) else None
+                if isinstance(dt, datetime):
+                    date_obj = dt.date()
+            elif isinstance(date_str, datetime):
+                date_obj = date_str.date()
+            elif isinstance(date_str, str):
+                # Try date-only first
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    # Try ISO datetime
+                    try:
+                        date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00')).date()
+                    except ValueError:
+                        date_obj = None
+        except Exception:
+            date_obj = None
+        if not date_obj:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                 "version": "1.0"
             }), 400
         
@@ -995,13 +1058,33 @@ def update_currency_exchange(exchange_uuid: str):
                 "version": "1.0"
             }), 400
 
-        # Convert date
+        # Convert date (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
+        date_obj = None
         try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
+            if isinstance(date_str, dict):
+                normalizer = DateNormalizationService()
+                normalized = normalizer.normalize_input_payload({"date": date_str})
+                dt = normalized.get("date") if isinstance(normalized, dict) else None
+                if isinstance(dt, datetime):
+                    date_obj = dt.date()
+            elif isinstance(date_str, datetime):
+                date_obj = date_str.date()
+            elif isinstance(date_str, str):
+                # Try date-only first
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    # Try ISO datetime
+                    try:
+                        date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00')).date()
+                    except ValueError:
+                        date_obj = None
+        except Exception:
+            date_obj = None
+        if not date_obj:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                 "version": "1.0"
             }), 400
         

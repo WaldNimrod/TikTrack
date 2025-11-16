@@ -26,6 +26,35 @@ class PreferencesGroupManager {
     };
     this.currentUserId = 1;
     this.currentProfileId = null;
+    // מיפוי שמות מפתח קנוניים ↔ מזהי שדות/שמות ישנים ב-DOM
+    // הערה: הרשימה תורחב בהמשך לפי הסריקה; מבוצעת כאן ליבה ראשונית כדי לאפשר דו-כיווניות.
+    this.nameAliases = {
+      // Filters (historic camelCase → canonical snake_case)
+      default_status_filter: ['defaultStatusFilter'],
+      default_type_filter: ['defaultTypeFilter'],
+      default_date_range_filter: ['defaultDateRangeFilter'],
+      default_search_filter: ['defaultSearchFilter'],
+      // Trading basic
+      default_trading_account: ['defaultTradingAccount', 'tradingAccountDefault'],
+      default_page_size: ['defaultPageSize', 'pageSizeDefault'],
+      // Colors (inputs משתמשים ב-data-color-key, אך נוסיף עזרי תאימות)
+      primary_color: ['primaryColor', 'colorPrimary'],
+      secondary_color: ['secondaryColor', 'colorSecondary'],
+      success_color: ['successColor'],
+      danger_color: ['dangerColor'],
+      warning_color: ['warningColor'],
+      info_color: ['infoColor'],
+      // Notifications
+      notification_mode: ['notificationMode'],
+      log_level: ['logLevel'],
+      verbose_logging: ['verboseLogging'],
+      // Charts unified
+      chart_candles_up_color: ['chartCandlesUpColor'],
+      chart_candles_down_color: ['chartCandlesDownColor'],
+      chart_grid_color: ['chartGridColor'],
+    };
+    // מיפוי הפוך מהיר: מזהה/שם שדה → מפתח קנוני
+    this.reverseNameAliases = this._buildReverseAliases(this.nameAliases);
     this.valueMappings = {
       defaultStatusFilter: {
         toEnglish: {
@@ -102,6 +131,40 @@ class PreferencesGroupManager {
   }
 
   /**
+     * בניית מיפוי הפוך לזיהוי מהיר של קלטי UI והשלכתם למפתח הקנוני
+     * @param {Object} aliases - map of canonicalKey -> string[]
+     * @returns {Object} reverse map uiName/id -> canonicalKey
+     */
+  _buildReverseAliases(aliases) {
+    const reverse = {};
+    Object.keys(aliases).forEach(canonical => {
+      const list = Array.isArray(aliases[canonical]) ? aliases[canonical] : [];
+      list.forEach(alias => {
+        if (alias && typeof alias === 'string') {
+          reverse[alias] = canonical;
+        }
+      });
+      // גם המפתח הקנוני עצמו צריך לעבוד ישירות
+      reverse[canonical] = canonical;
+    });
+    return reverse;
+  }
+
+  /**
+     * קבלת רשימת שמות/מזהים אפשריים לשדה לפי מפתח קנוני
+     * כוללת: המפתח הקנוני, עליאסים, וגם html-safe-escaped
+     */
+  _getPossibleFieldNames(canonicalKey) {
+    const names = new Set();
+    if (canonicalKey) {
+      names.add(canonicalKey);
+      const aliasList = this.nameAliases[canonicalKey] || [];
+      aliasList.forEach(a => names.add(a));
+    }
+    return Array.from(names);
+  }
+
+  /**
      * פתיחת section (סוגר אחרים אוטומטית)
      * @param {string} sectionId - Section ID
      */
@@ -168,6 +231,7 @@ class PreferencesGroupManager {
      */
   async loadGroupData(sectionId, groupName) {
     try {
+      const t0 = performance && performance.now ? performance.now() : Date.now();
       window.Logger?.info(`📥 Loading group ${groupName}...`, { page: 'preferences-group-manager' });
 
       // בדיקה אם PreferencesCore זמין
@@ -177,7 +241,7 @@ class PreferencesGroupManager {
       }
 
       const preferences = await window.PreferencesCore.loadGroupPreferences(groupName);
-      this.populateGroupFields(sectionId, preferences);
+      const populatedStats = this.populateGroupFields(sectionId, preferences);
       this.markGroupAsLoaded(sectionId);
 
       if (window.PreferencesCore) {
@@ -188,7 +252,13 @@ class PreferencesGroupManager {
         this.currentProfileId = window.PreferencesUI.currentProfileId ?? this.currentProfileId;
       }
 
-      window.Logger?.info(`✅ Loaded ${Object.keys(preferences).length} preferences for group ${groupName}`, { page: 'preferences-group-manager' });
+      const t1 = performance && performance.now ? performance.now() : Date.now();
+      window.Logger?.info(`✅ Loaded ${Object.keys(preferences).length} preferences for group ${groupName}`, {
+        page: 'preferences-group-manager',
+        timeMs: Math.round(t1 - t0),
+        populatedFields: populatedStats?.populatedCount ?? null,
+        unresolvedFields: populatedStats?.unresolvedKeys ?? [],
+      });
     } catch (error) {
       window.Logger?.error(`Failed to load group ${groupName}:`, error, { page: 'preferences-group-manager' });
       window.showErrorNotification?.(`שגיאה בטעינת קבוצה ${this.getGroupDisplayName(groupName)}`);
@@ -204,7 +274,7 @@ class PreferencesGroupManager {
     const section = document.getElementById(sectionId);
     if (!section) {
       window.Logger?.warn(`Section ${sectionId} not found for population`, { page: 'preferences-group-manager' });
-      return;
+      return { populatedCount: 0, unresolvedKeys: [] };
     }
 
     const normalizedPreferences = Array.isArray(preferences)
@@ -221,28 +291,39 @@ class PreferencesGroupManager {
       : preferences || {};
 
     let populatedCount = 0;
-    Object.keys(normalizedPreferences).forEach(prefName => {
-      if (!prefName) {return;}
-      const escapedName = typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function'
-        ? window.CSS.escape(prefName)
-        : prefName;
-      const selectorParts = [`[name="${prefName}"]`];
-      if (escapedName !== prefName) {
-        selectorParts.push(`[name="${escapedName}"]`);
-      }
-      selectorParts.push(`#${escapedName}`);
+    const unresolvedKeys = [];
+    Object.keys(normalizedPreferences).forEach(rawKey => {
+      if (!rawKey) {return;}
+      // Resolve canonical key (supports both canonical and alias keys coming from backend/cache)
+      const canonicalKey = this.reverseNameAliases[rawKey] || rawKey;
+      const possibleNames = this._getPossibleFieldNames(canonicalKey);
+
+      // Build selector including name/id and escaped variants
+      const selectorParts = [];
+      possibleNames.forEach(nameOrId => {
+        const esc = typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function'
+          ? window.CSS.escape(nameOrId)
+          : nameOrId;
+        selectorParts.push(`[name="${nameOrId}"]`, `[name="${esc}"]`, `#${esc}`);
+      });
+
+      // Try data-color-key as well
+      selectorParts.push(`[data-color-key="${canonicalKey}"]`);
+
       const field = section.querySelector(selectorParts.join(', '));
       if (field) {
         if (field.type === 'checkbox') {
-          field.checked = normalizedPreferences[prefName] === 'true' || normalizedPreferences[prefName] === true;
+          const v = normalizedPreferences[rawKey];
+          field.checked = v === 'true' || v === true;
         } else {
-          const normalizedValue = this.normalizePreferenceValue(prefName, normalizedPreferences[prefName], 'toEnglish');
+          const sourceValue = normalizedPreferences[rawKey];
+          const normalizedValue = this.normalizePreferenceValue(canonicalKey, sourceValue, 'toEnglish');
           const previousValue = field.value;
           field.value = normalizedValue;
 
           // If direct assignment failed (option not found), try fallback to original value
-          if (field.value !== normalizedValue && normalizedPreferences[prefName] !== undefined && normalizedPreferences[prefName] !== null) {
-            field.value = normalizedPreferences[prefName];
+          if (field.value !== normalizedValue && sourceValue !== undefined && sourceValue !== null) {
+            field.value = sourceValue;
           }
 
           // If still empty and there was a previous value, restore it to avoid blank selection
@@ -251,10 +332,17 @@ class PreferencesGroupManager {
           }
         }
         populatedCount++;
+      } else {
+        unresolvedKeys.push(canonicalKey);
       }
     });
 
-    window.Logger?.debug(`Populated ${populatedCount} fields in section ${sectionId}`, { page: 'preferences-group-manager' });
+    window.Logger?.debug(`Populated ${populatedCount} fields in section ${sectionId}`, {
+      page: 'preferences-group-manager',
+      unresolvedCount: unresolvedKeys.length,
+      unresolvedKeys,
+    });
+    return { populatedCount, unresolvedKeys };
   }
 
   /**
@@ -344,6 +432,17 @@ class PreferencesGroupManager {
       window.showSuccessNotification?.(`✅ ${displayName} נשמרו בהצלחה`);
 
       window.Logger?.info(`✅ Saved ${results.saved} preferences for group ${groupName}`, { page: 'preferences-group-manager' });
+
+      // רענון טבלת Preference Types (אם קיימת בממשק) באמצעות אירוע כללי
+      try {
+        if (typeof window.dispatchEvent === 'function') {
+          window.dispatchEvent(new CustomEvent('preferences:types-refresh', {
+            detail: { source: 'preferences-group-manager', groupName, savedKeys },
+          }));
+        }
+      } catch (e) {
+        window.Logger?.warn('⚠️ Failed to dispatch preferences:types-refresh event', e, { page: 'preferences-group-manager' });
+      }
     } catch (error) {
       window.Logger?.error(`Failed to save group ${groupName}:`, error, { page: 'preferences-group-manager' });
       window.showErrorNotification?.('שגיאה בשמירת הגדרות');
@@ -360,24 +459,26 @@ class PreferencesGroupManager {
     const inputs = section.querySelectorAll('input, select, textarea');
 
     inputs.forEach(input => {
-      // For color pickers, use data-color-key if available, otherwise use name or id
-      let name = null;
-      if (input.type === 'color' && input.dataset.colorKey) {
-        name = input.dataset.colorKey;
+      // Determine canonical preference key:
+      // Priority: explicit data-color-key / data-pref-key → alias reverse map → name/id
+      let canonicalName = null;
+      if (input.dataset && (input.dataset.colorKey || input.dataset.prefKey)) {
+        canonicalName = input.dataset.colorKey || input.dataset.prefKey;
       } else {
-        name = input.name || input.id;
+        const uiName = input.name || input.id;
+        canonicalName = this.reverseNameAliases[uiName] || uiName;
       }
 
-      if (!name) {return;}
+      if (!canonicalName) {return;}
 
       // Skip buttons, hidden fields, disabled fields
       if (input.type === 'button' || input.type === 'submit' || input.type === 'hidden') {return;}
       if (input.disabled) {return;}
 
       if (input.type === 'checkbox') {
-        formData[name] = input.checked ? 'true' : 'false';
+        formData[canonicalName] = input.checked ? 'true' : 'false';
       } else {
-        formData[name] = this.normalizePreferenceValue(name, input.value, 'toEnglish');
+        formData[canonicalName] = this.normalizePreferenceValue(canonicalName, input.value, 'toEnglish');
       }
     });
 

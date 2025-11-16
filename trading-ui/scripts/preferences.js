@@ -221,6 +221,16 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
 
         window.preferencesCache.set(preferences);
 
+        // אם המערכת החדשה זמינה — עדכן הקשר פרופיל כדי לסנכרן משתמש/פרופיל פעיל במערכות הגלובאליות
+        try {
+            const context = payload?.profileContext || null;
+            if (context && window.PreferencesUI && typeof window.PreferencesUI.updateProfileContext === 'function') {
+                await window.PreferencesUI.updateProfileContext(context);
+            }
+        } catch (syncError) {
+            console.warn('⚠️ Failed to sync profile context to PreferencesUI:', syncError);
+        }
+
         if (window.colorSchemeSystem?.updateCSSVariablesFromPreferences) {
             console.log('🎨 Updating CSS variables from preferences...');
             window.colorSchemeSystem.updateCSSVariablesFromPreferences(preferences);
@@ -475,19 +485,15 @@ window.saveAllPreferences = async function() {
 window.initializePreferences = async function() {
     try {
         console.log('🚀 Initializing Preferences System...');
-        
-        // בדיקת תקינות השירות
-        const isHealthy = await window.checkPreferencesServiceHealth();
-        if (!isHealthy) {
-            console.warn('⚠️ Preferences service is not healthy, using fallback');
-        return false;
-      }
-      
-        // טעינת העדפות ראשונית
-        await window.getAllUserPreferences();
-      
-        console.log('✅ Preferences System initialized successfully');
-      return true;
+
+        // נטען אך ורק דרך המערכת החדשה
+        if (!window.PreferencesUI || typeof window.PreferencesUI.loadAllPreferences !== 'function') {
+            console.error('❌ PreferencesUI is not available - cannot initialize preferences system without the new flow');
+            return false;
+        }
+        await window.PreferencesUI.loadAllPreferences();
+        console.log('✅ Preferences System initialized via PreferencesUI (no fallback)');
+        return true;
     } catch (error) {
         console.error('❌ Error initializing Preferences System:', error);
       return false;

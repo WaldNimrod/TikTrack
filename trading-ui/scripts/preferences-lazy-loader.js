@@ -76,21 +76,9 @@ class PreferenceClassifier {
         'chartAutoRefresh',
         'chartRefreshInterval',
 
-        // Status colors
-        'statusOpenColor',
-        'statusClosedColor',
-        'statusCancelledColor',
-
-        // Notification colors
-        'notificationSuccessColor',
-        'notificationErrorColor',
-        'notificationWarningColor',
-        'notificationInfoColor',
-
-        // Value colors
-        'valuePositiveColor',
-        'valueNegativeColor',
-        'valueNeutralColor',
+        // Note: colors are loaded via the unified colors system (group/all),
+        // so we avoid point-fetching color preferences here to prevent 404s
+        // when specific color keys are not defined as standalone preferences.
 
         // Filter defaults
         'defaultDateRangeFilter',

@@ -19,7 +19,7 @@ from datetime import datetime
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -203,6 +203,7 @@ def get_user_preference() -> Any:
         }), 500
 
 @preferences_bp.route('/user', methods=['GET'])
+@require_authentication()
 def get_user_preferences() -> Any:
     """
     קבלת העדפות משתמש
@@ -212,7 +213,14 @@ def get_user_preferences() -> Any:
         - use_cache (optional): האם להשתמש במטמון (default: true)
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)  # ברירת מחדל: משתמש 1
+        # Enforce authenticated user; do not allow overriding via query
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
@@ -251,6 +259,7 @@ def get_user_preferences() -> Any:
         }), 500
 
 @preferences_bp.route('/user', methods=['POST'])
+@require_authentication()
 def save_user_preferences() -> Any:
     """
     שמירת העדפות משתמש
@@ -268,7 +277,14 @@ def save_user_preferences() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        user_id = data.get('user_id', 1)  # ברירת מחדל: משתמש 1
+        # Enforce authenticated user; ignore provided user_id
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         preferences = data.get('preferences', {})
         profile_id = data.get('profile_id')
         
@@ -555,12 +571,20 @@ def get_multiple_preferences() -> Any:
 # ============================================================================
 
 @preferences_bp.route('/profiles', methods=['GET'])
+@require_authentication()
 def get_user_profiles() -> Any:
     """
     קבלת פרופילים של משתמש
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)
+        # Enforce authenticated user; do not allow overriding via query
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         
         # קבלת פרופילים
         profiles = preferences_service.get_user_profiles(user_id)
@@ -586,6 +610,7 @@ def get_user_profiles() -> Any:
         }), 500
 
 @preferences_bp.route('/profiles', methods=['POST'])
+@require_authentication()
 def create_profile() -> Any:
     """
     יצירת פרופיל חדש
@@ -606,10 +631,11 @@ def create_profile() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        user_id = data.get('user_id')
+        # Enforce authenticated user; ignore provided user_id
+        user_id = getattr(g, 'user_id', None)
         profile_name = data.get('profile_name')
         description = data.get('description', '')
-        created_by = data.get('created_by')
+        created_by = user_id
         is_default = data.get('is_default', False)
         
         # בדיקת פרמטרים חובה

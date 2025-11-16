@@ -395,36 +395,9 @@ class FieldRendererService {
      * @returns {string} badge HTML
      */
     static renderExchangeBadge(meta = {}) {
-        const groupId = meta.exchange_group_id || meta.group_id;
-        if (!groupId) {
-            return '';
-        }
+        // Per requirement: do not render an exchange badge in the table (or anywhere)
+        return '';
 
-        const direction = (meta.exchange_direction || meta.direction || '').toLowerCase();
-        const directionLabel = direction === 'to' ? 'צד חיובי' : 'צד שלילי';
-
-        const summarySource = meta.exchange_pair_summary || meta.linked_exchange_summary || {};
-        const amountRaw = summarySource.amount ?? meta.amount;
-        const amountValue = typeof amountRaw === 'number' ? amountRaw : parseFloat(amountRaw);
-        const currencySymbol = this._normalizeCurrencySymbol(summarySource.currency_symbol || meta.currency_symbol) || '';
-
-        const amountDisplay = Number.isFinite(amountValue)
-            ? amountValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : null;
-
-        const tooltipParts = [directionLabel];
-        if (amountDisplay) {
-            tooltipParts.push(`${amountDisplay}${currencySymbol ? ` ${currencySymbol}` : ''}`);
-        }
-        const tooltip = tooltipParts.join(' • ');
-
-        const amountInline = amountDisplay
-            ? `<small class="exchange-badge-amount" dir="ltr">${amountDisplay}${currencySymbol}</small>`
-            : '';
-
-        return `<span class="status-badge exchange-badge" data-status-category="info" data-exchange-group="${groupId}" title="${tooltip}">
-            🔁 ${directionLabel}${amountInline}
-        </span>`;
     }
 
     /**

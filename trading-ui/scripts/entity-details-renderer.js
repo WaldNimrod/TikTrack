@@ -3554,6 +3554,11 @@ class EntityDetailsRenderer {
             return '';
         }
 
+        // Remove "open record page" action for cash_flow by stripping VIEW buttons
+        if (entityType === 'cash_flow' && actionsHtml && actionsHtml.includes('data-button-type="VIEW"')) {
+            actionsHtml = actionsHtml.replace(/<button[^>]*data-button-type="VIEW"[\s\S]*?<\/button>/g, '');
+        }
+
         return `
             <div class="entity-details-actions mt-4 d-flex justify-content-end">
                 ${actionsHtml}
@@ -3676,11 +3681,64 @@ class EntityDetailsRenderer {
     /**
      * Format date - עיצוב תאריך
      */
-    formatDate(dateString) {
-        if (!dateString) return 'לא זמין';
-        
+    formatDate(dateInput) {
+        if (!dateInput) return 'לא זמין';
         try {
-            const date = new Date(dateString);
+            // Support DateEnvelope {display, local, utc, epochMs}
+            if (typeof dateInput === 'object') {
+                const display = dateInput.display || dateInput.DISPLAY;
+                if (display) return display;
+                const localVal = dateInput.local || dateInput.LOCAL;
+                if (localVal) {
+                    const d = new Date(localVal);
+                    if (!isNaN(d.getTime())) {
+                        return d.toLocaleDateString('he-IL', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                }
+                const utcVal = dateInput.utc || dateInput.UTC;
+                if (utcVal) {
+                    const d = new Date(utcVal);
+                    if (!isNaN(d.getTime())) {
+                        return d.toLocaleDateString('he-IL', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                }
+                const epoch = dateInput.epochMs || dateInput.epochms || dateInput.epoch;
+                if (epoch) {
+                    const d = new Date(Number(epoch));
+                    if (!isNaN(d.getTime())) {
+                        return d.toLocaleDateString('he-IL', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                }
+            }
+            // Fallbacks: handle YYYY-MM-DD safely, then general string/Date
+            if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+                const [y, m, d] = dateInput.split('-').map(Number);
+                const dateOnly = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0);
+                return dateOnly.toLocaleDateString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            }
+            const date = new Date(dateInput);
             return date.toLocaleDateString('he-IL', {
                 year: 'numeric',
                 month: '2-digit',
@@ -3689,7 +3747,7 @@ class EntityDetailsRenderer {
                 minute: '2-digit'
             });
         } catch (error) {
-            return dateString;
+            return typeof dateInput === 'string' ? dateInput : 'לא זמין';
         }
     }
     renderCashFlow(cashFlowData, options = {}) {
@@ -3743,10 +3801,8 @@ class EntityDetailsRenderer {
             ? window.FieldRendererService.renderExchangePairCards(cashFlowData.exchange_pair_summary, {
                 currentId: cashFlowData.id,
                 renderAction: (flow) => {
-                    if (!flow?.id) {
-                        return '';
-                    }
-                    return `<button class="btn btn-sm btn-outline-primary" onclick="showEntityDetails('cash_flow', ${flow.id}, { mode: 'view' })">פתח רשומה</button>`;
+                    // Cash flow has no dedicated details page; do not render an open-page button
+                    return '';
                 }
             })
             : '';
@@ -3803,6 +3859,37 @@ class EntityDetailsRenderer {
                 : '<span class="text-muted">לא זמין</span>';
 
             const currencyNameDisplay = name || 'לא זמין';
+            const pairSummary = cashFlowData.exchange_pair_summary || null;
+            const currenciesHtml = pairSummary
+                ? (function () {
+                    const fromName = pairSummary.from?.currency_name || 'לא זמין';
+                    const toName = pairSummary.to?.currency_name || 'לא זמין';
+                    const fromSymbol = pairSummary.from?.currency_symbol || '';
+                    const toSymbol = pairSummary.to?.currency_symbol || '';
+                    const fromBadge = window.FieldRendererService.renderCurrency(
+                        pairSummary.from?.currency_id || null,
+                        fromName,
+                        fromSymbol || ''
+                    );
+                    const toBadge = window.FieldRendererService.renderCurrency(
+                        pairSummary.to?.currency_id || null,
+                        toName,
+                        toSymbol || ''
+                    );
+                    return `
+                        <div class="d-flex flex-column gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted">מקור:</span>
+                                ${fromBadge}
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted">מבוקש:</span>
+                                ${toBadge}
+                            </div>
+                        </div>
+                    `;
+                })()
+                : `<span class="text-muted">${currencyNameDisplay}</span>`;
         
         return `
                 <div class="cash-flow-primary">
@@ -3825,16 +3912,30 @@ class EntityDetailsRenderer {
                         </div>
                 </div>
                 
-                    <div class="mb-3 d-flex align-items-center">
+                    <div class="mb-3 d-flex">
                         <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
-                        <span class="text-muted">${currencyNameDisplay}</span>
-                </div>
+                        <div class="d-flex align-items-start">
+                            ${currenciesHtml}
+                        </div>
+                    </div>
                 </div>
             `;
         }
 
-        const feeAmount = Number(cashFlowData.fee_amount || 0);
-        const feeHtml = window.FieldRendererService.renderAmount(feeAmount, symbol || '', 0, true);
+        // Fee: for exchanges, fee is stored on the 'from' side; fallback to pair summary if present
+        let feeAmount = Number(cashFlowData.fee_amount || 0);
+        let feeSymbol = symbol || '';
+        const pairSummary = cashFlowData.exchange_pair_summary || null;
+        if (pairSummary && Number(pairSummary.fee_amount || 0) > 0) {
+            feeAmount = Number(pairSummary.fee_amount);
+            // Prefer account (fee) currency symbol from summary if available
+            feeSymbol = pairSummary.fee_currency_symbol || feeSymbol;
+            if ((!feeSymbol || feeSymbol.length === 0) && pairSummary.fee_currency_id && typeof window.getCurrencyDisplay === 'function') {
+                const c = window.getCurrencyDisplay(pairSummary.fee_currency_id);
+                feeSymbol = (c && c.symbol) ? c.symbol : feeSymbol;
+            }
+        }
+        const feeHtml = window.FieldRendererService.renderAmount(feeAmount, feeSymbol, 0, true);
 
         let tradeDisplay = '<span class="text-muted">לא מקושר</span>';
         if (cashFlowData.trade_id) {
@@ -3855,6 +3956,16 @@ class EntityDetailsRenderer {
             ? `<span class="badge bg-light text-dark text-break" style="word-break: break-word; max-width: 100%;">${cashFlowData.external_id}</span>`
             : '<span class="text-muted">לא זמין</span>';
 
+        // Exchange rate (if available in pair summary)
+        const exchangeRateRow = (pairSummary && pairSummary.exchange_rate)
+            ? `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">שער המרה:</label>
+                    <span class="text-muted" dir="ltr">${Number(pairSummary.exchange_rate).toFixed(6)}</span>
+                </div>
+              `
+            : '';
+
         return `
             <div class="cash-flow-secondary mt-4">
 
@@ -3864,6 +3975,8 @@ class EntityDetailsRenderer {
                         ${feeHtml}
                     </div>
                 </div>
+                
+                ${exchangeRateRow}
                 
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מקור:</label>

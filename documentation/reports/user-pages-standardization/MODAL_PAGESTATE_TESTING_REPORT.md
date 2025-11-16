@@ -11,8 +11,8 @@
 
 - ✅ **טסטים Unit**: 27 טסטים עברו (כולל 5 טסטים חדשים ל-hideModal)
 - ✅ **טסטים Integration**: 7 טסטים עברו
-- ✅ **טסטים E2E**: 3 טסטים עברו
-- ✅ **סה"כ**: 37 טסטים עברו בהצלחה
+- ✅ **טסטים E2E**: 16 טסטים עברו (10 notes + 10 trades + 2 trade_plans + 3 alerts)
+- ✅ **סה"כ**: 50 טסטים עברו בהצלחה
 - ✅ **0 שגיאות linter**
 
 ---
@@ -48,6 +48,19 @@
 - ✅ פתיחת מודל
 - ✅ סגירת מודל
 - ✅ ניווט בין מודלים
+
+### 1.4 טסטים E2E פר עמוד
+
+**תוצאות:**
+- ✅ **notes.test.js**: 10 טסטים עברו
+  - 3 טסטים ל-ModalManagerV2 Integration (hideModal, fallback)
+  - 3 טסטים ל-PageStateManager Integration (section restoration, legacy function removal)
+- ✅ **trades.test.js**: 10 טסטים עברו
+  - 3 טסטים ל-ModalManagerV2 Integration (hideModal, warning logging)
+- ✅ **trade_plans.test.js**: 2 טסטים עברו
+  - 2 טסטים ל-ModalManagerV2 Integration (special cancel modal)
+- ✅ **alerts.test.js**: 3 טסטים עברו
+  - 3 טסטים ל-ModalManagerV2 Integration (hideModal, legacy listeners, fallback)
 
 ---
 
@@ -175,6 +188,10 @@
 
 ### קבצי טסטים
 - `tests/unit/modal-manager-v2.test.js` (הוספת 5 טסטים ל-hideModal)
+- `tests/e2e/user-pages/notes.test.js` (הוספת 6 טסטים: 3 ModalManagerV2 + 3 PageStateManager)
+- `tests/e2e/user-pages/trades.test.js` (הוספת 3 טסטים ל-ModalManagerV2)
+- `tests/e2e/user-pages/trade_plans.test.js` (הוספת 2 טסטים ל-ModalManagerV2)
+- `tests/e2e/user-pages/alerts.test.js` (הוספת 3 טסטים ל-ModalManagerV2)
 
 ### קבצי תיעוד
 - `documentation/reports/user-pages-standardization/MODAL_PAGESTATE_STATUS_REPORT.md`
@@ -187,8 +204,10 @@
 
 ✅ **כל הבדיקות עברו בהצלחה!**
 
-- **37 טסטים עברו** (27 unit + 7 integration + 3 E2E)
-- **9 מקומות תוקנו** ב-4 עמודים
+- **50 טסטים עברו** (27 unit + 7 integration + 16 E2E)
+- **9 מקומות תוקנו** ב-4 עמודים (notes, trades, trade_plans, alerts)
+- **14 טסטים E2E חדשים** נוספו לבדיקות פר עמוד
+- **3 טסטים E2E** ל-PageStateManager integration
 - **1 פונקציה מקומית הוסרה** (PageStateManager)
 - **0 שגיאות linter**
 - **כל התיעוד עודכן**

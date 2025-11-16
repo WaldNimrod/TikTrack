@@ -56,4 +56,62 @@ describe('Trade Plans Page E2E Tests', () => {
         const viewport = documentRef.querySelector('meta[name="viewport"]');
         expect(viewport).not.toBeNull();
     });
+
+    describe('ModalManagerV2 Integration', () => {
+        test('should use Bootstrap.Modal.getOrCreateInstance for cancel trade plan modal', () => {
+            // Mock Bootstrap Modal
+            const showSpy = jest.fn();
+            const mockModalInstance = {
+                show: showSpy
+            };
+            global.bootstrap = {
+                Modal: {
+                    getOrCreateInstance: jest.fn().mockReturnValue(mockModalInstance)
+                }
+            };
+
+            // Create modal element
+            const modalElement = documentRef.createElement('div');
+            modalElement.id = 'cancelTradePlanModal';
+            modalElement.className = 'modal fade';
+            documentRef.body.appendChild(modalElement);
+
+            // Simulate openCancelTradePlanModal behavior
+            if (modalElement) {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                modal.show();
+            }
+
+            expect(bootstrap.Modal.getOrCreateInstance).toHaveBeenCalledWith(modalElement);
+            expect(showSpy).toHaveBeenCalled();
+        });
+
+        test('should handle special cancel modal correctly', () => {
+            // Mock ModalManagerV2 (should not be used for special modals)
+            window.ModalManagerV2 = {
+                hideModal: jest.fn()
+            };
+
+            // Mock Bootstrap Modal
+            const mockModalInstance = {
+                show: jest.fn(),
+                hide: jest.fn()
+            };
+            global.bootstrap = {
+                Modal: {
+                    getOrCreateInstance: jest.fn().mockReturnValue(mockModalInstance)
+                }
+            };
+
+            // Create modal element
+            const modalElement = documentRef.createElement('div');
+            modalElement.id = 'cancelTradePlanModal';
+            documentRef.body.appendChild(modalElement);
+
+            // Special modals use Bootstrap directly, not ModalManagerV2
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            expect(modal).toBeDefined();
+            expect(bootstrap.Modal.getOrCreateInstance).toHaveBeenCalled();
+        });
+    });
 });

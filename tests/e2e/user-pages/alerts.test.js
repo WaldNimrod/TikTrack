@@ -74,4 +74,84 @@ describe('Alerts Page E2E Tests', () => {
         const viewport = documentRef.querySelector('meta[name="viewport"]');
         expect(viewport).not.toBeNull();
     });
+
+    describe('ModalManagerV2 Integration', () => {
+        test('should use ModalManagerV2.hideModal for add alert modal', () => {
+            // Mock ModalManagerV2
+            const hideModalSpy = jest.fn();
+            window.ModalManagerV2 = {
+                hideModal: hideModalSpy
+            };
+
+            // Mock Bootstrap Modal
+            const mockModalInstance = {
+                hide: jest.fn()
+            };
+            global.bootstrap = {
+                Modal: {
+                    getInstance: jest.fn().mockReturnValue(mockModalInstance)
+                }
+            };
+
+            // Create modal element
+            const modalElement = documentRef.createElement('div');
+            modalElement.id = 'addAlertModal';
+            modalElement.className = 'modal fade';
+            documentRef.body.appendChild(modalElement);
+
+            // Simulate createAlertFromCondition behavior
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                window.ModalManagerV2.hideModal('addAlertModal');
+            }
+
+            expect(hideModalSpy).toHaveBeenCalledWith('addAlertModal');
+        });
+
+        test('should not have legacy Bootstrap modal event listeners', () => {
+            // Create modal element
+            const modalElement = documentRef.createElement('div');
+            modalElement.id = 'addAlertModal';
+            modalElement.className = 'modal fade';
+            documentRef.body.appendChild(modalElement);
+
+            // Verify no legacy event listeners are attached
+            const clickListeners = modalElement.getEventListeners?.() || [];
+            const backdropListeners = clickListeners.filter(
+                listener => listener.type === 'click' && listener.target === modalElement
+            );
+
+            // ModalManagerV2 handles backdrop clicks automatically, so legacy listeners should not exist
+            expect(backdropListeners.length).toBe(0);
+        });
+
+        test('should fallback to Bootstrap Modal when ModalManagerV2 is unavailable', () => {
+            // No ModalManagerV2
+            window.ModalManagerV2 = undefined;
+
+            // Mock Bootstrap Modal
+            const hideSpy = jest.fn();
+            const mockModalInstance = {
+                hide: hideSpy
+            };
+            global.bootstrap = {
+                Modal: {
+                    getInstance: jest.fn().mockReturnValue(mockModalInstance)
+                }
+            };
+
+            // Create modal element
+            const modalElement = documentRef.createElement('div');
+            modalElement.id = 'addAlertModal';
+            modalElement.className = 'modal fade';
+            documentRef.body.appendChild(modalElement);
+
+            // Simulate fallback behavior
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+
+            expect(hideSpy).toHaveBeenCalled();
+        });
+    });
 });

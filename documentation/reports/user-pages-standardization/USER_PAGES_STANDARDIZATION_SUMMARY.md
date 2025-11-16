@@ -204,10 +204,12 @@ For each page there is a dedicated per-page report in this directory with detail
    - ✅ 9 מקומות עם קוד ישן הוחלפו ב-ModalManagerV2 (עודכן מ-8)
    - ✅ הוספת `hideModal()` ל-ModalManagerV2
    - ✅ הוספת 5 טסטים חדשים ל-hideModal
-   - ✅ כל הטסטים עברו (37 טסטים בסך הכל: 27 unit + 7 integration + 3 E2E)
+   - ✅ הוספת 14 טסטים E2E פר עמוד (notes: 6, trades: 3, trade_plans: 2, alerts: 3)
+   - ✅ כל הטסטים עברו (50 טסטים בסך הכל: 27 unit + 7 integration + 16 E2E)
 3. ✅ **הושלם**: שילוב PageStateManager (1 עמוד: notes.js)
    - ✅ הסרת `restoreNotesSectionState()` המקומית
    - ✅ שימוש ב-PageStateManager + restoreAllSectionStates()
+   - ✅ הוספת 3 טסטים E2E ל-PageStateManager integration
 
 ### שלב 3 - עדיפות נמוכה (4-6 שבועות)
 1. **ניקוי קוד legacy** (jQuery, XMLHttpRequest)

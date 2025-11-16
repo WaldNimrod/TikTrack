@@ -10,13 +10,13 @@
     "notes": "Cash flows fixes round - Backend API routes and Frontend date handling fixes"
   },
   "development": {
-    "version": "1.1.14.0",
+    "version": "1.1.15.0",
     "major": 1,
     "minor": 1,
-    "patch": 14,
+    "patch": 15,
     "build": 0,
-    "commit": "44e705737bf30bdd8e23ac77b20d0c7826327b0e",
-    "updated_at": "2025-11-16T22:09:18+00:00",
-    "notes": "Pages optimization: JSDoc updates, entity services integration, E2E tests expansion"
+    "commit": "b21568b627dbe68e9133d401b88421878f7dd38a",
+    "updated_at": "2025-11-16T22:54:35+00:00",
+    "notes": "תיקון מקיף: טעינת העדפות בכל העמודים - הוספת preferences scripts לכל 15 העמודים, הסרת כפילות Bootstrap JS, הוספת טסטים מקיפים"
   }
 }

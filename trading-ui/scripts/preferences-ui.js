@@ -1056,9 +1056,12 @@ class PreferencesUI {
         // Update counters
         await this.updateCounters(allPreferences);
 
-        // Load profiles to dropdown
-        const effectiveUserId = this.currentUserId ?? finalUserId ?? 1;
-        await window.loadProfilesToDropdown(effectiveUserId);
+        // Load profiles to dropdown (only if profileSelect element exists - preferences page only)
+        const profileSelect = document.getElementById('profileSelect');
+        if (profileSelect) {
+          const effectiveUserId = this.currentUserId ?? finalUserId ?? 1;
+          await window.loadProfilesToDropdown(effectiveUserId);
+        }
 
         this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(allPreferences).length} העדפות`);
 
@@ -1947,6 +1950,13 @@ if (!window.toggleSection) {
  */
 window.loadProfilesToDropdown = async function(userId = null) {
   try {
+    // Check if profileSelect element exists first (preferences page only)
+    const profileSelect = document.getElementById('profileSelect');
+    if (!profileSelect) {
+      // Silently return - this is normal for pages that don't have profile select
+      return false;
+    }
+
     // Resolve userId from context if not provided
     if (!userId || userId === 1) {
       userId = window.PreferencesUI?.currentUserId
@@ -1961,7 +1971,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
 
     if (!window.PreferencesData?.loadProfiles || typeof window.PreferencesData.loadProfiles !== 'function') {
       window.Logger.warn('⚠️ PreferencesData.loadProfiles not available', { page: 'preferences-ui' });
-      return;
+      return false;
     }
     const { profiles = [], profileContext = null } = await window.PreferencesData.loadProfiles({ userId, force: true });
     window.Logger.info('📋 Profiles API response', {
@@ -1970,12 +1980,6 @@ window.loadProfilesToDropdown = async function(userId = null) {
       resolvedProfileId: profileContext?.resolved_profile_id ?? null,
       activeProfileId: profileContext?.active_profile_id ?? null,
     });
-    const profileSelect = document.getElementById('profileSelect');
-
-    if (!profileSelect) {
-      window.Logger.warn('⚠️ Profile select element not found', { page: 'preferences-ui' });
-      return false;
-    }
 
     if (window.PreferencesUI) {
       try {

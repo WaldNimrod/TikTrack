@@ -45,33 +45,42 @@
       }
 
       // Load required groups (served from cache if 304)
-      await Promise.all(this.requiredGroups.map(g => window.PreferencesV4.getGroup(g)));
+      const userId = this.currentUserId ?? window.PreferencesCore?.currentUserId ?? 1;
+      await Promise.all(this.requiredGroups.map(g => window.PreferencesV4.getGroup(g, null, userId)));
 
-      // Load profiles to dropdown
-      if (typeof window.loadProfilesToDropdown === 'function') {
+      // Load profiles to dropdown (only if profileSelect element exists - preferences page only)
+      const profileSelect = document.getElementById('profileSelect');
+      if (profileSelect && typeof window.loadProfilesToDropdown === 'function') {
         await window.loadProfilesToDropdown(this.currentUserId);
       }
 
-      // Load accounts for default account preference
-      if (typeof window.loadAccountsForPreferences === 'function') {
+      // Load accounts for default account preference (only if element exists - preferences page only)
+      const defaultAccountSelect = document.getElementById('defaultAccountSelect') || document.getElementById('defaultAccount');
+      if (defaultAccountSelect && typeof window.loadAccountsForPreferences === 'function') {
         await window.loadAccountsForPreferences();
       }
 
-      // Render preference types audit table
-      if (typeof window.renderPreferenceTypesAuditTable === 'function') {
+      // Render preference types audit table (only if element exists - preferences page only)
+      const preferenceTypesTable = document.getElementById('preferenceTypesTable') || document.querySelector('[data-table-type="preference_types"]');
+      if (preferenceTypesTable && typeof window.renderPreferenceTypesAuditTable === 'function') {
         await window.renderPreferenceTypesAuditTable();
       }
 
-      // Start debug monitoring if available
-      if (window.PreferencesDebugMonitor && typeof window.PreferencesDebugMonitor.startMonitoring === 'function') {
-        window.Logger?.info('🔍 Starting preferences debug monitoring', { page: 'preferences-ui-v4' });
-        window.PreferencesDebugMonitor.startMonitoring();
-      } else {
-        window.Logger?.warn('⚠️ PreferencesDebugMonitor not available', {
-          page: 'preferences-ui-v4',
-          hasMonitor: Boolean(window.PreferencesDebugMonitor),
-          hasStartFunction: Boolean(window.PreferencesDebugMonitor?.startMonitoring),
-        });
+      // Start debug monitoring if available (preferences page only)
+      const isPreferencesPage = document.body?.classList?.contains('preferences-page') || 
+                                 window.location.pathname === '/preferences' ||
+                                 window.location.pathname.includes('/preferences');
+      if (isPreferencesPage) {
+        if (window.PreferencesDebugMonitor && typeof window.PreferencesDebugMonitor.startMonitoring === 'function') {
+          window.Logger?.info('🔍 Starting preferences debug monitoring', { page: 'preferences-ui-v4' });
+          window.PreferencesDebugMonitor.startMonitoring();
+        } else {
+          window.Logger?.warn('⚠️ PreferencesDebugMonitor not available', {
+            page: 'preferences-ui-v4',
+            hasMonitor: Boolean(window.PreferencesDebugMonitor),
+            hasStartFunction: Boolean(window.PreferencesDebugMonitor?.startMonitoring),
+          });
+        }
       }
 
       // Populate known UI elements
@@ -179,10 +188,31 @@
 
   window.PreferencesUIV4 = new PreferencesUIV4();
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => window.PreferencesUIV4.initialize());
+  // Only auto-initialize on preferences page
+  // On other pages, initialization is handled by page-initialization-configs.js if needed
+  const isPreferencesPage = () => {
+    try {
+      const body = document.body;
+      if (!body || !body.classList) return false;
+      return body.classList.contains('preferences-page') || 
+             window.location.pathname === '/preferences' ||
+             window.location.pathname.includes('/preferences');
+    } catch (e) {
+      return false;
+    }
+  };
+
+  if (isPreferencesPage()) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => window.PreferencesUIV4.initialize());
+    } else {
+      window.PreferencesUIV4.initialize();
+    }
   } else {
-    window.PreferencesUIV4.initialize();
+    window.Logger?.debug?.('ℹ️ PreferencesUIV4: Skipping auto-initialization (not preferences page)', {
+      page: 'preferences-ui-v4',
+      pathname: window.location.pathname,
+    });
   }
 })();
 

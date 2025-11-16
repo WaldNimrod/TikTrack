@@ -91,10 +91,17 @@
     });
   }
 
-  async function getGroup(group, profileId = null) {
-    return dedup(`GET_GROUP:${group}:${profileId ?? ''}`, async () => {
+  async function getGroup(group, profileId = null, userId = null) {
+    return dedup(`GET_GROUP:${group}:${profileId ?? ''}:${userId ?? ''}`, async () => {
+      // Resolve userId from PreferencesCore or default to 1
+      const resolvedUserId = userId ?? 
+        window.PreferencesCore?.currentUserId ?? 
+        window.PreferencesData?.currentUserId ?? 
+        1;
+      
       const params = new URLSearchParams();
       params.set('group', group);
+      params.set('user_id', String(resolvedUserId));
       if (profileId != null) params.set('profile_id', String(profileId));
       const headers = {};
       const cachedETag = etagByGroup.get(group);
@@ -104,6 +111,15 @@
         const cached = cacheByGroup.get(group) || {};
         return { group, values: cached, profileContext, etag: cachedETag, fromCache: true };
       }
+      if (res.status === 401 || res.status === 403) {
+        window.Logger?.warn?.('PreferencesV4 getGroup authentication error', { page: 'preferences-v4', status: res.status, group });
+        // Return empty group instead of throwing - allow page to continue
+        return { group, values: {}, profileContext, etag: null, fromCache: false };
+      }
+      if (!res.ok) {
+        const errorText = await res.text().catch(() => 'Unknown error');
+        throw new Error(`GetGroup failed: ${res.status} ${errorText}`);
+      }
       const json = await res.json();
       if (!json?.success) throw new Error(json?.error || 'Failed group fetch');
       const data = json.data;
@@ -111,8 +127,15 @@
       if (et) etagByGroup.set(group, et);
       const groupValues = data.values || {};
       cacheByGroup.set(group, groupValues);
-      if (Object.keys(groupValues).length === 0) {
+      // Only warn about empty groups on preferences page or if explicitly debugging
+      const isPreferencesPage = document.body?.classList?.contains('preferences-page') || 
+                                 window.location.pathname === '/preferences' ||
+                                 window.location.pathname.includes('/preferences');
+      if (Object.keys(groupValues).length === 0 && isPreferencesPage) {
         window.Logger?.warn?.(`⚠️ PreferencesV4: group '${group}' returned empty values`, { page: 'preferences-v4' });
+      } else if (Object.keys(groupValues).length === 0) {
+        // Debug level for other pages (normal - groups may not be needed)
+        window.Logger?.debug?.(`PreferencesV4: group '${group}' returned empty values (normal on non-preferences pages)`, { page: 'preferences-v4' });
       }
       profileContext = data.profile_context || profileContext;
       window.dispatchEvent(new CustomEvent('preferences:updated', { detail: { scope: 'group', group } }));
@@ -120,10 +143,15 @@
     });
   }
 
-  async function getGroups(groups, profileId = null) {
+  async function getGroups(groups, profileId = null, userId = null) {
     const results = {};
     for (const g of groups) {
-      const { values } = await getGroup(g, profileId);
+      // Resolve userId for getGroup call
+      const resolvedUserId = userId ?? 
+        window.PreferencesCore?.currentUserId ?? 
+        window.PreferencesData?.currentUserId ?? 
+        1;
+      const { values } = await getGroup(g, profileId, resolvedUserId);
       results[g] = values;
     }
     return results;

@@ -551,7 +551,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
-        description: 'קונפיגורציית מודל ביצועים',
+        description: 'קונפיגורציית מודל ביצועים (ספציפי לעמוד executions)',
         required: false,
         loadOrder: 18
       },

@@ -542,6 +542,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.loadExecutionsData',
+        'window.executionsModalConfig',
         'window.SelectPopulatorService',
         'window.tickerService',
         'window.loadUserPreferences',
@@ -588,17 +589,39 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             console.warn('⚠️ loadUserPreferences not available!');
           }
 
+          // Debug: Check if we reach this point
+          console.log('🔍 [DEBUG] Reached line 590 - about to check loadExecutionsData');
+          window.Logger?.info?.('🔍 [DEBUG] Reached line 590 - about to check loadExecutionsData', {
+            page: 'page-initialization-configs',
+          });
+
+          window.Logger.info('🔍 Checking loadExecutionsData...', {
+            exists: typeof window.loadExecutionsData !== 'undefined',
+            type: typeof window.loadExecutionsData,
+            isFunction: typeof window.loadExecutionsData === 'function',
+            page: 'page-initialization-configs',
+          });
+          
           if (typeof window.loadExecutionsData === 'function') {
             window.Logger.info('📥 Calling loadExecutionsData...', {
               page: 'page-initialization-configs',
             });
-            await window.loadExecutionsData();
-            window.Logger.info('✅ loadExecutionsData completed', {
-              page: 'page-initialization-configs',
-            });
+            try {
+              await window.loadExecutionsData();
+              window.Logger.info('✅ loadExecutionsData completed', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.error('❌ loadExecutionsData failed', {
+                error: error?.message,
+                stack: error?.stack,
+                page: 'page-initialization-configs',
+              });
+            }
           } else {
             window.Logger.warn('⚠️ window.loadExecutionsData is not a function', {
               type: typeof window.loadExecutionsData,
+              value: window.loadExecutionsData,
               page: 'page-initialization-configs',
             });
           }

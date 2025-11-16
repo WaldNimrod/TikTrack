@@ -1,7 +1,7 @@
 # מערכת העדפות - TikTrack Preferences System
 
 > **גרסה 4.0** - מערכת העדפות גמישה ומתקדמת  
-> **עדכון אחרון:** 15 בנובמבר 2025 - תיקון טעינת חשבונות וטבלת סוגי העדפות, הוספת Debug Monitor
+> **עדכון אחרון:** 27 בינואר 2025 - תיקון טעינת העדפות בכל העמודים, הסרת כפילות Bootstrap JS, הוספת טסטים מקיפים
 
 ---
 
@@ -33,24 +33,31 @@
 - **Frontend**  
   - `tests/unit/preferences-page.test.js` – לוגיקה של שמירה ועומס UI  
   - `tests/integration/preferences-integration.test.js` – זרימת CRUD מלאה מול cache/unified systems  
-  - `tests/component/preferences-flow.test.js` – מסלול משתמש מלא בעמוד ההעדפות
+  - `tests/e2e/user-pages/preferences-scripts-loading.test.js` – **חדש!** בדיקת טעינת העדפות בכל העמודים
+  - `tests/e2e/user-pages/preferences.test.js` – בדיקת עמוד העדפות
+  - `tests/e2e/preferences-flow.test.js` – מסלול משתמש מלא בעמוד ההעדפות
+  - `tests/unit/preferences.v4.events.test.js` – בדיקת אירועי Preferences V4
+  - `tests/integration/preferences.v4.bootstrap.integration.test.js` – בדיקת bootstrap flow
 - **Backend**  
   - `Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py` – `/api/preferences/version` ו-`/api/preferences/user/check-updates`  
   - `Backend/tests/test_services/test_tag_service.py` – וידוא אינטגרציית cache + analytics שמוזנות להעדפות
 - **פקודות מומלצות:**  
   ```
   npm run test -- --coverage --runInBand
+  npm run test -- tests/e2e/user-pages/preferences-scripts-loading.test.js
   python3 -m pytest Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py
   ```
   יש לעדכן את `tests/TEST_STATUS_REPORT.md` בכל שינוי המשפיע על העדפות.
 
-### סטטיסטיקות מערכת נוכחיות - **עדכון 15/11/2025:**
+### סטטיסטיקות מערכת נוכחיות - **עדכון 27/01/2025:**
 - **126 העדפות פעילות** במערכת (עדכון מדויק לפי DB)
 - **7 קבוצות** העדפות מאורגנות
 - **פרופילים מרובים** - כל משתמש יכול ליצור מספר פרופילים
 - **63 צבעים** (entity, status, type, priority, value, chart colors, UI colors)
 - **23 הגדרות התראות** (הקבוצה הגדולה ביותר)
 - **Debug Monitor** - מערכת ניטור ובדיקה מפורטת
+- **15 עמודים** עם preferences package - כולם מתוקנים ומאומתים
+- **60+ טסטים** לבדיקת טעינת העדפות בכל העמודים
 
 ---
 

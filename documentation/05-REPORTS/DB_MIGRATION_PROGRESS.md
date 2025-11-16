@@ -48,6 +48,15 @@
 - ✅ Created `scripts/db/verify_models_vs_db.py`:
   - Verifies SQLAlchemy models match database structure
   - Identifies mismatches before migration
+- ✅ Created `scripts/db/export_constraints_from_sqlite.py`:
+  - Exports all constraints from SQLite for migration preparation
+  - Generates detailed constraint mapping document
+- ✅ Created `scripts/db/convert_triggers_to_postgres.py`:
+  - Converts SQLite triggers to PostgreSQL functions and triggers
+  - Generates migration SQL for trigger conversion
+- ✅ Created `scripts/db/verify_indexes.py`:
+  - Verifies indexes are properly defined in SQLAlchemy models
+  - Compares DB indexes with model indexes
 
 ### 7. Documentation
 - ✅ Created `DB_MIGRATION_SCAN_REPORT.md` - Full scan findings
@@ -81,26 +90,33 @@
 
 ## 🔄 Next Steps (Non-Intrusive)
 
-### 1. Constraint Translation
-- [ ] Run `scripts/db/sync_constraints_postgres.py` to generate constraint mapping
-- [ ] Review generated `DB_CONSTRAINTS_MAPPING.md`
-- [ ] Identify any constraints requiring manual translation
+### 1. Constraint Translation ✅
+- ✅ Created `export_constraints_from_sqlite.py` to export constraints
+- ✅ Generated `DB_CONSTRAINTS_EXPORT.md` with all 114 constraints
+- [ ] Run `scripts/db/sync_constraints_postgres.py` after data migration
+- [ ] Review and apply constraints to PostgreSQL
 
-### 2. Trigger Conversion
-- [ ] Convert SQLite triggers to PostgreSQL functions:
+### 2. Trigger Conversion ✅
+- ✅ Created `convert_triggers_to_postgres.py` for trigger conversion
+- ✅ Generated `DB_TRIGGERS_POSTGRES.md` with PostgreSQL equivalents
+- ✅ Converted 2 triggers:
   - `protect_base_currency_update`
   - `protect_base_currency_delete`
-- [ ] Create PostgreSQL trigger definitions
+- [ ] Test trigger functions on development PostgreSQL
+- [ ] Apply triggers after data migration
 
-### 3. Index Verification
-- [ ] Verify all indexes are defined in SQLAlchemy models
-- [ ] Create migration script for index creation
+### 3. Index Verification ✅
+- ✅ Created `verify_indexes.py` to compare DB and model indexes
+- ✅ Generated `DB_INDEXES_VERIFICATION.md`
+- [ ] Review missing indexes and add to models if needed
 - [ ] Document any performance-critical indexes
 
-### 4. Foreign Key Verification
-- [ ] Verify all foreign keys are properly defined in models
-- [ ] Test foreign key constraints in PostgreSQL
-- [ ] Document any cascading delete requirements
+### 4. Foreign Key Verification ✅
+- ✅ Created `verify_foreign_keys.py` to compare DB and model foreign keys
+- ✅ Generated `DB_FOREIGN_KEYS_VERIFICATION.md`
+- ✅ Documented all cascading delete requirements
+- [ ] Review missing foreign keys and add to models if needed
+- [ ] Test foreign key constraints in PostgreSQL after migration
 
 ### 5. Data Migration Testing
 - [ ] Test migration script on development database

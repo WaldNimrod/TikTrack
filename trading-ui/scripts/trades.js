@@ -2529,6 +2529,455 @@ function initializeTradeConditionsSystem() {
 
 window.initializeTradeConditionsSystem = initializeTradeConditionsSystem;
 
+function getTradesModalElement() {
+  return document.getElementById('tradesModal');
+}
+
+function getTradeModalEntityName(modalElement) {
+  if (!modalElement) {
+    return '';
+  }
+  if (modalElement.dataset.entityName && modalElement.dataset.entityName.trim() !== '') {
+    return modalElement.dataset.entityName;
+  }
+  const tickerSelect = modalElement.querySelector('#tradeTicker');
+  if (tickerSelect && tickerSelect.selectedOptions.length > 0) {
+    const tickerName = tickerSelect.selectedOptions[0].textContent?.trim();
+    if (tickerName) {
+      modalElement.dataset.entityName = tickerName;
+      return tickerName;
+    }
+  }
+  return '';
+}
+
+async function openTradeConditionsModal(modalElement, options = {}) {
+  if (!modalElement) {
+    window.Logger?.error('Trades modal element not found while opening conditions', {}, { page: 'trades' });
+    window.showNotification?.('מודול הטריידים לא זמין כרגע.', 'error');
+    return;
+  }
+  const entityId = modalElement.dataset.entityId;
+  if (!entityId) {
+    window.showNotification?.('יש לשמור את הטרייד לפני ניהול תנאים.', 'info');
+    return;
+  }
+  const entityName = getTradeModalEntityName(modalElement);
+  const { focusConditionId = null, layoutMode = 'form-only' } = options;
+  if (!window.conditionsModalController?.open) {
+    window.showNotification?.('מודול התנאים אינו זמין כעת.', 'error');
+    return;
+  }
+  try {
+    await window.conditionsModalController.open({
+      entityType: 'trade',
+      entityId: Number(entityId),
+      entityName,
+      parentModalId: modalElement.id,
+      focusConditionId,
+      layoutMode
+    });
+  } catch (error) {
+    window.Logger?.error('Failed to open trade conditions modal', { error: error?.message }, { page: 'trades' });
+    window.showNotification?.('שגיאה בפתיחת מודול התנאים.', 'error');
+  }
+}
+
+async function handleTradeConditionsButtonClick() {
+  const modalElement = getTradesModalElement();
+  await openTradeConditionsModal(modalElement);
+}
+
+window.handleTradeConditionsButtonClick = handleTradeConditionsButtonClick;
+
+async function handleTradeConditionSummaryEdit(conditionId) {
+  const modalElement = getTradesModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול הטריידים לא זמין כרגע.', 'error');
+    return;
+  }
+  const entityId = modalElement.dataset.entityId;
+  if (!entityId) {
+    window.showNotification?.('נדרש לשמור את הטרייד לפני עריכת תנאים.', 'info');
+    return;
+  }
+  const numericConditionId = Number(conditionId);
+  if (!Number.isFinite(numericConditionId)) {
+    window.Logger?.warn('handleTradeConditionSummaryEdit called without valid condition id', { conditionId }, { page: 'trades' });
+    return;
+  }
+  await openTradeConditionsModal(modalElement, { focusConditionId: numericConditionId });
+}
+
+async function handleTradeConditionSummaryDelete(conditionId) {
+  const modalElement = getTradesModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול הטריידים לא זמין כרגע.', 'error');
+    return;
+  }
+  const entityId = modalElement.dataset.entityId;
+  if (!entityId) {
+    window.showNotification?.('נדרש לשמור את הטרייד לפני מחיקת תנאים.', 'info');
+    return;
+  }
+  const numericConditionId = Number(conditionId);
+  if (!Number.isFinite(numericConditionId)) {
+    window.Logger?.warn('handleTradeConditionSummaryDelete called without valid condition id', { conditionId }, { page: 'trades' });
+    return;
+  }
+
+  const renderer = window.ConditionsSummaryRenderer;
+  const cachedCondition = renderer?.getCondition?.('trade', entityId, numericConditionId);
+  const confirmed = renderer?.confirmDeletion
+    ? await renderer.confirmDeletion(cachedCondition)
+    : window.confirm('האם למחוק את התנאי הנבחר?');
+  if (!confirmed) {
+    return;
+  }
+
+  if (isConditionsModalOpen('trade', entityId) && window.conditionsUIManager?.handleDeleteCondition) {
+    await window.conditionsUIManager.handleDeleteCondition(numericConditionId, { skipConfirm: true });
+    return;
+  }
+
+  if (renderer?.deleteConditionViaCrud) {
+    await renderer.deleteConditionViaCrud('trade', numericConditionId, entityId);
+  } else {
+    await deleteConditionViaCrud(numericConditionId, entityId, 'trade');
+  }
+}
+
+window.handleTradeConditionSummaryEdit = handleTradeConditionSummaryEdit;
+window.handleTradeConditionSummaryDelete = handleTradeConditionSummaryDelete;
+
+async function evaluateSingleTradeCondition(conditionId) {
+  if (!conditionId) {
+    throw new Error('מזהה תנאי חסר');
+  }
+  const response = await fetch(`/api/trade-conditions/${conditionId}/evaluate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    const message = payload?.message || 'שגיאה בבדיקת התנאי';
+    throw new Error(message);
+  }
+  const payload = await response.json();
+  return normalizeConditionEvaluationPayload(payload?.data || payload);
+}
+
+async function handleTradeConditionRowEvaluate(conditionId) {
+  if (!conditionId) {
+    return;
+  }
+  const modalElement = getTradesModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול הטריידים לא זמין כרגע.', 'error');
+    return;
+  }
+  const renderer = window.ConditionsSummaryRenderer;
+  const translator = window.conditionsTranslations;
+  const button = document.querySelector(`[data-condition-evaluate="${conditionId}"]`);
+  renderer?.setButtonLoadingState?.(button, true);
+  try {
+    const payload = await evaluateSingleTradeCondition(conditionId);
+    if (payload) {
+      renderer?.setEvaluation?.('trade', Number(conditionId), payload);
+      const successMessage = translator?.getMessage?.('single_condition_evaluated') || 'התנאי נבדק בהצלחה.';
+      window.showNotification?.(successMessage, 'success');
+    }
+  } catch (error) {
+    window.Logger?.error('handleTradeConditionRowEvaluate failed', { error: error?.message, conditionId }, { page: 'trades' });
+    const errorMessage = translator?.getMessage?.('single_condition_evaluate_error') || 'שגיאה בבדיקת התנאי.';
+    window.showNotification?.(errorMessage, 'error');
+    renderer?.setEvaluation?.('trade', Number(conditionId), { error: errorMessage });
+  } finally {
+    renderer?.setButtonLoadingState?.(button, false);
+    const refreshedModal = getTradesModalElement();
+    if (refreshedModal) {
+      loadTradeConditionsSummary(refreshedModal, { showLoading: false });
+    }
+  }
+}
+
+window.handleTradeConditionRowEvaluate = handleTradeConditionRowEvaluate;
+
+async function handleTradeConditionToggleAlerts(conditionId) {
+  if (!conditionId) {
+    return;
+  }
+  const modalElement = getTradesModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול הטריידים לא זמין כרגע.', 'error');
+    return;
+  }
+  const renderer = window.ConditionsSummaryRenderer;
+  const translator = window.conditionsTranslations;
+  const button = document.querySelector(`[data-condition-toggle="${conditionId}"]`);
+  renderer?.setButtonLoadingState?.(button, true);
+  try {
+    const response = await fetch(`/api/trade-conditions/${conditionId}/alert/toggle`, {
+      method: 'POST'
+    });
+    const payload = await response.json();
+    if (!response.ok || payload?.status === 'error') {
+      throw new Error(payload?.message || 'toggle_failed');
+    }
+    const isEnabled = payload?.data?.auto_generate_alerts !== false;
+    const messageKey = isEnabled ? 'auto_alerts_enabled' : 'auto_alerts_disabled';
+    const notification = translator?.getMessage?.(messageKey)
+      || (isEnabled ? 'התראות אוטומטיות הופעלו.' : 'התראות אוטומטיות כובו.');
+    window.showNotification?.(notification, 'success');
+  } catch (error) {
+    window.Logger?.error('handleTradeConditionToggleAlerts failed', { error: error?.message, conditionId }, { page: 'trades' });
+    const errorMessage = translator?.getMessage?.('auto_alerts_toggle_error') || 'שגיאה בעדכון מצב ההתראות.';
+    window.showNotification?.(errorMessage, 'error');
+  } finally {
+    renderer?.setButtonLoadingState?.(button, false);
+    const refreshedModal = getTradesModalElement();
+    if (refreshedModal) {
+      loadTradeConditionsSummary(refreshedModal, { showLoading: false });
+    }
+  }
+}
+
+window.handleTradeConditionToggleAlerts = handleTradeConditionToggleAlerts;
+
+async function handleTradeEvaluateConditionsClick() {
+  const modalElement = getTradesModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול הטריידים לא זמין כרגע.', 'error');
+    return;
+  }
+  const entityId = modalElement.dataset.entityId;
+  if (!entityId) {
+    window.showNotification?.('יש לשמור את הטרייד לפני בדיקת תנאים.', 'info');
+    return;
+  }
+
+  window.ConditionsSummaryRenderer?.setButtonLoadingStateById?.('tradeEvaluateConditionsButton', true);
+  try {
+    const conditions = await getTradeConditionsForEvaluation(entityId);
+    if (!Array.isArray(conditions) || !conditions.length) {
+      window.showNotification?.('אין תנאים פעילים לטרייד זה.', 'info');
+      return;
+    }
+
+    const evaluationResults = await Promise.all(
+      conditions
+        .filter(condition => condition?.id)
+        .map(condition => evaluateSingleTradeCondition(condition.id)
+          .then(payload => ({
+            conditionId: condition.id,
+            payload
+          }))
+          .catch(error => ({
+            conditionId: condition.id,
+            error: error?.message || 'evaluation_failed'
+          })))
+    );
+
+    const renderer = window.ConditionsSummaryRenderer;
+    let successCount = 0;
+    let errorCount = 0;
+
+    evaluationResults.forEach(result => {
+      if (!result || !result.conditionId) {
+        return;
+      }
+      if (result.error) {
+        errorCount += 1;
+        renderer?.setEvaluation?.('trade', Number(result.conditionId), { error: result.error });
+        return;
+      }
+      if (result.payload) {
+        successCount += 1;
+        renderer?.setEvaluation?.('trade', Number(result.conditionId), result.payload);
+      }
+    });
+
+    if (successCount) {
+      window.showNotification?.(`נבדקו ${successCount} תנאים בהצלחה.`, 'success');
+    }
+    if (errorCount) {
+      window.showNotification?.(`${errorCount} תנאים לא נבדקו.`, 'warning');
+    }
+  } catch (error) {
+    window.Logger?.error('handleTradeEvaluateConditionsClick failed', { error, page: 'trades' });
+    window.showNotification?.('שגיאה בבדיקת התנאים.', 'error');
+  } finally {
+    window.ConditionsSummaryRenderer?.setButtonLoadingStateById?.('tradeEvaluateConditionsButton', false);
+    const refreshedModal = getTradesModalElement();
+    if (refreshedModal) {
+      loadTradeConditionsSummary(refreshedModal, { showLoading: false });
+    }
+  }
+}
+
+window.handleTradeEvaluateConditionsClick = handleTradeEvaluateConditionsClick;
+
+async function getTradeConditionsForEvaluation(entityId) {
+  const numericId = Number(entityId);
+  const cached = window.ConditionsSummaryRenderer?.getConditions?.('trade', numericId);
+  if (Array.isArray(cached) && cached.length) {
+    return cached;
+  }
+  const response = await fetch(`/api/trade-conditions/trades/${entityId}/conditions`);
+  if (!response.ok) {
+    throw new Error('טעינת התנאים נכשלה');
+  }
+  const payload = await response.json();
+  const data = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+  if (Array.isArray(data)) {
+    window.ConditionsSummaryRenderer?.setConditions?.('trade', numericId, data);
+  }
+  return data;
+}
+
+async function loadTradeConditionsSummary(modalElement, { showLoading = true } = {}) {
+  const summaryContainer = modalElement?.querySelector('#tradeConditionsSummary');
+  if (!summaryContainer) {
+    return;
+  }
+
+  const entityId = modalElement.dataset.entityId;
+  if (!entityId) {
+    delete summaryContainer.dataset.entityId;
+    summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את הטרייד לפני שניתן להציג תנאים.</div>';
+    window.ConditionsSummaryRenderer?.clearCache?.('trade', null);
+    return;
+  }
+
+  summaryContainer.dataset.entityId = entityId;
+  const crudManager = window.conditionsCRUDManager;
+  if (!crudManager) {
+    summaryContainer.innerHTML = '<div class="text-muted small mb-0">מערכת התנאים אינה זמינה כעת.</div>';
+    return;
+  }
+
+  if (showLoading) {
+    summaryContainer.innerHTML = `
+      <div class="text-center text-muted py-2">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        טוען תנאים פעילים...
+      </div>
+    `;
+  }
+
+  try {
+    crudManager.setContext?.({ entityType: 'trade' });
+    const conditions = await crudManager.readConditions(Number(entityId), true);
+    const activeConditions = (conditions || []).filter(condition => condition?.is_active !== false);
+    window.ConditionsSummaryRenderer?.setConditions?.('trade', Number(entityId), activeConditions);
+
+    if (!activeConditions.length) {
+      summaryContainer.innerHTML = '<div class="text-muted small mb-0">אין תנאים פעילים לטרייד זה.</div>';
+      return;
+    }
+
+    summaryContainer.innerHTML = window.ConditionsSummaryRenderer?.buildTable?.('trade', activeConditions, {
+      edit: 'handleTradeConditionSummaryEdit',
+      delete: 'handleTradeConditionSummaryDelete',
+      evaluate: 'handleTradeConditionRowEvaluate',
+      toggle: 'handleTradeConditionToggleAlerts'
+    }) || '<div class="text-muted small mb-0">לא נמצא Renderer להצגת תנאים.</div>';
+    if (window.ButtonSystem?.processButtons) {
+      window.ButtonSystem.processButtons(summaryContainer);
+    } else if (window.ButtonSystem?.hydrateButtons) {
+      window.ButtonSystem.hydrateButtons(summaryContainer);
+    }
+  } catch (error) {
+    window.Logger?.error('Failed to load trade conditions summary', { error: error?.message, entityId }, { page: 'trades' });
+    summaryContainer.innerHTML = '<div class="alert alert-warning py-2 px-2 mb-0 small">שגיאה בטעינת תנאים פעילים. נסה שוב.</div>';
+  }
+}
+
+function setupTradeConditionsButton(modalElement) {
+  window.Logger?.info('setupTradeConditionsButton invoked', { modalId: modalElement?.id, mode: modalElement?.dataset?.modalMode || modalElement?.dataset?.mode }, { page: 'trades' });
+  if (!modalElement) {
+    return;
+  }
+
+  const controlsWrapper = modalElement.querySelector('[data-conditions-controls="trade"]');
+  if (!controlsWrapper || controlsWrapper.dataset.initialized === 'true') {
+    return;
+  }
+
+  if (window.ButtonSystem?.processButtons) {
+    window.ButtonSystem.processButtons(controlsWrapper);
+  } else if (window.ButtonSystem?.hydrateButtons) {
+    window.ButtonSystem.hydrateButtons(controlsWrapper);
+  }
+
+  const summaryContainer = controlsWrapper.querySelector('#tradeConditionsSummary');
+  const disabledHint = controlsWrapper.querySelector('[data-conditions-disabled-hint]');
+  const openButton = document.getElementById('tradeOpenConditionsButton');
+  const evaluateButton = document.getElementById('tradeEvaluateConditionsButton');
+  const tickerSelect = modalElement.querySelector('#tradeTicker');
+
+  const updateButtonState = () => {
+    const isEnabled = Boolean(modalElement.dataset.entityId);
+    if (openButton) {
+      openButton.toggleAttribute('disabled', !isEnabled);
+      openButton.setAttribute('aria-disabled', isEnabled ? 'false' : 'true');
+    }
+    if (evaluateButton) {
+      evaluateButton.toggleAttribute('disabled', !isEnabled);
+      evaluateButton.setAttribute('aria-disabled', isEnabled ? 'false' : 'true');
+    }
+    if (disabledHint) {
+      disabledHint.classList.toggle('d-none', Boolean(isEnabled));
+    }
+
+    if (summaryContainer) {
+      if (isEnabled) {
+        loadTradeConditionsSummary(modalElement);
+      } else {
+        delete summaryContainer.dataset.entityId;
+        summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את הטרייד לפני שניתן להציג תנאים.</div>';
+      }
+    }
+  };
+
+  if (tickerSelect && !tickerSelect.dataset.conditionsNameBound) {
+    tickerSelect.addEventListener('change', () => {
+      getTradeModalEntityName(modalElement);
+      updateButtonState();
+    });
+    tickerSelect.dataset.conditionsNameBound = 'true';
+  }
+
+  modalElement.addEventListener('modal:entity-context-changed', updateButtonState);
+  modalElement.addEventListener('modal:entity-context-reset', () => {
+    modalElement.dataset.entityId = '';
+    modalElement.dataset.entityName = '';
+    window.ConditionsSummaryRenderer?.clearCache?.('trade', null);
+    updateButtonState();
+  });
+
+  if (!modalElement.__tradeConditionsUpdatedListener) {
+    modalElement.__tradeConditionsUpdatedListener = (event) => {
+      const detail = event.detail || {};
+      if (detail.entityType !== 'trade' || !detail.tradeId) {
+        return;
+      }
+      if (String(detail.tradeId) === String(modalElement.dataset.entityId)) {
+        loadTradeConditionsSummary(modalElement, { showLoading: false });
+      }
+    };
+    window.addEventListener('tradePlanConditionsUpdated', modalElement.__tradeConditionsUpdatedListener);
+  }
+
+  controlsWrapper.dataset.initialized = 'true';
+  updateButtonState();
+  window.Logger?.info('Trade conditions controls ready', { entityId: modalElement.dataset.entityId, mode: modalElement.dataset.modalMode || modalElement.dataset.mode }, { page: 'trades' });
+}
+
+window.setupTradeConditionsButton = setupTradeConditionsButton;
+
 // ===== SORTING AND FILTERING FUNCTIONS =====
 // Table sorting, filtering, and state management
 

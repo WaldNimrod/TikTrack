@@ -2187,10 +2187,7 @@ function getTradePlansModalElement() {
   return document.getElementById('tradePlansModal');
 }
 
-const tradePlanConditionsSummaryCache = new Map();
-const tradePlanConditionEvaluations = new Map();
-
-function isConditionsModalOpenForPlan(entityId) {
+function isConditionsModalOpen(entityType, entityId) {
   if (!entityId) {
     return false;
   }
@@ -2203,33 +2200,23 @@ function isConditionsModalOpenForPlan(entityId) {
   if (!isVisible) {
     return false;
   }
-  return context.entityType === 'plan' && Number(context.entityId) === Number(entityId);
+  return context.entityType === entityType && Number(context.entityId) === Number(entityId);
 }
 
+window.isConditionsModalOpen = isConditionsModalOpen;
+
 function getCachedConditionSummary(entityId, conditionId) {
-  const list = tradePlanConditionsSummaryCache.get(Number(entityId));
-  if (!Array.isArray(list)) {
+  if (!window.ConditionsSummaryRenderer) {
     return null;
   }
-  return list.find(condition => Number(condition.id) === Number(conditionId)) || null;
+  return window.ConditionsSummaryRenderer.getCondition('plan', entityId, conditionId);
 }
 
 function clearCachedConditionsSummary(entityId) {
-  if (!entityId) {
-    tradePlanConditionsSummaryCache.clear();
-    tradePlanConditionEvaluations.clear();
+  if (!window.ConditionsSummaryRenderer) {
     return;
   }
-  const numericId = Number(entityId);
-  const cachedList = tradePlanConditionsSummaryCache.get(numericId);
-  if (Array.isArray(cachedList)) {
-    cachedList.forEach(condition => {
-      if (condition?.id) {
-        tradePlanConditionEvaluations.delete(Number(condition.id));
-      }
-    });
-  }
-  tradePlanConditionsSummaryCache.delete(numericId);
+  window.ConditionsSummaryRenderer.clearCache('plan', entityId ?? null);
 }
 
 async function openTradePlanConditionsModal(modalElement, options = {}) {
@@ -2247,7 +2234,7 @@ async function openTradePlanConditionsModal(modalElement, options = {}) {
 
   const focusConditionId = options.focusConditionId ? Number(options.focusConditionId) : null;
 
-  if (isConditionsModalOpenForPlan(entityId)) {
+  if (isConditionsModalOpen('plan', entityId)) {
     if (focusConditionId && window.conditionsUIManager?.handleEditCondition) {
       try {
         await window.conditionsUIManager.handleEditCondition(focusConditionId);
@@ -2297,6 +2284,8 @@ async function handleTradePlanConditionsButtonClick() {
 
 window.handleTradePlanConditionsButtonClick = handleTradePlanConditionsButtonClick;
 window.handleTradePlanEvaluateConditionsClick = handleTradePlanEvaluateConditionsClick;
+window.handleTradePlanConditionRowEvaluate = handleTradePlanConditionRowEvaluate;
+window.handleTradePlanConditionToggleAlerts = handleTradePlanConditionToggleAlerts;
 
 async function handleTradePlanConditionSummaryEdit(conditionId) {
   const modalElement = getTradePlansModalElement();
@@ -2334,18 +2323,25 @@ async function handleTradePlanConditionSummaryDelete(conditionId) {
     return;
   }
 
+  const renderer = window.ConditionsSummaryRenderer;
   const cachedCondition = getCachedConditionSummary(entityId, numericConditionId);
-  const confirmed = await confirmTradePlanConditionDeletion(cachedCondition);
+  const confirmed = renderer?.confirmDeletion
+    ? await renderer.confirmDeletion(cachedCondition)
+    : window.confirm('האם למחוק את התנאי הנבחר?');
   if (!confirmed) {
     return;
   }
 
-  if (isConditionsModalOpenForPlan(entityId) && window.conditionsUIManager?.handleDeleteCondition) {
+  if (isConditionsModalOpen('plan', entityId) && window.conditionsUIManager?.handleDeleteCondition) {
     await window.conditionsUIManager.handleDeleteCondition(numericConditionId, { skipConfirm: true });
     return;
   }
 
-  await deleteConditionViaCrud(numericConditionId, entityId);
+  if (renderer?.deleteConditionViaCrud) {
+    await renderer.deleteConditionViaCrud('plan', numericConditionId, entityId);
+  } else {
+    await deleteConditionViaCrud(numericConditionId, entityId, 'plan');
+  }
 }
 
 window.handleTradePlanConditionSummaryEdit = handleTradePlanConditionSummaryEdit;
@@ -2379,7 +2375,7 @@ async function confirmTradePlanConditionDeletion(condition) {
   return window.confirm(fullMessage);
 }
 
-async function deleteConditionViaCrud(conditionId, entityId) {
+async function deleteConditionViaCrud(conditionId, entityId, entityType = 'plan') {
   const crudManager = window.conditionsCRUDManager;
   if (!crudManager) {
     window.showNotification?.('מערכת ניהול התנאים אינה זמינה כרגע.', 'error');
@@ -2387,15 +2383,16 @@ async function deleteConditionViaCrud(conditionId, entityId) {
   }
 
   try {
-    crudManager.setContext?.({ entityType: 'plan' });
+    crudManager.setContext?.({ entityType });
     const success = await crudManager.deleteCondition(Number(conditionId), Number(entityId));
     if (success) {
       window.showNotification?.('התנאי נמחק בהצלחה', 'success');
       window.dispatchEvent(new CustomEvent('tradePlanConditionsUpdated', {
         detail: {
           action: 'delete',
-          entityType: 'plan',
-          tradePlanId: Number(entityId),
+          entityType,
+          tradePlanId: entityType === 'plan' ? Number(entityId) : null,
+          tradeId: entityType === 'trade' ? Number(entityId) : null,
           payload: { conditionId: Number(conditionId) }
         }
       }));
@@ -2527,215 +2524,6 @@ function getConditionsTranslator() {
   return window.conditionsTranslations || null;
 }
 
-function escapeHtmlForConditions(value) {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function stripHtmlForConditions(value) {
-  if (!value) {
-    return '';
-  }
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = value;
-  return tempDiv.textContent || tempDiv.innerText || '';
-}
-
-function getConditionActionMeta(actionKey) {
-  const translator = getConditionsTranslator();
-  const actions = translator?.getTriggerActions?.() || {};
-  return actions[actionKey] || null;
-}
-
-function getConditionActionLabel(condition) {
-  const translator = getConditionsTranslator();
-  const actionKey = condition?.trigger_action || condition?.triggerAction || 'enter_trade_positive';
-  return translator?.getTriggerActionLabel?.(actionKey) || actionKey;
-}
-
-function formatConditionActionCell(condition) {
-  const actionLabel = getConditionActionLabel(condition);
-  const notesPreview = stripHtmlForConditions(condition?.action_notes || condition?.actionNotes || '');
-  const truncatedNotes = notesPreview.length > 120 ? `${notesPreview.slice(0, 120)}…` : notesPreview;
-  const polarity = getConditionActionMeta(condition?.trigger_action || condition?.triggerAction)?.polarity || 'neutral';
-  const polarityClass = polarity === 'positive' ? 'text-success' : (polarity === 'negative' ? 'text-danger' : 'text-muted');
-
-  return `
-    <div class="d-flex flex-column gap-1">
-      <span class="fw-semibold ${polarityClass}">${escapeHtmlForConditions(actionLabel)}</span>
-      ${truncatedNotes ? `<span class="text-muted small">${escapeHtmlForConditions(truncatedNotes)}</span>` : ''}
-    </div>
-  `;
-}
-
-function getConditionEvaluationRecord(conditionId) {
-  if (!conditionId) {
-    return null;
-  }
-  return tradePlanConditionEvaluations.get(Number(conditionId)) || null;
-}
-
-function formatConditionEvaluationCell(condition) {
-  const evaluation = getConditionEvaluationRecord(condition?.id);
-  if (!evaluation) {
-    return '<span class="text-muted small">טרם נבדק</span>';
-  }
-
-  if (evaluation.error) {
-    return `<div class="text-danger small">${escapeHtmlForConditions(evaluation.error)}</div>`;
-  }
-
-  const badgeHtml = window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function'
-    ? window.FieldRendererService.renderStatus(evaluation.met ? 'triggered' : 'not_triggered', 'alert')
-    : `<span class="badge ${evaluation.met ? 'bg-success' : 'bg-secondary'}">${evaluation.met ? 'הופעל' : 'לא הופעל'}</span>`;
-
-  let timestampHtml = '';
-  if (evaluation.evaluationTime) {
-    const formattedTime = typeof window.formatDateTime === 'function'
-      ? window.formatDateTime(evaluation.evaluationTime)
-      : new Date(evaluation.evaluationTime).toLocaleString('he-IL');
-    timestampHtml = `<span class="text-muted small">${escapeHtmlForConditions(formattedTime)}</span>`;
-  }
-
-  return `
-    <div class="d-flex flex-column gap-1">
-      ${badgeHtml}
-      ${timestampHtml}
-    </div>
-  `;
-}
-
-function extractConditionParametersSummary(condition) {
-  if (!condition) {
-    return {};
-  }
-  if (condition.parameters && typeof condition.parameters === 'object') {
-    return condition.parameters;
-  }
-  const raw = condition.parameters_json;
-  if (!raw) {
-    return {};
-  }
-  if (typeof raw === 'object') {
-    return raw;
-  }
-  try {
-    const parsed = JSON.parse(raw);
-    return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
-  } catch (error) {
-    window.Logger?.warn('Failed parsing condition parameters for summary', { error: error?.message }, { page: 'trade_plans' });
-    return {};
-  }
-}
-
-function getConditionMethodName(condition) {
-  const translator = getConditionsTranslator();
-  const methodKey = condition?.method_key || condition?.method?.method_key;
-  if (methodKey && translator?.getMethodName) {
-    const translated = translator.getMethodName(methodKey);
-    if (translated) {
-      return translated;
-    }
-  }
-  return condition?.method_name
-    || condition?.method?.name_he
-    || condition?.method?.name_en
-    || 'ללא שם';
-}
-
-function getConditionOperatorLabel(condition) {
-  const translator = getConditionsTranslator();
-  const operator = condition?.logical_operator || 'NONE';
-  return translator?.getOperator?.(operator) || operator;
-}
-
-function formatConditionParametersSummaryHtml(condition) {
-  const parameters = extractConditionParametersSummary(condition);
-  const entries = Object.entries(parameters);
-  if (!entries.length) {
-    return '<span class="text-muted">ללא פרמטרים</span>';
-  }
-  const translator = getConditionsTranslator();
-  return entries.map(([key, value]) => {
-    const label = translator?.getParameterName?.(key) || key;
-    return `<div class="badge bg-light text-dark border fw-normal me-1 mb-1">${escapeHtmlForConditions(label)}: ${escapeHtmlForConditions(value)}</div>`;
-  }).join('');
-}
-
-function buildTradePlanConditionsSummaryTable(conditions) {
-  const rows = conditions.map(condition => {
-    const methodName = getConditionMethodName(condition);
-    const operatorName = getConditionOperatorLabel(condition);
-    const parametersHtml = formatConditionParametersSummaryHtml(condition);
-    const updatedAt = condition?.updated_at?.display
-      || condition?.created_at?.display
-      || '';
-    const conditionIdAttr = condition?.id ? `data-condition-id="${condition.id}"` : '';
-    const actionHtml = formatConditionActionCell(condition);
-    const evaluationHtml = formatConditionEvaluationCell(condition);
-    return `
-      <tr>
-        <td class="fw-semibold">${escapeHtmlForConditions(methodName)}</td>
-        <td>${escapeHtmlForConditions(operatorName)}</td>
-        <td>${parametersHtml}</td>
-        <td>${actionHtml}</td>
-        <td>${evaluationHtml}</td>
-        <td>${escapeHtmlForConditions(updatedAt)}</td>
-        <td class="text-center table-action-buttons" ${conditionIdAttr}>
-          <button
-            type="button"
-            data-button-type="EDIT"
-            data-variant="small"
-            data-size="small"
-            data-text=""
-            data-tooltip="עריכת תנאי"
-            aria-label="עריכת תנאי"
-            data-onclick="handleTradePlanConditionSummaryEdit(${condition.id || 0})">
-          </button>
-          <button
-            type="button"
-            data-button-type="DELETE"
-            data-variant="small"
-            data-size="small"
-            data-text=""
-            data-tooltip="מחיקת תנאי"
-            aria-label="מחיקת תנאי"
-            data-onclick="handleTradePlanConditionSummaryDelete(${condition.id || 0})">
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  return `
-    <div class="table-responsive">
-      <table class="table table-sm table-striped table-hover align-middle mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>שיטה</th>
-            <th>אופרטור</th>
-            <th>פרמטרים</th>
-            <th>פעולה</th>
-            <th>בדיקה אחרונה</th>
-            <th>עודכן</th>
-            <th class="text-center" style="width: 90px;">פעולות</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
 async function handleTradePlanEvaluateConditionsClick() {
   const modalElement = getTradePlansModalElement();
   if (!modalElement) {
@@ -2748,7 +2536,7 @@ async function handleTradePlanEvaluateConditionsClick() {
     return;
   }
 
-  setEvaluateButtonLoadingState(true);
+  window.ConditionsSummaryRenderer?.setButtonLoadingStateById?.('tradePlanEvaluateConditionsButton', true);
   try {
     const conditions = await getTradePlanConditionsForEvaluation(entityId);
     if (!Array.isArray(conditions) || !conditions.length) {
@@ -2760,18 +2548,19 @@ async function handleTradePlanEvaluateConditionsClick() {
     let successCount = 0;
     let errorCount = 0;
 
+    const renderer = window.ConditionsSummaryRenderer;
     evaluationResults.forEach(result => {
       if (!result || !result.conditionId) {
         return;
       }
       if (result.error) {
         errorCount += 1;
-        tradePlanConditionEvaluations.set(Number(result.conditionId), { error: result.error });
+        renderer?.setEvaluation?.('plan', Number(result.conditionId), { error: result.error });
         return;
       }
       if (result.payload) {
         successCount += 1;
-        tradePlanConditionEvaluations.set(Number(result.conditionId), result.payload);
+        renderer?.setEvaluation?.('plan', Number(result.conditionId), result.payload);
       }
     });
 
@@ -2785,7 +2574,7 @@ async function handleTradePlanEvaluateConditionsClick() {
     window.Logger?.error('handleTradePlanEvaluateConditionsClick failed', { error, page: 'trade_plans' });
     window.showNotification?.('שגיאה בבדיקת התנאים.', 'error');
   } finally {
-    setEvaluateButtonLoadingState(false);
+    window.ConditionsSummaryRenderer?.setButtonLoadingStateById?.('tradePlanEvaluateConditionsButton', false);
     const refreshedModal = getTradePlansModalElement();
     if (refreshedModal) {
       loadTradePlanConditionsSummary(refreshedModal, { showLoading: false });
@@ -2793,29 +2582,9 @@ async function handleTradePlanEvaluateConditionsClick() {
   }
 }
 
-function setEvaluateButtonLoadingState(isLoading) {
-  const button = document.getElementById('tradePlanEvaluateConditionsButton');
-  if (!button) {
-    return;
-  }
-  if (isLoading) {
-    button.dataset.loading = 'true';
-    button.disabled = true;
-  } else {
-    delete button.dataset.loading;
-    const baseDisabled = button.getAttribute('aria-disabled') === 'true';
-    button.disabled = baseDisabled;
-  }
-  if (window.ButtonSystem?.processButtons) {
-    window.ButtonSystem.processButtons(button.parentElement || button);
-  } else if (window.ButtonSystem?.hydrateButtons) {
-    window.ButtonSystem.hydrateButtons(button.parentElement || button);
-  }
-}
-
 async function getTradePlanConditionsForEvaluation(entityId) {
   const numericId = Number(entityId);
-  const cached = tradePlanConditionsSummaryCache.get(numericId);
+  const cached = window.ConditionsSummaryRenderer?.getConditions?.('plan', numericId);
   if (Array.isArray(cached) && cached.length) {
     return cached;
   }
@@ -2826,7 +2595,7 @@ async function getTradePlanConditionsForEvaluation(entityId) {
   const payload = await response.json();
   const data = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
   if (Array.isArray(data)) {
-    tradePlanConditionsSummaryCache.set(numericId, data);
+    window.ConditionsSummaryRenderer?.setConditions?.('plan', numericId, data);
   }
   return data;
 }
@@ -2865,6 +2634,79 @@ async function evaluateSinglePlanCondition(conditionId) {
   return normalized;
 }
 
+async function handleTradePlanConditionRowEvaluate(conditionId) {
+  if (!conditionId) {
+    return;
+  }
+  const modalElement = getTradePlansModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול תוכניות מסחר לא זמין כרגע.', 'error');
+    return;
+  }
+  const translator = getConditionsTranslator();
+  const renderer = window.ConditionsSummaryRenderer;
+  const button = document.querySelector(`[data-condition-evaluate="${conditionId}"]`);
+  renderer?.setButtonLoadingState?.(button, true);
+  try {
+    const payload = await evaluateSinglePlanCondition(conditionId);
+    if (payload) {
+      renderer?.setEvaluation?.('plan', Number(conditionId), payload);
+      const successMessage = translator?.getMessage?.('single_condition_evaluated') || 'התנאי נבדק בהצלחה.';
+      window.showNotification?.(successMessage, 'success');
+    }
+  } catch (error) {
+    window.Logger?.error('handleTradePlanConditionRowEvaluate failed', { error: error?.message, conditionId }, { page: 'trade_plans' });
+    const errorMessage = translator?.getMessage?.('single_condition_evaluate_error') || 'שגיאה בבדיקת התנאי.';
+    window.showNotification?.(errorMessage, 'error');
+    renderer?.setEvaluation?.('plan', Number(conditionId), { error: errorMessage });
+  } finally {
+    renderer?.setButtonLoadingState?.(button, false);
+    const refreshedModal = getTradePlansModalElement();
+    if (refreshedModal) {
+      loadTradePlanConditionsSummary(refreshedModal, { showLoading: false });
+    }
+  }
+}
+
+async function handleTradePlanConditionToggleAlerts(conditionId) {
+  if (!conditionId) {
+    return;
+  }
+  const modalElement = getTradePlansModalElement();
+  if (!modalElement) {
+    window.showNotification?.('מודול תוכניות מסחר לא זמין כרגע.', 'error');
+    return;
+  }
+  const translator = getConditionsTranslator();
+  const renderer = window.ConditionsSummaryRenderer;
+  const button = document.querySelector(`[data-condition-toggle="${conditionId}"]`);
+  renderer?.setButtonLoadingState?.(button, true);
+  try {
+    const response = await fetch(`/api/plan-conditions/${conditionId}/alert/toggle`, {
+      method: 'POST'
+    });
+    const payload = await response.json();
+    if (!response.ok || payload?.status === 'error') {
+      throw new Error(payload?.message || 'toggle_failed');
+    }
+    const isEnabled = payload?.data?.auto_generate_alerts !== false;
+    const messageKey = isEnabled ? 'auto_alerts_enabled' : 'auto_alerts_disabled';
+    const notification = translator?.getMessage?.(messageKey)
+      || (isEnabled ? 'התראות אוטומטיות הופעלו.' : 'התראות אוטומטיות כובו.');
+    window.showNotification?.(notification, 'success');
+  } catch (error) {
+    window.Logger?.error('handleTradePlanConditionToggleAlerts failed', { error: error?.message, conditionId }, { page: 'trade_plans' });
+    const errorMessage = translator?.getMessage?.('auto_alerts_toggle_error') || 'שגיאה בעדכון מצב ההתראות.';
+    window.showNotification?.(errorMessage, 'error');
+  } finally {
+    renderer?.setButtonLoadingState?.(button, false);
+    const refreshedModal = getTradePlansModalElement();
+    if (refreshedModal) {
+      loadTradePlanConditionsSummary(refreshedModal, { showLoading: false });
+    }
+  }
+}
+
 function normalizeConditionEvaluationPayload(rawPayload) {
   if (!rawPayload) {
     return null;
@@ -2893,8 +2735,6 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
   }
 
   summaryContainer.dataset.entityId = entityId;
-  tradePlanConditionsSummaryCache.set(Number(entityId), []);
-
   const crudManager = window.conditionsCRUDManager;
   if (!crudManager) {
     summaryContainer.innerHTML = '<div class="text-muted small mb-0">מערכת התנאים אינה זמינה כעת.</div>';
@@ -2914,24 +2754,19 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
     crudManager.setContext?.({ entityType: 'plan' });
     const conditions = await crudManager.readConditions(Number(entityId), true);
     const activeConditions = (conditions || []).filter(condition => condition?.is_active !== false);
-    tradePlanConditionsSummaryCache.set(Number(entityId), activeConditions);
-    const validIds = new Set(
-      activeConditions
-        .filter(condition => condition?.id)
-        .map(condition => Number(condition.id))
-    );
-    tradePlanConditionEvaluations.forEach((value, key) => {
-      if (!validIds.has(Number(key))) {
-        tradePlanConditionEvaluations.delete(Number(key));
-      }
-    });
+    window.ConditionsSummaryRenderer?.setConditions?.('plan', Number(entityId), activeConditions);
 
     if (!activeConditions.length) {
       summaryContainer.innerHTML = '<div class="text-muted small mb-0">אין תנאים פעילים לתכנון זה.</div>';
       return;
     }
 
-    summaryContainer.innerHTML = buildTradePlanConditionsSummaryTable(activeConditions);
+    summaryContainer.innerHTML = window.ConditionsSummaryRenderer?.buildTable?.('plan', activeConditions, {
+      edit: 'handleTradePlanConditionSummaryEdit',
+      delete: 'handleTradePlanConditionSummaryDelete',
+      evaluate: 'handleTradePlanConditionRowEvaluate',
+      toggle: 'handleTradePlanConditionToggleAlerts'
+    }) || '<div class="text-muted small mb-0">לא נמצא Renderer להצגת תנאים.</div>';
     if (window.ButtonSystem?.processButtons) {
       window.ButtonSystem.processButtons(summaryContainer);
     } else if (window.ButtonSystem?.hydrateButtons) {

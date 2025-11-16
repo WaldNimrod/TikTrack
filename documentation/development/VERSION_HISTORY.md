@@ -58,3 +58,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-15T01:57:09+00:00 | 1.1.5.1 | 1.1.5.0 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | 1e395783a97250f0f46e3ac8346ee348da4ab466 | build | SYEP interest cashflow split |
 | 2025-11-15T11:29:28+00:00 | 1.1.6.0 | 1.1.5.1 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | patch | Add condition trigger actions and manual evaluation |
 | 2025-11-15T15:52:46+00:00 | 1.1.7.0 | 1.1.6.0 | f0d829446119bf084124c4de1460898f30d84ec9 | 1e599c6a42910eff644b9970c8b3831b7e7e2c6b | patch | Conditions dev playbook |
+| 2025-11-16T07:03:29+00:00 | 1.1.7.1 | 1.1.7.0 | 28fccde99df1fcf8a1f86c13ff2b4f5cf9a27e5f | f0d829446119bf084124c4de1460898f30d84ec9 | build | Phase5.1: Trade plans conditions table (per-row evaluate, alerts stats, toggle) + initial trades modal integration |

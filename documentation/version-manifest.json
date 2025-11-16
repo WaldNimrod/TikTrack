@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.7.0",
+    "version": "1.1.7.1",
     "major": 1,
     "minor": 1,
     "patch": 7,
-    "build": 0,
-    "commit": "f0d829446119bf084124c4de1460898f30d84ec9",
-    "updated_at": "2025-11-15T15:52:46+00:00",
-    "notes": "Conditions dev playbook"
+    "build": 1,
+    "commit": "28fccde99df1fcf8a1f86c13ff2b4f5cf9a27e5f",
+    "updated_at": "2025-11-16T07:03:29+00:00",
+    "notes": "Phase5.1: Trade plans conditions table (per-row evaluate, alerts stats, toggle) + initial trades modal integration"
   }
 }

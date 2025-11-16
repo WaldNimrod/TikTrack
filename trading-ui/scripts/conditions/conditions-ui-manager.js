@@ -582,4 +582,584 @@ class ConditionsUIManager {
 
 window.ConditionsUIManager = ConditionsUIManager;
 
+(function initializeConditionsSummaryRenderer() {
+    if (window.ConditionsSummaryRenderer) {
+        return;
+    }
 
+    const SUMMARY_CACHE = {
+        plan: new Map(),
+        trade: new Map()
+    };
+    const ENTITY_CONDITION_INDEX = {
+        plan: new Map(),
+        trade: new Map()
+    };
+    const CONDITION_OWNER_INDEX = {
+        plan: new Map(),
+        trade: new Map()
+    };
+    const EVALUATION_CACHE = {
+        plan: new Map(),
+        trade: new Map()
+    };
+
+    const defaultAlertStats = {
+        total: 0,
+        open: 0,
+        closed: 0,
+        triggered: 0,
+        last_triggered_at: null
+    };
+
+    function getTranslator() {
+        return window.conditionsTranslations || null;
+    }
+
+    function getCache(entityType) {
+        return SUMMARY_CACHE[entityType] || SUMMARY_CACHE.plan;
+    }
+
+    function getEntityConditionIndex(entityType) {
+        return ENTITY_CONDITION_INDEX[entityType] || ENTITY_CONDITION_INDEX.plan;
+    }
+
+    function getConditionOwnerIndex(entityType) {
+        return CONDITION_OWNER_INDEX[entityType] || CONDITION_OWNER_INDEX.plan;
+    }
+
+    function getEvaluationCache(entityType) {
+        return EVALUATION_CACHE[entityType] || EVALUATION_CACHE.plan;
+    }
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined) {
+            return '';
+        }
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function stripHtml(value) {
+        if (!value) {
+            return '';
+        }
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = value;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    }
+
+    function formatTimestamp(dateValue) {
+        if (!dateValue) {
+            return '';
+        }
+        if (typeof window.formatDateTime === 'function') {
+            return window.formatDateTime(dateValue);
+        }
+        const parsed = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+        if (!(parsed instanceof Date) || Number.isNaN(parsed.getTime())) {
+            return '';
+        }
+        return parsed.toLocaleString('he-IL');
+    }
+
+    function getConditionActionMeta(actionKey) {
+        const translator = getTranslator();
+        const actions = translator?.getTriggerActions?.() || {};
+        return actions[actionKey] || null;
+    }
+
+    function getConditionActionLabel(condition) {
+        const translator = getTranslator();
+        const actionKey = condition?.trigger_action || condition?.triggerAction || 'enter_trade_positive';
+        return translator?.getTriggerActionLabel?.(actionKey) || actionKey;
+    }
+
+    function getConditionMethodName(condition) {
+        const translator = getTranslator();
+        const methodKey = condition?.method_key || condition?.method?.method_key;
+        if (methodKey && translator?.getMethodName) {
+            const translated = translator.getMethodName(methodKey);
+            if (translated) {
+                return translated;
+            }
+        }
+        return condition?.method_name
+            || condition?.method?.name_he
+            || condition?.method?.name_en
+            || 'ללא שם';
+    }
+
+    function getConditionOperatorLabel(condition) {
+        const translator = getTranslator();
+        const operator = condition?.logical_operator || 'NONE';
+        return translator?.getOperator?.(operator) || operator;
+    }
+
+    function extractParameters(condition) {
+        if (condition?.parameters && typeof condition.parameters === 'object') {
+            return condition.parameters;
+        }
+        const raw = condition?.parameters_json;
+        if (!raw) {
+            return {};
+        }
+        if (typeof raw === 'object') {
+            return raw;
+        }
+        try {
+            const parsed = JSON.parse(raw);
+            return typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        } catch (error) {
+            window.Logger?.warn?.('[ConditionsSummaryRenderer] Failed parsing condition parameters', { error: error?.message }, { page: 'conditions-ui-manager' });
+            return {};
+        }
+    }
+
+    function formatParametersHtml(condition) {
+        const entries = Object.entries(extractParameters(condition));
+        if (!entries.length) {
+            return '<span class="text-muted">ללא פרמטרים</span>';
+        }
+        const translator = getTranslator();
+        return entries.map(([key, value]) => {
+            const label = translator?.getParameterName?.(key) || key;
+            return `<div class="badge bg-light text-dark border fw-normal me-1 mb-1">${escapeHtml(label)}: ${escapeHtml(value)}</div>`;
+        }).join('');
+    }
+
+    function normalizeAlertStats(condition) {
+        const stats = condition?.alert_stats || {};
+        return {
+            total: Number(stats.total ?? defaultAlertStats.total),
+            open: Number(stats.open ?? defaultAlertStats.open),
+            closed: Number(stats.closed ?? defaultAlertStats.closed),
+            triggered: Number(stats.triggered ?? defaultAlertStats.triggered),
+            last_triggered_at: stats.last_triggered_at ?? defaultAlertStats.last_triggered_at
+        };
+    }
+
+    function getEvaluationRecord(entityType, conditionId) {
+        if (!conditionId) {
+            return null;
+        }
+        return getEvaluationCache(entityType).get(Number(conditionId)) || null;
+    }
+
+    function formatEvaluationCell(entityType, condition) {
+        const evaluation = getEvaluationRecord(entityType, condition?.id);
+        if (!evaluation) {
+            const stats = normalizeAlertStats(condition);
+            const hasTriggered = stats.triggered > 0;
+            const badgeHtml = window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function'
+                ? window.FieldRendererService.renderStatus(hasTriggered ? 'triggered' : 'not_triggered', 'alert')
+                : `<span class="badge ${hasTriggered ? 'bg-success' : 'bg-secondary'}">${hasTriggered ? 'הופעל' : 'לא הופעל'}</span>`;
+            const timestampHtml = stats.last_triggered_at
+                ? `<span class="text-muted small">הופעל לאחרונה: ${escapeHtml(formatTimestamp(stats.last_triggered_at))}</span>`
+                : '<span class="text-muted small">לא קיימת בדיקה שמורה</span>';
+            return `
+                <div class="d-flex flex-column gap-1">
+                    ${badgeHtml}
+                    ${timestampHtml}
+                </div>
+            `;
+        }
+
+        if (evaluation.error) {
+            return `<div class="text-danger small">${escapeHtml(evaluation.error)}</div>`;
+        }
+
+        const badgeHtml = window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function'
+            ? window.FieldRendererService.renderStatus(evaluation.met ? 'triggered' : 'not_triggered', 'alert')
+            : `<span class="badge ${evaluation.met ? 'bg-success' : 'bg-secondary'}">${evaluation.met ? 'הופעל' : 'לא הופעל'}</span>`;
+
+        let timestampHtml = '';
+        const formattedTime = formatTimestamp(evaluation.evaluationTime || evaluation.evaluated_at);
+        if (formattedTime) {
+            timestampHtml = `<span class="text-muted small">${escapeHtml(formattedTime)}</span>`;
+        }
+
+        return `
+            <div class="d-flex flex-column gap-1">
+                ${badgeHtml}
+                ${timestampHtml}
+            </div>
+        `;
+    }
+
+    function formatAlertStatsCell(condition) {
+        const stats = normalizeAlertStats(condition);
+        const hasTriggered = stats.triggered > 0;
+        const badgeHtml = window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function'
+            ? window.FieldRendererService.renderStatus(hasTriggered ? 'triggered' : 'not_triggered', 'alert')
+            : `<span class="badge ${hasTriggered ? 'bg-success' : 'bg-secondary'}">${hasTriggered ? 'הופעל' : 'לא הופעל'}</span>`;
+        const lastTriggeredText = stats.last_triggered_at
+            ? `הופעל לאחרונה: ${escapeHtml(formatTimestamp(stats.last_triggered_at))}`
+            : 'אין התראות פעילות';
+        return `
+            <div class="d-flex flex-column gap-1">
+                ${badgeHtml}
+                <span class="text-muted small">סה״כ ${stats.total} | פתוחות ${stats.open}</span>
+                <span class="text-muted small">${lastTriggeredText}</span>
+            </div>
+        `;
+    }
+
+    function formatAutoAlertToggleCell(condition, toggleHandlerName) {
+        if (!toggleHandlerName) {
+            return '';
+        }
+        const isEnabled = condition?.auto_generate_alerts !== false;
+        const tooltip = isEnabled ? 'כיבוי התראות אוטומטיות' : 'הפעלת התראות אוטומטיות';
+        const icon = isEnabled ? '⚡' : '⛔';
+        const buttonType = isEnabled ? 'SUCCESS' : 'WARNING';
+        return `
+            <div class="text-center">
+                <button
+                    type="button"
+                    data-button-type="${buttonType}"
+                    data-variant="small"
+                    data-size="small"
+                    data-icon="${icon}"
+                    data-text=""
+                    data-condition-toggle="${condition?.id || ''}"
+                    data-tooltip="${tooltip}"
+                    aria-label="${tooltip}"
+                    data-onclick="${toggleHandlerName}(${condition?.id || 0})">
+                </button>
+            </div>
+        `;
+    }
+
+    function formatActionCell(condition) {
+        const actionLabel = getConditionActionLabel(condition);
+        const notesPreview = stripHtml(condition?.action_notes || condition?.actionNotes || '');
+        const truncatedNotes = notesPreview.length > 120 ? `${notesPreview.slice(0, 120)}…` : notesPreview;
+        const polarity = getConditionActionMeta(condition?.trigger_action || condition?.triggerAction)?.polarity || 'neutral';
+        const polarityClass = polarity === 'positive' ? 'text-success' : (polarity === 'negative' ? 'text-danger' : 'text-muted');
+
+        return `
+            <div class="d-flex flex-column gap-1">
+                <span class="fw-semibold ${polarityClass}">${escapeHtml(actionLabel)}</span>
+                ${truncatedNotes ? `<span class="text-muted small">${escapeHtml(truncatedNotes)}</span>` : ''}
+            </div>
+        `;
+    }
+
+    function buildActionsColumn(condition, handlerConfig) {
+        const buttons = [];
+        if (handlerConfig.evaluate) {
+            buttons.push(`
+                <button
+                    type="button"
+                    data-button-type="REFRESH"
+                    data-variant="small"
+                    data-size="small"
+                    data-icon="↻"
+                    data-text=""
+                    data-condition-evaluate="${condition.id || ''}"
+                    data-tooltip="בדיקת תנאי"
+                    aria-label="בדיקת תנאי"
+                    data-onclick="${handlerConfig.evaluate}(${condition.id || 0})">
+                </button>
+            `);
+        }
+        if (handlerConfig.edit) {
+            buttons.push(`
+                <button
+                    type="button"
+                    data-button-type="EDIT"
+                    data-variant="small"
+                    data-size="small"
+                    data-text=""
+                    data-tooltip="עריכת תנאי"
+                    aria-label="עריכת תנאי"
+                    data-onclick="${handlerConfig.edit}(${condition.id || 0})">
+                </button>
+            `);
+        }
+        if (handlerConfig.delete) {
+            buttons.push(`
+                <button
+                    type="button"
+                    data-button-type="DELETE"
+                    data-variant="small"
+                    data-size="small"
+                    data-text=""
+                    data-tooltip="מחיקת תנאי"
+                    aria-label="מחיקת תנאי"
+                    data-onclick="${handlerConfig.delete}(${condition.id || 0})">
+                </button>
+            `);
+        }
+        return buttons.join('\n');
+    }
+
+    function buildRow(entityType, condition, handlerConfig) {
+        const methodName = getConditionMethodName(condition);
+        const operatorName = getConditionOperatorLabel(condition);
+        const parametersHtml = formatParametersHtml(condition);
+        const updatedAt = condition?.updated_at?.display
+            || condition?.created_at?.display
+            || '';
+        const alertsHtml = formatAlertStatsCell(condition);
+        const autoAlertsHtml = formatAutoAlertToggleCell(condition, handlerConfig.toggle);
+        const evaluationHtml = formatEvaluationCell(entityType, condition);
+
+        return `
+            <tr>
+                <td class="fw-semibold">${escapeHtml(methodName)}</td>
+                <td>${escapeHtml(operatorName)}</td>
+                <td>${parametersHtml}</td>
+                <td>${formatActionCell(condition)}</td>
+                <td>${evaluationHtml}</td>
+                <td>${alertsHtml}</td>
+                <td>${autoAlertsHtml}</td>
+                <td>${escapeHtml(updatedAt)}</td>
+                <td class="text-center table-action-buttons">
+                    ${buildActionsColumn(condition, handlerConfig)}
+                </td>
+            </tr>
+        `;
+    }
+
+    function buildTable(entityType, conditions, handlerConfig = {}) {
+        if (!Array.isArray(conditions) || !conditions.length) {
+            return '<div class="text-muted small mb-0">אין תנאים פעילים להצגה.</div>';
+        }
+        const rows = conditions.map(condition => buildRow(entityType, condition, handlerConfig)).join('');
+        return `
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>שיטה</th>
+                            <th>אופרטור</th>
+                            <th>פרמטרים</th>
+                            <th>פעולה</th>
+                            <th>בדיקה אחרונה</th>
+                            <th>התראות</th>
+                            <th>אוטומציה</th>
+                            <th>עודכן</th>
+                            <th class="text-center" style="width: 140px;">פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function updateEntityIndexes(entityType, entityId, conditionIds) {
+        const entityIndex = getEntityConditionIndex(entityType);
+        const ownerIndex = getConditionOwnerIndex(entityType);
+        const evaluationCache = getEvaluationCache(entityType);
+        const normalizedId = Number(entityId);
+        const previousSet = entityIndex.get(normalizedId) || new Set();
+
+        previousSet.forEach((conditionId) => {
+            if (!conditionIds.has(conditionId)) {
+                ownerIndex.delete(conditionId);
+                evaluationCache.delete(conditionId);
+            }
+        });
+
+        entityIndex.set(normalizedId, conditionIds);
+        conditionIds.forEach((conditionId) => {
+            ownerIndex.set(conditionId, normalizedId);
+        });
+    }
+
+    function setConditions(entityType, entityId, conditions = []) {
+        if (!entityId && entityId !== 0) {
+            return;
+        }
+        const normalizedId = Number(entityId);
+        const cache = getCache(entityType);
+        cache.set(normalizedId, conditions);
+        const conditionIds = new Set(
+            conditions
+                .filter(condition => condition?.id)
+                .map(condition => Number(condition.id))
+        );
+        updateEntityIndexes(entityType, normalizedId, conditionIds);
+    }
+
+    function getConditions(entityType, entityId) {
+        if (!entityId && entityId !== 0) {
+            return [];
+        }
+        const cache = getCache(entityType);
+        return cache.get(Number(entityId)) || [];
+    }
+
+    function getCondition(entityType, entityId, conditionId) {
+        const list = getConditions(entityType, entityId);
+        if (!Array.isArray(list)) {
+            return null;
+        }
+        return list.find(condition => Number(condition.id) === Number(conditionId)) || null;
+    }
+
+    function clearCache(entityType, entityId = null) {
+        const cache = getCache(entityType);
+        const entityIndex = getEntityConditionIndex(entityType);
+        const ownerIndex = getConditionOwnerIndex(entityType);
+        const evaluationCache = getEvaluationCache(entityType);
+
+        if (entityId === null || entityId === undefined) {
+            cache.clear();
+            entityIndex.clear();
+            ownerIndex.clear();
+            evaluationCache.clear();
+            return;
+        }
+
+        const normalizedId = Number(entityId);
+        cache.delete(normalizedId);
+        const conditionIds = entityIndex.get(normalizedId);
+        if (conditionIds) {
+            conditionIds.forEach((conditionId) => {
+                ownerIndex.delete(conditionId);
+                evaluationCache.delete(conditionId);
+            });
+            entityIndex.delete(normalizedId);
+        }
+    }
+
+    function setEvaluation(entityType, conditionId, payload) {
+        if (!conditionId && conditionId !== 0) {
+            return;
+        }
+        const evaluationCache = getEvaluationCache(entityType);
+        if (payload === null || payload === undefined) {
+            evaluationCache.delete(Number(conditionId));
+            return;
+        }
+        evaluationCache.set(Number(conditionId), payload);
+    }
+
+    function clearEvaluation(entityType, conditionId) {
+        if (!conditionId && conditionId !== 0) {
+            return;
+        }
+        getEvaluationCache(entityType).delete(Number(conditionId));
+    }
+
+    async function confirmConditionDeletion(condition) {
+        const translator = getTranslator();
+        const title = translator?.getMessage('condition_delete_confirm_title') || 'מחיקת תנאי';
+        const baseMessage = translator?.getMessage('condition_delete_confirm_message') || 'האם למחוק את התנאי הנבחר?';
+        const secondary = translator?.getMessage('condition_delete_confirm_secondary') || '';
+        const methodName = condition?.method_name || condition?.method?.name || '';
+        const message = methodName ? `${baseMessage}\n${methodName}` : baseMessage;
+        const fullMessage = secondary ? `${message}\n${secondary}` : message;
+
+        if (typeof window.showConfirmationDialog === 'function') {
+            return await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    title,
+                    fullMessage,
+                    () => resolve(true),
+                    () => resolve(false),
+                    'danger'
+                );
+            });
+        }
+
+        if (window.showNotification) {
+            window.showNotification(`${title}: ${message}`, 'warning');
+        }
+
+        if (window.confirm) {
+            return window.confirm(fullMessage);
+        }
+
+        return true;
+    }
+
+    function setButtonLoadingState(button, isLoading) {
+        if (!button) {
+            return;
+        }
+        if (isLoading) {
+            button.dataset.loading = 'true';
+            button.disabled = true;
+        } else {
+            delete button.dataset.loading;
+            const baseDisabled = button.getAttribute('aria-disabled') === 'true';
+            button.disabled = baseDisabled;
+        }
+        if (window.ButtonSystem?.processButtons) {
+            window.ButtonSystem.processButtons(button.parentElement || button);
+        } else if (window.ButtonSystem?.hydrateButtons) {
+            window.ButtonSystem.hydrateButtons(button.parentElement || button);
+        }
+    }
+
+    function dispatchConditionsUpdated(entityType, entityId, action, payload = {}) {
+        try {
+            const detail = {
+                action,
+                entityType,
+                tradePlanId: entityType === 'plan' ? Number(entityId) : null,
+                tradeId: entityType === 'trade' ? Number(entityId) : null,
+                payload
+            };
+            window.dispatchEvent?.(new CustomEvent('tradePlanConditionsUpdated', { detail }));
+        } catch (error) {
+            window.Logger?.warn('[ConditionsSummaryRenderer] Failed to emit conditions update event', { error: error?.message }, { page: 'conditions-ui-manager' });
+        }
+    }
+
+    async function deleteConditionViaCrud(entityType, conditionId, entityId) {
+        const crudManager = window.conditionsCRUDManager;
+        if (!crudManager) {
+            window.showNotification?.('מערכת ניהול התנאים אינה זמינה כרגע.', 'error');
+            return false;
+        }
+        try {
+            crudManager.setContext?.({ entityType });
+            const success = await crudManager.deleteCondition(Number(conditionId), Number(entityId));
+            if (success) {
+                clearEvaluation(entityType, conditionId);
+                window.showNotification?.('התנאי נמחק בהצלחה', 'success');
+                dispatchConditionsUpdated(entityType, entityId, 'delete', { conditionId: Number(conditionId) });
+                return true;
+            }
+        } catch (error) {
+            window.Logger?.error('[ConditionsSummaryRenderer] Failed to delete condition', { error: error?.message, conditionId, entityType }, { page: 'conditions-ui-manager' });
+            window.showNotification?.('שגיאה במחיקת התנאי', 'error');
+        }
+        return false;
+    }
+
+    window.ConditionsSummaryRenderer = {
+        setConditions,
+        getConditions,
+        getCondition,
+        clearCache,
+        setEvaluation,
+        clearEvaluation,
+        buildTable,
+        formatActionCell,
+        formatEvaluationCell,
+        formatAlertStatsCell,
+        formatAutoAlertToggleCell,
+        confirmDeletion: confirmConditionDeletion,
+        setButtonLoadingState,
+        setButtonLoadingStateById: (buttonId, isLoading) => {
+            if (!buttonId) {
+                return;
+            }
+            setButtonLoadingState(document.getElementById(buttonId), isLoading);
+        },
+        deleteConditionViaCrud
+    };
+})();

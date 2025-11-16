@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func, case
 from models.alert import Alert
 from models.note_relation_type import NoteRelationType
 from services.validation_service import ValidationService
@@ -562,4 +563,57 @@ class AlertService:
         except Exception as e:
             db.rollback()
             logger.error(f"Error deleting condition alerts: {e}")
+            raise
+
+    @staticmethod
+    def default_condition_stats() -> Dict[str, Any]:
+        return {
+            'total': 0,
+            'open': 0,
+            'closed': 0,
+            'triggered': 0,
+            'last_triggered_at': None
+        }
+
+    @staticmethod
+    def get_condition_alert_stats(
+        db: Session,
+        condition_ids: List[int],
+        condition_type: str = 'plan'
+    ) -> Dict[int, Dict[str, Any]]:
+        """Return aggregated alert statistics for the provided condition IDs."""
+        if not condition_ids:
+            return {}
+
+        # Determine which column to aggregate on
+        condition_column = Alert.plan_condition_id if condition_type == 'plan' else Alert.trade_condition_id
+
+        try:
+            rows = (
+                db.query(
+                    condition_column.label('condition_id'),
+                    func.count(Alert.id).label('total_alerts'),
+                    func.sum(case((Alert.status == 'closed', 1), else_=0)).label('closed_alerts'),
+                    func.sum(case((Alert.status != 'closed', 1), else_=0)).label('open_alerts'),
+                    func.sum(case((Alert.is_triggered == 'true', 1), else_=0)).label('triggered_alerts'),
+                    func.max(Alert.triggered_at).label('last_triggered_at')
+                )
+                .filter(condition_column.in_(condition_ids))
+                .group_by(condition_column)
+                .all()
+            )
+
+            stats_map: Dict[int, Dict[str, Any]] = {}
+            for row in rows:
+                stats_map[row.condition_id] = {
+                    'total': int(row.total_alerts or 0),
+                    'open': int(row.open_alerts or 0),
+                    'closed': int(row.closed_alerts or 0),
+                    'triggered': int(row.triggered_alerts or 0),
+                    'last_triggered_at': row.last_triggered_at.isoformat() if row.last_triggered_at else None
+                }
+
+            return stats_map
+        except Exception as exc:
+            logger.error(f"Error aggregating alert stats for conditions: {exc}")
             raise

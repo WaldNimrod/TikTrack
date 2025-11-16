@@ -3626,6 +3626,11 @@ class ModalManagerV2 {
         const accountField = searchScope.querySelector('#cashFlowAccount');
         const descriptionField = searchScope.querySelector('#cashFlowDescription');
         const netAmountField = searchScope.querySelector('#currencyExchangeNetAmount');
+        if (typeof window.setCurrencyExchangeSummary === 'function') {
+            window.setCurrencyExchangeSummary(null);
+        } else if (netAmountField) {
+            netAmountField.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+        }
         
         console.log('🔵 Fields found:', {
             fromAmountField: !!fromAmountField,
@@ -4951,6 +4956,16 @@ class ModalManagerV2 {
                         await window.loadAlertTickerInfo(tickerId);
                     }
                 });
+            }
+        }
+
+        if (modalId === 'tradesModal') {
+            if (typeof window.setupTradeConditionsButton === 'function') {
+                try {
+                    window.setupTradeConditionsButton(modalElement);
+                } catch (error) {
+                    window.Logger?.warn('⚠️ Failed to initialize trade conditions controls', { error, page: 'modal-manager-v2' });
+                }
             }
         }
 

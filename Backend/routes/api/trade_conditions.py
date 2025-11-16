@@ -6,13 +6,15 @@ API endpoints for trade conditions management
 from flask import Blueprint, request, jsonify
 import logging
 import json
-from typing import Dict, Any
+from datetime import datetime
+from typing import Dict, Any, Optional
 
 from models.trade_condition import TradeCondition
 from models.trade import Trade
 from models.plan_condition import PlanCondition
 from services.conditions_validation_service import ConditionsValidationService
 from services.preferences_service import PreferencesService
+from services.alert_service import AlertService
 from config.database import get_db
 from .base_entity_utils import BaseEntityUtils
 
@@ -25,6 +27,21 @@ def _get_date_normalizer():
 
 # Create blueprint
 trade_conditions_bp = Blueprint('trade_conditions', __name__, url_prefix='/api/trade-conditions')
+
+
+def _build_condition_alert_stats(
+    stats_map: Optional[Dict[int, Dict[str, Any]]],
+    condition_id: Optional[int]
+) -> Dict[str, Any]:
+    base_stats = AlertService.default_condition_stats()
+    if not condition_id or not stats_map:
+        return base_stats
+    stats = stats_map.get(condition_id)
+    if not stats:
+        return base_stats
+    merged = base_stats.copy()
+    merged.update(stats)
+    return merged
 
 @trade_conditions_bp.route('/trades/<int:trade_id>/conditions', methods=['GET'])
 def get_trade_conditions(trade_id):
@@ -50,11 +67,16 @@ def get_trade_conditions(trade_id):
             conditions = db_session.query(TradeCondition).filter(
                 TradeCondition.trade_id == trade_id
             ).order_by(TradeCondition.condition_group, TradeCondition.created_at).all()
+            condition_ids = [condition.id for condition in conditions if condition.id]
+            stats_map = {}
+            if condition_ids:
+                stats_map = AlertService.get_condition_alert_stats(db_session, condition_ids, 'trade')
             
             # Convert to dictionary
             result = []
             for condition in conditions:
                 condition_dict = condition.to_dict()
+                condition_dict['alert_stats'] = _build_condition_alert_stats(stats_map, condition.id)
                 result.append(condition_dict)
             
             payload = BaseEntityUtils.create_success_payload(
@@ -153,6 +175,7 @@ def create_trade_condition(trade_id):
             
             # Return created condition
             condition_dict = condition.to_dict()
+            condition_dict['alert_stats'] = AlertService.default_condition_stats()
             
             payload = BaseEntityUtils.create_success_payload(
                 normalizer,
@@ -197,8 +220,10 @@ def get_trade_condition(condition_id):
                 )
                 return jsonify(payload), 404
             
-            # Convert to dictionary
+            # Convert to dictionary with alert stats
+            stats_map = AlertService.get_condition_alert_stats(db_session, [condition.id], 'trade')
             condition_dict = condition.to_dict()
+            condition_dict['alert_stats'] = _build_condition_alert_stats(stats_map, condition.id)
             
             payload = BaseEntityUtils.create_success_payload(
                 normalizer,
@@ -278,8 +303,10 @@ def update_trade_condition(condition_id):
             
             db_session.commit()
             
-            # Return updated condition
+            # Return updated condition with alert stats
+            stats_map = AlertService.get_condition_alert_stats(db_session, [condition.id], 'trade')
             condition_dict = condition.to_dict()
+            condition_dict['alert_stats'] = _build_condition_alert_stats(stats_map, condition.id)
             
             return jsonify({
                 'status': 'success',
@@ -814,7 +841,6 @@ def create_condition_alert(condition_id):
                 return jsonify({'status': 'error', 'message': f'Trade condition with ID {condition_id} not found'}), 404
             
             # Check if alert already exists
-            from services.alert_service import AlertService
             alert_service = AlertService(db_session)
             existing_alert = alert_service.get_alert_by_condition(db_session, trade_condition_id=condition_id)
             
@@ -865,7 +891,6 @@ def delete_condition_alert(condition_id):
     try:
         db_session = next(get_db())
         try:
-            from services.alert_service import AlertService
             alert_service = AlertService(db_session)
             
             deleted_count = alert_service.delete_condition_alerts(db_session, trade_condition_id=condition_id)

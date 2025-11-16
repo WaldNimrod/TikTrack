@@ -2167,9 +2167,28 @@ class ModalManagerV2 {
     /**
      * Populate form with data - מילוי טופס עם נתונים
      * 
+     * **Trade Planning Fields Support (2025-01-29):**
+     * - For trade entities, populates planning fields (planned_quantity, planned_amount, entry_price) 
+     *   ONLY from Trade entity itself
+     * - NO FALLBACKS - if data is missing, shows clear notification to user
+     * - Implements strict data source policy: only Trade's own fields, no position/plan fallbacks
+     * 
      * @param {HTMLElement} modalElement - אלמנט המודל
-     * @param {Object} data - נתונים למילוי
+     * @param {Object} data - נתונים למילוי, עבור trade כולל:
+     *   - planned_quantity: כמות מתוכננת מה-Trade עצמו
+     *   - planned_amount: סכום מתוכנן מה-Trade עצמו
+     *   - entry_price: מחיר כניסה מה-Trade עצמו
      * @param {string} formId - מזהה הטופס (אופציונלי)
+     * @returns {Promise<void>}
+     * 
+     * @example
+     * // For trade entity - only uses Trade's own planning fields
+     * await modalManager.populateForm(modalElement, {
+     *   planned_quantity: 100,
+     *   planned_amount: 10000,
+     *   entry_price: 100
+     * });
+     * // If fields are missing, user will see notification: "נתוני תכנון חסרים"
      */
     async populateForm(modalElement, data, formId = null) {
         const form = formId ? 
@@ -6157,6 +6176,40 @@ class ModalManagerV2 {
                 }
             }
         }
+        this.updateGlobalBackdropVisibility();
+    }
+
+    /**
+     * Hide modal by ID - סגירת מודל לפי מזהה
+     * 
+     * @param {string} modalId - מזהה המודל לסגירה (אופציונלי - אם לא מוגדר, סוגר את המודל הפעיל)
+     * @returns {void}
+     */
+    hideModal(modalId = null) {
+        const targetModalId = modalId || this.activeModal;
+        if (!targetModalId) {
+            return;
+        }
+
+        const modalElement = document.getElementById(targetModalId);
+        if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            } else {
+                // אם אין instance, נסה ליצור ולסגור
+                const newModal = bootstrap.Modal.getOrCreateInstance(modalElement, { backdrop: false });
+                if (newModal) {
+                    newModal.hide();
+                }
+            }
+        }
+
+        // עדכון activeModal אם זה המודל הפעיל
+        if (this.activeModal === targetModalId) {
+            this.activeModal = null;
+        }
+
         this.updateGlobalBackdropVisibility();
     }
 

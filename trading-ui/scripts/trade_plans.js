@@ -1828,25 +1828,94 @@ function updateTradePlansTable(trade_plans) {
           })()}
         </td>
         ${(() => {
-          if (typeof window.renderUpdatedCell === 'function') {
-            return window.renderUpdatedCell(design, {
-              fields: ['updated_at', 'updatedAt', 'cancelled_at', 'created_at'],
-              columnClass: 'col-updated'
-            });
-          }
-          const fallbackDate = window.toDateObject
-            ? window.toDateObject(design.updated_at || design.cancelled_at || design.created_at)
-            : (design.updated_at || design.cancelled_at || design.created_at
-                ? new Date(design.updated_at || design.cancelled_at || design.created_at)
-                : null);
-          if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+          // Prefer FieldRendererService.renderDate for consistent date formatting
+          const rawDate = design.updated_at || design.updatedAt || design.cancelled_at || design.created_at || null;
+          
+          if (!rawDate) {
             return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
           }
-          const absolute = fallbackDate.toLocaleString('he-IL');
-          const duration = typeof window.getDurationSince === 'function'
-            ? window.getDurationSince(fallbackDate, { fallback: absolute })
-            : absolute;
-          return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+          // Use FieldRendererService.renderDate for proper date formatting
+          let dateDisplay = '';
+          let epoch = null;
+
+          if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+            // Use FieldRendererService to render date with time
+            dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+            
+            // Get epoch for sorting
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+              epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+            } else if (rawDate instanceof Date) {
+              epoch = rawDate.getTime();
+            } else if (typeof rawDate === 'string') {
+              const parsed = Date.parse(rawDate);
+              epoch = Number.isNaN(parsed) ? null : parsed;
+            } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+              epoch = rawDate.epochMs;
+            }
+          } else {
+            // Fallback: work directly with date envelope objects or raw values
+            const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+              ? window.dateUtils.ensureDateEnvelope(rawDate)
+              : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                ? rawDate
+                : null;
+
+            // Derive epoch milliseconds in a canonical way
+            epoch = (() => {
+              if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+              }
+              if (typeof window.getEpochMilliseconds === 'function') {
+                return window.getEpochMilliseconds(envelope || rawDate);
+              }
+              if (envelope && typeof envelope.epochMs === 'number') {
+                return envelope.epochMs;
+              }
+              if (rawDate instanceof Date) {
+                return rawDate.getTime();
+              }
+              if (typeof rawDate === 'string') {
+                const parsed = Date.parse(rawDate);
+                return Number.isNaN(parsed) ? null : parsed;
+              }
+              return null;
+            })();
+
+            if (epoch === null || Number.isNaN(epoch)) {
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+
+            // Build date display using unified date utilities
+            dateDisplay = (() => {
+              if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                return window.dateUtils.formatDateTime(envelope || rawDate);
+              }
+              if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+              }
+              try {
+                return new Date(epoch).toLocaleString('he-IL', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+              } catch (err) {
+                window.Logger?.warn('⚠️ trade_plans updated-cell date formatting failed', { err, planId: design?.id }, { page: 'trade_plans' });
+                return 'לא מוגדר';
+              }
+            })();
+          }
+
+          if (!dateDisplay || dateDisplay === '-') {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+
+          return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
         })()}
         <td class="actions-cell">
           ${(() => {

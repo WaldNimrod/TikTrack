@@ -289,9 +289,24 @@ function getInvestmentTypeColor(investmentType) {
  * Load trades data from server
  * Fetches all trades and updates the table display
  * 
+ * **Trade Planning Fields Support (2025-01-29):**
+ * - Maps planning fields (planned_quantity, planned_amount, entry_price) from API response
+ * - Includes these fields in localTradesData for use in edit modal and details module
+ * - Supports legacy 'quantity' field for backward compatibility
+ * 
+ * **Data Sources (priority order):**
+ * 1. TableDataRegistry (unified system)
+ * 2. TradesData service (entity-specific service)
+ * 3. Direct API call fallback
+ * 
  * @function loadTradesData
  * @async
  * @returns {Promise<void>}
+ * 
+ * @example
+ * // Loads trades with planning fields
+ * await loadTradesData();
+ * // window.tradesData now includes: planned_quantity, planned_amount, entry_price
  */
 async function loadTradesData() {
   try {
@@ -674,8 +689,20 @@ function displayTradeTickerInfo(ticker) {
 }
 
 /**
- * טעינת נתוני טיקר עדכניים
- * Load current ticker data for trades
+ * Load ticker data for trades using entity service
+ * 
+ * טעינת נתוני טיקר עדכניים באמצעות שירות ישויות
+ * 
+ * Fetches ticker data using the global ticker service instead of direct API calls.
+ * Falls back to direct API call if service is not available.
+ * 
+ * @param {Array<Object>} trades - Array of trade objects with ticker_id property
+ * @returns {Promise<Object>} Map of ticker data keyed by ticker ID
+ * @throws {Error} When API call fails
+ * 
+ * @example
+ * const tickerData = await loadTickerDataForTrades(trades);
+ * const tickerPrice = tickerData[trade.ticker_id]?.current_price;
  */
 async function loadTickerDataForTrades(trades) {
   try {
@@ -689,14 +716,22 @@ async function loadTickerDataForTrades(trades) {
       return {};
     }
     
-    // Fetch ticker data from API
-    const response = await fetch('/api/tickers/');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Fetch ticker data using ticker service (preferred method)
+    let tickers = [];
+    if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+      tickers = await window.tickerService.getTickers();
+    } else if (window.getTickers && typeof window.getTickers === 'function') {
+      tickers = await window.getTickers();
+    } else {
+      // Fallback: direct API call
+      window.Logger?.warn('⚠️ Ticker service not available - using direct API fallback', { page: 'trades' });
+      const response = await fetch('/api/tickers/');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      tickers = data.data || data || [];
     }
-    
-    const data = await response.json();
-    const tickers = data.data || data;
     
     // Create a map of ticker data
     const tickerDataMap = {};
@@ -951,25 +986,94 @@ async function updateTradesTable(trades) {
         })()}
       </td>
       ${(() => {
-        if (typeof window.renderUpdatedCell === 'function') {
-          return window.renderUpdatedCell(trade, {
-            fields: ['updated_at', 'closed_at', 'cancelled_at', 'created_at'],
-            columnClass: 'col-updated'
-          });
-        }
-        const fallbackDate = window.toDateObject
-          ? window.toDateObject(trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at)
-          : (trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at
-              ? new Date(trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at)
-              : null);
-        if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+        // Prefer FieldRendererService.renderDate for consistent date formatting
+        const rawDate = trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at || null;
+        
+        if (!rawDate) {
           return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
         }
-        const absolute = fallbackDate.toLocaleString('he-IL');
-        const duration = typeof window.getDurationSince === 'function'
-          ? window.getDurationSince(fallbackDate, { fallback: absolute })
-          : absolute;
-        return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+        // Use FieldRendererService.renderDate for proper date formatting
+        let dateDisplay = '';
+        let epoch = null;
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          // Use FieldRendererService to render date with time
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          
+          // Get epoch for sorting
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          // Fallback: work directly with date envelope objects or raw values
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(rawDate)
+            : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+              ? rawDate
+              : null;
+
+          // Derive epoch milliseconds in a canonical way
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            if (rawDate instanceof Date) {
+              return rawDate.getTime();
+            }
+            if (typeof rawDate === 'string') {
+              const parsed = Date.parse(rawDate);
+              return Number.isNaN(parsed) ? null : parsed;
+            }
+            return null;
+          })();
+
+          if (epoch === null || Number.isNaN(epoch)) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+
+          // Build date display using unified date utilities
+          dateDisplay = (() => {
+            if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+              return window.dateUtils.formatDateTime(envelope || rawDate);
+            }
+            if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+              return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+            }
+            try {
+              return new Date(epoch).toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } catch (err) {
+              window.Logger?.warn('⚠️ trades updated-cell date formatting failed', { err, tradeId: trade?.id }, { page: 'trades' });
+              return 'לא מוגדר';
+            }
+          })();
+        }
+
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
       })()}
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
@@ -1720,14 +1824,10 @@ window.validateTradeForm = validateTradeForm;
  */
 function hideAddTradeModal() {
   try {
-    if (window.ModalManagerV2) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
       window.ModalManagerV2.hideModal('tradesModal');
     } else {
-      // Fallback to Bootstrap modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('tradesModal'));
-      if (modal) {
-        modal.hide();
-      }
+      window.Logger?.warn('ModalManagerV2.hideModal not available, modal may not close', { page: "trades" });
     }
   } catch (error) {
     window.Logger?.error('Error in hideAddTradeModal', error, { page: "trades" });
@@ -1746,14 +1846,10 @@ window.hideAddTradeModal = hideAddTradeModal;
  */
 function hideEditTradeModal() {
   try {
-    if (window.ModalManagerV2) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
       window.ModalManagerV2.hideModal('tradesModal');
     } else {
-      // Fallback to Bootstrap modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('tradesModal'));
-      if (modal) {
-        modal.hide();
-      }
+      window.Logger?.warn('ModalManagerV2.hideModal not available, modal may not close', { page: "trades" });
     }
   } catch (error) {
     window.Logger?.error('Error in hideEditTradeModal', error, { page: "trades" });
@@ -3962,8 +4058,30 @@ function generateDetailedLog() {
 // REMOVED: showEditTradeModal - use window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId) directly
 
 /**
- * שמירת טרייד
- * Handles both add and edit modes
+ * שמירת טרייד - Save Trade
+ * Handles both add and edit modes with planning fields support
+ * 
+ * **Trade Planning Fields Support (2025-01-29):**
+ * - Sends planning fields (planned_quantity, planned_amount, entry_price) to backend
+ * - Calculates planned_amount from quantity * entry_price if not provided
+ * - Backend implements snapshot logic: if trade_plan_id is provided, planning fields 
+ *   are copied from plan (unless explicitly overridden)
+ * 
+ * **No Fallbacks Policy:**
+ * - Only sends fields that are explicitly provided in form
+ * - Does not calculate or infer planning fields from other sources
+ * - If fields are missing, they are sent as null (backend handles gracefully)
+ * 
+ * @function saveTrade
+ * @returns {Promise<void>}
+ * 
+ * @example
+ * // Form with planning fields
+ * // tradeQuantity = 100, tradeEntryPrice = 100
+ * // Result: planned_quantity=100, planned_amount=10000, entry_price=100
+ * 
+ * // Form with trade_plan_id
+ * // Backend will snapshot planning fields from plan automatically
  */
 async function saveTrade() {
     window.Logger.debug('saveTrade called', { page: 'trades' });

@@ -49,7 +49,8 @@
     "docs:validate": "npm run jsdoc:validate",
     "docs:check": "npm run jsdoc:check",
     "docs:add": "npm run jsdoc:add",
-    "docs:update": "npm run docs:add && npm run docs:generate"
+    "docs:update": "npm run docs:add && npm run docs:generate",
+    "ci:prefs-guards": "bash scripts/ci/preferences-guards.sh"
   },
   "repository": {
     "type": "git",

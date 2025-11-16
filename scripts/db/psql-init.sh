@@ -42,3 +42,4 @@ echo "✅ PostgreSQL user/database ensured."
 echo "ℹ️  Connection string: postgresql://${APP_USER}:***@${DB_HOST}:${DB_PORT}/${APP_DB}"
 
 
+

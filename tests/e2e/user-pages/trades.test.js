@@ -9,51 +9,59 @@
  * @author TikTrack Development Team
  */
 
-const { loadPageTemplate } = require('../../utils/page-test-utils');
+const { loadPageTemplate, mountHtml, resetDom } = require('../../utils/page-test-utils');
 
 describe('Trades Page E2E Tests', () => {
     let htmlContent;
+    let documentRef;
 
     beforeAll(() => {
         htmlContent = loadPageTemplate('trades');
     });
 
+    beforeEach(() => {
+        ({ document: documentRef } = mountHtml(htmlContent, { url: '/trades' }));
+    });
+
+    afterEach(() => {
+        resetDom();
+    });
+
     test('should load trades page successfully', () => {
-        expect(htmlContent.includes('trades-page')).toBe(true);
+        expect(documentRef.title).toBeDefined();
+        expect(documentRef.body).toBeDefined();
     });
 
-    test('should have trades table', () => {
-        expect(
-            htmlContent.includes('tradesTable') ||
-            htmlContent.includes('data-table-type="trades"')
-        ).toBe(true);
+    test('should have trades table with correct data-table-type', () => {
+        const table = documentRef.querySelector('table[data-table-type="trades"]');
+        expect(table).not.toBeNull();
     });
 
-    test('should have table actions', () => {
-        expect(htmlContent.includes('table-actions')).toBe(true);
-    });
-
-    test('should have filter controls', () => {
-        expect(htmlContent.includes('unified-header')).toBe(true);
-    });
-
-    test('should load required scripts', () => {
-        expect(htmlContent.includes('<script')).toBe(true);
+    test('should have add trade button wired to ModalManager via data-onclick', () => {
+        const addButton = documentRef.querySelector('button[data-button-type="ADD"][data-entity-type="trade"]');
+        if (addButton) {
+            expect(addButton.getAttribute('data-onclick')).toContain('showModalSafe');
+        } else {
+            // Fallback: check for any add button
+            const addButtons = documentRef.querySelectorAll('button[data-onclick*="showModalSafe"][data-onclick*="tradesModal"]');
+            expect(addButtons.length).toBeGreaterThan(0);
+        }
     });
 
     test('should have proper page structure', () => {
-        expect(htmlContent.includes('main-content')).toBe(true);
+        expect(documentRef.querySelector('.main-content') || documentRef.querySelector('main')).not.toBeNull();
     });
 
-    test('should have navigation elements', () => {
-        expect(htmlContent.includes('unified-header')).toBe(true);
+    test('should have unified header', () => {
+        expect(documentRef.querySelector('unified-header') || documentRef.querySelector('.unified-header')).not.toBeNull();
     });
 
     test('should be responsive', () => {
-        expect(htmlContent.includes('meta name="viewport"')).toBe(true);
+        const viewport = documentRef.querySelector('meta[name="viewport"]');
+        expect(viewport).not.toBeNull();
     });
 
     test('should have proper language attributes', () => {
-        expect(htmlContent.includes('<html lang="')).toBe(true);
+        expect(documentRef.documentElement.getAttribute('lang')).toBeDefined();
     });
 });

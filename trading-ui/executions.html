@@ -626,8 +626,7 @@
         </div>
     </div>
     
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+    <!-- Bootstrap JavaScript - Removed duplicate (5.3.0), using 5.3.3 from base package -->
     
             <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
@@ -702,6 +701,8 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
     <!-- [25] Load Order: 25 -->
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [25a] Preferences Data Service -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
     <!-- [27] Load Order: 27 -->
@@ -718,6 +719,15 @@
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [33] Load Order: 33 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+    <!-- [Data Services] Load Order: After services -->
+    <script src="scripts/services/executions-data.js?v=1.0.0"></script> <!-- שירות נתונים לביצועים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PENDING EXECUTION TRADE CREATION ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: After entity-services -->
+    <!-- [Pending Execution Trade Creation] -->
+    <script src="scripts/pending-execution-trade-creation.js?v=1.0.0"></script> <!-- ממשק יצירת טרייד מביצועים -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/11: UI ADVANCED PACKAGE ===== -->
@@ -800,6 +810,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [58.9] Preferences V4 SDK (group-first) -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [60] Load Order: 60 -->
@@ -812,6 +824,8 @@
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [64] Load Order: 64 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <!-- [64.1] Preferences UI V4 (Group-First) -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
 

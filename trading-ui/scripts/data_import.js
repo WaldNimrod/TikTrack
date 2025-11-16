@@ -226,12 +226,17 @@
 
     /**
      * Fetch trading accounts from the API.
+     * Uses DataImportData service for unified caching and error handling.
      * @async
      * @function fetchTradingAccounts
      * @returns {Promise<Array<Object>>}
      */
     async function fetchTradingAccounts() {
         try {
+            if (window.DataImportData?.loadTradingAccountsForImport) {
+                return await window.DataImportData.loadTradingAccountsForImport();
+            }
+            // Fallback to direct fetch if service not available
             const response = await fetch(API_ENDPOINTS.accounts, {
                 method: 'GET',
                 headers: {
@@ -254,6 +259,7 @@
 
     /**
      * Fetch import history for a specific account.
+     * Uses DataImportData service for unified caching and error handling.
      * @async
      * @function fetchHistoryForAccount
      * @param {Object} account - Trading account object.
@@ -265,32 +271,66 @@
         }
 
         try {
-            const response = await fetch(API_ENDPOINTS.history(account.id), {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            let sessions = [];
+            
+            if (window.DataImportData?.loadImportHistoryData) {
+                sessions = await window.DataImportData.loadImportHistoryData({
+                    accountId: account.id,
+                    limit: 20
+                });
+                Logger.debug('📦 Fetched history via DataImportData service', {
+                    accountId: account.id,
+                    sessionsCount: Array.isArray(sessions) ? sessions.length : 0,
+                    page: PAGE_NAME
+                });
+            } else {
+                // Fallback to direct fetch if service not available
+                const response = await fetch(API_ENDPOINTS.history(account.id), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
-            if (!response.ok) {
-                throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                if (!response.ok) {
+                    throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                }
+
+                const payload = await response.json();
+                sessions = payload.sessions || payload.data || [];
+                Logger.debug('📦 Fetched history via direct fetch', {
+                    accountId: account.id,
+                    sessionsCount: Array.isArray(sessions) ? sessions.length : 0,
+                    page: PAGE_NAME
+                });
             }
 
-            const payload = await response.json();
-            const sessions = payload.sessions || payload.data || [];
-
             if (!Array.isArray(sessions)) {
+                Logger.warn('⚠️ Sessions is not an array', {
+                    accountId: account.id,
+                    sessionsType: typeof sessions,
+                    sessions,
+                    page: PAGE_NAME
+                });
                 return [];
             }
 
-            return sessions.map(session => ({
+            const enrichedSessions = sessions.map(session => ({
                 ...session,
                 trading_account_id: account.id,
                 trading_account_name: resolveAccountDisplayName(account)
             }));
+
+            Logger.debug('✅ Enriched sessions with account info', {
+                accountId: account.id,
+                enrichedCount: enrichedSessions.length,
+                page: PAGE_NAME
+            });
+
+            return enrichedSessions;
         } catch (error) {
             Logger.error('❌ Failed to fetch history for account', {
-                error,
+                error: error?.message || error,
                 accountId: account.id,
                 page: PAGE_NAME
             });
@@ -759,6 +799,7 @@
     window.refreshDataImportHistory = refreshDataImportHistory;
     window.registerDataImportTable = registerDataImportTable;
 })();
+
 
 
 

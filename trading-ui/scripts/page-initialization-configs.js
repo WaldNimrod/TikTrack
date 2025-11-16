@@ -349,7 +349,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
-        'window.initializePreferences',
+        'window.PreferencesUIV4',
       ],
 
       // ← NEW: מטאדאטה
@@ -383,8 +383,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             await window.loadAccountsForPreferences();
           }
 
-          // טעינת מערכת העדפות
-          if (typeof window.initializePreferences === 'function') {
+          // טעינת מערכת העדפות (V4 first)
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            await window.PreferencesUIV4.initialize();
+          } else if (typeof window.initializePreferences === 'function') {
             await window.initializePreferences();
           } else if (typeof window.loadAllPreferences === 'function') {
             await window.loadAllPreferences();
@@ -443,6 +445,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
+        'window.TradesData',
         'window.ModalManagerV2',
         'window.InvestmentCalculationService',
         'window.loadTradesData',

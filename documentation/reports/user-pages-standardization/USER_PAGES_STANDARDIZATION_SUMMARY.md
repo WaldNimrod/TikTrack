@@ -54,8 +54,8 @@ For each page there is a dedicated per-page report in this directory with detail
 # דוח סטנדרטיזציה מרכזי - עמודי משתמש
 
 **תאריך יצירה**: ינואר 2025  
-**תאריך עדכון אחרון**: ינואר 2025 (שילוב CacheSyncManager הושלם)  
-**סטטוס**: דוח מעודכן - שילוב CacheSyncManager הושלם ב-9 עמודים מרכזיים
+**תאריך עדכון אחרון**: ינואר 2025 (CacheSyncManager Testing הושלם)  
+**סטטוס**: דוח מעודכן - CacheSyncManager Testing הושלם: סריקה, תיקון, בדיקה, טסטים
 
 ## תקציר מנהלים
 
@@ -99,6 +99,14 @@ For each page there is a dedicated per-page report in this directory with detail
 - Backend cache מסונכרן אוטומטית דרך `/api/cache-sync/invalidate`
 - Fallback ל-UnifiedCacheManager ישיר במקרה של כשל
 - **15+ נקודות ניקוי מטמון ישיר הוחלפו** ב-CacheSyncManager
+
+**עדכון - בדיקות וטסטים (ינואר 2025):**
+- ✅ **בדיקה רוחבית**: נסרקו 8 שירותי נתונים, כל השירותים תקינים
+- ✅ **תיקון data-import-data.js**: שונה action מ-'trading-account-updated' ל-'account-updated'
+- ✅ **תיקון preferences-data.js**: הוספת CacheSyncManager בכל פונקציות CRUD
+- ✅ **טסטים מקיפים**: נוצר `cache-sync-comprehensive.test.js` עם בדיקות לכל השירותים
+- ✅ **דוח טסטים**: נוצר `CACHE_SYNC_TESTING_SUMMARY.md` עם סיכום כיסוי טסטים
+- ✅ **דוח בדיקה**: נוצר `CACHE_SYNC_VERIFICATION_REPORT.md` עם תוצאות בדיקה מפורטות
 
 ### המלצות כלליות
 
@@ -198,6 +206,9 @@ For each page there is a dedicated per-page report in this directory with detail
 ## קישורים לדוחות נוספים
 
 - **מפת אינטגרציה CacheSyncManager**: [CACHE_SYNC_INTEGRATION_MAP.md](CACHE_SYNC_INTEGRATION_MAP.md)
+- **דוח בדיקות CacheSyncManager**: [CACHE_SYNC_TESTING_REPORT.md](CACHE_SYNC_TESTING_REPORT.md)
+- **דוח בדיקה רוחבית**: [CACHE_SYNC_VERIFICATION_REPORT.md](CACHE_SYNC_VERIFICATION_REPORT.md)
+- **סיכום טסטים**: [CACHE_SYNC_TESTING_SUMMARY.md](CACHE_SYNC_TESTING_SUMMARY.md)
 - **דוחות פרטניים**: כל עמוד כולל דוח מפורט נפרד עם ממצאים ספציפיים
 
 ---

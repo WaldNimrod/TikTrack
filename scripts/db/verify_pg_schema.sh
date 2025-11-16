@@ -47,3 +47,4 @@ for table in "${TABLES[@]}"; do
 done
 
 
+

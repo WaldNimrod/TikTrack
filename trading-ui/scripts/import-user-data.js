@@ -1048,6 +1048,14 @@ async function submitAccountLinkSelection(forceOverride = false) {
                 );
                 return;
             }
+            if (data.error_code === 'ACCOUNT_ALREADY_LINKED') {
+                // Account number is already linked to a different account
+                showImportUserDataNotification(
+                    data.error || 'מספר החשבון כבר משויך לחשבון אחר במערכת.',
+                    'error'
+                );
+                return;
+            }
             const message = getApiErrorMessage(data, 'שיוך החשבון נכשל');
             showImportUserDataNotification(message, 'error');
             return;

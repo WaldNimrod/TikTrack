@@ -216,6 +216,9 @@ async function checkForMismatches(pageName, pageConfig) {
         // Extract filename from path (e.g., "services/data-collection-service.js" -> "data-collection-service.js")
         const scriptFilename = requiredScript.split('/').pop();
         
+        // Check if this is an external script (CDN) - need to check full URL
+        const isExternalScript = requiredScript.startsWith('http://') || requiredScript.startsWith('https://');
+        
         // Check if script is in 404 errors list
         const script404 = script404Errors.find(e => {
             const errorFilename = e.file.split('/').pop();
@@ -223,17 +226,28 @@ async function checkForMismatches(pageName, pageConfig) {
             return errorFilename === requiredFilename || e.file === requiredScript;
         });
         
-        // Check both full path and filename (to handle cases where path might differ)
-        const isLoaded = loadedScripts.some(loadedScript => {
-            // Check full path match
-            if (loadedScript === requiredScript || loadedScript.includes(requiredScript)) {
-                return true;
-            }
-            // Check filename match (extract filename from loaded script)
-            const loadedFilename = loadedScript.split('/').pop().split('?')[0]; // Remove query params
-            const requiredFilename = scriptFilename.split('?')[0];
-            return loadedFilename === requiredFilename;
-        });
+        // For external scripts, check full URL in DOM
+        let isLoaded = false;
+        if (isExternalScript) {
+            // Check if external script is loaded by checking DOM for full URL
+            const scriptElement = Array.from(document.querySelectorAll('script[src]')).find(script => {
+                const src = script.src.split('?')[0]; // Remove query params
+                return src === requiredScript || src.includes(requiredScript.split('/').pop());
+            });
+            isLoaded = !!scriptElement;
+        } else {
+            // Check both full path and filename (to handle cases where path might differ)
+            isLoaded = loadedScripts.some(loadedScript => {
+                // Check full path match
+                if (loadedScript === requiredScript || loadedScript.includes(requiredScript)) {
+                    return true;
+                }
+                // Check filename match (extract filename from loaded script)
+                const loadedFilename = loadedScript.split('/').pop().split('?')[0]; // Remove query params
+                const requiredFilename = scriptFilename.split('?')[0];
+                return loadedFilename === requiredFilename;
+            });
+        }
         
         if (!isLoaded || script404) {
             mismatches.push({

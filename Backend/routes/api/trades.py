@@ -9,6 +9,7 @@ from services.preferences_service import PreferencesService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 from services.tag_service import TagService
 import logging
+from config import settings
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -131,6 +132,18 @@ def get_trades():
     status = request.args.get('status')
     
     try:
+        # Monitoring: log DB configuration and current trades row count
+        try:
+            raw_count = db.execute("SELECT COUNT(*) FROM trades").scalar()
+        except Exception as _e:
+            raw_count = None
+        logger.info(
+            "Trades API debug: DATABASE_URL=%s, USING_SQLITE=%s, DB_PATH=%s, trades_count=%s",
+            getattr(settings, "DATABASE_URL", None),
+            getattr(settings, "USING_SQLITE", None),
+            getattr(settings, "DB_PATH", None),
+            raw_count,
+        )
         normalizer = _get_date_normalizer()
         # If there are filtering parameters, use appropriate function
         if trading_account_id and status:

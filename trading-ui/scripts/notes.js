@@ -30,8 +30,7 @@
  * - removeCurrentAttachment() - removeCurrentAttachment function
  * - showAddNoteModal() - * Replace current attachment
  * 
- * EVENT HANDLING (4)
- * - restoreNotesSectionState() - restoreNotesSectionState function
+ * EVENT HANDLING (3)
  * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
  * - clearNoteValidationErrors() - clearNoteValidationErrors function
  * - setEditorContent() - * קבלת תוכן מעורך הטקסט
@@ -368,53 +367,14 @@ async function deleteNote(id) {
 
 // פונקציה לשחזור מצב הסגירה
 /**
- * Restore the state of notes sections from localStorage
- * Restores the collapsed/expanded state of various sections
+ * Restore the state of notes sections
+ * REMOVED: This function has been removed. Section state restoration is now handled by:
+ * - PageStateManager.loadPageState() - loads saved section states
+ * - restoreAllSectionStates() - restores all sections using PageStateManager
+ * 
+ * This function used localStorage directly, which is now replaced by PageStateManager.
+ * The restorePageState() function (line 2539) now handles section restoration via PageStateManager.
  */
-function restoreNotesSectionState() {
-  try {
-    // שחזור מצב top-section (התראות וסיכום)
-    const topCollapsed = localStorage.getItem('notesTopSectionHidden') === 'true';
-  const topSection = document.querySelector('.top-section');
-
-  if (topSection) {
-    const sectionBody = topSection.querySelector('.section-body');
-    const toggleBtn = topSection.querySelector('button[onclick="toggleSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody && topCollapsed) {
-      sectionBody.style.display = 'none';
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    }
-  }
-
-  // שחזור מצב סקשן ההערות
-  const notesCollapsed = localStorage.getItem('notesMainSectionHidden') === 'true';
-  const contentSections = document.querySelectorAll('.content-section');
-  const notesSection = contentSections[0];
-
-  if (notesSection) {
-    const sectionBody = notesSection.querySelector('.section-body');
-    const toggleBtn = notesSection.querySelector('button[onclick="toggleSection(\'main\')"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody && notesCollapsed) {
-      sectionBody.style.display = 'none';
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    }
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בשחזור מצב סקשנים:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בשחזור מצב סקשנים', error.message);
-    }
-  }
-}
 
 // פונקציות נוספות
 
@@ -424,7 +384,7 @@ window.editNote = editNote;
 window.deleteNote = deleteNote;
 // window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
-window.restoreNotesSectionState = restoreNotesSectionState;
+// REMOVED: window.restoreNotesSectionState - use PageStateManager + restoreAllSectionStates() instead
 
 // פונקציה לטעינת נתונים
 // הפונקציה loadNotesData מוגדרת כבר בשורה 99 כ-window.loadNotesData
@@ -458,36 +418,79 @@ function updateNotesTable(notes) {
     let tradePlans = [];
     let tickers = [];
 
-    // פונקציה לטעינת נתונים נוספים
+    // פונקציה לטעינת נתונים נוספים באמצעות שירותי ישויות כלליים כשאפשר
     const loadAdditionalData = async () => {
       try {
-        window.Logger.info('📡 טוען נתונים נוספים עבור הערות...', { page: "notes" });
-        const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-          fetch('/api/trading-accounts/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/trades/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/trade-plans/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/tickers/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-        ]);
+        window.Logger.info('📡 טוען נתונים נוספים עבור הערות (שירותי ישויות)...', { page: "notes" });
 
-        // ודא שהתשובות הן מערכים - גם אם ה-API מחזיר שגיאה
-        const accountsData = Array.isArray(accountsResponse) ? accountsResponse : (Array.isArray(accountsResponse?.data) ? accountsResponse.data : []);
-        const tradesData = Array.isArray(tradesResponse) ? tradesResponse : (Array.isArray(tradesResponse?.data) ? tradesResponse.data : []);
-        const tradePlansData = Array.isArray(tradePlansResponse) ? tradePlansResponse : (Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data : []);
-        const tickersData = Array.isArray(tickersResponse) ? tickersResponse : (Array.isArray(tickersResponse?.data) ? tickersResponse.data : []);
+        const loadAccounts = async () => {
+          if (typeof window.getAccounts === 'function') {
+            return await window.getAccounts();
+          }
+          const response = await fetch('/api/trading-accounts/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTrades = async () => {
+          // כרגע אין שירות טריידים כללי – שימוש ב-API ישיר
+          const response = await fetch('/api/trades/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTradePlans = async () => {
+          if (window.tradePlanService && typeof window.tradePlanService.loadTradePlansData === 'function') {
+            const data = await window.tradePlanService.loadTradePlansData();
+            return Array.isArray(data) ? data : [];
+          }
+          if (typeof window.loadTradePlansData === 'function') {
+            const data = await window.loadTradePlansData();
+            return Array.isArray(data) ? data : [];
+          }
+          const response = await fetch('/api/trade-plans/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTickers = async () => {
+          if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+            const data = await window.tickerService.getTickers();
+            return Array.isArray(data) ? data : [];
+          }
+          if (typeof window.getTickers === 'function') {
+            const data = await window.getTickers();
+            return Array.isArray(data) ? data : [];
+          }
+          const response = await fetch('/api/tickers/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+          loadAccounts(),
+          loadTrades(),
+          loadTradePlans(),
+          loadTickers()
+        ]);
 
         accounts = accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         trades = tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         tradePlans = tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         tickers = tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         
-        window.Logger.info('✅ נתונים נוספים נטענו:', {
+        window.Logger.info('✅ נתונים נוספים נטענו (שירותי ישויות):', {
           accounts: accounts.length,
           trades: trades.length,
           tradePlans: tradePlans.length,
           tickers: tickers.length
         }, { page: "notes" });
       } catch (error) {
-        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים:', error, { page: "notes" });
+        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים (שירותי ישויות):', error, { page: "notes" });
         // המשך עם מערכים ריקים
         accounts = [];
         trades = [];
@@ -725,23 +728,94 @@ function updateNotesTable(notes) {
             <td data-date='${dateSortValue}'>${dateDisplay}</td>
             <td>${attachmentDisplay}</td>
             ${(() => {
-              if (typeof window.renderUpdatedCell === 'function') {
-                return window.renderUpdatedCell(note, {
-                  fields: ['updated_at', 'created_at'],
-                  columnClass: 'col-updated'
-                });
-              }
-              const fallbackDate = window.toDateObject
-                ? window.toDateObject(note.updated_at || note.created_at)
-                : (note.updated_at || note.created_at ? new Date(note.updated_at || note.created_at) : null);
-              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+              // Prefer FieldRendererService.renderDate for consistent date formatting
+              const rawDate = note.updated_at || note.created_at || null;
+              
+              if (!rawDate) {
                 return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
               }
-              const absolute = fallbackDate.toLocaleString('he-IL');
-              const duration = typeof window.getDurationSince === 'function'
-                ? window.getDurationSince(fallbackDate, { fallback: absolute })
-                : absolute;
-              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+              // Use FieldRendererService.renderDate for proper date formatting
+              let dateDisplay = '';
+              let epoch = null;
+
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                // Use FieldRendererService to render date with time
+                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                
+                // Get epoch for sorting
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                } else if (rawDate instanceof Date) {
+                  epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                  const parsed = Date.parse(rawDate);
+                  epoch = Number.isNaN(parsed) ? null : parsed;
+                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                  epoch = rawDate.epochMs;
+                }
+              } else {
+                // Fallback: work directly with date envelope objects or raw values
+                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                  ? window.dateUtils.ensureDateEnvelope(rawDate)
+                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                    ? rawDate
+                    : null;
+
+                // Derive epoch milliseconds in a canonical way
+                epoch = (() => {
+                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                  }
+                  if (typeof window.getEpochMilliseconds === 'function') {
+                    return window.getEpochMilliseconds(envelope || rawDate);
+                  }
+                  if (envelope && typeof envelope.epochMs === 'number') {
+                    return envelope.epochMs;
+                  }
+                  if (rawDate instanceof Date) {
+                    return rawDate.getTime();
+                  }
+                  if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    return Number.isNaN(parsed) ? null : parsed;
+                  }
+                  return null;
+                })();
+
+                if (epoch === null || Number.isNaN(epoch)) {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+
+                // Build date display using unified date utilities
+                dateDisplay = (() => {
+                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                    return window.dateUtils.formatDateTime(envelope || rawDate);
+                  }
+                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                  }
+                  try {
+                    return new Date(epoch).toLocaleString('he-IL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    });
+                  } catch (err) {
+                    window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
+                    return 'לא מוגדר';
+                  }
+                })();
+              }
+
+              if (!dateDisplay || dateDisplay === '-') {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+
+              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
             })()}
             <td class='actions-cell'>
               ${(() => {
@@ -768,6 +842,33 @@ function updateNotesTable(notes) {
       // 🔘 עדכון כפתורים דינמיים
       if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
         window.ButtonSystem.initializeButtons();
+      }
+      
+      // 🔘 אתחול טולטיפים לכפתורי הפילטר (אם מערכת הכפתורים לא אתחלה אותם)
+      // כפתורי הפילטר עם data-button-type="FILTER" אמורים להיות מעובדים אוטומטית,
+      // אבל נוודא שהטולטיפים מאותחלים נכון
+      if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+        const filterContainer = document.querySelector('.filter-buttons-container');
+        if (filterContainer) {
+          // אתחל טולטיפים רק לכפתורי הפילטר (לא לכל הכפתורים)
+          const filterButtons = filterContainer.querySelectorAll('button[data-button-type="FILTER"][data-tooltip]');
+          filterButtons.forEach(btn => {
+            const tooltipText = btn.getAttribute('data-tooltip');
+            if (tooltipText && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+              // הסר tooltip קיים אם קיים
+              const existingTooltip = bootstrap.Tooltip.getInstance(btn);
+              if (existingTooltip) {
+                existingTooltip.dispose();
+              }
+              // אתחל tooltip חדש
+              new bootstrap.Tooltip(btn, {
+                title: tooltipText,
+                placement: btn.getAttribute('data-tooltip-placement') || 'top',
+                trigger: btn.getAttribute('data-tooltip-trigger') || 'hover'
+              });
+            }
+          });
+        }
       }
     });
   
@@ -1364,10 +1465,15 @@ async function updateNoteFromModal() {
 // פונקציה זו הוסרה - שימוש במערכת הגלובלית showDeleteWarning
 
 async function confirmDeleteNote(noteId) {
-  // סגירת המודל
-  const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
-  if (modal) {
-    modal.hide();
+  // סגירת המודל דרך ModalManagerV2
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+    window.ModalManagerV2.hideModal('deleteNoteModal');
+  } else {
+    // Fallback ל-Bootstrap modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
+    if (modal) {
+      modal.hide();
+    }
   }
 
   // מחיקת ההערה
@@ -1959,27 +2065,15 @@ function filterNotesByType(type) {
   const buttons = document.querySelectorAll('[data-type]');
   buttons.forEach(btn => {
     btn.classList.remove('active');
-    if (btn.getAttribute('data-type') === 'all') {
-      const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
-      btn.style.backgroundColor = 'white';
-      btn.style.color = colors.positive;
-      btn.style.borderColor = colors.positive;
-    } else {
-      btn.classList.add('btn');
-    }
+    // השארת הסגנון לניהול ע"י מערכת הכפתורים / CSS גלובלי
+    btn.style.backgroundColor = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
   });
 
   const activeButton = document.querySelector(`[data-type="${type}"]`);
   if (activeButton) {
-    if (type === 'all') {
-      const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
-      activeButton.style.backgroundColor = 'white';
-      activeButton.style.color = colors.positive;
-      activeButton.style.borderColor = colors.positive;
-    } else {
-      activeButton.classList.remove('btn');
-      activeButton.classList.add('active');
-    }
+    activeButton.classList.add('active');
   }
 
   let filteredNotes;
@@ -2057,9 +2151,20 @@ function viewNote(noteId) {
         loadNoteForViewing(noteId);
       }
 
-      // הצגת המודל
-      const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
-      modal.show();
+      // הצגת המודל דרך ModalManagerV2 (אם זמין) או fallback ל-Bootstrap
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        // אם יש config ל-viewNoteModal, נשתמש ב-ModalManagerV2
+        // אחרת, נשתמש ב-Bootstrap (מודל view-only מיוחד)
+        const modalElement = document.getElementById('viewNoteModal');
+        if (modalElement) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+          modal.show();
+        }
+      } else {
+        // Fallback ל-Bootstrap modal
+        const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
+        modal.show();
+      }
     }
   
   } catch (error) {
@@ -2202,18 +2307,25 @@ function editCurrentNote() {
   try {
     const noteId = window.currentViewingNoteId;
     if (noteId) {
-      // סגירת מודל הצפייה
-      const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
-      viewModal.hide();
+      // סגירת מודל הצפייה דרך ModalManagerV2
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('viewNoteModal');
+      } else {
+        // Fallback ל-Bootstrap modal
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
+        if (viewModal) {
+          viewModal.hide();
+        }
+      }
 
-    // פתיחת מודל העריכה
-    // Use ModalManagerV2 directly
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-      window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
-    } else {
-      window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+      // פתיחת מודל העריכה
+      // Use ModalManagerV2 directly
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+      } else {
+        window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+      }
     }
-  }
   
   } catch (error) {
     window.Logger.error('שגיאה בעריכת הערה הנוכחית:', error, { page: "notes" });
@@ -2501,5 +2613,5 @@ window.showEditNoteModal = async function(noteId) {
     }
 };
 
-window.restoreNotesSectionState = restoreNotesSectionState;
+// REMOVED: window.restoreNotesSectionState - use PageStateManager + restoreAllSectionStates() instead
 

@@ -27,15 +27,17 @@ class ExecutionService:
     def get_all(self, db: Session, filters=None):
         return db.query(Execution).options(
             joinedload(Execution.trading_account),
-            joinedload(Execution.ticker),
-            joinedload(Execution.trade)
+            joinedload(Execution.ticker)
+            # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).all()
     
     def get_by_id(self, db: Session, execution_id: int):
         return db.query(Execution).options(
             joinedload(Execution.trading_account),
-            joinedload(Execution.ticker),
-            joinedload(Execution.trade)
+            joinedload(Execution.ticker)
+            # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).filter(Execution.id == execution_id).first()
 
 # Initialize base API

@@ -1100,21 +1100,22 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               if (now - lastCheckTs < 30000) return; // throttle 30s
               lastCheckTs = now;
               try {
-                const resp = await fetch('/api/preferences/version');
-                if (resp.ok) {
-                  const js = await resp.json();
-                  const incoming = js?.data?.version;
-                  const current = window.__ttPreferencesVersion;
-                  if (incoming && incoming !== current) {
-                    window.__ttPreferencesVersion = incoming;
-                    if (typeof window.loadUserPreferences === 'function') {
-                      await window.loadUserPreferences({ force: true, source: 'visibility-check' });
-                    }
+                // Use PreferencesData/Core instead of direct fetch to preferences endpoints
+                const payload = await (window.PreferencesData?.loadAllPreferencesRaw
+                  ? window.PreferencesData.loadAllPreferencesRaw({ force: false })
+                  : Promise.resolve({ profileContext: null }));
+                const incoming = payload?.profileContext?.versions?.last_update
+                  || payload?.profileContext?.last_update
+                  || null;
+                const current = window.__ttPreferencesVersion;
+                if (incoming && incoming !== current) {
+                  window.__ttPreferencesVersion = incoming;
+                  if (typeof window.loadUserPreferences === 'function') {
+                    await window.loadUserPreferences({ force: true, source: 'visibility-check' });
                   }
                 }
-                // Silently ignore 404 or other errors - endpoint may not be available
               } catch (err) {
-                // Silently ignore errors - endpoint may not be available or network issues
+                // Silently ignore errors - data service may be unavailable or network issues
               }
             }
           });
@@ -1977,8 +1978,14 @@ async function shouldShowNotification(category) {
       console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
     }
 
-    // If preference is not found (null), don't show notification
+    // If preference is not found (null), show notifications by default for critical categories
+    // This ensures error notifications are always shown even if preferences are not set up
     if (isEnabled === null) {
+      // For import-user-data category, always show errors and warnings
+      if (category === 'import-user-data') {
+        console.log(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`);
+        return true;
+      }
       console.log(`⚠️ Preference ${preferenceName} not found - notification disabled`);
       return false;
     }

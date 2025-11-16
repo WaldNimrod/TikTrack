@@ -13,6 +13,7 @@ Last Updated: 2025-01-16
 
 from typing import List, Dict, Any, Optional, Tuple, Set
 from datetime import datetime, timezone
+import uuid
 from decimal import Decimal
 import logging
 import os
@@ -707,7 +708,9 @@ class ImportOrchestrator:
                 'error': (
                     f"מספר החשבון כבר משויך לחשבון \"{existing_binding.name}\" (ID {existing_binding.id}). "
                     f"נא להשתמש בחשבון זה או לנתק את השיוך לפני המשך הפעולה."
-                )
+                ),
+                'error_code': 'ACCOUNT_ALREADY_LINKED',
+                'existing_account': self._serialize_account(existing_binding)
             }
 
         current_external_number = self._normalize_account_identifier(trading_account.external_account_number)
@@ -1248,7 +1251,9 @@ class ImportOrchestrator:
                     'tax_country': record.get('tax_country'),
                     'external_id': record.get('external_id'),
                     'section': record.get('section'),
-                    'metadata': metadata
+                    'metadata': metadata,
+                    # Preserve commission from IBKR connector (from Comm/Fee field)
+                    'commission': record.get('commission')
                 }
                 records_to_import.append(record_payload)
 
@@ -1293,8 +1298,9 @@ class ImportOrchestrator:
                     if chosen_ti is None:
                         continue
                     used_to.add(chosen_ti)
-                    # Assign shared external_id
-                    exchange_id = CashFlowHelperService.create_exchange_external_id()
+                    # Assign shared external_id in canonical exchange_<uuid> format
+                    exchange_uuid = uuid.uuid4().hex
+                    exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
                     # Ensure metadata exists
                     for rec in (f, records_to_import[chosen_ti]):
                         meta = rec.get('metadata')
@@ -2084,6 +2090,8 @@ class ImportOrchestrator:
     ) -> Dict[str, Any]:
         raw_entries = preview_data.get('records_to_import', []) or []
         skipped_count = len(preview_data.get('records_to_skip', []) or [])
+        from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
+        to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
 
         if not raw_entries:
             error_message = 'No cashflow records available for import.'
@@ -2102,61 +2110,9 @@ class ImportOrchestrator:
             else:
                 cashflow_records.append(entry)
 
-        # Ensure forex conversions have shared exchange_<uuid> external_id at import time as well
-        try:
-            from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
-            to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
-            def is_exchange_record(rec: Dict[str, Any]) -> bool:
-                st = (rec.get('storage_type') or rec.get('cashflow_type') or '').lower()
-                return st in {from_type, to_type} or (rec.get('cashflow_type') == 'forex_conversion')
-            def get_date_str(val):
-                if isinstance(val, dict):
-                    return str(val.get('date') or val.get('utc') or val.get('local') or '')
-                return str(val or '')
-            from_idxs: List[int] = []
-            to_idxs: List[int] = []
-            for idx, rec in enumerate(cashflow_records):
-                if not is_exchange_record(rec):
-                    continue
-                storage_type, _ = self._resolve_cashflow_storage_type(rec)
-                if storage_type == from_type:
-                    from_idxs.append(idx)
-                elif storage_type == to_type:
-                    to_idxs.append(idx)
-            used_to: set = set()
-            for fi in from_idxs:
-                f = cashflow_records[fi]
-                # skip if already has proper exchange external id
-                existing = (f.get('external_id') or '')
-                if isinstance(existing, str) and existing.startswith(CashFlowHelperService.EXCHANGE_PREFIX):
-                    continue
-                f_date = get_date_str(f.get('effective_date'))
-                chosen_ti = None
-                for ti in to_idxs:
-                    if ti in used_to:
-                        continue
-                    t = cashflow_records[ti]
-                    t_existing = (t.get('external_id') or '')
-                    if isinstance(t_existing, str) and t_existing.startswith(CashFlowHelperService.EXCHANGE_PREFIX):
-                        continue
-                    t_date = get_date_str(t.get('effective_date'))
-                    if f_date and t_date and f_date[:10] == t_date[:10]:
-                        chosen_ti = ti
-                        break
-                if chosen_ti is None:
-                    for ti in to_idxs:
-                        if ti not in used_to:
-                            chosen_ti = ti
-                            break
-                if chosen_ti is None:
-                    continue
-                used_to.add(chosen_ti)
-                exchange_id = CashFlowHelperService.create_exchange_external_id()
-                # assign to both sides
-                for rec in (f, cashflow_records[chosen_ti]):
-                    rec['external_id'] = exchange_id
-        except Exception as _pair_err:
-            logger.warning("⚠️ Import-time forex pairing failed: %s", _pair_err)
+        # Note: Forex pairing is already done in _build_preview_payload (lines 1258-1312)
+        # Records should already have shared external_id in exchange_<uuid> format
+        # If pairing failed in preview, records won't be grouped and will be skipped below
 
         imported_count = 0
         import_errors: List[str] = []
@@ -2189,6 +2145,10 @@ class ImportOrchestrator:
                     storage_type, inferred_note = self._resolve_cashflow_storage_type(record)
                     if mapping_note is None:
                         mapping_note = inferred_note
+                # Skip standalone forex legs; they are handled as paired exchanges below
+                if (storage_type in {from_type, to_type}) or ((record.get('cashflow_type') or '').lower() == 'forex_conversion'):
+                    skipped_count += 1
+                    continue
 
                 amount = float(record.get('amount', 0))
                 if amount == 0:
@@ -2248,7 +2208,7 @@ class ImportOrchestrator:
                 )
                 import_errors.append(f"Cashflow #{index + 1} failed: {record_error}")
 
-        # Create grouped currency exchanges using a unified structure (align with manual creation)
+        # Create grouped currency exchanges using service SSOT (align with manual creation)
         for exchange_id, pair in exchange_groups.items():
             try:
                 from_rec = pair.get('from')
@@ -2264,51 +2224,46 @@ class ImportOrchestrator:
                 to_currency = CurrencyService.get_by_symbol(self.db_session, to_currency_symbol)
                 if not from_currency or not to_currency:
                     raise ValueError("Currency not found for exchange")
-                # Amounts: ensure sign convention (from negative, to positive)
+                # Amounts (positive magnitude) and rate
                 from_amount = abs(float(from_rec.get('amount', 0)))
                 to_amount = abs(float(to_rec.get('amount', 0)))
+                exchange_rate = (to_amount / from_amount) if from_amount else 0.0
+                if exchange_rate <= 0:
+                    # fallback if only rate exists in metadata
+                    exchange_rate = float((from_rec.get('trade_price') or to_rec.get('trade_price') or 0.0) or 0.0)
                 # Date
                 effective_dt = self._resolve_datetime(from_rec.get('effective_date') or to_rec.get('effective_date'))
                 date_value = effective_dt.date() if effective_dt else None
                 # Description
                 description = from_rec.get('memo') or to_rec.get('memo')
-                # Fee amount (if any commission detected on source side metadata)
+                # Fee amount - extract from record.commission (set by IBKR connector from Comm/Fee field)
+                # Commission is stored directly in the record, not in metadata
                 fee_amount = 0.0
-                meta = (from_rec.get('metadata') or {}) if isinstance(from_rec.get('metadata'), dict) else {}
-                commission_val = meta.get('commission') or from_rec.get('commission')
+                commission_val = from_rec.get('commission')
+                if commission_val is None:
+                    # Fallback: check metadata if commission was moved there
+                    meta = (from_rec.get('metadata') or {}) if isinstance(from_rec.get('metadata'), dict) else {}
+                    commission_val = meta.get('commission')
                 try:
                     fee_amount = float(commission_val) if commission_val not in (None, '') else 0.0
                 except (TypeError, ValueError):
                     fee_amount = 0.0
-                # Create from flow
-                from_flow = CashFlow(
+
+                # Use service SSOT to create the pair (shared external_id, correct types/signs)
+                svc_result = CashFlowHelperService.create_exchange(
+                    self.db_session,
                     trading_account_id=import_session.trading_account_id,
-                    type=CashFlowHelperService.EXCHANGE_FROM_TYPE,
-                    amount=-from_amount,
+                    from_currency_id=from_currency.id,
+                    to_currency_id=to_currency.id,
+                    date=date_value,
+                    from_amount=from_amount,
+                    exchange_rate=exchange_rate,
                     fee_amount=fee_amount,
-                    date=date_value,
                     description=description,
-                    currency_id=from_currency.id,
-                    usd_rate=float(from_currency.usd_rate or 1.0),
-                    source='file_import',
-                    external_id=exchange_id
+                    source='file_import'
                 )
-                self.db_session.add(from_flow)
-                # Create to flow
-                to_flow = CashFlow(
-                    trading_account_id=import_session.trading_account_id,
-                    type=CashFlowHelperService.EXCHANGE_TO_TYPE,
-                    amount=to_amount,
-                    fee_amount=0.0,
-                    date=date_value,
-                    description=description,
-                    currency_id=to_currency.id,
-                    usd_rate=float(to_currency.usd_rate or 1.0),
-                    source='file_import',
-                    external_id=exchange_id
-                )
-                self.db_session.add(to_flow)
-                imported_count += 2
+                if svc_result:
+                    imported_count += 2
             except Exception as exch_error:
                 logger.error("❌ Failed to create exchange %s: %s", exchange_id, exch_error, exc_info=True)
                 import_errors.append(f"Exchange {exchange_id} failed: {exch_error}")

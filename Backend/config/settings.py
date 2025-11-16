@@ -9,12 +9,13 @@ IS_PRODUCTION = ENVIRONMENT == "production"
 BASE_DIR = Path(__file__).parent.parent
 UI_DIR = BASE_DIR.parent / "trading-ui"
 
-# Legacy SQLite information (used during migration scripts only)
+# SQLite information (development default)
 DB_DIR = BASE_DIR / "db"
-LEGACY_DB_FILENAME = "tiktrack.db"
-LEGACY_DB_PATH = DB_DIR / LEGACY_DB_FILENAME
+# Standardize on tiktrack.db (legacy simpleTrade_new.db kept only for archives/migrations)
+STANDARD_DB_FILENAME = "tiktrack.db"
+STANDARD_DB_PATH = DB_DIR / STANDARD_DB_FILENAME
 # Backwards compatibility constant used by legacy imports (app.py, tests, scripts)
-DB_PATH = LEGACY_DB_PATH
+DB_PATH = STANDARD_DB_PATH
 
 # Database source selection
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
@@ -29,7 +30,7 @@ if POSTGRES_HOST:
         f"@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
     )
 else:
-    DEFAULT_DATABASE_URL = f"sqlite:///{LEGACY_DB_PATH}"
+    DEFAULT_DATABASE_URL = f"sqlite:///{STANDARD_DB_PATH}"
 
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 USING_SQLITE = DATABASE_URL.startswith("sqlite")

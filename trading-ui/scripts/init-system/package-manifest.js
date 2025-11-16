@@ -292,6 +292,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5.1
       },
       {
+        file: 'services/executions-data.js',
+        globalCheck: 'window.loadExecutionsData',
+        description: 'שירות נתונים לביצועים',
+        required: false,
+        loadOrder: 5.2
+      },
+      {
         file: 'services/crud-response-handler.js',
         globalCheck: 'window.CrudResponseHandler',
         description: 'מטפל בתגובות CRUD',
@@ -1014,7 +1021,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/trades-data.js',
         globalCheck: 'window.TradesData',
         description: 'שירות נתוני טריידים (CRUD + Cache)',
-        required: true,
+        required: false,
         loadOrder: 0
       },
       {
@@ -1049,14 +1056,14 @@ const PACKAGE_MANIFEST = {
         file: 'services/trade-plans-data.js',
         globalCheck: 'window.TradePlansData',
         description: 'שירות נתוני תוכניות מסחר',
-        required: true,
+        required: false,
         loadOrder: 6
       },
       {
         file: 'services/notes-data.js',
         globalCheck: 'window.NotesData',
         description: 'שירות נתוני הערות',
-        required: true,
+        required: false,
         loadOrder: 6.5
       },
       {

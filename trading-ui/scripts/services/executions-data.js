@@ -59,17 +59,51 @@
     }
   }
 
-  async function clearExecutionsCache(patternOnly = false) {
+  async function invalidateExecutionsCache() {
+    // Try CacheSyncManager first (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('execution-updated');
+        return;
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      }
+    }
+    
+    // Fallback to direct invalidation
     if (!window.UnifiedCacheManager) {
       return;
     }
-    if (patternOnly && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
-      await window.UnifiedCacheManager.clearByPattern(EXECUTIONS_DATA_KEY);
+    if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+      await window.UnifiedCacheManager.invalidate(EXECUTIONS_DATA_KEY).catch((error) => {
+        window.Logger?.warn?.('⚠️ Failed to invalidate executions cache', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      });
       return;
     }
-    if (typeof window.UnifiedCacheManager.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate(EXECUTIONS_DATA_KEY);
+    if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+      await window.UnifiedCacheManager.clearByPattern(EXECUTIONS_DATA_KEY).catch((error) => {
+        window.Logger?.warn?.('⚠️ Failed to clear executions cache pattern', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      });
     }
+  }
+
+  async function clearExecutionsCache(patternOnly = false) {
+    if (patternOnly) {
+      if (typeof window.UnifiedCacheManager?.clearByPattern === 'function') {
+        await window.UnifiedCacheManager.clearByPattern(EXECUTIONS_DATA_KEY);
+      }
+      return;
+    }
+    await invalidateExecutionsCache();
   }
 
   function notifyLoadError(message, error) {
@@ -141,14 +175,110 @@
     }
   }
 
+  function buildUrl(path) {
+    const base = resolveBaseUrl();
+    if (!base) {
+      return path;
+    }
+    if (path.startsWith('http')) {
+      return path;
+    }
+    const separator = base.endsWith('/') || path.startsWith('/') ? '' : '/';
+    return `${base}${separator}${path.replace(/^\//, '')}`;
+  }
+
+  async function sendExecutionMutation({ executionId, method, payload, signal }) {
+    const endpoint = executionId ? `/api/executions/${executionId}` : '/api/executions';
+    try {
+      const response = await fetch(buildUrl(endpoint), {
+        method,
+        headers: DEFAULT_HEADERS,
+        body: payload ? JSON.stringify(payload) : undefined,
+        signal,
+      });
+
+      if (response.ok) {
+        // Determine action based on method
+        if (window.CacheSyncManager?.invalidateByAction) {
+          const action = method === 'POST' ? 'execution-created' :
+                        method === 'PUT' ? 'execution-updated' :
+                        method === 'DELETE' ? 'execution-deleted' : 'execution-updated';
+          try {
+            await window.CacheSyncManager.invalidateByAction(action);
+          } catch (error) {
+            // Fallback to direct invalidation
+            await invalidateExecutionsCache();
+          }
+        } else {
+          await invalidateExecutionsCache();
+        }
+      }
+
+      return response;
+    } catch (error) {
+      window.Logger?.error?.('❌ Execution mutation failed', {
+        ...PAGE_LOG_CONTEXT,
+        executionId,
+        method,
+        error: error?.message,
+      });
+      throw error;
+    }
+  }
+
+  async function createExecution(payload, options = {}) {
+    return sendExecutionMutation({ method: 'POST', payload, signal: options.signal });
+  }
+
+  async function updateExecution(executionId, payload, options = {}) {
+    return sendExecutionMutation({
+      executionId,
+      method: 'PUT',
+      payload,
+      signal: options.signal,
+    });
+  }
+
+  async function deleteExecution(executionId, options = {}) {
+    return sendExecutionMutation({
+      executionId,
+      method: 'DELETE',
+      signal: options.signal,
+    });
+  }
+
+  async function fetchExecutionDetails(executionId, options = {}) {
+    const response = await fetch(buildUrl(`/api/executions/${executionId}`), {
+      method: 'GET',
+      headers: DEFAULT_HEADERS,
+      signal: options.signal,
+    });
+
+    if (!response.ok) {
+      const error = new Error(`טעינת פרטי ביצוע ${executionId} נכשלה (${response.status})`);
+      window.Logger?.error?.('❌ Failed to fetch execution details', {
+        ...PAGE_LOG_CONTEXT,
+        executionId,
+        error: error.message,
+      });
+      throw error;
+    }
+
+    return response.json();
+  }
+
   window.ExecutionsData = {
     KEY: EXECUTIONS_DATA_KEY,
     TTL: EXECUTIONS_TTL,
     loadExecutionsData,
     fetchFresh: fetchExecutionsFromApi,
     saveCache: saveExecutionsCache,
-    invalidateCache: () => clearExecutionsCache(false),
+    invalidateCache: invalidateExecutionsCache,
     clearPattern: () => clearExecutionsCache(true),
+    createExecution,
+    updateExecution,
+    deleteExecution,
+    fetchExecutionDetails,
   };
 
   window.Logger?.info?.('✅ Executions Data Service initialized', PAGE_LOG_CONTEXT);

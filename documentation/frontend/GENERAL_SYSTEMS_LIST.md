@@ -21,6 +21,7 @@
 ### 🔵 מערכות CRUD ונתונים
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
+| **שירותי נתונים ייעודיים** | `trading-ui/scripts/services/*-data.js` | [DATA_SERVICES_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/DATA_SERVICES_DEVELOPER_GUIDE.md)<br>[DATA_SERVICES_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/DATA_SERVICES_ARCHITECTURE.md) | שירותי נתונים מאוחדים לכל ישות: trades-data.js, executions-data.js, cash-flows-data.js, notes-data.js, trading-accounts-data.js, data-import-data.js, research-data.js, preferences-data.js |
 | Data Collection Service | `trading-ui/scripts/services/data-collection-service.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | איסוף/הצבת נתוני טפסים במפה אחידה והמרות טיפוס |
 | Dashboard Data Loader | `trading-ui/scripts/index.js` | [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#dashboard-loader-indexjs) | טעינת נתוני דשבורד אמיתיים + עיבוד מטבעות/סיכומים עם CacheTTLGuard |
 | Investment Calculation Service | `trading-ui/scripts/services/investment-calculation-service.js` | [INVESTMENT_CALCULATION_SERVICE.md](INVESTMENT_CALCULATION_SERVICE.md) | חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל |
@@ -58,7 +59,7 @@
 | --- | --- | --- | --- |
 | Cache Stage B-Lite (תצורה זמנית) | `trading-ui/scripts/unified-cache-manager.js`<br>`trading-ui/scripts/cache-clear-menu.js`<br>`trading-ui/scripts/cache-ttl-guard.js` | [CACHE_STAGE_B_LITE.md](../03-DEVELOPMENT/CACHE_STAGE_B_LITE.md) | שכבות Memory/LocalStorage/IndexedDB פעילות, מטמון שרת כבוי (`CACHE_DISABLED=true`), תפריט ניקוי מטמון אחיד, ניהול מפתחות פרופיל ועטיפת TTL לטעינת נתונים |
 | Unified Cache Manager | `trading-ui/scripts/unified-cache-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | בחירת שכבת מטמון (Memory/LocalStorage/IndexedDB/Backend) והחזרות TTL |
-| Cache Sync Manager | `trading-ui/scripts/cache-sync-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | סנכרון Frontend ↔ Backend, ניהול invalidation והפעלת reload חובה |
+| Cache Sync Manager | `trading-ui/scripts/cache-sync-manager.js` | [CACHE_SYNC_SPECIFICATION.md](../04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md) | סנכרון Frontend ↔ Backend, ניהול invalidation patterns, dependencies, והפעלת reload חובה. **שילוב מלא הושלם ב-9 עמודים מרכזיים (ינואר 2025)** |
 | Cache Policy Manager | `trading-ui/scripts/cache-policy-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | כלל אחיד למדיניות מטמון לפי סוג נתון ותוקף |
 | LocalStorage Events Sync | `trading-ui/scripts/modules/localstorage-sync.js` | [LOCALSTORAGE_EVENTS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LOCALSTORAGE_EVENTS_SYSTEM.md) | האזנה לאירועי שינוי אחסון ושמירת עקביות בין טאבים |
 

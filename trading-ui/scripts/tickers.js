@@ -400,27 +400,39 @@ function updateCurrencyOptions(ticker = null) {
 // Status updates and activity tracking
 
 /**
- * Update active trades field for tickers
- * Updates active_trades field based on open trades
+ * Update active trades field for tickers using entity service
+ * 
+ * עדכון שדה active_trades עבור טיקרים באמצעות שירות ישויות
+ * 
+ * Updates active_trades field based on open trades. Uses TradesData service
+ * instead of direct API calls. Falls back to direct API call if service is unavailable.
  * 
  * @function updateActiveTradesField
  * @async
  * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await updateActiveTradesField();
  */
 async function updateActiveTradesField() {
   // Updating active_trades field for tickers
 
   try {
-    // טעינת טריידים מהשרת
-    const tradesResponse = await fetch('/api/trades/');
-    if (!tradesResponse.ok) {
-      // window.Logger.warn('⚠️ Could not load trades for active_trades update', { page: "tickers" });
-      return;
+    // טעינת טריידים באמצעות שירות ישויות (preferred method)
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      if (!tradesResponse.ok) {
+        // window.Logger.warn('⚠️ Could not load trades for active_trades update', { page: "tickers" });
+        return;
+      }
+      const data = await tradesResponse.json();
+      trades = data.data || data || [];
     }
-
-    const tradesData = await tradesResponse.json();
-
-    const trades = tradesData.data || tradesData;
 
     // יצירת מפה של טיקרים עם טריידים פתוחים
     const tickersWithOpenTrades = new Set();
@@ -1717,21 +1729,89 @@ function renderTickersTableRows(tickers) {
            </span>`;
 
       const updatedCellHtml = (() => {
-        if (typeof window.renderUpdatedCell === 'function') {
-          return window.renderUpdatedCell(ticker, {
-            fields: ['updated_at', 'yahoo_updated_at', 'fetched_at', 'last_updated_at'],
-            columnClass: 'col-updated'
-          });
-        }
-        const fallbackDate = parseValidDate(ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at);
-        if (!fallbackDate) {
+        // Prefer FieldRendererService.renderDate for consistent date formatting
+        const rawDate = ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at || null;
+        
+        if (!rawDate) {
           return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
         }
-        const absolute = fallbackDate.toLocaleString('he-IL');
-        const duration = typeof window.getDurationSince === 'function'
-          ? window.getDurationSince(fallbackDate, { fallback: absolute })
-          : absolute;
-        return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+        // Use FieldRendererService.renderDate for proper date formatting
+        let dateDisplay = '';
+        let epoch = null;
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          // Use FieldRendererService to render date with time
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          
+          // Get epoch for sorting
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          // Fallback: use parseValidDate if available, otherwise work with date envelope objects
+          const fallbackDate = typeof parseValidDate === 'function' 
+            ? parseValidDate(rawDate)
+            : (rawDate instanceof Date ? rawDate : (typeof rawDate === 'string' ? new Date(rawDate) : null));
+          
+          if (!fallbackDate || !(fallbackDate instanceof Date) || Number.isNaN(fallbackDate.getTime())) {
+            return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+          }
+
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(fallbackDate)
+            : null;
+
+          // Derive epoch milliseconds in a canonical way
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || fallbackDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || fallbackDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            return fallbackDate.getTime();
+          })();
+
+          // Build date display using unified date utilities
+          dateDisplay = (() => {
+            if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+              return window.dateUtils.formatDateTime(envelope || fallbackDate);
+            }
+            if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+              return window.dateUtils.formatDate(envelope || fallbackDate, { includeTime: true });
+            }
+            try {
+              return fallbackDate.toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } catch (err) {
+              window.Logger?.warn('⚠️ tickers updated-cell date formatting failed', { err, tickerId: ticker?.id }, { page: 'tickers' });
+              return 'לא מוגדר';
+            }
+          })();
+        }
+
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+        }
+
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
       })();
 
       return `

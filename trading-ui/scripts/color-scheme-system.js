@@ -1091,13 +1091,17 @@ async function loadColorPreferences() {
       }
     }
     
-    try {
-      const payload = await window.PreferencesData.loadAllPreferencesRaw({ force: true });
-      const preferences = payload?.preferences || {};
-      window.currentPreferences = preferences;
-      return preferences;
-    } catch (apiError) {
-      if (window.Logger) { window.Logger.warn('⚠️ Could not load preferences from API', { page: "color-scheme" }); }
+    // Centralized path: use PreferencesData to avoid duplicate/raw fetches
+    if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
+      try {
+        const { preferences } = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
+        if (preferences && typeof preferences === 'object') {
+          window.currentPreferences = preferences;
+          return preferences;
+        }
+      } catch (svcError) {
+        if (window.Logger) { window.Logger.warn('⚠️ Could not load preferences via PreferencesData', { page: "color-scheme" }); }
+      }
     }
     
     // Last resort: return empty object - NO hardcoded colors!

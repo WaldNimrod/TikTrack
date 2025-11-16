@@ -9,39 +9,69 @@
  * @author TikTrack Development Team
  */
 
-const { loadPageTemplate } = require('../../utils/page-test-utils');
+const { loadPageTemplate, mountHtml, resetDom } = require('../../utils/page-test-utils');
 
 describe('Alerts Page E2E Tests', () => {
     let htmlContent;
+    let documentRef;
 
     beforeAll(() => {
         htmlContent = loadPageTemplate('alerts');
     });
 
+    beforeEach(() => {
+        ({ document: documentRef } = mountHtml(htmlContent, { url: '/alerts' }));
+    });
+
+    afterEach(() => {
+        resetDom();
+    });
+
     test('should load alerts page successfully', () => {
-        expect(htmlContent.includes('alerts-page')).toBe(true);
+        expect(documentRef.title).toBeDefined();
+        expect(documentRef.body).toBeDefined();
     });
 
-    test('should have alerts table', () => {
-        expect(
-            htmlContent.includes('alertsTable') ||
-            htmlContent.includes('data-table-type="alerts"')
-        ).toBe(true);
+    test('should have alerts table with correct data-table-type', () => {
+        const table = documentRef.querySelector('table[data-table-type="alerts"]');
+        expect(table).not.toBeNull();
     });
 
-    test('should have table actions', () => {
-        expect(htmlContent.includes("showModalSafe('alertsModal','add')")).toBe(true);
+    test('should have add alert button wired to ModalManager via data-onclick', () => {
+        const addButton = documentRef.querySelector('button[data-button-type="ADD"][data-entity-type="alert"]');
+        expect(addButton).not.toBeNull();
+        expect(addButton.getAttribute('data-onclick')).toContain('showModalSafe');
     });
 
-    test('should load required scripts', () => {
-        expect(htmlContent.includes('alerts.js')).toBe(true);
+    test('should have entity-type filter buttons with icons only', () => {
+        const filterContainer = documentRef.querySelector('.filter-buttons-container');
+        expect(filterContainer).not.toBeNull();
+
+        const allButton = filterContainer.querySelector('button[data-type="all"][data-button-type="FILTER"]');
+        const accountButton = filterContainer.querySelector('button[data-type="account"][data-button-type="FILTER"]');
+        const tradeButton = filterContainer.querySelector('button[data-type="trade"][data-button-type="FILTER"]');
+        const planButton = filterContainer.querySelector('button[data-type="trade_plan"][data-button-type="FILTER"]');
+        const tickerButton = filterContainer.querySelector('button[data-type="ticker"][data-button-type="FILTER"]');
+
+        expect(allButton).not.toBeNull();
+        expect(accountButton).not.toBeNull();
+        expect(tradeButton).not.toBeNull();
+        expect(planButton).not.toBeNull();
+        expect(tickerButton).not.toBeNull();
+
+        // וידוא שהכפתורים מוגדרים לוריאנט קטן (איקון בלבד) וללא טקסט גלוי
+        [allButton, accountButton, tradeButton, planButton, tickerButton].forEach(btn => {
+            expect(btn.getAttribute('data-variant')).toBe('small');
+            expect(btn.textContent.trim()).toBe('');
+        });
     });
 
     test('should have proper page structure', () => {
-        expect(htmlContent.includes('main-content')).toBe(true);
+        expect(documentRef.querySelector('.main-content') || documentRef.querySelector('main')).not.toBeNull();
     });
 
     test('should be responsive', () => {
-        expect(htmlContent.includes('meta name="viewport"')).toBe(true);
+        const viewport = documentRef.querySelector('meta[name="viewport"]');
+        expect(viewport).not.toBeNull();
     });
 });

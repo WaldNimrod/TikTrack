@@ -97,13 +97,10 @@ def upload_and_preview():
     file_name = file.filename
 
     try:
-        # Create database session
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
-        engine = create_engine('sqlite:///db/simpleTrade_new.db')
-        Session = sessionmaker(bind=engine)
-        db_session = Session()
-        
+        # Use application's configured DB session (no hardcoded engine/URL)
+        from config.database import SessionLocal
+        db_session = SessionLocal()
+        #
         orchestrator = ImportOrchestrator(db_session)
         
         # Create import session first
@@ -150,6 +147,11 @@ def upload_and_preview():
     except Exception as e:
         logger.error(f"Unexpected error during file preview: {e}", exc_info=True)
         return jsonify({"error": "An unexpected error occurred during file analysis."}), 500
+    finally:
+        try:
+            db_session.close()
+        except Exception:
+            pass
 
 @user_data_import_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -884,7 +886,8 @@ def allow_existing_record(session_id):
         record_index = data.get('record_index')
         
         # Get session
-        session = db.session.query(ImportSession).filter_by(id=session_id).first()
+        db_session = next(get_db())
+        session = db_session.query(ImportSession).filter_by(id=session_id).first()
         if not session:
             return jsonify({'status': 'error', 'message': 'Session not found'}), 404
         
@@ -926,7 +929,7 @@ def allow_existing_record(session_id):
             
             # Save updated preview
             session.preview_data = _utc_storage_normalizer.normalize_output(preview_data)
-            db.session.commit()
+            db_session.commit()
         
         projected_preview = _project_storage_payload(preview_data)
         return jsonify({'status': 'success', 'preview_data': projected_preview})
@@ -934,6 +937,11 @@ def allow_existing_record(session_id):
     except Exception as e:
         logger.error(f"Error allowing existing record: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        try:
+            db_session.close()
+        except Exception:
+            pass
 
 @user_data_import_bp.route('/session/<int:session_id>/execute', methods=['POST'])
 def execute_import(session_id: int):

@@ -16,9 +16,19 @@
         window.Logger?.error?.('PreferencesV4 SDK missing', { page: 'preferences-ui-v4' });
         return;
       }
-      const { profileContext } = await window.PreferencesV4.bootstrap(this.requiredGroups);
-      this.currentUserId = profileContext?.user_id ?? null;
-      this.currentProfileId = profileContext?.resolved_profile_id ?? null;
+      try {
+        const { profileContext } = await window.PreferencesV4.bootstrap(this.requiredGroups);
+        this.currentUserId = profileContext?.user_id ?? null;
+        this.currentProfileId = profileContext?.resolved_profile_id ?? null;
+      } catch (error) {
+        window.Logger?.warn?.('PreferencesV4 bootstrap failed, continuing without profile context', {
+          page: 'preferences-ui-v4',
+          error: error?.message,
+        });
+        this.currentUserId = null;
+        this.currentProfileId = null;
+        return; // Exit early if bootstrap fails
+      }
 
       this._renderUser(profileContext);
       this._renderProfile(profileContext);

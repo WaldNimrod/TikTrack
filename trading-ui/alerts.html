@@ -135,11 +135,66 @@
                         <div class="filter-buttons-container button-row">
                             <button data-button-type="ADD" data-entity-type="alert" data-variant="full" data-onclick="window.showModalSafe('alertsModal','add')" data-text="הוסף התראה" title="הוסף התראה חדשה"></button>
                             <div class="action-separator"></div>
-                            <button data-button-type="FILTER" data-variant="normal" data-text="הכל" data-classes="btn-sm active" data-onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="🏦" data-text="חשבונות" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="💼" data-text="טריידים" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="📝" data-text="תוכניות" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="📈" data-text="טיקרים" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="⚙️"
+                                data-classes="btn-sm active"
+                                data-onclick="filterAlertsByRelatedObjectType('all')"
+                                data-type="all"
+                                title="הצג הכל"
+                                data-tooltip="הצג הכל - כל סוגי הישויות"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="🏦"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('account')"
+                                data-type="account"
+                                title="התראות על חשבונות"
+                                data-tooltip="סינון לפי: חשבונות"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="💼"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('trade')"
+                                data-type="trade"
+                                title="התראות על טריידים"
+                                data-tooltip="סינון לפי: טריידים"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="📝"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('trade_plan')"
+                                data-type="trade_plan"
+                                title="התראות על תוכניות השקעה"
+                                data-tooltip="סינון לפי: תוכניות"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="📈"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('ticker')"
+                                data-type="ticker"
+                                title="התראות על טיקרים"
+                                data-tooltip="סינון לפי: טיקרים"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
                             
                             <span class="filter-separator">|</span>
                         </div>

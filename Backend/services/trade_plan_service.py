@@ -47,7 +47,54 @@ class TradePlanService:
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> TradePlan:
-        """Create new trade plan"""
+        """
+        Create a new trade plan with snapshot support from existing trade.
+        
+        **Snapshot Pattern (2025-01-29):**
+        When a trade_id is provided, this method implements the "snapshot" pattern:
+        - Trade is the source when creating plan from trade
+        - Planning fields (planned_amount, entry_price) are copied from the linked Trade
+          as a snapshot at plan creation time
+        - Explicit planning fields in data override snapshot values (allows manual override)
+        
+        **No Fallbacks Policy:**
+        - Only uses Trade data if trade_id is provided
+        - Does not use other fallback sources
+        - If planning fields are missing, validation will enforce required fields
+        
+        Args:
+            db (Session): Database session
+            data (Dict[str, Any]): Trade plan data including:
+                - trading_account_id (required)
+                - ticker_id (required)
+                - trade_id (optional) - if provided, planning fields are snapshotted from trade
+                - planned_amount (optional) - overrides snapshot if provided
+                - entry_price (required) - overrides snapshot if provided
+                - Other standard trade plan fields (status, side, investment_type, etc.)
+        
+        Returns:
+            TradePlan: Created trade plan entity
+        
+        Raises:
+            ValueError: If validation fails or date format is invalid
+        
+        Example:
+            # Create plan from trade (snapshot)
+            plan = TradePlanService.create(db, {
+                'trading_account_id': 1,
+                'ticker_id': 2,
+                'trade_id': 10  # Planning fields will be copied from trade #10
+            })
+            
+            # Create plan with explicit planning fields (override)
+            plan = TradePlanService.create(db, {
+                'trading_account_id': 1,
+                'ticker_id': 2,
+                'trade_id': 10,
+                'planned_amount': 20000,  # Overrides trade's planned_amount
+                'entry_price': 200  # Overrides trade's entry_price
+            })
+        """
         try:
             # Convert string dates to datetime objects where needed
             if 'created_at' in data and isinstance(data['created_at'], str):
@@ -73,6 +120,26 @@ class TradePlanService:
                 if cancelled_at.tzinfo is not None:
                     cancelled_at = cancelled_at.astimezone(timezone.utc).replace(tzinfo=None)
                 data['cancelled_at'] = cancelled_at
+
+            # Snapshot planning data when a trade_id is provided (creating plan from trade)
+            # This implements the "snapshot" pattern: Trade is the source when creating plan from trade
+            trade_id = data.get('trade_id')
+            if trade_id:
+                try:
+                    from models.trade import Trade
+                    trade = db.query(Trade).filter(Trade.id == trade_id).first()
+                except Exception as e:
+                    logger.warning(f"Could not load trade {trade_id} for planning snapshot: {e}")
+                    trade = None
+                if trade:
+                    # Only fill snapshot fields when not explicitly provided in payload
+                    # This allows manual override while defaulting to trade values
+                    trade_amount = getattr(trade, 'planned_amount', None)
+                    trade_entry_price = getattr(trade, 'entry_price', None)
+                    
+                    data.setdefault('planned_amount', trade_amount)
+                    data.setdefault('entry_price', trade_entry_price)
+                    logger.info(f"Snapshotted planning fields from trade {trade_id}: planned_amount={trade_amount}, entry_price={trade_entry_price}")
 
             # Validate data against constraints
             logger.info("Validating trade plan data before creation")

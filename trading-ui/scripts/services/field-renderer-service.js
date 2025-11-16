@@ -168,8 +168,9 @@ class FieldRendererService {
             }
         }
 
-        const dateObj = typeof window.toDateObject === 'function'
-            ? window.toDateObject(candidate)
+        // Use window.dateUtils.toDateObject (window.toDateObject doesn't exist)
+        const dateObj = (window.dateUtils && typeof window.dateUtils.toDateObject === 'function')
+            ? window.dateUtils.toDateObject(candidate)
             : (value instanceof Date ? value : new Date(value));
 
         if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) {

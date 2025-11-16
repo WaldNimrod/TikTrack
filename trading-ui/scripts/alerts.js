@@ -352,17 +352,30 @@ function renderAlertsTableRows(alerts) {
   // פונקציה לטעינת נתונים נוספים
   const loadAdditionalData = async () => {
     try {
-      const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-        fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/trade-plans/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+      // Use entity services instead of direct fetch calls
+      const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+        (window.getAccounts && typeof window.getAccounts === 'function') 
+          ? window.getAccounts().catch(() => [])
+          : Promise.resolve([]),
+        (window.TradesData && typeof window.TradesData.loadTradesData === 'function')
+          ? window.TradesData.loadTradesData().catch(() => [])
+          : Promise.resolve([]),
+        (window.tradePlanService && typeof window.tradePlanService.getTradePlans === 'function')
+          ? window.tradePlanService.getTradePlans().catch(() => [])
+          : (window.getTradePlans && typeof window.getTradePlans === 'function')
+            ? window.getTradePlans().catch(() => [])
+            : Promise.resolve([]),
+        (window.tickerService && typeof window.tickerService.getTickers === 'function')
+          ? window.tickerService.getTickers().catch(() => [])
+          : (window.getTickers && typeof window.getTickers === 'function')
+            ? window.getTickers().catch(() => [])
+            : Promise.resolve([]),
       ]);
 
-      accounts = (accountsResponse.data || accountsResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-      trades = (tradesResponse.data || tradesResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-      tickers = (tickersResponse.data || tickersResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      accounts = Array.isArray(accountsData) ? accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
+      trades = Array.isArray(tradesData) ? tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
+      tradePlans = Array.isArray(tradePlansData) ? tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
+      tickers = Array.isArray(tickersData) ? tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
     } catch {
       // // window.Logger.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error, { page: "alerts" });
       // המשך עם מערכים ריקים
@@ -795,25 +808,94 @@ function renderAlertsTableRows(alerts) {
           <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
           <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
           ${(() => {
-            if (typeof window.renderUpdatedCell === 'function') {
-              return window.renderUpdatedCell(alert, {
-                fields: ['updated_at', 'triggered_at', 'created_at'],
-                columnClass: 'col-updated'
-              });
-            }
-            const fallbackDate = window.toDateObject
-              ? window.toDateObject(alert.updated_at || alert.triggered_at || alert.created_at)
-              : (alert.updated_at || alert.triggered_at || alert.created_at
-                  ? new Date(alert.updated_at || alert.triggered_at || alert.created_at)
-                  : null);
-            if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+            // Prefer FieldRendererService.renderDate for consistent date formatting
+            const rawDate = alert.updated_at || alert.triggered_at || alert.created_at || null;
+            
+            if (!rawDate) {
               return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
             }
-            const absolute = fallbackDate.toLocaleString('he-IL');
-            const duration = typeof window.getDurationSince === 'function'
-              ? window.getDurationSince(fallbackDate, { fallback: absolute })
-              : absolute;
-            return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+            // Use FieldRendererService.renderDate for proper date formatting
+            let dateDisplay = '';
+            let epoch = null;
+
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+              // Use FieldRendererService to render date with time
+              dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+              
+              // Get epoch for sorting
+              if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+              } else if (rawDate instanceof Date) {
+                epoch = rawDate.getTime();
+              } else if (typeof rawDate === 'string') {
+                const parsed = Date.parse(rawDate);
+                epoch = Number.isNaN(parsed) ? null : parsed;
+              } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                epoch = rawDate.epochMs;
+              }
+            } else {
+              // Fallback: work directly with date envelope objects or raw values
+              const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                ? window.dateUtils.ensureDateEnvelope(rawDate)
+                : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                  ? rawDate
+                  : null;
+
+              // Derive epoch milliseconds in a canonical way
+              epoch = (() => {
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                  return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                }
+                if (typeof window.getEpochMilliseconds === 'function') {
+                  return window.getEpochMilliseconds(envelope || rawDate);
+                }
+                if (envelope && typeof envelope.epochMs === 'number') {
+                  return envelope.epochMs;
+                }
+                if (rawDate instanceof Date) {
+                  return rawDate.getTime();
+                }
+                if (typeof rawDate === 'string') {
+                  const parsed = Date.parse(rawDate);
+                  return Number.isNaN(parsed) ? null : parsed;
+                }
+                return null;
+              })();
+
+              if (epoch === null || Number.isNaN(epoch)) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+
+              // Build date display using unified date utilities
+              dateDisplay = (() => {
+                if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                  return window.dateUtils.formatDateTime(envelope || rawDate);
+                }
+                if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                  return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                }
+                try {
+                  return new Date(epoch).toLocaleString('he-IL', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  });
+                } catch (err) {
+                  window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
+                  return 'לא מוגדר';
+                }
+              })();
+            }
+
+            if (!dateDisplay || dateDisplay === '-') {
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+
+            return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
           })()}
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
@@ -911,34 +993,51 @@ async function updateAlertsTable(alerts, options = {}) {
 // Data loading, saving, and modal data management
 
 /**
- * Load modal data for alerts
- * Loads accounts, trades, trade plans, and tickers for modal dropdowns
+ * Load modal data for alerts page using entity services
+ * 
+ * טעינת נתוני מודל עבור עמוד התראות באמצעות שירותי ישויות
+ * 
+ * Loads accounts, trades, trade plans, and tickers data using global entity services
+ * instead of direct API calls. Falls back to direct API calls if services are unavailable.
  * 
  * @function loadModalData
  * @async
  * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await loadModalData();
  */
 async function loadModalData() {
   try {
 
     // טעינת נתונים במקביל
     // window.Logger.info('🔧 Loading modal data...', { page: "alerts" });
-    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trade-plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+    // Use entity services instead of direct fetch calls
+    const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+      (window.getAccounts && typeof window.getAccounts === 'function') 
+        ? window.getAccounts().catch(() => [])
+        : Promise.resolve([]),
+      (window.TradesData && typeof window.TradesData.loadTradesData === 'function')
+        ? window.TradesData.loadTradesData().catch(() => [])
+        : Promise.resolve([]),
+      (window.tradePlanService && typeof window.tradePlanService.getTradePlans === 'function')
+        ? window.tradePlanService.getTradePlans().catch(() => [])
+        : (window.getTradePlans && typeof window.getTradePlans === 'function')
+          ? window.getTradePlans().catch(() => [])
+          : Promise.resolve([]),
+      (window.tickerService && typeof window.tickerService.getTickers === 'function')
+        ? window.tickerService.getTickers().catch(() => [])
+        : (window.getTickers && typeof window.getTickers === 'function')
+          ? window.getTickers().catch(() => [])
+          : Promise.resolve([]),
     ]);
 
     // וידוא שהנתונים הם מערכים
-    const accounts = Array.isArray(accountsResponse?.data) ? accountsResponse.data :
-      Array.isArray(accountsResponse) ? accountsResponse : [];
-    const trades = Array.isArray(tradesResponse?.data) ? tradesResponse.data :
-      Array.isArray(tradesResponse) ? tradesResponse : [];
-    const tradePlans = Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data :
-      Array.isArray(tradePlansResponse) ? tradePlansResponse : [];
-    const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data :
-      Array.isArray(tickersResponse) ? tickersResponse : [];
+    const accounts = Array.isArray(accountsData) ? accountsData : [];
+    const trades = Array.isArray(tradesData) ? tradesData : [];
+    const tradePlans = Array.isArray(tradePlansData) ? tradePlansData : [];
+    const tickers = Array.isArray(tickersData) ? tickersData : [];
 
     // window.Logger.info('🔧 Modal data loaded:', { page: "alerts" });
     // window.Logger.info('🔧 Accounts:', accounts.length, { page: "alerts" });

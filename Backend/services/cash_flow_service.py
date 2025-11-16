@@ -25,6 +25,7 @@ class CashFlowService:
     Service for cash flow operations, especially currency exchanges
     """
     
+    # Existing constants preserved for compatibility with API and UI
     EXCHANGE_PREFIX = "exchange_"
     EXCHANGE_FROM_TYPE = "currency_exchange_from"
     EXCHANGE_TO_TYPE = "currency_exchange_to"
@@ -193,6 +194,104 @@ class CashFlowService:
             str: External ID with prefix
         """
         return f"{CashFlowService.EXCHANGE_PREFIX}{uuid}"
+
+    # ------------------------------------------------------------------
+    # Creation APIs (SSOT for manual + import flows)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def create_exchange(
+        db: Session,
+        *,
+        trading_account_id: int,
+        from_currency_id: int,
+        to_currency_id: int,
+        date,
+        from_amount: float,
+        exchange_rate: float,
+        fee_amount: float = 0.0,
+        description: str = None,
+        source: str = "currency_exchange"
+    ) -> Dict[str, Any]:
+        """
+        Create an atomic currency exchange pair using the canonical structure.
+        Returns: dict with from_flow, to_flow, exchange_id (external_id with prefix).
+        """
+        from models.cash_flow import CashFlow
+        from models.currency import Currency
+        import uuid as _uuid
+        from datetime import datetime as _dt, date as _date
+
+        # Validate input
+        if not trading_account_id or not from_currency_id or not to_currency_id:
+            raise ValueError("Missing required fields for exchange creation")
+        if from_currency_id == to_currency_id:
+            raise ValueError("From and to currencies must be different")
+        if from_amount <= 0:
+            raise ValueError("From amount must be greater than 0")
+        if exchange_rate <= 0:
+            raise ValueError("Exchange rate must be greater than 0")
+        if fee_amount is None:
+            fee_amount = 0.0
+        if fee_amount < 0:
+            raise ValueError("Fee amount cannot be negative")
+        # Normalize date to date object
+        if isinstance(date, _dt):
+            date_value = date.date()
+        elif isinstance(date, _date):
+            date_value = date
+        else:
+            date_value = date
+
+        # Calculate target amount
+        to_amount = from_amount * exchange_rate
+
+        # Resolve currencies for usd_rate
+        from_currency = db.query(Currency).filter(Currency.id == from_currency_id).first()
+        to_currency = db.query(Currency).filter(Currency.id == to_currency_id).first()
+        if not from_currency or not to_currency:
+            raise ValueError("Currency not found")
+
+        # Create shared external_id
+        exchange_uuid = _uuid.uuid4().hex[:12]
+        exchange_id = CashFlowService.create_exchange_id(exchange_uuid)
+
+        # Build flows
+        from_flow = CashFlow(
+            trading_account_id=trading_account_id,
+            type=CashFlowService.EXCHANGE_FROM_TYPE,
+            amount=-abs(float(from_amount)),
+            fee_amount=float(fee_amount or 0.0),
+            currency_id=from_currency_id,
+            usd_rate=float(from_currency.usd_rate or 1.0),
+            date=date_value,
+            description=description,
+            source=source,
+            external_id=exchange_id
+        )
+        to_flow = CashFlow(
+            trading_account_id=trading_account_id,
+            type=CashFlowService.EXCHANGE_TO_TYPE,
+            amount=float(to_amount),
+            fee_amount=0.0,
+            currency_id=to_currency_id,
+            usd_rate=float(to_currency.usd_rate or 1.0),
+            date=date_value,
+            description=description,
+            source=source,
+            external_id=exchange_id
+        )
+
+        db.add(from_flow)
+        db.add(to_flow)
+        db.commit()
+        db.refresh(from_flow)
+        db.refresh(to_flow)
+
+        return {
+            "exchange_id": exchange_id,
+            "from_flow": from_flow,
+            "to_flow": to_flow
+        }
 
     @staticmethod
     def _safe_number(value: Any) -> Optional[float]:

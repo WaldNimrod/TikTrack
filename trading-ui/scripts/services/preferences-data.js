@@ -2,11 +2,78 @@
  * Preferences Data Service
  * ========================
  * Centralizes every API interaction for user preferences so that pages can rely
- * on one cache-aware layer (UnifiedCacheManager + CacheTTLGuard) instead of
+ * on one cache-aware layer (UnifiedCacheManager + CacheTTLGuard + CacheSyncManager) instead of
  * issuing ad-hoc fetch() calls.
+ * 
+ * Related Documentation:
+ * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+ * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * 
+ * Function Index:
+ * ==============
+ * 
+ * CACHE MANAGEMENT:
+ * - readCache(key, options) - Read from UnifiedCacheManager
+ * - saveCache(key, value, options) - Save to UnifiedCacheManager
+ * - clearCachePattern(prefix) - Clear cache by pattern (fallback only)
+ * 
+ * PREFERENCE OPERATIONS:
+ * - loadPreference({ preferenceName, userId, profileId, force, ttl }) - Load single preference
+ * - loadPreferenceGroup({ groupName, userId, profileId, force, ttl }) - Load preference group
+ * - loadPreferencesByNames({ names, userId, profileId, force, ttl }) - Load multiple preferences
+ * - loadAllPreferencesRaw({ userId, profileId, force, ttl }) - Load all preferences
+ * - savePreference({ preferenceName, value, userId, profileId }) - Save single preference (uses CacheSyncManager)
+ * - savePreferences({ preferences, userId, profileId }) - Save multiple preferences (uses CacheSyncManager)
+ * 
+ * PROFILE OPERATIONS:
+ * - loadProfiles({ userId, force, ttl }) - Load all profiles
+ * - createProfile({ name, description, userId }) - Create new profile (uses CacheSyncManager)
+ * - activateProfile({ profileId, userId }) - Activate profile (uses CacheSyncManager)
+ * - deleteProfile({ profileId, userId }) - Delete profile (uses CacheSyncManager)
+ * 
+ * METADATA OPERATIONS:
+ * - loadPreferenceGroupsMetadata({ force, ttl }) - Load groups metadata
+ * - loadPreferenceTypes({ force, ttl }) - Load preference types
+ * - loadDefaultPreference(preferenceName, { userId, profileId, force, ttl }) - Load default value
+ * - loadPreferenceInfo(preferenceName) - Load preference info
+ * - checkPreferenceExists(preferenceName) - Check if preference exists
+ * - checkHealth() - Health check
+ * 
+ * UTILITY FUNCTIONS:
+ * - buildDedupeKey(url, options) - Build dedupe key for request deduplication
+ * - resolveBaseUrl() - Resolve base URL for API calls
+ * - buildUrl(path) - Build full URL
+ * - buildUrlWithParams(path, params) - Build URL with query params
+ * - fetchJson(path, options) - Generic fetch with error handling
+ * - buildCacheKey(prefix, parts) - Build cache key
+ * - normalizePreferenceEntries(rawPreferences) - Normalize preference entries
+ * - normalizePreferencesPayload(payload, fallback) - Normalize preferences payload
+ * - normalizeProfilesPayload(payload, userId) - Normalize profiles payload
+ * - normalizeGroupsPayload(payload) - Normalize groups payload
+ * - normalizeTypesPayload(payload) - Normalize types payload
+ * - normalizeGroupRecord(record) - Normalize group record
+ * 
+ * @version 2.0.0
+ * @created January 2025
+ * @updated January 2025 - Added CacheSyncManager integration
+ * @author TikTrack Development Team
  */
 (function initPreferencesDataService() {
   const PAGE_LOG_CONTEXT = { page: 'preferences-data' };
+
+  // In-flight request dedupe registry
+  const inflight = new Map();
+  // ETag registry per URL
+  const etags = new Map();
+  // Simple circuit breaker for 429 bursts
+  let rateLimitedUntil = 0;
+
+  // Utility to build a stable dedupe key
+  function buildDedupeKey(url, options) {
+    const method = (options?.method || 'GET').toUpperCase();
+    const body = options?.body ? JSON.stringify(options.body) : '';
+    return `${method} ${url} ${body}`;
+    }
 
   const KEY_PREFIXES = {
     all: 'preference-data',
@@ -77,22 +144,86 @@
       headers = {},
       signal,
       credentials = 'same-origin',
+      // advanced options
+      timeoutMs = 15000,
+      dedupe = true,
+      maxRetries = 2,
     } = options;
 
     const url = buildUrlWithParams(path, params);
-    const response = await fetch(url, {
-      method,
-      headers: {
-        ...DEFAULT_HEADERS,
-        ...headers,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      signal,
-      credentials,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    // Dedupe identical requests
+    const key = buildDedupeKey(url, { method, body });
+    if (dedupe && inflight.has(key)) {
+      try {
+        return await inflight.get(key);
+      } catch (e) {
+        // fallthrough to perform a fresh call if previous failed
+      }
+    }
+
+    const doFetch = async (attempt = 0) => {
+      // Circuit breaker: if recently rate-limited, delay
+      const now = Date.now();
+      if (rateLimitedUntil && now < rateLimitedUntil) {
+        const waitMs = Math.min(rateLimitedUntil - now, 3000);
+        await new Promise(r => setTimeout(r, waitMs));
+      }
+      try {
+        const hdrs = {
+          method,
+          headers: {
+            ...DEFAULT_HEADERS,
+            ...headers,
+          },
+          body: body ? JSON.stringify(body) : undefined,
+          signal: signal || controller.signal,
+          credentials,
+        };
+        // Send If-None-Match ETag when available
+        const etag = etags.get(url);
+        if (etag) {
+          hdrs.headers['If-None-Match'] = etag;
+        }
+        const resp = await fetch(url, {
+          ...hdrs,
+          body: body ? JSON.stringify(body) : undefined,
+          signal: signal || controller.signal,
+          credentials,
+        });
+        return resp;
+      } catch (e) {
+        if (attempt < maxRetries) {
+          const backoff = Math.min(1000 * Math.pow(2, attempt), 4000);
+          await new Promise(r => setTimeout(r, backoff));
+          return doFetch(attempt + 1);
+        }
+        throw e;
+      }
+    };
+
+    const fetchPromise = doFetch(0)
+      .finally(() => {
+        clearTimeout(timeoutId);
+        inflight.delete(key);
+      });
+
+    if (dedupe) {
+      inflight.set(key, fetchPromise);
+    }
+
+    const response = await fetchPromise;
 
     let payload = null;
     try {
+      // Handle 304 – serve from cache when possible
+      if (response.status === 304) {
+        // Attempt to read cached response based on path+params cache key(s)
+        // Callers of fetchJson must manage their own cache reads; here we only short-circuit parse
+        return { status: 304, fromCache: true };
+      }
       payload = await response.json();
     } catch (error) {
       window.Logger?.warn?.('⚠️ Failed to parse JSON response for preferences request', {
@@ -110,21 +241,48 @@
         `HTTP ${response.status}: ${response.statusText}`;
       const error = new Error(errorMessage);
       error.payload = payload;
-      // Authentication UX: show clear error and allow UI to react
+      // Authentication handling: mark error for callers, but avoid using the
+      // notification system here (it itself relies on preferences and can
+      // create recursive errors if preferences endpoints return 401).
       if (response.status === 401 || response.status === 403) {
-        try {
-          const message = payload?.error?.message || payload?.message || 'דרושה התחברות למערכת';
-          if (window.NotificationSystem?.error) {
-            window.NotificationSystem.error(message, { context: 'preferences' });
-          } else if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification(message);
-          }
-        } catch (_) { /* noop */ }
         error.isAuthError = true;
         error.status = response.status;
+        try {
+          window.Logger?.warn?.('⚠️ Preferences request failed with authentication error', {
+            ...PAGE_LOG_CONTEXT,
+            url,
+            status: response.status,
+            message: errorMessage,
+          });
+        } catch (_) { /* noop */ }
+      } else if (response.status === 429) {
+        // Respect Retry-After header if present, then retry transparently
+        const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
+        // Jitter to avoid herd effects
+        const jitter = Math.floor(Math.random() * 250);
+        // Trip short-lived circuit breaker
+        rateLimitedUntil = Date.now() + Math.min(retryAfter * 1000 + jitter, 5000);
+        if ((options.maxRetries ?? 2) > 0) {
+          await new Promise(r => setTimeout(r, Math.min(retryAfter * 1000 + jitter, 5000)));
+          // Retry once with reduced maxRetries to avoid infinite loop
+          return await fetchJson(path, {
+            ...options,
+            maxRetries: (options.maxRetries ?? 2) - 1,
+          });
+        }
+        error.status = 429;
+        error.isRateLimited = true;
       }
       throw error;
     }
+
+    // Store latest ETag if present
+    try {
+      const respEtag = response.headers?.get?.('ETag');
+      if (respEtag) {
+        etags.set(url, respEtag);
+      }
+    } catch {}
 
     return payload;
   }
@@ -482,11 +640,58 @@
       },
     });
 
-    await clearCachePattern(KEY_PREFIXES.single);
-    await clearCachePattern(KEY_PREFIXES.all);
+    // Cache invalidation via CacheSyncManager (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('preference-updated');
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+        // Fallback to direct cache clearing
+        await clearCachePattern(KEY_PREFIXES.single);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+    } else {
+      // Fallback to direct cache clearing if CacheSyncManager not available
+      await clearCachePattern(KEY_PREFIXES.single);
+      await clearCachePattern(KEY_PREFIXES.all);
+    }
+    
+    // Unified cache refresh: request profile refresh when available
+    if (window.UnifiedCacheManager?.refreshUserPreferences) {
+      try {
+        await window.UnifiedCacheManager.refreshUserPreferences(
+          profileId ?? 'active',
+          null,
+          { userId, preferenceNames: [preferenceName] },
+        );
+      } catch (_) { /* best-effort */ }
+    }
     return payload;
   }
 
+  /**
+   * Save multiple preferences
+   * 
+   * @param {Object} options - Preferences options
+   * @param {Object} options.preferences - Object with preference names as keys and values
+   * @param {number} [options.userId=1] - User ID
+   * @param {number|null} [options.profileId=null] - Profile ID (null for active profile)
+   * @returns {Promise<Object>} API response payload
+   * 
+   * @description
+   * Saves multiple preferences and invalidates cache via CacheSyncManager.
+   * Uses 'preference-updated' action for cache invalidation with fallback to direct cache clearing.
+   * 
+   * Cache Invalidation:
+   * - Primary: CacheSyncManager.invalidateByAction('preference-updated')
+   * - Fallback: UnifiedCacheManager.clearByPattern() for 'preference-single' and 'preference-data'
+   * 
+   * Related Documentation:
+   * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+   */
   async function savePreferences({ preferences = {}, userId = 1, profileId = null }) {
     if (!preferences || typeof preferences !== 'object' || Object.keys(preferences).length === 0) {
       return { success: false, message: 'No preferences provided' };
@@ -501,8 +706,35 @@
       },
     });
 
-    await clearCachePattern(KEY_PREFIXES.single);
-    await clearCachePattern(KEY_PREFIXES.all);
+    // Cache invalidation via CacheSyncManager (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('preference-updated');
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+        // Fallback to direct cache clearing
+        await clearCachePattern(KEY_PREFIXES.single);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+    } else {
+      // Fallback to direct cache clearing if CacheSyncManager not available
+      await clearCachePattern(KEY_PREFIXES.single);
+      await clearCachePattern(KEY_PREFIXES.all);
+    }
+    
+    // Unified cache refresh: request profile refresh when available
+    if (window.UnifiedCacheManager?.refreshUserPreferences) {
+      try {
+        await window.UnifiedCacheManager.refreshUserPreferences(
+          profileId ?? 'active',
+          null,
+          { userId, preferenceNames: Object.keys(preferences) },
+        );
+      } catch (_) { /* best-effort */ }
+    }
     return payload;
   }
 
@@ -525,6 +757,26 @@
     return normalized;
   }
 
+  /**
+   * Create a new user profile
+   * 
+   * @param {Object} options - Profile options
+   * @param {string} options.name - Profile name
+   * @param {string} [options.description=''] - Profile description
+   * @param {number} [options.userId=1] - User ID
+   * @returns {Promise<Object>} API response payload
+   * 
+   * @description
+   * Creates a new user profile and invalidates cache via CacheSyncManager.
+   * Uses 'profile-created' action for cache invalidation with fallback to direct cache clearing.
+   * 
+   * Cache Invalidation:
+   * - Primary: CacheSyncManager.invalidateByAction('profile-created')
+   * - Fallback: UnifiedCacheManager.clearByPattern() for 'profile-data'
+   * 
+   * Related Documentation:
+   * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+   */
   async function createProfile({ name, description = '', userId = 1 }) {
     if (!name) {
       throw new Error('Profile name is required');
@@ -540,10 +792,45 @@
       },
     });
 
-    await clearCachePattern(KEY_PREFIXES.profiles);
+    // Cache invalidation via CacheSyncManager (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('profile-created');
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+        // Fallback to direct cache clearing
+        await clearCachePattern(KEY_PREFIXES.profiles);
+      }
+    } else {
+      // Fallback to direct cache clearing if CacheSyncManager not available
+      await clearCachePattern(KEY_PREFIXES.profiles);
+    }
     return payload;
   }
 
+  /**
+   * Activate a user profile
+   * 
+   * @param {Object} options - Profile activation options
+   * @param {number} options.profileId - Profile ID to activate (0 for default profile)
+   * @param {number} [options.userId=1] - User ID
+   * @returns {Promise<Object>} API response payload
+   * 
+   * @description
+   * Activates a user profile and invalidates cache via CacheSyncManager.
+   * Uses 'profile-switched' action for cache invalidation with fallback to direct cache clearing.
+   * If profileId is 0, returns success without API call (default profile).
+   * 
+   * Cache Invalidation:
+   * - Primary: CacheSyncManager.invalidateByAction('profile-switched')
+   * - Fallback: UnifiedCacheManager.clearByPattern() for 'profile-data' and 'preference-data'
+   * 
+   * Related Documentation:
+   * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+   */
   async function activateProfile({ profileId, userId = 1 }) {
     if (profileId === 0) {
       return { success: true, message: 'Default profile selected (no API call)' };
@@ -557,18 +844,68 @@
       },
     });
 
-    await clearCachePattern(KEY_PREFIXES.profiles);
-    await clearCachePattern(KEY_PREFIXES.all);
+    // Cache invalidation via CacheSyncManager (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('profile-switched');
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+        // Fallback to direct cache clearing
+        await clearCachePattern(KEY_PREFIXES.profiles);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+    } else {
+      // Fallback to direct cache clearing if CacheSyncManager not available
+      await clearCachePattern(KEY_PREFIXES.profiles);
+      await clearCachePattern(KEY_PREFIXES.all);
+    }
     return payload;
   }
 
+  /**
+   * Delete a user profile
+   * 
+   * @param {Object} options - Profile deletion options
+   * @param {number} options.profileId - Profile ID to delete
+   * @param {number} [options.userId=1] - User ID
+   * @returns {Promise<Object>} API response payload
+   * 
+   * @description
+   * Deletes a user profile and invalidates cache via CacheSyncManager.
+   * Uses 'profile-deleted' action for cache invalidation with fallback to direct cache clearing.
+   * 
+   * Cache Invalidation:
+   * - Primary: CacheSyncManager.invalidateByAction('profile-deleted')
+   * - Fallback: UnifiedCacheManager.clearByPattern() for 'profile-data'
+   * 
+   * Related Documentation:
+   * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+   */
   async function deleteProfile({ profileId, userId = 1 }) {
     const payload = await fetchJson(`/api/preferences/profiles/${profileId}`, {
       method: 'DELETE',
       params: { user_id: userId },
     });
 
-    await clearCachePattern(KEY_PREFIXES.profiles);
+    // Cache invalidation via CacheSyncManager (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('profile-deleted');
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+        // Fallback to direct cache clearing
+        await clearCachePattern(KEY_PREFIXES.profiles);
+      }
+    } else {
+      // Fallback to direct cache clearing if CacheSyncManager not available
+      await clearCachePattern(KEY_PREFIXES.profiles);
+    }
     return payload;
   }
 

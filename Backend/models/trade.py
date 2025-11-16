@@ -19,6 +19,11 @@ class Trade(BaseModel):
     status = Column(String(20), default='open', nullable=True)
     investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints
     side = Column(String(10), default='Long', nullable=True)  # Long, Short
+
+    # Planning snapshot fields (per-trade planned position, even without a trade_plan)
+    planned_quantity = Column(Float, nullable=True)
+    planned_amount = Column(Float, nullable=True)
+    entry_price = Column(Float, nullable=True)
     # opened_at field removed - using created_at from BaseModel instead
     closed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
@@ -49,6 +54,10 @@ class Trade(BaseModel):
                 "status": self.status,
                 "investment_type": self.investment_type,
                 "side": self.side,
+                # Planning snapshot fields (may be None if not set)
+                "planned_quantity": getattr(self, "planned_quantity", None),
+                "planned_amount": getattr(self, "planned_amount", None),
+                "entry_price": getattr(self, "entry_price", None),
                 "notes": self.notes,
                 "opened_at": self.created_at,
                 "closed_at": self.closed_at,

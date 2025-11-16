@@ -131,8 +131,82 @@ class TradeService:
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Trade:
-        """Create a new trade"""
+        """
+        Create a new trade with snapshot support for planning fields.
         
+        **Snapshot Pattern (2025-01-29):**
+        When a trade_plan_id is provided, this method implements the "snapshot" pattern:
+        - TradePlan is the source of truth by default
+        - Planning fields (planned_quantity, planned_amount, entry_price) are copied 
+          from the linked TradePlan as a snapshot at trade creation time
+        - Explicit planning fields in data override snapshot values (allows manual override)
+        - planned_quantity is calculated automatically: planned_amount / entry_price
+        
+        **No Fallbacks Policy:**
+        - Only uses TradePlan data if trade_plan_id is provided
+        - Does not use position data or other fallback sources
+        - If planning fields are missing, they remain NULL (no automatic calculation from other sources)
+        
+        Args:
+            db (Session): Database session
+            data (Dict[str, Any]): Trade data including:
+                - trading_account_id (required)
+                - ticker_id (required)
+                - trade_plan_id (optional) - if provided, planning fields are snapshotted from plan
+                - planned_quantity (optional) - overrides snapshot if provided
+                - planned_amount (optional) - overrides snapshot if provided
+                - entry_price (optional) - overrides snapshot if provided
+                - Other standard trade fields (status, side, investment_type, etc.)
+        
+        Returns:
+            Trade: Created trade entity
+        
+        Raises:
+            ValueError: If validation fails or date format is invalid
+        
+        Example:
+            # Create trade from plan (snapshot)
+            trade = TradeService.create(db, {
+                'trading_account_id': 1,
+                'ticker_id': 2,
+                'trade_plan_id': 5  # Planning fields will be copied from plan #5
+            })
+            
+            # Create trade with explicit planning fields (override)
+            trade = TradeService.create(db, {
+                'trading_account_id': 1,
+                'ticker_id': 2,
+                'trade_plan_id': 5,
+                'planned_amount': 15000,  # Overrides plan's planned_amount
+                'entry_price': 150  # Overrides plan's entry_price
+            })
+        """
+        # Snapshot planning data when a trade_plan_id is provided
+        # This implements the "snapshot" pattern: Trade Plan is the source of truth by default
+        # When creating a trade from a plan, we copy planning fields as a snapshot at trade creation time
+        trade_plan_id = data.get('trade_plan_id')
+        if trade_plan_id:
+            try:
+                plan = db.query(TradePlan).filter(TradePlan.id == trade_plan_id).first()
+            except Exception as e:
+                logger.warning(f"Could not load trade plan {trade_plan_id} for planning snapshot: {e}")
+                plan = None
+            if plan:
+                # Only fill snapshot fields when not explicitly provided in payload
+                # This allows manual override while defaulting to plan values
+                plan_amount = getattr(plan, 'planned_amount', None)
+                plan_entry_price = getattr(plan, 'entry_price', None)
+                
+                data.setdefault('planned_amount', plan_amount)
+                data.setdefault('entry_price', plan_entry_price)
+                
+                # Calculate planned_quantity from planned_amount and entry_price if both are available
+                if 'planned_quantity' not in data and plan_amount and plan_entry_price and plan_entry_price > 0:
+                    data['planned_quantity'] = plan_amount / plan_entry_price
+                elif 'planned_quantity' not in data:
+                    # Fallback: try to get quantity from plan if it exists (future field)
+                    data.setdefault('planned_quantity', getattr(plan, 'quantity', None))
+
         # Convert string dates to datetime objects
         if 'created_at' in data and isinstance(data['created_at'], str):
             try:
@@ -260,6 +334,14 @@ class TradeService:
             raise ValueError("Ticker mismatch between trade and trade plan")
 
         trade.trade_plan_id = trade_plan_id
+
+        # Planning snapshot on late assignment:
+        # Only fill snapshot fields if they are currently empty on the trade
+        if getattr(trade, 'planned_amount', None) is None:
+            trade.planned_amount = getattr(plan, 'planned_amount', None)
+        if getattr(trade, 'entry_price', None) is None:
+            trade.entry_price = getattr(plan, 'entry_price', None)
+        # planned_quantity remains optional and can be derived when needed
         db.add(trade)
         db.commit()
         logger.info(f"Linked trade {trade_id} to trade plan {trade_plan_id}")

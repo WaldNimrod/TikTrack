@@ -146,6 +146,7 @@ from routes.api import (
     wal_bp,
     system_settings_bp
 )
+from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
 from routes.api.cache_changes import cache_changes_bp
 
@@ -311,6 +312,22 @@ try:
 except:
     logger.info("📦 Flask version: unknown")
 
+# Log effective database binding
+try:
+    # database_config is already used by LegacyDBProxy; engine binds to the active DB
+    effective_db_url = str(database_config.engine.url)
+    logger.info("🗄️ Effective DATABASE_URL: %s", effective_db_url)
+    if effective_db_url.startswith("sqlite"):
+        # For sqlite, also log resolved file path when possible
+        try:
+            # sqlite:////absolute/path or sqlite:///relative
+            path_part = effective_db_url.split("sqlite:///")[-1]
+            logger.info("📂 SQLite file path: %s", os.path.abspath(path_part))
+        except Exception:
+            pass
+except Exception as _log_db_err:
+    logger.warning("⚠️ Could not log database URL: %s", _log_db_err)
+
 try:
     logger.info("🗄️ Initializing database...")
     with PerformanceTracker("Database initialization"):
@@ -438,6 +455,7 @@ app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(tags_bp)
 app.register_blueprint(preferences_bp)
+app.register_blueprint(preferences_v4_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)

@@ -146,11 +146,14 @@
     // 11. בדיקת API
     console.log('1️⃣1️⃣ API CHECK:');
     try {
-        const response = await fetch('/api/preferences/user/preference?name=entityTradingAccountColor');
-        const data = await response.json();
-        console.log('   API entityTradingAccountColor:', data);
+        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+            const value = await window.PreferencesCore.getPreference('entityTradingAccountColor');
+            console.log('   PreferencesCore entityTradingAccountColor:', value);
+        } else {
+            console.log('   ⚠️ PreferencesCore not available');
+        }
     } catch (error) {
-        console.log('   ⚠️ API error:', error.message);
+        console.log('   ⚠️ PreferencesCore error:', error.message);
     }
     console.log('');
     

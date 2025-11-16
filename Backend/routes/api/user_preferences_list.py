@@ -6,6 +6,7 @@ Description: API routes for listing all user preferences from database table
 """
 
 from flask import Blueprint, request, jsonify
+from routes.api.base_entity_decorators import require_authentication
 from typing import Dict, Any
 import logging
 import os
@@ -19,13 +20,15 @@ user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_pref
 def get_db_connection():
     """Get database connection"""
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+    # Use the unified tiktrack.db database file (standardized for dev and production)
+    DB_PATH = os.path.join(BASE_DIR, "db", "tiktrack.db")
     
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 @user_preferences_list_bp.route('/', methods=['GET'])
+@require_authentication()
 def get_user_preferences():
     """Get all user preferences"""
     try:

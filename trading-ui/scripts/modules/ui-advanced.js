@@ -1956,19 +1956,15 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    // מניעת כפילויות
-    if (window.colorPreferencesLoaded) {
-      return;
-    }
+    // מניעת כפילויות בוטלה כדי לאפשר טעינה מחודשת לפי צורך (ובבדיקות)
     
 
     // נסה ראשית מערכת העדפות
     try {
-      const newResponse = await fetch('/api/preferences/user');
-      if (newResponse.ok) {
-        const newData = await newResponse.json();
-        if (newData.success && newData.data.preferences) {
-          const prefs = newData.data.preferences;
+      if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
+        const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
+        if (prefPayload && prefPayload.preferences) {
+          const prefs = prefPayload.preferences;
           
           // עדכון מערכת הצבעים מהעדפות
           if (prefs.colorScheme) {
@@ -2017,10 +2013,9 @@ async function loadColorPreferences() {
     }
 
     // Fallback ל-legacy
-    const response = await fetch('/api/preferences/user');
-    if (response.ok) {
-      const data = await response.json();
-      const preferences = data.data || data;
+    if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
+      const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
+      const preferences = prefPayload?.preferences || {};
 
       // עדכון מערכת הצבעים
       // הסרנו את preferences.numericValueColors כי הוא לא קיים במערכת ההעדפות
@@ -2078,25 +2073,24 @@ async function loadColorPreferences() {
 window.loadUserPreferences = async function loadUserPreferences(options = {}) {
   const { force = false, source = 'manual' } = options || {};
   try {
-    const url = force ? '/api/preferences/user?use_cache=false' : '/api/preferences/user';
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.warn('⚠️ preferences fetch not OK:', res.status);
+    // Use centralized data service
+    const prefPayload = await (window.PreferencesData?.loadAllPreferencesRaw?.({ force }) || Promise.resolve(null));
+    if (!prefPayload) {
+      console.warn('⚠️ PreferencesData.loadAllPreferencesRaw returned empty payload');
       return false;
     }
-    const json = await res.json();
     
     // Update PreferencesCore with the profile ID from server
-    if (window.PreferencesCore && json?.data?.profile_id !== undefined) {
-      window.PreferencesCore.currentProfileId = json.data.profile_id;
-      console.log('✅ Updated PreferencesCore.currentProfileId to:', json.data.profile_id);
+    if (window.PreferencesCore && prefPayload?.resolvedProfileId !== undefined) {
+      window.PreferencesCore.currentProfileId = prefPayload.resolvedProfileId;
+      console.log('✅ Updated PreferencesCore.currentProfileId to:', prefPayload.resolvedProfileId);
     }
     
-    const prefsRaw = json?.data?.preferences || {};
+    const prefsRaw = prefPayload?.preferences || {};
     let prefs = { ...prefsRaw };
 
     // Merge colors from alternative shapes/groups if missing
-    const inlineColors = json?.data?.colors || prefsRaw?.colors || {};
+    const inlineColors = prefsRaw?.colors || {};
     if (!prefs.primaryColor && (inlineColors.primaryColor || inlineColors.primary)) {
       prefs.primaryColor = inlineColors.primaryColor || inlineColors.primary;
     }
@@ -2105,10 +2099,9 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
     }
     if (!prefs.primaryColor || !prefs.secondaryColor) {
       try {
-        const groupRes = await fetch('/api/preferences/user/group?group=colors');
-        if (groupRes.ok) {
-          const groupJson = await groupRes.json();
-          const g = groupJson?.data?.preferences || groupJson?.data || {};
+        if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceGroup === 'function') {
+          const group = await window.PreferencesData.loadPreferenceGroup({ groupName: 'colors' });
+          const g = group?.preferences || {};
           if (!prefs.primaryColor && (g.primaryColor || g.primary)) {
             prefs.primaryColor = g.primaryColor || g.primary;
           }

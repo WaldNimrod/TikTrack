@@ -394,14 +394,22 @@ async function saveExecution() {
         const url = isEdit ? `/api/executions/${executionId}` : '/api/executions';
         const method = isEdit ? 'PUT' : 'POST';
         
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(executionData)
-        });
+        // Send to API using ExecutionsData service if available
+        let response;
+        if (isEdit && typeof window.ExecutionsData?.updateExecution === 'function') {
+            response = await window.ExecutionsData.updateExecution(executionId, executionData);
+        } else if (!isEdit && typeof window.ExecutionsData?.createExecution === 'function') {
+            response = await window.ExecutionsData.createExecution(executionData);
+        } else {
+            // Fallback to direct fetch
+            response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(executionData)
+            });
+        }
         
         // Use CRUDResponseHandler for consistent response handling
         let crudResult;
@@ -747,8 +755,15 @@ async function loadExecutionsData(options = {}) {
 
     let rawExecutions;
     if (typeof window.ExecutionsData?.loadExecutionsData === 'function') {
+      window.Logger.debug('📦 Using ExecutionsData service', { page: "executions" });
       rawExecutions = await window.ExecutionsData.loadExecutionsData({ force, ttl });
+      window.Logger.debug('📦 ExecutionsData returned', { 
+        count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
+        type: typeof rawExecutions,
+        page: "executions" 
+      });
     } else {
+      window.Logger.warn('⚠️ ExecutionsData service not available, using direct fetch', { page: "executions" });
       const base = window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/executions/?_t=${Date.now()}`, {
         method: 'GET',
@@ -765,6 +780,10 @@ async function loadExecutionsData(options = {}) {
 
       const data = await response.json();
       rawExecutions = data?.data || data;
+      window.Logger.debug('📦 Direct fetch returned', { 
+        count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
+        page: "executions" 
+      });
     }
 
     executionsData = Array.isArray(rawExecutions)
@@ -774,6 +793,11 @@ async function loadExecutionsData(options = {}) {
         }))
       : [];
     window.executionsData = executionsData; // עדכון הנתונים הגלובליים
+    
+    window.Logger.info('✅ Executions data loaded', { 
+      count: executionsData.length,
+      page: "executions" 
+    });
 
     if (window.headerSystem && window.headerSystem.currentFilters) {
       const filters = window.headerSystem.currentFilters;
@@ -800,6 +824,10 @@ async function loadExecutionsData(options = {}) {
       }
     }
 
+    window.Logger.debug('🔄 Syncing executions pagination', { 
+      count: executionsData.length,
+      page: "executions" 
+    });
     syncExecutionsPagination(executionsData);
 
     if (typeof window.registerExecutionsTables === 'function') {
@@ -807,6 +835,11 @@ async function loadExecutionsData(options = {}) {
     }
 
     await restorePageState('executions');
+    
+    window.Logger.info('✅ Executions table updated', { 
+      count: executionsData.length,
+      page: "executions" 
+    });
   } catch (error) {
     handleApiError(error, 'עסקעות');
   }
@@ -820,10 +853,20 @@ function syncExecutionsPagination(executionsData) {
   try {
     const tableId = 'executionsTable';
     const tableType = 'executions';
+    
+    window.Logger.debug('🔄 syncExecutionsPagination called', { 
+      count: Array.isArray(executionsData) ? executionsData.length : 0,
+      tableId,
+      tableType,
+      page: "executions" 
+    });
 
     if (window.setTableData) {
       window.setTableData(tableType, executionsData, { tableId });
       window.setFilteredTableData(tableType, executionsData, { tableId, skipPageReset: true });
+      window.Logger.debug('✅ setTableData called', { page: "executions" });
+    } else {
+      window.Logger.warn('⚠️ setTableData not available', { page: "executions" });
     }
 
     const paginationInstance = window.ensureTablePagination
@@ -832,13 +875,15 @@ function syncExecutionsPagination(executionsData) {
 
     if (paginationInstance) {
       paginationInstance.setData(executionsData);
+      window.Logger.debug('✅ Pagination instance setData called', { page: "executions" });
     } else {
+      window.Logger.debug('⚠️ No pagination instance, using updateExecutionsTableMain', { page: "executions" });
       updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
       updateExecutionsSummary(executionsData);
       updateExecutionsCounters(executionsData?.length || 0);
     }
   } catch (error) {
-    window.Logger?.error('syncExecutionsPagination failed', { error });
+    window.Logger?.error('❌ syncExecutionsPagination failed', { error: error?.message, page: "executions" });
     updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
     updateExecutionsSummary(executionsData);
     updateExecutionsCounters(executionsData?.length || 0);
@@ -1005,27 +1050,20 @@ async function updateExecutionsTableMain(executions, options = {}) {
   let tickers = [];
 
   try {
-    const [tradesResponse, tickersResponse] = await Promise.all([
-      fetch('/api/trades/').then(r => {
-        if (r.ok) {
-          return r.json();
-        } else {
-          // // window.Logger.warn('⚠️ Trades API returned error:', r.status, { page: "executions" });
-          return { data: [] };
-        }
-      }).catch(() => ({ data: [] })),
-      fetch('/api/tickers/').then(r => {
-        if (r.ok) {
-          return r.json();
-        } else {
-          // // window.Logger.warn('⚠️ Tickers API returned error:', r.status, { page: "executions" });
-          return { data: [] };
-        }
-      }).catch(() => ({ data: [] })),
+    // Use entity services instead of direct fetch calls
+    const [tradesData, tickersData] = await Promise.all([
+      (window.TradesData && typeof window.TradesData.loadTradesData === 'function')
+        ? window.TradesData.loadTradesData().catch(() => [])
+        : Promise.resolve([]),
+      (window.tickerService && typeof window.tickerService.getTickers === 'function')
+        ? window.tickerService.getTickers().catch(() => [])
+        : (window.getTickers && typeof window.getTickers === 'function')
+          ? window.getTickers().catch(() => [])
+          : Promise.resolve([]),
     ]);
 
-    trades = tradesResponse.data || [];
-    tickers = tickersResponse.data || [];
+    trades = Array.isArray(tradesData) ? tradesData : [];
+    tickers = Array.isArray(tickersData) ? tickersData : [];
 
     // וידוא שהנתונים הם מערכים
     if (!Array.isArray(trades)) {
@@ -1143,25 +1181,94 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 </td>
                 <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
                 ${(() => {
-                  if (typeof window.renderUpdatedCell === 'function') {
-                    return window.renderUpdatedCell(execution, {
-                      fields: ['updated_at', 'execution_date', 'date', 'created_at'],
-                      columnClass: 'col-updated'
-                    });
-                  }
-                  const fallbackDate = window.toDateObject
-                    ? window.toDateObject(execution.updated_at || execution.execution_date || execution.date || execution.created_at)
-                    : (execution.updated_at || execution.execution_date || execution.date || execution.created_at
-                        ? new Date(execution.updated_at || execution.execution_date || execution.date || execution.created_at)
-                        : null);
-                  if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                  // Prefer FieldRendererService.renderDate for consistent date formatting
+                  const rawDate = execution.updated_at || execution.execution_date || execution.date || execution.created_at || null;
+                  
+                  if (!rawDate) {
                     return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
                   }
-                  const absolute = fallbackDate.toLocaleString('he-IL');
-                  const duration = typeof window.getDurationSince === 'function'
-                    ? window.getDurationSince(fallbackDate, { fallback: absolute })
-                    : absolute;
-                  return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+                  // Use FieldRendererService.renderDate for proper date formatting
+                  let dateDisplay = '';
+                  let epoch = null;
+
+                  if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                    // Use FieldRendererService to render date with time
+                    dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                    
+                    // Get epoch for sorting
+                    if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                      const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                      epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                    } else if (rawDate instanceof Date) {
+                      epoch = rawDate.getTime();
+                    } else if (typeof rawDate === 'string') {
+                      const parsed = Date.parse(rawDate);
+                      epoch = Number.isNaN(parsed) ? null : parsed;
+                    } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                      epoch = rawDate.epochMs;
+                    }
+                  } else {
+                    // Fallback: work directly with date envelope objects or raw values
+                    const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                      ? window.dateUtils.ensureDateEnvelope(rawDate)
+                      : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                        ? rawDate
+                        : null;
+
+                    // Derive epoch milliseconds in a canonical way
+                    epoch = (() => {
+                      if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                        return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                      }
+                      if (typeof window.getEpochMilliseconds === 'function') {
+                        return window.getEpochMilliseconds(envelope || rawDate);
+                      }
+                      if (envelope && typeof envelope.epochMs === 'number') {
+                        return envelope.epochMs;
+                      }
+                      if (rawDate instanceof Date) {
+                        return rawDate.getTime();
+                      }
+                      if (typeof rawDate === 'string') {
+                        const parsed = Date.parse(rawDate);
+                        return Number.isNaN(parsed) ? null : parsed;
+                      }
+                      return null;
+                    })();
+
+                    if (epoch === null || Number.isNaN(epoch)) {
+                      return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                    }
+
+                    // Build date display using unified date utilities
+                    dateDisplay = (() => {
+                      if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                        return window.dateUtils.formatDateTime(envelope || rawDate);
+                      }
+                      if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                        return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                      }
+                      try {
+                        return new Date(epoch).toLocaleString('he-IL', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      } catch (err) {
+                        window.Logger?.warn('⚠️ executions updated-cell date formatting failed', { err, executionId: execution?.id }, { page: 'executions' });
+                        return 'לא מוגדר';
+                      }
+                    })();
+                  }
+
+                  if (!dateDisplay || dateDisplay === '-') {
+                    return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                  }
+
+                  return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
                 })()}
                 <td class="actions-cell">
                     <div class="d-flex gap-1 justify-content-center align-items-center table-flex-nowrap">
@@ -1546,7 +1653,7 @@ window.initializeExecutionsPage = async function() {
   // שחזור מצב הסגירה - handled by global toggleSection system
 
   // טעינת נתונים
-  loadExecutionsData();
+  await loadExecutionsData();
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
@@ -1715,9 +1822,20 @@ function enableAllFields(mode = 'add') {
 }
 
 /**
- * טעינת טריידים לטיקר שנבחר
+ * Load active trades for selected ticker using entity service
+ * 
+ * טעינת טריידים לטיקר שנבחר באמצעות שירות ישויות
+ * 
+ * Loads trades data using TradesData service instead of direct API calls.
+ * Falls back to direct API call if service is unavailable.
+ * 
  * @param {string} mode - מצב ('add' או 'edit')
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
+ * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await loadActiveTradesForTicker('add', false);
  */
 async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false) {
   window.Logger.info('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades, { page: "executions" });
@@ -1741,10 +1859,16 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
   }
 
   try {
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades/');
-    const tickerTradesData = await tradesResponse.json();
-    const trades = tickerTradesData.data || tickerTradesData || [];
+    // טעינת טריידים באמצעות שירות ישויות (preferred method)
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      const tickerTradesData = await tradesResponse.json();
+      trades = tickerTradesData.data || tickerTradesData || [];
+    }
 
     // סינון טריידים לטיקר שנבחר
     let filteredTrades;
@@ -2801,7 +2925,8 @@ function updateExecutionsGlobalData(executions) {
 }
 
 // עדכון הפונקציה הקיימת loadExecutionsData
-const originalLoadExecutionsData = window.loadExecutionsData || loadExecutionsData;
+// Use the actual function, not the placeholder
+const originalLoadExecutionsData = loadExecutionsData;
 window.loadExecutionsData = async function() {
   await originalLoadExecutionsData();
 
@@ -2907,21 +3032,47 @@ window.toggleExternalIdField = toggleExternalIdField;
 let tickersSummaryData = [];
 
 /**
- * טעינת נתוני טיקרים חלקיים
+ * Load tickers summary data using entity services
+ * 
+ * טעינת נתוני טיקרים חלקיים באמצעות שירותי ישויות
+ * 
+ * Loads tickers and trades data using global entity services instead of direct API calls.
+ * Falls back to direct API calls if services are unavailable.
+ * 
+ * @async
+ * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await loadTickersSummaryData();
  */
 async function loadTickersSummaryData() {
   // window.Logger.info('🔄 טעינת נתוני טיקרים חלקיים...', { page: "executions" });
 
   try {
-    // טעינת טיקרים
-    const tickersResponse = await fetch('/api/tickers/');
-    const tickersData = await tickersResponse.json();
-    const allTickers = tickersData.data || tickersData || [];
+    // טעינת טיקרים באמצעות שירות ישויות (preferred method)
+    let allTickers = [];
+    if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+      allTickers = await window.tickerService.getTickers().catch(() => []);
+    } else if (window.getTickers && typeof window.getTickers === 'function') {
+      allTickers = await window.getTickers().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tickersResponse = await fetch('/api/tickers/');
+      const tickersData = await tickersResponse.json();
+      allTickers = tickersData.data || tickersData || [];
+    }
 
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades/');
-    const summaryTradesData = await tradesResponse.json();
-    const trades = summaryTradesData.data || summaryTradesData || [];
+    // טעינת טריידים באמצעות שירות
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      const summaryTradesData = await tradesResponse.json();
+      trades = summaryTradesData.data || summaryTradesData || [];
+    }
 
     // סינון טיקרים עם טריידים פעילים או סגורים
     const relevantTickers = allTickers.filter(ticker => {
@@ -3134,23 +3285,48 @@ window.addExecutionForTicker = addExecutionForTicker;
 // REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
 
 /**
- * עדכון רשימת הטיקרים לפי הצ'קבוקס
+ * Update tickers list using entity services
+ * 
+ * עדכון רשימת טיקרים באמצעות שירותי ישויות
+ * 
+ * Loads tickers and trades data using global entity services instead of direct API calls.
+ * Filters tickers based on mode and showClosedTrades parameter.
+ * 
  * @param {string} mode - מצב ('add' או 'edit')
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
+ * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await updateTickersList('add', false);
  */
 async function updateTickersList(mode, showClosedTrades = false) {
   // window.Logger.info('🔄 עדכון רשימת טיקרים:', { mode, showClosedTrades }, { page: "executions" });
 
   try {
-    // טעינת כל הטיקרים
-    const tickersResponse = await fetch('/api/tickers/');
-    const tickersData = await tickersResponse.json();
-    const allTickers = tickersData.data || tickersData || [];
+    // טעינת כל הטיקרים באמצעות שירות ישויות (preferred method)
+    let allTickers = [];
+    if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+      allTickers = await window.tickerService.getTickers().catch(() => []);
+    } else if (window.getTickers && typeof window.getTickers === 'function') {
+      allTickers = await window.getTickers().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tickersResponse = await fetch('/api/tickers/');
+      const tickersData = await tickersResponse.json();
+      allTickers = tickersData.data || tickersData || [];
+    }
 
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades/');
-    const tickersTradesData = await tradesResponse.json();
-    const trades = tickersTradesData.data || tickersTradesData || [];
+    // טעינת טריידים באמצעות שירות
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      const tickersTradesData = await tradesResponse.json();
+      trades = tickersTradesData.data || tickersTradesData || [];
+    }
 
     // סינון טיקרים לפי הקריטריונים
     let filteredTickers;
@@ -3284,10 +3460,16 @@ async function performExecutionDeletion(executionId) {
             await window.unifiedCacheManager.clearByPattern('account-balance-*');
         }
         
-        // Send delete request
-        const response = await fetch(`/api/executions/${executionId}`, {
-            method: 'DELETE'
-        });
+        // Send delete request using ExecutionsData service if available
+        let response;
+        if (typeof window.ExecutionsData?.deleteExecution === 'function') {
+            response = await window.ExecutionsData.deleteExecution(executionId);
+        } else {
+            // Fallback to direct fetch
+            response = await fetch(`/api/executions/${executionId}`, {
+                method: 'DELETE'
+            });
+        }
         
         // Use CRUDResponseHandler for consistent response handling
         await CRUDResponseHandler.handleDeleteResponse(response, {
@@ -3732,15 +3914,24 @@ async function acceptSuggestion(executionId, tradeId) {
     try {
         window.Logger?.info(`✅ Accepting suggestion: execution ${executionId} -> trade ${tradeId}`, { page: "executions" });
         
-        const response = await fetch(`/api/executions/${executionId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+        // Use ExecutionsData service if available
+        let response;
+        if (typeof window.ExecutionsData?.updateExecution === 'function') {
+            response = await window.ExecutionsData.updateExecution(executionId, {
                 trade_id: tradeId
-            })
-        });
+            });
+        } else {
+            // Fallback to direct fetch
+            response = await fetch(`/api/executions/${executionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    trade_id: tradeId
+                })
+            });
+        }
         
         if (!response.ok) {
             const errorData = await response.json();

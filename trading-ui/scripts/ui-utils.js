@@ -2144,9 +2144,15 @@ function renderUpdatedCell(entity, options = {}) {
     const paths = Array.isArray(fields) ? fields : [fields];
     for (const path of paths) {
       const candidate = window.resolvePropertyPath(entity, path);
-      const dateObj = typeof window.toDateObject === 'function'
-        ? window.toDateObject(candidate)
-        : (candidate instanceof Date ? candidate : new Date(candidate));
+      // Use centralized date utils to handle DateEnvelope, datetime objects, and strings
+      let dateObj = null;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateObj = window.dateUtils.toDateObject(candidate);
+      } else if (candidate instanceof Date) {
+        dateObj = candidate;
+      } else if (candidate) {
+        dateObj = new Date(candidate);
+      }
       if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
         if (!updatedDate || dateObj.getTime() > updatedDate.getTime()) {
           updatedDate = dateObj;

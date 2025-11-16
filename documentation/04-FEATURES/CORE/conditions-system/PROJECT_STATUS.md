@@ -1,7 +1,7 @@
 # Conditions System - Project Status Report
 **תאריך עדכון:** 19 אוקטובר 2025  
 **גרסה:** 1.0.0  
-**סטטוס:** Phase 4 Complete - Ready for Phase 5  
+**סטטוס:** Phase 5 Advanced - Trade Plans Complete, Trades In Progress  
 
 ---
 
@@ -16,7 +16,8 @@
 - **Documentation**: תיעוד מקיף ומעודכן
 
 ### ⏳ **בפיתוח (Phase 5)**
-ס
+- Trade Plans: אינטגרציית תנאים מלאה הושלמה (טבלת תקציר, בדיקה ידנית, סטטיסטיקות התראות, Auto Alerts Toggle, פעולות שורה, אירועי עדכון).
+- Trades: אינטגרציית תנאים – תשתית קיימת ומחוברת; נדרש להשלים הצגה מלאה של טבלת התקציר + בדיקה ידנית + סטטיסטיקות + Auto Alerts Toggle, וכן לאשר ירושה ועריכה עצמאית.
 
 ---
 
@@ -48,11 +49,11 @@
 
 ## 🚀 **השלבים הבאים**
 
-### Phase 5: Integration (3-4 שעות)
-1. **Trade Plans Page**: הוספת כפתור “בדיקת תנאים” בזמן אמת + חיווי תוצאה
-2. **Trades Page**: אינטגרציית תנאים מלאה (כולל חיווי Trigger)
-3. **User Guide**: הרחבה עם תרחישי Plan→Trade והסבר UI בהפעלת תנאי
-4. **Condition Trigger UX**: Badge/Notification מסודרים כשמתקיים תנאי
+### Phase 5: Integration (Advanced)
+1. **Trade Plans Page**: הושלם – כפתור “בדיקת תנאים”, חיווי תוצאה, סטטיסטיקות, אוטומציה ופעולות.
+2. **Trades Page**: בתהליך – אינטגרציה מלאה (כולל חיווי Trigger) והצגת תקציר.
+3. **User Guide**: הושלם עדכון החלקים הרלוונטיים ל־Trades + הוספת Test Plan.
+4. **Condition Trigger UX**: הושלם בצד ה־Plans; מימוש תצוגה בצד ה־Trades יושלם בשלב הבא.
 
 ### Phase 6: Testing & Completion (3 שעות)
 1. **Performance Testing**: בדיקות עומס על משימת ההערכה
@@ -93,9 +94,9 @@
 - [x] Git backup
 
 ### ⏳ **בפיתוח**
-- [ ] Trade Plans page integration
+- [x] Trade Plans page integration
 - [ ] Trades page integration
-- [ ] User guide creation
+- [x] User guide updates (כולל Trades)
 
 ### 📋 **מתוכנן**
 - [ ] Performance testing
@@ -127,7 +128,7 @@
 
 ---
 
-**סטטוס כללי**: 🟢 **על המסלול** - Phase 4 הושלם בהצלחה, מוכן ל-Phase 5
-**השלב הבא**: אינטגרציה עם עמודי Trade Plans ו-Trades
-**זמן משוער לסיום**: 4-6 שעות
+**סטטוס כללי**: 🟢 **על המסלול** - Phase 5 מתקדם, Trade Plans הושלם, Trades פתוח חלקית
+**השלב הבא**: השלמת אינטגרציית Trades + הרצת בדיקות מתוכנית המבחנים
+**זמן משוער לסיום**: 3-4 שעות
 **עדיפות**: גבוהה

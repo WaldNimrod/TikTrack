@@ -1,7 +1,7 @@
 # Conditions System - Development Roadmap
 **תאריך יצירה:** 19 אוקטובר 2025  
 **גרסה:** 1.0.0  
-**סטטוס:** Phase 4 Complete - Ready for Phase 5  
+**סטטוס:** Phase 5 Advanced - Trade Plans Complete, Trades In Progress  
 
 ---
 
@@ -27,33 +27,30 @@
 
 ---
 
-## 🚀 **Phase 5 - NEXT STEPS**
+## 🚀 **Phase 5 - Progress**
 
-### 5.1 Trade Plans Page Integration
+### 5.1 Trade Plans Page Integration — ✅ Completed
 **Files to modify:**
 - `trading-ui/trade_plans.html`
 - `trading-ui/scripts/trade_plans.js`
 
-**Features to add:**
-- "Evaluate Now" button per condition
-- Condition status indicators (met/not met)
-- Last evaluation timestamp display
-- Auto-generate alerts toggle
-- Alert count from condition
+**Delivered:**
+- "Evaluate Now" (bulk + per-row), חיווי סטטוס ותאריך בדיקה
+- עמודת סטטיסטיקות התראות ו־Auto Alerts Toggle
+- פעילות עריכה/מחיקה/בדיקה בשורת פעולות (ButtonSystem, RTL)
 
-### 5.2 Trades Page Integration
+### 5.2 Trades Page Integration — ⏳ In Progress
 **Files to modify:**
 - `trading-ui/trades.html` 
 - `trading-ui/scripts/trades.js`
 
-**Features to add:**
-- Similar to Trade Plans integration
-- Inherited condition evaluation
-- Independent condition management
+**Remaining:**
+- טבלת תקציר מלאה עם סטטוס/סטטיסטיקות/אוטומציה
+- בדיקה ידנית (bulk + per-row)
+- ירושה מתכנית וניהול עצמאי (אימות תצוגה וזרימות עריכה)
 
-### 5.3 Comprehensive User Guide
-**File to create:**
-- `documentation/04-FEATURES/CORE/conditions-system/conditions-system.md`
+### 5.3 Comprehensive User Guide — ✅ Updated
+עודכן מדריך המשתמש (כולל סעיפי Trades) ונוסף מסמך `CONDITIONS_SYSTEM_TEST_PLAN.md`.
 
 **Sections to include:**
 1. Overview & Architecture
@@ -70,17 +67,7 @@
 ## 🧪 **Phase 6 - Testing & Quality Assurance**
 
 ### 6.1 Comprehensive Testing Plan
-**Test Scenarios:**
-1. Create condition for each trading method
-2. Evaluate each condition manually
-3. Verify correct evaluation logic
-4. Test bulk evaluation
-5. Verify alert auto-generation
-6. Test with auto-alerts disabled
-7. Test with missing market data
-8. Test with stale data
-9. Performance test with 100+ conditions
-10. Test background task execution
+עפ״י `CONDITIONS_SYSTEM_TEST_PLAN.md` (CRUD לכל 6 השיטות, Evaluate ידני/באלק, סטטיסטיקות, אוטומציה, ירושה, RTL, ביצועים 100+).
 
 ### 6.2 Integration Testing
 **Full Workflow Test:**
@@ -159,7 +146,7 @@
 
 ---
 
-**Next Action**: Begin Phase 5 - Trade Plans and Trades page integration
-**Estimated Time**: 2-3 hours
+**Next Action**: Complete Trades integration + run Test Plan
+**Estimated Time**: 3 hours
 **Priority**: High
 **Dependencies**: Phase 4 complete ✅

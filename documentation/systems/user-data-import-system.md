@@ -47,15 +47,15 @@ Task-specific Execution → Database Storage & Reporting
 
 ### פריסת תהליכים (Task Plugins)
 
-| שלב | Executions | Cashflows | Account Reconciliation |
-| --- | --- | --- | --- |
-| Parsing | קריאת מקטע TRADES | קריאת מקטעים: Cash Report, Interest, Deposits/Withdrawals, Dividends | קריאת Account Information, BaseCurrency, Entitlements |
-| Normalization | `symbol`, `action`, `quantity`, `price`, `fee`, DateEnvelope | `cashflow_type`, `amount`, `currency`, `effective_date`, `source_account`, `target_account`, `asset_symbol` | `account_id`, `base_currency`, `margin_status`, `missing_documents`, `account_aliases` |
-| Validation | צד העסקה, שדות חובה, סכומים חיוביים | סכומים ≠ 0, מטבע מזוהה, שיוך חשבון, סיווג תזרים | קיום חשבון במערכת, התאמת מטבע בסיס, וולידציה מול הרשאות קיימות |
-| Duplicate Detection / Integrity | exact external_id, 5/5 match | התאמה לפי (`cashflow_type`, `amount`, `effective_date`, `currency`, `source_account`) | איתור חשבונות חסרים/חסומים, שינויים קריטיים במטבע |
-| Summary Outputs | `analysis_results`, `duplicate_details`, `missing_tickers` | `cashflow_records`, `cashflow_summary`, `cashflow_duplicates`, `missing_accounts` | `account_validation_results`, `reconciliation_flags`, `missing_accounts` |
-| Problem Resolution UI | Missing tickers, duplicates, existing records | Cashflow issues: חשבונות חסרים, כפילויות, מטבע לא תואם | Account reconciliation issues: בסיס מטבע, הרשאות חסרות, שמות חשבון |
-| Execution | יצירת `Execution` | יצירת `CashFlow` / `CashFlowAdjustment` | עדכון טבלת `trading_accounts`, יצירת דוח סטיות (ללא שינוי נתונים אם יש שגיאות) |
+| שלב | Executions | Cashflows | Account Reconciliation | Portfolio Positions | Taxes & FX |
+| --- | --- | --- | --- | --- | --- |
+| Parsing | קריאת מקטע TRADES | Cash Report, Interest, Deposits/Withdrawals, Dividends, Withholding Tax, Trades Forex | Account Information, Account Configuration, Base Currency, Account Summary | Open Positions, Forex Balances, Net Asset Value, Change in NAV | Withholding Tax, Change in NAV, Mark-to-Market Forex, Realized & Unrealized Forex, Trades Forex |
+| Normalization | `symbol`, `action`, `quantity`, `price`, `fee`, DateEnvelope | `cashflow_type`, `amount`, `currency`, `effective_date`, `source_account`, `target_account`, `asset_symbol` | `account_id`, `base_currency`, `margin_status`, `missing_documents`, `account_aliases` | `record_type`, `symbol`, `asset_category`, `currency`, `quantity`, `market_value`, `cost_basis`, `unrealized_pl`, `statement_period_end` | `record_type`, `currency`, `amount`, `description`, `effective_date`, `source_currency`, `target_currency`, `quantity`, `trade_price` |
+| Validation | צד העסקה, שדות חובה, סכומים חיוביים | סכומים ≠ 0, מטבע מזוהה, שיוך חשבון, סיווג תזרים, cashflow issues | קיום חשבון, התאמת מטבע בסיס, הרשאות ומסמכים | מאזן לפי מטבע/קטגוריה, סימון פוזיציות כמות=0, סטטוס account_id, תקפות envelope | סכומים/מטבעות עבור withholding, בדיקת שדות forex_conversion, nav_components, נאספים totals לפי מטבע וסוג |
+| Duplicate Detection / Integrity | exact external_id, 5/5 match | התאמה לפי (`cashflow_type`, `amount`, `effective_date`, `currency`, `source_account`) | זיהוי חשבונות כפולים/חסרים | Pass-through (דוח בלבד) + סטטיסטיקות תקינות | Pass-through (דוח בלבד) + סטטיסטיקות FX/Tax |
+| Summary Outputs | `analysis_results`, `duplicate_details`, `missing_tickers` | `cashflow_summary`, `totals_by_type`, `missing_accounts`, `currency_issues` | `account_validation_results`, `issues` (מטבע, הרשאות, מסמכים) | `currency_totals`, `asset_category_totals`, `zero_quantity_positions`, `positions_detected` | `totals_by_currency`, `totals_by_type`, `nav_components`, `forex_trades`, `taxes_detected` |
+| Problem Resolution UI | Missing tickers, duplicates, existing records | Cashflow issues: חשבונות חסרים, כפילויות, מטבע לא תואם | Account reconciliation issues: בסיס מטבע, הרשאות חסרות, שמות חשבון | כרטיסי מטבע/קטגוריה + רשימת פוזיציות חשודות (אין Persist) | כרטיסי מטבע/סוג + רשימת רכיבי NAV והמרות מט"ח |
+| Execution | יצירת `Execution` | יצירת `CashFlow` / `CashFlowAdjustment` | עדכון טבלת `trading_accounts`, יצירת דוח סטיות | Report-only (`_execute_report_only`) – סימון השלמת דו"ח | Report-only (`_execute_report_only`) – סימון השלמת דו"ח |
 
 ### זרימת נתונים בין שלבים
 
@@ -71,10 +71,20 @@ Task-specific Execution → Database Storage & Reporting
    - הממשק ננעל עד קבלת תשובה מהשרת או הודעת שגיאה, ומאפשר שקיפות לגבי זמן העיבוד (לרבות Multi-Task).
 
 ### תנאי קדם: שיוך חשבון למס' חיצוני
-- לכל `trading_account` נוסף השדה `external_account_number` (ייחודי, Nullable). לפני כל פעולה (upload/analyze/preview/execute/refresh-preview) ה-`ImportOrchestrator` משווה בין המספר שבקובץ (נשלף מקטעי `account_reconciliation`) לבין המספר שבמערכת.
-- אם החשבון לא משויך או שהמספר שגוי, כל נקודות הקצה מחזירות תגובה עם `error_code: ACCOUNT_LINK_REQUIRED` ואובייקט `linking` שמפרט את הסטטוס (`unlinked`/`mismatch`/`missing_in_file`), מספר הקובץ, המספר השמור ומזהה הסשן.
-- Endpoint חדש: `POST /api/user-data-import/session/<id>/link-account` מעדכן את השדה בטבלת `trading_accounts` ומוודא שאין התנגשויות. ה-UI מציג מודל ייעודי (`accountLinkingModal`) שמופעל אוטומטית כאשר חוזרת השגיאה, ומאפשר למשתמש ללחוץ על "שייך חשבון למערכת".
-- בממשק בחירת התהליך, "בדיקת שיוך חשבון" (account_reconciliation) מופיעה ראשונה ונבחרת כברירת מחדל כדי לעודד הפעלה לפני יבואי Executions/Cashflows.
+- לכל `trading_account` נוסף השדה `external_account_number` (Unique). לפני כל פעולה (upload/analyze/preview/execute/refresh-preview) ה-`ImportOrchestrator` קורא את `account_id` מתוך קובץ הברוקר (IBKR: Account Information) ומנסה לאתר את החשבון המתאים:
+  - **מזהה מוכר** → `linking_status=pending_confirmation`, מוחזר אובייקט `recognized_account`. ה-UI מציג חלון אישור שבו ניתן לאמת או לעבור למצב בחירה.
+  - **מזהה לא מוכר/שגוי** → `status=unlinked/mismatch/missing_in_file` עם מספר הקובץ. המודל מוצג מיידית ומאפשר לבחור חשבון אחר.
+- כל נקודות הקצה מחזירות `error_code: ACCOUNT_LINK_REQUIRED` עם אובייקט `linking` מפורט (`status`, מספרים, מזהה הסשן, חשבון מזוהה אם קיים). הקליינט חייב להאזין ל-error code בכל שלב.
+- ממשק API:
+  - `GET /session/<id>/account-link/status` – מצב נוכחי (כולל חשבון מזוהה).
+  - `POST /session/<id>/account-link/confirm` – מאשר את השיוך האוטומטי ומסמן `linking_confirmed=True`.
+  - `POST /session/<id>/account-link/select` – משייך את הסשן לחשבון שנבחר ידנית (`confirm_overwrite` נדרש כאשר לחשבון כבר יש מספר חיצוני).
+  - הנתיב ההיסטורי `/link-account` קורא לאותה לוגיקה לשמירת תאימות.
+- מודל חשבון המסחר (`tradingAccountsModal`) כולל את השדה `brokerAccountNumber` כדי לנהל את `external_account_number` גם מחוץ לזרימת הייבוא.
+- בממשק בחירת התהליך, "בדיקת שיוך חשבון" נשארת ראשונה אך כעת מוצגת גם תצוגה אינפורמטיבית בשלב 1 (מספר מהקובץ + סטטוס השיוך).
+- החל מ-נובמבר 2025 נוסף שלב "Precheck" לפני הניתוח: ה-Frontend מעלה את הקובץ ל-`POST /api/user-data-import/precheck`, הקונקטור מריץ בדיקת מבנה (`precheck_file`), והכפתור "המשך לניתוח" ננעל עד שהבדיקה עוברת בהצלחה. סטטוס הבדיקה מוצג ליד בחירת הקובץ.
+- פריסת שורת הפתיחה במודל עודכנה: שורה ראשונה – ספק → תהליך → כרטיס הסבר; שורה שנייה – בחירת קובץ + סטטוס הבדיקה → כרטיס זיהוי חשבון שמופיע רק לאחר יצירת session. איפוס הסשן מנקה גם את הכרטיס והסטטוס.
+- כאשר `ACCOUNT_LINK_REQUIRED` מוחזר, המודל נפתח וה-UI עוצר את הניתוח. לאחר אישור השיוך המערכת מפעילה `GET /session/<id>/analyze` על אותו session (אין העלאה מחודשת של הקובץ), כך שכל תהליך הייבוא מתבצע רק אחרי שהשיוך אושר.
 
 3. **שלב 3**: ניתוח קובץ (Task-specific)
    - קריאה ל-`/api/user-data-import/upload`
@@ -97,7 +107,7 @@ Task-specific Execution → Database Storage & Reporting
 
 5. **שלב 4**: תצוגה מקדימה
    - קריאה ל-`/api/user-data-import/session/{id}/preview`
-   - השרת מחזיר `preview_data` עם טבלאות מותאמות לתהליך (Executions, Cashflows, Account Issues)
+   - השרת מחזיר `preview_data` עם טבלאות מותאמות לתהליך (Executions, Cashflows, Account Issues, Portfolio, Taxes & FX)
 
 6. **שלב 5**: אישור סופי
    - הצגת סיכום סופי
@@ -164,7 +174,9 @@ class BaseImportConnector(ABC):
     
     def generate_external_id(self, record: Dict[str, Any]) -> str
     def validate_record(self, record: Dict[str, Any]) -> List[str]
+    def precheck_file(self, file_content: str, *, file_name: Optional[str], task_type: Optional[str]) -> Dict[str, Any]
 ```
+בנובמבר 2025 נוספה המתודה `precheck_file` לכל הקונקטורים, שמופעלת ע"י `POST /api/user-data-import/precheck` מיד כשהמשתמש בוחר קובץ. ברירת המחדל בודקת שהקובץ אינו ריק ושהוא מזוהה ע"י `identify_file`, אך ניתן להוסיף בדיקות ספציפיות לקונקטור (לדוגמה כותרות חובה).
 
 ### IBKR Connector
 
@@ -174,7 +186,7 @@ class BaseImportConnector(ABC):
 
 - **העברות והפקדות**: `Deposits & Withdrawals`, `Transfers` – הפקת כיוון תזרים, חשבון יעד, מזהה חברה מעבירה.
 - **דיבידנדים**: `Dividends`, `Change in Dividend Accruals` – שמירת סכום ברוטו/נטו, תאריכי Ex/Pay, סימון קוד פעולה (Po/Re).
-- **ריביות**: `Interest`, `Interest Accruals`, `Stock Yield Enhancement Program Securities Lent Interest Details`.
+- **ריביות**: `Interest`, `Interest Accruals`, `Stock Yield Enhancement Program Securities Lent Interest Details`. (מנובמבר 2025 כל שורה שבה ה-Description מכיל `Stock Yield Enhancement Program` או `SYEP` מאותחלת גם אם הופיעה בתוך מקטע Interest כללי).
 - **SYEP**: `Stock Yield Enhancement Program Securities Lent Activity` כולל `transaction_id` וערך בטחונות.
 - **מסים ועמלות**: `Withholding Tax`, `Borrow Fee Details`, סעיפי `Cash Report` הרלוונטיים.
 - **המרות מט"ח**: רשומות `Trades,Data,Order,Forex` ממופות ל-`cashflow_type=forex_conversion` עם בסיס/צמד מטבעות ועמלות נלוות.
@@ -184,7 +196,10 @@ class BaseImportConnector(ABC):
 | ---- | -------------- | ------------------------- | ----------- |
 | `executions` | `Trades,Header` + `Trades,Data` | `_parse_trades_section` | רשומות ביצועים |
 | `cashflows` | `Deposits & Withdrawals`, `Transfers`, `Dividends`, `Change in Dividend Accruals`, `Interest`, `Interest Accruals`, `Withholding Tax`, `Borrow Fee Details`, `Stock Yield Enhancement Program Securities Lent Activity`, `Stock Yield Enhancement Program Securities Lent Interest Details`, רשומות Forex (`Trades,Data,Order,Forex`) | `_parse_cashflow_sections`, `_build_cashflow_record`, `_build_forex_cashflows` | רשומות תזרים עם `cashflow_type`, שיוך חשבון ו-`metadata` |
-| `account_reconciliation` | `Account Information`, `Account Configuration`, `Base Currency`, `Account Summary` | `_parse_account_configuration`, `_parse_base_currency` | נתוני חשבון ומטבע בסיס |
+| `account_reconciliation` | `Account Information`, `Account Configuration`, `Base Currency`, `Account Summary` | `_parse_account_sections`, `_accumulate_account_data` | נתוני חשבון ומטבע בסיס |
+| `portfolio_positions` | `Open Positions`, `Forex Balances`, `Net Asset Value`, `Change in NAV` | `_parse_portfolio_sections`, `_build_open_position_record`, `_build_forex_balance_record` | רשומות פוזיציות/מאזן מט"ח עם `statement_period` |
+| `taxes_and_fx` | `Withholding Tax`, `Change in NAV`, `Mark-to-Market Performance Summary (Forex)`, `Realized & Unrealized Performance Summary (Forex)`, רשומות Forex מהתזרימים | `_parse_tax_fx_sections`, `_build_withholding_tax_records`, `_build_mtm_summary_records`, `_build_tax_cashflow_records` | רשומות `tax_cashflow`/`nav_component`/`forex_conversion` עם מטא-דאטה מלא |
+| Precheck | דרישה חדשה (2025-11): `IBKRConnector.precheck_file` מאתר כותרות חובה (`Statement,Header`, `Trades,Header`) ומזהה `Account Information,Data,Account ID`. במקרה של חוסר כותרות מוחזר `success=False` כדי שה-UI יעצור את התהליך. |
 
 #### אובייקטי נורמליזציה
 
@@ -235,14 +250,14 @@ class BaseImportConnector(ABC):
 - `ImportOrchestrator` מתפקד כמנהל תהליכים אחיד: הוא מאתר את הקונקטור, מריץ ניתוח ומפעיל **Task** ייעודי לכל סוג נתונים.
 - כל Task מממש ממשק קבוע (`load_raw() → normalize() → validate() → persist()`) ונרשם ב-`tasks_registry`.
 - מצב תהליכים:
-  | מפתח | סטטוס | תיאור קצר |
-  |------|-------|------------|
-  | `executions` | זמין | ייבוא ביצועי מסחר (התהליך הקיים – כולל DateEnvelope וזרימת Preview מלאה). |
-  | `cashflows` | פלייסהולדר | ייבוא תזרימי מזומנים (הפקדות, משיכות, ריביות, דיבידנדים) – ממתין למימוש Task ייעודי. |
-  | `account_reconciliation` | פלייסהולדר | אימות מפרטי החשבון והמטבע הבסיסי מול נתוני המערכת. |
-  | `portfolio_positions` | פלייסהולדר | השוואת פוזיציות פתוחות/NAV מול נתוני פורטפוליו פנימיים. |
-  | `taxes_and_fx` | פלייסהולדר | ניתוח ריביות, מיסים ותרגומי מטבע, כולל איתור פערים. |
-- UI: בשלב 2 של המודל מוצגת כעת בחירת התהליך. רק תהליכים במצב "זמין" מאפשרים מעבר לשלב הבא; תהליכים עתידיים מציגים הודעת פלייסהולדר ומפנים למסמך אפיון.
+| מפתח | סטטוס | תיאור קצר |
+|------|-------|------------|
+| `executions` | זמין | ייבוא ביצועי מסחר מלא (Persist לטבלת `executions`). |
+| `cashflows` | זמין | ייבוא תזרימי מזומנים (Persist לטבלת `cash_flows`, כולל מיפוי storage_type). |
+| `account_reconciliation` | זמין | דו"ח התאמת חשבון + חסימת ייבוא עד שיוך חשבון חיצוני. |
+| `portfolio_positions` | דו״ח בלבד | השוואת פוזיציות/NAV – הפקה ויזואלית ללא Persist (נשמר ב-session). |
+| `taxes_and_fx` | דו״ח בלבד | ניתוח ריביות, מיסים והפרשי מטבע – נתוני דו״ח בלבד. |
+- UI: בשלב 2 של המודל מוצגת כעת בחירת התהליך. רק תהליכים במצב "זמין"/"דו״ח בלבד" מאפשרים מעבר לשלב הבא; תהליך שלא הושלם עדיין מציג הודעת סטטוס ומפנה למסמך האפיון.
 
 ## שירותים
 
@@ -255,6 +270,8 @@ class BaseImportConnector(ABC):
 | Executions | `symbol`, `action`, `date`, `quantity`, `price`, `fee`, `external_id`, `source` | `realized_pl`, `mtm_pl`, `currency`, `asset_category` | בהתאם לסטנדרט הקיים |
 | Cashflows | `cashflow_type`, `amount`, `currency`, `effective_date`, `external_id`, `source` | `source_account`, `target_account`, `asset_symbol`, `memo`, `tax_country`, `metadata` | סכום ≠ 0, DateEnvelope מלא; `metadata` שומר ערכי מקור + `original_cashflow_type`, `storage_cashflow_type`, `mapping_note`, `notes`, `original_source_account` (אם בוצעה המרה לחשבון הסשן) |
 | Account Reconciliation | `account_id`, `base_currency`, `external_id`, `source` | `margin_status`, `entitlements`, `missing_documents`, `account_aliases`, `risk_profile` | מזהה חיצוני ייחודי לפי חשבון + תאריך דיווח |
+| Portfolio Positions | `record_type`, `account_id`, `symbol/description`, `currency`, `quantity`, `market_value`, `statement_period_end`, `external_id`, `source` | `asset_category`, `cost_basis`, `unrealized_pl`, `statement_period`, `code`, `description` | תומך ברשומות `open_position`, `forex_balance`, ו-`*_total`; מיועד לדו"ח בלבד |
+| Taxes & FX | `record_type`, `currency`, `amount`, `external_id`, `source` | `description`, `effective_date`, `component`, `tax_code`, `source_currency`, `target_currency`, `quantity`, `trade_price`, `commission`, `basis`, `realized_pl`, `mtm_pl` | `record_type` מגדיר את סט השדות המחייבים (Withholding / Forex / NAV); שומר `record_metadata` לניתוח עתידי |
 
 ### Validation Service
 
@@ -272,6 +289,15 @@ class BaseImportConnector(ABC):
   - מטבע בסיס תואם להגדרת החשבון (או מסומן כחריגה).
   - רשימת הרשאות (entitlements) אינה ריקה – אחרת flagged.
   - מסמכים חסרים מדווחים ב-`missing_documents`.
+- Portfolio Positions:
+  - אימות `account_id`, `currency`, `statement_period_end` וערכים מספריים.
+  - יצירת `currency_totals`, `asset_category_totals`, `zero_quantity_positions` להמחשה ב-UI.
+  - תיוג רשומות Summary (`*_total`) לטובת הצגתן (לא נכתבות ל-DB).
+- Taxes & FX:
+  - סכומים מספריים ומטבע מזוהה לרשומות `withholding_tax`/`tax_cashflow`.
+  - אימות שדות `source_currency`/`target_currency` לרשומות `forex_conversion`.
+  - מעבר על `nav_component` לצבירת `nav_components` וחשיפת שינויים חריגים.
+  - רשימת `forex_trades` משמשת את ה-UI להצגת אירועים לבדיקה.
 
 ### Cashflow Type Mapping (עדכון 2025-11)
 
@@ -285,7 +311,7 @@ class BaseImportConnector(ABC):
 | `deposit`                  | `deposit`                 | סכומים חיוביים בלבד |
 | `withdrawal`               | `withdrawal`              | סכומים שליליים בלבד |
 | `transfer`                 | `transfer_in` / `transfer_out` | נגזר מסימן הסכום |
-| `forex_conversion`         | `transfer_in` / `transfer_out` | `mapping_note` = `Forex conversion` |
+| `forex_conversion`         | `currency_exchange_to` / `currency_exchange_from` | `mapping_note` = `Forex conversion` |
 | `dividend`                 | `dividend`                | — |
 | `dividend_accrual`         | `other_positive` / `other_negative` | על פי סימן הסכום |
 | `interest`                 | `interest`                | — |
@@ -293,7 +319,7 @@ class BaseImportConnector(ABC):
 | `tax`                      | `tax`                     | — |
 | `fee`                      | `fee`                     | — |
 | `borrow_fee`               | `fee`                     | `mapping_note` = `Borrow fee` |
-| `syep_interest`            | `interest`                | `mapping_note` = `SYEP interest` |
+| `syep_interest`            | `syep_interest`           | `mapping_note` = `SYEP interest` |
 | `cash_adjustment`          | `other_positive` / `other_negative` | על פי סימן הסכום |
 | ערכים אחרים               | `other_positive` / `other_negative` | שם המקור נשמר ב-`mapping_note` |
 
@@ -314,6 +340,9 @@ class BaseImportConnector(ABC):
     - חשבון שכבר עבר reconcile מאותו תאריך (`external_id` כפול).
     - סטטוס בסיס/הרשאות שכבר נמצא במערכת (Deep compare) ומסמן `unchanged`.
   - פלט: `reconciliation_flags` עם רשימת חריגות (חדש/מעודכן/חסר).
+- Portfolio Positions / Taxes & FX:
+  - משתמשים ב-`_passthrough_duplicate_result` – אין Persist ולכן אין בדיקת כפילויות מלאה.
+  - השירות מחזיר את כל הרשומות כ-`clean_records` תוך שמירה על `record_index` עבור ה-UI.
 
 ### Import Orchestrator
 
@@ -322,7 +351,7 @@ class BaseImportConnector(ABC):
 1. **יצירת סשן**: `create_import_session()` – שומר `task_type`, `parsed_sections`, `raw_metadata`.
 2. **ניתוח קובץ**: `analyze_file(task_type)` – מפעיל Pipeline ייעודי ומחזיר שדות מותאמים (`analysis_results`, `cashflow_summary`, `reconciliation_summary`).
 3. **הכנת תצוגה מקדימה**: `generate_preview(task_type)` – משחזר נתונים מהתהליך, מפיק סטטיסטיקות וטבלאות, מוסיף `storage_type`, `mapping_note` ומעתיק את המיפוי גם לרשימת ההשמטות/כפילויות.
-4. **ביצוע ייבוא**: `execute_import(task_type)` – מפעיל persister בהתאם (Executions → `Execution`, Cashflows → `CashFlow`/`CashFlowAdjustment`, Account Reconciliation → `AccountAuditReport`/עדכוני חשבון) תוך שימוש ב-`storage_type` לכתיבת האנום הסופי והוספת שורת מקור בתיאור הרשומה.
+4. **ביצוע ייבוא**: `execute_import(task_type)` – מפעיל persister בהתאם (Executions → `Execution`, Cashflows → `CashFlow`/`CashFlowAdjustment`, Account Reconciliation → `AccountAuditReport`/עדכוני חשבון). עבור `portfolio_positions` ו-`taxes_and_fx` נעשה שימוש ב-`_execute_report_only` שמסמן את הדו"ח כ'הושלם' ללא Persist ומשאיר את הנתונים ב-`summary_data`.
 5. **דוחות לייב**: `create_live_report()` מעדכן כעת גם:
    - `cashflow_records`, `cashflow_summary`, `totals_by_currency` ו-`cashflow_type_stats`.
    - `missing_accounts` ו-`missing_account_details` (כולל סטטוס וקטגוריית הבעיה).
@@ -339,6 +368,8 @@ class BaseImportConnector(ABC):
   - כרטיסי מטבע (`totals_by_currency`) המציגים יתרות נטו לכל קוד.
   - אזור התראות קריטיות עם מספר חשבונות חסרים, בעיות מטבע והערות ממוקדות על פי `issues_by_type`.
 - עבור **Executions** ו-**Account Reconciliation** התוויות בכרטיסים מתעדכנות אוטומטית (לדוגמה “חשבונות חסרים” במקום “טיקרים חסרים”).
+- עבור **Portfolio Positions** מוצגים כרטיסי מטבע/קטגוריה ורשימת פוזיציות "אפסיות" לפי `zero_quantity_positions`.
+- עבור **Taxes & FX** מוצגים כרטיסי סכומים לפי מטבע/סוג וקיימת רשימת רכיבי NAV ועסקאות FX לבדיקה.
 - כפתור ההמשך בשלב זה מוביל כעת ישירות לתצוגה המקדימה, לאחר טעינת נתוני פתרון הבעיות.
 
 ## ממשק משתמש - שלב 3: פתרון בעיות
@@ -399,7 +430,7 @@ class BaseImportConnector(ABC):
 - **`refreshPreviewData()`** – שולחת `POST /api/user-data-import/session/<id>/refresh-preview`, מעדכנת את `previewData` מתוך snapshot השרת ומרעננת את הטבלאות בהתאם, תוך שמירה על ה-state המקומי עד להשלמת הרענון.
 
 #### `confirmSelectedDataType()`
-מאשר את סוג הייבוא שנבחר. אם התהליך זמין – ממשיך לשלב התצוגה המקדימה; אחרת מציג לאדמין הודעת פלייסהולדר ומפנה למסמך האפיון הרלוונטי.
+מאשר את סוג הייבוא שנבחר. אם התהליך זמין או דו״ח בלבד – ממשיך לשלב התצוגה המקדימה; אחרת מציג לאדמין הודעת סטטוס ומפנה למסמך האפיון הרלוונטי.
 
 #### `openAddTickerModal(symbol, currency)`
 פותח את `tickersModal` דרך ModalManagerV2, ממלא מראש את הסמל והמטבע (כולל ניסיון להתאים קוד מטבע לערך הקיים ברשימת המטבעות) ומוודא שהקריאה ל-`saveTicker` של המערכת הכללית תוביל לרענון אוטומטי של תצוגת הייבוא.

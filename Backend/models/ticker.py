@@ -80,6 +80,7 @@ class Ticker(BaseModel):
                         viewonly=True)
     market_quotes = relationship("MarketDataQuote", back_populates="ticker")
     intraday_slots = relationship("IntradayDataSlot", back_populates="ticker")
+    last_quote = relationship("QuotesLast", back_populates="ticker", uselist=False)
     
     def __repr__(self) -> str:
         """String representation of the ticker"""

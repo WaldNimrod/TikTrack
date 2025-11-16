@@ -1,26 +1,44 @@
 /**
- * ========================================
- * Trade Plans Data Layer
- * ========================================
+ * Trade Plans Data Service
+ * ======================================
+ * Unified loader for trade plans data with cache + TTL guard integration.
  *
- * Unified data service for trade plans CRUD operations.
+ * Responsibilities:
+ * - Load trade plans list via API (with cache bust for local file protocol)
+ * - Save results inside UnifiedCacheManager with a 45s TTL
+ * - Provide forced reload + cache invalidation helpers
+ * - Surface consistent errors through the global notification + log systems
+ * - CRUD operations (create, update, delete, fetchDetails)
+ * - CacheSyncManager integration for automatic cache invalidation
+ *
+ * Related Documentation:
+ * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+ *
+ * @version 2.0.0
+ * @created November 2025
+ * @author TikTrack Development Team
  */
+(function tradePlansDataService() {
+  const TRADE_PLANS_DATA_KEY = 'trade-plans-data';
+  const TRADE_PLANS_TTL = 45 * 1000; // 45 seconds per audit plan
+  const PAGE_LOG_CONTEXT = { page: 'trade-plans-data' };
 
-async function loadTradePlansData() {
-  try {
-    if (typeof window.UnifiedCacheManager?.get === 'function') {
-      const cached = await window.UnifiedCacheManager.get('trade-plans-data', { ttl: 30000 });
-      if (cached) {
-        console.log('📦 Trade plans loaded from cache');
-        return Array.isArray(cached)
-          ? cached
-          : Array.isArray(cached?.data)
-            ? cached.data
-            : [];
+  async function loadTradePlansData() {
+    try {
+      if (typeof window.UnifiedCacheManager?.get === 'function') {
+        const cached = await window.UnifiedCacheManager.get(TRADE_PLANS_DATA_KEY, { ttl: TRADE_PLANS_TTL });
+        if (cached) {
+          window.Logger?.debug?.('📦 Trade plans loaded from cache', PAGE_LOG_CONTEXT);
+          return Array.isArray(cached)
+            ? cached
+            : Array.isArray(cached?.data)
+              ? cached.data
+              : [];
+        }
       }
-    }
 
-    console.log('🔄 Loading trade plans data directly from API...');
+      window.Logger?.debug?.('🔄 Loading trade plans data directly from API...', PAGE_LOG_CONTEXT);
     const response = await fetch('/api/trade-plans/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -30,12 +48,13 @@ async function loadTradePlansData() {
     const payload = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
 
     if (typeof window.UnifiedCacheManager?.save === 'function') {
-      await window.UnifiedCacheManager.save('trade-plans-data', payload, { ttl: 30000 });
+      await window.UnifiedCacheManager.save(TRADE_PLANS_DATA_KEY, payload, { ttl: TRADE_PLANS_TTL });
     }
 
+    window.Logger?.debug?.('✅ Trade plans loaded from API', { ...PAGE_LOG_CONTEXT, count: payload.length });
     return payload;
   } catch (error) {
-    console.error('❌ Error loading trade plans data:', error);
+    window.Logger?.error?.('❌ Error loading trade plans data', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בטעינת נתוני תוכניות מסחר');
     throw error;
   }
@@ -59,7 +78,7 @@ async function saveTradePlan(planData) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error saving trade plan:', error);
+    window.Logger?.error?.('❌ Error saving trade plan', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בשמירת תוכנית מסחר');
     throw error;
   }
@@ -84,7 +103,7 @@ async function updateTradePlan(planId, planData) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error updating trade plan:', error);
+    window.Logger?.error?.('❌ Error updating trade plan', { ...PAGE_LOG_CONTEXT, planId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בעדכון תוכנית מסחר');
     throw error;
   }
@@ -105,7 +124,7 @@ async function deleteTradePlan(planId) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error deleting trade plan:', error);
+    window.Logger?.error?.('❌ Error deleting trade plan', { ...PAGE_LOG_CONTEXT, planId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה במחיקת תוכנית מסחר');
     throw error;
   }
@@ -129,7 +148,7 @@ async function executeTradePlan(planId) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error executing trade plan:', error);
+    window.Logger?.error?.('❌ Error executing trade plan', { ...PAGE_LOG_CONTEXT, planId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בביצוע תוכנית מסחר');
     throw error;
   }
@@ -154,7 +173,7 @@ async function cancelTradePlan(planId) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error canceling trade plan:', error);
+    window.Logger?.error?.('❌ Error canceling trade plan', { ...PAGE_LOG_CONTEXT, planId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בביטול תוכנית מסחר');
     throw error;
   }
@@ -179,8 +198,34 @@ async function copyTradePlan(planId) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error copying trade plan:', error);
+    window.Logger?.error?.('❌ Error copying trade plan', { ...PAGE_LOG_CONTEXT, planId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בהעתקת תוכנית מסחר');
+    throw error;
+  }
+}
+
+async function fetchTradePlanDetails(planId, options = {}) {
+  try {
+    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+    const response = await fetch(`${base}/api/trade-plans/${planId}`, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      signal: options.signal,
+    });
+
+    if (!response.ok) {
+      const error = new Error(`טעינת פרטי תוכנית מסחר ${planId} נכשלה (${response.status})`);
+      window.Logger?.error?.('❌ Failed to fetch trade plan details', {
+        ...PAGE_LOG_CONTEXT,
+        planId,
+        error: error.message,
+      });
+      throw error;
+    }
+
+    return response.json();
+  } catch (error) {
+    window.Logger?.error?.('❌ Error getting trade plan details', { ...PAGE_LOG_CONTEXT, planId, error: error?.message || error });
     throw error;
   }
 }
@@ -188,11 +233,11 @@ async function copyTradePlan(planId) {
 async function getCachedTradePlans() {
   try {
     if (typeof window.UnifiedCacheManager?.get === 'function') {
-      return await window.UnifiedCacheManager.get('trade-plans-data');
+      return await window.UnifiedCacheManager.get(TRADE_PLANS_DATA_KEY);
     }
     return null;
   } catch (error) {
-    console.error('❌ Error getting cached trade plans:', error);
+    window.Logger?.warn?.('⚠️ Error getting cached trade plans', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
     return null;
   }
 }
@@ -200,10 +245,10 @@ async function getCachedTradePlans() {
 async function setCachedTradePlans(data) {
   try {
     if (typeof window.UnifiedCacheManager?.save === 'function') {
-      await window.UnifiedCacheManager.save('trade-plans-data', data, { ttl: 30000 });
+      await window.UnifiedCacheManager.save(TRADE_PLANS_DATA_KEY, data, { ttl: TRADE_PLANS_TTL });
     }
   } catch (error) {
-    console.error('❌ Error setting cached trade plans:', error);
+    window.Logger?.warn?.('⚠️ Error setting cached trade plans', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
   }
 }
 
@@ -213,14 +258,16 @@ async function invalidateTradePlansCache() {
       await window.CacheSyncManager.invalidateByAction('trade-plan-updated');
     } else if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
       // Fallback to direct invalidation if CacheSyncManager not available
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+      await window.UnifiedCacheManager.invalidate(TRADE_PLANS_DATA_KEY);
     }
   } catch (error) {
-    console.error('❌ Error invalidating trade plans cache:', error);
+    window.Logger?.warn?.('⚠️ Error invalidating trade plans cache', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
   }
 }
 
 window.TradePlansData = {
+  KEY: TRADE_PLANS_DATA_KEY,
+  TTL: TRADE_PLANS_TTL,
   loadTradePlansData,
   saveTradePlan,
   updateTradePlan,
@@ -228,10 +275,12 @@ window.TradePlansData = {
   executeTradePlan,
   cancelTradePlan,
   copyTradePlan,
+  fetchTradePlanDetails,
   getCachedTradePlans,
   setCachedTradePlans,
-  invalidateTradePlansCache
+  invalidateTradePlansCache,
 };
 
-console.log('✅ Trade Plans Data module loaded');
+window.Logger?.info?.('✅ Trade Plans Data Service initialized', PAGE_LOG_CONTEXT);
+})();
 

@@ -634,7 +634,26 @@ window.loadDashboardData = async function(options = {}) {
 
     const executeLoad = async () => {
         if (force) {
-            if (window.UnifiedCacheManager?.clearByPattern) {
+            // Try CacheSyncManager first (preferred method)
+            if (window.CacheSyncManager?.invalidateByAction) {
+                try {
+                    await window.CacheSyncManager.invalidateByAction('dashboard-updated');
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+                        page: 'index',
+                        error: error?.message,
+                    });
+                    // Fallback to direct invalidation
+                    if (window.UnifiedCacheManager?.clearByPattern) {
+                        try {
+                            await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
+                        } catch (clearError) {
+                            window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+                        }
+                    }
+                }
+            } else if (window.UnifiedCacheManager?.clearByPattern) {
+                // Fallback if CacheSyncManager not available
                 try {
                     await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
                 } catch (clearError) {

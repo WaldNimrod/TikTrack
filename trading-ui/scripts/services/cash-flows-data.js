@@ -302,6 +302,26 @@
     });
   }
 
+  async function fetchCashFlowDetails(cashFlowId, options = {}) {
+    const response = await fetch(buildUrl(ENDPOINTS.detail(cashFlowId)), {
+      method: 'GET',
+      headers: DEFAULT_HEADERS,
+      signal: options.signal,
+    });
+
+    if (!response.ok) {
+      const error = new Error(`טעינת פרטי תזרים מזומנים ${cashFlowId} נכשלה (${response.status})`);
+      window.Logger?.error?.('❌ Failed to fetch cash flow details', {
+        ...PAGE_LOG_CONTEXT,
+        cashFlowId,
+        error: error.message,
+      });
+      throw error;
+    }
+
+    return response.json();
+  }
+
   async function sendExchangeMutation({ exchangeId, method, payload, signal }) {
     const endpoint = exchangeId ? ENDPOINTS.exchangeDetail(exchangeId) : ENDPOINTS.exchange;
     try {
@@ -384,6 +404,7 @@
     createCashFlow,
     updateCashFlow,
     deleteCashFlow,
+    fetchCashFlowDetails,
     createCurrencyExchange,
     updateCurrencyExchange,
     deleteCurrencyExchange,

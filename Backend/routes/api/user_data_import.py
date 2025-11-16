@@ -440,6 +440,20 @@ def get_session(session_id: int):
             if summary_data:
                 session_dict['summary_data'] = _project_storage_payload(summary_data)
             
+            # Include linked trading account information
+            if session.trading_account_id:
+                try:
+                    trading_account = db_session.query(TradingAccount).filter(
+                        TradingAccount.id == session.trading_account_id
+                    ).first()
+                    if trading_account:
+                        from services.user_data_import.import_orchestrator import ImportOrchestrator
+                        orchestrator = ImportOrchestrator(db_session)
+                        session_dict['trading_account'] = orchestrator._serialize_account(trading_account)
+                        logger.info(f"✅ Included trading account info: ID={trading_account.id}, Name={trading_account.name}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to include trading account info: {str(e)}")
+            
             return jsonify({
                 'status': 'success',
                 'session': session_dict

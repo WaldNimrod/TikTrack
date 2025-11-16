@@ -553,7 +553,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
 
       // ← NEW: מטאדאטה
-      description: 'מעקב ביצועי עסקאות - היסטוריית עסקאות שבוצעו',
+      description: 'מעקב ביצועי עסקאות - היסטוריית ביצועים שבוצעו',
       lastModified: '2025-11-13',
       pageType: 'crud',
 

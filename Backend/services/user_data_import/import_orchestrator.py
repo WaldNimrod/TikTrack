@@ -666,11 +666,19 @@ class ImportOrchestrator:
         target_trading_account_id: Optional[int] = None,
         confirm_overwrite: bool = False
     ) -> Dict[str, Any]:
+        logger.info(f"🔗 [ACCOUNT_LINKING] Starting account linking process", extra={
+            'session_id': session_id,
+            'target_account_id': target_trading_account_id,
+            'override_account_number': override_account_number,
+            'confirm_overwrite': confirm_overwrite
+        })
+        
         session = self.db_session.query(ImportSession).filter(
             ImportSession.id == session_id
         ).first()
 
         if not session:
+            logger.error(f"❌ [ACCOUNT_LINKING] Session not found: {session_id}")
             return {'success': False, 'error': 'Session not found'}
 
         connector_type = session.get_summary_data('connector_type')
@@ -678,6 +686,7 @@ class ImportOrchestrator:
         connector = self.connectors.get(connector_type)
 
         if not connector or not file_content:
+            logger.error(f"❌ [ACCOUNT_LINKING] Session missing data: connector={bool(connector)}, content={bool(file_content)}")
             return {'success': False, 'error': 'Session is missing connector or content data'}
 
         metadata = self._resolve_file_account_metadata(session, connector, file_content)
@@ -685,10 +694,14 @@ class ImportOrchestrator:
         normalized_number = self._normalize_account_identifier(file_account_number)
 
         if not normalized_number:
+            logger.error(f"❌ [ACCOUNT_LINKING] Unable to determine account number from file")
             return {'success': False, 'error': 'Unable to determine account number from file'}
+
+        logger.info(f"📋 [ACCOUNT_LINKING] File account number: {normalized_number}")
 
         target_account_id = target_trading_account_id or session.trading_account_id
         if not target_account_id:
+            logger.error(f"❌ [ACCOUNT_LINKING] Target account ID not provided")
             return {'success': False, 'error': 'Target trading account not provided'}
 
         trading_account = self.db_session.query(TradingAccount).filter(
@@ -696,25 +709,46 @@ class ImportOrchestrator:
         ).first()
 
         if not trading_account:
+            logger.error(f"❌ [ACCOUNT_LINKING] Trading account not found: {target_account_id}")
             return {'success': False, 'error': 'Trading account not found'}
 
+        logger.info(f"🎯 [ACCOUNT_LINKING] Target account: ID={trading_account.id}, Name={trading_account.name}, Current external={trading_account.external_account_number}")
+
+        # STEP 1: Check if the account number is already linked to a different account
+        # If so, automatically remove the old link to allow the new one
         existing_binding = self.db_session.query(TradingAccount).filter(
             TradingAccount.external_account_number == normalized_number,
             TradingAccount.id != trading_account.id
         ).first()
+        
         if existing_binding:
-            return {
-                'success': False,
-                'error': (
-                    f"מספר החשבון כבר משויך לחשבון \"{existing_binding.name}\" (ID {existing_binding.id}). "
-                    f"נא להשתמש בחשבון זה או לנתק את השיוך לפני המשך הפעולה."
-                ),
-                'error_code': 'ACCOUNT_ALREADY_LINKED',
-                'existing_account': self._serialize_account(existing_binding)
-            }
+            logger.info(f"🔄 [ACCOUNT_LINKING] Found existing binding: Account ID={existing_binding.id}, Name={existing_binding.name}")
+            # STEP 1a: Automatically remove the old link
+            old_account_name = existing_binding.name
+            old_account_id = existing_binding.id
+            old_external = existing_binding.external_account_number
+            existing_binding.external_account_number = None
+            
+            logger.info(f"🧹 [ACCOUNT_LINKING] Removing old link: Account {old_account_id} ({old_account_name}) - external_account_number set to None")
+            
+            # Commit the removal of old link first to avoid IntegrityError with unique constraint
+            self.db_session.commit()
+            logger.info(f"✅ [ACCOUNT_LINKING] Old link removed and committed successfully")
+            
+            # Refresh the trading_account to ensure we have the latest state
+            self.db_session.refresh(trading_account)
+            logger.info(f"🔄 [ACCOUNT_LINKING] Refreshed target account state")
+            
+            # Log the change for audit purposes
+            logger.info(
+                f"📝 [ACCOUNT_LINKING] Account link changed: {normalized_number} moved from account {old_account_id} ({old_account_name}) "
+                f"to account {trading_account.id} ({trading_account.name})"
+            )
 
+        # STEP 2: Check if target account already has a different external number
         current_external_number = self._normalize_account_identifier(trading_account.external_account_number)
         if current_external_number and current_external_number != normalized_number and not confirm_overwrite:
+            logger.warning(f"⚠️ [ACCOUNT_LINKING] Target account already has different external number: {current_external_number} != {normalized_number}")
             return {
                 'success': False,
                 'error': (
@@ -726,18 +760,24 @@ class ImportOrchestrator:
                 'target_account': self._serialize_account(trading_account)
             }
 
+        # STEP 3: Create new link
+        logger.info(f"🔗 [ACCOUNT_LINKING] Setting new link: Account {trading_account.id} -> {normalized_number}")
         trading_account.external_account_number = normalized_number
         session.trading_account_id = trading_account.id
 
         try:
             self.db_session.commit()
-        except IntegrityError:
+            logger.info(f"✅ [ACCOUNT_LINKING] New link committed successfully")
+        except IntegrityError as e:
             self.db_session.rollback()
+            # This should not happen if we properly removed the old link above
+            logger.error(f"❌ [ACCOUNT_LINKING] IntegrityError during account linking: {e}", exc_info=True)
             return {
                 'success': False,
                 'error': 'מספר החשבון כבר משויך לחשבון מסחר אחר במערכת'
             }
 
+        # STEP 4: Update session metadata
         session.add_summary_data({
             'file_account_number': normalized_number,
             'linking_status': 'linked',
@@ -745,13 +785,17 @@ class ImportOrchestrator:
             'linking_matched_account_id': trading_account.id
         })
         self.db_session.flush()
+        logger.info(f"✅ [ACCOUNT_LINKING] Session metadata updated")
 
-        return {
+        result = {
             'success': True,
             'linked_account_number': normalized_number,
             'trading_account_id': trading_account.id,
             'linked_account': self._serialize_account(trading_account)
         }
+        
+        logger.info(f"✅ [ACCOUNT_LINKING] Account linking completed successfully: Account {trading_account.id} ({trading_account.name}) linked to {normalized_number}")
+        return result
 
     def confirm_account_link(self, session_id: int) -> Dict[str, Any]:
         session = self.db_session.query(ImportSession).filter(

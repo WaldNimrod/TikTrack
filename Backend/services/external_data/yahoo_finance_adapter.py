@@ -1148,7 +1148,9 @@ class YahooFinanceAdapter:
         try:
             logger.debug(f"🔄 Updating quotes_last table for ticker {ticker_id}")
             
-            from sqlalchemy import text
+            from models.quotes_last import QuotesLast
+            from sqlalchemy.dialects.postgresql import insert
+            from config.settings import USING_SQLITE
 
             asof_utc = quote.asof_utc
             if asof_utc is None:
@@ -1157,36 +1159,53 @@ class YahooFinanceAdapter:
                 asof_utc = asof_utc.replace(tzinfo=timezone.utc)
 
             fetched_at = datetime.now(timezone.utc)
-
             provider_name = quote.source or 'yahoo_finance'
 
-            self.db_session.execute(
-                text("""
-                INSERT OR REPLACE INTO quotes_last 
-                (ticker_id, price, change_amount, change_percent, volume, provider, source,
-                 currency, asof_utc, fetched_at, last_updated, is_stale, quality_score)
-                VALUES (:ticker_id, :price, :change_amount, :change_percent, :volume, :provider, :source,
-                        :currency, :asof_utc, :fetched_at, :last_updated, :is_stale, :quality_score)
-                """),
-                {
-                    "ticker_id": ticker_id,
-                    "price": quote.price,
-                    "change_amount": quote.change_amount,
-                    "change_percent": quote.change_pct,
-                    "volume": quote.volume,
-                    "provider": provider_name,
-                    "source": provider_name,
-                    "currency": quote.currency or 'USD',
-                    "asof_utc": asof_utc,
-                    "fetched_at": fetched_at,
-                    "last_updated": fetched_at,
-                    "is_stale": 0,
-                    "quality_score": 1.0,
-                }
-            )
+            # Prepare data
+            quote_data = {
+                "ticker_id": ticker_id,
+                "price": quote.price,
+                "change_amount": quote.change_amount,
+                "change_percent": quote.change_pct,
+                "volume": quote.volume,
+                "provider": provider_name,
+                "source": provider_name,
+                "currency": quote.currency or 'USD',
+                "asof_utc": asof_utc,
+                "fetched_at": fetched_at,
+                "last_updated": fetched_at,
+                "is_stale": False,
+                "quality_score": 1.0,
+            }
+
+            # Use upsert logic - compatible with both SQLite and PostgreSQL
+            if USING_SQLITE:
+                # SQLite: Use INSERT OR REPLACE
+                existing = self.db_session.query(QuotesLast).filter(
+                    QuotesLast.ticker_id == ticker_id
+                ).first()
+                
+                if existing:
+                    # Update existing record
+                    for key, value in quote_data.items():
+                        setattr(existing, key, value)
+                else:
+                    # Create new record
+                    new_quote = QuotesLast(**quote_data)
+                    self.db_session.add(new_quote)
+            else:
+                # PostgreSQL: Use ON CONFLICT
+                stmt = insert(QuotesLast).values(**quote_data)
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=['ticker_id'],
+                    set_=quote_data
+                )
+                self.db_session.execute(stmt)
             
+            self.db_session.commit()
             logger.debug(f"✅ Updated quotes_last for ticker {ticker_id}")
             
         except Exception as e:
             logger.error(f"❌ Error updating quotes_last for ticker {ticker_id}: {e}")
+            self.db_session.rollback()
             # Don't raise - this is not critical enough to fail the whole operation

@@ -20,6 +20,7 @@ from .constraint import Constraint, EnumValue, ConstraintValidation
 from .tag_category import TagCategory
 from .tag import Tag
 from .tag_link import TagLink
+from .quotes_last import QuotesLast
 
 __all__ = [
     'BaseModel',
@@ -53,5 +54,6 @@ __all__ = [
     'ConstraintValidation',
     'TagCategory',
     'Tag',
-    'TagLink'
+    'TagLink',
+    'QuotesLast'
 ]

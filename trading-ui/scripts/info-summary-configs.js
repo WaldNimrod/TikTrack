@@ -47,7 +47,7 @@ const INFO_SUMMARY_CONFIGS = {
     stats: [
       {
         id: 'totalExecutions',
-        label: 'סה"כ עסקעות',
+        label: 'סה"כ ביצועים',
         calculator: 'count',
         subStats: [
           {

@@ -51,15 +51,17 @@ class ValidationService:
             logger.info(f"Validating {table_name} - found {len(constraints)} constraints")
             
             # Custom validation for executions.realized_pl based on action
+            # Realized P/L is required only for sell (closing long position) and cover (closing short position)
+            # Realized P/L is not required for buy (opening long position) and short (opening short position)
             if table_name == 'executions':
                 action = data.get('action')
                 realized_pl = data.get('realized_pl')
                 
-                if action == 'sell' and realized_pl is None:
-                    errors.append("Field 'realized_pl' is required for sell actions")
-                elif action == 'buy' and realized_pl is not None and realized_pl != 0:
-                    # In buy, realized_pl should be NULL or 0
-                    logger.warning(f"Realized P/L should be NULL or 0 for buy actions, got: {realized_pl}")
+                if action in ['sell', 'cover'] and realized_pl is None:
+                    errors.append(f"Field 'realized_pl' is required for {action} actions (closing positions)")
+                elif action in ['buy', 'short'] and realized_pl is not None and realized_pl != 0:
+                    # In buy/short, realized_pl should be NULL or 0 (opening positions)
+                    logger.warning(f"Realized P/L should be NULL or 0 for {action} actions (opening positions), got: {realized_pl}")
                     # This is a warning, not an error - we'll allow it but log it
             
             logger.info(f"Starting constraint loop for {table_name}")

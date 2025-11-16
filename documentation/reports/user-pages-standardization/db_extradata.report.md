@@ -1,71 +1,62 @@
 # דוח סטנדרטיזציה - db_extradata
 
 ## סקירה כללית
-- **סוג עמוד**: עמוד תומך
-- **קובץ HTML**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/db_extradata.html`
-- **קובץ JavaScript**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/db_extradata.js`
+- **סוג עמוד**: עמוד technical
+- **קובץ HTML**: `trading-ui/db_extradata.html`
+- **קובץ JavaScript**: `trading-ui/scripts/db_extradata.js`
+- **תאריך סריקה**: 2025-11-17 01:12:28
 
 ## שימוש במערכות כלליות
 
 ### שירות נתונים
 - **שירות נתונים קיים**: ❌ לא
 - **שירות נתונים בשימוש**: ❌ לא
-- **קובץ שירות**: `אין`
+- **שירות נתונים עם CRUD מלא**: ❌ לא
+- **שירות נתונים עם CacheSyncManager**: ❌ לא
+- **קובץ שירות**: `trading-ui/scripts/services/לא קיים`
 
 ### מערכת מטמון
 - **UnifiedCacheManager**: ❌ לא
 - **CacheTTLGuard**: ❌ לא
 - **CacheSyncManager**: ❌ לא
-- **ניקוי מטמון ישיר**: ✅ לא
 
 ### מערכת CRUD
 - **CRUDResponseHandler**: ❌ לא
-- **handleApiResponseWithRefresh**: ❌ לא
-- **קריאות fetch ישירות**: 1
+- **שירות נתונים עם CRUD**: ❌ לא
 
 ### מערכת מודלים
 - **ModalManagerV2**: ❌ לא
-- **קוד מודלים ישן**: ✅ לא
-
-### מערכת רינדור
-- **FieldRendererService**: ❌ לא
-- **רינדור ידני**: ⚠️ כן
+- **קובץ קונפיגורציה**: ❌ לא
 
 ### ניהול מצב עמוד
-- **PageStateManager**: ❌ לא
-- **ניהול מצב מותאם**: ✅ לא
+- **PAGE_CONFIGS**: ❌ לא
+- **טעינה אוטומטית**: ❌ לא
 
 ### מערכת לוגים
-- **Logger Service**: ❌ לא
+- **Logger Service**: ⚠️ חלקי
 - **console.log/warn/error**: 19
 
 ## חובות טכניים מרכזיים
 
-- ⚠️ אין שירות נתונים ייעודי - העמוד משתמש ב-fetch ישיר
-- ⚠️ אין שימוש ב-UnifiedCacheManager
-- ⚠️ אין שימוש ב-CRUDResponseHandler
-- ⚠️ אין שימוש ב-handleApiResponseWithRefresh
-- ⚠️ אין שימוש ב-ModalManagerV2
-- ⚠️ רינדור ידני במקום FieldRendererService
-- ⚠️ שימוש ב-console.log במקום Logger (19)
-- ⚠️ סטיילים inline ב-HTML
+- ⚠️ שימוש ב-console.log במקום Logger (19 מופעים)
+- ⚠️ סטיילים inline ב-HTML (2 מופעים)
+- ⚠️ אין טעינה אוטומטית של נתונים
+- ⚠️ אין הגדרה ב-PAGE_CONFIGS
 
 ## משימות מומלצות
 
-1. ליצור שירות נתונים ייעודי db-extradata-data.js לפי דוגמת trades-data.js
-2. להשתמש ב-UnifiedCacheManager דרך שירות הנתונים
-3. לעטוף פעולות CRUD ב-CRUDResponseHandler.handleApiResponse
-4. להשתמש ב-handleApiResponseWithRefresh לאחר פעולות CRUD
-5. להחליף מודלים ישנים ל-ModalManagerV2
-6. להשתמש ב-FieldRendererService.renderStatus/renderAmount/renderDate
-7. להחליף console.log/warn/error ל-window.Logger.info/warn/error
-8. להעביר כל הסטיילים לקובץ CSS חיצוני
+1. 7. החלפת כל console.log/warn/error ב-window.Logger עם context object
+2. 8. העברת כל הסטיילים לקובץ CSS חיצוני
+3. 9. הוספת טעינה אוטומטית של נתונים ב-PAGE_CONFIGS.customInitializers
+4. 10. הוספת הגדרה ב-PAGE_CONFIGS עם requiredGlobals מלא
 
 ## סטטיסטיקות
 
-- **קריאות fetch ישירות**: 1
 - **שימוש ב-console.log**: 19
-- **דפוסי קוד ישנים**: 0
+- **סטיילים inline**: 2
+- **שירות נתונים**: חסר
+- **CRUD Handler**: לא בשימוש
+- **Modal V2**: לא בשימוש
 
 ---
-*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה*
+*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - 2025-11-17*

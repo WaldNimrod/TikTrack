@@ -673,13 +673,20 @@ async function saveTicker() {
       remarks: remarks || null
     };
 
-    const response = await fetch('/api/tickers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tickerPayload),
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.TickersData && window.TickersData.createTicker) {
+      response = await window.TickersData.createTicker(tickerPayload);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch('/api/tickers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tickerPayload),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
@@ -883,13 +890,20 @@ async function updateTicker() {
       remarks: remarks || null,
     };
 
-    const response = await fetch(`/api/tickers/${parseInt(id)}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tickerPayload),
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.TickersData && window.TickersData.updateTicker) {
+      response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch(`/api/tickers/${parseInt(id)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tickerPayload),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
@@ -1502,9 +1516,16 @@ async function confirmDeleteTicker(id) {
   const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 
   try {
-    const response = await fetch(`/api/tickers/${id}`, {
-      method: 'DELETE',
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.TickersData && window.TickersData.deleteTicker) {
+      response = await window.TickersData.deleteTicker(id);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch(`/api/tickers/${id}`, {
+        method: 'DELETE',
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleDeleteResponse(response, {

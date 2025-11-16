@@ -583,7 +583,7 @@ async function loadRealData() {
         // טעינת נתוני תכנוני טריידים
         await loadTradePlansTableData();
         
-        // טעינת נתוני עסקעות
+        // טעינת נתוני ביצועים
         await loadExecutionsTableData();
         
         log('נתונים אמיתיים נטענו מבסיס הנתונים');
@@ -620,11 +620,11 @@ async function loadTradePlansTableData() {
 }
 
 /**
- * טעינת נתוני עסקעות ישירות מה-API
+ * טעינת נתוני ביצועים ישירות מה-API
  */
 async function loadExecutionsTableData() {
     try {
-        console.log('🔄 טוען נתוני עסקעות...');
+        console.log('🔄 טוען נתוני ביצועים...');
         const response = await fetch(`/api/executions/?_t=${Date.now()}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
@@ -637,10 +637,10 @@ async function loadExecutionsTableData() {
         
         window.executionsData = data;
         updateExecutionsTableDisplay(data);
-        console.log(`✅ טענו ${data.length} עסקעות`);
+        console.log(`✅ טענו ${data.length} ביצועים`);
         
     } catch (error) {
-        console.error('❌ שגיאה בטעינת עסקעות:', error);
+        console.error('❌ שגיאה בטעינת ביצועים:', error);
     }
 }
 
@@ -686,14 +686,14 @@ function updateTradePlansTableDisplay(data) {
 }
 
 /**
- * עדכון תצוגת טבלת עסקעות
+ * עדכון תצוגת טבלת ביצועים
  */
 function updateExecutionsTableDisplay(data) {
     const tbody = document.querySelector('#executionsTable tbody');
     if (!tbody) return;
     
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין עסקעות</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין ביצועים</td></tr>';
         return;
     }
     

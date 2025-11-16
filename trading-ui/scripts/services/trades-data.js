@@ -1,31 +1,45 @@
 /**
- * ========================================
- * Trades Data Layer
- * ========================================
+ * Trades Data Service
+ * ======================================
+ * Unified loader for trades data with cache + TTL guard integration.
  *
- * Handles:
- * - API calls (GET, POST, PUT, DELETE)
- * - UnifiedCacheManager integration
- * - Standardized error handling
- * - Promise-based responses
+ * Responsibilities:
+ * - Load trades list via API (with cache bust for local file protocol)
+ * - Save results inside UnifiedCacheManager with a 45s TTL
+ * - Provide forced reload + cache invalidation helpers
+ * - Surface consistent errors through the global notification + log systems
+ * - CRUD operations (create, update, delete, fetchDetails)
+ * - CacheSyncManager integration for automatic cache invalidation
+ *
+ * Related Documentation:
+ * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+ *
+ * @version 2.0.0
+ * @created November 2025
+ * @author TikTrack Development Team
  */
+(function tradesDataService() {
+  const TRADES_DATA_KEY = 'trades-data';
+  const TRADES_TTL = 45 * 1000; // 45 seconds per audit plan
+  const PAGE_LOG_CONTEXT = { page: 'trades-data' };
 
-async function loadTradesData(options = {}) {
-  try {
-    const { force = false } = options || {};
-    if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
-      const cached = await window.UnifiedCacheManager.get('trades-data', { ttl: 30000 });
-      if (cached) {
-        console.log('📦 Trades loaded from cache');
-        return Array.isArray(cached)
-          ? cached
-          : Array.isArray(cached?.data)
-            ? cached.data
-            : [];
+  async function loadTradesData(options = {}) {
+    try {
+      const { force = false } = options || {};
+      if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
+        const cached = await window.UnifiedCacheManager.get(TRADES_DATA_KEY, { ttl: TRADES_TTL });
+        if (cached) {
+          window.Logger?.debug?.('📦 Trades loaded from cache', PAGE_LOG_CONTEXT);
+          return Array.isArray(cached)
+            ? cached
+            : Array.isArray(cached?.data)
+              ? cached.data
+              : [];
+        }
       }
-    }
 
-    console.log('🔄 Loading trades data from API...');
+      window.Logger?.debug?.('🔄 Loading trades data from API...', PAGE_LOG_CONTEXT);
     let response = await fetch('/api/trades/');
     if (!response.ok) {
       // Retry without trailing slash once
@@ -49,12 +63,13 @@ async function loadTradesData(options = {}) {
     const payload = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
 
     if (typeof window.UnifiedCacheManager?.save === 'function') {
-      await window.UnifiedCacheManager.save('trades-data', payload, { ttl: 30000 });
+      await window.UnifiedCacheManager.save(TRADES_DATA_KEY, payload, { ttl: TRADES_TTL });
     }
 
+    window.Logger?.debug?.('✅ Trades loaded from API', { ...PAGE_LOG_CONTEXT, count: payload.length });
     return payload;
   } catch (error) {
-    console.error('❌ Error loading trades data:', error);
+    window.Logger?.error?.('❌ Error loading trades data', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בטעינת נתוני טריידים');
     throw error;
   }
@@ -78,7 +93,7 @@ async function saveTrade(tradeData) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error saving trade:', error);
+    window.Logger?.error?.('❌ Error saving trade', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בשמירת טרייד');
     throw error;
   }
@@ -103,7 +118,7 @@ async function updateTrade(tradeId, tradeData) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error updating trade:', error);
+    window.Logger?.error?.('❌ Error updating trade', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בעדכון טרייד');
     throw error;
   }
@@ -126,7 +141,7 @@ async function deleteTrade(tradeId) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error deleting trade:', error);
+    window.Logger?.error?.('❌ Error deleting trade', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה במחיקת טרייד');
     throw error;
   }
@@ -151,21 +166,32 @@ async function closeTrade(tradeId, closeData) {
     }
     return result;
   } catch (error) {
-    console.error('❌ Error closing trade:', error);
+    window.Logger?.error?.('❌ Error closing trade', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בסגירת טרייד');
     throw error;
   }
 }
 
-async function getTradeDetails(tradeId) {
+async function getTradeDetails(tradeId, options = {}) {
   try {
-    const response = await fetch(`/api/trades/${tradeId}`);
+    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+    const response = await fetch(`${base}/api/trades/${tradeId}`, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      signal: options.signal,
+    });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = new Error(`טעינת פרטי טרייד ${tradeId} נכשלה (${response.status})`);
+      window.Logger?.error?.('❌ Failed to fetch trade details', {
+        ...PAGE_LOG_CONTEXT,
+        tradeId,
+        error: error.message,
+      });
+      throw error;
     }
     return await response.json();
   } catch (error) {
-    console.error('❌ Error getting trade details:', error);
+    window.Logger?.error?.('❌ Error getting trade details', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בקבלת פרטי טרייד');
     throw error;
   }
@@ -183,7 +209,7 @@ async function copyTrade(tradeId) {
     };
     return await saveTrade(newTradeData);
   } catch (error) {
-    console.error('❌ Error copying trade:', error);
+    window.Logger?.error?.('❌ Error copying trade', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
     window.showErrorNotification?.('שגיאה', 'שגיאה בהעתקת טרייד');
     throw error;
   }
@@ -192,11 +218,11 @@ async function copyTrade(tradeId) {
 async function getCachedTrades() {
   try {
     if (typeof window.UnifiedCacheManager?.get === 'function') {
-      return await window.UnifiedCacheManager.get('trades-data');
+      return await window.UnifiedCacheManager.get(TRADES_DATA_KEY);
     }
     return null;
   } catch (error) {
-    console.error('❌ Error getting cached trades:', error);
+    window.Logger?.warn?.('⚠️ Error getting cached trades', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
     return null;
   }
 }
@@ -204,10 +230,10 @@ async function getCachedTrades() {
 async function setCachedTrades(data) {
   try {
     if (typeof window.UnifiedCacheManager?.save === 'function') {
-      await window.UnifiedCacheManager.save('trades-data', data, { ttl: 30000 });
+      await window.UnifiedCacheManager.save(TRADES_DATA_KEY, data, { ttl: TRADES_TTL });
     }
   } catch (error) {
-    console.error('❌ Error setting cached trades:', error);
+    window.Logger?.warn?.('⚠️ Error setting cached trades', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
   }
 }
 
@@ -217,14 +243,16 @@ async function invalidateTradesCache() {
       await window.CacheSyncManager.invalidateByAction('trade-updated');
     } else if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
       // Fallback to direct invalidation if CacheSyncManager not available
-      await window.UnifiedCacheManager.invalidate('trades-data');
+      await window.UnifiedCacheManager.invalidate(TRADES_DATA_KEY);
     }
   } catch (error) {
-    console.error('❌ Error invalidating trades cache:', error);
+    window.Logger?.warn?.('⚠️ Error invalidating trades cache', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
   }
 }
 
 window.TradesData = {
+  KEY: TRADES_DATA_KEY,
+  TTL: TRADES_TTL,
   loadTradesData,
   saveTrade,
   updateTrade,
@@ -234,8 +262,9 @@ window.TradesData = {
   copyTrade,
   getCachedTrades,
   setCachedTrades,
-  invalidateTradesCache
+  invalidateTradesCache,
 };
 
-console.log('✅ Trades Data module loaded');
+window.Logger?.info?.('✅ Trades Data Service initialized', PAGE_LOG_CONTEXT);
+})();
 

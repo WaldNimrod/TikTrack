@@ -81,6 +81,21 @@
   }
 
   async function invalidateDashboardData() {
+    // Try CacheSyncManager first (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        // Dashboard depends on multiple entities, invalidate by common actions
+        await window.CacheSyncManager.invalidateByAction('dashboard-updated');
+        return;
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          page: 'dashboard-data',
+          error: error?.message,
+        });
+      }
+    }
+    
+    // Fallback to direct invalidation
     if (!window.UnifiedCacheManager?.invalidate) {
       return;
     }

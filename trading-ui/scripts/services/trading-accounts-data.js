@@ -271,8 +271,8 @@
       signal: options.signal,
     });
     if (!response.ok) {
-      const error = new Error(`טעינת חשבון ${accountId} נכשלה (${response.status})`);
-      window.Logger?.error?.('Failed to fetch trading account details', {
+      const error = new Error(`טעינת פרטי חשבון מסחר ${accountId} נכשלה (${response.status})`);
+      window.Logger?.error?.('❌ Failed to fetch trading account details', {
         ...PAGE_LOG_CONTEXT,
         accountId,
         error: error.message,
@@ -280,6 +280,11 @@
       throw error;
     }
     return response.json();
+  }
+
+  // Alias for consistency with other services
+  async function fetchTradingAccountDetails(accountId, options = {}) {
+    return fetchTradingAccount(accountId, options);
   }
 
   window.TradingAccountsData = {
@@ -295,6 +300,7 @@
     updateTradingAccount,
     deleteTradingAccount,
     fetchTradingAccount,
+    fetchTradingAccountDetails, // Alias for consistency
   };
 
   window.Logger?.info?.('✅ Trading Accounts Data Service initialized', PAGE_LOG_CONTEXT);

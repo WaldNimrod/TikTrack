@@ -1732,17 +1732,28 @@ async function saveAlert() {
     window.Logger.info('🔧 Request method:', isEdit ? 'PUT' : 'POST', { page: "alerts" });
     window.Logger.info('🔧 Request body:', JSON.stringify(alertPayload, null, 2), { page: "alerts" });
 
-    const url = isEdit ? `/api/alerts/${alertId}` : '/api/alerts/';
-    const method = isEdit ? 'PUT' : 'POST';
     const modalId = 'alertsModal'; // ModalManagerV2 uses alertsModal
     
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(alertPayload),
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.AlertsData) {
+      if (isEdit) {
+        response = await window.AlertsData.updateAlert(alertId, alertPayload);
+      } else {
+        response = await window.AlertsData.createAlert(alertPayload);
+      }
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      const url = isEdit ? `/api/alerts/${alertId}` : '/api/alerts/';
+      const method = isEdit ? 'PUT' : 'POST';
+      response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(alertPayload),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
@@ -2178,10 +2189,16 @@ async function confirmDeleteAlert(alertId) {
     if (window.performAlertDeletion) {
       await window.performAlertDeletion(alertId);
     } else {
-      // Fallback if performAlertDeletion not available
-      const response = await fetch(`/api/alerts/${alertId}`, {
-        method: 'DELETE',
-      });
+      // שימוש בשירות הנתונים החדש
+      let response;
+      if (window.AlertsData && window.AlertsData.deleteAlert) {
+        response = await window.AlertsData.deleteAlert(alertId);
+      } else {
+        // Fallback ל-direct fetch אם השירות לא זמין
+        response = await fetch(`/api/alerts/${alertId}`, {
+          method: 'DELETE',
+        });
+      }
 
       await CRUDResponseHandler.handleDeleteResponse(response, {
         successMessage: 'התראה נמחקה בהצלחה!',

@@ -1,67 +1,60 @@
 # דוח סטנדרטיזציה - alerts
 
 ## סקירה כללית
-- **סוג עמוד**: עמוד מרכזי
-- **קובץ HTML**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/alerts.html`
-- **קובץ JavaScript**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/alerts.js`
+- **סוג עמוד**: עמוד central
+- **קובץ HTML**: `trading-ui/alerts.html`
+- **קובץ JavaScript**: `trading-ui/scripts/alerts.js`
+- **תאריך סריקה**: 2025-11-17 01:12:28
 
 ## שימוש במערכות כלליות
 
 ### שירות נתונים
 - **שירות נתונים קיים**: ❌ לא
-- **שירות נתונים בשימוש**: ✅ כן
-- **קובץ שירות**: `אין`
+- **שירות נתונים בשימוש**: ❌ לא
+- **שירות נתונים עם CRUD מלא**: ❌ לא
+- **שירות נתונים עם CacheSyncManager**: ❌ לא
+- **קובץ שירות**: `trading-ui/scripts/services/לא קיים`
 
 ### מערכת מטמון
 - **UnifiedCacheManager**: ❌ לא
 - **CacheTTLGuard**: ❌ לא
 - **CacheSyncManager**: ❌ לא
-- **ניקוי מטמון ישיר**: ✅ לא
 
 ### מערכת CRUD
 - **CRUDResponseHandler**: ✅ כן
-- **handleApiResponseWithRefresh**: ❌ לא
-- **קריאות fetch ישירות**: 20
+- **שירות נתונים עם CRUD**: ❌ לא
 
 ### מערכת מודלים
 - **ModalManagerV2**: ✅ כן
-- **קוד מודלים ישן**: ⚠️ כן
-
-### מערכת רינדור
-- **FieldRendererService**: ✅ כן
-- **רינדור ידני**: ⚠️ כן
+- **קובץ קונפיגורציה**: ✅ כן
 
 ### ניהול מצב עמוד
-- **PageStateManager**: ✅ כן
-- **ניהול מצב מותאם**: ✅ לא
+- **PAGE_CONFIGS**: ❌ לא
+- **טעינה אוטומטית**: ✅ כן
 
 ### מערכת לוגים
-- **Logger Service**: ✅ כן
+- **Logger Service**: ⚠️ חלקי
 - **console.log/warn/error**: 1
 
 ## חובות טכניים מרכזיים
 
-- ⚠️ אין שירות נתונים ייעודי - העמוד משתמש ב-fetch ישיר
-- ⚠️ אין שימוש ב-UnifiedCacheManager
-- ⚠️ אין שימוש ב-handleApiResponseWithRefresh
-- ⚠️ קוד מודלים ישן (jQuery/Bootstrap)
-- ⚠️ שימוש ב-console.log במקום Logger (1)
-- ⚠️ דפוסי קוד ישנים: Inline onclick
+- ❌ אין שירות נתונים ייעודי
+- ⚠️ שימוש ב-console.log במקום Logger (1 מופעים)
+- ⚠️ אין הגדרה ב-PAGE_CONFIGS
 
 ## משימות מומלצות
 
-1. ליצור שירות נתונים ייעודי alerts-data.js לפי דוגמת trades-data.js
-2. להשתמש ב-UnifiedCacheManager דרך שירות הנתונים
-3. להשתמש ב-handleApiResponseWithRefresh לאחר פעולות CRUD
-4. להסיר קוד מודלים ישן ולהשתמש ב-ModalManagerV2 בלבד
-5. להחליף console.log/warn/error ל-window.Logger.info/warn/error
-6. לעדכן לדפוסים מודרניים (fetch, data-onclick, וכו')
+1. 1. יצירת שירות נתונים `*-data.js` עם פונקציות CRUD מלאות
+2. 7. החלפת כל console.log/warn/error ב-window.Logger עם context object
+3. 10. הוספת הגדרה ב-PAGE_CONFIGS עם requiredGlobals מלא
 
 ## סטטיסטיקות
 
-- **קריאות fetch ישירות**: 20
 - **שימוש ב-console.log**: 1
-- **דפוסי קוד ישנים**: 1
+- **סטיילים inline**: 0
+- **שירות נתונים**: חסר
+- **CRUD Handler**: בשימוש
+- **Modal V2**: בשימוש
 
 ---
-*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה*
+*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - 2025-11-17*

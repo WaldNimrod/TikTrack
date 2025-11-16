@@ -4143,10 +4143,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined') {
       requiresCharts: true,
       customInitializers: [
         async pageConfig => {
-          console.log('⚡ Initializing Executions...');
+          window.Logger?.info?.('⚡ Initializing Executions (from core-systems)...', {
+            page: 'core-systems',
+          });
 
-          if (typeof window.initializeExecutionsPage === 'function') {
-            window.initializeExecutionsPage();
+          // Use page-initialization-configs if available, otherwise fallback
+          if (window.PAGE_CONFIGS?.executions?.customInitializers) {
+            const pageConfigInitializers = window.PAGE_CONFIGS.executions.customInitializers;
+            window.Logger?.info?.('📋 Using page-initialization-configs initializers', {
+              count: pageConfigInitializers.length,
+              page: 'core-systems',
+            });
+            for (const init of pageConfigInitializers) {
+              if (typeof init === 'function') {
+                try {
+                  await init(pageConfig);
+                } catch (error) {
+                  window.Logger?.error?.('❌ Error in page-initialization-configs initializer', {
+                    error: error?.message,
+                    page: 'core-systems',
+                  });
+                }
+              }
+            }
+          } else if (typeof window.initializeExecutionsPage === 'function') {
+            window.Logger?.info?.('📋 Using initializeExecutionsPage fallback', {
+              page: 'core-systems',
+            });
+            await window.initializeExecutionsPage();
+          } else {
+            window.Logger?.warn?.('⚠️ No executions initialization method available', {
+              page: 'core-systems',
+            });
           }
         },
       ],

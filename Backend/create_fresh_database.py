@@ -570,7 +570,9 @@ class DatabaseRecreator:
             
             # Execution actions
             (execution_action_constraint_id, 'buy', 'קנייה', 1, 1),
-            (execution_action_constraint_id, 'sale', 'מכירה', 1, 2),
+            (execution_action_constraint_id, 'sell', 'מכירה', 1, 2),
+            (execution_action_constraint_id, 'short', 'מכירה בחסר', 1, 3),
+            (execution_action_constraint_id, 'cover', 'כיסוי', 1, 4),
             
             # Cash flow types
             (cash_flow_type_constraint_id, 'deposit', 'הפקדה', 1, 1),

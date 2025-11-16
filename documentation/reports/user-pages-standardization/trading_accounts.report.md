@@ -1,67 +1,62 @@
 # דוח סטנדרטיזציה - trading_accounts
 
 ## סקירה כללית
-- **סוג עמוד**: עמוד מרכזי
-- **קובץ HTML**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/trading_accounts.html`
-- **קובץ JavaScript**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trading_accounts.js`
+- **סוג עמוד**: עמוד central
+- **קובץ HTML**: `trading-ui/trading_accounts.html`
+- **קובץ JavaScript**: `trading-ui/scripts/trading_accounts.js`
+- **תאריך סריקה**: 2025-11-17 01:12:28
 
 ## שימוש במערכות כלליות
 
 ### שירות נתונים
 - **שירות נתונים קיים**: ✅ כן
 - **שירות נתונים בשימוש**: ✅ כן
-- **קובץ שירות**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/trading-accounts-data.js`
+- **שירות נתונים עם CRUD מלא**: ✅ כן
+- **שירות נתונים עם CacheSyncManager**: ✅ כן
+- **קובץ שירות**: `trading-ui/scripts/services/trading-accounts-data.js`
 
 ### מערכת מטמון
-- **UnifiedCacheManager**: ❌ לא
-- **CacheTTLGuard**: ❌ לא
-- **CacheSyncManager**: ❌ לא
-- **ניקוי מטמון ישיר**: ✅ לא
+- **UnifiedCacheManager**: ✅ כן
+- **CacheTTLGuard**: ✅ כן
+- **CacheSyncManager**: ✅ כן
 
 ### מערכת CRUD
 - **CRUDResponseHandler**: ✅ כן
-- **handleApiResponseWithRefresh**: ❌ לא
-- **קריאות fetch ישירות**: 17
+- **שירות נתונים עם CRUD**: ✅ כן
 
 ### מערכת מודלים
 - **ModalManagerV2**: ✅ כן
-- **קוד מודלים ישן**: ✅ לא
-
-### מערכת רינדור
-- **FieldRendererService**: ❌ לא
-- **רינדור ידני**: ⚠️ כן
+- **קובץ קונפיגורציה**: ✅ כן
 
 ### ניהול מצב עמוד
-- **PageStateManager**: ✅ כן
-- **ניהול מצב מותאם**: ✅ לא
+- **PAGE_CONFIGS**: ❌ לא
+- **טעינה אוטומטית**: ❌ לא
 
 ### מערכת לוגים
-- **Logger Service**: ✅ כן
+- **Logger Service**: ⚠️ חלקי
 - **console.log/warn/error**: 23
 
 ## חובות טכניים מרכזיים
 
-- ⚠️ אין שימוש ב-UnifiedCacheManager
-- ⚠️ אין שימוש ב-handleApiResponseWithRefresh
-- ⚠️ רינדור ידני במקום FieldRendererService
-- ⚠️ שימוש ב-console.log במקום Logger (23)
-- ⚠️ סטיילים inline ב-HTML
-- ⚠️ דפוסי קוד ישנים: Inline onclick
+- ⚠️ שימוש ב-console.log במקום Logger (23 מופעים)
+- ⚠️ סטיילים inline ב-HTML (18 מופעים)
+- ⚠️ אין טעינה אוטומטית של נתונים
+- ⚠️ אין הגדרה ב-PAGE_CONFIGS
 
 ## משימות מומלצות
 
-1. להשתמש ב-UnifiedCacheManager דרך שירות הנתונים
-2. להשתמש ב-handleApiResponseWithRefresh לאחר פעולות CRUD
-3. להשתמש ב-FieldRendererService.renderStatus/renderAmount/renderDate
-4. להחליף console.log/warn/error ל-window.Logger.info/warn/error
-5. להעביר כל הסטיילים לקובץ CSS חיצוני
-6. לעדכן לדפוסים מודרניים (fetch, data-onclick, וכו')
+1. 7. החלפת כל console.log/warn/error ב-window.Logger עם context object
+2. 8. העברת כל הסטיילים לקובץ CSS חיצוני
+3. 9. הוספת טעינה אוטומטית של נתונים ב-PAGE_CONFIGS.customInitializers
+4. 10. הוספת הגדרה ב-PAGE_CONFIGS עם requiredGlobals מלא
 
 ## סטטיסטיקות
 
-- **קריאות fetch ישירות**: 17
 - **שימוש ב-console.log**: 23
-- **דפוסי קוד ישנים**: 1
+- **סטיילים inline**: 18
+- **שירות נתונים**: קיים
+- **CRUD Handler**: בשימוש
+- **Modal V2**: בשימוש
 
 ---
-*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה*
+*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - 2025-11-17*

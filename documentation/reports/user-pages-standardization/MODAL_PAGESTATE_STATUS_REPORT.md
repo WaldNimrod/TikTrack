@@ -153,9 +153,10 @@
    - `hideEditTradeModal()` - שורה 1847: הסרת fallback, משתמש רק ב-`ModalManagerV2.hideModal('tradesModal')`
 3. ✅ **trade_plans.js** - 1 מקום תוקן:
    - `openCancelTradePlanModal()` - שורה 934: משתמש ב-`Bootstrap.Modal.getOrCreateInstance` (מודל מיוחד לביטול)
-4. ✅ **alerts.js** - 2 מקומות תוקנו:
+4. ✅ **alerts.js** - 3 מקומות תוקנו:
    - שורה 276: הסרת event listener לסגירה בלחיצה על רקע (ModalManagerV2 מטפל בזה אוטומטית)
    - שורה 2598: הסרת event listener נוסף
+   - שורה 3095: החלפת `bootstrap.Modal.getInstance().hide()` ל-`ModalManagerV2.hideModal('addAlertModal')`
 
 **שינויים נוספים:**
 - ✅ הוספת `hideModal()` ל-ModalManagerV2 (שורה 6188) - פונקציה חדשה לסגירת מודלים לפי ID
@@ -175,9 +176,10 @@
 ## סיכום סופי
 
 ### ModalManagerV2
-- ✅ **4 עמודים תוקנו** (8 מקומות)
+- ✅ **4 עמודים תוקנו** (9 מקומות - עודכן מ-8)
 - ✅ **כל הקוד הישן הוחלף** ב-ModalManagerV2 או הוסר
-- ✅ **טסטים נוספו** ל-hideModal
+- ✅ **טסטים נוספו** ל-hideModal (5 טסטים חדשים)
+- ✅ **כל הטסטים עברו** (34 טסטים בסך הכל)
 
 ### PageStateManager
 - ✅ **1 עמוד תוקן** (notes.js)

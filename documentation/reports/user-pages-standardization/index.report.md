@@ -1,67 +1,62 @@
 # דוח סטנדרטיזציה - index
 
 ## סקירה כללית
-- **סוג עמוד**: עמוד מרכזי
-- **קובץ HTML**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/index.html`
-- **קובץ JavaScript**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/index.js`
+- **סוג עמוד**: עמוד central
+- **קובץ HTML**: `trading-ui/index.html`
+- **קובץ JavaScript**: `trading-ui/scripts/index.js`
+- **תאריך סריקה**: 2025-11-17 01:12:28
 
 ## שימוש במערכות כלליות
 
 ### שירות נתונים
 - **שירות נתונים קיים**: ✅ כן
 - **שירות נתונים בשימוש**: ✅ כן
-- **קובץ שירות**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/dashboard-data.js`
+- **שירות נתונים עם CRUD מלא**: ❌ לא
+- **שירות נתונים עם CacheSyncManager**: ❌ לא
+- **קובץ שירות**: `trading-ui/scripts/services/dashboard-data.js`
 
 ### מערכת מטמון
 - **UnifiedCacheManager**: ✅ כן
 - **CacheTTLGuard**: ✅ כן
 - **CacheSyncManager**: ❌ לא
-- **ניקוי מטמון ישיר**: ⚠️ כן
 
 ### מערכת CRUD
 - **CRUDResponseHandler**: ❌ לא
-- **handleApiResponseWithRefresh**: ❌ לא
-- **קריאות fetch ישירות**: 1
+- **שירות נתונים עם CRUD**: ❌ לא
 
 ### מערכת מודלים
 - **ModalManagerV2**: ❌ לא
-- **קוד מודלים ישן**: ✅ לא
-
-### מערכת רינדור
-- **FieldRendererService**: ✅ כן
-- **רינדור ידני**: ⚠️ כן
+- **קובץ קונפיגורציה**: ❌ לא
 
 ### ניהול מצב עמוד
-- **PageStateManager**: ❌ לא
-- **ניהול מצב מותאם**: ✅ לא
+- **PAGE_CONFIGS**: ❌ לא
+- **טעינה אוטומטית**: ✅ כן
 
 ### מערכת לוגים
-- **Logger Service**: ✅ כן
+- **Logger Service**: ⚠️ חלקי
 - **console.log/warn/error**: 9
 
 ## חובות טכניים מרכזיים
 
-- ⚠️ ניקוי מטמון ישיר במקום CacheSyncManager
-- ⚠️ אין שימוש ב-CRUDResponseHandler
-- ⚠️ אין שימוש ב-handleApiResponseWithRefresh
-- ⚠️ אין שימוש ב-ModalManagerV2
-- ⚠️ שימוש ב-console.log במקום Logger (9)
-- ⚠️ סטיילים inline ב-HTML
+- ⚠️ שירות נתונים לא משתמש ב-CacheSyncManager
+- ⚠️ שימוש ב-console.log במקום Logger (9 מופעים)
+- ⚠️ סטיילים inline ב-HTML (11 מופעים)
+- ⚠️ אין הגדרה ב-PAGE_CONFIGS
 
 ## משימות מומלצות
 
-1. להחליף UnifiedCacheManager.remove/clear לשימוש ב-CacheSyncManager
-2. לעטוף פעולות CRUD ב-CRUDResponseHandler.handleApiResponse
-3. להשתמש ב-handleApiResponseWithRefresh לאחר פעולות CRUD
-4. להחליף מודלים ישנים ל-ModalManagerV2
-5. להחליף console.log/warn/error ל-window.Logger.info/warn/error
-6. להעביר כל הסטיילים לקובץ CSS חיצוני
+1. 3. שילוב CacheSyncManager.invalidateByAction בשירות הנתונים
+2. 7. החלפת כל console.log/warn/error ב-window.Logger עם context object
+3. 8. העברת כל הסטיילים לקובץ CSS חיצוני
+4. 10. הוספת הגדרה ב-PAGE_CONFIGS עם requiredGlobals מלא
 
 ## סטטיסטיקות
 
-- **קריאות fetch ישירות**: 1
 - **שימוש ב-console.log**: 9
-- **דפוסי קוד ישנים**: 0
+- **סטיילים inline**: 11
+- **שירות נתונים**: קיים
+- **CRUD Handler**: לא בשימוש
+- **Modal V2**: לא בשימוש
 
 ---
-*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה*
+*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - 2025-11-17*

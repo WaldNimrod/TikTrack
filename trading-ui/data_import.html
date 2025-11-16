@@ -870,12 +870,6 @@
                             </div>
                             <div class="d-flex gap-2 mt-3 flex-wrap" id="accountLinkingRecognizedActions">
                                 <button
-                                    data-button-type="PRIMARY"
-                                    data-text="אשר חשבון מזוהה"
-                                    data-onclick="confirmAutoLinkedAccount()"
-                                    id="accountLinkingConfirmBtn">
-                                </button>
-                                <button
                                     data-button-type="SECONDARY"
                                     data-text="בחר חשבון אחר"
                                     data-onclick="showAccountLinkingSelection()"
@@ -920,10 +914,10 @@
                     </small>
                     <div class="d-flex gap-2 flex-wrap" id="accountLinkingFooterActions">
                         <button
-                            data-button-type="SECONDARY"
-                            data-onclick="hideAccountLinkingModal()"
-                            data-text="סגור"
-                            id="accountLinkingFooterCloseBtn">
+                            data-button-type="PRIMARY"
+                            data-text="אשר חשבון מזוהה"
+                            data-onclick="confirmAutoLinkedAccount()"
+                            id="accountLinkingConfirmBtn">
                         </button>
                     </div>
                 </div>

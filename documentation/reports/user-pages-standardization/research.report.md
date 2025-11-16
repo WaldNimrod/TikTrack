@@ -1,63 +1,56 @@
 # דוח סטנדרטיזציה - research
 
 ## סקירה כללית
-- **סוג עמוד**: עמוד מרכזי
-- **קובץ HTML**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/research.html`
-- **קובץ JavaScript**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/research.js`
+- **סוג עמוד**: עמוד central
+- **קובץ HTML**: `trading-ui/research.html`
+- **קובץ JavaScript**: `trading-ui/scripts/research.js`
+- **תאריך סריקה**: 2025-11-17 01:12:28
 
 ## שימוש במערכות כלליות
 
 ### שירות נתונים
 - **שירות נתונים קיים**: ✅ כן
-- **שירות נתונים בשימוש**: ❌ לא
-- **קובץ שירות**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/services/research-data.js`
+- **שירות נתונים בשימוש**: ✅ כן
+- **שירות נתונים עם CRUD מלא**: ❌ לא
+- **שירות נתונים עם CacheSyncManager**: ❌ לא
+- **קובץ שירות**: `trading-ui/scripts/services/research-data.js`
 
 ### מערכת מטמון
-- **UnifiedCacheManager**: ❌ לא
-- **CacheTTLGuard**: ❌ לא
+- **UnifiedCacheManager**: ✅ כן
+- **CacheTTLGuard**: ✅ כן
 - **CacheSyncManager**: ❌ לא
-- **ניקוי מטמון ישיר**: ✅ לא
 
 ### מערכת CRUD
 - **CRUDResponseHandler**: ❌ לא
-- **handleApiResponseWithRefresh**: ❌ לא
-- **קריאות fetch ישירות**: 0
+- **שירות נתונים עם CRUD**: ❌ לא
 
 ### מערכת מודלים
 - **ModalManagerV2**: ❌ לא
-- **קוד מודלים ישן**: ✅ לא
-
-### מערכת רינדור
-- **FieldRendererService**: ❌ לא
-- **רינדור ידני**: ⚠️ כן
+- **קובץ קונפיגורציה**: ❌ לא
 
 ### ניהול מצב עמוד
-- **PageStateManager**: ❌ לא
-- **ניהול מצב מותאם**: ✅ לא
+- **PAGE_CONFIGS**: ✅ כן
+- **טעינה אוטומטית**: ✅ כן
 
 ### מערכת לוגים
-- **Logger Service**: ❌ לא
+- **Logger Service**: ✅ כן
 - **console.log/warn/error**: 0
 
 ## חובות טכניים מרכזיים
 
-- ⚠️ שירות נתונים קיים אך לא בשימוש - העמוד משתמש ב-fetch ישיר
-- ⚠️ אין שימוש ב-handleApiResponseWithRefresh
-- ⚠️ אין שימוש ב-ModalManagerV2
-- ⚠️ רינדור ידני במקום FieldRendererService
+- ⚠️ שירות נתונים לא משתמש ב-CacheSyncManager
 
 ## משימות מומלצות
 
-1. להחליף קריאות fetch ישירות לשימוש ב-research-data.js
-2. להשתמש ב-handleApiResponseWithRefresh לאחר פעולות CRUD
-3. להחליף מודלים ישנים ל-ModalManagerV2
-4. להשתמש ב-FieldRendererService.renderStatus/renderAmount/renderDate
+1. 3. שילוב CacheSyncManager.invalidateByAction בשירות הנתונים
 
 ## סטטיסטיקות
 
-- **קריאות fetch ישירות**: 0
 - **שימוש ב-console.log**: 0
-- **דפוסי קוד ישנים**: 0
+- **סטיילים inline**: 0
+- **שירות נתונים**: קיים
+- **CRUD Handler**: לא בשימוש
+- **Modal V2**: לא בשימוש
 
 ---
-*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה*
+*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - 2025-11-17*

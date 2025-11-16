@@ -15,22 +15,28 @@ For each page there is a dedicated per-page report in this directory with detail
 
 ## Central & Supporting Pages Status Table
 
-| Page | Category | UnifiedTableSystem | CRUDResponseHandler | UnifiedCache (UCM/TTL/Sync) | ModalManagerV2 / Modals | PageState / HeaderSystem | Entity Services / Linked Items | Alignment | Detail Report |
+**תאריך עדכון אחרון**: 17 נובמבר 2025  
+**סריקה אחרונה**: 17 עמודים נסרקו
+
+| Page | Category | Data Service | CRUD Handler | Cache Sync | Modal V2 | Auto Loading | Console Logs | Alignment | Detail Report |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| index.html | Central | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | MEDIUM | `index_PAGE_STANDARDIZATION_REPORT.md` |
-| trades.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `trades_PAGE_STANDARDIZATION_REPORT.md` |
-| trade_plans.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `trade_plans_PAGE_STANDARDIZATION_REPORT.md` |
-| alerts.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `alerts_PAGE_STANDARDIZATION_REPORT.md` |
-| tickers.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `tickers_PAGE_STANDARDIZATION_REPORT.md` |
-| trading_accounts.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `trading_accounts_PAGE_STANDARDIZATION_REPORT.md` |
-| executions.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `executions_PAGE_STANDARDIZATION_REPORT.md` |
-| cash_flows.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `cash_flows_PAGE_STANDARDIZATION_REPORT.md` |
-| data_import.html | Central | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | MEDIUM | `data_import_PAGE_STANDARDIZATION_REPORT.md` |
-| notes.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `notes_PAGE_STANDARDIZATION_REPORT.md` |
-| research.html | Central | ✅ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | MEDIUM | `research_PAGE_STANDARDIZATION_REPORT.md` |
-| preferences.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | HIGH | `preferences_PAGE_STANDARDIZATION_REPORT.md` |
-| db_display.html | Technical | ⚠️ | ❌ | ❌ | ⚠️ | ⚠️ | ⚠️ | LOW | `db_display_PAGE_STANDARDIZATION_REPORT.md` |
-| db_extradata.html | Technical | ⚠️ | ❌ | ❌ | ⚠️ | ⚠️ | ⚠️ | LOW | `db_extradata_PAGE_STANDARDIZATION_REPORT.md` |
+| index.html | Central | ✅ | N/A | ❌ | N/A | ✅ | 9 | MEDIUM | `index.report.md` |
+| trades.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | 10 | HIGH | `trades.report.md` |
+| trade_plans.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | 1 | HIGH | `trade_plans.report.md` |
+| alerts.html | Central | ❌ | ✅ | ❌ | ✅ | ✅ | 1 | MEDIUM | `alerts.report.md` |
+| tickers.html | Central | ❌ | ✅ | ❌ | ✅ | ✅ | 16 | MEDIUM | `tickers.report.md` |
+| trading_accounts.html | Central | ✅ | ✅ | ✅ | ✅ | ❌ | 23 | MEDIUM | `trading_accounts.report.md` |
+| executions.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | 6 | HIGH | `executions.report.md` |
+| cash_flows.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | 21 | HIGH | `cash_flows.report.md` |
+| data_import.html | Central | ✅ | ❌ | ✅ | ❌ | ❌ | 0 | MEDIUM | `data_import.report.md` |
+| notes.html | Central | ✅ | ✅ | ✅ | ✅ | ✅ | 1 | HIGH | `notes.report.md` |
+| research.html | Central | ✅ | N/A | ❌ | N/A | ✅ | 0 | MEDIUM | `research.report.md` |
+| preferences.html | Central | ✅ | ❌ | ✅ | ❌ | ❌ | 83 | LOW | `preferences.report.md` |
+| external-data-dashboard.html | Supporting | ❌ | N/A | ❌ | N/A | ❌ | 0 | LOW | `external-data-dashboard.report.md` |
+| chart-management.html | Supporting | ❌ | N/A | ❌ | N/A | ❌ | 0 | LOW | `chart-management.report.md` |
+| crud-testing-dashboard.html | Supporting | ❌ | N/A | ❌ | N/A | ❌ | 0 | LOW | `crud-testing-dashboard.report.md` |
+| db_display.html | Technical | ❌ | N/A | ❌ | N/A | ✅ | 19 | LOW | `db_display.report.md` |
+| db_extradata.html | Technical | ❌ | N/A | ❌ | N/A | ❌ | 19 | LOW | `db_extradata.report.md` |
 | constraints.html | Technical | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | MEDIUM | `constraints_PAGE_STANDARDIZATION_REPORT.md` |
 | background-tasks.html | Technical | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | MEDIUM | `background-tasks_PAGE_STANDARDIZATION_REPORT.md` |
 | server-monitor.html | Technical | ⚠️ | ⚠️ | ✅ | ⚠️ | ⚠️ | ⚠️ | MEDIUM | `server-monitor_PAGE_STANDARDIZATION_REPORT.md` |
@@ -54,8 +60,8 @@ For each page there is a dedicated per-page report in this directory with detail
 # דוח סטנדרטיזציה מרכזי - עמודי משתמש
 
 **תאריך יצירה**: ינואר 2025  
-**תאריך עדכון אחרון**: ינואר 2025 (CacheSyncManager Testing הושלם)  
-**סטטוס**: דוח מעודכן - CacheSyncManager Testing הושלם: סריקה, תיקון, בדיקה, טסטים
+**תאריך עדכון אחרון**: 17 נובמבר 2025 (סריקה מקיפה הושלמה)  
+**סטטוס**: דוח מעודכן - סריקה מקיפה של 17 עמודים הושלמה, דוחות מפורטים נוצרו/עודכנו
 
 ## תקציר מנהלים
 
@@ -69,16 +75,15 @@ For each page there is a dedicated per-page report in this directory with detail
 - **ניהול מצב עמוד** (PageStateManager)
 - **מערכת לוגים** (Logger Service)
 
-### ממצאים עיקריים
+### ממצאים עיקריים (עדכון נובמבר 2025)
 
-- **סה"כ עמודים נסרקו**: 25 עמודים (12 מרכזיים + 13 תומכים)
-- **עמודים עם שירות נתונים**: 9 עמודים
-- **עמודים המשתמשים ב-UnifiedCacheManager**: 9 עמודים (עלה מ-6)
-- **עמודים המשתמשים ב-CacheSyncManager**: 9 עמודים (חדש! ✅)
-- **עמודים המשתמשים ב-CRUDResponseHandler**: 9 עמודים (עלה מ-8)
-- **עמודים המשתמשים ב-ModalManagerV2**: 8 עמודים (✅ הושלם - כל הקוד הישן הוחלף)
-- **סה"כ קריאות console.log**: 511 קריאות (צריך להחליף ל-Logger)
-- **סה"כ קריאות fetch ישירות**: 172 קריאות (חלקן צריכות לעבור לשירותי נתונים)
+- **סה"כ עמודים נסרקו**: 17 עמודים (12 מרכזיים + 3 תומכים + 2 טכניים)
+- **עמודים עם שירות נתונים**: 10/17 עמודים (59%)
+- **עמודים עם CRUD Handler** (CRUD pages only): 8/10 עמודים (80%)
+- **עמודים עם CacheSyncManager**: 8/17 עמודים (47%)
+- **עמודים עם Modal V2** (CRUD pages only): 8/10 עמודים (80%)
+- **עמודים עם טעינה אוטומטית**: 10/17 עמודים (59%)
+- **סה"כ קריאות console.log**: 209 קריאות (צריך להחליף ל-Logger)
 
 ### עדכון - שילוב CacheSyncManager (ינואר 2025)
 
@@ -149,20 +154,31 @@ For each page there is a dedicated per-page report in this directory with detail
 
 ## סיכום לפי קטגוריות
 
-### עמודים מרכזיים - מצב כללי
+### עמודים מרכזיים - מצב כללי (עדכון נובמבר 2025)
 
 | סטטוס | מספר עמודים | עמודים |
 |--------|-------------|---------|
-| ✅ **מיושרים היטב** | 9 | trades, trade_plans, alerts, tickers, trading_accounts, executions, cash_flows, notes, preferences |
-| ⚠️ **דורשים שיפורים** | 3 | index, data_import, research |
+| ✅ **מיושרים היטב** | 5 | trades, trade_plans, executions, cash_flows, notes |
+| ⚠️ **דורשים שיפורים** | 7 | index, alerts, tickers, trading_accounts, data_import, research, preferences |
 | ❌ **דורשים עבודה משמעותית** | 0 | - |
 
-### עמודים תומכים - מצב כללי
+**הערות**:
+- **alerts, tickers**: חסר שירות נתונים ייעודי
+- **trading_accounts**: חסרה טעינה אוטומטית
+- **data_import**: חסר CRUD Handler ו-Modal V2
+- **preferences**: 83 console.log statements, חסר CRUD Handler ו-Modal V2
+
+### עמודים תומכים וטכניים - מצב כללי (עדכון נובמבר 2025)
 
 | סטטוס | מספר עמודים | הערות |
 |--------|-------------|--------|
-| ⚠️ **דורשים שיפורים** | 8 | רוב העמודים הטכניים דורשים שילוב מערכות כלליות |
-| ❌ **דורשים עבודה משמעותית** | 5 | db_display, db_extradata, constraints, server-monitor, system-management |
+| ⚠️ **דורשים שיפורים** | 5 | external-data-dashboard, chart-management, crud-testing-dashboard, db_display, db_extradata |
+| ❌ **דורשים עבודה משמעותית** | 0 | - |
+
+**הערות**:
+- כל העמודים התומכים והטכניים חסרים שירותי נתונים
+- רוב העמודים חסרים טעינה אוטומטית
+- db_display, db_extradata: 19 console.log statements כל אחד
 
 ## תוכנית עבודה מומלצת
 
@@ -185,9 +201,10 @@ For each page there is a dedicated per-page report in this directory with detail
    - ✅ 15+ נקודות ניקוי מטמון ישיר הוחלפו
    - ✅ CacheSyncManager מעודכן עם invalidation patterns חדשים
 2. ✅ **הושלם**: השלמת מעבר ל-ModalManagerV2 (4 עמודים: notes, trades, trade_plans, alerts)
-   - ✅ 8 מקומות עם קוד ישן הוחלפו ב-ModalManagerV2
+   - ✅ 9 מקומות עם קוד ישן הוחלפו ב-ModalManagerV2 (עודכן מ-8)
    - ✅ הוספת `hideModal()` ל-ModalManagerV2
-   - ✅ הוספת טסטים ל-hideModal
+   - ✅ הוספת 5 טסטים חדשים ל-hideModal
+   - ✅ כל הטסטים עברו (37 טסטים בסך הכל: 27 unit + 7 integration + 3 E2E)
 3. ✅ **הושלם**: שילוב PageStateManager (1 עמוד: notes.js)
    - ✅ הסרת `restoreNotesSectionState()` המקומית
    - ✅ שימוש ב-PageStateManager + restoreAllSectionStates()
@@ -216,6 +233,7 @@ For each page there is a dedicated per-page report in this directory with detail
 - **דוח בדיקה רוחבית**: [CACHE_SYNC_VERIFICATION_REPORT.md](CACHE_SYNC_VERIFICATION_REPORT.md)
 - **סיכום טסטים**: [CACHE_SYNC_TESTING_SUMMARY.md](CACHE_SYNC_TESTING_SUMMARY.md)
 - **דוח ModalManagerV2 ו-PageStateManager**: [MODAL_PAGESTATE_STATUS_REPORT.md](MODAL_PAGESTATE_STATUS_REPORT.md)
+- **דוח בדיקות ModalManagerV2 ו-PageStateManager**: [MODAL_PAGESTATE_TESTING_REPORT.md](MODAL_PAGESTATE_TESTING_REPORT.md)
 - **דוחות פרטניים**: כל עמוד כולל דוח מפורט נפרד עם ממצאים ספציפיים
 
 ---

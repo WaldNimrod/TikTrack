@@ -156,7 +156,12 @@ class IBKRConnector(BaseConnector):
                 "הקובץ חסר את הכותרות הנדרשות: " + ', '.join(missing_headers)
             )
 
-        if 'Account Information,Data,Account ID' not in file_content:
+        # Check for Account Information section - can be either "Account ID" or "Account" field
+        has_account_info = (
+            'Account Information,Data,Account ID' in file_content or
+            'Account Information,Data,Account' in file_content
+        )
+        if not has_account_info:
             warnings = warnings + ['לא נמצא מקטע Account Information. ייתכן שיידרש זיהוי חשבון ידני.']
 
         if errors:

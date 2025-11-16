@@ -101,7 +101,7 @@
  * Last Updated: 2025-01-27
  */
 
-// ===== קובץ JavaScript לדף עסקעות =====
+// ===== קובץ JavaScript לדף ביצועים =====
 
 // ===== EXECUTION MANAGEMENT FUNCTIONS =====
 // CRUD operations for executions
@@ -230,24 +230,49 @@ async function editExecution(id) {
  */
 /**
  * עדכון שדה Realized P/L לפי סוג הפעולה
+ * ModalManagerV2 uses field.id directly from config (executionType, not addExecutionType/editExecutionType)
+ * 
+ * Realized P/L נדרש רק ל:
+ * - sell (מכירה) - סגירת פוזיציה long
+ * - cover (כיסוי) - סגירת פוזיציה short
+ * 
+ * Realized P/L לא נדרש ל:
+ * - buy (קנייה) - פתיחת פוזיציה long
+ * - short (מכירה בחסר) - פתיחת פוזיציה short
  */
-function updateRealizedPLField(mode = 'add') {
-  const actionSelect = document.getElementById(mode === 'add' ? 'addExecutionType' : 'editExecutionType');
+function updateRealizedPLField() {
+  // ModalManagerV2 uses the field id directly from config - no prefix
+  const actionSelect = document.getElementById('executionType');
   const realizedPLField = document.getElementById('executionRealizedPL');
   
   if (!actionSelect || !realizedPLField) {
+    window.Logger?.debug('⚠️ updateRealizedPLField: Field not found', {
+      actionSelect: !!actionSelect,
+      realizedPLField: !!realizedPLField,
+      page: 'executions'
+    });
     return;
   }
   
   const actionType = actionSelect.value;
   
-  if (actionType === 'buy') {
+  // Enable Realized P/L only for sell and cover (closing positions)
+  if (actionType === 'sell' || actionType === 'cover') {
+    realizedPLField.disabled = false;
+    realizedPLField.required = true;
+    window.Logger?.debug('✅ updateRealizedPLField: Enabled Realized P/L', {
+      actionType,
+      page: 'executions'
+    });
+  } else {
+    // Disable Realized P/L for buy, short, and any unknown types (opening positions)
     realizedPLField.disabled = true;
     realizedPLField.required = false;
     realizedPLField.value = '';
-  } else if (actionType === 'sell' || actionType === 'sale') {
-    realizedPLField.disabled = false;
-    realizedPLField.required = true;
+    window.Logger?.debug('✅ updateRealizedPLField: Disabled Realized P/L', {
+      actionType,
+      page: 'executions'
+    });
   }
 }
 
@@ -377,11 +402,13 @@ async function saveExecution() {
             hasErrors = true;
         }
         
-        // Validate realized_pl for sell actions
-        if (executionData.action === 'sell' || executionData.action === 'sale' || executionData.action === 'cover') {
+        // Validate realized_pl for sell and cover actions (closing positions only)
+        // Realized P/L is required only for sell (closing long position) and cover (closing short position)
+        if (executionData.action === 'sell' || executionData.action === 'cover') {
             if (executionData.realized_pl === null || executionData.realized_pl === undefined) {
                 if (window.showValidationWarning) {
-                    window.showValidationWarning('executionRealizedPL', 'Realized P/L חובה במכירה');
+                    const actionLabel = executionData.action === 'sell' ? 'מכירה' : 'כיסוי';
+                    window.showValidationWarning('executionRealizedPL', `Realized P/L חובה ב-${actionLabel}`);
                 }
                 hasErrors = true;
             }
@@ -846,7 +873,7 @@ async function loadExecutionsData(options = {}) {
       page: "executions" 
     });
   } catch (error) {
-    handleApiError(error, 'עסקעות');
+    handleApiError(error, 'ביצועים');
   }
 }
 
@@ -996,14 +1023,14 @@ function updateExecutionsCounters(filteredCountOverride = null) {
       }
     }
 
-    countElement.textContent = `${filteredCount} עסקעות`;
+    countElement.textContent = `${filteredCount} ביצועים`;
   } catch (error) {
     window.Logger?.warn('updateExecutionsCounters failed', { error });
   }
 }
 
 /**
- * עדכון טבלת עסקעות
+ * עדכון טבלת ביצועים
  */
 async function updateExecutionsTableMain(executions, options = {}) {
   if (!options.internal) {
@@ -1034,7 +1061,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו ביצועים</td></tr>';
     return;
   }
 
@@ -1535,9 +1562,9 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
   // Filtered executions
   return filtered;
   } catch (error) {
-    window.Logger.error('שגיאה בפילטור מקומי של עסקעות:', error, { page: "executions" });
+      window.Logger.error('שגיאה בפילטור מקומי של ביצועים:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפילטור מקומי של עסקעות', error.message);
+      window.showErrorNotification('שגיאה בפילטור מקומי של ביצועים', error.message);
     }
     return executions; // החזרת הנתונים המקוריים במקרה של שגיאה
   }
@@ -1592,7 +1619,7 @@ window.goToNote = goToNote;
 // ===== פונקציות סידור =====
 
 /**
- * פונקציה לסידור טבלת עסקעות
+ * פונקציה לסידור טבלת ביצועים
  * @param {number} columnIndex - אינדקס העמודה לסידור
  *
  * דוגמאות שימוש:
@@ -1680,16 +1707,9 @@ window.initializeExecutionsPage = async function() {
   updateTickersList('edit', false);
 
   // Event listeners לעדכון שדה Realized P/L לפי סוג הפעולה
-  const addExecutionType = document.getElementById('addExecutionType');
-  const editExecutionType = document.getElementById('editExecutionType');
-  
-  if (addExecutionType) {
-    addExecutionType.addEventListener('change', () => updateRealizedPLField('add'));
-  }
-  
-  if (editExecutionType) {
-    editExecutionType.addEventListener('change', () => updateRealizedPLField('edit'));
-  }
+  // ModalManagerV2 uses field.id directly from config (executionType, not addExecutionType/editExecutionType)
+  // We need to attach the listener when the modal is shown, not on page load
+  // This will be handled by ModalManagerV2's onModalShown callback
 
   // Load trade suggestions after page initialization
   setTimeout(async () => {
@@ -2145,8 +2165,8 @@ function addNewTrade() {
 }
 
 /**
- * עדכון סיכום נתונים לעסקעות
- * @param {Array} executions - מערך העסקעות
+ * עדכון סיכום נתונים לביצועים
+ * @param {Array} executions - מערך הביצועים
  */
 
 // הגדרת הפונקציות כגלובליות
@@ -2931,9 +2951,12 @@ function updateExecutionsGlobalData(executions) {
 
 // עדכון הפונקציה הקיימת loadExecutionsData
 // Use the actual function, not the placeholder
+// Standard pattern: when called from CRUD operations, always use force: true (like trades.js)
 const originalLoadExecutionsData = loadExecutionsData;
-window.loadExecutionsData = async function() {
-  await originalLoadExecutionsData();
+window.loadExecutionsData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in trades.js and other pages
+  await originalLoadExecutionsData({ ...options, force: true });
 
   // עדכון הנתונים הגלובליים לאחר טעינה
   if (window.executionsData && window.executionsData.length > 0) {

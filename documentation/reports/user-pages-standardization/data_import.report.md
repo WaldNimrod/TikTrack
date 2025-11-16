@@ -1,39 +1,36 @@
 # דוח סטנדרטיזציה - data_import
 
 ## סקירה כללית
-- **סוג עמוד**: עמוד מרכזי
-- **קובץ HTML**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/data_import.html`
-- **קובץ JavaScript**: `/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/data_import.js`
+- **סוג עמוד**: עמוד central
+- **קובץ HTML**: `trading-ui/data_import.html`
+- **קובץ JavaScript**: `trading-ui/scripts/data_import.js`
+- **תאריך סריקה**: 2025-11-17 01:12:28
 
 ## שימוש במערכות כלליות
 
 ### שירות נתונים
-- **שירות נתונים קיים**: ❌ לא
-- **שירות נתונים בשימוש**: ❌ לא
-- **קובץ שירות**: `אין`
+- **שירות נתונים קיים**: ✅ כן
+- **שירות נתונים בשימוש**: ✅ כן
+- **שירות נתונים עם CRUD מלא**: ✅ כן
+- **שירות נתונים עם CacheSyncManager**: ✅ כן
+- **קובץ שירות**: `trading-ui/scripts/services/data-import-data.js`
 
 ### מערכת מטמון
-- **UnifiedCacheManager**: ❌ לא
-- **CacheTTLGuard**: ❌ לא
-- **CacheSyncManager**: ❌ לא
-- **ניקוי מטמון ישיר**: ✅ לא
+- **UnifiedCacheManager**: ✅ כן
+- **CacheTTLGuard**: ✅ כן
+- **CacheSyncManager**: ✅ כן
 
 ### מערכת CRUD
 - **CRUDResponseHandler**: ❌ לא
-- **handleApiResponseWithRefresh**: ❌ לא
-- **קריאות fetch ישירות**: 2
+- **שירות נתונים עם CRUD**: ✅ כן
 
 ### מערכת מודלים
 - **ModalManagerV2**: ❌ לא
-- **קוד מודלים ישן**: ✅ לא
-
-### מערכת רינדור
-- **FieldRendererService**: ✅ כן
-- **רינדור ידני**: ⚠️ כן
+- **קובץ קונפיגורציה**: ❌ לא
 
 ### ניהול מצב עמוד
-- **PageStateManager**: ❌ לא
-- **ניהול מצב מותאם**: ✅ לא
+- **PAGE_CONFIGS**: ❌ לא
+- **טעינה אוטומטית**: ❌ לא
 
 ### מערכת לוגים
 - **Logger Service**: ✅ כן
@@ -41,27 +38,29 @@
 
 ## חובות טכניים מרכזיים
 
-- ⚠️ אין שירות נתונים ייעודי - העמוד משתמש ב-fetch ישיר
-- ⚠️ אין שימוש ב-UnifiedCacheManager
 - ⚠️ אין שימוש ב-CRUDResponseHandler
-- ⚠️ אין שימוש ב-handleApiResponseWithRefresh
 - ⚠️ אין שימוש ב-ModalManagerV2
-- ⚠️ סטיילים inline ב-HTML
+- ⚠️ אין קובץ קונפיגורציה למודל
+- ⚠️ סטיילים inline ב-HTML (32 מופעים)
+- ⚠️ אין טעינה אוטומטית של נתונים
+- ⚠️ אין הגדרה ב-PAGE_CONFIGS
 
 ## משימות מומלצות
 
-1. ליצור שירות נתונים ייעודי data-import-data.js לפי דוגמת trades-data.js
-2. להשתמש ב-UnifiedCacheManager דרך שירות הנתונים
-3. לעטוף פעולות CRUD ב-CRUDResponseHandler.handleApiResponse
-4. להשתמש ב-handleApiResponseWithRefresh לאחר פעולות CRUD
-5. להחליף מודלים ישנים ל-ModalManagerV2
-6. להעביר כל הסטיילים לקובץ CSS חיצוני
+1. 4. שילוב CRUDResponseHandler בכל פעולות CRUD
+2. 5. מעבר ל-ModalManagerV2 (הסרת קוד מודלים ישן)
+3. 6. יצירת קובץ קונפיגורציה `modal-configs/data-import-config.js`
+4. 8. העברת כל הסטיילים לקובץ CSS חיצוני
+5. 9. הוספת טעינה אוטומטית של נתונים ב-PAGE_CONFIGS.customInitializers
+6. 10. הוספת הגדרה ב-PAGE_CONFIGS עם requiredGlobals מלא
 
 ## סטטיסטיקות
 
-- **קריאות fetch ישירות**: 2
 - **שימוש ב-console.log**: 0
-- **דפוסי קוד ישנים**: 0
+- **סטיילים inline**: 32
+- **שירות נתונים**: קיים
+- **CRUD Handler**: לא בשימוש
+- **Modal V2**: לא בשימוש
 
 ---
-*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה*
+*דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - 2025-11-17*

@@ -30,25 +30,34 @@ POSTGRES_URL = os.getenv(
 )
 
 # Target tables (PostgreSQL) → Source tables (SQLite)
+# Group B: Users, Preferences, Trading Methods
 TABLE_MAP: Dict[str, str] = {
     "users": "users",
     "preference_types": "preference_types",
     "preference_groups": "preference_groups",
     "preference_profiles": "preference_profiles",
     "user_preferences": "user_preferences_v3",  # consolidate onto a single canonical table
+    "preferences_legacy": "preferences_legacy",  # preserve as backup/history
     "trading_methods": "trading_methods",
     "method_parameters": "method_parameters",
+    # Group C: Constraints and Connectivity
     "constraints": "constraints",
     "constraint_validations": "constraint_validations",
     "enum_values": "enum_values",
     "note_relation_types": "note_relation_types",
-    "link_types": "link_types",
+    "link_types": "link_types",  # if exists
+    # Group D: Currencies and Financial Aux Data
     "currencies": "currencies",
     "external_data_providers": "external_data_providers",
+    "quotes_last": "quotes_last",  # cache table for last quotes
+    # Group E: System Configuration
     "system_setting_types": "system_setting_types",
     "system_settings": "system_settings",
     "system_setting_groups": "system_setting_groups",
-    "system_setting_profiles": "system_setting_profiles",
+    "system_setting_profiles": "system_setting_profiles",  # if exists
+    # Group F: Tags System
+    "tag_categories": "tag_categories",
+    "tags": "tags",
 }
 
 

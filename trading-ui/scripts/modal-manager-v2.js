@@ -4595,6 +4595,39 @@ class ModalManagerV2 {
                 
                 console.log('✅ Added source field listener for executionExternalId');
             }
+            
+            // Handle execution type field - enable/disable Realized P/L field based on execution type
+            // Realized P/L נדרש רק ל-sell (מכירה) ו-cover (כיסוי) - סגירת פוזיציות
+            // Realized P/L לא נדרש ל-buy (קנייה) ו-short (מכירה בחסר) - פתיחת פוזיציות
+            const executionTypeSelect = modalElement.querySelector('#executionType');
+            const realizedPLField = modalElement.querySelector('#executionRealizedPL');
+            
+            if (executionTypeSelect && realizedPLField) {
+                // Function to update Realized P/L field state
+                const updateRealizedPLField = () => {
+                    const executionType = executionTypeSelect.value;
+                    if (executionType === 'sell' || executionType === 'cover') {
+                        // Enable Realized P/L for sell and cover (closing positions)
+                        realizedPLField.disabled = false;
+                        realizedPLField.required = true;
+                        console.log(`🔓 Enabled executionRealizedPL (type: ${executionType})`);
+                    } else {
+                        // Disable Realized P/L for buy, short, and any unknown types (opening positions)
+                        realizedPLField.disabled = true;
+                        realizedPLField.required = false;
+                        realizedPLField.value = '';
+                        console.log(`🔒 Disabled executionRealizedPL (type: ${executionType})`);
+                    }
+                };
+                
+                // Set initial state
+                updateRealizedPLField();
+                
+                // Add change listener
+                executionTypeSelect.addEventListener('change', updateRealizedPLField);
+                
+                console.log('✅ Added execution type listener for executionRealizedPL');
+            }
         }
         
         // For Trade Plans modal - handle ticker selection

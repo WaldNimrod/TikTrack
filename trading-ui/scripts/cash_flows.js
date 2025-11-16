@@ -211,7 +211,7 @@ function applyFallbackDateSort(data) {
       window.saveSortState('cash_flows', 3, 'desc');
     }
   } catch (error) {
-    console.error('❌ applyFallbackDateSort: failed to sort data', error);
+    window.Logger.error('applyFallbackDateSort: failed to sort data', { page: 'cash_flows', error: error?.message || error });
   }
 }
 
@@ -710,7 +710,7 @@ async function deleteCashFlow(id) {
     }
     
   } catch (error) {
-    console.error('❌ deleteCashFlow: Error occurred:', error);
+    window.Logger.error('deleteCashFlow: Error occurred', { page: 'cash_flows', error: error?.message || error });
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
   }
 }
@@ -741,7 +741,7 @@ async function performCashFlowDeletion(id) {
       requiresHardReload: false
     });
   } catch (error) {
-    console.error('❌ performCashFlowDeletion: Error occurred:', error);
+    window.Logger.error('performCashFlowDeletion: Error occurred', { page: 'cash_flows', error: error?.message || error });
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
   }
 }
@@ -2074,7 +2074,6 @@ async function updateCashFlow(id) {
  * @returns {Promise<void>}
  */
 async function saveCashFlow() {
-    console.log('🔵 saveCashFlow CALLED');
     window.Logger.debug('saveCashFlow called', { page: 'cash_flows' });
     
     try {
@@ -2091,7 +2090,7 @@ async function saveCashFlow() {
 
         // Count records BEFORE save
         const initialTableCount = cashFlowsData ? cashFlowsData.length : 0;
-        console.log('📊 INITIAL STATE: Table has', initialTableCount, 'records');
+        window.Logger.debug('Initial state: Table has records', { page: 'cash_flows', count: initialTableCount });
         
         // CRUDResponseHandler will handle cache clearing automatically
         // No need to call clearCacheBeforeCRUD here
@@ -2101,7 +2100,7 @@ async function saveCashFlow() {
         if (!form) {
             throw new Error('Cash flow form not found');
         }
-        console.log('🔵 saveCashFlow - Form found');
+        window.Logger.debug('saveCashFlow - Form found', { page: 'cash_flows' });
         
         const cashFlowData = DataCollectionService.collectFormData({
             amount: { id: 'cashFlowAmount', type: 'float' },
@@ -2172,11 +2171,11 @@ async function saveCashFlow() {
         }
         
         if (hasErrors) {
-            console.log('❌ saveCashFlow - Validation errors, returning');
+            window.Logger.warn('saveCashFlow - Validation errors, returning', { page: 'cash_flows' });
             return;
         }
         
-        console.log('✅ saveCashFlow - Validation passed');
+        window.Logger.debug('saveCashFlow - Validation passed', { page: 'cash_flows' });
         
         // Determine if this is add or edit
         const isEdit = form.dataset.mode === 'edit';
@@ -2214,7 +2213,7 @@ async function saveCashFlow() {
         // No need to pre-check or call response.json() here
         let crudResult = null;
         if (isEdit) {
-            console.log('🔵 saveCashFlow - Calling handleUpdateResponse...');
+            window.Logger.debug('saveCashFlow - Calling handleUpdateResponse', { page: 'cash_flows', cashFlowId });
             crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן עודכן בהצלחה',
@@ -2223,7 +2222,7 @@ async function saveCashFlow() {
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
         } else {
-            console.log('🔵 saveCashFlow - Calling handleSaveResponse...');
+            window.Logger.debug('saveCashFlow - Calling handleSaveResponse', { page: 'cash_flows' });
             crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
                 modalId: 'cashFlowModal',
                 successMessage: 'תזרים מזומן נוסף בהצלחה',
@@ -2252,11 +2251,10 @@ async function saveCashFlow() {
             }
         }
         
-        console.log('🔵 saveCashFlow - CRUDResponseHandler completed');
+        window.Logger.debug('saveCashFlow - CRUDResponseHandler completed', { page: 'cash_flows' });
         
     } catch (error) {
-        console.error('❌ saveCashFlow - Error caught:', error);
-        console.error('❌ saveCashFlow - Error message:', error.message);
+        window.Logger.error('saveCashFlow - Error caught', { page: 'cash_flows', error: error?.message || error });
         CRUDResponseHandler.handleError(error, 'שמירת תזרים מזומן');
     }
 }
@@ -2270,7 +2268,6 @@ async function saveCashFlow() {
  * @returns {Promise<void>}
  */
 async function saveCurrencyExchange() {
-    console.log('🔵 saveCurrencyExchange CALLED');
     window.Logger.debug('saveCurrencyExchange called', { page: 'cash_flows' });
     
     try {
@@ -2522,7 +2519,7 @@ async function saveCurrencyExchange() {
  */
 async function loadCurrencyExchange(exchangeId) {
     try {
-        console.log('🔵 loadCurrencyExchange - Loading exchange:', exchangeId);
+        window.Logger.debug('loadCurrencyExchange - Loading exchange', { page: 'cash_flows', exchangeId });
         
         let payload;
         if (typeof window.CashFlowsData?.fetchCurrencyExchange === 'function') {
@@ -2610,10 +2607,10 @@ async function loadCurrencyExchange(exchangeId) {
             setCurrencyExchangeSummary(exchangeData.exchange_pair_summary || null);
         }
 
-        console.log('✅ loadCurrencyExchange - Exchange loaded successfully');
+        window.Logger.debug('loadCurrencyExchange - Exchange loaded successfully', { page: 'cash_flows', exchangeId });
         
     } catch (error) {
-        console.error('❌ loadCurrencyExchange - Error:', error);
+        window.Logger.error('loadCurrencyExchange - Error', { page: 'cash_flows', exchangeId, error: error?.message || error });
         if (window.showNotification) {
             window.showNotification('שגיאה', 'שגיאה בטעינת פרטי המרת מטבע', 'error');
         }
@@ -2633,7 +2630,7 @@ async function deleteCurrencyExchange(exchangeId) {
             return;
         }
         
-        console.log('🔵 deleteCurrencyExchange - Deleting exchange:', exchangeId);
+        window.Logger.debug('deleteCurrencyExchange - Deleting exchange', { page: 'cash_flows', exchangeId });
         
         let response;
         if (typeof window.CashFlowsData?.deleteCurrencyExchange === 'function') {
@@ -2652,7 +2649,7 @@ async function deleteCurrencyExchange(exchangeId) {
         });
         
     } catch (error) {
-        console.error('❌ deleteCurrencyExchange - Error:', error);
+        window.Logger.error('deleteCurrencyExchange - Error', { page: 'cash_flows', exchangeId, error: error?.message || error });
         if (window.showNotification) {
             window.showNotification('שגיאה', `שגיאה במחיקת המרת מטבע: ${error.message}`, 'error');
         }

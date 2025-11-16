@@ -158,7 +158,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/trading_accounts">חשבונות מסחר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/executions">ביצועים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li class="separator"></li>

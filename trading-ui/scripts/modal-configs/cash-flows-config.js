@@ -53,6 +53,7 @@ const cashFlowModalConfig = {
             width: 300,
             style: 'width: 300px; min-width: 200px;',
             defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            populateFromService: 'accounts', // שימוש ב-SelectPopulatorService לחשבונות
             rowClass: 'row',
             colClass: 'col-md-6'
         },
@@ -85,6 +86,7 @@ const cashFlowModalConfig = {
             width: 300,
             style: 'width: 300px; min-width: 200px;',
             defaultFromPreferences: true, // ברירת מחדל מטבע ראשי מהעדפות
+            populateFromService: 'currencies', // שימוש ב-SelectPopulatorService למטבעות
             rowClass: 'row',
             colClass: 'col-md-6'
         },

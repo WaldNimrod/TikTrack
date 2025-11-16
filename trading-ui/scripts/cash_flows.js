@@ -95,6 +95,10 @@ async function loadCashFlowsData(options = {}) {
   };
 
   const fallbackLoader = async () => {
+    // This is a fallback - should use CashFlowsData service instead
+    if (typeof window.CashFlowsData?.fetchFresh === 'function') {
+      return await window.CashFlowsData.fetchFresh(loadOptions);
+    }
     const response = await fetch(`/api/cash-flows/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
@@ -1038,25 +1042,91 @@ async function renderCashFlowsTable() {
     window.translateCashFlowSource(cashFlow.source) :
     cashFlow.source}</td>
             ${(() => {
-              if (typeof window.renderUpdatedCell === 'function') {
-                return window.renderUpdatedCell(cashFlow, {
-                  fields: ['updated_at', 'date', 'created_at'],
-                  columnClass: 'col-updated'
-                });
-              }
-              const fallbackDate = window.toDateObject
-                ? window.toDateObject(cashFlow.updated_at || cashFlow.date || cashFlow.created_at)
-                : (cashFlow.updated_at || cashFlow.date || cashFlow.created_at
-                    ? new Date(cashFlow.updated_at || cashFlow.date || cashFlow.created_at)
-                    : null);
-              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+              // Prefer FieldRendererService.renderDate for consistent date formatting (same as notes page)
+              const rawDate = cashFlow.updated_at || cashFlow.date || cashFlow.created_at || null;
+              
+              if (!rawDate) {
                 return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
               }
-              const absolute = fallbackDate.toLocaleString('he-IL');
-              const duration = typeof window.getDurationSince === 'function'
-                ? window.getDurationSince(fallbackDate, { fallback: absolute })
-                : absolute;
-              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+              // Use FieldRendererService.renderDate for proper date formatting (handles DateEnvelope, Date objects, strings)
+              let dateDisplay = '';
+              let epoch = null;
+
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                // Use FieldRendererService to render date with time (same as notes page)
+                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                
+                // Get epoch for sorting
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                } else if (rawDate instanceof Date) {
+                  epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                  const parsed = Date.parse(rawDate);
+                  epoch = Number.isNaN(parsed) ? null : parsed;
+                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                  epoch = rawDate.epochMs;
+                }
+              } else {
+                // Fallback: work directly with date envelope objects or raw values (same as notes page)
+                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                  ? window.dateUtils.ensureDateEnvelope(rawDate)
+                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                    ? rawDate
+                    : null;
+
+                // Derive epoch milliseconds
+                epoch = (() => {
+                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                  }
+                  if (envelope && typeof envelope.epochMs === 'number') {
+                    return envelope.epochMs;
+                  }
+                  if (rawDate instanceof Date) {
+                    return rawDate.getTime();
+                  }
+                  if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    return Number.isNaN(parsed) ? null : parsed;
+                  }
+                  return null;
+                })();
+
+                if (epoch === null || Number.isNaN(epoch)) {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+
+                // Build date display using unified date utilities
+                dateDisplay = (() => {
+                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                    return window.dateUtils.formatDateTime(envelope || rawDate);
+                  }
+                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                  }
+                  try {
+                    return new Date(epoch).toLocaleString('he-IL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    });
+                  } catch (err) {
+                    window.Logger?.warn('⚠️ cash_flows updated-cell date formatting failed', { err, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
+                    return 'לא מוגדר';
+                  }
+                })();
+              }
+
+              if (!dateDisplay || dateDisplay === '-') {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+
+              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
             })()}
             <td class="col-actions actions-cell actions-4-items">
               ${actionsMenu}
@@ -1176,7 +1246,12 @@ function groupUnifiedExchanges(rows) {
   const data = Array.isArray(rows) ? rows : [];
   const groups = new Map();
   const isExchangeExternal = (cf) => {
-    const id = cf?.exchange_group_id || cf?.external_id || '';
+    // קיים group id מה-API? זה זיהוי תקף, גם אם לא מתחיל ב-exchange_
+    if (cf?.exchange_group_id && typeof cf.exchange_group_id === 'string') {
+      return true;
+    }
+    // אחרת, קבל מזהה מה-external_id בפורמט exchange_
+    const id = cf?.external_id || '';
     return typeof id === 'string' && id.startsWith('exchange_');
   };
   data.forEach(cf => {
@@ -1226,7 +1301,15 @@ function renderUnifiedForexExchangesTable(sourceRows) {
     return `${(symbol || '$')}${n.toFixed(2)}`;
   };
   const getCurrencySymbol = (cf) => {
-    return (cf && (cf.currency_symbol || cf.currency || (cf.currency_id ? resolveCurrencyById?.(cf.currency_id)?.symbol : ''))) || '';
+    if (!cf) return '';
+    // Prefer symbol on record, else map from currency_id via global helper, else raw currency code
+    if (cf.currency_symbol) return cf.currency_symbol;
+    if (cf.currency) return cf.currency;
+    if (cf.currency_id && typeof resolveCurrencyById === 'function') {
+      const c = resolveCurrencyById(cf.currency_id);
+      return c?.symbol || '';
+    }
+    return '';
   };
   const getAccountName = (id) => {
     return (typeof getAccountNameById === 'function' ? getAccountNameById(id) : null) || (id ? `חשבון מסחר ${id}` : '-');

@@ -17,8 +17,9 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
 from config.database import SessionLocal
-from config.settings import LEGACY_DB_PATH
+from config.settings import DB_PATH
 from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference
+from models.user import User
 from services.constraint_service import ConstraintService
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class PreferencesService:
         self.cache_timestamps: Dict[str, float] = {}
         self.constraint_service = ConstraintService()
         # Legacy compatibility for scripts/tests still touching the sqlite path directly
-        self.db_path = str(LEGACY_DB_PATH)
+        self.db_path = str(DB_PATH)
 
     # ------------------------------------------------------------------ #
     # Session helpers
@@ -135,13 +136,19 @@ class PreferencesService:
             if not profile or profile.user_id != user_id:
                 raise ProfileNotFoundError(f"Profile {resolved_profile_id} not found for user {user_id}")
 
-            # Build minimal user object (we don't have full user table here)
+            # Build user object from users table when available
+            db_user = session.get(User, user_id)
             user_obj = {
                 "id": user_id,
-                # username/display_name may be completed on the client if needed
-                "username": None,
-                "display_name": None,
+                "username": getattr(db_user, "username", None) if db_user else None,
+                "display_name": getattr(db_user, "display_name", None) if db_user else None,
+                "full_name": getattr(db_user, "full_name", None) if db_user else None,
             }
+            # Ensure user object always has at least id and username fallback
+            if not user_obj.get("username") and user_id:
+                user_obj["username"] = f"user_{user_id}"
+            if not user_obj.get("display_name") and user_obj.get("username"):
+                user_obj["display_name"] = user_obj["username"]
 
             # Build resolved profile object with stable naming and fallbacks
             resolved_profile = {
@@ -477,9 +484,15 @@ class PreferencesService:
         self, user_id: int, profile_name: str, is_default: bool = False, description: Optional[str] = None
     ) -> Dict[str, Any]:
         with self._session_scope(commit=True) as session:
+            # Validation: user_id must be provided, profile_name must be non-empty
+            if user_id is None:
+                raise ValidationError("user_id is required")
+            normalized_name = (profile_name or "").strip()
+            if not normalized_name:
+                raise ValidationError("profile_name is required")
             profile = PreferenceProfile(
                 user_id=user_id,
-                profile_name=profile_name,
+                profile_name=normalized_name,
                 is_active=not is_default,
                 is_default=is_default,
                 description=description,
@@ -525,7 +538,13 @@ class PreferencesService:
 
     def get_all_preference_types(self) -> List[Dict[str, Any]]:
         with self._session_scope() as session:
-            types = session.scalars(select(PreferenceType).order_by(PreferenceType.preference_name)).all()
+            stmt = (
+                select(PreferenceType, PreferenceGroup)
+                .join(PreferenceGroup, PreferenceType.group_id == PreferenceGroup.id)
+                .where(PreferenceType.is_active == True)
+                .order_by(PreferenceGroup.group_name, PreferenceType.preference_name)
+            )
+            results = session.execute(stmt).all()
             return [
                 {
                     "id": pref.id,
@@ -533,8 +552,11 @@ class PreferencesService:
                     "data_type": pref.data_type,
                     "default_value": pref.default_value,
                     "description": pref.description,
+                    "group_id": group.id,
+                    "group_name": group.group_name,
+                    "is_active": pref.is_active,
                 }
-                for pref in types
+                for pref, group in results
             ]
 
     def get_preference_groups(self) -> List[Dict[str, Any]]:

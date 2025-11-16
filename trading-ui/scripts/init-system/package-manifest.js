@@ -285,6 +285,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
+        file: 'services/preferences-data.js',
+        globalCheck: 'window.PreferencesData',
+        description: 'שירות נתוני העדפות (API + Cache)',
+        required: true,
+        loadOrder: 5.1
+      },
+      {
         file: 'services/crud-response-handler.js',
         globalCheck: 'window.CrudResponseHandler',
         description: 'מטפל בתגובות CRUD',
@@ -657,6 +664,13 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base'],
     scripts: [
       {
+        file: 'services/preferences-v4.js',
+        globalCheck: 'window.PreferencesV4',
+        description: 'Preferences V4 SDK (group-first)',
+        required: true,
+        loadOrder: 0.9
+      },
+      {
         file: 'preferences-core-new.js',
         globalCheck: 'window.PreferencesCore',
         description: 'ליבת העדפות (ללא צבעים)',
@@ -699,11 +713,25 @@ const PACKAGE_MANIFEST = {
         loadOrder: 6
       },
       {
+        file: 'preferences-ui-v4.js',
+        globalCheck: 'window.PreferencesUIV4',
+        description: 'ממשק משתמש V4 (Group-First)',
+        required: true,
+        loadOrder: 6.1
+      },
+      {
         file: 'preferences-page.js',
         globalCheck: 'window.loadAccountsForPreferences',
         description: 'פונקציות ספציפיות לעמוד העדפות',
         required: false,
         loadOrder: 7
+      },
+      {
+        file: 'preferences-debug-monitor.js',
+        globalCheck: 'window.PreferencesDebugMonitor',
+        description: 'קוד ניטור ובדיקה לבעיות העדפות',
+        required: false,
+        loadOrder: 7.1
       },
       {
         file: 'preferences-group-manager.js',
@@ -982,6 +1010,13 @@ const PACKAGE_MANIFEST = {
     loadOrder: 10,
     dependencies: ['base', 'services'],
     scripts: [
+      {
+        file: 'services/trades-data.js',
+        globalCheck: 'window.TradesData',
+        description: 'שירות נתוני טריידים (CRUD + Cache)',
+        required: true,
+        loadOrder: 0
+      },
       {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',

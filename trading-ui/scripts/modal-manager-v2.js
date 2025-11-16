@@ -1943,7 +1943,15 @@ class ModalManagerV2 {
             }
             
             const result = await response.json();
-            return result.data || result;
+            const entityData = result.data || result;
+            
+            // Adapt DateEnvelope objects if date-utils is available
+            // This ensures date fields are properly converted for form inputs
+            if (window.adaptDateEnvelopes && typeof window.adaptDateEnvelopes === 'function') {
+                return window.adaptDateEnvelopes(entityData);
+            }
+            
+            return entityData;
             
         } catch (error) {
             console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
@@ -2001,7 +2009,7 @@ class ModalManagerV2 {
      */
     getPluralEndpoint(entityType) {
         const pluralMap = {
-            'cash_flow': 'cash_flows',
+            'cash_flow': 'cash-flows',  // Fixed: matches url_prefix='/api/cash-flows' in backend
             'trade': 'trades',
             'trading_account': 'trading-accounts',
             'alert': 'alerts',
@@ -2475,27 +2483,80 @@ class ModalManagerV2 {
                     }
                 } else if (field.type === 'date' && value) {
                     // Date type - value should be in YYYY-MM-DD format
-                    const dateStr = typeof value === 'string' ? value : value.toString();
-                    // Extract date part if datetime format (YYYY-MM-DDTHH:MM:SS)
-                    field.value = dateStr.split('T')[0];
-                    console.log(`📅 Set date field ${field.id} to: ${field.value}`);
+                    // Use centralized date utils to handle DateEnvelope, Date objects, datetime objects, and strings
+                    // Same approach as notes page - handle all date formats properly
+                    let dateObj = null;
+                    
+                    // Handle Date objects directly (server may return Date objects)
+                    if (value instanceof Date) {
+                        dateObj = new Date(value.getTime());
+                    }
+                    // Use centralized date utils for DateEnvelope, strings, and other formats
+                    else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        dateObj = window.dateUtils.toDateObject(value);
+                    }
+                    // Fallback if date-utils not loaded
+                    else if (typeof value === 'string') {
+                        dateObj = new Date(value);
+                    }
+                    else {
+                        // Try to convert to string and parse
+                        try {
+                            dateObj = new Date(value.toString());
+                        } catch (e) {
+                            console.warn(`⚠️ Failed to parse date value for ${field.id}:`, value, e);
+                        }
+                    }
+                    
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        // Format as YYYY-MM-DD for date input
+                        const year = dateObj.getFullYear();
+                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        field.value = `${year}-${month}-${day}`;
+                        console.log(`✅ Set date field ${field.id} to: ${field.value}`);
+                    } else {
+                        console.warn(`⚠️ Invalid date value for ${field.id}:`, value, { dateObj, isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj' });
+                    }
                 } else if (field.type === 'datetime-local' && value) {
                     // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
-                    const dateStr = typeof value === 'string' ? value : value.toString();
-                    // Handle both formats: 'YYYY-MM-DD HH:MM:SS' and 'YYYY-MM-DDTHH:MM:SS'
-                    let formattedDate = dateStr;
-                    if (dateStr.includes(' ')) {
-                        // Convert 'YYYY-MM-DD HH:MM:SS' to 'YYYY-MM-DDTHH:MM'
-                        formattedDate = dateStr.replace(' ', 'T').substring(0, 16);
-                    } else if (!dateStr.includes('T')) {
-                        // If no time part, add default time
-                        formattedDate = `${dateStr}T00:00`;
-                    } else {
-                        // If has T, ensure it's in correct format (YYYY-MM-DDTHH:MM)
-                        formattedDate = dateStr.substring(0, 16);
+                    // Use centralized date utils to handle DateEnvelope, Date objects, datetime objects, and strings
+                    // Same approach as notes page - handle all date formats properly
+                    let dateObj = null;
+                    
+                    // Handle Date objects directly (server may return Date objects)
+                    if (value instanceof Date) {
+                        dateObj = new Date(value.getTime());
                     }
-                    field.value = formattedDate;
-                    console.log(`📅 Set datetime-local field ${field.id} to: ${field.value} (from: ${value})`);
+                    // Use centralized date utils for DateEnvelope, strings, and other formats
+                    else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        dateObj = window.dateUtils.toDateObject(value);
+                    }
+                    // Fallback if date-utils not loaded
+                    else if (typeof value === 'string') {
+                        dateObj = new Date(value);
+                    }
+                    else {
+                        // Try to convert to string and parse
+                        try {
+                            dateObj = new Date(value.toString());
+                        } catch (e) {
+                            console.warn(`⚠️ Failed to parse datetime value for ${field.id}:`, value, e);
+                        }
+                    }
+                    
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        // Format as YYYY-MM-DDTHH:MM for datetime-local input
+                        const year = dateObj.getFullYear();
+                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        const hours = String(dateObj.getHours()).padStart(2, '0');
+                        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                        field.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                        console.log(`✅ Set datetime-local field ${field.id} to: ${field.value}`);
+                    } else {
+                        console.warn(`⚠️ Invalid datetime value for ${field.id}:`, value, { dateObj, isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj' });
+                    }
                 } else if (field.type === 'file') {
                     // File inputs cannot have their value set programmatically for security reasons
                     // Only empty string is allowed. Instead, we can show the current filename in a label or text field
@@ -2556,80 +2617,79 @@ class ModalManagerV2 {
         // עדכון linkButton fields (trade/plan selectors)
         await this.updateLinkButtonFields(form, data);
         
-        // Special handling for trade entity: populate quantity and amount from position or trade_plan
+        // Special handling for trade entity: populate planning fields ONLY from Trade entity itself
+        // NO FALLBACKS - if data is missing, show clear notification to user
         if (config?.entityType === 'trade') {
-            console.log('🔍 [Trade Edit] Checking for quantity and amount fields...');
-            console.log('🔍 [Trade Edit] Available data keys:', Object.keys(data));
-            console.log('🔍 [Trade Edit] position_quantity:', data.position_quantity);
-            console.log('🔍 [Trade Edit] position_amount:', data.position_amount);
-            console.log('🔍 [Trade Edit] trade_plan:', data.trade_plan);
-            console.log('🔍 [Trade Edit] trade_plan_planned_amount:', data.trade_plan_planned_amount);
-            console.log('🔍 [Trade Edit] entry_price:', data.entry_price);
+            window.Logger?.info('🔍 [Trade Edit] Populating planning fields from Trade entity only', {
+                planned_quantity: data.planned_quantity,
+                planned_amount: data.planned_amount,
+                entry_price: data.entry_price
+            }, { page: 'modal-manager-v2' });
             
-            // Check if entry_price was already populated in the form
+            // Get Trade's own planning fields ONLY (no fallbacks)
+            // בדיקה מפורשת ל-null/undefined - לא להשתמש ב-|| כי 0 הוא ערך תקין
+            const tradePlannedQuantity = (data.planned_quantity !== null && data.planned_quantity !== undefined)
+                ? data.planned_quantity
+                : ((data.quantity !== null && data.quantity !== undefined) ? data.quantity : null);
+            const tradePlannedAmount = (data.planned_amount !== null && data.planned_amount !== undefined)
+                ? data.planned_amount
+                : null;
+            const tradeEntryPrice = (data.entry_price !== null && data.entry_price !== undefined)
+                ? data.entry_price
+                : null;
+            
+            // Track missing fields for notification
+            const missingFields = [];
+            
+            // Populate entry_price field - ONLY from Trade.entry_price
             const entryPriceField = form.querySelector('#tradeEntryPrice');
-            const entryPrice = data.entry_price || (entryPriceField ? parseFloat(entryPriceField.value) || 0 : 0);
-            console.log('🔍 [Trade Edit] entryPrice (from data or field):', entryPrice);
-            
-            // Try to populate quantity from position_quantity or trade_plan
-            const quantityField = form.querySelector('#tradeQuantity');
-            if (quantityField) {
-                console.log(`🔍 [Trade Edit] quantityField found, current value: "${quantityField.value}"`);
-                if (!quantityField.value || quantityField.value === '') {
-                    // Try position_quantity first (actual position)
-                    if (data.position_quantity && data.position_quantity !== 0) {
-                        quantityField.value = data.position_quantity;
-                        console.log(`✅ Set tradeQuantity from position_quantity: ${data.position_quantity}`);
+            if (entryPriceField) {
+                if (!entryPriceField.value || entryPriceField.value === '') {
+                    if (tradeEntryPrice && tradeEntryPrice !== 0) {
+                        entryPriceField.value = tradeEntryPrice;
+                        window.Logger?.info(`✅ Set tradeEntryPrice from Trade.entry_price: ${tradeEntryPrice}`, {}, { page: 'modal-manager-v2' });
+                    } else {
+                        missingFields.push('מחיר כניסה');
                     }
-                    // If still empty, try to calculate from trade_plan if available
-                    else {
-                        // Check both nested and flat formats
-                        const plannedAmount = (data.trade_plan && data.trade_plan.planned_amount) || data.trade_plan_planned_amount;
-                        // Get entry_price from data or from already-populated field
-                        const entryPriceValue = entryPrice || 0;
-                        
-                        if (plannedAmount && entryPriceValue && entryPriceValue !== 0) {
-                            const calculatedQuantity = plannedAmount / entryPriceValue;
-                            if (calculatedQuantity > 0) {
-                                quantityField.value = calculatedQuantity.toFixed(2);
-                                console.log(`✅ Set tradeQuantity from trade_plan calculation: ${calculatedQuantity.toFixed(2)} (planned_amount: ${plannedAmount}, entry_price: ${entryPriceValue})`);
-                            }
-                        } else {
-                            console.log(`⚠️ Cannot calculate quantity - plannedAmount: ${plannedAmount}, entryPrice: ${entryPriceValue}`);
-                        }
-                    }
-                } else {
-                    console.log(`⏭️ quantityField already has value: "${quantityField.value}", skipping`);
                 }
-            } else {
-                console.error('❌ quantityField (#tradeQuantity) not found!');
             }
             
-            // Try to populate amount from position_amount or trade_plan.planned_amount
+            // Populate quantity field - ONLY from Trade.planned_quantity
+            const quantityField = form.querySelector('#tradeQuantity');
+            if (quantityField) {
+                if (!quantityField.value || quantityField.value === '') {
+                    if (tradePlannedQuantity && tradePlannedQuantity !== 0) {
+                        quantityField.value = tradePlannedQuantity;
+                        window.Logger?.info(`✅ Set tradeQuantity from Trade.planned_quantity: ${tradePlannedQuantity}`, {}, { page: 'modal-manager-v2' });
+                    } else {
+                        missingFields.push('כמות');
+                    }
+                }
+            }
+            
+            // Populate amount field - ONLY from Trade.planned_amount
             const amountField = form.querySelector('#tradeTotalInvestment');
             if (amountField) {
-                console.log(`🔍 [Trade Edit] amountField found, current value: "${amountField.value}"`);
                 if (!amountField.value || amountField.value === '') {
-                    // Try position_amount first (actual position cost)
-                    if (data.position_amount && data.position_amount !== 0) {
-                        amountField.value = data.position_amount;
-                        console.log(`✅ Set tradeTotalInvestment from position_amount: ${data.position_amount}`);
+                    if (tradePlannedAmount && tradePlannedAmount !== 0) {
+                        amountField.value = tradePlannedAmount;
+                        window.Logger?.info(`✅ Set tradeTotalInvestment from Trade.planned_amount: ${tradePlannedAmount}`, {}, { page: 'modal-manager-v2' });
+                    } else {
+                        missingFields.push('סכום השקעה');
                     }
-                    // If still empty, try trade_plan.planned_amount (both nested and flat formats)
-                    else {
-                        const plannedAmount = (data.trade_plan && data.trade_plan.planned_amount) || data.trade_plan_planned_amount;
-                        if (plannedAmount && plannedAmount !== 0) {
-                            amountField.value = plannedAmount;
-                            console.log(`✅ Set tradeTotalInvestment from trade_plan.planned_amount: ${plannedAmount}`);
-                        } else {
-                            console.log(`⚠️ Cannot set amount - plannedAmount: ${plannedAmount}`);
-                        }
-                    }
-                } else {
-                    console.log(`⏭️ amountField already has value: "${amountField.value}", skipping`);
                 }
-            } else {
-                console.error('❌ amountField (#tradeTotalInvestment) not found!');
+            }
+            
+            // Show notification if any planning fields are missing
+            if (missingFields.length > 0 && window.showInfoNotification) {
+                const fieldsList = missingFields.join(', ');
+                window.showInfoNotification(
+                    'נתוני תכנון חסרים',
+                    `הטרייד לא כולל את השדות הבאים: ${fieldsList}. אנא מלא אותם ידנית.`,
+                    8000,
+                    'system'
+                );
+                window.Logger?.warn('⚠️ Trade missing planning fields', { missingFields, tradeId: data.id }, { page: 'modal-manager-v2' });
             }
         }
         

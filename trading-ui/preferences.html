@@ -32,6 +32,8 @@
     <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
     <!-- [7] Load Order: 7 -->
     <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [7a] External: Bootstrap JS Bundle (Tooltips & Modals) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap Bundle -->
     <!-- [8] Load Order: 8 -->
     <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
     <!-- [9] Load Order: 9 -->
@@ -197,11 +199,15 @@
 
     <!-- [58] Page-specific: preferences -->
     <script src="scripts/preferences.js?v=1.0.0"></script> <!-- Page-specific script for preferences -->
+    <!-- [59] Page-specific: preferences-page -->
+    <script src="scripts/preferences-page.js?v=1.0.0"></script> <!-- פונקציות ספציפיות לעמוד העדפות -->
+    <!-- [60] Page-specific: preferences-debug-monitor -->
+    <script src="scripts/preferences-debug-monitor.js?v=1.0.0"></script> <!-- קוד ניטור ובדיקה לבעיות העדפות -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 58 | Unique Scripts Loaded: 58 -->
+    <!-- 📊 Total Scripts Processed: 60 | Unique Scripts Loaded: 60 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("preferences") -->
 
 </body>

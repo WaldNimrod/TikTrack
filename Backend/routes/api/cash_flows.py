@@ -42,8 +42,9 @@ class CashFlowService:
     def get_all(self, db: Session, filters=None):
         cash_flows = db.query(CashFlow).options(
             joinedload(CashFlow.account),
-            joinedload(CashFlow.currency),
-            joinedload(CashFlow.trade)
+            joinedload(CashFlow.currency)
+            # Removed joinedload(CashFlow.trade) - causes errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).all()
         
         # Enhance data with account and currency names
@@ -62,8 +63,9 @@ class CashFlowService:
     def get_by_id(self, db: Session, cash_flow_id: int):
         return db.query(CashFlow).options(
             joinedload(CashFlow.account),
-            joinedload(CashFlow.currency),
-            joinedload(CashFlow.trade)
+            joinedload(CashFlow.currency)
+            # Removed joinedload(CashFlow.trade) - causes errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).filter(CashFlow.id == cash_flow_id).first()
 
 # Initialize base API
@@ -803,50 +805,25 @@ def create_currency_exchange():
                 "version": "1.0"
             }), 404
         
-        # Create exchange UUID
-        exchange_uuid = uuid.uuid4().hex[:12]
-        exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
-        
-        # Create cash flows within transaction
+        # Create via service (SSOT)
         try:
-            # From flow (negative - outgoing)
-            from_flow = CashFlow(
+            svc_result = CashFlowHelperService.create_exchange(
+                db,
                 trading_account_id=trading_account_id,
-                type=EXCHANGE_FROM_TYPE,
-                amount=-from_amount,
+                from_currency_id=from_currency_id,
+                to_currency_id=to_currency_id,
+                date=date_obj,
+                from_amount=from_amount,
+                exchange_rate=exchange_rate,
                 fee_amount=fee_amount,
-                currency_id=from_currency_id,
-                usd_rate=float(from_currency.usd_rate),
-                date=date_obj,
                 description=description,
-                source=source_value,
-                external_id=exchange_id
+                source=source_value
             )
-            db.add(from_flow)
-            
-            # To flow (positive - incoming)
-            to_flow = CashFlow(
-                trading_account_id=trading_account_id,
-                type=EXCHANGE_TO_TYPE,
-                amount=to_amount,
-                fee_amount=0.0,
-                currency_id=to_currency_id,
-                usd_rate=float(to_currency.usd_rate),
-                date=date_obj,
-                description=description,
-                source=source_value,
-                external_id=exchange_id
-            )
-            db.add(to_flow)
-            
-            # Commit transaction
-            db.commit()
-            
-            # Refresh to get IDs
-            db.refresh(from_flow)
-            db.refresh(to_flow)
-            
-            # Return response
+            from_flow = svc_result["from_flow"]
+            to_flow = svc_result["to_flow"]
+            exchange_id = svc_result["exchange_id"]
+            exchange_uuid = CashFlowHelperService.get_exchange_uuid_from_external_id(exchange_id)
+
             result = {
                 "exchange_id": exchange_uuid,
                 "exchange_external_id": exchange_id,
@@ -858,20 +835,22 @@ def create_currency_exchange():
             pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
             if pair_summary:
                 result["exchange_pair_summary"] = pair_summary
-            
+
             logger.info(f"✅ Currency exchange created successfully: {exchange_id}")
-            
+
             return jsonify({
                 "status": "success",
                 "data": result,
                 "message": "Currency exchange created successfully",
                 "version": "1.0"
             }), 201
-            
         except Exception as e:
-            db.rollback()
             logger.error(f"Error creating currency exchange: {str(e)}")
-            raise
+            return jsonify({
+                "status": "error",
+                "error": {"message": str(e)},
+                "version": "1.0"
+            }), 400
             
     except Exception as e:
         logger.error(f"Error in create_currency_exchange: {str(e)}")

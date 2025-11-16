@@ -52,6 +52,17 @@ def bootstrap_preferences() -> Any:
     - core preference groups (colors, ui, trading)
     - version_hash used as ETag
     Supports If-None-Match for conditional GET (304 when unchanged).
+    
+    Returns:
+        JSON response with:
+        - success: Boolean
+        - data: Object containing profile_context, groups, version_hash
+        - error: Error message if failed
+        
+    Status Codes:
+        - 200: Success
+        - 304: Not Modified (If-None-Match header matches)
+        - 401: Unauthorized
     """
     try:
         # Authenticated user

@@ -5,6 +5,30 @@
  * Documentation: See documentation/frontend/PREFERENCES_DEBUG_MONITOR.md
  */
 
+// ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Debug Monitor
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - PreferencesDebugMonitor - Debug monitoring and diagnostics
+ * 
+ * Global Functions:
+ * - startPreferencesDebugMonitoring() - Start automatic monitoring
+ * - stopPreferencesDebugMonitoring() - Stop monitoring
+ * - runPreferencesDebugCheck() - Run one-time check
+ * - generatePreferencesDebugReport() - Generate detailed report
+ * 
+ * Global Instances:
+ * - window.PreferencesDebugMonitor - Main debug monitor instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
 (() => {
   'use strict';
 

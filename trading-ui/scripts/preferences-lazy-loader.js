@@ -221,6 +221,7 @@ class LazyLoader {
     this.backgroundLoader = null;
     this.currentUserId = 1;
     this.currentProfileId = 0;
+    this._bootedForKey = null;
 
     this.loadingStats = {
       critical: { loaded: 0, total: 0 },
@@ -248,6 +249,13 @@ class LazyLoader {
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : 0;
     window.Logger.info(`🔍 LAZY LOADER DEBUG: Using finalProfileId=${finalProfileId}`, { page: 'preferences-lazy-loader' });
 
+    // Debounce duplicate initialize for same (user,profile) key
+    const initKey = `${userId}:${finalProfileId}`;
+    if (this._bootedForKey === initKey) {
+      window.Logger.debug('⏭️ LazyLoader initialize skipped (same user/profile)', { page: 'preferences-lazy-loader' });
+      return;
+    }
+
     if (this.currentProfileId !== undefined && this.currentProfileId !== null && this.currentProfileId !== finalProfileId) {
       window.Logger.info(`🔄 LAZY LOADER DEBUG: Profile changed from ${this.currentProfileId} to ${finalProfileId} - clearing internal state`, { page: 'preferences-lazy-loader' });
       this.loadedPreferences.clear();
@@ -256,6 +264,7 @@ class LazyLoader {
 
     this.currentUserId = userId;
     this.currentProfileId = finalProfileId;
+    this._bootedForKey = initKey;
 
     // Load critical preferences immediately
     await this.loadCriticalPreferences(userId, finalProfileId);

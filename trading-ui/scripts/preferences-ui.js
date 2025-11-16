@@ -33,6 +33,39 @@ if (window.Logger && window.Logger.info) {
 }
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences UI System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - FormManager - Form operations and validation
+ * - UIManager - UI updates and feedback
+ * - LoadingManager - Loading states
+ * - NotificationManager - User feedback
+ * - PreferencesUI - Main coordinator class
+ * 
+ * Global Functions:
+ * - saveAllPreferences(userId, profileId) - Save all preferences (backward compatibility wrapper)
+ * 
+ * Global Instances:
+ * - window.PreferencesUI - Main preferences UI instance
+ * 
+ * Main Methods (PreferencesUI class):
+ * - initialize() - Initialize preferences UI system
+ * - loadAllPreferences(userId, profileId) - Load all preferences
+ * - saveAllPreferences(userId, profileId) - Save all preferences
+ * - updateProfileContext(context) - Update profile context
+ * - updateActiveUserDisplay(userInfo) - Update active user display
+ * - updateProfileContext(profileContext) - Update profile context display
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // FORM MANAGER CLASS
 // ============================================================================
 
@@ -473,11 +506,112 @@ class PreferencesUI {
     this.uiManager = new UIManager();
     this.loadingManager = new LoadingManager();
 
-    this.currentUserId = 1; // Nimrod
+    this.currentUserId = null;
     this.currentProfileId = null; // Will be loaded from server
     this.cachedPreferences = {};
     this.profileContext = null;
     this.lastResolvedProfileId = null;
+    this._initialized = false;
+    this._telemetry = {
+      marks: {},
+      mark(label) { this.marks[label] = performance.now(); },
+      read() { return { ...this.marks }; },
+      reset() { this.marks = {}; },
+    };
+  }
+
+  /**
+   * Bootstrap barrier - single call to server bootstrap endpoint with ETag
+   * Seeds context and core groups; fires preferences:bootstrap:ready.
+   */
+  async bootstrap() {
+    try {
+      this._telemetry.mark('bootstrap.start');
+      const payload = (window.PreferencesData?.fetchJson && typeof window.PreferencesData.fetchJson === 'function')
+        ? await window.PreferencesData.fetchJson('/api/preferences/bootstrap', { dedupe: true })
+        : null;
+      // If 304 or empty, rely on caches; initialize continues
+      if (payload && payload.data && payload.data.profile_context) {
+        await this.updateProfileContext(payload.data.profile_context);
+        this.currentUserId = payload.data.user_id || this.currentUserId;
+        this.currentProfileId = payload.data.profile_id ?? this.currentProfileId;
+      }
+      this._telemetry.mark('bootstrap.end');
+      if (typeof window.dispatchEvent === 'function') {
+        window.dispatchEvent(new CustomEvent('preferences:bootstrap:ready', {
+          detail: { ok: true },
+        }));
+      }
+    } catch (err) {
+      window.Logger?.warn('⚠️ PreferencesUI.bootstrap failed (continuing with fallback)', err, { page: 'preferences-ui' });
+      if (typeof window.dispatchEvent === 'function') {
+        window.dispatchEvent(new CustomEvent('preferences:bootstrap:ready', {
+          detail: { ok: false, error: err?.message || 'bootstrap failed' },
+        }));
+      }
+    }
+  }
+
+  /**
+     * Single entry-point initializer to avoid fan-out.
+     * Enforces strict order: context -> lazy -> preferences -> UI bind.
+     */
+  async initialize() {
+    if (this._initialized) {
+      window.Logger?.info('ℹ️ PreferencesUI already initialized, skipping re-init', { page: 'preferences-ui' });
+      return;
+    }
+    this._initialized = true;
+    window.__PREFERENCES_PAGE_ACTIVE__ = true;
+
+    try {
+      this._telemetry.reset();
+      this._telemetry.mark('init.start');
+      // 0) Bootstrap barrier first (handles ETag/304; seeds context)
+      await this.bootstrap();
+      // 1) Load profiles to get profile_context (source of truth) or confirm it
+      this._telemetry.mark('profiles.load.start');
+      const { profiles = [], profileContext = null } = (window.PreferencesData?.loadProfiles && typeof window.PreferencesData.loadProfiles === 'function')
+        ? await window.PreferencesData.loadProfiles({ force: true })
+        : { profiles: [], profileContext: null };
+      this._telemetry.mark('profiles.load.end');
+      if (profileContext) {
+        this._telemetry.mark('context.update.start');
+        await this.updateProfileContext(profileContext);
+        this._telemetry.mark('context.update.end');
+      }
+
+      // 2) Initialize LazyLoader with resolved ids
+      const effectiveUserId = this.currentUserId ?? profileContext?.user?.id ?? null;
+      const effectiveProfileId = this.currentProfileId ?? profileContext?.resolved_profile_id ?? null;
+      if (window.LazyLoader && effectiveUserId !== null && effectiveProfileId !== null) {
+        this._telemetry.mark('lazy.init.start');
+        await window.LazyLoader.initialize(effectiveUserId, effectiveProfileId);
+        this._telemetry.mark('lazy.init.end');
+      }
+
+      // 3) Load all preferences (single call path)
+      this._telemetry.mark('prefs.load.start');
+      await this.loadAllPreferences(effectiveUserId, effectiveProfileId);
+      this._telemetry.mark('prefs.load.end');
+      this._telemetry.mark('init.end');
+
+      window.Logger?.info('✅ PreferencesUI initialize completed', {
+        page: 'preferences-ui',
+        userId: this.currentUserId,
+        profileId: this.currentProfileId,
+        telemetry: this._telemetry.read(),
+      });
+      // Fire a lightweight event for monitoring widgets
+      if (typeof window.dispatchEvent === 'function') {
+        window.dispatchEvent(new CustomEvent('preferences:init:completed', {
+          detail: { telemetry: this._telemetry.read() },
+        }));
+      }
+    } catch (e) {
+      window.Logger?.error('❌ PreferencesUI initialize failed', e, { page: 'preferences-ui' });
+      this.uiManager.showError('שגיאה בטעינת העדפות');
+    }
   }
 
   /**
@@ -487,8 +621,12 @@ class PreferencesUI {
   async loadActiveProfile() {
     try {
       window.Logger.info('🔍 Loading active profile from server...', { page: 'preferences-ui' });
+      if (!window.PreferencesData?.loadProfiles || typeof window.PreferencesData.loadProfiles !== 'function') {
+        window.Logger.warn('⚠️ PreferencesData.loadProfiles not available', { page: 'preferences-ui' });
+        return;
+      }
       const { profiles, profileContext } = await window.PreferencesData.loadProfiles({
-        userId: this.currentUserId || 1,
+        userId: this.currentUserId ?? undefined,
         force: true,
       });
       window.Logger.info(`🔍 Loaded ${profiles.length} profiles from server`, { page: 'preferences-ui' });
@@ -605,8 +743,27 @@ class PreferencesUI {
   updateProfileContext(context = null) {
     let refreshPromise = Promise.resolve();
     const previousResolvedId = this.profileContext?.resolved_profile_id ?? this.lastResolvedProfileId ?? null;
-    const userInfo = context?.user || null;
-    const resolvedProfile = context?.resolved_profile || null;
+    const userInfoRaw = context?.user || null;
+    const resolvedProfileRaw = context?.resolved_profile || null;
+    // Build safe fallbacks so UI never shows "לא זמין"/"ברירת מחדל" when IDs are known
+    const effectiveUserId =
+      (userInfoRaw && (userInfoRaw.id ?? null)) ??
+      (context?.user_id ?? null) ??
+      (this.currentUserId ?? null);
+    // Build complete userInfo object with all available fields
+    const userInfo = effectiveUserId ? {
+      id: Number(effectiveUserId),
+      display_name: userInfoRaw?.display_name || userInfoRaw?.full_name || null,
+      username: userInfoRaw?.username || null,
+      full_name: userInfoRaw?.full_name || null,
+    } : (userInfoRaw || null);
+    const effectiveResolvedProfileId =
+      (context?.resolved_profile_id ?? null) ??
+      (context?.profile_id ?? null) ??
+      (this.currentProfileId ?? null);
+    const resolvedProfile = resolvedProfileRaw || (effectiveResolvedProfileId !== null && effectiveResolvedProfileId !== undefined
+      ? { id: Number(effectiveResolvedProfileId), name: `Profile #${Number(effectiveResolvedProfileId)}` }
+      : null);
     if (window.Logger) {
       window.Logger.info('🔁 updateProfileContext invoked', {
         page: 'preferences-ui',
@@ -614,40 +771,42 @@ class PreferencesUI {
         requestedProfileId: context?.requested_profile_id ?? null,
         resolvedProfileId: context?.resolved_profile_id ?? null,
         activeProfileId: context?.active_profile_id ?? null,
-        userId: context?.user?.id ?? null,
+        userId: userInfo?.id ?? null,
         previousResolvedId,
       });
     }
     if (context) {
       this.profileContext = { ...context };
-      if (context.user?.id) {
-        this.currentUserId = context.user.id;
+      if (userInfo?.id) {
+        this.currentUserId = userInfo.id;
       }
-      if (context.resolved_profile_id !== null && context.resolved_profile_id !== undefined) {
-        this.currentProfileId = context.resolved_profile_id;
+      if (effectiveResolvedProfileId !== null && effectiveResolvedProfileId !== undefined) {
+        this.currentProfileId = Number(effectiveResolvedProfileId);
         if (window.PreferencesCore) {
-          window.PreferencesCore.currentProfileId = context.resolved_profile_id;
+          window.PreferencesCore.currentProfileId = Number(effectiveResolvedProfileId);
         }
       }
       if (window.PreferencesCore) {
         window.PreferencesCore.latestProfileContext = { ...context };
-        if (context.user?.id) {
-          window.PreferencesCore.currentUserId = context.user.id;
+        if (userInfo?.id) {
+          window.PreferencesCore.currentUserId = userInfo.id;
         }
       }
       this.updateActiveUserDisplay(userInfo);
       this.updateActiveProfileDisplay(resolvedProfile);
-      if (window.UnifiedCacheManager?.refreshUserPreferences && context.resolved_profile_id !== null && context.resolved_profile_id !== undefined) {
-        if (previousResolvedId !== null && previousResolvedId !== context.resolved_profile_id) {
-          refreshPromise = window.UnifiedCacheManager.refreshUserPreferences(context.resolved_profile_id, null, {
-            userId: context.user?.id ?? this.currentUserId ?? 1,
+      if (window.UnifiedCacheManager?.refreshUserPreferences && effectiveResolvedProfileId !== null && effectiveResolvedProfileId !== undefined) {
+        if (previousResolvedId !== null && previousResolvedId !== Number(effectiveResolvedProfileId)) {
+          refreshPromise = window.UnifiedCacheManager.refreshUserPreferences(Number(effectiveResolvedProfileId), null, {
+            userId: userInfo?.id ?? this.currentUserId ?? 1,
             previousProfileId: previousResolvedId,
           }).catch(cacheError => {
             window.Logger?.warn('⚠️ Failed to refresh cache after profile change', cacheError, { page: 'preferences-ui' });
           });
         }
       }
-      this.lastResolvedProfileId = context.resolved_profile_id ?? this.lastResolvedProfileId;
+      this.lastResolvedProfileId = (effectiveResolvedProfileId !== null && effectiveResolvedProfileId !== undefined)
+        ? Number(effectiveResolvedProfileId)
+        : this.lastResolvedProfileId;
     } else {
       this.profileContext = null;
       this.lastResolvedProfileId = null;
@@ -731,34 +890,40 @@ class PreferencesUI {
      * @param {Object|null} userInfo - Active user information
      */
   updateActiveUserDisplay(userInfo = null) {
+    // Fallback to profileContext if userInfo is null/empty
+    if (!userInfo || (!userInfo.id && !userInfo.username)) {
+      const ctx = this.profileContext || window.PreferencesCore?.latestProfileContext || null;
+      if (ctx?.user) {
+        userInfo = ctx.user;
+      } else if (ctx?.user_id) {
+        // Build minimal user object from user_id if user object missing
+        userInfo = { id: ctx.user_id };
+      }
+    }
+
     const hasId = userInfo?.id !== undefined && userInfo?.id !== null;
-    let displayName = userInfo?.display_name?.trim?.() ||
-            userInfo?.full_name?.trim?.() ||
-            userInfo?.username?.trim?.() ||
-            null;
-    if (!displayName && hasId) {
-      displayName = `User #${userInfo.id}`;
-    }
-    if (!displayName) {
-      displayName = 'לא זמין';
-    }
-    const idText = hasId ? `#${userInfo.id}` : '';
+    const nameRaw = userInfo?.display_name?.trim?.() ||
+      userInfo?.full_name?.trim?.() ||
+      userInfo?.username?.trim?.() ||
+      '';
+    const nameOrFallback = nameRaw || (hasId ? `User #${userInfo.id}` : 'לא זמין');
+    const combined = hasId ? `${nameOrFallback} (#${userInfo.id})` : nameOrFallback;
     const summaryNameEl = document.getElementById('activeUserName');
     const summaryIdEl = document.getElementById('activeUserId');
     const cardNameEl = document.getElementById('activeUserName_display');
     const cardIdEl = document.getElementById('activeUserId_display');
 
     if (summaryNameEl) {
-      summaryNameEl.textContent = displayName;
+      summaryNameEl.textContent = combined;
     }
     if (summaryIdEl) {
-      summaryIdEl.textContent = hasId ? `(${idText})` : '';
+      summaryIdEl.textContent = hasId ? `#${userInfo.id}` : '';
     }
     if (cardNameEl) {
-      cardNameEl.textContent = displayName;
+      cardNameEl.textContent = combined;
     }
     if (cardIdEl) {
-      cardIdEl.textContent = idText;
+      cardIdEl.textContent = hasId ? `#${userInfo.id}` : '';
     }
 
     if (hasId) {
@@ -767,8 +932,9 @@ class PreferencesUI {
 
     window.Logger?.info('👤 Active user display updated', {
       page: 'preferences-ui',
-      displayName,
+      displayName: combined,
       userId: hasId ? userInfo.id : null,
+      userInfoSource: userInfo ? 'provided' : 'fallback',
     });
   }
 
@@ -778,13 +944,9 @@ class PreferencesUI {
      */
   updateActiveProfileDisplay(profile = null) {
     const hasId = profile?.id !== undefined && profile?.id !== null;
-    let profileName = profile?.name || null;
-    if (!profileName && hasId) {
-      profileName = `Profile #${profile.id}`;
-    }
-    if (!profileName) {
-      profileName = 'ברירת מחדל';
-    }
+    const nameRaw = profile?.name || '';
+    const nameOrFallback = nameRaw || (hasId ? `Profile #${profile.id}` : 'ברירת מחדל');
+    const combined = hasId ? `${nameOrFallback} (#${profile.id})` : nameOrFallback;
     const profileDescription = profile?.description || (profile?.id === 0 ? 'פרופיל ברירת מחדל של המערכת' : 'פרופיל משתמש');
 
     const summaryNameEl = document.getElementById('activeProfileName');
@@ -793,21 +955,21 @@ class PreferencesUI {
     const summaryInfoEl = document.getElementById('activeProfileInfo');
 
     if (summaryNameEl) {
-      summaryNameEl.textContent = profileName;
+      summaryNameEl.textContent = combined;
     }
     if (cardNameEl) {
-      cardNameEl.textContent = profileName;
+      cardNameEl.textContent = combined;
     }
     if (cardDescriptionEl) {
       cardDescriptionEl.textContent = profileDescription;
     }
     if (summaryInfoEl) {
-      summaryInfoEl.textContent = profileName;
+      summaryInfoEl.textContent = combined;
     }
 
     window.Logger?.info('📘 Active profile display updated', {
       page: 'preferences-ui',
-      profileName,
+      profileName: nameOrFallback,
       profileId: profile?.id ?? null,
     });
   }
@@ -895,7 +1057,8 @@ class PreferencesUI {
         await this.updateCounters(allPreferences);
 
         // Load profiles to dropdown
-        await window.loadProfilesToDropdown();
+        const effectiveUserId = this.currentUserId ?? finalUserId ?? 1;
+        await window.loadProfilesToDropdown(effectiveUserId);
 
         this.loadingManager.stopLoading(loaderId, true, `נטענו ${Object.keys(allPreferences).length} העדפות`);
 
@@ -936,7 +1099,8 @@ class PreferencesUI {
 
         // Load profiles to dropdown
         window.Logger.info('🔄 Calling loadProfilesToDropdown...', { page: 'preferences-ui' });
-        await window.loadProfilesToDropdown();
+        const effectiveUserId = this.currentUserId ?? finalUserId ?? 1;
+        await window.loadProfilesToDropdown(effectiveUserId);
 
         this.loadingManager.stopLoading(loaderId, true, 'העדפות נטענו בהצלחה');
       }
@@ -1374,6 +1538,10 @@ class PreferencesUI {
 
       // Update groups count
       try {
+        if (!window.PreferencesData?.loadPreferenceGroupsMetadata || typeof window.PreferencesData.loadPreferenceGroupsMetadata !== 'function') {
+          window.Logger.warn('⚠️ PreferencesData.loadPreferenceGroupsMetadata not available', { page: 'preferences-ui' });
+          return;
+        }
         const { count: groupsCount } = await window.PreferencesData.loadPreferenceGroupsMetadata();
         const groupsCountElement = document.getElementById('groupsCount');
         if (groupsCountElement) {
@@ -1777,10 +1945,24 @@ if (!window.toggleSection) {
  * @param {number} userId - User ID (default: 1)
  * @returns {Promise<boolean>} Success status
  */
-window.loadProfilesToDropdown = async function(userId = 1) {
+window.loadProfilesToDropdown = async function(userId = null) {
   try {
+    // Resolve userId from context if not provided
+    if (!userId || userId === 1) {
+      userId = window.PreferencesUI?.currentUserId
+        ?? window.PreferencesUI?.profileContext?.user_id
+        ?? window.PreferencesUI?.profileContext?.user?.id
+        ?? window.PreferencesCore?.currentUserId
+        ?? window.PreferencesUIV4?.currentUserId
+        ?? 1;
+    }
+    
     window.Logger.info('📂 Loading profiles to dropdown...', { page: 'preferences-ui', userId });
 
+    if (!window.PreferencesData?.loadProfiles || typeof window.PreferencesData.loadProfiles !== 'function') {
+      window.Logger.warn('⚠️ PreferencesData.loadProfiles not available', { page: 'preferences-ui' });
+      return;
+    }
     const { profiles = [], profileContext = null } = await window.PreferencesData.loadProfiles({ userId, force: true });
     window.Logger.info('📋 Profiles API response', {
       page: 'preferences-ui',
@@ -1885,21 +2067,27 @@ window.loadProfilesToDropdown = async function(userId = 1) {
         if (activeProfileInfo) {
           activeProfileInfo.textContent = activeProfile.name;
         }
-        const userInfo = profileContext?.user || null;
+        // Build userInfo with fallbacks
+        let userInfo = profileContext?.user || null;
+        if (!userInfo && profileContext?.user_id) {
+          // Fallback: build minimal user object from user_id
+          userInfo = { id: profileContext.user_id };
+        }
         if (window.PreferencesUI) {
           window.PreferencesUI.updateActiveUserDisplay(userInfo);
           window.PreferencesUI.updateActiveProfileDisplay(activeProfile);
         } else {
-          const displayName = userInfo?.display_name || userInfo?.full_name || userInfo?.username || 'לא זמין';
+          const displayName = userInfo?.display_name || userInfo?.full_name || userInfo?.username || (userInfo?.id ? `User #${userInfo.id}` : 'לא זמין');
           const idText = userInfo?.id !== undefined && userInfo?.id !== null ? `(#${userInfo.id})` : '';
+          const combined = userInfo?.id ? `${displayName} ${idText}` : displayName;
           if (activeUserNameSummary) {
-            activeUserNameSummary.textContent = displayName;
+            activeUserNameSummary.textContent = combined;
           }
           if (activeUserIdSummary) {
             activeUserIdSummary.textContent = idText;
           }
           if (activeUserNameDisplay) {
-            activeUserNameDisplay.textContent = displayName;
+            activeUserNameDisplay.textContent = combined;
           }
           if (activeUserIdDisplay) {
             activeUserIdDisplay.textContent = idText;
@@ -1980,6 +2168,10 @@ window.loadProfilesToDropdown = async function(userId = 1) {
  */
 window.getUserProfiles = async function(userId = 1) {
   try {
+    if (!window.PreferencesData?.loadProfiles || typeof window.PreferencesData.loadProfiles !== 'function') {
+      window.Logger.warn('⚠️ PreferencesData.loadProfiles not available', { page: 'preferences-ui' });
+      return [];
+    }
     const result = await window.PreferencesData.loadProfiles({ userId });
     return result.profiles || [];
   } catch (error) {
@@ -2169,13 +2361,45 @@ function hideDefaultProfileWarning() {
   }
 }
 
-// Auto-initialize when DOM is ready
+// Auto-initialize when DOM is ready (disabled on preferences page - V4 owns that page)
+const shouldAutoInitPreferencesUI = () => {
+  try {
+    const body = document.body;
+    if (!body || !body.classList) {
+      return true;
+    }
+    // Skip legacy PreferencesUI auto-init on the main preferences page,
+    // where PreferencesUIV4 + unifiedAppInitializer manage initialization.
+    return !body.classList.contains('preferences-page');
+  } catch (e) {
+    return true;
+  }
+};
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    if (!shouldAutoInitPreferencesUI()) {
+      window.Logger?.info?.('ℹ️ Skipping legacy PreferencesUI auto-init on preferences page (handled by PreferencesUIV4)', {
+        page: 'preferences-ui',
+      });
+      return;
+    }
     window.Logger.info('📄 Preferences UI system initialized', { page: 'preferences-ui' });
+    if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+      window.PreferencesUI.initialize();
+    }
   });
 } else {
-  window.Logger.info('📄 Preferences UI system initialized', { page: 'preferences-ui' });
+  if (!shouldAutoInitPreferencesUI()) {
+    window.Logger?.info?.('ℹ️ Skipping legacy PreferencesUI auto-init on preferences page (handled by PreferencesUIV4)', {
+      page: 'preferences-ui',
+    });
+  } else {
+    window.Logger.info('📄 Preferences UI system initialized', { page: 'preferences-ui' });
+    if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+      window.PreferencesUI.initialize();
+    }
+  }
 }
 
 if (window.Logger && window.Logger.info) {

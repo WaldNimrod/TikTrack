@@ -34,6 +34,37 @@
 // window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core-new" });
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Core System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - PreferencesAPIClient - HTTP communication with backend
+ * - PreferencesCacheManager - Cache operations (4-layer cache)
+ * - PreferencesValidationManager - Preference validation
+ * - PreferencesProfileManager - Profile operations
+ * - PreferencesCore - Main coordinator class
+ * 
+ * Global Functions (Backward Compatibility):
+ * - getPreference(preferenceName, userId, profileId) - Get single preference
+ * - savePreference(preferenceName, value, userId, profileId) - Save single preference
+ * - getAllPreferences(userId, profileId) - Get all preferences
+ * - saveAllPreferences(preferences, userId, profileId) - Save multiple preferences
+ * - getCurrentPreference(preferenceName, options) - Get cached preference with fallbacks
+ * - initializePreferencesWithLazyLoading(userId, profileId) - Initialize with lazy loading
+ * - initializePreferences(userId, profileId) - Initialize preferences (legacy alias)
+ * 
+ * Global Instances:
+ * - window.PreferencesCore - Main preferences core instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // ERROR CLASSES
 // ============================================================================
 
@@ -75,11 +106,13 @@ class PreferencesAPIClient {
   }
 
   /**
-     * Generic GET request
-     * @param {string} endpoint - API endpoint
-     * @param {Object} params - Query parameters
-     * @returns {Promise<any>} Response data
-     */
+   * Generic GET request
+   * @function PreferencesAPIClient.get
+   * @param {string} endpoint - API endpoint
+   * @param {Object} params - Query parameters
+   * @returns {Promise<any>} Response data
+   * @throws {APIError} If HTTP request fails
+   */
   async get(endpoint, params = {}) {
     const url = new URL(`${this.baseURL}${endpoint}`, window.location.origin);
 
@@ -130,6 +163,10 @@ class PreferencesAPIClient {
      * @returns {Promise<any>} Preference value
      */
   async getPreference(preferenceName, userId = null, profileId = null) {
+    if (!window.PreferencesData?.loadPreference || typeof window.PreferencesData.loadPreference !== 'function') {
+      window.Logger?.warn?.('[PreferencesCore] loadPreference API is not available', { page: 'preferences-core-new' });
+      return null;
+    }
     const result = await window.PreferencesData.loadPreference({
       preferenceName,
       userId: userId || this.defaultUserId,
@@ -145,6 +182,10 @@ class PreferencesAPIClient {
      * @returns {Promise<Object>} All preferences
      */
   async getAllPreferences(userId = null, profileId = null) {
+    if (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+      window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available', { page: 'preferences-core-new' });
+      return null;
+    }
     const payload = await window.PreferencesData.loadAllPreferencesRaw({
       userId: userId || this.defaultUserId,
       profileId,
@@ -499,12 +540,15 @@ class PreferencesCore {
   }
 
   /**
-     * Get all preferences with lazy loading
-     * @param {number} userId - User ID
-     * @param {number} profileId - Profile ID
-     * @param {Array<string>} criticalPrefs - Critical preferences to load immediately
-     * @returns {Promise<Object>} Preferences object
-     */
+   * Get all preferences with lazy loading
+   * @function PreferencesCore.getAllPreferences
+   * @param {number} [userId=null] - User ID (uses currentUserId if not provided)
+   * @param {number} [profileId=null] - Profile ID (uses currentProfileId if not provided, 0 for default)
+   * @param {Array<string>} [criticalPrefs=[]] - Critical preferences to load immediately
+   * @returns {Promise<Object>} Preferences object with all preference values
+   * @example
+   * const allPrefs = await window.PreferencesCore.getAllPreferences(1, 2);
+   */
   async getAllPreferences(userId = null, profileId = null, criticalPrefs = []) {
     // For default profile, use 0 explicitly
     const finalUserId = userId || this.currentUserId;
@@ -581,14 +625,18 @@ class PreferencesCore {
   }
 
   /**
-     * Save single preference with strict validation
-     * @param {string} preferenceName - Preference name
-     * @param {any} value - Preference value
-     * @param {number} userId - User ID
-     * @param {number} profileId - Profile ID
-     * @param {string} dataType - Expected data type
-     * @returns {Promise<Object>} Save result with validation
-     */
+   * Save single preference with strict validation
+   * @function PreferencesCore.savePreference
+   * @param {string} preferenceName - Preference name
+   * @param {any} value - Preference value
+   * @param {number} [userId=null] - User ID (uses currentUserId if not provided)
+   * @param {number} [profileId=null] - Profile ID (uses currentProfileId if not provided, 0 for default)
+   * @param {string} [dataType='string'] - Data type for validation
+   * @returns {Promise<Object>} Save result with validation status
+   * @throws {ValidationError} If validation fails
+   * @example
+   * await window.PreferencesCore.savePreference('primaryCurrency', 'EUR', 1, 2);
+   */
   async savePreference(preferenceName, value, userId = null, profileId = null, dataType = 'string') {
     try {
       // Strict validation if available

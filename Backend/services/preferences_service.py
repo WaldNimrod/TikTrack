@@ -38,7 +38,17 @@ class ProfileNotFoundError(PreferenceError):
 
 
 class PreferencesService:
-    """Main entry point for managing user preferences."""
+    """
+    Main entry point for managing user preferences.
+    
+    This service handles all preference-related operations including:
+    - Reading and writing user preferences
+    - Profile management
+    - Cache management
+    - Validation
+    
+    Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+    """
 
     CACHE_TTL = 24 * 60 * 60  # 24 hours
 
@@ -129,6 +139,27 @@ class PreferencesService:
         requested_profile_id: Optional[int] = None,
         **_ignored_kwargs: Any,
     ) -> Dict[str, Any]:
+        """
+        Build profile context with user and profile information.
+        
+        Args:
+            user_id: User ID
+            profile_id: Profile ID (optional, uses active profile if not provided)
+            requested_profile_id: Requested profile ID (optional)
+            **_ignored_kwargs: Additional ignored keyword arguments
+            
+        Returns:
+            Dictionary containing:
+            - user_id: User ID
+            - profile_id: Profile ID
+            - user: User object with id, username, display_name, full_name
+            - resolved_profile: Profile object with id, name, description, is_default, is_active
+            - versions: Version information
+            - generated_at: Timestamp
+            
+        Raises:
+            ProfileNotFoundError: If profile not found for user
+        """
         with self._session_scope() as session:
             resolved_profile_id = requested_profile_id or profile_id
             resolved_profile_id = resolved_profile_id or self._get_active_profile_id(session, user_id)

@@ -13,6 +13,29 @@
  * @lastUpdated January 30, 2025
  */
 
+// ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Group Manager
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - PreferencesGroupManager - Group management with accordion UI
+ * 
+ * Global Functions:
+ * - loadPreferenceGroup(groupName, userId, profileId) - Load preference group
+ * - savePreferenceGroup(groupName) - Save preference group
+ * - toggleSection(sectionId) - Toggle section open/close
+ * 
+ * Global Instances:
+ * - window.PreferencesGroupManager - Main group manager instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
 class PreferencesGroupManager {
   constructor() {
     this.openSectionId = null; // רק section אחד פתוח

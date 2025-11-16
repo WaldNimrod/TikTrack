@@ -30,6 +30,32 @@ if (window.Logger && window.Logger.info) {
 }
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Colors System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - ColorManager - Core color operations (load, save, validate)
+ * - ColorPickerManager - UI color pickers management
+ * 
+ * Global Functions:
+ * - loadColorsForPreferences(userId, profileId) - Load all colors for preferences page
+ * - resetAllColorsToDefaults() - Reset all colors to default values
+ * - getColorPreference(colorName) - Get color by name
+ * - setColorPreference(colorName, colorValue) - Set color preference
+ * 
+ * Global Instances:
+ * - window.ColorManager - Main color manager instance
+ * - window.ColorPickerManager - Main color picker manager instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // COLOR MANAGER CLASS
 // ============================================================================
 

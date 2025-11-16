@@ -31,6 +31,33 @@ if (window.Logger && window.Logger.info) {
 }
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Validation System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - PreferenceValidator - Core validation logic
+ * - ExistenceError - Error for preference not found
+ * - FormatError - Error for invalid format
+ * - ConstraintError - Error for constraint violation
+ * 
+ * Global Functions:
+ * - validatePreference(preferenceName, value, dataType) - Validate preference
+ * - checkPreferenceExists(preferenceName) - Check if preference exists
+ * - validatePreferenceFormat(value, dataType) - Validate format
+ * - validatePreferenceConstraints(value, constraints) - Validate constraints
+ * 
+ * Global Instances:
+ * - window.PreferenceValidator - Main validator instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // VALIDATION ERROR CLASSES
 // ============================================================================
 

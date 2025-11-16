@@ -26,6 +26,30 @@
 window.Logger.info('📄 Loading preferences-profiles.js v1.0.0...', { page: 'preferences-profiles' });
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Profiles System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - ProfileManager - Core profile operations (get, switch, create, delete)
+ * 
+ * Global Functions:
+ * - switchProfile(profileId, userId) - Switch active profile
+ * - createProfile(name, description, userId) - Create new profile
+ * - deleteProfile(profileId, userId) - Delete profile
+ * - getProfiles(userId) - Get user profiles
+ * 
+ * Global Instances:
+ * - window.ProfileManager - Main profile manager instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // PROFILE MANAGER CLASS
 // ============================================================================
 

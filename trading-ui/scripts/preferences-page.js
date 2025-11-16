@@ -33,22 +33,19 @@
 window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "preferences-page" })...');
 
 /**
- * Function Index:
- * ==============
- *
- * DATA LOADING:
- * - loadAccountsForPreferences() - Loads trading accounts for default account preference
- *
- * PREFERENCES MANAGEMENT:
- * - savePreferences()
- * - loadPreferences()
- * - resetPreferences()
- *
- * UI MANAGEMENT:
- * - updateUI()
- * - validateForm()
- *
- * ==============
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Page Functions
+ * ============================================================================
+ * 
+ * Global Functions:
+ * - loadAccountsForPreferences() - Load trading accounts for default account select
+ * - renderPreferenceTypesAuditTable() - Render preference types audit table
+ * 
+ * Helper Functions (Internal):
+ * - (Internal helpers for account loading and table rendering)
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
  */
 
 // ===== DATA LOADING =====

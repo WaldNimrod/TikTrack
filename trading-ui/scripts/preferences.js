@@ -1,12 +1,60 @@
 /**
- * Preferences System - Frontend JavaScript
+ * Preferences System - Frontend JavaScript (Legacy/Backward Compatibility)
  * =======================================
  * 
  * מערכת העדפות - JavaScript לממשק המשתמש
  * 
+ * ⚠️ NOTE: This file contains legacy functions for backward compatibility.
+ * For new code, use preferences-core-new.js (PreferencesCore) or preferences-ui-v4.js (PreferencesV4).
+ * 
  * @version 1.0.0
  * @lastUpdated January 2025
  * @author TikTrack Development Team
+ * 
+ * @deprecated Most functions in this file are deprecated. Use PreferencesCore or PreferencesV4 instead.
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ */
+
+// ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences System (Legacy)
+ * ============================================================================
+ * 
+ * ⚠️ DEPRECATED: Most functions are deprecated. Use PreferencesCore or PreferencesV4.
+ * 
+ * Legacy Functions (Backward Compatibility):
+ * - getPreference(preferenceName, userId, profileId) - Get single preference (DEPRECATED - use PreferencesCore)
+ * - savePreference(preferenceName, value, userId, profileId) - Save single preference (DEPRECATED - use PreferencesCore)
+ * - getGroupPreferences(groupName, userId, profileId) - Get group preferences
+ * - getPreferencesByNames(preferenceNames, userId, profileId) - Get multiple preferences
+ * - getAllUserPreferences(userId, profileId) - Get all preferences (DEPRECATED - use PreferencesCore)
+ * - savePreferences(preferences, userId, profileId) - Save multiple preferences (DEPRECATED - use PreferencesCore)
+ * - getUserProfiles(userId) - Get user profiles
+ * - clearPreferencesCache() - Clear cache (DEPRECATED - use UnifiedCacheManager)
+ * - checkPreferencesServiceHealth() - Check service health
+ * - getPreferenceInfo(preferenceName) - Get preference info
+ * - loadPreferences(userId, profileId) - Load preferences (LEGACY)
+ * - saveAllPreferences() - Save all preferences (LEGACY)
+ * - resetToDefaults() - Reset to defaults
+ * - initializePreferences() - Initialize (LEGACY)
+ * - loadProfilesToDropdown() - Load profiles to dropdown (LEGACY - use preferences-page.js)
+ * - loadProfile() - Load profile (DEPRECATED)
+ * - switchProfile(profileId) - Switch profile (DEPRECATED - use PreferencesData.activateProfile)
+ * - saveAsActiveProfile() - Save as active profile (DEPRECATED)
+ * 
+ * Utility Functions:
+ * - getPaginationSize(tableType) - Get pagination size
+ * - setPaginationSize(tableType, size) - Set pagination size
+ * 
+ * Legacy Cache:
+ * - window.preferencesCache - Legacy cache object (DEPRECATED - use UnifiedCacheManager)
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
  */
 
 // ===== GLOBAL PREFERENCES SYSTEM =====
@@ -606,6 +654,9 @@ window.loadProfilesToDropdown = async function() {
 
 /**
  * טעינת פרופיל
+ * @deprecated Use PreferencesData.loadProfiles() and PreferencesUI.loadAllPreferences() instead
+ * @function loadProfile
+ * @returns {Promise<boolean>} Success status
  */
 window.loadProfile = async function() {
     try {
@@ -656,6 +707,10 @@ window.loadProfile = async function() {
 
 /**
  * החלפת פרופיל פעיל
+ * @deprecated Use PreferencesData.activateProfile() instead
+ * @function switchProfile
+ * @param {number} profileId - Profile ID
+ * @returns {Promise<boolean>} Success status
  */
 window.switchProfile = async function(profileId) {
     try {
@@ -683,6 +738,8 @@ window.switchProfile = async function(profileId) {
 
 /**
  * שמירת העדפות נוכחיות כפרופיל פעיל
+ * @deprecated Use PreferencesUI.saveAllPreferences() instead
+ * @function saveAsActiveProfile
  * @returns {Promise<boolean>} - האם השמירה הצליחה
  */
 window.saveAsActiveProfile = async function() {
@@ -772,20 +829,12 @@ window.saveAsActiveProfile = async function() {
 };
 
 // ===== AUTO-INITIALIZATION =====
-
-// אתחול אוטומטי כשהדף נטען
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM loaded, initializing Preferences System...');
-    
-    // אתחול המערכת
-    window.initializePreferences().then(success => {
-        if (success) {
-            console.log('🎉 Preferences System ready!');
-        } else {
-            console.warn('⚠️ Preferences System initialization failed');
-        }
-    });
-});
+// NOTE:
+// Auto-initialization is now managed by the unified app initializer and, on the
+// preferences page itself, by the V4 flow (PreferencesUIV4).
+// To prevent double initialization and noisy errors, this legacy
+// DOMContentLoaded handler has been removed. The functions in this file remain
+// available for backward-compatible callers.
 
 // ===== EXPORT FOR TESTING =====
 

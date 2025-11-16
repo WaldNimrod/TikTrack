@@ -10,13 +10,13 @@
     "notes": "Cash flows fixes round - Backend API routes and Frontend date handling fixes"
   },
   "development": {
-    "version": "1.1.13.0",
+    "version": "1.1.14.0",
     "major": 1,
     "minor": 1,
-    "patch": 13,
+    "patch": 14,
     "build": 0,
-    "commit": "93a13a374d300777da0f61ee99b72c7c944b569f",
-    "updated_at": "2025-11-16T21:49:29+00:00",
-    "notes": "Preferences system code audit: add function indexes, improve JSDoc, mark deprecated functions"
+    "commit": "44e705737bf30bdd8e23ac77b20d0c7826327b0e",
+    "updated_at": "2025-11-16T22:09:18+00:00",
+    "notes": "Pages optimization: JSDoc updates, entity services integration, E2E tests expansion"
   }
 }

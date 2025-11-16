@@ -3092,8 +3092,16 @@ async function createAlertFromCondition() {
 
         showSuccessNotification('התראה נוצרה בהצלחה מתנאי קיים');
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
-        modal?.hide();
+        // סגירת מודל דרך ModalManagerV2
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          window.ModalManagerV2.hideModal('addAlertModal');
+        } else {
+          // Fallback ל-Bootstrap modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
+          if (modal) {
+            modal.hide();
+          }
+        }
 
         if (typeof loadAlertsData === 'function') {
             loadAlertsData();

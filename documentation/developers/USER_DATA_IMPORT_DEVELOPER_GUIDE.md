@@ -62,6 +62,18 @@
 - כל נקודת קצה שמחזירה סשנים משתמשת ב-`_project_storage_payload` → `DateNormalizationService` כדי להחזיר `DateEnvelope`.
 - Frontend מסתמך על הפורמט הזה לצורך הצגות בלוח המוביל ובכרטיסי סטטוס.
 
+### ניהול סשנים פעילים (עדכון ינואר 2025)
+- **`get_latest_active_session()`** – מחזיר רק סשנים פעילים תוך סינון חכם:
+  - **לא מחזיר**: סשנים עם status `completed`, `failed`, `cancelled`
+  - **לא מחזיר**: סשנים ישנים (יותר מ-24 שעות) שנשארו תקועים ב-`analyzing`/`ready`/`importing`
+  - **לא מחזיר**: סשנים ללא `created_at` (סשנים ישנים מ-legacy)
+  - **מחזיר רק**: סשנים שנוצרו ב-24 השעות האחרונות עם status פעיל
+- **ניקוי אוטומטי**: אחרי ייבוא מוצלח, ה-Frontend מנקה את כל נתוני הסשן:
+  - `currentSessionId`, `activeSessionInfo`, `pendingAccountLinking`
+  - `analysisResults`, `previewData`, `selectedFile`
+  - localStorage (`clearStoredActiveSession()`)
+- **תוצאה**: פתיחה מחדש של התהליך לא תציג סשן פעיל ישן
+
 ## Account Linking Prerequisite (Phase 1 – Nov 2025)
 - טבלת `trading_accounts` הורחבה עם העמודה `external_account_number` (טקסט ייחודי). העמודה משמשת כקישור הקנוני לחשבון החיצוני ומוצגת/נערכת דרך מודל חשבון המסחר (`brokerAccountNumber`).
 - החל מנובמבר 2025 אין יותר בחירת חשבון ידנית במסך הייבוא. הלקוח מעלה קובץ → המערכת קוראת את מספר החשבון מהקובץ (`extract_account_metadata`) ומאתרת אוטומטית את החשבון המתאים:
@@ -70,7 +82,11 @@
 - נקודות קצה חדשות:
   - `GET /api/user-data-import/session/<id>/account-link/status` – החזרת מצב השיוך הנוכחי (סטטוס, חשבון מזוהה, מספר מהקובץ).
   - `POST /api/user-data-import/session/<id>/account-link/confirm` – מאשר שיוך אוטומטי (מצב pending) ומסמן את הסשן כ-`linking_confirmed`.
-  - `POST /api/user-data-import/session/<id>/account-link/select` – שומר שיוך לחשבון שנבחר ידנית. במידה והחשבון כבר מכיל `external_account_number`, מוחזר `error_code=ACCOUNT_LINK_OVERWRITE_REQUIRED` והלקוח צריך לשלוח שוב עם `confirm_overwrite=true`.
+  - `POST /api/user-data-import/session/<id>/account-link/select` – שומר שיוך לחשבון שנבחר ידנית. **עדכון ינואר 2025**: המערכת כעת **מסירה אוטומטית** שיוך ישן אם החשבון הנבחר כבר מכיל `external_account_number` אחר. במקום להחזיר שגיאה, המערכת:
+    1. מסירה את ה-`external_account_number` מהחשבון הישן
+    2. מבצעת commit מיידי לשחרור ה-unique constraint
+    3. ממשיכה לשייך את החשבון החדש
+    4. מעדכנת את הסשן עם החשבון החדש
   - הנתיב ההיסטורי `POST /session/<id>/link-account` נשאר כתמיכה אחורה אך קורא לאותה לוגיקה חדשה.
 - `_enforce_account_link` מוסיף סטטוסי linking חדשים (`pending_confirmation`, `linked`, `missing_in_file`) ומחזיר תמיד `linking.recognized_account` על מנת שה-UI יוכל להציג את שם החשבון/המטבע.
 - לאחר שיוך מוצלח (`linking_confirmed=True`) נקראים שוב `analyze_file`/`generate_preview` ברקע כך שאין צורך להעלות את הקובץ מחדש.
@@ -83,6 +99,8 @@
 - פריסת שלב 1 עודכנה: שורה ראשונה – בחירת ספק → בחירת תהליך → כרטיס הסבר. שורה שנייה – בחירת קובץ (כולל סטטוס הבדיקה) → כרטיס זיהוי חשבון שמופיע רק כאשר קיים session פעיל.
 - איפוס סשן (`resetImportSession`) מאפס גם את כרטיס הזיהוי והסטטוס של הבדיקה כך שהמשתמש לא רואה נתונים היסטוריים.
 - בעת הפעלת `analyze_file` התהליך מתחיל בזיהוי החשבון: ה-Orchestrator יוצר session, שומר את מספר החשבון ונעצר עם `ACCOUNT_LINK_REQUIRED` עד לאישור. לאחר שהמשתמש מאשר/מעדכן שיוך, ה-UI אינו מעלה את הקובץ שוב אלא מריץ `reanalyseSessionForTask` (GET `/session/<id>/analyze`) על אותו session ולכן כל השלבים שאחרי הקישור מתבצעים רק פעם אחת.
+- **עדכון ינואר 2025 – Precheck ללא קובץ**: ה-Frontend כעת בודק בקפידה שיש קובץ תקין (`instanceof File` ו-`size > 0`) לפני שליחת בקשות precheck. זה מונע שגיאות 400 כאשר פותחים את המודול עם סשן פעיל אך ללא קובץ נבחר.
+- **עדכון ינואר 2025 – הצגת מספר חשבון**: ה-UI מציג כעת את `external_account_number` (מספר החשבון החיצוני) באופן בולט במודול השיוך, כדי להבהיר למשתמש מה המערכת משווה ומזהה.
 
 ## Task Plugins – Portfolio Positions & Taxes/Fx (Nov 2025)
 ### Portfolio Positions (`task_type=portfolio_positions`)
@@ -165,5 +183,28 @@
 - הוספת Task רשמי ל-`account_reconciliation` עם Persist מלא.
 - הרחבת דוחות live כדי לכלול diff מטבע/חשבונות לפני ואחרי הייבוא.
 - ניתוח אוטומטי של פערים (alerts) על בסיס `mapping_note`.
+
+## עדכונים אחרונים (ינואר 2025)
+
+### ניקוי סשנים אוטומטי
+- **Backend**: `get_latest_active_session()` מסנן כעת סשנים ישנים (יותר מ-24 שעות) וסשנים ללא `created_at`
+- **Frontend**: אחרי ייבוא מוצלח, כל נתוני הסשן מתנקים אוטומטית (`performImport()`)
+- **תוצאה**: פתיחה מחדש של התהליך לא מציגה סשן פעיל ישן
+
+### שיפור Account Linking
+- **הסרה אוטומטית של שיוך ישן**: כאשר משנים שיוך חשבון, המערכת מסירה אוטומטית את השיוך הישן במקום להחזיר שגיאה
+- **Commit מיידי**: המערכת מבצעת commit לפני שיוך חדש כדי לשחרר unique constraints
+- **רענון סשן**: אחרי שיוך מוצלח, הסשן מתעדכן אוטומטית והמידע מוצג נכון ב-UI
+
+### שיפורי UI
+- **Precheck ללא קובץ**: בדיקה קפדנית של קובץ תקין לפני precheck
+- **הצגת מספר חשבון**: `external_account_number` מוצג בולט במודול השיוך
+- **סידור כפתורים**: כפתור "אשר חשבון מזוהה" הועבר למוטב המודול
+- **ביצועים**: רענון תצוגה מקדימה (`refreshPreviewData`) רץ כעת ברקע ללא חסימת UI
+
+### תיעוד קוד
+- **JSDoc מלא**: כל הפונקציות ב-`import-user-data.js` מתועדות עם JSDoc מלא
+- **Docstrings Python**: כל הפונקציות ב-`import_orchestrator.py` מתועדות עם docstrings
+- **אינדקס פונקציות**: אינדקס מלא של כל הפונקציות במערכת
 
 

@@ -132,6 +132,27 @@ const IMPORT_DATA_TYPE_ORDER = [
 
 const PROBLEM_RESOLUTION_TTL = 5 * 60 * 1000; // 5 minutes
 
+/**
+ * Create an empty problem state object
+ * 
+ * Initializes all problem tracking Maps to empty state.
+ * Used for resetting problem resolution state before new analysis.
+ * 
+ * @returns {Object} Empty problem state with Maps for each problem type
+ * @property {Map} missingTickers - Missing ticker symbols
+ * @property {Map} withinFileDuplicates - Duplicates within the file
+ * @property {Map} existingRecords - Records that already exist in system
+ * @property {Map} cashflowMissingAccounts - Missing accounts for cashflows
+ * @property {Map} cashflowCurrencyIssues - Currency issues for cashflows
+ * @property {Map} accountMissingAccounts - Missing accounts for account reconciliation
+ * @property {Map} accountCurrencyMismatches - Currency mismatches for accounts
+ * @property {Map} accountEntitlementWarnings - Entitlement warnings for accounts
+ * @property {Map} accountMissingDocuments - Missing documents for accounts
+ * 
+ * @example
+ * const problemState = createEmptyProblemState();
+ * problemState.missingTickers.set('AAPL', { symbol: 'AAPL', count: 1 });
+ */
 function createEmptyProblemState() {
     return {
         missingTickers: new Map(),
@@ -229,11 +250,28 @@ function updateAccountDetectionSummary(statusOverride) {
     }
 
     if (systemValueEl) {
-        const recognizedName = pendingAccountLinking?.recognizedAccount?.name
-            || linkedAccountInfo?.name
-            || activeSessionInfo?.accountName
-            || '';
-        systemValueEl.textContent = recognizedName || 'טרם זוהה';
+        // Display external_account_number (used for matching) instead of name to avoid confusion
+        const recognizedAccount = pendingAccountLinking?.recognizedAccount || linkedAccountInfo;
+        let displayValue = 'טרם זוהה';
+        
+        if (recognizedAccount) {
+            // Prefer external_account_number (what we actually match against)
+            if (recognizedAccount.external_account_number) {
+                displayValue = recognizedAccount.external_account_number;
+                // Optionally add name in parentheses for clarity
+                if (recognizedAccount.name) {
+                    displayValue = `${recognizedAccount.external_account_number} (${recognizedAccount.name})`;
+                }
+            } else if (recognizedAccount.name) {
+                // Fallback to name if no external_account_number
+                displayValue = recognizedAccount.name;
+            }
+        } else if (activeSessionInfo?.accountName) {
+            // Fallback for active session
+            displayValue = activeSessionInfo.accountName;
+        }
+        
+        systemValueEl.textContent = displayValue;
     }
 
     const statusValue = statusOverride
@@ -473,9 +511,10 @@ function getSelectedDataTypeValue() {
 function triggerFilePrecheckIfReady(options = {}) {
     const { file: explicitFile = null } = options;
     const currentFile = explicitFile || selectedFile || window.selectedFile || null;
-    const hasFile = Boolean(currentFile);
-
-    if (!hasFile) {
+    
+    // Strict validation: file must be a File object, not just truthy
+    const isValidFile = currentFile instanceof File && currentFile.size > 0;
+    if (!isValidFile) {
         activeFilePrecheckRequestId += 1;
         setFilePrecheckStatus('idle', FILE_PRECHECK_STATUS_MESSAGES.idle);
         return;
@@ -491,10 +530,44 @@ function triggerFilePrecheckIfReady(options = {}) {
     runFilePrecheck(currentFile, connectorValue);
 }
 
+/**
+ * Run file precheck validation
+ * 
+ * Validates file structure and content before analysis. Checks that file is valid
+ * File object with size > 0, then sends to backend for format validation.
+ * 
+ * @param {File} file - File object to validate
+ * @param {string|null} [connectorValueOverride=null] - Override connector value (optional)
+ * @returns {Promise<void>}
+ * 
+ * @throws {Error} If file is invalid or precheck fails
+ * 
+ * @example
+ * // Basic precheck
+ * const fileInput = document.getElementById('fileInput');
+ * await runFilePrecheck(fileInput.files[0]);
+ * 
+ * @example
+ * // Precheck with connector override
+ * await runFilePrecheck(file, 'IBKR');
+ * 
+ * @see {@link triggerFilePrecheckIfReady} For automatic precheck triggering
+ * @see {@link setFilePrecheckStatus} For updating precheck status
+ * 
+ * @since 2.0.0
+ * @updated January 2025 - Added strict file validation (instanceof File, size > 0)
+ */
 async function runFilePrecheck(file, connectorValueOverride = null) {
     const connectorValue = connectorValueOverride || getSelectedConnectorValue();
-    if (!file || !connectorValue) {
-        setFilePrecheckStatus('idle', 'בחר ספק נתונים וקובץ כדי להריץ בדיקה ראשונית.');
+    
+    // Strict validation: file must be a File object, not just truthy
+    const isValidFile = file instanceof File && file.size > 0;
+    if (!isValidFile || !connectorValue) {
+        if (!isValidFile) {
+            setFilePrecheckStatus('idle', 'בחר קובץ כדי להריץ בדיקה ראשונית.');
+        } else {
+            setFilePrecheckStatus('idle', 'בחר ספק נתונים וקובץ כדי להריץ בדיקה ראשונית.');
+        }
         return;
     }
 
@@ -793,7 +866,15 @@ function handleAccountLinkRequired(response) {
     updateAccountDetectionSummary(linking.status);
     updateAccountLinkingModalContent();
     showAccountLinkingModal();
-    showImportUserDataNotification(pendingAccountLinking.message, pendingAccountLinking.status === 'mismatch' ? 'warning' : 'error');
+    // Determine notification type based on status
+    let notificationType = 'error';
+    if (pendingAccountLinking.status === 'mismatch') {
+        notificationType = 'warning';
+    } else if (pendingAccountLinking.status === 'pending_confirmation' || pendingAccountLinking.requiresConfirmation) {
+        // Info notification for account detection that requires confirmation
+        notificationType = 'info';
+    }
+    showImportUserDataNotification(pendingAccountLinking.message, notificationType);
     updateImportModalNavigation();
     syncAccountAndConnectorLockState();
 }
@@ -860,18 +941,30 @@ function updateAccountLinkingModalContent(linkInfo = pendingAccountLinking) {
         recognizedSection.classList.toggle('d-none', !shouldShowRecognized);
         if (shouldShowRecognized && recognizedLabel) {
             const recognizedAccount = linkInfo.recognizedAccount;
-            if (recognizedAccount?.name) {
-                const accountParts = [recognizedAccount.name];
+            if (recognizedAccount) {
+                // Display external_account_number first (what we match against), then name
+                const parts = [];
                 if (recognizedAccount.external_account_number) {
-                    accountParts.push(`(${recognizedAccount.external_account_number})`);
+                    parts.push(recognizedAccount.external_account_number);
                 }
-                recognizedLabel.textContent = accountParts.join(' ');
+                if (recognizedAccount.name) {
+                    parts.push(recognizedAccount.name);
+                }
+                recognizedLabel.textContent = parts.length > 0 
+                    ? parts.join(' - ')
+                    : 'לא זוהה חשבון תואם';
             } else {
                 recognizedLabel.textContent = 'לא זוהה חשבון תואם';
             }
         }
         if (recognizedActions) {
             recognizedActions.classList.toggle('d-none', !shouldShowRecognized);
+        }
+        
+        // Show/hide confirm button in footer (moved from recognizedActions)
+        const confirmBtn = document.getElementById('accountLinkingConfirmBtn');
+        if (confirmBtn) {
+            confirmBtn.style.display = shouldShowRecognized ? '' : 'none';
         }
     }
 
@@ -927,7 +1020,17 @@ async function loadAccountsForLinking(targetSelect) {
     accountOptionsCache.forEach((account) => {
         const option = document.createElement('option');
         option.value = account.id;
-        option.textContent = account.name || `חשבון #${account.id}`;
+        // Display external_account_number first (what we match against), then name
+        let displayText = '';
+        if (account.external_account_number) {
+            displayText = account.external_account_number;
+            if (account.name) {
+                displayText += ` - ${account.name}`;
+            }
+        } else {
+            displayText = account.name || `חשבון #${account.id}`;
+        }
+        option.textContent = displayText;
         if (account.external_account_number) {
             option.dataset.externalAccountNumber = account.external_account_number;
         }
@@ -1012,22 +1115,76 @@ async function confirmAutoLinkedAccount() {
     }
 }
 
+/**
+ * Submit account link selection to backend
+ * 
+ * Handles the complete account linking flow:
+ * 1. Validates selection and checks for overwrite requirements
+ * 2. Sends link request to backend
+ * 3. Updates local state with linked account info
+ * 4. Reloads session data to get updated account information
+ * 5. Resumes import flow after successful linking
+ * 
+ * @param {boolean} [forceOverride=false] - Whether to force overwrite existing link
+ * @returns {Promise<void>}
+ * 
+ * @throws {Error} If account linking fails or API request fails
+ * 
+ * @example
+ * // Basic account link
+ * await submitAccountLinkSelection();
+ * 
+ * @example
+ * // Force overwrite existing link
+ * await submitAccountLinkSelection(true);
+ * 
+ * @see {@link resumeImportFlowAfterLinking} For continuing import after linking
+ * @see {@link fetchExistingSessionDetails} For reloading session data
+ * 
+ * @since 2.0.0
+ * @updated January 2025 - Added automatic old link removal and session reload
+ */
 async function submitAccountLinkSelection(forceOverride = false) {
+    window.Logger?.info('[ACCOUNT_LINKING] 🔗 Starting account link selection process', {
+        sessionId: pendingAccountLinking?.sessionId,
+        forceOverride,
+        page: 'import-user-data'
+    });
+    
     if (!pendingAccountLinking?.sessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ No session ID found', { page: 'import-user-data' });
         showImportUserDataNotification('לא נמצא סשן לשיוך חשבון.', 'error');
         return;
     }
     const select = document.getElementById('accountLinkingAccountSelect');
     if (!select || !select.value) {
+        window.Logger?.warn('[ACCOUNT_LINKING] ⚠️ No account selected', { page: 'import-user-data' });
         showImportUserDataNotification('אנא בחר חשבון לשיוך.', 'warning');
         return;
     }
     const selectedValue = select.value;
+    const selectedOption = select.options[select.selectedIndex];
+    const selectedAccountName = selectedOption?.textContent || `Account ${selectedValue}`;
     const confirmOverwrite = forceOverride || pendingOverwriteAccountId === selectedValue;
     const reanalysisTask = pendingAccountLinking?.taskType || selectedDataTypeKey || 'executions';
 
+    window.Logger?.info('[ACCOUNT_LINKING] 📋 Account selection details', {
+        selectedAccountId: selectedValue,
+        selectedAccountName,
+        confirmOverwrite,
+        fileAccountNumber: pendingAccountLinking?.fileAccountNumber,
+        page: 'import-user-data'
+    });
+
     setAccountLinkingLoading(true);
     try {
+        window.Logger?.info('[ACCOUNT_LINKING] 📤 Sending account link request to server', {
+            sessionId: pendingAccountLinking.sessionId,
+            tradingAccountId: Number(selectedValue),
+            confirmOverwrite,
+            page: 'import-user-data'
+        });
+        
         const response = await fetch(`/api/user-data-import/session/${pendingAccountLinking.sessionId}/account-link/select`, {
             method: 'POST',
             headers: {
@@ -1038,9 +1195,27 @@ async function submitAccountLinkSelection(forceOverride = false) {
                 confirm_overwrite: confirmOverwrite
             })
         });
+        
+        window.Logger?.info('[ACCOUNT_LINKING] 📥 Received response from server', {
+            status: response.status,
+            ok: response.ok,
+            page: 'import-user-data'
+        });
+        
         const data = await response.json();
+        
+        window.Logger?.info('[ACCOUNT_LINKING] 📊 Response data', {
+            success: data.success,
+            error: data.error,
+            error_code: data.error_code,
+            linked_account_number: data.linked_account_number,
+            trading_account_id: data.trading_account_id,
+            page: 'import-user-data'
+        });
+        
         if (!response.ok || !data.success) {
             if (data.error_code === 'ACCOUNT_LINK_OVERWRITE_REQUIRED') {
+                window.Logger?.warn('[ACCOUNT_LINKING] ⚠️ Overwrite required', { page: 'import-user-data' });
                 pendingOverwriteAccountId = selectedValue;
                 showImportUserDataNotification(
                     data.error || 'לחשבון זה קיים כבר מספר חיצוני. לחץ שוב כדי לאשר החלפה.',
@@ -1048,22 +1223,46 @@ async function submitAccountLinkSelection(forceOverride = false) {
                 );
                 return;
             }
+            // Note: ACCOUNT_ALREADY_LINKED is now handled automatically by the backend
+            // The backend removes the old link and creates a new one, so this error should not occur
             if (data.error_code === 'ACCOUNT_ALREADY_LINKED') {
-                // Account number is already linked to a different account
+                window.Logger?.error('[ACCOUNT_LINKING] ❌ ACCOUNT_ALREADY_LINKED error (should not happen)', {
+                    error: data.error,
+                    page: 'import-user-data'
+                });
+                // Fallback: if this error still occurs, show a generic error
                 showImportUserDataNotification(
-                    data.error || 'מספר החשבון כבר משויך לחשבון אחר במערכת.',
+                    data.error || 'שגיאה בשיוך החשבון. נא לנסות שוב.',
                     'error'
                 );
                 return;
             }
+            window.Logger?.error('[ACCOUNT_LINKING] ❌ Account linking failed', {
+                error: data.error,
+                error_code: data.error_code,
+                page: 'import-user-data'
+            });
             const message = getApiErrorMessage(data, 'שיוך החשבון נכשל');
             showImportUserDataNotification(message, 'error');
             return;
         }
 
+        // STEP 1: Clear pending overwrite
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 1: Clearing pending overwrite', { page: 'import-user-data' });
         pendingOverwriteAccountId = null;
+        
+        // STEP 2: Update linked account info
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 2: Updating linked account info', {
+            accountId: data.trading_account_id || data.linked_account?.id,
+            accountName: data.linked_account?.name,
+            externalAccountNumber: data.linked_account_number || data.linked_account?.external_account_number,
+            page: 'import-user-data'
+        });
         setLinkedAccountInfo(data.linked_account);
         setActiveFileAccountNumber(data.linked_account_number || pendingAccountLinking?.fileAccountNumber || null);
+        
+        // STEP 3: Update active session info
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 3: Updating active session info', { page: 'import-user-data' });
         updateActiveSessionInfo({
             accountId: data.trading_account_id || data.linked_account?.id || pendingAccountLinking?.tradingAccountId,
             accountName: data.linked_account?.name || activeSessionInfo?.accountName || '',
@@ -1072,27 +1271,98 @@ async function submitAccountLinkSelection(forceOverride = false) {
             linkingStatus: 'confirmed',
             status: 'שיוך אושר'
         });
+        
+        // STEP 4: Save session ID before clearing pending account linking
+        const sessionIdForReload = pendingAccountLinking.sessionId;
+        const fileAccountNumberForReload = pendingAccountLinking.fileAccountNumber;
+        
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 4: Clearing pending account linking', { 
+            sessionId: sessionIdForReload,
+            page: 'import-user-data' 
+        });
         pendingAccountLinking = null;
+        
+        // STEP 5: Update navigation
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 5: Updating import modal navigation', { page: 'import-user-data' });
         updateImportModalNavigation();
+        
+        // STEP 6: Close account linking modal
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 6: Closing account linking modal', { page: 'import-user-data' });
         hideAccountLinkingModal();
+        
+        // STEP 7: Show success notification
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 7: Showing success notification', { page: 'import-user-data' });
         showImportUserDataNotification('מספר החשבון שויך בהצלחה. מפעיל מחדש את תהליך הניתוח.', 'success');
+        
+        // STEP 8: Update currentSessionId before reloading
+        if (sessionIdForReload) {
+            currentSessionId = sessionIdForReload;
+            window.currentSessionId = sessionIdForReload;
+        }
+        
+        // STEP 9: Reload session data to get updated account information
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 9: Reloading session data to get updated account info', {
+            sessionId: sessionIdForReload,
+            page: 'import-user-data'
+        });
+        await fetchExistingSessionDetails(sessionIdForReload);
+        
+        // STEP 10: Resume import flow (reload session and update UI)
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 10: Resuming import flow after linking', {
+            taskType: reanalysisTask,
+            sessionId: currentSessionId,
+            page: 'import-user-data'
+        });
         await resumeImportFlowAfterLinking(reanalysisTask);
+        
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Account linking process completed successfully', { page: 'import-user-data' });
     } catch (error) {
-        window.Logger?.error('[Import Modal] Failed to link account', { error: error.message });
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ Exception during account linking', {
+            error: error.message,
+            stack: error.stack,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('שגיאה בשיוך החשבון', 'error');
     } finally {
         setAccountLinkingLoading(false);
+        window.Logger?.info('[ACCOUNT_LINKING] 🔚 Account linking process finished', { page: 'import-user-data' });
     }
 }
 
 async function resumeImportFlowAfterLinking(taskType) {
+    window.Logger?.info('[ACCOUNT_LINKING] 🔄 Starting resume import flow after linking', {
+        taskType,
+        currentSessionId,
+        page: 'import-user-data'
+    });
+    
+    // STEP 1: Sync account and connector lock state
+    window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 1: Syncing account and connector lock state', { page: 'import-user-data' });
     syncAccountAndConnectorLockState();
+    
     if (!currentSessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ No active session ID found', { page: 'import-user-data' });
         showImportUserDataNotification('לא נמצא סשן פעיל להמשך הניתוח לאחר השיוך.', 'error');
         return;
     }
+    
+    // STEP 2: Reload session data (reanalyse)
+    window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 2: Reloading session data (reanalyse)', {
+        sessionId: currentSessionId,
+        taskType,
+        page: 'import-user-data'
+    });
     await reanalyseSessionForTask(taskType, 'בודק את חשבון המסחר לאחר שיוך...');
+    
+    // STEP 3: Navigate to step 2 (preview)
+    window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 3: Navigating to step 2 (preview)', { page: 'import-user-data' });
     goToStep(2);
+    
+    // STEP 4: Update account detection summary to show new linked account
+    window.Logger?.info('[ACCOUNT_LINKING] ✅ Step 4: Updating account detection summary', { page: 'import-user-data' });
+    updateAccountDetectionSummary('confirmed');
+    
+    window.Logger?.info('[ACCOUNT_LINKING] ✅ Resume import flow completed', { page: 'import-user-data' });
 }
 
 async function openAccountLinkingModalManually() {
@@ -1203,8 +1473,7 @@ function setAccountLinkingLoading(isLoading) {
     const selectionBtn = document.getElementById('accountLinkingActionBtn');
     const confirmBtn = document.getElementById('accountLinkingConfirmBtn');
     const closeButtons = [
-        document.getElementById('accountLinkingCloseBtn'),
-        document.getElementById('accountLinkingFooterCloseBtn')
+        document.getElementById('accountLinkingCloseBtn')
     ];
 
     [selectionBtn, confirmBtn].forEach((button) => {
@@ -2540,6 +2809,24 @@ function persistActiveSession() {
     }
 }
 
+/**
+ * Clear stored active session from localStorage
+ * 
+ * Removes the active import session from localStorage and updates UI indicators.
+ * Called after successful import or session reset.
+ * 
+ * @returns {void}
+ * 
+ * @example
+ * // Clear session after successful import
+ * clearStoredActiveSession();
+ * 
+ * @see {@link ACTIVE_SESSION_STORAGE_KEY} For storage key constant
+ * @see {@link updateActiveSessionIndicator} For UI update
+ * 
+ * @since 2.0.0
+ * @updated January 2025 - Part of automatic session cleanup after import
+ */
 function clearStoredActiveSession() {
     try {
         localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
@@ -2589,6 +2876,11 @@ async function restoreActiveSessionFromStorage() {
 }
 
 async function fetchExistingSessionDetails(sessionId) {
+    window.Logger?.info('[ACCOUNT_LINKING] 🔄 Fetching existing session details', {
+        sessionId,
+        page: 'import-user-data'
+    });
+    
     try {
         const response = await fetch(`/api/user-data-import/session/${sessionId}`);
         if (!response.ok) {
@@ -2607,8 +2899,63 @@ async function fetchExistingSessionDetails(sessionId) {
             ?? session.file_account_number
             ?? null;
         
+        // Get linked account information from session
+        const tradingAccountId = session.trading_account_id;
+        const linkingMatchedAccountId = summary.linking_matched_account_id || tradingAccountId;
+        const linkingStatus = summary.linking_status || 'unknown';
+        const linkingConfirmed = summary.linking_confirmed || false;
+        
+        window.Logger?.info('[ACCOUNT_LINKING] 📊 Session details loaded', {
+            sessionId,
+            tradingAccountId,
+            linkingMatchedAccountId,
+            linkingStatus,
+            linkingConfirmed,
+            fileAccountNumber,
+            hasTradingAccountInSession: !!session.trading_account,
+            page: 'import-user-data'
+        });
+        
+        // Try to get account info from session first (if included by backend)
+        let linkedAccountInfo = session.trading_account || null;
+        
+        // If not in session, fetch from API
+        if (!linkedAccountInfo && (linkingMatchedAccountId || tradingAccountId)) {
+            const accountId = linkingMatchedAccountId || tradingAccountId;
+            try {
+                const accountResponse = await fetch(`/api/trading-accounts/${accountId}`);
+                if (accountResponse.ok) {
+                    const accountData = await accountResponse.json();
+                    if (accountData.status === 'success' && accountData.data) {
+                        linkedAccountInfo = accountData.data;
+                        window.Logger?.info('[ACCOUNT_LINKING] ✅ Linked account details loaded from API', {
+                            accountId,
+                            accountName: linkedAccountInfo.name,
+                            externalAccountNumber: linkedAccountInfo.external_account_number,
+                            page: 'import-user-data'
+                        });
+                    }
+                }
+            } catch (error) {
+                window.Logger?.warn('[ACCOUNT_LINKING] ⚠️ Failed to fetch linked account details', {
+                    accountId: linkingMatchedAccountId || tradingAccountId,
+                    error: error.message,
+                    page: 'import-user-data'
+                });
+            }
+        } else if (linkedAccountInfo) {
+            window.Logger?.info('[ACCOUNT_LINKING] ✅ Linked account details loaded from session', {
+                accountId: linkedAccountInfo.id,
+                accountName: linkedAccountInfo.name,
+                externalAccountNumber: linkedAccountInfo.external_account_number,
+                page: 'import-user-data'
+            });
+        }
+        
         updateSymbolMetadataCache(summary?.symbol_metadata || session.symbol_metadata);
-        updateActiveSessionInfo({
+        
+        // Update active session info with account information
+        const updates = {
             status: mapSessionStatusToLabel(session.status),
             totalRecords: summary.total_records ?? session.total_records ?? activeSessionInfo?.totalRecords ?? 0,
             readyRecords: summary.records_to_import ?? session.imported_records ?? activeSessionInfo?.readyRecords ?? 0,
@@ -2617,10 +2964,37 @@ async function fetchExistingSessionDetails(sessionId) {
             duplicateRecords: summary.duplicate_records ?? activeSessionInfo?.duplicateRecords ?? 0,
             existingRecords: summary.existing_records ?? activeSessionInfo?.existingRecords ?? 0,
             provider: session.provider || activeSessionInfo?.provider,
-            fileAccountNumber
+            fileAccountNumber,
+            linkingStatus: linkingConfirmed ? 'confirmed' : linkingStatus
+        };
+        
+        // Add account information if available
+        if (linkedAccountInfo) {
+            updates.accountId = linkedAccountInfo.id;
+            updates.accountName = linkedAccountInfo.name;
+            updates.externalAccountNumber = linkedAccountInfo.external_account_number;
+            setLinkedAccountInfo(linkedAccountInfo);
+        } else if (tradingAccountId) {
+            updates.accountId = tradingAccountId;
+        }
+        
+        updateActiveSessionInfo(updates);
+        
+        // Update account detection summary
+        updateAccountDetectionSummary(linkingConfirmed ? 'confirmed' : linkingStatus);
+        
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Session details updated in UI', {
+            sessionId,
+            accountId: updates.accountId,
+            accountName: updates.accountName,
+            page: 'import-user-data'
         });
     } catch (error) {
-        window.Logger?.warn?.('[Import Modal] Failed to fetch existing session details', { error: error?.message, sessionId });
+        window.Logger?.warn?.('[ACCOUNT_LINKING] ⚠️ Failed to fetch existing session details', {
+            error: error?.message,
+            sessionId,
+            page: 'import-user-data'
+        });
         if (currentSessionId === sessionId) {
             currentSessionId = null;
             window.currentSessionId = null;
@@ -2999,30 +3373,18 @@ function ensureTickerSaveHook(retry = 0) {
 
         const result = await saveFn.apply(this, args);
 
+        // Schedule refresh in background - don't block modal closing
         if (currentSessionId) {
-            const scheduleRefresh = () => {
+            // Use setTimeout to run refresh after modal closes (non-blocking)
+            setTimeout(() => {
                 try {
-                    const refreshPromise = refreshPreviewData();
-                    if (refreshPromise?.catch) {
-                        refreshPromise.catch((error) => {
-                            window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save (async)', {
-                                error: error?.message
-                            });
-                        });
-                    }
-            } catch (error) {
+                    refreshPreviewData();
+                } catch (error) {
                     window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save', {
                         error: error?.message
                     });
                 }
-            };
-
-            // הפעלת רענון לאחר השלמת פעולת השמירה, עם דילי קצר לביטחון
-            if (typeof window.requestAnimationFrame === 'function') {
-                window.requestAnimationFrame(() => setTimeout(scheduleRefresh, 150));
-            } else {
-                setTimeout(scheduleRefresh, 150);
-            }
+            }, 300); // Small delay to allow modal to close first
         }
 
         return result;
@@ -3787,7 +4149,15 @@ function loadStep2Content() {
  */
 
 async function reanalyseSessionForTask(taskKey, loadingMessage = 'טוען ומעבד נתונים...') {
+    window.Logger?.info('[ACCOUNT_LINKING] 🔄 Starting session reanalysis', {
+        taskKey,
+        currentSessionId,
+        loadingMessage,
+        page: 'import-user-data'
+    });
+    
     if (!currentSessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ No active session ID for reanalysis', { page: 'import-user-data' });
         throw new Error('לא נמצא מזהה סשן פעיל');
     }
 
@@ -3795,8 +4165,28 @@ async function reanalyseSessionForTask(taskKey, loadingMessage = 'טוען ומ�
     setAnalysisLoadingState(true, loadingMessage, 90);
 
     try {
+        window.Logger?.info('[ACCOUNT_LINKING] 📤 Sending reanalysis request', {
+            sessionId: currentSessionId,
+            taskType: encodedTask,
+            page: 'import-user-data'
+        });
+        
         const analysisResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/analyze?task_type=${encodedTask}`);
+        
+        window.Logger?.info('[ACCOUNT_LINKING] 📥 Received reanalysis response', {
+            status: analysisResponse.status,
+            ok: analysisResponse.ok,
+            page: 'import-user-data'
+        });
+        
         const analysisJson = await analysisResponse.json();
+        
+        window.Logger?.info('[ACCOUNT_LINKING] 📊 Reanalysis response data', {
+            success: analysisJson.success,
+            status: analysisJson.status,
+            hasAnalysisResults: !!analysisJson.analysis_results,
+            page: 'import-user-data'
+        });
 
         if (handleAccountLinkingBlockingResponse(analysisJson, 'reanalyze')) {
             setAnalysisLoadingState(false);
@@ -6560,7 +6950,29 @@ function executeImportWithReport() {
 }
 
 /**
- * Perform import
+ * Perform the final import operation
+ * 
+ * Executes the import process for the current session, imports records to database,
+ * and clears session data after successful import.
+ * 
+ * @param {boolean} [generateReport=false] - Whether to generate a report after import
+ * @returns {void}
+ * 
+ * @throws {Error} If import fails or session is invalid
+ * 
+ * @example
+ * // Basic import
+ * performImport();
+ * 
+ * @example
+ * // Import with report generation
+ * performImport(true);
+ * 
+ * @see {@link clearStoredActiveSession} For session cleanup after import
+ * @see {@link showImportUserDataNotification} For user notifications
+ * 
+ * @since 2.0.0
+ * @updated January 2025 - Added automatic session cleanup after successful import
  */
 function performImport(generateReport = false) {
     if (!currentSessionId) {
@@ -6607,6 +7019,25 @@ function performImport(generateReport = false) {
             }
 
             showImportUserDataNotification(successMessage, 'success');
+            
+            // Clear session data after successful import
+            window.Logger?.info('[Import Modal] Clearing session data after successful import', {
+                sessionId: currentSessionId,
+                importedCount,
+                page: 'import-user-data'
+            });
+            currentSessionId = null;
+            window.currentSessionId = null;
+            activeSessionInfo = null;
+            pendingAccountLinking = null;
+            analysisResults = null;
+            previewData = null;
+            selectedFile = null;
+            window.selectedFile = null;
+            clearStoredActiveSession();
+            updateResetSessionButtonState();
+            updateActiveSessionIndicator();
+            
             closeImportUserDataModal();
             
             if (importErrors.length) {
@@ -6635,7 +7066,6 @@ function performImport(generateReport = false) {
             
             // Clear cache to show new data - use centralized cache clearing
             clearImportCacheLayers({ reason: 'import-user-data:execute' });
-            clearStoredActiveSession();
             window.refreshDataImportHistory?.();
             // LEGACY (pre Stage B-Lite) flow:
             // if (typeof window.clearCacheQuick === 'function') {
@@ -7466,6 +7896,7 @@ function getConfidenceClass(confidence) {
 function refreshPreviewData() {
     if (!currentSessionId) return;
     
+    // Run refresh in background - don't block UI
     fetch(`/api/user-data-import/session/${currentSessionId}/refresh-preview`, {
         method: 'POST'
     })
@@ -7478,7 +7909,7 @@ function refreshPreviewData() {
             previewData = data.preview_data;
             updateSymbolMetadataCache(data.preview_data?.symbol_metadata || data.preview_data?.summary?.symbol_metadata);
             updateActiveSessionFromPreview(data.preview_data);
-            // Refresh the current step display
+            // Refresh the current step display only if modal is still open
             if (currentStep === 2) {
                 displayProblemResolutionDetailed(data.preview_data);
             } else if (currentStep === 3) {
@@ -7487,12 +7918,21 @@ function refreshPreviewData() {
                 displayPreview(data.preview_data);
             }
         } else {
-            showImportUserDataNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
+            // Don't show error notification if modal is closed - user already moved on
+            if (document.getElementById('importUserDataModal')?.classList.contains('show')) {
+                showImportUserDataNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
+            }
         }
     })
     .catch(error => {
-        window.Logger.error('Refresh preview error:', error);
-        showImportUserDataNotification('שגיאה ברענון התצוגה', 'error');
+        window.Logger?.warn('[Import Modal] Refresh preview error (non-blocking)', {
+            error: error?.message,
+            page: 'import-user-data'
+        });
+        // Don't show error notification if modal is closed
+        if (document.getElementById('importUserDataModal')?.classList.contains('show')) {
+            showImportUserDataNotification('שגיאה ברענון התצוגה', 'error');
+        }
     });
 }
 

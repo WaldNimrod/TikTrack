@@ -306,17 +306,55 @@ class ImportSessionManager:
         """
         Get the latest active import session (ready/importing/analyzing).
         
+        Excludes completed, failed, and cancelled sessions.
+        Also excludes very old sessions (older than 24 hours) that are stuck in analyzing/ready state.
+        Excludes legacy sessions without created_at timestamp.
+        
+        This method implements smart filtering to prevent old stuck sessions from being
+        returned as active, ensuring users don't see stale import sessions.
+        
         Args:
-            statuses: Optional list of statuses to consider active
+            statuses: Optional list of statuses to consider active.
+                     Defaults to ['importing', 'ready', 'analyzing'].
             
         Returns:
-            ImportSession instance or None
+            ImportSession instance or None if no active session found.
+            
+        Examples:
+            >>> manager = ImportSessionManager(db_session)
+            >>> session = manager.get_latest_active_session()
+            >>> if session:
+            ...     print(f"Active session: {session.id}")
+            
+        Note:
+            - Only returns sessions created in the last 24 hours
+            - Excludes sessions without created_at (legacy sessions)
+            - Excludes completed, failed, and cancelled sessions
+            
+        See Also:
+            - cleanup_old_sessions() for periodic cleanup
+            - ImportSession.status for valid status values
+            
+        Updated:
+            January 2025 - Added filtering for old sessions and legacy sessions
         """
         try:
             active_statuses = statuses or ['importing', 'ready', 'analyzing']
             
+            # Exclude completed, failed, and cancelled sessions
+            excluded_statuses = ['completed', 'failed', 'cancelled']
+            
+            # Also exclude very old sessions (older than 24 hours) that are stuck
+            from datetime import datetime, timedelta
+            cutoff_time = datetime.now() - timedelta(hours=24)
+            
             session = self.db_session.query(ImportSession).filter(
-                ImportSession.status.in_(active_statuses)
+                ImportSession.status.in_(active_statuses),
+                ~ImportSession.status.in_(excluded_statuses),
+                # Only include sessions created in the last 24 hours
+                # Exclude sessions without created_at (they are old legacy sessions)
+                ImportSession.created_at.isnot(None),
+                ImportSession.created_at >= cutoff_time
             ).order_by(desc(ImportSession.id)).first()
             
             if session:

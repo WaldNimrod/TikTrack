@@ -100,6 +100,20 @@
   }
 
   async function invalidateCache() {
+    // Try CacheSyncManager first (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('cash-flow-updated');
+        return;
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      }
+    }
+    
+    // Fallback to direct invalidation
     if (!window.UnifiedCacheManager) {
       return;
     }
@@ -238,7 +252,21 @@
       });
 
       if (response.ok) {
-        await invalidateCache();
+        const result = await response.json().catch(() => ({}));
+        // Determine action based on method
+        if (window.CacheSyncManager?.invalidateByAction) {
+          const action = method === 'POST' ? 'cash-flow-created' :
+                        method === 'PUT' ? 'cash-flow-updated' :
+                        method === 'DELETE' ? 'cash-flow-deleted' : 'cash-flow-updated';
+          try {
+            await window.CacheSyncManager.invalidateByAction(action);
+          } catch (error) {
+            // Fallback to direct invalidation
+            await invalidateCache();
+          }
+        } else {
+          await invalidateCache();
+        }
       }
 
       return response;
@@ -285,7 +313,16 @@
       });
 
       if (response.ok) {
-        await invalidateCache();
+        // Currency exchange also affects cash flows cache
+        if (window.CacheSyncManager?.invalidateByAction) {
+          try {
+            await window.CacheSyncManager.invalidateByAction('cash-flow-updated');
+          } catch (error) {
+            await invalidateCache();
+          }
+        } else {
+          await invalidateCache();
+        }
       }
 
       return response;

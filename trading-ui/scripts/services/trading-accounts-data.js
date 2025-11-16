@@ -76,6 +76,20 @@
   }
 
   async function invalidateAccountsCache() {
+    // Try CacheSyncManager first (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('account-updated');
+        return;
+      } catch (error) {
+        window.Logger?.warn?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      }
+    }
+    
+    // Fallback to direct invalidation
     if (!window.UnifiedCacheManager) {
       return;
     }
@@ -209,7 +223,21 @@
       });
 
       if (response.ok) {
-        await invalidateAccountsCache();
+        const result = await response.json().catch(() => ({}));
+        // Determine action based on method
+        if (window.CacheSyncManager?.invalidateByAction) {
+          const action = method === 'POST' ? 'account-created' :
+                        method === 'PUT' ? 'account-updated' :
+                        method === 'DELETE' ? 'account-deleted' : 'account-updated';
+          try {
+            await window.CacheSyncManager.invalidateByAction(action);
+          } catch (error) {
+            // Fallback to direct invalidation
+            await invalidateAccountsCache();
+          }
+        } else {
+          await invalidateAccountsCache();
+        }
       }
 
       return response;

@@ -10,9 +10,10 @@
  * - Promise-based responses
  */
 
-async function loadTradesData() {
+async function loadTradesData(options = {}) {
   try {
-    if (typeof window.UnifiedCacheManager?.get === 'function') {
+    const { force = false } = options || {};
+    if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
       const cached = await window.UnifiedCacheManager.get('trades-data', { ttl: 30000 });
       if (cached) {
         console.log('📦 Trades loaded from cache');
@@ -25,12 +26,26 @@ async function loadTradesData() {
     }
 
     console.log('🔄 Loading trades data from API...');
-    const response = await fetch('/api/trades/');
+    let response = await fetch('/api/trades/');
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Retry without trailing slash once
+      const retry = await fetch('/api/trades');
+      if (!retry.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      response = retry;
     }
 
     const data = await response.json();
+    try {
+      window.Logger?.info?.('🔎 TradesData: raw API payload snapshot', {
+        hasDataKey: !!data && Object.prototype.hasOwnProperty.call(data, 'data'),
+        isArrayRoot: Array.isArray(data),
+        dataArrayLen: Array.isArray(data?.data) ? data.data.length : null,
+      }, { page: 'trades-data' });
+    } catch (e) {
+      // ignore log issues
+    }
     const payload = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
 
     if (typeof window.UnifiedCacheManager?.save === 'function') {
@@ -58,8 +73,8 @@ async function saveTrade(tradeData) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trades-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-created');
     }
     return result;
   } catch (error) {
@@ -83,8 +98,8 @@ async function updateTrade(tradeId, tradeData) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trades-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-updated');
     }
     return result;
   } catch (error) {
@@ -106,8 +121,8 @@ async function deleteTrade(tradeId) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trades-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-deleted');
     }
     return result;
   } catch (error) {
@@ -130,8 +145,9 @@ async function closeTrade(tradeId, closeData) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trades-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      // Closing a trade is similar to updating it
+      await window.CacheSyncManager.invalidateByAction('trade-updated');
     }
     return result;
   } catch (error) {
@@ -197,7 +213,10 @@ async function setCachedTrades(data) {
 
 async function invalidateTradesCache() {
   try {
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
+    if (window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-updated');
+    } else if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
+      // Fallback to direct invalidation if CacheSyncManager not available
       await window.UnifiedCacheManager.invalidate('trades-data');
     }
   } catch (error) {

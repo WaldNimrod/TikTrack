@@ -717,22 +717,44 @@ class CRUDResponseHandler {
      */
     static async refreshEntityTables(entityType) {
         try {
-            // ניקוי מטמון עבור הישות - שימוש נכון ב-UnifiedCacheManager
-            if (this._isUnifiedCacheManagerAvailable()) {
-                // ניקוי ממוקד לפי entity type
-                const keys = await window.UnifiedCacheManager.getAllKeys();
-                const entityKeys = keys.filter(k => 
-                    k.startsWith(`${entityType}_`) || 
-                    k.startsWith(`all_${entityType}`) ||
-                    k.includes(entityType)
-                );
-                
-                for (const key of entityKeys) {
-                    await window.UnifiedCacheManager.remove(key);
+            // ניקוי מטמון עבור הישות - שימוש ב-CacheSyncManager
+            const actionMap = {
+                'trade': 'trade-updated',
+                'trades': 'trade-updated',
+                'trade_plan': 'trade-plan-updated',
+                'trade_plans': 'trade-plan-updated',
+                'alert': 'alert-updated',
+                'alerts': 'alert-updated',
+                'execution': 'execution-updated',
+                'executions': 'execution-updated',
+                'cash_flow': 'cash-flow-updated',
+                'cash_flows': 'cash-flow-updated',
+                'note': 'note-updated',
+                'notes': 'note-updated',
+                'ticker': 'ticker-updated',
+                'tickers': 'ticker-updated',
+                'trading_account': 'account-updated',
+                'trading_accounts': 'account-updated',
+                'account': 'account-updated',
+                'accounts': 'account-updated'
+            };
+            
+            // Try CacheSyncManager first (preferred method)
+            const action = actionMap[entityType];
+            if (action && window.CacheSyncManager?.invalidateByAction) {
+                try {
+                    await window.CacheSyncManager.invalidateByAction(action);
+                    console.log(`🔄 נוקה מטמון עבור ${entityType} דרך CacheSyncManager (action: ${action})`);
+                } catch (cacheError) {
+                    console.warn(`⚠️ CacheSyncManager.invalidateByAction failed for ${entityType}, falling back to direct invalidation`, cacheError);
+                    // Fallback to direct invalidation
+                    await this._invalidateCacheDirectly(entityType);
                 }
-                console.log(`🔄 נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
+            } else if (this._isUnifiedCacheManagerAvailable()) {
+                // Fallback to direct invalidation if CacheSyncManager not available or entity type not mapped
+                await this._invalidateCacheDirectly(entityType);
             } else {
-                console.debug(`⚠️ UnifiedCacheManager not available - skipping cache clear for ${entityType}`);
+                console.debug(`⚠️ Cache managers not available - skipping cache clear for ${entityType}`);
             }
 
             // איפוס דגלי טעינה קיימים אם יש גישה אליהם
@@ -753,6 +775,33 @@ class CRUDResponseHandler {
 
         } catch (error) {
             console.error(`❌ שגיאה ברענון ${entityType}:`, error);
+        }
+    }
+
+    /**
+     * ניקוי מטמון ישיר (fallback method)
+     * @private
+     */
+    static async _invalidateCacheDirectly(entityType) {
+        if (!this._isUnifiedCacheManagerAvailable()) {
+            return;
+        }
+        
+        try {
+            // ניקוי ממוקד לפי entity type
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            const entityKeys = keys.filter(k => 
+                k.startsWith(`${entityType}_`) || 
+                k.startsWith(`all_${entityType}`) ||
+                k.includes(entityType)
+            );
+            
+            for (const key of entityKeys) {
+                await window.UnifiedCacheManager.remove(key);
+            }
+            console.log(`🔄 נוקה מטמון ישיר עבור ${entityType} (${entityKeys.length} מפתחות)`);
+        } catch (error) {
+            console.warn(`⚠️ Failed to invalidate cache directly for ${entityType}:`, error);
         }
     }
 

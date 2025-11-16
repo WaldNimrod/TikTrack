@@ -297,16 +297,53 @@ async function loadTradesData() {
   try {
     window.Logger.info('Loading trades data via TradesData module', { page: "trades" });
 
+    let rawData = [];
+    // Prefer the unified TableDataRegistry when available to align with other pages
+    if (window.TableDataRegistry && typeof window.TableDataRegistry.getData === 'function') {
+      try {
+        rawData = await window.TableDataRegistry.getData('trades', { force: true });
+      } catch (e) {
+        window.Logger?.warn('⚠️ TableDataRegistry.getData failed for trades, falling back to TradesData', { error: e }, { page: 'trades' });
+      }
+    }
+    if (!Array.isArray(rawData) || rawData.length === 0) {
     const loader = window.TradesData?.loadTradesData;
-    const rawData = typeof loader === 'function'
-      ? await loader()
-      : [];
+    if (typeof loader === 'function') {
+      rawData = await loader({ force: true });
+    } else {
+      // Fallback: direct API call aligned with system API config
+      window.Logger.warn('⚠️ TradesData service not available - using direct API fallback', { page: 'trades' });
+      try {
+        let response = await fetch('/api/trades/', { cache: 'no-store' });
+        if (!response.ok) {
+          // retry without trailing slash
+          const retry = await fetch('/api/trades', { cache: 'no-store' });
+          if (!retry.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          response = retry;
+        }
+        const json = await response.json();
+        rawData = Array.isArray(json?.data) ? json.data : (Array.isArray(json) ? json : []);
+      } catch (apiError) {
+        window.Logger.error('❌ Trades API fallback failed', apiError, { page: 'trades' });
+        rawData = [];
+      }
+    }
+    }
 
     const apiData = Array.isArray(rawData)
       ? rawData
       : Array.isArray(rawData?.data)
         ? rawData.data
         : [];
+    try {
+      window.Logger?.info?.('🔎 TradesUI: loader results', {
+        isArray: Array.isArray(rawData),
+        rawLen: Array.isArray(rawData) ? rawData.length : null,
+        apiLen: Array.isArray(apiData) ? apiData.length : null,
+      }, { page: 'trades' });
+    } catch (e) {}
 
     if (!Array.isArray(apiData)) {
       window.Logger.warn('⚠️ Trades data loader returned non-array payload', { rawData }, { page: "trades" });
@@ -332,12 +369,18 @@ async function loadTradesData() {
       closed_at: trade.closed_at,
       cancelled_at: trade.cancelled_at,
       notes: trade.notes,
+      // Planning fields (snapshot) - from Trade model
+      planned_quantity: trade.planned_quantity || trade.quantity || null,
+      planned_amount: trade.planned_amount || null,
+      entry_price: trade.entry_price || null,
+      // Legacy fields for backward compatibility
+      quantity: trade.planned_quantity || trade.quantity || null,
       // Position data from backend
       position: trade.position,
       current_price: trade.current_price,
       daily_change: trade.daily_change,
-    change_amount: trade.change_amount,
-    updated_at: trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at
+      change_amount: trade.change_amount,
+      updated_at: trade.updated_at || trade.closed_at || trade.cancelled_at || trade.created_at
     }));
 
     // עדכון המשתנה הגלובלי
@@ -1214,15 +1257,8 @@ async function cancelTradeRecord(tradeId) {
  */
 async function performTradeCancellation(tradeId) {
   try {
-    // Clear relevant caches before mutation
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
-      try {
-        await window.UnifiedCacheManager.clearByPattern('trades');
-        await window.UnifiedCacheManager.clearByPattern('dashboard');
-      } catch (e) {
-        window.Logger?.warn('⚠️ Failed clearing cache before cancel', e, { page: 'trades' });
-      }
-    }
+    // Cache will be invalidated after successful cancellation via CacheSyncManager
+    // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
     const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1396,15 +1432,8 @@ async function deleteTradeRecord(tradeId) {
 async function performTradeDeletion(tradeId) {
   try {
     // Send delete request
-    // Clear relevant caches before mutation
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
-      try {
-        await window.UnifiedCacheManager.clearByPattern('trades');
-        await window.UnifiedCacheManager.clearByPattern('dashboard');
-      } catch (e) {
-        window.Logger?.warn('⚠️ Failed clearing cache before delete', e, { page: 'trades' });
-      }
-    }
+    // Cache will be invalidated after successful delete via CacheSyncManager
+    // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
     const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -1417,6 +1446,30 @@ async function performTradeDeletion(tradeId) {
       reloadFn: window.loadTradesData,
       requiresHardReload: false
     });
+
+    // אימות מחיקה בפועל: בדיקת GET שהרשומה איננה יותר
+    try {
+      const verify = await fetch(`/api/trades/${tradeId}`, { method: 'GET', headers: { 'Accept': 'application/json' } });
+      if (verify && verify.ok) {
+        // עדיין קיים בשרת – דווח שגיאת עקביות ורענן קשיח של הטבלה
+        window.Logger?.warn('⚠️ Deletion verification failed – trade still exists', { tradeId, status: verify.status }, { page: 'trades' });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('מחיקה', 'מחיקת הטרייד דווחה כהצלחה אך הרשומה עדיין קיימת. נבצע רענון וננסה שוב.');
+        }
+        // ניקוי מטמונים ורענון
+        try {
+          await window.UnifiedCacheManager?.clearByPattern?.('trades');
+          await window.UnifiedCacheManager?.clearByPattern?.('dashboard');
+        } catch (_e) {}
+        if (typeof window.loadTradesData === 'function') {
+          await window.loadTradesData();
+        }
+      } else if (verify && verify.status === 404) {
+        window.Logger?.info('✅ Deletion verified – trade not found (404)', { tradeId }, { page: 'trades' });
+      }
+    } catch (verErr) {
+      window.Logger?.debug('Deletion verification check failed (network or other)', { tradeId, error: verErr }, { page: 'trades' });
+    }
 
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'מחיקת טרייד');
@@ -3949,13 +4002,24 @@ async function saveTrade() {
             }
         }
         
+        // Calculate planned_amount from quantity and entry_price if not provided directly
+        let plannedAmount = tradeData.planned_amount;
+        if (!plannedAmount && tradeData.quantity && tradeData.entry_price) {
+            plannedAmount = parseFloat(tradeData.quantity) * parseFloat(tradeData.entry_price);
+        }
+
         const payload = {
+            // Core required fields – must match backend Trade model exactly
             trading_account_id: tradeData.trading_account_id,
             ticker_id: tradeData.ticker_id,
             status: tradeData.status,
             side: tradeData.side,
-            type: tradeData.type,
             investment_type: tradeData.type,
+            // Planning fields (snapshot from form or from trade_plan)
+            planned_quantity: tradeData.quantity ? parseFloat(tradeData.quantity) : null,
+            planned_amount: plannedAmount ? parseFloat(plannedAmount) : null,
+            entry_price: tradeData.entry_price ? parseFloat(tradeData.entry_price) : null,
+            // Notes are stored as free text
             notes: tradeData.notes || null
         };
         
@@ -4006,15 +4070,8 @@ async function saveTrade() {
         const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
         const method = isEdit ? 'PUT' : 'POST';
         
-        // Clear relevant caches before mutation
-        if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearByPattern === 'function') {
-            try {
-                await window.UnifiedCacheManager.clearByPattern('trades');
-                await window.UnifiedCacheManager.clearByPattern('dashboard');
-            } catch (e) {
-                window.Logger?.warn('⚠️ Failed clearing cache before save', e, { page: 'trades' });
-            }
-        }
+        // Cache will be invalidated after successful save via CacheSyncManager in CRUDResponseHandler
+        // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
 
         // Send to API
         const response = await fetch(url, {

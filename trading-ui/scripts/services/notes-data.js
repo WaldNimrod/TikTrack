@@ -82,6 +82,20 @@
   }
 
   async function invalidateNotesCache() {
+    // Try CacheSyncManager first (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('note-updated');
+        return;
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      }
+    }
+    
+    // Fallback to direct invalidation
     if (!window.UnifiedCacheManager) {
       return;
     }
@@ -252,7 +266,21 @@
     const response = await fetch(url, buildMutationRequest({ method, payload, headers, signal }));
 
     if (response.ok) {
-      await invalidateNotesCache();
+      const result = await response.json().catch(() => ({}));
+      // Determine action based on method
+      if (window.CacheSyncManager?.invalidateByAction) {
+        const action = method === 'POST' ? 'note-created' :
+                      method === 'PUT' ? 'note-updated' :
+                      method === 'DELETE' ? 'note-deleted' : 'note-updated';
+        try {
+          await window.CacheSyncManager.invalidateByAction(action);
+        } catch (error) {
+          // Fallback to direct invalidation
+          await invalidateNotesCache();
+        }
+      } else {
+        await invalidateNotesCache();
+      }
     }
 
     return response;

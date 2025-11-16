@@ -92,6 +92,10 @@ class CacheSyncManager {
       'trade-created': ['trades-data', 'dashboard-data'],
       'trade-updated': ['trades-data', 'dashboard-data'],
       'trade-deleted': ['trades-data', 'dashboard-data'],
+      'trade-plan-created': ['trade-plans-data', 'dashboard-data', 'trades-data'],
+      'trade-plan-updated': ['trade-plans-data', 'dashboard-data', 'trades-data'],
+      'trade-plan-deleted': ['trade-plans-data', 'dashboard-data', 'trades-data'],
+      'trade-plan-cancelled': ['trade-plans-data', 'dashboard-data', 'trades-data'],
       'trade-plan-linked': [
         'trades',
         'trade-plans',

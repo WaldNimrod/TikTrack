@@ -10,13 +10,13 @@
     "notes": "Production release 1.1.1"
   },
   "development": {
-    "version": "1.1.9.0",
+    "version": "1.1.10.0",
     "major": 1,
     "minor": 1,
-    "patch": 9,
+    "patch": 10,
     "build": 0,
-    "commit": "083a89adb411ca6c8304202a583de052484fd7b5",
-    "updated_at": "2025-11-16T08:31:24+00:00",
-    "notes": "Docs: index links for Conditions, GENERAL_SYSTEMS_LIST test plan, progress & remarks report"
+    "commit": "d383b8b1de0512aca6785b80f7432f90f2dfb149",
+    "updated_at": "2025-11-16T20:34:07+00:00",
+    "notes": "Integrate CacheSyncManager in all CRUD operations - 9 central pages now use CacheSyncManager for cache invalidation"
   }
 }

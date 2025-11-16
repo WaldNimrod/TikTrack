@@ -54,8 +54,8 @@ async function saveTradePlan(planData) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-plan-created');
     }
     return result;
   } catch (error) {
@@ -79,8 +79,8 @@ async function updateTradePlan(planId, planData) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-plan-updated');
     }
     return result;
   } catch (error) {
@@ -100,8 +100,8 @@ async function deleteTradePlan(planId) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-plan-deleted');
     }
     return result;
   } catch (error) {
@@ -123,8 +123,9 @@ async function executeTradePlan(planId) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      // Executing a plan is similar to updating it
+      await window.CacheSyncManager.invalidateByAction('trade-plan-updated');
     }
     return result;
   } catch (error) {
@@ -147,8 +148,9 @@ async function cancelTradePlan(planId) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      // Canceling a plan is similar to updating it
+      await window.CacheSyncManager.invalidateByAction('trade-plan-updated');
     }
     return result;
   } catch (error) {
@@ -171,8 +173,9 @@ async function copyTradePlan(planId) {
     }
 
     const result = await response.json();
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
-      await window.UnifiedCacheManager.invalidate('trade-plans-data');
+    if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
+      // Copying creates a new plan
+      await window.CacheSyncManager.invalidateByAction('trade-plan-created');
     }
     return result;
   } catch (error) {
@@ -206,7 +209,10 @@ async function setCachedTradePlans(data) {
 
 async function invalidateTradePlansCache() {
   try {
-    if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
+    if (window.CacheSyncManager?.invalidateByAction) {
+      await window.CacheSyncManager.invalidateByAction('trade-plan-updated');
+    } else if (typeof window.UnifiedCacheManager?.invalidate === 'function') {
+      // Fallback to direct invalidation if CacheSyncManager not available
       await window.UnifiedCacheManager.invalidate('trade-plans-data');
     }
   } catch (error) {

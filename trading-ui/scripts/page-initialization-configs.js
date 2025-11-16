@@ -589,7 +589,18 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           if (typeof window.loadExecutionsData === 'function') {
+            window.Logger.info('📥 Calling loadExecutionsData...', {
+              page: 'page-initialization-configs',
+            });
             await window.loadExecutionsData();
+            window.Logger.info('✅ loadExecutionsData completed', {
+              page: 'page-initialization-configs',
+            });
+          } else {
+            window.Logger.warn('⚠️ window.loadExecutionsData is not a function', {
+              type: typeof window.loadExecutionsData,
+              page: 'page-initialization-configs',
+            });
           }
 
           // Initialize import modal

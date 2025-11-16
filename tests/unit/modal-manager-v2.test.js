@@ -487,5 +487,103 @@ describe('Modal Manager V2', () => {
             }).not.toThrow();
         });
     });
+
+    describe('hideModal', () => {
+        test('should hide modal by ID', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.hideModal) {
+                return;
+            }
+
+            const mockModalInstance = {
+                hide: jest.fn()
+            };
+
+            bootstrap.Modal.getInstance = jest.fn().mockReturnValue(mockModalInstance);
+            bootstrap.Modal.getOrCreateInstance = jest.fn().mockReturnValue(mockModalInstance);
+
+            const modalElement = document.createElement('div');
+            modalElement.id = 'test-hide-modal';
+            document.body.appendChild(modalElement);
+
+            window.ModalManagerV2.hideModal('test-hide-modal');
+
+            expect(mockModalInstance.hide).toHaveBeenCalled();
+
+            document.body.removeChild(modalElement);
+        });
+
+        test('should hide active modal when no ID provided', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.hideModal) {
+                return;
+            }
+
+            const mockModalInstance = {
+                hide: jest.fn()
+            };
+
+            bootstrap.Modal.getInstance = jest.fn().mockReturnValue(mockModalInstance);
+
+            const modalElement = document.createElement('div');
+            modalElement.id = 'test-active-modal';
+            document.body.appendChild(modalElement);
+
+            window.ModalManagerV2.activeModal = 'test-active-modal';
+            window.ModalManagerV2.hideModal();
+
+            expect(mockModalInstance.hide).toHaveBeenCalled();
+            expect(window.ModalManagerV2.activeModal).toBeNull();
+
+            document.body.removeChild(modalElement);
+        });
+
+        test('should handle non-existent modal gracefully', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.hideModal) {
+                return;
+            }
+
+            bootstrap.Modal.getInstance = jest.fn().mockReturnValue(null);
+            bootstrap.Modal.getOrCreateInstance = jest.fn().mockReturnValue(null);
+
+            expect(() => {
+                window.ModalManagerV2.hideModal('non-existent-modal');
+            }).not.toThrow();
+        });
+
+        test('should create modal instance if not exists', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.hideModal) {
+                return;
+            }
+
+            const mockModalInstance = {
+                hide: jest.fn()
+            };
+
+            bootstrap.Modal.getInstance = jest.fn().mockReturnValue(null);
+            bootstrap.Modal.getOrCreateInstance = jest.fn().mockReturnValue(mockModalInstance);
+
+            const modalElement = document.createElement('div');
+            modalElement.id = 'test-create-modal';
+            document.body.appendChild(modalElement);
+
+            window.ModalManagerV2.hideModal('test-create-modal');
+
+            expect(bootstrap.Modal.getOrCreateInstance).toHaveBeenCalled();
+            expect(mockModalInstance.hide).toHaveBeenCalled();
+
+            document.body.removeChild(modalElement);
+        });
+
+        test('should handle null modalId and no active modal', () => {
+            if (!window.ModalManagerV2 || !window.ModalManagerV2.hideModal) {
+                return;
+            }
+
+            window.ModalManagerV2.activeModal = null;
+
+            expect(() => {
+                window.ModalManagerV2.hideModal(null);
+            }).not.toThrow();
+        });
+    });
 });
 

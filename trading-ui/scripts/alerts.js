@@ -273,18 +273,15 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.setAttribute('data-bs-keyboard', 'true');
     }
 
-    // הוספת event listener לסגירה בלחיצה על הרקע
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      }
-    });
+    // REMOVED: Event listener לסגירה בלחיצה על הרקע
+    // ModalManagerV2 מטפל ב-backdrop click אוטומטית דרך handleGlobalBackdropClick
+    // אם המודל הוא חלק מ-ModalManagerV2, אין צורך ב-event listener מקומי
+    // אם המודל הוא מודל מיוחד (לא חלק מ-ModalManagerV2), Bootstrap מטפל בזה אוטומטית עם data-bs-backdrop
   });
 
-  window.Logger.info('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע', { page: "alerts" });
+  // REMOVED: הודעת לוג - event listeners לסגירה בלחיצה על הרקע הוסרו
+  // ModalManagerV2 מטפל ב-backdrop click אוטומטית
+  // window.Logger.info('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע', { page: "alerts" });
 
   // בדיקת הצבעים הסטטיים
   window.Logger.info('🎨 בודק צבעים סטטיים...', { page: "alerts" });
@@ -2595,15 +2592,10 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.setAttribute('data-bs-keyboard', 'true');
     }
 
-    // הוספת event listener לסגירה בלחיצה על הרקע
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      }
-    });
+    // REMOVED: Event listener לסגירה בלחיצה על הרקע
+    // ModalManagerV2 מטפל ב-backdrop click אוטומטית דרך handleGlobalBackdropClick
+    // אם המודל הוא חלק מ-ModalManagerV2, אין צורך ב-event listener מקומי
+    // אם המודל הוא מודל מיוחד (לא חלק מ-ModalManagerV2), Bootstrap מטפל בזה אוטומטית עם data-bs-backdrop
   });
 });
 

@@ -163,9 +163,14 @@ async function addExecution() {
  */
 
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
-window.loadExecutionsData = window.loadExecutionsData || function() {
-  // loadExecutionsData not yet defined, using placeholder
-};
+// Note: The actual function will be assigned later (line 2930)
+// This placeholder is only set if it doesn't already exist
+if (!window.loadExecutionsData) {
+  window.loadExecutionsData = function() {
+    window.Logger?.warn?.('⚠️ loadExecutionsData called before initialization', { page: "executions" });
+    return Promise.resolve([]);
+  };
+}
 
 // משתנים גלובליים
 if (!window.executionsData) {

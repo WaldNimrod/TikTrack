@@ -922,7 +922,14 @@ function buildTradePlanConfirmationDetails(tradePlan, tradePlanId) {
 }
 
 /**
- * פתיחת מודל ביטול תכנון
+ * Open cancel trade plan modal
+ * Opens a special modal for canceling a trade plan (not part of ModalManagerV2 CRUD system)
+ * Uses Bootstrap modal directly as this is a special-purpose modal
+ * 
+ * @function openCancelTradePlanModal
+ * @param {number} tradePlanId - ID of the trade plan to cancel
+ * @returns {void}
+ * @since 2.1.0 - Updated to use Bootstrap.Modal.getOrCreateInstance when ModalManagerV2 is available
  */
 function openCancelTradePlanModal(tradePlanId) {
   try {
@@ -942,8 +949,20 @@ function openCancelTradePlanModal(tradePlanId) {
 
   document.getElementById('cancelTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
 
-  const modal = new bootstrap.Modal(document.getElementById('cancelTradePlanModal'));
-  modal.show();
+  // פתיחת מודל ביטול דרך ModalManagerV2 (אם זמין) או fallback ל-Bootstrap
+  // זה מודל מיוחד לביטול תכנון, לא חלק מ-ModalManagerV2 CRUD
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+    // ModalManagerV2 לא מטפל בפתיחת מודלים מיוחדים, נשתמש ב-Bootstrap
+    const modalElement = document.getElementById('cancelTradePlanModal');
+    if (modalElement) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+      modal.show();
+    }
+  } else {
+    // Fallback ל-Bootstrap modal
+    const modal = new bootstrap.Modal(document.getElementById('cancelTradePlanModal'));
+    modal.show();
+  }
   
   } catch (error) {
     window.Logger.error('שגיאה בפתיחת מודל ביטול תכנון:', error, { page: "trade_plans" });

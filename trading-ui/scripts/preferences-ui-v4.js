@@ -16,10 +16,14 @@
         window.Logger?.error?.('PreferencesV4 SDK missing', { page: 'preferences-ui-v4' });
         return;
       }
+      let profileContext = null;
       try {
-        const { profileContext } = await window.PreferencesV4.bootstrap(this.requiredGroups);
-        this.currentUserId = profileContext?.user_id ?? null;
-        this.currentProfileId = profileContext?.resolved_profile_id ?? null;
+        // Get userId from PreferencesCore or default to 1
+        const userId = window.PreferencesCore?.currentUserId ?? 1;
+        const bootstrapResult = await window.PreferencesV4.bootstrap(this.requiredGroups, null, userId);
+        profileContext = bootstrapResult?.profileContext ?? null;
+        this.currentUserId = profileContext?.user_id ?? profileContext?.user?.id ?? null;
+        this.currentProfileId = profileContext?.resolved_profile_id ?? profileContext?.resolved_profile?.id ?? null;
       } catch (error) {
         window.Logger?.warn?.('PreferencesV4 bootstrap failed, continuing without profile context', {
           page: 'preferences-ui-v4',
@@ -27,11 +31,18 @@
         });
         this.currentUserId = null;
         this.currentProfileId = null;
-        return; // Exit early if bootstrap fails
+        profileContext = null;
       }
 
-      this._renderUser(profileContext);
-      this._renderProfile(profileContext);
+      // Only render if we have profile context
+      if (profileContext) {
+        this._renderUser(profileContext);
+        this._renderProfile(profileContext);
+      } else {
+        window.Logger?.warn?.('No profile context available, skipping user/profile rendering', {
+          page: 'preferences-ui-v4',
+        });
+      }
 
       // Load required groups (served from cache if 304)
       await Promise.all(this.requiredGroups.map(g => window.PreferencesV4.getGroup(g)));

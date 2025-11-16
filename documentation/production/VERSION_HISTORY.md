@@ -18,3 +18,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-14T22:52:17+00:00 | 1.1.1.0 | 1.0.8.0 | 87cdd25fd639298da485550f8bd5ee10917c034d | 0d5f54c8d41e340b2105b04a094442ec6f8701f5 | set | Production release 1.1.1 |
 | 2025-11-16T21:29:24+00:00 | 1.1.2.0 | 1.1.1.0 | 863d46f578530935c42fbfb4830e991fc9b53f48 | 87cdd25fd639298da485550f8bd5ee10917c034d | patch | תיקון בעיות בעמוד תזרימי מזומנים: טעינת מטבעות, מודול עריכה, תאריכים ועמודת עודכן |
 | 2025-11-16T22:02:45+00:00 | 1.1.3.0 | 1.1.2.0 | e93f36fb5392ff630fc891ce2f47ca6efdff2ba9 | 863d46f578530935c42fbfb4830e991fc9b53f48 | patch | Trade Planning Fields - Complete Implementation with Snapshot Pattern, Documentation, and Code Quality Improvements |
+| 2025-11-16T22:07:34+00:00 | 1.1.4.0 | 1.1.3.0 | 9676c2c32c1870820abdc3cc2074eee5ae0b3700 | e93f36fb5392ff630fc891ce2f47ca6efdff2ba9 | patch | Cash flows fixes round - Backend API routes and Frontend date handling fixes |

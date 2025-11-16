@@ -1464,6 +1464,15 @@ async function updateNoteFromModal() {
 
 // פונקציה זו הוסרה - שימוש במערכת הגלובלית showDeleteWarning
 
+/**
+ * Confirm and delete a note
+ * Closes the delete confirmation modal using ModalManagerV2 and deletes the note
+ * 
+ * @function confirmDeleteNote
+ * @param {number} noteId - ID of the note to delete
+ * @returns {Promise<void>}
+ * @since 2.1.0 - Updated to use ModalManagerV2.hideModal() instead of direct Bootstrap modal
+ */
 async function confirmDeleteNote(noteId) {
   // סגירת המודל דרך ModalManagerV2
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
@@ -2134,7 +2143,12 @@ function getTypeDisplayName(type) {
 // פונקציה לצפייה בהערה
 /**
  * View a note
+ * Opens the note view modal using the global entity details system or fallback to Bootstrap modal
+ * 
+ * @function viewNote
  * @param {number} noteId - ID of the note to view
+ * @returns {void}
+ * @since 2.1.0 - Updated to use ModalManagerV2 for modal management when available
  */
 function viewNote(noteId) {
   try {
@@ -2301,7 +2315,11 @@ function getNoteRelatedDisplay(note) {
 // פונקציה לעריכת הערה נוכחית
 /**
  * Edit current note
- * Opens edit modal for the currently viewing note
+ * Closes the view modal using ModalManagerV2 and opens edit modal for the currently viewing note
+ * 
+ * @function editCurrentNote
+ * @returns {void}
+ * @since 2.1.0 - Updated to use ModalManagerV2.hideModal() instead of direct Bootstrap modal
  */
 function editCurrentNote() {
   try {

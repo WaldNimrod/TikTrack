@@ -76,7 +76,7 @@ For each page there is a dedicated per-page report in this directory with detail
 - **עמודים המשתמשים ב-UnifiedCacheManager**: 9 עמודים (עלה מ-6)
 - **עמודים המשתמשים ב-CacheSyncManager**: 9 עמודים (חדש! ✅)
 - **עמודים המשתמשים ב-CRUDResponseHandler**: 9 עמודים (עלה מ-8)
-- **עמודים המשתמשים ב-ModalManagerV2**: 8 עמודים
+- **עמודים המשתמשים ב-ModalManagerV2**: 8 עמודים (✅ הושלם - כל הקוד הישן הוחלף)
 - **סה"כ קריאות console.log**: 511 קריאות (צריך להחליף ל-Logger)
 - **סה"כ קריאות fetch ישירות**: 172 קריאות (חלקן צריכות לעבור לשירותי נתונים)
 
@@ -113,17 +113,18 @@ For each page there is a dedicated per-page report in this directory with detail
 1. ✅ **הושלם**: יצירת שירותי נתונים ייעודיים לכל העמודים (executions, trading_accounts, cash_flows, notes, data_import)
 2. **עדיפות גבוהה**: החלפת כל קריאות `console.log` ל-`window.Logger`
 3. ✅ **הושלם**: שילוב CacheSyncManager בכל פעולות CRUD
-4. **עדיפות בינונית**: השלמת מעבר ל-ModalManagerV2 בעמודים הנותרים
-5. **עדיפות נמוכה**: ניקוי קוד legacy (jQuery AJAX, XMLHttpRequest)
+4. ✅ **הושלם**: השלמת מעבר ל-ModalManagerV2 (4 עמודים, 8 מקומות תוקנו)
+5. ✅ **הושלם**: שילוב PageStateManager (1 עמוד - notes.js)
+6. **עדיפות נמוכה**: ניקוי קוד legacy (jQuery AJAX, XMLHttpRequest)
 
 ## טבלת סטטוס
 
 | עמוד | סוג | Data Service | Cache | CRUD | Modals | Field Renderer | Page State | Logger | דוח מפורט |
 |------|-----|-------------|-------|------|--------|----------------|------------|--------|-----------|
 | index | מרכזי | ✅ | ⚠️ | ❌ | ❌ | ✅ | ❌ | ⚠️ | [index.report.md](index.report.md) |
-| trades | מרכזי | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | [trades.report.md](trades.report.md) |
-| trade_plans | מרכזי | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | [trade_plans.report.md](trade_plans.report.md) |
-| alerts | מרכזי | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | [alerts.report.md](alerts.report.md) |
+| trades | מרכזי | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | [trades.report.md](trades.report.md) |
+| trade_plans | מרכזי | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | [trade_plans.report.md](trade_plans.report.md) |
+| alerts | מרכזי | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | [alerts.report.md](alerts.report.md) |
 | tickers | מרכזי | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | [tickers.report.md](tickers.report.md) |
 | trading_accounts | מרכזי | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | [trading_accounts.report.md](trading_accounts.report.md) |
 | executions | מרכזי | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | [executions.report.md](executions.report.md) |
@@ -183,8 +184,13 @@ For each page there is a dedicated per-page report in this directory with detail
    - ✅ CRUDResponseHandler מעודכן לשימוש ב-CacheSyncManager
    - ✅ 15+ נקודות ניקוי מטמון ישיר הוחלפו
    - ✅ CacheSyncManager מעודכן עם invalidation patterns חדשים
-2. **השלמת מעבר ל-ModalManagerV2** בעמודים הנותרים
-3. **שילוב PageStateManager** בעמודים החסרים
+2. ✅ **הושלם**: השלמת מעבר ל-ModalManagerV2 (4 עמודים: notes, trades, trade_plans, alerts)
+   - ✅ 8 מקומות עם קוד ישן הוחלפו ב-ModalManagerV2
+   - ✅ הוספת `hideModal()` ל-ModalManagerV2
+   - ✅ הוספת טסטים ל-hideModal
+3. ✅ **הושלם**: שילוב PageStateManager (1 עמוד: notes.js)
+   - ✅ הסרת `restoreNotesSectionState()` המקומית
+   - ✅ שימוש ב-PageStateManager + restoreAllSectionStates()
 
 ### שלב 3 - עדיפות נמוכה (4-6 שבועות)
 1. **ניקוי קוד legacy** (jQuery, XMLHttpRequest)
@@ -209,8 +215,9 @@ For each page there is a dedicated per-page report in this directory with detail
 - **דוח בדיקות CacheSyncManager**: [CACHE_SYNC_TESTING_REPORT.md](CACHE_SYNC_TESTING_REPORT.md)
 - **דוח בדיקה רוחבית**: [CACHE_SYNC_VERIFICATION_REPORT.md](CACHE_SYNC_VERIFICATION_REPORT.md)
 - **סיכום טסטים**: [CACHE_SYNC_TESTING_SUMMARY.md](CACHE_SYNC_TESTING_SUMMARY.md)
+- **דוח ModalManagerV2 ו-PageStateManager**: [MODAL_PAGESTATE_STATUS_REPORT.md](MODAL_PAGESTATE_STATUS_REPORT.md)
 - **דוחות פרטניים**: כל עמוד כולל דוח מפורט נפרד עם ממצאים ספציפיים
 
 ---
 *דוח נוצר אוטומטית על ידי סקריפט ניתוח סטנדרטיזציה - ינואר 2025*  
-*עודכן: ינואר 2025 - שילוב CacheSyncManager הושלם*
+*עודכן: ינואר 2025 - שילוב CacheSyncManager הושלם, ModalManagerV2 ו-PageStateManager הושלמו*

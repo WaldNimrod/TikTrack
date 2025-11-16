@@ -45,10 +45,17 @@
     return res;
   }
 
-  async function bootstrap(groups = DEFAULT_GROUPS, profileId = null) {
-    return dedup(`BOOTSTRAP:${groups.join(',')}:${profileId ?? ''}`, async () => {
+  async function bootstrap(groups = DEFAULT_GROUPS, profileId = null, userId = null) {
+    return dedup(`BOOTSTRAP:${groups.join(',')}:${profileId ?? ''}:${userId ?? ''}`, async () => {
+      // Resolve userId from PreferencesCore or default to 1
+      const resolvedUserId = userId ?? 
+        window.PreferencesCore?.currentUserId ?? 
+        window.PreferencesData?.currentUserId ?? 
+        1;
+      
       const params = new URLSearchParams();
       params.set('groups', groups.join(','));
+      params.set('user_id', String(resolvedUserId));
       if (profileId != null) params.set('profile_id', String(profileId));
       const headers = {};
       if (bootstrapETag) headers['If-None-Match'] = bootstrapETag;

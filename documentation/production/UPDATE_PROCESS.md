@@ -8,6 +8,15 @@
 
 ## ⚡ TL;DR - רצף מהיר
 
+### שיטה חדשה (מומלץ) - Master Script
+
+```bash
+# הרצת כל התהליך בפקודה אחת
+python scripts/production-update/master.py
+```
+
+### שיטה קלאסית (עדיין נתמכת)
+
 ```bash
 # 0. עצירת השרת (אם רץ)
 lsof -i :5001 && kill <PID>
@@ -32,9 +41,22 @@ git commit -m "chore: production release YYYY-MM-DD"
 git push origin production
 ```
 
-> כל השלבים זמינים גם כ־Cursor Tasks (Cmd+Shift+P → Tasks: Run Task → TT:*).
+> כל השלבים זמינים גם כ־Cursor Tasks (Cmd+Shift+P → Tasks: Run Task → TT:*).  
+> **חדש:** Master Script זמין ב-`scripts/production-update/master.py` - ראה `scripts/production-update/README.md`
 
 ---
+
+## 🆕 חידושים בגרסה 2.0.0
+
+- 🎯 `scripts/production-update/master.py` – Master Script מאוחד להרצת כל התהליך בפקודה אחת
+- 📦 מערכת מודולרית – כל שלב במודול נפרד, ניתן להריץ בנפרד
+- 🔄 Resume mode – המשך מהשלב האחרון שנכשל
+- 🧪 Dry-run mode – הרצה ללא ביצוע שינויים
+- 📊 דיווח מפורט – דוחות JSON, לוגים, סיכומים
+- 🔙 Rollback אוטומטי – snapshot לפני כל עדכון
+- 🧹 ניקוי גיבויים אוטומטי – משולב ב-sync
+- 🌐 בדיקות UI אוטומטיות – בדיקת עמודים, JavaScript, CSS
+- 🤖 פתרון קונפליקטים אוטומטי – פתרון לפי כללים מוגדרים
 
 ## 🆕 חידושים בגרסה 1.3.0
 
@@ -277,9 +299,16 @@ cp Backend/db/tiktrack.db production/Backend/db/tiktrack.db
 
 ## 📚 נספחים ורפרנסים
 
+### Master Script (מומלץ)
+- `scripts/production-update/master.py` - Master Script מאוחד
+- `scripts/production-update/README.md` - מדריך Master Script
+
+### מדריכים
 - `documentation/03-DEVELOPMENT/PRODUCTION_RELEASE_PLAYBOOK.md`
 - `documentation/frontend/GENERAL_SYSTEMS_LIST.md`
 - `documentation/INDEX.md`
+
+### סקריפטים (עדיין נתמכים)
 - `scripts/release/create_db_backup.py`
 - `scripts/release/verify_schema.py`
 - `scripts/release/run_release_checklist.py`

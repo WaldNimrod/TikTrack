@@ -28,7 +28,7 @@ else
 fi
 
 blocked_paths_regex='^(archive/|backup/|logs/)'
-allowed_prod_prefixes=('production/' 'documentation/' 'scripts/git-hooks/')
+allowed_prod_prefixes=('production/' 'documentation/' 'scripts/git-hooks/' 'scripts/production-update/')
 
 error_messages=()
 

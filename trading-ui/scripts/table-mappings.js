@@ -17,6 +17,23 @@
 console.log('🔵 [table-mappings.js] FILE LOADING STARTED');
 console.log('🔵 [table-mappings.js] Current window.TABLE_COLUMN_MAPPINGS:', window.TABLE_COLUMN_MAPPINGS ? `exists (${Object.keys(window.TABLE_COLUMN_MAPPINGS).length} keys)` : 'NOT FOUND');
 
+// ===== DATE FIELD HINTS =====
+// Array of strings that indicate date/time fields in column names
+const DATE_KEY_HINTS = [
+  'date',
+  'time',
+  'timestamp',
+  '_at',
+  '_on',
+  'fetched',
+  'asof',
+  'created',
+  'updated',
+  'closed',
+  'expiry',
+  'triggered'
+];
+
 // ===== TABLE COLUMN MAPPINGS =====
 const TABLE_COLUMN_MAPPINGS = {
   // טבלת תכנונים (Trade Plans) - Trade Plans Page Structure (מוצג בפועל)
@@ -553,6 +570,8 @@ function buildDateEnvelope(rawValue, options = {}) {
   try {
     if (typeof window.formatDate === 'function') {
       display = window.formatDate(local);
+    } else if (typeof window.dateUtils?.formatDate === 'function') {
+      display = window.dateUtils.formatDate(local);
     } else {
       display = new Date(epochMs).toLocaleDateString('he-IL');
     }
@@ -585,6 +604,43 @@ function getColumnValue(item, columnIndex, tableType) {
   const columns = TABLE_COLUMN_MAPPINGS[tableType] || [];
   const columnMeta = normalizeColumnEntry(columns[columnIndex]);
   const fieldName = columnMeta.key;
+  // Get sortType from column meta or from TABLE_COLUMN_SORT_TYPES
+  let sortType = columnMeta.sortType;
+  if (!sortType && TABLE_COLUMN_SORT_TYPES[tableType] && fieldName) {
+    sortType = TABLE_COLUMN_SORT_TYPES[tableType][fieldName];
+  }
+  if (!sortType && typeof window.getColumnSortType === 'function') {
+    sortType = window.getColumnSortType(tableType, columnIndex);
+  }
+
+  // Helper to extract epochMs from DateEnvelope for sorting
+  const extractEpochForSort = (value) => {
+    if (!value && value !== 0) {
+      return null;
+    }
+    // If it's already a DateEnvelope object
+    if (value && typeof value === 'object' && typeof value.epochMs === 'number' && !Number.isNaN(value.epochMs)) {
+      return value.epochMs;
+    }
+    // If it's a number (already epoch)
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    // Try to get epoch using dateUtils
+    if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+      const epoch = window.dateUtils.getEpochMilliseconds(value);
+      if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+        return epoch;
+      }
+    }
+    if (window.getEpochMilliseconds && typeof window.getEpochMilliseconds === 'function') {
+      const epoch = window.getEpochMilliseconds(value);
+      if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+        return epoch;
+      }
+    }
+    return null;
+  };
 
   const parseSortDateValue = (rawValue) => {
     if (!rawValue && rawValue !== 0) {
@@ -813,7 +869,25 @@ function getColumnValue(item, columnIndex, tableType) {
     }
     if (fieldName === 'yahoo_updated_at') {
       const dateValue = item.yahoo_updated_at || item.updated_at || item.last_price_update || null;
-      return buildDateEnvelope(dateValue);
+      // For sorting, extract epochMs from DateEnvelope
+      const envelope = buildDateEnvelope(dateValue);
+      if (envelope && typeof envelope.epochMs === 'number' && !Number.isNaN(envelope.epochMs)) {
+        return envelope.epochMs;
+      }
+      // Fallback to parsing date value directly
+      if (dateValue) {
+        const epochValue = extractEpochForSort(dateValue);
+        if (epochValue !== null) {
+          return epochValue;
+        }
+        if (typeof dateValue === 'string') {
+          const parsed = parseSortDateValue(dateValue);
+          if (parsed !== 0) {
+            return parsed;
+          }
+        }
+      }
+      return envelope || '';
     }
     // For other fields, return directly
     return item[fieldName] || '';
@@ -1044,10 +1118,32 @@ function getColumnValue(item, columnIndex, tableType) {
     if (fieldName === 'execution_date') {
       const envelopeCandidate = item.execution_date;
       if (envelopeCandidate && typeof envelopeCandidate === 'object') {
+        // For sorting, extract epochMs from DateEnvelope
+        if (typeof envelopeCandidate.epochMs === 'number' && !Number.isNaN(envelopeCandidate.epochMs)) {
+          return envelopeCandidate.epochMs;
+        }
+        const epochValue = extractEpochForSort(envelopeCandidate);
+        if (epochValue !== null) {
+          return epochValue;
+        }
         return envelopeCandidate;
       }
       const directValue = item.execution_date || (item.execution && item.execution.date);
-      return buildDateEnvelope(directValue);
+      const envelope = buildDateEnvelope(directValue);
+      if (envelope && typeof envelope.epochMs === 'number' && !Number.isNaN(envelope.epochMs)) {
+        return envelope.epochMs;
+      }
+      const epochValue = extractEpochForSort(directValue);
+      if (epochValue !== null) {
+        return epochValue;
+      }
+      if (directValue && typeof directValue === 'string') {
+        const parsed = parseSortDateValue(directValue);
+        if (parsed !== 0) {
+          return parsed;
+        }
+      }
+      return envelope || '';
     }
     if (fieldName === 'trade_id') {
       return item.trade_id || 0;
@@ -1058,12 +1154,34 @@ function getColumnValue(item, columnIndex, tableType) {
     if (fieldName === 'trade_created_at') {
       const envelopeCandidate = item.trade_created_at;
       if (envelopeCandidate && typeof envelopeCandidate === 'object') {
+        // For sorting, extract epochMs from DateEnvelope
+        if (typeof envelopeCandidate.epochMs === 'number' && !Number.isNaN(envelopeCandidate.epochMs)) {
+          return envelopeCandidate.epochMs;
+        }
+        const epochValue = extractEpochForSort(envelopeCandidate);
+        if (epochValue !== null) {
+          return epochValue;
+        }
         return envelopeCandidate;
       }
       const dateValue = item.trade_created_at
         || (item.suggestion && (item.suggestion.created_at || item.suggestion.opened_at || item.suggestion.open_date || item.suggestion.start_date))
         || null;
-      return buildDateEnvelope(dateValue);
+      const envelope = buildDateEnvelope(dateValue);
+      if (envelope && typeof envelope.epochMs === 'number' && !Number.isNaN(envelope.epochMs)) {
+        return envelope.epochMs;
+      }
+      const epochValue = extractEpochForSort(dateValue);
+      if (epochValue !== null) {
+        return epochValue;
+      }
+      if (dateValue && typeof dateValue === 'string') {
+        const parsed = parseSortDateValue(dateValue);
+        if (parsed !== 0) {
+          return parsed;
+        }
+      }
+      return envelope || '';
     }
     if (fieldName === 'status') {
       return item.status || '';
@@ -1091,8 +1209,31 @@ function getColumnValue(item, columnIndex, tableType) {
     }
   }
 
+  // Get the raw value
+  const rawValue = item[fieldName];
+  
+  // For date columns, extract epochMs for proper sorting
+  // Use window.DATE_KEY_HINTS if available, otherwise fallback to local DATE_KEY_HINTS
+  // CRITICAL: Always check window first to avoid ReferenceError if DATE_KEY_HINTS is not in scope
+  const dateHints = (typeof window !== 'undefined' && window.DATE_KEY_HINTS) 
+    ? window.DATE_KEY_HINTS 
+    : (typeof DATE_KEY_HINTS !== 'undefined' ? DATE_KEY_HINTS : []);
+  if (sortType === 'dateEnvelope' || sortType === 'date' || (Array.isArray(dateHints) && dateHints.some(hint => fieldName.toLowerCase().includes(hint)))) {
+    // Check if the value is a DateEnvelope or can be converted to epoch
+    const epochValue = extractEpochForSort(rawValue);
+    if (epochValue !== null) {
+      return epochValue;
+    }
+    // If not DateEnvelope, try to parse as date string
+    if (rawValue && typeof rawValue === 'string') {
+      const parsed = parseSortDateValue(rawValue);
+      if (parsed !== 0) {
+        return parsed;
+      }
+    }
+  }
 
-  return item[fieldName] || '';
+  return rawValue || '';
 }
 
 /**
@@ -1343,11 +1484,13 @@ window.getColumnSortType = getColumnSortType;
 window.getColumnKey = getColumnKey;
 window.getColumnIndexByKey = getColumnIndexByKey;
 window.getDefaultSortChain = buildCanonDefaultSortChain;
+window.DATE_KEY_HINTS = DATE_KEY_HINTS;
 
 // ייצוא המודול עצמו
 window.tableMappings = {
   TABLE_COLUMN_MAPPINGS,
   TABLE_COLUMN_KEYS,
+  DATE_KEY_HINTS,
   getColumnValue,
   getTableMapping,
   isTableSupported,

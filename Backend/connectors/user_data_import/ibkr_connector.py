@@ -232,6 +232,7 @@ class IBKRConnector(BaseConnector):
         cashflows = self._parse_cashflow_sections(lines)
         account_info = self._parse_account_sections(lines)
         statement_metadata = self._parse_statement_metadata(lines)
+        cash_report_summary = self._parse_cash_report_summary(lines)  # Summary totals from Cash Report
 
         forex_cashflows = self._build_forex_cashflows()
         all_cashflows = cashflows + forex_cashflows
@@ -252,6 +253,7 @@ class IBKRConnector(BaseConnector):
             'account_reconciliation': account_info,
             'portfolio_positions': portfolio_positions,
             'taxes_and_fx': tax_fx_records,
+            'cash_report_summary': cash_report_summary,  # Summary totals from Cash Report for validation
             'statement_metadata': statement_metadata
         }
 
@@ -355,6 +357,144 @@ class IBKRConnector(BaseConnector):
                 records.append(record)
 
         return records
+
+    def _parse_cash_report_summary(self, lines: List[str]) -> Dict[str, float]:
+        """
+        Parse Cash Report section and extract summary totals by Activity.
+        
+        IMPORTANT: This function is used ONLY for comparison purposes, not for creating cashflow records.
+        It extracts totals from the Cash Report section to compare with imported cashflows.
+        
+        The function filters out activities that are NOT real cash movements:
+        - Cash FX Translation Gain/Loss (unrealized FX, not actual cash)
+        - Trades (Sales/Purchase) (part of executions, not separate cashflow)
+        - Commissions (included in executions/forex, not separate)
+        - Starting/Ending Cash balances (summary rows, not transactions)
+        
+        Only REAL cash movements are included in the summary for comparison.
+        
+        Returns:
+            Dict mapping cashflow_type to total_amount from Cash Report summaries
+            (only includes real cash movements, excludes accounting entries)
+        """
+        summary_totals: Dict[str, float] = {}
+        in_cash_report = False
+        current_headers: Optional[List[str]] = None
+        
+        # Mapping from Cash Report Activity names to cashflow_type
+        # IMPORTANT: Only map REAL cash movements (exclude accounting entries)
+        activity_to_type = {
+            'Dividends': 'dividend',
+            'Deposits': 'deposit',
+            'Withdrawals': 'withdrawal',
+            'Account Transfers': 'transfer',
+            'Broker Interest Paid and Received': 'interest',
+            'Interest': 'interest',
+            'Withholding Tax': 'tax',
+            'Payment In Lieu of Dividends': 'dividend',
+            # NOTE: The following are NOT mapped because they are skipped:
+            # - 'Commissions': Included in executions/forex, not separate cashflow
+            # - 'Cash FX Translation Gain/Loss': Unrealized FX, not actual cash
+            # - 'Trades (Sales)' / 'Trades (Purchase)': Part of executions, not cashflow
+        }
+        
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            
+            # Check if we're entering Cash Report section
+            if stripped.startswith('Cash Report,Header'):
+                in_cash_report = True
+                current_headers = self._parse_section_headers(stripped)
+                continue
+            
+            # Check if we're leaving Cash Report section
+            if in_cash_report and not stripped.startswith('Cash Report'):
+                in_cash_report = False
+                current_headers = None
+                continue
+            
+            if not in_cash_report or not current_headers:
+                continue
+            
+            # Only process Data rows (skip Header, Trailer, etc.)
+            if not stripped.startswith('Cash Report,Data'):
+                continue
+            
+            # Parse the row
+            value_reader = csv.reader(io.StringIO(stripped))
+            values = next(value_reader)
+            
+            if len(values) < 3:
+                continue
+            
+            # Activity is in the third column (index 2)
+            activity = values[2].strip() if len(values) > 2 else ''
+            
+            # Skip summary rows (Starting Cash, Ending Cash, etc.)
+            skip_activities = [
+                'Starting Cash',
+                'Ending Cash',
+                'Ending Settled Cash',
+                'Starting Collateral Value',
+                'Ending Collateral Value',
+                'Net Cash Balance',
+                'Net Settled Cash Balance',
+                'Net Securities Lent Activity'
+            ]
+            if activity in skip_activities:
+                continue
+            
+            # IMPORTANT: Skip activities that are NOT real cash movements
+            # These are accounting entries, not actual cash flows
+            skip_non_cash_activities = [
+                'Cash FX Translation Gain/Loss',  # Unrealized FX gain/loss, not actual cash
+                'Trades (Sales)',  # Part of executions, not separate cashflow
+                'Trades (Purchase)',  # Part of executions, not separate cashflow
+                'Commissions'  # Included in executions or forex_conversion, not separate
+            ]
+            if activity in skip_non_cash_activities:
+                continue
+            
+            # Get cashflow_type from activity mapping
+            cashflow_type = activity_to_type.get(activity)
+            if not cashflow_type:
+                # Try to infer from activity name
+                activity_lower = activity.lower()
+                if 'dividend' in activity_lower:
+                    cashflow_type = 'dividend'
+                elif 'interest' in activity_lower:
+                    cashflow_type = 'interest'
+                elif 'tax' in activity_lower or 'withholding' in activity_lower:
+                    cashflow_type = 'tax'
+                elif 'fee' in activity_lower or 'commission' in activity_lower:
+                    cashflow_type = 'fee'
+                elif 'deposit' in activity_lower:
+                    cashflow_type = 'deposit'
+                elif 'withdrawal' in activity_lower:
+                    cashflow_type = 'withdrawal'
+                elif 'transfer' in activity_lower:
+                    cashflow_type = 'transfer'
+                else:
+                    # Skip unknown activities
+                    continue
+            
+            # Get total amount from Base Currency Summary column (usually index 4)
+            # Or from Total column if available
+            total_amount = None
+            if len(values) > 4:
+                total_str = values[4].strip()
+                try:
+                    total_amount = float(total_str) if total_str else 0.0
+                except (ValueError, TypeError):
+                    pass
+            
+            if total_amount is not None and cashflow_type:
+                # Sum up totals for the same cashflow_type
+                summary_totals[cashflow_type] = summary_totals.get(cashflow_type, 0.0) + abs(total_amount)
+        
+        return summary_totals
 
     def _parse_statement_metadata(self, lines: List[str]) -> Dict[str, Any]:
         metadata: Dict[str, Any] = {
@@ -811,6 +951,9 @@ class IBKRConnector(BaseConnector):
                 'cash_amount': self._parse_float(row.get('Cash Amount'))
             })
         elif section_key == 'dividend_accrual':
+            # NOTE: Dividend accrual records represent declared but not yet paid dividends.
+            # These are accounting entries, not actual cash movements.
+            # Users should verify the actual meaning of these records before importing.
             extras.update({
                 'gross_amount': self._parse_float(row.get('Gross Amount')),
                 'net_amount': self._parse_float(row.get('Net Amount')),
@@ -845,6 +988,24 @@ class IBKRConnector(BaseConnector):
         return extras
 
     def _should_skip_cashflow_row(self, section_name: str, row: Dict[str, Any]) -> bool:
+        """
+        Determine if a cashflow row should be skipped.
+        
+        IMPORTANT: This function filters out summary rows and accounting entries that are NOT
+        real cash movements. Only actual cash flow transactions should be processed.
+        
+        Skips rows that are:
+        - Headers, trailers, totals, subtotals
+        - Starting/Ending Cash balances (summary rows, not transactions)
+        - Any summary or accounting entries that don't represent actual money movement
+        
+        Args:
+            section_name: Name of the section being processed
+            row: Dictionary representing a single row of data
+            
+        Returns:
+            True if the row should be skipped, False if it should be processed
+        """
         values = [str(value).strip() for value in row.values()]
         first_value = next((value for value in values if value and value not in {'--'}), '')
 
@@ -852,8 +1013,18 @@ class IBKRConnector(BaseConnector):
             return True
 
         lowered = first_value.lower()
-        if 'header' in lowered:
+        
+        # Skip headers, trailers, totals, subtotals, starting/ending balances
+        skip_patterns = [
+            'header',
+            'trailer',
+            'subtotal',
+            'ending',
+            'starting'
+        ]
+        if any(pattern in lowered for pattern in skip_patterns):
             return True
+            
         if lowered.startswith('total') or lowered.endswith(' total') or lowered.endswith(' totals'):
             return True
         if lowered.startswith('starting') and 'dividend accrual' in lowered:
@@ -996,16 +1167,34 @@ class IBKRConnector(BaseConnector):
         section_key = self.CASHFLOW_SECTION_NAMES.get(section_name, '').lower()
 
         if section_key == 'cash_report':
+            # IMPORTANT: Cash Report section should not be processed here as cashflow records.
+            # Cash Report is only used for summary comparison, not for creating cashflow records.
+            # Individual cashflow records come from their specific sections (Dividends, Interest, etc.).
+            # If we reach here, it means a Cash Report row was not filtered out properly.
+            # Return 'cash_adjustment' as fallback, but this should rarely happen.
             activity_code = (row.get('Activity Code') or row.get('Activity') or '').lower()
             description = (row.get('Description') or row.get('Activity Description') or '').lower()
+            
+            # Skip non-cash activities (should have been filtered in _parse_cash_report_summary)
+            skip_activities = [
+                'cash fx translation gain/loss',
+                'trades (sales)',
+                'trades (purchase)',
+                'commissions'
+            ]
+            if any(skip in activity_code or skip in description for skip in skip_activities):
+                return 'cash_adjustment'  # Will be filtered out later
+            
             if 'dividend' in activity_code or 'dividend' in description:
                 return 'dividend'
             if 'interest' in activity_code or 'interest' in description:
                 return 'interest'
             if 'tax' in activity_code or 'withholding' in description:
                 return 'tax'
+            # NOTE: 'fee' and 'commission' should not appear here as they are filtered in _parse_cash_report_summary
+            # But if they do, we skip them (return cash_adjustment which will be filtered)
             if 'fee' in activity_code or 'commission' in description:
-                return 'fee'
+                return 'cash_adjustment'  # Will be filtered out (commissions are in executions/forex)
             if 'deposit' in description:
                 return 'deposit'
             if 'withdrawal' in description or 'transfer' in description:
@@ -1125,43 +1314,126 @@ class IBKRConnector(BaseConnector):
         return list(self._last_symbol_metadata_entries)
 
     def _build_forex_cashflows(self) -> List[Dict[str, Any]]:
+        """
+        Build forex conversion cashflow records.
+        
+        IMPORTANT: This function creates TWO separate records (FROM/TO) for each forex conversion,
+        instead of a single record with Proceeds. This atomic model ensures:
+        1. Correct pairing during import (matching by date, currencies, exchange_rate, asset_symbol)
+        2. Accurate amount calculation (FROM: -abs(quantity), TO: abs(quantity * trade_price))
+        3. Proper fee assignment (commission goes only on FROM record)
+        4. Complete metadata for pairing (exchange_rate, quantity, source_currency, target_currency, symbol)
+        
+        The records are created from _pending_forex_rows which are identified in _parse_trades_section
+        as rows where Asset Category == 'Forex' AND DataDiscriminator == 'Order'.
+        
+        Returns:
+            List of forex conversion records (from and to pairs)
+            Each forex conversion results in 2 records that will be paired during import.
+        """
         forex_records: List[Dict[str, Any]] = []
         if not self._pending_forex_rows:
             return forex_records
 
         for row in self._pending_forex_rows:
             try:
-                amount = self._parse_float(row.get('Proceeds'))
                 effective_date = self._extract_datetime(
                     row,
                     ['Date/Time', 'Trade Date']
                 )
-                symbol = row.get('Symbol', '')
+                symbol = row.get('Symbol', '').strip()
+                
+                # Validate symbol format: must contain dot and identify two currencies (BASE.QUOTE)
+                if not symbol or '.' not in symbol:
+                    logger.warning(f"⚠️ Skipping forex row with invalid Symbol format (must be BASE.QUOTE): {symbol}")
+                    continue
+                
                 pair_base, pair_quote = self._split_currency_pair(symbol)
-                record = {
+                if not pair_base or not pair_quote:
+                    logger.warning(f"⚠️ Skipping forex row - failed to extract currencies from Symbol: {symbol}")
+                    continue
+                
+                # Extract key values from IBKR row
+                quantity = self._parse_float(row.get('Quantity'))
+                trade_price = self._parse_float(row.get('T. Price'))
+                proceeds = self._parse_float(row.get('Proceeds'))
+                commission = self._parse_float(row.get('Comm/Fee'))
+                
+                # Validate required fields
+                if quantity is None or quantity == 0:
+                    logger.warning(f"⚠️ Skipping forex row with invalid Quantity: {row.get('Quantity')}")
+                    continue
+                if trade_price is None or trade_price == 0:
+                    logger.warning(f"⚠️ Skipping forex row with invalid T.Price: {row.get('T. Price')}")
+                    continue
+                
+                # Calculate amounts correctly:
+                # - FROM: negative quantity in base currency (what we're selling)
+                # - TO: positive quantity * price in quote currency (what we're receiving)
+                from_amount = -abs(quantity)  # Always negative (outgoing)
+                to_amount = abs(quantity * trade_price)  # Always positive (incoming)
+                
+                # Common metadata for both records
+                common_metadata = {
+                    'exchange_rate': trade_price,
+                    'quantity': quantity,
+                    'proceeds': proceeds,  # For verification
+                    'source_currency': pair_base,
+                    'target_currency': pair_quote,
+                    'symbol': symbol,
+                    'basis': self._parse_float(row.get('Basis')),
+                    'realized_pl': self._parse_float(row.get('Realized P/L')),
+                    'mtm_pl': self._parse_float(row.get('MTM P/L'))
+                }
+                
+                # Create FROM record (negative, base currency)
+                from_record = {
                     'section': 'Trades',
                     'cashflow_type': 'forex_conversion',
-                    'amount': amount,
-                    'currency': row.get('Currency') or pair_quote or '',
+                    'amount': from_amount,
+                    'currency': pair_base,  # Base currency (what we're selling)
                     'effective_date': effective_date,
                     'source_account': row.get('Account') or '',
                     'target_account': '',
                     'asset_symbol': symbol,
                     'memo': row.get('Code') or '',
                     'tax_country': '',
-                    'quantity': self._parse_float(row.get('Quantity')),
-                    'trade_price': self._parse_float(row.get('T. Price')),
-                    'commission': self._parse_float(row.get('Comm/Fee')),
-                    'basis': self._parse_float(row.get('Basis')),
-                    'realized_pl': self._parse_float(row.get('Realized P/L')),
-                    'mtm_pl': self._parse_float(row.get('MTM P/L')),
+                    'quantity': quantity,
+                    'trade_price': trade_price,
+                    'commission': commission,  # Fee goes on FROM record
                     'source_currency': pair_base,
                     'target_currency': pair_quote,
+                    'metadata': dict(common_metadata),  # Copy for FROM
                     '_raw_row': row
                 }
-                forex_records.append(record)
+                
+                # Create TO record (positive, quote currency)
+                to_record = {
+                    'section': 'Trades',
+                    'cashflow_type': 'forex_conversion',
+                    'amount': to_amount,
+                    'currency': pair_quote,  # Quote currency (what we're receiving)
+                    'effective_date': effective_date,
+                    'source_account': row.get('Account') or '',
+                    'target_account': '',
+                    'asset_symbol': symbol,
+                    'memo': row.get('Code') or '',
+                    'tax_country': '',
+                    'quantity': quantity,
+                    'trade_price': trade_price,
+                    'commission': 0.0,  # Fee only on FROM record
+                    'source_currency': pair_base,
+                    'target_currency': pair_quote,
+                    'metadata': dict(common_metadata),  # Copy for TO
+                    '_raw_row': row
+                }
+                
+                # Add both records (they will be paired later by matching currencies and date)
+                forex_records.append(from_record)
+                forex_records.append(to_record)
+                
             except Exception as exc:
-                logger.debug("Failed to build forex conversion record: %s", exc)
+                logger.error(f"❌ Failed to build forex conversion record: {exc}", exc_info=True)
 
         self._pending_forex_rows = []
         return forex_records

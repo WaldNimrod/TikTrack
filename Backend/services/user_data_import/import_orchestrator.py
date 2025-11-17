@@ -346,6 +346,12 @@ class ImportOrchestrator:
         )
         session.total_records = len(raw_records)
         logger.info("✅ Parsed %s records", len(raw_records))
+        
+        # Get cash_report_summary from connector if available (for cashflows task)
+        cash_report_summary = {}
+        if task_type == 'cashflows' and hasattr(connector, 'parse_sections'):
+            sections = connector.parse_sections(file_content)
+            cash_report_summary = sections.get('cash_report_summary', {})
 
         if task_type == 'executions':
             symbol_metadata = self.symbol_metadata_service.build_metadata_map(
@@ -404,7 +410,8 @@ class ImportOrchestrator:
             'normalization_result': normalization_result,
             'validation_result': validation_result,
             'duplicate_result': duplicate_result,
-            'symbol_metadata': symbol_metadata
+            'symbol_metadata': symbol_metadata,
+            'cash_report_summary': cash_report_summary  # Summary totals from Cash Report for validation
         }
 
     # ------------------------------------------------------------------
@@ -1213,13 +1220,24 @@ class ImportOrchestrator:
         elif raw_type == 'dividend':
             storage_type = 'dividend'
         elif raw_type == 'dividend_accrual':
+            # IMPORTANT: Dividend accrual records represent declared but not yet paid dividends.
+            # These are accounting entries, not actual cash movements.
+            # They do NOT represent money that entered or left the account.
+            # IBKR includes them for accounting purposes, but they should not be imported as regular dividends.
+            # Users should verify the actual meaning of these records before importing.
+            # They are stored as 'other_positive'/'other_negative' to distinguish them from real dividends.
             storage_type = 'other_positive' if is_positive else 'other_negative'
-            mapping_note = 'Dividend accrual'
+            mapping_note = 'Dividend accrual (accounting entry, not actual cash)'
         elif raw_type == 'interest':
             storage_type = 'interest'
         elif raw_type == 'interest_accrual':
+            # IMPORTANT: Interest accrual records represent declared but not yet paid/received interest.
+            # These are accounting entries, not actual cash movements.
+            # They do NOT represent money that entered or left the account.
+            # IBKR includes them for accounting purposes, but they should not be imported as regular interest.
+            # They are stored as 'other_positive'/'other_negative' to distinguish them from real interest.
             storage_type = 'other_positive' if is_positive else 'other_negative'
-            mapping_note = 'Interest accrual'
+            mapping_note = 'Interest accrual (accounting entry, not actual cash)'
         elif raw_type == 'tax':
             storage_type = 'tax'
         elif raw_type == 'fee':
@@ -1248,15 +1266,104 @@ class ImportOrchestrator:
 
         return storage_type, mapping_note
 
-    def _build_preview_payload(self, task_type: str, pipeline_result: Dict[str, Any]) -> Dict[str, Any]:
+    def _calculate_import_totals_by_type(self, records_to_import: List[Dict[str, Any]]) -> Dict[str, float]:
+        """
+        Calculate total amounts by cashflow_type from records to be imported.
+        
+        IMPORTANT: This function calculates totals only for records that are actually selected
+        for import (after filtering by selected_types). It uses abs(amount) to ensure
+        consistent comparison with Cash Report totals.
+        
+        Args:
+            records_to_import: List of records that will be imported (already filtered by selected_types)
+            
+        Returns:
+            Dict mapping cashflow_type to total_amount (absolute values for comparison)
+        """
+        totals: Dict[str, float] = {}
+        for record in records_to_import:
+            cashflow_type = (record.get('cashflow_type') or '').lower()
+            if not cashflow_type:
+                continue
+            try:
+                amount = float(record.get('amount', 0))
+                # Use absolute value for consistent comparison with Cash Report
+                totals[cashflow_type] = totals.get(cashflow_type, 0.0) + abs(amount)
+            except (TypeError, ValueError):
+                # Skip records with invalid amounts
+                continue
+        return totals
+
+    def _compare_totals_with_cash_report(
+        self,
+        import_totals: Dict[str, float],
+        cash_report_summary: Dict[str, float]
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Compare import totals with Cash Report summary totals.
+        
+        IMPORTANT: This comparison only includes REAL cash movements.
+        It excludes:
+        - Cash FX Translation Gain/Loss (unrealized FX, not actual cash)
+        - Trades (Sales/Purchase) (part of executions, not cashflow)
+        - Commissions (included in executions/forex, not separate)
+        - Accruals (accounting entries, not actual cash)
+        
+        Args:
+            import_totals: Dict mapping cashflow_type to total_amount from import
+            cash_report_summary: Dict mapping cashflow_type to total_amount from Cash Report
+                                (already filtered to exclude non-cash activities)
+            
+        Returns:
+            Dict with comparison results for each cashflow_type
+        """
+        comparison: Dict[str, Dict[str, Any]] = {}
+        
+        # Only compare REAL cashflow types (exclude accruals and forex from import side)
+        # Note: forex_conversion is not in Cash Report (it's part of Trades)
+        # Note: accruals are not in Cash Report (they are accounting entries)
+        real_cashflow_types = {
+            'deposit', 'withdrawal', 'transfer', 'dividend', 
+            'interest', 'tax', 'fee', 'borrow_fee', 'syep_interest'
+        }
+        
+        # Get types that exist in both sources (only real cashflows)
+        import_real_types = {t for t in import_totals.keys() if t in real_cashflow_types}
+        report_types = set(cash_report_summary.keys())
+        all_types = import_real_types | report_types
+        
+        for cashflow_type in all_types:
+            import_total = import_totals.get(cashflow_type, 0.0)
+            report_total = cash_report_summary.get(cashflow_type, 0.0)
+            difference = abs(import_total - report_total)
+            
+            # Consider match if difference is less than 0.01 (small rounding differences)
+            match = difference < 0.01
+            
+            comparison[cashflow_type] = {
+                'import_total': import_total,
+                'report_total': report_total,
+                'difference': difference,
+                'match': match
+            }
+        
+        return comparison
+
+    def _build_preview_payload(self, task_type: str, pipeline_result: Dict[str, Any], selected_types: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Construct preview payload based on task type.
+        
+        Args:
+            task_type: Task type (e.g., 'cashflows', 'executions')
+            pipeline_result: Result from import pipeline
+            selected_types: Optional list of cashflow types to import (for cashflows task)
         """
         task = (task_type or 'executions').lower()
         validation_result = pipeline_result['validation_result']
         duplicate_result = pipeline_result['duplicate_result']
         raw_records = pipeline_result['raw_records']
         symbol_metadata = pipeline_result.get('symbol_metadata', {})
+        cash_report_summary = pipeline_result.get('cash_report_summary', {})  # Summary totals from Cash Report
 
         if task == 'cashflows':
             clean_records = duplicate_result.get('clean_records', [])
@@ -1301,16 +1408,68 @@ class ImportOrchestrator:
                 }
                 records_to_import.append(record_payload)
 
+            # Filter records by selected_types if provided (for cashflows task)
+            if selected_types and isinstance(selected_types, list) and len(selected_types) > 0:
+                # Normalize selected_types to lowercase for comparison
+                selected_types_lower = [t.lower() for t in selected_types]
+                original_count = len(records_to_import)
+                records_to_import = [
+                    rec for rec in records_to_import
+                    if rec.get('cashflow_type', '').lower() in selected_types_lower
+                ]
+                logger.info(
+                    "🔍 Filtered cashflow records by selected_types: %s -> %s (removed %s)",
+                    original_count,
+                    len(records_to_import),
+                    original_count - len(records_to_import)
+                )
+
             # Pair forex conversions: assign shared exchange_<uuid> external_id for from/to sides
+            # Improved pairing: match by date + currencies + exchange_rate (from metadata)
             try:
                 from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
                 to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
-                # Build indices by date for simple same-day pairing
+                
                 def extract_date_str(value):
                     # value may be envelope or iso string
                     if isinstance(value, dict):
                         return value.get('date') or value.get('utc') or value.get('local')
                     return value
+                
+                def get_currency_from_record(rec: Dict[str, Any], direction: str) -> Optional[str]:
+                    """Get currency from record - check metadata first, then currency field"""
+                    meta = rec.get('metadata') or {}
+                    if direction == 'from':
+                        return meta.get('source_currency') or rec.get('source_currency') or rec.get('currency')
+                    else:  # to
+                        return meta.get('target_currency') or rec.get('target_currency') or rec.get('currency')
+                
+                def get_exchange_rate(rec: Dict[str, Any]) -> Optional[float]:
+                    """Get exchange_rate from metadata"""
+                    meta = rec.get('metadata') or {}
+                    rate = meta.get('exchange_rate')
+                    if rate is not None:
+                        try:
+                            return float(rate)
+                        except (TypeError, ValueError):
+                            pass
+                    # Fallback: try trade_price
+                    trade_price = rec.get('trade_price')
+                    if trade_price is not None:
+                        try:
+                            return float(trade_price)
+                        except (TypeError, ValueError):
+                            pass
+                    return None
+                
+                def get_asset_symbol(rec: Dict[str, Any]) -> Optional[str]:
+                    """Get asset_symbol (Symbol) from record - check metadata first, then asset_symbol field"""
+                    meta = rec.get('metadata') or {}
+                    symbol = meta.get('symbol') or rec.get('asset_symbol') or rec.get('Symbol')
+                    if symbol and isinstance(symbol, str) and '.' in symbol:
+                        return symbol.strip().upper()
+                    return None
+                
                 # Create list of candidates with indices
                 from_indices = []
                 to_indices = []
@@ -1320,44 +1479,176 @@ class ImportOrchestrator:
                         from_indices.append(idx)
                     elif st == to_type:
                         to_indices.append(idx)
+                
                 used_to = set()
                 for fi in from_indices:
                     f = records_to_import[fi]
                     f_date = extract_date_str(f.get('effective_date'))
-                    # Find nearest TO on same date first, else any unused TO
+                    f_from_currency = get_currency_from_record(f, 'from')
+                    f_to_currency = get_currency_from_record(f, 'to')
+                    f_exchange_rate = get_exchange_rate(f)
+                    f_asset_symbol = get_asset_symbol(f)
+                    
+                    # Find matching TO record:
+                    # 1. Same date
+                    # 2. Matching currencies (f.from_currency == t.from_currency, f.to_currency == t.to_currency)
+                    # 3. Matching exchange_rate (if available)
+                    # 4. Matching asset_symbol (if available) - strongest indicator
                     chosen_ti = None
+                    best_match_score = -1
+                    
                     for ti in to_indices:
                         if ti in used_to:
                             continue
                         t = records_to_import[ti]
                         t_date = extract_date_str(t.get('effective_date'))
-                        if f_date and t_date and str(f_date)[:10] == str(t_date)[:10]:
+                        
+                        # Check date match
+                        date_match = False
+                        if f_date and t_date:
+                            date_match = str(f_date)[:10] == str(t_date)[:10]
+                        if not date_match:
+                            continue
+                        
+                        # Check currency match
+                        t_from_currency = get_currency_from_record(t, 'from')
+                        t_to_currency = get_currency_from_record(t, 'to')
+                        t_exchange_rate = get_exchange_rate(t)
+                        t_asset_symbol = get_asset_symbol(t)
+                        
+                        currency_match = (
+                            f_from_currency and t_from_currency and 
+                            f_from_currency.upper() == t_from_currency.upper() and
+                            f_to_currency and t_to_currency and
+                            f_to_currency.upper() == t_to_currency.upper()
+                        )
+                        
+                        # Check asset_symbol match (strongest indicator - exact match)
+                        asset_symbol_match = (
+                            f_asset_symbol and t_asset_symbol and
+                            f_asset_symbol == t_asset_symbol
+                        )
+                        
+                        # Calculate match score (higher is better)
+                        match_score = 0
+                        if date_match:
+                            match_score += 1
+                        if currency_match:
+                            match_score += 2
+                        if asset_symbol_match:
+                            match_score += 4  # Strong indicator - exact symbol match
+                        if f_exchange_rate and t_exchange_rate:
+                            # Allow small tolerance for floating point comparison
+                            rate_diff = abs(f_exchange_rate - t_exchange_rate)
+                            if rate_diff < 0.0001:  # Very close match
+                                match_score += 3
+                            elif rate_diff < 0.01:  # Close match
+                                match_score += 1
+                        
+                        # Prefer exact matches (score >= 7 = date + currency + asset_symbol, or >= 6 = date + currency + rate)
+                        if match_score > best_match_score:
+                            best_match_score = match_score
                             chosen_ti = ti
-                            break
+                            # If we have a perfect match (with asset_symbol or date+currency+rate), use it immediately
+                            if match_score >= 7 or (match_score >= 6 and asset_symbol_match):
+                                break
+                    
+                    # If no match found, try any unused TO on same date (fallback)
+                    if chosen_ti is None:
+                        for ti in to_indices:
+                            if ti in used_to:
+                                continue
+                            t = records_to_import[ti]
+                            t_date = extract_date_str(t.get('effective_date'))
+                            if f_date and t_date and str(f_date)[:10] == str(t_date)[:10]:
+                                chosen_ti = ti
+                                break
+                    
+                    # If still no match, use any unused TO (last resort)
                     if chosen_ti is None:
                         for ti in to_indices:
                             if ti not in used_to:
                                 chosen_ti = ti
                                 break
+                    
                     if chosen_ti is None:
+                        logger.warning(
+                            "⚠️ [PAIRING] No matching TO record found for FROM record at index %s (currency: %s, symbol: %s). "
+                            "This FROM record will be skipped during import.",
+                            fi,
+                            f_from_currency,
+                            f_asset_symbol or 'N/A'
+                        )
+                        # Mark this FROM record to be skipped (it's incomplete)
+                        records_to_import[fi]['_skip_incomplete'] = True
                         continue
+                    
                     used_to.add(chosen_ti)
+                    t = records_to_import[chosen_ti]
+                    
                     # Assign shared external_id in canonical exchange_<uuid> format
                     exchange_uuid = uuid.uuid4().hex
                     exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
-                    # Ensure metadata exists
-                    for rec in (f, records_to_import[chosen_ti]):
+                    
+                    # Ensure metadata exists and is consistent
+                    for rec in (f, t):
                         meta = rec.get('metadata')
                         if meta is None or not isinstance(meta, dict):
                             meta = {}
                             rec['metadata'] = meta
                         meta['exchange_external_id'] = exchange_id
+                        # Ensure currency info is in metadata for later use
+                        if 'source_currency' not in meta:
+                            source_curr = get_currency_from_record(rec, 'from')
+                            if source_curr:
+                                meta['source_currency'] = source_curr
+                        if 'target_currency' not in meta:
+                            target_curr = get_currency_from_record(rec, 'to')
+                            if target_curr:
+                                meta['target_currency'] = target_curr
+                        # Ensure exchange_rate is in metadata
+                        if 'exchange_rate' not in meta:
+                            rate = get_exchange_rate(rec)
+                            if rate is not None:
+                                meta['exchange_rate'] = rate
                         # Favor shared external_id for import/storage
                         rec['external_id'] = exchange_id
+                    
+                    logger.debug(
+                        "✅ [PAIRING] Paired exchange: FROM (idx %s, %s) <-> TO (idx %s, %s), rate: %s, symbol: %s",
+                        fi,
+                        f_from_currency,
+                        chosen_ti,
+                        get_currency_from_record(t, 'to'),
+                        f_exchange_rate or 'N/A',
+                        f_asset_symbol or 'N/A'
+                    )
+                    
             except Exception as pairing_error:
-                logger.warning("⚠️ Forex pairing step failed: %s", pairing_error)
+                logger.error("❌ Forex pairing step failed: %s", pairing_error, exc_info=True)
 
             records_to_skip: List[Dict[str, Any]] = []
+            
+            # Add incomplete exchange pairs (FROM without TO or vice versa) to skip list
+            for idx, rec in enumerate(records_to_import):
+                if rec.get('_skip_incomplete'):
+                    storage_type, mapping_note = self._resolve_cashflow_storage_type(rec)
+                    records_to_skip.append({
+                        'record': rec,
+                        'reason': 'incomplete_exchange_pair',
+                        'errors': ['No matching TO record found for this FROM record'],
+                        'cashflow_type': rec.get('cashflow_type'),
+                        'section': rec.get('section'),
+                        'metadata': rec.get('metadata', {}),
+                        'storage_type': storage_type,
+                        'mapping_note': mapping_note
+                    })
+                    # Remove from records_to_import
+                    records_to_import[idx] = None
+            
+            # Remove None entries (incomplete pairs)
+            records_to_import = [r for r in records_to_import if r is not None]
+            
             for error_info in validation_result.get('validation_errors', []):
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(error_info.get('record') or {})
                 records_to_skip.append({
@@ -1426,6 +1717,25 @@ class ImportOrchestrator:
                 validation_result.get('valid_records', []),
                 type_stats=validation_result.get('type_stats', {})
             )
+            
+            # Calculate import totals by type (for selected types only)
+            # NOTE: This includes only REAL cash movements that were selected for import.
+            # The calculation uses abs(amount) for consistent comparison with Cash Report.
+            # Accruals and forex_conversion are excluded from comparison (see _compare_totals_with_cash_report).
+            import_totals_by_type = self._calculate_import_totals_by_type(records_to_import)
+            
+            # Compare import totals with Cash Report summary
+            # IMPORTANT: Comparison only includes real cashflows, excludes:
+            # - forex_conversion (not in Cash Report, part of Trades section)
+            # - dividend_accrual, interest_accrual (not in Cash Report, accounting entries, not actual cash)
+            # - Cash FX Translation, Trades (Sales/Purchase), Commissions (already excluded from cash_report_summary)
+            # 
+            # Only the following types are compared:
+            # deposit, withdrawal, transfer, dividend, interest, tax, fee, borrow_fee, syep_interest
+            summary_comparison = self._compare_totals_with_cash_report(
+                import_totals_by_type,
+                cash_report_summary
+            )
 
             return {
                 'task_type': task,
@@ -1442,7 +1752,8 @@ class ImportOrchestrator:
                     'missing_accounts': validation_result.get('missing_accounts', []),
                     'currency_issues': validation_result.get('currency_issues', []),
                     'type_stats': cashflow_summary.get('type_stats', {}),
-                    'issues_by_type': validation_result.get('issues_by_type', {})
+                    'issues_by_type': validation_result.get('issues_by_type', {}),
+                    'summary_comparison': summary_comparison  # Comparison with Cash Report
                 },
                 'cashflow_summary': cashflow_summary,
                 'cashflow_records': len(records_to_import)
@@ -1755,13 +2066,14 @@ class ImportOrchestrator:
                 'error': str(e)
             }
     
-    def generate_preview(self, session_id: int, task_type: Optional[str] = None) -> Dict[str, Any]:
+    def generate_preview(self, session_id: int, task_type: Optional[str] = None, selected_types: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Generate preview data for user confirmation.
         
         Args:
             session_id: Import session ID
             task_type: Optional override for task type
+            selected_types: Optional list of cashflow types to import (for cashflows task)
             
         Returns:
             Dict[str, Any]: Preview data
@@ -1811,7 +2123,7 @@ class ImportOrchestrator:
                 task_type=normalized_task
             )
 
-            preview_data_raw = self._build_preview_payload(normalized_task, pipeline_result)
+            preview_data_raw = self._build_preview_payload(normalized_task, pipeline_result, selected_types=selected_types)
             preview_data_raw['task_type'] = normalized_task
 
             logger.info("🔄 Updating session with preview data...")
@@ -1840,9 +2152,14 @@ class ImportOrchestrator:
                 'error': str(e)
             }
     
-    def execute_import(self, session_id: int, task_type: Optional[str] = None) -> Dict[str, Any]:
+    def execute_import(self, session_id: int, task_type: Optional[str] = None, selected_types: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Execute the import process and persist records according to the active task type.
+        
+        Args:
+            session_id: Import session ID
+            task_type: Optional override for task type
+            selected_types: Optional list of cashflow types to import (for cashflows task)
         """
         try:
             logger.info(f"🔍 Starting execute_import for session {session_id}")
@@ -1868,7 +2185,7 @@ class ImportOrchestrator:
             import_session.update_status('importing')
             self.db_session.flush()
 
-            preview_result = self.generate_preview(session_id, requested_task_type)
+            preview_result = self.generate_preview(session_id, requested_task_type, selected_types=selected_types)
             if not preview_result['success']:
                 error_message = preview_result.get('error', 'Failed to regenerate preview data')
                 logger.error(
@@ -2261,28 +2578,93 @@ class ImportOrchestrator:
                 from_rec = pair.get('from')
                 to_rec = pair.get('to')
                 if not from_rec or not to_rec:
-                    raise ValueError(f"Incomplete exchange pair for {exchange_id}")
-                # Resolve currencies
-                from_currency_symbol = from_rec.get('currency')
-                to_currency_symbol = to_rec.get('currency')
+                    error_msg = f"Incomplete exchange pair for {exchange_id}: missing {'TO' if not to_rec else 'FROM'} record"
+                    logger.warning(f"⚠️ [IMPORT] {error_msg}")
+                    import_errors.append(error_msg)
+                    skipped_count += 2  # Both FROM and TO are skipped
+                    continue
+                
+                # Extract metadata from records (preferred source for accurate data)
+                from_meta = (from_rec.get('metadata') or {}) if isinstance(from_rec.get('metadata'), dict) else {}
+                to_meta = (to_rec.get('metadata') or {}) if isinstance(to_rec.get('metadata'), dict) else {}
+                
+                # Get currencies - prefer metadata, fallback to currency field
+                from_currency_symbol = (
+                    from_meta.get('source_currency') or 
+                    from_rec.get('source_currency') or 
+                    from_rec.get('currency')
+                )
+                to_currency_symbol = (
+                    to_meta.get('target_currency') or 
+                    to_rec.get('target_currency') or 
+                    to_rec.get('currency')
+                )
+                
                 if not from_currency_symbol or not to_currency_symbol:
-                    raise ValueError("Missing currency symbol for exchange")
+                    raise ValueError(f"Missing currency symbol for exchange {exchange_id}: from={from_currency_symbol}, to={to_currency_symbol}")
+                
                 from_currency = CurrencyService.get_by_symbol(self.db_session, from_currency_symbol)
                 to_currency = CurrencyService.get_by_symbol(self.db_session, to_currency_symbol)
                 if not from_currency or not to_currency:
-                    raise ValueError("Currency not found for exchange")
-                # Amounts (positive magnitude) and rate
-                from_amount = abs(float(from_rec.get('amount', 0)))
-                to_amount = abs(float(to_rec.get('amount', 0)))
-                exchange_rate = (to_amount / from_amount) if from_amount else 0.0
-                if exchange_rate <= 0:
-                    # fallback if only rate exists in metadata
-                    exchange_rate = float((from_rec.get('trade_price') or to_rec.get('trade_price') or 0.0) or 0.0)
+                    raise ValueError(f"Currency not found for exchange {exchange_id}: from={from_currency_symbol}, to={to_currency_symbol}")
+                
+                # Get exchange_rate from metadata (preferred) - this is the accurate rate from IBKR
+                exchange_rate = None
+                if from_meta.get('exchange_rate') is not None:
+                    try:
+                        exchange_rate = float(from_meta['exchange_rate'])
+                    except (TypeError, ValueError):
+                        pass
+                if exchange_rate is None and to_meta.get('exchange_rate') is not None:
+                    try:
+                        exchange_rate = float(to_meta['exchange_rate'])
+                    except (TypeError, ValueError):
+                        pass
+                # Fallback: try trade_price from records
+                if exchange_rate is None:
+                    trade_price = from_rec.get('trade_price') or to_rec.get('trade_price')
+                    if trade_price is not None:
+                        try:
+                            exchange_rate = float(trade_price)
+                        except (TypeError, ValueError):
+                            pass
+                
+                # Get from_amount - prefer Quantity from metadata (accurate), fallback to abs(amount)
+                from_amount = None
+                quantity = from_meta.get('quantity') or from_rec.get('quantity')
+                if quantity is not None:
+                    try:
+                        from_amount = abs(float(quantity))
+                    except (TypeError, ValueError):
+                        pass
+                # Fallback: use absolute value of amount field
+                if from_amount is None:
+                    from_amount = abs(float(from_rec.get('amount', 0)))
+                
+                if from_amount <= 0:
+                    raise ValueError(f"Invalid from_amount for exchange {exchange_id}: {from_amount}")
+                
+                if exchange_rate is None or exchange_rate <= 0:
+                    # Last resort: calculate from amounts (may be inaccurate)
+                    to_amount = abs(float(to_rec.get('amount', 0)))
+                    if to_amount > 0 and from_amount > 0:
+                        exchange_rate = to_amount / from_amount
+                        logger.warning(
+                            "⚠️ [IMPORT] Calculated exchange_rate from amounts for %s: %s (may be inaccurate). "
+                            "Metadata exchange_rate not available.",
+                            exchange_id,
+                            exchange_rate
+                        )
+                    else:
+                        raise ValueError(f"Invalid exchange_rate for exchange {exchange_id}: rate={exchange_rate}, from_amount={from_amount}, to_amount={to_amount}")
+                
                 # Date
                 effective_dt = self._resolve_datetime(from_rec.get('effective_date') or to_rec.get('effective_date'))
                 date_value = effective_dt.date() if effective_dt else None
+                
                 # Description
                 description = from_rec.get('memo') or to_rec.get('memo')
+                
                 # Fee amount - extract from record.commission (set by IBKR connector from Comm/Fee field)
                 # Commission is stored directly in the record, not in metadata
                 # IMPORTANT: Normalize fee_amount to be non-negative (negative fees are invalid)
@@ -2290,8 +2672,7 @@ class ImportOrchestrator:
                 commission_val = from_rec.get('commission')
                 if commission_val is None:
                     # Fallback: check metadata if commission was moved there
-                    meta = (from_rec.get('metadata') or {}) if isinstance(from_rec.get('metadata'), dict) else {}
-                    commission_val = meta.get('commission')
+                    commission_val = from_meta.get('commission')
                 try:
                     fee_amount_raw = float(commission_val) if commission_val not in (None, '') else 0.0
                     # Normalize: if fee is negative, set to 0 (fee amount cannot be negative)
@@ -2306,6 +2687,7 @@ class ImportOrchestrator:
                     fee_amount = 0.0
 
                 # Use service SSOT to create the pair (shared external_id, correct types/signs)
+                # This uses the accurate exchange_rate and from_amount from metadata
                 svc_result = CashFlowHelperService.create_exchange(
                     self.db_session,
                     trading_account_id=import_session.trading_account_id,
@@ -2320,6 +2702,16 @@ class ImportOrchestrator:
                 )
                 if svc_result:
                     imported_count += 2
+                    logger.info(
+                        "✅ [IMPORT] Created exchange %s: %s %s -> %s %s (rate: %s, fee: %s)",
+                        exchange_id,
+                        from_amount,
+                        from_currency_symbol,
+                        from_amount * exchange_rate,
+                        to_currency_symbol,
+                        exchange_rate,
+                        fee_amount
+                    )
             except Exception as exch_error:
                 logger.error("❌ Failed to create exchange %s: %s", exchange_id, exch_error, exc_info=True)
                 import_errors.append(f"Exchange {exchange_id} failed: {exch_error}")

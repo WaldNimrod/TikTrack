@@ -968,6 +968,7 @@ def execute_import(session_id: int):
     Body params:
         task_type: Optional override for task type
         generate_report: Whether to generate a report after import
+        selected_types: Optional list of cashflow types to import (for cashflows task)
     
     Returns:
         JSON response with import results
@@ -975,10 +976,11 @@ def execute_import(session_id: int):
     try:
         payload = request.get_json(silent=True) or {}
         task_type = payload.get('task_type')
+        selected_types = payload.get('selected_types')  # List of cashflow types to import
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.execute_import(session_id, task_type)
+            result_raw = orchestrator.execute_import(session_id, task_type, selected_types=selected_types)
             
             if not result_raw.get('success'):
                 status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 400

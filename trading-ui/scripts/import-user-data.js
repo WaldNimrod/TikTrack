@@ -77,6 +77,7 @@ let filePrecheckState = {
     message: ''
 };
 let activeFilePrecheckRequestId = 0;
+let selectedCashflowTypes = {}; // Track selected cashflow types for import (default: all except dividend_accrual)
 
 /**
  * Helper function to set element display using Bootstrap classes instead of inline styles
@@ -2100,6 +2101,7 @@ function clearCashflowAnalysisSections() {
     const sections = [
         { section: 'cashflowTypeSummarySection', content: 'cashflowTypeSummaryCards' },
         { section: 'cashflowCurrencySummarySection', content: 'cashflowCurrencySummaryCards' },
+        { section: 'cashflowSummaryComparisonSection', content: 'cashflowSummaryComparisonTable' },
         { section: 'cashflowIssuesSummarySection', content: 'cashflowIssuesSummaryList' }
     ];
 
@@ -2129,7 +2131,7 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
         return;
     }
 
-    entries
+        entries
         .sort((a, b) => (b[1]?.total_records || 0) - (a[1]?.total_records || 0))
         .forEach(([typeKey, stats]) => {
             const total = safeToNumber(stats.total_records);
@@ -2139,21 +2141,136 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             const primaryCurrencyEntry = Object.entries(stats.currencies || {})
                 .sort(([, amountA], [, amountB]) => Math.abs(amountB) - Math.abs(amountA))[0];
 
+            // Add warning for dividend_accrual records
+            const isDividendAccrual = typeKey === 'dividend_accrual';
+            const warningNote = isDividendAccrual 
+                ? '<small style="color: #fc5a06; font-weight: bold;">⚠️ רשומות אלו מייצגות דיבידנדים שהוכרזו אך עדיין לא שולמו. נא לבדוק את משמעות הרשומה בפועל לפני ייבוא.</small>'
+                : '';
+
+            // Initialize selectedCashflowTypes if not already set (default: all selected except dividend_accrual)
+            if (Object.keys(selectedCashflowTypes).length === 0) {
+                entries.forEach(([key]) => {
+                    selectedCashflowTypes[key] = key !== 'dividend_accrual';
+                });
+            }
+            
+            // Get current selection state (default: true for all except dividend_accrual)
+            const isSelected = selectedCashflowTypes[typeKey] !== undefined 
+                ? selectedCashflowTypes[typeKey] 
+                : !isDividendAccrual;
+
             const card = document.createElement('div');
             card.className = 'analysis-card';
+            card.setAttribute('data-cashflow-type', typeKey);
             card.innerHTML = `
                 <div class="card-icon"><i class="bi bi-diagram-3"></i></div>
                 <div class="card-content">
-                    <div class="card-number">${formatNumber(total)}</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <div class="card-number">${formatNumber(total)}</div>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" 
+                                   class="cashflow-type-checkbox" 
+                                   data-type="${typeKey}"
+                                   ${isSelected ? 'checked' : ''}
+                                   style="cursor: pointer; width: 18px; height: 18px;">
+                            <span style="font-size: 0.9em; font-weight: 500;">ייבוא</span>
+                        </label>
+                    </div>
                     <div class="card-label">${resolveCashflowTypeLabel(typeKey)}</div>
                     <small>✅ ${formatNumber(valid)} | ⚠️ ${formatNumber(invalid)}</small>
                     <small>סה״כ סכום: ${formatAmount(amount)}</small>
                     ${primaryCurrencyEntry ? `<small>מטבע מוביל: ${primaryCurrencyEntry[0]} ${formatAmount(primaryCurrencyEntry[1])}</small>` : ''}
+                    ${warningNote}
                 </div>
             `;
             container.appendChild(card);
+            
+            // Add event listener for checkbox
+            const checkbox = card.querySelector('.cashflow-type-checkbox');
+            if (checkbox) {
+                checkbox.addEventListener('change', function() {
+                    selectedCashflowTypes[typeKey] = this.checked;
+                    // Update counts if needed
+                    updateCashflowTypeCounts();
+                });
+            }
         });
 
+    setElementDisplay(section, 'block');
+}
+
+/**
+ * Update cashflow type counts based on selected types
+ * This function can be called when checkboxes change to update UI counts
+ */
+function updateCashflowTypeCounts() {
+    // This function can be extended to update summary counts if needed
+    // For now, it's a placeholder that can be called when checkboxes change
+    // The actual filtering happens in displayPreviewData() and performImport()
+}
+
+/**
+ * Render cashflow summary comparison table (import totals vs Cash Report totals)
+ */
+function renderCashflowSummaryComparison(summaryComparison = {}) {
+    const section = document.getElementById('cashflowSummaryComparisonSection');
+    const container = document.getElementById('cashflowSummaryComparisonTable');
+    if (!section || !container) {
+        return;
+    }
+
+    if (!summaryComparison || Object.keys(summaryComparison).length === 0) {
+        setElementDisplay(section, 'none');
+        return;
+    }
+
+    const entries = Object.entries(summaryComparison);
+    if (entries.length === 0) {
+        setElementDisplay(section, 'none');
+        return;
+    }
+
+    let tableHTML = `
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>סוג תזרים</th>
+                    <th>סכום ייבוא</th>
+                    <th>סכום דוח</th>
+                    <th>הפרש</th>
+                    <th>סטטוס</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    entries.forEach(([cashflowType, comparison]) => {
+        const importTotal = safeToNumber(comparison.import_total || 0);
+        const reportTotal = safeToNumber(comparison.report_total || 0);
+        const difference = safeToNumber(comparison.difference || 0);
+        const match = comparison.match === true;
+        
+        const statusClass = match ? 'text-success' : 'text-danger';
+        const statusText = match ? '✅ תואם' : '⚠️ לא תואם';
+        const rowClass = match ? '' : 'table-warning';
+
+        tableHTML += `
+            <tr class="${rowClass}">
+                <td>${resolveCashflowTypeLabel(cashflowType)}</td>
+                <td>${formatAmount(importTotal)}</td>
+                <td>${formatAmount(reportTotal)}</td>
+                <td>${formatAmount(difference)}</td>
+                <td class="${statusClass}">${statusText}</td>
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+    container.innerHTML = tableHTML;
     setElementDisplay(section, 'block');
 }
 
@@ -5206,6 +5323,11 @@ function renderCashflowAnalysisSummary(results) {
 
     renderCashflowTypeCards(typeStats, totalsByType);
     renderCashflowCurrencyCards(totalsByCurrency);
+    
+    // Render summary comparison if available
+    const summaryComparison = results.summary?.summary_comparison || results.summary_comparison || {};
+    renderCashflowSummaryComparison(summaryComparison);
+    
     renderCashflowIssuesSummary({
         issuesByType,
         missingAccountDetails,
@@ -5849,9 +5971,27 @@ function displayPreviewData(data) {
     }
     
     const taskType = (data.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions').toLowerCase();
-    const recordsToImport = data.records_to_import || [];
+    let recordsToImport = data.records_to_import || [];
     const recordsToSkip = data.records_to_skip || [];
     const summary = data.summary || {};
+
+    // Filter records by selectedCashflowTypes for cashflows task
+    if (taskType === 'cashflows' && Object.keys(selectedCashflowTypes).length > 0) {
+        const selectedTypes = Object.keys(selectedCashflowTypes).filter(
+            type => selectedCashflowTypes[type] === true
+        );
+        if (selectedTypes.length > 0) {
+            const originalCount = recordsToImport.length;
+            recordsToImport = recordsToImport.filter(record => {
+                const cashflowType = (record.cashflow_type || record.record?.cashflow_type || '').toLowerCase();
+                return selectedTypes.some(selectedType => selectedType.toLowerCase() === cashflowType);
+            });
+            window.Logger.debug(
+                '[Import Modal] Filtered preview records by selected types',
+                { originalCount, filteredCount: recordsToImport.length, selectedTypes, page: 'import-user-data' }
+            );
+        }
+    }
 
     const importCount = recordsToImport.length;
     const skipCount = recordsToSkip.length;
@@ -7027,13 +7167,19 @@ function performImport(generateReport = false) {
     setAnalysisLoadingState(true, 'מייבא נתונים...', 15);
     showImportUserDataNotification('מתחיל ייבוא נתונים...', 'info');
     
+    // Get selected cashflow types (only types that are checked)
+    const selectedTypes = Object.keys(selectedCashflowTypes).filter(
+        type => selectedCashflowTypes[type] === true
+    );
+    
     fetch(`/api/user-data-import/session/${currentSessionId}/execute`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            generate_report: generateReport
+            generate_report: generateReport,
+            selected_types: selectedTypes.length > 0 ? selectedTypes : undefined
         })
     })
     .then(response => response.json())

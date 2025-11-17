@@ -465,6 +465,11 @@ async function legacyFetchTradingAccounts() {
   return result.data || result || [];
 }
 
+/**
+ * Load trading accounts data from service
+ * @param {Object} [options={}] - Loading options (force, signal, etc.)
+ * @returns {Promise<Array>} Array of trading accounts
+ */
 async function loadTradingAccountsData(options = {}) {
   window.Logger.info('Loading trading accounts data via service', { page: "trading_accounts" });
   try {
@@ -568,6 +573,12 @@ function getCurrencySymbol(currencyValue) {
   }
 }
 
+/**
+ * Enrich trading accounts with balance data
+ * @param {Array} accounts - Array of trading accounts
+ * @param {Map<number, Object>} balancesMap - Map of accountId -> balance data
+ * @returns {Array} Enriched accounts array with balance information
+ */
 function enrichAccountsWithBalances(accounts, balancesMap) {
   return accounts.map(account => {
     const balanceData = balancesMap?.get(account.id);
@@ -632,15 +643,14 @@ async function syncTradingAccountsPagination(accountsData) {
   updateTradingAccountsTable(safeAccounts);
 }
 
-/**
- * Update trading accounts table
- * @function updateTradingAccountsTable
- * @param {Array} trading_accounts - Trading accounts array
- * @returns {void}
- */
 // משתנה למניעת עדכונים כפולים
 let isUpdatingTradingAccountsTable = false;
 
+/**
+ * Update trading accounts table with new data
+ * @param {Array} trading_accounts - Array of trading accounts to display
+ * @returns {void}
+ */
 function updateTradingAccountsTable(trading_accounts) {
   if (isUpdatingTradingAccountsTable) {
     window.Logger.warn('⚠️ updateTradingAccountsTable כבר רץ - דילוג על עדכון', { page: "trading_accounts" });
@@ -951,8 +961,8 @@ async function updateTradingAccountsSummary(trading_accounts) {
 }
 
 /**
- * פונקציה לטעינת חשבונות - מתאימה לעבוד עם designs.html
- * הפונקציה טוענת נתונים ומעדכנת את הטבלה
+ * Load trading accounts and update table
+ * @returns {Promise<void>}
  */
 async function loadTradingAccounts() {
   try {
@@ -1684,7 +1694,8 @@ window.deleteTradingAccount = deleteTradingAccount;
 // window.loadTradingAccountsDataForTradingAccountsPage כבר מוגדר בתחילת הקובץ
 
 /**
- * שחזור מצב סקשן החשבונות
+ * Restore trading accounts section state (collapsed/expanded)
+ * @returns {Promise<void>}
  */
 async function restoreTradingAccountsSectionState() {
   const savedState = await window.unifiedCacheManager?.get('trading_accountsSectionCollapsed') || localStorage.getItem('trading_accountsSectionCollapsed');
@@ -2234,8 +2245,7 @@ let tradingAccountsCurrentSortDirection = 'asc';
 // Detailed Log Functions for Accounts Page
 /**
  * Generate detailed log for trading accounts page
- * @function generateDetailedLog
- * @returns {string} JSON string of log data
+ * @returns {string} Detailed log string
  */
 function generateDetailedLog() {
     const tradingAccountsStats = {

@@ -186,10 +186,9 @@ window.loadNotesData = async function(options = {}) {
 // REMOVED: uploadFile - unused function
 
 /**
- * Download file from note
- * @function downloadFile
- * @param {string} noteId - Note ID
- * @param {string} fileName - File name
+ * Download file attached to note
+ * @param {number|string} noteId - Note ID
+ * @param {string} fileName - File name to download
  * @returns {void}
  */
 function downloadFile(noteId, fileName) {
@@ -926,11 +925,12 @@ function updateNotesSummary(notes) {
 // פונקציה לעדכון גלובלי של הטבלה (נדרשת עבור הפילטרים)
 /**
  * Update grid from component filters
- * @param {Array} _selectedStatuses - Selected statuses filter
- * @param {Array} _selectedTypes - Selected types filter
- * @param {Array} _selectedAccounts - Selected accounts filter
- * @param {Object} _selectedDateRange - Selected date range filter
- * @param {string} _searchTerm - Search term filter
+ * @param {Array} _selectedStatuses - Selected statuses (unused)
+ * @param {Array} _selectedTypes - Selected types (unused)
+ * @param {Array} _selectedAccounts - Selected accounts (unused)
+ * @param {Object} _selectedDateRange - Selected date range (unused)
+ * @param {string} _searchTerm - Search term (unused)
+ * @returns {void}
  */
 function updateGridFromComponent(
   _selectedStatuses,
@@ -962,7 +962,12 @@ function updateGridFromComponent(
 // REMOVED: Orphaned code - radio button event listeners not in function
 
 /**
- * מילוי select עם נתונים
+ * Populate select element with data
+ * @param {string} selectId - Select element ID
+ * @param {Array} data - Data array to populate
+ * @param {string} field - Field name to display
+ * @param {string} [prefix=''] - Prefix for option text
+ * @returns {void}
  */
 function populateSelect(selectId, data, field, prefix = '') {
   try {
@@ -1134,6 +1139,7 @@ function updateRadioButtons(accounts = [], trades = [], tradePlans = [], tickers
 /**
  * Handle note relation type change
  * Called when radio button for relation type changes
+ * @returns {void}
  */
 function onNoteRelationTypeChange() {
   // הפונקציה הזו נקראת בעת שינוי רדיו באטון

@@ -52,32 +52,32 @@
 **כיסוי**: 66.7% (34/51 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 13
-- **פונקציות עם JSDoc חלקי**: 21
+- **פונקציות עם JSDoc מלא** (params + returns): 15
+- **פונקציות עם JSDoc חלקי**: 19
 - **פונקציות ללא JSDoc**: 17
 
 **רשימת פונקציות**:
 
 - ❌ `fallbackLoader()` (שורה 105) - missing
-- ✅ `downloadFile()` (שורה 195) - complete
-- ✅ `openNoteDetails()` (שורה 258) - partial
-- ✅ `editNote()` (שורה 280) - complete
-- ✅ `deleteNote()` (שורה 295) - complete
-- ❌ `fallbackDateDisplay()` (שורה 325) - missing
-- ❌ `updateNotesTable()` (שורה 403) - missing
-- ❌ `loadAdditionalData()` (שורה 422) - missing
-- ❌ `loadAccounts()` (שורה 426) - missing
-- ❌ `loadTrades()` (שורה 436) - missing
-- ❌ `loadTradePlans()` (שורה 444) - missing
-- ❌ `loadTickers()` (שורה 459) - missing
-- ❌ `escape()` (שורה 564) - missing
-- ✅ `updateNotesSummary()` (שורה 888) - partial
-- ✅ `updateGridFromComponent()` (שורה 935) - partial
-- ✅ `populateSelect()` (שורה 967) - partial
-- ❌ `updateRadioButtons()` (שורה 1060) - missing
-- ✅ `onNoteRelationTypeChange()` (שורה 1138) - complete
-- ✅ `populateEditSelectByType()` (שורה 1150) - complete
-- ✅ `validateNoteForm()` (שורה 1222) - partial
+- ✅ `downloadFile()` (שורה 194) - complete
+- ✅ `openNoteDetails()` (שורה 257) - partial
+- ✅ `editNote()` (שורה 279) - complete
+- ✅ `deleteNote()` (שורה 294) - complete
+- ❌ `fallbackDateDisplay()` (שורה 324) - missing
+- ❌ `updateNotesTable()` (שורה 402) - missing
+- ❌ `loadAdditionalData()` (שורה 421) - missing
+- ❌ `loadAccounts()` (שורה 425) - missing
+- ❌ `loadTrades()` (שורה 435) - missing
+- ❌ `loadTradePlans()` (שורה 443) - missing
+- ❌ `loadTickers()` (שורה 458) - missing
+- ❌ `escape()` (שורה 563) - missing
+- ✅ `updateNotesSummary()` (שורה 887) - partial
+- ✅ `updateGridFromComponent()` (שורה 935) - complete
+- ✅ `populateSelect()` (שורה 972) - complete
+- ❌ `updateRadioButtons()` (שורה 1065) - missing
+- ✅ `onNoteRelationTypeChange()` (שורה 1144) - complete
+- ✅ `populateEditSelectByType()` (שורה 1156) - complete
+- ✅ `validateNoteForm()` (שורה 1228) - partial
 
 ... ועוד 31 פונקציות
 ---

@@ -222,7 +222,9 @@ async function loadCurrenciesData() {
 }
 
 /**
- * קבלת סמל מטבע לפי מזהה
+ * Get currency symbol by currency ID
+ * @param {number|string} currencyId - Currency ID
+ * @returns {string} Currency symbol or 'N/A' if not found
  */
 function getCurrencySymbol(currencyId) {
   try {
@@ -239,7 +241,9 @@ function getCurrencySymbol(currencyId) {
 }
 
 /**
- * קבלת עיצוב סוג טיקר
+ * Get ticker type style configuration
+ * @param {string} type - Ticker type
+ * @returns {Object} Style object with backgroundColor, color, padding, etc.
  */
 function getTickerTypeStyle(type) {
   try {
@@ -270,7 +274,9 @@ function getTickerTypeStyle(type) {
 }
 
 /**
- * קבלת עיצוב סטטוס טיקר
+ * Get ticker status style configuration
+ * @param {string} status - Ticker status ('open', 'closed', 'cancelled')
+ * @returns {Object} Style object with backgroundColor, color, padding, etc.
  */
 function getTickerStatusStyle(status) {
   try {
@@ -307,7 +313,9 @@ function getTickerStatusStyle(status) {
 }
 
 /**
- * קבלת תווית סטטוס טיקר
+ * Get ticker status label in Hebrew
+ * @param {string} status - Ticker status ('open', 'closed', 'cancelled')
+ * @returns {string} Status label in Hebrew
  */
 function getTickerStatusLabel(status) {
   try {
@@ -324,7 +332,9 @@ function getTickerStatusLabel(status) {
 }
 
 /**
- * פונקציה ליצירת אפשרויות מטבע בטופס
+ * Generate currency options HTML for select elements
+ * @param {Object|null} [ticker=null] - Ticker object for pre-selection
+ * @returns {string} HTML string with option elements
  */
 let currenciesUnavailableNotified = false;
 
@@ -369,7 +379,9 @@ function generateTickerCurrencyOptions(ticker = null) {
 }
 
 /**
- * פונקציה לעדכון אפשרויות מטבע בטופס
+ * Update currency options in add/edit ticker forms
+ * @param {Object|null} [ticker=null] - Ticker object for pre-selection in edit mode
+ * @returns {void}
  */
 function updateCurrencyOptions(ticker = null) {
   try {
@@ -407,14 +419,9 @@ function updateCurrencyOptions(ticker = null) {
  * Updates active_trades field based on open trades. Uses TradesData service
  * instead of direct API calls. Falls back to direct API call if service is unavailable.
  * 
- * @function updateActiveTradesField
- * @async
- * @returns {Promise<void>}
- * @throws {Error} When data loading fails
- * 
- * @example
  * Update active trades field for tickers
  * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
  */
 async function updateActiveTradesField() {
   // Updating active_trades field for tickers
@@ -939,7 +946,9 @@ async function updateTicker() {
 }
 
 /**
- * ביטול טיקר
+ * Cancel ticker (change status to cancelled)
+ * @param {number|string} id - Ticker ID
+ * @returns {Promise<void>}
  */
 async function cancelTicker(id) {
 
@@ -1009,7 +1018,9 @@ async function checkLinkedItemsAndCancelTicker(tickerId) {
 }
 
 /**
- * ביצוע הביטול בפועל
+ * Perform ticker cancellation (actual API call)
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function performTickerCancellation(tickerId) {
   try {
@@ -1181,7 +1192,9 @@ async function updateAllTickerStatuses() {
 // Function removed - not used anywhere
 
 /**
- * ביצוע ביטול טיקר
+ * Perform ticker cancellation (legacy function)
+ * @param {number|string} id - Ticker ID
+ * @returns {Promise<void>}
  */
 async function performCancelTicker(id) {
 
@@ -1370,7 +1383,9 @@ async function checkLinkedItemsAndDeleteTicker(tickerId) {
 }
 
 /**
- * ביצוע המחיקה בפועל
+ * Perform ticker deletion (actual API call)
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function performTickerDeletion(tickerId) {
   try {
@@ -1566,9 +1581,10 @@ async function confirmDeleteTicker(id) {
 // REMOVED: clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() from unified-cache-manager.js instead
 
 /**
- * טעינת נתוני טיקרים - גרסה פשוטה
+ * Internal function for loading tickers data
+ * @param {Object} [options={}] - Loading options (force, signal, etc.)
+ * @returns {Promise<Array>} Array of tickers
  */
-// Internal function for loading tickers data
 async function loadTickersDataInternal(options = {}) {
   try {
     window.Logger.info('Loading tickers data', { page: "tickers" });
@@ -1659,7 +1675,9 @@ window.loadTickersData = async function(options = {}) {
 };
 
 /**
- * עדכון סטטיסטיקות סיכום טיקרים
+ * Update tickers summary statistics
+ * @param {Array} tickers - Array of tickers to summarize
+ * @returns {void}
  */
 function updateTickersSummaryStats(tickers) {
   const tickersArray = Array.isArray(tickers)
@@ -1689,7 +1707,9 @@ function updateTickersSummaryStats(tickers) {
 
 
 /**
- * עדכון טבלת טיקרים - גרסה פשוטה
+ * Render tickers table rows
+ * @param {Array} tickers - Array of tickers to render
+ * @returns {void}
  */
 function renderTickersTableRows(tickers) {
   try {
@@ -1947,6 +1967,12 @@ function renderTickersTableRows(tickers) {
   }
 }
 
+/**
+ * Update tickers table with new data
+ * @param {Array} tickers - Array of tickers to display
+ * @param {Object} [options={}] - Options (skipPagination, etc.)
+ * @returns {Promise<void>}
+ */
 async function updateTickersTable(tickers, options = {}) {
   const { skipPagination = false } = options;
   const safeTickers = Array.isArray(tickers) ? tickers : [];
@@ -2570,7 +2596,11 @@ async function refreshYahooFinanceDataSilently() {
   }
 }
 
-// פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
+/**
+ * Filter tickers by type
+ * @param {string} type - Ticker type to filter by ('all', 'stock', 'etf', 'bond', 'crypto', 'forex', 'other')
+ * @returns {void}
+ */
 function filterTickersByType(type) {
   try {
     window.Logger.info(`🔍 Filtering tickers by type: ${type}`, { page: "tickers" });
@@ -2643,7 +2673,11 @@ function filterTickersByType(type) {
   }
 }
 
-// פונקציה עזר לקבלת שם תצוגה לסוג
+/**
+ * Get display name for ticker type in Hebrew
+ * @param {string} type - Ticker type
+ * @returns {string} Display name in Hebrew
+ */
 function getTypeDisplayName(type) {
   try {
     const typeNames = {

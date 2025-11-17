@@ -4,6 +4,29 @@
  * External Data Dashboard Controller
  * Integrates with the documented external data systems and relies solely on real backend responses.
  * Documentation: documentation/features/external_data/EXTERNAL_DATA_SYSTEM.md
+ * 
+ * ============================================================================
+ * FUNCTION INDEX - External Data Dashboard
+ * ============================================================================
+ * 
+ * Initialization:
+ * - initializeExternalDataDashboard() - Initialize external data dashboard
+ * 
+ * Data Loading:
+ * - loadExternalDataMetrics() - Load external data metrics
+ * - refreshExternalDataDashboard() - Refresh dashboard data
+ * 
+ * Chart Management:
+ * - updateResponseTimeChart() - Update response time chart
+ * - updateDataQualityChart() - Update data quality chart
+ * - updateProviderComparisonChart() - Update provider comparison chart
+ * - updateErrorAnalysisChart() - Update error analysis chart
+ * 
+ * UI Functions:
+ * - updateDashboardDisplay() - Update dashboard display
+ * - formatMetricValue() - Format metric value for display
+ * 
+ * ============================================================================
  */
 (function () {
   const MODULE_NAME = 'external-data-dashboard';
@@ -24,27 +47,71 @@
     debug: () => {}
   };
 
+  /**
+   * Notification helper object
+   * @type {Object}
+   */
   const notification = {
+    /**
+     * Show success notification
+     * @param {string} title - Notification title
+     * @param {string} [message=''] - Notification message
+     * @param {number} [duration=4000] - Notification duration in milliseconds
+     * @param {string} [category='system'] - Notification category
+     * @returns {void}
+     */
     success(title, message = '', duration = 4000, category = 'system') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification(title, message, duration, category);
       }
     },
+    /**
+     * Show error notification
+     * @param {string} title - Notification title
+     * @param {string} [message=''] - Notification message
+     * @returns {void}
+     */
     error(title, message = '') {
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification(title, message);
       }
     },
+    /**
+     * Show warning notification
+     * @param {string} title - Notification title
+     * @param {string} [message=''] - Notification message
+     * @param {number} [duration=4000] - Notification duration in milliseconds
+     * @param {string} [category='system'] - Notification category
+     * @returns {void}
+     */
     warning(title, message = '', duration = 4000, category = 'system') {
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification(title, message, duration, category);
       }
     },
+    /**
+     * Show info notification
+     * @param {string} title - Notification title
+     * @param {string} [message=''] - Notification message
+     * @param {number} [duration=4000] - Notification duration in milliseconds
+     * @param {string} [category='system'] - Notification category
+     * @returns {void}
+     */
     info(title, message = '', duration = 4000, category = 'system') {
       if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification(title, message, duration, category);
       }
     },
+    /**
+     * Show detailed error notification with developer information
+     * @param {string} title - Notification title
+     * @param {string} userMessage - User-facing error message
+     * @param {string[]} [developerDetails=[]] - Developer details array
+     * @param {Object} [options={}] - Additional options
+     * @param {number} [options.duration] - Notification duration
+     * @param {string} [options.category] - Notification category
+     * @returns {void}
+     */
     detailedError(title, userMessage, developerDetails = [], options = {}) {
       const developerSection = developerDetails.length
         ? `---\nמידע למפתח:\n${developerDetails.join('\n')}`
@@ -342,7 +409,15 @@
     };
   }
 
+  /**
+   * External Data Dashboard class
+   * Manages the external data dashboard UI and data loading
+   */
   class ExternalDataDashboard {
+    /**
+     * Create ExternalDataDashboard instance
+     * @returns {void}
+     */
     constructor() {
       this.isInitialized = false;
       this.autoRefreshHandle = null;
@@ -360,6 +435,10 @@
       this.chartSystemUnavailable = false;
     }
 
+    /**
+     * Get ChartSystem instance
+     * @returns {Object|null} ChartSystem instance or null if unavailable
+     */
     getChartSystem() {
       if (window.ChartSystem) {
         this.chartSystemUnavailable = false;
@@ -372,6 +451,12 @@
       return null;
     }
 
+    /**
+     * Destroy chart by ID and optionally clear property
+     * @param {string} id - Chart ID
+     * @param {string|null} [propertyName=null] - Property name to clear
+     * @returns {boolean} True if destroyed successfully
+     */
     destroyChart(id, propertyName = null) {
       const chartSystem = this.getChartSystem();
       if (chartSystem && typeof chartSystem.destroy === 'function') {
@@ -395,6 +480,10 @@
       return true;
     }
 
+    /**
+     * Initialize the dashboard
+     * @returns {Promise<void>}
+     */
     async init() {
       if (this.isInitialized) {
         logger.debug(`${MODULE_NAME}:init:skipped - already initialized`);
@@ -416,6 +505,10 @@
       }
     }
 
+    /**
+     * Initialize header system
+     * @returns {void}
+     */
     initializeHeader() {
       if (window.headerSystem && typeof window.headerSystem.init === 'function') {
         try {
@@ -427,6 +520,10 @@
       document.title = 'דשבורד נתונים חיצוניים - TikTrack';
     }
 
+    /**
+     * Setup event listeners for dashboard controls
+     * @returns {void}
+     */
     setupEventListeners() {
       const logLevelFilter = getElement('log-level-filter');
       if (logLevelFilter) {
@@ -444,6 +541,10 @@
       }
     }
 
+    /**
+     * Start auto-refresh interval
+     * @returns {void}
+     */
     startAutoRefresh() {
       this.stopAutoRefresh();
       this.autoRefreshHandle = window.setInterval(() => {
@@ -451,6 +552,10 @@
       }, AUTO_REFRESH_INTERVAL_MS);
     }
 
+    /**
+     * Stop auto-refresh interval
+     * @returns {void}
+     */
     stopAutoRefresh() {
       if (this.autoRefreshHandle) {
         window.clearInterval(this.autoRefreshHandle);
@@ -458,6 +563,10 @@
       }
     }
 
+    /**
+     * Load initial dashboard data
+     * @returns {Promise<void>}
+     */
     async loadInitialData() {
       await Promise.all([
         this.loadSystemStatus(),
@@ -468,6 +577,11 @@
       ]);
     }
 
+    /**
+     * Refresh core dashboard data
+     * @param {boolean} [showNotifications=false] - Whether to show notifications
+     * @returns {Promise<void>}
+     */
     async refreshCoreData(showNotifications = false) {
       await Promise.allSettled([
         this.loadSystemStatus(showNotifications),
@@ -476,6 +590,11 @@
       ]);
     }
 
+    /**
+     * Refresh all external data
+     * @returns {Promise<Object>} Refresh result payload
+     * @throws {Error} If refresh fails
+     */
     async refreshAllExternalData() {
       const startTime = performance.now();
       try {
@@ -597,6 +716,11 @@
       }
     }
 
+    /**
+     * Load system status data
+     * @param {boolean} [showNotifications=false] - Whether to show notifications
+     * @returns {Promise<void>}
+     */
     async loadSystemStatus(showNotifications = false) {
       try {
         const response = await fetch('/api/external-data/status/');
@@ -617,6 +741,11 @@
       }
     }
 
+    /**
+     * Render system status data
+     * @param {Object|null} data - Status data or null
+     * @returns {void}
+     */
     renderSystemStatus(data) {
       this.renderSummaryCards(data);
       this.renderStatusIndicators(data);
@@ -627,6 +756,11 @@
       });
     }
 
+    /**
+     * Render summary cards
+     * @param {Object|null} data - Status data or null
+     * @returns {void}
+     */
     renderSummaryCards(data) {
       const providersTotal = data?.providers?.total ?? null;
       const totalQuotes = data?.cache?.total_quotes ?? null;
@@ -657,6 +791,11 @@
       }
     }
 
+    /**
+     * Render status indicators
+     * @param {Object|null} data - Status data or null
+     * @returns {void}
+     */
     renderStatusIndicators(data) {
       if (!data) {
         setStatusIndicator('yahoo-status', 'inactive');
@@ -676,6 +815,11 @@
       this.renderApiStatus(data);
     }
 
+    /**
+     * Render Yahoo Finance status
+     * @param {Object} data - Status data
+     * @returns {void}
+     */
     renderYahooStatus(data) {
       const yahooProvider = data.providers?.details?.find((provider) => provider.name === 'yahoo_finance');
       const status = yahooProvider?.is_active
@@ -703,6 +847,11 @@
       }
     }
 
+    /**
+     * Render cache status
+     * @param {Object|null} cacheData - Cache data or null
+     * @returns {void}
+     */
     renderCacheStatus(cacheData) {
       const status = cacheData ? 'active' : 'inactive';
       setStatusIndicator('cache-status-indicator', status);
@@ -734,6 +883,11 @@
       ].join('');
     }
 
+    /**
+     * Render database status
+     * @param {Object} providersInfo - Providers information
+     * @returns {void}
+     */
     renderDatabaseStatus(providersInfo) {
       const hasData = providersInfo && typeof providersInfo.total === 'number';
       const status = hasData ? 'active' : 'inactive';
@@ -756,6 +910,11 @@
       ].join('');
     }
 
+    /**
+     * Render API status
+     * @param {Object} data - Status data
+     * @returns {void}
+     */
     renderApiStatus(data) {
       const statusValue = data?.success === true ? 'active' : 'warning';
       setStatusIndicator('api-status-indicator', statusValue);
@@ -774,6 +933,12 @@
       ].join('');
     }
 
+    /**
+     * Write HTML to element by ID
+     * @param {string} id - Element ID
+     * @param {string} html - HTML content
+     * @returns {void}
+     */
     writeElementHtml(id, html) {
       const element = getElement(id);
       if (element) {
@@ -781,6 +946,11 @@
       }
     }
 
+    /**
+     * Update provider last update times
+     * @param {Array} providerDetails - Array of provider details
+     * @returns {void}
+     */
     updateProviderLastUpdateTimes(providerDetails) {
       const yahooElement = getElement('yahoo-last-update');
       if (yahooElement) {
@@ -799,6 +969,11 @@
     }
   }
 
+  /**
+   * Update statistics cards
+   * @param {Object|null} data - Status data or null
+   * @returns {void}
+   */
   updateStatisticsCards(data) {
       if (!data) {
         setElementText('records-count', NOT_AVAILABLE_TEXT);
@@ -846,6 +1021,11 @@
       }
     }
 
+    /**
+     * Update charts from status data
+     * @param {Object} data - Status data
+     * @returns {Promise<void>}
+     */
     async updateChartsFromStatus(data) {
       await Promise.all([
         this.updateDataQualityChart(data),
@@ -854,6 +1034,11 @@
       ]);
     }
 
+    /**
+     * Load providers data
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
     async loadProviders(showNotification = false) {
       try {
         const response = await fetch('/api/external-data/status/providers');
@@ -885,9 +1070,13 @@
         this.providers = [];
         this.renderProviders();
         this.handleError('שגיאה בטעינת רשימת הספקים', error, 'load-providers');
-    }
+      }
   }
 
+  /**
+   * Render providers list
+   * @returns {void}
+   */
   renderProviders() {
       const providersGrid = getElement('providers-grid');
       if (!providersGrid) {
@@ -950,6 +1139,11 @@
         .join('');
     }
 
+    /**
+     * Load cache statistics
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
     async loadCacheStats(showNotification = false) {
       try {
         const response = await fetch('/api/cache/stats');
@@ -970,6 +1164,10 @@
       }
     }
 
+    /**
+     * Render cache statistics
+     * @returns {void}
+     */
     renderCacheStats() {
       const cacheStatsElement = getElement('cache-stats');
       if (!cacheStatsElement) {
@@ -1005,6 +1203,11 @@
       this.updateCurrentSettings(stats);
     }
 
+    /**
+     * Update current cache settings display
+     * @param {Object} cacheStats - Cache statistics object
+     * @returns {void}
+     */
     updateCurrentSettings(cacheStats) {
       const hotCacheElement = getElement('current-hot-cache');
       const warmCacheElement = getElement('current-warm-cache');
@@ -1029,6 +1232,11 @@
       }
     }
 
+    /**
+     * Load logs data
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
     async loadLogs(showNotification = false) {
       try {
         const logManager = window.UnifiedLogManager;
@@ -1061,6 +1269,10 @@
       }
     }
 
+    /**
+     * Apply log filters
+     * @returns {void}
+     */
     applyLogFilters() {
       const levelFilter = getElement('log-level-filter');
       const searchInput = getElement('log-search');
@@ -1082,6 +1294,11 @@
       this.renderLogs(filtered);
   }
 
+  /**
+   * Render logs list
+   * @param {Array} logs - Array of log entries
+   * @returns {void}
+   */
   renderLogs(logs) {
       const logContent = getElement('log-content');
       if (!logContent) {
@@ -1119,6 +1336,11 @@
         .join('');
     }
 
+    /**
+     * Load group refresh history
+     * @param {boolean} [showNotification=false] - Whether to show notification
+     * @returns {Promise<void>}
+     */
     async loadGroupRefreshHistory(showNotification = false) {
       try {
         const limitSelect = getElement('group-limit');
@@ -1140,6 +1362,11 @@
       }
     }
 
+    /**
+     * Render group refresh history
+     * @param {Array} history - Array of history entries
+     * @returns {void}
+     */
     renderGroupRefreshHistory(history) {
       const container = getElement('group-refresh-content');
       if (!container) {
@@ -1175,6 +1402,11 @@
         .join('');
     }
 
+    /**
+     * Get category label in Hebrew
+     * @param {string} category - Category name
+     * @returns {string} Category label
+     */
     getCategoryLabel(category) {
       const labels = {
         active_trades: 'טיקרים עם טרייד פעיל',
@@ -1185,22 +1417,42 @@
       return labels[category] || category || NOT_AVAILABLE_TEXT;
     }
 
+  /**
+   * Refresh providers data
+   * @returns {Promise<void>}
+   */
   async refreshProviders() {
       await this.loadProviders(true);
     }
 
+    /**
+     * Refresh cache statistics
+     * @returns {Promise<void>}
+     */
     async refreshCacheStats() {
       await this.loadCacheStats(true);
     }
 
+    /**
+     * Refresh system status
+     * @returns {Promise<void>}
+     */
     async refreshSystemStatus() {
       await this.loadSystemStatus(true);
     }
 
+    /**
+     * Refresh group history
+     * @returns {Promise<void>}
+     */
     async refreshGroupHistory() {
       await this.loadGroupRefreshHistory(true);
     }
 
+    /**
+     * Save dashboard settings
+     * @returns {Promise<void>}
+     */
     async saveSettings() {
       const payload = {
         hot_cache_ttl: Number(getElement('hot-cache-ttl')?.value) || null,
@@ -1225,6 +1477,10 @@
     }
   }
 
+  /**
+   * Reset settings form
+   * @returns {Promise<void>}
+   */
   async resetSettings() {
       const hotElement = getElement('hot-cache-ttl');
       const warmElement = getElement('warm-cache-ttl');
@@ -1237,6 +1493,10 @@
       notification.info('הגדרות אופסו', 'ניתן להזין ערכים חדשים ולשמור');
   }
 
+  /**
+   * Clear logs
+   * @returns {Promise<void>}
+   */
   async clearLogs() {
     try {
       const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
@@ -1256,6 +1516,10 @@
     }
   }
 
+  /**
+   * Clear external data cache
+   * @returns {Promise<void>}
+   */
   async clearCache() {
     try {
       const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
@@ -1273,6 +1537,10 @@
     }
   }
 
+  /**
+   * Reset external data system
+   * @returns {Promise<void>}
+   */
   async resetExternalSystem() {
     try {
       await this.clearCache();
@@ -1283,6 +1551,10 @@
     }
   }
 
+  /**
+   * Optimize cache
+   * @returns {Promise<void>}
+   */
   async optimizeCache() {
     try {
       const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
@@ -1301,6 +1573,10 @@
     }
   }
 
+  /**
+   * Test all providers
+   * @returns {Promise<Array>} Array of test results
+   */
   async testAllProviders() {
     try {
         const startTime = performance.now();
@@ -1338,6 +1614,12 @@
       }
     }
 
+    /**
+     * Render provider test modal
+     * @param {Array} results - Array of test results
+     * @param {number} durationMs - Test duration in milliseconds
+     * @returns {void}
+     */
     renderProviderTestModal(results, durationMs) {
       if (typeof window.showDetailsModal !== 'function') {
         return;
@@ -1384,6 +1666,10 @@
         window.showDetailsModal('בדיקת ספקי נתונים - תוצאות מפורטות', modalContent);
     }
 
+    /**
+     * Analyze dashboard data
+     * @returns {Promise<Object|null>} Analysis summary or null if no data
+     */
     async analyzeData() {
       if (!this.statusData) {
         notification.warning('אין נתונים', 'אנא טען מחדש את סטטוס המערכת לפני ניתוח');
@@ -1408,6 +1694,10 @@
       return summary;
     }
 
+    /**
+     * Backup dashboard data
+     * @returns {Promise<void>}
+     */
     async backupData() {
       try {
         await this.refreshCoreData();
@@ -1426,6 +1716,12 @@
       }
     }
 
+    /**
+     * Export data to file
+     * @param {string} filename - Filename for export
+     * @param {Object} data - Data to export
+     * @returns {void}
+     */
     exportToFile(filename, data) {
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
@@ -1438,6 +1734,10 @@
       window.URL.revokeObjectURL(url);
     }
 
+    /**
+     * Validate dashboard data
+     * @returns {Promise<Object|null>} Validation result or null if no data
+     */
     async validateData() {
       if (!this.statusData) {
         notification.warning('אין נתונים', 'אנא טען מחדש את הסטטוס לפני בדיקות תקינות');
@@ -1472,6 +1772,10 @@
       return { issues, timestamp: new Date().toISOString() };
     }
 
+    /**
+     * Run unit tests
+     * @returns {Promise<Object>} Test results object
+     */
     async runUnitTests() {
       const tests = [];
       const startTime = performance.now();
@@ -1498,6 +1802,12 @@
       return { tests, passed, failed, duration };
     }
 
+    /**
+     * Render test results modal
+     * @param {Array} tests - Array of test results
+     * @param {number} duration - Test duration in milliseconds
+     * @returns {void}
+     */
     renderTestResultsModal(tests, duration) {
       if (typeof window.showDetailsModal !== 'function') {
         return;
@@ -1543,6 +1853,10 @@
         window.showDetailsModal('בדיקות יחידה - תוצאות מפורטות', modalContent);
   }
 
+  /**
+   * Test specific functions
+   * @returns {Promise<Array>} Array of test results
+   */
   async testSpecificFunction() {
       const tests = [];
       tests.push(await this.testYahooFinanceAPI());
@@ -1559,6 +1873,10 @@
       return tests;
   }
 
+  /**
+   * Generate test report
+   * @returns {Promise<Object>} Test report object
+   */
   async generateTestReport() {
       const result = await this.runUnitTests();
       const report = {
@@ -1582,6 +1900,11 @@
       return report;
   }
 
+  /**
+   * Generate text report from test results
+   * @param {Object} report - Test report object
+   * @returns {string} Text report
+   */
   generateTextReport(report) {
       const lines = [];
       lines.push('=== דוח בדיקות מערכת נתונים חיצוניים ===');
@@ -1603,6 +1926,10 @@
       return lines.join('\n');
     }
 
+  /**
+   * Test Yahoo Finance API connection
+   * @returns {Promise<Object>} Test result object
+   */
   async testYahooFinanceAPI() {
       const startTime = performance.now();
     try {
@@ -1633,6 +1960,10 @@
     }
   }
 
+  /**
+   * Test database operations
+   * @returns {Promise<Object>} Test result object
+   */
   async testDatabaseOperations() {
       const startTime = performance.now();
     try {
@@ -1663,6 +1994,10 @@
     }
   }
 
+  /**
+   * Test cache operations
+   * @returns {Promise<Object>} Test result object
+   */
   async testCacheOperations() {
       const startTime = performance.now();
     try {
@@ -1693,6 +2028,10 @@
     }
   }
 
+  /**
+   * Test rate limiting
+   * @returns {Promise<Object>} Test result object
+   */
   async testRateLimitingReal() {
       const startTime = performance.now();
       try {
@@ -1719,6 +2058,10 @@
     }
   }
 
+  /**
+   * Test data validation
+   * @returns {Promise<Object>} Test result object
+   */
   async testDataValidation() {
       const startTime = performance.now();
     try {
@@ -1753,6 +2096,10 @@
     }
   }
 
+  /**
+   * Test error handling
+   * @returns {Promise<Object>} Test result object
+   */
   async testErrorHandling() {
       const startTime = performance.now();
     try {
@@ -1782,6 +2129,10 @@
       }
     }
 
+    /**
+     * Test API endpoints
+     * @returns {Promise<Array>} Array of endpoint test results
+     */
     async testAPIEndpoints() {
       const endpoints = [
         { name: '/api/external-data/status/', method: 'GET' },
@@ -1824,6 +2175,11 @@
       return results;
     }
 
+    /**
+     * Render API test modal
+     * @param {Array} results - Array of API test results
+     * @returns {void}
+     */
     renderApiTestModal(results) {
       if (typeof window.showDetailsModal !== 'function') {
         return;
@@ -1870,6 +2226,10 @@
       window.showDetailsModal('בדיקת API - פירוט', modalContent);
     }
 
+    /**
+     * Start performance monitoring
+     * @returns {Array} Performance samples array
+     */
     startPerformanceMonitoring() {
       if (this.performanceInterval) {
         notification.info('ניטור ביצועים', 'ניטור הביצועים כבר פעיל');
@@ -1884,6 +2244,10 @@
       return this.performanceSamples;
     }
 
+    /**
+     * Stop performance monitoring
+     * @returns {Array} Performance samples array
+     */
     stopPerformanceMonitoring() {
       if (this.performanceInterval) {
         window.clearInterval(this.performanceInterval);
@@ -1895,6 +2259,10 @@
       return this.performanceSamples;
     }
 
+    /**
+     * Collect performance sample
+     * @returns {Promise<void>}
+     */
     async collectPerformanceSample() {
       const startTime = performance.now();
       try {
@@ -1930,6 +2298,10 @@
       }
     }
 
+    /**
+     * Refresh performance charts
+     * @returns {Promise<void>}
+     */
     async refreshPerformanceCharts() {
       await Promise.all([
         this.updateResponseTimeChart(),
@@ -1940,6 +2312,10 @@
       notification.success('גרפי ביצועים', 'הגרפים עודכנו על סמך נתונים אחרונים');
     }
 
+    /**
+     * Update response time chart
+     * @returns {Promise<void>}
+     */
     async updateResponseTimeChart() {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
@@ -1995,6 +2371,11 @@
       }
     }
 
+    /**
+     * Update data quality chart
+     * @param {Object} data - Status data
+     * @returns {Promise<void>}
+     */
     async updateDataQualityChart(data) {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
@@ -2041,6 +2422,11 @@
       }
     }
 
+    /**
+     * Update provider comparison chart
+     * @param {Object} data - Status data
+     * @returns {Promise<void>}
+     */
     async updateProviderComparisonChart(data) {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
@@ -2099,6 +2485,10 @@
       }
     }
 
+    /**
+     * Update error analysis chart
+     * @returns {Promise<void>}
+     */
     async updateErrorAnalysisChart() {
       const chartSystem = this.getChartSystem();
       if (!chartSystem) {
@@ -2167,6 +2557,10 @@
       }
     }
 
+    /**
+     * Export performance data
+     * @returns {Promise<Object|null>} Performance data payload or null
+     */
     async exportPerformanceData() {
       if (!this.performanceSamples.length) {
         notification.warning('אין נתונים', 'הפעל ניטור ביצועים לפני ייצוא');
@@ -2186,6 +2580,10 @@
       return payload;
     }
 
+    /**
+     * Calculate average response time from performance samples
+     * @returns {number|null} Average response time in milliseconds or null
+     */
     calculateAverageResponseTime() {
       const validSamples = this.performanceSamples.filter(
         (sample) => typeof sample.responseTimeMs === 'number'
@@ -2197,6 +2595,10 @@
       return total / validSamples.length;
     }
 
+    /**
+     * Analyze system bottlenecks
+     * @returns {Promise<Array|null>} Array of bottleneck objects or null
+     */
     async analyzeBottlenecks() {
       if (!this.statusData) {
         notification.warning('אין נתונים', 'אנא טען מחדש את הסטטוס לפני ניתוח');
@@ -2248,6 +2650,11 @@
       return bottlenecks;
     }
 
+    /**
+     * Render bottleneck analysis modal
+     * @param {Array} bottlenecks - Array of bottleneck objects
+     * @returns {void}
+     */
     renderBottleneckModal(bottlenecks) {
       if (typeof window.showDetailsModal !== 'function') {
         return;
@@ -2293,6 +2700,10 @@
       window.showDetailsModal('ניתוח צווארי בקבוק - פירוט', modalContent);
     }
 
+    /**
+     * Copy detailed log to clipboard
+     * @returns {Promise<string>} Detailed log text
+     */
     async copyDetailedLog() {
       const log = this.generateDetailedLog();
       try {
@@ -2304,6 +2715,10 @@
       return log;
     }
 
+    /**
+     * Generate detailed log text
+     * @returns {string} Detailed log text
+     */
     generateDetailedLog() {
       const lines = [];
       lines.push('=== לוג מפורט - דשבורד נתונים חיצוניים ===');
@@ -2396,6 +2811,13 @@
       return lines.join('\n');
     }
 
+    /**
+     * Handle error with logging and notification
+     * @param {string} title - Error title
+     * @param {Error|string} error - Error object or message
+     * @param {string} context - Error context
+     * @returns {void}
+     */
     handleError(title, error, context) {
       const message = error instanceof Error ? error.message : String(error);
       logger.error(`${MODULE_NAME}:${context}: ${message}`, { error });
@@ -2409,6 +2831,10 @@ window.ExternalDataDashboard = ExternalDataDashboard;
     window.externalDataDashboard = new ExternalDataDashboard();
   }
 
+  /**
+   * Toggle all sections visibility
+   * @returns {void}
+   */
   window.toggleAllSections = function () {
     const sections = document.querySelectorAll('.section-content, .section-body');
     const toggleBtn = document.querySelector('.filter-toggle-btn .section-toggle-icon');
@@ -2432,6 +2858,11 @@ window.ExternalDataDashboard = ExternalDataDashboard;
     }
   };
 
+  /**
+   * Toggle section visibility by ID
+   * @param {string} sectionId - Section ID to toggle
+   * @returns {void}
+   */
   window.toggleSection = function (sectionId) {
     const section = document.getElementById(sectionId);
     if (!section) {
@@ -2454,6 +2885,10 @@ window.ExternalDataDashboard = ExternalDataDashboard;
     }
   };
 
+  /**
+   * Copy detailed log to clipboard (local wrapper)
+   * @returns {Promise<string>} Detailed log text
+   */
   window.copyDetailedLogLocal = async function () {
     if (window.externalDataDashboard) {
       return window.externalDataDashboard.copyDetailedLog();
@@ -2461,19 +2896,44 @@ window.ExternalDataDashboard = ExternalDataDashboard;
     return '';
   };
 
+  /**
+   * External Data Dashboard Actions
+   * Global action handlers for dashboard buttons
+   * @type {Object}
+   */
   window.ExternalDataDashboardActions = {
+    /**
+     * Refresh system status
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     refreshStatus(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.loadSystemStatus(true);
     },
+    /**
+     * Refresh providers data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     refreshProviders(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.loadProviders(true);
     },
+    /**
+     * Refresh cache statistics
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     refreshCacheStats(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.loadCacheStats(true);
     },
+    /**
+     * Refresh all external data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object>}
+     */
     refreshAllExternalData(event) {
       if (event) event.preventDefault();
       return ensureExternalDashboardInstance()
@@ -2483,82 +2943,182 @@ window.ExternalDataDashboard = ExternalDataDashboard;
           notification.error('שגיאה ברענון כל הטיקרים', error.message || 'רענון הטיקרים נכשל');
         });
     },
+    /**
+     * Clear external cache
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     clearExternalCache(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.clearCache();
     },
+    /**
+     * Reset external system
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     resetExternalSystem(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.resetExternalSystem();
     },
+    /**
+     * Optimize external cache
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     optimizeExternalCache(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.optimizeCache();
     },
+    /**
+     * Save cache settings
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     saveCacheSettings(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.saveSettings();
     },
+    /**
+     * Reset cache settings
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     resetCacheSettings(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.resetSettings();
     },
+    /**
+     * Run unit tests
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object>}
+     */
     runUnitTests(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.runUnitTests();
     },
+    /**
+     * Generate test report
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object>}
+     */
     generateTestReport(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.generateTestReport();
     },
+    /**
+     * Test all providers
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Array>}
+     */
     testAllProviders(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.testAllProviders();
     },
+    /**
+     * Analyze dashboard data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object|null>}
+     */
     analyzeData(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.analyzeData();
     },
+    /**
+     * Export data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     exportData(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.exportData();
     },
+    /**
+     * Backup data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     backupData(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.backupData();
     },
+    /**
+     * Copy detailed log to clipboard
+     * @param {Event} [event] - Event object
+     * @returns {Promise<string>}
+     */
     copyDetailedLog(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.copyDetailedLog();
     },
+    /**
+     * Start performance monitoring
+     * @param {Event} [event] - Event object
+     * @returns {Array}
+     */
     startMonitoring(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.startPerformanceMonitoring();
     },
+    /**
+     * Stop performance monitoring
+     * @param {Event} [event] - Event object
+     * @returns {Array}
+     */
     stopMonitoring(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.stopPerformanceMonitoring();
     },
+    /**
+     * Analyze system bottlenecks
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Array|null>}
+     */
     analyzeBottlenecks(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.analyzeBottlenecks();
     },
+    /**
+     * Export performance data
+     * @param {Event} [event] - Event object
+     * @returns {Promise<Object|null>}
+     */
     exportPerformanceData(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.exportPerformanceData();
     },
+    /**
+     * Refresh logs
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     refreshLogs(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.loadLogs(true);
     },
+    /**
+     * Clear logs
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     clearLogs(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.clearLogs();
     },
+    /**
+     * Refresh group refresh history
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     refreshHistory(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.loadGroupRefreshHistory(true);
     },
+    /**
+     * Refresh performance charts
+     * @param {Event} [event] - Event object
+     * @returns {Promise<void>}
+     */
     refreshPerformanceCharts(event) {
       if (event) event.preventDefault();
       return window.externalDataDashboard?.refreshPerformanceCharts();

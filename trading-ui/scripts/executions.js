@@ -520,7 +520,9 @@ window.updateExecution = updateExecution;
 // Use viewLinkedItemsForExecution from linked-items.js instead
 
 /**
- * הצגת הפריטים המקושרים
+ * Display linked items for execution
+ * @param {Object} linkedItems - Object containing linked items (trades, plans, alerts, notes)
+ * @returns {void}
  */
 function displayLinkedItems(linkedItems) {
   try {
@@ -707,7 +709,9 @@ function displayLinkedItems(linkedItems) {
 // REMOVED: displayLinkedItems(executionId) - duplicate function (there's another displayLinkedItems(linkedItems) that's used)
 
 /**
- * מעבר לטרייד ספציפי
+ * Navigate to specific trade page
+ * @param {number|string} tradeId - Trade ID
+ * @returns {void}
  */
 function goToTrade(tradeId) {
   try {
@@ -721,7 +725,9 @@ function goToTrade(tradeId) {
 }
 
 /**
- * מעבר לתכנון ספציפי
+ * Navigate to specific trade plan page
+ * @param {number|string} planId - Trade plan ID
+ * @returns {void}
  */
 function goToPlan(planId) {
   try {
@@ -735,7 +741,9 @@ function goToPlan(planId) {
 }
 
 /**
- * מעבר להתראה ספציפית
+ * Navigate to specific alert page
+ * @param {number|string} alertId - Alert ID
+ * @returns {void}
  */
 function goToAlert(alertId) {
   try {
@@ -749,7 +757,9 @@ function goToAlert(alertId) {
 }
 
 /**
- * מעבר להערה ספציפית
+ * Navigate to specific note page
+ * @param {number|string} noteId - Note ID
+ * @returns {void}
  */
 function goToNote(noteId) {
   try {
@@ -878,8 +888,9 @@ async function loadExecutionsData(options = {}) {
 }
 
 /**
- * Synchronize executions pagination with dataset
- * @param {Array} executionsData
+ * Sync executions pagination with data
+ * @param {Array} executionsData - Executions data array
+ * @returns {void}
  */
 function syncExecutionsPagination(executionsData) {
   try {
@@ -922,6 +933,11 @@ function syncExecutionsPagination(executionsData) {
   }
 }
 
+/**
+ * Set filtered executions dataset and update table
+ * @param {Array} filteredExecutions - Filtered executions array
+ * @returns {void}
+ */
 function setExecutionsFilteredDataset(filteredExecutions) {
   try {
     const tableId = 'executionsTable';
@@ -950,6 +966,10 @@ function setExecutionsFilteredDataset(filteredExecutions) {
   }
 }
 
+/**
+ * Get pagination options for executions table
+ * @returns {Object} Pagination options object
+ */
 function getExecutionsPaginationOptions() {
   return {
     tableType: 'executions',
@@ -958,6 +978,13 @@ function getExecutionsPaginationOptions() {
   };
 }
 
+/**
+ * Handle executions page render event
+ * @param {Object} params - Render parameters
+ * @param {Array} params.pageData - Page data array
+ * @param {Object} params.pagination - Pagination info
+ * @returns {void}
+ */
 function handleExecutionsPageRender({ pageData, pagination }) {
   updateExecutionsTableMain(pageData, { skipCounters: true, skipSummary: true, internal: true });
   if (window.setPageTableData) {
@@ -969,16 +996,32 @@ function handleExecutionsPageRender({ pageData, pagination }) {
   updateExecutionsCounters();
 }
 
+/**
+ * Handle executions filtered data change event
+ * @param {Object} params - Filter parameters
+ * @param {Array} params.filteredData - Filtered data array
+ * @returns {void}
+ */
 function handleExecutionsFilteredChange({ filteredData }) {
   updateExecutionsSummary(filteredData);
   updateExecutionsCounters(filteredData?.length || 0);
 }
 
+/**
+ * Apply filtered executions data
+ * @param {Array} data - Filtered executions data
+ * @returns {void}
+ */
 function applyExecutionsFilteredData(data) {
   filteredExecutions = Array.isArray(data) ? data : [];
   setExecutionsFilteredDataset(filteredExecutions);
 }
 
+/**
+ * Update executions summary statistics
+ * @param {Array|null} [filteredDataOverride=null] - Optional filtered data override
+ * @returns {void}
+ */
 function updateExecutionsSummary(filteredDataOverride = null) {
   try {
     const filteredData = filteredDataOverride
@@ -1006,6 +1049,11 @@ function updateExecutionsSummary(filteredDataOverride = null) {
   }
 }
 
+/**
+ * Update executions counter display
+ * @param {number|null} [filteredCountOverride=null] - Optional filtered count override
+ * @returns {void}
+ */
 function updateExecutionsCounters(filteredCountOverride = null) {
   try {
     const countElement = document.querySelector('.table-count');
@@ -1488,7 +1536,16 @@ function isDateInRange(dateString, dateRange) {
 // הגדרת הפונקציה כגלובלית
 window.isDateInRange = isDateInRange;
 
-// פונקציית פילטור מקומי לעסקאות
+/**
+ * Filter executions locally by multiple criteria
+ * @param {Array} executions - Executions array to filter
+ * @param {Array} selectedStatuses - Selected statuses filter
+ * @param {Array} selectedTypes - Selected types filter
+ * @param {Array} selectedAccounts - Selected accounts filter
+ * @param {string} dateRange - Date range filter
+ * @param {string} searchTerm - Search term filter
+ * @returns {Array} Filtered executions array
+ */
 function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
   try {
   // filterExecutionsLocally called
@@ -1736,7 +1793,8 @@ if (document.readyState === 'loading') {
 }
 
 /**
- * הגדרת תצורות מודלים
+ * Setup modal configurations (backdrop, keyboard)
+ * @returns {void}
  */
 function setupModalConfigurations() {
   try {
@@ -1816,8 +1874,9 @@ async function loadTickersWithOpenOrClosedTradesAndPlans() {
 
 
 /**
- * הפעלת כל השדות אחרי בחירת טרייד/תכנון
- * @param {string} mode - 'add' או 'edit'
+ * Enable all form fields after trade/plan selection
+ * @param {string} [mode='add'] - Mode ('add' or 'edit')
+ * @returns {void}
  */
 function enableAllFields(mode = 'add') {
   try {
@@ -2016,8 +2075,9 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
 
 /**
- * עדכון טריידים כאשר הצ'קבוקס משתנה
- * @param {string} mode - 'add' או 'edit'
+ * Update trades list when checkbox changes
+ * @param {string} [mode='add'] - Mode ('add' or 'edit')
+ * @returns {Promise<void>}
  */
 async function updateTradesOnCheckboxChange(mode = 'add') {
   // // window.Logger.info('🔄 עדכון טריידים לפי צ\'קבוקס, מצב:', mode, { page: "executions" });
@@ -2049,8 +2109,9 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
 }
 
 /**
- * עדכון טריידים כאשר הטיקר משתנה
- * @param {string} mode - 'add' או 'edit'
+ * Update trades list when ticker changes
+ * @param {string} [mode='add'] - Mode ('add' or 'edit')
+ * @returns {Promise<void>}
  */
 async function updateTradesOnTickerChange(mode = 'add') {
   window.Logger.info('🔄 עדכון טריידים לפי שינוי טיקר, מצב:', mode, { page: "executions" });
@@ -2073,8 +2134,9 @@ async function updateTradesOnTickerChange(mode = 'add') {
 }
 
 /**
- * מעבר לדף טיקר (בפיתוח)
- * @param {string} symbol - סמל הטיקר
+ * Navigate to ticker page (in development)
+ * @param {string} _symbol - Ticker symbol (unused)
+ * @returns {void}
  */
 function goToTickerPage(_symbol) {
   try {
@@ -2121,7 +2183,8 @@ function showTickerHelp() {
 }
 
 /**
- * הוספת טיקר חדש
+ * Add new ticker (in development)
+ * @returns {void}
  */
 function addNewTicker() {
   try {
@@ -2141,7 +2204,8 @@ function addNewTicker() {
 }
 
 /**
- * הוספת תכנון חדש
+ * Add new trade plan (in development)
+ * @returns {void}
  */
 function addNewPlan() {
   // הוספת תכנון חדש
@@ -2225,15 +2289,18 @@ function enableExecutionFormFields() {
 }
 
 /**
- * השבתת שדות הטופס
+ * Disable execution form fields
  * @deprecated Use toggleExecutionFormFields(false) instead
+ * @returns {void}
  */
 function disableExecutionFormFields() {
   toggleExecutionFormFields(false);
 }
 
 /**
- * טעינת מידע על הטיקר
+ * Load ticker information for execution form
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function loadExecutionTickerInfo(tickerId) {
   try {
@@ -2290,7 +2357,9 @@ async function loadExecutionTickerInfo(tickerId) {
 }
 
 /**
- * הצגת מידע על הטיקר
+ * Display ticker information in execution form
+ * @param {Object} ticker - Ticker object
+ * @returns {void}
  */
 function displayExecutionTickerInfo(ticker) {
   // Create or update ticker info display
@@ -2358,7 +2427,8 @@ function displayExecutionTickerInfo(ticker) {
 }
 
 /**
- * הסתרת מידע על הטיקר
+ * Hide ticker information from execution form
+ * @returns {void}
  */
 function hideExecutionTickerInfo() {
   const tickerInfoDiv = document.getElementById('executionTickerInfo');
@@ -2368,8 +2438,9 @@ function hideExecutionTickerInfo() {
 }
 
 /**
- * חישוב ערכים מחושבים לטופס עסקה (הוספה או עריכה)
- * @param {string} formType - 'add' או 'edit'
+ * Calculate execution values (total, etc.) for form
+ * @param {string} formType - Form type ('add' or 'edit')
+ * @returns {void}
  */
 function calculateExecutionValues(formType) {
   const isEdit = formType === 'edit';
@@ -2419,16 +2490,18 @@ function calculateExecutionValues(formType) {
 }
 
 /**
- * חישוב ערכים מחושבים לטופס הוספה
+ * Calculate execution values for add form
  * @deprecated Use calculateExecutionValues('add') instead
+ * @returns {void}
  */
 function calculateAddExecutionValues() {
   calculateExecutionValues('add');
 }
 
 /**
- * חישוב ערכים מחושבים לטופס עריכה
+ * Calculate execution values for edit form
  * @deprecated Use calculateExecutionValues('edit') instead
+ * @returns {void}
  */
 function calculateEditExecutionValues() {
   calculateExecutionValues('edit');
@@ -2471,8 +2544,9 @@ window.goToLinkedTrade = goToLinkedTrade;
 // ========================================
 
 /**
- * טעינת ביצועים לטרייד
- * @param {number} tradeId - מזהה הטרייד
+ * Load executions for trade (used in trade modal)
+ * @param {number} _tradeId - Trade ID (unused)
+ * @returns {void}
  */
 function loadTradeExecutions(_tradeId) {
   // טעינת ביצועים לטרייד
@@ -2552,7 +2626,8 @@ function addEditBuySell() {
 }
 
 /**
- * שיוך עסקה קיימת לטרייד
+ * Link existing execution to trade (in development)
+ * @returns {void}
  */
 function linkExistingExecution() {
   if (typeof window.showInfoNotification === 'function') {
@@ -2563,7 +2638,8 @@ function linkExistingExecution() {
 }
 
 /**
- * ביטול שיוך עסקה מטרייד
+ * Unlink execution from trade (in development)
+ * @returns {void}
  */
 function unlinkExecution() {
   if (typeof window.showInfoNotification === 'function') {

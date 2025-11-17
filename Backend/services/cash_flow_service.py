@@ -405,3 +405,122 @@ class CashFlowService:
 
         return summary
 
+    # ------------------------------------------------------------------
+    # Creation API for regular (non-exchange) cash flows (SSOT for manual + import)
+    # ------------------------------------------------------------------
+    @staticmethod
+    def create_regular_cash_flow(
+        db: Session,
+        *,
+        trading_account_id: int,
+        type: str,
+        amount: float,
+        date,
+        currency_id: int = None,
+        usd_rate: float = None,
+        fee_amount: float = 0.0,
+        description: str = None,
+        source: str = "manual",
+        external_id: str = None,
+        trade_id: int = None
+    ) -> CashFlow:
+        """
+        Create a regular (non-exchange) cash flow with validation matching manual creation.
+        
+        This function uses the same validation logic as the API endpoint to ensure
+        consistency between manual creation and import processes.
+        
+        Args:
+            db: Database session
+            trading_account_id: Trading account ID
+            type: Cash flow type (deposit, withdrawal, fee, etc.)
+            amount: Cash flow amount (must be non-zero)
+            date: Date object or datetime
+            currency_id: Currency ID (defaults to 1 for USD)
+            usd_rate: USD exchange rate (defaults to 1.0)
+            fee_amount: Fee amount in account base currency (must be non-negative)
+            description: Optional description
+            source: Source of cash flow (defaults to 'manual')
+            external_id: External ID (defaults to '0')
+            trade_id: Optional trade ID
+            
+        Returns:
+            CashFlow: Created cash flow object
+            
+        Raises:
+            ValueError: If validation fails
+        """
+        from models.cash_flow import CashFlow
+        from models.currency import Currency
+        from services.validation_service import ValidationService
+        from datetime import datetime as _dt, date as _date
+        
+        # Normalize date to date object
+        if isinstance(date, _dt):
+            date_value = date.date()
+        elif isinstance(date, _date):
+            date_value = date
+        elif date is None:
+            date_value = None
+        else:
+            date_value = date
+        
+        # Set defaults matching API endpoint logic
+        if currency_id is None:
+            currency_id = 1  # USD
+        if usd_rate is None:
+            usd_rate = 1.000000
+        if source is None:
+            source = 'manual'
+        if external_id is None:
+            external_id = '0'
+        
+        # Normalize fee amount - always store non-negative value
+        if fee_amount is None:
+            fee_amount = 0.0
+        try:
+            fee_amount_value = float(fee_amount) if fee_amount not in (None, '') else 0.0
+        except (TypeError, ValueError):
+            raise ValueError("Invalid fee_amount. Fee must be a non-negative number.")
+        
+        if fee_amount_value < 0:
+            raise ValueError("Fee amount cannot be negative")
+        
+        # Validate amount is non-zero
+        if amount == 0:
+            raise ValueError("Amount cannot be zero")
+        
+        # Resolve currency for usd_rate if not provided
+        if usd_rate == 1.0 and currency_id != 1:
+            currency = db.query(Currency).filter(Currency.id == currency_id).first()
+            if currency:
+                usd_rate = float(currency.usd_rate or 1.0)
+        
+        # Prepare data dict for validation
+        data = {
+            'trading_account_id': trading_account_id,
+            'type': type,
+            'amount': float(amount),
+            'date': date_value,
+            'currency_id': currency_id,
+            'usd_rate': float(usd_rate),
+            'fee_amount': fee_amount_value,
+            'description': description,
+            'source': source,
+            'external_id': external_id,
+            'trade_id': trade_id
+        }
+        
+        # Validate data against constraints (same as API endpoint)
+        is_valid, errors = ValidationService.validate_data(db, 'cash_flows', data)
+        if not is_valid:
+            error_message = "; ".join(errors)
+            raise ValueError(f"Cash flow validation failed: {error_message}")
+        
+        # Create cash flow object
+        cash_flow = CashFlow(**data)
+        db.add(cash_flow)
+        # Note: Caller is responsible for commit/flush
+        
+        return cash_flow
+

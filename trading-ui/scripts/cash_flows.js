@@ -534,7 +534,8 @@ function getAccountNameById(accountId) {
 }
 
 /**
- * טעינת נתוני חשבונות מסחר אם הם לא נטענו
+ * Ensure trading accounts data is loaded
+ * @returns {Promise<void>}
  */
 async function ensureTradingAccountsLoaded() {
   // אם יש כבר נתונים, אין צורך לטעון שוב
@@ -1282,6 +1283,8 @@ async function syncCashFlowsPagination(cashFlows) {
 
 /**
  * Group cash flows into unified forex exchanges (one row per exchange_<uuid>)
+ * @param {Array} rows - Array of cash flow rows
+ * @returns {Array} Array of grouped exchange objects
  */
 function groupUnifiedExchanges(rows) {
   const data = Array.isArray(rows) ? rows : [];
@@ -1324,6 +1327,8 @@ function groupUnifiedExchanges(rows) {
 
 /**
  * Render unified forex exchanges table at page bottom
+ * @param {Array} sourceRows - Array of cash flow rows
+ * @returns {void}
  */
 function renderUnifiedForexExchangesTable(sourceRows) {
   const tableBody = document.querySelector('#forexUnifiedTable tbody');
@@ -1450,7 +1455,7 @@ function ensureExchangePairsAdjacency(rows) {
 }
 
 /**
- * Setup exchange row interactions
+ * Setup exchange row interactions (hover, click handlers)
  * @returns {void}
  */
 function setupExchangeRowInteractions() {
@@ -2029,7 +2034,8 @@ function applyUserPreferences(preferences) {
 }
 
 /**
- * אתחול הדף
+ * Initialize cash flows page
+ * @returns {Promise<void>}
  */
 async function initializeCashFlowsPage() {
   window.Logger.info('Initializing cash flows page', { page: 'cash_flows' });

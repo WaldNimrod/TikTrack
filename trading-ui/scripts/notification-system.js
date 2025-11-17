@@ -1589,7 +1589,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
             </div>
             <div class="modal-footer">
               <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-              <button data-button-type="COPY" data-onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')" data-text="העתק" title="העתק ללוח"></button>
+              <button data-button-type="COPY" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" data-text="העתק" title="העתק ללוח" id="${modalId}-copy-btn"></button>
             </div>
           </div>
         </div>
@@ -1603,6 +1603,28 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
     const modalElement = document.getElementById(modalId);
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
+    
+    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
+    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
+        if (typeof window.copyToClipboard === 'function') {
+          window.copyToClipboard(textToCopy, title);
+        } else if (typeof copyToClipboard === 'function') {
+          copyToClipboard(textToCopy, title);
+        } else {
+          // Fallback: use navigator.clipboard directly
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            if (typeof window.showSuccessNotification === 'function') {
+              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
+            }
+          }).catch(err => {
+            window.Logger?.error('[NotificationSystem] Failed to copy:', err, { page: 'notification-system' });
+          });
+        }
+      });
+    }
     
     // הסרת ה-modal אחרי סגירה
     modalElement.addEventListener('hidden.bs.modal', () => {

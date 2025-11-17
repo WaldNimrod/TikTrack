@@ -58,24 +58,24 @@
 
 **רשימת פונקציות**:
 
-- ❌ `info()` (שורה 21) - missing
-- ❌ `warn()` (שורה 22) - missing
-- ❌ `error()` (שורה 23) - missing
-- ❌ `debug()` (שורה 24) - missing
-- ✅ `safeText()` (שורה 74) - complete
-- ✅ `formatNumber()` (שורה 89) - complete
-- ✅ `formatDecimal()` (שורה 103) - complete
-- ✅ `formatPercent()` (שורה 116) - complete
-- ✅ `formatDurationMs()` (שורה 130) - complete
-- ✅ `formatRelativeTime()` (שורה 146) - complete
-- ✅ `extractTimestampIso()` (שורה 178) - complete
-- ✅ `formatRelativeFromPayload()` (שורה 196) - complete
-- ✅ `formatTimePayloadForDeveloper()` (שורה 206) - complete
-- ✅ `ensureExternalDashboardInstance()` (שורה 248) - partial
-- ✅ `setElementText()` (שורה 270) - complete
-- ✅ `getElement()` (שורה 282) - complete
-- ❌ `setStatusIndicator()` (שורה 296) - missing
-- ✅ `getThemeFonts()` (שורה 327) - partial
+- ❌ `info()` (שורה 44) - missing
+- ❌ `warn()` (שורה 45) - missing
+- ❌ `error()` (שורה 46) - missing
+- ❌ `debug()` (שורה 47) - missing
+- ✅ `safeText()` (שורה 97) - complete
+- ✅ `formatNumber()` (שורה 112) - complete
+- ✅ `formatDecimal()` (שורה 126) - complete
+- ✅ `formatPercent()` (שורה 139) - complete
+- ✅ `formatDurationMs()` (שורה 153) - complete
+- ✅ `formatRelativeTime()` (שורה 169) - complete
+- ✅ `extractTimestampIso()` (שורה 201) - complete
+- ✅ `formatRelativeFromPayload()` (שורה 219) - complete
+- ✅ `formatTimePayloadForDeveloper()` (שורה 229) - complete
+- ✅ `ensureExternalDashboardInstance()` (שורה 271) - partial
+- ✅ `setElementText()` (שורה 293) - complete
+- ✅ `getElement()` (שורה 305) - complete
+- ❌ `setStatusIndicator()` (שורה 319) - missing
+- ✅ `getThemeFonts()` (שורה 350) - partial
 ---
 
 ## סעיף D: Recommended Tasks

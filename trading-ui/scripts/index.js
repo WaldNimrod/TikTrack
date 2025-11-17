@@ -825,6 +825,7 @@ window.dashboardDataState = dashboardDataState;
 /**
  * Switch between table tabs on the index page
  * @param {string} tabName - The name of the tab to switch to
+ * @returns {void}
  */
 function switchTableTab(tabName) {
     // Hide all table contents
@@ -850,6 +851,7 @@ function switchTableTab(tabName) {
 /**
  * Refresh overview data on the index page
  * Fetches and updates overview section data
+ * @returns {void}
  */
 function refreshOverview() {
     window.Logger.info('Refreshing overview data...', { page: "index" });
@@ -860,7 +862,8 @@ function refreshOverview() {
 
 /**
  * Export overview data from the index page
- * @param {string} format - Export format (csv, json, etc.)
+ * @param {string} [format='csv'] - Export format (csv, json, etc.)
+ * @returns {void}
  */
 function exportOverview(format = 'csv') {
     if (typeof showNotification === 'function') {
@@ -873,6 +876,7 @@ function exportOverview(format = 'csv') {
 /**
  * Execute quick actions on the index page
  * @param {string} actionType - Type of quick action to execute
+ * @returns {void}
  */
 function quickAction(actionType) {
     if (typeof showNotification === 'function') {
@@ -1027,6 +1031,10 @@ async function createAccountChart() {
     }
 }
 
+/**
+ * Create mixed chart on the index page
+ * @returns {Promise<void>}
+ */
 async function createMixedChart() {
     try {
         // window.Logger.info('🔀 Creating mixed chart...', { page: "index" });
@@ -1080,6 +1088,10 @@ async function createMixedChart() {
 // Flag to prevent duplicate chart refresh
 let chartsRefreshing = false;
 
+/**
+ * Refresh all charts on the index page
+ * @returns {Promise<void>}
+ */
 async function refreshAllCharts() {
     // Prevent duplicate refresh
     if (chartsRefreshing) {
@@ -1113,6 +1125,11 @@ async function refreshAllCharts() {
     }
 }
 
+/**
+ * Refresh a specific chart by ID
+ * @param {string} chartId - Chart ID ('tradesStatusChart', 'performanceChart', 'accountChart', 'mixedChart')
+ * @returns {Promise<void>}
+ */
 async function refreshChart(chartId) {
     window.Logger.info(`🔄 Refreshing chart: ${chartId}`, { page: "index" });
     
@@ -1148,6 +1165,11 @@ async function refreshChart(chartId) {
     }
 }
 
+/**
+ * Export a specific chart by ID
+ * @param {string} chartId - Chart ID to export
+ * @returns {Promise<void>}
+ */
 async function exportChart(chartId) {
     window.Logger.info(`📤 Exporting chart: ${chartId}`, { page: "index" });
     
@@ -1172,6 +1194,10 @@ async function exportChart(chartId) {
     }
 }
 
+/**
+ * Export all charts on the index page
+ * @returns {Promise<void>}
+ */
 async function exportAllCharts() {
     window.Logger.info('📤 Exporting all charts...', { page: "index" });
     
@@ -1278,6 +1304,10 @@ window.exportChart = exportChart;
 window.exportAllCharts = exportAllCharts;
 
 // Detailed Log Functions for Index Page
+/**
+ * Generate detailed log for index page debugging
+ * @returns {string} JSON string with detailed log data
+ */
 function generateDetailedLog() {
     try {
         const logData = {
@@ -1392,7 +1422,10 @@ function generateDetailedLog() {
 }
 
 
-// Z-Index Debug Function - בדיקת מצב z-index בפועל
+/**
+ * Debug Z-Index status for header system
+ * @returns {void}
+ */
 function debugZIndexStatus() {
     window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: "index" });
     window.Logger.info('=====================================', { page: "index" });
@@ -1459,6 +1492,10 @@ function debugZIndexStatus() {
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local copyDetailedLog function for index page
+/**
+ * Copy detailed log to clipboard
+ * @returns {Promise<void>}
+ */
 async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();

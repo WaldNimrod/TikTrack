@@ -49,12 +49,12 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 70.3% (64/91 פונקציות)
+**כיסוי**: 78.0% (71/91 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 3
-- **פונקציות עם JSDoc חלקי**: 61
-- **פונקציות ללא JSDoc**: 27
+- **פונקציות עם JSDoc מלא** (params + returns): 27
+- **פונקציות עם JSDoc חלקי**: 44
+- **פונקציות ללא JSDoc**: 20
 
 **רשימת פונקציות**:
 
@@ -63,21 +63,21 @@
 - ❌ `updateRealizedPLField()` (שורה 243) - missing
 - ✅ `saveExecution()` (שורה 324) - partial
 - ✅ `updateExecution()` (שורה 498) - complete
-- ✅ `displayLinkedItems()` (שורה 525) - partial
-- ✅ `goToTrade()` (שורה 712) - partial
-- ✅ `goToPlan()` (שורה 726) - partial
-- ✅ `goToAlert()` (שורה 740) - partial
-- ✅ `goToNote()` (שורה 754) - partial
-- ✅ `loadExecutionsData()` (שורה 782) - partial
-- ✅ `syncExecutionsPagination()` (שורה 884) - partial
-- ❌ `setExecutionsFilteredDataset()` (שורה 925) - missing
-- ❌ `getExecutionsPaginationOptions()` (שורה 953) - missing
-- ❌ `handleExecutionsPageRender()` (שורה 961) - missing
-- ❌ `handleExecutionsFilteredChange()` (שורה 972) - missing
-- ❌ `applyExecutionsFilteredData()` (שורה 977) - missing
-- ❌ `updateExecutionsSummary()` (שורה 982) - missing
-- ❌ `updateExecutionsCounters()` (שורה 1009) - missing
-- ✅ `updateExecutionsTableMain()` (שורה 1035) - partial
+- ✅ `displayLinkedItems()` (שורה 527) - complete
+- ✅ `goToTrade()` (שורה 716) - complete
+- ✅ `goToPlan()` (שורה 732) - complete
+- ✅ `goToAlert()` (שורה 748) - complete
+- ✅ `goToNote()` (שורה 764) - complete
+- ✅ `loadExecutionsData()` (שורה 792) - partial
+- ✅ `syncExecutionsPagination()` (שורה 895) - complete
+- ✅ `setExecutionsFilteredDataset()` (שורה 941) - complete
+- ✅ `getExecutionsPaginationOptions()` (שורה 973) - complete
+- ✅ `handleExecutionsPageRender()` (שורה 988) - complete
+- ✅ `handleExecutionsFilteredChange()` (שורה 1005) - complete
+- ✅ `applyExecutionsFilteredData()` (שורה 1015) - complete
+- ✅ `updateExecutionsSummary()` (שורה 1025) - complete
+- ✅ `updateExecutionsCounters()` (שורה 1057) - complete
+- ✅ `updateExecutionsTableMain()` (שורה 1083) - partial
 
 ... ועוד 71 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-27 פונקציות חסרות
+3. הוספת JSDoc ל-20 פונקציות חסרות
 
 ---
 

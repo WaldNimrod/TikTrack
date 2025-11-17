@@ -49,35 +49,35 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 67.3% (35/52 פונקציות)
+**כיסוי**: 73.1% (38/52 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 5
-- **פונקציות עם JSDoc חלקי**: 30
-- **פונקציות ללא JSDoc**: 17
+- **פונקציות עם JSDoc מלא** (params + returns): 24
+- **פונקציות עם JSDoc חלקי**: 14
+- **פונקציות ללא JSDoc**: 14
 
 **רשימת פונקציות**:
 
 - ✅ `editTicker()` (שורה 98) - complete
 - ✅ `viewTickerDetails()` (שורה 118) - partial
 - ✅ `loadCurrenciesData()` (שורה 206) - partial
-- ✅ `getCurrencySymbol()` (שורה 227) - partial
-- ✅ `getTickerTypeStyle()` (שורה 244) - partial
-- ✅ `getTickerStatusStyle()` (שורה 275) - partial
-- ✅ `getTickerStatusLabel()` (שורה 312) - partial
-- ✅ `generateTickerCurrencyOptions()` (שורה 331) - partial
-- ✅ `updateCurrencyOptions()` (שורה 374) - partial
-- ❌ `updateActiveTradesField()` (שורה 419) - missing
-- ✅ `updateTickerActiveTradesStatus()` (שורה 465) - partial
-- ✅ `updateAllActiveTradesStatuses()` (שורה 497) - partial
-- ✅ `restoreTickersSectionState()` (שורה 535) - partial
-- ✅ `saveTicker()` (שורה 594) - partial
-- ❌ `updateTicker()` (שורה 734) - missing
-- ✅ `cancelTicker()` (שורה 944) - partial
-- ✅ `checkLinkedItemsAndCancelTicker()` (שורה 1007) - partial
-- ✅ `performTickerCancellation()` (שורה 1014) - partial
-- ❌ `onSuccess()` (שורה 1030) - missing
-- ✅ `checkLinkedItemsBeforeDeleteTicker()` (שורה 1104) - complete
+- ✅ `getCurrencySymbol()` (שורה 229) - complete
+- ✅ `getTickerTypeStyle()` (שורה 248) - complete
+- ✅ `getTickerStatusStyle()` (שורה 281) - complete
+- ✅ `getTickerStatusLabel()` (שורה 320) - complete
+- ✅ `generateTickerCurrencyOptions()` (שורה 341) - complete
+- ✅ `updateCurrencyOptions()` (שורה 386) - complete
+- ❌ `updateActiveTradesField()` (שורה 426) - missing
+- ✅ `updateTickerActiveTradesStatus()` (שורה 472) - partial
+- ✅ `updateAllActiveTradesStatuses()` (שורה 504) - partial
+- ✅ `restoreTickersSectionState()` (שורה 542) - partial
+- ✅ `saveTicker()` (שורה 601) - partial
+- ❌ `updateTicker()` (שורה 741) - missing
+- ✅ `cancelTicker()` (שורה 953) - complete
+- ✅ `checkLinkedItemsAndCancelTicker()` (שורה 1016) - complete
+- ✅ `performTickerCancellation()` (שורה 1025) - complete
+- ❌ `onSuccess()` (שורה 1041) - missing
+- ✅ `checkLinkedItemsBeforeDeleteTicker()` (שורה 1115) - complete
 
 ... ועוד 32 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-17 פונקציות חסרות
+3. הוספת JSDoc ל-14 פונקציות חסרות
 
 ---
 

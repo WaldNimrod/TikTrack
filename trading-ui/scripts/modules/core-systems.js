@@ -3909,7 +3909,7 @@ window.showDetailedNotification = async function (
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-              <button type="button" class="btn btn-primary" data-onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
+              <button type="button" class="btn btn-primary" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" id="${modalId}-copy-btn">העתק</button>
             </div>
           </div>
         </div>
@@ -3919,6 +3919,28 @@ window.showDetailedNotification = async function (
     // Use the unified helper function to create and show modal without ARIA warnings
     const modal = window.createAndShowModal(modalHtml, modalId);
     const modalElement = document.getElementById(modalId);
+
+    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
+    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
+        if (typeof window.copyToClipboard === 'function') {
+          window.copyToClipboard(textToCopy, title);
+        } else if (typeof copyToClipboard === 'function') {
+          copyToClipboard(textToCopy, title);
+        } else {
+          // Fallback: use navigator.clipboard directly
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            if (typeof window.showSuccessNotification === 'function') {
+              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
+            }
+          }).catch(err => {
+            console.error('Failed to copy:', err);
+          });
+        }
+      });
+    }
 
     // הסרת ה-modal אחרי סגירה
     modalElement.addEventListener('hidden.bs.modal', () => {

@@ -52,8 +52,8 @@
 **כיסוי**: 70.7% (58/82 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 35
-- **פונקציות עם JSDoc חלקי**: 23
+- **פונקציות עם JSDoc מלא** (params + returns): 38
+- **פונקציות עם JSDoc חלקי**: 20
 - **פונקציות ללא JSDoc**: 24
 
 **רשימת פונקציות**:
@@ -71,13 +71,13 @@
 - ✅ `filterCashFlowsLocallyByType()` (שורה 487) - complete
 - ✅ `reapplyCashFlowTypeFilter()` (שורה 502) - complete
 - ✅ `getAccountNameById()` (שורה 512) - complete
-- ✅ `ensureTradingAccountsLoaded()` (שורה 539) - partial
-- ✅ `validateCashFlowAmount()` (שורה 595) - complete
-- ✅ `validateCashFlowDate()` (שורה 608) - complete
-- ✅ `validateCashFlowForm()` (שורה 625) - partial
-- ✅ `validateEditCashFlowForm()` (שורה 665) - partial
-- ✅ `deleteCashFlow()` (שורה 703) - partial
-- ✅ `performCashFlowDeletion()` (שורה 761) - complete
+- ✅ `ensureTradingAccountsLoaded()` (שורה 540) - partial
+- ✅ `validateCashFlowAmount()` (שורה 596) - complete
+- ✅ `validateCashFlowDate()` (שורה 609) - complete
+- ✅ `validateCashFlowForm()` (שורה 626) - partial
+- ✅ `validateEditCashFlowForm()` (שורה 666) - partial
+- ✅ `deleteCashFlow()` (שורה 704) - partial
+- ✅ `performCashFlowDeletion()` (שורה 762) - complete
 
 ... ועוד 62 פונקציות
 ---

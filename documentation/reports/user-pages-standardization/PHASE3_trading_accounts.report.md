@@ -49,12 +49,12 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 62.9% (39/62 פונקציות)
+**כיסוי**: 66.1% (41/62 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 19
+- **פונקציות עם JSDoc מלא** (params + returns): 21
 - **פונקציות עם JSDoc חלקי**: 20
-- **פונקציות ללא JSDoc**: 23
+- **פונקציות ללא JSDoc**: 21
 
 **רשימת פונקציות**:
 
@@ -66,18 +66,18 @@
 - ✅ `loadDefaultTradingAccounts()` (שורה 422) - partial
 - ❌ `isTradingAccountsLoaded()` (שורה 442) - missing
 - ✅ `legacyFetchTradingAccounts()` (שורה 451) - partial
-- ❌ `loadTradingAccountsData()` (שורה 468) - missing
-- ✅ `loadAccountBalance()` (שורה 494) - complete
-- ✅ `loadAccountBalancesBatch()` (שורה 521) - complete
-- ✅ `getCurrencySymbol()` (שורה 542) - complete
-- ❌ `enrichAccountsWithBalances()` (שורה 571) - missing
-- ✅ `syncTradingAccountsPagination()` (שורה 592) - complete
-- ❌ `render()` (שורה 601) - missing
-- ❌ `onFilteredDataChange()` (שורה 610) - missing
-- ✅ `updateTradingAccountsTable()` (שורה 644) - complete
-- ✅ `updateTradingAccountsSummary()` (שורה 846) - complete
-- ❌ `getCurrencySymbol()` (שורה 909) - missing
-- ✅ `loadTradingAccounts()` (שורה 957) - partial
+- ✅ `loadTradingAccountsData()` (שורה 473) - complete
+- ✅ `loadAccountBalance()` (שורה 499) - complete
+- ✅ `loadAccountBalancesBatch()` (שורה 526) - complete
+- ✅ `getCurrencySymbol()` (שורה 547) - complete
+- ✅ `enrichAccountsWithBalances()` (שורה 582) - complete
+- ✅ `syncTradingAccountsPagination()` (שורה 603) - complete
+- ❌ `render()` (שורה 612) - missing
+- ❌ `onFilteredDataChange()` (שורה 621) - missing
+- ✅ `updateTradingAccountsTable()` (שורה 654) - complete
+- ✅ `updateTradingAccountsSummary()` (שורה 856) - complete
+- ❌ `getCurrencySymbol()` (שורה 919) - missing
+- ✅ `loadTradingAccounts()` (שורה 967) - partial
 
 ... ועוד 42 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-23 פונקציות חסרות
+3. הוספת JSDoc ל-21 פונקציות חסרות
 
 ---
 

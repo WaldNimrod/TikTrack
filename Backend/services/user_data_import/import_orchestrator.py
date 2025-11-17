@@ -2228,20 +2228,23 @@ class ImportOrchestrator:
                     f"cashflow_{import_session.id}_{index + 1}"
                 )
 
-                cashflow = CashFlow(
+                # Use service SSOT for regular cash flows (same validation as manual creation)
+                # This ensures consistency between manual and import processes
+                cashflow = CashFlowHelperService.create_regular_cash_flow(
+                    self.db_session,
                     trading_account_id=import_session.trading_account_id,
                     type=storage_type or record.get('cashflow_type', 'cash_adjustment'),
                     amount=amount,
-                    fee_amount=0.0,
                     date=effective_date,
-                    description=description,
                     currency_id=currency_id,
                     usd_rate=usd_rate,
+                    fee_amount=0.0,
+                    description=description,
                     source='file_import',
                     external_id=external_id,
                     trade_id=None
                 )
-                self.db_session.add(cashflow)
+                # Note: create_regular_cash_flow already calls db.add(), no need to add again
                 imported_count += 1
             except Exception as record_error:
                 logger.error(
@@ -2282,6 +2285,7 @@ class ImportOrchestrator:
                 description = from_rec.get('memo') or to_rec.get('memo')
                 # Fee amount - extract from record.commission (set by IBKR connector from Comm/Fee field)
                 # Commission is stored directly in the record, not in metadata
+                # IMPORTANT: Normalize fee_amount to be non-negative (negative fees are invalid)
                 fee_amount = 0.0
                 commission_val = from_rec.get('commission')
                 if commission_val is None:
@@ -2289,7 +2293,15 @@ class ImportOrchestrator:
                     meta = (from_rec.get('metadata') or {}) if isinstance(from_rec.get('metadata'), dict) else {}
                     commission_val = meta.get('commission')
                 try:
-                    fee_amount = float(commission_val) if commission_val not in (None, '') else 0.0
+                    fee_amount_raw = float(commission_val) if commission_val not in (None, '') else 0.0
+                    # Normalize: if fee is negative, set to 0 (fee amount cannot be negative)
+                    fee_amount = max(0.0, fee_amount_raw)
+                    if fee_amount_raw < 0:
+                        logger.warning(
+                            "⚠️ [IMPORT] Negative fee amount detected for exchange %s: %s. Normalized to 0.0",
+                            exchange_id,
+                            fee_amount_raw
+                        )
                 except (TypeError, ValueError):
                     fee_amount = 0.0
 

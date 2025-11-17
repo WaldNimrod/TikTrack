@@ -1141,6 +1141,12 @@ function onNoteRelationTypeChange() {
   // אבל אנחנו צריכים אותה לעבוד גם בעת טעינת נתונים לעריכה
 }
 
+/**
+ * Populate edit select by type
+ * @param {string} relationType - Relation type
+ * @param {number|string} selectedId - Selected ID
+ * @returns {Promise<void>}
+ */
 async function populateEditSelectByType(relationType, selectedId) {
   try {
     let data = [];
@@ -1231,7 +1237,10 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   return result.isValid;
 }
 
-// פונקציות שמירה ומחיקה
+/**
+ * Save note (handles both add and edit modes)
+ * @returns {Promise<void>}
+ */
 async function saveNote() {
   const form = document.getElementById('notesModalForm') || document.getElementById('addNoteForm');
   if (!form) {
@@ -1354,6 +1363,10 @@ async function saveNote() {
   }
 }
 
+/**
+ * Update note from modal
+ * @returns {Promise<void>}
+ */
 async function updateNoteFromModal() {
   
   // שימוש ב-DataCollectionService לאיסוף נתונים
@@ -1489,6 +1502,11 @@ async function confirmDeleteNote(noteId) {
   await deleteNoteFromServer(noteId);
 }
 
+/**
+ * Delete note from server
+ * @param {number|string} noteId - Note ID
+ * @returns {Promise<void>}
+ */
 async function deleteNoteFromServer(noteId) {
   const maxRetries = 3;
   let retryCount = 0;
@@ -1730,7 +1748,10 @@ function setupNoteValidationEvents() {
   }
 }
 
-// פונקציה לביטול בחירת קובץ
+/**
+ * Clear selected file
+ * @returns {void}
+ */
 function clearSelectedFile() {
   try {
     const fileInput = document.getElementById('editNoteAttachment');
@@ -2189,7 +2210,11 @@ function viewNote(noteId) {
   }
 }
 
-// פונקציה לטעינת נתוני הערה לצפייה
+/**
+ * Load note data for viewing
+ * @param {number|string} noteId - Note ID
+ * @returns {Promise<void>}
+ */
 async function loadNoteForViewing(noteId) {
   try {
     let payload;

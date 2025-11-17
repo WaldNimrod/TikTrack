@@ -100,6 +100,11 @@ const SIDE_LABELS = Object.freeze({
     sell: 'מכירה'
 });
 
+/**
+ * Convert value to number
+ * @param {*} value - Value to convert
+ * @returns {number} Number value or 0 if invalid
+ */
 function toNumber(value) {
     if (typeof value === 'number' && Number.isFinite(value)) {
         return value;
@@ -108,6 +113,11 @@ function toNumber(value) {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/**
+ * Resolve date value from various formats
+ * @param {*} value - Date value (string, object, or null)
+ * @returns {string|null} Resolved date string or null
+ */
 function resolveDateValue(value) {
     if (!value && value !== 0) {
         return null;
@@ -121,6 +131,11 @@ function resolveDateValue(value) {
     return null;
 }
 
+/**
+ * Format date to short format
+ * @param {*} value - Date value to format
+ * @returns {string} Formatted date string or empty string
+ */
 function formatDateShort(value) {
     const resolved = resolveDateValue(value);
     if (!resolved) {
@@ -145,6 +160,11 @@ function formatDateShort(value) {
     }
 }
 
+/**
+ * Normalize payload to array
+ * @param {*} payload - Payload to normalize
+ * @returns {Array} Normalized array
+ */
 function normalizeArray(payload) {
     if (!payload) {
         return [];
@@ -167,6 +187,12 @@ function normalizeArray(payload) {
     return [];
 }
 
+/**
+ * Determine currency symbol from accounts or trades
+ * @param {Array} [accounts=[]] - Array of accounts
+ * @param {Array} [trades=[]] - Array of trades
+ * @returns {string} Currency symbol or '$' as default
+ */
 function determineCurrencySymbol(accounts = [], trades = []) {
     for (const account of accounts) {
         if (account?.currency_symbol) {
@@ -190,6 +216,13 @@ function determineCurrencySymbol(accounts = [], trades = []) {
     return '$';
 }
 
+/**
+ * Format amount as HTML
+ * @param {*} value - Amount value
+ * @param {string} [currencySymbol='$'] - Currency symbol
+ * @param {number} [decimals=2] - Number of decimal places
+ * @returns {string} Formatted HTML string
+ */
 function formatAmountHtml(value, currencySymbol = '$', decimals = 2) {
     const numericValue = toNumber(value);
     if (!Number.isFinite(numericValue)) {
@@ -205,6 +238,11 @@ function formatAmountHtml(value, currencySymbol = '$', decimals = 2) {
     return `${currencySymbol}${numericValue.toFixed(decimals)}`;
 }
 
+/**
+ * Translate side value to Hebrew
+ * @param {*} side - Side value
+ * @returns {string} Translated side or original value
+ */
 function translateSide(side) {
     if (!side && side !== 0) {
         return '';
@@ -220,6 +258,13 @@ function translateSide(side) {
     return SIDE_LABELS[normalized] || side;
 }
 
+/**
+ * Compute portfolio profit and loss
+ * @param {Array} [trades=[]] - Array of trades
+ * @param {Array} [accounts=[]] - Array of accounts
+ * @param {Array} [cashFlows=[]] - Array of cash flows
+ * @returns {number} Total P&L
+ */
 function computePortfolioPnL(trades = [], accounts = [], cashFlows = []) {
     let total = 0;
     trades.forEach((trade) => {
@@ -253,6 +298,12 @@ function computePortfolioPnL(trades = [], accounts = [], cashFlows = []) {
     return total;
 }
 
+/**
+ * Update summary statistics on dashboard
+ * @param {Object} data - Dashboard data
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
 function updateSummaryStats(data, currencySymbol) {
     const { trades = [], alerts = [], accounts = [], cashFlows = [] } = data;
 
@@ -282,6 +333,12 @@ function updateSummaryStats(data, currencySymbol) {
     }
 }
 
+/**
+ * Update recent trades section
+ * @param {Array} [trades=[]] - Array of trades
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
 function updateRecentTrades(trades = [], currencySymbol) {
     if (window.RecentTradesWidget?.render) {
         window.RecentTradesWidget.render(trades, currencySymbol);
@@ -368,6 +425,11 @@ function updateRecentTrades(trades = [], currencySymbol) {
     container.appendChild(list);
 }
 
+/**
+ * Update active alerts section
+ * @param {Array} [alerts=[]] - Array of alerts
+ * @returns {void}
+ */
 function updateActiveAlerts(alerts = []) {
     const container = document.getElementById('activeAlerts');
     if (!container) {
@@ -446,6 +508,14 @@ function updateActiveAlerts(alerts = []) {
     container.appendChild(list);
 }
 
+/**
+ * Update dashboard count indicators
+ * @param {Object} data - Dashboard data
+ * @param {Array} [data.trades=[]] - Array of trades
+ * @param {Array} [data.alerts=[]] - Array of alerts
+ * @param {Array} [data.accounts=[]] - Array of accounts
+ * @returns {void}
+ */
 function updateDashboardCount({ trades = [], alerts = [], accounts = [] }) {
     const countEl = document.getElementById('dashboardCount');
     if (!countEl) {
@@ -456,6 +526,15 @@ function updateDashboardCount({ trades = [], alerts = [], accounts = [] }) {
     countEl.textContent = `טריידים: ${trades.length.toLocaleString('he-IL')} • התראות פעילות: ${activeAlerts.length.toLocaleString('he-IL')} • חשבונות: ${accounts.length.toLocaleString('he-IL')}`;
 }
 
+/**
+ * Update portfolio summary section
+ * @param {Object} data - Portfolio data
+ * @param {Array} [data.accounts=[]] - Array of accounts
+ * @param {Array} [data.trades=[]] - Array of trades
+ * @param {Array} [data.cashFlows=[]] - Array of cash flows
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
 function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, currencySymbol) {
     const container = document.getElementById('portfolioSummaryStats');
     if (!container) {
@@ -487,6 +566,11 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     `;
 }
 
+/**
+ * Show dashboard error message
+ * @param {string} message - Error message
+ * @returns {void}
+ */
 function showDashboardError(message) {
     const fallback = message || 'שגיאה בטעינת נתוני הדשבורד';
     const recentContainer = document.getElementById('recentTrades');
@@ -503,6 +587,11 @@ function showDashboardError(message) {
     }
 }
 
+/**
+ * Handle dashboard error
+ * @param {Error} error - Error object
+ * @returns {void}
+ */
 function handleDashboardError(error) {
     const message = error?.message || 'שגיאה בטעינת נתוני הדשבורד';
     window.Logger?.error?.('❌ Error loading dashboard data', { message, stack: error?.stack }, { page: 'index' });
@@ -512,6 +601,12 @@ function handleDashboardError(error) {
     showDashboardError(message);
 }
 
+/**
+ * Process dashboard data
+ * @param {Object} data - Dashboard data
+ * @param {string} [source='network'] - Data source
+ * @returns {void}
+ */
 function processDashboardData(data, source = 'network') {
     if (!data) {
         return;
@@ -565,6 +660,11 @@ function processDashboardData(data, source = 'network') {
     window.dashboardData = dashboardDataState.data;
 }
 
+/**
+ * Legacy function to fetch dashboard data from API (DEPRECATED)
+ * @deprecated Use loadDashboardDataFromService instead
+ * @returns {Promise<Object>} Dashboard data
+ */
 async function legacyFetchDashboardDataFromApi() {
     const fetchJsonList = async (url, label) => {
         const response = await fetch(url, {
@@ -607,6 +707,12 @@ async function legacyFetchDashboardDataFromApi() {
     return result;
 }
 
+/**
+ * Load dashboard data from service
+ * @param {Object} [options={}] - Loading options
+ * @param {boolean} [options.force=false] - Force refresh from server
+ * @returns {Promise<Object>} Dashboard data
+ */
 async function loadDashboardDataFromService(options = {}) {
     const { force = false } = options;
 
@@ -873,6 +979,10 @@ async function createPerformanceChart() {
     }
 }
 
+/**
+ * Create account chart
+ * @returns {Promise<void>}
+ */
 async function createAccountChart() {
     try {
         // window.Logger.info('🏦 Creating account chart...', { page: "index" });

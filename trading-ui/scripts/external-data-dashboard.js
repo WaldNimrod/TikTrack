@@ -65,6 +65,12 @@
     }
   };
 
+  /**
+   * Get safe text value or fallback
+   * @param {*} value - Value to check
+   * @param {string} [fallback=NOT_AVAILABLE_TEXT] - Fallback text if value is invalid
+   * @returns {string} Safe text value
+   */
   function safeText(value, fallback = NOT_AVAILABLE_TEXT) {
     if (value === null || value === undefined) {
       return fallback;
@@ -75,6 +81,11 @@
     return value;
   }
 
+  /**
+   * Format number with locale formatting
+   * @param {*} value - Value to format
+   * @returns {string} Formatted number or NOT_AVAILABLE_TEXT
+   */
   function formatNumber(value) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return NOT_AVAILABLE_TEXT;
@@ -83,6 +94,12 @@
     return formatter.format(Number(value));
   }
 
+  /**
+   * Format decimal number with specified digits
+   * @param {*} value - Value to format
+   * @param {number} [digits=2] - Number of decimal digits
+   * @returns {string} Formatted decimal or NOT_AVAILABLE_TEXT
+   */
   function formatDecimal(value, digits = 2) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return NOT_AVAILABLE_TEXT;
@@ -91,6 +108,11 @@
     return formatter.format(Number(value));
   }
 
+  /**
+   * Format value as percentage
+   * @param {*} value - Value to format (0-1 or 0-100)
+   * @returns {string} Formatted percentage or NOT_AVAILABLE_TEXT
+   */
   function formatPercent(value) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return NOT_AVAILABLE_TEXT;
@@ -100,6 +122,11 @@
     return `${formatDecimal(percentValue, 2)}%`;
   }
 
+  /**
+   * Format duration in milliseconds
+   * @param {number} durationMs - Duration in milliseconds
+   * @returns {string} Formatted duration (ms or s) or NOT_AVAILABLE_TEXT
+   */
   function formatDurationMs(durationMs) {
     if (typeof durationMs !== 'number' || Number.isNaN(durationMs)) {
       return NOT_AVAILABLE_TEXT;
@@ -111,6 +138,11 @@
     return `${seconds.toFixed(2)}s`;
   }
 
+  /**
+   * Format relative time from ISO string
+   * @param {string} isoString - ISO date string
+   * @returns {string} Relative time string or NOT_AVAILABLE_TEXT
+   */
   function formatRelativeTime(isoString) {
     if (!isoString) {
       return NOT_AVAILABLE_TEXT;
@@ -138,6 +170,11 @@
     return `לפני ${diffDays} ימים`;
   }
 
+  /**
+   * Extract ISO timestamp from value
+   * @param {*} value - Value to extract timestamp from (string or object)
+   * @returns {string|null} ISO timestamp or null
+   */
   function extractTimestampIso(value) {
     if (!value) {
       return null;
@@ -151,11 +188,21 @@
     return null;
   }
 
+  /**
+   * Format relative time from payload value
+   * @param {*} value - Payload value (string or object)
+   * @returns {string} Relative time string or NOT_AVAILABLE_TEXT
+   */
   function formatRelativeFromPayload(value) {
     const isoValue = extractTimestampIso(value);
     return isoValue ? formatRelativeTime(isoValue) : NOT_AVAILABLE_TEXT;
   }
 
+  /**
+   * Format time payload for developer display
+   * @param {*} value - Time value (string, object, or other)
+   * @returns {string} Formatted time string for developers
+   */
   function formatTimePayloadForDeveloper(value) {
     if (!value) {
       return 'לא זמין';
@@ -193,6 +240,11 @@
     return String(value);
   }
 
+  /**
+   * Ensure ExternalDataDashboard instance is initialized
+   * @returns {Promise<Object>} ExternalDataDashboard instance
+   * @throws {Error} If ExternalDataDashboard class is not available
+   */
   async function ensureExternalDashboardInstance() {
     if (!window.ExternalDataDashboard || typeof window.ExternalDataDashboard !== 'function') {
       throw new Error('ExternalDataDashboard class is not available');
@@ -209,6 +261,12 @@
     return window.externalDataDashboard;
   }
 
+  /**
+   * Set element text content by ID
+   * @param {string} id - Element ID
+   * @param {string} value - Text value to set
+   * @returns {void}
+   */
   function setElementText(id, value) {
     const element = document.getElementById(id);
     if (element) {
@@ -216,10 +274,25 @@
     }
   }
 
+  /**
+   * Get element by ID
+   * @param {string} id - Element ID
+   * @returns {HTMLElement|null} Element or null if not found
+   */
   function getElement(id) {
     return document.getElementById(id);
   }
 
+  /**
+   * Set status indicator element
+   * @param {string} elementId - Element ID
+   * @param {string} status - Status value ('active', 'warning', 'error', 'inactive')
+   * @param {Object} [options={}] - Options for status classes
+   * @param {string} [options.activeClass='status-indicator active'] - Active class
+   * @param {string} [options.inactiveClass='status-indicator inactive'] - Inactive class
+   * @param {string} [options.errorClass='status-indicator error'] - Error class
+   * @returns {void}
+   */
   function setStatusIndicator(elementId, status, options = {}) {
     const element = getElement(elementId);
     if (!element) {
@@ -247,6 +320,10 @@
     element.textContent = textValue;
   }
 
+  /**
+   * Get theme fonts from ChartTheme
+   * @returns {Object|null} Theme fonts object or null
+   */
   function getThemeFonts() {
     if (window.ChartTheme && typeof window.ChartTheme.getTheme === 'function') {
       const theme = window.ChartTheme.getTheme();

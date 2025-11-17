@@ -350,6 +350,11 @@ let activeCashFlowTypeFilter = 'all';
 const EXCHANGE_FROM_TYPES = new Set(['currency_exchange_from']);
 const EXCHANGE_TO_TYPES = new Set(['currency_exchange_to']);
 
+/**
+ * Resolve exchange direction from flow type
+ * @param {string} flowType - Flow type
+ * @returns {string|null} Exchange direction ('from', 'to', or null)
+ */
 function resolveExchangeDirectionFromType(flowType) {
   const normalized = typeof flowType === 'string' ? flowType.toLowerCase() : '';
   if (EXCHANGE_FROM_TYPES.has(normalized)) {
@@ -361,6 +366,10 @@ function resolveExchangeDirectionFromType(flowType) {
   return null;
 }
 
+/**
+ * Get cash flows pagination instance
+ * @returns {Object|null} Pagination instance or null
+ */
 function getCashFlowsPaginationInstance() {
   if (cashFlowsPaginationInstance) {
     return cashFlowsPaginationInstance;
@@ -382,6 +391,11 @@ function getCashFlowsPaginationInstance() {
   return null;
 }
 
+/**
+ * Set active cash flow type button
+ * @param {string} value - Flow type value
+ * @returns {void}
+ */
 function setActiveCashFlowTypeButton(value) {
   const container = document.getElementById('cashFlowTypeFilters');
   if (!container) {
@@ -404,6 +418,12 @@ function setActiveCashFlowTypeButton(value) {
   });
 }
 
+/**
+ * Check if cash flow matches type
+ * @param {Object} item - Cash flow item
+ * @param {string} normalizedType - Normalized type
+ * @returns {boolean} True if matches
+ */
 function cashFlowMatchesType(item, normalizedType) {
   if (normalizedType === 'all') {
     return true;
@@ -419,6 +439,13 @@ function cashFlowMatchesType(item, normalizedType) {
   return candidate === normalizedType;
 }
 
+/**
+ * Filter cash flows by type
+ * @param {string} flowType - Flow type
+ * @param {Object} [options={}] - Filter options
+ * @param {boolean} [options.skipButtonUpdate=false] - Skip button update
+ * @returns {Promise<void>}
+ */
 async function filterCashFlowsByType(flowType, options = {}) {
   const { skipButtonUpdate = false } = options || {};
   const requestedType = typeof flowType === 'string' && flowType.trim() ? flowType.trim() : 'all';
@@ -452,6 +479,11 @@ async function filterCashFlowsByType(flowType, options = {}) {
   await updateCashFlowsTable(fallbackData);
 }
 
+/**
+ * Filter cash flows locally by type
+ * @param {string} flowType - Flow type
+ * @returns {Array} Filtered cash flows
+ */
 function filterCashFlowsLocallyByType(flowType) {
   const sourceData = Array.isArray(window.allCashFlowsData) ? window.allCashFlowsData : (Array.isArray(window.cashFlowsData) ? window.cashFlowsData : []);
   if (flowType === 'all') {
@@ -463,6 +495,10 @@ function filterCashFlowsLocallyByType(flowType) {
   });
 }
 
+/**
+ * Reapply cash flow type filter
+ * @returns {Promise<void>}
+ */
 async function reapplyCashFlowTypeFilter() {
   await filterCashFlowsByType(activeCashFlowTypeFilter, { skipButtonUpdate: true });
 }
@@ -1196,6 +1232,11 @@ function updatePageSummaryStats() {
   }
 }
 
+/**
+ * Sync cash flows pagination
+ * @param {Array} cashFlows - Array of cash flows
+ * @returns {Promise<void>}
+ */
 async function syncCashFlowsPagination(cashFlows) {
   const safeCashFlows = Array.isArray(cashFlows) ? cashFlows : [];
 
@@ -1348,6 +1389,11 @@ function renderUnifiedForexExchangesTable(sourceRows) {
   });
 }
 
+/**
+ * Ensure exchange pairs adjacency
+ * @param {Array} rows - Array of rows
+ * @returns {Array} Ordered rows
+ */
 function ensureExchangePairsAdjacency(rows) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return Array.isArray(rows) ? rows : [];
@@ -1403,6 +1449,10 @@ function ensureExchangePairsAdjacency(rows) {
   return ordered;
 }
 
+/**
+ * Setup exchange row interactions
+ * @returns {void}
+ */
 function setupExchangeRowInteractions() {
   const table = document.getElementById('cashFlowsTable');
   if (!table) return;
@@ -1428,6 +1478,11 @@ function setupExchangeRowInteractions() {
   });
 }
 
+/**
+ * Highlight exchange group
+ * @param {string} groupId - Group ID
+ * @returns {void}
+ */
 function highlightExchangeGroup(groupId) {
   if (!groupId) return;
   if (currentExchangeHighlightGroupId && currentExchangeHighlightGroupId !== groupId) {
@@ -1438,6 +1493,11 @@ function highlightExchangeGroup(groupId) {
   currentExchangeHighlightGroupId = groupId;
 }
 
+/**
+ * Clear exchange highlight
+ * @param {string} groupId - Group ID
+ * @returns {void}
+ */
 function clearExchangeHighlight(groupId) {
   const targetGroup = groupId || currentExchangeHighlightGroupId;
   if (!targetGroup) return;
@@ -1448,6 +1508,11 @@ function clearExchangeHighlight(groupId) {
   }
 }
 
+/**
+ * Set currency exchange summary
+ * @param {Object} summary - Exchange summary object
+ * @returns {void}
+ */
 function setCurrencyExchangeSummary(summary) {
   const container = document.getElementById('currencyExchangeNetAmount');
   if (!container) return;
@@ -1470,6 +1535,11 @@ function setCurrencyExchangeSummary(summary) {
   });
 }
 
+/**
+ * Hydrate cash flow exchange display
+ * @param {number|string} cashFlowId - Cash flow ID
+ * @returns {void}
+ */
 function hydrateCashFlowExchangeDisplay(cashFlowId) {
   const container = document.getElementById('cashFlowExchangePairDisplay');
   if (!container) return;

@@ -475,6 +475,11 @@ function syncTradesPagination(tradesData) {
   }
 }
 
+/**
+ * Update trades summary statistics
+ * @param {Array|null} [filteredDataOverride=null] - Filtered data override
+ * @returns {void}
+ */
 function updateTradesSummary(filteredDataOverride = null) {
   try {
     const filteredData = filteredDataOverride
@@ -490,6 +495,11 @@ function updateTradesSummary(filteredDataOverride = null) {
   }
 }
 
+/**
+ * Update trades counters
+ * @param {number|null} [filteredCountOverride=null] - Filtered count override
+ * @returns {void}
+ */
 function updateTradesCounters(filteredCountOverride = null) {
   try {
     const countElement = document.getElementById('tradesCount');
@@ -545,6 +555,10 @@ function setTradesFilteredDataset(filteredTrades) {
   }
 }
 
+/**
+ * Get trades pagination options
+ * @returns {Object} Pagination options
+ */
 function getTradesPaginationOptions() {
   return {
     tableType: 'trades',
@@ -553,6 +567,13 @@ function getTradesPaginationOptions() {
   };
 }
 
+/**
+ * Handle trades page render
+ * @param {Object} options - Render options
+ * @param {Array} options.pageData - Page data
+ * @param {Object} options.pagination - Pagination info
+ * @returns {void}
+ */
 function handleTradesPageRender({ pageData, pagination }) {
   updateTradesTable(pageData);
   if (window.setPageTableData) {
@@ -589,7 +610,9 @@ function handleTradesFilteredChange({ filteredData }) {
  * - Automatic row count updates
  */
 /**
- * טעינת מידע על הטיקר (למודל החדש)
+ * Load ticker information for trade modal
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function loadTradeTickerInfo(tickerId) {
   try {
@@ -619,7 +642,9 @@ async function loadTradeTickerInfo(tickerId) {
 }
 
 /**
- * הצגת מידע על הטיקר (למודל החדש)
+ * Display ticker information in trade modal
+ * @param {Object} ticker - Ticker object
+ * @returns {void}
  */
 function displayTradeTickerInfo(ticker) {
   const tickerInfoContainer = document.getElementById('tradeTickerInfoDisplay');
@@ -752,6 +777,11 @@ async function loadTickerDataForTrades(trades) {
   }
 }
 
+/**
+ * Update trades table
+ * @param {Array} trades - Array of trades
+ * @returns {Promise<void>}
+ */
 async function updateTradesTable(trades) {
   window.Logger.info('🔍 updateTradesTable called with:', trades?.length || 0, 'trades', { page: "trades" });
   
@@ -2168,8 +2198,9 @@ window.populateRelatedObjects = populateRelatedObjects;
  * Restore sort state wrapper
  * Uses global restoreSortState from page-utils.js
  * 
- * @function restoreSortState
- * @returns {void}
+ * Restore sort state wrapper
+ * Uses global restoreSortState from page-utils.js
+ * @returns {Promise<void>}
  */
 async function restoreSortState() {
   try {
@@ -2825,6 +2856,11 @@ async function handleTradeConditionSummaryDelete(conditionId) {
 window.handleTradeConditionSummaryEdit = handleTradeConditionSummaryEdit;
 window.handleTradeConditionSummaryDelete = handleTradeConditionSummaryDelete;
 
+/**
+ * Evaluate single trade condition
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Promise<Object>} Evaluation result
+ */
 async function evaluateSingleTradeCondition(conditionId) {
   if (!conditionId) {
     throw new Error('מזהה תנאי חסר');
@@ -2844,6 +2880,11 @@ async function evaluateSingleTradeCondition(conditionId) {
   return normalizeConditionEvaluationPayload(payload?.data || payload);
 }
 
+/**
+ * Handle trade condition row evaluate
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Promise<void>}
+ */
 async function handleTradeConditionRowEvaluate(conditionId) {
   if (!conditionId) {
     return;
@@ -2994,6 +3035,11 @@ async function handleTradeEvaluateConditionsClick() {
 
 window.handleTradeEvaluateConditionsClick = handleTradeEvaluateConditionsClick;
 
+/**
+ * Get trade conditions for evaluation
+ * @param {number|string} entityId - Entity ID
+ * @returns {Promise<Array>} Array of conditions
+ */
 async function getTradeConditionsForEvaluation(entityId) {
   const numericId = Number(entityId);
   const cached = window.ConditionsSummaryRenderer?.getConditions?.('trade', numericId);

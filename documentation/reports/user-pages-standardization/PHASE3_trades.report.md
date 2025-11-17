@@ -49,12 +49,12 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 63.4% (59/93 פונקציות)
+**כיסוי**: 67.7% (63/93 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 18
-- **פונקציות עם JSDoc חלקי**: 41
-- **פונקציות ללא JSDoc**: 34
+- **פונקציות עם JSDoc מלא** (params + returns): 21
+- **פונקציות עם JSDoc חלקי**: 42
+- **פונקציות ללא JSDoc**: 30
 
 **רשימת פונקציות**:
 
@@ -65,19 +65,19 @@
 - ❌ `updateTradesSummary()` (שורה 478) - missing
 - ❌ `updateTradesCounters()` (שורה 493) - missing
 - ✅ `setTradesFilteredDataset()` (שורה 520) - partial
-- ❌ `getTradesPaginationOptions()` (שורה 548) - missing
-- ❌ `handleTradesPageRender()` (שורה 556) - missing
-- ❌ `handleTradesFilteredChange()` (שורה 567) - missing
-- ✅ `loadTradeTickerInfo()` (שורה 594) - partial
-- ✅ `displayTradeTickerInfo()` (שורה 624) - partial
-- ❌ `loadTickerDataForTrades()` (שורה 707) - missing
-- ❌ `updateTradesTable()` (שורה 755) - missing
-- ✅ `loadTradePlanDates()` (שורה 1128) - partial
-- ✅ `viewTickerDetails()` (שורה 1176) - complete
-- ✅ `viewAccountDetails()` (שורה 1199) - complete
-- ✅ `viewTradePlanDetails()` (שורה 1222) - complete
-- ✅ `editTradeRecord()` (שורה 1245) - complete
-- ✅ `cancelTradeRecord()` (שורה 1300) - partial
+- ✅ `getTradesPaginationOptions()` (שורה 552) - partial
+- ❌ `handleTradesPageRender()` (שורה 560) - missing
+- ❌ `handleTradesFilteredChange()` (שורה 571) - missing
+- ✅ `loadTradeTickerInfo()` (שורה 598) - partial
+- ✅ `displayTradeTickerInfo()` (שורה 628) - partial
+- ❌ `loadTickerDataForTrades()` (שורה 711) - missing
+- ❌ `updateTradesTable()` (שורה 759) - missing
+- ✅ `loadTradePlanDates()` (שורה 1132) - partial
+- ✅ `viewTickerDetails()` (שורה 1180) - complete
+- ✅ `viewAccountDetails()` (שורה 1203) - complete
+- ✅ `viewTradePlanDetails()` (שורה 1226) - complete
+- ✅ `editTradeRecord()` (שורה 1249) - complete
+- ✅ `cancelTradeRecord()` (שורה 1304) - partial
 
 ... ועוד 73 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-34 פונקציות חסרות
+3. הוספת JSDoc ל-30 פונקציות חסרות
 
 ---
 

@@ -49,12 +49,12 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 0.0% (0/18 פונקציות)
+**כיסוי**: 72.2% (13/18 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 0
-- **פונקציות עם JSDoc חלקי**: 0
-- **פונקציות ללא JSDoc**: 18
+- **פונקציות עם JSDoc מלא** (params + returns): 11
+- **פונקציות עם JSDoc חלקי**: 2
+- **פונקציות ללא JSDoc**: 5
 
 **רשימת פונקציות**:
 
@@ -62,20 +62,20 @@
 - ❌ `warn()` (שורה 22) - missing
 - ❌ `error()` (שורה 23) - missing
 - ❌ `debug()` (שורה 24) - missing
-- ❌ `safeText()` (שורה 68) - missing
-- ❌ `formatNumber()` (שורה 78) - missing
-- ❌ `formatDecimal()` (שורה 86) - missing
-- ❌ `formatPercent()` (שורה 94) - missing
-- ❌ `formatDurationMs()` (שורה 103) - missing
-- ❌ `formatRelativeTime()` (שורה 114) - missing
-- ❌ `extractTimestampIso()` (שורה 141) - missing
-- ❌ `formatRelativeFromPayload()` (שורה 154) - missing
-- ❌ `formatTimePayloadForDeveloper()` (שורה 159) - missing
-- ❌ `ensureExternalDashboardInstance()` (שורה 196) - missing
-- ❌ `setElementText()` (שורה 212) - missing
-- ❌ `getElement()` (שורה 219) - missing
-- ❌ `setStatusIndicator()` (שורה 223) - missing
-- ❌ `getThemeFonts()` (שורה 250) - missing
+- ✅ `safeText()` (שורה 74) - complete
+- ✅ `formatNumber()` (שורה 89) - complete
+- ✅ `formatDecimal()` (שורה 103) - complete
+- ✅ `formatPercent()` (שורה 116) - complete
+- ✅ `formatDurationMs()` (שורה 130) - complete
+- ✅ `formatRelativeTime()` (שורה 146) - complete
+- ✅ `extractTimestampIso()` (שורה 178) - complete
+- ✅ `formatRelativeFromPayload()` (שורה 196) - complete
+- ✅ `formatTimePayloadForDeveloper()` (שורה 206) - complete
+- ✅ `ensureExternalDashboardInstance()` (שורה 248) - partial
+- ✅ `setElementText()` (שורה 270) - complete
+- ✅ `getElement()` (שורה 282) - complete
+- ❌ `setStatusIndicator()` (שורה 296) - missing
+- ✅ `getThemeFonts()` (שורה 327) - partial
 ---
 
 ## סעיף D: Recommended Tasks
@@ -86,7 +86,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-18 פונקציות חסרות
+3. הוספת JSDoc ל-5 פונקציות חסרות
 
 ---
 

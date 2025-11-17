@@ -49,35 +49,35 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 48.4% (30/62 פונקציות)
+**כיסוי**: 61.3% (38/62 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 13
-- **פונקציות עם JSDoc חלקי**: 17
-- **פונקציות ללא JSDoc**: 32
+- **פונקציות עם JSDoc מלא** (params + returns): 19
+- **פונקציות עם JSDoc חלקי**: 19
+- **פונקציות ללא JSDoc**: 24
 
 **רשימת פונקציות**:
 
-- ❌ `loadCurrenciesFromServer()` (שורה 266) - missing
-- ❌ `getCurrencyDisplay()` (שורה 306) - missing
-- ❌ `generateCurrencyOptions()` (שורה 342) - missing
-- ❌ `loadTradingAccountsFromServer()` (שורה 358) - missing
-- ❌ `loadAllTradingAccountsFromServer()` (שורה 383) - missing
-- ✅ `loadDefaultTradingAccounts()` (שורה 407) - partial
-- ❌ `isTradingAccountsLoaded()` (שורה 427) - missing
-- ❌ `legacyFetchTradingAccounts()` (שורה 432) - missing
-- ❌ `loadTradingAccountsData()` (שורה 449) - missing
-- ✅ `loadAccountBalance()` (שורה 475) - complete
-- ✅ `loadAccountBalancesBatch()` (שורה 502) - complete
-- ❌ `getCurrencySymbol()` (שורה 518) - missing
-- ❌ `enrichAccountsWithBalances()` (שורה 547) - missing
-- ❌ `syncTradingAccountsPagination()` (שורה 563) - missing
-- ❌ `render()` (שורה 572) - missing
-- ❌ `onFilteredDataChange()` (שורה 581) - missing
-- ✅ `updateTradingAccountsTable()` (שורה 615) - complete
-- ✅ `updateTradingAccountsSummary()` (שורה 817) - complete
-- ❌ `getCurrencySymbol()` (שורה 880) - missing
-- ✅ `loadTradingAccounts()` (שורה 928) - partial
+- ✅ `loadCurrenciesFromServer()` (שורה 269) - partial
+- ❌ `getCurrencyDisplay()` (שורה 309) - missing
+- ✅ `generateCurrencyOptions()` (שורה 349) - complete
+- ✅ `loadTradingAccountsFromServer()` (שורה 369) - complete
+- ✅ `loadAllTradingAccountsFromServer()` (שורה 398) - complete
+- ✅ `loadDefaultTradingAccounts()` (שורה 422) - partial
+- ❌ `isTradingAccountsLoaded()` (שורה 442) - missing
+- ✅ `legacyFetchTradingAccounts()` (שורה 451) - partial
+- ❌ `loadTradingAccountsData()` (שורה 468) - missing
+- ✅ `loadAccountBalance()` (שורה 494) - complete
+- ✅ `loadAccountBalancesBatch()` (שורה 521) - complete
+- ✅ `getCurrencySymbol()` (שורה 542) - complete
+- ❌ `enrichAccountsWithBalances()` (שורה 571) - missing
+- ✅ `syncTradingAccountsPagination()` (שורה 592) - complete
+- ❌ `render()` (שורה 601) - missing
+- ❌ `onFilteredDataChange()` (שורה 610) - missing
+- ✅ `updateTradingAccountsTable()` (שורה 644) - complete
+- ✅ `updateTradingAccountsSummary()` (שורה 846) - complete
+- ❌ `getCurrencySymbol()` (שורה 909) - missing
+- ✅ `loadTradingAccounts()` (שורה 957) - partial
 
 ... ועוד 42 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-32 פונקציות חסרות
+3. הוספת JSDoc ל-24 פונקציות חסרות
 
 ---
 

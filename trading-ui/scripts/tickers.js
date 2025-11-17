@@ -413,7 +413,8 @@ function updateCurrencyOptions(ticker = null) {
  * @throws {Error} When data loading fails
  * 
  * @example
- * await updateActiveTradesField();
+ * Update active trades field for tickers
+ * @returns {Promise<void>}
  */
 async function updateActiveTradesField() {
   // Updating active_trades field for tickers
@@ -726,7 +727,9 @@ async function saveTicker() {
  * - פונקציה: window.showLinkedItemsWarning('ticker', id)
  * - מונע ביטול כאשר יש פריטים פתוחים
  *
+ * Update ticker
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
+ * @returns {Promise<void>}
  */
 async function updateTicker() {
   
@@ -1111,7 +1114,9 @@ async function checkLinkedItemsBeforeCancelTicker(tickerId) {
 }
 
 /**
- * קבלת סימבול הטיקר לפי ID
+ * Get ticker symbol by ID
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {string|null} Ticker symbol or null
  */
 function getTickerSymbol(tickerId) {
   try {

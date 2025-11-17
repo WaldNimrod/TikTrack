@@ -49,35 +49,35 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 47.1% (41/87 פונקציות)
+**כיסוי**: 72.4% (63/87 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 7
-- **פונקציות עם JSDoc חלקי**: 34
-- **פונקציות ללא JSDoc**: 46
+- **פונקציות עם JSDoc מלא** (params + returns): 33
+- **פונקציות עם JSDoc חלקי**: 30
+- **פונקציות ללא JSDoc**: 24
 
 **רשימת פונקציות**:
 
-- ✅ `executeTradePlan()` (שורה 101) - partial
-- ✅ `loadTradePlanTickerInfo()` (שורה 178) - partial
-- ✅ `displayTradePlanTickerInfo()` (שורה 208) - partial
-- ✅ `hideTickerInfo()` (שורה 305) - partial
-- ✅ `updateTickerInfo()` (שורה 323) - partial
-- ✅ `updateSharesFromAmount()` (שורה 361) - partial
-- ✅ `updateAmountFromShares()` (שורה 388) - partial
-- ✅ `hideEditTickerInfo()` (שורה 414) - partial
-- ✅ `updateEditTickerInfo()` (שורה 440) - partial
-- ✅ `updateEditSharesFromAmount()` (שורה 630) - partial
-- ✅ `updateEditAmountFromShares()` (שורה 658) - partial
-- ✅ `checkLinkedItemsBeforeCancel()` (שורה 693) - partial
-- ✅ `reactivateTradePlan()` (שורה 700) - partial
-- ✅ `addEditCondition()` (שורה 770) - partial
-- ✅ `addEditReason()` (שורה 787) - partial
-- ✅ `addEditImportantNote()` (שורה 804) - partial
-- ✅ `addEditReminder()` (שורה 821) - partial
-- ✅ `addImportantNote()` (שורה 838) - partial
-- ✅ `addReminder()` (שורה 855) - complete
-- ✅ `buildTradePlanConfirmationDetails()` (שורה 874) - complete
+- ✅ `executeTradePlan()` (שורה 102) - complete
+- ✅ `loadTradePlanTickerInfo()` (שורה 181) - complete
+- ✅ `displayTradePlanTickerInfo()` (שורה 213) - complete
+- ✅ `hideTickerInfo()` (שורה 310) - partial
+- ✅ `updateTickerInfo()` (שורה 329) - partial
+- ✅ `updateSharesFromAmount()` (שורה 366) - partial
+- ✅ `updateAmountFromShares()` (שורה 392) - partial
+- ✅ `hideEditTickerInfo()` (שורה 418) - partial
+- ✅ `updateEditTickerInfo()` (שורה 445) - partial
+- ✅ `updateEditSharesFromAmount()` (שורה 634) - partial
+- ✅ `updateEditAmountFromShares()` (שורה 663) - partial
+- ✅ `checkLinkedItemsBeforeCancel()` (שורה 698) - complete
+- ✅ `reactivateTradePlan()` (שורה 707) - complete
+- ✅ `addEditCondition()` (שורה 775) - partial
+- ✅ `addEditReason()` (שורה 792) - partial
+- ✅ `addEditImportantNote()` (שורה 809) - partial
+- ✅ `addEditReminder()` (שורה 826) - partial
+- ✅ `addImportantNote()` (שורה 843) - partial
+- ✅ `addReminder()` (שורה 860) - complete
+- ✅ `buildTradePlanConfirmationDetails()` (שורה 879) - complete
 
 ... ועוד 67 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-46 פונקציות חסרות
+3. הוספת JSDoc ל-24 פונקציות חסרות
 
 ---
 

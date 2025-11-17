@@ -49,35 +49,35 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 16.2% (6/37 פונקציות)
+**כיסוי**: 70.3% (26/37 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 1
-- **פונקציות עם JSDoc חלקי**: 5
-- **פונקציות ללא JSDoc**: 31
+- **פונקציות עם JSDoc מלא** (params + returns): 18
+- **פונקציות עם JSDoc חלקי**: 8
+- **פונקציות ללא JSDoc**: 11
 
 **רשימת פונקציות**:
 
-- ❌ `toNumber()` (שורה 103) - missing
-- ❌ `resolveDateValue()` (שורה 111) - missing
-- ❌ `formatDateShort()` (שורה 124) - missing
-- ❌ `normalizeArray()` (שורה 148) - missing
-- ❌ `determineCurrencySymbol()` (שורה 170) - missing
-- ❌ `formatAmountHtml()` (שורה 193) - missing
-- ❌ `translateSide()` (שורה 208) - missing
-- ❌ `computePortfolioPnL()` (שורה 223) - missing
-- ❌ `updateSummaryStats()` (שורה 256) - missing
-- ❌ `updateRecentTrades()` (שורה 285) - missing
-- ❌ `updateActiveAlerts()` (שורה 371) - missing
-- ❌ `updateDashboardCount()` (שורה 449) - missing
-- ❌ `updatePortfolioSummary()` (שורה 459) - missing
-- ❌ `showDashboardError()` (שורה 490) - missing
-- ❌ `handleDashboardError()` (שורה 506) - missing
-- ❌ `processDashboardData()` (שורה 515) - missing
-- ❌ `legacyFetchDashboardDataFromApi()` (שורה 568) - missing
-- ❌ `fetchJsonList()` (שורה 569) - missing
-- ❌ `loadDashboardDataFromService()` (שורה 610) - missing
-- ❌ `executeLoad()` (שורה 635) - missing
+- ✅ `toNumber()` (שורה 108) - complete
+- ✅ `resolveDateValue()` (שורה 121) - complete
+- ✅ `formatDateShort()` (שורה 139) - complete
+- ✅ `normalizeArray()` (שורה 168) - complete
+- ✅ `determineCurrencySymbol()` (שורה 196) - complete
+- ✅ `formatAmountHtml()` (שורה 226) - complete
+- ✅ `translateSide()` (שורה 246) - complete
+- ✅ `computePortfolioPnL()` (שורה 268) - complete
+- ✅ `updateSummaryStats()` (שורה 307) - complete
+- ✅ `updateRecentTrades()` (שורה 342) - complete
+- ✅ `updateActiveAlerts()` (שורה 433) - complete
+- ✅ `updateDashboardCount()` (שורה 519) - complete
+- ✅ `updatePortfolioSummary()` (שורה 538) - complete
+- ✅ `showDashboardError()` (שורה 574) - complete
+- ✅ `handleDashboardError()` (שורה 595) - complete
+- ✅ `processDashboardData()` (שורה 610) - complete
+- ✅ `legacyFetchDashboardDataFromApi()` (שורה 668) - partial
+- ✅ `fetchJsonList()` (שורה 669) - partial
+- ✅ `loadDashboardDataFromService()` (שורה 716) - complete
+- ❌ `executeLoad()` (שורה 741) - missing
 
 ... ועוד 17 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-31 פונקציות חסרות
+3. הוספת JSDoc ל-11 פונקציות חסרות
 
 ---
 

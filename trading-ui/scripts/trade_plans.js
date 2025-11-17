@@ -96,7 +96,8 @@
  * ========================================
  * ביצוע תוכנית מסחר
  * מבצע את התוכנית המסחרית
- * @param {number} planId - מזהה התוכנית
+ * @param {number|string} planId - Trade plan ID
+ * @returns {void}
  */
 function executeTradePlan(planId) {
   try {
@@ -173,7 +174,9 @@ function executeTradePlan(planId) {
 }
 
 /**
- * טעינת מידע על הטיקר (למודל החדש)
+ * Load ticker information for trade plan modal
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function loadTradePlanTickerInfo(tickerId) {
   try {
@@ -203,7 +206,9 @@ async function loadTradePlanTickerInfo(tickerId) {
 }
 
 /**
- * הצגת מידע על הטיקר (למודל החדש)
+ * Display ticker information in trade plan modal
+ * @param {Object} ticker - Ticker object
+ * @returns {void}
  */
 function displayTradePlanTickerInfo(ticker) {
   // Create or update ticker info display
@@ -299,7 +304,7 @@ function displayTradePlanTickerInfo(ticker) {
  * Hide ticker information display
  * Removes ticker info from add modal
  * 
- * @function hideTickerInfo
+ * Hide ticker info from add modal
  * @returns {void}
  */
 function hideTickerInfo() {
@@ -319,6 +324,7 @@ function hideTickerInfo() {
 /**
  * Update ticker info in add modal
  * Updates display elements and form fields when ticker is selected in add modal
+ * @returns {Promise<void>}
  */
 async function updateTickerInfo() {
   try {
@@ -353,9 +359,8 @@ async function updateTickerInfo() {
 
 /**
  * Update shares from planned amount in add modal
+ * Update shares from planned amount in add modal
  * Calculates number of shares based on planned amount and current price
- * 
- * @function updateSharesFromAmount
  * @returns {void}
  */
 function updateSharesFromAmount() {
@@ -380,9 +385,8 @@ function updateSharesFromAmount() {
 
 /**
  * Update amount from shares in add modal
+ * Update amount from shares in add modal
  * Calculates planned amount based on number of shares and current price
- * 
- * @function updateAmountFromShares
  * @returns {void}
  */
 function updateAmountFromShares() {
@@ -408,7 +412,7 @@ function updateAmountFromShares() {
 // REMOVED: loadEditTickerInfo, displayEditTickerInfo, updateEditFormFieldsWithTickerData - not used
 // Edit modal ticker info functions
 /**
- * Hide edit ticker information section
+ * Hide edit ticker information section in edit modal
  * @returns {void}
  */
 function hideEditTickerInfo() {
@@ -435,7 +439,8 @@ function hideEditTickerInfo() {
  */
 
 /**
- * עדכון מידע על הטיקר במודל העריכה
+ * Update ticker information in edit modal
+ * @returns {Promise<void>}
  */
 async function updateEditTickerInfo() {
   const tickerId = document.getElementById('editTradePlanTickerId').value;
@@ -622,9 +627,8 @@ async function updateEditTickerInfo() {
 
 /**
  * Update shares from planned amount in edit modal
+ * Update shares from planned amount in edit modal
  * Calculates number of shares based on planned amount and current price
- * 
- * @function updateEditSharesFromAmount
  * @returns {void}
  */
 function updateEditSharesFromAmount() {
@@ -653,7 +657,8 @@ function updateEditSharesFromAmount() {
 }
 
 /**
- * עדכון סכום מתוכנן ממספר מניות במודל העריכה
+ * Update planned amount from number of shares in edit modal
+ * @returns {void}
  */
 function updateEditAmountFromShares() {
   try {
@@ -695,7 +700,9 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
 }
 
 /**
- * הפעלה מחדש של תכנון מבוטל
+ * Reactivate cancelled trade plan
+ * @param {number|string} tradePlanId - Trade plan ID
+ * @returns {Promise<void>}
  */
 async function reactivateTradePlan(tradePlanId) {
   try {
@@ -762,9 +769,7 @@ async function reactivateTradePlan(tradePlanId) {
 
 /**
  * Add condition to edit modal
- * Placeholder for future condition functionality
- * 
- * @function addEditCondition
+ * Add/edit condition (placeholder for future functionality)
  * @returns {void}
  */
 function addEditCondition() {
@@ -781,7 +786,7 @@ function addEditCondition() {
 }
 
 /**
- * Add edit reason functionality (placeholder)
+ * Add/edit reason (placeholder for future functionality)
  * @returns {void}
  */
 function addEditReason() {
@@ -798,7 +803,7 @@ function addEditReason() {
 }
 
 /**
- * Add edit important note functionality (placeholder)
+ * Add/edit important note (placeholder for future functionality)
  * @returns {void}
  */
 function addEditImportantNote() {
@@ -815,7 +820,7 @@ function addEditImportantNote() {
 }
 
 /**
- * Add edit reminder functionality (placeholder)
+ * Add/edit reminder (placeholder for future functionality)
  * @returns {void}
  */
 function addEditReminder() {
@@ -832,7 +837,7 @@ function addEditReminder() {
 }
 
 /**
- * Add important note functionality (placeholder for add modal)
+ * Add important note (placeholder for add modal)
  * @returns {void}
  */
 function addImportantNote() {
@@ -1026,6 +1031,11 @@ async function cancelTradePlan(tradePlanId) {
   }
 }
 
+/**
+ * Perform trade plan cancellation
+ * @param {number|string} tradePlanId - Trade plan ID
+ * @returns {Promise<void>}
+ */
 async function performTradePlanCancellation(tradePlanId) {
   try {
     const response = await fetch(`/api/trade-plans/${tradePlanId}/cancel`, {
@@ -1063,7 +1073,8 @@ async function performTradePlanCancellation(tradePlanId) {
 /**
  * View linked items for trade plan
  * Uses global viewLinkedItems function from linked-items.js
- * @param {number} tradePlanId - Trade plan ID
+ * @param {number|string} tradePlanId - Trade plan ID
+ * @returns {void}
  */
 function viewLinkedItemsForTradePlan(tradePlanId) {
   if (typeof window.viewLinkedItems === 'function') {
@@ -1082,6 +1093,7 @@ function viewLinkedItemsForTradePlan(tradePlanId) {
  * @param {HTMLElement} stopPercentageInput - Stop percentage input element
  * @param {HTMLElement} targetPriceInput - Target price input element
  * @param {HTMLElement} targetPercentageInput - Target percentage input element
+ * @returns {void}
  */
 function updatePricesFromPercentages(
   priceInput, sideInput, stopPriceInput, stopPercentageInput, 
@@ -1116,6 +1128,7 @@ function updatePricesFromPercentages(
  * @param {HTMLElement} stopPercentageInput - Stop percentage input element
  * @param {HTMLElement} targetPriceInput - Target price input element
  * @param {HTMLElement} targetPercentageInput - Target percentage input element
+ * @returns {void}
  */
 function updatePercentagesFromPrices(
   priceInput, sideInput, stopPriceInput, stopPercentageInput, 
@@ -1144,6 +1157,7 @@ function updatePercentagesFromPrices(
 /**
  * Setup price calculation event listeners for add modal
  * Sets up automatic price/percentage calculations when form fields change
+ * @returns {void}
  */
 function setupPriceCalculation() {
   try {
@@ -1204,6 +1218,7 @@ function setupPriceCalculation() {
 /**
  * Setup price calculation event listeners for edit modal
  * Sets up automatic price/percentage calculations when edit form fields change
+ * @returns {void}
  */
 function setupEditPriceCalculation() {
   try {
@@ -1279,6 +1294,13 @@ window.addEditImportantNote = addEditImportantNote;
 window.addEditReminder = addEditReminder;
 window.applyTradePlanDefaultRiskLevels = applyTradePlanDefaultRiskLevels;
 
+/**
+ * Apply default risk levels to trade plan
+ * @param {Object} [options={}] - Options for applying risk levels
+ * @param {HTMLElement} [options.modalElement] - Modal element
+ * @param {boolean} [options.force=false] - Force application
+ * @returns {Promise<void>}
+ */
 async function applyTradePlanDefaultRiskLevels(options = {}) {
   if (!window.InvestmentCalculationService || typeof window.InvestmentCalculationService.applyDefaultRisk !== 'function') {
     return;
@@ -1335,8 +1357,8 @@ async function applyTradePlanDefaultRiskLevels(options = {}) {
 }
 
 /**
- * Helper to gather modal inputs used for amount/quantity calculations
- * @returns {{amountInput: HTMLInputElement|null, sharesInput: HTMLInputElement|null, priceInput: HTMLInputElement|null, priceDisplay: HTMLElement|null}}
+ * Get trade plan modal elements for calculations
+ * @returns {Object} Object with amountInput, sharesInput, priceInput, priceDisplay, entryDateInput
  */
 function getTradePlanModalElements() {
   const amountInput = document.getElementById('planAmount')
@@ -1364,8 +1386,8 @@ function getTradePlanModalElements() {
 
 /**
  * Parse numeric value from input, allowing partial decimal typing
- * @param {HTMLInputElement|null} input
- * @returns {number}
+ * @param {HTMLInputElement|null} input - Input element
+ * @returns {number} Parsed number or 0
  */
 function parseFieldValue(input) {
   if (!input) {
@@ -1381,9 +1403,9 @@ function parseFieldValue(input) {
 
 /**
  * Parse price from entry input (or fallback to display element)
- * @param {HTMLInputElement|null} priceInput
- * @param {HTMLElement|null} priceDisplay
- * @returns {number}
+ * @param {HTMLInputElement|null} priceInput - Price input element
+ * @param {HTMLElement|null} priceDisplay - Price display element
+ * @returns {number} Parsed price or 0
  */
 function parsePriceValue(priceInput, priceDisplay) {
   const priceFromInput = parseFieldValue(priceInput);
@@ -1404,8 +1426,8 @@ function parsePriceValue(priceInput, priceDisplay) {
 
 /**
  * Normalize response from convertAmountToShares into consistent structure
- * @param {number|object} result
- * @returns {{sharesValue: number|null, adjustedAmount: number|null}}
+ * @param {number|Object} result - Result from convertAmountToShares
+ * @returns {Object} Object with sharesValue and adjustedAmount
  */
 function normalizeSharesResult(result) {
   if (result == null) {
@@ -1543,7 +1565,9 @@ async function loadTradePlansData() {
  * פונקציה זו מעדכנת את הטבלה עם הנתונים החדשים
  * כולל המרת ערכים לעברית ועיצוב תאים
  *
- * @param {Array} trade_plans - מערך של תכנונים לעדכון
+ * Update trade plans table
+ * @param {Array} trade_plans - Array of trade plans
+ * @returns {void}
  */
 function updateTradePlansTable(trade_plans) {
   try {
@@ -2008,7 +2032,7 @@ function updateTradePlansTable(trade_plans) {
  * The global function is window.updatePageSummaryStats(pageName, data, countElementId).
  * We call it directly without creating a local override.
  * 
- * @function updateTradePlansPageSummaryStats
+ * Update trade plans page summary statistics
  * @returns {void}
  */
 function updateTradePlansPageSummaryStats() {
@@ -2062,8 +2086,9 @@ function updateTradePlansPageSummaryStats() {
 // All validation rules are defined in: modal-configs/trade-plans-config.js -> validation property
 
 /**
- * Disable add-form fields until ticker is selected.
- * Uses global ModalManager when available to align with the unified system.
+ * Disable add-form fields until ticker is selected
+ * Uses global ModalManager when available to align with the unified system
+ * @returns {void}
  */
 function disableFormFields() {
   try {
@@ -2110,7 +2135,8 @@ function disableFormFields() {
 }
 
 /**
- * Enable edit form fields wrapper using ModalManager when possible.
+ * Enable edit form fields wrapper using ModalManager when possible
+ * @returns {void}
  */
 function enableEditFieldsWrapper() {
   try {
@@ -2142,7 +2168,8 @@ function enableEditFieldsWrapper() {
 }
 
 /**
- * Disable edit form fields wrapper using ModalManager when possible.
+ * Disable edit form fields wrapper using ModalManager when possible
+ * @returns {void}
  */
 function disableEditFields() {
   try {
@@ -2193,6 +2220,7 @@ window.addEditImportantNote = addEditImportantNote;
 /**
  * Initialize conditions system for trade plans
  * Uses global ConditionsInitializer from conditions package
+ * @returns {boolean} True if initialized successfully
  */
 function initializeTradePlanConditionsSystem() {
   try {
@@ -2253,6 +2281,11 @@ function initializeTradePlanConditionsSystem() {
   }
 }
 
+/**
+ * Get trade plan modal entity name
+ * @param {HTMLElement} modalElement - Modal element
+ * @returns {string} Entity name or empty string
+ */
 function getTradePlanModalEntityName(modalElement) {
   if (!modalElement) {
     return '';
@@ -2271,10 +2304,20 @@ function getTradePlanModalEntityName(modalElement) {
   return '';
 }
 
+/**
+ * Get trade plans modal element
+ * @returns {HTMLElement|null} Modal element or null
+ */
 function getTradePlansModalElement() {
   return document.getElementById('tradePlansModal');
 }
 
+/**
+ * Check if conditions modal is open
+ * @param {string} entityType - Entity type
+ * @param {number|string} entityId - Entity ID
+ * @returns {boolean} True if modal is open
+ */
 function isConditionsModalOpen(entityType, entityId) {
   if (!entityId) {
     return false;
@@ -2293,6 +2336,12 @@ function isConditionsModalOpen(entityType, entityId) {
 
 window.isConditionsModalOpen = isConditionsModalOpen;
 
+/**
+ * Get cached condition summary
+ * @param {number|string} entityId - Entity ID
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Object|null} Condition summary or null
+ */
 function getCachedConditionSummary(entityId, conditionId) {
   if (!window.ConditionsSummaryRenderer) {
     return null;
@@ -2300,6 +2349,11 @@ function getCachedConditionSummary(entityId, conditionId) {
   return window.ConditionsSummaryRenderer.getCondition('plan', entityId, conditionId);
 }
 
+/**
+ * Clear cached condition summary
+ * @param {number|string} entityId - Entity ID
+ * @returns {void}
+ */
 function clearCachedConditionsSummary(entityId) {
   if (!window.ConditionsSummaryRenderer) {
     return;
@@ -2307,6 +2361,13 @@ function clearCachedConditionsSummary(entityId) {
   window.ConditionsSummaryRenderer.clearCache('plan', entityId ?? null);
 }
 
+/**
+ * Open trade plan conditions modal
+ * @param {HTMLElement} modalElement - Modal element
+ * @param {Object} [options={}] - Options
+ * @param {boolean} [options.showLoading=true] - Show loading indicator
+ * @returns {Promise<void>}
+ */
 async function openTradePlanConditionsModal(modalElement, options = {}) {
   if (!modalElement) {
     window.Logger?.error('Trade plans modal element not found while opening conditions', {}, { page: 'trade_plans' });
@@ -2365,6 +2426,10 @@ async function openTradePlanConditionsModal(modalElement, options = {}) {
   });
 }
 
+/**
+ * Handle trade plan conditions button click
+ * @returns {Promise<void>}
+ */
 async function handleTradePlanConditionsButtonClick() {
   const modalElement = getTradePlansModalElement();
   await openTradePlanConditionsModal(modalElement);
@@ -2394,6 +2459,11 @@ async function handleTradePlanConditionSummaryEdit(conditionId) {
   await openTradePlanConditionsModal(modalElement, { focusConditionId: numericConditionId });
 }
 
+/**
+ * Handle trade plan condition summary delete
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Promise<void>}
+ */
 async function handleTradePlanConditionSummaryDelete(conditionId) {
   const modalElement = getTradePlansModalElement();
   if (!modalElement) {
@@ -2463,6 +2533,13 @@ async function confirmTradePlanConditionDeletion(condition) {
   return window.confirm(fullMessage);
 }
 
+/**
+ * Delete condition via CRUD
+ * @param {number|string} conditionId - Condition ID
+ * @param {number|string} entityId - Entity ID
+ * @param {string} [entityType='plan'] - Entity type
+ * @returns {Promise<void>}
+ */
 async function deleteConditionViaCrud(conditionId, entityId, entityType = 'plan') {
   const crudManager = window.conditionsCRUDManager;
   if (!crudManager) {
@@ -2495,6 +2572,11 @@ async function deleteConditionViaCrud(conditionId, entityId, entityType = 'plan'
   }
 }
 
+/**
+ * Build trade plan modal navigation metadata
+ * @param {HTMLElement} modalElement - Modal element
+ * @returns {Object|null} Navigation metadata or null
+ */
 function buildTradePlanModalNavigationMetadata(modalElement) {
   if (!modalElement) {
     return null;
@@ -2517,6 +2599,11 @@ function buildTradePlanModalNavigationMetadata(modalElement) {
   };
 }
 
+/**
+ * Register trade plan modal navigation
+ * @param {HTMLElement} modalElement - Modal element
+ * @returns {Promise<void>}
+ */
 async function registerTradePlanModalNavigation(modalElement) {
   if (!modalElement || !window.ModalNavigationService?.registerModalOpen) {
     return;
@@ -2536,6 +2623,12 @@ async function registerTradePlanModalNavigation(modalElement) {
   }
 }
 
+/**
+ * Update trade plan modal navigation
+ * @param {HTMLElement} modalElement - Modal element
+ * @param {Object} [overrides={}] - Navigation overrides
+ * @returns {void}
+ */
 function updateTradePlanModalNavigation(modalElement, overrides = {}) {
   if (!modalElement || !window.ModalNavigationService?.updateModalMetadata) {
     return;
@@ -2561,6 +2654,12 @@ function updateTradePlanModalNavigation(modalElement, overrides = {}) {
   }
 }
 
+/**
+ * Handle trade plan modal restore
+ * @param {Event} event - Restore event
+ * @param {HTMLElement} modalElement - Modal element
+ * @returns {void}
+ */
 function handleTradePlanModalRestore(event, modalElement) {
   const detail = event.detail || {};
   const { stage, entry } = detail;
@@ -2584,6 +2683,10 @@ function handleTradePlanModalRestore(event, modalElement) {
   }
 }
 
+/**
+ * Setup trade plan modal navigation
+ * @returns {void}
+ */
 function setupTradePlanModalNavigation() {
   const modalElement = document.getElementById('tradePlansModal');
   if (!modalElement || modalElement.dataset.navigationBound === 'true') {
@@ -2608,6 +2711,10 @@ if (document.readyState === 'loading') {
   setupTradePlanModalNavigation();
 }
 
+/**
+ * Get conditions translator
+ * @returns {Object|null} Conditions translator or null
+ */
 function getConditionsTranslator() {
   return window.conditionsTranslations || null;
 }
@@ -2704,6 +2811,11 @@ function evaluatePlanConditions(conditions) {
   return Promise.all(promises);
 }
 
+/**
+ * Evaluate single plan condition
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Promise<Object>} Evaluation result
+ */
 async function evaluateSinglePlanCondition(conditionId) {
   if (!conditionId) {
     throw new Error('מזהה תנאי חסר');
@@ -2756,6 +2868,11 @@ async function handleTradePlanConditionRowEvaluate(conditionId) {
   }
 }
 
+/**
+ * Handle trade plan condition toggle alerts
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Promise<void>}
+ */
 async function handleTradePlanConditionToggleAlerts(conditionId) {
   if (!conditionId) {
     return;
@@ -2795,6 +2912,11 @@ async function handleTradePlanConditionToggleAlerts(conditionId) {
   }
 }
 
+/**
+ * Normalize condition evaluation payload
+ * @param {*} rawPayload - Raw payload
+ * @returns {Object|null} Normalized payload or null
+ */
 function normalizeConditionEvaluationPayload(rawPayload) {
   if (!rawPayload) {
     return null;
@@ -2808,6 +2930,13 @@ function normalizeConditionEvaluationPayload(rawPayload) {
   };
 }
 
+/**
+ * Load trade plan conditions summary
+ * @param {HTMLElement} modalElement - Modal element
+ * @param {Object} [options={}] - Options
+ * @param {boolean} [options.showLoading=true] - Show loading indicator
+ * @returns {Promise<void>}
+ */
 async function loadTradePlanConditionsSummary(modalElement, { showLoading = true } = {}) {
   const summaryContainer = modalElement?.querySelector('#tradePlanConditionsSummary');
   if (!summaryContainer) {
@@ -2868,7 +2997,8 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
 
 /**
  * Bind conditions management controls inside the trade plan modal
- * @param {HTMLElement} modalElement
+ * @param {HTMLElement} modalElement - Modal element
+ * @returns {void}
  */
 function setupTradePlanConditionsButton(modalElement) {
   window.Logger?.info('setupTradePlanConditionsButton invoked', { modalId: modalElement?.id, mode: modalElement?.dataset?.modalMode || modalElement?.dataset?.mode }, { page: 'trade_plans' });
@@ -2954,6 +3084,7 @@ function setupTradePlanConditionsButton(modalElement) {
 /**
  * Setup sortable headers for trade plans table
  * Uses global setupSortableHeaders function from page-utils.js
+ * @returns {void}
  */
 function setupSortableHeadersLocal() {
   try {
@@ -2979,6 +3110,7 @@ window.setupTradePlanConditionsButton = setupTradePlanConditionsButton;
 /**
  * Restore planning section state for trade plans
  * Uses global restoreAllSectionStates function from ui-utils.js
+ * @returns {void}
  */
 function restorePlanningSectionState() {
   try {
@@ -3029,7 +3161,7 @@ window.showEditTradePlanModal = async function(tradePlanId) {
  * Filter trade plans by investment type
  * Filters the trade plans table by investment type (swing, investment, passive, or all)
  * 
- * @function filterTradePlansByType
+ * Filter trade plans by type
  * @param {string} type - Investment type to filter by ('all', 'swing', 'investment', 'passive')
  * @returns {void}
  */
@@ -3103,8 +3235,8 @@ window.filterTradePlansByType = filterTradePlansByType;
 // REMOVED: showEditTradePlanModal - use window.ModalManagerV2.showEditModal('tradePlansModal', 'trade_plan', tradePlanId) directly
 
 /**
- * שמירת תוכנית מסחר
- * Handles both add and edit modes
+ * Save trade plan (handles both add and edit modes)
+ * @returns {Promise<void>}
  */
 async function saveTradePlan() {
     window.Logger.debug('saveTradePlan called', { page: 'trade_plans' });
@@ -3382,6 +3514,11 @@ async function deleteTradePlan(tradePlanId) {
     }
 }
 
+/**
+ * Perform trade plan deletion
+ * @param {number|string} tradePlanId - Trade plan ID
+ * @returns {Promise<void>}
+ */
 async function performTradePlanDeletion(tradePlanId) {
     try {
         // Send delete request

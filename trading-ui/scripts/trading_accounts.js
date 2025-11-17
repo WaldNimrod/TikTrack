@@ -262,7 +262,10 @@ window.currenciesData = [];
 window.currenciesLoaded = false;
 let tradingAccountsPaginationInstance = null;
 
-// פונקציה לטעינת מטבעות מהשרת
+/**
+ * Load currencies from server
+ * @returns {Promise<Array>} Array of currencies
+ */
 async function loadCurrenciesFromServer() {
   try {
     const token = await window.unifiedCacheManager?.get('authToken') || localStorage.getItem('authToken');
@@ -338,7 +341,11 @@ async function loadCurrenciesFromServer() {
 //   return '$'; // ברירת מחדל
 // }
 
-// פונקציה ליצירת אפשרויות מטבע בטופס
+/**
+ * Generate currency options for form
+ * @param {Object|null} [tradingAccount=null] - Trading account
+ * @returns {Promise<void>}
+ */
 async function generateCurrencyOptions(tradingAccount = null) {
   // שימוש ב-SelectPopulatorService למילוי מטבעות
   const selectId = 'currency_id';
@@ -354,7 +361,11 @@ async function generateCurrencyOptions(tradingAccount = null) {
   await SelectPopulatorService.populateCurrenciesSelect(selectId, options);
 }
 
-// פונקציה לטעינת חשבונות מהשרת
+/**
+ * Load trading accounts from server
+ * @param {Object} [options={}] - Loading options
+ * @returns {Promise<Array>} Array of trading accounts
+ */
 async function loadTradingAccountsFromServer(options = {}) {
   window.Logger.info('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀', { page: "trading_accounts" });
   try {
@@ -379,7 +390,11 @@ async function loadTradingAccountsFromServer(options = {}) {
   }
 }
 
-// פונקציה לטעינת כל החשבונות מהשרת (לפילטר)
+/**
+ * Load all trading accounts from server (for filter)
+ * @param {Object} [options={}] - Loading options
+ * @returns {Promise<Array>} Array of trading accounts
+ */
 async function loadAllTradingAccountsFromServer(options = {}) {
   try {
     const allTradingAccounts = await loadTradingAccountsData(options);
@@ -428,7 +443,11 @@ function loadDefaultTradingAccounts() {
 //   return window.trading_accountsLoaded || false;
 // }
 
-// פונקציה לטעינת נתוני חשבונות מסחר מהשרת
+/**
+ * Legacy function to fetch trading accounts from server (DEPRECATED)
+ * @deprecated Use loadTradingAccountsData instead
+ * @returns {Promise<Array>} Array of trading accounts
+ */
 async function legacyFetchTradingAccounts() {
   const response = await fetch(`/api/trading-accounts/?_t=${Date.now()}`, {
     method: 'GET',
@@ -515,6 +534,11 @@ async function loadAccountBalancesBatch(accountIds) {
   return balanceMap;
 }
 
+/**
+ * Get currency symbol from currency value
+ * @param {string|number} currencyValue - Currency value
+ * @returns {string} Currency symbol or '$' as default
+ */
 function getCurrencySymbol(currencyValue) {
   if (!currencyValue) {
     return '$';
@@ -560,6 +584,11 @@ function enrichAccountsWithBalances(accounts, balancesMap) {
   });
 }
 
+/**
+ * Sync trading accounts pagination
+ * @param {Array} accountsData - Array of accounts data
+ * @returns {Promise<void>}
+ */
 async function syncTradingAccountsPagination(accountsData) {
   const safeAccounts = Array.isArray(accountsData) ? accountsData : [];
 
@@ -2500,6 +2529,11 @@ async function deleteTradingAccount(accountId) {
     }
 }
 
+/**
+ * Perform trading account deletion
+ * @param {number|string} accountId - Account ID
+ * @returns {Promise<void>}
+ */
 async function performTradingAccountDeletion(accountId) {
     try {
         let response;
@@ -2734,7 +2768,10 @@ window.registerTradingAccountsTables = function() {
     });
 };
 
-// Auto-register when DOM is ready and UnifiedTableSystem is available
+/**
+ * Wait and register tables when DOM is ready and UnifiedTableSystem is available
+ * @returns {Promise<void>}
+ */
 async function waitAndRegisterTables() {
     // Wait for UnifiedAppInitializer to finish
     if (window.unifiedAppInit && !window.unifiedAppInit.initialized) {

@@ -60,21 +60,43 @@
 // ===== GLOBAL PREFERENCES SYSTEM =====
 
 // Global preferences cache
+/**
+ * Legacy preferences cache object (DEPRECATED - use UnifiedCacheManager)
+ * @deprecated Use UnifiedCacheManager instead
+ * @type {Object}
+ */
 window.preferencesCache = {
     data: {},
     timestamp: null,
     ttl: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    /**
+     * Check if cache is valid
+     * @returns {boolean} True if cache is valid, false otherwise
+     */
     isValid: function() {
         if (!this.timestamp) return false;
         return (Date.now() - this.timestamp) < this.ttl;
     },
+    /**
+     * Set cache data
+     * @param {Object} data - Data to cache
+     * @returns {void}
+     */
     set: function(data) {
         this.data = data;
         this.timestamp = Date.now();
     },
+    /**
+     * Get cached data if valid
+     * @returns {Object|null} Cached data or null if invalid
+     */
     get: function() {
         return this.isValid() ? this.data : null;
     },
+    /**
+     * Clear cache
+     * @returns {void}
+     */
     clear: function() {
         this.data = {};
         this.timestamp = null;

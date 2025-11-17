@@ -49,12 +49,12 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 54.9% (28/51 פונקציות)
+**כיסוי**: 66.7% (34/51 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 9
-- **פונקציות עם JSDoc חלקי**: 19
-- **פונקציות ללא JSDoc**: 23
+- **פונקציות עם JSDoc מלא** (params + returns): 13
+- **פונקציות עם JSDoc חלקי**: 21
+- **פונקציות ללא JSDoc**: 17
 
 **רשימת פונקציות**:
 
@@ -75,9 +75,9 @@
 - ✅ `updateGridFromComponent()` (שורה 935) - partial
 - ✅ `populateSelect()` (שורה 967) - partial
 - ❌ `updateRadioButtons()` (שורה 1060) - missing
-- ✅ `onNoteRelationTypeChange()` (שורה 1138) - partial
-- ❌ `populateEditSelectByType()` (שורה 1144) - missing
-- ✅ `validateNoteForm()` (שורה 1216) - partial
+- ✅ `onNoteRelationTypeChange()` (שורה 1138) - complete
+- ✅ `populateEditSelectByType()` (שורה 1150) - complete
+- ✅ `validateNoteForm()` (שורה 1222) - partial
 
 ... ועוד 31 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-23 פונקציות חסרות
+3. הוספת JSDoc ל-17 פונקציות חסרות
 
 ---
 

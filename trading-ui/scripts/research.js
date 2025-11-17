@@ -1,6 +1,29 @@
-/*
+/**
  * Research Page Controller
+ * ========================
  * Minimal dashboard shell (no mock data, no legacy stubs).
+ * 
+ * @version 1.0.0
+ * @author TikTrack Development Team
+ * 
+ * ============================================================================
+ * FUNCTION INDEX - Research Page
+ * ============================================================================
+ * 
+ * Initialization:
+ * - initializeResearchPage() - Initialize research dashboard shell
+ * 
+ * Data Loading:
+ * - loadResearchData(options) - Load research data from service or API
+ * 
+ * Rendering:
+ * - renderPlaceholder(error) - Render placeholder message or error
+ * - renderDataState() - Render data state with timestamp
+ * 
+ * Utilities:
+ * - getContainer() - Get dashboard container element
+ * 
+ * ============================================================================
  */
 (function researchPageController() {
   const DASHBOARD_CONTAINER_ID = 'researchDashboardShell';

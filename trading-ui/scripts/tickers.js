@@ -233,7 +233,7 @@ function getCurrencySymbol(currencyId) {
     const currency = window.currenciesData.find(c => c.id === currencyId);
     return currency ? currency.symbol : currencyId || 'N/A';
   } catch (error) {
-    console.error('getCurrencySymbol failed:', error);
+    window.Logger.error('getCurrencySymbol failed', { page: 'tickers', error: error?.message || error });
     return currencyId || 'N/A';
   }
 }
@@ -255,7 +255,7 @@ function getTickerTypeStyle(type) {
       textAlign: 'center',
     };
   } catch (error) {
-    console.error('getTickerTypeStyle failed:', error);
+    window.Logger.error('getTickerTypeStyle failed', { page: 'tickers', error: error?.message || error });
     return {
       backgroundColor: '#6c757d',
       color: '#ffffff',
@@ -292,7 +292,7 @@ function getTickerStatusStyle(status) {
       textAlign: 'center',
     };
   } catch (error) {
-    console.error('getTickerStatusStyle failed:', error);
+    window.Logger.error('getTickerStatusStyle failed', { page: 'tickers', error: error?.message || error });
     return {
       backgroundColor: '#e8f5e8',
       color: '#388e3c',
@@ -318,7 +318,7 @@ function getTickerStatusLabel(status) {
     };
     return labels[status] || 'פתוח';
   } catch (error) {
-    console.error('getTickerStatusLabel failed:', error);
+    window.Logger.error('getTickerStatusLabel failed', { page: 'tickers', error: error?.message || error });
     return 'פתוח';
   }
 }
@@ -357,7 +357,7 @@ function generateTickerCurrencyOptions(ticker = null) {
 
     return options;
   } catch (error) {
-    console.error('generateTickerCurrencyOptions failed:', error);
+    window.Logger.error('generateTickerCurrencyOptions failed', { page: 'tickers', error: error?.message || error });
     if (!currenciesUnavailableNotified) {
       currenciesUnavailableNotified = true;
       if (typeof window.showErrorNotification === 'function') {
@@ -392,7 +392,7 @@ function updateCurrencyOptions(ticker = null) {
         : editOptions;
     }
   } catch (error) {
-    console.error('updateCurrencyOptions failed:', error);
+    window.Logger.error('updateCurrencyOptions failed', { page: 'tickers', error: error?.message || error });
   }
 }
 
@@ -547,7 +547,7 @@ function restoreTickersSectionState() {
       // window.Logger.warn('⚠️ restoreSectionStates function not available globally', { page: "tickers" });
     }
   } catch (error) {
-    console.error('restoreTickersSectionState failed:', error);
+    window.Logger.error('restoreTickersSectionState failed', { page: 'tickers', error: error?.message || error });
   }
 }
 
@@ -1124,7 +1124,7 @@ function getTickerSymbol(tickerId) {
     }
     return `טיקר ${tickerId}`;
   } catch (error) {
-    console.error('getTickerSymbol failed:', error);
+    window.Logger.error('getTickerSymbol failed', { page: 'tickers', tickerId, error: error?.message || error });
     return `טיקר ${tickerId}`;
   }
 }
@@ -1563,42 +1563,50 @@ async function confirmDeleteTicker(id) {
 /**
  * טעינת נתוני טיקרים - גרסה פשוטה
  */
-async function loadTickersData() {
+// Internal function for loading tickers data
+async function loadTickersDataInternal(options = {}) {
   try {
-    window.Logger.info('Loading tickers data (bypass cache)', { page: "tickers" });
+    window.Logger.info('Loading tickers data', { page: "tickers" });
     
-    // ניקוי מטמון לפני טעינה
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
-      await window.UnifiedCacheManager.clearAllCache('Light');
-    } else if (typeof window.clearAllCache === 'function') {
-      window.clearAllCache();
-    }
-    // Clear local tickers data
-    window.tickersData = [];
-    tickersData = [];
-    
-    // טעינת מטבעות אם עוד לא נטענו
-    if (!window.currenciesLoaded) {
-      await loadCurrenciesData();
-    }
-
-    // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/tickers/?_t=${Date.now()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
+    // Use TickersData service if available, otherwise fallback to direct API call
+    let rawTickers = [];
+    if (window.TickersData?.loadTickersData) {
+      rawTickers = await window.TickersData.loadTickersData({ force: options.force || false });
+      window.Logger.info('📊 נתונים שהתקבלו מ-TickersData service:', rawTickers.length, 'טיקרים', { page: "tickers" });
+    } else {
+      // Fallback: direct API call with cache bypass
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+        await window.UnifiedCacheManager.clearAllCache('Light');
+      } else if (typeof window.clearAllCache === 'function') {
+        window.clearAllCache();
       }
-    });
+      // Clear local tickers data
+      window.tickersData = [];
+      tickersData = [];
+      
+      // טעינת מטבעות אם עוד לא נטענו
+      if (!window.currenciesLoaded) {
+        await loadCurrenciesData();
+      }
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // קריאה ישירה לשרת עם timestamp למניעת cache
+      const response = await fetch(`/api/tickers/?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      rawTickers = data?.data || data;
     }
-
-    const data = await response.json();
 
     // שמירת הנתונים
-    const rawTickers = data?.data || data;
     tickersData = Array.isArray(rawTickers)
       ? rawTickers.map(ticker => ({
           ...ticker,
@@ -1628,16 +1636,22 @@ async function loadTickersData() {
     // Restore page state (filters, sort, sections, entity filters)
     await restorePageState('tickers');
 
+    // יישום צבעי ישות על כותרות אחרי טעינת הנתונים
+    if (window.applyEntityColorsToHeaders) {
+      window.applyEntityColorsToHeaders('ticker');
+    }
   } catch (error) {
     handleApiError(error, 'טעינת נתוני טיקרים');
-
-  }
-
-  // יישום צבעי ישות על כותרות אחרי טעינת הנתונים
-  if (window.applyEntityColorsToHeaders) {
-    window.applyEntityColorsToHeaders('ticker');
+    throw error;
   }
 }
+
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+window.loadTickersData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  return await loadTickersDataInternal({ ...options, force: true });
+};
 
 /**
  * עדכון סטטיסטיקות סיכום טיקרים
@@ -1664,7 +1678,7 @@ function updateTickersSummaryStats(tickers) {
       }
     }
   } catch (error) {
-    console.error('updateTickersSummaryStats failed:', error);
+    window.Logger.error('updateTickersSummaryStats failed', { page: 'tickers', error: error?.message || error });
   }
 }
 
@@ -1839,7 +1853,7 @@ function renderTickersTableRows(tickers) {
                 <tr>
                     <td title="${ticker.symbol || 'N/A'}">
                         <span class="ticker-symbol-link" 
-                              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
+                              data-onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
                               title="לחץ לצפייה בפרטי הטיקר">
                             <strong>${ticker.symbol || 'N/A'}</strong>
                         </span>
@@ -1982,7 +1996,7 @@ window.toggleTickersSection = function() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection('tickers');
     } else {
-        console.error('toggleSection not available');
+        window.Logger.error('toggleSection not available', { page: 'tickers' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת הסתרת סקשנים לא זמינה. אנא רענן את הדף.');
         }
@@ -2007,7 +2021,7 @@ window.clearTickersCache = async function() {
                 window.Logger.info('✅ Tickers cache cleared via UnifiedCacheManager', { page: "tickers" });
             }
         } catch (error) {
-            console.warn('Failed to clear cache via UnifiedCacheManager:', error);
+            window.Logger.warn('Failed to clear cache via UnifiedCacheManager', { page: 'tickers', error: error?.message || error });
             // Fallback to window.clearAllCache if available
             if (typeof window.clearAllCache === 'function') {
                 await window.clearAllCache();
@@ -2017,7 +2031,7 @@ window.clearTickersCache = async function() {
         // Fallback to global clearAllCache
         await window.clearAllCache();
     } else {
-        console.warn('No cache clearing system available');
+        window.Logger.warn('No cache clearing system available', { page: 'tickers' });
     }
 };
 
@@ -2046,7 +2060,7 @@ async function checkTickerExternalData() {
     const warningDiv = document.getElementById('tickerExternalDataWarning');
     
     if (!symbolField || !checkBtn || !resultDiv || !warningDiv) {
-        console.warn('⚠️ Elements not found for external data check');
+        window.Logger.warn('Elements not found for external data check', { page: 'tickers' });
         return;
     }
     
@@ -2140,8 +2154,7 @@ async function checkTickerExternalData() {
         }
         
     } catch (error) {
-        console.error('❌ Error checking external data:', error);
-        window.Logger?.error(`Error checking external data for ${symbol}`, error, { page: 'tickers' });
+        window.Logger?.error('Error checking external data', { page: 'tickers', symbol, error: error?.message || error });
         
         // Show warning
         warningDiv.innerHTML = `
@@ -2233,7 +2246,7 @@ window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.restoreTickersSectionState = restoreTickersSectionState;
 // Note: saveTicker already exported above
 // REMOVED: window.clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() directly
-window.loadTickersData = loadTickersData;
+// Note: window.loadTickersData is already defined as wrapper function above (line 1650)
 window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
@@ -2618,7 +2631,7 @@ function filterTickersByType(type) {
 
     window.Logger.info(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`, { page: "tickers" });
   } catch (error) {
-    console.error('filterTickersByType failed:', error);
+    window.Logger.error('filterTickersByType failed', { page: 'tickers', type, error: error?.message || error });
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'שגיאה בסינון טיקרים');
     }
@@ -2639,7 +2652,7 @@ function getTypeDisplayName(type) {
     };
     return typeNames[type] || type;
   } catch (error) {
-    console.error('getTypeDisplayName failed:', error);
+    window.Logger.error('getTypeDisplayName failed', { page: 'tickers', type, error: error?.message || error });
     return type;
   }
 }

@@ -2624,7 +2624,7 @@ window.showEditNoteModal = async function(noteId) {
             await window.TagUIManager.hydrateSelectForEntity('editNoteTags', 'note', noteId, { force: true });
         }
     } else {
-        console.error('ModalManagerV2 not available');
+        window.Logger.error('ModalManagerV2 not available', { page: 'notes' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
         }

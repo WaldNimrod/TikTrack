@@ -220,34 +220,34 @@
                         פורטפוליו
                     </div>
                     <div class="table-count" id="portfolioCount">טוען...</div>
-                    <div class="table-actions" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: nowrap;">
+                    <div class="table-actions">
                         <!-- Filters -->
-                        <select id="portfolioAccountFilter" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px; flex-shrink: 0;">
+                        <select id="portfolioAccountFilter" class="form-select form-select-sm">
                             <option value="">כל חשבונות המסחר</option>
                         </select>
                         <!-- Side filter buttons -->
-                        <div class="btn-group btn-group-sm" role="group" id="portfolioSideFilterGroup" style="margin-inline-end: 0.5rem; flex-shrink: 0;">
+                        <div class="btn-group btn-group-sm" role="group" id="portfolioSideFilterGroup">
                             <button data-button-type="FILTER" data-variant="small" data-icon="↕" data-classes="portfolio-side-filter-btn" data-onclick="handlePortfolioSideFilter('')" data-side="" title="הכל" aria-pressed="false" type="button"></button>
                             <button data-button-type="FILTER" data-variant="small" data-icon="↑" data-classes="portfolio-side-filter-btn portfolio-side-filter-long" data-onclick="handlePortfolioSideFilter('long')" data-side="long" title="Long" aria-pressed="false" type="button"></button>
                             <button data-button-type="FILTER" data-variant="small" data-icon="↓" data-classes="portfolio-side-filter-btn portfolio-side-filter-short" data-onclick="handlePortfolioSideFilter('short')" data-side="short" title="Short" aria-pressed="false" type="button"></button>
                         </div>
                         <!-- Checkboxes - stacked vertically with smaller font -->
-                        <div style="display: flex; flex-direction: column; gap: 0.25rem; margin-inline-end: 0.5rem; flex-shrink: 0;">
-                            <label class="form-check-label" style="font-size: 0.75rem; margin: 0; white-space: nowrap;">
-                                <input type="checkbox" id="portfolioIncludeClosed" class="form-check-input" style="margin-inline-end: 0.25rem;">
+                        <div class="portfolio-checkboxes-container">
+                            <label class="form-check-label portfolio-checkbox-label">
+                                <input type="checkbox" id="portfolioIncludeClosed" class="form-check-input portfolio-checkbox-input">
                                 הצג פוזיציות סגורות
                             </label>
-                            <label class="form-check-label" style="font-size: 0.75rem; margin: 0; white-space: nowrap;">
-                                <input type="checkbox" id="portfolioUnifyAccounts" class="form-check-input" style="margin-inline-end: 0.25rem;">
+                            <label class="form-check-label portfolio-checkbox-label">
+                                <input type="checkbox" id="portfolioUnifyAccounts" class="form-check-input portfolio-checkbox-input">
                                 אחד פוזיציות בין חשבונות מסחר
                             </label>
                         </div>
-                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('full-portfolio')" data-text="הצג/הסתר" style="flex-shrink: 0;"></button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('full-portfolio')" data-text="הצג/הסתר" class="portfolio-toggle-btn"></button>
                     </div>
                 </div>
 
                 <!-- Portfolio body -->
-                <div class="section-body" style="display: none;">
+                <div class="section-body d-none">
                     <div class="table-responsive" id="portfolioContainer">
                         <table class="table table-hover" id="portfolioTable" data-table-type="portfolio">
                             <thead>
@@ -292,7 +292,7 @@
                 </div>
             </div> <!-- End portfolio section -->
             
-        </div></div><div style="height: 3rem;"></div><div class="notification-container" id="notificationContainer"></div><div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div></div>
+        </div></div><div class="bottom-spacer"></div><div class="notification-container" id="notificationContainer"></div><div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div></div>
             <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->

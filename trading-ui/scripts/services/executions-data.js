@@ -8,6 +8,37 @@
  * - Save results inside UnifiedCacheManager with a 45s TTL
  * - Provide forced reload + cache invalidation helpers
  * - Surface consistent errors through the global notification + log systems
+ * - CRUD operations (create, update, delete, fetchDetails)
+ * - CacheSyncManager integration for automatic cache invalidation
+ *
+ * Related Documentation:
+ * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+ * - documentation/03-DEVELOPMENT/GUIDES/DATA_SERVICES_DEVELOPER_GUIDE.md
+ *
+ * Function Index:
+ * ==============
+ *
+ * CACHE MANAGEMENT:
+ * - saveExecutionsCache(data, options) - Save executions to cache
+ * - invalidateExecutionsCache() - Invalidate executions cache (uses CacheSyncManager)
+ * - clearExecutionsCache(patternOnly) - Clear executions cache
+ *
+ * DATA LOADING:
+ * - fetchExecutionsFromApi({ signal }) - Fetch executions from API
+ * - loadExecutionsData(options) - Load executions with cache support
+ *
+ * CRUD OPERATIONS:
+ * - createExecution(payload, options) - Create new execution
+ * - updateExecution(executionId, payload, options) - Update existing execution
+ * - deleteExecution(executionId, options) - Delete execution
+ * - fetchExecutionDetails(executionId, options) - Fetch single execution details
+ * - sendExecutionMutation({ executionId, method, payload, signal }) - Generic mutation handler
+ *
+ * @version 2.0.0
+ * @created November 2025
+ * @updated January 2025 - Added CRUD operations and CacheSyncManager integration
+ * @author TikTrack Development Team
  */
 (function executionsDataService() {
   const EXECUTIONS_DATA_KEY = 'executions-data';
@@ -107,7 +138,7 @@
   }
 
   function notifyLoadError(message, error) {
-    const details = error?.message || message || 'שגיאה בטעינת עסקאות';
+    const details = error?.message || message || 'שגיאה בטעינת ביצועים';
     window.Logger?.error?.('Executions data load failed', { ...PAGE_LOG_CONTEXT, error: details });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', `${details} – הנתונים לא זמינים כרגע`);
@@ -170,7 +201,7 @@
 
       return await loader();
     } catch (error) {
-      notifyLoadError('שגיאה בטעינת עסקאות', error);
+      notifyLoadError('שגיאה בטעינת ביצועים', error);
       throw error;
     }
   }

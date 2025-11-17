@@ -10,13 +10,13 @@
     "notes": "Cash flows fixes round - Backend API routes and Frontend date handling fixes"
   },
   "development": {
-    "version": "1.1.16.0",
+    "version": "1.1.17.0",
     "major": 1,
     "minor": 1,
-    "patch": 16,
+    "patch": 17,
     "build": 0,
-    "commit": "b3b4229b23c7c2e3ada00d8447652d4469d914f3",
-    "updated_at": "2025-11-16T23:38:29+00:00",
-    "notes": "Add comprehensive E2E tests for ModalManagerV2 and PageStateManager integration"
+    "commit": "f982172b71ae075b6a93356a297fd927a517dfcd",
+    "updated_at": "2025-11-17T00:20:33+00:00",
+    "notes": "Update main menu structure and multiple page improvements"
   }
 }

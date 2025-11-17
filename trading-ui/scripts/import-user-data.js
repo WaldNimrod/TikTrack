@@ -78,6 +78,33 @@ let filePrecheckState = {
 };
 let activeFilePrecheckRequestId = 0;
 
+/**
+ * Helper function to set element display using Bootstrap classes instead of inline styles
+ * @param {HTMLElement} element - The element to update
+ * @param {string} displayValue - The display value ('none', 'block', 'flex', 'inline-flex', etc.) or empty string to show
+ */
+function setElementDisplay(element, displayValue) {
+    if (!element) return;
+    
+    // Remove all display-related classes
+    element.classList.remove('d-none', 'd-block', 'd-flex', 'd-inline-flex', 'd-inline', 'd-inline-block');
+    
+    if (!displayValue || displayValue === 'none') {
+        element.classList.add('d-none');
+    } else if (displayValue === 'block') {
+        element.classList.add('d-block');
+    } else if (displayValue === 'flex' || displayValue === 'inline-flex') {
+        element.classList.add('d-flex');
+    } else if (displayValue === 'inline') {
+        element.classList.add('d-inline');
+    } else if (displayValue === 'inline-block') {
+        element.classList.add('d-inline-block');
+    } else {
+        // For other values, use inline style as fallback
+        element.style.display = displayValue;
+    }
+}
+
 const IMPORT_DATA_TYPE_DEFINITIONS = {
     executions: {
         key: 'executions',
@@ -216,10 +243,20 @@ function updateAccountDetectionSummary(statusOverride) {
 
     const hasSessionContext = Boolean(currentSessionId || pendingAccountLinking || activeSessionInfo);
     if (detectionCard) {
-        detectionCard.style.display = hasSessionContext ? '' : 'none';
+        // Use Bootstrap classes instead of inline styles
+        if (hasSessionContext) {
+            detectionCard.classList.remove('d-none');
+        } else {
+            detectionCard.classList.add('d-none');
+        }
     }
     if (manageLinkBtn) {
-        manageLinkBtn.style.display = hasSessionContext ? '' : 'none';
+        // Use Bootstrap classes instead of inline styles
+        if (hasSessionContext) {
+            manageLinkBtn.classList.remove('d-none');
+        } else {
+            manageLinkBtn.classList.add('d-none');
+        }
         manageLinkBtn.disabled = !hasSessionContext;
         manageLinkBtn.setAttribute('aria-disabled', hasSessionContext ? 'false' : 'true');
     }
@@ -964,7 +1001,7 @@ function updateAccountLinkingModalContent(linkInfo = pendingAccountLinking) {
         // Show/hide confirm button in footer (moved from recognizedActions)
         const confirmBtn = document.getElementById('accountLinkingConfirmBtn');
         if (confirmBtn) {
-            confirmBtn.style.display = shouldShowRecognized ? '' : 'none';
+            setElementDisplay(confirmBtn, shouldShowRecognized ? '' : 'none');
         }
     }
 
@@ -1688,20 +1725,27 @@ function showProcessingOverlay(message = 'טוען ומעבד נתונים...') 
         if (messageEl) {
             messageEl.textContent = message;
         }
-        processingOverlayElement.style.display = 'flex';
+        setElementDisplay(processingOverlayElement, 'flex');
     }
 }
 
 function hideProcessingOverlay() {
     if (processingOverlayElement) {
-        processingOverlayElement.style.display = 'none';
+        setElementDisplay(processingOverlayElement, 'none');
     }
 }
 
 function setAnalysisLoadingState(isLoading, message = 'טוען ומעבד נתונים...', progress = null) {
     const indicator = document.getElementById('analysisLoadingIndicator');
     if (indicator) {
-        indicator.style.display = isLoading ? 'flex' : 'none';
+        // Use Bootstrap classes instead of inline styles
+        if (isLoading) {
+            indicator.classList.remove('d-none');
+            indicator.classList.add('d-flex');
+        } else {
+            indicator.classList.remove('d-flex');
+            indicator.classList.add('d-none');
+        }
         const messageElement = indicator.querySelector('.analysis-loading-text');
         if (messageElement && message) {
             messageElement.textContent = message;
@@ -2066,7 +2110,7 @@ function clearCashflowAnalysisSections() {
             contentElement.innerHTML = '';
         }
         if (sectionElement) {
-            sectionElement.style.display = 'none';
+            setElementDisplay(sectionElement, 'none');
         }
     });
 }
@@ -2081,7 +2125,7 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
     container.innerHTML = '';
     const entries = Object.entries(typeStats);
     if (!entries.length) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         return;
     }
 
@@ -2110,7 +2154,7 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             container.appendChild(card);
         });
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
 }
 
 function renderCashflowCurrencyCards(totalsByCurrency = {}) {
@@ -2125,7 +2169,7 @@ function renderCashflowCurrencyCards(totalsByCurrency = {}) {
         .filter(([currency]) => currency && currency !== 'undefined');
 
     if (!entries.length) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         return;
     }
 
@@ -2144,7 +2188,7 @@ function renderCashflowCurrencyCards(totalsByCurrency = {}) {
             container.appendChild(card);
         });
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
 }
 
 function renderCashflowIssuesSummary({
@@ -2192,7 +2236,7 @@ function renderCashflowIssuesSummary({
     });
 
     if (!items.length) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         return;
     }
 
@@ -2211,7 +2255,7 @@ function renderCashflowIssuesSummary({
         list.appendChild(card);
     });
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
 }
 
 function renderKeyValueCards(sectionId, containerId, entries = {}, { labelPrefix = '', emptyLabel = '' } = {}) {
@@ -2224,11 +2268,11 @@ function renderKeyValueCards(sectionId, containerId, entries = {}, { labelPrefix
     container.innerHTML = '';
     const pairs = Object.entries(entries || {}).filter(([key]) => typeof key === 'string' && key.trim() !== '');
     if (!pairs.length) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     pairs
         .sort(([, valueA], [, valueB]) => Math.abs(valueB) - Math.abs(valueA))
         .forEach(([key, value]) => {
@@ -2254,11 +2298,11 @@ function renderListSummary(sectionId, listId, items = [], formatter) {
 
     list.innerHTML = '';
     if (!Array.isArray(items) || !items.length) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     items.slice(0, 10).forEach((item) => {
         const li = document.createElement('li');
         const text = formatter ? formatter(item) : String(item);
@@ -2410,7 +2454,7 @@ function ensureRichTextEditorForTickerRemarks(modalElement) {
     editorContainer.id = TICKER_REMARKS_EDITOR_ID;
     editorContainer.classList.add('rich-text-editor-container');
 
-    textarea.style.display = 'none';
+    setElementDisplay(textarea, 'none');
     textarea.setAttribute('data-rich-text-enhanced', 'true');
     textarea.parentNode.insertBefore(editorContainer, textarea.nextSibling);
 
@@ -2451,7 +2495,7 @@ function updateResetSessionButtonState() {
 
     if (!resetButton) {
         if (resumeButton) {
-            resumeButton.style.display = hasSession ? 'inline-flex' : 'none';
+            setElementDisplay(resumeButton, hasSession ? 'inline-flex' : 'none');
             resumeButton.disabled = !hasSession;
             resumeButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
         }
@@ -2459,12 +2503,12 @@ function updateResetSessionButtonState() {
         return;
     }
 
-    resetButton.style.display = hasSession ? 'inline-flex' : 'none';
+    setElementDisplay(resetButton, hasSession ? 'inline-flex' : 'none');
     resetButton.disabled = !hasSession;
     resetButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
 
     if (resumeButton) {
-        resumeButton.style.display = hasSession ? 'inline-flex' : 'none';
+        setElementDisplay(resumeButton, hasSession ? 'inline-flex' : 'none');
         resumeButton.disabled = !hasSession;
         resumeButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
     }
@@ -2585,24 +2629,24 @@ function updateActiveSessionIndicator() {
     }
     
     if (!currentSessionId || !activeSessionInfo) {
-        indicator.style.display = 'none';
+        setElementDisplay(indicator, 'none');
         indicator.setAttribute('data-has-session', 'false');
         if (controlsRow) {
-            controlsRow.style.display = 'none';
+            setElementDisplay(controlsRow, 'none');
         }
         if (detailsRow) {
-            detailsRow.style.display = 'none';
+            setElementDisplay(detailsRow, 'none');
         }
         return;
     }
     
-    indicator.style.display = 'block';
+    setElementDisplay(indicator, 'block');
     indicator.setAttribute('data-has-session', 'true');
     if (controlsRow) {
-        controlsRow.style.display = '';
+        setElementDisplay(controlsRow, '');
     }
     if (detailsRow) {
-        detailsRow.style.display = '';
+        setElementDisplay(detailsRow, '');
     }
     
     const sessionIdEl = document.getElementById('activeSessionIdValue');
@@ -3629,12 +3673,12 @@ function resetImportModal() {
     // Reset UI elements
     const fileInfo = document.getElementById('fileInfo');
     if (fileInfo) {
-        fileInfo.style.display = 'none';
+        setElementDisplay(fileInfo, 'none');
     }
     
     const dropZone = document.getElementById('dropZone');
     if (dropZone) {
-        dropZone.style.display = 'block';
+        setElementDisplay(dropZone, 'block');
     }
     
     const dataTypeSelect = document.getElementById('importDataTypeSelect');
@@ -3702,13 +3746,13 @@ function resetAnalysisDisplay() {
     
     const problemResolutionSection = document.getElementById('problemResolutionSection');
     if (problemResolutionSection) {
-        problemResolutionSection.style.display = 'none';
+        setElementDisplay(problemResolutionSection, 'none');
     }
 
     const analysisActions = document.getElementById('analysisStepActions');
     const continueBtn = document.getElementById('analysisContinueBtn');
     if (analysisActions) {
-        analysisActions.style.display = 'none';
+        setElementDisplay(analysisActions, 'none');
     }
     if (continueBtn) {
         continueBtn.disabled = true;
@@ -3937,7 +3981,7 @@ function showStepContent(step) {
         page: 'import-user-data' 
     });
     importSteps.forEach(stepElement => {
-        stepElement.style.display = 'none';
+        setElementDisplay(stepElement, 'none');
     });
     
     // Show current step content
@@ -3949,14 +3993,14 @@ function showStepContent(step) {
         // Also show the problem resolution section
         const problemSection = document.getElementById('problemResolutionSection');
         if (problemSection) {
-            problemSection.style.display = 'block';
+            setElementDisplay(problemSection, 'block');
         }
                     } else if (step === 3) {
                         currentStepContent = document.getElementById('step-preview');
                     }
     
     if (currentStepContent) {
-        currentStepContent.style.display = 'block';
+        setElementDisplay(currentStepContent, 'block');
         window.Logger.info('[Import Modal] Step content shown', { 
             step, 
             elementId: currentStepContent.id,
@@ -4120,17 +4164,17 @@ function handleFileDrop(event) {
 function updateHeaderActions(step) {
     const uploadActions = document.getElementById('uploadStepActions');
     if (uploadActions) {
-        uploadActions.style.display = step === 1 ? 'flex' : 'none';
+        setElementDisplay(uploadActions, step === 1 ? 'flex' : 'none');
     }
 
     const analysisActions = document.getElementById('analysisStepActions');
     if (analysisActions) {
-        analysisActions.style.display = step === 2 ? 'flex' : 'none';
+        setElementDisplay(analysisActions, step === 2 ? 'flex' : 'none');
     }
 
     const previewActions = document.getElementById('previewStepActions');
     if (previewActions) {
-        previewActions.style.display = step === 3 ? 'flex' : 'none';
+        setElementDisplay(previewActions, step === 3 ? 'flex' : 'none');
     }
 }
 
@@ -4247,7 +4291,7 @@ function clearProblemSections() {
     sections.forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section) {
-            section.style.display = 'none';
+            setElementDisplay(section, 'none');
         }
     });
     
@@ -4391,13 +4435,13 @@ function displayExistingRecords(existingRecords) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(7, 'אין רשומות קיימות למעקב.');
         markProblemTableReady('existingRecordsTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map((entry) => renderDuplicateRow(entry.item, 'existing_record', entry.index))
         .join('');
@@ -4490,12 +4534,12 @@ function handleFileSelect(event) {
     if (fileInfo && fileName && fileSize) {
         fileName.textContent = file.name;
         fileSize.textContent = formatFileSize(file.size);
-        fileInfo.style.display = 'block';
+        setElementDisplay(fileInfo, 'block');
         
         // Hide drop zone
         const dropZone = document.getElementById('dropZone');
         if (dropZone) {
-            dropZone.style.display = 'none';
+            setElementDisplay(dropZone, 'none');
         }
         
         window.Logger.debug('[Import Modal] File info updated in UI', { page: 'import-user-data' });
@@ -4602,10 +4646,10 @@ function resetFile() {
     const dropZone = document.getElementById('dropZone');
     
     if (fileInfo) {
-        fileInfo.style.display = 'none';
+        setElementDisplay(fileInfo, 'none');
     }
     if (dropZone) {
-        dropZone.style.display = 'block';
+        setElementDisplay(dropZone, 'block');
     }
     
     if (window.clearFieldValidation) {
@@ -5080,7 +5124,7 @@ function displayAnalysisResults(results) {
         const stepActions = document.getElementById('analysisStepActions');
         const continueBtn = document.getElementById('analysisContinueBtn');
         if (stepActions && continueBtn) {
-            stepActions.style.display = 'flex';
+            setElementDisplay(stepActions, 'flex');
             continueBtn.disabled = false;
             continueBtn.setAttribute('aria-disabled', 'false');
         }
@@ -5619,7 +5663,7 @@ async function loadProblemResolution(autoTriggered = false) {
             const stepActions = document.getElementById('analysisStepActions');
             const continueBtn = document.getElementById('analysisContinueBtn');
             if (stepActions) {
-                stepActions.style.display = 'flex';
+                setElementDisplay(stepActions, 'flex');
             }
             if (continueBtn) {
                 continueBtn.disabled = false;
@@ -5667,7 +5711,7 @@ async function loadProblemResolution(autoTriggered = false) {
         const stepActions = document.getElementById('analysisStepActions');
         const continueBtn = document.getElementById('analysisContinueBtn');
         if (stepActions) {
-            stepActions.style.display = 'flex';
+            setElementDisplay(stepActions, 'flex');
         }
         if (continueBtn) {
             continueBtn.disabled = false;
@@ -5679,7 +5723,7 @@ async function loadProblemResolution(autoTriggered = false) {
         const stepActions = document.getElementById('analysisStepActions');
         const continueBtn = document.getElementById('analysisContinueBtn');
         if (stepActions) {
-            stepActions.style.display = 'flex';
+            setElementDisplay(stepActions, 'flex');
         }
         if (continueBtn) {
             continueBtn.disabled = false;
@@ -6705,19 +6749,19 @@ async function openAddTickerModal(symbol, currency = 'USD') {
                         const summaryHtml = renderMetadataSummaryBlock(metadata);
                         if (summaryHtml) {
                             externalDataResult.innerHTML = summaryHtml;
-                            externalDataResult.style.display = 'block';
+                            setElementDisplay(externalDataResult, 'block');
     } else {
                             externalDataResult.innerHTML = '';
-                            externalDataResult.style.display = 'none';
+                            setElementDisplay(externalDataResult, 'none');
                         }
                     }
 
                     if (externalDataWarning) {
                         if (metadata) {
-                            externalDataWarning.style.display = 'none';
+                            setElementDisplay(externalDataWarning, 'none');
                             externalDataWarning.innerHTML = '';
                         } else {
-                            externalDataWarning.style.display = 'block';
+                            setElementDisplay(externalDataWarning, 'block');
                             externalDataWarning.innerHTML = '<small>לא נמצאו נתוני רקע לטיקר זה. ניתן להוסיף ידנית.</small>';
                         }
                     }
@@ -7363,7 +7407,7 @@ function clearProblemSectionsForSession() {
     sections.forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section) {
-            section.style.display = 'none';
+            setElementDisplay(section, 'none');
         }
     });
     
@@ -7408,13 +7452,13 @@ function displayMissingTickers(missingTickers) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(5, 'אין טיקרים חסרים.');
         markProblemTableReady('missingTickersTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map((entry) => renderMissingTickerRow(entry.item))
         .join('');
@@ -7440,13 +7484,13 @@ function displayWithinFileDuplicates(duplicates, activeMatchIndexSet = new Set()
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(7, 'אין כפילויות פעילות בקובץ.');
         markProblemTableReady('withinFileDuplicatesTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map((entry) => renderDuplicateRow(entry.item, 'within_file', entry.index, activeMatchIndexSet))
         .join('');
@@ -8127,13 +8171,13 @@ function displayCashflowMissingAccounts(accounts) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(4, 'אין חשבונות חסרים.');
         markProblemTableReady('cashflowMissingAccountsTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map(({ item }) => renderCashflowMissingAccountRow(item))
         .join('');
@@ -8173,13 +8217,13 @@ function displayCashflowCurrencyIssues(issues) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(4, 'אין בעיות מטבע פעילות.');
         markProblemTableReady('cashflowCurrencyIssuesTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map(({ item }) => renderCashflowCurrencyIssueRow(item))
         .join('');
@@ -8212,13 +8256,13 @@ function displayAccountMissingAccounts(accounts) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(3, 'אין חשבונות חסרים.');
         markProblemTableReady('accountMissingAccountsTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map(({ item }) => renderAccountMissingAccountRow(item))
         .join('');
@@ -8258,13 +8302,13 @@ function displayAccountCurrencyMismatches(items) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(3, 'אין אי התאמות במטבעי בסיס.');
         markProblemTableReady('accountCurrencyMismatchesTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map(({ item }) => renderAccountCurrencyMismatchRow(item))
         .join('');
@@ -8303,13 +8347,13 @@ function displayAccountEntitlementWarnings(items) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(3, 'אין התראות הרשאות פעילות.');
         markProblemTableReady('accountEntitlementWarningsTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map(({ item }) => renderAccountEntitlementWarningRow(item))
         .join('');
@@ -8352,13 +8396,13 @@ function displayAccountMissingDocuments(items) {
     const unresolvedEntries = tracking.unresolvedItems || [];
 
     if (unresolvedEntries.length === 0) {
-        section.style.display = 'none';
+        setElementDisplay(section, 'none');
         tableBody.innerHTML = renderTableEmptyRow(2, 'אין מסמכים חסרים.');
         markProblemTableReady('accountMissingDocumentsTable');
         return;
     }
 
-    section.style.display = 'block';
+    setElementDisplay(section, 'block');
     tableBody.innerHTML = unresolvedEntries
         .map(({ item }) => renderAccountMissingDocumentsRow(item))
         .join('');

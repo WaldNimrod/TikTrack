@@ -28,6 +28,9 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_data-import.css?v=1.0.0">
+    
     <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
     <script>
         window.showModalSafe = async function(modalId, mode = 'add') {
@@ -169,11 +172,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div id="importHistoryEmptyState" class="empty-state" style="display: none;">
+                        <div id="importHistoryEmptyState" class="empty-state d-none">
                             <i class="bi bi-inbox"></i>
                             <p>עדיין לא בוצעו תהליכי ייבוא. לחץ על "📥 הפעלת מודול ייבוא" כדי להתחיל תהליך חדש.</p>
                         </div>
-                        <div id="importHistoryErrorState" class="error-state" style="display: none;">
+                        <div id="importHistoryErrorState" class="error-state d-none">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <p id="importHistoryErrorMessage">שגיאה בטעינת תהליכי הייבוא. נסה לרענן את הנתונים.</p>
                         </div>
@@ -221,36 +224,36 @@
                                 <div class="step-label">תצוגה מקדימה + אישור</div>
                             </div>
                         </div>
-                        <div class="analysis-loading-indicator align-items-center gap-2 flex-wrap" id="analysisLoadingIndicator" style="display:none;">
-                            <div class="spinner-border text-primary" role="status" aria-hidden="true" style="width:1.8rem;height:1.8rem;"></div>
+                        <div class="analysis-loading-indicator align-items-center gap-2 flex-wrap d-none" id="analysisLoadingIndicator">
+                            <div class="spinner-border text-primary analysis-spinner" role="status" aria-hidden="true"></div>
                             <div class="flex-grow-1 d-flex flex-column gap-1">
-                                <span class="analysis-loading-text" style="font-weight:600;">טוען ומעבד נתונים...</span>
-                                <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height:6px;">
-                                    <div class="progress-bar" id="analysisProgressBar" style="width:0%"></div>
+                                <span class="analysis-loading-text">טוען ומעבד נתונים...</span>
+                                <div class="progress analysis-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                    <div class="progress-bar" id="analysisProgressBar"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="steps-header-actions d-flex align-items-center gap-2 flex-wrap" id="stepsHeaderPrimaryActions">
-                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="uploadStepActions" style="display:none;">
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="uploadStepActions">
                                 <button data-button-type="TERTIARY"
                                         data-text="המשך סשן פעיל"
                                         data-onclick="resumeActiveImportSession()"
                                         id="resumeImportSessionBtn"
-                                        style="display:none;"></button>
+                                        class="d-none"></button>
                                 <button data-button-type="PRIMARY"
                                         data-text="המשך לניתוח"
                                         data-onclick="analyzeFile()"
                                         id="analyzeBtn"
                                         disabled></button>
                             </div>
-                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="analysisStepActions" style="display:none;">
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="analysisStepActions">
                                 <button data-button-type="PRIMARY"
                                         data-text="המשך לתצוגה מקדימה"
                                         data-onclick="proceedToPreviewFromProblems()"
                                         id="analysisContinueBtn"
                                         disabled></button>
                             </div>
-                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="previewStepActions" style="display:none;">
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="previewStepActions">
                                 <button data-button-type="PRIMARY"
                                         data-text="ביצוע ייבוא"
                                         data-onclick="confirmImport()"
@@ -265,7 +268,7 @@
 
                     <div class="import-step" id="step-upload" data-step="1">
                         <div class="step-content">
-                            <div class="row g-3 align-items-center" id="activeSessionControlsRow" style="display:none;">
+                            <div class="row g-3 align-items-center d-none" id="activeSessionControlsRow">
                                 <div class="col-12 col-lg-6 d-flex align-items-center justify-content-lg-start justify-content-center">
                                     <div class="summary-card info-card d-flex align-items-center flex-wrap active-session-warning-card w-100">
                                         <div class="summary-title flex-grow-1">קיים סשן פתוח, ניתן להמשיך או לנקות</div>
@@ -274,7 +277,7 @@
                                                 data-onclick="confirmResetImportSession()"
                                                 data-entity-type="cash_flow"
                                                 id="resetImportSessionBtn"
-                                                style="display:none;"></button>
+                                                class="d-none"></button>
                                     </div>
                                 </div>
                                 <div class="col-12 col-lg-6">
@@ -282,9 +285,9 @@
                                 </div>
                             </div>
 
-                            <div class="row g-3" id="activeSessionDetailsRow" style="display:none;">
+                            <div class="row g-3 d-none" id="activeSessionDetailsRow">
                                 <div class="col-12">
-                                    <div class="summary-card active-session-card active-session-warning-card" id="activeSessionIndicator" style="display:none;">
+                                    <div class="summary-card active-session-card active-session-warning-card d-none" id="activeSessionIndicator">
                                         <h4>
                                             <i class="bi bi-activity"></i>
                                             סשן ייבוא פעיל
@@ -389,7 +392,7 @@
                                             <p>גרור קובץ CSV או לחץ לבחירה</p>
                                             <input type="file" id="fileInput" accept=".csv" hidden>
                                         </div>
-                                        <div class="file-info" id="fileInfo" style="display:none;">
+                                        <div class="file-info d-none" id="fileInfo">
                                             <div class="file-details">
                                                 <span class="file-name" id="fileName"></span>
                                                 <span class="file-size" id="fileSize"></span>
@@ -403,7 +406,7 @@
                                     </div>
                                 </div>
                                 <div class="col-12 col-lg-6">
-                                    <div class="account-section" id="accountDetectionCard" style="display:none;">
+                                    <div class="account-section d-none" id="accountDetectionCard">
                                         <label>זיהוי חשבון מסחר:</label>
                                         <div class="account-detection-card" id="accountDetectionSummary">
                                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -444,7 +447,7 @@
                         </div>
                     </div>
 
-                    <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
+                    <div class="import-step d-none" id="step-analysis" data-step="2">
                         <div class="step-content">
                             <h3>תוצאות ניתוח</h3>
                             <div class="analysis-cards">
@@ -499,25 +502,25 @@
                                 </div>
                             </div>
 
-                            <div id="cashflowTypeSummarySection" style="display:none; margin-top:1.5rem;">
+                            <div id="cashflowTypeSummarySection" class="d-none mt-4">
                                 <h4>חלוקת רשומות לפי סוג</h4>
                                 <div class="analysis-cards" id="cashflowTypeSummaryCards"></div>
                             </div>
 
-                            <div id="cashflowCurrencySummarySection" style="display:none; margin-top:1.5rem;">
+                            <div id="cashflowCurrencySummarySection" class="d-none mt-4">
                                 <h4>סיכום לפי מטבע</h4>
                                 <div class="analysis-cards" id="cashflowCurrencySummaryCards"></div>
                             </div>
 
-                            <div id="cashflowIssuesSummarySection" style="display:none; margin-top:1.5rem;">
+                            <div id="cashflowIssuesSummarySection" class="d-none mt-4">
                                 <h4>התראות קריטיות</h4>
                                 <div class="problem-card-container problem-cards-container" id="cashflowIssuesSummaryList"></div>
                             </div>
 
-                            <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
+                            <div class="problem-resolution-section d-none" id="problemResolutionSection">
                                 <h3>פתרון בעיות</h3>
 
-                                <div class="problem-section" id="missingTickersSection" style="display:none;">
+                                <div class="problem-section d-none" id="missingTickersSection">
                                     <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
                                     <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
                                     <div class="table-responsive">
@@ -540,7 +543,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="cashflowMissingAccountsSection" style="display:none;">
+                                <div class="problem-section d-none" id="cashflowMissingAccountsSection">
                                     <h4><i class="bi bi-people"></i> חשבונות חסרים</h4>
                                     <p>החשבונות הבאים לא קיימים במערכת. יש לשייך אותם לפני המשך הייבוא:</p>
                                     <div class="table-responsive">
@@ -562,7 +565,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="cashflowCurrencyIssuesSection" style="display:none;">
+                                <div class="problem-section d-none" id="cashflowCurrencyIssuesSection">
                                     <h4><i class="bi bi-currency-exchange"></i> בעיות מטבע</h4>
                                     <p>נמצאו רשומות עם קודי מטבע לא מזוהים או שגויים:</p>
                                     <div class="table-responsive">
@@ -584,7 +587,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountMissingAccountsSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountMissingAccountsSection">
                                     <h4><i class="bi bi-person-x"></i> חשבונות חסרים</h4>
                                     <p>חשבונות אלו לא קיימים במערכת או אינם משויכים. יש לטפל בהם לפני המשך התהליך:</p>
                                     <div class="table-responsive">
@@ -605,7 +608,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountCurrencyMismatchesSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountCurrencyMismatchesSection">
                                     <h4><i class="bi bi-cash-stack"></i> אי התאמות מטבע בסיס</h4>
                                     <p>החשבונות הבאים מכילים מטבע בסיס שונה מזה המוגדר במערכת:</p>
                                     <div class="table-responsive">
@@ -626,7 +629,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountEntitlementWarningsSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountEntitlementWarningsSection">
                                     <h4><i class="bi bi-shield-exclamation"></i> הרשאות חסרות</h4>
                                     <p>החשבונות הבאים חסרים הרשאות נדרשות:</p>
                                     <div class="table-responsive">
@@ -647,7 +650,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountMissingDocumentsSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountMissingDocumentsSection">
                                     <h4><i class="bi bi-file-earmark-excel"></i> מסמכים חסרים</h4>
                                     <p>יש להשלים את המסמכים המופיעים להלן עבור חשבונות אלו:</p>
                                     <div class="table-responsive">
@@ -667,7 +670,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="existingRecordsSection" style="display:none;">
+                                <div class="problem-section d-none" id="existingRecordsSection">
                                     <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
                                     <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
                                     <div class="table-responsive">
@@ -692,7 +695,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
+                                <div class="problem-section d-none" id="withinFileDuplicatesSection">
                                     <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
                                     <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזו רשומה לייבא:</p>
                                     <div class="table-responsive">
@@ -721,7 +724,7 @@
                         </div>
                     </div>
 
-                    <div class="import-step" id="step-preview" data-step="3" style="display:none;">
+                    <div class="import-step d-none" id="step-preview" data-step="3">
                         <div class="step-content">
                             <h3>תצוגה מקדימה ואישור</h3>
 
@@ -1069,7 +1072,7 @@
     <!-- [51] Load Order: 51 -->
     <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
     <!-- [52] Load Order: 52 -->
-    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני עסקאות -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
     <!-- [53] Load Order: 53 -->
     <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
     <!-- [54] Load Order: 54 -->

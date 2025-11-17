@@ -952,7 +952,7 @@ async function renderCashFlowsTable() {
     const tradeCell = cashFlow.trade_id 
       ? `<div class="table-cell-flex-small">
            <button class="btn btn-sm btn-outline-primary table-btn-small" 
-                   onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${cashFlow.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${cashFlow.trade_id}, 'view'); }" 
+                   data-onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${cashFlow.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${cashFlow.trade_id}, 'view'); }" 
                    title="פתח פרטי טרייד">
              🔗
            </button>
@@ -1463,7 +1463,7 @@ function setCurrencyExchangeSummary(summary) {
         return '';
       }
       if (typeof showEntityDetails === 'function') {
-        return `<button class="btn btn-sm btn-outline-primary" onclick="showEntityDetails('cash_flow', ${flow.id}, { mode: 'view' })">פתח רשומה</button>`;
+        return `<button class="btn btn-sm btn-outline-primary" data-onclick="showEntityDetails('cash_flow', ${flow.id}, { mode: 'view' })">פתח רשומה</button>`;
       }
       return '';
     }
@@ -1500,7 +1500,7 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
       if (!flow?.id) {
         return '';
       }
-      return `<button class="btn btn-sm btn-outline-primary" onclick="showCashFlowDetails(${flow.id})">פתח רשומה</button>`;
+      return `<button class="btn btn-sm btn-outline-primary" data-onclick="showCashFlowDetails(${flow.id})">פתח רשומה</button>`;
     }
   });
 }
@@ -1858,8 +1858,7 @@ async function applyDynamicColors() {
         } else if (entityColors.account) {
           // DEPRECATED - should use trading_account!
           const error = new Error(`❌ DEPRECATED: entityColors.account is no longer supported. Use entityColors.trading_account instead!`);
-          window.Logger.error('❌ DEPRECATED: entityColors.account used', { entityColors }, { page: "cash_flows" });
-          console.error(error);
+          window.Logger.error('DEPRECATED: entityColors.account used', { page: 'cash_flows', entityColors });
           throw error;
         }
         
@@ -2505,7 +2504,7 @@ async function saveCurrencyExchange() {
         }
         
     } catch (error) {
-        console.error('❌ saveCurrencyExchange - Error caught:', error);
+        window.Logger.error('saveCurrencyExchange - Error caught', { page: 'cash_flows', error: error?.message || error });
         CRUDResponseHandler.handleError(error, 'שמירת המרת מטבע');
     }
 }

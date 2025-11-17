@@ -32,7 +32,7 @@
  * - addNewTrade() - * הוספת טיקר חדש
  * - updateExecutionsSummary() - * הוספת תכנון חדש
  * - calculateAddExecutionValues() - calculateAddExecutionValues function
- * - updateExecutionsTableForTradeModal() - * טעינת עסקאות לטרייד
+ * - updateExecutionsTableForTradeModal() - * טעינת ביצועים לטרייד
  * - addEditBuySell() - addEditBuySell function
  * - updateExecutionsGlobalData() - updateExecutionsGlobalData function
  * - updateTickersSummaryTable() - updateTickersSummaryTable function
@@ -1166,7 +1166,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     // Trade column - show trade ID with link button if exists
     const tradeCell = execution.trade_id 
       ? `<div class="table-cell-flex-small">
-           <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" title="פתח פרטי טרייד"></button>
+           <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" data-onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" title="פתח פרטי טרייד"></button>
            <span>#${execution.trade_id}</span>
          </div>`
       : '-';
@@ -1179,7 +1179,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 <td class="ticker-cell">
                     <div class="table-cell-flex">
                         <strong class="table-link-positive" 
-                          onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                          data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                           title="פתח פרטי סימבול">${symbol}</strong>
                     </div>
                 </td>
@@ -1190,7 +1190,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                       </span>`}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
-                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                  data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
@@ -1370,7 +1370,8 @@ async function updateExecutionsTableMain(executions, options = {}) {
             if (remainingHighlighted.length === 0) {
               const clearBtn = document.getElementById('clearHighlightsBtn');
               if (clearBtn) {
-                clearBtn.style.display = 'none';
+                clearBtn.classList.add('d-none');
+                clearBtn.classList.remove('d-inline-block');
               }
             }
           }, 3 * 60 * 1000); // 3 דקות
@@ -1380,7 +1381,8 @@ async function updateExecutionsTableMain(executions, options = {}) {
       // הצגת כפתור הניקוי
       const clearBtn = document.getElementById('clearHighlightsBtn');
       if (clearBtn) {
-        clearBtn.style.display = 'inline-block';
+        clearBtn.classList.remove('d-none');
+        clearBtn.classList.add('d-inline-block');
       }
     }, 100); // קצת delay כדי שהטבלה תיטען
   }
@@ -1597,7 +1599,7 @@ window.showEditExecutionModal = function(executionId) {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
         window.ModalManagerV2.showEditModal('executionsModal', 'execution', executionId);
     } else {
-        console.error('ModalManagerV2 not available');
+        window.Logger.error('ModalManagerV2 not available', { page: 'executions' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
         }
@@ -2469,27 +2471,27 @@ window.goToLinkedTrade = goToLinkedTrade;
 // ========================================
 
 /**
- * טעינת עסקאות לטרייד
+ * טעינת ביצועים לטרייד
  * @param {number} tradeId - מזהה הטרייד
  */
 function loadTradeExecutions(_tradeId) {
-  // טעינת עסקאות לטרייד
+  // טעינת ביצועים לטרייד
 
   try {
-    // כאן תהיה קריאה לשרת לטעינת העסקאות
+    // כאן תהיה קריאה לשרת לטעינת הביצועים
     // כרגע נציג נתוני דוגמה
 
     // לא צריך לעדכן טבלה בדף executions (זו פונקציה למודל עריכת טרייד)
     // loadTradeExecutions called on executions page - no action needed
     // loadTradeExecutions completed successfully
   } catch (error) {
-    handleApiError(error, 'עסקאות לטרייד');
+    handleApiError(error, 'ביצועים לטרייד');
   }
 }
 
 /**
- * עדכון טבלת העסקאות במודל עריכת טרייד
- * @param {Array} executions - מערך העסקאות
+ * עדכון טבלת הביצועים במודל עריכת טרייד
+ * @param {Array} executions - מערך הביצועים
  */
 function updateExecutionsTableForTradeModal(executions) {
   // updateExecutionsTableForTradeModal called
@@ -2641,10 +2643,12 @@ window.setupExecutionsFilterFunctions = setupExecutionsFilterFunctions;
 
     if (topSection && topIcon) {
       if (topSectionHidden) {
-        topSection.style.display = 'none';
+        topSection.classList.add('d-none');
+        topSection.classList.remove('d-block');
         topIcon.textContent = '▼';
       } else {
-        topSection.style.display = 'block';
+        topSection.classList.remove('d-none');
+        topSection.classList.add('d-block');
         topIcon.textContent = '▲';
       }
     }
@@ -2777,7 +2781,7 @@ function setupExecutionsFilterFunctions() {
         });
     }
     } catch (error) {
-      console.error('filterExecutionsByAccount failed:', error);
+      window.Logger.error('filterExecutionsByAccount failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2835,7 +2839,7 @@ function setupExecutionsFilterFunctions() {
     updateExecutionsSummary(filteredExecutions);
     // Search results
     } catch (error) {
-      console.error('searchExecutions failed:', error);
+      window.Logger.error('searchExecutions failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2866,7 +2870,7 @@ function setupExecutionsFilterFunctions() {
     updateExecutionsSummary(filteredExecutions);
     // Filtered by type
     } catch (error) {
-      console.error('filterExecutionsByType failed:', error);
+      window.Logger.error('filterExecutionsByType failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2916,7 +2920,7 @@ function setupExecutionsFilterFunctions() {
     applyExecutionsFilteredData(filteredExecutions);
     // Filtered by date
     } catch (error) {
-      console.error('filterExecutionsByDate failed:', error);
+      window.Logger.error('filterExecutionsByDate failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2931,7 +2935,7 @@ function setupExecutionsFilterFunctions() {
     applyExecutionsFilteredData(filteredExecutions);
     // Filters reset, showing all executions
     } catch (error) {
-      console.error('resetExecutionsFilters failed:', error);
+      window.Logger.error('resetExecutionsFilters failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -3037,14 +3041,16 @@ function toggleExternalIdField(mode) {
 
   if (source === 'manual') {
     // הסתרת שדה מזהה חיצוני עבור מקור ידני
-    externalIdContainer.style.display = 'none';
+    externalIdContainer.classList.add('d-none');
+    externalIdContainer.classList.remove('d-block');
     if (externalIdField) {
       externalIdField.value = '';
     }
     // שדה מזהה חיצוני מוסתר (מקור ידני)
   } else {
     // הצגת שדה מזהה חיצוני עבור מקורות אחרים
-    externalIdContainer.style.display = 'block';
+    externalIdContainer.classList.remove('d-none');
+    externalIdContainer.classList.add('d-block');
     // שדה מזהה חיצוני מוצג
   }
 }
@@ -3211,8 +3217,8 @@ function updateTickersSummaryTable(tickers = null) {
             <td>${ticker.totalTrades} (${ticker.activeTrades} פעיל, ${ticker.closedTrades} סגור)</td>
             <td>${creationDate}</td>
             <td class="actions-cell">
-                <button data-button-type="VIEW" data-variant="small" data-icon="👁️" data-classes="btn-outline-primary table-btn-small" onclick="viewTickerDetails(${ticker.id})" title="צפה בפרטים"></button>
-                <button data-button-type="ADD" data-variant="small" data-icon="➕" data-classes="btn-outline-success table-btn-small" onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה"></button>
+                <button data-button-type="VIEW" data-variant="small" data-icon="👁️" data-classes="btn-outline-primary table-btn-small" data-onclick="viewTickerDetails(${ticker.id})" title="צפה בפרטים"></button>
+                <button data-button-type="ADD" data-variant="small" data-icon="➕" data-classes="btn-outline-success table-btn-small" data-onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה"></button>
             </td>
         `;
 
@@ -3864,7 +3870,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     const executionInfo = showExecutionInfo
         ? `<div class="table-cell-flex">
              <strong class="table-link-positive" 
-               onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${executionId}, 'view'); }"
+               data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${executionId}, 'view'); }"
                title="פתח פרטי ביצוע">
                #${executionId}
              </strong>
@@ -3892,7 +3898,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             </td>
             <td class="col-trade">
                 <div class="table-cell-flex">
-                    <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" onclick="openTradeDetailsModal(${suggestion.trade_id})" title="פתח פרטי טרייד"></button>
+                    <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" data-onclick="openTradeDetailsModal(${suggestion.trade_id})" title="פתח פרטי טרייד"></button>
                     <strong>#${suggestion.trade_id}</strong>
                 </div>
                 <div class="text-muted small">${suggestion.ticker_symbol || ''}</div>
@@ -3917,8 +3923,8 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             </td>
             <td class="col-actions actions-cell">
                 <div class="table-cell-flex-small">
-                    <button data-button-type="APPROVE" data-variant="small" data-icon="✓" data-classes="btn-outline-success table-btn-small" onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})" title="קבל המלצה"></button>
-                    <button data-button-type="REJECT" data-variant="small" data-icon="✗" data-classes="btn-outline-danger table-btn-small" onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})" title="דחה המלצה"></button>
+                    <button data-button-type="APPROVE" data-variant="small" data-icon="✓" data-classes="btn-outline-success table-btn-small" data-onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})" title="קבל המלצה"></button>
+                    <button data-button-type="REJECT" data-variant="small" data-icon="✗" data-classes="btn-outline-danger table-btn-small" data-onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})" title="דחה המלצה"></button>
                 </div>
             </td>
         </tr>

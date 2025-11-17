@@ -125,7 +125,8 @@ let alertsPaginationInstance = null;
  * @async
  * @returns {Promise<void>}
  */
-window.loadAlertsData = async function() {
+// Internal function for loading alerts data
+async function loadAlertsDataInternal(options = {}) {
   // Prevent multiple simultaneous calls
   if (loadAlertsDataInProgress) {
     window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
@@ -137,18 +138,25 @@ window.loadAlertsData = async function() {
     try {
       window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
 
-      // קריאה לשרת לקבלת נתוני התראות
-      window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
-      const response = await fetch('/api/alerts/');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Use AlertsData service if available, otherwise fallback to direct API call
+      let rawAlerts = [];
+      if (window.AlertsData?.loadAlertsData) {
+        rawAlerts = await window.AlertsData.loadAlertsData({ force: options.force || false });
+        window.Logger.info('📊 נתונים שהתקבלו מ-AlertsData service:', rawAlerts.length, 'התראות', { page: "alerts" });
+      } else {
+        // Fallback: direct API call
+        window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
+        const response = await fetch('/api/alerts/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+        rawAlerts = data?.data || data;
       }
 
-      const data = await response.json();
-      window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
-
       // שמירת הנתונים במשתנה גלובלי
-      const rawAlerts = data?.data || data;
       window.alertsData = Array.isArray(rawAlerts)
         ? rawAlerts.map(alert => ({
             ...alert,
@@ -201,6 +209,13 @@ window.loadAlertsData = async function() {
   })();
 
   return loadAlertsDataPromise;
+}
+
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+window.loadAlertsData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  return await loadAlertsDataInternal({ ...options, force: true });
 };
 
 /**
@@ -772,7 +787,7 @@ function renderAlertsTableRows(alerts) {
           <td class="ticker-cell">
             <div class="ticker-cell-content">
               <span class="ticker-symbol-link" 
-                    onclick="showEntityDetails('alert', ${alert.id}); return false;" 
+                    data-onclick="showEntityDetails('alert', ${alert.id}); return false;" 
                     title="פרטי התראה">
                 ${symbolDisplay}
               </span>
@@ -2360,8 +2375,7 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   if (type === 'account') {
     // DEPRECATED - use trading_account instead!
     const error = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
-    window.Logger.error('❌ DEPRECATED: account entity type used in alerts', { type }, { page: "alerts" });
-    console.error(error);
+    window.Logger.error('DEPRECATED: account entity type used in alerts', { page: "alerts", type });
     throw error;
   }
 
@@ -2627,7 +2641,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Export functions to global scope for HTML onclick attributes
 
 // Export all necessary functions to global scope
-window.loadAlertsData = window.loadAlertsData;
+// Note: window.loadAlertsData is already defined as wrapper function above (line 215)
 window.updateAlertsTable = updateAlertsTable;
 // REMOVED: window.updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
 // REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
@@ -3163,7 +3177,8 @@ function initializeAlertModalTabs() {
  * Update modal buttons based on active tab
  */
 function updateModalButtons(activeTab) {
-    const addAlertBtn = document.querySelector('button[onclick="addAlert()"]');
+    // Use data-onclick selector instead of onclick (legacy support)
+    const addAlertBtn = document.querySelector('button[data-onclick*="addAlert()"]') || document.querySelector('button[onclick="addAlert()"]');
     const createFromConditionBtn = document.getElementById('createFromConditionBtn');
     
     if (activeTab === '#add-manual-pane') {

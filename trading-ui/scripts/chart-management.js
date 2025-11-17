@@ -2,6 +2,45 @@
  * Chart Management Page Script
  * ===========================
  * Controls the development dashboard for managing Chart.js demos.
+ * 
+ * @version 1.0.0
+ * @author TikTrack Development Team
+ * 
+ * ============================================================================
+ * FUNCTION INDEX - Chart Management Page
+ * ============================================================================
+ * 
+ * Class: ChartManagement
+ * 
+ * Initialization:
+ * - constructor() - Initialize ChartManagement instance
+ * - init() - Initialize chart management system
+ * - ensureChartSystem() - Ensure Chart.js system is loaded
+ * - registerAdapters() - Register performance and trades adapters
+ * 
+ * DOM Management:
+ * - cacheElements() - Cache DOM elements for performance
+ * - attachEvents() - Attach event listeners
+ * - ensureChartsListContainer() - Ensure charts list container exists
+ * - ensureChartContainer(chartId, title) - Ensure chart container exists
+ * 
+ * Chart Operations:
+ * - refreshChartsStatus() - Refresh charts status display
+ * - renderChart({ id, title, type, generator, data, container, options }) - Render chart
+ * - createTestChart() - Create test chart
+ * - createPerformanceChart() - Create performance chart
+ * - createAccountChart() - Create account chart
+ * - createMixedChart() - Create mixed chart
+ * - updateTestChart() - Update test chart
+ * - refreshAllCharts() - Refresh all charts
+ * - removeChart(chartId) - Remove chart by ID
+ * - destroyAllCharts() - Destroy all charts
+ * 
+ * Export:
+ * - exportAllCharts(format) - Export all charts
+ * - exportTestChart(format) - Export test chart
+ * 
+ * ============================================================================
  */
 
 ;(function () {

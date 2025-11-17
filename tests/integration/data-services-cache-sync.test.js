@@ -63,7 +63,13 @@ describe('Data Services Cache Sync Integration', () => {
             'cash-flow-deleted': ['cash-flows-data', 'account-balance-*'],
             'note-created': ['notes-data'],
             'note-updated': ['notes-data'],
-            'note-deleted': ['notes-data']
+            'note-deleted': ['notes-data'],
+            'alert-created': ['alerts-data'],
+            'alert-updated': ['alerts-data'],
+            'alert-deleted': ['alerts-data'],
+            'ticker-created': ['tickers-data'],
+            'ticker-updated': ['tickers-data'],
+            'ticker-deleted': ['tickers-data']
         };
 
         mockCacheSyncManager = {
@@ -128,11 +134,21 @@ describe('Data Services Cache Sync Integration', () => {
             path.join(__dirname, '../../trading-ui/scripts/services/notes-data.js'),
             'utf8'
         );
+        const alertsCode = fs.readFileSync(
+            path.join(__dirname, '../../trading-ui/scripts/services/alerts-data.js'),
+            'utf8'
+        );
+        const tickersCode = fs.readFileSync(
+            path.join(__dirname, '../../trading-ui/scripts/services/tickers-data.js'),
+            'utf8'
+        );
 
         eval(executionsCode);
         eval(dataImportCode);
         eval(cashFlowsCode);
         eval(notesCode);
+        eval(alertsCode);
+        eval(tickersCode);
     });
 
     beforeEach(() => {
@@ -286,6 +302,92 @@ describe('Data Services Cache Sync Integration', () => {
         });
     });
 
+    describe('Alerts CRUD Cache Invalidation', () => {
+        test('should invalidate cache on alert creation', async () => {
+            await mockUnifiedCacheManager.save('alerts-data', [{ id: 1 }]);
+
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                status: 201,
+                json: async () => ({ id: 2 })
+            });
+
+            await window.AlertsData.createAlert({ ticker_id: 1, condition: 'price > 100' });
+
+            expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('alert-created');
+            expect(await mockUnifiedCacheManager.get('alerts-data')).toBeNull();
+        });
+
+        test('should invalidate cache on alert update', async () => {
+            await mockUnifiedCacheManager.save('alerts-data', [{ id: 1 }]);
+
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                status: 200,
+                json: async () => ({ id: 1, updated: true })
+            });
+
+            await window.AlertsData.updateAlert(1, { condition: 'price > 200' });
+
+            expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('alert-updated');
+        });
+
+        test('should invalidate cache on alert deletion', async () => {
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                status: 200,
+                json: async () => ({ success: true })
+            });
+
+            return window.AlertsData.deleteAlert(1).then(() => {
+                expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('alert-deleted');
+            });
+        });
+    });
+
+    describe('Tickers CRUD Cache Invalidation', () => {
+        test('should invalidate cache on ticker creation', async () => {
+            await mockUnifiedCacheManager.save('tickers-data', [{ id: 1 }]);
+
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                status: 201,
+                json: async () => ({ id: 2 })
+            });
+
+            await window.TickersData.createTicker({ symbol: 'TSLA', name: 'Tesla Inc.' });
+
+            expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('ticker-created');
+            expect(await mockUnifiedCacheManager.get('tickers-data')).toBeNull();
+        });
+
+        test('should invalidate cache on ticker update', async () => {
+            await mockUnifiedCacheManager.save('tickers-data', [{ id: 1 }]);
+
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                status: 200,
+                json: async () => ({ id: 1, updated: true })
+            });
+
+            await window.TickersData.updateTicker(1, { name: 'Updated Name' });
+
+            expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('ticker-updated');
+        });
+
+        test('should invalidate cache on ticker deletion', async () => {
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                status: 200,
+                json: async () => ({ success: true })
+            });
+
+            return window.TickersData.deleteTicker(1).then(() => {
+                expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('ticker-deleted');
+            });
+        });
+    });
+
     describe('Multiple Service Coordination', () => {
         test('should coordinate cache invalidation across multiple services', async () => {
             // Pre-populate caches from multiple services
@@ -293,6 +395,8 @@ describe('Data Services Cache Sync Integration', () => {
             await mockUnifiedCacheManager.save('data-import-accounts', [{ id: 1 }]);
             await mockUnifiedCacheManager.save('cash-flows-data', []);
             await mockUnifiedCacheManager.save('notes-data', []);
+            await mockUnifiedCacheManager.save('alerts-data', []);
+            await mockUnifiedCacheManager.save('tickers-data', []);
 
             // Perform operations from different services
             mockFetch.mockResolvedValue({
@@ -303,10 +407,14 @@ describe('Data Services Cache Sync Integration', () => {
 
             await window.ExecutionsData.createExecution({});
             await window.DataImportData.invalidateAccountsCache();
+            await window.AlertsData.createAlert({ ticker_id: 1, condition: 'price > 100' });
+            await window.TickersData.createTicker({ symbol: 'TSLA', name: 'Tesla Inc.' });
 
-            // Verify both services invalidated their caches
+            // Verify all services invalidated their caches
             expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('execution-created');
             expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('trading-account-updated');
+            expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('alert-created');
+            expect(mockCacheSyncManager.invalidateByAction).toHaveBeenCalledWith('ticker-created');
         });
     });
 });

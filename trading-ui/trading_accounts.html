@@ -176,7 +176,7 @@
                         </div>
                         <div class="table-actions">
                             <!-- Account selector -->
-                            <select id="accountActivitySelector" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
+                            <select id="accountActivitySelector" class="form-select form-select-sm" class="">
                                 <option value="">בחר חשבון...</option>
                             </select>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('account-activity-summary')" data-text="הצג/הסתר"></button>
@@ -184,13 +184,13 @@
                     </div>
 
                     <!-- Account Activity summary body -->
-                    <div class="section-body" style="display: none;">
+                    <div class="section-body" class="d-none">
                         <!-- Statistics Card -->
-                        <div class="card" id="accountActivityStatisticsCard" style="display: none;">
+                        <div class="card" id="accountActivityStatisticsCard" class="d-none">
                             <!-- Overall Summary Section (All Records) -->
                             <div id="overallStatisticsSection">
                                 <!-- Single header spanning both columns -->
-                                <div class="statistics-header-full" style="text-align: center; margin-bottom: 20px;">
+                                <div class="statistics-header-full" class="statistics-header-full">
                                     <h4>סיכום כללי</h4>
                                 </div>
                                 
@@ -206,12 +206,12 @@
                             </div>
                             
                             <!-- Divider line between overall summary and cash flows -->
-                            <div style="width: 100%; border-top: 1px solid #ddd; margin: 30px 0;"></div>
+                            <div class="section-divider-full-large"></div>
                             
                             <!-- Cash Flows Section -->
                             <div id="cashFlowsStatisticsSection">
                                 <!-- Single header spanning both columns -->
-                                <div class="statistics-header-full" style="text-align: center; margin-bottom: 20px;">
+                                <div class="statistics-header-full" class="statistics-header-full">
                                     <h4>תזרימי מזומנים</h4>
                                 </div>
                                 
@@ -226,7 +226,7 @@
                                 </div>
                                 
                                 <!-- Divider line between main summary and breakdown -->
-                                <div style="width: 100%; border-top: 1px solid #ddd; margin: 20px 0;"></div>
+                                <div class="section-divider-full"></div>
                                 
                                 <!-- Breakdown by subtype: two columns -->
                                 <div class="two-column-grid" id="cashFlowsBreakdown">
@@ -239,9 +239,9 @@
                                 </div>
                             </div>
                             <!-- Executions Section: Below cash flows -->
-                            <div id="executionsStatisticsSection" style="margin-top: 30px;">
+                            <div id="executionsStatisticsSection" class="section-margin-top">
                                 <!-- Single header spanning both columns -->
-                                <div class="statistics-header-full" style="text-align: center; margin-bottom: 20px;">
+                                <div class="statistics-header-full" class="statistics-header-full">
                                     <h4>ביצועים</h4>
                                 </div>
                                 
@@ -256,7 +256,7 @@
                                 </div>
                                 
                                 <!-- Divider line between main summary and breakdown -->
-                                <div style="width: 100%; border-top: 1px solid #ddd; margin: 20px 0;"></div>
+                                <div class="section-divider-full"></div>
                                 
                                 <!-- Breakdown by subtype: two columns -->
                                 <div class="two-column-grid" id="executionsBreakdown">
@@ -284,7 +284,7 @@
                         </div>
                     </div>
 
-                    <div class="section-body" style="display: none;">
+                    <div class="section-body" class="d-none">
                         <div class="table-responsive" id="accountActivityContainer">
                             <table class="table table-hover" id="accountActivityTable" data-table-type="account_activity">
                                 <thead>
@@ -318,7 +318,7 @@
                                         <td colspan="8" class="loading">בחר חשבון להצגת תנועות...</td>
                                     </tr>
                                 </tbody>
-                                <tfoot id="accountActivityFooter" style="display: none;">
+                                <tfoot id="accountActivityFooter" class="d-none">
                                     <tr class="summary-row">
                                         <td colspan="4" class="text-end"><strong>סה"כ לפי מטבע:</strong></td>
                                         <td colspan="4" id="currencyBalancesSummary"></td>
@@ -343,14 +343,14 @@
                         </div>
                         <div class="table-count" id="positionsCount">
                             <span id="positionsCountText">בחר חשבון...</span>
-                            <span id="positionsSeparator" style="display: none; margin: 0 0.5rem;">|</span>
-                            <span id="positionsTotalValue" style="display: none;">סה"כ שווי פוזיציות: <strong id="positionsTotalValueAmount">-</strong></span>
-                            <span id="positionsSeparator2" style="display: none; margin: 0 0.5rem;">|</span>
-                            <span id="positionsAccountTotalValue" style="display: none;">סה"כ שווי חשבון: <strong id="positionsAccountTotalValueAmount">-</strong></span>
+                            <span id="positionsSeparator" class="d-none me-2">|</span>
+                            <span id="positionsTotalValue" class="d-none">סה"כ שווי פוזיציות: <strong id="positionsTotalValueAmount">-</strong></span>
+                            <span id="positionsSeparator2" class="d-none me-2">|</span>
+                            <span id="positionsAccountTotalValue" class="d-none">סה"כ שווי חשבון: <strong id="positionsAccountTotalValueAmount">-</strong></span>
                         </div>
                         <div class="table-actions">
                             <!-- Account selector -->
-                            <select id="positionsAccountSelector" class="form-select form-select-sm" style="margin-inline-end: 0.5rem; min-width: 200px;">
+                            <select id="positionsAccountSelector" class="form-select form-select-sm" class="">
                                 <option value="">בחר חשבון...</option>
                             </select>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('positions-portfolio')" data-text="הצג/הסתר"></button>
@@ -358,7 +358,7 @@
                     </div>
 
                     <!-- Positions body -->
-                    <div class="section-body" style="display: none;">
+                    <div class="section-body" class="d-none">
                         <div class="table-responsive" id="positionsContainer">
                             <table class="table" id="positionsTable" data-table-type="positions">
                                 <thead>
@@ -600,6 +600,16 @@
     <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
     <!-- [58] Load Order: 58 -->
     <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
+    <!-- [58.5] Load Order: 58.5 -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
+    <!-- [58.6] Load Order: 58.6 -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
+    <!-- [58.7] Load Order: 58.7 -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
+    <!-- [58.8] Load Order: 58.8 -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
+    <!-- [58.9] Load Order: 58.9 -->
+    <script src="scripts/modal-configs/trading-accounts-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל חשבונות מסחר -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 8/10: ENTITY DETAILS PACKAGE ===== -->

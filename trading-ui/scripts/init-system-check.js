@@ -66,19 +66,15 @@ class InitSystemCheck {
             return;
         }
 
-        // יצירת כפתור הבדיקה עם תפריט משנה
+        // יצירת כפתור הבדיקה
         const monitoringButton = document.createElement('li');
-        monitoringButton.className = 'tiktrack-nav-item dropdown';
+        monitoringButton.className = 'tiktrack-nav-item';
         monitoringButton.innerHTML = `
-            <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" id="initSystemCheckBtn" 
-               title="ניטור מערכת איתחול">
+            <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
+               title="ניטור מערכת איתחול"
+               data-onclick="initSystemCheck?.runPageCheck(event)">
                 <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
-                <span class="tiktrack-dropdown-arrow">▼</span>
             </a>
-            <ul class="tiktrack-dropdown-menu">
-                <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.runPageCheck(event)">בדיקת מערכת איתחול</a></li>
-                <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.generateScriptLoadingCode(event)">ייצר קוד טעינה</a></li>
-            </ul>
         `;
 
         // הוספת הכפתור בסוף הרשימה

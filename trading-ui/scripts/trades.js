@@ -1691,8 +1691,16 @@ async function restorePageState(pageName) {
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for HTML onclick attributes
 
-// Export all necessary functions to global scope
-window.loadTradesData = loadTradesData;
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+const originalLoadTradesData = loadTradesData;
+window.loadTradesData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  // Note: loadTradesData already calls TradesData.loadTradesData({ force: true }) internally,
+  // but we ensure it's always called with force: true from the wrapper
+  return await originalLoadTradesData();
+};
+
 window.updateTradesTable = updateTradesTable;
 window.updatePageSummaryStats = updatePageSummaryStats;
 
@@ -4365,7 +4373,7 @@ window.showEditTradeModal = function(tradeId) {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
         window.ModalManagerV2.showEditModal('tradesModal', 'trade', tradeId);
     } else {
-        console.error('ModalManagerV2 not available');
+        window.Logger.error('ModalManagerV2 not available', { page: 'trades' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
         }

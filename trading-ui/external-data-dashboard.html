@@ -23,7 +23,7 @@
                         <h2>🌐 דשבורד נתונים חיצוניים</h2>
                         <div class="header-actions d-flex align-items-center gap-2">
                             <button data-button-type="COPY" data-text="העתק לוג מפורט" data-onclick="ExternalDataDashboardActions.copyDetailedLog(event)" data-size="small" data-id="action-copy-log-header"></button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -111,7 +111,7 @@
                 <div class="content-section" id="status-overview-section">
                     <div class="section-header">
                         <h2>סטטוס מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('status-overview-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('status-overview-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -170,7 +170,7 @@
                 <div class="content-section" id="actions-section">
                     <div class="section-header">
                         <h2>פעולות מהירות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('actions-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('actions-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -239,7 +239,7 @@
                 <div class="content-section" id="providers-section">
                     <div class="section-header">
                         <h2>ספקי נתונים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('providers-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('providers-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                                         </button>
                     </div>
@@ -257,7 +257,7 @@
                 <div class="content-section" id="cache-section">
                     <div class="section-header">
                         <h2>ניהול מטמון נתונים חיצוניים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('cache-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('cache-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                                         </button>
                     </div>
@@ -316,7 +316,7 @@
                             <button data-button-type="REFRESH" data-text="רענון לוגים" data-onclick="ExternalDataDashboardActions.refreshLogs(event)" data-size="small" data-id="action-refresh-logs"></button>
                             <button data-button-type="DELETE" data-text="ניקוי לוגים" data-onclick="ExternalDataDashboardActions.clearLogs(event)" data-size="small" data-id="action-clear-logs"></button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('logs-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('logs-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -345,14 +345,14 @@
                         <h2>היסטוריית רענון קבוצתי</h2>
                         <div class="section-actions d-flex align-items-center gap-2">
                             <label class="form-label mb-0" for="group-limit">מספר רשומות:</label>
-                            <select id="group-limit" class="form-select form-select-sm" style="width: auto;">
+                            <select id="group-limit" class="form-select form-select-sm" class="w-auto">
                                 <option value="20">20</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
                             <button data-button-type="REFRESH" data-text="רענון היסטוריה" data-onclick="ExternalDataDashboardActions.refreshHistory(event)" data-size="small" data-id="action-refresh-history"></button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('history-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('history-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -367,7 +367,7 @@
                         <div class="section-actions">
                             <button data-button-type="REFRESH" data-text="רענון גרפים" data-onclick="ExternalDataDashboardActions.refreshPerformanceCharts(event)" data-size="small" data-id="action-refresh-charts"></button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>

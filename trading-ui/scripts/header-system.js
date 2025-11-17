@@ -146,11 +146,9 @@ class HeaderSystem {
                       </a>
                     </li>
 
-
-
                     <li class="tiktrack-nav-item dropdown">
-                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
-                        <span class="nav-text">הגדרות</span>
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="data">
+                        <span class="nav-text">נתונים</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
@@ -160,10 +158,18 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/executions">ביצועים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                      </ul>
+                    </li>
+
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                        <span class="nav-text">הגדרות</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
-                        <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
@@ -172,7 +178,7 @@ class HeaderSystem {
 
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
-                        <span class="nav-text">כלי פיתוח</span>
+                        <span class="nav-text">פיתוח</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
@@ -237,16 +243,12 @@ class HeaderSystem {
                       </a>
                     </li>
 
-                    <li class="tiktrack-nav-item dropdown">
-                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" id="initSystemCheckBtn" 
-                         title="ניטור מערכת איתחול">
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
+                         title="ניטור מערכת איתחול"
+                         data-onclick="initSystemCheck?.runPageCheck(event)">
                         <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
-                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
-                      <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.runPageCheck(event)">בדיקת מערכת איתחול</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.generateScriptLoadingCode(event)">ייצר קוד טעינה</a></li>
-                      </ul>
                     </li>
                   </ul>
                 </nav>

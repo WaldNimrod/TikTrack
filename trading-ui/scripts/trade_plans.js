@@ -3018,7 +3018,7 @@ window.showEditTradePlanModal = async function(tradePlanId) {
             await window.TagUIManager.hydrateSelectForEntity('tradePlanTags', 'trade_plan', tradePlanId, { force: true });
         }
     } else {
-        console.error('ModalManagerV2 not available');
+        window.Logger.error('ModalManagerV2 not available', { page: 'trade_plans' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
         }

@@ -523,7 +523,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'import-user-data.js',
         globalCheck: 'window.openImportUserDataModal',
-        description: 'מודל ייבוא נתוני עסקאות',
+        description: 'מודל ייבוא נתוני ביצועים',
         required: true,
         loadOrder: 14
       },

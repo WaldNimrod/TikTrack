@@ -1,0 +1,6441 @@
+{
+  "scan_date": "1763338144.1386862",
+  "total_pages": 15,
+  "pages": [
+    {
+      "page_name": "index",
+      "page_type": "central",
+      "html_file": "trading-ui/index.html",
+      "js_file": "trading-ui/scripts/index.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "toNumber",
+          "line_number": 103,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "resolveDateValue",
+          "line_number": 111,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatDateShort",
+          "line_number": 124,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "normalizeArray",
+          "line_number": 148,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "determineCurrencySymbol",
+          "line_number": 170,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatAmountHtml",
+          "line_number": 193,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "translateSide",
+          "line_number": 208,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "computePortfolioPnL",
+          "line_number": 223,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateSummaryStats",
+          "line_number": 256,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateRecentTrades",
+          "line_number": 285,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateActiveAlerts",
+          "line_number": 371,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateDashboardCount",
+          "line_number": 449,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updatePortfolioSummary",
+          "line_number": 459,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "showDashboardError",
+          "line_number": 490,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleDashboardError",
+          "line_number": 506,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "processDashboardData",
+          "line_number": 515,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "legacyFetchDashboardDataFromApi",
+          "line_number": 568,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "fetchJsonList",
+          "line_number": 569,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadDashboardDataFromService",
+          "line_number": 610,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "executeLoad",
+          "line_number": 635,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "afterRead",
+          "line_number": 675,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "afterLoad",
+          "line_number": 680,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "switchTableTab",
+          "line_number": 723,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshOverview",
+          "line_number": 748,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "exportOverview",
+          "line_number": 759,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "quickAction",
+          "line_number": 771,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "createTradesStatusChart",
+          "line_number": 786,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "createPerformanceChart",
+          "line_number": 832,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "createAccountChart",
+          "line_number": 876,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "createMixedChart",
+          "line_number": 920,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "refreshAllCharts",
+          "line_number": 973,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "refreshChart",
+          "line_number": 1006,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "exportChart",
+          "line_number": 1041,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "exportAllCharts",
+          "line_number": 1065,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "generateDetailedLog",
+          "line_number": 1171,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "debugZIndexStatus",
+          "line_number": 1286,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "copyDetailedLogLocal",
+          "line_number": 1352,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 16.216216216216218,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 37,
+      "documented_functions": 6
+    },
+    {
+      "page_name": "trades",
+      "page_type": "central",
+      "html_file": "trading-ui/trades.html",
+      "js_file": "trading-ui/scripts/trades.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "formatDailyChange",
+          "line_number": 212,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getInvestmentTypeColor",
+          "line_number": 244,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "loadTradesData",
+          "line_number": 311,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "syncTradesPagination",
+          "line_number": 448,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTradesSummary",
+          "line_number": 478,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradesCounters",
+          "line_number": 493,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setTradesFilteredDataset",
+          "line_number": 520,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTradesPaginationOptions",
+          "line_number": 548,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradesPageRender",
+          "line_number": 556,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradesFilteredChange",
+          "line_number": 567,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradeTickerInfo",
+          "line_number": 594,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayTradeTickerInfo",
+          "line_number": 624,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTickerDataForTrades",
+          "line_number": 707,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradesTable",
+          "line_number": 755,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradePlanDates",
+          "line_number": 1128,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "viewTickerDetails",
+          "line_number": 1176,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "viewAccountDetails",
+          "line_number": 1199,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "viewTradePlanDetails",
+          "line_number": 1222,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "editTradeRecord",
+          "line_number": 1245,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "cancelTradeRecord",
+          "line_number": 1300,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "executeCancellation",
+          "line_number": 1315,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "performTradeCancellation",
+          "line_number": 1362,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "deleteTradeRecord",
+          "line_number": 1397,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performTradeDeletion",
+          "line_number": 1536,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditImportantNote",
+          "line_number": 1593,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditReminder",
+          "line_number": 1610,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 1632,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "addTrade",
+          "line_number": 1714,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "editTrade",
+          "line_number": 1745,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "clearTradeValidation",
+          "line_number": 1774,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "validateTradeForm",
+          "line_number": 1792,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "hideAddTradeModal",
+          "line_number": 1833,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "hideEditTradeModal",
+          "line_number": 1855,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateRadioButtons",
+          "line_number": 1880,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "populateSelect",
+          "line_number": 1966,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onRelationTypeChange",
+          "line_number": 2009,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "onRelatedObjectChange",
+          "line_number": 2041,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "enableConditionFields",
+          "line_number": 2068,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "disableConditionFields",
+          "line_number": 2095,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "populateRelatedObjects",
+          "line_number": 2124,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "restoreSortState",
+          "line_number": 2174,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "enableTradeFormFields",
+          "line_number": 2199,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "disableTradeFormFields",
+          "line_number": 2245,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadModalData",
+          "line_number": 2290,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializeTradesPage",
+          "line_number": 2313,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshPositions",
+          "line_number": 2342,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "setupDateValidation",
+          "line_number": 2392,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "validateDateFields",
+          "line_number": 2433,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "clearDateValidationMessages",
+          "line_number": 2506,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addImportantNote",
+          "line_number": 2539,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addReminder",
+          "line_number": 2550,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "onShowClosedTradesChange",
+          "line_number": 2562,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateTableStats",
+          "line_number": 2600,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "addEditBuySell",
+          "line_number": 2622,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializeTradeConditionsSystem",
+          "line_number": 2644,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializerInstance",
+          "line_number": 2652,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "afterInit",
+          "line_number": 2668,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradesModalElement",
+          "line_number": 2707,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradeModalEntityName",
+          "line_number": 2711,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "openTradeConditionsModal",
+          "line_number": 2729,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradeConditionsButtonClick",
+          "line_number": 2761,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradeConditionSummaryEdit",
+          "line_number": 2768,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradeConditionSummaryDelete",
+          "line_number": 2787,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "evaluateSingleTradeCondition",
+          "line_number": 2828,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradeConditionRowEvaluate",
+          "line_number": 2847,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradeConditionToggleAlerts",
+          "line_number": 2883,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradeEvaluateConditionsClick",
+          "line_number": 2924,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradeConditionsForEvaluation",
+          "line_number": 2997,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradeConditionsSummary",
+          "line_number": 3015,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupTradeConditionsButton",
+          "line_number": 3073,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateButtonState",
+          "line_number": 3096,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupSortEventListeners",
+          "line_number": 3171,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "validateTradePlanChange",
+          "line_number": 3208,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "validateTradeChanges",
+          "line_number": 3279,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "applyStatusFilterToTrades",
+          "line_number": 3356,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "validateTickerChange",
+          "line_number": 3411,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "showTickerChangeConfirmation",
+          "line_number": 3464,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "validateTradePlanDate",
+          "line_number": 3521,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateEditTradeTickerFromPlan",
+          "line_number": 3560,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateEditTradePriceFromTicker",
+          "line_number": 3640,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reactivateTrade",
+          "line_number": 3689,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshTrades",
+          "line_number": 3745,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTrade",
+          "line_number": 3779,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "confirmDeleteTrade",
+          "line_number": 3839,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "generateDetailedLog",
+          "line_number": 3876,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "saveTrade",
+          "line_number": 4094,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "deleteTrade",
+          "line_number": 4260,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "setupTradeConditionsButton",
+          "line_number": 4270,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "ensureEntityName",
+          "line_number": 4284,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateButtonState",
+          "line_number": 4298,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 4400,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 4406,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 4409,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 63.44086021505376,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 93,
+      "documented_functions": 59
+    },
+    {
+      "page_name": "trade_plans",
+      "page_type": "central",
+      "html_file": "trading-ui/trade_plans.html",
+      "js_file": "trading-ui/scripts/trade_plans.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "executeTradePlan",
+          "line_number": 101,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTradePlanTickerInfo",
+          "line_number": 178,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayTradePlanTickerInfo",
+          "line_number": 208,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "hideTickerInfo",
+          "line_number": 305,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTickerInfo",
+          "line_number": 323,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateSharesFromAmount",
+          "line_number": 361,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateAmountFromShares",
+          "line_number": 388,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "hideEditTickerInfo",
+          "line_number": 414,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateEditTickerInfo",
+          "line_number": 440,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateEditSharesFromAmount",
+          "line_number": 630,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateEditAmountFromShares",
+          "line_number": 658,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsBeforeCancel",
+          "line_number": 693,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reactivateTradePlan",
+          "line_number": 700,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditCondition",
+          "line_number": 770,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditReason",
+          "line_number": 787,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditImportantNote",
+          "line_number": 804,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditReminder",
+          "line_number": 821,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addImportantNote",
+          "line_number": 838,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addReminder",
+          "line_number": 855,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "buildTradePlanConfirmationDetails",
+          "line_number": 874,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "openCancelTradePlanModal",
+          "line_number": 934,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "cancelTradePlan",
+          "line_number": 980,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "executeCancellation",
+          "line_number": 987,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "performTradePlanCancellation",
+          "line_number": 1029,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onSuccess",
+          "line_number": 1042,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "viewLinkedItemsForTradePlan",
+          "line_number": 1068,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updatePricesFromPercentages",
+          "line_number": 1086,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updatePercentagesFromPrices",
+          "line_number": 1120,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupPriceCalculation",
+          "line_number": 1148,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updatePrices",
+          "line_number": 1163,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updatePercentages",
+          "line_number": 1167,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupEditPriceCalculation",
+          "line_number": 1208,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updatePrices",
+          "line_number": 1223,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updatePercentages",
+          "line_number": 1227,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "applyTradePlanDefaultRiskLevels",
+          "line_number": 1282,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradePlanModalElements",
+          "line_number": 1341,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "parseFieldValue",
+          "line_number": 1370,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "parsePriceValue",
+          "line_number": 1388,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "normalizeSharesResult",
+          "line_number": 1410,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "loadTradePlansData",
+          "line_number": 1490,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTradePlansTable",
+          "line_number": 1548,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "hasActiveFilters",
+          "line_number": 1574,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradePlansPageSummaryStats",
+          "line_number": 2014,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "disableFormFields",
+          "line_number": 2068,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "enableEditFieldsWrapper",
+          "line_number": 2115,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "disableEditFields",
+          "line_number": 2147,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializeTradePlanConditionsSystem",
+          "line_number": 2197,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializerInstance",
+          "line_number": 2205,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "afterInit",
+          "line_number": 2221,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradePlanModalEntityName",
+          "line_number": 2256,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradePlansModalElement",
+          "line_number": 2274,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "isConditionsModalOpen",
+          "line_number": 2278,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getCachedConditionSummary",
+          "line_number": 2296,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "clearCachedConditionsSummary",
+          "line_number": 2303,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "openTradePlanConditionsModal",
+          "line_number": 2310,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanConditionsButtonClick",
+          "line_number": 2368,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanConditionSummaryEdit",
+          "line_number": 2378,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanConditionSummaryDelete",
+          "line_number": 2397,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "confirmTradePlanConditionDeletion",
+          "line_number": 2438,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "deleteConditionViaCrud",
+          "line_number": 2466,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "buildTradePlanModalNavigationMetadata",
+          "line_number": 2498,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "registerTradePlanModalNavigation",
+          "line_number": 2520,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradePlanModalNavigation",
+          "line_number": 2539,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanModalRestore",
+          "line_number": 2564,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupTradePlanModalNavigation",
+          "line_number": 2587,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getConditionsTranslator",
+          "line_number": 2611,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanEvaluateConditionsClick",
+          "line_number": 2615,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTradePlanConditionsForEvaluation",
+          "line_number": 2673,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "evaluatePlanConditions",
+          "line_number": 2691,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "evaluateSinglePlanCondition",
+          "line_number": 2707,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanConditionRowEvaluate",
+          "line_number": 2725,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleTradePlanConditionToggleAlerts",
+          "line_number": 2759,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "normalizeConditionEvaluationPayload",
+          "line_number": 2798,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradePlanConditionsSummary",
+          "line_number": 2811,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupTradePlanConditionsButton",
+          "line_number": 2873,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateButtonState",
+          "line_number": 2896,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupSortableHeadersLocal",
+          "line_number": 2958,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restorePlanningSectionState",
+          "line_number": 2983,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterTradePlansByType",
+          "line_number": 3036,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "saveTradePlan",
+          "line_number": 3109,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getNumericValue",
+          "line_number": 3189,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "deleteTradePlan",
+          "line_number": 3337,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performTradePlanDeletion",
+          "line_number": 3385,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 3427,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 3497,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 3503,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 3506,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 47.12643678160919,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 87,
+      "documented_functions": 41
+    },
+    {
+      "page_name": "alerts",
+      "page_type": "central",
+      "html_file": "trading-ui/alerts.html",
+      "js_file": "trading-ui/scripts/alerts.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "loadAlertsDataInternal",
+          "line_number": 129,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getConditionSourceDisplay",
+          "line_number": 325,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderAlertsTableRows",
+          "line_number": 350,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadAdditionalData",
+          "line_number": 365,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateAlertsTable",
+          "line_number": 957,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "render",
+          "line_number": 967,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onFilteredDataChange",
+          "line_number": 976,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadModalData",
+          "line_number": 1023,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "filterFn",
+          "line_number": 1077,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "filterFn",
+          "line_number": 1084,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateRadioButtons",
+          "line_number": 1113,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "populateSelect",
+          "line_number": 1190,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "onRelationTypeChange",
+          "line_number": 1314,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "onRelatedObjectChange",
+          "line_number": 1340,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "toggleConditionFields",
+          "line_number": 1365,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "enableConditionFields",
+          "line_number": 1412,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "disableConditionFields",
+          "line_number": 1420,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "enableEditConditionFields",
+          "line_number": 1428,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "disableEditConditionFields",
+          "line_number": 1436,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "populateRelatedObjects",
+          "line_number": 1444,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "parseAlertCondition",
+          "line_number": 1492,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "saveAlert",
+          "line_number": 1524,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "editAlert",
+          "line_number": 1817,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getAlertState",
+          "line_number": 1843,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "validateAlertStatusCombination",
+          "line_number": 1893,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateStatusAndTriggered",
+          "line_number": 1907,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateAlert",
+          "line_number": 1953,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "deleteAlertInternal",
+          "line_number": 2156,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "confirmDeleteAlert",
+          "line_number": 2199,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restoreAlertsSectionState",
+          "line_number": 2263,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterAlertsByRelatedObjectTypeWrapper",
+          "line_number": 2344,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterAlertsByRelatedObjectType",
+          "line_number": 2414,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "loadAlerts",
+          "line_number": 2457,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reactivateAlert",
+          "line_number": 2497,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateAlertStatus",
+          "line_number": 2568,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "above",
+          "line_number": 2644,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "validateAlertForm",
+          "line_number": 2657,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateEvaluationStats",
+          "line_number": 2706,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "saveAlertData",
+          "line_number": 2736,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "generateDetailedLog",
+          "line_number": 2768,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateAlertsSummary",
+          "line_number": 2794,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getCreatedMs",
+          "line_number": 2819,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "generateDetailedLogForAlerts",
+          "line_number": 2899,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadConditionsFromSource",
+          "line_number": 2931,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTradePlansForConditions",
+          "line_number": 2952,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTradesForConditions",
+          "line_number": 2979,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadConditionsFromItem",
+          "line_number": 3006,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayAvailableConditions",
+          "line_number": 3039,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "selectConditionForAlert",
+          "line_number": 3069,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "createAlertFromCondition",
+          "line_number": 3094,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializeAlertModalTabs",
+          "line_number": 3162,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateModalButtons",
+          "line_number": 3179,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "evaluateAllConditions",
+          "line_number": 3214,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshConditionEvaluations",
+          "line_number": 3253,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "showEvaluationLoading",
+          "line_number": 3290,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayEvaluationResults",
+          "line_number": 3311,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateEvaluationSummary",
+          "line_number": 3337,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadAlertTickerInfo",
+          "line_number": 3383,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayAlertTickerInfo",
+          "line_number": 3417,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "clearAlertTickerInfo",
+          "line_number": 3503,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 3540,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 3610,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 3616,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 3619,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 75.0,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 64,
+      "documented_functions": 48
+    },
+    {
+      "page_name": "tickers",
+      "page_type": "central",
+      "html_file": "trading-ui/tickers.html",
+      "js_file": "trading-ui/scripts/tickers.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "editTicker",
+          "line_number": 98,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "viewTickerDetails",
+          "line_number": 118,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadCurrenciesData",
+          "line_number": 206,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getCurrencySymbol",
+          "line_number": 227,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTickerTypeStyle",
+          "line_number": 244,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTickerStatusStyle",
+          "line_number": 275,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTickerStatusLabel",
+          "line_number": 312,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "generateTickerCurrencyOptions",
+          "line_number": 331,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateCurrencyOptions",
+          "line_number": 374,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateActiveTradesField",
+          "line_number": 418,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTickerActiveTradesStatus",
+          "line_number": 464,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateAllActiveTradesStatuses",
+          "line_number": 496,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restoreTickersSectionState",
+          "line_number": 534,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "saveTicker",
+          "line_number": 593,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTicker",
+          "line_number": 731,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "cancelTicker",
+          "line_number": 941,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsAndCancelTicker",
+          "line_number": 1004,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performTickerCancellation",
+          "line_number": 1011,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "onSuccess",
+          "line_number": 1027,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "checkLinkedItemsBeforeDeleteTicker",
+          "line_number": 1101,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsBeforeCancelTicker",
+          "line_number": 1109,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTickerSymbol",
+          "line_number": 1116,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateAllTickerStatuses",
+          "line_number": 1136,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performCancelTicker",
+          "line_number": 1181,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reactivateTicker",
+          "line_number": 1308,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "onSuccess",
+          "line_number": 1335,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "checkLinkedItemsAndDeleteTicker",
+          "line_number": 1363,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performTickerDeletion",
+          "line_number": 1370,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "onSuccess",
+          "line_number": 1390,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "deleteTicker",
+          "line_number": 1455,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "confirmDeleteTicker",
+          "line_number": 1512,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTickersDataInternal",
+          "line_number": 1567,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTickersSummaryStats",
+          "line_number": 1659,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderTickersTableRows",
+          "line_number": 1689,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "toFiniteNumber",
+          "line_number": 1691,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "parseValidDate",
+          "line_number": 1698,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updatedCellHtml",
+          "line_number": 1766,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTickersTable",
+          "line_number": 1945,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "render",
+          "line_number": 1955,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onFilteredDataChange",
+          "line_number": 1964,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "checkTickerExternalData",
+          "line_number": 2056,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "above",
+          "line_number": 2249,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 2260,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 2330,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 2336,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 2339,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadColorsAndApplyToHeaders",
+          "line_number": 2373,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "tryLoadData",
+          "line_number": 2460,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "refreshYahooFinanceData",
+          "line_number": 2502,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshYahooFinanceDataSilently",
+          "line_number": 2538,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterTickersByType",
+          "line_number": 2569,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getTypeDisplayName",
+          "line_number": 2642,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 67.3076923076923,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 52,
+      "documented_functions": 35
+    },
+    {
+      "page_name": "trading_accounts",
+      "page_type": "central",
+      "html_file": "trading-ui/trading_accounts.html",
+      "js_file": "trading-ui/scripts/trading_accounts.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "loadCurrenciesFromServer",
+          "line_number": 266,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getCurrencyDisplay",
+          "line_number": 306,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "generateCurrencyOptions",
+          "line_number": 342,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradingAccountsFromServer",
+          "line_number": 358,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadAllTradingAccountsFromServer",
+          "line_number": 383,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadDefaultTradingAccounts",
+          "line_number": 407,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "isTradingAccountsLoaded",
+          "line_number": 427,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "legacyFetchTradingAccounts",
+          "line_number": 432,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradingAccountsData",
+          "line_number": 449,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadAccountBalance",
+          "line_number": 475,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "loadAccountBalancesBatch",
+          "line_number": 502,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getCurrencySymbol",
+          "line_number": 518,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "enrichAccountsWithBalances",
+          "line_number": 547,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "syncTradingAccountsPagination",
+          "line_number": 563,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "render",
+          "line_number": 572,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onFilteredDataChange",
+          "line_number": 581,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradingAccountsTable",
+          "line_number": 615,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateTradingAccountsSummary",
+          "line_number": 817,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getCurrencySymbol",
+          "line_number": 880,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradingAccounts",
+          "line_number": 928,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTradingAccountFilterDisplayText",
+          "line_number": 964,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "deleteTradingAccountFromAPI",
+          "line_number": 1155,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 1171,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "cancelTradingAccount",
+          "line_number": 1185,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "confirmDeleteTradingAccount",
+          "line_number": 1353,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "checkLinkedItems",
+          "line_number": 1358,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "showOpenTradesWarning",
+          "line_number": 1370,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "showEditTradingAccountModalById",
+          "line_number": 1386,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "setupSortableHeaders",
+          "line_number": 1503,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "filterTradingAccountsLocally",
+          "line_number": 1516,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradingAccountFilterMenu",
+          "line_number": 1609,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "restoreTradingAccountsSectionState",
+          "line_number": 1660,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "cancelTradingAccountWithLinkedItemsCheck",
+          "line_number": 1731,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "deleteTradingAccountWithLinkedItemsCheck",
+          "line_number": 1800,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restoreTradingAccount",
+          "line_number": 1879,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsAndCancelTradingAccount",
+          "line_number": 1956,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performTradingAccountCancellation",
+          "line_number": 1963,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsAndDeleteTradingAccount",
+          "line_number": 2013,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsBeforeCancelTradingAccount",
+          "line_number": 2024,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "checkLinkedItemsBeforeDeleteTradingAccount",
+          "line_number": 2032,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getTradingAccountName",
+          "line_number": 2042,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateTradingAccount",
+          "line_number": 2060,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "showTradingAccountDetails",
+          "line_number": 2112,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "generateDetailedLog",
+          "line_number": 2211,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTradingAccounts",
+          "line_number": 2232,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "saveTradingAccount",
+          "line_number": 2268,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2404,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2412,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "deleteTradingAccount",
+          "line_number": 2452,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performTradingAccountDeletion",
+          "line_number": 2503,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2518,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 2556,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 2630,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 2636,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 2639,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 2652,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 2655,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 2672,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 2675,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 2694,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 2716,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "waitAndRegisterTables",
+          "line_number": 2738,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 48.38709677419355,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 62,
+      "documented_functions": 30
+    },
+    {
+      "page_name": "executions",
+      "page_type": "central",
+      "html_file": "trading-ui/executions.html",
+      "js_file": "trading-ui/scripts/executions.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "addExecution",
+          "line_number": 116,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "editExecution",
+          "line_number": 195,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateRealizedPLField",
+          "line_number": 243,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "saveExecution",
+          "line_number": 324,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateExecution",
+          "line_number": 498,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "displayLinkedItems",
+          "line_number": 525,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "goToTrade",
+          "line_number": 712,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "goToPlan",
+          "line_number": 726,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "goToAlert",
+          "line_number": 740,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "goToNote",
+          "line_number": 754,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadExecutionsData",
+          "line_number": 782,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "syncExecutionsPagination",
+          "line_number": 884,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "setExecutionsFilteredDataset",
+          "line_number": 925,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getExecutionsPaginationOptions",
+          "line_number": 953,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleExecutionsPageRender",
+          "line_number": 961,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "handleExecutionsFilteredChange",
+          "line_number": 972,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "applyExecutionsFilteredData",
+          "line_number": 977,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateExecutionsSummary",
+          "line_number": 982,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateExecutionsCounters",
+          "line_number": 1009,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateExecutionsTableMain",
+          "line_number": 1035,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "isDateInRange",
+          "line_number": 1407,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "filterExecutionsLocally",
+          "line_number": 1492,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "restoreSortState",
+          "line_number": 1639,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "setupModalConfigurations",
+          "line_number": 1741,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTickersWithOpenOrClosedTradesAndPlans",
+          "line_number": 1781,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "enableAllFields",
+          "line_number": 1822,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadActiveTradesForTicker",
+          "line_number": 1867,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTradesOnCheckboxChange",
+          "line_number": 2022,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTradesOnTickerChange",
+          "line_number": 2055,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "goToTickerPage",
+          "line_number": 2079,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "showTickerHelp",
+          "line_number": 2107,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addNewTicker",
+          "line_number": 2126,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addNewPlan",
+          "line_number": 2146,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addNewTrade",
+          "line_number": 2159,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "toggleExecutionFormFields",
+          "line_number": 2194,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "enableExecutionFormFields",
+          "line_number": 2223,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "disableExecutionFormFields",
+          "line_number": 2231,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadExecutionTickerInfo",
+          "line_number": 2238,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayExecutionTickerInfo",
+          "line_number": 2295,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "hideExecutionTickerInfo",
+          "line_number": 2363,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "calculateExecutionValues",
+          "line_number": 2374,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "calculateAddExecutionValues",
+          "line_number": 2425,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "calculateEditExecutionValues",
+          "line_number": 2433,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "goToLinkedTrade",
+          "line_number": 2445,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTradeExecutions",
+          "line_number": 2477,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateExecutionsTableForTradeModal",
+          "line_number": 2496,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addEditBuySell",
+          "line_number": 2546,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "linkExistingExecution",
+          "line_number": 2557,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "unlinkExecution",
+          "line_number": 2568,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "setupExecutionsFilterFunctions",
+          "line_number": 2734,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "applyAccountFilterWithTradesData",
+          "line_number": 2792,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateExecutionsGlobalData",
+          "line_number": 2949,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "showAddModal",
+          "line_number": 3001,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "showEditModal",
+          "line_number": 3002,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "toggleExternalIdField",
+          "line_number": 3029,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "loadTickersSummaryData",
+          "line_number": 3083,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateTickersSummaryTable",
+          "line_number": 3165,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshTickersSummary",
+          "line_number": 3234,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "viewTickerDetails",
+          "line_number": 3255,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "addExecutionForTicker",
+          "line_number": 3274,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTickersList",
+          "line_number": 3337,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "deleteExecution",
+          "line_number": 3439,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performExecutionDeletion",
+          "line_number": 3486,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 3529,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 3599,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 3605,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 3608,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 3621,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 3627,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradeSuggestionsForAll",
+          "line_number": 3653,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateSuggestionsCount",
+          "line_number": 3729,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderTradeSuggestionsSection",
+          "line_number": 3739,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "buildTradeSuggestionRow",
+          "line_number": 3843,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "toggleAllSuggestions",
+          "line_number": 3937,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "acceptSuggestion",
+          "line_number": 3947,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "rejectSuggestion",
+          "line_number": 3999,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "acceptAllSuggestions",
+          "line_number": 4031,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "rejectAllSuggestions",
+          "line_number": 4098,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "applySelectedSuggestions",
+          "line_number": 4115,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "openTradeDetailsModal",
+          "line_number": 4184,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTradeSuggestionsFlatData",
+          "line_number": 4201,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "sortTradeSuggestionsTable",
+          "line_number": 4213,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateTradeSuggestionsTable",
+          "line_number": 4224,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializeTradeSuggestionsPagination",
+          "line_number": 4262,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "onPageChange",
+          "line_number": 4274,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onPageSizeChange",
+          "line_number": 4277,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "renderTradeSuggestionsPageRows",
+          "line_number": 4293,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "buildTradeSuggestionsFlatList",
+          "line_number": 4336,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "parseDateToTimestamp",
+          "line_number": 4337,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "resolveTimezone",
+          "line_number": 4374,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "createDateEnvelope",
+          "line_number": 4388,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 70.32967032967034,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 91,
+      "documented_functions": 64
+    },
+    {
+      "page_name": "data_import",
+      "page_type": "central",
+      "html_file": "trading-ui/data_import.html",
+      "js_file": "trading-ui/scripts/data_import.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "initializeDataImportModule",
+          "line_number": 30,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "info",
+          "line_number": 35,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "warn",
+          "line_number": 36,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "error",
+          "line_number": 37,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "history",
+          "line_number": 70,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "coerceDateEnvelope",
+          "line_number": 80,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getEpochFromEnvelope",
+          "line_number": 116,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "initializeDataImportPage",
+          "line_number": 139,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "refreshDataImportHistory",
+          "line_number": 175,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "fetchTradingAccounts",
+          "line_number": 234,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "fetchHistoryForAccount",
+          "line_number": 268,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "resolveAccountDisplayName",
+          "line_number": 347,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "normalizeSessionRecord",
+          "line_number": 367,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "renderImportSummary",
+          "line_number": 420,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderImportHistoryTable",
+          "line_number": 451,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderHistoryRow",
+          "line_number": 499,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "renderStatus",
+          "line_number": 530,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "formatDateValue",
+          "line_number": 567,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "setLoadingState",
+          "line_number": 655,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "toggleEmptyState",
+          "line_number": 676,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "toggleErrorState",
+          "line_number": 695,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "notify",
+          "line_number": 715,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateTableRegistry",
+          "line_number": 731,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "registerDataImportTable",
+          "line_number": 754,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 770,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 771,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 73.07692307692307,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 26,
+      "documented_functions": 19
+    },
+    {
+      "page_name": "cash_flows",
+      "page_type": "central",
+      "html_file": "trading-ui/cash_flows.html",
+      "js_file": "trading-ui/scripts/cash_flows.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "loadCashFlowsData",
+          "line_number": 89,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "fallbackLoader",
+          "line_number": 97,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "applyFallbackDateSort",
+          "line_number": 197,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "calculateBalance",
+          "line_number": 223,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "resolveExchangeDirectionFromType",
+          "line_number": 353,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getCashFlowsPaginationInstance",
+          "line_number": 364,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setActiveCashFlowTypeButton",
+          "line_number": 385,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "cashFlowMatchesType",
+          "line_number": 407,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "filterCashFlowsByType",
+          "line_number": 422,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "null",
+          "line_number": 434,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "filterCashFlowsLocallyByType",
+          "line_number": 455,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reapplyCashFlowTypeFilter",
+          "line_number": 466,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getAccountNameById",
+          "line_number": 476,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "ensureTradingAccountsLoaded",
+          "line_number": 503,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "validateCashFlowAmount",
+          "line_number": 559,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "validateCashFlowDate",
+          "line_number": 572,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "validateCashFlowForm",
+          "line_number": 589,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "validateEditCashFlowForm",
+          "line_number": 629,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "deleteCashFlow",
+          "line_number": 667,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "performCashFlowDeletion",
+          "line_number": 725,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 740,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadAccountsForCashFlow",
+          "line_number": 837,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterFn",
+          "line_number": 844,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadCurrenciesForCashFlow",
+          "line_number": 869,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderCashFlowsTable",
+          "line_number": 890,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "escape",
+          "line_number": 1015,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updatePageSummaryStats",
+          "line_number": 1160,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "syncCashFlowsPagination",
+          "line_number": 1199,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "render",
+          "line_number": 1208,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onFilteredDataChange",
+          "line_number": 1217,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "groupUnifiedExchanges",
+          "line_number": 1245,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "isExchangeExternal",
+          "line_number": 1248,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "renderUnifiedForexExchangesTable",
+          "line_number": 1287,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "fmtAmt",
+          "line_number": 1295,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getCurrencySymbol",
+          "line_number": 1303,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getAccountName",
+          "line_number": 1314,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "fmtDate",
+          "line_number": 1317,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "buildActions",
+          "line_number": 1318,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "ensureExchangePairsAdjacency",
+          "line_number": 1351,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setupExchangeRowInteractions",
+          "line_number": 1406,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "highlight",
+          "line_number": 1420,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "clear",
+          "line_number": 1421,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "highlightExchangeGroup",
+          "line_number": 1431,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "clearExchangeHighlight",
+          "line_number": 1441,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setCurrencyExchangeSummary",
+          "line_number": 1451,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "renderAction",
+          "line_number": 1461,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "hydrateCashFlowExchangeDisplay",
+          "line_number": 1473,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "renderAction",
+          "line_number": 1499,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatAmount",
+          "line_number": 1518,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getCashFlowTypeWithColor",
+          "line_number": 1545,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getCashFlowTypeText",
+          "line_number": 1618,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "resolveCurrencySymbolForCashFlow",
+          "line_number": 1628,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "formatCashFlowAmount",
+          "line_number": 1686,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "formatUsdRate",
+          "line_number": 1734,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "showCashFlowDetails",
+          "line_number": 1750,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "updateCashFlowsTable",
+          "line_number": 1774,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "startAutoRefresh",
+          "line_number": 1807,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "applyDynamicColors",
+          "line_number": 1838,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "applyUserPreferences",
+          "line_number": 1914,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "initializeCashFlowsPage",
+          "line_number": 1964,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateCashFlow",
+          "line_number": 2038,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "saveCashFlow",
+          "line_number": 2075,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2220,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2229,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "saveCurrencyExchange",
+          "line_number": 2269,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2493,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2501,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadCurrencyExchange",
+          "line_number": 2519,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "deleteCurrencyExchange",
+          "line_number": 2626,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 2646,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "isCurrencyExchange",
+          "line_number": 2664,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getExchangeIdFromCashFlow",
+          "line_number": 2690,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "confirmDeleteCashFlow",
+          "line_number": 2717,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "manageExternalIdField",
+          "line_number": 2758,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "setupSourceFieldListeners",
+          "line_number": 2800,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "initializeExternalIdFields",
+          "line_number": 2838,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "editCashFlow",
+          "line_number": 2875,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "generateDetailedLog",
+          "line_number": 2921,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 3222,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 3292,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 3298,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 3313,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 53.65853658536586,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 82,
+      "documented_functions": 44
+    },
+    {
+      "page_name": "notes",
+      "page_type": "central",
+      "html_file": "trading-ui/notes.html",
+      "js_file": "trading-ui/scripts/notes.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "fallbackLoader",
+          "line_number": 105,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "downloadFile",
+          "line_number": 195,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "openNoteDetails",
+          "line_number": 258,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "editNote",
+          "line_number": 280,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "deleteNote",
+          "line_number": 295,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "fallbackDateDisplay",
+          "line_number": 325,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateNotesTable",
+          "line_number": 403,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadAdditionalData",
+          "line_number": 422,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadAccounts",
+          "line_number": 426,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTrades",
+          "line_number": 436,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTradePlans",
+          "line_number": 444,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadTickers",
+          "line_number": 459,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "escape",
+          "line_number": 564,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateNotesSummary",
+          "line_number": 888,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateGridFromComponent",
+          "line_number": 935,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "populateSelect",
+          "line_number": 967,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "updateRadioButtons",
+          "line_number": 1060,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "onNoteRelationTypeChange",
+          "line_number": 1138,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "populateEditSelectByType",
+          "line_number": 1144,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "validateNoteForm",
+          "line_number": 1216,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "saveNote",
+          "line_number": 1235,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 1276,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateNoteFromModal",
+          "line_number": 1357,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 1436,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "confirmDeleteNote",
+          "line_number": 1476,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "deleteNoteFromServer",
+          "line_number": 1492,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "reloadFn",
+          "line_number": 1508,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "clearNoteValidationErrors",
+          "line_number": 1534,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "setupNoteValidationEvents",
+          "line_number": 1595,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "clearSelectedFile",
+          "line_number": 1734,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "restoreSortState",
+          "line_number": 1782,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "showTickerPage",
+          "line_number": 1810,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "formatText",
+          "line_number": 1838,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "insertLink",
+          "line_number": 1879,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "clearFormatting",
+          "line_number": 1920,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getEditorContent",
+          "line_number": 1945,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "setEditorContent",
+          "line_number": 1986,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterNotesData",
+          "line_number": 2034,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "filterNotesByType",
+          "line_number": 2066,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "getTypeDisplayName",
+          "line_number": 2125,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "viewNote",
+          "line_number": 2153,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "loadNoteForViewing",
+          "line_number": 2193,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getNoteRelatedDisplay",
+          "line_number": 2274,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "editCurrentNote",
+          "line_number": 2324,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "displayCurrentAttachment",
+          "line_number": 2361,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "removeCurrentAttachment",
+          "line_number": 2418,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "replaceCurrentAttachment",
+          "line_number": 2458,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        },
+        {
+          "function_name": "restorePageState",
+          "line_number": 2517,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "complete"
+        },
+        {
+          "function_name": "getColumns",
+          "line_number": 2587,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "dataGetter",
+          "line_number": 2593,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "updateFunction",
+          "line_number": 2596,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 54.90196078431373,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 51,
+      "documented_functions": 28
+    },
+    {
+      "page_name": "research",
+      "page_type": "central",
+      "html_file": "trading-ui/research.html",
+      "js_file": "trading-ui/scripts/research.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "researchPageController",
+          "line_number": 28,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getContainer",
+          "line_number": 41,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "renderPlaceholder",
+          "line_number": 45,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "renderDataState",
+          "line_number": 62,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadResearchData",
+          "line_number": 81,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "initializeResearchPage",
+          "line_number": 112,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 0.0,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 6,
+      "documented_functions": 0
+    },
+    {
+      "page_name": "preferences",
+      "page_type": "central",
+      "html_file": "trading-ui/preferences.html",
+      "js_file": "trading-ui/scripts/preferences.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "isValid",
+          "line_number": 67,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "set",
+          "line_number": 71,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "get",
+          "line_number": 75,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "clear",
+          "line_number": 78,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 0.0,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 4,
+      "documented_functions": 0
+    },
+    {
+      "page_name": "external-data-dashboard",
+      "page_type": "supporting",
+      "html_file": "trading-ui/external-data-dashboard.html",
+      "js_file": "trading-ui/scripts/external-data-dashboard.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "info",
+          "line_number": 21,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "warn",
+          "line_number": 22,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "error",
+          "line_number": 23,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "debug",
+          "line_number": 24,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "safeText",
+          "line_number": 68,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatNumber",
+          "line_number": 78,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatDecimal",
+          "line_number": 86,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatPercent",
+          "line_number": 94,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatDurationMs",
+          "line_number": 103,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatRelativeTime",
+          "line_number": 114,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "extractTimestampIso",
+          "line_number": 141,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatRelativeFromPayload",
+          "line_number": 154,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "formatTimePayloadForDeveloper",
+          "line_number": 159,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "ensureExternalDashboardInstance",
+          "line_number": 196,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setElementText",
+          "line_number": 212,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getElement",
+          "line_number": 219,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "setStatusIndicator",
+          "line_number": 223,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "getThemeFonts",
+          "line_number": 250,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 0.0,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 18,
+      "documented_functions": 0
+    },
+    {
+      "page_name": "chart-management",
+      "page_type": "supporting",
+      "html_file": "trading-ui/chart-management.html",
+      "js_file": "trading-ui/scripts/chart-management.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "generator",
+          "line_number": 234,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "generator",
+          "line_number": 254,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "generator",
+          "line_number": 272,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "generator",
+          "line_number": 297,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "loadChartManagement",
+          "line_number": 440,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
+          "function_name": "expose",
+          "line_number": 445,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        }
+      ],
+      "jsdoc_coverage": 0.0,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 6,
+      "documented_functions": 0
+    },
+    {
+      "page_name": "crud-testing-dashboard",
+      "page_type": "supporting",
+      "html_file": "trading-ui/crud-testing-dashboard.html",
+      "js_file": "trading-ui/scripts/crud-testing-dashboard.js",
+      "jquery_ajax_locations": [],
+      "xmlhttprequest_locations": [],
+      "inline_onclick_locations": [],
+      "inline_styles": [],
+      "has_function_index": true,
+      "function_index_quality": "partial",
+      "functions": [
+        {
+          "function_name": "initializeCRUDTestingDashboard",
+          "line_number": 32,
+          "has_jsdoc": true,
+          "has_params": false,
+          "has_returns": true,
+          "has_examples": false,
+          "jsdoc_quality": "partial"
+        }
+      ],
+      "jsdoc_coverage": 100.0,
+      "total_jquery_ajax": 0,
+      "total_xmlhttprequest": 0,
+      "total_inline_onclick": 0,
+      "total_inline_styles": 0,
+      "total_functions": 1,
+      "documented_functions": 1
+    }
+  ]
+}

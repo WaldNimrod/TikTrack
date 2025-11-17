@@ -21,7 +21,7 @@
 ### 🔵 מערכות CRUD ונתונים
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
-| **שירותי נתונים ייעודיים** | `trading-ui/scripts/services/*-data.js` | [DATA_SERVICES_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/DATA_SERVICES_DEVELOPER_GUIDE.md)<br>[DATA_SERVICES_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/DATA_SERVICES_ARCHITECTURE.md) | שירותי נתונים מאוחדים לכל ישות: trades-data.js, executions-data.js, cash-flows-data.js, notes-data.js, trading-accounts-data.js, data-import-data.js, research-data.js, preferences-data.js |
+| **שירותי נתונים ייעודיים** | `trading-ui/scripts/services/*-data.js` | [DATA_SERVICES_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/DATA_SERVICES_DEVELOPER_GUIDE.md)<br>[DATA_SERVICES_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/DATA_SERVICES_ARCHITECTURE.md) | שירותי נתונים מאוחדים לכל ישות: trades-data.js, executions-data.js, cash-flows-data.js, notes-data.js, trading-accounts-data.js, data-import-data.js, research-data.js, preferences-data.js, alerts-data.js, tickers-data.js |
 | Data Collection Service | `trading-ui/scripts/services/data-collection-service.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | איסוף/הצבת נתוני טפסים במפה אחידה והמרות טיפוס |
 | Dashboard Data Loader | `trading-ui/scripts/index.js` | [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#dashboard-loader-indexjs) | טעינת נתוני דשבורד אמיתיים + עיבוד מטבעות/סיכומים עם CacheTTLGuard |
 | Investment Calculation Service | `trading-ui/scripts/services/investment-calculation-service.js` | [INVESTMENT_CALCULATION_SERVICE.md](INVESTMENT_CALCULATION_SERVICE.md) | חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל |
@@ -80,6 +80,6 @@
 ### ✅ סיכום
 - **סה״כ מערכות פעילות מתועדות:** 28 (לפי הטבלאות לעיל).
 - **חובת שימוש:** לפני כל פיתוח חדש יש לבדוק התאמה למערכת קיימת ולהשתמש בה דרך ה-API המתועד.
-- **עדכון אחרון:** 9 בנובמבר 2025 (בהתאם למיפוי מאותו היום).
+- **עדכון אחרון:** 27 בינואר 2025 (הוספת alerts-data.js, tickers-data.js, עדכון תיעוד שירותי נתונים).
 - **אחריות המשך:** כל מערכת חדשה שנכנסת לפרויקט חייבת להוסיף שורה בטבלה הרלוונטית + לינק לדוקומנטציה מעודכנת.
 

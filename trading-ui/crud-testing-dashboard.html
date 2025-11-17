@@ -164,13 +164,13 @@
                 </div>
                                     <div class="card-body">
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                            <button class="btn btn-primary btn-lg" onclick="runSmartTestAllEntities()">
+                                            <button class="btn btn-primary btn-lg" data-onclick="runSmartTestAllEntities()">
                                                 <i class="fas fa-play"></i> הרץ בדיקות מהירות (29 עמודים)
                                             </button>
-                                            <button class="btn btn-outline-info" onclick="exportReportHTML()">
+                                            <button class="btn btn-outline-info" data-onclick="exportReportHTML()">
                                                 <i class="fas fa-download"></i> ייצא דוח HTML
                                             </button>
-                                            <button class="btn btn-outline-secondary" onclick="copyReportToClipboard()">
+                                            <button class="btn btn-outline-secondary" data-onclick="copyReportToClipboard()">
                                                 <i class="fas fa-copy"></i> העתק דוח
                                             </button>
                                         </div>
@@ -321,7 +321,7 @@
                                             <li><i class="fas fa-check text-success"></i> תאימות דפדפנים</li>
                                             </ul>
                                         <div class="d-grid">
-                                            <button class="btn btn-info" onclick="runButtonSystemTests()">
+                                            <button class="btn btn-info" data-onclick="runButtonSystemTests()">
                                                 <i class="fas fa-play"></i> הרץ בדיקות כפתורים
                                             </button>
                                         </div>
@@ -347,7 +347,7 @@
                                             <li><i class="fas fa-check text-success"></i> קשרים עם Tickers</li>
                                         </ul>
                                         <div class="d-grid">
-                                            <button class="btn btn-warning" onclick="runExecutionsCRUDTests()">
+                                            <button class="btn btn-warning" data-onclick="runExecutionsCRUDTests()">
                                                 <i class="fas fa-play"></i> הרץ בדיקות Executions
                                             </button>
                                         </div>

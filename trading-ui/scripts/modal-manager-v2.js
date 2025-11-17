@@ -88,9 +88,9 @@ class ModalManagerV2 {
             // הוספה לאובייקט הגלובלי
             window.ModalManagerV2 = this;
             
-            console.log('ModalManagerV2 initialized successfully');
+            window.Logger?.info('ModalManagerV2 initialized successfully', { page: 'modal-manager-v2' });
         } catch (error) {
-            console.error('Error initializing ModalManagerV2:', error);
+            window.Logger?.error('Error initializing ModalManagerV2', { page: 'modal-manager-v2', error: error?.message || error });
         }
     }
 

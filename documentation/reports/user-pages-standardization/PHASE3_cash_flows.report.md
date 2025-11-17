@@ -49,12 +49,12 @@
 
 ### JSDoc Coverage
 
-**כיסוי**: 65.9% (54/82 פונקציות)
+**כיסוי**: 70.7% (58/82 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 32
-- **פונקציות עם JSDoc חלקי**: 22
-- **פונקציות ללא JSDoc**: 28
+- **פונקציות עם JSDoc מלא** (params + returns): 35
+- **פונקציות עם JSDoc חלקי**: 23
+- **פונקציות ללא JSDoc**: 24
 
 **רשימת פונקציות**:
 
@@ -63,21 +63,21 @@
 - ✅ `applyFallbackDateSort()` (שורה 197) - partial
 - ✅ `calculateBalance()` (שורה 223) - partial
 - ✅ `resolveExchangeDirectionFromType()` (שורה 358) - complete
-- ❌ `getCashFlowsPaginationInstance()` (שורה 369) - missing
-- ✅ `setActiveCashFlowTypeButton()` (שורה 395) - complete
-- ✅ `cashFlowMatchesType()` (שורה 423) - complete
-- ✅ `filterCashFlowsByType()` (שורה 445) - complete
-- ❌ `null()` (שורה 457) - missing
-- ✅ `filterCashFlowsLocallyByType()` (שורה 483) - complete
-- ❌ `reapplyCashFlowTypeFilter()` (שורה 494) - missing
-- ✅ `getAccountNameById()` (שורה 504) - complete
-- ✅ `ensureTradingAccountsLoaded()` (שורה 531) - partial
-- ✅ `validateCashFlowAmount()` (שורה 587) - complete
-- ✅ `validateCashFlowDate()` (שורה 600) - complete
-- ✅ `validateCashFlowForm()` (שורה 617) - partial
-- ✅ `validateEditCashFlowForm()` (שורה 657) - partial
-- ✅ `deleteCashFlow()` (שורה 695) - partial
-- ✅ `performCashFlowDeletion()` (שורה 753) - complete
+- ✅ `getCashFlowsPaginationInstance()` (שורה 373) - partial
+- ✅ `setActiveCashFlowTypeButton()` (שורה 399) - complete
+- ✅ `cashFlowMatchesType()` (שורה 427) - complete
+- ✅ `filterCashFlowsByType()` (שורה 449) - complete
+- ❌ `null()` (שורה 461) - missing
+- ✅ `filterCashFlowsLocallyByType()` (שורה 487) - complete
+- ✅ `reapplyCashFlowTypeFilter()` (שורה 502) - complete
+- ✅ `getAccountNameById()` (שורה 512) - complete
+- ✅ `ensureTradingAccountsLoaded()` (שורה 539) - partial
+- ✅ `validateCashFlowAmount()` (שורה 595) - complete
+- ✅ `validateCashFlowDate()` (שורה 608) - complete
+- ✅ `validateCashFlowForm()` (שורה 625) - partial
+- ✅ `validateEditCashFlowForm()` (שורה 665) - partial
+- ✅ `deleteCashFlow()` (שורה 703) - partial
+- ✅ `performCashFlowDeletion()` (שורה 761) - complete
 
 ... ועוד 62 פונקציות
 ---
@@ -90,7 +90,7 @@
 
 ### עדיפות בינונית
 
-3. הוספת JSDoc ל-28 פונקציות חסרות
+3. הוספת JSDoc ל-24 פונקציות חסרות
 
 ---
 

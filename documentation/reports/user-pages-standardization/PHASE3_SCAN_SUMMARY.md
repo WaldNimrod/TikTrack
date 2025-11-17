@@ -25,7 +25,7 @@
 | קטגוריה | סטטוס |
 |---------|--------|
 | Function Index | 15/15 עמודים |
-| JSDoc Coverage ממוצע | 76.4% |
+| JSDoc Coverage ממוצע | 77.1% |
 
 ---
 
@@ -34,7 +34,7 @@
 | עמוד | jQuery AJAX | XMLHttpRequest | Inline onclick | Inline Styles | Function Index | JSDoc Coverage |
 |------|------------|----------------|---------------|---------------|----------------|----------------|
 | alerts | 0 | 0 | 0 | 0 | ✅ | 75.0% |
-| cash_flows | 0 | 0 | 0 | 0 | ✅ | 65.9% |
+| cash_flows | 0 | 0 | 0 | 0 | ✅ | 70.7% |
 | chart-management | 0 | 0 | 0 | 0 | ✅ | 100.0% |
 | crud-testing-dashboard | 0 | 0 | 0 | 0 | ✅ | 100.0% |
 | data_import | 0 | 0 | 0 | 0 | ✅ | 73.1% |
@@ -46,8 +46,8 @@
 | research | 0 | 0 | 0 | 0 | ✅ | 83.3% |
 | tickers | 0 | 0 | 0 | 0 | ✅ | 67.3% |
 | trade_plans | 0 | 0 | 0 | 0 | ✅ | 72.4% |
-| trades | 0 | 0 | 0 | 0 | ✅ | 67.7% |
-| trading_accounts | 0 | 0 | 0 | 0 | ✅ | 61.3% |
+| trades | 0 | 0 | 0 | 0 | ✅ | 72.0% |
+| trading_accounts | 0 | 0 | 0 | 0 | ✅ | 62.9% |
 
 ---
 

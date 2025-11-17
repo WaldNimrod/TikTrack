@@ -52,8 +52,8 @@
 **כיסוי**: 67.3% (35/52 פונקציות)
 
 **פירוט**:
-- **פונקציות עם JSDoc מלא** (params + returns): 2
-- **פונקציות עם JSDoc חלקי**: 33
+- **פונקציות עם JSDoc מלא** (params + returns): 5
+- **פונקציות עם JSDoc חלקי**: 30
 - **פונקציות ללא JSDoc**: 17
 
 **רשימת פונקציות**:
@@ -67,17 +67,17 @@
 - ✅ `getTickerStatusLabel()` (שורה 312) - partial
 - ✅ `generateTickerCurrencyOptions()` (שורה 331) - partial
 - ✅ `updateCurrencyOptions()` (שורה 374) - partial
-- ❌ `updateActiveTradesField()` (שורה 418) - missing
-- ✅ `updateTickerActiveTradesStatus()` (שורה 464) - partial
-- ✅ `updateAllActiveTradesStatuses()` (שורה 496) - partial
-- ✅ `restoreTickersSectionState()` (שורה 534) - partial
-- ✅ `saveTicker()` (שורה 593) - partial
-- ❌ `updateTicker()` (שורה 731) - missing
-- ✅ `cancelTicker()` (שורה 941) - partial
-- ✅ `checkLinkedItemsAndCancelTicker()` (שורה 1004) - partial
-- ✅ `performTickerCancellation()` (שורה 1011) - partial
-- ❌ `onSuccess()` (שורה 1027) - missing
-- ✅ `checkLinkedItemsBeforeDeleteTicker()` (שורה 1101) - partial
+- ❌ `updateActiveTradesField()` (שורה 419) - missing
+- ✅ `updateTickerActiveTradesStatus()` (שורה 465) - partial
+- ✅ `updateAllActiveTradesStatuses()` (שורה 497) - partial
+- ✅ `restoreTickersSectionState()` (שורה 535) - partial
+- ✅ `saveTicker()` (שורה 594) - partial
+- ❌ `updateTicker()` (שורה 734) - missing
+- ✅ `cancelTicker()` (שורה 944) - partial
+- ✅ `checkLinkedItemsAndCancelTicker()` (שורה 1007) - partial
+- ✅ `performTickerCancellation()` (שורה 1014) - partial
+- ❌ `onSuccess()` (שורה 1030) - missing
+- ✅ `checkLinkedItemsBeforeDeleteTicker()` (שורה 1104) - complete
 
 ... ועוד 32 פונקציות
 ---

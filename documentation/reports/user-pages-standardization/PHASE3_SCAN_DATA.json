@@ -406,25 +406,25 @@
         },
         {
           "function_name": "updateTradesSummary",
-          "line_number": 478,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 483,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "updateTradesCounters",
-          "line_number": 493,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 503,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "setTradesFilteredDataset",
-          "line_number": 520,
+          "line_number": 530,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -433,25 +433,25 @@
         },
         {
           "function_name": "getTradesPaginationOptions",
-          "line_number": 552,
+          "line_number": 562,
           "has_jsdoc": true,
-          "has_params": false,
+          "has_params": true,
           "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "partial"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "handleTradesPageRender",
-          "line_number": 560,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 577,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "handleTradesFilteredChange",
-          "line_number": 571,
+          "line_number": 588,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -460,25 +460,25 @@
         },
         {
           "function_name": "loadTradeTickerInfo",
-          "line_number": 598,
+          "line_number": 617,
           "has_jsdoc": true,
-          "has_params": false,
-          "has_returns": false,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "partial"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "displayTradeTickerInfo",
-          "line_number": 628,
+          "line_number": 649,
           "has_jsdoc": true,
-          "has_params": false,
-          "has_returns": false,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "partial"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "loadTickerDataForTrades",
-          "line_number": 711,
+          "line_number": 732,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -487,16 +487,16 @@
         },
         {
           "function_name": "updateTradesTable",
-          "line_number": 759,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 785,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "loadTradePlanDates",
-          "line_number": 1132,
+          "line_number": 1158,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -505,7 +505,7 @@
         },
         {
           "function_name": "viewTickerDetails",
-          "line_number": 1180,
+          "line_number": 1206,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -514,7 +514,7 @@
         },
         {
           "function_name": "viewAccountDetails",
-          "line_number": 1203,
+          "line_number": 1229,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -523,7 +523,7 @@
         },
         {
           "function_name": "viewTradePlanDetails",
-          "line_number": 1226,
+          "line_number": 1252,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -532,7 +532,7 @@
         },
         {
           "function_name": "editTradeRecord",
-          "line_number": 1249,
+          "line_number": 1275,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -541,7 +541,7 @@
         },
         {
           "function_name": "cancelTradeRecord",
-          "line_number": 1304,
+          "line_number": 1330,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -550,7 +550,7 @@
         },
         {
           "function_name": "executeCancellation",
-          "line_number": 1319,
+          "line_number": 1345,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -559,7 +559,7 @@
         },
         {
           "function_name": "performTradeCancellation",
-          "line_number": 1366,
+          "line_number": 1392,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -568,7 +568,7 @@
         },
         {
           "function_name": "deleteTradeRecord",
-          "line_number": 1401,
+          "line_number": 1427,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -577,7 +577,7 @@
         },
         {
           "function_name": "performTradeDeletion",
-          "line_number": 1540,
+          "line_number": 1566,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -586,7 +586,7 @@
         },
         {
           "function_name": "addEditImportantNote",
-          "line_number": 1597,
+          "line_number": 1623,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -595,7 +595,7 @@
         },
         {
           "function_name": "addEditReminder",
-          "line_number": 1614,
+          "line_number": 1640,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -604,7 +604,7 @@
         },
         {
           "function_name": "restorePageState",
-          "line_number": 1636,
+          "line_number": 1662,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -613,7 +613,7 @@
         },
         {
           "function_name": "addTrade",
-          "line_number": 1718,
+          "line_number": 1744,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -622,7 +622,7 @@
         },
         {
           "function_name": "editTrade",
-          "line_number": 1749,
+          "line_number": 1775,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -631,7 +631,7 @@
         },
         {
           "function_name": "clearTradeValidation",
-          "line_number": 1778,
+          "line_number": 1804,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -640,7 +640,7 @@
         },
         {
           "function_name": "validateTradeForm",
-          "line_number": 1796,
+          "line_number": 1822,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -649,7 +649,7 @@
         },
         {
           "function_name": "hideAddTradeModal",
-          "line_number": 1837,
+          "line_number": 1863,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -658,7 +658,7 @@
         },
         {
           "function_name": "hideEditTradeModal",
-          "line_number": 1859,
+          "line_number": 1885,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -667,7 +667,7 @@
         },
         {
           "function_name": "updateRadioButtons",
-          "line_number": 1884,
+          "line_number": 1910,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -676,7 +676,7 @@
         },
         {
           "function_name": "populateSelect",
-          "line_number": 1970,
+          "line_number": 1996,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -685,7 +685,7 @@
         },
         {
           "function_name": "onRelationTypeChange",
-          "line_number": 2013,
+          "line_number": 2039,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -694,7 +694,7 @@
         },
         {
           "function_name": "onRelatedObjectChange",
-          "line_number": 2045,
+          "line_number": 2071,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -703,7 +703,7 @@
         },
         {
           "function_name": "enableConditionFields",
-          "line_number": 2072,
+          "line_number": 2098,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -712,7 +712,7 @@
         },
         {
           "function_name": "disableConditionFields",
-          "line_number": 2099,
+          "line_number": 2125,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -721,7 +721,7 @@
         },
         {
           "function_name": "populateRelatedObjects",
-          "line_number": 2128,
+          "line_number": 2154,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -730,7 +730,7 @@
         },
         {
           "function_name": "restoreSortState",
-          "line_number": 2178,
+          "line_number": 2205,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -739,7 +739,7 @@
         },
         {
           "function_name": "enableTradeFormFields",
-          "line_number": 2203,
+          "line_number": 2230,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -748,7 +748,7 @@
         },
         {
           "function_name": "disableTradeFormFields",
-          "line_number": 2249,
+          "line_number": 2276,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -757,7 +757,7 @@
         },
         {
           "function_name": "loadModalData",
-          "line_number": 2294,
+          "line_number": 2321,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -766,7 +766,7 @@
         },
         {
           "function_name": "initializeTradesPage",
-          "line_number": 2317,
+          "line_number": 2344,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -775,7 +775,7 @@
         },
         {
           "function_name": "refreshPositions",
-          "line_number": 2346,
+          "line_number": 2373,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -784,7 +784,7 @@
         },
         {
           "function_name": "setupDateValidation",
-          "line_number": 2396,
+          "line_number": 2423,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -793,7 +793,7 @@
         },
         {
           "function_name": "validateDateFields",
-          "line_number": 2437,
+          "line_number": 2464,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -802,7 +802,7 @@
         },
         {
           "function_name": "clearDateValidationMessages",
-          "line_number": 2510,
+          "line_number": 2537,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -811,7 +811,7 @@
         },
         {
           "function_name": "addImportantNote",
-          "line_number": 2543,
+          "line_number": 2570,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -820,7 +820,7 @@
         },
         {
           "function_name": "addReminder",
-          "line_number": 2554,
+          "line_number": 2581,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -829,7 +829,7 @@
         },
         {
           "function_name": "onShowClosedTradesChange",
-          "line_number": 2566,
+          "line_number": 2593,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -838,7 +838,7 @@
         },
         {
           "function_name": "updateTableStats",
-          "line_number": 2604,
+          "line_number": 2631,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -847,7 +847,7 @@
         },
         {
           "function_name": "addEditBuySell",
-          "line_number": 2626,
+          "line_number": 2653,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -856,7 +856,7 @@
         },
         {
           "function_name": "initializeTradeConditionsSystem",
-          "line_number": 2648,
+          "line_number": 2675,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -865,7 +865,7 @@
         },
         {
           "function_name": "initializerInstance",
-          "line_number": 2656,
+          "line_number": 2683,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -874,7 +874,7 @@
         },
         {
           "function_name": "afterInit",
-          "line_number": 2672,
+          "line_number": 2699,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -883,7 +883,7 @@
         },
         {
           "function_name": "getTradesModalElement",
-          "line_number": 2711,
+          "line_number": 2738,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -892,7 +892,7 @@
         },
         {
           "function_name": "getTradeModalEntityName",
-          "line_number": 2715,
+          "line_number": 2742,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -901,7 +901,7 @@
         },
         {
           "function_name": "openTradeConditionsModal",
-          "line_number": 2733,
+          "line_number": 2760,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -910,7 +910,7 @@
         },
         {
           "function_name": "handleTradeConditionsButtonClick",
-          "line_number": 2765,
+          "line_number": 2792,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -919,7 +919,7 @@
         },
         {
           "function_name": "handleTradeConditionSummaryEdit",
-          "line_number": 2772,
+          "line_number": 2799,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -928,7 +928,7 @@
         },
         {
           "function_name": "handleTradeConditionSummaryDelete",
-          "line_number": 2791,
+          "line_number": 2818,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -937,7 +937,7 @@
         },
         {
           "function_name": "evaluateSingleTradeCondition",
-          "line_number": 2837,
+          "line_number": 2864,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -946,7 +946,7 @@
         },
         {
           "function_name": "handleTradeConditionRowEvaluate",
-          "line_number": 2861,
+          "line_number": 2888,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -955,7 +955,7 @@
         },
         {
           "function_name": "handleTradeConditionToggleAlerts",
-          "line_number": 2897,
+          "line_number": 2924,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -964,7 +964,7 @@
         },
         {
           "function_name": "handleTradeEvaluateConditionsClick",
-          "line_number": 2938,
+          "line_number": 2965,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -973,7 +973,7 @@
         },
         {
           "function_name": "getTradeConditionsForEvaluation",
-          "line_number": 3016,
+          "line_number": 3043,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -982,7 +982,7 @@
         },
         {
           "function_name": "loadTradeConditionsSummary",
-          "line_number": 3034,
+          "line_number": 3061,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -991,7 +991,7 @@
         },
         {
           "function_name": "setupTradeConditionsButton",
-          "line_number": 3092,
+          "line_number": 3119,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1000,7 +1000,7 @@
         },
         {
           "function_name": "updateButtonState",
-          "line_number": 3115,
+          "line_number": 3142,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1009,7 +1009,7 @@
         },
         {
           "function_name": "setupSortEventListeners",
-          "line_number": 3190,
+          "line_number": 3217,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -1018,7 +1018,7 @@
         },
         {
           "function_name": "validateTradePlanChange",
-          "line_number": 3227,
+          "line_number": 3254,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -1027,7 +1027,7 @@
         },
         {
           "function_name": "validateTradeChanges",
-          "line_number": 3298,
+          "line_number": 3325,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -1036,7 +1036,7 @@
         },
         {
           "function_name": "applyStatusFilterToTrades",
-          "line_number": 3375,
+          "line_number": 3402,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -1045,7 +1045,7 @@
         },
         {
           "function_name": "validateTickerChange",
-          "line_number": 3430,
+          "line_number": 3457,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -1054,7 +1054,7 @@
         },
         {
           "function_name": "showTickerChangeConfirmation",
-          "line_number": 3483,
+          "line_number": 3510,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -1063,7 +1063,7 @@
         },
         {
           "function_name": "validateTradePlanDate",
-          "line_number": 3540,
+          "line_number": 3567,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -1072,7 +1072,7 @@
         },
         {
           "function_name": "updateEditTradeTickerFromPlan",
-          "line_number": 3579,
+          "line_number": 3606,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1081,7 +1081,7 @@
         },
         {
           "function_name": "updateEditTradePriceFromTicker",
-          "line_number": 3659,
+          "line_number": 3686,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1090,7 +1090,7 @@
         },
         {
           "function_name": "reactivateTrade",
-          "line_number": 3708,
+          "line_number": 3735,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1099,7 +1099,7 @@
         },
         {
           "function_name": "refreshTrades",
-          "line_number": 3764,
+          "line_number": 3791,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -1108,7 +1108,7 @@
         },
         {
           "function_name": "updateTrade",
-          "line_number": 3798,
+          "line_number": 3825,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1117,7 +1117,7 @@
         },
         {
           "function_name": "confirmDeleteTrade",
-          "line_number": 3858,
+          "line_number": 3885,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1126,7 +1126,7 @@
         },
         {
           "function_name": "generateDetailedLog",
-          "line_number": 3895,
+          "line_number": 3922,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -1135,7 +1135,7 @@
         },
         {
           "function_name": "saveTrade",
-          "line_number": 4113,
+          "line_number": 4140,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1144,7 +1144,7 @@
         },
         {
           "function_name": "deleteTrade",
-          "line_number": 4279,
+          "line_number": 4306,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1153,7 +1153,7 @@
         },
         {
           "function_name": "setupTradeConditionsButton",
-          "line_number": 4289,
+          "line_number": 4316,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -1162,7 +1162,7 @@
         },
         {
           "function_name": "ensureEntityName",
-          "line_number": 4303,
+          "line_number": 4330,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1171,7 +1171,7 @@
         },
         {
           "function_name": "updateButtonState",
-          "line_number": 4317,
+          "line_number": 4344,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1180,7 +1180,7 @@
         },
         {
           "function_name": "getColumns",
-          "line_number": 4419,
+          "line_number": 4446,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1189,7 +1189,7 @@
         },
         {
           "function_name": "dataGetter",
-          "line_number": 4425,
+          "line_number": 4452,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1198,7 +1198,7 @@
         },
         {
           "function_name": "updateFunction",
-          "line_number": 4428,
+          "line_number": 4455,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -1206,13 +1206,13 @@
           "jsdoc_quality": "missing"
         }
       ],
-      "jsdoc_coverage": 67.74193548387096,
+      "jsdoc_coverage": 72.04301075268818,
       "total_jquery_ajax": 0,
       "total_xmlhttprequest": 0,
       "total_inline_onclick": 0,
       "total_inline_styles": 0,
       "total_functions": 93,
-      "documented_functions": 63
+      "documented_functions": 67
     },
     {
       "page_name": "trade_plans",
@@ -2710,7 +2710,7 @@
         },
         {
           "function_name": "updateActiveTradesField",
-          "line_number": 418,
+          "line_number": 419,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2719,7 +2719,7 @@
         },
         {
           "function_name": "updateTickerActiveTradesStatus",
-          "line_number": 464,
+          "line_number": 465,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2728,7 +2728,7 @@
         },
         {
           "function_name": "updateAllActiveTradesStatuses",
-          "line_number": 496,
+          "line_number": 497,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2737,7 +2737,7 @@
         },
         {
           "function_name": "restoreTickersSectionState",
-          "line_number": 534,
+          "line_number": 535,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -2746,7 +2746,7 @@
         },
         {
           "function_name": "saveTicker",
-          "line_number": 593,
+          "line_number": 594,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -2755,7 +2755,7 @@
         },
         {
           "function_name": "updateTicker",
-          "line_number": 731,
+          "line_number": 734,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2764,7 +2764,7 @@
         },
         {
           "function_name": "cancelTicker",
-          "line_number": 941,
+          "line_number": 944,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2773,7 +2773,7 @@
         },
         {
           "function_name": "checkLinkedItemsAndCancelTicker",
-          "line_number": 1004,
+          "line_number": 1007,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2782,7 +2782,7 @@
         },
         {
           "function_name": "performTickerCancellation",
-          "line_number": 1011,
+          "line_number": 1014,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2791,7 +2791,7 @@
         },
         {
           "function_name": "onSuccess",
-          "line_number": 1027,
+          "line_number": 1030,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2800,34 +2800,34 @@
         },
         {
           "function_name": "checkLinkedItemsBeforeDeleteTicker",
-          "line_number": 1101,
+          "line_number": 1104,
           "has_jsdoc": true,
-          "has_params": false,
-          "has_returns": false,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "partial"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "checkLinkedItemsBeforeCancelTicker",
-          "line_number": 1109,
+          "line_number": 1112,
           "has_jsdoc": true,
-          "has_params": false,
-          "has_returns": false,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "partial"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "getTickerSymbol",
-          "line_number": 1116,
+          "line_number": 1121,
           "has_jsdoc": true,
-          "has_params": false,
-          "has_returns": false,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "partial"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "updateAllTickerStatuses",
-          "line_number": 1136,
+          "line_number": 1141,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2836,7 +2836,7 @@
         },
         {
           "function_name": "performCancelTicker",
-          "line_number": 1181,
+          "line_number": 1186,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2845,7 +2845,7 @@
         },
         {
           "function_name": "reactivateTicker",
-          "line_number": 1308,
+          "line_number": 1313,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -2854,7 +2854,7 @@
         },
         {
           "function_name": "onSuccess",
-          "line_number": 1335,
+          "line_number": 1340,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2863,7 +2863,7 @@
         },
         {
           "function_name": "checkLinkedItemsAndDeleteTicker",
-          "line_number": 1363,
+          "line_number": 1368,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2872,7 +2872,7 @@
         },
         {
           "function_name": "performTickerDeletion",
-          "line_number": 1370,
+          "line_number": 1375,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2881,7 +2881,7 @@
         },
         {
           "function_name": "onSuccess",
-          "line_number": 1390,
+          "line_number": 1395,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2890,7 +2890,7 @@
         },
         {
           "function_name": "deleteTicker",
-          "line_number": 1455,
+          "line_number": 1460,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2899,7 +2899,7 @@
         },
         {
           "function_name": "confirmDeleteTicker",
-          "line_number": 1512,
+          "line_number": 1517,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2908,7 +2908,7 @@
         },
         {
           "function_name": "loadTickersDataInternal",
-          "line_number": 1567,
+          "line_number": 1572,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2917,7 +2917,7 @@
         },
         {
           "function_name": "updateTickersSummaryStats",
-          "line_number": 1659,
+          "line_number": 1664,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2926,7 +2926,7 @@
         },
         {
           "function_name": "renderTickersTableRows",
-          "line_number": 1689,
+          "line_number": 1694,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2935,7 +2935,7 @@
         },
         {
           "function_name": "toFiniteNumber",
-          "line_number": 1691,
+          "line_number": 1696,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -2944,7 +2944,7 @@
         },
         {
           "function_name": "parseValidDate",
-          "line_number": 1698,
+          "line_number": 1703,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2953,7 +2953,7 @@
         },
         {
           "function_name": "updatedCellHtml",
-          "line_number": 1766,
+          "line_number": 1771,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2962,7 +2962,7 @@
         },
         {
           "function_name": "updateTickersTable",
-          "line_number": 1945,
+          "line_number": 1950,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2971,7 +2971,7 @@
         },
         {
           "function_name": "render",
-          "line_number": 1955,
+          "line_number": 1960,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2980,7 +2980,7 @@
         },
         {
           "function_name": "onFilteredDataChange",
-          "line_number": 1964,
+          "line_number": 1969,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -2989,7 +2989,7 @@
         },
         {
           "function_name": "checkTickerExternalData",
-          "line_number": 2056,
+          "line_number": 2061,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -2998,7 +2998,7 @@
         },
         {
           "function_name": "above",
-          "line_number": 2249,
+          "line_number": 2254,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3007,7 +3007,7 @@
         },
         {
           "function_name": "restorePageState",
-          "line_number": 2260,
+          "line_number": 2265,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -3016,7 +3016,7 @@
         },
         {
           "function_name": "getColumns",
-          "line_number": 2330,
+          "line_number": 2335,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3025,7 +3025,7 @@
         },
         {
           "function_name": "dataGetter",
-          "line_number": 2336,
+          "line_number": 2341,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3034,7 +3034,7 @@
         },
         {
           "function_name": "updateFunction",
-          "line_number": 2339,
+          "line_number": 2344,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3043,7 +3043,7 @@
         },
         {
           "function_name": "loadColorsAndApplyToHeaders",
-          "line_number": 2373,
+          "line_number": 2378,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -3052,7 +3052,7 @@
         },
         {
           "function_name": "tryLoadData",
-          "line_number": 2460,
+          "line_number": 2465,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3061,7 +3061,7 @@
         },
         {
           "function_name": "refreshYahooFinanceData",
-          "line_number": 2502,
+          "line_number": 2507,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -3070,7 +3070,7 @@
         },
         {
           "function_name": "refreshYahooFinanceDataSilently",
-          "line_number": 2538,
+          "line_number": 2543,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -3079,7 +3079,7 @@
         },
         {
           "function_name": "filterTickersByType",
-          "line_number": 2569,
+          "line_number": 2574,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3088,7 +3088,7 @@
         },
         {
           "function_name": "getTypeDisplayName",
-          "line_number": 2642,
+          "line_number": 2647,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -3667,21 +3667,21 @@
         },
         {
           "function_name": "waitAndRegisterTables",
-          "line_number": 2772,
-          "has_jsdoc": false,
+          "line_number": 2775,
+          "has_jsdoc": true,
           "has_params": false,
-          "has_returns": false,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "partial"
         }
       ],
-      "jsdoc_coverage": 61.29032258064516,
+      "jsdoc_coverage": 62.903225806451616,
       "total_jquery_ajax": 0,
       "total_xmlhttprequest": 0,
       "total_inline_onclick": 0,
       "total_inline_styles": 0,
       "total_functions": 62,
-      "documented_functions": 38
+      "documented_functions": 39
     },
     {
       "page_name": "executions",
@@ -4837,16 +4837,16 @@
         },
         {
           "function_name": "getCashFlowsPaginationInstance",
-          "line_number": 369,
-          "has_jsdoc": false,
+          "line_number": 373,
+          "has_jsdoc": true,
           "has_params": false,
-          "has_returns": false,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "partial"
         },
         {
           "function_name": "setActiveCashFlowTypeButton",
-          "line_number": 395,
+          "line_number": 399,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4855,7 +4855,7 @@
         },
         {
           "function_name": "cashFlowMatchesType",
-          "line_number": 423,
+          "line_number": 427,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4864,7 +4864,7 @@
         },
         {
           "function_name": "filterCashFlowsByType",
-          "line_number": 445,
+          "line_number": 449,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4873,7 +4873,7 @@
         },
         {
           "function_name": "null",
-          "line_number": 457,
+          "line_number": 461,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -4882,7 +4882,7 @@
         },
         {
           "function_name": "filterCashFlowsLocallyByType",
-          "line_number": 483,
+          "line_number": 487,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4891,16 +4891,16 @@
         },
         {
           "function_name": "reapplyCashFlowTypeFilter",
-          "line_number": 494,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 502,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "getAccountNameById",
-          "line_number": 504,
+          "line_number": 512,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4909,7 +4909,7 @@
         },
         {
           "function_name": "ensureTradingAccountsLoaded",
-          "line_number": 531,
+          "line_number": 539,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -4918,7 +4918,7 @@
         },
         {
           "function_name": "validateCashFlowAmount",
-          "line_number": 587,
+          "line_number": 595,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4927,7 +4927,7 @@
         },
         {
           "function_name": "validateCashFlowDate",
-          "line_number": 600,
+          "line_number": 608,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4936,7 +4936,7 @@
         },
         {
           "function_name": "validateCashFlowForm",
-          "line_number": 617,
+          "line_number": 625,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -4945,7 +4945,7 @@
         },
         {
           "function_name": "validateEditCashFlowForm",
-          "line_number": 657,
+          "line_number": 665,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -4954,7 +4954,7 @@
         },
         {
           "function_name": "deleteCashFlow",
-          "line_number": 695,
+          "line_number": 703,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -4963,7 +4963,7 @@
         },
         {
           "function_name": "performCashFlowDeletion",
-          "line_number": 753,
+          "line_number": 761,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -4972,7 +4972,7 @@
         },
         {
           "function_name": "reloadFn",
-          "line_number": 768,
+          "line_number": 776,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -4981,7 +4981,7 @@
         },
         {
           "function_name": "loadAccountsForCashFlow",
-          "line_number": 865,
+          "line_number": 873,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -4990,7 +4990,7 @@
         },
         {
           "function_name": "filterFn",
-          "line_number": 872,
+          "line_number": 880,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -4999,7 +4999,7 @@
         },
         {
           "function_name": "loadCurrenciesForCashFlow",
-          "line_number": 897,
+          "line_number": 905,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": false,
@@ -5008,7 +5008,7 @@
         },
         {
           "function_name": "renderCashFlowsTable",
-          "line_number": 918,
+          "line_number": 926,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -5017,7 +5017,7 @@
         },
         {
           "function_name": "escape",
-          "line_number": 1043,
+          "line_number": 1051,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5026,7 +5026,7 @@
         },
         {
           "function_name": "updatePageSummaryStats",
-          "line_number": 1188,
+          "line_number": 1196,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5035,7 +5035,7 @@
         },
         {
           "function_name": "syncCashFlowsPagination",
-          "line_number": 1232,
+          "line_number": 1240,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5044,7 +5044,7 @@
         },
         {
           "function_name": "render",
-          "line_number": 1241,
+          "line_number": 1249,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5053,7 +5053,7 @@
         },
         {
           "function_name": "onFilteredDataChange",
-          "line_number": 1250,
+          "line_number": 1258,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5062,7 +5062,7 @@
         },
         {
           "function_name": "groupUnifiedExchanges",
-          "line_number": 1278,
+          "line_number": 1286,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -5071,7 +5071,7 @@
         },
         {
           "function_name": "isExchangeExternal",
-          "line_number": 1281,
+          "line_number": 1289,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -5080,7 +5080,7 @@
         },
         {
           "function_name": "renderUnifiedForexExchangesTable",
-          "line_number": 1320,
+          "line_number": 1328,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -5089,15 +5089,6 @@
         },
         {
           "function_name": "fmtAmt",
-          "line_number": 1328,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
-          "has_examples": false,
-          "jsdoc_quality": "missing"
-        },
-        {
-          "function_name": "getCurrencySymbol",
           "line_number": 1336,
           "has_jsdoc": false,
           "has_params": false,
@@ -5106,8 +5097,17 @@
           "jsdoc_quality": "missing"
         },
         {
+          "function_name": "getCurrencySymbol",
+          "line_number": 1344,
+          "has_jsdoc": false,
+          "has_params": false,
+          "has_returns": false,
+          "has_examples": false,
+          "jsdoc_quality": "missing"
+        },
+        {
           "function_name": "getAccountName",
-          "line_number": 1347,
+          "line_number": 1355,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5116,7 +5116,7 @@
         },
         {
           "function_name": "fmtDate",
-          "line_number": 1350,
+          "line_number": 1358,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5125,7 +5125,7 @@
         },
         {
           "function_name": "buildActions",
-          "line_number": 1351,
+          "line_number": 1359,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5134,7 +5134,7 @@
         },
         {
           "function_name": "ensureExchangePairsAdjacency",
-          "line_number": 1389,
+          "line_number": 1397,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5143,7 +5143,7 @@
         },
         {
           "function_name": "setupExchangeRowInteractions",
-          "line_number": 1448,
+          "line_number": 1456,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5152,7 +5152,7 @@
         },
         {
           "function_name": "highlight",
-          "line_number": 1462,
+          "line_number": 1470,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5161,7 +5161,7 @@
         },
         {
           "function_name": "clear",
-          "line_number": 1463,
+          "line_number": 1471,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5170,16 +5170,16 @@
         },
         {
           "function_name": "highlightExchangeGroup",
-          "line_number": 1473,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 1486,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "clearExchangeHighlight",
-          "line_number": 1488,
+          "line_number": 1501,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5188,16 +5188,16 @@
         },
         {
           "function_name": "setCurrencyExchangeSummary",
-          "line_number": 1498,
-          "has_jsdoc": false,
-          "has_params": false,
-          "has_returns": false,
+          "line_number": 1516,
+          "has_jsdoc": true,
+          "has_params": true,
+          "has_returns": true,
           "has_examples": false,
-          "jsdoc_quality": "missing"
+          "jsdoc_quality": "complete"
         },
         {
           "function_name": "renderAction",
-          "line_number": 1508,
+          "line_number": 1526,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5206,7 +5206,7 @@
         },
         {
           "function_name": "hydrateCashFlowExchangeDisplay",
-          "line_number": 1525,
+          "line_number": 1543,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5215,7 +5215,7 @@
         },
         {
           "function_name": "renderAction",
-          "line_number": 1551,
+          "line_number": 1569,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5224,7 +5224,7 @@
         },
         {
           "function_name": "formatAmount",
-          "line_number": 1570,
+          "line_number": 1588,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5233,7 +5233,7 @@
         },
         {
           "function_name": "getCashFlowTypeWithColor",
-          "line_number": 1597,
+          "line_number": 1615,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5242,7 +5242,7 @@
         },
         {
           "function_name": "getCashFlowTypeText",
-          "line_number": 1670,
+          "line_number": 1688,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5251,7 +5251,7 @@
         },
         {
           "function_name": "resolveCurrencySymbolForCashFlow",
-          "line_number": 1680,
+          "line_number": 1698,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5260,7 +5260,7 @@
         },
         {
           "function_name": "formatCashFlowAmount",
-          "line_number": 1738,
+          "line_number": 1756,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5269,7 +5269,7 @@
         },
         {
           "function_name": "formatUsdRate",
-          "line_number": 1786,
+          "line_number": 1804,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5278,7 +5278,7 @@
         },
         {
           "function_name": "showCashFlowDetails",
-          "line_number": 1802,
+          "line_number": 1820,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5287,7 +5287,7 @@
         },
         {
           "function_name": "updateCashFlowsTable",
-          "line_number": 1826,
+          "line_number": 1844,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5296,7 +5296,7 @@
         },
         {
           "function_name": "startAutoRefresh",
-          "line_number": 1859,
+          "line_number": 1877,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5305,7 +5305,7 @@
         },
         {
           "function_name": "applyDynamicColors",
-          "line_number": 1890,
+          "line_number": 1908,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -5314,7 +5314,7 @@
         },
         {
           "function_name": "applyUserPreferences",
-          "line_number": 1966,
+          "line_number": 1984,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5323,7 +5323,7 @@
         },
         {
           "function_name": "initializeCashFlowsPage",
-          "line_number": 2016,
+          "line_number": 2034,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": false,
@@ -5332,7 +5332,7 @@
         },
         {
           "function_name": "updateCashFlow",
-          "line_number": 2090,
+          "line_number": 2108,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5341,7 +5341,7 @@
         },
         {
           "function_name": "saveCashFlow",
-          "line_number": 2127,
+          "line_number": 2145,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5350,7 +5350,7 @@
         },
         {
           "function_name": "reloadFn",
-          "line_number": 2272,
+          "line_number": 2290,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5359,7 +5359,7 @@
         },
         {
           "function_name": "reloadFn",
-          "line_number": 2281,
+          "line_number": 2299,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5368,7 +5368,7 @@
         },
         {
           "function_name": "saveCurrencyExchange",
-          "line_number": 2321,
+          "line_number": 2339,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5377,7 +5377,7 @@
         },
         {
           "function_name": "reloadFn",
-          "line_number": 2545,
+          "line_number": 2563,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5386,7 +5386,7 @@
         },
         {
           "function_name": "reloadFn",
-          "line_number": 2553,
+          "line_number": 2571,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5395,7 +5395,7 @@
         },
         {
           "function_name": "loadCurrencyExchange",
-          "line_number": 2571,
+          "line_number": 2589,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5404,7 +5404,7 @@
         },
         {
           "function_name": "deleteCurrencyExchange",
-          "line_number": 2678,
+          "line_number": 2696,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5413,7 +5413,7 @@
         },
         {
           "function_name": "reloadFn",
-          "line_number": 2698,
+          "line_number": 2716,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5422,7 +5422,7 @@
         },
         {
           "function_name": "isCurrencyExchange",
-          "line_number": 2716,
+          "line_number": 2734,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5431,7 +5431,7 @@
         },
         {
           "function_name": "getExchangeIdFromCashFlow",
-          "line_number": 2742,
+          "line_number": 2760,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5440,7 +5440,7 @@
         },
         {
           "function_name": "confirmDeleteCashFlow",
-          "line_number": 2769,
+          "line_number": 2787,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5449,7 +5449,7 @@
         },
         {
           "function_name": "manageExternalIdField",
-          "line_number": 2810,
+          "line_number": 2828,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5458,7 +5458,7 @@
         },
         {
           "function_name": "setupSourceFieldListeners",
-          "line_number": 2852,
+          "line_number": 2870,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5467,7 +5467,7 @@
         },
         {
           "function_name": "initializeExternalIdFields",
-          "line_number": 2890,
+          "line_number": 2908,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5476,7 +5476,7 @@
         },
         {
           "function_name": "editCashFlow",
-          "line_number": 2927,
+          "line_number": 2945,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5485,7 +5485,7 @@
         },
         {
           "function_name": "generateDetailedLog",
-          "line_number": 2973,
+          "line_number": 2991,
           "has_jsdoc": true,
           "has_params": false,
           "has_returns": true,
@@ -5494,7 +5494,7 @@
         },
         {
           "function_name": "restorePageState",
-          "line_number": 3274,
+          "line_number": 3292,
           "has_jsdoc": true,
           "has_params": true,
           "has_returns": true,
@@ -5503,7 +5503,7 @@
         },
         {
           "function_name": "getColumns",
-          "line_number": 3344,
+          "line_number": 3362,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5512,7 +5512,7 @@
         },
         {
           "function_name": "dataGetter",
-          "line_number": 3350,
+          "line_number": 3368,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5521,7 +5521,7 @@
         },
         {
           "function_name": "updateFunction",
-          "line_number": 3365,
+          "line_number": 3383,
           "has_jsdoc": false,
           "has_params": false,
           "has_returns": false,
@@ -5529,13 +5529,13 @@
           "jsdoc_quality": "missing"
         }
       ],
-      "jsdoc_coverage": 65.85365853658537,
+      "jsdoc_coverage": 70.73170731707317,
       "total_jquery_ajax": 0,
       "total_xmlhttprequest": 0,
       "total_inline_onclick": 0,
       "total_inline_styles": 0,
       "total_functions": 82,
-      "documented_functions": 54
+      "documented_functions": 58
     },
     {
       "page_name": "notes",

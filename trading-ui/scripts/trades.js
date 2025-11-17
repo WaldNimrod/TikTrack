@@ -524,8 +524,9 @@ function updateTradesCounters(filteredCountOverride = null) {
 }
 
 /**
- * Apply filtered dataset to pagination and table
- * @param {Array} filteredTrades
+ * Set trades filtered dataset
+ * @param {Array} filteredTrades - Filtered trades array
+ * @returns {void}
  */
 function setTradesFilteredDataset(filteredTrades) {
   try {
@@ -585,6 +586,12 @@ function handleTradesPageRender({ pageData, pagination }) {
   updateTradesCounters();
 }
 
+/**
+ * Handle trades filtered data change
+ * @param {Object} options - Change options
+ * @param {Array} options.filteredData - Filtered data
+ * @returns {void}
+ */
 function handleTradesFilteredChange({ filteredData }) {
   updateTradesSummary(filteredData);
   updateTradesCounters(filteredData?.length || 0);
@@ -2146,9 +2153,7 @@ function disableConditionFields() {
 
 /**
  * Populate related objects select based on relation type
- * 
- * @function populateRelatedObjects
- * @param {number} relationTypeId - The relation type ID (1=account, 2=trade, 3=trade_plan, 4=ticker)
+ * @param {number|string} relationTypeId - The relation type ID (1=account, 2=trade, 3=trade_plan, 4=ticker)
  * @returns {void}
  */
 function populateRelatedObjects(relationTypeId) {

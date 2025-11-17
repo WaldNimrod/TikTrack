@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.1.0",
+    "version": "1.1.2.0",
     "major": 1,
     "minor": 1,
-    "patch": 1,
+    "patch": 2,
     "build": 0,
-    "commit": "87cdd25fd639298da485550f8bd5ee10917c034d",
-    "updated_at": "2025-11-14T22:52:17+00:00",
-    "notes": "Production release 1.1.1"
+    "commit": "ce4723012a8068511a987cc50ac3e101db2665b8",
+    "updated_at": "2025-11-17T01:41:42+00:00",
+    "notes": "Production update from main - 2025-11-17"
   },
   "development": {
     "version": "1.1.7.0",

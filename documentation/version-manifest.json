@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.4.0",
+    "version": "1.1.5.0",
     "major": 1,
     "minor": 1,
-    "patch": 4,
+    "patch": 5,
     "build": 0,
-    "commit": "9676c2c32c1870820abdc3cc2074eee5ae0b3700",
-    "updated_at": "2025-11-16T22:07:34+00:00",
-    "notes": "Cash flows fixes round - Backend API routes and Frontend date handling fixes"
+    "commit": "76fee7a1d2bf324ac984715e07ead95ca31c1c41",
+    "updated_at": "2025-11-17T00:21:43+00:00",
+    "notes": "Complete standardization work - data services, tests, and documentation"
   },
   "development": {
     "version": "1.1.17.0",

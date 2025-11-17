@@ -123,6 +123,12 @@ class ModalManagerV2 {
             this.handleModalHidden(event.target);
         });
         
+        // מאזין מרכזי ללחיצה על backdrop - פועל על כל המודולים במערכת
+        // זה מבטיח שלחיצה על הרקע תסגור את המודל כמו לחיצה על כפתור סגור
+        document.addEventListener('click', (event) => {
+            this.handleBackdropClick(event);
+        }, true); // useCapture: true כדי לתפוס את האירוע לפני שהוא מגיע למודל
+        
         // מאזין לפתיחת מודלים
         document.addEventListener('shown.bs.modal', (event) => {
             this.handleModalShown(event.target);
@@ -2264,13 +2270,13 @@ class ModalManagerV2 {
                             try {
                                 const date = new Date(displayText);
                                 if (!isNaN(date.getTime())) {
-                                    displayText = date.toLocaleString('he-IL', {
+                                    displayText = window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleString('he-IL', {
                                         year: 'numeric',
                                         month: '2-digit',
                                         day: '2-digit',
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                    });
+                                    }));
                                 }
                             } catch (e) {
                                 // Keep original value if parsing fails
@@ -3551,11 +3557,11 @@ class ModalManagerV2 {
         if (typeof window.formatDate === 'function') {
             return window.formatDate(isoString);
         }
-        return date.toLocaleDateString('he-IL', {
+        return window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
-        });
+        }));
     }
     
     /**
@@ -5830,7 +5836,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.opened_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                 } else if (typeId === 3) {
                     // עבור תוכנית - צריך להתאים בדיוק לפורמט בטבלה: תוכנית | טיקר | צד | סוג השקעה | תאריך
@@ -5850,7 +5856,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                 } else if (typeId === 1) {
                     // עבור חשבון - שם + מטבע
@@ -6006,7 +6012,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.opened_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                     
                     if (index < 3) { // Log only first 3 for debugging
@@ -6039,7 +6045,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                     
                     if (index < 3) { // Log only first 3 for debugging
@@ -6164,6 +6170,89 @@ class ModalManagerV2 {
         event.preventDefault();
         event.stopPropagation();
         this.closeActiveModal();
+    }
+
+    /**
+     * Handle backdrop click - טיפול בלחיצה על backdrop (כל סוגי המודולים)
+     * פונקציה מרכזית שפועלת על כל המודולים במערכת - גם Bootstrap וגם custom
+     * 
+     * @param {Event} event - אירוע הלחיצה
+     * @private
+     */
+    handleBackdropClick(event) {
+        if (!event) {
+            return;
+        }
+
+        const target = event.target;
+        
+        // בדיקה אם הלחיצה היא על backdrop (Bootstrap או global)
+        const isBackdropClick = 
+            target.classList.contains('modal-backdrop') || 
+            target === this.globalBackdrop;
+        
+        // בדיקה אם הלחיצה היא על modal element עצמו (לא על התוכן שלו)
+        // זה קורה כשלוחצים על הרקע של המודל (מחוץ ל-modal-dialog)
+        const modalElement = target.closest('.modal.show');
+        const isModalElementClick = 
+            modalElement && 
+            target === modalElement; // הלחיצה היא על modal element עצמו, לא על תוכן
+
+        if (!isBackdropClick && !isModalElementClick) {
+            return;
+        }
+
+        // מציאת המודל הפעיל
+        let activeModal = null;
+        
+        if (isBackdropClick) {
+            // אם לחיצה על backdrop - מציאת המודל הפעיל
+            const openModals = document.querySelectorAll('.modal.show');
+            if (openModals.length === 0) {
+                return;
+            }
+            activeModal = openModals[openModals.length - 1];
+        } else if (isModalElementClick) {
+            // אם לחיצה על modal element עצמו
+            activeModal = modalElement;
+        }
+
+        if (!activeModal) {
+            return;
+        }
+
+        // בדיקה אם המודל מאפשר סגירה בלחיצה על הרקע
+        // אם יש data-bs-backdrop="static" - לא נסגור
+        const backdropSetting = activeModal.getAttribute('data-bs-backdrop');
+        if (backdropSetting === 'static') {
+            return;
+        }
+
+        // בדיקה אם הלחיצה היא על modal-dialog (לא על הרקע)
+        // אם כן - לא נסגור (זה תוכן המודל)
+        if (isModalElementClick) {
+            const modalDialog = activeModal.querySelector('.modal-dialog');
+            if (modalDialog && modalDialog.contains(target)) {
+                return;
+            }
+        }
+
+        // סגירת המודל
+        event.preventDefault();
+        event.stopPropagation();
+
+        // ניסיון לסגור דרך Bootstrap Modal instance
+        const modalInstance = bootstrap?.Modal?.getInstance(activeModal);
+        if (modalInstance && typeof modalInstance.hide === 'function') {
+            modalInstance.hide();
+        } else {
+            // fallback - סגירה ידנית
+            activeModal.classList.remove('show');
+            activeModal.style.display = 'none';
+            activeModal.setAttribute('aria-hidden', 'true');
+            activeModal.removeAttribute('aria-modal');
+            activeModal.dispatchEvent(new Event('hidden.bs.modal'));
+        }
     }
 
     _getActiveModalCount() {

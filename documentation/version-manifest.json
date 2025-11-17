@@ -10,13 +10,13 @@
     "notes": "Backup verification and PostgreSQL migration updates"
   },
   "development": {
-    "version": "1.1.20.0",
+    "version": "1.1.21.0",
     "major": 1,
     "minor": 1,
-    "patch": 20,
+    "patch": 21,
     "build": 0,
-    "commit": "5a7d7b5ce443ddeebb6dbf195d5e8ccfca9c107c",
-    "updated_at": "2025-11-17T02:03:46+00:00",
-    "notes": "Phase 3: JSDoc coverage improvements - added JSDoc to external-data-dashboard.js, cash_flows.js, executions.js, index.js, notes.js, tickers.js, trading_accounts.js"
+    "commit": "5a9371ece904c2ad0f2c0c98ba26dd64fc7458be",
+    "updated_at": "2025-11-17T20:16:48+00:00",
+    "notes": "Fix: Add centralized backdrop click handler for all modals and fix cash_flows page loading order"
   }
 }

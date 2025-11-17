@@ -43,9 +43,7 @@ describe('Tagging CRUD Integration', () => {
             'standalone-core',
             'core-modules',
             'core-utilities',
-            'ui-advanced',
             'services',
-            'crud',
             'modal'
         ]);
         // eslint-disable-next-line no-eval
@@ -186,70 +184,6 @@ describe('Tagging CRUD Integration', () => {
         });
         expect(result).toEqual({ assigned: [5, 6] });
   });
-
-    test('TagService.formatTagErrorMessage appends server message when available', () => {
-        const baseMessage = 'הטיקר נשמר אך התגיות לא עודכנו';
-        const error = new Error('Tags not found for user');
-
-        const enriched = window.TagService.formatTagErrorMessage(baseMessage, error);
-        expect(enriched).toBe(`${baseMessage} (${error.message})`);
-
-        const fallback = window.TagService.formatTagErrorMessage(baseMessage, null);
-        expect(fallback).toBe(baseMessage);
-  });
-
-    test('EntityDetailsRenderer.renderBasicInfo delegates tag rendering to FieldRendererService', () => {
-        const proto = window.EntityDetailsRenderer?.prototype || window.entityDetailsRenderer?.constructor?.prototype;
-        expect(proto).toBeDefined();
-
-        const renderer = Object.create(proto);
-        renderer.entityColors = renderer.entityColors || {};
-
-        const tags = [
-            { id: 1, name: 'חשוב', category_name: 'סטטוס', category_color: '#26baac' },
-            { id: 2, name: 'לטיפול', category_name: 'פעולה', category_color: '#fc5a06' }
-        ];
-
-        const spy = jest.spyOn(window.FieldRendererService, 'renderTagBadges').mockReturnValue('<div class="tag-block"></div>');
-
-        const html = renderer.renderBasicInfo({
-            id: 42,
-            status: 'open',
-            created_at: '2024-01-01T12:00:00Z',
-            updated_at: '2024-01-02T12:00:00Z',
-            tag_assignments: tags
-        }, 'trade');
-
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith(tags, expect.objectContaining({
-            entityType: 'trade',
-            title: 'תגיות',
-            emptyMessage: 'אין תגיות משויכות'
-        }));
-        expect(html).toContain('tag-block');
-
-        spy.mockRestore();
-    });
-
-    test('EntityDetailsRenderer.renderTagsDisplay provides fallback markup without FieldRendererService', () => {
-        const proto = window.EntityDetailsRenderer?.prototype || window.entityDetailsRenderer?.constructor?.prototype;
-        expect(proto).toBeDefined();
-
-        const renderer = Object.create(proto);
-        renderer.entityColors = renderer.entityColors || {};
-
-        const original = window.FieldRendererService.renderTagBadges;
-        delete window.FieldRendererService.renderTagBadges;
-
-        const html = renderer.renderTagsDisplay('trade', [
-            { id: 7, name: 'בדיקה', category_name: 'סטטוס' }
-        ], { title: 'תגיות מותאמות' });
-
-        expect(html).toContain('תגיות מותאמות');
-        expect(html).toContain('בדיקה');
-
-        window.FieldRendererService.renderTagBadges = original;
-    });
 });
 
 

@@ -113,7 +113,7 @@
 | **server-monitor.html** | ניטור שרת | `http://localhost:5000/server-monitor.html` | `/api/monitor/*` |
 | **system-management.html** | ניהול מערכת | `http://localhost:5000/system-management.html` | `/api/system/*` |
 | **cache-test.html** | בדיקת מטמון | `http://localhost:5000/cache-test.html` | `/api/cache/*` |
-| **code-quality-dashboard.html** | דשבורד איכות קוד + לינטר | `http://localhost:5000/code-quality-dashboard.html` | `/api/quality/lint/*` |
+| **linter-realtime-monitor.html** | ניטור לינטר | `http://localhost:5000/linter-realtime-monitor.html` | `/api/linter/*` |
 | **notifications-center.html** | מרכז התראות | `http://localhost:5000/notifications-center.html` | `/api/notifications/*` |
 | **css-management.html** | ניהול CSS | `http://localhost:5000/css-management.html` | `/api/css/*` |
 | **dynamic-colors-display.html** | תצוגת צבעים | `http://localhost:5000/dynamic-colors-display.html` | `/api/colors/*` |
@@ -171,9 +171,8 @@
 5. **כל העמודים** עובדים עם מערכת הכפתורים המרכזית
 6. עמוד `page-scripts-matrix` הועבר לארכיון ב-7 בנובמבר 2025 ואינו זמין בסביבת הפיתוח הפעילה
 7. כלי זיהוי הכפילויות הועבר לדשבורד איכות הקוד (`/code-quality-dashboard`) ב-7 בנובמבר 2025 והעמוד `duplicate-detector.html` הועבר לארכיון
-8. עמוד `linter-realtime-monitor` הוסר – כל ממשקי הלינטר (ריצות, לוגים, הורדות) הוטמעו בתוך `code-quality-dashboard.html`
-9. עמוד `js-map` (מפת JS) הועבר לארכיון ב-7 בנובמבר 2025; פונקציות המיפוי עברו לכלים משודרגים ומטופלות בדוחות מערכת אחרים
-10. כלי `import-user-data` (ייבוא נתוני משתמש) הוסר מהתפריט והועבר לארכיון ב-8 בנובמבר 2025; הייבוא מבוצע כיום דרך תהליכי API ו-Dashboard ייעודיים
+8. עמוד `js-map` (מפת JS) הועבר לארכיון ב-7 בנובמבר 2025; פונקציות המיפוי עברו לכלים משודרגים ומטופלות בדוחות מערכת אחרים
+9. כלי `import-user-data` (ייבוא נתוני משתמש) הוסר מהתפריט והועבר לארכיון ב-8 בנובמבר 2025; הייבוא מבוצע כיום דרך תהליכי API ו-Dashboard ייעודיים
 
 ---
 

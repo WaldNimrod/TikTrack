@@ -727,8 +727,7 @@
   color: #6f42c1; /* Purple - נשאר קבוע */
 }
 
-#pendingExecutionsHighlightsList,
-.pending-highlight-list {
+#pendingExecutionsHighlightsList {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;

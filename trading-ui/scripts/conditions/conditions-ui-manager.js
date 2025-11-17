@@ -26,6 +26,7 @@ class ConditionsUIManager {
         this.postSavePromptElement = null;
         this.postSaveModalElement = null;
         this.postSaveBackdropElement = null;
+        this.layoutMode = 'manager';
     }
 
     async initialize(options = {}) {
@@ -34,6 +35,7 @@ class ConditionsUIManager {
         this.entityType = options.entityType || 'plan';
         this.entityId = options.entityId;
         this.entityName = options.entityName || '';
+        this.layoutMode = options.layoutMode || 'manager';
         this.container = document.getElementById(options.containerId || 'conditionsManagerRoot');
 
         if (!this.container) {
@@ -60,92 +62,24 @@ class ConditionsUIManager {
     }
 
     renderLayout() {
-        const entityLabel = this.entityType === 'plan' ? 'תוכנית מסחר' : 'עסקה';
-        const entityDetails = `
-            <div>
-                <h5 class="mb-1">ניהול תנאים – ${entityLabel} #${this.entityId}</h5>
-                ${this.entityName ? `<div class="text-muted small">${this.entityName}</div>` : ''}
-            </div>
-        `;
-
         this.container.innerHTML = `
-            <div class="conditions-manager">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    ${entityDetails}
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-outline-secondary btn-sm" id="refreshConditionsBtn">
-                            <i class="fas fa-sync-alt"></i> רענן
-                        </button>
-                        <button class="btn btn-primary btn-sm" id="addConditionBtn">
-                            <i class="fas fa-plus"></i> ${this.translator.getFormLabel('add_condition')}
-                        </button>
-                    </div>
-                </div>
-
-                <div id="conditionsListContainer" class="conditions-list mb-4"></div>
-                <div id="conditionsFormContainer" class="conditions-form-container" style="display:none;"></div>
+            <div class="conditions-manager conditions-manager--form-only">
+                <div id="conditionsFormContainer" class="conditions-form-container conditions-form-container--two-column"></div>
             </div>
         `;
     }
 
     bindStaticEvents() {
-        const refreshBtn = this.container.querySelector('#refreshConditionsBtn');
-        const addBtn = this.container.querySelector('#addConditionBtn');
-
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', () => {
-                this.logEvent('refresh-click', { forced: true });
-                this.refreshConditions(true);
-            });
-        }
-
-        if (addBtn) {
-            addBtn.addEventListener('click', () => {
-                this.logEvent('add-condition-click');
-                this.openConditionForm();
-            });
-        }
-
-        const listContainer = this.container.querySelector('#conditionsListContainer');
-        if (listContainer) {
-            listContainer.addEventListener('click', (event) => {
-                const actionBtn = event.target.closest('[data-action]');
-                if (!actionBtn) return;
-
-                const conditionId = Number(actionBtn.getAttribute('data-condition-id'));
-                if (!conditionId) return;
-
-                const action = actionBtn.getAttribute('data-action');
-                switch (action) {
-                    case 'edit':
-                        this.logEvent('edit-click', { conditionId });
-                        this.handleEditCondition(conditionId);
-                        break;
-                    case 'delete':
-                        this.logEvent('delete-click', { conditionId });
-                        this.handleDeleteCondition(conditionId);
-                        break;
-                    default:
-                        break;
-                }
-            });
-        }
+        this.openConditionForm();
     }
 
     async refreshConditions(force = false) {
         const listContainer = this.container.querySelector('#conditionsListContainer');
-        if (!listContainer) return;
-
-        listContainer.innerHTML = `
-            <div class="d-flex align-items-center text-muted">
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                טוען תנאים...
-            </div>
-        `;
-
+        if (listContainer) {
+            listContainer.innerHTML = '';
+        }
         try {
             this.conditions = await this.crudManager.readConditions(this.entityId, !force);
-            this.renderConditions();
             this.logEvent('refresh-success', { count: this.conditions?.length || 0 });
         } catch (error) {
             window.Logger?.error('[ConditionsUIManager] Failed to load conditions', { error: error?.message, stack: error?.stack }, { page: 'conditions-ui-manager' });
@@ -155,25 +89,7 @@ class ConditionsUIManager {
     }
 
     renderConditions() {
-        const listContainer = this.container.querySelector('#conditionsListContainer');
-        if (!listContainer) return;
-
-        if (!this.conditions || this.conditions.length === 0) {
-            listContainer.innerHTML = `
-                <div class="alert alert-info d-flex align-items-center">
-                    <i class="fas fa-info-circle me-2"></i>
-                    לא קיימים תנאים עבור ישות זו. לחץ על "הוסף תנאי" כדי להתחיל.
-                </div>
-            `;
-            return;
-        }
-
-        const rows = this.conditions.map(condition => this.renderConditionCard(condition)).join('');
-        listContainer.innerHTML = `
-            <div class="conditions-cards">
-                ${rows}
-            </div>
-        `;
+        return;
     }
 
     renderConditionCard(condition) {
@@ -200,10 +116,10 @@ class ConditionsUIManager {
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge ${statusBadgeClass}">${statusText}</span>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-primary" data-action="edit" data-condition-id="${condition.id}">
+                                <button class="btn btn-outline-primary" data-condition-action="edit" data-condition-id="${condition.id}">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-outline-danger" data-action="delete" data-condition-id="${condition.id}">
+                                <button class="btn btn-outline-danger" data-condition-action="delete" data-condition-id="${condition.id}">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -254,8 +170,22 @@ class ConditionsUIManager {
         await this.openConditionForm(condition);
     }
 
-    async handleDeleteCondition(conditionId) {
+    async handleDeleteCondition(conditionId, options = {}) {
         try {
+            const condition = this.conditions.find(item => item.id === conditionId);
+            if (!condition) {
+                this.showNotification('התנאי המבוקש לא נמצא', 'error');
+                return;
+            }
+
+            if (!options.skipConfirm) {
+                const confirmed = await this.confirmConditionDeletion(condition);
+                if (!confirmed) {
+                    this.logEvent('delete-cancelled', { conditionId });
+                    return;
+                }
+            }
+
             const success = await this.crudManager.deleteCondition(conditionId, this.entityId);
             if (success) {
                 await this.refreshConditions(true);
@@ -271,6 +201,34 @@ class ConditionsUIManager {
                 this.showNotification(message, 'error');
             }
         }
+    }
+
+    async confirmConditionDeletion(condition) {
+        const translator = this.translator;
+        const title = translator?.getMessage('condition_delete_confirm_title') || 'מחיקת תנאי';
+        const baseMessage = translator?.getMessage('condition_delete_confirm_message') || 'האם למחוק את התנאי הנבחר?';
+        const secondary = translator?.getMessage('condition_delete_confirm_secondary') || '';
+        const methodName = condition?.method_name || condition?.method?.name || '';
+        const message = methodName ? `${baseMessage}\n${methodName}` : baseMessage;
+        const fullMessage = secondary ? `${message}\n${secondary}` : message;
+
+        if (typeof window.showConfirmationDialog === 'function') {
+            return await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                    title,
+                    fullMessage,
+                    () => resolve(true),
+                    () => resolve(false),
+                    'danger'
+                );
+            });
+        }
+
+        if (window.showNotification) {
+            window.showNotification(`${title}: ${message}`, 'warning');
+        }
+
+        return window.confirm(fullMessage);
     }
 
     async openConditionForm(condition = null) {
@@ -301,6 +259,9 @@ class ConditionsUIManager {
         if (container) {
             container.innerHTML = '';
             container.style.display = 'none';
+        }
+        if (this.formGenerator?.destroyActionNotesEditor) {
+            this.formGenerator.destroyActionNotesEditor();
         }
         this.removePostSavePrompt();
         this.removePostSaveConfirmation();

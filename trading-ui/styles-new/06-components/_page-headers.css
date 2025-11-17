@@ -105,6 +105,8 @@
 /* עמודי כלי פיתוח - צבע development */
 .development-page .section-header,
 .development-page .top-section .section-header,
+.linter-realtime-monitor-page .section-header,
+.linter-realtime-monitor-page .top-section .section-header,
 .init-system-page .section-header,
 .init-system-page .top-section .section-header,
 .system-management-page .section-header,

@@ -318,9 +318,17 @@ if (window.filterSystem) {
     };
 }
 
-// שמירת מצב בעת שינוי סידור (כולל שרשרת קריטריונים)
-const chain = window.getDefaultSortChain('trades');
-await window.saveSortState('trades', chain[0].columnIndex, chain[0].direction, { chain });
+// שמירת מצב בעת שינוי סידור
+const originalSaveSortState = window.saveSortState;
+window.saveSortState = async function(tableType, columnIndex, direction) {
+    await originalSaveSortState.call(this, tableType, columnIndex, direction);
+    
+    // שמירה דרך PageStateManager
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+        const pageName = window.getCurrentPageName ? window.getCurrentPageName() : tableType;
+        await window.PageStateManager.saveSort(pageName, { columnIndex, direction });
+    }
+};
 ```
 
 ---

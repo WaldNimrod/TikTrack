@@ -30,13 +30,8 @@
  * - renderAssignmentItem(item)
  * - renderCreations(list)
  * - renderCreationItem(item)
- * - setupHoverDetails()
  *
  * ACTIONS
- * - handleAssignButton(tradeId, planId)
- * - handleCreateButton(tradeId)
- * - handleDismissAssignment(tradeId, planId)
- * - handleDismissCreation(tradeId)
  * - assignTradeToPlan(tradeId, planId)
  * - openPlanCreationModal(tradeId)
  * - preparePlanModal(tradeId, prefill)
@@ -145,7 +140,7 @@
                                 <h6 class="mb-0 text-muted">שיוך לתוכנית קיימת</h6>
                                 <span class="badge bg-body-secondary text-body" id="pendingTradePlanAssignmentsCount">0</span>
                             </div>
-                            <ul class="list-group list-group-flush pending-highlight-list" id="pendingTradePlanAssignmentsList"></ul>
+                            <ul class="list-group list-group-flush" id="pendingTradePlanAssignmentsList"></ul>
                         </div>
                         <hr class="my-1 d-none" id="pendingTradePlanDivider">
                         <div class="d-flex flex-column gap-2 widget-section" id="pendingTradePlanCreationsSection">
@@ -153,7 +148,7 @@
                                 <h6 class="mb-0 text-muted">יצירת תוכנית חדשה</h6>
                                 <span class="badge bg-body-secondary text-body" id="pendingTradePlanCreationsCount">0</span>
                             </div>
-                            <ul class="list-group list-group-flush pending-highlight-list" id="pendingTradePlanCreationsList"></ul>
+                            <ul class="list-group list-group-flush" id="pendingTradePlanCreationsList"></ul>
                         </div>
                     </div>
                 </div>
@@ -287,7 +282,6 @@
                 params.set('limit', String(limit));
             }
             params.set('suggestions', '3');
-            params.set('_t', Date.now().toString());
 
             const response = await fetch(`${ASSIGNMENTS_ENDPOINT}?${params.toString()}`, {
                 headers: { Accept: 'application/json' }
@@ -322,7 +316,6 @@
             if (Number.isFinite(limit)) {
                 params.set('limit', String(limit));
             }
-            params.set('_t', Date.now().toString());
 
             const response = await fetch(`${CREATIONS_ENDPOINT}?${params.toString()}`, {
                 headers: { Accept: 'application/json' }
@@ -379,8 +372,6 @@
             } else if (window.initializeButtons) {
                 window.initializeButtons(this.dom.card);
             }
-
-            this.setupHoverDetails();
         },
 
         renderAssignments(items) {
@@ -426,7 +417,7 @@
             const createdAt = this.formatDate(trade.created_at);
 
             return `
-                <li class="list-group-item pending-highlight-item" data-trade-id="${trade.id}" data-kind="assignment">
+                <li class="list-group-item d-flex flex-column gap-2" data-trade-id="${trade.id}">
                     <div class="d-flex align-items-start gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex flex-wrap align-items-center gap-2">
@@ -445,7 +436,6 @@
                                 data-trade-id="${trade.id}"
                                 data-plan-id="${plan.id}"
                                 data-text="שייך"
-                                data-onclick="PendingTradePlanWidget.handleAssignButton(${trade.id}, ${plan.id})"
                                 title="שיוך לתוכנית קיימת">
                             </button>
                             <button
@@ -455,24 +445,17 @@
                                 data-trade-id="${trade.id}"
                                 data-plan-id="${plan.id}"
                                 data-text="דחה"
-                                data-onclick="PendingTradePlanWidget.handleDismissAssignment(${trade.id}, ${plan.id})"
                                 title="הסתר הצעה זו">
                             </button>
                         </div>
                     </div>
-                    <div class="pending-highlight-details">
-                        <div class="row g-2 align-items-stretch">
-                            <div class="col-12">
-                                <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="text-muted small fw-semibold">תוכנית מומלצת:</span>
-                                        ${planBadge}
-                                        ${statusBadge || ''}
-                                    </div>
-                                    ${reasonsList}
-                                </div>
-                            </div>
+                    <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small fw-semibold">תוכנית מומלצת:</span>
+                            ${planBadge}
+                            ${statusBadge || ''}
                         </div>
+                        ${reasonsList}
                     </div>
                 </li>
             `;
@@ -488,48 +471,6 @@
             }
             const html = items.map(item => this.renderCreationItem(item)).join('');
             this.dom.creationsList.innerHTML = html;
-        },
-
-        setupHoverDetails() {
-            const lists = [this.dom.assignmentsList, this.dom.creationsList].filter(Boolean);
-            lists.forEach(list => {
-                const items = list.querySelectorAll('.pending-highlight-item');
-                items.forEach(item => {
-                    if (item.dataset.hoverBound === 'true') {
-                        return;
-                    }
-
-                    let hideTimer = null;
-                    const showDetails = () => {
-                        if (hideTimer) {
-                            clearTimeout(hideTimer);
-                            hideTimer = null;
-                        }
-                        item.classList.add('is-hovered');
-                    };
-
-                    const hideDetails = () => {
-                        if (hideTimer) {
-                            clearTimeout(hideTimer);
-                        }
-                        hideTimer = window.setTimeout(() => {
-                            item.classList.remove('is-hovered');
-                            hideTimer = null;
-                        }, 160);
-                    };
-
-                    item.addEventListener('mouseenter', showDetails);
-                    item.addEventListener('mouseleave', hideDetails);
-                    item.addEventListener('focusin', showDetails);
-                    item.addEventListener('focusout', (event) => {
-                        if (!item.contains(event.relatedTarget)) {
-                            hideDetails();
-                        }
-                    });
-
-                    item.dataset.hoverBound = 'true';
-                });
-            });
         },
 
         renderCreationItem(item) {
@@ -561,7 +502,7 @@
                 : '';
 
             return `
-                <li class="list-group-item pending-highlight-item" data-trade-id="${trade.id}" data-kind="creation">
+                <li class="list-group-item d-flex flex-column gap-2" data-trade-id="${trade.id}">
                     <div class="d-flex align-items-start gap-2">
                         <div class="flex-grow-1">
                             <div class="d-flex flex-wrap align-items-center gap-2">
@@ -574,12 +515,11 @@
                         <div class="d-flex align-items-center gap-2">
                             ${scoreBadge}
                             <button
-                                data-button-type="ADD"
+                                data-button-type="PRIMARY"
                                 data-variant="small"
                                 data-role="create-plan"
                                 data-trade-id="${trade.id}"
                                 data-text="פתח תוכנית"
-                                data-onclick="PendingTradePlanWidget.handleCreateButton(${trade.id})"
                                 title="יצירת תוכנית חדשה">
                             </button>
                             <button
@@ -588,67 +528,22 @@
                                 data-role="dismiss-suggestion"
                                 data-trade-id="${trade.id}"
                                 data-text="דחה"
-                                data-onclick="PendingTradePlanWidget.handleDismissCreation(${trade.id})"
                                 title="הסתר הצעה זו">
                             </button>
                         </div>
                     </div>
-                    <div class="pending-highlight-details">
-                        <div class="row g-2 align-items-stretch">
-                            <div class="col-12">
-                                <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
-                                    <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
-                                        <span>כמות מוצעת: ${quantity}</span>
-                                        <span>•</span>
-                                        <span>סכום מתוכנן: ${amount || '-'} </span>
-                                        <span>•</span>
-                                        <span>תאריך כניסה: ${this.formatDate(prefill.entry_date)}</span>
-                                    </div>
-                                    ${assignmentNotice}
-                                </div>
-                            </div>
+                    <div class="bg-body-tertiary rounded-3 p-3 d-flex flex-column gap-2">
+                        <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+                            <span>כמות מוצעת: ${quantity}</span>
+                            <span>•</span>
+                            <span>סכום מתוכנן: ${amount || '-'} </span>
+                            <span>•</span>
+                            <span>תאריך כניסה: ${this.formatDate(prefill.entry_date)}</span>
                         </div>
+                        ${assignmentNotice}
                     </div>
                 </li>
             `;
-        },
-
-        handleAssignButton(tradeId, planId) {
-            const numericTradeId = Number(tradeId);
-            const numericPlanId = Number(planId);
-            if (!Number.isFinite(numericTradeId) || !Number.isFinite(numericPlanId)) {
-                window.Logger?.warn('⚠️ Invalid identifiers for handleAssignButton', { tradeId, planId }, { page: 'index' });
-                return;
-            }
-            this.assignTradeToPlan(numericTradeId, numericPlanId);
-        },
-
-        handleCreateButton(tradeId) {
-            const numericTradeId = Number(tradeId);
-            if (!Number.isFinite(numericTradeId)) {
-                window.Logger?.warn('⚠️ Invalid tradeId for handleCreateButton', { tradeId }, { page: 'index' });
-                return;
-            }
-            this.openPlanCreationModal(numericTradeId);
-        },
-
-        handleDismissAssignment(tradeId, planId) {
-            const numericTradeId = Number(tradeId);
-            const numericPlanId = Number(planId);
-            if (!Number.isFinite(numericTradeId)) {
-                return;
-            }
-            const dismissKey = this.getDismissKey('assignment', numericTradeId, Number.isFinite(numericPlanId) ? numericPlanId : null);
-            this.dismissSuggestion(dismissKey);
-        },
-
-        handleDismissCreation(tradeId) {
-            const numericTradeId = Number(tradeId);
-            if (!Number.isFinite(numericTradeId)) {
-                return;
-            }
-            const dismissKey = this.getDismissKey('creation', numericTradeId);
-            this.dismissSuggestion(dismissKey);
         },
 
         async assignTradeToPlan(tradeId, planId) {
@@ -717,7 +612,7 @@
 
             try {
                 await window.ModalManagerV2?.showModal('tradePlansModal', 'add');
-                await this.preparePlanModal(tradeId, creation.prefill || {});
+                this.preparePlanModal(tradeId, creation.prefill || {});
             } catch (error) {
                 window.Logger?.error('❌ Failed to open trade plan modal', { error: error?.message }, { page: 'index' });
                 if (typeof window.showErrorNotification === 'function') {
@@ -726,7 +621,7 @@
             }
         },
 
-        async preparePlanModal(tradeId, prefill) {
+        preparePlanModal(tradeId, prefill) {
             const modalInfo = window.ModalManagerV2?.getModalInfo?.('tradePlansModal');
             const modalElement = modalInfo?.element;
             if (!modalElement) {
@@ -751,40 +646,7 @@
                 tradePlanNotes: prefill.notes ?? ''
             };
 
-            const tickerSelect = modalElement.querySelector('#tradePlanTicker');
-            if (tickerSelect && window.SelectPopulatorService?.populateTickersSelect) {
-                try {
-                    await window.SelectPopulatorService.populateTickersSelect(tickerSelect, {
-                        defaultValue: populatePayload.tradePlanTicker,
-                        includeEmpty: false
-                    });
-                } catch (error) {
-                    window.Logger?.warn('⚠️ populateTickersSelect failed for trade plan modal', { error: error?.message }, { page: 'index' });
-                }
-            }
-
-            const accountSelect = modalElement.querySelector('#tradePlanAccount');
-            if (accountSelect && window.SelectPopulatorService?.populateAccountsSelect) {
-                try {
-                    await window.SelectPopulatorService.populateAccountsSelect(accountSelect, {
-                        defaultValue: populatePayload.tradePlanAccount,
-                        defaultFromPreferences: true,
-                        includeEmpty: false
-                    });
-                } catch (error) {
-                    window.Logger?.warn('⚠️ populateAccountsSelect failed for trade plan modal', { error: error?.message }, { page: 'index' });
-                }
-            }
-
-            await window.ModalManagerV2?.populateForm?.(modalElement, populatePayload);
-
-            if (populatePayload.tradePlanTicker && typeof window.loadTradePlanTickerInfo === 'function') {
-                try {
-                    await window.loadTradePlanTickerInfo(populatePayload.tradePlanTicker);
-                } catch (error) {
-                    window.Logger?.warn('⚠️ loadTradePlanTickerInfo failed', { error: error?.message, tickerId: populatePayload.tradePlanTicker }, { page: 'index' });
-                }
-            }
+            window.ModalManagerV2?.populateForm?.(modalElement, populatePayload);
 
             if (typeof window.applyTradePlanDefaultRiskLevels === 'function') {
                 window.applyTradePlanDefaultRiskLevels({ force: true, modalElement });

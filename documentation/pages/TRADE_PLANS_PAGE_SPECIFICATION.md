@@ -25,11 +25,8 @@ trading-ui/
 │   ├── trade_plans.js        # לוגיקת העמוד והפונקציונליות
 │   └── conditions/           # מערכת התנאים
 │       ├── conditions-translations.js
-│       ├── conditions-validator.js
-│       ├── conditions-form-generator.js
-│       ├── conditions-crud-manager.js
-│       ├── conditions-ui-manager.js
-│       └── conditions-modal-controller.js
+│       ├── condition-validator.js
+│       └── condition-builder.js
 └── styles-new/               # עיצוב ITCSS
     ├── 05-objects/_layout.css
     ├── 06-components/_buttons-advanced.css
@@ -174,7 +171,7 @@ trading-ui/
 - **פונקציונליות:** טיפול אחיד בשגיאות, logging
 
 #### מערכת התנאים (חדש בגרסה 3.0.0)
-- **קבצים:** `scripts/conditions/conditions-ui-manager.js`, `conditions-form-generator.js`, `conditions-crud-manager.js`, `conditions-modal-controller.js`
+- **קובץ:** `scripts/conditions/condition-builder.js`
 - **תיעוד:** `documentation/02-ARCHITECTURE/FRONTEND/CONDITIONS_SYSTEM.md`
 - **פונקציונליות:** בניית תנאים מותאמים אישית, בחירת שיטות מסחר, הגדרת פרמטרים
 
@@ -334,13 +331,6 @@ const validationRules = {
 };
 ```
 
-### 5. שמירת תוכנית מסחר (CRUD אחיד)
-- `saveTradePlan()` משתמשת ב-`DataCollectionService.collectFormData()` לאיסוף שדות הטופס כולל תגיות.
-- הוולידציה מתבצעת דרך `validateEntityForm()` עם חוקים ייעודיים (שדות חובה, מינימום). שדה ההערות מנוהל ע״י עורך Rich Text ולכן נבדק בצד השרת להגבלת 5,000 תווים.
-- לפני שינוי סטטוס ל-`cancelled` מתבצעת בדיקת `checkLinkedItemsBeforeAction('trade_plan', id, 'cancel')` למניעת ביטול עם פריטים מקושרים.
-- שינוי טיקר קיים חסום ומציג הודעת מערכת.
-- שליחת הבקשה ל-API מטופלת ב-`CRUDResponseHandler.handleSaveResponse/handleUpdateResponse`, והצמדת תגיות משלימה באמצעות `TagService.replaceEntityTags()`.
-
 ---
 
 ## API Endpoints
@@ -461,7 +451,7 @@ const validationRules = {
 - `scripts/error-handlers.js`
 - `scripts/conditions/conditions-translations.js` (חדש בגרסה 3.0.0)
 - `scripts/conditions/condition-validator.js` (חדש בגרסה 3.0.0)
-- `scripts/conditions/conditions-ui-manager.js`, `conditions-form-generator.js`, `conditions-crud-manager.js`, `conditions-modal-controller.js` (עודכן ב-2025-11)
+- `scripts/conditions/condition-builder.js` (חדש בגרסה 3.0.0)
 
 ### קבצי CSS נדרשים:
 - `styles-new/05-objects/_layout.css`

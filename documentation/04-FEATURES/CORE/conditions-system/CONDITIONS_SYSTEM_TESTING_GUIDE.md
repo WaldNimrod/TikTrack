@@ -477,19 +477,7 @@ class TestPlanConditionsAPI(unittest.TestCase):
 
 ## בדיקות יחידה - Frontend
 
-### 1. בדיקות Conditions UI Manager (TODO)
-
-- **`conditions-ui-manager`**  
-  - תריצו שמירה מוצלחת ותאמתו שהקריאה ל-`promptPostSaveAction` מתבצעת עם הערך הנכון.  
-  - בדקו שהמסלול `add another` פותח מחדש את הטופס, כולל reset של state.  
-  - ודאו שהמסלול `return` מפעיל `ModalNavigationService.goBack()` או `ConditionsModalController.goBackToParent()` בעת fallback.
-- **`conditions-crud-manager`**  
-  - בדקו טיפול בשגיאות (`error.silent`, `error.forceRefresh`).  
-  - מוודאים ש-`requestJson` זורק חריגות עבור JSON לא תקין/כשל רשת, ושלא נשמר cache ריק.
-- **`conditions-form-generator`**  
-  - בדיקות עבור `collectFormData` (החזרת `method_id` כמספר, סינון ערכי falsey) והצגת הודעות שגיאה מתורגמות.
-
-### Legacy – בדיקת ConditionBuilder (הוסר)
+### 1. בדיקת ConditionBuilder
 
 ```javascript
 // condition-builder.test.js
@@ -1426,7 +1414,7 @@ npm test
 npm test -- --coverage
 
 # Run specific test file
-npm test conditions-ui-manager.test.js
+npm test condition-builder.test.js
 ```
 
 ### 3. Integration Tests

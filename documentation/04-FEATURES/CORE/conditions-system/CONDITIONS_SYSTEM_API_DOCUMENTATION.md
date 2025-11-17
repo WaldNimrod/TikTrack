@@ -1,6 +1,6 @@
 # תיעוד API - מערכת התנאים
 **תאריך יצירה:** 19 אוקטובר 2025  
-**תאריך עדכון:** 19 אוקטובר 2025  
+**תאריך עדכון:** 15 נובמבר 2025  
 **גרסה:** 1.1.0  
 **מפתח:** AI Assistant  
 
@@ -102,6 +102,8 @@ const methods = await response.json();
     "parameters_json": "{\"period\": 20, \"type\": \"SMA\", \"comparison\": \"above\"}",
     "logical_operator": "AND",
     "is_active": true,
+    "trigger_action": "enter_trade_positive",
+    "action_notes": "<p>כניסה עם חצי פוזיציה תוך 5 דקות.</p>",
     "created_at": "2025-10-19T00:00:00Z",
     "updated_at": "2025-10-19T00:00:00Z"
   }
@@ -118,7 +120,9 @@ const methods = await response.json();
   "method_id": 1,
   "condition_group": 0,
   "parameters_json": "{\"period\": 20, \"type\": \"SMA\", \"comparison\": \"above\"}",
-  "logical_operator": "AND"
+  "logical_operator": "AND",
+  "trigger_action": "enter_trade_positive",
+  "action_notes": "<p>נכנסים במידתיות מלאה.</p>"
 }
 ```
 
@@ -132,6 +136,8 @@ const methods = await response.json();
   "parameters_json": "{\"period\": 20, \"type\": \"SMA\", \"comparison\": \"above\"}",
   "logical_operator": "AND",
   "is_active": true,
+  "trigger_action": "enter_trade_positive",
+  "action_notes": "<p>נכנסים במידתיות מלאה.</p>",
   "created_at": "2025-10-19T00:00:00Z",
   "updated_at": "2025-10-19T00:00:00Z"
 }

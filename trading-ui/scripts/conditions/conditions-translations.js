@@ -34,6 +34,40 @@ class ConditionsTranslations {
                 'fibonacci': 'פיבונאצ\'י',
                 'fibonacci_retracement': 'פיבונאצ\'י'
             },
+
+            // Method details (logic + examples)
+            method_details: {
+                'moving_averages': {
+                    title: 'ממוצעים נעים – זיהוי שינוי מגמה',
+                    description: 'בודק את מערכת היחסים בין ממוצעים נעים קצרים וארוכים כדי לזהות חציות שמאותתות על שינוי כיוון או האצה של מגמה קיימת.',
+                    example: 'MA20 חוצה מעלה את MA50 → איתות להתחזקות מגמה עולה.'
+                },
+                'volume_analysis': {
+                    title: 'ניתוח נפח – אישור תנועה',
+                    description: 'מודד את עוצמת התנועה במחיר מול נפח המסחר כדי לוודא שפריצות או שבירות מתרחשות עם תמיכה אמיתית של קונים/מוכרים.',
+                    example: 'נפח גבוה ב־150% מהממוצע ב־20 נרות כשהמחיר פורץ התנגדות.'
+                },
+                'support_and_resistance': {
+                    title: 'תמיכה והתנגדות – עבודה סביב רמות מפתח',
+                    description: 'משווה את מחיר השוק לרמות ידועות כדי לאתר נגיעה/היפוך/פריצה של אזורי תמיכה או התנגדות שהוגדרו מראש.',
+                    example: 'מחיר יורד אל אזור תמיכה 150₪ (±1%) ומציג נר היפוך עולה.'
+                },
+                'trend_lines': {
+                    title: 'קווי מגמה – שמירה או שבירה של קו',
+                    description: 'בודק אם המחיר נשאר מעל או מתחת לקווי מגמה שנבנו על סמך שיאים/שפלים, כדי לזהות שמירה על הכיוון או שבירה שלו.',
+                    example: 'סגירה יומית מעל קו מגמת עלייה שנבנה מ־3 שפלים עוקבים.'
+                },
+                'technical_patterns': {
+                    title: 'דפוסים טכניים – זיהוי מבנים נפוצים',
+                    description: 'מזהה דפוסים סיסטמטיים (דגל, משולש, Cup & Handle ועוד) ומוודא שהמחיר מגיב בהתאם להתנהגות המצופה מהדפוס.',
+                    example: 'תבנית Cup & Handle מסתיימת בפריצה של 2% מעל קו ההתנגדות של הידית.'
+                },
+                'fibonacci_retracement': {
+                    title: 'פיבונאצ\'י – חיפוש נקודות כניסה/יציאה',
+                    description: 'בודק האם המחיר נעצר או מתהפך סביב רמות פיבונאצ\'י מרכזיות (38.2%, 50%, 61.8%) כדי להעריך תיקון בריא מול המשך מגמה.',
+                    example: 'המניה מתקנת עד לרמת ‎61.8%‎ מן המהלך הקודם ולאחר מכן חוזרת לעלות.'
+                }
+            },
             
             // Method Categories
             categories: {
@@ -64,6 +98,26 @@ class ConditionsTranslations {
                 'pattern_type': 'סוג דפוס',
                 'fib_type': 'סוג פיבונאצ\'י',
                 'level_price': 'מחיר רמה'
+            },
+
+            // Trigger actions
+            trigger_actions: {
+                'enter_trade_positive': {
+                    label: 'כניסה לטרייד (חיובי)',
+                    polarity: 'positive'
+                },
+                'scale_in_positive': {
+                    label: 'הגדלת פוזיציה (חיובי)',
+                    polarity: 'positive'
+                },
+                'exit_trade_negative': {
+                    label: 'יציאה מהטרייד (שלילי)',
+                    polarity: 'negative'
+                },
+                'scale_out_negative': {
+                    label: 'הקטנת פוזיציה (שלילי)',
+                    polarity: 'negative'
+                }
             },
             
             // Logical Operators
@@ -117,7 +171,13 @@ class ConditionsTranslations {
                 'condition_delete_error': 'שגיאה במחיקת תנאי',
                 'condition_methods_error': 'שגיאה בטעינת שיטות מסחר',
                 'method_required': 'יש לבחור שיטת מסחר',
-                'parameters_required': 'יש למלא את כל הפרמטרים הנדרשים'
+                'parameters_required': 'יש למלא את כל הפרמטרים הנדרשים',
+                'trigger_action_required': 'יש לבחור פעולה כשמתקיים תנאי',
+                'action_notes_helper': 'הערות טקסט עשיר יוצגו למשתמש בעת הפעלת התנאי',
+                'method_info_placeholder': 'בחר שיטת מסחר כדי לראות הסבר ודוגמה.',
+                'condition_delete_confirm_title': 'מחיקת תנאי',
+                'condition_delete_confirm_message': 'האם אתה בטוח שברצונך למחוק את התנאי הנבחר? הפעולה אינה הפיכה.',
+                'condition_delete_confirm_secondary': 'המחיקה תשפיע רק על התנאי הנוכחי.'
             },
             
             // Form Labels
@@ -127,12 +187,16 @@ class ConditionsTranslations {
                 'logical_operator': 'אופרטור לוגי',
                 'condition_group': 'קבוצת תנאי',
                 'is_active': 'פעיל',
+                'trigger_action': 'פעולה כשמתקיים',
+                'action_notes': 'הערות לפעולה',
                 'save_condition': 'שמור תנאי',
                 'cancel': 'ביטול',
                 'add_condition': 'הוסף תנאי',
                 'edit_condition': 'ערוך תנאי',
                 'delete_condition': 'מחק תנאי',
-                'create_alert': 'צור התראה'
+                'create_alert': 'צור התראה',
+                'method_info_title': 'איך התנאי פועל',
+                'method_example_label': 'דוגמה:'
             }
         };
     }
@@ -170,6 +234,29 @@ class ConditionsTranslations {
     }
     
     /**
+     * Get method details (description + example)
+     * @function getMethodDetails
+     * @param {string} methodKey - Method key
+     * @returns {{title: string, description: string, example: string}|null}
+     */
+    getMethodDetails(methodKey) {
+        if (!methodKey) return null;
+        const normalizedKey = this._generateMethodKey(methodKey);
+        if (!normalizedKey) {
+            return null;
+        }
+        const details = this.get(`method_details.${normalizedKey}`, null);
+        if (!details) {
+            return null;
+        }
+        return {
+            title: details.title || this.getMethodName(normalizedKey),
+            description: details.description || '',
+            example: details.example || ''
+        };
+    }
+    
+    /**
      * Get category name
      * @function getCategoryName
      * @param {string} categoryKey - Category key
@@ -187,6 +274,40 @@ class ConditionsTranslations {
      */
     getParameterName(parameterKey) {
         return this.get(`parameters.${parameterKey}`, parameterKey);
+    }
+
+    /**
+     * Get trigger action definitions
+     * @returns {Object} Trigger action map
+     */
+    getTriggerActions() {
+        return this.translations?.trigger_actions || {};
+    }
+
+    /**
+     * Get trigger action label
+     * @param {string} actionKey
+     * @returns {string}
+     */
+    getTriggerActionLabel(actionKey) {
+        if (!actionKey) {
+            return this.getTriggerActions().enter_trade_positive?.label || actionKey;
+        }
+        const entry = this.getTriggerActions()[actionKey];
+        return entry?.label || actionKey;
+    }
+
+    /**
+     * Get trigger action polarity (positive/negative)
+     * @param {string} actionKey
+     * @returns {string}
+     */
+    getTriggerActionPolarity(actionKey) {
+        if (!actionKey) {
+            return 'positive';
+        }
+        const entry = this.getTriggerActions()[actionKey];
+        return entry?.polarity || 'neutral';
     }
     
     /**
@@ -257,6 +378,9 @@ class ConditionsTranslations {
         const status = condition.status
             || (condition.is_active === false ? 'inactive' : 'active');
 
+        const triggerActionKey = condition.trigger_action || condition.triggerAction || 'enter_trade_positive';
+        const triggerMeta = this.getTriggerActions?.()[triggerActionKey] || {};
+
         return {
             ...condition,
             method_key: methodKey,
@@ -267,7 +391,11 @@ class ConditionsTranslations {
             status_name: this.getStatus(status),
             logical_operator_name: this.getOperator(condition.logical_operator),
             parameters: this._normalizeParameters(condition.parameters_json || condition.parameters),
-            entity_type: entityType
+            entity_type: entityType,
+            trigger_action: triggerActionKey,
+            trigger_action_label: triggerMeta.label || triggerActionKey,
+            trigger_action_polarity: triggerMeta.polarity || 'neutral',
+            action_notes: condition.action_notes || ''
         };
     }
     

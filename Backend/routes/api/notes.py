@@ -5,7 +5,6 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
-from services.tag_service import TagService
 import logging
 import os
 import uuid
@@ -542,15 +541,6 @@ def delete_note(note_id: int):
             # Delete attached file if exists
             if note.attachment:
                 delete_uploaded_file(note.attachment)
-
-            try:
-                TagService.remove_all_tags_for_entity(db, 'note', note_id)
-            except ValueError as tag_error:
-                logger.warning(
-                    "Failed to remove tags for note %s before deletion: %s",
-                    note_id,
-                    tag_error,
-                )
             
             # Delete note from database
             db.delete(note)

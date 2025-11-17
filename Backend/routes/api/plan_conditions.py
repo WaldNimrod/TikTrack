@@ -90,6 +90,8 @@ def _ensure_conditions_tables(db_session) -> None:
                     logical_operator VARCHAR(10) DEFAULT 'NONE',
                     is_active BOOLEAN DEFAULT 1,
                     auto_generate_alerts BOOLEAN DEFAULT 1,
+                    trigger_action VARCHAR(50) DEFAULT 'enter_trade_positive',
+                    action_notes TEXT,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (trade_plan_id) REFERENCES trade_plans(id) ON DELETE CASCADE,
@@ -107,6 +109,8 @@ def _ensure_conditions_tables(db_session) -> None:
                     inherited_from_plan_condition_id INTEGER,
                     is_active BOOLEAN DEFAULT 1,
                     auto_generate_alerts BOOLEAN DEFAULT 1,
+                    trigger_action VARCHAR(50) DEFAULT 'enter_trade_positive',
+                    action_notes TEXT,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (trade_id) REFERENCES trades(id) ON DELETE CASCADE,
@@ -149,9 +153,29 @@ def _ensure_conditions_tables(db_session) -> None:
             "ALTER TABLE plan_conditions ADD COLUMN auto_generate_alerts BOOLEAN DEFAULT 1 NOT NULL"
         )
         altered |= ensure_column(
+            'plan_conditions',
+            'trigger_action',
+            "ALTER TABLE plan_conditions ADD COLUMN trigger_action VARCHAR(50) DEFAULT 'enter_trade_positive' NOT NULL"
+        )
+        altered |= ensure_column(
+            'plan_conditions',
+            'action_notes',
+            "ALTER TABLE plan_conditions ADD COLUMN action_notes TEXT"
+        )
+        altered |= ensure_column(
             'trade_conditions',
             'auto_generate_alerts',
             "ALTER TABLE trade_conditions ADD COLUMN auto_generate_alerts BOOLEAN DEFAULT 1 NOT NULL"
+        )
+        altered |= ensure_column(
+            'trade_conditions',
+            'trigger_action',
+            "ALTER TABLE trade_conditions ADD COLUMN trigger_action VARCHAR(50) DEFAULT 'enter_trade_positive' NOT NULL"
+        )
+        altered |= ensure_column(
+            'trade_conditions',
+            'action_notes',
+            "ALTER TABLE trade_conditions ADD COLUMN action_notes TEXT"
         )
 
         # Create indexes (IF NOT EXISTS is safe to call repeatedly)
@@ -282,6 +306,10 @@ def create_plan_condition(plan_id):
                 import json
                 parameters_json = json.dumps(parameters_json, ensure_ascii=False)
             
+            sanitized_action_notes = BaseEntityUtils.sanitize_rich_text(
+                normalized_payload.get('action_notes')
+            ) if normalized_payload.get('action_notes') else None
+
             condition = PlanCondition(
                 trade_plan_id=plan_id,
                 method_id=normalized_payload['method_id'],
@@ -289,7 +317,9 @@ def create_plan_condition(plan_id):
                 parameters_json=parameters_json,
                 logical_operator=normalized_payload.get('logical_operator', 'NONE'),
                 is_active=normalized_payload.get('is_active', True),
-                auto_generate_alerts=normalized_payload.get('auto_generate_alerts', True)
+                auto_generate_alerts=normalized_payload.get('auto_generate_alerts', True),
+                trigger_action=normalized_payload.get('trigger_action', 'enter_trade_positive'),
+                action_notes=sanitized_action_notes
             )
             
             db_session.add(condition)
@@ -428,6 +458,12 @@ def update_plan_condition(condition_id):
             condition.logical_operator = normalized_payload.get('logical_operator', condition.logical_operator)
             condition.is_active = normalized_payload.get('is_active', condition.is_active)
             condition.auto_generate_alerts = normalized_payload.get('auto_generate_alerts', condition.auto_generate_alerts)
+            condition.trigger_action = normalized_payload.get('trigger_action', condition.trigger_action)
+            if 'action_notes' in normalized_payload:
+                sanitized_action_notes = BaseEntityUtils.sanitize_rich_text(
+                    normalized_payload.get('action_notes')
+                ) if normalized_payload.get('action_notes') else None
+                condition.action_notes = sanitized_action_notes
             
             db_session.commit()
             
@@ -679,6 +715,10 @@ def create_bulk_plan_conditions():
                 if isinstance(parameters_json, dict):
                     import json
                     parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+
+                sanitized_action_notes = BaseEntityUtils.sanitize_rich_text(
+                    condition_data.get('action_notes')
+                ) if condition_data.get('action_notes') else None
                 
                 condition = PlanCondition(
                     trade_plan_id=plan_id,
@@ -686,7 +726,10 @@ def create_bulk_plan_conditions():
                     condition_group=condition_data.get('condition_group', 0),
                     parameters_json=parameters_json,
                     logical_operator=condition_data.get('logical_operator', 'NONE'),
-                    is_active=condition_data.get('is_active', True)
+                    is_active=condition_data.get('is_active', True),
+                    auto_generate_alerts=condition_data.get('auto_generate_alerts', True),
+                    trigger_action=condition_data.get('trigger_action', 'enter_trade_positive'),
+                    action_notes=sanitized_action_notes
                 )
                 
                 db_session.add(condition)

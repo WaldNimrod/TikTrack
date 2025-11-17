@@ -1018,6 +1018,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 6
       },
       {
+        file: 'services/notes-data.js',
+        globalCheck: 'window.NotesData',
+        description: 'שירות נתוני הערות',
+        required: true,
+        loadOrder: 6.5
+      },
+      {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
         description: 'מתרגם תנאים',

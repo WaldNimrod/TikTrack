@@ -72,10 +72,15 @@ trading-ui/
 - **רשת תנאים** - העתקת תנאים מתכניות מסחר לטריידים
 - **התראות אוטומטיות** - יצירת התראות מתנאים
 - **ניהול קבוצות** - ארגון תנאים בקבוצות לוגיות
+- **פעולה כשמתקיים** - לכל תנאי מוגדרת פעולה עסקית (כניסה, הגדלה, יציאה או הקטנה) ואזור הערות טקסט עשיר שמלווה את הביצוע בפועל.
 
 ### 3. חוויית משתמש ומעקב
-- **טבלת תקציר תנאים** – מוצגת במודל עריכת תכנית (66% מהרוחב), כוללת עמודות שיטה/אופרטור/פרמטרים/עודכן/פעולות ופועלת על בסיס הנתונים של `EntityDetailsAPI`.
-- **כפתורי פעולה אחידים** – כל הכפתורים (הוספה/עריכה/מחיקה) משתמשים ב-`ButtonSystem.processButtons` עם `data-variant="small"` להצגת איקונים בלבד (ללא טקסט) בכיוון RTL תקין.
+- **טבלת תקציר תנאים** – ממוקמת ישירות מתחת לשורת התגיות, משתמשת בסגנונות הטבלה המאוחדת וכוללת עמודת פעולות עם כפתורי אייקונים בלבד. הנתונים מגיעים מ-`EntityDetailsAPI` ומתעדכנים אוטומטית באירוע `tradePlanConditionsUpdated`.
+- **בדיקה ידנית** – כפתור “בדיקת תנאים” בעמוד התכנון מפעיל את מנוע ההערכה על כל התנאים הפעילים, מציג לכל שורה Badge Triggered/Not Triggered ותאריך בדיקה אחרון מבלי לצאת מהמודל.
+- **עמודת פעולה** – הטבלה כוללת תיאור מלא של “מה עושים כשמתקיים” והערות טקסט עשיר, כך שהצוות מבין את המשמעות המבצעית של כל תנאי גם לפני פתיחת הטופס.
+- **מצב טופס ייעודי** – מודול התנאים (`ConditionsUIManager`) נטען במצב Form-Only בתוך `ModalManagerV2`, כך שהמודל הבן מתמקד בקליטת תנאי יחיד בעוד שמסך האב ממשיך להציג את התקציר והפעולות.
+- **כפתורי פעולה אחידים** – כל הכפתורים (הוספה/עריכה/מחיקה/שמור/ביטול) נוצרים דרך `ButtonSystem.processButtons`, עם `data-variant` תואם ויישור RTL שממקם את הפוטר בצד שמאל (סוף השורה).
+- **הסבר דינמי לשיטות** – `conditions-form-generator` מוסיף כרטיס מידע עם תיאור, חוקים ודוגמה עבור כל שיטת מסחר, מתורגם מ-`conditions-translations`.
 - **Modal Navigation Integration** – `ConditionsModalController` שומר על מודל האב, תומך ב-`focusConditionId` לעריכת תנאי מתוך התקציר ומונע ריענון דף באמצעות `ConditionsReloadBypass`.
 - **Post-Save Confirmation** – לאחר שמירה מוצג חלון ייעודי (“הוסף תנאי נוסף” / “חזרה לתכנון”) במקום סגירה כפולה של מודלים.
 
@@ -84,6 +89,7 @@ trading-ui/
 - **טריידים** - הגדרת תנאים לטריידים
 - **התראות** - יצירת התראות מתנאים קיימים
 - **נתונים חיצוניים** - שימוש בנתוני שוק אמיתיים
+- **Plan → Trade Sync** - בעת הפיכת תכנון לטרייד, כל השדות (כולל פעולה והערות) מועתקים אוטומטית ודואגים לעקביות מלאה.
 
 ---
 
@@ -93,6 +99,7 @@ trading-ui/
 
 ### Backend & DB
 - `_ensure_conditions_tables()` רץ בכל פעולה (GET/POST/PUT/DELETE) ומוודא קיום כל הטבלאות, העמודות והאינדקסים (כולל `method_key`, `auto_generate_alerts`).
+- נוספו השדות `trigger_action` (ערך Enum) ו-`action_notes` (Rich Text) ב-`plan_conditions`/`trade_conditions`, עם Sanitization דו-שלבי (Backend + DOMPurify) ולוגיקה לרשת אותם לטריידים.
 - `TradingMethod` מחזיר `method_key` מחושב (`_generate_method_key`) כדי להבטיח צימוד מלא לוולידציה בצד הלקוח.
 - `parameters_json` מתקבל כאובייקט ומומר ל-JSON string יחיד כדי למנוע stringify כפול ותקלות decoding.
 
@@ -102,10 +109,13 @@ trading-ui/
 - פונקציית `safeParse` מוודאת JSON nested (למשל `validation_rule`) ומחזירה הודעות ברורות ללוגרים/משתמש.
 
 ### UI & חוויית משתמש
-- `conditions-form-generator.js` הופך את כפתור “שמור” ל-`type="button"` ומונע submit טבעי כדי לשמור את המודלים פתוחים ולרשום לוגים.
-- `conditions-ui-manager.js` ו-`conditions-crud-manager.js` מנהלים עצמאית הצלחות/שגיאות, מונעים reliance על `CRUDResponseHandler` ומוסיפים מודל Post-Save מותאם.
-- `trade_plans.js` יוצר תקציר תנאים, מאזין ל-`tradePlanConditionsUpdated`, מפעיל `ButtonSystem` לכל כפתור פעולה ומאפשר עריכה/מחיקה ישירות מהטבלה.
-- כפתור “הוסף תנאי” הוצב לצד שדה התגיות בשורה משותפת (33%/66%), משתמש ב-`data-button-type="ADD"` + `data-variant="small"` ומוצג בצד שמאל (RTL) עם tooltip/aria-label.
+- `conditions-form-generator.js` מפיק כרטיס הסבר לשיטה, מחליף את הפוטר הידני ב-`modal-footer` רשמי, משייך `data-button-type="SAVE/CANCEL"` ויוצר כפתורים דרך `ButtonSystem`.
+- לטופס נוספו שדה פעולה ושדה הערות בטקסט עשיר באמצעות `RichTextEditorService`, כולל בחירה מתוך Enum אחיד והנחיות לטיפול בהפעלת התנאי.
+- `conditions-ui-manager.js` פועל במצב Form-Only, קורא רק לטופס ומדווח לוגים דרך `ConditionsFlow`, בעוד שהתקציר והתצוגה מרונדרים במודל האב.
+- `conditions-crud-manager.js` מנהל עצמאית הצלחות/שגיאות, מונע reliance על `CRUDResponseHandler` ומוסיף מודל Post-Save מותאם.
+- `trade_plans.js` יוצר תקציר תנאים, מציב אותו תחת כפתור "ניהול תנאים" (כעת "הוסף תנאי"), מאזין ל-`tradePlanConditionsUpdated`, מפעיל `ButtonSystem` לכל כפתור פעולה ומאפשר עריכה/מחיקה ישירות מהטבלה עם `showConfirmationDialog`.
+- כפתור “הוסף תנאי” מוקם לצד שדה התגיות בשורה משותפת (33%/66%), משתמש ב-`data-button-type="ADD"` + `data-variant="small"` ומוצג בקצה השמאלי (RTL) עם tooltip/aria-label.
+- כפתור “בדיקת תנאים” מפעיל את API ההערכה לכל התנאים הפעילים בתכנון, שומר את התוצאות ב-`tradePlanConditionEvaluations` ומציג badge/timestamp ישירות בטבלה.
 
 ### לוגים והתראות
 - כלל התרחישים המרכזיים שולחים לוגים דרך `window.Logger` עם תגיות ייעודיות (`ConditionsFlow`, `ConditionsCRUD`, `ConditionsFormFlow`, `ConditionsReloadBypass`).

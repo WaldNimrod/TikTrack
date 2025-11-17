@@ -228,7 +228,21 @@ const tradePlansModalConfig = {
                     <div class="text-muted small" data-conditions-disabled-hint>
                         ניהול תנאים יהיה זמין לאחר שמירת התכנון.
                     </div>
-                    <div class="d-flex justify-content-end" dir="rtl">
+                    <div class="d-flex justify-content-end flex-wrap gap-2" dir="rtl">
+                        <button
+                            type="button"
+                            id="tradePlanEvaluateConditionsButton"
+                            data-button-type="REFRESH"
+                            data-variant="small"
+                            data-style="outline"
+                            data-classes=" btn-outline-secondary"
+                            data-icon="↻"
+                            data-text=""
+                            data-size="small"
+                            data-onclick="handleTradePlanEvaluateConditionsClick()"
+                            data-tooltip="בדיקת תנאים מול השוק"
+                            aria-label="בדיקת תנאים">
+                        </button>
                         <button
                             type="button"
                             id="tradePlanOpenConditionsButton"
@@ -239,6 +253,7 @@ const tradePlansModalConfig = {
                             data-icon="➕"
                             data-text=""
                             data-size="small"
+                            data-onclick="handleTradePlanConditionsButtonClick()"
                             data-tooltip="הוסף תנאי"
                             aria-label="הוסף תנאי">
                         </button>

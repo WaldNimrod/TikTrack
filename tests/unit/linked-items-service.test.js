@@ -731,7 +731,7 @@ describe('Linked Items Service', () => {
 
                 test('should return cancel function for trading_account', () => {
                     const result = LinkedItemsService._getCancelFunctionForType('trading_account', 111, 'active');
-                    expect(result).toBe('window.cancelTradingAccountWithLinkedItemsCheck(111)');
+                    expect(result).toBe('window.cancelAccount(111)');
                 });
 
                 test('should return cancel function for alert', () => {
@@ -763,7 +763,7 @@ describe('Linked Items Service', () => {
 
                 test('should return reactivate function for cancelled trading_account', () => {
                     const result = LinkedItemsService._getCancelFunctionForType('trading_account', 111, 'cancelled');
-                    expect(result).toBe('window.restoreTradingAccount(111)');
+                    expect(result).toBe('window.reactivateAccount(111)');
                 });
 
                 test('should return reactivate function for cancelled alert', () => {

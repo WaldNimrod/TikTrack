@@ -335,16 +335,11 @@ class RateLimitMiddleware:
         self.rate_limiter = RateLimiter()
     
     def __call__(self, environ, start_response):
-        path_info = environ.get('PATH_INFO', '') or ''
-
-        # Skip rate limiting for static assets and HTML pages
-        if not (path_info == '/api' or path_info.startswith('/api/')):
-            return self.app(environ, start_response)
-
         # Get client identifier
         client_id = environ.get('REMOTE_ADDR', 'unknown')
         
         # Get endpoint type
+        path_info = environ.get('PATH_INFO', '')
         endpoint_type = self.rate_limiter.get_endpoint_type(path_info)
         
         # Check rate limit

@@ -8,30 +8,18 @@
  * @lastUpdated January 5, 2025
  */
 
-/* מודל בסיסי - שימוש במערכת ה-z-index הגלובלית */
+/* מודל בסיסי - מבוסס על apple-theme.css */
 .modal {
-  --modal-nested-offset: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset));
+  z-index: 999999999 ;
   direction: rtl;
 }
 
+/* הגדרות z-index גבוהות לכל המודלים באתר */
 .modal-dialog {
-  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset) + 1);
-}
-
-.modal-content {
-  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset) + 2);
-}
-
-/* מודל מקונן - ללא רקע נוסף ואופסט z-index מוסכם */
-.modal.modal-nested {
-  --modal-nested-offset: 20;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  z-index: 1000000000 ;
 }
 
 /* הגדרות מיוחדות למודלים גדולים */
@@ -43,6 +31,7 @@
 }
 
 .modal-content {
+  z-index: 1000000001 ;
   background: var(--apple-bg-elevated);
   border-radius: 6px;
   box-shadow: var(--apple-shadow-heavy);
@@ -52,7 +41,7 @@
 }
 
 .modal-backdrop {
-  z-index: var(--z-index-modal-backdrop, 1040);
+  z-index: 999999998 ;
 }
 
 /* ===== Modal Navigation System ===== */
@@ -192,9 +181,21 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 }
 
 /* וידוא שכל המודלים מופיעים מעל הכל */
+.modal.show {
+  z-index: 999999999 ;
+}
+
+.modal.show .modal-dialog {
+  z-index: 1000000000 ;
+}
+
+.modal.show .modal-content {
+  z-index: 1000000001 ;
+}
+
 /* וידוא שהרקע לא חוסם את המודלים */
 .modal-backdrop.show {
-  z-index: var(--z-index-modal-backdrop, 1040);
+  z-index: 999999998 ;
 }
 
 /* מודלים ספציפיים עם z-index גבוה יותר */

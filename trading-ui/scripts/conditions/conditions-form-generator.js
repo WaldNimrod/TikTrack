@@ -57,7 +57,14 @@ class ConditionsFormGenerator {
         this.mode = options.isEdit ? 'edit' : 'create';
 
         container.innerHTML = this.buildFormHTML(options);
+        this.initializeActionNotesEditor(options.conditionData);
+        if (window.ButtonSystem?.processButtons) {
+            window.ButtonSystem.processButtons(container);
+        } else if (window.ButtonSystem?.hydrateButtons) {
+            window.ButtonSystem.hydrateButtons(container);
+        }
         this.attachEventListeners(container);
+        this.renderMethodExplanation(null);
 
         try {
             await this.loadMethods();
@@ -77,32 +84,47 @@ class ConditionsFormGenerator {
         const conditionData = options.conditionData || {};
         return `
             <div class="condition-form" id="conditionForm">
-                <div class="condition-form-header">
-                    <h4 id="formTitle">${options.isEdit ? this.translator.getFormLabel('edit_condition') : this.translator.getFormLabel('add_condition')}</h4>
-                    <button class="btn btn-sm btn-outline-secondary" id="closeFormBtn" type="button">
-                        <i class="fas fa-times"></i>
-                    </button>
+                <div class="condition-form-header mb-3">
+                    <h4 id="formTitle" class="mb-0">${options.isEdit ? this.translator.getFormLabel('edit_condition') : this.translator.getFormLabel('add_condition')}</h4>
                 </div>
                 <div class="condition-form-body">
                     <form id="conditionFormElement" novalidate>
-                        <div class="mb-3">
-                            <label for="methodSelect" class="form-label">
-                                ${this.translator.getFormLabel('select_method')}
-                                <span class="text-danger">*</span>
-                            </label>
-                            <select class="form-select" id="methodSelect" required>
-                                <option value="">${this.translator.getFormLabel('select_method')}...</option>
-                            </select>
-                            <div class="invalid-feedback" id="methodSelectError"></div>
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label for="methodSelect" class="form-label">
+                                        ${this.translator.getFormLabel('select_method')}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="methodSelect" required>
+                                        <option value="">${this.translator.getFormLabel('select_method')}...</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="methodSelectError"></div>
+                                </div>
+
+                                <div id="methodInfoWrapper" class="mb-3" aria-live="polite">
+                                    <div class="alert alert-info mb-0 small" id="methodInfoCard">
+                                        <div class="fw-semibold" id="methodInfoTitle">
+                                            ${this.translator.getFormLabel('method_info_title')}
+                                        </div>
+                                        <div id="methodInfoDescription" class="mt-1">
+                                            ${this.translator.getMessage('method_info_placeholder')}
+                                        </div>
+                                        <div id="methodInfoExample" class="mt-2 text-muted d-none"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div id="parametersContainer" class="mb-3" style="display: none;">
+                                    <label class="form-label">${this.translator.getFormLabel('method_parameters')}</label>
+                                    <div id="parametersFields"></div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div id="parametersContainer" class="mb-3" style="display: none;">
-                            <label class="form-label">${this.translator.getFormLabel('method_parameters')}</label>
-                            <div id="parametersFields"></div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
                                 <label for="logicalOperator" class="form-label">
                                     ${this.translator.getFormLabel('logical_operator')}
                                 </label>
@@ -112,7 +134,7 @@ class ConditionsFormGenerator {
                                     <option value="OR">${this.translator.getOperator('OR')}</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label for="conditionGroup" class="form-label">
                                     ${this.translator.getFormLabel('condition_group')}
                                 </label>
@@ -122,7 +144,30 @@ class ConditionsFormGenerator {
                             </div>
                         </div>
 
-                        <div class="form-check form-switch mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="triggerAction" class="form-label">
+                                    ${this.translator.getFormLabel('trigger_action')}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="triggerAction" required>
+                                    ${this.buildTriggerActionOptions(conditionData.trigger_action)}
+                                </select>
+                                <div class="invalid-feedback" id="triggerActionError"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="conditionActionNotesEditor" class="form-label">
+                                    ${this.translator.getFormLabel('action_notes')}
+                                </label>
+                                <div class="rich-text-editor" id="conditionActionNotesEditor" aria-live="polite"></div>
+                                <small class="form-text text-muted">
+                                    ${this.translator.getMessage('action_notes_helper') || ''}
+                                </small>
+                                <div class="invalid-feedback" id="actionNotesError"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
                             <input class="form-check-input" type="checkbox" id="isActive"
                                    ${conditionData.is_active !== false ? 'checked' : ''}>
                             <label class="form-check-label" for="isActive">
@@ -130,15 +175,22 @@ class ConditionsFormGenerator {
                             </label>
                         </div>
 
-                        <div class="d-flex gap-2 justify-content-end">
-                            <!-- NOTE: Button stays type="button" to prevent GET submission that reloads trade_plans with query params -->
-                            <button class="btn btn-primary" type="button" id="saveConditionBtn">
-                                <i class="fas fa-save"></i>
-                                ${this.translator.getFormLabel('save_condition')}
+                        <div class="modal-footer conditions-form-footer justify-content-end gap-2 flex-wrap">
+                            <button
+                                type="button"
+                                id="cancelFormBtn"
+                                data-button-type="CANCEL"
+                                data-variant="full"
+                                data-size="normal"
+                                data-text="${this.translator.getFormLabel('cancel')}">
                             </button>
-                            <button class="btn btn-outline-secondary" type="button" id="cancelFormBtn">
-                                <i class="fas fa-times"></i>
-                                ${this.translator.getFormLabel('cancel')}
+                            <button
+                                type="button"
+                                id="saveConditionBtn"
+                                data-button-type="SAVE"
+                                data-variant="primary"
+                                data-size="normal"
+                                data-text="${this.translator.getFormLabel('save_condition')}">
                             </button>
                         </div>
                     </form>
@@ -180,10 +232,6 @@ class ConditionsFormGenerator {
             cancelBtn.addEventListener('click', () => this.handleFormCancel());
         }
 
-        const closeBtn = container.querySelector('#closeFormBtn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.handleFormCancel());
-        }
     }
 
     async loadMethods() {
@@ -237,6 +285,7 @@ class ConditionsFormGenerator {
         }
 
         this.currentMethod = method;
+        this.renderMethodExplanation(method);
         this.renderParameterFields(method);
         window.Logger?.info('[ConditionsFormGenerator] Parameters rendered for method', { methodId, parametersCount: method.parameters?.length || 0 }, { page: 'conditions-form-generator' });
     }
@@ -251,6 +300,89 @@ class ConditionsFormGenerator {
             wrapper.style.display = 'none';
         }
         this.currentMethod = null;
+        this.renderMethodExplanation(null);
+    }
+
+    renderMethodExplanation(method) {
+        const titleElement = document.getElementById('methodInfoTitle');
+        const descriptionElement = document.getElementById('methodInfoDescription');
+        const exampleElement = document.getElementById('methodInfoExample');
+        if (!titleElement || !descriptionElement || !exampleElement) {
+            return;
+        }
+
+        if (!method) {
+            titleElement.textContent = this.translator.getFormLabel('method_info_title');
+            descriptionElement.textContent = this.translator.getMessage('method_info_placeholder');
+            exampleElement.textContent = '';
+            exampleElement.classList.add('d-none');
+            return;
+        }
+
+        const methodKey = this.getMethodKeyFromMethod(method);
+        const details = this.translator.getMethodDetails(methodKey);
+        const fallbackTitle = method.name || this.translator.getMethodName(methodKey);
+
+        titleElement.textContent = details?.title || fallbackTitle;
+        descriptionElement.textContent = details?.description || this.translator.getMessage('method_info_placeholder');
+
+        if (details?.example) {
+            const exampleLabel = this.translator.getFormLabel('method_example_label') || '';
+            exampleElement.textContent = exampleLabel ? `${exampleLabel} ${details.example}` : details.example;
+            exampleElement.classList.remove('d-none');
+        } else {
+            exampleElement.textContent = '';
+            exampleElement.classList.add('d-none');
+        }
+    }
+
+    buildTriggerActionOptions(selectedValue) {
+        const actions = this.translator.getTriggerActions();
+        const options = Object.entries(actions).map(([key, meta]) => {
+            const isSelected = key === selectedValue ? 'selected' : '';
+            const label = meta?.label || key;
+            return `<option value="${key}" ${isSelected}>${label}</option>`;
+        }).join('');
+        const placeholder = `<option value="">${this.translator.getFormLabel('trigger_action')}...</option>`;
+        return `${placeholder}${options}`;
+    }
+
+    initializeActionNotesEditor(conditionData = {}) {
+        const editorId = 'conditionActionNotesEditor';
+        if (!window.RichTextEditorService?.initEditor) {
+            return;
+        }
+        window.RichTextEditorService.destroyEditor?.(editorId);
+        const editor = window.RichTextEditorService.initEditor(editorId, {
+            placeholder: this.translator.getFormLabel('action_notes') || 'הכנס הערות',
+            maxLength: 20000
+        });
+        const existingContent = conditionData?.action_notes || conditionData?.actionNotes || '';
+        if (existingContent && window.RichTextEditorService?.setContent) {
+            window.RichTextEditorService.setContent(editorId, existingContent);
+        } else if (editor?.root) {
+            editor.root.innerHTML = '';
+        }
+    }
+
+    destroyActionNotesEditor() {
+        if (window.RichTextEditorService?.destroyEditor) {
+            window.RichTextEditorService.destroyEditor('conditionActionNotesEditor');
+        }
+    }
+
+    getMethodKeyFromMethod(method) {
+        if (!method) return '';
+        if (method.method_key) return method.method_key;
+        if (method.key) return method.key;
+        if (typeof this.translator?._generateMethodKey === 'function') {
+            return this.translator._generateMethodKey(method.name_en || method.name || '');
+        }
+        const fallbackName = method.name || method.name_en || '';
+        return fallbackName
+            .toLowerCase()
+            .replace(/\s+/g, '_')
+            .replace(/[^a-z0-9_]/g, '');
     }
 
     renderParameterFields(method) {
@@ -386,6 +518,7 @@ class ConditionsFormGenerator {
         const logicalOperator = document.getElementById('logicalOperator');
         const conditionGroup = document.getElementById('conditionGroup');
         const isActive = document.getElementById('isActive');
+        const triggerAction = document.getElementById('triggerAction');
 
         const methodIdValue = methodSelect?.value ? Number(methodSelect.value) : null;
 
@@ -394,7 +527,8 @@ class ConditionsFormGenerator {
             logical_operator: logicalOperator?.value || 'NONE',
             condition_group: Number(conditionGroup?.value) || 0,
             is_active: Boolean(isActive?.checked),
-            parameters_json: {}
+            parameters_json: {},
+            trigger_action: triggerAction?.value || null
         };
 
         if (this.currentMethod) {
@@ -428,6 +562,11 @@ class ConditionsFormGenerator {
                     data.parameters_json[parameter.parameter_key] = input.value;
                 }
             });
+        }
+
+        if (window.RichTextEditorService?.getContent) {
+            const notesHtml = window.RichTextEditorService.getContent('conditionActionNotesEditor') || '';
+            data.action_notes = notesHtml.trim();
         }
 
         return data;
@@ -497,6 +636,11 @@ class ConditionsFormGenerator {
             isActive.checked = conditionData.is_active;
         }
 
+        const triggerAction = document.getElementById('triggerAction');
+        if (triggerAction && conditionData.trigger_action) {
+            triggerAction.value = conditionData.trigger_action;
+        }
+
         const parameters = conditionData.parameters_json || conditionData.parameters;
         if (parameters && this.currentMethod) {
             const parsedParams = typeof parameters === 'string' ? this.safeParse(parameters, {}) : parameters;
@@ -510,6 +654,10 @@ class ConditionsFormGenerator {
                     input.value = value;
                 }
             });
+        }
+
+        if (conditionData.action_notes && window.RichTextEditorService?.setContent) {
+            window.RichTextEditorService.setContent('conditionActionNotesEditor', conditionData.action_notes);
         }
     }
 

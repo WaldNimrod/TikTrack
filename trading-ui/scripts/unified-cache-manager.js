@@ -128,6 +128,21 @@ const CACHE_DEPENDENCIES = {
     'executions-data': ['accounts-data'],
     'execution-{id}': ['executions-data'],
     
+    // Trade Plans Level
+    'trade-plans-data': ['accounts-data'],
+    'trade-plan-{id}': ['trade-plans-data'],
+    
+    // Cash Flows Level
+    'cash-flows-data': ['accounts-data'],
+    'cash-flow-{id}': ['cash-flows-data'],
+    
+    // Notes Level
+    'notes-data': [],
+    'note-{id}': ['notes-data'],
+    
+    // Research Level
+    'research-data': [],
+    
     // Market Level
     'tickers-data': ['accounts-data'],
     'ticker-{id}': ['tickers-data'],
@@ -140,7 +155,15 @@ const CACHE_DEPENDENCIES = {
     'conditions-data': ['trades-data'],
     
     // Dashboard Level
-    'dashboard-data': ['market-data', 'trades-data', 'executions-data'],
+    'dashboard-data': [
+        'market-data',
+        'trades-data',
+        'executions-data',
+        'alerts-data',
+        'trade-plans-data',
+        'accounts-data',
+        'cash-flows-data'
+    ],
     'statistics-data': ['trades-data', 'executions-data']
 };
 
@@ -155,6 +178,13 @@ const TTL_POLICIES = {
     'trades-data': 'short',          // 5 minutes
     'trade-{id}': 'short',           // 5 minutes
     'executions-data': 'short',      // 5 minutes
+    'trade-plans-data': 'short',
+    'trade-plan-{id}': 'short',
+    'cash-flows-data': 'short',
+    'cash-flow-{id}': 'short',
+    'notes-data': 'short',
+    'note-{id}': 'short',
+    'research-data': 'medium',
     'market-data': 'very-short',     // 1 minute
     'quote-{symbol}': 'very-short',  // 1 minute
     'dashboard-data': 'medium',      // 30 minutes

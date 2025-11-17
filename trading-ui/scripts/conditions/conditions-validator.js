@@ -131,6 +131,13 @@ class ConditionsValidator {
             if (!conditionData.method_id) {
                 errors.push('יש לבחור שיטת מסחר');
             }
+
+            if (!conditionData.trigger_action) {
+                errors.push({
+                    field: 'triggerAction',
+                    message: this.translator.getMessage('trigger_action_required') || 'יש לבחור פעולה כשמתקיים תנאי'
+                });
+            }
             
             // Validate method parameters
             if (conditionData.method_id && conditionData.parameters_json) {

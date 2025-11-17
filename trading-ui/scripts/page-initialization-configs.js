@@ -1078,6 +1078,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiredGlobals: [
         'NotificationSystem',
         'DataUtils',
+        'window.NotesData',
         'window.loadNotesData',
         'window.RichTextEditorService',
         'window.Quill',

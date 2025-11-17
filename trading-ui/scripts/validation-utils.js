@@ -1,13 +1,13 @@
 /**
  * Validation Utils - Comprehensive Function Index
  * ==========================================
- *
+ * 
  * This file contains a comprehensive validation system with real-time and submission validation support.
  * Includes field validation, form validation, custom validation rules, and advanced validation features.
- *
+ * 
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/VALIDATION_SYSTEM.md
- *
+ * 
  * Author: TikTrack Development Team
  * Version: 3.0
  * Last Updated: 2025-01-27
@@ -16,7 +16,8 @@
 // ===== CONSTANTS =====
 
 // כללי ולידציה ברירת מחדל
-const DEFAULT_VALIDATION_RULES = window.DEFAULT_VALIDATION_RULES || {
+if (typeof window.DEFAULT_VALIDATION_RULES === 'undefined') {
+const DEFAULT_VALIDATION_RULES = {
   text: {
     required: false,
     minLength: 0,
@@ -47,8 +48,8 @@ const DEFAULT_VALIDATION_RULES = window.DEFAULT_VALIDATION_RULES || {
     customValidation: null,
   },
 };
-
-window.DEFAULT_VALIDATION_RULES = DEFAULT_VALIDATION_RULES;
+  window.DEFAULT_VALIDATION_RULES = DEFAULT_VALIDATION_RULES;
+}
 
 // ===== HELPER FUNCTIONS =====
 
@@ -599,24 +600,24 @@ function validateTickerSymbol(value) {
 function validateDateRange(startFieldId, endFieldId, errorMessage) {
   const startField = document.getElementById(startFieldId);
   const endField = document.getElementById(endFieldId);
-
-  if (!startField || !endField) {return true;}
-
+  
+  if (!startField || !endField) return true;
+  
   const startValue = startField.value;
   const endValue = endField.value;
-
+  
   if (startValue && endValue) {
     const startDate = new Date(startValue);
     const endDate = new Date(endValue);
-
+    
     if (endDate < startDate) {
       showFieldError(endField, errorMessage || 'תאריך סיום לא יכול להיות לפני תאריך התחלה');
       return false;
     }
-
+    
     clearFieldValidation(endField);
   }
-
+  
   return true;
 }
 
@@ -631,20 +632,20 @@ function validateEntityForm(formId, fieldConfigs) {
   let isValid = true;
   const errors = {};
   const errorMessages = [];
-
+  
   fieldConfigs.forEach(config => {
     const field = document.getElementById(config.id);
-    if (!field) {return;}
-
+    if (!field) return;
+    
     const result = validateField(field, config.rules || {required: true});
-
+    
     if (result !== true) {
       isValid = false;
       errors[config.id] = result;
       errorMessages.push(`${config.name}: ${result}`);
     }
   });
-
+  
   return {isValid, errors, errorMessages};
 }
 
@@ -658,22 +659,22 @@ function validateEntityForm(formId, fieldConfigs) {
  */
 async function validateWithConfirmation(title, message, validationFn) {
   const validationResult = await validationFn();
-
+  
   if (!validationResult.isValid) {
     if (window.showErrorNotification) {
       window.showErrorNotification(title, validationResult.message);
     }
     return false;
   }
-
+  
   // הצגת דיאלוג אישור
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (window.showConfirmationDialog) {
       window.showConfirmationDialog(
         title,
         message,
         () => resolve(true),
-        () => resolve(false),
+        () => resolve(false)
       );
     } else {
       resolve(window.confirm(`${title}\n\n${message}`));

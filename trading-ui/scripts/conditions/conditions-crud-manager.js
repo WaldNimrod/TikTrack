@@ -378,6 +378,16 @@ class ConditionsCRUDManager {
             prepared.id = Number.isNaN(conditionId) ? null : conditionId;
         }
 
+        if (prepared.trigger_action) {
+            prepared.trigger_action = String(prepared.trigger_action);
+        } else {
+            prepared.trigger_action = 'enter_trade_positive';
+        }
+
+        if (typeof prepared.action_notes === 'string') {
+            prepared.action_notes = prepared.action_notes.trim();
+        }
+
         return prepared;
     }
 

@@ -182,18 +182,6 @@ TABLE_COLUMN_MAPPINGS['trade_suggestions'] = [
 | טיקרים | `tickers` | `tickers.js` | עמודה 0, asc |
 | חשבונות מסחר | `trading_accounts` | `trading_accounts.js` | עמודה 0, asc |
 
-## 🔄 סנכרון עם TableDataRegistry ופאג׳ינציה
-
-- החל מגרסת נובמבר 2025, `TableRegistry.register` עוטף כל `dataGetter` כך שהוא יחזיר תחילה את המערך הקיים ב־`TableDataRegistry` (filtered → full). אם אין רשומות ב־Registry, הוא יפעיל את ה־dataGetter המקורי ויזריק את התוצאה בחזרה ל־Registry.
-- `updateFunction` של טבלה שמשתמשת ב־PaginationSystem חייב לקרוא לפונקציית הסנכרון הכללית (למשל `syncPositionsTablePagination`) במקום לרנדר ישירות את ה־page slice. בצורה זו, גם כאשר TableSorter מפעיל מיון על כלל הרשומות, הפאג׳ינציה מחושבת מחדש ורק החתך המתאים מגיע ל־DOM.
-- Header System ופילטרים פנימיים מעדכנים את ה־Registry לפני הפעלת הפאג׳ינציה (`skipRegistry: true`). לכן TableSorter תמיד יקבל את אותו dataset שהפאג׳ינציה והסטטיסטיקות משתמשות בו.
-
-המשמעות למפתחים:
-
-1. אין לשמור page slices במשתנים גלובליים של הטבלה. שמרו תמיד את הדאטה המלא ב־state/Registry, ואת חיתוך העמוד תנו ל־PaginationSystem לנהל.
-2. בעת יצירת טבלה חדשה – ודאו שיש `sync<Table>Pagination` שמזומן גם בטעינה הראשונית וגם ב־`updateFunction` של UnifiedTableSystem.
-3. מנוגש שני מצבי המטמון (Dev/Prod) דרך `UnifiedCacheManager`, ולכן TableSorter ו־PaginationSystem עובדים על אותו מקור אמת בלי קשר לסביבה.
-
 ---
 
 ## ⚠️ הודעות אזהרה

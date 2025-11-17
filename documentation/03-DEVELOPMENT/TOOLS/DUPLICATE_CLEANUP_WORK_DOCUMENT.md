@@ -1,8 +1,8 @@
 # מסמך עבודה - ניקוי כפילויות ואיחוד דפוסים
 
 **תאריך יצירה:** 26 באוקטובר 2025  
-**גרסה:** 2.2  
-**סטטוס:** הושלם (שלב 4 + חבילת שחרור)
+**גרסה:** 2.1  
+**סטטוס:** בעבודה (עודכן לאחר ניקוי כפילויות import & linter)
 
 ---
 
@@ -336,48 +336,28 @@
 
 ---
 
-## 📦 חבילת שחרור – שלב 4 (13 בנובמבר 2025)
+## 🚀 הצעדים הבאים
 
-### סיכום קצר
-- הושלם שלב 4 במלואו, כולל הכנת חבילת QA רשמית והחלת מבנה בדיקות מודולרי חדש.
-- טסטי המשתמש הותאמו למנגנון DOM המאוחד והמערכות הכלליות (FieldRendererService, ModalManagerV2, UnifiedCacheManager וכו').
-- מסמכי הסטטוס והגרסאות עודכנו לגרסה 2.2 של המסמך, 1.0.24.0 ב-development.
+### 1. השלמת דפוסים פשוטים
+- **Validation Functions**: 3 עמודים
+- **Simple Status Updates**: 2 עמודים
 
-### בדיקות ו-QA
-- `npm run test:unit`
-- `npm run test:integration`
-- `npm run test:component`
-- `npm run test:ci`
-- כיסוי (project `combined`): Statements 29.55%, Branches 14.76%, Functions 38.34%, Lines 31.01%.
-- 14 טסטי Playwright legacy נשארו מסומנים כ-skipped לגל האיחוד הבא.
+### 2. טיפול בדפוסים מורכבים
+- **trade_plans.js**: דפוס מורכב (300+ שורות)
+- **Cancel vs Delete**: 5 עמודים
+- **Modal Functions מורכבים**: 3 עמודים
 
-### Deliverables מרכזיים
-- קונפיגורציות Jest מחולקות (`jest.config.js`, `jest.config.ci.js`, `tests/config/jest-base.js`).
-- תשתית פוליפילים וטעינת DOM (`tests/setup/jest-polyfills.js`, `tests/support/dom-loader.js`).
-- עדכון טסטים (`tests/e2e/user-pages/*.test.js`, `tests/TEST_STATUS_REPORT.md`).
-- עדכון מסמכי גרסאות (`documentation/development/VERSION_HISTORY.md`, `documentation/version-manifest.json`).
+### 3. שיפור כלי הניטור
+- **Logger System Optimization**: הפחתת overhead
+- **Cache Management**: שיפור ניהול המטמון
+- **Error Handling**: הגעה ל-90%+ כיסוי
+- **JSDoc Coverage**: הגעה ל-100% כיסוי
 
-### גרסאות
-- **Development:** 1.0.24.0 – Duplicate cleanup stage 4 QA + Jest multi-project release package.
-- **Production:** ללא שינוי (1.0.6.0).
-
----
-
-## 🚀 הצעדים הבאים (שלב 5)
-
-### 1. טיפול בדפוסים מורכבים
-- **trade_plans.js** – איחוד הדפוסים המורכבים (300+ שורות).
-- **Modal Functions מורכבים** – השלמת תהליך האיחוד ב-3 עמודים.
-- **Cancel vs Delete** – בחינה מחודשת של הסמנטיקה העסקית והפרדת האחריות.
-
-### 2. שיפור כיסוי ובדיקות
-- העלאת כיסוי statements לכיוון ≥60% באמצעות הרחבת הבדיקות בפרויקט `combined`.
-- המרה או הסרה של הטסטים המדולגים (Playwright legacy) ל-JSDOM מלא.
-
-### 3. המשך אופטימיזציה
-- צמצום החוב ב-`npm run check:all`.
-- אופטימיזציית Logger & Cache בהתאם לתוצאות הניטור.
-- המשך שיפור Error Handling ו-JSDoc לעמידה ביעדים של 90%+/100%.
+### 4. כלי בקרה ומעקב
+- **Code Quality Dashboard**: לוח בקרה מרכזי
+- **Real-time Monitoring**: ניטור בזמן אמת
+- **Automated Reports**: דוחות אוטומטיים
+- **Quality Gates**: שערי איכות
 
 ---
 
@@ -400,6 +380,6 @@
 
 ---
 
-**עדכון אחרון:** 13 בנובמבר 2025  
-**סטטוס:** הושלם  
-**התקדמות:** 100% הושלם
+**עדכון אחרון:** 12 בנובמבר 2025  
+**סטטוס:** בעבודה פעילה  
+**התקדמות:** 87% הושלם

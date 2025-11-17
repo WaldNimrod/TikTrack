@@ -337,109 +337,58 @@ window.uiUtils = {
  * @param {string} currentStatus - Current status of the item (optional)
  */
 async function cancelItem(itemType, itemId, itemName = null, currentStatus = null) {
-  window.Logger?.info('[ui-basic] cancelItem invoked', { itemType, itemId, itemName, currentStatus });
+  // Global cancel function called for
 
+  // בדיקה אם האובייקט כבר מבוטל
   if (currentStatus === 'cancelled') {
+    // Item is already cancelled
     if (typeof window.showInfoNotification === 'function') {
-      const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
-        ? window.LinkedItemsService.getEntityLabel(itemType)
+      const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+        ? window.LinkedItemsService.getEntityLabel(itemType) 
         : itemType;
       window.showInfoNotification(`${entityLabel} כבר מבוטל`);
     }
     return;
   }
 
-  let hasLinkedItems = false;
+  // הגדרת הפעולה הנוכחית לביטול
+  window.currentAction = 'cancel';
 
-  if (typeof window.checkLinkedItemsBeforeAction === 'function' && window.checkLinkedItemsBeforeAction !== cancelItem) {
-    window.Logger?.info('[ui-basic] Using global checkLinkedItemsBeforeAction', { itemType, itemId });
-    hasLinkedItems = await window.checkLinkedItemsBeforeAction(itemType, itemId, 'cancel');
-    window.Logger?.info('[ui-basic] Linked items result (global)', { itemType, itemId, hasLinkedItems });
-  } else {
-    window.currentAction = 'cancel';
+  // בדיקת פריטים מקושרים לפני הביטול
+  try {
+    // Use relative URL to work with both development (8080) and production (5001)
+    const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
 
-    try {
-      const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
-      window.Logger?.info('[ui-basic] Fallback linked-items fetch', {
-        itemType,
-        itemId,
-        ok: response.ok,
-        status: response.status,
-      });
+    if (response.ok) {
+      const linkedItemsData = await response.json();
+      const childEntities = linkedItemsData.child_entities || [];
+      const parentEntities = linkedItemsData.parent_entities || [];
+      const allEntities = [...childEntities, ...parentEntities];
 
-      if (response.ok) {
-        const linkedItemsData = await response.json();
-        const childEntities = linkedItemsData.child_entities || [];
-        const parentEntities = linkedItemsData.parent_entities || [];
+      if (allEntities.length > 0) {
+        // יש פריטים מקושרים - הצגת אזהרה
+        // Linked items found
 
-        window.Logger?.info('[ui-basic] Fallback linked-items counts', {
-          itemType,
-          itemId,
-          childCount: childEntities.length,
-          parentCount: parentEntities.length,
-        });
-
-        if (childEntities.length > 0) {
-          hasLinkedItems = true;
-          if (typeof window.showLinkedItemsModal === 'function') {
-            window.Logger?.info('[ui-basic] Showing linked items modal (fallback)', { itemType, itemId });
-            window.showLinkedItemsModal(linkedItemsData, itemType, itemId, 'warningBlock');
-          } else {
-            handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
-            if (window.showErrorNotification) {
-              const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
-                ? window.LinkedItemsService.getEntityLabel(itemType)
-                : itemType;
-              window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
-            }
+        if (typeof window.showLinkedItemsModal === 'function') {
+          window.showLinkedItemsModal(allEntities, itemType, itemId);
+        } else {
+          handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
+          if (window.showErrorNotification) {
+            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+              ? window.LinkedItemsService.getEntityLabel(itemType) 
+              : itemType;
+            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
           }
         }
+        return;
       }
-    } catch (error) {
-      window.Logger?.warn('[ui-basic] Linked-items fallback failed, proceeding', { itemType, itemId, error });
-    } finally {
-      delete window.currentAction;
     }
+  } catch {
+    // Linked items check failed, proceeding with cancellation
   }
 
-  if (hasLinkedItems) {
-    window.Logger?.info('[ui-basic] cancelItem aborted due to linked items', { itemType, itemId });
-    return;
-  }
-
-  const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)
-    ? window.LinkedItemsService.getEntityLabel(itemType)
-    : itemType;
-  const displayName = itemName || `${entityLabel} ${itemId}`;
-
-  let confirmed = true;
-  if (typeof window.showCancelWarning === 'function') {
-    window.Logger?.info('[ui-basic] Showing cancel warning modal', { itemType, itemId, itemName: displayName });
-    confirmed = await new Promise(resolve => {
-      window.showCancelWarning(itemType, displayName, entityLabel,
-        () => resolve(true),
-        () => resolve(false));
-    });
-  } else if (typeof window.showConfirmationDialog === 'function') {
-    window.Logger?.info('[ui-basic] Showing confirmation dialog fallback', { itemType, itemId, itemName: displayName });
-    confirmed = await new Promise(resolve => {
-      window.showConfirmationDialog(
-        `ביטול ${entityLabel}`,
-        `האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?\n\nהסטטוס יעודכן ל"מבוטל".`,
-        () => resolve(true),
-        () => resolve(false),
-        'warning'
-      );
-    });
-  } else {
-    confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
-  }
-
-  if (!confirmed) {
-    window.Logger?.info('[ui-basic] cancelItem cancelled by user', { itemType, itemId });
-    return;
-  }
-
+  // אין פריטים מקושרים - ביצוע הביטול
+  // No linked items found, proceeding with cancellation
   await performItemCancellation(itemType, itemId, itemName);
 }
 
@@ -459,7 +408,6 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       ? window.LinkedItemsService.getEntityLabel(itemType) 
       : itemType;
     const successMessage = `${entityLabel} בוטל בהצלחה!`;
-    window.Logger?.info('[ui-basic] performItemCancellation started', { itemType, itemId });
 
     switch (itemType) {
     case 'trade_plan':
@@ -506,16 +454,8 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       throw new Error(`לא נתמך ביטול עבור סוג: ${itemType}`);
     }
 
-    window.Logger?.info('[ui-basic] performItemCancellation response', {
-      itemType,
-      itemId,
-      ok: response?.ok,
-      status: response?.status,
-    });
-
     if (response.ok) {
       // Item cancelled successfully
-      window.Logger?.info('[ui-basic] performItemCancellation success', { itemType, itemId, successMessage });
 
       // הצגת הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
@@ -1469,8 +1409,61 @@ window.loadSectionStates = loadSectionStates;
 // Load section states when DOM is ready - הוסר כדי למנוע כפילות עם core-systems.js
 // האתחול מתבצע דרך מערכת האתחול המאוחדת
 // ===== VALIDATION UTILS - מערכת ולידציה גלובלית =====
-// ⚠️ כל היכולות הכלליות עברו ל-`scripts/validation-utils.js`.
-// כאן אנחנו רק משתמשים בפונקציות שנטענות מהמערכת הגנרית כדי למנוע כפילויות.
+/*
+ * Validation Utils - TikTrack
+ * ===========================
+ *
+ * מערכת ולידציה גלובלית עם תמיכה בוולידציה בזמן אמת ובזמן שליחה
+ *
+ * 📖 דוקומנטציה מפורטת: documentation/frontend/VALIDATION_SYSTEM.md
+ *
+ * קובץ: trading-ui/scripts/validation-utils.js
+ * גרסה: 2.2
+ * עדכון אחרון: אוגוסט 31, 2025
+ * מחבר: TikTrack Development Team
+ *
+ * תיקונים אחרונים (31 באוגוסט 2025):
+ * - תיקון פונקציות showFieldError, showFieldSuccess, clearFieldError, clearFieldValidation
+ * - תמיכה ב-ID מחרוזת או אלמנט DOM
+ * - בדיקת קיום אלמנט לפני פעולה
+ * - הוספת הודעות אזהרה לקונסול
+ * - שיפור תאימות עם קובץ trade_plans.js
+ */
+
+// ===== קבועים =====
+
+// כללי ולידציה ברירת מחדל
+const DEFAULT_VALIDATION_RULES = {
+  text: {
+    required: false,
+    minLength: 0,
+    maxLength: 255,
+    pattern: /.*/,
+    customValidation: null,
+  },
+  number: {
+    required: false,
+    min: null,
+    max: null,
+    step: null,
+    customValidation: null,
+  },
+  email: {
+    required: false,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    customValidation: null,
+  },
+  date: {
+    required: false,
+    minDate: null,
+    maxDate: null,
+    customValidation: null,
+  },
+  select: {
+    required: false,
+    customValidation: null,
+  },
+};
 
 // ===== פונקציות עזר =====
 

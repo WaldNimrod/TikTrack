@@ -219,9 +219,6 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
       (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) ||
       `טיקר ${itemId}`;
     modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
-  } else if (itemType === 'tag') {
-    const tagName = data.tagName || data.tag?.name || `תגית ${itemId ?? ''}`.trim();
-    modalTitle = `ישויות עם התגית ${tagName}`;
   } else if (itemType === 'trade_plan') {
     modalTitle = 'פריטים מקושרים לתוכנית השקעה';
   } else if (itemType === 'trading_account') {
@@ -344,11 +341,6 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) ||
       `טיקר ${itemId}`;
     itemName = tickerSymbol;
-    break;
-  }
-  case 'tag': {
-    const tagName = data.tagName || data.tag?.name || `תגית ${itemId ?? ''}`.trim();
-    itemName = tagName;
     break;
   }
   case 'alert':

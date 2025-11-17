@@ -100,7 +100,7 @@
 
 ### 1.7 DEVELOPMENT_TOOLS_STANDARDIZATION_TASKS – סטנדרטיזציה לעמודי כלי פיתוח
 - ⚙️ **אחר (מאוחד בפרויקט עמודי כלי פיתוח):** המעקב מתבצע כעת במסמך הפרויקט הייעודי, אך הסעיפים נשמרים כאן לעיון.
-- לכל אחד מהעמודים (`background-tasks.html`, `cache-test.html`, `db_display.html`, `db_extradata.html`, `code-quality-dashboard.html`, `notifications-center.html`, `server-monitor.html`, `system-management.html`):
+- לכל אחד מהעמודים (`background-tasks.html`, `cache-test.html`, `db_display.html`, `db_extradata.html`, `linter-realtime-monitor.html`, `notifications-center.html`, `server-monitor.html`, `system-management.html`):
   - ניקוי CSS מיותר.
   - שיוך לכל קבצי ה-CSS המאוחדים (apple-theme, bootstrap, styles, header-system, typography, table, notification-system).
   - שימוש עקבי במחלקות Bootstrap.

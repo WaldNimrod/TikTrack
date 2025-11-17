@@ -130,6 +130,10 @@ def create_trade_condition(trade_id):
             parameters_json = normalized_payload['parameters_json']
             if isinstance(parameters_json, dict):
                 parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+
+            sanitized_action_notes = BaseEntityUtils.sanitize_rich_text(
+                normalized_payload.get('action_notes')
+            ) if normalized_payload.get('action_notes') else None
             
             condition = TradeCondition(
                 trade_id=trade_id,
@@ -138,7 +142,10 @@ def create_trade_condition(trade_id):
                 parameters_json=parameters_json,
                 logical_operator=normalized_payload.get('logical_operator', 'NONE'),
                 inherited_from_plan_condition_id=normalized_payload.get('inherited_from_plan_condition_id'),
-                is_active=normalized_payload.get('is_active', True)
+                is_active=normalized_payload.get('is_active', True),
+                auto_generate_alerts=normalized_payload.get('auto_generate_alerts', True),
+                trigger_action=normalized_payload.get('trigger_action', 'enter_trade_positive'),
+                action_notes=sanitized_action_notes
             )
             
             db_session.add(condition)
@@ -261,6 +268,13 @@ def update_trade_condition(condition_id):
             condition.logical_operator = data.get('logical_operator', condition.logical_operator)
             condition.inherited_from_plan_condition_id = data.get('inherited_from_plan_condition_id', condition.inherited_from_plan_condition_id)
             condition.is_active = data.get('is_active', condition.is_active)
+            condition.auto_generate_alerts = data.get('auto_generate_alerts', condition.auto_generate_alerts)
+            condition.trigger_action = data.get('trigger_action', condition.trigger_action)
+            if 'action_notes' in data:
+                sanitized_action_notes = BaseEntityUtils.sanitize_rich_text(
+                    data.get('action_notes')
+                ) if data.get('action_notes') else None
+                condition.action_notes = sanitized_action_notes
             
             db_session.commit()
             
@@ -502,7 +516,10 @@ def inherit_conditions_from_plan():
                     parameters_json=plan_condition.parameters_json,
                     logical_operator=plan_condition.logical_operator,
                     inherited_from_plan_condition_id=plan_condition.id,
-                    is_active=plan_condition.is_active
+                    is_active=plan_condition.is_active,
+                    auto_generate_alerts=plan_condition.auto_generate_alerts,
+                    trigger_action=plan_condition.trigger_action,
+                    action_notes=plan_condition.action_notes
                 )
                 
                 db_session.add(trade_condition)
@@ -590,6 +607,10 @@ def create_bulk_trade_conditions():
                 if isinstance(parameters_json, dict):
                     import json
                     parameters_json = json.dumps(parameters_json, ensure_ascii=False)
+
+                sanitized_action_notes = BaseEntityUtils.sanitize_rich_text(
+                    condition_data.get('action_notes')
+                ) if condition_data.get('action_notes') else None
                 
                 condition = TradeCondition(
                     trade_id=trade_id,
@@ -598,7 +619,10 @@ def create_bulk_trade_conditions():
                     parameters_json=parameters_json,
                     logical_operator=condition_data.get('logical_operator', 'NONE'),
                     inherited_from_plan_condition_id=condition_data.get('inherited_from_plan_condition_id'),
-                    is_active=condition_data.get('is_active', True)
+                    is_active=condition_data.get('is_active', True),
+                    auto_generate_alerts=condition_data.get('auto_generate_alerts', True),
+                    trigger_action=condition_data.get('trigger_action', 'enter_trade_positive'),
+                    action_notes=sanitized_action_notes
                 )
                 
                 db_session.add(condition)

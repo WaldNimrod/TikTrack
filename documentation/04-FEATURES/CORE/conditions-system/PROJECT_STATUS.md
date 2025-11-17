@@ -16,43 +16,7 @@
 - **Documentation**: תיעוד מקיף ומעודכן
 
 ### ⏳ **בפיתוח (Phase 5)**
-- **Trade Plans Integration**: אינטגרציה עם עמוד תכניות מסחר
-- **Trades Integration**: אינטגרציה עם עמוד טריידים
-- **User Guide**: מדריך משתמש מקיף
-
-### 📋 **תכנון (Phase 6-7)**
-- **Comprehensive Testing**: בדיקות מקיפות
-- **Performance Testing**: בדיקות ביצועים
-- **Final Documentation**: תיעוד סופי
-
----
-
-## 🎯 **מטרות שהושגו**
-
-### Backend Systems (100% Complete)
-- ✅ **ConditionEvaluator Service**: מעריך תנאים בזמן אמת
-- ✅ **ConditionEvaluationTask**: משימת רקע אוטומטית
-- ✅ **API Endpoints**: 6 endpoints חדשים
-- ✅ **Database Schema**: שדה auto_generate_alerts
-- ✅ **Alert Integration**: יצירת התראות אוטומטית
-
-### Frontend Systems (60% Complete)
-- ✅ **Test Page**: בדיקות הערכת תנאים
-- ✅ **UI Demo**: פקדי הערכה וסטטוס
-- ⏳ **Trade Plans Page**: אינטגרציה עם תנאים
-- ⏳ **Trades Page**: אינטגרציה עם תנאים
-
-### Documentation (80% Complete)
-- ✅ **API Documentation**: תיעוד מקיף
-- ✅ **System Documentation**: מעודכן
-- ✅ **Index Documentation**: מעודכן
-- ⏳ **User Guide**: מדריך משתמש מקיף
-
-### Testing (70% Complete)
-- ✅ **Unit Tests**: בדיקות יחידה
-- ✅ **Integration Tests**: בדיקות אינטגרציה
-- ⏳ **Performance Tests**: בדיקות ביצועים
-- ⏳ **User Acceptance Tests**: בדיקות משתמש
+ס
 
 ---
 
@@ -84,20 +48,22 @@
 
 ## 🚀 **השלבים הבאים**
 
-### Phase 5: Integration (2-3 שעות)
-1. **Trade Plans Page**: הוספת פקדי הערכה
-2. **Trades Page**: הוספת פקדי הערכה
-3. **User Guide**: יצירת מדריך משתמש
+### Phase 5: Integration (3-4 שעות)
+1. **Trade Plans Page**: הוספת כפתור “בדיקת תנאים” בזמן אמת + חיווי תוצאה
+2. **Trades Page**: אינטגרציית תנאים מלאה (כולל חיווי Trigger)
+3. **User Guide**: הרחבה עם תרחישי Plan→Trade והסבר UI בהפעלת תנאי
+4. **Condition Trigger UX**: Badge/Notification מסודרים כשמתקיים תנאי
 
-### Phase 6: Testing (1-2 שעות)
-1. **Performance Testing**: בדיקות ביצועים
-2. **User Acceptance Testing**: בדיקות משתמש
-3. **Integration Testing**: בדיקות אינטגרציה
+### Phase 6: Testing & Completion (3 שעות)
+1. **Performance Testing**: בדיקות עומס על משימת ההערכה
+2. **User Acceptance Testing**: תרחישי קצה Plan→Trade + Trigger Actions
+3. **Integration Testing**: פילטר ראשי, פאג׳ינציה, תנאים והתראות משולבים
+4. **Trigger Actions Field**: API+UI (CRUD) לשדה “פעולה כשמתקיים” + Rich Text Notes
+5. **Final Documentation**: עדכון כל המסמכים + מדריך מפתח/QA
 
 ### Phase 7: Finalization (1 שעה)
-1. **Final Documentation**: תיעוד סופי
-2. **Git Backup**: גיבוי סופי
-3. **Deployment**: פריסה
+1. **Git Backup**: גיבוי סופי
+2. **Deployment Prep**: הרשאות + גרסאות
 
 ---
 

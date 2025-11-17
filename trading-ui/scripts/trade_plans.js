@@ -1645,10 +1645,15 @@ function updateTradePlansTable(trade_plans) {
             </td></tr>`;
     }
 
-    // Updating record count
-    const countElement = document.querySelector('#trade_plansCount');
-    if (countElement) {
-      countElement.textContent = '0 תכנונים';
+    // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', 0);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('#trade_plansCount');
+      if (countElement) {
+        countElement.textContent = '0 תכנונים';
+      }
     }
 
     // Updating statistics - use the non-recursive function
@@ -2002,10 +2007,15 @@ function updateTradePlansTable(trade_plans) {
   tbody.innerHTML = tableHTML;
   window.Logger.info(`✅ Table updated successfully`, { page: "trade_plans" });
 
-      // Updating record count
-    const countElement = document.querySelector('#trade_plansCount');
-    if (countElement) {
-      countElement.textContent = `${trade_plans.length} תכנונים`;
+      // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('#trade_plansCount', 'trade_plans', 'תכנונים', trade_plans.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('#trade_plansCount');
+      if (countElement) {
+        countElement.textContent = `${trade_plans.length} תכנונים`;
+      }
     }
 
     // Updating statistics - use the non-recursive function
@@ -2053,9 +2063,15 @@ function updateTradePlansPageSummaryStats() {
           if (config) {
             const dataToUse = window.filteredTradePlansData || window.tradePlansData || [];
             window.InfoSummarySystem.calculateAndRender(dataToUse, config);
-            const countElement = document.getElementById('designsCount');
-            if (countElement && dataToUse) {
-              countElement.textContent = `${dataToUse.length} תכנונים`;
+            // Update count using generic function
+            if (window.updateTableCount) {
+              window.updateTableCount('designsCount', 'trade_plans', 'תכנונים', dataToUse ? dataToUse.length : 0);
+            } else {
+              // Fallback
+              const countElement = document.getElementById('designsCount');
+              if (countElement && dataToUse) {
+                countElement.textContent = `${dataToUse.length} תכנונים`;
+              }
             }
           }
         }

@@ -1056,22 +1056,28 @@ function updateExecutionsSummary(filteredDataOverride = null) {
  */
 function updateExecutionsCounters(filteredCountOverride = null) {
   try {
-    const countElement = document.querySelector('.table-count');
-    if (!countElement) {
-      return;
-    }
-
-    let filteredCount = filteredCountOverride;
-    if (filteredCount === null || typeof filteredCount === 'undefined') {
-      if (window.getTableDataCounts) {
-        const counts = window.getTableDataCounts('executions');
-        filteredCount = counts.filtered;
-      } else {
-        filteredCount = window.executionsData?.length || 0;
+    // Use generic updateTableCount function
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'executions', 'ביצועים', filteredCountOverride);
+    } else {
+      // Fallback to old implementation
+      const countElement = document.querySelector('.table-count');
+      if (!countElement) {
+        return;
       }
-    }
 
-    countElement.textContent = `${filteredCount} ביצועים`;
+      let filteredCount = filteredCountOverride;
+      if (filteredCount === null || typeof filteredCount === 'undefined') {
+        if (window.getTableDataCounts) {
+          const counts = window.getTableDataCounts('executions');
+          filteredCount = counts.filtered;
+        } else {
+          filteredCount = window.executionsData?.length || 0;
+        }
+      }
+
+      countElement.textContent = `${filteredCount} ביצועים`;
+    }
   } catch (error) {
     window.Logger?.warn('updateExecutionsCounters failed', { error });
   }

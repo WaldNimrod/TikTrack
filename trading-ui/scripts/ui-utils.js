@@ -2127,6 +2127,67 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
   }
 }
 
+/**
+ * Update table count element with total filtered records (not just current page)
+ * Generic function to update count display using TableDataRegistry
+ * 
+ * @function updateTableCount
+ * @param {string|HTMLElement} countElementOrSelector - Element ID, selector, or element itself
+ * @param {string} tableType - Table type identifier (e.g., 'trades', 'tickers', 'alerts')
+ * @param {string} itemName - Item name for display (e.g., 'טריידים', 'טיקרים', 'התראות')
+ * @param {number} [fallbackCount] - Fallback count if TableDataRegistry not available
+ * @returns {void}
+ * 
+ * @example
+ * updateTableCount('#tradesCount', 'trades', 'טריידים');
+ * updateTableCount('.table-count', 'tickers', 'טיקרים');
+ * updateTableCount(document.getElementById('alertsCount'), 'alerts', 'התראות', 0);
+ */
+function updateTableCount(countElementOrSelector, tableType, itemName, fallbackCount = null) {
+  try {
+    let countElement = null;
+    
+    // Resolve element from various input types
+    if (typeof countElementOrSelector === 'string') {
+      if (countElementOrSelector.startsWith('#')) {
+        countElement = document.getElementById(countElementOrSelector.substring(1));
+      } else if (countElementOrSelector.startsWith('.')) {
+        countElement = document.querySelector(countElementOrSelector);
+      } else {
+        // Try as ID first, then as selector
+        countElement = document.getElementById(countElementOrSelector) || document.querySelector(countElementOrSelector);
+      }
+    } else if (countElementOrSelector instanceof HTMLElement) {
+      countElement = countElementOrSelector;
+    }
+    
+    if (!countElement) {
+      window.Logger?.debug('Count element not found', { tableType, selector: countElementOrSelector });
+      return;
+    }
+    
+    // Use TableDataRegistry to get total filtered count (not just current page)
+    let totalCount = fallbackCount;
+    if (window.getTableDataCounts) {
+      const counts = window.getTableDataCounts(tableType);
+      totalCount = counts.filtered || counts.total || fallbackCount || 0;
+    } else if (fallbackCount === null) {
+      // If no fallback provided and TableDataRegistry not available, try to get from window variable
+      const dataVar = window[`${tableType}Data`] || window[`filtered${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Data`];
+      totalCount = Array.isArray(dataVar) ? dataVar.length : 0;
+    }
+    
+    if (totalCount !== null && totalCount !== undefined) {
+      countElement.textContent = `${totalCount} ${itemName}`;
+    }
+  } catch (error) {
+    window.Logger?.warn('updateTableCount failed', { tableType, error: error?.message || error });
+  }
+}
+
+// Export to window for global access
+window.updateTableCount = updateTableCount;
+
 function renderUpdatedCell(entity, options = {}) {
   const {
     fields = ['updated_at', 'updatedAt'],

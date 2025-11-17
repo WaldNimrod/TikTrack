@@ -1946,10 +1946,15 @@ function renderTickersTableRows(tickers) {
     // כפיית reflow של הדפדפן
     tbody.offsetHeight;
 
-    // עדכון הספירה
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
-      countElement.textContent = `${tickers.length} טיקרים`;
+    // עדכון הספירה - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'tickers', 'טיקרים', tickers.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('.table-count');
+      if (countElement) {
+        countElement.textContent = `${tickers.length} טיקרים`;
+      }
     }
     
     window.Logger.debug(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`, { page: "tickers" });
@@ -2660,11 +2665,18 @@ function filterTickersByType(type) {
       window.updateTickersTable(filteredData);
     }
 
-    // עדכון ספירת הטיקרים
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
+    // עדכון ספירת הטיקרים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
       const typeText = type === 'all' ? 'כל הטיקרים' : getTypeDisplayName(type);
-      countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
+      const itemName = type !== 'all' ? `טיקרים (${typeText})` : 'טיקרים';
+      window.updateTableCount('.table-count', 'tickers', itemName, filteredData.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('.table-count');
+      if (countElement) {
+        const typeText = type === 'all' ? 'כל הטיקרים' : getTypeDisplayName(type);
+        countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
+      }
     }
 
     window.Logger.info(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`, { page: "tickers" });

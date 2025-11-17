@@ -502,22 +502,28 @@ function updateTradesSummary(filteredDataOverride = null) {
  */
 function updateTradesCounters(filteredCountOverride = null) {
   try {
-    const countElement = document.getElementById('tradesCount');
-    if (!countElement) {
-      return;
-    }
-
-    let filteredCount = filteredCountOverride;
-    if (filteredCount === null || typeof filteredCount === 'undefined') {
-      if (window.getTableDataCounts) {
-        const counts = window.getTableDataCounts('trades');
-        filteredCount = counts.filtered;
-      } else {
-        filteredCount = window.tradesData?.length || 0;
+    // Use generic updateTableCount function
+    if (window.updateTableCount) {
+      window.updateTableCount('tradesCount', 'trades', 'טריידים', filteredCountOverride);
+    } else {
+      // Fallback to old implementation
+      const countElement = document.getElementById('tradesCount');
+      if (!countElement) {
+        return;
       }
-    }
 
-    countElement.textContent = `${filteredCount} טריידים`;
+      let filteredCount = filteredCountOverride;
+      if (filteredCount === null || typeof filteredCount === 'undefined') {
+        if (window.getTableDataCounts) {
+          const counts = window.getTableDataCounts('trades');
+          filteredCount = counts.filtered;
+        } else {
+          filteredCount = window.tradesData?.length || 0;
+        }
+      }
+
+      countElement.textContent = `${filteredCount} טריידים`;
+    }
   } catch (error) {
     window.Logger?.warn('updateTradesCounters failed', { error });
   }

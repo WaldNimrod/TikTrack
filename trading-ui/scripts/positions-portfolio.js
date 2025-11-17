@@ -396,8 +396,14 @@ async function loadAccountPositions(accountId) {
         const accountTotalElement = document.getElementById('positionsAccountTotalValue');
         const accountTotalAmountElement = document.getElementById('positionsAccountTotalValueAmount');
         
-        if (countTextElement) {
-            countTextElement.textContent = `${positions.length} פוזיציות`;
+        // Update count using generic function (gets total filtered count, not just current page)
+        if (window.updateTableCount) {
+            window.updateTableCount('positionsCountText', 'positions', 'פוזיציות', positions.length);
+        } else {
+            // Fallback
+            if (countTextElement) {
+                countTextElement.textContent = `${positions.length} פוזיציות`;
+            }
         }
         
         // Show/hide elements based on data availability
@@ -803,7 +809,7 @@ async function loadPortfolio() {
         window.positionsPortfolioState.portfolioData = normalized;
         setPortfolioDiagnostics(normalized.diagnostics);
         
-        // Update count
+        // Update count using generic function (gets total filtered count, not just current page)
         const countElement = document.getElementById('portfolioCount');
         if (countElement) {
             const totalPositions = normalized.summary?.total_positions ?? normalized.positions.length ?? 0;
@@ -811,7 +817,13 @@ async function loadPortfolio() {
             if (normalized.diagnostics?.accounts_without_executions?.length) {
                 countText += ' • אין נתוני Executions בחלק מהחשבונות';
             }
-            countElement.textContent = countText;
+            // Use generic function if available, otherwise direct update
+            if (window.updateTableCount) {
+                // For portfolio, we need to preserve the diagnostic text, so use direct update
+                countElement.textContent = countText;
+            } else {
+                countElement.textContent = countText;
+            }
         }
         
         // Render table (Pagination System)

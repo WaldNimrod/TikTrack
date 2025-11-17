@@ -177,11 +177,19 @@ function filterByRelatedObjectType(type, data, updateFunction, countSelector, it
     }
   }
 
+  // Update count element using generic function (gets total filtered count, not just current page)
   if (typeof countSelector === 'string' && countSelector.trim()) {
-    const countElement = document.querySelector(countSelector);
-    if (countElement) {
-      const label = typeof itemName === 'string' ? ` ${itemName}` : '';
-      countElement.textContent = `${Array.isArray(filteredData) ? filteredData.length : 0}${label}`;
+    const tableTypeForCount = resolvedTableType || entityName || null;
+    if (window.updateTableCount && tableTypeForCount) {
+      const label = typeof itemName === 'string' ? itemName : '';
+      window.updateTableCount(countSelector, tableTypeForCount, label, Array.isArray(filteredData) ? filteredData.length : 0);
+    } else {
+      // Fallback to direct update
+      const countElement = document.querySelector(countSelector);
+      if (countElement) {
+        const label = typeof itemName === 'string' ? ` ${itemName}` : '';
+        countElement.textContent = `${Array.isArray(filteredData) ? filteredData.length : 0}${label}`;
+      }
     }
   }
 

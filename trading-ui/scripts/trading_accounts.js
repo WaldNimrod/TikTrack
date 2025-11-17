@@ -194,10 +194,15 @@ window.loadTradingAccountsDataForTradingAccountsPage = async function(passedOpti
       window.Logger.warn('updateTradingAccountsSummary לא זמין', { page: "trading_accounts" });
     }
 
-    // עדכון מונה הטבלה
-    const countElement = document.getElementById('accountsCount');
-    if (countElement) {
-      countElement.textContent = `${filteredTradingAccounts.length} חשבונות מסחר`;
+    // עדכון מונה הטבלה - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('accountsCount', 'trading_accounts', 'חשבונות מסחר', filteredTradingAccounts.length);
+    } else {
+      // Fallback
+      const countElement = document.getElementById('accountsCount');
+      if (countElement) {
+        countElement.textContent = `${filteredTradingAccounts.length} חשבונות מסחר`;
+      }
     }
 
     // Restore page state (filters, sort, sections, entity filters)
@@ -622,10 +627,17 @@ async function syncTradingAccountsPagination(accountsData) {
           if (typeof window.updateTradingAccountsSummary === 'function') {
             window.updateTradingAccountsSummary(Array.isArray(filteredData) ? filteredData : []);
           }
-          const countElement = document.getElementById('accountsCount');
-          if (countElement) {
+          // Update count using generic function
+          if (window.updateTableCount) {
             const count = Array.isArray(filteredData) ? filteredData.length : 0;
-            countElement.textContent = `${count} חשבונות מסחר`;
+            window.updateTableCount('accountsCount', 'trading_accounts', 'חשבונות מסחר', count);
+          } else {
+            // Fallback
+            const countElement = document.getElementById('accountsCount');
+            if (countElement) {
+              const count = Array.isArray(filteredData) ? filteredData.length : 0;
+              countElement.textContent = `${count} חשבונות מסחר`;
+            }
           }
         },
       });
@@ -677,8 +689,14 @@ function updateTradingAccountsTable(trading_accounts) {
     if (trading_accounts.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין חשבונות מסחר להצגה</td></tr>';
       const countElement = document.getElementById('accountsCount');
-      if (countElement) {
-        countElement.textContent = '0 חשבונות';
+      // Update count using generic function
+      if (window.updateTableCount) {
+        window.updateTableCount('accountsCount', 'trading_accounts', 'חשבונות', 0);
+      } else {
+        // Fallback
+        if (countElement) {
+          countElement.textContent = '0 חשבונות';
+        }
       }
       if (typeof window.hideLoadingState === 'function') {
         window.hideLoadingState();
@@ -822,9 +840,15 @@ function updateTradingAccountsTable(trading_accounts) {
       `;
     }).join('');
 
-    const countElement = document.getElementById('accountsCount');
-    if (countElement) {
-      countElement.textContent = `${trading_accounts.length} חשבונות`;
+    // עדכון מונה הטבלה - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('accountsCount', 'trading_accounts', 'חשבונות', trading_accounts.length);
+    } else {
+      // Fallback
+      const countElement = document.getElementById('accountsCount');
+      if (countElement) {
+        countElement.textContent = `${trading_accounts.length} חשבונות`;
+      }
     }
 
     if (typeof window.hideLoadingState === 'function') {

@@ -1284,10 +1284,23 @@ async function renderCashFlowsTable() {
 
   setupExchangeRowInteractions();
 
-  // עדכון מספר הפריטים
-  const countElement = document.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${cashFlowsData.length} תזרימים`;
+  // עדכון מספר הפריטים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+  if (window.updateTableCount) {
+    window.updateTableCount('cashFlowsCount', 'cash_flows', 'תזרימים', cashFlowsData.length);
+  } else {
+    // Fallback
+    const countElement = document.getElementById('cashFlowsCount');
+    if (countElement) {
+      // Use TableDataRegistry to get total filtered count (not just current page)
+      if (window.getTableDataCounts) {
+        const counts = window.getTableDataCounts('cash_flows');
+        const totalCount = counts.filtered || counts.total || cashFlowsData.length;
+        countElement.textContent = `${totalCount} תזרימים`;
+      } else {
+        // Fallback to data length
+        countElement.textContent = `${cashFlowsData.length} תזרימים`;
+      }
+    }
   }
 
   // Clean up and reinitialize Bootstrap tooltips after table update
@@ -1360,9 +1373,23 @@ function updatePageSummaryStats() {
       });
     } else {
       // Fallback to local implementation if global system not available
-      const countElement = document.getElementById('cashFlowsCount');
-      if (countElement && summarySource) {
-        countElement.textContent = summarySource.length;
+      // Use generic updateTableCount function
+      if (window.updateTableCount) {
+        window.updateTableCount('cashFlowsCount', 'cash_flows', 'תזרימים', summarySource ? summarySource.length : 0);
+      } else {
+        // Fallback
+        const countElement = document.getElementById('cashFlowsCount');
+        if (countElement) {
+          // Use TableDataRegistry to get total filtered count (not just current page)
+          if (window.getTableDataCounts) {
+            const counts = window.getTableDataCounts('cash_flows');
+            const totalCount = counts.filtered || counts.total || (summarySource ? summarySource.length : 0);
+            countElement.textContent = `${totalCount} תזרימים`;
+          } else if (summarySource) {
+            // Fallback to summary source length
+            countElement.textContent = `${summarySource.length} תזרימים`;
+          }
+        }
       }
       
       const summaryElement = document.getElementById('cashFlowsSummary');
@@ -1409,9 +1436,24 @@ async function syncCashFlowsPagination(cashFlows) {
           if (typeof updatePageSummaryStats === 'function') {
             updatePageSummaryStats();
           }
-          const countElement = document.querySelector('.table-count');
-          if (countElement) {
-            countElement.textContent = `${window.filteredCashFlowsData.length} תזרימים`;
+          // Update count element with total filtered records (not just current page)
+          // Use generic updateTableCount function
+          if (window.updateTableCount) {
+            window.updateTableCount('cashFlowsCount', 'cash_flows', 'תזרימים', window.filteredCashFlowsData.length);
+          } else {
+            // Fallback
+            const countElement = document.getElementById('cashFlowsCount');
+            if (countElement) {
+              // Use TableDataRegistry to get total filtered count
+              if (window.getTableDataCounts) {
+                const counts = window.getTableDataCounts('cash_flows');
+                const totalCount = counts.filtered || counts.total || window.filteredCashFlowsData.length;
+                countElement.textContent = `${totalCount} תזרימים`;
+              } else {
+                // Fallback to filtered data length
+                countElement.textContent = `${window.filteredCashFlowsData.length} תזרימים`;
+              }
+            }
           }
         },
       });

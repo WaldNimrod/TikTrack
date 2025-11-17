@@ -928,10 +928,15 @@ function renderAlertsTableRows(alerts) {
 
     tbody.innerHTML = tableHTML;
 
-    // עדכון ספירת רשומות
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
-      countElement.textContent = `${alerts.length} התראות`;
+    // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'alerts', 'התראות', alerts.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('.table-count');
+      if (countElement) {
+        countElement.textContent = `${alerts.length} התראות`;
+      }
     }
 
     // עדכון סטטיסטיקות דרך המערכת הגנרית
@@ -2395,10 +2400,15 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   updateAlertsTable(filteredAlerts);
   
 
-  // עדכון ספירת רשומות
-  const countElement = document.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${filteredAlerts.length} התראות`;
+  // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+  if (window.updateTableCount) {
+    window.updateTableCount('.table-count', 'alerts', 'התראות', filteredAlerts.length);
+  } else {
+    // Fallback
+    const countElement = document.querySelector('.table-count');
+    if (countElement) {
+      countElement.textContent = `${filteredAlerts.length} התראות`;
+    }
   }
 
   // window.Logger.info(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`, { page: "alerts" });

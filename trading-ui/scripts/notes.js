@@ -152,9 +152,15 @@ window.loadNotesData = async function(options = {}) {
       window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: 'notes' });
     }
 
-    const countElement = document.getElementById('notesCount');
-    if (countElement) {
-      countElement.textContent = `${normalizedNotes.length} הערות`;
+    // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('notesCount', 'notes', 'הערות', normalizedNotes.length);
+    } else {
+      // Fallback
+      const countElement = document.getElementById('notesCount');
+      if (countElement) {
+        countElement.textContent = `${normalizedNotes.length} הערות`;
+      }
     }
 
     if (typeof window.registerNotesTables === 'function') {
@@ -893,10 +899,15 @@ function updateNotesSummary(notes) {
     // שמירת המספר המקורי לחיפוש
   window.originalNotesCount = notesArray.length;
 
-  // עדכון table-count
-  const tableCountElement = document.querySelector('.table-count');
-  if (tableCountElement) {
-    tableCountElement.textContent = `${notesArray.length} הערות`;
+  // עדכון table-count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+  if (window.updateTableCount) {
+    window.updateTableCount('.table-count', 'notes', 'הערות', notesArray.length);
+  } else {
+    // Fallback
+    const tableCountElement = document.querySelector('.table-count');
+    if (tableCountElement) {
+      tableCountElement.textContent = `${notesArray.length} הערות`;
+    }
   }
 
   // מערכת מאוחדת לסיכום נתונים

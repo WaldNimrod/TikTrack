@@ -2810,6 +2810,11 @@ async function getTradePlanConditionsForEvaluation(entityId) {
   return data;
 }
 
+/**
+ * Evaluate plan conditions
+ * @param {Array} conditions - Array of conditions
+ * @returns {Promise<Array>} Array of evaluation results
+ */
 function evaluatePlanConditions(conditions) {
   const promises = conditions
     .filter(condition => condition?.id)

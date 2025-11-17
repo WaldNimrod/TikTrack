@@ -2202,9 +2202,6 @@ window.populateRelatedObjects = populateRelatedObjects;
 /**
  * Restore sort state wrapper
  * Uses global restoreSortState from page-utils.js
- * 
- * Restore sort state wrapper
- * Uses global restoreSortState from page-utils.js
  * @returns {Promise<void>}
  */
 async function restoreSortState() {

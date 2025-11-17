@@ -2440,6 +2440,11 @@ window.handleTradePlanEvaluateConditionsClick = handleTradePlanEvaluateCondition
 window.handleTradePlanConditionRowEvaluate = handleTradePlanConditionRowEvaluate;
 window.handleTradePlanConditionToggleAlerts = handleTradePlanConditionToggleAlerts;
 
+/**
+ * Handle trade plan condition summary edit
+ * @param {number|string} conditionId - Condition ID
+ * @returns {Promise<void>}
+ */
 async function handleTradePlanConditionSummaryEdit(conditionId) {
   const modalElement = getTradePlansModalElement();
   if (!modalElement) {
@@ -2505,6 +2510,11 @@ async function handleTradePlanConditionSummaryDelete(conditionId) {
 window.handleTradePlanConditionSummaryEdit = handleTradePlanConditionSummaryEdit;
 window.handleTradePlanConditionSummaryDelete = handleTradePlanConditionSummaryDelete;
 
+/**
+ * Confirm trade plan condition deletion
+ * @param {Object} condition - Condition object
+ * @returns {Promise<boolean>} True if confirmed
+ */
 async function confirmTradePlanConditionDeletion(condition) {
   const translator = getConditionsTranslator();
   const title = translator?.getMessage('condition_delete_confirm_title') || 'מחיקת תנאי';
@@ -2777,6 +2787,11 @@ async function handleTradePlanEvaluateConditionsClick() {
   }
 }
 
+/**
+ * Get trade plan conditions for evaluation
+ * @param {number|string} entityId - Entity ID
+ * @returns {Promise<Array>} Array of conditions
+ */
 async function getTradePlanConditionsForEvaluation(entityId) {
   const numericId = Number(entityId);
   const cached = window.ConditionsSummaryRenderer?.getConditions?.('plan', numericId);

@@ -783,6 +783,115 @@ async function performCashFlowDeletion(id) {
   }
 }
 
+/**
+ * מחיקת כל רשומות תזרימי המזומנים מייבוא (source='file_import')
+ * @function deleteImportedCashFlows
+ * @async
+ * @returns {Promise<void>}
+ */
+async function deleteImportedCashFlows() {
+  try {
+    // Show confirmation dialog
+    const confirmationMessage = 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים שמקורן בייבוא (source=\'file_import\')?\n\nפעולה זו תמחק את כל הרשומות המיובאות ותאפשר בדיקות ייבוא מחדש.';
+    
+    if (typeof window.showConfirmationDialog === 'function') {
+      const confirmed = await new Promise((resolve) => {
+        try {
+          window.showConfirmationDialog(
+            'מחיקת רשומות מייבוא',
+            confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        } catch (error) {
+          console.error('Error in showConfirmationDialog:', error);
+          // Fallback to simple confirm
+          const confirmed = window.confirm(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?');
+          resolve(confirmed);
+        }
+      });
+      
+      if (!confirmed) {
+        return;
+      }
+    } else {
+      // Fallback to simple confirm
+      if (!confirm(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?')) {
+        return;
+      }
+    }
+
+    // Show loading notification
+    if (window.showNotification) {
+      window.showNotification('מבצע מחיקה...', 'info', 3000);
+    }
+
+    // Call API endpoint
+    const response = await fetch('/api/cash-flows/delete-imported', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.status === 'success') {
+      const deletedCount = data.deleted_count || 0;
+      const message = deletedCount > 0 
+        ? `נמחקו ${deletedCount} רשומות תזרימי מזומנים מייבוא בהצלחה!`
+        : 'לא נמצאו רשומות מייבוא למחיקה.';
+      
+      if (window.showNotification) {
+        window.showNotification(message, 'success', 5000);
+      } else {
+        alert(message);
+      }
+
+      // Reload cash flows data
+      if (typeof window.loadCashFlowsData === 'function') {
+        await window.loadCashFlowsData({ force: true });
+      } else if (typeof window.updateCashFlowsTable === 'function') {
+        // Fallback: try to refresh table
+        window.updateCashFlowsTable();
+      }
+    } else {
+      const errorMessage = data.error?.message || data.message || 'שגיאה במחיקת רשומות מייבוא';
+      if (window.showNotification) {
+        window.showNotification(errorMessage, 'error', 6000);
+      } else {
+        alert(`שגיאה: ${errorMessage}`);
+      }
+      
+      if (window.Logger) {
+        window.Logger.error('deleteImportedCashFlows: API error', { 
+          page: 'cash_flows', 
+          error: errorMessage,
+          response: data
+        });
+      }
+    }
+  } catch (error) {
+    const errorMessage = error?.message || 'שגיאה בלתי צפויה במחיקת רשומות מייבוא';
+    if (window.showNotification) {
+      window.showNotification(errorMessage, 'error', 6000);
+    } else {
+      alert(`שגיאה: ${errorMessage}`);
+    }
+    
+    if (window.Logger) {
+      window.Logger.error('deleteImportedCashFlows: Error occurred', { 
+        page: 'cash_flows', 
+        error: error?.message || error 
+      });
+    }
+  }
+}
+
+// Export function to window for onclick handler
+window.deleteImportedCashFlows = deleteImportedCashFlows;
+
 // ========================================
 // פונקציות פריטים מקושרים
 // ========================================
@@ -1145,13 +1254,14 @@ async function renderCashFlowsTable() {
                     return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
                   }
                   try {
-                    return new Date(epoch).toLocaleString('he-IL', {
+                    const dateObj = new Date(epoch);
+                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    });
+                    }));
                   } catch (err) {
                     window.Logger?.warn('⚠️ cash_flows updated-cell date formatting failed', { err, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
                     return 'לא מוגדר';
@@ -1178,6 +1288,44 @@ async function renderCashFlowsTable() {
   const countElement = document.querySelector('.table-count');
   if (countElement) {
     countElement.textContent = `${cashFlowsData.length} תזרימים`;
+  }
+
+  // Clean up and reinitialize Bootstrap tooltips after table update
+  // This prevents "Cannot convert undefined or null to object" errors
+  if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+    try {
+      // Destroy all existing tooltips in the table container
+      const tableContainer = document.querySelector('#cashFlowsContainer');
+      if (tableContainer) {
+        const existingTooltips = tableContainer.querySelectorAll('[data-bs-toggle="tooltip"], [data-tooltip]');
+        existingTooltips.forEach(element => {
+          const tooltipInstance = bootstrap.Tooltip.getInstance(element);
+          if (tooltipInstance) {
+            try {
+              tooltipInstance.dispose();
+            } catch (e) {
+              // Ignore disposal errors
+            }
+          }
+        });
+      }
+      
+      // Reinitialize tooltips via button system if available
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        setTimeout(() => {
+          window.ButtonSystem.initializeButtons();
+        }, 100);
+      } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+        setTimeout(() => {
+          const tableContainer = document.querySelector('#cashFlowsContainer');
+          if (tableContainer) {
+            window.advancedButtonSystem.initializeTooltips(tableContainer);
+          }
+        }, 100);
+      }
+    } catch (tooltipError) {
+      window.Logger?.warn('Tooltip cleanup/reinit failed', { error: tooltipError?.message, page: 'cash_flows' });
+    }
   }
 
   // Render unified forex exchanges table
@@ -2975,6 +3123,7 @@ window.initializeExternalIdFields = initializeExternalIdFields;
 window.filterCashFlowsByType = filterCashFlowsByType;
 window.reapplyCashFlowTypeFilter = reapplyCashFlowTypeFilter;
 window.deleteCashFlow = deleteCashFlow;
+window.deleteImportedCashFlows = deleteImportedCashFlows;
 window.performCashFlowDeletion = performCashFlowDeletion;
 // REMOVED: window exports for removed modal wrapper functions
 // Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
@@ -2995,7 +3144,7 @@ window.setCurrencyExchangeSummary = setCurrencyExchangeSummary;
  * @returns {void}
  */
 function generateDetailedLog() {
-    const timestamp = new Date().toLocaleString('he-IL');
+    const timestamp = window.formatDate ? window.formatDate(new Date(), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(), { includeTime: true }) : new Date().toLocaleString('he-IL'));
     const log = [];
 
     log.push('=== לוג מפורט - תזרימי מזומנים ===');
@@ -3330,11 +3479,28 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('cash_flows', columnIndex);
+        const sortedData = await window.UnifiedTableSystem.sorter.sort('cash_flows', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
+        // Update pagination with sorted data
+        if (Array.isArray(sortedData) && window.PaginationSystem) {
+          const paginationInstance = getCashFlowsPaginationInstance();
+          if (paginationInstance && typeof paginationInstance.setData === 'function') {
+            paginationInstance.setData(sortedData);
+          }
+        }
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
-      await window.UnifiedTableSystem.sorter.applyDefaultSort('cash_flows');
+      const sortedData = await window.UnifiedTableSystem.sorter.applyDefaultSort('cash_flows');
+      // Update pagination with sorted data
+      if (Array.isArray(sortedData) && window.PaginationSystem) {
+        const paginationInstance = getCashFlowsPaginationInstance();
+        if (paginationInstance && typeof paginationInstance.setData === 'function') {
+          paginationInstance.setData(sortedData);
+        }
+      }
     }
 
     // שחזור סקשנים
@@ -3387,6 +3553,14 @@ window.registerCashFlowsTables = function() {
             return window.cashFlowsData || [];
         },
         updateFunction: (data) => {
+            // Update pagination with sorted/filtered data
+            if (Array.isArray(data) && window.PaginationSystem) {
+                const paginationInstance = getCashFlowsPaginationInstance();
+                if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                    paginationInstance.setData(data);
+                }
+            }
+            // Update table display
             if (typeof window.updateCashFlowsTable === 'function') {
                 window.updateCashFlowsTable(data);
             }

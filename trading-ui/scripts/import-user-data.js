@@ -860,6 +860,19 @@ function handleAccountLinkingBlockingResponse(data, contextLabel = '') {
     if (contextLabel && window.Logger?.warn) {
         window.Logger.warn(`[Import Modal] Account linking required (${contextLabel})`, { data, page: 'import-user-data' });
     }
+    
+    // IMPORTANT: Update currentSessionId from response before processing
+    const sessionId = data?.session_id || data?.linking?.session_id;
+    if (sessionId) {
+        currentSessionId = sessionId;
+        window.currentSessionId = sessionId;
+        window.Logger?.info('[ACCOUNT_LINKING] ✅ Updated currentSessionId from response', {
+            sessionId: sessionId,
+            contextLabel: contextLabel,
+            page: 'import-user-data'
+        });
+    }
+    
     const linkingDetails = data?.linking || data?.account_linking_details || {};
     const detectedNumber = linkingDetails.file_account_number || linkingDetails.file_value;
     if (detectedNumber) {
@@ -875,8 +888,22 @@ function handleAccountLinkRequired(response) {
     if (currentSessionId) {
         window.currentSessionId = currentSessionId;
     }
+    
+    // IMPORTANT: Ensure we have a valid sessionId before creating pendingAccountLinking
+    const sessionId = linking.session_id || response?.session_id || currentSessionId;
+    if (!sessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ Cannot create pendingAccountLinking - no sessionId available', {
+            response: response,
+            linking: linking,
+            currentSessionId: currentSessionId,
+            page: 'import-user-data'
+        });
+        showImportUserDataNotification('שגיאה: לא נמצא מספר סשן. נא לנסות שוב.', 'error');
+        return;
+    }
+    
     pendingAccountLinking = {
-        sessionId: linking.session_id || response?.session_id || currentSessionId,
+        sessionId: sessionId,
         tradingAccountId: linking.trading_account_id || selectedAccount || null,
         fileAccountNumber: linking.file_account_number
             || response?.file_account_number
@@ -1118,6 +1145,11 @@ async function confirmAutoLinkedAccount() {
     setAccountLinkingLoading(true);
     const reanalysisTask = pendingAccountLinking?.taskType || selectedDataTypeKey || 'executions';
     try {
+        if (!pendingAccountLinking || !pendingAccountLinking.sessionId) {
+            window.Logger?.error('[ACCOUNT_LINKING] ❌ Cannot confirm - no sessionId available', { page: 'import-user-data' });
+            showImportUserDataNotification('שגיאה: לא נמצא מספר סשן. נא לנסות שוב.', 'error');
+            return;
+        }
         const response = await fetch(`/api/user-data-import/session/${pendingAccountLinking.sessionId}/account-link/confirm`, {
             method: 'POST',
             headers: {
@@ -1189,8 +1221,13 @@ async function submitAccountLinkSelection(forceOverride = false) {
         page: 'import-user-data'
     });
     
-    if (!pendingAccountLinking?.sessionId) {
-        window.Logger?.error('[ACCOUNT_LINKING] ❌ No session ID found', { page: 'import-user-data' });
+    if (!pendingAccountLinking || !pendingAccountLinking.sessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ No session ID found', { 
+            pendingAccountLinking: pendingAccountLinking,
+            sessionId: pendingAccountLinking?.sessionId,
+            currentSessionId: currentSessionId,
+            page: 'import-user-data' 
+        });
         showImportUserDataNotification('לא נמצא סשן לשיוך חשבון.', 'error');
         return;
     }
@@ -1206,11 +1243,19 @@ async function submitAccountLinkSelection(forceOverride = false) {
     const confirmOverwrite = forceOverride || pendingOverwriteAccountId === selectedValue;
     const reanalysisTask = pendingAccountLinking?.taskType || selectedDataTypeKey || 'executions';
 
+    // IMPORTANT: Double-check sessionId before making API call
+    if (!pendingAccountLinking || !pendingAccountLinking.sessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ Cannot select account - no sessionId available', { page: 'import-user-data' });
+        showImportUserDataNotification('שגיאה: לא נמצא מספר סשן. נא לנסות שוב.', 'error');
+        return;
+    }
+    
     window.Logger?.info('[ACCOUNT_LINKING] 📋 Account selection details', {
         selectedAccountId: selectedValue,
         selectedAccountName,
         confirmOverwrite,
         fileAccountNumber: pendingAccountLinking?.fileAccountNumber,
+        sessionId: pendingAccountLinking.sessionId,
         page: 'import-user-data'
     });
 
@@ -1311,6 +1356,16 @@ async function submitAccountLinkSelection(forceOverride = false) {
         });
         
         // STEP 4: Save session ID before clearing pending account linking
+        // IMPORTANT: Check if pendingAccountLinking exists before accessing its properties
+        if (!pendingAccountLinking || !pendingAccountLinking.sessionId) {
+            window.Logger?.error('[ACCOUNT_LINKING] ❌ Cannot save session ID - pendingAccountLinking is null or missing sessionId', {
+                pendingAccountLinking: pendingAccountLinking,
+                currentSessionId: currentSessionId,
+                page: 'import-user-data'
+            });
+            showImportUserDataNotification('שגיאה: לא נמצא מידע על הסשן לשיוך. נא לנסות שוב.', 'error');
+            return;
+        }
         const sessionIdForReload = pendingAccountLinking.sessionId;
         const fileAccountNumberForReload = pendingAccountLinking.fileAccountNumber;
         
@@ -1533,11 +1588,13 @@ function setAccountLinkingLoading(isLoading) {
 }
 
 async function linkExternalAccountToTradingAccount() {
-    if (!pendingAccountLinking?.sessionId) {
+    if (!pendingAccountLinking || !pendingAccountLinking.sessionId) {
+        window.Logger?.error('[ACCOUNT_LINKING] ❌ Cannot link account - no sessionId available', { page: 'import-user-data' });
         showImportUserDataNotification('לא נמצא סשן לשיוך חשבון.', 'error');
         return;
     }
     if (!pendingAccountLinking.fileAccountNumber) {
+        window.Logger?.warn('[ACCOUNT_LINKING] ⚠️ No file account number available', { page: 'import-user-data' });
         showImportUserDataNotification('לא נמצא מספר חשבון בקובץ לתיוג.', 'error');
         return;
     }
@@ -2125,7 +2182,42 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
     }
 
     container.innerHTML = '';
-    const entries = Object.entries(typeStats);
+    
+    // IMPORTANT: Filter out types that should be skipped (not imported)
+    // These types are filtered out in IBKRConnector._build_cashflow_record:
+    // - dividend_accrual: Accounting entry, not actual cash movement
+    // - interest_accrual: Accounting entry, not actual cash movement
+    // - syep_activity: Activity details, not cash movement
+    // - syep_interest: Duplicate detail (already in Interest section)
+    // - cash_report: Summary only, not actual records
+    // - cash_adjustment: Filtered out type
+    
+    // TEMPORARY FOR TESTING: Skip all types except 'interest'
+    // TODO: Remove this temporary filter after testing
+    const skippedTypes = [
+        'dividend_accrual',
+        'interest_accrual',
+        'syep_activity',
+        'syep_interest',
+        'cash_report',
+        'cash_adjustment',
+        // TEMPORARY: Skip all types except 'interest' for testing
+        'deposit',
+        'withdrawal',
+        'dividend',
+        'tax',
+        'fee',
+        'borrow_fee',
+        'forex_conversion',
+        'transfer'
+    ];
+    
+    // Filter out skipped types
+    const filteredTypeStats = Object.fromEntries(
+        Object.entries(typeStats).filter(([typeKey]) => !skippedTypes.includes(typeKey))
+    );
+    
+    const entries = Object.entries(filteredTypeStats);
     if (!entries.length) {
         setElementDisplay(section, 'none');
         return;
@@ -2141,23 +2233,23 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             const primaryCurrencyEntry = Object.entries(stats.currencies || {})
                 .sort(([, amountA], [, amountB]) => Math.abs(amountB) - Math.abs(amountA))[0];
 
-            // Add warning for dividend_accrual records
-            const isDividendAccrual = typeKey === 'dividend_accrual';
-            const warningNote = isDividendAccrual 
-                ? '<small style="color: #fc5a06; font-weight: bold;">⚠️ רשומות אלו מייצגות דיבידנדים שהוכרזו אך עדיין לא שולמו. נא לבדוק את משמעות הרשומה בפועל לפני ייבוא.</small>'
-                : '';
+            // Note: All skipped types (dividend_accrual, interest_accrual, syep_activity, syep_interest, cash_report, cash_adjustment)
+            // are already filtered out above, so all types here are valid for import
 
-            // Initialize selectedCashflowTypes if not already set (default: all selected except dividend_accrual)
+            // Initialize selectedCashflowTypes if not already set
+            // TEMPORARY FOR TESTING: Only select 'interest' by default
             if (Object.keys(selectedCashflowTypes).length === 0) {
                 entries.forEach(([key]) => {
-                    selectedCashflowTypes[key] = key !== 'dividend_accrual';
+                    // TEMPORARY: Only select 'interest' for testing
+                    selectedCashflowTypes[key] = (key === 'interest'); // Only interest selected by default
                 });
             }
             
-            // Get current selection state (default: true for all except dividend_accrual)
+            // Get current selection state
+            // TEMPORARY FOR TESTING: Default to false (only interest should be selected)
             const isSelected = selectedCashflowTypes[typeKey] !== undefined 
                 ? selectedCashflowTypes[typeKey] 
-                : !isDividendAccrual;
+                : (typeKey === 'interest'); // TEMPORARY: Only interest selected by default
 
             const card = document.createElement('div');
             card.className = 'analysis-card';
@@ -2180,7 +2272,6 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
                     <small>✅ ${formatNumber(valid)} | ⚠️ ${formatNumber(invalid)}</small>
                     <small>סה״כ סכום: ${formatAmount(amount)}</small>
                     ${primaryCurrencyEntry ? `<small>מטבע מוביל: ${primaryCurrencyEntry[0]} ${formatAmount(primaryCurrencyEntry[1])}</small>` : ''}
-                    ${warningNote}
                 </div>
             `;
             container.appendChild(card);
@@ -5970,6 +6061,21 @@ function displayPreviewData(data) {
         return;
     }
     
+    // CRITICAL: Load selectedCashflowTypes from preview_data if available
+    // This ensures resume session works correctly
+    if (data.selected_types && Array.isArray(data.selected_types) && data.selected_types.length > 0) {
+        // Reset selectedCashflowTypes and set only the types from preview_data
+        selectedCashflowTypes = {};
+        data.selected_types.forEach(type => {
+            selectedCashflowTypes[type] = true;
+        });
+        window.Logger.info('[Import Modal] Loaded selectedCashflowTypes from preview_data', {
+            selectedTypes: data.selected_types,
+            selectedCashflowTypes,
+            page: 'import-user-data'
+        });
+    }
+    
     const taskType = (data.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions').toLowerCase();
     let recordsToImport = data.records_to_import || [];
     const recordsToSkip = data.records_to_skip || [];
@@ -7172,6 +7278,8 @@ function performImport(generateReport = false) {
         type => selectedCashflowTypes[type] === true
     );
     
+    // CRITICAL: Always send selected_types, even if empty array
+    // This ensures the backend can filter correctly
     fetch(`/api/user-data-import/session/${currentSessionId}/execute`, {
         method: 'POST',
         headers: {
@@ -7179,7 +7287,7 @@ function performImport(generateReport = false) {
         },
         body: JSON.stringify({
             generate_report: generateReport,
-            selected_types: selectedTypes.length > 0 ? selectedTypes : undefined
+            selected_types: selectedTypes  // Always include, never undefined
         })
     })
     .then(response => response.json())

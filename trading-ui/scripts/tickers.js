@@ -1853,7 +1853,7 @@ function renderTickersTableRows(tickers) {
               return window.dateUtils.formatDate(envelope || fallbackDate, { includeTime: true });
             }
             try {
-              return fallbackDate.toLocaleString('he-IL', {
+              return window.formatDate ? window.formatDate(fallbackDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(fallbackDate, { includeTime: true }) : fallbackDate.toLocaleString('he-IL', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -2323,7 +2323,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('tickers', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('tickers', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל

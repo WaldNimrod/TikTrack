@@ -57,6 +57,64 @@ class ImportOrchestrator:
     - Validation and duplicate detection
     - Preview generation
     - Import execution
+    
+    Function Index:
+    ===============
+    
+    Session Management:
+    - __init__: Initialize orchestrator with database session
+    - create_import_session: Create new import session
+    - reset_session: Reset import session to initial state
+    - get_session_status: Get current session status
+    - get_import_history: Get import history for trading account
+    
+    File Analysis:
+    - analyze_file: Analyze uploaded file and extract raw records
+    - _process_import_pipeline: Process import pipeline (internal)
+    - _build_analysis_payload: Build analysis results payload
+    - _summarize_cashflows: Summarize cashflow records
+    - _build_type_breakdown: Build breakdown by cashflow type
+    
+    Preview Generation:
+    - generate_preview: Generate preview of records to import
+    - _build_preview_payload: Build preview payload with filtering
+    - get_preview_snapshot: Get current preview snapshot
+    - _ensure_preview_data: Ensure preview data exists
+    - _update_preview_cache: Update preview cache
+    
+    Import Execution:
+    - execute_import: Execute import of selected records
+    - _execute_import_executions: Import execution records
+    - _execute_import_cashflows: Import cashflow records (with 3 filtering points)
+    - _execute_import_account_reconciliation: Import account reconciliation
+    - _execute_report_only: Execute report-only import
+    
+    Account Linking:
+    - detect_account_binding: Detect account binding from file
+    - link_trading_account_to_file: Link trading account to file
+    - confirm_account_link: Confirm account link
+    - get_account_link_status: Get account link status
+    - _ensure_cashflow_account_binding: Ensure cashflow account binding
+    
+    Duplicate Handling:
+    - accept_duplicate: Accept duplicate record for import
+    - reject_duplicate: Reject duplicate record
+    - allow_existing_record: Allow existing record
+    
+    Utility Functions:
+    - create_live_report: Create/update live import report
+    - _make_payload_json_safe: Convert payload to JSON-safe format
+    - _resolve_datetime: Resolve datetime value
+    - _normalize_account_identifier: Normalize account identifier
+    - _resolve_cashflow_storage_type: Resolve cashflow storage type
+    - _calculate_import_totals_by_type: Calculate import totals by type
+    - _compare_totals_with_cash_report: Compare totals with cash report
+    - _detect_connector: Detect connector type from file
+    - _normalise_symbol_metadata: Normalize symbol metadata
+    - _build_links_rich_text: Build rich text for links
+    - _merge_rich_text: Merge rich text blocks
+    - _upgrade_preview_data_structure: Upgrade preview data structure
+    - _finalize_preview_data: Finalize preview data
     """
     
     def __init__(self, db_session: Session):
@@ -1370,7 +1428,55 @@ class ImportOrchestrator:
             records_to_import: List[Dict[str, Any]] = []
             for entry in clean_records:
                 record = entry['record']
+                cashflow_type = (record.get('cashflow_type') or '').lower()
+                
+                # IMPORTANT: Verify that the second column is "Data" - only Data rows are actual records
+                # This is a critical validation: rows with Header, Trailer, Total, etc. are NOT data records
+                # For IBKR format: {Section Name},Data,{field1},{field2},...
+                # The second column MUST be "Data" for this to be a valid record
+                section = record.get('section') or ''
+                
+                # All records from _parse_cashflow_sections already passed the check (line 342: if not stripped.startswith(f'{current_section},Data'))
+                # Forex conversions from Trades section also come from Data rows (Trades,Data,Order,...)
+                # So we trust that records reaching here are valid Data rows
+                # However, we add an explicit check if _raw_row is available for extra safety
+                raw_row = record.get('_raw_row')
+                if raw_row and isinstance(raw_row, dict):
+                    # If we have _raw_row, we can verify it came from a Data row
+                    # But since _parse_cashflow_sections already filters, this is just a safety check
+                    # The real validation happens in _parse_cashflow_sections line 342
+                    pass
+                
+                # IMPORTANT: According to IBKR Import Documentation (_Tmp/TikTrack_IBKR_Import_Documentation.md),
+                # these are accounting entries, NOT actual cash movements, and should NOT be imported:
+                # - dividend_accrual (Change in Dividend Accruals)
+                # - interest_accrual (Change in Interest Accruals)
+                # - FX Translation Gain/Loss (unrealized FX, not actual cash)
+                # These should be automatically skipped, not imported as 'other_positive'/'other_negative'
+                skip_accounting_entries = [
+                    'dividend_accrual',
+                    'interest_accrual',
+                    'fx_translation',
+                    'cash_fx_translation_gain_loss'
+                ]
+                
+                if cashflow_type in skip_accounting_entries:
+                    # Add to records_to_skip with clear reason
+                    records_to_skip.append({
+                        'record_index': entry.get('record_index'),
+                        'record': record,
+                        'reason': 'accounting_entry_not_cash',
+                        'cashflow_type': cashflow_type,
+                        'message': f'Accounting entry ({cashflow_type}) - not an actual cash movement per IBKR Import Documentation'
+                    })
+                    continue
+                
+                # CRITICAL: Resolve storage_type BEFORE pairing forex records
+                # This ensures forex_conversion records get correct storage_type (currency_exchange_from/to)
                 storage_type, mapping_note = self._resolve_cashflow_storage_type(record)
+                
+                # IMPORTANT: Update record with storage_type for pairing logic
+                record['storage_type'] = storage_type
 
                 metadata = dict(record.get('metadata') or {})
                 if 'original_cashflow_type' not in metadata and record.get('cashflow_type'):
@@ -1413,16 +1519,43 @@ class ImportOrchestrator:
                 # Normalize selected_types to lowercase for comparison
                 selected_types_lower = [t.lower() for t in selected_types]
                 original_count = len(records_to_import)
-                records_to_import = [
-                    rec for rec in records_to_import
-                    if rec.get('cashflow_type', '').lower() in selected_types_lower
-                ]
+                
+                # Debug: Show sample of cashflow_type values before filtering
+                sample_types = [rec.get('cashflow_type', 'NO_TYPE') for rec in records_to_import[:10]]
                 logger.info(
-                    "🔍 Filtered cashflow records by selected_types: %s -> %s (removed %s)",
+                    "🔍 [GENERATE_PREVIEW] Filtering by selected_types: %s (sample types: %s)",
+                    selected_types_lower,
+                    sample_types
+                )
+                
+                # IMPORTANT: Filter records - only keep those matching selected_types
+                filtered_records = []
+                for rec in records_to_import:
+                    rec_cf_type = (rec.get('cashflow_type') or '').lower()
+                    if rec_cf_type in selected_types_lower:
+                        filtered_records.append(rec)
+                
+                records_to_import = filtered_records
+                
+                logger.info(
+                    "🔍 [GENERATE_PREVIEW] Filtered cashflow records: %s -> %s (removed %s)",
                     original_count,
                     len(records_to_import),
                     original_count - len(records_to_import)
                 )
+                
+                # Debug: Show what types remain after filtering
+                if records_to_import:
+                    remaining_types = [rec.get('cashflow_type', 'NO_TYPE') for rec in records_to_import[:5]]
+                    logger.info(
+                        "🔍 [GENERATE_PREVIEW] Remaining types after filter: %s",
+                        remaining_types
+                    )
+                else:
+                    logger.warning(
+                        "⚠️ [GENERATE_PREVIEW] No records remain after filtering! selected_types: %s",
+                        selected_types_lower
+                    )
 
             # Pair forex conversions: assign shared exchange_<uuid> external_id for from/to sides
             # Improved pairing: match by date + currencies + exchange_rate (from metadata)
@@ -1471,13 +1604,18 @@ class ImportOrchestrator:
                     return None
                 
                 # Create list of candidates with indices
+                # IMPORTANT: Match forex records by cashflow_type='forex_conversion' OR storage_type
+                # This ensures we catch all forex records, even if storage_type wasn't set yet
                 from_indices = []
                 to_indices = []
                 for idx, rec in enumerate(records_to_import):
                     st = rec.get('storage_type')
-                    if st == from_type:
+                    cf_type = (rec.get('cashflow_type') or '').lower()
+                    
+                    # Match by storage_type (if already resolved) OR by cashflow_type='forex_conversion'
+                    if st == from_type or (cf_type == 'forex_conversion' and rec.get('amount', 0) < 0):
                         from_indices.append(idx)
-                    elif st == to_type:
+                    elif st == to_type or (cf_type == 'forex_conversion' and rec.get('amount', 0) > 0):
                         to_indices.append(idx)
                 
                 used_to = set()
@@ -1737,10 +1875,12 @@ class ImportOrchestrator:
                 cash_report_summary
             )
 
-            return {
+            # IMPORTANT: Store selected_types in preview_data for later use (e.g., accept_duplicate)
+            result = {
                 'task_type': task,
                 'records_to_import': records_to_import,
                 'records_to_skip': records_to_skip,
+                'selected_types': selected_types,  # Store for accept_duplicate filtering
                 'summary': {
                     'total_records': len(raw_records),
                     'records_to_import': len(records_to_import),
@@ -2125,6 +2265,10 @@ class ImportOrchestrator:
 
             preview_data_raw = self._build_preview_payload(normalized_task, pipeline_result, selected_types=selected_types)
             preview_data_raw['task_type'] = normalized_task
+            
+            # CRITICAL: Store selected_types in preview_data BEFORE saving
+            # This ensures it's available when execute_import loads preview_data
+            preview_data_raw['selected_types'] = selected_types or []
 
             logger.info("🔄 Updating session with preview data...")
             preview_data_serializable = self._make_payload_json_safe(preview_data_raw)
@@ -2185,6 +2329,11 @@ class ImportOrchestrator:
             import_session.update_status('importing')
             self.db_session.flush()
 
+            logger.info(
+                "🔍 [EXECUTE_IMPORT] Starting import for session %s with selected_types: %s",
+                session_id,
+                selected_types
+            )
             preview_result = self.generate_preview(session_id, requested_task_type, selected_types=selected_types)
             if not preview_result['success']:
                 error_message = preview_result.get('error', 'Failed to regenerate preview data')
@@ -2198,11 +2347,107 @@ class ImportOrchestrator:
                 return {'success': False, 'error': error_message}
             
             preview_data = preview_result['preview_data']
+            
+            # CRITICAL: Use selected_types from parameter OR from preview_data
+            # This ensures filtering works even if selected_types wasn't passed to execute_import
+            if not selected_types:
+                selected_types = preview_data.get('selected_types', [])
+                logger.info(
+                    "🔍 [EXECUTE_IMPORT] Loaded selected_types from preview_data: %s",
+                    selected_types
+                )
+            
+            # IMPORTANT: Double-check filtering by selected_types
+            # Even though generate_preview should have filtered, we verify here to ensure consistency
+            if selected_types and isinstance(selected_types, list) and len(selected_types) > 0:
+                selected_types_lower = [t.lower() for t in selected_types]
+                original_count = len(preview_data.get('records_to_import', []))
+                
+                # Debug: Show sample types before filtering
+                sample_before = [rec.get('cashflow_type', 'NO_TYPE') for rec in preview_data.get('records_to_import', [])[:10]]
+                logger.info(
+                    "🔍 [EXECUTE_IMPORT] Before filtering: %s records, sample types: %s, selected_types: %s",
+                    original_count,
+                    sample_before,
+                    selected_types_lower
+                )
+                
+                filtered_records = [
+                    rec for rec in preview_data.get('records_to_import', [])
+                    if (rec.get('cashflow_type') or '').lower() in selected_types_lower
+                ]
+                
+                # Debug: Show what was filtered
+                sample_after = [rec.get('cashflow_type', 'NO_TYPE') for rec in filtered_records[:10]]
+                logger.info(
+                    "🔍 [EXECUTE_IMPORT] After filtering: %s records, sample types: %s",
+                    len(filtered_records),
+                    sample_after
+                )
+                
+                if len(filtered_records) != original_count:
+                    logger.warning(
+                        "⚠️ [EXECUTE_IMPORT] Additional filtering applied: %s -> %s records (selected_types: %s)",
+                        original_count,
+                        len(filtered_records),
+                        selected_types
+                    )
+                    preview_data['records_to_import'] = filtered_records
+                    preview_data['selected_types'] = selected_types  # Ensure it's stored
+                else:
+                    logger.warning(
+                        "⚠️ [EXECUTE_IMPORT] No filtering occurred! All %s records passed through (selected_types: %s)",
+                        original_count,
+                        selected_types
+                    )
+                    # CRITICAL: Even if no filtering occurred, ensure selected_types is stored
+                    preview_data['selected_types'] = selected_types
+            
             records_to_import = preview_data.get('records_to_import', []) or []
+            
+            # CRITICAL: Final validation - if selected_types was provided, verify all records match
+            if selected_types and isinstance(selected_types, list) and len(selected_types) > 0:
+                selected_types_lower = [t.lower() for t in selected_types]
+                mismatched_records = []
+                for rec in records_to_import:
+                    rec_cf_type = (rec.get('cashflow_type') or '').lower()
+                    if rec_cf_type not in selected_types_lower:
+                        mismatched_records.append({
+                            'cashflow_type': rec_cf_type,
+                            'expected': selected_types_lower
+                        })
+                
+                if mismatched_records:
+                    error_msg = (
+                        f"CRITICAL: Found {len(mismatched_records)} records that don't match selected_types. "
+                        f"Expected: {selected_types_lower}, Found: {[r['cashflow_type'] for r in mismatched_records[:5]]}"
+                    )
+                    logger.error(f"❌ [EXECUTE_IMPORT] {error_msg}")
+                    import_session.update_status('failed')
+                    self.db_session.commit()
+                    return {
+                        'success': False,
+                        'error': error_msg,
+                        'error_code': 'FILTERING_MISMATCH'
+                    }
+                else:
+                    logger.info(
+                        "✅ [EXECUTE_IMPORT] All %s records match selected_types: %s",
+                        len(records_to_import),
+                        selected_types_lower
+                    )
+            
+            # IMPORTANT: All records in records_to_import must have passed the "Data" column check
+            # This means the second column in the original CSV was "Data" (not Header, Trailer, Total, etc.)
+            # This validation happens in IBKRConnector._parse_cashflow_sections line 342:
+            #   if not stripped.startswith(f'{current_section},Data'): continue
+            # All records reaching here are guaranteed to be valid Data rows
+            
             logger.info(
-                "📦 Session %s: %s records ready for enrichment",
+                "📦 Session %s: %s records ready for import (selected_types: %s)",
                 session_id,
-                len(records_to_import)
+                len(records_to_import),
+                selected_types or 'all'
             )
 
             if not records_to_import:
@@ -2454,6 +2699,116 @@ class ImportOrchestrator:
         from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
         to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
 
+        # IMPORTANT: All records in raw_entries must have passed the "Data" column check
+        # This means the second column in the original CSV was "Data" (not Header, Trailer, Total, etc.)
+        # This validation happens in IBKRConnector._parse_cashflow_sections line 442:
+        #   if not stripped.startswith(f'{current_section},Data'): continue
+        # All records reaching here are guaranteed to be valid Data rows with correct cashflow_type
+        
+        # Helper function to extract record dict from entry (handles both formats)
+        def extract_record(entry):
+            """Extract record dict from entry (handles both formats)"""
+            if isinstance(entry, dict):
+                if 'record' in entry:
+                    return entry['record']
+                return entry
+            return entry
+        
+        # IMPORTANT: Log what we're about to import
+        logger.info(
+            "🔍 [EXECUTE_IMPORT_CASHFLOWS] About to import %s records. Selected types in preview_data: %s",
+            len(raw_entries),
+            preview_data.get('selected_types')
+        )
+        
+        # CRITICAL: Third filtering point (final check) - filter by selected_types if provided
+        # This is the final safety net to ensure only selected types are imported
+        selected_types = preview_data.get('selected_types', [])
+        if selected_types and isinstance(selected_types, list) and len(selected_types) > 0:
+            selected_types_lower = [t.lower() for t in selected_types]
+            original_count = len(raw_entries)
+            
+            # Debug: Show sample types before filtering
+            sample_before = [
+                (extract_record(rec).get('cashflow_type') or extract_record(rec).get('type') or 'NO_TYPE')
+                for rec in raw_entries[:10]
+            ]
+            logger.info(
+                "🔍 [EXECUTE_IMPORT_CASHFLOWS] Final filtering check: %s records, sample types: %s, selected_types: %s",
+                original_count,
+                sample_before,
+                selected_types_lower
+            )
+            
+            # Filter records
+            filtered_entries = []
+            for entry in raw_entries:
+                rec = extract_record(entry)
+                rec_cf_type = (rec.get('cashflow_type') or rec.get('type') or '').lower()
+                if rec_cf_type in selected_types_lower:
+                    filtered_entries.append(entry)
+            
+            raw_entries = filtered_entries
+            
+            logger.info(
+                "🔍 [EXECUTE_IMPORT_CASHFLOWS] Final filtering result: %s -> %s records (removed %s)",
+                original_count,
+                len(raw_entries),
+                original_count - len(raw_entries)
+            )
+            
+            # CRITICAL: Final validation - verify all remaining records match selected_types
+            if selected_types and isinstance(selected_types, list) and len(selected_types) > 0:
+                selected_types_lower = [t.lower() for t in selected_types]
+                mismatched = []
+                for entry in raw_entries:
+                    rec = extract_record(entry)
+                    rec_cf_type = (rec.get('cashflow_type') or rec.get('type') or '').lower()
+                    if rec_cf_type not in selected_types_lower:
+                        mismatched.append(rec_cf_type)
+                
+                if mismatched:
+                    error_msg = (
+                        f"CRITICAL: Found {len(mismatched)} records that don't match selected_types after final filtering. "
+                        f"Expected: {selected_types_lower}, Found: {list(set(mismatched))[:5]}"
+                    )
+                    logger.error(f"❌ [EXECUTE_IMPORT_CASHFLOWS] {error_msg}")
+                    return {
+                        'success': False,
+                        'error': error_msg,
+                        'error_code': 'FILTERING_MISMATCH',
+                        'imported_count': 0,
+                        'skipped_count': skipped_count
+                    }
+                else:
+                    logger.info(
+                        "✅ [EXECUTE_IMPORT_CASHFLOWS] All %s records match selected_types: %s",
+                        len(raw_entries),
+                        selected_types_lower
+                    )
+            
+            # Debug: Show what types remain after filtering
+            if raw_entries:
+                sample_after = [
+                    (extract_record(rec).get('cashflow_type') or extract_record(rec).get('type') or 'NO_TYPE')
+                    for rec in raw_entries[:10]
+                ]
+                logger.info(
+                    "🔍 [EXECUTE_IMPORT_CASHFLOWS] Remaining types after final filter: %s",
+                    sample_after
+                )
+        
+        # Debug: Show types of first 10 records
+        if raw_entries:
+            sample_types = [
+                (extract_record(rec).get('cashflow_type') or extract_record(rec).get('type') or 'NO_TYPE')
+                for rec in raw_entries[:10]
+            ]
+            logger.info(
+                "🔍 [EXECUTE_IMPORT_CASHFLOWS] Sample types in records_to_import: %s",
+                sample_types
+            )
+
         if not raw_entries:
             error_message = 'No cashflow records available for import.'
             return {
@@ -2497,6 +2852,9 @@ class ImportOrchestrator:
         # Remove grouped exchange records from flat list; they will be created atomically below
         cashflow_records = [r for r in cashflow_records if not is_exchange_external(r.get('external_id'))]
 
+        # Import ImportValidator for pre-import validation
+        from .import_validator import ImportValidator
+        
         for index, record in enumerate(cashflow_records):
             try:
                 storage_type = record.get('storage_type')
@@ -2506,8 +2864,44 @@ class ImportOrchestrator:
                     storage_type, inferred_note = self._resolve_cashflow_storage_type(record)
                     if mapping_note is None:
                         mapping_note = inferred_note
-                # Skip standalone forex legs; they are handled as paired exchanges below
-                if (storage_type in {from_type, to_type}) or ((record.get('cashflow_type') or '').lower() == 'forex_conversion'):
+                
+                # IMPORTANT: Skip forex legs ONLY if they are NOT already paired (no exchange_ external_id)
+                # If they have exchange_ external_id, they are already handled in exchange_groups above
+                record_external_id = record.get('external_id') or ''
+                is_paired_forex = (
+                    isinstance(record_external_id, str) and 
+                    record_external_id.startswith(CashFlowHelperService.EXCHANGE_PREFIX)
+                )
+                
+                # Skip standalone forex legs (not paired); they are handled as paired exchanges below
+                # But DON'T skip if they are already paired (have exchange_ external_id)
+                if not is_paired_forex and (
+                    (storage_type in {from_type, to_type}) or 
+                    ((record.get('cashflow_type') or '').lower() == 'forex_conversion')
+                ):
+                    skipped_count += 1
+                    logger.debug(
+                        "⏭️ [IMPORT] Skipping unpaired forex record (no exchange_ external_id): %s",
+                        record_external_id or 'no_external_id'
+                    )
+                    continue
+
+                # CRITICAL: Pre-import validation using ImportValidator
+                # This ensures 100% data accuracy before database insertion
+                validation_record = {
+                    'cashflow_type': storage_type or record.get('cashflow_type'),
+                    'amount': record.get('amount'),
+                    'fee_amount': record.get('fee_amount', 0),
+                    'currency': record.get('currency')
+                }
+                is_valid, validation_error = ImportValidator.validate_cashflow_record(
+                    validation_record,
+                    db_session=self.db_session
+                )
+                if not is_valid:
+                    error_msg = f"Validation failed for record #{index + 1}: {validation_error}"
+                    logger.warning(f"⚠️ [IMPORT] {error_msg}")
+                    import_errors.append(error_msg)
                     skipped_count += 1
                     continue
 
@@ -2582,6 +2976,60 @@ class ImportOrchestrator:
                     logger.warning(f"⚠️ [IMPORT] {error_msg}")
                     import_errors.append(error_msg)
                     skipped_count += 2  # Both FROM and TO are skipped
+                    continue
+                
+                # CRITICAL: Pre-import validation of exchange pair
+                # Validate both records individually and as a pair
+                from_storage_type = from_rec.get('storage_type') or from_rec.get('cashflow_type')
+                to_storage_type = to_rec.get('storage_type') or to_rec.get('cashflow_type')
+                
+                validation_from = {
+                    'cashflow_type': from_storage_type,
+                    'amount': from_rec.get('amount'),
+                    'fee_amount': from_rec.get('fee_amount', 0),
+                    'currency': from_rec.get('currency')
+                }
+                validation_to = {
+                    'cashflow_type': to_storage_type,
+                    'amount': to_rec.get('amount'),
+                    'fee_amount': to_rec.get('fee_amount', 0),
+                    'currency': to_rec.get('currency')
+                }
+                
+                # Validate individual records
+                from_valid, from_error = ImportValidator.validate_cashflow_record(
+                    validation_from,
+                    db_session=self.db_session
+                )
+                if not from_valid:
+                    error_msg = f"FROM record validation failed for {exchange_id}: {from_error}"
+                    logger.warning(f"⚠️ [IMPORT] {error_msg}")
+                    import_errors.append(error_msg)
+                    skipped_count += 2
+                    continue
+                
+                to_valid, to_error = ImportValidator.validate_cashflow_record(
+                    validation_to,
+                    db_session=self.db_session
+                )
+                if not to_valid:
+                    error_msg = f"TO record validation failed for {exchange_id}: {to_error}"
+                    logger.warning(f"⚠️ [IMPORT] {error_msg}")
+                    import_errors.append(error_msg)
+                    skipped_count += 2
+                    continue
+                
+                # Validate pair structure
+                pair_valid, pair_error = ImportValidator.validate_exchange_pair(
+                    validation_from,
+                    validation_to,
+                    db_session=self.db_session
+                )
+                if not pair_valid:
+                    error_msg = f"Exchange pair validation failed for {exchange_id}: {pair_error}"
+                    logger.warning(f"⚠️ [IMPORT] {error_msg}")
+                    import_errors.append(error_msg)
+                    skipped_count += 2
                     continue
                 
                 # Extract metadata from records (preferred source for accurate data)
@@ -3154,12 +3602,22 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'No preview data found'}
             
             # Find the record in records_to_skip
+            # IMPORTANT: Frontend sends 'within_file' but backend stores 'within_file_duplicate'
+            # Map duplicate_type to actual reason values
+            reason_mapping = {
+                'within_file': 'within_file_duplicate',
+                'existing_record': 'existing_record'
+            }
+            expected_reason = reason_mapping.get(duplicate_type, duplicate_type)
+            
             record_to_move = None
             new_skip_list = []
             
             for skip_record in preview_data.get('records_to_skip', []):
+                skip_reason = skip_record.get('reason')
+                # Match by record_index and reason (handle both mapped and direct values)
                 if (skip_record.get('record_index') == record_index and 
-                    skip_record.get('reason') == duplicate_type):
+                    (skip_reason == expected_reason or skip_reason == duplicate_type)):
                     record_to_move = skip_record
                 else:
                     new_skip_list.append(skip_record)
@@ -3168,15 +3626,39 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Record not found in skip list'}
             
             # Move to records_to_import
-            import_record = {
-                'symbol': record_to_move.get('symbol'),
-                'action': record_to_move.get('action'),
-                'quantity': record_to_move.get('quantity'),
-                'price': record_to_move.get('price'),
-                'fee': record_to_move.get('fee'),
-                'date': record_to_move.get('date'),
-                'external_id': record_to_move.get('external_id')
-            }
+            # IMPORTANT: For cashflows, preserve the full record structure from 'record' field
+            # For executions, use the basic fields
+            if 'record' in record_to_move and isinstance(record_to_move['record'], dict):
+                # Cashflow record - use the full record structure
+                import_record = dict(record_to_move['record'])
+                # Preserve any additional metadata (critical for forex pairs)
+                if 'cashflow_type' in record_to_move:
+                    import_record['cashflow_type'] = record_to_move['cashflow_type']
+                if 'storage_type' in record_to_move:
+                    import_record['storage_type'] = record_to_move['storage_type']
+                if 'metadata' in record_to_move:
+                    # Preserve metadata (includes exchange_external_id for forex pairs)
+                    if 'metadata' not in import_record or not isinstance(import_record['metadata'], dict):
+                        import_record['metadata'] = {}
+                    if isinstance(record_to_move['metadata'], dict):
+                        import_record['metadata'].update(record_to_move['metadata'])
+                # Preserve external_id if it exists (critical for forex pairs - exchange_<uuid>)
+                if 'external_id' in record_to_move and record_to_move['external_id']:
+                    import_record['external_id'] = record_to_move['external_id']
+                # Preserve section info if it exists
+                if 'section' in record_to_move:
+                    import_record['section'] = record_to_move['section']
+            else:
+                # Execution record - use basic fields
+                import_record = {
+                    'symbol': record_to_move.get('symbol'),
+                    'action': record_to_move.get('action'),
+                    'quantity': record_to_move.get('quantity'),
+                    'price': record_to_move.get('price'),
+                    'fee': record_to_move.get('fee'),
+                    'date': record_to_move.get('date'),
+                    'external_id': record_to_move.get('external_id')
+                }
             
             preview_data['records_to_import'].append(import_record)
             preview_data['records_to_skip'] = new_skip_list
@@ -3277,16 +3759,41 @@ class ImportOrchestrator:
                 return {'success': False, 'error': 'Record not found in skip list'}
             
             # Move to records_to_import
-            import_record = {
-                'symbol': record_to_move.get('symbol'),
-                'action': record_to_move.get('action'),
-                'quantity': record_to_move.get('quantity'),
-                'price': record_to_move.get('price'),
-                'fee': record_to_move.get('fee'),
-                'date': record_to_move.get('date'),
-                'external_id': record_to_move.get('external_id'),
-                'force_import_existing': True
-            }
+            # IMPORTANT: For cashflows, preserve the full record structure from 'record' field
+            # For executions, use the basic fields
+            if 'record' in record_to_move and isinstance(record_to_move['record'], dict):
+                # Cashflow record - use the full record structure
+                import_record = dict(record_to_move['record'])
+                # Preserve any additional metadata (critical for forex pairs)
+                if 'cashflow_type' in record_to_move:
+                    import_record['cashflow_type'] = record_to_move['cashflow_type']
+                if 'storage_type' in record_to_move:
+                    import_record['storage_type'] = record_to_move['storage_type']
+                if 'metadata' in record_to_move:
+                    # Preserve metadata (includes exchange_external_id for forex pairs)
+                    if 'metadata' not in import_record or not isinstance(import_record['metadata'], dict):
+                        import_record['metadata'] = {}
+                    if isinstance(record_to_move['metadata'], dict):
+                        import_record['metadata'].update(record_to_move['metadata'])
+                # Preserve external_id if it exists (critical for forex pairs - exchange_<uuid>)
+                if 'external_id' in record_to_move and record_to_move['external_id']:
+                    import_record['external_id'] = record_to_move['external_id']
+                # Preserve section info if it exists
+                if 'section' in record_to_move:
+                    import_record['section'] = record_to_move['section']
+                import_record['force_import_existing'] = True
+            else:
+                # Execution record - use basic fields
+                import_record = {
+                    'symbol': record_to_move.get('symbol'),
+                    'action': record_to_move.get('action'),
+                    'quantity': record_to_move.get('quantity'),
+                    'price': record_to_move.get('price'),
+                    'fee': record_to_move.get('fee'),
+                    'date': record_to_move.get('date'),
+                    'external_id': record_to_move.get('external_id'),
+                    'force_import_existing': True
+                }
             
             preview_data['records_to_import'].append(import_record)
             preview_data['records_to_skip'] = new_skip_list

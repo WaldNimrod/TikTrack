@@ -1917,7 +1917,7 @@ class EntityDetailsRenderer {
                     const qtySign = qty > 0 ? '+' : (qty < 0 ? '-' : '');
                     const qtyHtml = `<span class="${qtyClass}" dir="ltr">${qtySign}#${Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>`;
                 const feeHtml = renderAmount(exec.fee || 0, true);
-                    const dateText = exec.date ? new Date(exec.date).toLocaleString('he-IL') : 'לא זמין';
+                    const dateText = exec.date ? (window.formatDate ? window.formatDate(exec.date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(exec.date, { includeTime: true }) : new Date(exec.date).toLocaleString('he-IL'))) : 'לא זמין';
                     const priceHtml = renderAmount(exec.price || 0, false, 2);
                 const totalHtml = renderAmount(exec.total || 0, true);
 
@@ -2760,13 +2760,13 @@ class EntityDetailsRenderer {
                 return typeof dateValue === 'string' ? dateValue : '';
             }
 
-            return date.toLocaleString('he-IL', {
+            return window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleString('he-IL', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit'
-            });
+            }));
         } catch (error) {
             return typeof dateValue === 'string' ? dateValue : '';
         }
@@ -3703,39 +3703,39 @@ class EntityDetailsRenderer {
                 if (localVal) {
                     const d = new Date(localVal);
                     if (!isNaN(d.getTime())) {
-                        return d.toLocaleDateString('he-IL', {
+                        return window.formatDate ? window.formatDate(d, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(d, { includeTime: true }) : d.toLocaleDateString('he-IL', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
-                        });
+                        }));
                     }
                 }
                 const utcVal = dateInput.utc || dateInput.UTC;
                 if (utcVal) {
                     const d = new Date(utcVal);
                     if (!isNaN(d.getTime())) {
-                        return d.toLocaleDateString('he-IL', {
+                        return window.formatDate ? window.formatDate(d, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(d, { includeTime: true }) : d.toLocaleDateString('he-IL', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
-                        });
+                        }));
                     }
                 }
                 const epoch = dateInput.epochMs || dateInput.epochms || dateInput.epoch;
                 if (epoch) {
                     const d = new Date(Number(epoch));
                     if (!isNaN(d.getTime())) {
-                        return d.toLocaleDateString('he-IL', {
+                        return window.formatDate ? window.formatDate(d, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(d, { includeTime: true }) : d.toLocaleDateString('he-IL', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
-                        });
+                        }));
                     }
                 }
             }
@@ -3743,20 +3743,20 @@ class EntityDetailsRenderer {
             if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
                 const [y, m, d] = dateInput.split('-').map(Number);
                 const dateOnly = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0);
-                return dateOnly.toLocaleDateString('he-IL', {
+                return window.formatDate ? window.formatDate(dateOnly) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateOnly) : dateOnly.toLocaleDateString('he-IL', {
                     year: 'numeric',
                     month: '2-digit',
                     day: '2-digit'
-                });
+                }));
             }
             const date = new Date(dateInput);
-            return date.toLocaleDateString('he-IL', {
+            return window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleDateString('he-IL', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit'
-            });
+            }));
         } catch (error) {
             return typeof dateInput === 'string' ? dateInput : 'לא זמין';
         }

@@ -149,27 +149,39 @@ function parseDate(dateString, options = {}) {
 
 #### **formatDate Function**
 ```javascript
-function formatDate(dateString) {
-  try {
-    const date = parseDate(dateString);
-    if (!date) {
-      return 'Invalid Date';
-    }
-    
-    const options = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    };
-    
-    const formatted = date.toLocaleDateString('en-US', options);
-    console.log(`✅ Date formatted: ${dateString} -> ${formatted}`);
-    return formatted;
-    
-  } catch (error) {
-    console.error('❌ Error formatting date:', error);
-    return 'Invalid Date';
-  }
+function formatDate(value, options = {}) {
+  // Returns European format: DD.MM.YYYY (or dd.mm.YY with twoDigitYear option)
+  // Supports DateEnvelope, Date objects, ISO strings, and epoch timestamps
+  // Example: formatDate('2025-09-25') -> "25.09.2025"
+  // Example: formatDate('2025-09-25', { includeTime: true }) -> "25.09.2025 14:30"
+  // Example: formatDate('2025-09-25', { twoDigitYear: true }) -> "25.09.25"
+}
+```
+
+#### **formatDateFull Function**
+```javascript
+function formatDateFull(value, includeTime = false) {
+  // Returns full format: DD.MM.YYYY
+  // Example: formatDateFull('2025-09-25') -> "25.09.2025"
+  // Example: formatDateFull('2025-09-25', true) -> "25.09.2025 14:30"
+}
+```
+
+#### **formatDateNormal Function**
+```javascript
+function formatDateNormal(value, includeTime = false) {
+  // Returns normal format: dd.mm.YY (2-digit year)
+  // Example: formatDateNormal('2025-09-25') -> "25.09.25"
+  // Example: formatDateNormal('2025-09-25', true) -> "25.09.25 14:30"
+}
+```
+
+#### **formatDateShort Function**
+```javascript
+function formatDateShort(value, includeTime = false) {
+  // Returns short format: dd.mm (no year)
+  // Example: formatDateShort('2025-09-25') -> "25.09"
+  // Example: formatDateShort('2025-09-25', true) -> "25.09 14:30"
 }
 ```
 
@@ -238,15 +250,18 @@ function formatDateOnly(dateString) {
 | `Custom` | Custom format | User-defined | `parseDate()` |
 | `Timestamp` | Unix timestamp | `1727258400000` | `parseDate()` |
 
+**Note:** All output formats now use European format with dot separator (`.`) instead of slash (`/`).
+
 ### 🎨 **Supported Output Formats**
 
 | Format | Description | Example | Function |
 |--------|-------------|---------|----------|
-| `Short Date` | Short date format | `Sep 25, 2025` | `formatDate()` |
-| `Long Date` | Long date format | `September 25, 2025` | `formatDate()` |
-| `DateTime` | Date with time | `Sep 25, 2025, 10:30:00 AM` | `formatDateTime()` |
-| `Date Only` | Date without time | `09/25/2025` | `formatDateOnly()` |
-| `Time Only` | Time without date | `10:30:00 AM` | `formatTime()` |
+| `Full Date` | Full date format (DD.MM.YYYY) | `25.09.2025` | `formatDateFull()` |
+| `Normal Date` | Normal date format (dd.mm.YY) | `25.09.25` | `formatDateNormal()` |
+| `Short Date` | Short date format (dd.mm) | `25.09` | `formatDateShort()` |
+| `DateTime` | Date with time (DD.MM.YYYY HH:MM) | `25.09.2025 14:30` | `formatDateTime()` or `formatDateFull(..., true)` |
+| `Date Only` | Date without time (DD.MM.YYYY) | `25.09.2025` | `formatDateOnly()` or `formatDate()` |
+| `Time Only` | Time without date (HH:MM) | `14:30` | `formatTimeOnly()` |
 | `Relative` | Relative time | `2 hours ago` | `formatRelative()` |
 
 ### 🔄 **Integration with Other Systems**

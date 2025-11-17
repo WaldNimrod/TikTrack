@@ -232,8 +232,16 @@ class CashFlowService:
             raise ValueError("Exchange rate must be greater than 0")
         if fee_amount is None:
             fee_amount = 0.0
+        # IMPORTANT: Normalize negative fees to 0 (should not happen, but handle gracefully)
         if fee_amount < 0:
-            raise ValueError("Fee amount cannot be negative")
+            # Log warning but don't raise error - normalize to 0 instead
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                "⚠️ [CashFlowService] Negative fee_amount detected: %s. Normalizing to 0.0",
+                fee_amount
+            )
+            fee_amount = 0.0
         # Normalize date to date object
         if isinstance(date, _dt):
             date_value = date.date()

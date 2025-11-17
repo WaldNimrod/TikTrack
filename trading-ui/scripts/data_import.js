@@ -101,7 +101,7 @@
                 utc: iso,
                 local: iso,
                 epochMs: parsed,
-                display: new Date(parsed).toLocaleString('he-IL')
+                display: window.formatDate ? window.formatDate(new Date(parsed), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(parsed), { includeTime: true }) : new Date(parsed).toLocaleString('he-IL'))
             };
         }
 
@@ -582,7 +582,7 @@
                 if (Number.isFinite(asNumber)) {
                     const numericDate = new Date(asNumber);
                     if (!Number.isNaN(numericDate.getTime())) {
-                        return numericDate.toLocaleString('he-IL');
+                        return window.formatDate ? window.formatDate(numericDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(numericDate, { includeTime: true }) : numericDate.toLocaleString('he-IL'));
                     }
                 }
             }
@@ -591,7 +591,7 @@
         if (typeof value === 'number' && Number.isFinite(value)) {
             const numericDate = new Date(value);
             if (!Number.isNaN(numericDate.getTime())) {
-                return numericDate.toLocaleString('he-IL');
+                return window.formatDate ? window.formatDate(numericDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(numericDate, { includeTime: true }) : numericDate.toLocaleString('he-IL'));
             }
         }
 
@@ -617,7 +617,7 @@
             if (candidate) {
                 const parsedCandidate = new Date(candidate);
                 if (!Number.isNaN(parsedCandidate.getTime())) {
-                    return parsedCandidate.toLocaleString('he-IL');
+                    return window.formatDate ? window.formatDate(parsedCandidate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(parsedCandidate, { includeTime: true }) : parsedCandidate.toLocaleString('he-IL'));
                 }
                 if (typeof candidate === 'string' && candidate.trim().toLowerCase() === 'invalid date') {
                     return 'לא זמין';
@@ -643,7 +643,7 @@
             return 'לא זמין';
         }
 
-        return date.toLocaleString('he-IL');
+        return window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleString('he-IL'));
     }
 
     /**

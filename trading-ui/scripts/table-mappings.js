@@ -119,13 +119,14 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת תזרימי מזומנים (Cash Flows) - Cash Flows Page Structure (מוצג בפועל)
   'cash_flows': [
-    'account_name',          // 0 - חשבון מסחר
-    'type',                  // 1 - סוג
-    'amount',                // 2 - סכום
-    'date',                  // 3 - תאריך
-    'description',           // 4 - תיאור
-    'source',                // 5 - מקור
-    'updated_at',            // 6 - עודכן
+    'trade_id',             // 0 - טרייד
+    'account_name',          // 1 - חשבון מסחר
+    'type',                  // 2 - סוג
+    'amount',                // 3 - סכום
+    'date',                  // 4 - תאריך
+    'description',           // 5 - תיאור
+    'source',                // 6 - מקור
+    'updated_at',            // 7 - עודכן
   ],
 
   // טבלת היסטוריית ייבוא נתונים (Data Import History)
@@ -322,7 +323,13 @@ const TABLE_COLUMN_SORT_TYPES = {
     updated_at: 'date'
   },
   cash_flows: {
+    trade_id: 'numeric',
+    account_name: 'string',
+    type: 'string',
+    amount: 'numeric',
     date: 'date',
+    description: 'string',
+    source: 'string',
     updated_at: 'date'
   },
   import_history: {
@@ -780,12 +787,74 @@ function getColumnValue(item, columnIndex, tableType) {
   
   // Cash flows table - special handling for calculated fields
   if (tableType === 'cash_flows') {
+    if (fieldName === 'trade_id') {
+      // Return trade_id as number for proper numeric sorting
+      const tradeId = item.trade_id;
+      if (tradeId === null || tradeId === undefined) {
+        return 0; // Sort null/undefined trade_ids first
+      }
+      return typeof tradeId === 'number' ? tradeId : parseInt(tradeId, 10) || 0;
+    }
     if (fieldName === 'account_name') {
       // Get account name
       if (item.account && item.account.name) {
         return item.account.name;
       }
       return item.account_name || item.account_id || '';
+    }
+    if (fieldName === 'type') {
+      // Return type as string for proper string sorting
+      const typeValue = (item.type || '').toString();
+      // Debug logging for cash_flows type column
+      if (tableType === 'cash_flows' && columnIndex === 2) {
+        console.log(`🔍 [getColumnValue] cash_flows type:`, {
+          itemId: item.id,
+          itemType: item.type,
+          typeValue,
+          typeOf: typeof item.type,
+          columnIndex
+        });
+      }
+      return typeValue;
+    }
+    if (fieldName === 'amount') {
+      // Return amount as number for proper numeric sorting
+      const amount = item.amount;
+      if (amount === null || amount === undefined) {
+        return 0;
+      }
+      return typeof amount === 'number' ? amount : parseFloat(amount) || 0;
+    }
+    // For date columns, extract epochMs for proper sorting
+    if (fieldName === 'date' || fieldName === 'updated_at') {
+      const dateValue = item[fieldName];
+      if (dateValue) {
+        const epochValue = extractEpochForSort(dateValue);
+        if (epochValue !== null) {
+          return epochValue;
+        }
+        // Fallback to parsing date string
+        if (typeof dateValue === 'string') {
+          const parsed = parseSortDateValue(dateValue);
+          if (parsed !== 0) {
+            return parsed;
+          }
+        }
+        // Last resort: try to convert to Date and get epoch
+        try {
+          const dateObj = new Date(dateValue);
+          if (!Number.isNaN(dateObj.getTime())) {
+            return dateObj.getTime();
+          }
+        } catch (e) {
+          // Ignore parsing errors
+        }
+      }
+      return 0; // Return 0 for null/undefined dates to sort them first
+    }
+    // For string fields (description, source), return as string
+    if (fieldName === 'description' || fieldName === 'source') {
+      return (item[fieldName] || '').toString();
     }
     // For other fields, return directly
     return item[fieldName] || '';

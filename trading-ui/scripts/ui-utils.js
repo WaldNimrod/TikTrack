@@ -2173,11 +2173,12 @@ function renderUpdatedCell(entity, options = {}) {
       const duration = window.getDurationSince(updatedDate, { format, includeSeconds, fallback });
       const absolute = typeof window.formatDateTime === 'function'
         ? window.formatDateTime(updatedDate)
-        : updatedDate.toLocaleString('he-IL');
+        : (window.formatDate ? window.formatDate(updatedDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(updatedDate, { includeTime: true }) : updatedDate.toLocaleString('he-IL')));
       const titleAttr = absolute ? ` title="${absolute}"` : '';
       displayHtml = `<span class="updated-value" dir="ltr"${titleAttr}>${duration || absolute}</span>`;
     } else {
-      displayHtml = `<span class="updated-value" dir="ltr">${updatedDate.toLocaleString('he-IL')}</span>`;
+      const formattedDate = window.formatDate ? window.formatDate(updatedDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(updatedDate, { includeTime: true }) : updatedDate.toLocaleString('he-IL'));
+      displayHtml = `<span class="updated-value" dir="ltr">${formattedDate}</span>`;
     }
   } else {
     displayHtml = `<span class="updated-value-empty">${fallback}</span>`;

@@ -784,7 +784,8 @@ function updateTradingAccountsTable(trading_accounts) {
                 return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
               }
               try {
-                return new Date(epoch).toLocaleString('he-IL', {
+                const dateObj = new Date(epoch);
+                return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric',
@@ -2636,7 +2637,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('trading_accounts', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('trading_accounts', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל

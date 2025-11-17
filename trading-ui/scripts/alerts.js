@@ -604,7 +604,7 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (createdDateObj && !Number.isNaN(createdDateObj.getTime())) {
-                        return createdDateObj.toLocaleString('he-IL', {
+                        return window.formatDate ? window.formatDate(createdDateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(createdDateObj, { includeTime: true }) : createdDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
                           day: '2-digit',
@@ -662,7 +662,7 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (triggeredDateObj && !Number.isNaN(triggeredDateObj.getTime())) {
-                        return triggeredDateObj.toLocaleString('he-IL', {
+                        return window.formatDate ? window.formatDate(triggeredDateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(triggeredDateObj, { includeTime: true }) : triggeredDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
                           day: '2-digit',
@@ -759,7 +759,7 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (expiryDateObj && !Number.isNaN(expiryDateObj.getTime())) {
-                        return expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                        return window.formatDate ? window.formatDate(expiryDateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(expiryDateObj) : expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' }));
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ expiry date fallback failed', { error, alertId: alert?.id }, { page: 'alerts' });
@@ -889,7 +889,8 @@ function renderAlertsTableRows(alerts) {
                   return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
                 }
                 try {
-                  return new Date(epoch).toLocaleString('he-IL', {
+                  const dateObj = new Date(epoch);
+                  return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',
@@ -1245,7 +1246,7 @@ function populateSelect(selectId, data, field, prefix = '') {
             : (() => {
                 try {
                   if (dateObj && !Number.isNaN(dateObj.getTime())) {
-                    return dateObj.toLocaleDateString('he-IL');
+                    return window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
@@ -1278,7 +1279,7 @@ function populateSelect(selectId, data, field, prefix = '') {
             : (() => {
                 try {
                   if (dateObj && !Number.isNaN(dateObj.getTime())) {
-                    return dateObj.toLocaleDateString('he-IL');
+                    return window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
@@ -3324,7 +3325,7 @@ function displayEvaluationResults(data) {
                     <div>סה"כ תנאים: <strong>${results.length}</strong></div>
                     <div>תנאים שהתקיימו: <strong class="text-success">${metCount}</strong></div>
                     <div>תנאים שלא התקיימו: <strong class="text-danger">${notMetCount}</strong></div>
-                    <div>זמן הערכה: <strong>${new Date().toLocaleTimeString('he-IL')}</strong></div>
+                    <div>זמן הערכה: <strong>${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</strong></div>
                 </div>
             </div>
         `;
@@ -3348,7 +3349,7 @@ function updateEvaluationSummary(data) {
     if (totalConditions) totalConditions.textContent = results.length;
     if (metConditions) metConditions.textContent = metCount;
     if (notMetConditions) notMetConditions.textContent = notMetCount;
-    if (evaluationTime) evaluationTime.textContent = new Date().toLocaleTimeString('he-IL');
+    if (evaluationTime) evaluationTime.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
 }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
@@ -3572,7 +3573,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('alerts', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('alerts', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל

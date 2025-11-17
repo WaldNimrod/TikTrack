@@ -50,7 +50,7 @@ class DateNormalizationService:
     )
     _ISO_DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     _DATE_KEY_HINTS = ("date", "time", "timestamp", "_at", "_on", "fetched", "asof")
-    _DEFAULT_DISPLAY_FORMAT = "%d/%m/%Y %H:%M"
+    _DEFAULT_DISPLAY_FORMAT = "%d.%m.%Y %H:%M"
 
     def __init__(self, user_timezone: str = "UTC") -> None:
         self.user_timezone = self._validate_timezone(user_timezone)

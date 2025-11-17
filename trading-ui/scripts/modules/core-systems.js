@@ -2599,7 +2599,7 @@ function showFinalSuccessModal(successInfo) {
               </h6>
               <hr>
               <p class="mb-0">
-                <strong>זמן:</strong> ${new Date(successInfo.timestamp).toLocaleString('he-IL')}<br>
+                <strong>זמן:</strong> ${window.formatDate ? window.formatDate(new Date(successInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(successInfo.timestamp), { includeTime: true }) : new Date(successInfo.timestamp).toLocaleString('he-IL'))}<br>
                 <strong>קטגוריה:</strong> ${successInfo.category}<br>
                 <strong>מזהה:</strong> ${successInfo.id}
               </p>
@@ -2758,7 +2758,7 @@ function showFinalSuccessModalWithReload(successInfo) {
               </h6>
               <hr>
               <p class="mb-2">
-                <strong>זמן:</strong> ${new Date(successInfo.timestamp).toLocaleString('he-IL')}<br>
+                <strong>זמן:</strong> ${window.formatDate ? window.formatDate(new Date(successInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(successInfo.timestamp), { includeTime: true }) : new Date(successInfo.timestamp).toLocaleString('he-IL'))}<br>
                 <strong>קטגוריה:</strong> ${successInfo.category}<br>
                 <strong>מזהה:</strong> ${successInfo.id}
               </p>
@@ -2926,7 +2926,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
                 <div class="col-md-6">
                   <p><strong>שורה:</strong> ${errorInfo.line}</p>
                   <p><strong>קטגוריה:</strong> ${errorInfo.category}</p>
-                  <p><strong>זמן:</strong> ${new Date(errorInfo.timestamp).toLocaleString('he-IL')}</p>
+                  <p><strong>זמן:</strong> ${window.formatDate ? window.formatDate(new Date(errorInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(errorInfo.timestamp), { includeTime: true }) : new Date(errorInfo.timestamp).toLocaleString('he-IL'))}</p>
                 </div>
               </div>
               
@@ -3736,7 +3736,7 @@ ${successInfo.category}
 ${successInfo.id}
 
 ⏰ זמן:
-${new Date(successInfo.timestamp).toLocaleString('he-IL')}
+${window.formatDate ? window.formatDate(new Date(successInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(successInfo.timestamp), { includeTime: true }) : new Date(successInfo.timestamp).toLocaleString('he-IL'))}
 
 📊 פרטי הצלחה:
 ${JSON.stringify(successInfo.details, null, 2)}
@@ -3750,7 +3750,7 @@ ${JSON.stringify(successInfo.system, null, 2)}
 ${successInfo.performance ? `⚡ ביצועים:\n${JSON.stringify(successInfo.performance, null, 2)}\n` : ''}
 
 ═══════════════════════════════════════════════════════════════
-  נוצר על ידי מערכת TikTrack - ${new Date().toLocaleString('he-IL')}
+  נוצר על ידי מערכת TikTrack - ${window.formatDate ? window.formatDate(new Date(), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(), { includeTime: true }) : new Date().toLocaleString('he-IL'))}
 ═══════════════════════════════════════════════════════════════
   `.trim();
 }

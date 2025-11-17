@@ -379,6 +379,10 @@ class TableSorter {
       sortOptions.tableType = tableType;
       sortOptions.columnIndex = columnIndex;
 
+      // Get tableId for pagination updates
+      const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+      const tableId = table ? table.id : null;
+
       let data = config.dataGetter();
       if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
         const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
@@ -402,20 +406,71 @@ class TableSorter {
         return [];
       }
 
-      // שימוש ב-sortTableData הקיים
+      // שימוש ב-sortTableData הקיים (שכבר מעדכן Registry ו-pagination)
       const { safeUpdateFunction, release: releaseUpdate } = TableSorter.prepareUpdateFunction(tableType, config);
 
       if (typeof window.sortTableData === 'function') {
         const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction, sortOptions);
         if (sortResult && typeof sortResult.then === 'function') {
           return sortResult
+            .then((sortedData) => {
+              // Additional update to Registry and pagination after sort completes
+              if (window.TableDataRegistry && tableId && Array.isArray(sortedData)) {
+                try {
+                  window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
+                } catch (err) {
+                  if (window.Logger) {
+                    window.Logger.warn(`TableSorter.sort: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+                  }
+                }
+              }
+              if (tableId && window.PaginationSystem && Array.isArray(sortedData)) {
+                try {
+                  const paginationInstance = window.PaginationSystem.get(tableId);
+                  if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                    paginationInstance.setData(sortedData);
+                  }
+                } catch (err) {
+                  if (window.Logger) {
+                    window.Logger.warn(`TableSorter.sort: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+                  }
+                }
+              }
+              return sortedData;
+            })
             .finally(() => {
               releaseUpdate();
               releaseSorter();
             })
             .catch(error => {
+              releaseUpdate();
+              releaseSorter();
               throw error;
             });
+        }
+        // For synchronous results, also update Registry and pagination
+        if (Array.isArray(sortResult)) {
+          if (window.TableDataRegistry && tableId) {
+            try {
+              window.TableDataRegistry.setFilteredData(tableType, sortResult, { tableId, skipPageReset: true });
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn(`TableSorter.sort: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+              }
+            }
+          }
+          if (tableId && window.PaginationSystem) {
+            try {
+              const paginationInstance = window.PaginationSystem.get(tableId);
+              if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                paginationInstance.setData(sortResult);
+              }
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn(`TableSorter.sort: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+              }
+            }
+          }
         }
         releaseUpdate();
         releaseSorter();
@@ -523,6 +578,33 @@ class TableSorter {
 
       if (options.saveState !== false && primary) {
         this.saveSortState(tableType, primary.columnIndex, primary.direction || 'asc', { chain: sortChain });
+      }
+
+      // Get tableId for pagination updates
+      const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+      const tableId = table ? table.id : null;
+
+      // Update Registry and pagination with sorted data
+      if (window.TableDataRegistry && tableId) {
+        try {
+          window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableSorter.sortByChain: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
+      }
+      if (tableId && window.PaginationSystem) {
+        try {
+          const paginationInstance = window.PaginationSystem.get(tableId);
+          if (paginationInstance && typeof paginationInstance.setData === 'function') {
+            paginationInstance.setData(sortedData);
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableSorter.sortByChain: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
       }
 
       const updateResult = safeUpdateFunction(sortedData);

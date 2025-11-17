@@ -233,6 +233,13 @@ const PACKAGE_MANIFEST = {
         description: 'מערכת צבעים דינמית',
         required: true,
         loadOrder: 19
+      },
+      {
+        file: 'debug-modal-z-index.js',
+        globalCheck: 'window.debugModalZIndex',
+        description: 'כלי דיבאג לבדיקת שכבות z-index של מודלים',
+        required: false,
+        loadOrder: 20
       }
     ],
     estimatedSize: '~280KB',

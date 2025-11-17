@@ -1055,6 +1055,14 @@ class FieldRendererService {
             return '';
         }
 
+        // Use formatDateShort for consistent dd.mm format
+        if (typeof window.dateUtils?.formatDateShort === 'function') {
+            return window.dateUtils.formatDateShort(date);
+        }
+        if (typeof window.formatDateShort === 'function') {
+            return window.formatDateShort(date);
+        }
+
         let resolvedDate = null;
 
         try {
@@ -1313,10 +1321,28 @@ class FieldRendererService {
         }
 
         try {
+            // Fallback: use dateUtils functions for consistent formatting
+            if (typeof window.dateUtils?.formatDate === 'function') {
+                return window.dateUtils.formatDate(date, { includeTime });
+            }
+            if (typeof window.formatDate === 'function') {
+                return window.formatDate(date, includeTime);
+            }
+            // Last resort: manual formatting with European format
             const dateObj = new Date(date);
-            return includeTime
-                ? dateObj.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+            if (includeTime) {
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, '0');
+                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                return `${day}.${month}.${year} ${hours}:${minutes}`;
+            } else {
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                return `${day}.${month}.${year}`;
+            }
         } catch (error) {
             return isoCandidate || '-';
         }
@@ -1326,6 +1352,12 @@ class FieldRendererService {
      * Render short date dd.mm
      */
     static renderDateShort(date) {
+        if (typeof window.dateUtils?.formatDateShort === 'function') {
+            return window.dateUtils.formatDateShort(date);
+        }
+        if (typeof window.formatDateShort === 'function') {
+            return window.formatDateShort(date);
+        }
         return this._formatDateDdMm(date);
     }
 
@@ -1333,11 +1365,11 @@ class FieldRendererService {
      * רנדור תאריך ביצוע (שנה בשתי ספרות + שעה)
      * 
      * @param {string|Date} date - תאריך ביצוע
-     * @returns {string} - HTML עם תאריך ושעה בפורמט DD/MM/YY | HH:MM
+     * @returns {string} - HTML עם תאריך ושעה בפורמט dd.mm.YY HH:MM
      * 
      * @example
      * const html = FieldRendererService.renderExecutionDate('2024-01-15T14:30:00');
-     * // Output: '<span class="execution-date">15/01/24 | 14:30</span>'
+     * // Output: '<span class="execution-date">15.01.24 14:30</span>'
      */
     static renderExecutionDate(date) {
         if (!date && date !== 0) {
@@ -1368,18 +1400,23 @@ class FieldRendererService {
         }
 
         try {
+            // Use formatDateNormal for dd.mm.YY format with time
+            if (typeof window.dateUtils?.formatDateNormal === 'function') {
+                const formatted = window.dateUtils.formatDateNormal(date, { includeTime: true });
+                return `<span class="execution-date">${formatted}</span>`;
+            }
+            if (typeof window.formatDateNormal === 'function') {
+                const formatted = window.formatDateNormal(date, true);
+                return `<span class="execution-date">${formatted}</span>`;
+            }
+            // Fallback: manual formatting with European format
             const dateObj = new Date(date);
-            const dateStr = dateObj.toLocaleDateString('he-IL', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit'
-            });
-            const timeStr = dateObj.toLocaleTimeString('he-IL', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-            return `<span class="execution-date">${dateStr} | ${timeStr}</span>`;
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = String(dateObj.getFullYear()).slice(-2);
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            return `<span class="execution-date">${day}.${month}.${year} ${hours}:${minutes}</span>`;
         } catch (error) {
             return isoCandidate || '-';
         }

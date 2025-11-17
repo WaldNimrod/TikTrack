@@ -56,6 +56,17 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  * @returns {*} Column value
  */
 function resolveColumnValue(item, columnIndex, tableType) {
+  // Debug logging for cash_flows type column
+  if (tableType === 'cash_flows' && columnIndex === 2) {
+    console.log(`🔍 [resolveColumnValue] cash_flows column 2:`, {
+      itemId: item?.id,
+      itemType: item?.type,
+      hasTableMappings: !!window.tableMappings,
+      hasGetColumnValue: !!(window.tableMappings && typeof window.tableMappings.getColumnValue === 'function'),
+      hasWindowGetColumnValue: typeof window.getColumnValue === 'function'
+    });
+  }
+
   // Special handling for linked_items table
   if (tableType === 'linked_items') {
     switch (columnIndex) {
@@ -192,6 +203,22 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
     ? window.tableMappings.getColumnKey(tableType, columnIndex)
     : null;
 
+  // Debug logging for cash_flows type column
+  if (tableType === 'cash_flows' && columnIndex === 2) {
+    console.log(`🔍 [getCustomSortValue] cash_flows column 2:`, {
+      columnKey,
+      columnIndex,
+      aValue: typeof aValue === 'string' ? aValue.substring(0, 50) : aValue,
+      bValue: typeof bValue === 'string' ? bValue.substring(0, 50) : bValue,
+      aType: typeof aValue,
+      bType: typeof bValue,
+      aItemType: a?.type,
+      bItemType: b?.type,
+      tableMappingsExists: !!window.tableMappings,
+      getColumnKeyExists: !!(window.tableMappings && typeof window.tableMappings.getColumnKey === 'function')
+    });
+  }
+
   // Custom sorting for tickers table
   if (tableType === 'tickers') {
     if (columnKey === 'status') {
@@ -227,6 +254,53 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
     }
   }
 
+  // Custom sorting for cash_flows table
+  if (tableType === 'cash_flows') {
+    // Type column (index 2) - string sorting with Hebrew locale support
+    // Always handle columnIndex 2 explicitly, regardless of columnKey
+    if (columnIndex === 2) {
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      const result = aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+      console.log(`🔍 [getCustomSortValue] cash_flows type sort (columnIndex 2):`, {
+        columnKey,
+        columnIndex,
+        aStr: aStr.substring(0, 30),
+        bStr: bStr.substring(0, 30),
+        result,
+        aValue,
+        bValue
+      });
+      return result;
+    }
+    // Also handle by columnKey if it's 'type' (for robustness)
+    if (columnKey === 'type') {
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      const result = aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+      console.log(`🔍 [getCustomSortValue] cash_flows type sort (columnKey 'type'):`, {
+        columnKey,
+        columnIndex,
+        aStr: aStr.substring(0, 30),
+        bStr: bStr.substring(0, 30),
+        result
+      });
+      return result;
+    }
+    // Account name column (index 1) - string sorting with Hebrew locale support
+    if (columnKey === 'account_name' || columnIndex === 1) {
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      return aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+    }
+    // Description and source columns - string sorting
+    if (columnKey === 'description' || columnKey === 'source') {
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      return aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+    }
+  }
+
   // Custom sorting for other table types can be added here
   // if (tableType === 'trades') { ... }
   // if (tableType === 'accounts') { ... }
@@ -245,13 +319,30 @@ function compareTableRows(a, b, tableType, columnIndex, direction = 'asc') {
   const rawAValue = resolveColumnValue(a, columnIndex, tableType);
   const rawBValue = resolveColumnValue(b, columnIndex, tableType);
 
+  // Debug logging for cash_flows type column
+  if (tableType === 'cash_flows' && columnIndex === 2) {
+    console.log(`🔍 [compareTableRows] cash_flows column 2:`, {
+      sortType,
+      rawAValue: typeof rawAValue === 'string' ? rawAValue.substring(0, 50) : rawAValue,
+      rawBValue: typeof rawBValue === 'string' ? rawBValue.substring(0, 50) : rawBValue,
+      aType: typeof rawAValue,
+      bType: typeof rawBValue
+    });
+  }
+
   const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, rawAValue, rawBValue);
   if (customSortResult !== null) {
     const primaryResult = direction === 'asc' ? customSortResult : -customSortResult;
+    if (tableType === 'cash_flows' && columnIndex === 2) {
+      console.log(`🔍 [compareTableRows] customSortResult used:`, { customSortResult, primaryResult, direction });
+    }
     if (primaryResult !== 0) {
       return primaryResult;
     }
   } else {
+    if (tableType === 'cash_flows' && columnIndex === 2) {
+      console.log(`🔍 [compareTableRows] customSortResult is null, using fallback`);
+    }
     let aValue = rawAValue;
     let bValue = rawBValue;
 
@@ -331,11 +422,33 @@ function compareTableRows(a, b, tableType, columnIndex, direction = 'asc') {
       bValue = new Date(bValue);
     }
 
-    if (aValue < bValue) {
-      return direction === 'asc' ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return direction === 'asc' ? 1 : -1;
+    // String sorting with Hebrew locale support for cash_flows type column
+    if (tableType === 'cash_flows' && (columnIndex === 2 || columnKey === 'type')) {
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      const result = aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+      if (tableType === 'cash_flows' && columnIndex === 2) {
+        console.log(`🔍 [compareTableRows] String sort fallback:`, { aStr, bStr, result });
+      }
+      if (result !== 0) {
+        return direction === 'asc' ? result : -result;
+      }
+    } else if (sortType === 'string' || (!sortType && typeof aValue === 'string' && typeof bValue === 'string')) {
+      // General string sorting with locale support
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      const result = aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+      if (result !== 0) {
+        return direction === 'asc' ? result : -result;
+      }
+    } else {
+      // Numeric or other comparison
+      if (aValue < bValue) {
+        return direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return direction === 'asc' ? 1 : -1;
+      }
     }
   }
 
@@ -371,6 +484,21 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
     const sortOptions = typeof options === 'object' && options !== null ? { ...options } : {};
     const forcedDirection = sortOptions.direction || sortOptions.forceDirection || null;
     let newDirection = forcedDirection ? (forcedDirection === 'desc' ? 'desc' : 'asc') : 'asc';
+
+    // Get data from Registry if available (filteredData for proper sorting)
+    let dataToSort = data;
+    let tableId = null;
+    if (window.TableDataRegistry) {
+      const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+      if (table) {
+        tableId = table.id;
+      }
+      // Try to get filtered data from Registry first
+      const registryFilteredData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+      if (Array.isArray(registryFilteredData) && registryFilteredData.length > 0) {
+        dataToSort = registryFilteredData;
+      }
+    }
 
     if (!forcedDirection) {
       // קבלת מצב סידור נוכחי דרך UnifiedCacheManager
@@ -418,7 +546,75 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
       });
     }
 
-    const sortedData = [...data].sort((a, b) => compareTableRows(a, b, tableType, columnIndex, newDirection));
+    // Debug: Log first few items before sorting for cash_flows type column
+    if (tableType === 'cash_flows' && columnIndex === 2) {
+      console.log(`🔍 [sortTableData] Before sort - first 5 items:`, 
+        dataToSort.slice(0, 5).map(item => ({
+          id: item.id,
+          type: item.type,
+          typeValue: resolveColumnValue(item, columnIndex, tableType)
+        }))
+      );
+      console.log(`🔍 [sortTableData] Testing sort comparison:`, {
+        item1: { id: dataToSort[0]?.id, type: dataToSort[0]?.type },
+        item2: { id: dataToSort[1]?.id, type: dataToSort[1]?.type },
+        comparison: compareTableRows(dataToSort[0], dataToSort[1], tableType, columnIndex, newDirection)
+      });
+    }
+
+    const sortedData = [...dataToSort].sort((a, b) => {
+      const result = compareTableRows(a, b, tableType, columnIndex, newDirection);
+      if (tableType === 'cash_flows' && columnIndex === 2 && Math.random() < 0.01) {
+        console.log(`🔍 [sortTableData] Comparison:`, {
+          aType: a.type,
+          bType: b.type,
+          result
+        });
+      }
+      return result;
+    });
+
+    // Debug: Log first few items after sorting for cash_flows type column
+    if (tableType === 'cash_flows' && columnIndex === 2) {
+      console.log(`🔍 [sortTableData] After sort - first 5 items:`, 
+        sortedData.slice(0, 5).map(item => ({
+          id: item.id,
+          type: item.type,
+          typeValue: resolveColumnValue(item, columnIndex, tableType)
+        }))
+      );
+      console.log(`🔍 [sortTableData] Sort completed:`, {
+        originalLength: dataToSort.length,
+        sortedLength: sortedData.length,
+        direction: newDirection,
+        dataChanged: JSON.stringify(dataToSort.slice(0, 3).map(i => i.id)) !== JSON.stringify(sortedData.slice(0, 3).map(i => i.id))
+      });
+    }
+
+    // Update TableDataRegistry with sorted data
+    if (window.TableDataRegistry && tableId) {
+      try {
+        window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
+      } catch (err) {
+        if (window.Logger) {
+          window.Logger.warn(`sortTableData: Failed to update TableDataRegistry for "${tableType}"`, err, { page: "tables" });
+        }
+      }
+    }
+
+    // Update pagination instance with sorted data
+    if (tableId && window.PaginationSystem) {
+      try {
+        const paginationInstance = window.PaginationSystem.get(tableId);
+        if (paginationInstance && typeof paginationInstance.setData === 'function') {
+          paginationInstance.setData(sortedData);
+        }
+      } catch (err) {
+        if (window.Logger) {
+          window.Logger.warn(`sortTableData: Failed to update pagination for "${tableType}"`, err, { page: "tables" });
+        }
+      }
+    }
 
     if (typeof updateFunction !== 'function') {
       complete(newDirection, sortedData);
@@ -559,7 +755,7 @@ window.saveSortState = async function (tableType, columnIndex, direction, option
     const tableStateKey = `sortState_${tableType}`;
     await window.UnifiedCacheManager.save(tableStateKey, sortState, {
       layer: 'localStorage',
-      ttl: null, // persistent
+      ttl: 3600000, // 1 hour - consistent with table state TTL
       syncToBackend: false
     });
     

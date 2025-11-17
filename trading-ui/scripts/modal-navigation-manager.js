@@ -629,7 +629,14 @@ class ModalNavigationService {
       current: this._summarizeEntry(currentEntry),
       target: this._summarizeEntry(targetEntry)
     });
+    
+    // הסרת המודל הנוכחי מה-stack לפני הסתרתו (כדי למנוע כפילות)
+    await this.registerModalClose(currentEntry.modalId, { instanceId: currentEntry.instanceId, internal: true });
+    
+    // הסתרת המודל הנוכחי
     await this._hideModalInstance(currentEntry);
+    
+    // הצגת המודל הקודם
     await this._ensureModalVisible(targetEntry);
     this.activeInstanceId = targetEntry.instanceId;
     await this._persistState();

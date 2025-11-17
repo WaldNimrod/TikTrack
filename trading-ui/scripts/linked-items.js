@@ -260,17 +260,31 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     }
   }
   
-  const modal = new bootstrap.Modal(modalElement);
+  // יצירת Bootstrap modal instance ללא backdrop (ננהל אותו באופן מרכזי)
+  const modal = new bootstrap.Modal(modalElement, {
+    backdrop: false, // ננהל backdrop מרכזית
+    keyboard: true
+  });
   
   modalElement.addEventListener('hidden.bs.modal', () => {
-    if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
+    // רישום סגירה במערכת הניווט (רק אם לא נסגר דרך goBack)
+    // goBack כבר מטפל בהסרה מה-stack דרך registerModalClose עם internal: true
+    if (window.ModalNavigationService?.registerModalClose) {
+      // רק אם המודל עדיין ב-stack (לא נסגר דרך goBack)
+      const stack = window.ModalNavigationService.getStack();
+      const isInStack = stack.some(entry => entry.modalId === modalElement.id);
+      if (isInStack) {
+        window.ModalNavigationService.registerModalClose(modalElement.id);
+      }
+    } else if (window.registerModalNavigationClose) {
       window.registerModalNavigationClose(modalElement.id);
     }
   }, { once: true });
   
-  modalElement.addEventListener('shown.bs.modal', () => {
+  modalElement.addEventListener('shown.bs.modal', async () => {
+    // רישום המודל במערכת הניווט
     if (window.ModalNavigationService?.registerModalOpen) {
-      window.ModalNavigationService.registerModalOpen(modalElement, {
+      await window.ModalNavigationService.registerModalOpen(modalElement, {
         modalId,
         modalType: 'linked-items-modal',
         entityType: itemType,
@@ -279,7 +293,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
         metadata: { mode }
       });
     } else if (window.pushModalToNavigation) {
-      window.pushModalToNavigation(modalElement, {
+      await window.pushModalToNavigation(modalElement, {
         modalId,
         modalType: 'linked-items-modal',
         entityType: itemType,
@@ -287,6 +301,11 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
         title: modalTitle,
         metadata: { mode }
       });
+    }
+
+    // עדכון UI של ניווט (breadcrumb וכפתור חזרה)
+    if (window.modalNavigationManager?.updateModalNavigation) {
+      window.modalNavigationManager.updateModalNavigation(modalElement);
     }
 
     // Initialize tooltips for filter buttons after modal is shown
@@ -851,11 +870,14 @@ function createModal(id, title, content, mode = 'view') {
   }
 
   // Create new modal with mode-specific styling
+  // כולל תמיכה ב-ModalNavigationService (breadcrumb וכפתור חזרה)
+  // שימוש ב-modal-nested class למודלים מקוננים (z-index נכון)
   const modalHtml = `
-    <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
+    <div class="modal fade modal-nested" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}" ${mode === 'warningBlock' ? 'style="background: linear-gradient(135deg, #dc3545, #c82333) !important; color: white !important; border-bottom: 2px solid #c82333 !important;"' : ''}>
+            <div class="modal-navigation-breadcrumb" id="${id}Breadcrumb" style="display: none;"></div>
             <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>

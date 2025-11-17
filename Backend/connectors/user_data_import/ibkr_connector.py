@@ -34,6 +34,31 @@ class IBKRConnector(BaseConnector):
     
     This connector handles the complex IBKR CSV format and extracts
     trading data from the Trades section of the statement.
+    
+    ============================================================================
+    FUNCTION INDEX
+    ============================================================================
+    Public API:
+      - parse_file(): Parse IBKR CSV file
+      - identify_file(): Check if file is IBKR format
+      - detect_format(): Detect IBKR format
+      - precheck_file(): Lightweight file validation
+    
+    Cashflow Parsing:
+      - _parse_cashflow_sections(): Parse cashflow sections from CSV
+      - _identify_record_type(): Identify cashflow type from section/row (CENTRALIZED)
+      - _build_cashflow_record(): Build cashflow record dict
+      - _should_skip_cashflow_row(): Filter summary rows and accounting entries
+    
+    Forex/Exchange:
+      - _build_forex_cashflows(): Build FROM/TO forex records (if exists)
+    
+    Utilities:
+      - _extract_amount_and_currency(): Extract amount and currency from row
+      - _extract_datetime(): Extract date from row
+      - _parse_section_headers(): Parse CSV section headers
+      - _match_section_header(): Match section header line
+    ============================================================================
     """
     CASHFLOW_SECTION_NAMES = {
         'Deposits & Withdrawals': 'deposit_withdrawal',
@@ -312,9 +337,83 @@ class IBKRConnector(BaseConnector):
         self._pending_forex_rows = forex_rows
         return records
 
+    def _identify_record_type(self, section_name: str, row: Dict[str, Any]) -> Optional[str]:
+        """
+        Identify cashflow type from IBKR CSV row.
+        
+        CRITICAL RULES:
+        1. Only rows with format "{Section},Data,..." are valid records (checked in _parse_cashflow_sections)
+        2. Section name (first column) maps directly to cashflow_type via CASHFLOW_SECTION_NAMES
+        3. Returns None for rows that should be skipped (accruals, summaries, etc.)
+        
+        Args:
+            section_name: First column value (e.g., "Dividends", "Interest")
+            row: Parsed CSV row as dict
+            
+        Returns:
+            cashflow_type string or None (skip record)
+            
+        Examples:
+            "Dividends" → "dividend"
+            "Interest" → "interest"
+            "Change in Dividend Accruals" → None (skip)
+        """
+        # Get section key from mapping
+        section_key = self.CASHFLOW_SECTION_NAMES.get(section_name, '').lower()
+        
+        # CRITICAL: Skip accounting entries completely - these are NOT actual cash movements
+        # They represent declared but not yet paid amounts and should NOT be imported
+        # This check happens BEFORE any other processing to ensure these records never reach _build_cashflow_record
+        skip_sections = {
+            'dividend_accrual',  # Change in Dividend Accruals - accounting entry, not actual cash
+            'interest_accrual',  # Interest Accruals - accounting entry, not actual cash
+            'syep_activity',     # Stock Yield Enhancement Program Activity - not cash flow
+            'syep_interest',     # SYEP Interest Details - duplicate of general Interest section
+            'cash_report'        # Cash Report - summary section, not individual records
+        }
+        if section_key in skip_sections:
+            logger.debug(f"⏭️ Skipping accounting entry/summary section: {section_name} (section_key: {section_key})")
+            return None
+        
+        # If section not in mapping, skip
+        if not section_key:
+            return None
+        
+        # Direct mapping: section_key IS the cashflow_type (with minimal special cases)
+        # Special case 1: deposit_withdrawal -> resolve by amount sign
+        if section_key == 'deposit_withdrawal':
+            amount, _ = self._extract_amount_and_currency(row, section_key)
+            return 'deposit' if amount and amount > 0 else 'withdrawal'
+        
+        # Special case 2: interest -> check if SYEP interest
+        if section_key == 'interest':
+            description = (row.get('Description') or row.get('Activity Description') or '').lower()
+            memo = (row.get('Memo') or row.get('Field Name') or '').lower()
+            text_blob = ' '.join(filter(None, [description, memo]))
+            if 'stock yield enhancement' in text_blob or 'syep' in text_blob:
+                return None  # Skip SYEP interest (duplicate of general Interest section)
+            return 'interest'
+        
+        # Special case 3: transfer -> keep as 'transfer' (amount sign indicates direction)
+        if section_key == 'transfer':
+            return 'transfer'
+        
+        # Special case 4: borrow_fee -> maps to 'fee' for storage
+        if section_key == 'borrow_fee':
+            return 'borrow_fee'  # Will be mapped to 'fee' in storage_type
+        
+        # For all other sections: section_key IS the cashflow_type
+        return section_key
+
     def _parse_cashflow_sections(self, lines: List[str]) -> List[Dict[str, Any]]:
         """
         Parse cashflow-related sections (cash report, deposits, interest, etc.)
+        
+        IMPORTANT: This is the ONLY logic needed for cash flow classification:
+        1. First column = Section Name -> maps to cashflow_type via _identify_record_type
+        2. Second column MUST be "Data" (checked below on line 351)
+        
+        That's it! No complex logic needed.
         """
         records: List[Dict[str, Any]] = []
         current_section: Optional[str] = None
@@ -339,6 +438,9 @@ class IBKRConnector(BaseConnector):
                 current_headers = None
                 continue
 
+            # CRITICAL CHECK: Second column MUST be "Data" - this is the ONLY validation needed
+            # Format: {Section Name},Data,{field1},{field2},...
+            # Any other value (Header, Trailer, Total, etc.) is NOT a data record
             if not stripped.startswith(f'{current_section},Data'):
                 continue
 
@@ -349,10 +451,18 @@ class IBKRConnector(BaseConnector):
                 value_idx = idx + 2  # Skip section & descriptor columns
                 row[header] = values[value_idx].strip() if value_idx < len(values) else ''
 
+            # Use centralized identification function
+            cashflow_type = self._identify_record_type(current_section, row)
+            if not cashflow_type:
+                # Skip this record (accruals, summaries, etc.)
+                continue
+
+            # Additional check: skip summary rows (totals, starting/ending balances)
             if self._should_skip_cashflow_row(current_section, row):
                 continue
 
-            record = self._build_cashflow_record(current_section, row)
+            # Build record with identified type
+            record = self._build_cashflow_record(current_section, row, cashflow_type)
             if record:
                 records.append(record)
 
@@ -875,17 +985,27 @@ class IBKRConnector(BaseConnector):
 
         return records
 
-    def _build_cashflow_record(self, section_name: str, row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _build_cashflow_record(self, section_name: str, row: Dict[str, Any], cashflow_type: str) -> Optional[Dict[str, Any]]:
         """
         Convert raw row dictionary into a unified cashflow record dict.
+        
+        IMPORTANT: This function receives ONLY rows that passed the critical checks:
+        1. First column = valid Section Name (from CASHFLOW_SECTION_NAMES)
+        2. Second column = "Data" (checked in _parse_cashflow_sections)
+        3. cashflow_type identified by _identify_record_type (not None)
+        
+        Args:
+            section_name: Section name from CSV (first column)
+            row: Parsed CSV row as dict
+            cashflow_type: Cashflow type identified by _identify_record_type
+            
+        Returns:
+            Cashflow record dict or None if should be skipped
         """
         try:
             section_key = self.CASHFLOW_SECTION_NAMES.get(section_name, '').lower()
-
-            # Ignore SYEP activity rows – only the interest details translate to cash movements
-            if section_key == 'syep_activity':
-                return None
-            cashflow_type = self._resolve_cashflow_type(section_name, row)
+            
+            # Extract amount and currency
             amount, currency = self._extract_amount_and_currency(row, section_key)
 
             if amount is None:
@@ -1163,66 +1283,6 @@ class IBKRConnector(BaseConnector):
                 return candidate
         return None
 
-    def _resolve_cashflow_type(self, section_name: str, row: Dict[str, Any]) -> str:
-        section_key = self.CASHFLOW_SECTION_NAMES.get(section_name, '').lower()
-
-        if section_key == 'cash_report':
-            # IMPORTANT: Cash Report section should not be processed here as cashflow records.
-            # Cash Report is only used for summary comparison, not for creating cashflow records.
-            # Individual cashflow records come from their specific sections (Dividends, Interest, etc.).
-            # If we reach here, it means a Cash Report row was not filtered out properly.
-            # Return 'cash_adjustment' as fallback, but this should rarely happen.
-            activity_code = (row.get('Activity Code') or row.get('Activity') or '').lower()
-            description = (row.get('Description') or row.get('Activity Description') or '').lower()
-            
-            # Skip non-cash activities (should have been filtered in _parse_cash_report_summary)
-            skip_activities = [
-                'cash fx translation gain/loss',
-                'trades (sales)',
-                'trades (purchase)',
-                'commissions'
-            ]
-            if any(skip in activity_code or skip in description for skip in skip_activities):
-                return 'cash_adjustment'  # Will be filtered out later
-            
-            if 'dividend' in activity_code or 'dividend' in description:
-                return 'dividend'
-            if 'interest' in activity_code or 'interest' in description:
-                return 'interest'
-            if 'tax' in activity_code or 'withholding' in description:
-                return 'tax'
-            # NOTE: 'fee' and 'commission' should not appear here as they are filtered in _parse_cash_report_summary
-            # But if they do, we skip them (return cash_adjustment which will be filtered)
-            if 'fee' in activity_code or 'commission' in description:
-                return 'cash_adjustment'  # Will be filtered out (commissions are in executions/forex)
-            if 'deposit' in description:
-                return 'deposit'
-            if 'withdrawal' in description or 'transfer' in description:
-                return 'withdrawal'
-            return activity_code or 'cash_adjustment'
-
-        if section_key == 'deposit_withdrawal':
-            amount, _ = self._extract_amount_and_currency(row, section_key)
-            return 'deposit' if amount and amount > 0 else 'withdrawal'
-
-        if section_key == 'interest':
-            description = (row.get('Description') or row.get('Activity Description') or '').lower()
-            memo = (row.get('Memo') or row.get('Field Name') or '').lower()
-            text_blob = ' '.join(filter(None, [description, memo]))
-            if 'stock yield enhancement' in text_blob or 'syep' in text_blob:
-                return 'syep_interest'
-            return 'interest'
-        if section_key == 'dividend':
-            return 'dividend'
-        if section_key == 'tax':
-            return 'tax'
-        if section_key == 'fee':
-            return 'fee'
-
-        if section_key == 'syep_interest':
-            return 'syep_interest'
-
-        return section_key or 'cash_adjustment'
 
     def _extract_amount_and_currency(
         self,

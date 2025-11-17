@@ -1342,7 +1342,7 @@ class SystemManagement {
     const statusLog = document.createElement('div');
     statusLog.className = 'log-entry log-info';
     statusLog.innerHTML = `
-      <div class="log-timestamp">${new Date().toLocaleTimeString('he-IL')}</div>
+      <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
       <div class="log-level">INFO</div>
       <div class="log-message">מערכת ניהול מערכת נטענה בהצלחה - ציון מערכת: ${data.system_score || 0}/100</div>
     `;
@@ -1357,7 +1357,7 @@ class SystemManagement {
 
       logEntry.className = `log-entry ${logLevel}`;
       logEntry.innerHTML = `
-        <div class="log-timestamp">${new Date().toLocaleTimeString('he-IL')}</div>
+        <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
         <div class="log-level">${levelText}</div>
         <div class="log-message">${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}</div>
       `;
@@ -1581,7 +1581,7 @@ class SystemManagement {
               const alertItem = document.createElement('div');
               alertItem.className = `alert-item ${alert.level}`;
 
-              const timestamp = new Date(alert.timestamp).toLocaleTimeString('he-IL');
+              const timestamp = window.formatTimeOnly ? window.formatTimeOnly(new Date(alert.timestamp)) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date(alert.timestamp)) : new Date(alert.timestamp).toLocaleTimeString('he-IL'));
 
               alertItem.innerHTML = `
                 <div class="alert-timestamp">${timestamp}</div>
@@ -1595,7 +1595,7 @@ class SystemManagement {
             const noAlertsItem = document.createElement('div');
             noAlertsItem.className = 'alert-item info';
             noAlertsItem.innerHTML = `
-              <div class="alert-timestamp">${new Date().toLocaleTimeString('he-IL')}</div>
+              <div class="alert-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
               <div class="alert-level">INFO</div>
               <div class="alert-message">אין התראות פעילות</div>
             `;

@@ -122,6 +122,7 @@
                         <div class="table-count" id="cashFlowsCount">טוען...</div>
                         <div class="table-actions">
                             <button data-button-type="ADD" data-entity-type="cash_flow" data-variant="full" data-onclick="window.showModalSafe('cashFlowModal','add')" data-text="הוסף תזרים מזומנים" title="הוסף תזרים מזומנים חדש"></button>
+                            <button data-button-type="DELETE" data-variant="warning" data-size="small" data-onclick="deleteImportedCashFlows()" data-text="מחק רשומות מייבוא" title="מחק את כל רשומות תזרימי המזומנים שמקורן בייבוא (source='file_import')" data-tooltip="מחיקת כל הרשומות מייבוא - לבדיקות" data-tooltip-placement="top"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
                         <div class="filter-buttons-container button-row" id="cashFlowTypeFilters">

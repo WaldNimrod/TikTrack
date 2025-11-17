@@ -915,7 +915,7 @@ function buildTradePlanConfirmationDetails(tradePlan, tradePlanId) {
       try {
         const dateObj = dateEnvelope instanceof Date ? dateEnvelope : new Date(dateEnvelope);
         if (!Number.isNaN(dateObj.getTime())) {
-          date = dateObj.toLocaleDateString('he-IL');
+          date = window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
         }
       } catch {
         date = 'לא מוגדר';
@@ -1747,7 +1747,8 @@ function updateTradePlansTable(trade_plans) {
           try {
             const dateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
             if (!Number.isNaN(dateObj.getTime())) {
-              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL')}</span>`;
+              const formatted = window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
+              return `<span class="date-text">${formatted}</span>`;
             }
           } catch (error) {
             window.Logger?.warn('⚠️ trade plans date fallback failed', { error, created_at: design?.created_at }, { page: 'trade_plans' });
@@ -1940,13 +1941,14 @@ function updateTradePlansTable(trade_plans) {
                 return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
               }
               try {
-                return new Date(epoch).toLocaleString('he-IL', {
+                const dateObj = new Date(epoch);
+                return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                   day: '2-digit',
                   month: '2-digit',
                   year: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit'
-                });
+                }));
               } catch (err) {
                 window.Logger?.warn('⚠️ trade_plans updated-cell date formatting failed', { err, planId: design?.id }, { page: 'trade_plans' });
                 return 'לא מוגדר';
@@ -3616,7 +3618,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('trade_plans', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('trade_plans', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל

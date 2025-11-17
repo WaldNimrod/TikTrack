@@ -324,7 +324,9 @@ function formatDateTimeValue(value) {
   if (Number.isNaN(date.getTime())) {
     return 'לא זמין';
   }
-  return `${date.toLocaleDateString('he-IL')} ${date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`;
+  const dateStr = window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL'));
+  const timeStr = window.formatTimeOnly ? window.formatTimeOnly(date) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(date) : date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }));
+  return `${dateStr} ${timeStr}`;
 }
 
 function formatRelativeTimeValue(value) {

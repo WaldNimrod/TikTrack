@@ -34,6 +34,11 @@
   -webkit-backdrop-filter: none;
 }
 
+/* מודל מקונן ברמה שנייה (מודל מקונן מעל מודל מקונן) - z-index גבוה יותר */
+.modal.modal-nested.modal-nested-level-2 {
+  --modal-nested-offset: 40 !important;
+}
+
 /* הגדרות מיוחדות למודלים גדולים */
 .modal-dialog.modal-lg {
   border: 2px solid #6c757d ;
@@ -198,12 +203,12 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 }
 
 /* מודלים ספציפיים עם z-index גבוה יותר */
+/* הוסר: #linkedItemsModal - משתמש ב-modal-nested class עם z-index דינמי */
 #addAlertModal,
 #editAlertModal,
 #addExecutionModal,
 #editExecutionModal,
 #deleteExecutionModal,
-#linkedItemsModal,
 #warningModal,
 #addAccountModal,
 #editAccountModal,
@@ -227,7 +232,6 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 #addExecutionModal .modal-dialog,
 #editExecutionModal .modal-dialog,
 #deleteExecutionModal .modal-dialog,
-#linkedItemsModal .modal-dialog,
 #warningModal .modal-dialog,
 #addAccountModal .modal-dialog,
 #editAccountModal .modal-dialog,
@@ -251,7 +255,6 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 #addExecutionModal .modal-content,
 #editExecutionModal .modal-content,
 #deleteExecutionModal .modal-content,
-#linkedItemsModal .modal-content,
 #warningModal .modal-content,
 #addAccountModal .modal-content,
 #editAccountModal .modal-content,

@@ -327,7 +327,7 @@ async function deleteNote(id) {
                       value?.utc || value?.local || value
                     );
                     if (!Number.isNaN(parsed.getTime())) {
-                      return parsed.toLocaleDateString('he-IL');
+                      return window.formatDate ? window.formatDate(parsed) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(parsed) : parsed.toLocaleDateString('he-IL'));
                     }
                   } catch (err) {
                     window.Logger?.warn('⚠️ fallbackDateDisplay failed', { err, value }, { page: 'notes' });
@@ -796,7 +796,8 @@ function updateNotesTable(notes) {
                     return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
                   }
                   try {
-                    return new Date(epoch).toLocaleString('he-IL', {
+                    const dateObj = new Date(epoch);
+                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',
@@ -2251,7 +2252,7 @@ async function loadNoteForViewing(noteId) {
                 try {
                   const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
                   if (!Number.isNaN(parsed.getTime())) {
-                    return parsed.toLocaleString('he-IL');
+                    return window.formatDate ? window.formatDate(parsed, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(parsed, { includeTime: true }) : parsed.toLocaleString('he-IL'));
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ viewNote created fallback failed', { error, noteId }, { page: 'notes' });
@@ -2580,7 +2581,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('notes', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('notes', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל

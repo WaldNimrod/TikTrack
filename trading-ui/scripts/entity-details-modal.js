@@ -282,6 +282,21 @@ class EntityDetailsModal {
                 }
             }
             
+            // בדיקה אם המודל נפתח כמודל מקונן (יש מודל אחר פתוח)
+            const isNested = options.source?.sourceModal === 'linked-items' || 
+                           (window.ModalNavigationService && window.ModalNavigationService.getStack().length > 0);
+            
+            // הוספת modal-nested class אם נפתח כמודל מקונן
+            if (isNested && this.modal) {
+                this.modal.classList.add('modal-nested', 'modal-nested-level-2');
+                // הגדרת offset גבוה יותר למודל מקונן (40 במקום 20)
+                this.modal.style.setProperty('--modal-nested-offset', '40');
+            } else if (this.modal) {
+                // הסרת modal-nested אם לא מקונן
+                this.modal.classList.remove('modal-nested', 'modal-nested-level-2');
+                this.modal.style.removeProperty('--modal-nested-offset');
+            }
+            
             // הצגת מצב טעינה
             this.showLoadingState();
 
@@ -325,7 +340,24 @@ class EntityDetailsModal {
     hide() {
         try {
             if (this.modal && this.isVisible()) {
-                // הסרה ממערכת ניהול הניווט (תקרה אוטומטית ב-handleModalHidden)
+                // אם יש מודל מקונן (יש מודל אחר פתוח) - השתמש ב-goBack
+                if (window.ModalNavigationService?.canGoBack && window.ModalNavigationService.canGoBack()) {
+                    // יש מודל מקונן - חזור למודל הקודם
+                    window.ModalNavigationService.goBack().catch((error) => {
+                        window.Logger?.warn('Failed to go back via navigation service, using fallback', { error: error?.message }, { page: "entity-details-modal" });
+                        // fallback - סגירה רגילה
+                        const bsModal = bootstrap.Modal.getInstance(this.modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        } else {
+                            this.modal.style.display = 'none';
+                            this.modal.classList.remove('show');
+                        }
+                    });
+                    return;
+                }
+                
+                // אין מודל מקונן - סגירה רגילה
                 const bsModal = bootstrap.Modal.getInstance(this.modal);
                 if (bsModal) {
                     bsModal.hide();
@@ -387,6 +419,18 @@ class EntityDetailsModal {
         if (!entityType || entityId === null || entityId === undefined) {
             window.Logger?.warn('EntityDetailsModal restore received entry without entity info', {
                 entry,
+                page: 'entity-details-modal'
+            });
+            return;
+        }
+
+        // בדיקה אם המודל כבר פתוח עם אותם נתונים - אם כן, לא צריך לטעון מחדש
+        if (this.isVisible() && 
+            this.currentEntityType === entityType && 
+            this.currentEntityId === entityId) {
+            window.Logger?.debug('EntityDetailsModal restore skipped - modal already open with same data', {
+                entityType,
+                entityId,
                 page: 'entity-details-modal'
             });
             return;
@@ -1267,20 +1311,29 @@ class EntityDetailsModal {
         this.currentEntityType = null;
         this.currentEntityId = null;
         
-        if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
+        // רישום סגירה במערכת הניווט (רק אם לא נסגר דרך goBack)
+        // goBack כבר מטפל בהסרה מה-stack דרך registerModalClose עם internal: true
+        if (window.ModalNavigationService?.registerModalClose) {
+            // רק אם המודל עדיין ב-stack (לא נסגר דרך goBack)
+            const stack = window.ModalNavigationService.getStack();
+            const isInStack = stack.some(entry => entry.modalId === this.modalId && entry.instanceId === this.navigationInstanceId);
+            if (isInStack) {
+                window.ModalNavigationService.registerModalClose(this.modalId, { instanceId: this.navigationInstanceId });
+            }
+        } else if (window.registerModalNavigationClose) {
             window.registerModalNavigationClose(this.modalId);
         }
 
         this.navigationInstanceId = null;
 
-                const contentElement = document.getElementById('entityDetailsContent');
-                if (contentElement) {
-                    contentElement.innerHTML = '';
-                    if (window.Logger) {
+        const contentElement = document.getElementById('entityDetailsContent');
+        if (contentElement) {
+            contentElement.innerHTML = '';
+            if (window.Logger) {
                 window.Logger.debug('✅ Cleared modal content after hide', {
-                            modalId: this.modal?.id,
-                            page: "entity-details-modal"
-                        });
+                    modalId: this.modal?.id,
+                    page: "entity-details-modal"
+                });
             }
         }
     }

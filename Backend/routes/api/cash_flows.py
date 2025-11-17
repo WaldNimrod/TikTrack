@@ -600,6 +600,60 @@ def delete_cash_flow(cash_flow_id: int):
         }), 500
     # Don't close db here - handle_database_session decorator will do it
 
+@cash_flows_bp.route('/delete-imported', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['cash_flows', 'account-activity-*'])
+def delete_imported_cash_flows():
+    """Delete all cash flows with source='file_import' - Dev utility for testing"""
+    try:
+        logger.info("=== DELETE IMPORTED CASH FLOWS START ===")
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
+        
+        # Count imported records
+        count = db.query(CashFlow).filter(CashFlow.source == 'file_import').count()
+        logger.info(f"Found {count} imported cash flows to delete")
+        
+        if count == 0:
+            logger.info("No imported cash flows to delete")
+            return jsonify({
+                "status": "success",
+                "message": "No imported cash flows found. Nothing to delete.",
+                "deleted_count": 0,
+                "version": "1.0"
+            }), 200
+        
+        # Get details for logging (before deletion)
+        cash_flows = db.query(CashFlow).filter(CashFlow.source == 'file_import').all()
+        cash_flow_ids = [cf.id for cf in cash_flows]
+        logger.info(f"Found {len(cash_flow_ids)} imported cash flows with IDs: {cash_flow_ids[:10] if len(cash_flow_ids) > 10 else cash_flow_ids}...")  # Log first 10 IDs
+        
+        # Remove tags for imported cash flows (non-blocking - continue even if fails)
+        # TEMPORARY: Skip tag removal to isolate the deletion issue
+        # TODO: Re-enable tag removal after deletion is working
+        tags_removed = 0
+        logger.info(f"Skipping tag removal for now - will delete {len(cash_flows)} cash flows directly")
+
+        # Delete all imported records
+        # Note: commit will be done by handle_database_session decorator
+        deleted_count = db.query(CashFlow).filter(CashFlow.source == 'file_import').delete()
+        logger.info(f"Delete query executed, deleted_count={deleted_count}")
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully deleted {deleted_count} imported cash flow(s)",
+            "deleted_count": deleted_count,
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        logger.error(f"Error deleting imported cash flows: {str(e)}", exc_info=True)
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to delete imported cash flows: {str(e)}"},
+            "version": "1.0"
+        }), 500
+    # Don't close db here - handle_database_session decorator will do it
+
 @cash_flows_bp.route('/delete-all', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows'])

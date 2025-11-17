@@ -1194,7 +1194,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
 
     if (trade) {
       // מידע על הטרייד: תאריך פתיחה | צד | סוג
-      const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const openDate = trade.created_at ? (window.formatDate ? window.formatDate(trade.created_at) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(trade.created_at) : 'לא מוגדר')) : 'לא מוגדר';
       const side = trade.side || 'לא מוגדר';
       const type = trade.investment_type || 'לא מוגדר';
 
@@ -1257,7 +1257,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                         '-'}
                 </td>
                 <td data-date="${execution.execution_date?.utc || execution.execution_date || execution.date || ''}">
-                    ${window.renderExecutionDate ? window.renderExecutionDate(execution.execution_date || execution.date) : window.renderDate ? window.renderDate(execution.execution_date || execution.date, true) : ((execution.execution_date || execution.date) ? new Date(execution.execution_date || execution.date).toLocaleDateString('he-IL') : '-')}
+                    ${window.renderExecutionDate ? window.renderExecutionDate(execution.execution_date || execution.date) : window.renderDate ? window.renderDate(execution.execution_date || execution.date, true) : ((execution.execution_date || execution.date) ? (window.formatDate ? window.formatDate(execution.execution_date || execution.date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(execution.execution_date || execution.date, { includeTime: true }) : '-')) : '-')}
                 </td>
                 <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
                 ${(() => {
@@ -1330,13 +1330,14 @@ async function updateExecutionsTableMain(executions, options = {}) {
                         return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
                       }
                       try {
-                        return new Date(epoch).toLocaleString('he-IL', {
+                        const dateObj = new Date(epoch);
+                        return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit'
-                        });
+                        }));
                       } catch (err) {
                         window.Logger?.warn('⚠️ executions updated-cell date formatting failed', { err, executionId: execution?.id }, { page: 'executions' });
                         return 'לא מוגדר';
@@ -2052,7 +2053,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
         if (trade.created_at) {
           try {
             const date = new Date(trade.created_at);
-            creationDate = date.toLocaleDateString('he-IL');
+            creationDate = window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL'));
           } catch {
             // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
           }
@@ -3270,7 +3271,7 @@ function updateTickersSummaryTable(tickers = null) {
     if (ticker.created_at) {
       try {
         const date = new Date(ticker.created_at);
-        creationDate = date.toLocaleDateString('he-IL');
+        creationDate = window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL'));
       } catch {
         // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', ticker.created_at, { page: "executions" });
       }
@@ -3526,7 +3527,7 @@ async function deleteExecution(executionId) {
             const quantity = execution.quantity || '0';
             const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
             const date = execution.date || execution.execution_date ? 
-                         new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
+                         (window.formatDate ? window.formatDate(execution.date || execution.execution_date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(execution.date || execution.execution_date) : new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL'))) : 
                          'לא מוגדר';
             executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
         }
@@ -3637,7 +3638,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('executions', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('executions', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
@@ -3925,7 +3929,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
         ? FieldRenderer.renderExecutionDate(executionDateValue)
         : (FieldRenderer?.renderDate
             ? FieldRenderer.renderDate(executionDateValue, true)
-            : (executionDateValue ? new Date(executionDateValue).toLocaleDateString('he-IL') : '-'));
+            : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : new Date(executionDateValue).toLocaleDateString('he-IL'))) : '-'));
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
     const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action === 'buy' ? 'קניה' : 'מכירה');
@@ -3936,7 +3940,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     
     const tradeEnvelope = suggestion.trade_created_at || suggestion.created_at;
     const tradeLocalValue = tradeEnvelope?.local || tradeEnvelope?.utc || tradeEnvelope?.display || suggestion.created_at;
-    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? new Date(tradeLocalValue).toLocaleDateString('he-IL') : '-');
+    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? (window.formatDate ? window.formatDate(tradeLocalValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(tradeLocalValue) : new Date(tradeLocalValue).toLocaleDateString('he-IL'))) : '-');
     const tradeSortValue = tradeEnvelope?.epochMs ?? suggestion.trade_created_at_epoch ?? tradeEnvelope?.utc ?? tradeLocalValue ?? '';
     const tradeStatus = FieldRenderer?.renderStatus ? FieldRenderer.renderStatus(suggestion.status, 'trade') : (suggestion.status === 'open' || suggestion.status === 'active' ? 'פעיל' : suggestion.status === 'closed' ? 'סגור' : suggestion.status);
     const tradeSide = FieldRenderer?.renderSide ? FieldRenderer.renderSide(suggestion.side) : (suggestion.side || '-');
@@ -4477,6 +4481,8 @@ function buildTradeSuggestionsFlatList(sourceData) {
         try {
             if (typeof window.formatDate === 'function') {
                 display = window.formatDate(local);
+            } else if (typeof window.dateUtils?.formatDate === 'function') {
+                display = window.dateUtils.formatDate(timestamp);
             } else {
                 display = new Date(timestamp).toLocaleDateString('he-IL');
             }

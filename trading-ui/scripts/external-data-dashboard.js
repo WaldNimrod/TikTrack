@@ -1306,7 +1306,7 @@
       }
 
       if (!logs.length) {
-      const currentTime = new Date().toLocaleString('he-IL');
+      const currentTime = window.formatDate ? window.formatDate(new Date(), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(), { includeTime: true }) : new Date().toLocaleString('he-IL'));
       logContent.innerHTML = `
         <div class="no-logs">
           <div class="no-logs-icon">📋</div>
@@ -1391,8 +1391,8 @@
                 <div class="group-refresh-category">${safeText(this.getCategoryLabel(entry.category))} - ${safeText(entry.time_period)}</div>
                 <div class="group-refresh-details">${details}</div>
                 <div class="group-refresh-time">
-                  התחיל: ${safeText(entry.started_at ? new Date(entry.started_at).toLocaleString('he-IL') : NOT_AVAILABLE_TEXT)}
-                  | הסתיים: ${safeText(entry.completed_at ? new Date(entry.completed_at).toLocaleString('he-IL') : 'בתהליך')}
+                  התחיל: ${safeText(entry.started_at ? (window.formatDate ? window.formatDate(entry.started_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(entry.started_at, { includeTime: true }) : new Date(entry.started_at).toLocaleString('he-IL'))) : NOT_AVAILABLE_TEXT)}
+                  | הסתיים: ${safeText(entry.completed_at ? (window.formatDate ? window.formatDate(entry.completed_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(entry.completed_at, { includeTime: true }) : new Date(entry.completed_at).toLocaleString('he-IL'))) : 'בתהליך')}
                 </div>
               </div>
               <div class="group-refresh-status ${statusClass}">${statusLabel}</div>
@@ -1908,7 +1908,7 @@
   generateTextReport(report) {
       const lines = [];
       lines.push('=== דוח בדיקות מערכת נתונים חיצוניים ===');
-      lines.push(`זמן יצירה: ${new Date(report.generatedAt).toLocaleString('he-IL')}`);
+      lines.push(`זמן יצירה: ${window.formatDate ? window.formatDate(new Date(report.generatedAt), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(report.generatedAt), { includeTime: true }) : new Date(report.generatedAt).toLocaleString('he-IL'))}`);
       lines.push('');
       lines.push('--- סיכום ---');
       lines.push(`סה"כ בדיקות: ${report.summary.total}`);
@@ -2332,7 +2332,7 @@
       }
 
       const labels = this.performanceSamples.map((sample) =>
-        new Date(sample.timestamp).toLocaleTimeString('he-IL')
+        window.formatDate ? window.formatDate(new Date(sample.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(sample.timestamp), { includeTime: true }) : new Date(sample.timestamp).toLocaleTimeString('he-IL'))
       );
       const dataset = this.performanceSamples.map((sample) => sample.responseTimeMs || 0);
 
@@ -2722,7 +2722,7 @@
     generateDetailedLog() {
       const lines = [];
       lines.push('=== לוג מפורט - דשבורד נתונים חיצוניים ===');
-      lines.push(`זמן יצירה: ${new Date().toLocaleString('he-IL')}`);
+      lines.push(`זמן יצירה: ${window.formatDate ? window.formatDate(new Date(), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(), { includeTime: true }) : new Date().toLocaleString('he-IL'))}`);
       lines.push(`כתובת עמוד: ${window.location.href}`);
       lines.push('');
 

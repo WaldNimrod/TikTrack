@@ -992,7 +992,8 @@ async function updateTradesTable(trades) {
           try {
             const dateObj = createdEnvelope instanceof Date ? createdEnvelope : new Date(createdEnvelope);
             if (!Number.isNaN(dateObj.getTime())) {
-              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>`;
+              const formatted = window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }));
+              return `<span class="date-text">${formatted}</span>`;
             }
           } catch (error) {
             window.Logger?.warn('⚠️ trades created_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
@@ -1014,7 +1015,8 @@ async function updateTradesTable(trades) {
           try {
             const dateObj = closedEnvelope instanceof Date ? closedEnvelope : new Date(closedEnvelope);
             if (!Number.isNaN(dateObj.getTime())) {
-              return `<span class="date-text">${dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' })}</span>`;
+              const formatted = window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }));
+              return `<span class="date-text">${formatted}</span>`;
             }
           } catch (error) {
             window.Logger?.warn('⚠️ trades closed_at fallback failed', { error, tradeId: trade?.id }, { page: 'trades' });
@@ -1092,13 +1094,14 @@ async function updateTradesTable(trades) {
               return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
             }
             try {
-              return new Date(epoch).toLocaleString('he-IL', {
+              const dateObj = new Date(epoch);
+              return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-              });
+              }));
             } catch (err) {
               window.Logger?.warn('⚠️ trades updated-cell date formatting failed', { err, tradeId: trade?.id }, { page: 'trades' });
               return 'לא מוגדר';
@@ -1181,11 +1184,11 @@ async function loadTradePlanDates() {
           const data = await response.json();
           if (data.status === 'success' && data.data) {
             const plan = data.data;
-            const createdDate = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL', { 
+            const createdDate = plan.created_at ? (window.formatDate ? window.formatDate(plan.created_at) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(plan.created_at) : new Date(plan.created_at).toLocaleDateString('he-IL', { 
               day: '2-digit', 
               month: '2-digit', 
               year: '2-digit' 
-            }) : 'תאריך לא ידוע';
+            }))) : 'תאריך לא ידוע';
             link.textContent = createdDate;
           } else {
             link.textContent = 'תוכנית קיימת';
@@ -1488,7 +1491,7 @@ async function deleteTradeRecord(tradeId) {
           try {
             const dateObj = openedEnvelope instanceof Date ? openedEnvelope : new Date(openedEnvelope);
             if (!Number.isNaN(dateObj.getTime())) {
-              date = dateObj.toLocaleDateString('he-IL');
+              date = window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
             }
           } catch {
             date = 'לא מוגדר';
@@ -1701,7 +1704,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('trades', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('trades', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
@@ -3305,7 +3311,7 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
       if (planCreatedAt && tradeOpenedAt && planCreatedAt > tradeOpenedAt) {
         return {
           isValid: false,
-          message: `תאריך יצירת התוכנית (${planCreatedAt.toLocaleDateString('he-IL')}) מאוחר מתאריך פתיחת הטרייד (${tradeOpenedAt.toLocaleDateString('he-IL')}). לא ניתן לקשר תוכנית שנוצרה אחרי פתיחת הטרייד.`,
+          message: `תאריך יצירת התוכנית (${window.formatDate ? window.formatDate(planCreatedAt) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(planCreatedAt) : planCreatedAt.toLocaleDateString('he-IL'))}) מאוחר מתאריך פתיחת הטרייד (${window.formatDate ? window.formatDate(tradeOpenedAt) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(tradeOpenedAt) : tradeOpenedAt.toLocaleDateString('he-IL'))}). לא ניתן לקשר תוכנית שנוצרה אחרי פתיחת הטרייד.`,
         };
       }
     }
@@ -3383,7 +3389,7 @@ async function validateTradeChanges(originalTrade, updatedTrade) {
       : (closedEnvelope ? new Date(closedEnvelope) : null);
 
     if (openedAt && closedAt && closedAt < openedAt) {
-      validations.push(`תאריך סגירה (${closedAt.toLocaleDateString('he-IL')}) לא יכול להיות לפני תאריך יצירה (${openedAt.toLocaleDateString('he-IL')})`);
+      validations.push(`תאריך סגירה (${window.formatDate ? window.formatDate(closedAt) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(closedAt) : closedAt.toLocaleDateString('he-IL'))}) לא יכול להיות לפני תאריך יצירה (${window.formatDate ? window.formatDate(openedAt) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(openedAt) : openedAt.toLocaleDateString('he-IL'))})`);
     }
   }
 
@@ -3586,7 +3592,7 @@ async function validateTradePlanDate(tradePlanId, tradeData) {
     if (planCreatedAt > tradeCreatedAt) {
       return {
         isValid: false,
-        message: `לא ניתן לקשר תוכנית טרייד שנוצרה בתאריך ${planCreatedAt.toLocaleDateString('he-IL')} לטרייד שנוצר בתאריך ${tradeCreatedAt.toLocaleDateString('he-IL')}. תאריך יצירת התוכנית לא יכול להיות מאוחר מתאריך יצירת הטרייד.`,
+        message: `לא ניתן לקשר תוכנית טרייד שנוצרה בתאריך ${window.formatDate ? window.formatDate(planCreatedAt) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(planCreatedAt) : planCreatedAt.toLocaleDateString('he-IL'))} לטרייד שנוצר בתאריך ${window.formatDate ? window.formatDate(tradeCreatedAt) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(tradeCreatedAt) : tradeCreatedAt.toLocaleDateString('he-IL'))}. תאריך יצירת התוכנית לא יכול להיות מאוחר מתאריך יצירת הטרייד.`,
       };
     }
 

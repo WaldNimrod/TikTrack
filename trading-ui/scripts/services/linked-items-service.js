@@ -267,6 +267,7 @@ class LinkedItemsService {
         let actionsHtml = '<div class="btn-group btn-group-sm linked-items-actions" role="group">';
         
         // יצירת options ל-viewEntityDetails עם מידע על המקור
+        // שימוש ב-ModalNavigationService לפתיחת מודל מקונן
         let viewOptions = { mode: 'view', includeLinkedItems: true };
         if (options.sourceInfo) {
             viewOptions.source = options.sourceInfo;
@@ -292,23 +293,15 @@ class LinkedItemsService {
         
         const viewOptionsStr = buildObjectLiteral(viewOptions);
         
-        // כפתור VIEW - עם העברת מידע על המקור
-        // נבנה את הקוד עם single quotes בתוך המחרוזת (כי כבר בררנו אותם ב-buildObjectLiteral)
-        // ואז נשתמש ב-double quotes ב-HTML attribute - זה צריך לעבוד בלי escape
+        // כפתור VIEW - עם העברת מידע על המקור ושימוש ב-ModalNavigationService
+        // showEntityDetails כבר משתמש ב-ModalNavigationService אוטומטית
         const onclickCode = `window.showEntityDetails('${item.type}', ${item.id}, ${viewOptionsStr})`;
-        // Escape של double quotes (אם יש) לשימוש בתוך HTML attribute עם double quotes
-        // אבל למעשה, אם viewOptionsStr משתמש רק ב-single quotes, לא צריך escape
-        // Escape של double quotes ואת ה-single quotes שכבר מבורחים (\\') - אבל למעשה, זה לא צריך
         const escapedOnclick = onclickCode.replace(/"/g, '&quot;');
         actionsHtml += `<button data-button-type="VIEW" data-variant="small" data-onclick="${escapedOnclick}" data-text="" title="צפה בפרטים"></button>`;
         
-        // כפתור LINK - רק אם יש פונקציה מתאימה
-        const linkFunction = this._getLinkedItemsFunctionForType(item.type, item.id);
-        if (linkFunction) {
-            actionsHtml += `<button data-button-type="LINK" data-variant="small" data-onclick="${linkFunction}" data-text="" title="פריטים מקושרים"></button>`;
-        }
+        // כפתור LINK - הוסר לפי דרישת המשתמש
         
-        // כפתור EDIT
+        // כפתור EDIT - עם בדיקה שהמודל קיים
         const editFunction = this._getEditFunctionForType(item.type, item.id);
         if (editFunction) {
             actionsHtml += `<button data-button-type="EDIT" data-variant="small" data-onclick="${editFunction}" data-text="" title="ערוך"></button>`;
@@ -321,6 +314,7 @@ class LinkedItemsService {
             const cancelTitle = item.status === 'cancelled' || item.status === 'canceled' ? 'הפעל מחדש' : 'בטל';
             actionsHtml += `<button data-button-type="${cancelType}" data-variant="small" data-onclick="${cancelFunction}" data-text="" title="${cancelTitle}"></button>`;
         } else {
+            // כפתור DELETE - תמיד להציג אם אין CANCEL/REACTIVATE
             const deleteFunction = this._getDeleteFunctionForType(item.type, item.id);
             if (deleteFunction) {
                 actionsHtml += `<button data-button-type="DELETE" data-variant="small" data-onclick="${deleteFunction}" data-text="" title="מחק"></button>`;
@@ -348,12 +342,12 @@ class LinkedItemsService {
             case 'VIEW':
                 return true; // תמיד להציג VIEW
             case 'LINK':
-                return true; // תמיד להציג LINK אם יש פונקציה
+                return false; // הוסר לפי דרישת המשתמש
             case 'EDIT':
                 // לא להציג EDIT למצבים מסוימים
                 return item.status !== 'cancelled' && item.status !== 'canceled';
             case 'DELETE':
-                // רק אם אין CANCEL/REACTIVATE
+                // תמיד להציג DELETE אם אין CANCEL/REACTIVATE
                 return !this._getCancelFunctionForType(item.type, item.id, item.status);
             case 'CANCEL':
             case 'REACTIVATE':
@@ -423,15 +417,60 @@ class LinkedItemsService {
      * @returns {string|null} - פונקציה או null
      */
     static _getEditFunctionForType(type, id) {
+        // מיפוי modalId לפי entityType
+        const modalIdMap = {
+            'trade': 'tradesModal',
+            'trade_plan': 'tradePlansModal',
+            'ticker': 'tickersModal',
+            'trading_account': 'tradingAccountsModal',
+            'alert': 'alertsModal',
+            'cash_flow': 'cashFlowModal',
+            'execution': 'executionsModal',
+            'note': 'notesModal'
+        };
+        
+        const modalId = modalIdMap[type];
+        
+        // אם יש modalId - השתמש ב-ModalManagerV2 (מערכת כללית)
+        if (modalId && window.ModalManagerV2) {
+            // לנוטס - נסה ליצור את המודל אם הוא לא קיים
+            if (type === 'note') {
+                return `(function() { 
+                    if (window.ModalManagerV2) { 
+                        try { 
+                            window.ModalManagerV2.showEditModal('notesModal', 'note', ${id}); 
+                        } catch (e) { 
+                            console.warn('First attempt failed, trying to initialize notesModal:', e); 
+                            if (window.notesModalConfig && typeof window.ModalManagerV2.createCRUDModal === 'function') { 
+                                try { 
+                                    window.ModalManagerV2.createCRUDModal(window.notesModalConfig); 
+                                    setTimeout(() => { 
+                                        window.ModalManagerV2.showEditModal('notesModal', 'note', ${id}); 
+                                    }, 100); 
+                                } catch (createError) { 
+                                    console.error('Failed to create notesModal:', createError); 
+                                    if (window.showErrorNotification) { 
+                                        window.showErrorNotification('שגיאה', 'לא ניתן לפתוח מודל עריכה. נא לרענן את הדף.'); 
+                                    } 
+                                } 
+                            } else if (window.showErrorNotification) { 
+                                window.showErrorNotification('שגיאה', 'מודל הערות לא מוכן. נא לרענן את הדף.'); 
+                            } 
+                        } 
+                    } 
+                })()`;
+            } else {
+                // ישויות אחרות - שימוש ישיר ב-ModalManagerV2
+                return `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('${modalId}', '${type}', ${id})`;
+            }
+        }
+        
+        // Fallback לפונקציות ספציפיות (אם קיימות)
         const functions = {
             'trade': `editTradeRecord('${id}')`,
             'trade_plan': `editTradePlan('${id}')`,
-            'ticker': `window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${id})`,
             'trading_account': `editAccount('${id}')`,
-            'alert': `editAlert(${id})`,
-            'cash_flow': `window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${id})`,
-            'execution': `window.ModalManagerV2.showEditModal('executionsModal', 'execution', ${id})`,
-            'note': `window.ModalManagerV2.showEditModal('notesModal', 'note', ${id})`
+            'alert': `editAlert(${id})`
         };
         
         return functions[type] || null;
@@ -479,11 +518,67 @@ class LinkedItemsService {
      * @returns {string|null} - פונקציה או null
      */
     static _getDeleteFunctionForType(type, id) {
-        // לא כל סוגי הישויות תומכים במחיקה ישירה
-        // רוב המחיקות נעשות דרך CRUD handlers ספציפיים
-        // אם יש פונקציית מחיקה גלובלית, ניתן להוסיף כאן
+        // פונקציות ספציפיות (אם קיימות) - עדיפות על המערכת הכללית
+        const specificFunctions = {
+            'trade': `window.deleteTradeRecord && window.deleteTradeRecord(${id})`,
+            'trade_plan': `window.deleteTradePlan && window.deleteTradePlan(${id})`,
+            'ticker': `window.deleteTicker && window.deleteTicker(${id})`,
+            'trading_account': `window.deleteTradingAccount && window.deleteTradingAccount(${id})`,
+            'alert': `window.deleteAlert && window.deleteAlert(${id})`,
+            'cash_flow': `window.deleteCashFlow && window.deleteCashFlow(${id})`,
+            'execution': `window.deleteExecution && window.deleteExecution(${id})`,
+            'note': `window.deleteNote && window.deleteNote(${id})`
+        };
         
-        return null; // כרגע לא מחזירים מחיקה ישירה דרך service זה
+        // אם יש פונקציה ספציפית - השתמש בה
+        if (specificFunctions[type]) {
+            return specificFunctions[type];
+        }
+        
+        // מערכת כללית - שימוש ב-EntityDetailsAPI
+        // מיפוי פונקציות רענון לפי סוג ישות
+        const refreshFuncMap = {
+            'trade': 'loadTradesData',
+            'trade_plan': 'loadTradePlansData',
+            'ticker': 'loadTickersData',
+            'trading_account': 'loadTradingAccountsData',
+            'alert': 'loadAlertsData',
+            'cash_flow': 'loadCashFlowsData',
+            'execution': 'loadExecutionsData',
+            'note': 'updateNotesTable'
+        };
+        
+        const refreshFuncName = refreshFuncMap[type] || null;
+        const refreshCode = refreshFuncName ? 
+            `if (window.${refreshFuncName} && typeof window.${refreshFuncName} === 'function') { window.${refreshFuncName}(); }` : 
+            '';
+        
+        return `(async function() {
+            try {
+                // בדיקת פריטים מקושרים לפני מחיקה
+                if (window.checkLinkedItemsBeforeAction) {
+                    const hasLinkedItems = await window.checkLinkedItemsBeforeAction('${type}', ${id}, 'delete');
+                    if (hasLinkedItems) {
+                        return; // המחיקה בוטלה - יש פריטים מקושרים
+                    }
+                }
+                
+                // מחיקה דרך EntityDetailsAPI (מערכת כללית)
+                if (window.entityDetailsAPI && typeof window.entityDetailsAPI.deleteEntity === 'function') {
+                    const deleted = await window.entityDetailsAPI.deleteEntity('${type}', ${id});
+                    if (deleted) {
+                        ${refreshCode}
+                    }
+                } else {
+                    throw new Error('מערכת המחיקה הכללית לא זמינה');
+                }
+            } catch (error) {
+                console.error('Error deleting ${type}:', error);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה במחיקה', error.message || 'לא ניתן למחוק את הישות');
+                }
+            }
+        })()`;
     }
 }
 

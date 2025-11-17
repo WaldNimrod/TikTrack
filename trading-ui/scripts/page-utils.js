@@ -812,14 +812,44 @@ async function restoreSortState(pageName) {
         }
         handledTables.add(tableType);
 
+        // Get tableId for pagination updates
+        const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+        const tableId = table ? table.id : null;
+
         if (Array.isArray(sortState.chain) && window.UnifiedTableSystem?.sorter?.sortByChain) {
-          await window.UnifiedTableSystem.sorter.sortByChain(tableType, sortState.chain, { saveState: true });
+          const sortedData = await window.UnifiedTableSystem.sorter.sortByChain(tableType, sortState.chain, { saveState: false });
+          // Update pagination after restoring sort
+          if (tableId && window.PaginationSystem && Array.isArray(sortedData)) {
+            try {
+              const paginationInstance = window.PaginationSystem.get(tableId);
+              if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                paginationInstance.setData(sortedData);
+              }
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn(`restoreSortState: Failed to update pagination for "${tableType}"`, err, { page: pageName || 'global' });
+              }
+            }
+          }
         } else if (typeof sortState.columnIndex === 'number' && sortState.columnIndex >= 0) {
           if (window.UnifiedTableSystem?.sorter?.sort) {
-            await window.UnifiedTableSystem.sorter.sort(tableType, sortState.columnIndex, {
+            const sortedData = await window.UnifiedTableSystem.sorter.sort(tableType, sortState.columnIndex, {
               direction: sortState.direction || 'asc',
-              saveState: true
+              saveState: false
             });
+            // Update pagination after restoring sort
+            if (tableId && window.PaginationSystem && Array.isArray(sortedData)) {
+              try {
+                const paginationInstance = window.PaginationSystem.get(tableId);
+                if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                  paginationInstance.setData(sortedData);
+                }
+              } catch (err) {
+                if (window.Logger) {
+                  window.Logger.warn(`restoreSortState: Failed to update pagination for "${tableType}"`, err, { page: pageName || 'global' });
+                }
+              }
+            }
           } else {
             await window.restoreAnyTableSort(tableType);
           }

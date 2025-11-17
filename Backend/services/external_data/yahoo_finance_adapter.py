@@ -176,7 +176,7 @@ class YahooFinanceAdapter:
                 'epochMs': epoch_ms,
                 'local': local_time.isoformat(),
                 'timezone': self.user_timezone,
-                'display': local_time.strftime('%d/%m/%Y %H:%M')
+                'display': local_time.strftime('%d.%m.%Y %H:%M')
             }
 
         except Exception as error:

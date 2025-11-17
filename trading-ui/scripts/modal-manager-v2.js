@@ -1076,7 +1076,8 @@ class ModalManagerV2 {
                         modalId === 'tradingAccountsModal' ? 'tradingAccountsModalConfig' : null,
                         modalId === 'tickersModal' ? 'tickersModalConfig' : null,
                         modalId === 'executionsModal' ? 'executionsModalConfig' : null,
-                        modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null
+                        modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null,
+                        modalId === 'notesModal' ? 'notesModalConfig' : null
                     ].filter(Boolean); // הסרת null values
                     
                     for (const name of possibleNames) {

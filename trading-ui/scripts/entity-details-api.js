@@ -1514,9 +1514,11 @@ class EntityDetailsAPI {
             const confirmed = await this.confirmDeletion(entityType, entityId);
             if (!confirmed) return false;
 
-            const url = `${this.baseUrl}/${entityType}/${entityId}`;
+            // Use direct entity API endpoint to avoid 302 redirect
+            // entity-details API returns 302 redirect, so we use the actual endpoint directly
+            const directUrl = `/api/${entityType}s/${entityId}`;
             
-            const response = await fetch(url, {
+            const response = await fetch(directUrl, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1525,7 +1527,9 @@ class EntityDetailsAPI {
             });
 
             if (!response.ok) {
-                throw new Error(`שגיאה במחיקה: ${response.status} ${response.statusText}`);
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error?.message || errorData.message || `שגיאה במחיקה: ${response.status} ${response.statusText}`;
+                throw new Error(errorMessage);
             }
 
             // מחיקת cache
@@ -1570,12 +1574,11 @@ class EntityDetailsAPI {
                 // fallback לconfirm רגיל
                 if (typeof showConfirmationDialog === 'function') {
                     showConfirmationDialog(
-                        `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`,
-                        () => resolve(true),
-                        () => resolve(false),
-                        'מחיקת ישות',
-                        'מחק',
-                        'ביטול'
+                        'מחיקת ישות',  // title
+                        `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`,  // message
+                        () => resolve(true),  // onConfirm
+                        () => resolve(false),  // onCancel
+                        'danger'  // color
                     );
                 } else {
                     const result = window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);

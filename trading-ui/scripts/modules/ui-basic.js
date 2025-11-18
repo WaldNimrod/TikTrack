@@ -846,6 +846,27 @@ window.toggleSection = async function (sectionId) {
       const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
       icon.textContent = newIcon;
     }
+    
+    // Update toggle button tooltip dynamically based on section state
+    // CRITICAL: Only update if button does NOT have data-tooltip-static (static tooltips cannot be changed)
+    if (toggleBtn && 
+        !toggleBtn.hasAttribute('data-tooltip-static') &&
+        window.advancedButtonSystem && 
+        typeof window.advancedButtonSystem.updateTooltip === 'function') {
+      const isCollapsed = sectionBody.style.display === 'none';
+      // Try to get section-specific tooltip text, or use default
+      const sectionName = section.querySelector('.table-title')?.textContent?.trim() || 
+                         section.querySelector('h2')?.textContent?.trim() || 
+                         sectionId;
+      const tooltipText = isCollapsed 
+        ? `הצג ${sectionName}` 
+        : `הסתר ${sectionName}`;
+      
+      window.advancedButtonSystem.updateTooltip(toggleBtn, tooltipText, {
+        placement: 'top',
+        trigger: 'hover'
+      });
+    }
 
     // Save state with page-specific key using Unified Cache Manager
     const isHidden = sectionBody.style.display === 'none';

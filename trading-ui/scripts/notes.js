@@ -447,18 +447,29 @@ function updateNotesTable(notes) {
         };
 
         const loadTradePlans = async () => {
-          if (window.tradePlanService && typeof window.tradePlanService.loadTradePlansData === 'function') {
-            const data = await window.tradePlanService.loadTradePlansData();
-            return Array.isArray(data) ? data : [];
+          try {
+            // בדיקה אם TradePlansData זמין לפני שימוש ב-service
+            // אם לא זמין, נדלג על השימוש ב-service ונעבור ישירות ל-API
+            if (window.TradePlansData && typeof window.TradePlansData.loadTradePlansData === 'function') {
+              if (window.tradePlanService && typeof window.tradePlanService.loadTradePlansData === 'function') {
+                const data = await window.tradePlanService.loadTradePlansData();
+                return Array.isArray(data) ? data : [];
+              }
+              if (typeof window.loadTradePlansData === 'function') {
+                const data = await window.loadTradePlansData();
+                return Array.isArray(data) ? data : [];
+              }
+            }
+            // אם TradePlansData לא זמין, נשתמש ב-API ישיר
+            const response = await fetch('/api/trade-plans/');
+            if (!response.ok) { return []; }
+            const payload = await response.json();
+            return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+          } catch (error) {
+            // אם יש שגיאה, נחזיר מערך ריק במקום לזרוק שגיאה
+            window.Logger?.warn('⚠️ שגיאה בטעינת תוכניות מסחר, מחזיר מערך ריק', { error: error.message }, { page: 'notes' });
+            return [];
           }
-          if (typeof window.loadTradePlansData === 'function') {
-            const data = await window.loadTradePlansData();
-            return Array.isArray(data) ? data : [];
-          }
-          const response = await fetch('/api/trade-plans/');
-          if (!response.ok) { return []; }
-          const payload = await response.json();
-          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
         };
 
         const loadTickers = async () => {
@@ -520,7 +531,7 @@ function updateNotesTable(notes) {
             <div style="padding: 20px;">
               <h5>📝 אין הערות</h5>
               <p>לא נמצאו הערות במערכת</p>
-              <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()"></button>
+              <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()" data-tooltip="הוסף הערה ראשונה למערכת" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
             </div>
           </td>
         </tr>
@@ -809,7 +820,7 @@ function updateNotesTable(notes) {
                       year: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    });
+                    }));
                   } catch (err) {
                     window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
                     return 'לא מוגדר';
@@ -846,34 +857,27 @@ function updateNotesTable(notes) {
       updateNotesSummary(notes);
       
       // 🔘 עדכון כפתורים דינמיים
-      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+      // NOTE: processButtons already handles tooltip initialization for buttons with data-button-type
+      // initializeTooltips is only needed for custom buttons without data-button-type
+      if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+        // Process all buttons including actions-menu buttons
+        // This will also initialize tooltips for buttons with data-button-type
+        window.advancedButtonSystem.processButtons(tbody);
+      } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
         window.ButtonSystem.initializeButtons();
       }
       
-      // 🔘 אתחול טולטיפים לכפתורי הפילטר (אם מערכת הכפתורים לא אתחלה אותם)
-      // כפתורי הפילטר עם data-button-type="FILTER" אמורים להיות מעובדים אוטומטית,
-      // אבל נוודא שהטולטיפים מאותחלים נכון
+      // 🔘 אתחול טולטיפים רק לכפתורים מותאמים אישית (ללא data-button-type)
+      // כפתורים עם data-button-type כבר טופלו ב-processButtons
       if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+        // Initialize tooltips for custom filter buttons (if any don't have data-button-type)
         const filterContainer = document.querySelector('.filter-buttons-container');
         if (filterContainer) {
-          // אתחל טולטיפים רק לכפתורי הפילטר (לא לכל הכפתורים)
-          const filterButtons = filterContainer.querySelectorAll('button[data-button-type="FILTER"][data-tooltip]');
-          filterButtons.forEach(btn => {
-            const tooltipText = btn.getAttribute('data-tooltip');
-            if (tooltipText && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-              // הסר tooltip קיים אם קיים
-              const existingTooltip = bootstrap.Tooltip.getInstance(btn);
-              if (existingTooltip) {
-                existingTooltip.dispose();
-              }
-              // אתחל tooltip חדש
-              new bootstrap.Tooltip(btn, {
-                title: tooltipText,
-                placement: btn.getAttribute('data-tooltip-placement') || 'top',
-                trigger: btn.getAttribute('data-tooltip-trigger') || 'hover'
-              });
-            }
-          });
+          // Only initialize tooltips for buttons without data-button-type
+          const customFilterButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-type]):not([data-button-processed])');
+          if (customFilterButtons.length > 0) {
+            window.advancedButtonSystem.initializeTooltips(filterContainer);
+          }
         }
       }
     });
@@ -1257,7 +1261,22 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
 
 /**
  * Save note (handles both add and edit modes)
+ * 
+ * שומר הערה חדשה או מעדכן הערה קיימת.
+ * תומך בשמירה עם קבצים מצורפים ותגיות.
+ * 
+ * @function saveNote
+ * @global
  * @returns {Promise<void>}
+ * @throws {Error} When form validation fails or API call fails
+ * 
+ * @example
+ * // Save a new note
+ * await window.saveNote();
+ * 
+ * @example
+ * // Update existing note (when form is in edit mode)
+ * await window.saveNote();
  */
 async function saveNote() {
   const form = document.getElementById('notesModalForm') || document.getElementById('addNoteForm');
@@ -1358,6 +1377,19 @@ async function saveNote() {
       crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
     } else {
       crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
+    }
+
+    // Cache invalidation after CRUDResponseHandler processes the response
+    if (crudResult && window.CacheSyncManager?.invalidateByAction) {
+      try {
+        const action = noteId ? 'note-updated' : 'note-created';
+        await window.CacheSyncManager.invalidateByAction(action);
+      } catch (cacheError) {
+        window.Logger?.warn('⚠️ Failed to invalidate cache after note save', {
+          error: cacheError,
+          page: 'notes'
+        });
+      }
     }
 
     const resolvedNoteId = noteId || Number(crudResult?.data?.id || crudResult?.id);

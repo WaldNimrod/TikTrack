@@ -21,3 +21,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-16T22:07:34+00:00 | 1.1.4.0 | 1.1.3.0 | 9676c2c32c1870820abdc3cc2074eee5ae0b3700 | e93f36fb5392ff630fc891ce2f47ca6efdff2ba9 | patch | Cash flows fixes round - Backend API routes and Frontend date handling fixes |
 | 2025-11-17T00:21:43+00:00 | 1.1.5.0 | 1.1.4.0 | 76fee7a1d2bf324ac984715e07ead95ca31c1c41 | 9676c2c32c1870820abdc3cc2074eee5ae0b3700 | patch | Complete standardization work - data services, tests, and documentation |
 | 2025-11-17T00:52:10+00:00 | 1.1.6.0 | 1.1.5.0 | 09be00218459585316233a911e8eb36ffeca7ac0 | 76fee7a1d2bf324ac984715e07ead95ca31c1c41 | patch | Backup verification and PostgreSQL migration updates |
+| 2025-11-18T16:05:49+00:00 | 1.1.7.0 | 1.1.6.0 | 64e500c3670ac27aae13283697b5c0337d2289d2 | 09be00218459585316233a911e8eb36ffeca7ac0 | patch | Complete tooltip system refactoring: static/dynamic support, unique ID generation, default mechanism |

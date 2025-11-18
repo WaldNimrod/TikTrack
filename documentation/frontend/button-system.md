@@ -649,13 +649,15 @@ ${createNewButton(`newFunction(${item.id})`)}
 
 ### Data Attributes נתמכים
 
-- `data-tooltip` - טקסט הטולטיפ (חובה)
+- `data-tooltip` - טקסט הטולטיפ (חובה לכפתורים קבועים)
 - `data-tooltip-placement` - מיקום הטולטיפ (`top`, `bottom`, `left`, `right`) - ברירת מחדל: `top`
 - `data-tooltip-trigger` - אירוע להצגה (`hover`, `click`, `focus`) - ברירת מחדל: `hover`
 - `data-tooltip-delay` - עיכוב לפני הצגה (מילישניות) - ברירת מחדל: `0`
 - `data-tooltip-html` - האם לאפשר HTML בטולטיפ (`true`/`false`) - ברירת מחדל: `false`
 - `data-tooltip-class` - מחלקה מותאמת אישית לטולטיפ
 - `data-tooltip-offset` - offset במילימטרים (`X,Y`) - ברירת מחדל: `0,0`
+- `data-id` - **מומלץ**: מזהה ייחודי לכפתור (מונע כפילות ID)
+- `data-tooltip-static` - **אוטומטי**: מסומן אוטומטית לכפתורים עם `data-tooltip` ב-HTML (מונע שינוי טולטיפ)
 
 ### דוגמאות שימוש
 
@@ -719,6 +721,107 @@ window.advancedButtonSystem.initializeTooltips(document.getElementById('myContai
 - כפתורים נוצרים דרך מערכת הכפתורים (`data-button-type`)
 - כפתורים מעובדים דרך `processButtons()`
 - כפתורים נוצרים דינמית דרך `addButton()` או `updateButton()`
+
+### כפתורים קבועים vs דינמיים
+
+#### כפתורים קבועים (Static Tooltips)
+כפתורים עם `data-tooltip` ב-HTML נחשבים כפתורים קבועים:
+- מסומנים אוטומטית עם `data-tooltip-static="true"`
+- הטולטיפ שלהם **לא יכול להשתנות** - הוא נשאר כמו שהוגדר ב-HTML
+- זה מבטיח יציבות קשיחה לכפתורים קבועים בממשק
+
+**דוגמה:**
+```html
+<button 
+    data-button-type="ADD" 
+    data-tooltip="הוסף הערה חדשה"
+    data-tooltip-placement="top">
+    הוסף הערה
+</button>
+```
+
+#### כפתורים דינמיים (Dynamic Tooltips)
+כפתורים שצריכים לשנות את הטולטיפ שלהם לפי מצב:
+- **לא** מסומנים עם `data-tooltip-static`
+- יכולים לעדכן טולטיפ דרך `window.advancedButtonSystem.updateTooltip()`
+- משמשים לכפתורי toggle שמשנים תוכן לפי מצב (פתוח/סגור)
+
+**דוגמה:**
+```javascript
+// עדכון טולטיפ דינמי
+window.advancedButtonSystem.updateTooltip(toggleButton, 'הצג סיכום מלא', {
+    placement: 'top',
+    trigger: 'hover'
+});
+```
+
+### מנגנון ברירת מחדל
+
+אם כפתור עם `data-button-type` **אין לו** `data-tooltip`, המערכת תנסה להשתמש בברירת מחדל:
+1. מחפשת ב-`BUTTON_TOOLTIPS_CONFIG` לפי `page`, `buttonType`, `entityType`
+2. אם לא נמצא, מחפשת ב-`BUTTON_TEXTS[buttonType]`
+3. אם לא נמצא, כפתור לא מקבל טולטיפ
+
+**דוגמה:**
+```html
+<!-- כפתור ללא data-tooltip - יקבל ברירת מחדל -->
+<button data-button-type="VIEW" data-entity-type="note">
+    צפה
+</button>
+<!-- יקבל טולטיפ: "צפה" (מ-BUTTON_TEXTS או BUTTON_TOOLTIPS_CONFIG) -->
+```
+
+### עדכון טולטיפים דינמיים
+
+לעדכון טולטיפ דינמי, השתמש ב-`updateTooltip()`:
+
+```javascript
+// עדכון טולטיפ לכפתור
+window.advancedButtonSystem.updateTooltip(buttonElement, 'טקסט חדש', {
+    placement: 'top',
+    trigger: 'hover',
+    delay: 500
+});
+
+// או עם ID/selector
+window.advancedButtonSystem.updateTooltip('#myButton', 'טקסט חדש');
+```
+
+**הגבלות:**
+- כפתורים עם `data-tooltip-static="true"` **לא יכולים** לעדכן טולטיפ
+- הפונקציה מחזירה `true` אם הצליחה, `false` אם לא
+
+### יצירת ID ייחודיים לכפתורים
+
+**חשוב מאוד**: כדי למנוע כפילות ID שעלולה לגרום לבעיות בטולטיפים, מומלץ תמיד להוסיף `data-id` מפורש לכפתורים קבועים ב-HTML:
+
+```html
+<!-- ✅ מומלץ: data-id מפורש -->
+<button 
+    data-button-type="TOGGLE" 
+    data-id="toggle-top-section"
+    data-tooltip="הצג או הסתר את אזור הסיכום">
+    הצג/הסתר
+</button>
+
+<!-- ⚠️ לא מומלץ: ללא data-id (יוצר ID אוטומטי שעלול להתנגש) -->
+<button 
+    data-button-type="TOGGLE" 
+    data-tooltip="הצג או הסתר את אזור הסיכום">
+    הצג/הסתר
+</button>
+```
+
+**כיצד המערכת יוצרת ID:**
+1. אם יש `data-id` - משתמש בו
+2. אם אין `data-id` - יוצר `btn-{buttonType}-{index}-{timestamp}`
+3. אם יש כפילות ID - מוסיף timestamp נוסף ליצירת ID ייחודי
+
+**דוגמאות ל-ID מומלצים:**
+- `toggle-top-section` - כפתור toggle לסקשן עליון
+- `toggle-main-section` - כפתור toggle לסקשן ראשי
+- `add-note-button` - כפתור הוספת הערה
+- `filter-all-notes` - כפתור פילטר "הכל"
 
 ### תאימות לאחור
 

@@ -72,7 +72,7 @@ class PageStandardizer {
         'scripts/services/default-value-setter.js?v=1.0.0',
         'scripts/services/crud-response-handler.js?v=1.0.0',
         'scripts/services/investment-calculation-service.js?v=1.0.0',
-        'https://cdn.quilljs.com/1.3.7/quill.min.js',
+        'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js',
         'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js',
         'scripts/services/rich-text-editor-service.js?v=1.0.0',
       ],

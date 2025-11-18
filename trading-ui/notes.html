@@ -29,6 +29,14 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
+    <!-- ===== CRITICAL: Debug Mode for Button Tooltips ===== -->
+    <script>
+        // Enable debug mode for button tooltips BEFORE button-system-init.js loads
+        // This allows us to see detailed logs about tooltip processing
+        window.ButtonTooltipDebugMode = true;
+        console.log('🔍 [Button Tooltip Debug] Debug mode enabled - tooltip logs will be shown');
+    </script>
+    
     <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
     <script>
         // Define showModalSafe immediately in head to ensure it's available before HTML is parsed
@@ -89,7 +97,7 @@
                         הערות
                     </div>
                     <div class="table-actions">
-                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" data-tooltip="הצג או הסתר את אזור הסיכום" data-tooltip-placement="top" data-tooltip-trigger="hover" data-id="toggle-top-section"></button>
                     </div>
                 </div>
 
@@ -121,7 +129,9 @@
                                 data-variant="full"
                                 data-onclick="window.showModalSafe('notesModal','add')"
                                 data-text="הוסף הערה"
-                                title="הוסף הערה חדשה">
+                                data-tooltip="הוסף הערה חדשה"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
                             </button>
                             <div class="action-separator"></div>
                             <!-- Entity type filters: icons only, labels via tooltips -->
@@ -132,7 +142,6 @@
                                 data-classes="btn-sm active"
                                 data-onclick="filterNotesByRelatedObjectType('all')"
                                 data-type="all"
-                                title="הצג כל ההערות"
                                 data-tooltip="הצג כל ההערות - כל סוגי הישויות"
                                 data-tooltip-placement="top"
                                 data-tooltip-trigger="hover">
@@ -144,8 +153,7 @@
                                 data-classes="btn-sm filter-icon-btn"
                                 data-onclick="filterNotesByRelatedObjectType('account')"
                                 data-type="account"
-                                title="הערות על חשבונות"
-                                data-tooltip="סינון לפי: חשבונות"
+                                data-tooltip="סינון לפי: חשבונות מסחר"
                                 data-tooltip-placement="top"
                                 data-tooltip-trigger="hover">
                             </button>
@@ -156,7 +164,6 @@
                                 data-classes="btn-sm filter-icon-btn"
                                 data-onclick="filterNotesByRelatedObjectType('trade')"
                                 data-type="trade"
-                                title="הערות על טריידים"
                                 data-tooltip="סינון לפי: טריידים"
                                 data-tooltip-placement="top"
                                 data-tooltip-trigger="hover">
@@ -168,8 +175,7 @@
                                 data-classes="btn-sm filter-icon-btn"
                                 data-onclick="filterNotesByRelatedObjectType('trade_plan')"
                                 data-type="trade_plan"
-                                title="הערות על תוכניות השקעה"
-                                data-tooltip="סינון לפי: תוכניות"
+                                data-tooltip="סינון לפי: תוכניות השקעה"
                                 data-tooltip-placement="top"
                                 data-tooltip-trigger="hover">
                             </button>
@@ -180,14 +186,13 @@
                                 data-classes="btn-sm filter-icon-btn"
                                 data-onclick="filterNotesByRelatedObjectType('ticker')"
                                 data-type="ticker"
-                                title="הערות על טיקרים"
                                 data-tooltip="סינון לפי: טיקרים"
                                 data-tooltip-placement="top"
                                 data-tooltip-trigger="hover">
                             </button>
                             <span class="filter-separator">|</span>
                         </div>
-                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר" data-tooltip="הצג או הסתר את טבלת ההערות" data-tooltip-placement="top" data-tooltip-trigger="hover" data-id="toggle-main-section"></button>
                     </div>
 
                     <!-- Notes table -->
@@ -197,19 +202,19 @@
                                 <thead>
                                     <tr>
                                         <th class="col-linked-object">
-                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="אובייקט מקושר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 0)" ></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="אובייקט מקושר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 0)" data-tooltip="מיין לפי אובייקט מקושר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
                                         </th>
                                         <th class="col-content">
-                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תוכן" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 1)" ></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תוכן" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 1)" data-tooltip="מיין לפי תוכן ההערה" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
                                         </th>
                                         <th class="col-created">
-                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 2)" ></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 2)" data-tooltip="מיין לפי תאריך יצירה" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
                                         </th>
                                         <th class="col-attachment">
                                             קובץ מצורף
                                         </th>
                                         <th class="col-updated">
-                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="עודכן" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 4)" ></button>
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="עודכן" data-classes="btn-link sortable-header" data-onclick="window.sortTable('notes', 4)" data-tooltip="מיין לפי תאריך עדכון" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
                                         </th>
                                         <th class="col-actions actions-cell actions-1-item">
                                         </th>
@@ -325,7 +330,7 @@
     <!-- [30] Load Order: 30 -->
     <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
     <!-- [31] Load Order: 31 -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" onload="console.log('✅ Quill.js loaded from CDN'); window.QuillLoaded = true;" onerror="console.error('❌ Failed to load Quill.js from CDN');"></script> <!-- Quill.js - Rich Text Editor Library -->
     <!-- [32] Load Order: 32 -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [33] Load Order: 33 -->

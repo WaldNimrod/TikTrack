@@ -313,6 +313,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 6
       },
       {
+        file: 'services/unified-crud-service.js',
+        globalCheck: 'window.UnifiedCRUDService',
+        description: 'שירות CRUD מאוחד לכל הישויות',
+        required: true,
+        loadOrder: 6.5
+      },
+      {
         file: 'services/investment-calculation-service.js',
         globalCheck: 'window.InvestmentCalculationService',
         description: 'חישובי סכום ↔ כמות לטפסי השקעות',
@@ -348,7 +355,7 @@ const PACKAGE_MANIFEST = {
         loadOrder: 11
       },
       {
-        file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
+        file: 'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
@@ -587,7 +594,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
-        required: false,
+        required: true,
         loadOrder: 22
       },
       {

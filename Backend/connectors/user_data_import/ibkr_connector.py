@@ -465,7 +465,7 @@ class IBKRConnector(BaseConnector):
             # - Deposits & Withdrawals: Date
             # - Withholding Tax: Date or Description
             # - Transfers: Date
-            # - Borrow Fee Details: Date or Description
+            # - Borrow Fee Details: Currency symbol (e.g., USD, EUR, ILS) - NOT total
             # If third column is empty or doesn't match expected pattern, skip
             if len(values) > 2:
                 third_column_value = values[2].strip()
@@ -473,7 +473,17 @@ class IBKRConnector(BaseConnector):
                 if not third_column_value:
                     logger.debug(f"⏭️ Skipping row with empty third column in section: {current_section}")
                     continue
-                # Skip if third column looks like a summary label (not a date/description)
+                
+                # Special validation for Borrow Fee Details: third column must be a currency symbol
+                if current_section == 'Borrow Fee Details':
+                    # Currency symbols are typically 3 uppercase letters (USD, EUR, ILS, etc.)
+                    # Check if it looks like a currency symbol: 2-4 uppercase letters, no spaces, no numbers
+                    currency_pattern = re.compile(r'^[A-Z]{2,4}$')
+                    if not currency_pattern.match(third_column_value):
+                        logger.debug(f"⏭️ Skipping Borrow Fee Details row - third column is not a valid currency symbol: {third_column_value}")
+                        continue
+                
+                # Skip if third column looks like a summary label (not a date/description/currency)
                 # Summary labels typically don't contain dates or meaningful descriptions
                 if third_column_value.lower() in ['total', 'subtotal', 'summary', 'ending', 'starting']:
                     logger.debug(f"⏭️ Skipping row with summary label in third column: {third_column_value}")

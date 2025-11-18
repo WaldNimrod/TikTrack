@@ -2192,24 +2192,22 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
     // - cash_report: Summary only, not actual records
     // - cash_adjustment: Filtered out type
     
-    // TEMPORARY FOR TESTING: Skip all types except 'interest'
-    // TODO: Remove this temporary filter after testing
+    // Filter out types that should be skipped (not imported)
+    // These types are filtered out in IBKRConnector._build_cashflow_record:
+    // - dividend_accrual: Accounting entry, not actual cash movement
+    // - interest_accrual: Accounting entry, not actual cash movement
+    // - syep_activity: Activity details, not cash movement
+    // - syep_interest: Duplicate detail (already in Interest section)
+    // - cash_report: Summary only, not actual records
+    // - cash_adjustment: Filtered out type
     const skippedTypes = [
         'dividend_accrual',
         'interest_accrual',
         'syep_activity',
         'syep_interest',
         'cash_report',
-        'cash_adjustment',
-        // TEMPORARY: Skip all types except 'interest' for testing
-        'deposit',
-        'withdrawal',
-        'dividend',
-        'tax',
-        'fee',
-        'borrow_fee',
-        'forex_conversion',
-        'transfer'
+        'cash_adjustment'
+        // Note: 'interest' and 'borrow_fee' are now enabled for import
     ];
     
     // Filter out skipped types
@@ -2237,19 +2235,19 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             // are already filtered out above, so all types here are valid for import
 
             // Initialize selectedCashflowTypes if not already set
-            // TEMPORARY FOR TESTING: Only select 'interest' by default
+            // Default: select 'interest' and 'borrow_fee' by default
             if (Object.keys(selectedCashflowTypes).length === 0) {
                 entries.forEach(([key]) => {
-                    // TEMPORARY: Only select 'interest' for testing
-                    selectedCashflowTypes[key] = (key === 'interest'); // Only interest selected by default
+                    // Select 'interest' and 'borrow_fee' by default
+                    selectedCashflowTypes[key] = (key === 'interest' || key === 'borrow_fee');
                 });
             }
             
             // Get current selection state
-            // TEMPORARY FOR TESTING: Default to false (only interest should be selected)
+            // Default: select 'interest' and 'borrow_fee' by default
             const isSelected = selectedCashflowTypes[typeKey] !== undefined 
                 ? selectedCashflowTypes[typeKey] 
-                : (typeKey === 'interest'); // TEMPORARY: Only interest selected by default
+                : (typeKey === 'interest' || typeKey === 'borrow_fee');
 
             const card = document.createElement('div');
             card.className = 'analysis-card';
@@ -3695,7 +3693,43 @@ window.initializeImportUserDataModal = function() {
 };
 
 /**
+ * Wrapper function for opening import modal - clears active session before opening
+ * This is called from the button click handler
+ */
+async function openImportUserDataModalWithSessionCleanup() {
+    window.Logger.info('[Import Modal] Opening import modal with session cleanup', { page: 'import-user-data' });
+    
+    // Check for active session and clear it before opening modal
+    try {
+        const response = await fetch('/api/user-data-import/sessions/active');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.session) {
+                const sessionStatus = (data.session.status || '').toLowerCase();
+                const closedStatuses = ['completed', 'failed', 'cancelled'];
+                
+                // If session is active (not closed), clear it
+                if (!closedStatuses.includes(sessionStatus)) {
+                    window.Logger.info('[Import Modal] Active session found, clearing before opening modal', { 
+                        sessionId: data.session.id, 
+                        page: 'import-user-data' 
+                    });
+                    // Clear active session silently (no user confirmation needed)
+                    await handleSessionReset(data.session.id);
+                }
+            }
+        }
+    } catch (error) {
+        window.Logger?.warn?.('[Import Modal] Failed to check/clear active session', { error: error?.message });
+    }
+    
+    // Now open the modal
+    await openImportUserDataModal();
+}
+
+/**
  * Open import user data modal
+ * Always opens in clean state - session management happens before this is called
  */
 async function openImportUserDataModal() {
     window.Logger.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
@@ -3766,24 +3800,12 @@ async function openImportUserDataModal() {
     // Load accounts
     await loadAccounts();
     
-    // Check for active session - simple and direct
-    const hasActiveSession = await checkActiveSessionOnModalOpen();
+    // Clear any session state - modal always opens in clean state
+    currentSessionId = null;
+    window.currentSessionId = null;
+    activeSessionInfo = null;
     
     const restoredStep = applyImportModalRestoreState();
-    
-    if (activeSessionInfo?.accountId) {
-        const accountSelect = modal.querySelector('#tradingAccountSelect');
-        if (accountSelect) {
-            setSelectValue(accountSelect, activeSessionInfo.accountId);
-        }
-    }
-    
-    if (activeSessionInfo?.connector) {
-        const connectorSelect = modal.querySelector('#connectorSelect');
-        if (connectorSelect) {
-            setSelectValue(connectorSelect, activeSessionInfo.connector);
-        }
-    }
     
     // Initialize step 1
     const initialStep = restoredStep && !Number.isNaN(Number(restoredStep))
@@ -3864,8 +3886,8 @@ function closeImportUserDataModal() {
  * Reset import modal state
  */
 function resetImportModal() {
-    // Reset modal state but preserve session info
-    // Session state is managed separately by handleSessionReset() and handleSessionCompletion()
+    // Reset modal state - always opens in clean state
+    // Session management happens before modal opens (in openImportUserDataModalWithSessionCleanup)
     currentStep = 1;
     selectedFile = null;
     window.selectedFile = null; // Make it global
@@ -3884,8 +3906,7 @@ function resetImportModal() {
     clearProblemTrackingState();
     problemTrackingSessionId = null;
     
-    // Note: currentSessionId, activeSessionInfo, selectedAccount, selectedConnector
-    // are NOT cleared here - they are managed by session management functions
+    // Note: Session state is cleared in openImportUserDataModal - modal always opens in clean state
     if (window.destroyRichTextEditor) {
         try {
             window.destroyRichTextEditor(TICKER_REMARKS_EDITOR_ID);
@@ -3942,11 +3963,10 @@ function resetImportModal() {
     
     // Reset analyze button
     updateAnalyzeButton();
-    updateResetSessionButtonState();
+    // Note: Session management removed from resetImportModal - modal always opens in clean state
     resetAnalysisDisplay();
     resetPreviewDisplay();
     clearProblemSections();
-    updateActiveSessionIndicator();
     
     setAnalysisLoadingState(false);
 }
@@ -4105,11 +4125,10 @@ function goToStep(step) {
     // Load step-specific content
     if (targetStep === 1) {
         window.Logger.debug('[Import Modal] Loading step 1 content', { page: 'import-user-data' });
-        // loadStep1Content now handles fetching and displaying active session info
+        // loadStep1Content always opens in clean state - no session management
         loadStep1Content().catch(error => {
             window.Logger?.warn?.('[Import Modal] Failed to load step 1 content', { error: error?.message });
         });
-        // Note: updateActiveSessionIndicator is called inside loadStep1Content
     } else if (targetStep === 2) {
         window.Logger.debug('[Import Modal] Loading step 2 content (Analysis + Problems)', { page: 'import-user-data' });
         loadStep2Content();
@@ -4248,6 +4267,7 @@ function showStepContent(step) {
 
 /**
  * Load step 1 content (File & Account Selection)
+ * Always opens in clean state - no active session management
  */
 async function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
@@ -4255,15 +4275,25 @@ async function loadStep1Content() {
     initializeDataTypeSelector();
     await loadAccounts();
     
-    // CRITICAL: Fetch and display active session info when loading step 1
-    // This ensures the button and session details are synchronized
-    if (!currentSessionId || !activeSessionInfo) {
-        await fetchLatestActiveSession();
+    // Ensure step 1 is always in clean state - no active session indicators
+    // Hide any session-related UI elements
+    const indicator = document.getElementById('activeSessionIndicator');
+    const controlsRow = document.getElementById('activeSessionControlsRow');
+    const detailsRow = document.getElementById('activeSessionDetailsRow');
+    if (indicator) {
+        indicator.classList.add('d-none');
+        indicator.style.display = 'none';
+    }
+    if (controlsRow) {
+        controlsRow.classList.add('d-none');
+        controlsRow.style.display = 'none';
+    }
+    if (detailsRow) {
+        detailsRow.classList.add('d-none');
+        detailsRow.style.display = 'none';
     }
     
-    // Update UI with session info
-    updateActiveSessionIndicator();
-    updateResetSessionButtonState();
+    // Ensure "Continue to Analysis" button is enabled
     updateAnalyzeButton();
 }
 
@@ -4823,12 +4853,9 @@ function updateAnalyzeButton() {
         const precheckPassed = getFilePrecheckStatus() === 'success';
     const dataTypeValid = Boolean(dataTypeValue && IMPORT_DATA_TYPE_DEFINITIONS[dataTypeValue]);
     
-    // CRITICAL: Disable analyze button if there's an active session
-    // User must resume or reset the active session before starting a new one
-    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
-    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
-    
-    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && dataTypeValid && precheckPassed) && !hasActiveSession;
+    // Modal always opens in clean state - no active session check needed
+    // Session management happens before modal opens (in openImportUserDataModal)
+    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && dataTypeValid && precheckPassed);
     
         const debugInfo = {
             selectedFile: !!currentSelectedFile,
@@ -4838,7 +4865,6 @@ function updateAnalyzeButton() {
         dataTypeValue,
         dataTypeValid,
         precheckPassed,
-        hasActiveSession,
             allFieldsFilled,
             page: 'import-user-data'
     };
@@ -5320,7 +5346,7 @@ function analyzeFile() {
                 taskType: selectedDataTypeKey
             });
             updateActiveSessionFromAnalysis(data.analysis_results);
-            updateResetSessionButtonState();
+            // Note: updateResetSessionButtonState removed - session management not needed in analyzeFile
             
             // Display results
             displayAnalysisResults(data.analysis_results);
@@ -8343,7 +8369,8 @@ function getImportDebugState(symbol) {
 }
 
 // Export functions for global access
-window.openImportUserDataModal = openImportUserDataModal;
+// Export wrapper function that handles session cleanup
+window.openImportUserDataModal = openImportUserDataModalWithSessionCleanup;
 window.closeImportUserDataModal = closeImportUserDataModal;
 window.goToStep = goToStep;
 window.uploadFile = handleFileSelect;

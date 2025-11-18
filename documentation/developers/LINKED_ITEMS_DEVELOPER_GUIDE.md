@@ -316,6 +316,109 @@ describe('EntityDetailsAPI', () => {
 
 ---
 
+## Modal Configuration Loading
+
+### Integration with Package Manifest System
+
+The Linked Items System integrates fully with TikTrack's package manifest and page initialization system. Modal configurations must be loaded according to the system's loading standards.
+
+### Required Modal Configs
+
+When opening edit modals from linked items, the following modal configs must be loaded:
+
+- **notes-config.js**: Required for editing notes from linked items
+- **trades-config.js**: Required for editing trades from linked items
+- **alerts-config.js**: Required for editing alerts from linked items
+- Other entity-specific configs as needed
+
+### Loading Strategy
+
+#### Option A: Preload (Recommended)
+
+Load modal configs in the page HTML before they're needed:
+
+```html
+<!-- In trades.html -->
+<script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script>
+<script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script>
+<script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script>
+```
+
+**Advantages:**
+- Simple and direct
+- Works with existing loading system
+- No dynamic loading needed
+- Rich Text Editor initializes immediately
+
+**Package Manifest Configuration:**
+
+```javascript
+// In package-manifest.js
+{
+  file: 'modal-configs/notes-config.js',
+  globalCheck: 'window.notesModalConfig',
+  description: 'קונפיגורציית מודל הערות',
+  required: true,  // Changed from false
+  loadOrder: 22
+}
+```
+
+#### Option B: Dynamic Loading (Fallback)
+
+The system includes a fallback mechanism for dynamic loading if a modal config is not preloaded:
+
+```javascript
+// In linked-items-service.js
+// Automatically attempts to load config if not found
+// This is a fallback - preloading is preferred
+```
+
+**Note:** Dynamic loading is less reliable and may cause timing issues with Rich Text Editor initialization in nested modals.
+
+### Rich Text Editor in Nested Modals
+
+When opening edit modals (especially notes) from linked items, the modal opens as a nested modal. The Rich Text Editor requires special handling:
+
+#### Requirements
+
+1. **Modal Config Preloaded**: `notes-config.js` must be loaded in the page HTML
+2. **Quill.js Available**: Quill.js must be loaded before the modal opens
+3. **Container Visibility**: The editor container must be visible when initialized
+4. **Nested Modal Detection**: The system must detect nested modals correctly
+
+#### Configuration
+
+```javascript
+// In notes-config.js
+{
+  type: 'rich-text',
+  id: 'noteContent',
+  options: {
+    minHeight: 200,  // Required for nested modals
+    direction: 'rtl',
+    // ... other options
+  }
+}
+```
+
+#### Initialization Flow
+
+1. Modal opens as nested (detected via `ModalNavigationService` and DOM check)
+2. `modal-nested` class is applied before `modal.show()`
+3. Rich Text Editor initialization waits for modal to be fully visible
+4. Retry mechanism (5 attempts) ensures editor initializes even if container not immediately visible
+5. `minHeight` is automatically set if container has no size
+
+#### Troubleshooting Rich Text Editor
+
+**Problem**: Editor doesn't appear in nested modal
+
+**Solutions:**
+1. Ensure `notes-config.js` is loaded in page HTML
+2. Check that `minHeight` is set in field options
+3. Verify Quill.js is loaded (check `window.Quill`)
+4. Check console for visibility warnings from `RichTextEditorService`
+
 ## Troubleshooting
 
 ### Common Issues

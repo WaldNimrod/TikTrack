@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.6.0",
+    "version": "1.1.7.0",
     "major": 1,
     "minor": 1,
-    "patch": 6,
+    "patch": 7,
     "build": 0,
-    "commit": "09be00218459585316233a911e8eb36ffeca7ac0",
-    "updated_at": "2025-11-17T00:52:10+00:00",
-    "notes": "Backup verification and PostgreSQL migration updates"
+    "commit": "64e500c3670ac27aae13283697b5c0337d2289d2",
+    "updated_at": "2025-11-18T16:05:49+00:00",
+    "notes": "Complete tooltip system refactoring: static/dynamic support, unique ID generation, default mechanism"
   },
   "development": {
     "version": "1.1.24.0",

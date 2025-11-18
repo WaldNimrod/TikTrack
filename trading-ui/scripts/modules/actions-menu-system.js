@@ -316,7 +316,21 @@ class ActionsMenuSystem {
             }
             
             // Use single quotes for the data-onclick attribute value - allows double quotes inside without escaping
-            const buttonHTML = `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
+            // Convert title to data-tooltip for consistency with button system
+            // If no title provided, the button system will use default tooltip via _getDefaultTooltip
+            let tooltipText = title || '';
+            let tooltipAttrs = '';
+            
+            if (tooltipText) {
+                // Explicit tooltip provided
+                tooltipAttrs = `data-tooltip="${tooltipText}" data-tooltip-placement="top" data-tooltip-trigger="hover"`;
+            } else {
+                // No explicit tooltip - button system will use default via _getDefaultTooltip
+                // We don't add data-tooltip here, let the button system handle it
+                tooltipAttrs = `data-tooltip-placement="top" data-tooltip-trigger="hover"`;
+            }
+            
+            const buttonHTML = `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' ${tooltipAttrs} style="margin-right: 4px;">${icon}</button>`;
             actionsMenuDebugLog(`✅ [ActionsMenuSystem] Created button ${index + 1}:`, {
                 type: buttonType,
                 onclick: onclick,
@@ -328,7 +342,7 @@ class ActionsMenuSystem {
         
         const fullHTML = `
             <div class="actions-menu-wrapper">
-                <button class="btn actions-trigger" title="פעולות">⚙️</button>
+                <button class="btn actions-trigger" data-tooltip="פעולות" data-tooltip-placement="top" data-tooltip-trigger="hover">⚙️</button>
                 <div class="actions-menu-popup">
                     ${menuButtons}
                 </div>
@@ -770,12 +784,25 @@ window.createActionsMenu = function(buttons) {
             escapedOnclick = escapedOnclick.replace(/'/g, '&#39;');
         }
         actionsMenuDebugLog(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick, escapedOnclick });
-        return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' title="${title || ''}" style="margin-right: 4px;">${icon}</button>`;
+        // Convert title to data-tooltip for consistency with button system
+        // If no title provided, the button system will use default tooltip via _getDefaultTooltip
+        let tooltipText = title || '';
+        let tooltipAttrs = '';
+        
+        if (tooltipText) {
+            // Explicit tooltip provided
+            tooltipAttrs = `data-tooltip="${tooltipText}" data-tooltip-placement="top" data-tooltip-trigger="hover"`;
+        } else {
+            // No explicit tooltip - button system will use default via _getDefaultTooltip
+            tooltipAttrs = `data-tooltip-placement="top" data-tooltip-trigger="hover"`;
+        }
+        
+        return `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' ${tooltipAttrs} style="margin-right: 4px;">${icon}</button>`;
     }).join('');
     
     const fallbackHTML = `
         <div class="actions-menu-wrapper">
-            <button class="btn actions-trigger" title="פעולות">⚙️</button>
+            <button class="btn actions-trigger" data-tooltip="פעולות" data-tooltip-placement="top" data-tooltip-trigger="hover">⚙️</button>
             <div class="actions-menu-popup">
                 ${menuButtons}
             </div>

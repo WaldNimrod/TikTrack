@@ -779,12 +779,44 @@ describe('Linked Items Service', () => {
         });
 
         describe('_getDeleteFunctionForType', () => {
-            test('should return null for all types (not implemented)', () => {
+            test('should return delete function for all entity types', () => {
                 const types = ['trade', 'trade_plan', 'ticker', 'trading_account', 'alert', 'cash_flow', 'execution', 'note'];
                 types.forEach(type => {
                     const result = LinkedItemsService._getDeleteFunctionForType(type, 123);
-                    expect(result).toBeNull();
+                    expect(result).toBeDefined();
+                    expect(typeof result).toBe('string');
                 });
+            });
+            
+            test('should use UnifiedCRUDService for delete operations when specific function not available', () => {
+                // Mock UnifiedCRUDService
+                global.window.UnifiedCRUDService = {
+                    deleteEntity: jest.fn()
+                };
+                global.window.entityDetailsAPI = {
+                    deleteEntity: jest.fn()
+                };
+                global.window.checkLinkedItemsBeforeAction = jest.fn().mockResolvedValue(false);
+                
+                const result = LinkedItemsService._getDeleteFunctionForType('note', 123);
+                
+                // The generated function should reference UnifiedCRUDService
+                expect(result).toContain('UnifiedCRUDService');
+                expect(result).toContain('deleteEntity');
+            });
+            
+            test('should fallback to EntityDetailsAPI if UnifiedCRUDService not available', () => {
+                // Remove UnifiedCRUDService
+                global.window.UnifiedCRUDService = null;
+                global.window.entityDetailsAPI = {
+                    deleteEntity: jest.fn()
+                };
+                global.window.checkLinkedItemsBeforeAction = jest.fn().mockResolvedValue(false);
+                
+                const result = LinkedItemsService._getDeleteFunctionForType('note', 123);
+                
+                // The generated function should reference entityDetailsAPI as fallback
+                expect(result).toContain('entityDetailsAPI');
             });
         });
     });

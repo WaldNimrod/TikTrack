@@ -1031,15 +1031,24 @@ function updatePortfolioSummaryToggleButton() {
     const collapseIcon = window.BUTTON_ICONS?.CLOSE || '✖️';
 
     toggleBtn.textContent = isMinimal ? expandIcon : collapseIcon;
-    toggleBtn.setAttribute('title', nextActionLabel);
-    toggleBtn.setAttribute('aria-label', nextActionLabel);
-    toggleBtn.setAttribute('data-tooltip', nextActionLabel);
-    toggleBtn.setAttribute('data-bs-original-title', nextActionLabel);
-
-    if (window.bootstrap?.Tooltip) {
-        const tooltipInstance = window.bootstrap.Tooltip.getInstance(toggleBtn);
-        if (tooltipInstance) {
-            tooltipInstance.setContent({ '.tooltip-inner': nextActionLabel });
+    
+    // Use centralized updateTooltip function instead of manual updates
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.updateTooltip === 'function') {
+        window.advancedButtonSystem.updateTooltip(toggleBtn, nextActionLabel, {
+            placement: 'top',
+            trigger: 'hover'
+        });
+    } else {
+        // Fallback to manual update if button system not available
+        toggleBtn.setAttribute('title', nextActionLabel);
+        toggleBtn.setAttribute('aria-label', nextActionLabel);
+        toggleBtn.setAttribute('data-tooltip', nextActionLabel);
+        
+        if (window.bootstrap?.Tooltip) {
+            const tooltipInstance = window.bootstrap.Tooltip.getInstance(toggleBtn);
+            if (tooltipInstance) {
+                tooltipInstance.setContent({ '.tooltip-inner': nextActionLabel });
+            }
         }
     }
 }

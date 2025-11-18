@@ -4717,61 +4717,35 @@ class EntityDetailsRenderer {
             return;
         }
         
-        // Check if button system is available
-        const buttonSystemAvailable = window.advancedButtonSystem && window.advancedButtonSystem.initializeTooltips;
-        console.log(`🔍 [Tooltip Debug] Button system available:`, buttonSystemAvailable);
-        
-        if (!buttonSystemAvailable) {
-            console.warn(`🔍 [Tooltip Debug] Button system not available, attempting manual initialization`);
-            // Fallback: manual Bootstrap tooltip initialization
-            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                buttonsWithTooltip.forEach((btn) => {
-                    try {
-                        // Destroy existing tooltip if exists
-                        const existingTooltip = bootstrap.Tooltip.getInstance(btn);
-                        if (existingTooltip) {
-                            existingTooltip.dispose();
-                        }
-                        
-                        const tooltipText = btn.getAttribute('data-tooltip');
-                        const placement = btn.getAttribute('data-tooltip-placement') || 'top';
-                        const trigger = btn.getAttribute('data-tooltip-trigger') || 'hover';
-                        
-                        if (tooltipText) {
-                            new bootstrap.Tooltip(btn, {
-                                title: tooltipText,
-                                placement: placement,
-                                trigger: trigger
-                            });
-                            console.log(`🔍 [Tooltip Debug] Manually initialized tooltip for button: ${btn.id || btn.getAttribute('data-type')}`);
-                        }
-                    } catch (error) {
-                        console.error(`🔍 [Tooltip Debug] Error initializing tooltip:`, error);
-                    }
-                });
-            } else {
-                console.error(`🔍 [Tooltip Debug] Bootstrap Tooltip not available`);
-            }
-            return;
-        }
-        
-        // Wait for DOM to be ready, then use button system to initialize tooltips
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                console.log(`🔍 [Tooltip Debug] Calling initializeTooltips on container`);
-                // Use button system to initialize tooltips for buttons with data-tooltip
-                // Filter buttons don't have data-button-type, so we only initialize tooltips
-                window.advancedButtonSystem.initializeTooltips(filterContainer);
-                
-                // Verify tooltips were initialized
+        // Use centralized button system to initialize tooltips
+        // This ensures consistent tooltip handling across the entire system
+        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+            // Wait for DOM to be ready, then use button system to initialize tooltips
+            requestAnimationFrame(() => {
                 setTimeout(() => {
-                    const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
-                        bootstrap?.Tooltip?.getInstance(btn)
-                    ).length;
-                    console.log(`🔍 [Tooltip Debug] Tooltips initialized: ${initializedCount}/${buttonsWithTooltip.length}`);
-                }, 200);
-            }, 100);
-        });
+                    console.log(`🔍 [Tooltip Debug] Calling initializeTooltips on container`);
+                    // Use button system to initialize tooltips for buttons with data-tooltip
+                    // Filter buttons don't have data-button-type, so we only initialize tooltips
+                    window.advancedButtonSystem.initializeTooltips(filterContainer);
+                    
+                    // Verify tooltips were initialized
+                    setTimeout(() => {
+                        const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
+                            bootstrap?.Tooltip?.getInstance(btn)
+                        ).length;
+                        console.log(`🔍 [Tooltip Debug] Tooltips initialized: ${initializedCount}/${buttonsWithTooltip.length}`);
+                    }, 200);
+                }, 100);
+            });
+        } else {
+            console.warn(`🔍 [Tooltip Debug] Button system not available - tooltips will not be initialized`);
+            if (window.Logger) {
+                window.Logger.warn('Button system not available for tooltip initialization', { 
+                    tableId, 
+                    page: 'entity-details-renderer' 
+                });
+            }
+        }
     }
 
     _enrichLinkedItems(items = [], parentEntityType = 'entity', options = {}) {

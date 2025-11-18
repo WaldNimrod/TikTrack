@@ -515,7 +515,17 @@
             `<td class="col-imported text-center">${session.importedRecords}</td>`,
             `<td class="col-skipped text-center">${session.skippedRecords}</td>`,
             `<td class="col-created">${createdDisplay || 'לא זמין'}</td>`,
-            `<td class="col-updated">${updatedDisplay || 'לא זמין'}</td>`
+            `<td class="col-updated">${updatedDisplay || 'לא זמין'}</td>`,
+            `<td class="col-actions text-center">
+                <button data-button-type="ACTION" 
+                        data-variant="primary" 
+                        data-size="small" 
+                        data-icon="🔄" 
+                        data-text="הרצה חוזרת" 
+                        data-onclick="rerunImportSession(${session.id})" 
+                        title="הרצה חוזרת של סשן ייבוא זה"
+                        data-tooltip="הרצה חוזרת של סשן ייבוא"></button>
+            </td>`
         ].join('');
 
         return row;
@@ -794,10 +804,38 @@
         Logger.info('📊 Registered import history table with UnifiedTableSystem', { page: PAGE_NAME });
     }
 
+    /**
+     * Rerun import session - placeholder function for future implementation
+     * @function rerunImportSession
+     * @param {number} sessionId - Session ID to rerun
+     */
+    function rerunImportSession(sessionId) {
+        Logger.info('🔄 Rerun import session requested', { sessionId, page: PAGE_NAME });
+        
+        // TODO: Implement rerun logic
+        // This will:
+        // 1. Load session data from database
+        // 2. Restore file content (if available)
+        // 3. Open import modal with pre-filled data
+        // 4. Allow user to modify settings and re-import
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                'הרצה חוזרת של סשן ייבוא',
+                'פונקציה זו תיושם בקרוב. היא תאפשר להריץ מחדש סשן ייבוא קיים עם אפשרות לעדכן הגדרות.',
+                'info',
+                5000
+            );
+        } else {
+            alert(`הרצה חוזרת של סשן ייבוא #${sessionId}\n\nפונקציה זו תיושם בקרוב.`);
+        }
+    }
+
     // Expose globals for the unified initializer
     window.initializeDataImportPage = initializeDataImportPage;
     window.refreshDataImportHistory = refreshDataImportHistory;
     window.registerDataImportTable = registerDataImportTable;
+    window.rerunImportSession = rerunImportSession;
 })();
 
 

@@ -693,7 +693,26 @@ class ModalNavigationService {
       });
       return;
     }
+    
+    // בדיקה אם המודל כבר פתוח ו-visible
+    const instance = bootstrap?.Modal?.getInstance(element);
+    const isAlreadyVisible = element.classList.contains('show') && 
+                             element.style.display !== 'none' && 
+                             element.offsetParent !== null; // בדיקה שהאלמנט visible
+    
     this._setElementInstanceId(element, entry.instanceId);
+    
+    // אם המודל כבר פתוח ו-visible - רק נשלח את אירוע ה-restore
+    if (isAlreadyVisible) {
+      this._logDebug('ensureModalVisible:already-visible', {
+        modalId: entry.modalId,
+        instanceId: entry.instanceId
+      });
+      await this._dispatchRestoreEvent(element, entry, 'before-show');
+      await this._dispatchRestoreEvent(element, entry, 'after-show');
+      return;
+    }
+    
     await this._dispatchRestoreEvent(element, entry, 'before-show');
     if (!element.classList.contains('show')) {
       await new Promise(resolve => {
@@ -702,11 +721,12 @@ class ModalNavigationService {
           resolve();
         };
         element.addEventListener('shown.bs.modal', onShown, { once: true });
-        const instance = bootstrap?.Modal?.getOrCreateInstance(element, { backdrop: false });
-        if (instance?.show) {
-          instance.show();
-                } else {
+        const modalInstance = bootstrap?.Modal?.getOrCreateInstance(element, { backdrop: false });
+        if (modalInstance?.show) {
+          modalInstance.show();
+        } else {
           element.classList.add('show');
+          element.style.display = 'block';
           onShown();
         }
       });

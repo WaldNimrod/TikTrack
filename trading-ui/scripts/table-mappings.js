@@ -803,19 +803,8 @@ function getColumnValue(item, columnIndex, tableType) {
       return item.account_name || item.account_id || '';
     }
     if (fieldName === 'type') {
-      // Return type as string for proper string sorting
-      const typeValue = (item.type || '').toString();
-      // Debug logging for cash_flows type column
-      if (tableType === 'cash_flows' && columnIndex === 2) {
-        console.log(`🔍 [getColumnValue] cash_flows type:`, {
-          itemId: item.id,
-          itemType: item.type,
-          typeValue,
-          typeOf: typeof item.type,
-          columnIndex
-        });
-      }
-      return typeValue;
+      // Return type as string - generic system will handle translation via localeCompare
+      return (item.type || '').toString();
     }
     if (fieldName === 'amount') {
       // Return amount as number for proper numeric sorting

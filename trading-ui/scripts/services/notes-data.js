@@ -265,24 +265,10 @@
 
     const response = await fetch(url, buildMutationRequest({ method, payload, headers, signal }));
 
-    if (response.ok) {
-      const result = await response.json().catch(() => ({}));
-      // Determine action based on method
-      if (window.CacheSyncManager?.invalidateByAction) {
-        const action = method === 'POST' ? 'note-created' :
-                      method === 'PUT' ? 'note-updated' :
-                      method === 'DELETE' ? 'note-deleted' : 'note-updated';
-        try {
-          await window.CacheSyncManager.invalidateByAction(action);
-        } catch (error) {
-          // Fallback to direct invalidation
-          await invalidateNotesCache();
-        }
-      } else {
-        await invalidateNotesCache();
-      }
-    }
-
+    // CRITICAL: Do NOT read response.json() here - let CRUDResponseHandler handle it
+    // Reading the response body here would consume it, causing CRUDResponseHandler to fail
+    // Cache invalidation should be handled by CRUDResponseHandler or after it processes the response
+    
     return response;
   }
 

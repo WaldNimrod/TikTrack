@@ -2696,32 +2696,77 @@ function syncTickerRemarksEditorToField(modalElement) {
     }
 }
 
+function isSessionActive(status) {
+    // Check if session status indicates it's still active (not closed)
+    // Accepts both raw status (English) and translated status (Hebrew)
+    if (!status) return false;
+    const statusStr = String(status).toLowerCase();
+    
+    // Check for closed statuses first (more specific)
+    const closedStatuses = ['completed', 'failed', 'cancelled', 'הושלם', 'נכשל', 'בוטל'];
+    if (closedStatuses.some(closedStatus => statusStr === closedStatus.toLowerCase() || statusStr.includes(closedStatus.toLowerCase()))) {
+        return false;
+    }
+    
+    // Check for active statuses (both English and Hebrew)
+    const activeStatuses = [
+        'analyzing', 'ready', 'importing', 'created',
+        'ניתוח בתהליך', 'מוכן לייבוא', 'ייבוא פעיל', 'התקבל',
+        'מוכן', 'בתהליך', 'פעיל'
+    ];
+    return activeStatuses.some(activeStatus => statusStr === activeStatus.toLowerCase() || statusStr.includes(activeStatus.toLowerCase()));
+}
+
 function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
     const resumeButton = document.getElementById('resumeImportSessionBtn');
-    const hasSession = Boolean(currentSessionId);
+    // Only show buttons if there's an active (not closed) session
+    // Use raw status if available (more reliable), otherwise use translated status
+    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
+    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
 
-    if (!resetButton) {
+    // CRITICAL: Always sync button visibility with session indicator
+    // If there's no active session, hide both button and info
+    if (!hasActiveSession) {
         if (resumeButton) {
-            setElementDisplay(resumeButton, hasSession ? 'inline-flex' : 'none');
-            resumeButton.disabled = !hasSession;
-            resumeButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
+            resumeButton.classList.add('d-none');
+            resumeButton.style.display = 'none';
+            resumeButton.disabled = true;
+            resumeButton.setAttribute('aria-disabled', 'true');
         }
-        updateActiveSessionIndicator();
+        if (resetButton) {
+            resetButton.classList.add('d-none');
+            resetButton.style.display = 'none';
+            resetButton.disabled = true;
+            resetButton.setAttribute('aria-disabled', 'true');
+        }
+        // Don't call updateActiveSessionIndicator here - it will be called separately
         return;
     }
 
-    setElementDisplay(resetButton, hasSession ? 'inline-flex' : 'none');
-    resetButton.disabled = !hasSession;
-    resetButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
-
+    // If we have an active session, show buttons and ensure info is visible
     if (resumeButton) {
-        setElementDisplay(resumeButton, hasSession ? 'inline-flex' : 'none');
-        resumeButton.disabled = !hasSession;
-        resumeButton.setAttribute('aria-disabled', hasSession ? 'false' : 'true');
+        resumeButton.classList.remove('d-none');
+        resumeButton.style.display = 'inline-flex';
+        // Force display if still hidden
+        if (window.getComputedStyle(resumeButton).display === 'none') {
+            resumeButton.style.display = 'inline-flex';
+        }
+        resumeButton.disabled = false;
+        resumeButton.setAttribute('aria-disabled', 'false');
     }
-
-    updateActiveSessionIndicator();
+    if (resetButton) {
+        resetButton.classList.remove('d-none');
+        resetButton.style.display = 'inline-flex';
+        // Force display if still hidden
+        if (window.getComputedStyle(resetButton).display === 'none') {
+            resetButton.style.display = 'inline-flex';
+        }
+        resetButton.disabled = false;
+        resetButton.setAttribute('aria-disabled', 'false');
+    }
+    
+    // Ensure indicator is also visible (will be called separately, but ensure consistency)
 }
 
 function getApiErrorMessage(response, fallback = 'שגיאה לא ידועה') {
@@ -2733,9 +2778,12 @@ function getApiErrorMessage(response, fallback = 'שגיאה לא ידועה') {
 
 function updateActiveSessionInfo(updates = {}) {
     if (!currentSessionId) {
+        // IMPORTANT: Don't clear stored session automatically - allow resuming incomplete sessions
+        // Only clear if explicitly requested (e.g., after successful import or explicit reset)
         activeSessionInfo = null;
         updateActiveSessionIndicator();
-        clearStoredActiveSession();
+        // Don't clear stored session here - allow resuming
+        // clearStoredActiveSession(); // REMOVED: Allow resuming incomplete sessions
         updateImportModalNavigation();
         setActiveFileAccountNumber(null);
         return;
@@ -2821,9 +2869,13 @@ function updateActiveSessionInfo(updates = {}) {
         activeSessionInfo.status = 'ניתוח בתהליך';
     }
     
+    // Store raw status if provided (for isSessionActive check)
+    if (updates.statusRaw !== undefined) {
+        activeSessionInfo.statusRaw = updates.statusRaw;
+    }
+    
     updateActiveSessionIndicator();
     updateResetSessionButtonState();
-    persistActiveSession();
     updateImportModalNavigation();
     syncAccountAndConnectorLockState();
 }
@@ -2836,25 +2888,45 @@ function updateActiveSessionIndicator() {
         return;
     }
     
-    if (!currentSessionId || !activeSessionInfo) {
-        setElementDisplay(indicator, 'none');
+    // Check if there's an active (not closed) session
+    // Use raw status if available (more reliable), otherwise use translated status
+    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
+    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
+    
+    if (!hasActiveSession) {
+        indicator.classList.add('d-none');
+        indicator.style.display = 'none';
         indicator.setAttribute('data-has-session', 'false');
         if (controlsRow) {
-            setElementDisplay(controlsRow, 'none');
+            controlsRow.classList.add('d-none');
+            controlsRow.style.display = 'none';
         }
         if (detailsRow) {
-            setElementDisplay(detailsRow, 'none');
+            detailsRow.classList.add('d-none');
+            detailsRow.style.display = 'none';
         }
         return;
     }
     
-    setElementDisplay(indicator, 'block');
+    // Show indicator and remove d-none class
+    indicator.classList.remove('d-none');
+    indicator.style.display = 'block';
     indicator.setAttribute('data-has-session', 'true');
     if (controlsRow) {
-        setElementDisplay(controlsRow, '');
+        controlsRow.classList.remove('d-none');
+        controlsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
+        // Force display if still hidden
+        if (window.getComputedStyle(controlsRow).display === 'none') {
+            controlsRow.style.display = 'flex'; // Bootstrap row uses flex
+        }
     }
     if (detailsRow) {
-        setElementDisplay(detailsRow, '');
+        detailsRow.classList.remove('d-none');
+        detailsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
+        // Force display if still hidden
+        if (window.getComputedStyle(detailsRow).display === 'none') {
+            detailsRow.style.display = 'block'; // Bootstrap row uses block
+        }
     }
     
     const sessionIdEl = document.getElementById('activeSessionIdValue');
@@ -3042,88 +3114,92 @@ function mapSessionStatusToLabel(status) {
     return statusMap[normalized] || status;
 }
 
-function persistActiveSession() {
-    try {
-        if (!currentSessionId || !activeSessionInfo) {
-            clearStoredActiveSession();
-            return;
-        }
-        
-        const storedPayload = {
-            ...activeSessionInfo,
-            sessionId: currentSessionId,
-            persistedAt: new Date().toISOString()
-        };
-        
-        localStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, JSON.stringify(storedPayload));
-    } catch (error) {
-        window.Logger?.warn?.('[Import Modal] Failed to persist active session info', { error: error?.message });
-    }
-}
-
 /**
- * Clear stored active session from localStorage
- * 
- * Removes the active import session from localStorage and updates UI indicators.
- * Called after successful import or session reset.
- * 
- * @returns {void}
- * 
- * @example
- * // Clear session after successful import
- * clearStoredActiveSession();
- * 
- * @see {@link ACTIVE_SESSION_STORAGE_KEY} For storage key constant
- * @see {@link updateActiveSessionIndicator} For UI update
- * 
- * @since 2.0.0
- * @updated January 2025 - Part of automatic session cleanup after import
+ * Simple session management - check for active session on modal open
+ * Returns true if active session found, false otherwise
  */
-function clearStoredActiveSession() {
+async function checkActiveSessionOnModalOpen() {
     try {
-        localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY);
-    } catch (error) {
-        window.Logger?.warn?.('[Import Modal] Failed to clear stored session info', { error: error?.message });
-    }
-}
-
-async function restoreActiveSessionFromStorage() {
-    let restoredFromStorage = false;
-    try {
-        const storedValue = localStorage.getItem(ACTIVE_SESSION_STORAGE_KEY);
-        if (!storedValue) {
+        const response = await fetch('/api/user-data-import/sessions/active');
+        if (!response.ok) {
+            return false;
+        }
+        
+        const data = await response.json();
+        if (!data.session) {
+            // No active session - clear UI and allow new session
+            currentSessionId = null;
+            window.currentSessionId = null;
+            activeSessionInfo = null;
             updateActiveSessionIndicator();
-            return await fetchLatestActiveSession();
+            updateResetSessionButtonState();
+            updateAnalyzeButton();
+            return false;
         }
         
-        const parsed = JSON.parse(storedValue);
-        if (!parsed?.sessionId) {
-            clearStoredActiveSession();
-            return await fetchLatestActiveSession();
+        const session = data.session;
+        const sessionStatus = (session.status || '').toLowerCase();
+        const closedStatuses = ['completed', 'failed', 'cancelled'];
+        
+        // If session is closed, treat as no session
+        if (closedStatuses.includes(sessionStatus)) {
+            currentSessionId = null;
+            window.currentSessionId = null;
+            activeSessionInfo = null;
+            updateActiveSessionIndicator();
+            updateResetSessionButtonState();
+            updateAnalyzeButton();
+            return false;
         }
         
-        currentSessionId = parsed.sessionId;
-        window.currentSessionId = parsed.sessionId;
-        activeSessionInfo = parsed;
-        setActiveFileAccountNumber(parsed.fileAccountNumber || null);
-        selectedAccount = parsed.accountId ?? null;
-        selectedConnector = parsed.connector ?? null;
-        if (parsed.fileName) {
-            window.selectedFile = window.selectedFile || { name: parsed.fileName, size: parsed.fileSize };
-        }
+        // Active session found - load it
+        const summary = data.summary || {};
+        const fileAccountNumber = summary.file_account_number
+            ?? session.summary_data?.file_account_number
+            ?? session.file_account_number
+            ?? null;
         
+        updateSymbolMetadataCache(summary?.symbol_metadata || session.symbol_metadata);
+        currentSessionId = session.id;
+        window.currentSessionId = session.id;
+        selectedAccount = session.trading_account_id ?? null;
+        const inferredConnector = typeof session.provider === 'string'
+            ? session.provider.toLowerCase()
+            : null;
+        selectedConnector = inferredConnector;
+        
+        updateActiveSessionInfo({
+            sessionId: session.id,
+            fileName: session.file_name,
+            accountId: session.trading_account_id,
+            provider: session.provider,
+            connector: inferredConnector,
+            connectorName: session.provider,
+            status: mapSessionStatusToLabel(session.status),
+            statusRaw: session.status,
+            totalRecords: summary.total_records ?? session.total_records ?? 0,
+            readyRecords: summary.imported_records
+                ?? summary.records_to_import
+                ?? Math.max(0, (session.total_records || 0) - (session.skipped_records || 0)),
+            skipRecords: summary.records_to_skip ?? session.skipped_records ?? 0,
+            fileAccountNumber
+        });
+        
+        await fetchExistingSessionDetails(session.id);
         updateActiveSessionIndicator();
         updateResetSessionButtonState();
+        updateAnalyzeButton();
         
-        restoredFromStorage = true;
-        await fetchExistingSessionDetails(parsed.sessionId);
+        return true;
     } catch (error) {
-        window.Logger?.warn?.('[Import Modal] Failed to restore session from storage', { error: error?.message });
-        clearStoredActiveSession();
-    } finally {
-        if (!restoredFromStorage) {
-            await fetchLatestActiveSession();
-        }
+        window.Logger?.warn?.('[Import Modal] Failed to check active session', { error: error?.message });
+        currentSessionId = null;
+        window.currentSessionId = null;
+        activeSessionInfo = null;
+        updateActiveSessionIndicator();
+        updateResetSessionButtonState();
+        updateAnalyzeButton();
+        return false;
     }
 }
 
@@ -3209,6 +3285,7 @@ async function fetchExistingSessionDetails(sessionId) {
         // Update active session info with account information
         const updates = {
             status: mapSessionStatusToLabel(session.status),
+            statusRaw: session.status, // Store raw status for isSessionActive check
             totalRecords: summary.total_records ?? session.total_records ?? activeSessionInfo?.totalRecords ?? 0,
             readyRecords: summary.records_to_import ?? session.imported_records ?? activeSessionInfo?.readyRecords ?? 0,
             skipRecords: summary.records_to_skip ?? session.skipped_records ?? activeSessionInfo?.skipRecords ?? 0,
@@ -3228,6 +3305,14 @@ async function fetchExistingSessionDetails(sessionId) {
             setLinkedAccountInfo(linkedAccountInfo);
         } else if (tradingAccountId) {
             updates.accountId = tradingAccountId;
+            // Try to get account name from select if available
+            const accountSelect = document.getElementById('tradingAccountSelect');
+            if (accountSelect) {
+                const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+                if (selectedOption && selectedOption.text) {
+                    updates.accountName = selectedOption.text.trim();
+                }
+            }
         }
         
         updateActiveSessionInfo(updates);
@@ -3248,6 +3333,8 @@ async function fetchExistingSessionDetails(sessionId) {
             page: 'import-user-data'
         });
         if (currentSessionId === sessionId) {
+            // IMPORTANT: Don't clear stored session on error - allow retrying/resuming
+            // Only clear if session is explicitly invalid or user requests reset
             currentSessionId = null;
             window.currentSessionId = null;
             activeSessionInfo = null;
@@ -3255,64 +3342,11 @@ async function fetchExistingSessionDetails(sessionId) {
             updateActiveSessionIndicator();
             updateImportModalNavigation();
         }
-        clearStoredActiveSession();
+        // Don't clear stored session on error - allow resuming
+        // clearStoredActiveSession(); // REMOVED: Allow resuming after errors
     }
 }
 
-async function fetchLatestActiveSession() {
-    try {
-        const response = await fetch('/api/user-data-import/sessions/active');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        if (!(data.success || data.status === 'success')) {
-            throw new Error(data.message || 'Active session fetch failed');
-        }
-        
-        if (!data.session) {
-            return;
-        }
-        
-        const session = data.session;
-        const summary = data.summary || {};
-        const fileAccountNumber = summary.file_account_number
-            ?? session.summary_data?.file_account_number
-            ?? session.file_account_number
-            ?? null;
-        
-        updateSymbolMetadataCache(summary?.symbol_metadata || session.symbol_metadata);
-        currentSessionId = session.id;
-        window.currentSessionId = session.id;
-        selectedAccount = session.trading_account_id ?? null;
-        const inferredConnector = typeof session.provider === 'string'
-            ? session.provider.toLowerCase()
-            : null;
-        selectedConnector = inferredConnector;
-        
-        updateActiveSessionInfo({
-            sessionId: session.id,
-            fileName: session.file_name,
-            accountId: session.trading_account_id,
-            provider: session.provider,
-            connector: inferredConnector,
-            connectorName: session.provider,
-            status: mapSessionStatusToLabel(session.status),
-            totalRecords: summary.total_records ?? session.total_records ?? 0,
-            readyRecords: summary.imported_records
-                ?? summary.records_to_import
-                ?? Math.max(0, (session.total_records || 0) - (session.skipped_records || 0)),
-            skipRecords: summary.records_to_skip ?? session.skipped_records ?? 0,
-            fileAccountNumber
-        });
-        
-        updateResetSessionButtonState();
-        await fetchExistingSessionDetails(session.id);
-    } catch (error) {
-        window.Logger?.debug?.('[Import Modal] No active session detected', { error: error?.message });
-    }
-}
 
 function renderImportDate(value, fallback = '') {
     try {
@@ -3729,9 +3763,11 @@ async function openImportUserDataModal() {
         window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
     }
     
-    // Load accounts and restore active session state
+    // Load accounts
     await loadAccounts();
-    await restoreActiveSessionFromStorage();
+    
+    // Check for active session - simple and direct
+    const hasActiveSession = await checkActiveSessionOnModalOpen();
     
     const restoredStep = applyImportModalRestoreState();
     
@@ -3798,6 +3834,8 @@ function closeImportUserDataModal() {
         setTimeout(() => {
             window.refreshDataImportHistory?.();
         }, 250);
+        // Just reset modal state - don't clear session here
+        // Session state is managed by handleSessionReset() and handleSessionCompletion()
         resetImportModal();
         modal.dataset.importClosing = 'false';
     };
@@ -3826,29 +3864,28 @@ function closeImportUserDataModal() {
  * Reset import modal state
  */
 function resetImportModal() {
-    currentSessionId = null;
-    window.currentSessionId = null;
+    // Reset modal state but preserve session info
+    // Session state is managed separately by handleSessionReset() and handleSessionCompletion()
     currentStep = 1;
     selectedFile = null;
     window.selectedFile = null; // Make it global
     activeFilePrecheckRequestId += 1;
     setFilePrecheckStatus('idle', FILE_PRECHECK_STATUS_MESSAGES.idle);
-    selectedAccount = null;
-    selectedConnector = null;
     analysisResults = null;
     previewData = null;
     dataTypeAvailabilityMap = {};
     selectedDataTypeKey = 'account_reconciliation';
     pendingAccountLinking = null;
     accountLinkingModalInstance = null;
-    activeSessionInfo = null;
     pendingImportModalRestoreState = null;
     importNavigationInstanceId = null;
     accountLinkingNavigationInstanceId = null;
-    setActiveFileAccountNumber(null);
     clearSymbolMetadataCache();
     clearProblemTrackingState();
     problemTrackingSessionId = null;
+    
+    // Note: currentSessionId, activeSessionInfo, selectedAccount, selectedConnector
+    // are NOT cleared here - they are managed by session management functions
     if (window.destroyRichTextEditor) {
         try {
             window.destroyRichTextEditor(TICKER_REMARKS_EDITOR_ID);
@@ -3914,25 +3951,6 @@ function resetImportModal() {
     setAnalysisLoadingState(false);
 }
 
-function finalizeImportReset(options = {}) {
-    const { clearCache = false, reason = 'import-user-data:reset' } = options;
-    clearStoredActiveSession();
-    resetImportModal();
-    goToStep(1);
-    
-    if (clearCache) {
-        clearImportCacheLayers({ reason });
-    }
-    
-    // Re-check for any remaining active sessions after backend reset
-    setTimeout(() => {
-        fetchLatestActiveSession()?.catch?.((error) => {
-            window.Logger?.debug?.('[Import Modal] Active session refetch after reset failed', {
-                error: error?.message
-            });
-        });
-    }, 300);
-}
 
 function resetAnalysisDisplay() {
     const analysisCounters = {
@@ -4087,7 +4105,11 @@ function goToStep(step) {
     // Load step-specific content
     if (targetStep === 1) {
         window.Logger.debug('[Import Modal] Loading step 1 content', { page: 'import-user-data' });
-        loadStep1Content();
+        // loadStep1Content now handles fetching and displaying active session info
+        loadStep1Content().catch(error => {
+            window.Logger?.warn?.('[Import Modal] Failed to load step 1 content', { error: error?.message });
+        });
+        // Note: updateActiveSessionIndicator is called inside loadStep1Content
     } else if (targetStep === 2) {
         window.Logger.debug('[Import Modal] Loading step 2 content (Analysis + Problems)', { page: 'import-user-data' });
         loadStep2Content();
@@ -4227,11 +4249,20 @@ function showStepContent(step) {
 /**
  * Load step 1 content (File & Account Selection)
  */
-function loadStep1Content() {
+async function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
     // Event listeners are already set up during initialization
     initializeDataTypeSelector();
-    loadAccounts();
+    await loadAccounts();
+    
+    // CRITICAL: Fetch and display active session info when loading step 1
+    // This ensures the button and session details are synchronized
+    if (!currentSessionId || !activeSessionInfo) {
+        await fetchLatestActiveSession();
+    }
+    
+    // Update UI with session info
+    updateActiveSessionIndicator();
     updateResetSessionButtonState();
     updateAnalyzeButton();
 }
@@ -4791,7 +4822,13 @@ function updateAnalyzeButton() {
         const currentSelectedFile = selectedFile || window.selectedFile;
         const precheckPassed = getFilePrecheckStatus() === 'success';
     const dataTypeValid = Boolean(dataTypeValue && IMPORT_DATA_TYPE_DEFINITIONS[dataTypeValue]);
-    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && dataTypeValid && precheckPassed);
+    
+    // CRITICAL: Disable analyze button if there's an active session
+    // User must resume or reset the active session before starting a new one
+    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
+    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
+    
+    const allFieldsFilled = Boolean(currentSelectedFile && connectorValue && dataTypeValid && precheckPassed) && !hasActiveSession;
     
         const debugInfo = {
             selectedFile: !!currentSelectedFile,
@@ -4801,6 +4838,7 @@ function updateAnalyzeButton() {
         dataTypeValue,
         dataTypeValid,
         precheckPassed,
+        hasActiveSession,
             allFieldsFilled,
             page: 'import-user-data'
     };
@@ -5192,9 +5230,11 @@ function analyzeFile() {
     const modal = document.getElementById('importUserDataModal');
     const connectorSelect = modal?.querySelector('#connectorSelect');
     const dataTypeSelect = modal?.querySelector('#importDataTypeSelect');
+    const accountSelect = modal?.querySelector('#tradingAccountSelect');
     
     const connectorValue = connectorSelect?.value || getSelectedConnectorValue();
     const dataTypeValue = dataTypeSelect?.value || selectedDataTypeKey || 'executions';
+    const accountValue = accountSelect?.value || linkedAccountInfo?.id || activeSessionInfo?.accountId || null;
     
     // Validate values
     if (!selectedFile || !connectorValue) {
@@ -5273,7 +5313,7 @@ function analyzeFile() {
                 provider: data.provider,
                 fileName: selectedFile?.name,
                 fileSize: selectedFile?.size ?? null,
-                accountName: accountSelect?.selectedOptions?.[0]?.text?.trim(),
+                accountName: accountSelect?.selectedOptions?.[0]?.text?.trim() || linkedAccountInfo?.name || activeSessionInfo?.accountName || null,
                 accountId: accountValue,
                 connector: connectorValue,
                 connectorName: connectorSelect?.selectedOptions?.[0]?.text?.trim(),
@@ -6657,8 +6697,12 @@ function displayConfirmationData(analysisResults, previewData) {
     const taskType = (analysisResults.task_type || previewData.task_type || selectedDataTypeKey || 'executions').toLowerCase();
     
     const fileName = window.selectedFile?.name || 'קובץ לא ידוע';
+    // Get account name from multiple sources (priority: activeSessionInfo > linkedAccountInfo > select > fallback)
     const accountSelect = document.getElementById('tradingAccountSelect');
-    const accountName = accountSelect?.selectedOptions[0]?.text || 'חשבון לא ידוע';
+    const accountName = activeSessionInfo?.accountName 
+        || linkedAccountInfo?.name 
+        || accountSelect?.selectedOptions[0]?.text 
+        || 'חשבון לא ידוע';
     
     const previewSummary = previewData.summary || {};
     const analysisSummary = analysisResults.summary || {};
@@ -7311,73 +7355,42 @@ function performImport(generateReport = false) {
 
         if (apiSucceeded && importedCount > 0) {
             setAnalysisLoadingState(true, 'מסכם תהליך הייבוא...', 90);
+            
+            // Build success message
             let successMessage = `ייבוא הנתונים הושלם בהצלחה! נוספו ${importedCount} רשומות חדשות.`;
             if (skippedCount > 0) {
                 successMessage += ` ${skippedCount} רשומות הושמטו (שגיאות/כפילויות).`;
             }
-
-            showImportUserDataNotification(successMessage, 'success');
             
-            // Clear session data after successful import
-            window.Logger?.info('[Import Modal] Clearing session data after successful import', {
-                sessionId: currentSessionId,
-                importedCount,
-                page: 'import-user-data'
-            });
-            currentSessionId = null;
-            window.currentSessionId = null;
-            activeSessionInfo = null;
-            pendingAccountLinking = null;
-            analysisResults = null;
-            previewData = null;
-            selectedFile = null;
-            window.selectedFile = null;
-            clearStoredActiveSession();
-            updateResetSessionButtonState();
-            updateActiveSessionIndicator();
-            
-            closeImportUserDataModal();
-            
+            // Build details message if there are warnings
+            let detailsMessage = null;
             if (importErrors.length) {
-                const detailedMessage = importErrors
+                detailsMessage = importErrors
                     .map((message, idx) => `• (${idx + 1}) ${message}`)
                     .join('\n');
-                if (typeof window.showDetailedNotification === 'function') {
-                    window.showDetailedNotification(
-                        'ייבוא הושלם עם אזהרות',
-                        detailedMessage,
-                        'warning',
-                        12000,
-                        'import-user-data'
-                    );
+            }
+            if (generateReport && data.report_url) {
+                if (detailsMessage) {
+                    detailsMessage += '\n\nדוח ייבוא זמין להורדה.';
                 } else {
-                    showImportUserDataNotification(
-                        'ייבוא הושלם עם אזהרות. פתח את לוג המערכת לפרטים.',
-                        'warning'
-                    );
+                    detailsMessage = 'דוח ייבוא זמין להורדה.';
                 }
             }
             
-            if (generateReport && data.report_url) {
-                showImportUserDataNotification('דוח ייבוא זמין להורדה', 'info');
-            }
+            // Handle session completion
+            handleSessionCompletion('completed', successMessage, detailsMessage);
             
-            // Clear cache to show new data - use centralized cache clearing
+            // Clear cache and refresh data
             clearImportCacheLayers({ reason: 'import-user-data:execute' });
-            window.refreshDataImportHistory?.();
-            // LEGACY (pre Stage B-Lite) flow:
-            // if (typeof window.clearCacheQuick === 'function') {
-            //     window.clearCacheQuick(null, { source: 'import-user-data' });
-            // } else if (typeof window.clearAllCacheAdvanced === 'function') {
-            //     window.clearAllCacheAdvanced({ source: 'import-user-data' });
-            // }
-
             if (typeof window.loadExecutionsData === 'function') {
                 window.loadExecutionsData();
             }
+            
+            closeImportUserDataModal();
             return;
         }
 
+        // Import failed
         const errorMessage = getApiErrorMessage(
             data,
             apiSucceeded && importedCount === 0
@@ -7385,87 +7398,70 @@ function performImport(generateReport = false) {
                 : 'שגיאה בייבוא הנתונים'
         );
 
-        showImportUserDataNotification(`שגיאה בייבוא: ${errorMessage}`, 'error');
-
+        // Build error details
+        let errorDetails = null;
         if (importErrors.length) {
-            const detailedMessage = importErrors
+            errorDetails = importErrors
                 .map((message, idx) => `• (${idx + 1}) ${message}`)
                 .join('\n');
-            if (typeof window.showDetailedNotification === 'function') {
-                window.showDetailedNotification(
-                    'שגיאה בייבוא נתונים',
-                    detailedMessage,
-                    'error',
-                    15000,
-                    'import-user-data'
-                );
-            }
         }
+
+        // Handle session completion with failure
+        handleSessionCompletion('failed', errorMessage, errorDetails);
+        
+        closeImportUserDataModal();
     })
     .catch(error => {
         window.Logger.error('Import error:', error);
-        showImportUserDataNotification('שגיאה בייבוא הנתונים', 'error');
+        handleSessionCompletion('failed', 'שגיאה בייבוא הנתונים', error?.message || 'שגיאה לא ידועה');
+        closeImportUserDataModal();
     })
     .finally(() => {
         setAnalysisLoadingState(false);
-        window.refreshDataImportHistory?.();
     });
 }
 
-function confirmResetImportSession() {
-    if (!currentSessionId) {
-        finalizeImportReset({ clearCache: true });
-        showImportUserDataNotification('לא נמצא סשן ייבוא פעיל. ניתן להתחיל תהליך חדש.', 'info');
-        return;
-    }
-
-    const confirmationMessage = 'הפעולה תאפס את סשן הייבוא הנוכחי, תנקה נתוני ביניים ומטמון, ותאפשר להתחיל תהליך חדש.\nהאם להמשיך?';
-    if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-            'איפוס תהליך ייבוא',
-            confirmationMessage,
-            () => performResetImportSession(),
-            null,
-            'warning'
-        );
-    } else if (window.confirm(confirmationMessage)) {
-        performResetImportSession();
-    }
-}
-
-function performResetImportSession() {
-    const sessionId = currentSessionId;
-
+/**
+ * Handle session reset - cancels session, clears cache, refreshes UI
+ * Session is permanently closed after this operation
+ */
+async function handleSessionReset(sessionId) {
     if (!sessionId) {
-        finalizeImportReset({ clearCache: true });
-        showImportUserDataNotification('לא נמצא סשן ייבוא פעיל. ניתן להתחיל תהליך חדש.', 'info');
+        // No session to reset - just clear UI and cache
+        resetImportModal();
+        clearImportCacheLayers({ reason: 'import-user-data:reset' });
+        updateActiveSessionIndicator();
+        updateResetSessionButtonState();
+        updateAnalyzeButton();
+        goToStep(1);
         return;
     }
 
-    showImportUserDataNotification('מאפס את סשן הייבוא...', 'info');
+    try {
+        showImportUserDataNotification('מאפס את סשן הייבוא...', 'info');
 
-    fetch(`/api/user-data-import/session/${sessionId}/reset`, {
-        method: 'POST'
-    })
-    .then(async (response) => {
+        const response = await fetch(`/api/user-data-import/session/${sessionId}/reset`, {
+            method: 'POST'
+        });
         const data = await response.json().catch(() => ({}));
-        return { ok: response.ok, data };
-    })
-    .then(({ ok, data }) => {
         const success = data?.success === true || data?.status === 'success';
         const sessionNotFound = (data?.message || '').toLowerCase().includes('session not found');
 
         if (success || sessionNotFound) {
-            const cancelledSessions = Array.isArray(data?.cancelled_sessions) ? data.cancelled_sessions.length : 0;
-            window.Logger?.info?.('[Import Modal] Reset request cancelled sessions', {
-                cancelledSessions,
-                sessionIds: data?.cancelled_sessions || []
-            });
-            showImportUserDataNotification('סשן הייבוא אופס בהצלחה. ניתן להתחיל תהליך חדש.', 'success');
-            finalizeImportReset({ clearCache: true });
+            // Session cancelled successfully
+            // Clear all state, cache, and refresh UI to "no session" state
+            resetImportModal();
+            clearImportCacheLayers({ reason: 'import-user-data:reset' });
+            updateActiveSessionIndicator();
+            updateResetSessionButtonState();
+            updateAnalyzeButton();
+            goToStep(1);
+            
+            showImportUserDataNotification('סשן הייבוא בוטל בהצלחה. ניתן להתחיל תהליך חדש.', 'success');
             return;
         }
 
+        // Error resetting session
         const errorMessage = getApiErrorMessage(data, 'נכשל באיפוס סשן הייבוא');
         showImportUserDataNotification(`שגיאה באיפוס הייבוא: ${errorMessage}`, 'error');
 
@@ -7479,8 +7475,7 @@ function performResetImportSession() {
                 'import-user-data'
             );
         }
-    })
-    .catch(error => {
+    } catch (error) {
         window.Logger?.error('[Import Modal] Failed to reset import session', { error: error?.message });
         showImportUserDataNotification('שגיאה באיפוס הייבוא', 'error');
         if (typeof window.showDetailedNotification === 'function') {
@@ -7492,10 +7487,70 @@ function performResetImportSession() {
                 'import-user-data'
             );
         }
-    })
-    .finally(() => {
-        updateResetSessionButtonState();
-    });
+    }
+}
+
+/**
+ * Handle session completion - called when session ends (success, failure, or cancellation)
+ * Shows appropriate notification and clears state
+ */
+function handleSessionCompletion(status, message, details = null) {
+    // Clear session state
+    currentSessionId = null;
+    window.currentSessionId = null;
+    activeSessionInfo = null;
+    
+    // Update UI to "no session" state
+    updateActiveSessionIndicator();
+    updateResetSessionButtonState();
+    updateAnalyzeButton();
+    
+    // Show notification based on status
+    const statusMessages = {
+        'completed': { type: 'success', defaultMessage: 'ייבוא הנתונים הושלם בהצלחה' },
+        'failed': { type: 'error', defaultMessage: 'ייבוא הנתונים נכשל' },
+        'cancelled': { type: 'info', defaultMessage: 'ייבוא הנתונים בוטל' }
+    };
+    
+    const statusInfo = statusMessages[status] || { type: 'info', defaultMessage: 'ייבוא הנתונים הסתיים' };
+    const finalMessage = message || statusInfo.defaultMessage;
+    
+    showImportUserDataNotification(finalMessage, statusInfo.type);
+    
+    if (details && typeof window.showDetailedNotification === 'function') {
+        window.showDetailedNotification(
+            'פרטי ייבוא',
+            details,
+            statusInfo.type,
+            10000,
+            'import-user-data'
+        );
+    }
+    
+    // Refresh import history
+    setTimeout(() => {
+        window.refreshDataImportHistory?.();
+    }, 500);
+}
+
+function confirmResetImportSession() {
+    if (!currentSessionId) {
+        handleSessionReset(null);
+        return;
+    }
+
+    const confirmationMessage = 'הפעולה תבטל את סשן הייבוא הנוכחי, תנקה נתוני ביניים ומטמון, ותאפשר להתחיל תהליך חדש.\nהאם להמשיך?';
+    if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+            'ביטול תהליך ייבוא',
+            confirmationMessage,
+            () => handleSessionReset(currentSessionId),
+            null,
+            'warning'
+        );
+    } else if (window.confirm(confirmationMessage)) {
+        handleSessionReset(currentSessionId);
+    }
 }
 
 /**

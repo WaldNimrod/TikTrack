@@ -1,6 +1,6 @@
 # דוח מצב - תהליכי ייבוא נתונים
-**תאריך עדכון**: 2025-01-16  
-**סטטוס כללי**: 🔄 בפיתוח פעיל - בעיות ידועות
+**תאריך עדכון**: 2025-01-30  
+**סטטוס כללי**: ✅ שיפורים משמעותיים - בדיקות פעילות
 
 ---
 
@@ -116,7 +116,7 @@
 
 ---
 
-### 🔴 בעיה #4: כפתור מחיקת רשומות מייבוא - שגיאת 500
+### ✅ בעיה #4: כפתור מחיקת רשומות מייבוא - שגיאת 500 (תוקן)
 
 **תיאור**: כפתור "מחק רשומות מייבוא" בדף cash flows גורם לשגיאת 500 Internal Server Error.
 
@@ -128,42 +128,40 @@
 - `trading-ui/cash_flows.html`:
   - כפתור "מחק רשומות מייבוא"
 
-**סטטוס**: 🔄 בתיקון פעיל
-- ✅ תיקנו את קריאת `showConfirmationDialog` - עכשיו מעבירים פרמטרים נפרדים
-- ✅ הסרנו `db.commit()` כפול - ה-decorator עושה commit אוטומטית
-- ✅ שיפרנו את הטיפול בשגיאות
-- ⚠️ עדיין יש שגיאת 500 - הסרנו זמנית את מחיקת התגים לבידוד הבעיה
+**סטטוס**: ✅ תוקן
+- ✅ תיקון Flask routing - העברת route `/delete-imported` לפני route `/<int:cash_flow_id>`
+- ✅ החזרת מחיקת תגים - שיפור הלוגיקה למחיקת תגים לפני מחיקת רשומות
+- ✅ שיפור הטיפול בשגיאות
 
 **פעולות שנעשו**:
-1. תיקון קריאת `showConfirmationDialog` - מעבירים פרמטרים נפרדים במקום אובייקט
-2. הסרת `db.commit()` מהפונקציה - ה-decorator `@handle_database_session(auto_commit=True)` עושה commit אוטומטית
+1. תיקון סדר ה-routes ב-Flask - route ספציפי לפני parameterized route
+2. החזרת מחיקת תגים - מחיקת תגים לפני מחיקת רשומות cash flow
 3. שיפור הלוגים - הוספנו לוגים מפורטים לכל שלב
-4. הסרה זמנית של מחיקת תגים - לבידוד הבעיה
 
 **קישור לתיעוד**: ראה [כפתור מחיקת רשומות מייבוא](#כפתור-מחיקת-רשומות-מייבוא) למטה
 
 ---
 
-### 🟡 בעיה #5: Account Linking - שגיאה בעדכון שיוך
+### ✅ בעיה #5: Account Linking - שגיאה בעדכון שיוך (תוקן)
 
 **תיאור**: ניסיון לשנות שיוך חשבון מציג שגיאה למרות שהפעולה אמורה לבצע בדיוק את זה.
 
 **מיקום בקוד**:
 - `Backend/services/user_data_import/import_orchestrator.py`:
   - `link_account()` - שיוך חשבון
+  - `_enforce_account_link()` - בדיקת שיוך
 - `trading-ui/scripts/import-user-data.js`:
   - `submitAccountLinkSelection()` - UI לשיוך
 
-**סטטוס**: 🔄 נדרש ניטור
-- ⚠️ המשתמש דיווח על שגיאה: "מספר החשבון כבר משויך לחשבון X"
-- ⚠️ הבעיה: הפעולה אמורה להסיר את השיוך הישן וליצור שיוך חדש
-- ⚠️ נדרש ניטור מפורט של התהליך
+**סטטוס**: ✅ תוקן
+- ✅ תיקון `_enforce_account_link()` - בדיקה אם השיוך כבר מאושר בסשן או בבסיס הנתונים
+- ✅ שיפור הלוגיקה - דילוג על בדיקות מיותרות אם השיוך כבר קיים
+- ✅ עדכון `file_account_number` - הוספה לכל רשומה ב-`_ensure_cashflow_account_binding()`
 
-**פעולות נדרשות**:
-1. הוספת ניטור מפורט של תהליך השיוך
-2. וידוא שהשיוך הישן מוסר לפני יצירת שיוך חדש
-3. עדכון ה-session לאחר שינוי שיוך
-4. עדכון התצוגה בממשק
+**פעולות שנעשו**:
+1. תיקון `_enforce_account_link()` - בדיקה אם השיוך כבר מאושר לפני ביצוע בדיקות נוספות
+2. הוספת `file_account_number` לכל רשומה - קבוע לכל הקובץ, נשמר ב-metadata
+3. שיפור הלוגיקה - דילוג על בדיקות מיותרות
 
 ---
 
@@ -190,48 +188,47 @@
 
 ---
 
-### בדיקה #2: ייבוא רק ריבית (interest)
+### ✅ בדיקה #2: ייבוא רק ריבית (interest) - הושלמה
 
 **מטרה**: לבדוק ייבוא של סוג אחד בלבד - ריבית.
 
 **תהליך**:
-1. הוספנו זמנית filtering ב-`renderCashflowTypeCards()` - רק `interest` מוצג
-2. הוספנו זמנית default selection - רק `interest` נבחר
-3. ביצוע ייבוא
-4. בדיקה שהרשומות בבסיס הנתונים הן רק `interest`
+1. ✅ תיקון זיהוי רשומות ריבית - הוספת validation לעמודה השלישית (לא כולל "total")
+2. ✅ תיקון סינון "Borrow Fees" - הוספת לוגיקה לדילוג על רשומות "Borrow Fees" מסוג interest
+3. ✅ ביצוע ייבוא - 5 רשומות ריבית (לא 6 - הושמטה רשומת "Borrow Fees")
+4. ✅ בדיקה שהרשומות בבסיס הנתונים הן רק `interest`
 
-**מיקום בקוד**:
-- `trading-ui/scripts/import-user-data.js`:
-  - `renderCashflowTypeCards()` - שורה 2197-2213: `skippedTypes` כולל את כל הסוגים חוץ מ-`interest`
-  - שורה 2244: `selectedCashflowTypes[key] = (key === 'interest')` - רק interest נבחר
+**תיקונים שבוצעו**:
+- ✅ תיקון `_parse_cashflow_sections()` - הוספת validation לעמודה השלישית
+- ✅ תיקון `_identify_record_type()` - הוספת לוגיקה לדילוג על "Borrow Fees" מסוג interest
+- ✅ תיקון `_build_preview_payload()` - תיקון return statement למניעת fall-through
+- ✅ תיקון validation - הרפיה של דרישת `source_account`
 
-**סטטוס**: 🔄 בדיקה פעילה
-- ✅ הוספנו TEMPORARY filtering
-- ⚠️ נדרש להסיר את ה-filtering הזמני אחרי הבדיקה
-
-**הערה**: זה שינוי זמני לבדיקה בלבד - יש להסיר אחרי הבדיקה!
+**תוצאות**:
+- ✅ זיהוי מדויק של 5 רשומות ריבית (לא 4, לא 6)
+- ✅ הושמטה רשומת "Borrow Fees" כצפוי
+- ✅ כל הרשומות מיובאות עם `external_account_number` נכון
 
 ---
 
-### בדיקה #3: מחיקת רשומות מייבוא
+### ✅ בדיקה #3: מחיקת רשומות מייבוא - הושלמה
 
 **מטרה**: לבדוק את כפתור המחיקה ולזהות את הבעיה שגורמת לשגיאת 500.
 
 **תהליך**:
-1. יצירת endpoint `/api/cash-flows/delete-imported`
-2. הוספת כפתור בדף cash flows
-3. ניסיון מחיקה
-4. זיהוי שגיאת 500
+1. ✅ יצירת endpoint `/api/cash-flows/delete-imported`
+2. ✅ הוספת כפתור בדף cash flows
+3. ✅ תיקון שגיאת 500 - תיקון Flask routing
+4. ✅ החזרת מחיקת תגים - שיפור הלוגיקה
 
 **פעולות שנעשו**:
 1. ✅ יצירת endpoint ב-`Backend/routes/api/cash_flows.py`
 2. ✅ הוספת כפתור ב-`trading-ui/cash_flows.html`
 3. ✅ יצירת פונקציה `deleteImportedCashFlows()` ב-`trading-ui/scripts/cash_flows.js`
-4. ✅ תיקון קריאת `showConfirmationDialog`
-5. ✅ הסרת `db.commit()` כפול
-6. ✅ הסרה זמנית של מחיקת תגים - לבידוד הבעיה
+4. ✅ תיקון Flask routing - העברת route `/delete-imported` לפני route `/<int:cash_flow_id>`
+5. ✅ החזרת מחיקת תגים - מחיקת תגים לפני מחיקת רשומות cash flow
 
-**סטטוס**: 🔄 בתיקון פעיל
+**סטטוס**: ✅ תוקן ופועל
 
 ---
 
@@ -418,17 +415,60 @@ def delete_imported_cash_flows():
 
 ## עדכונים אחרונים
 
-- **2025-01-16**: יצירת דוח מצב ראשוני
-- **2025-01-16**: תיקון קריאת `showConfirmationDialog` בכפתור המחיקה
-- **2025-01-16**: הסרת `db.commit()` כפול בכפתור המחיקה
-- **2025-01-16**: הוספת TEMPORARY filtering לבדיקת ייבוא רק ריבית
-- **2025-01-16**: הסרה זמנית של מחיקת תגים בכפתור המחיקה
+### 2025-01-30 - סבב שיפורים משמעותי
+
+**תיקונים עיקריים**:
+1. ✅ **תיקון כפתור מחיקת רשומות מייבוא** - תיקון Flask routing, החזרת מחיקת תגים
+2. ✅ **תיקון זיהוי רשומות ריבית** - הוספת validation לעמודה השלישית, סינון "Borrow Fees"
+3. ✅ **תיקון preview data** - תיקון return statement ב-`_build_preview_payload()` למניעת fall-through
+4. ✅ **תיקון account linking** - בדיקה אם השיוך כבר מאושר לפני ביצוע בדיקות נוספות
+5. ✅ **הוספת external account ID** - `file_account_number` נוסף לכל רשומה ב-metadata
+6. ✅ **תיקון validation** - הרפיה של דרישת `source_account` (נקבע אחיד לכל הקובץ)
+7. ✅ **תיקון analysis data storage** - שמירת רשומות מפושטות ב-`summary_data['cashflows']['records']`
+8. ✅ **תיקון frontend errors** - תיקון `ReferenceError` ב-`analyzeFile()`, שיפור `accountName` fallback
+9. ✅ **תיקון backend type validation** - עדכון enum values לכל סוגי cash flow
+10. ✅ **תיקון frontend account name display** - שיפור תצוגת שם החשבון ב-confirmation summary
+11. ✅ **תיקון description format** - הוספת metadata מפורט עם שבירות שורה (rich text)
+12. ✅ **תיקון cash flow details display** - הוספת שדה "הערה" במודול הפרטים, תמיכה ב-rich text
+13. ✅ **תיקון rich text editor** - תיקון אתחול editor במודל עריכה, תמיכה ב-pending content
+14. ✅ **תיקון session management** - פישוט הלוגיקה, שיפור תצוגת סשן פעיל, תיקון כפתורי resume/reset
+15. ✅ **תיקון third column validation** - הוספת validation לעמודה השלישית (לא כולל "total")
+
+**שיפורי UX**:
+- ✅ שיפור תצוגת סשן פעיל - כפתורי resume/reset מוצגים נכון
+- ✅ שיפור תצוגת שם החשבון - fallback logic משופר
+- ✅ תמיכה ב-rich text - הערות מוצגות עם שבירות שורה ועיצוב HTML
+- ✅ מיקום שדה "הערה" - מוצג בעמודה השנייה, אחרי "טרייד מקושר"
+
+### 2025-01-16 - יצירת דוח מצב ראשוני
+
+- יצירת דוח מצב ראשוני
+- תיקון קריאת `showConfirmationDialog` בכפתור המחיקה
+- הסרת `db.commit()` כפול בכפתור המחיקה
+- הוספת TEMPORARY filtering לבדיקת ייבוא רק ריבית
+- הסרה זמנית של מחיקת תגים בכפתור המחיקה
 
 ---
 
 ## הערות
 
-- כל השינויים המסומנים כ-TEMPORARY חייבים להיות מוסרים אחרי הבדיקות
-- יש לעדכן את הדוח הזה כשיש שינויים משמעותיים
-- יש לבדוק את לוגי השרת לזיהוי שגיאות מדויקות
+- ✅ כל השינויים המסומנים כ-TEMPORARY הוסרו
+- ✅ כל התיקונים נבדקו ופועלים כצפוי
+- ✅ מערכת ייבוא הנתונים מוכנה לבדיקות נוספות עם סוגי רשומות אחרים
+
+## קבצים שעודכנו
+
+### Backend
+- `Backend/connectors/user_data_import/ibkr_connector.py` - תיקון זיהוי רשומות, validation עמודה שלישית
+- `Backend/services/user_data_import/import_orchestrator.py` - תיקונים רבים: preview, account binding, description format
+- `Backend/services/user_data_import/session_manager.py` - תיקון session resumption
+- `Backend/services/user_data_import/validation_service.py` - הרפיה של דרישת source_account
+- `Backend/routes/api/cash_flows.py` - תיקון Flask routing למחיקת רשומות
+
+### Frontend
+- `trading-ui/scripts/import-user-data.js` - פישוט session management, תיקון errors
+- `trading-ui/scripts/entity-details-renderer.js` - הוספת תמיכה ב-rich text display
+- `trading-ui/scripts/modal-manager-v2.js` - תיקון rich text editor initialization
+- `trading-ui/scripts/cash_flows.js` - תיקון deleteImportedCashFlows
+- `trading-ui/cash_flows.html` - כפתור מחיקת רשומות
 

@@ -4003,6 +4003,8 @@ class EntityDetailsRenderer {
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">טרייד מקושר:</label>
                     <span class="d-flex align-items-center gap-2">${tradeDisplay}</span>
                 </div>
+                
+                ${this._renderCashFlowDescriptionInline(cashFlowData)}
             </div>
         `;
     }
@@ -4162,6 +4164,46 @@ class EntityDetailsRenderer {
             'system': 'מערכת'
         };
         return translations[source] || source;
+    }
+
+    /**
+     * Render cash flow description inline - רנדור הערה של תזרים מזומנים (inline, for secondary column)
+     * Displays rich text (HTML) with line breaks support, without background
+     * 
+     * @param {Object} cashFlowData - נתוני תזרים מזומנים
+     * @returns {string} - HTML מרונדר
+     * @private
+     */
+    _renderCashFlowDescriptionInline(cashFlowData) {
+        const description = cashFlowData.description || null;
+        
+        if (!description) {
+            return ''; // Don't show empty description
+        }
+        
+        // Sanitize HTML using RichTextEditorService for safe rich text rendering
+        let descriptionHtml = '';
+        if (window.RichTextEditorService && typeof window.RichTextEditorService.sanitizeHTML === 'function') {
+            // Use RichTextEditorService sanitization for safe HTML rendering
+            const sanitizedHtml = window.RichTextEditorService.sanitizeHTML(description);
+            // Display as rich text without background - preserve formatting and line breaks
+            descriptionHtml = sanitizedHtml || '<span class="text-muted">אין תוכן</span>';
+        } else if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
+            // Fallback to text preview with line breaks
+            descriptionHtml = window.FieldRendererService.renderTextPreview(description, { maxLength: 2000, preserveLineBreaks: true });
+        } else {
+            // Last resort: escape and preserve line breaks
+            descriptionHtml = this._escapeHtml(description).replace(/\n/g, '<br>');
+        }
+        
+        return `
+                <div class="mb-3 d-flex align-items-start">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">הערה:</label>
+                    <div class="flex-grow-1 rich-text-content" style="white-space: pre-wrap; word-wrap: break-word;">
+                        ${descriptionHtml}
+                    </div>
+                </div>
+        `;
     }
 
     /**
@@ -5188,6 +5230,7 @@ class EntityDetailsRenderer {
                 : '<span class="text-muted">לא זמין</span>';
             const currencyNameDisplay = name || 'לא זמין';
 
+            
             html += `
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך:</label>
@@ -5209,6 +5252,11 @@ class EntityDetailsRenderer {
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מטבע:</label>
                     <span class="text-muted">${currencyNameDisplay}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
+                    <span class="text-muted">${createdAt}</span>
                 </div>
             `;
 

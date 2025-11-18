@@ -435,9 +435,12 @@ class ImportOrchestrator:
         )
 
         if (task_type or '').lower() == 'cashflows':
+            # Get file_account_number from session (set during account linking)
+            file_account_number = session.get_summary_data('file_account_number')
             self._ensure_cashflow_account_binding(
                 normalization_result.get('normalized_records', []),
-                session.trading_account_id
+                session.trading_account_id,
+                file_account_number=file_account_number
             )
 
         logger.info(
@@ -650,7 +653,34 @@ class ImportOrchestrator:
             )
 
         linking_confirmed = bool(session.get_summary_data('linking_confirmed'))
+        linking_status = session.get_summary_data('linking_status')
         matched_account_id = session.get_summary_data('linking_matched_account_id')
+
+        # If linking is already confirmed, skip all checks
+        if linking_confirmed and linking_status == 'confirmed':
+            # Verify that file_account_number matches what's stored
+            stored_file_account = session.get_summary_data('file_account_number')
+            if stored_file_account == file_account_number:
+                logger.info(f"✅ [ACCOUNT_LINKING] Account linking already confirmed for session {session.id}")
+                return None
+        
+        # CRITICAL: Also check if account is already linked in database (even if session not explicitly confirmed)
+        # This handles the case where confirm_account_link was called but session state wasn't fully updated
+        if file_account_number:
+            existing_binding = self.db_session.query(TradingAccount).filter(
+                TradingAccount.external_account_number == file_account_number
+            ).first()
+            if existing_binding and existing_binding.id == session.trading_account_id:
+                # Account is already linked and matches session - no need for confirmation
+                session.add_summary_data({
+                    'linking_status': 'confirmed',
+                    'linking_confirmed': True,
+                    'linking_matched_account_id': existing_binding.id,
+                    'file_account_number': file_account_number
+                })
+                self.db_session.flush()
+                logger.info(f"✅ [ACCOUNT_LINKING] Account already linked in database for session {session.id}")
+                return None
 
         if matched_account_id and not linking_confirmed:
             matched_account = self.db_session.query(TradingAccount).filter(
@@ -796,9 +826,17 @@ class ImportOrchestrator:
             
             logger.info(f"🧹 [ACCOUNT_LINKING] Removing old link: Account {old_account_id} ({old_account_name}) - external_account_number set to None")
             
-            # Commit the removal of old link first to avoid IntegrityError with unique constraint
-            self.db_session.commit()
-            logger.info(f"✅ [ACCOUNT_LINKING] Old link removed and committed successfully")
+            try:
+                # Commit the removal of old link first to avoid IntegrityError with unique constraint
+                self.db_session.commit()
+                logger.info(f"✅ [ACCOUNT_LINKING] Old link removed and committed successfully")
+            except Exception as commit_error:
+                logger.error(f"❌ [ACCOUNT_LINKING] Failed to commit old link removal: {commit_error}", exc_info=True)
+                self.db_session.rollback()
+                return {
+                    'success': False,
+                    'error': f'שגיאה בהסרת השיוך הישן: {str(commit_error)}'
+                }
             
             # Refresh the trading_account to ensure we have the latest state
             self.db_session.refresh(trading_account)
@@ -833,13 +871,28 @@ class ImportOrchestrator:
         try:
             self.db_session.commit()
             logger.info(f"✅ [ACCOUNT_LINKING] New link committed successfully")
+            
+            # Refresh session to ensure it has the latest state
+            self.db_session.refresh(session)
+            logger.info(f"🔄 [ACCOUNT_LINKING] Refreshed session state - trading_account_id={session.trading_account_id}")
         except IntegrityError as e:
             self.db_session.rollback()
             # This should not happen if we properly removed the old link above
             logger.error(f"❌ [ACCOUNT_LINKING] IntegrityError during account linking: {e}", exc_info=True)
             return {
                 'success': False,
-                'error': 'מספר החשבון כבר משויך לחשבון מסחר אחר במערכת'
+                'error': 'מספר החשבון כבר משויך לחשבון מסחר אחר במערכת',
+                'error_code': 'ACCOUNT_ALREADY_LINKED',
+                'details': str(e)
+            }
+        except Exception as e:
+            self.db_session.rollback()
+            logger.error(f"❌ [ACCOUNT_LINKING] Unexpected error during account linking: {e}", exc_info=True)
+            return {
+                'success': False,
+                'error': f'שגיאה בלתי צפויה בשיוך החשבון: {str(e)}',
+                'error_code': 'ACCOUNT_LINK_ERROR',
+                'details': str(e)
             }
 
         # STEP 4: Update session metadata
@@ -942,14 +995,22 @@ class ImportOrchestrator:
     @staticmethod
     def _ensure_cashflow_account_binding(
         normalized_records: List[Dict[str, Any]],
-        trading_account_id: Optional[int]
+        trading_account_id: Optional[int],
+        file_account_number: Optional[str] = None
     ) -> None:
         """
         Ensure that normalized cashflow records are bound to the selected trading account.
+        
+        IMPORTANT: This function sets account information that is constant for the entire file:
+        - source_account: trading_account_id (internal account ID)
+        - external_account_number: file_account_number (external account identifier from file)
+        
+        These are set during account linking and applied to all records uniformly.
 
         Args:
             normalized_records: Cashflow records after normalization
             trading_account_id: Active trading account ID for the session
+            file_account_number: External account number from file (set during account linking)
         """
         if not normalized_records or trading_account_id is None:
             return
@@ -962,9 +1023,18 @@ class ImportOrchestrator:
             if metadata is None or not isinstance(metadata, dict):
                 metadata = {}
                 record['metadata'] = metadata
+            
+            # Preserve original account if different from current
             if 'original_source_account' not in metadata and original_account not in (None, '', account_identifier):
                 metadata['original_source_account'] = original_account
+            
+            # Set internal account ID (constant for all records in file)
             record['source_account'] = account_identifier
+            
+            # Set external account number (constant for all records in file, from account linking)
+            if file_account_number:
+                record['external_account_number'] = file_account_number
+                metadata['file_account_number'] = file_account_number
 
     def _build_analysis_payload(
         self,
@@ -1035,6 +1105,45 @@ class ImportOrchestrator:
                 'cashflow_issues_by_type': validation_result.get('issues_by_type', {}),
                 'duplicate_details': duplicate_result
             }
+            
+            # CRITICAL: Extract records from clean_records for storage in analysis_data
+            clean_records = duplicate_result.get('clean_records', [])
+            cashflow_records_list = []
+            for entry in clean_records:
+                if isinstance(entry, dict) and 'record' in entry:
+                    record = entry['record']
+                    cashflow_records_list.append({
+                        'cashflow_type': record.get('cashflow_type'),
+                        'amount': record.get('amount'),
+                        'currency': record.get('currency'),
+                        'effective_date': record.get('effective_date'),
+                        'memo': record.get('memo'),
+                        'section': record.get('section'),
+                        'source_account': record.get('source_account'),
+                        'external_account_number': record.get('external_account_number'),
+                        'external_id': record.get('external_id')
+                    })
+                elif isinstance(entry, dict):
+                    cashflow_records_list.append({
+                        'cashflow_type': entry.get('cashflow_type'),
+                        'amount': entry.get('amount'),
+                        'currency': entry.get('currency'),
+                        'effective_date': entry.get('effective_date'),
+                        'memo': entry.get('memo'),
+                        'section': entry.get('section'),
+                        'source_account': entry.get('source_account'),
+                        'external_account_number': entry.get('external_account_number'),
+                        'external_id': entry.get('external_id')
+                    })
+            
+            # Add cashflows records to summary_data for frontend
+            summary_data['cashflows'] = {
+                'records': cashflow_records_list,
+                'type_stats': cashflow_summary.get('type_stats', {}),
+                'totals_by_type': cashflow_summary.get('totals_by_type', {}),
+                'totals_by_currency': cashflow_summary.get('totals_by_currency', {})
+            }
+            
             return analysis_results, summary_data
 
         if task == 'account_reconciliation':
@@ -1426,6 +1535,7 @@ class ImportOrchestrator:
         if task == 'cashflows':
             clean_records = duplicate_result.get('clean_records', [])
             records_to_import: List[Dict[str, Any]] = []
+            records_to_skip: List[Dict[str, Any]] = []
             for entry in clean_records:
                 record = entry['record']
                 cashflow_type = (record.get('cashflow_type') or '').lower()
@@ -1451,11 +1561,19 @@ class ImportOrchestrator:
                 # these are accounting entries, NOT actual cash movements, and should NOT be imported:
                 # - dividend_accrual (Change in Dividend Accruals)
                 # - interest_accrual (Change in Interest Accruals)
+                # - syep_activity (Stock Yield Enhancement Program Activity)
+                # - syep_interest (SYEP Interest Details)
+                # - cash_report (Cash Report - summary section)
                 # - FX Translation Gain/Loss (unrealized FX, not actual cash)
                 # These should be automatically skipped, not imported as 'other_positive'/'other_negative'
+                # NOTE: Most of these are already filtered in _identify_record_type (returns None),
+                # but we add an extra safety check here in case any slip through
                 skip_accounting_entries = [
                     'dividend_accrual',
                     'interest_accrual',
+                    'syep_activity',
+                    'syep_interest',
+                    'cash_report',
                     'fx_translation',
                     'cash_fx_translation_gain_loss'
                 ]
@@ -1469,6 +1587,7 @@ class ImportOrchestrator:
                         'cashflow_type': cashflow_type,
                         'message': f'Accounting entry ({cashflow_type}) - not an actual cash movement per IBKR Import Documentation'
                     })
+                    logger.debug(f"⏭️ Skipping accounting entry in preview: {cashflow_type} from section {section}")
                     continue
                 
                 # CRITICAL: Resolve storage_type BEFORE pairing forex records
@@ -1606,17 +1725,24 @@ class ImportOrchestrator:
                 # Create list of candidates with indices
                 # IMPORTANT: Match forex records by cashflow_type='forex_conversion' OR storage_type
                 # This ensures we catch all forex records, even if storage_type wasn't set yet
+                # CRITICAL: storage_type should already be resolved at this point (line 1483-1485),
+                # but we check both to be safe
                 from_indices = []
                 to_indices = []
                 for idx, rec in enumerate(records_to_import):
                     st = rec.get('storage_type')
                     cf_type = (rec.get('cashflow_type') or '').lower()
+                    amount = rec.get('amount', 0)
                     
-                    # Match by storage_type (if already resolved) OR by cashflow_type='forex_conversion'
-                    if st == from_type or (cf_type == 'forex_conversion' and rec.get('amount', 0) < 0):
+                    # Match by storage_type (preferred - should be resolved by now) OR by cashflow_type='forex_conversion'
+                    # FROM records: negative amount, storage_type='currency_exchange_from' OR cashflow_type='forex_conversion' with negative amount
+                    if st == from_type or (cf_type == 'forex_conversion' and amount < 0):
                         from_indices.append(idx)
-                    elif st == to_type or (cf_type == 'forex_conversion' and rec.get('amount', 0) > 0):
+                        logger.debug(f"✅ [PAIRING] Found FROM record at index {idx}: storage_type={st}, cashflow_type={cf_type}, amount={amount}")
+                    # TO records: positive amount, storage_type='currency_exchange_to' OR cashflow_type='forex_conversion' with positive amount
+                    elif st == to_type or (cf_type == 'forex_conversion' and amount > 0):
                         to_indices.append(idx)
+                        logger.debug(f"✅ [PAIRING] Found TO record at index {idx}: storage_type={st}, cashflow_type={cf_type}, amount={amount}")
                 
                 used_to = set()
                 for fi in from_indices:
@@ -1875,12 +2001,13 @@ class ImportOrchestrator:
                 cash_report_summary
             )
 
-            # IMPORTANT: Store selected_types in preview_data for later use (e.g., accept_duplicate)
+            # IMPORTANT: Store selected_types in preview_data for later use (e.g., accept_duplicate, execute_import)
+            # CRITICAL: selected_types must be stored here to ensure it's available in execute_import
             result = {
                 'task_type': task,
                 'records_to_import': records_to_import,
                 'records_to_skip': records_to_skip,
-                'selected_types': selected_types,  # Store for accept_duplicate filtering
+                'selected_types': selected_types or [],  # Store selected_types for filtering in execute_import and accept_duplicate
                 'summary': {
                     'total_records': len(raw_records),
                     'records_to_import': len(records_to_import),
@@ -1896,8 +2023,12 @@ class ImportOrchestrator:
                     'summary_comparison': summary_comparison  # Comparison with Cash Report
                 },
                 'cashflow_summary': cashflow_summary,
-                'cashflow_records': len(records_to_import)
+                'cashflow_records': len(records_to_import),
+                'symbol_metadata': symbol_metadata
             }
+            
+            # CRITICAL: Return result for cashflows task - don't fall through to executions code
+            return result
 
         if task == 'account_reconciliation':
             valid_records = validation_result.get('valid_records', [])
@@ -2172,6 +2303,8 @@ class ImportOrchestrator:
             summary_data_storage = self.utc_normalizer.normalize_output(summary_data_serializable)
             session.add_summary_data(summary_data_storage)
             session.add_summary_data({'task_type': normalized_task})
+            # CRITICAL: Store analysis_data for frontend (same structure as summary_data but with key 'analysis_data')
+            session.add_summary_data({'analysis_data': summary_data_storage})
             session.total_records = summary_data_raw.get('total_records', session.total_records)
             session.status = 'ready'
             session.last_activity = datetime.now(timezone.utc)
@@ -2924,7 +3057,10 @@ class ImportOrchestrator:
                     currency_id = currency.id
                     usd_rate = float(currency.usd_rate or 1.0)
 
+                # Build comprehensive description with import metadata
                 description_parts = []
+                
+                # Original memo/description from record
                 if record.get('memo'):
                     description_parts.append(str(record['memo']))
                 if record.get('target_account'):
@@ -2933,7 +3069,49 @@ class ImportOrchestrator:
                     description_parts.append(f"Asset: {record['asset_symbol']}")
                 if mapping_note:
                     description_parts.append(f"מקור תזרים: {mapping_note}")
-                description = ' | '.join(description_parts) if description_parts else None
+                
+                # Import metadata section
+                import_metadata = []
+                
+                # Module version
+                import_metadata.append("\nנוצר ע״י מודול ייבוא גרסה 1.0")
+                
+                # Session ID
+                import_metadata.append(f"\nסשן ייבוא מספר {import_session.id}")
+                
+                # Import date/time (when the import was executed)
+                from datetime import datetime, timezone
+                import_datetime = datetime.now(timezone.utc)
+                import_date_str = import_datetime.strftime("%d.%m.%Y %H:%M:%S")
+                import_metadata.append(f"\nתאריך ייבוא {import_date_str}")
+                
+                # Original report date (from file)
+                if effective_date:
+                    report_date_str = effective_date.strftime("%d.%m.%Y")
+                    import_metadata.append(f"\nתאריך דוח המקור {report_date_str}")
+                
+                # Data provider/connector
+                connector_name = import_session.provider or import_session.connector_type or 'לא זמין'
+                import_metadata.append(f"\nספק נתונים חיצוני {connector_name}")
+                
+                # External account number
+                file_account_number = import_session.get_summary_data('file_account_number')
+                if file_account_number:
+                    import_metadata.append(f"\nמספר חשבון חיצוני {file_account_number}")
+                else:
+                    import_metadata.append("\nמספר חשבון חיצוני לא זמין")
+                
+                # Combine all parts
+                # Format: original memo on first line, then metadata on new lines
+                if description_parts:
+                    # Original memo/description first
+                    original_text = ' | '.join(description_parts)
+                    # Metadata on new lines (each already has \n prefix)
+                    metadata_text = ''.join(import_metadata)
+                    description = f"{original_text}{metadata_text}"
+                else:
+                    # If no original memo, just metadata (remove first \n)
+                    description = ''.join(import_metadata).lstrip('\n')
 
                 external_id = record.get('external_id') or (
                     f"cashflow_{import_session.id}_{index + 1}"
@@ -3110,8 +3288,56 @@ class ImportOrchestrator:
                 effective_dt = self._resolve_datetime(from_rec.get('effective_date') or to_rec.get('effective_date'))
                 date_value = effective_dt.date() if effective_dt else None
                 
-                # Description
-                description = from_rec.get('memo') or to_rec.get('memo')
+                # Build comprehensive description with import metadata
+                description_parts = []
+                
+                # Original memo/description from records
+                original_memo = from_rec.get('memo') or to_rec.get('memo')
+                if original_memo:
+                    description_parts.append(str(original_memo))
+                
+                # Import metadata section
+                import_metadata = []
+                
+                # Module version
+                import_metadata.append("\nנוצר ע״י מודול ייבוא גרסה 1.0")
+                
+                # Session ID
+                import_metadata.append(f"\nסשן ייבוא מספר {import_session.id}")
+                
+                # Import date/time (when the import was executed)
+                from datetime import datetime, timezone
+                import_datetime = datetime.now(timezone.utc)
+                import_date_str = import_datetime.strftime("%d.%m.%Y %H:%M:%S")
+                import_metadata.append(f"\nתאריך ייבוא {import_date_str}")
+                
+                # Original report date (from file)
+                if date_value:
+                    report_date_str = date_value.strftime("%d.%m.%Y")
+                    import_metadata.append(f"\nתאריך דוח המקור {report_date_str}")
+                
+                # Data provider/connector
+                connector_name = import_session.provider or import_session.connector_type or 'לא זמין'
+                import_metadata.append(f"\nספק נתונים חיצוני {connector_name}")
+                
+                # External account number
+                file_account_number = import_session.get_summary_data('file_account_number')
+                if file_account_number:
+                    import_metadata.append(f"\nמספר חשבון חיצוני {file_account_number}")
+                else:
+                    import_metadata.append("\nמספר חשבון חיצוני לא זמין")
+                
+                # Combine all parts
+                # Format: original memo on first line, then metadata on new lines
+                if description_parts:
+                    # Original memo/description first
+                    original_text = ' | '.join(description_parts)
+                    # Metadata on new lines (each already has \n prefix)
+                    metadata_text = ''.join(import_metadata)
+                    description = f"{original_text}{metadata_text}"
+                else:
+                    # If no original memo, just metadata (remove first \n)
+                    description = ''.join(import_metadata).lstrip('\n')
                 
                 # Fee amount - extract from record.commission (set by IBKR connector from Comm/Fee field)
                 # Commission is stored directly in the record, not in metadata

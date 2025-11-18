@@ -10,13 +10,13 @@
     "notes": "Backup verification and PostgreSQL migration updates"
   },
   "development": {
-    "version": "1.1.23.0",
+    "version": "1.1.24.0",
     "major": 1,
     "minor": 1,
-    "patch": 23,
+    "patch": 24,
     "build": 0,
-    "commit": "91db23719cbffa885b60265e78e44c46b03f0161",
-    "updated_at": "2025-11-17T22:20:31+00:00",
-    "notes": "Implement generic table count update function across all pages"
+    "commit": "30bc262d3d382e89ee867818e27dfd3cf9e9ae80",
+    "updated_at": "2025-11-18T15:19:07+00:00",
+    "notes": "IBKR import system improvements: record classification, session management, rich text support"
   }
 }

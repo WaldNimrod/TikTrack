@@ -1464,6 +1464,53 @@ class ModalManagerV2 {
             }
             
             modalElement.dataset.modalMode = mode;
+            
+            // בדיקה אם המודל נפתח כמודל מקונן (לפני modal.show())
+            // בדיקה כפולה: גם ב-ModalNavigationService וגם ישירות ב-DOM
+            let isNested = false;
+            
+            // בדיקה 1: ModalNavigationService stack
+            if (window.ModalNavigationService && 
+                window.ModalNavigationService.getStack && 
+                typeof window.ModalNavigationService.getStack === 'function') {
+                const stack = window.ModalNavigationService.getStack();
+                isNested = stack.length > 0;
+            }
+            
+            // בדיקה 2: ישירות ב-DOM - אם יש מודל אחר עם class 'show' (חשוב למודלים שנפתחים לפני רישום)
+            if (!isNested) {
+                const otherOpenModals = document.querySelectorAll('.modal.show');
+                // נבדוק אם יש מודל אחר פתוח (לא המודל הנוכחי)
+                for (const otherModal of otherOpenModals) {
+                    if (otherModal !== modalElement && otherModal.id !== modalId) {
+                        isNested = true;
+                        window.Logger?.debug(`Modal ${modalId} detected as nested via DOM check (other modal: ${otherModal.id})`, {
+                            modalId,
+                            otherModalId: otherModal.id,
+                            page: 'modal-manager-v2'
+                        });
+                        break;
+                    }
+                }
+            }
+            
+            // הוספת modal-nested class אם נפתח כמודל מקונן (לפני modal.show())
+            if (isNested && modalElement) {
+                modalElement.classList.add('modal-nested', 'modal-nested-level-2');
+                // הגדרת offset גבוה יותר למודל מקונן (40 במקום 20)
+                modalElement.style.setProperty('--modal-nested-offset', '40');
+                window.Logger?.debug(`Modal ${modalId} marked as nested before show()`, {
+                    modalId,
+                    stackLength: window.ModalNavigationService?.getStack?.()?.length || 0,
+                    domCheck: true,
+                    page: 'modal-manager-v2'
+                });
+            } else if (modalElement) {
+                // הסרת modal-nested אם לא מקונן
+                modalElement.classList.remove('modal-nested', 'modal-nested-level-2');
+                modalElement.style.removeProperty('--modal-nested-offset');
+            }
+            
             modal.show();
             this.bindDismissButtons(modalElement);
             this.ensureGlobalBackdrop();
@@ -1515,10 +1562,340 @@ class ModalManagerV2 {
             // בדיקה שהמודל נפתח בהצלחה
             console.log(`✅ Modal ${modalId} shown successfully`);
             
-            // אתחול rich-text editors (חייב להיות אחרי שהמודל נפתח)
-            // צריך לחכות קצת כדי שהמודל יוצג במלואו
-            setTimeout(async () => {
-                await this.initializeRichTextEditors(modalElement, modalInfo.config);
+            // פונקציה לבדיקה שהמודל גלוי לחלוטין (חשוב למודולים מקוננים)
+            const checkModalFullyVisible = () => {
+                // בדיקה שהמודל באמת גלוי (לא רק עם class 'show')
+                const isFullyVisible = modalElement.classList.contains('show') && 
+                                      modalElement.style.display !== 'none' &&
+                                      modalElement.offsetParent !== null &&
+                                      modalElement.offsetWidth > 0 &&
+                                      modalElement.offsetHeight > 0 &&
+                                      getComputedStyle(modalElement).visibility !== 'hidden' &&
+                                      getComputedStyle(modalElement).opacity !== '0';
+                return isFullyVisible;
+            };
+            
+            // פונקציה לבדיקת visibility עם MutationObserver (למודולים מקוננים)
+            const checkVisibilityWithObserver = (container, callback, timeout = 2000) => {
+                if (!container) {
+                    callback(false);
+                    return;
+                }
+                
+                // בדיקה מיידית
+                if (checkContainerVisible(container)) {
+                    callback(true);
+                    return;
+                }
+                
+                // שימוש ב-MutationObserver לבדיקת שינויים ב-DOM
+                const observer = new MutationObserver(() => {
+                    if (checkContainerVisible(container)) {
+                        observer.disconnect();
+                        callback(true);
+                    }
+                });
+                
+                // מעקב אחרי שינויים ב-parent element
+                const parentElement = container.parentElement || container.closest('.modal-body') || modalElement;
+                if (parentElement) {
+                    observer.observe(parentElement, { 
+                        attributes: true, 
+                        attributeFilter: ['style', 'class'],
+                        childList: true, 
+                        subtree: true 
+                    });
+                }
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    observer.disconnect();
+                    const isVisible = checkContainerVisible(container);
+                    callback(isVisible);
+                }, timeout);
+            };
+            
+            // פונקציה לבדיקת visibility של container
+            const checkContainerVisible = (container) => {
+                if (!container) return false;
+                return container.offsetParent !== null && 
+                       container.style.display !== 'none' && 
+                       !container.classList.contains('d-none') &&
+                       container.offsetWidth > 0 && 
+                       container.offsetHeight > 0 &&
+                       getComputedStyle(container).visibility !== 'hidden' &&
+                       getComputedStyle(container).opacity !== '0';
+            };
+            
+            // אתחול rich-text editors (חייב להיות אחרי שהמודל נפתח במלואו)
+            // משתמש באירוע shown.bs.modal כדי להבטיח שהמודל גלוי לחלוטין
+            const initializeRichTextEditorsHandler = async () => {
+                // בדיקה אם המודל מקונן (חייב לבדוק מחדש כי זה רץ אחרי shown.bs.modal)
+                const isNested = modalElement.classList.contains('modal-nested') || 
+                                (window.ModalNavigationService && 
+                                 window.ModalNavigationService.getStack && 
+                                 typeof window.ModalNavigationService.getStack === 'function' &&
+                                 window.ModalNavigationService.getStack().length > 1);
+                
+                // המתנה קצרה נוספת כדי להבטיח שהדום מוכן והקונטיינרים גלויים
+                // במודולים מקוננים, צריך יותר זמן
+                const waitTime = isNested ? 500 : 150; // הגדלה ל-500ms למודולים מקוננים
+                
+                // שימוש ב-requestAnimationFrame למודולים מקוננים
+                if (isNested) {
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+                
+                // בדיקה נוספת שהמודל עדיין גלוי
+                // CRITICAL: אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                const hasShowClass = modalElement.classList.contains('show');
+                const isVisible = checkModalFullyVisible();
+                
+                if (!isVisible && !hasShowClass) {
+                    window.Logger?.warn(`Modal ${modalId} is not fully visible, waiting for shown.bs.modal event...`, {
+                        modalId,
+                        isNested,
+                        visibility: {
+                            hasShowClass: modalElement.classList.contains('show'),
+                            display: modalElement.style.display,
+                            offsetParent: modalElement.offsetParent !== null,
+                            offsetWidth: modalElement.offsetWidth,
+                            offsetHeight: modalElement.offsetHeight,
+                            computedVisibility: getComputedStyle(modalElement).visibility,
+                            computedOpacity: getComputedStyle(modalElement).opacity
+                        },
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // אם המודל לא גלוי, נמתין לאירוע עם retry mechanism
+                    let retryCount = 0;
+                    const maxRetries = 3;
+                    const retryHandler = async () => {
+                        retryCount++;
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        if (checkModalFullyVisible() || modalElement.classList.contains('show')) {
+                            initializeRichTextEditorsHandler();
+                        } else if (retryCount < maxRetries) {
+                            modalElement.addEventListener('shown.bs.modal', retryHandler, { once: true });
+                        } else {
+                            window.Logger?.warn(`Modal ${modalId} still not visible after ${maxRetries} retries, attempting initialization anyway`, {
+                                modalId,
+                                page: 'modal-manager-v2'
+                            });
+                            // ננסה בכל זאת
+                            initializeRichTextEditorsHandler();
+                        }
+                    };
+                    modalElement.addEventListener('shown.bs.modal', retryHandler, { once: true });
+                    return;
+                }
+                
+                // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                if (!isVisible && hasShowClass) {
+                    window.Logger?.warn(`Modal ${modalId} has 'show' class but visibility check failed, attempting initialization anyway`, {
+                        modalId,
+                        page: 'modal-manager-v2'
+                    });
+                    // נמשיך לאתחל למרות שהבדיקה לא עברה
+                }
+                
+                // בדיקה ש-Quill.js נטען (אם לא, נמתין עד 2 שניות)
+                let quillCheckRetries = 20;
+                while (quillCheckRetries > 0 && typeof window.Quill === 'undefined') {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    quillCheckRetries--;
+                }
+                
+                // אם Quill.js עדיין לא נטען, ננסה לטעון אותו דינמית
+                if (typeof window.Quill === 'undefined') {
+                    console.warn('⚠️ Quill.js not found, attempting to load dynamically...');
+                    try {
+                        await new Promise((resolve, reject) => {
+                            // בדיקה אם כבר יש script tag
+                            const existingScript = document.querySelector('script[src*="quill"]');
+                            if (existingScript) {
+                                console.log('🔍 Found existing Quill.js script tag, waiting for it to load...');
+                                // אם יש script tag, נמתין שהוא יסתיים
+                                const checkQuill = () => {
+                                    if (typeof window.Quill !== 'undefined') {
+                                        console.log('✅ Quill.js loaded from existing script tag');
+                                        resolve();
+                                    }
+                                };
+                                
+                                // בדיקה מיידית
+                                checkQuill();
+                                
+                                // אם כבר נטען, נבדוק שוב
+                                if (existingScript.complete || existingScript.readyState === 'complete') {
+                                    // Script כבר נטען
+                                    setTimeout(() => {
+                                        if (typeof window.Quill !== 'undefined') {
+                                            resolve();
+                                        } else {
+                                            reject(new Error('Quill.js script tag exists but window.Quill is still undefined'));
+                                        }
+                                    }, 100);
+                                } else {
+                                    // נמתין לטעינה
+                                    existingScript.addEventListener('load', () => {
+                                        setTimeout(checkQuill, 100);
+                                    });
+                                    existingScript.addEventListener('error', (e) => {
+                                        console.error('❌ Error loading Quill.js from existing script tag:', e);
+                                        reject(new Error('Failed to load Quill.js from existing script tag'));
+                                    });
+                                    
+                                    // Timeout אחרי 5 שניות
+                                    setTimeout(() => {
+                                        if (typeof window.Quill === 'undefined') {
+                                            reject(new Error('Timeout waiting for Quill.js to load from existing script tag'));
+                                        }
+                                    }, 5000);
+                                }
+                            } else {
+                                console.log('🔍 No existing Quill.js script tag found, creating new one...');
+                                // אם אין script tag, ניצור אחד
+                                const script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js';
+                                script.async = false; // לא async כדי להבטיח סדר טעינה
+                                script.onload = () => {
+                                    setTimeout(() => {
+                                        if (typeof window.Quill !== 'undefined') {
+                                            console.log('✅ Quill.js loaded dynamically');
+                                            resolve();
+                                        } else {
+                                            reject(new Error('Quill.js script loaded but window.Quill is still undefined'));
+                                        }
+                                    }, 100);
+                                };
+                                script.onerror = (e) => {
+                                    console.error('❌ Error loading Quill.js dynamically:', e);
+                                    reject(new Error('Failed to load Quill.js from CDN'));
+                                };
+                                document.head.appendChild(script);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('❌ Failed to load Quill.js dynamically:', error);
+                        console.error('❌ Rich-text editors will not be initialized.');
+                        return;
+                    }
+                }
+                
+                // בדיקה סופית
+                if (typeof window.Quill === 'undefined') {
+                    console.error('❌ Quill.js not available after all attempts. Rich-text editors will not be initialized.');
+                    return;
+                }
+                
+                // ניסיון אתחול עם retry אם הקונטיינרים עדיין לא גלויים
+                // למודולים מקוננים, נשתמש ב-MutationObserver
+                const allFields = [];
+                if (modalInfo.config.fields && Array.isArray(modalInfo.config.fields)) {
+                    allFields.push(...modalInfo.config.fields);
+                }
+                if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs)) {
+                    modalInfo.config.tabs.forEach(tab => {
+                        if (tab.fields && Array.isArray(tab.fields)) {
+                            allFields.push(...tab.fields);
+                        }
+                    });
+                }
+                
+                const richTextFields = allFields.filter(f => f.type === 'rich-text');
+                
+                if (richTextFields.length === 0) {
+                    window.Logger?.debug('No rich-text fields found in modal config', { modalId, page: 'modal-manager-v2' });
+                    return;
+                }
+                
+                // למודולים מקוננים, נשתמש ב-retry mechanism משופר
+                if (isNested && richTextFields.length > 0) {
+                    window.Logger?.debug('Using enhanced retry mechanism for nested modal rich-text initialization', {
+                        modalId,
+                        richTextFieldsCount: richTextFields.length,
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // למודולים מקוננים, ננסה יותר פעמים עם המתנות ארוכות יותר
+                    let retries = 5; // יותר retries למודולים מקוננים
+                    let allInitialized = false;
+                    
+                    while (retries > 0 && !allInitialized) {
+                        // ננסה לאתחל את כל העורכים
+                        await this.initializeRichTextEditors(modalElement, modalInfo.config);
+                        
+                        // בדיקה אם כל העורכים אותחלו
+                        allInitialized = richTextFields.every(field => {
+                            const container = modalElement.querySelector(`#${field.id}`);
+                            if (!container) return false;
+                            return container.querySelector('.ql-container') || window.RichTextEditorService?.getEditorInstance(field.id);
+                        });
+                        
+                        if (allInitialized) {
+                            window.Logger?.info(`All rich-text editors initialized successfully for nested modal ${modalId}`, {
+                                modalId,
+                                attempts: 6 - retries,
+                                page: 'modal-manager-v2'
+                            });
+                            break;
+                        }
+                        
+                        retries--;
+                        if (retries > 0) {
+                            window.Logger?.warn(`Some rich-text editors not initialized in nested modal, retrying... (${retries} attempts left)`, {
+                                modalId,
+                                failedFields: richTextFields.filter(field => {
+                                    const container = modalElement.querySelector(`#${field.id}`);
+                                    if (!container) return true;
+                                    return !container.querySelector('.ql-container') && !window.RichTextEditorService?.getEditorInstance(field.id);
+                                }).map(f => f.id),
+                                page: 'modal-manager-v2'
+                            });
+                            // המתנה ארוכה יותר למודולים מקוננים
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                        }
+                    }
+                    
+                    if (!allInitialized) {
+                        window.Logger?.error(`Failed to initialize all rich-text editors in nested modal ${modalId} after all retries`, {
+                            modalId,
+                            totalFields: richTextFields.length,
+                            failedFields: richTextFields.filter(field => {
+                                const container = modalElement.querySelector(`#${field.id}`);
+                                if (!container) return true;
+                                return !container.querySelector('.ql-container') && !window.RichTextEditorService?.getEditorInstance(field.id);
+                            }).map(f => f.id),
+                            page: 'modal-manager-v2'
+                        });
+                    }
+                } else {
+                    // למודולים רגילים, נשתמש ב-retry mechanism הקיים
+                    let retries = 3;
+                    while (retries > 0) {
+                        await this.initializeRichTextEditors(modalElement, modalInfo.config);
+                        
+                        const allInitialized = richTextFields.every(field => {
+                            const container = modalElement.querySelector(`#${field.id}`);
+                            return container && (container.querySelector('.ql-container') || window.RichTextEditorService?.getEditorInstance(field.id));
+                        });
+                        
+                        if (allInitialized || retries === 1) {
+                            break;
+                        }
+                        
+                        retries--;
+                        window.Logger?.warn(`Some rich-text editors not initialized, retrying... (${retries} attempts left)`, {
+                            modalId,
+                            page: 'modal-manager-v2'
+                        });
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                }
                 
                 // אם במצב edit, צריך למלא את התוכן אחרי שהעורך אותחל
                 // populateForm נקרא לפני modal.show(), אז צריך למלא שוב אחרי אתחול העורך
@@ -1555,7 +1932,54 @@ class ModalManagerV2 {
                         }
                     }
                 }
-            }, 150);
+            };
+            
+            // אם המודל כבר מוצג לחלוטין, נמתין קצת ואז נאתחל
+            // למודולים מקוננים, נשתמש ב-requestAnimationFrame + setTimeout ארוך יותר
+            // CRITICAL: גם אם המודל לא עובר את הבדיקה המלאה, אם יש class 'show', ננסה לאתחל
+            const hasShowClass = modalElement.classList.contains('show');
+            const isFullyVisible = checkModalFullyVisible();
+            
+            if (isFullyVisible || hasShowClass) {
+                const isNested = modalElement.classList.contains('modal-nested') || 
+                                (window.ModalNavigationService && 
+                                 window.ModalNavigationService.getStack && 
+                                 typeof window.ModalNavigationService.getStack === 'function' &&
+                                 window.ModalNavigationService.getStack().length > 1);
+                const delay = isNested ? 800 : 300; // הגדלה ל-800ms למודולים מקוננים
+                
+                // למודולים מקוננים, נשתמש ב-requestAnimationFrame + setTimeout
+                if (isNested) {
+                    // המתנה עם requestAnimationFrame + setTimeout ארוך יותר
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            setTimeout(() => {
+                                // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                                if (checkModalFullyVisible() || modalElement.classList.contains('show')) {
+                                    initializeRichTextEditorsHandler();
+                                } else {
+                                    // אם המודל לא גלוי, נשתמש ב-event
+                                    modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
+                                }
+                            }, delay);
+                        });
+                    });
+                } else {
+                    // המתנה קצרה נוספת כדי להבטיח שהמודל באמת מוכן
+                    setTimeout(() => {
+                        // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                        if (checkModalFullyVisible() || modalElement.classList.contains('show')) {
+                            initializeRichTextEditorsHandler();
+                        } else {
+                            // אם המודל לא גלוי, נשתמש ב-event
+                            modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
+                        }
+                    }, delay);
+                }
+            } else {
+                // אחרת, המתן לאירוע shown.bs.modal
+                modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
+            }
             
             const navigationMetadata = {
                 modalId,
@@ -2127,6 +2551,7 @@ class ModalManagerV2 {
                             placeholder: options.placeholder || field.placeholder || 'הכנס תוכן כאן...',
                             direction: options.direction || 'rtl',
                             maxLength: options.maxLength || field.maxLength,
+                            minHeight: options.minHeight, // גובה מינימלי למודולים מקוננים
                             modules: {
                                 toolbar: options.toolbar || [
                                     [{ 'header': [2, 3, false] }],
@@ -2145,8 +2570,10 @@ class ModalManagerV2 {
                         const quill = window.RichTextEditorService.initEditor(field.id, editorOptions);
                         if (quill) {
                             console.log(`✅ Rich-text editor "${field.id}" initialized successfully`);
+                            // Check for pending content (set by populateForm before editor was initialized)
                             if (container.dataset.pendingContent !== undefined) {
                                 const pendingHtml = container.dataset.pendingContent || '';
+                                console.log(`📝 Loading pending content for ${field.id}:`, pendingHtml.substring(0, 100) + '...');
                                 this._setRichTextContent(field.id, pendingHtml, pendingHtml ? {} : { clearAutoMessage: true });
                                 delete container.dataset.pendingContent;
                             }
@@ -2215,6 +2642,27 @@ class ModalManagerV2 {
         // Field mapping for different entities
         const fieldMapping = this.getFieldMapping(config?.entityType);
         console.log('📝 populateForm - field mapping:', fieldMapping);
+        
+        // Get all field configs to check for rich-text fields
+        const allFieldConfigs = [];
+        if (config?.fields && Array.isArray(config.fields)) {
+            allFieldConfigs.push(...config.fields);
+        }
+        if (config?.tabs && Array.isArray(config.tabs)) {
+            config.tabs.forEach(tab => {
+                if (tab.fields && Array.isArray(tab.fields)) {
+                    allFieldConfigs.push(...tab.fields);
+                }
+            });
+        }
+        
+        // Create a map of field IDs to their configs for quick lookup
+        const fieldConfigMap = new Map();
+        allFieldConfigs.forEach(fieldConfig => {
+            if (fieldConfig.id) {
+                fieldConfigMap.set(fieldConfig.id, fieldConfig);
+            }
+        });
         
                 // Fields to ignore (metadata/relationship fields)
         const fieldsToIgnore = ['id', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
@@ -2493,17 +2941,22 @@ class ModalManagerV2 {
                     } else if (selectValue && field.value === selectValue) {
                         console.log(`✅ VERIFIED: field.value matches selectValue (${selectValue}) for ${field.id}`);
                     }                                                                            
-                } else if (field.classList && field.classList.contains('rich-text-editor-container')) {
+                } else if ((field.classList && field.classList.contains('rich-text-editor-container')) || 
+                           (fieldConfigMap.has(field.id) && fieldConfigMap.get(field.id).type === 'rich-text')) {
                     // Rich text editor - use RichTextEditorService
+                    // Check both by class and by field config to ensure we catch all rich-text fields
                     if (window.RichTextEditorService && typeof window.RichTextEditorService.getEditorInstance === 'function') {
                         const editor = window.RichTextEditorService.getEditorInstance(field.id);
                         if (editor) {
                             this._setRichTextContent(field.id, value || '', value ? {} : { clearAutoMessage: true });
                             console.log(`📝 Set rich-text field ${field.id} to: ${value || ''}`);
                         } else {
+                            // Editor not initialized yet - store content for later
                             field.dataset.pendingContent = value || '';
+                            console.log(`⏳ Rich-text editor ${field.id} not initialized yet, storing pending content`);
                         }
                     } else {
+                        // RichTextEditorService not available - store content for later
                         field.dataset.pendingContent = value || '';
                         console.warn(`⚠️ RichTextEditorService not available for field ${field.id}, storing pending content`);
                     }

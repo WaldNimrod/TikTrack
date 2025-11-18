@@ -307,11 +307,11 @@ class ImportSessionManager:
         Get the latest active import session (ready/importing/analyzing).
         
         Excludes completed, failed, and cancelled sessions.
-        Also excludes very old sessions (older than 24 hours) that are stuck in analyzing/ready state.
-        Excludes legacy sessions without created_at timestamp.
+        Allows resuming sessions regardless of age - users should be able to continue
+        incomplete sessions even if they are older than 24 hours.
         
-        This method implements smart filtering to prevent old stuck sessions from being
-        returned as active, ensuring users don't see stale import sessions.
+        This method allows users to resume incomplete import sessions, which is
+        important for user experience when the import process is interrupted.
         
         Args:
             statuses: Optional list of statuses to consider active.
@@ -327,16 +327,16 @@ class ImportSessionManager:
             ...     print(f"Active session: {session.id}")
             
         Note:
-            - Only returns sessions created in the last 24 hours
-            - Excludes sessions without created_at (legacy sessions)
-            - Excludes completed, failed, and cancelled sessions
+            - Returns sessions with active statuses regardless of age
+            - Excludes only completed, failed, and cancelled sessions
+            - Allows resuming incomplete sessions even if old
             
         See Also:
             - cleanup_old_sessions() for periodic cleanup
             - ImportSession.status for valid status values
             
         Updated:
-            January 2025 - Added filtering for old sessions and legacy sessions
+            January 2025 - Removed 24-hour cutoff to allow resuming old incomplete sessions
         """
         try:
             active_statuses = statuses or ['importing', 'ready', 'analyzing']
@@ -344,17 +344,13 @@ class ImportSessionManager:
             # Exclude completed, failed, and cancelled sessions
             excluded_statuses = ['completed', 'failed', 'cancelled']
             
-            # Also exclude very old sessions (older than 24 hours) that are stuck
-            from datetime import datetime, timedelta
-            cutoff_time = datetime.now() - timedelta(hours=24)
-            
+            # IMPORTANT: Allow resuming sessions regardless of age
+            # Users should be able to continue incomplete sessions even if they are old
+            # We no longer filter by created_at - if a session has an active status,
+            # it should be resumable regardless of when it was created
             session = self.db_session.query(ImportSession).filter(
                 ImportSession.status.in_(active_statuses),
-                ~ImportSession.status.in_(excluded_statuses),
-                # Only include sessions created in the last 24 hours
-                # Exclude sessions without created_at (they are old legacy sessions)
-                ImportSession.created_at.isnot(None),
-                ImportSession.created_at >= cutoff_time
+                ~ImportSession.status.in_(excluded_statuses)
             ).order_by(desc(ImportSession.id)).first()
             
             if session:

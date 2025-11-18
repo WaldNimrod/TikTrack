@@ -385,13 +385,15 @@ class IBKRConnector(BaseConnector):
             amount, _ = self._extract_amount_and_currency(row, section_key)
             return 'deposit' if amount and amount > 0 else 'withdrawal'
         
-        # Special case 2: interest -> check if SYEP interest
+        # Special case 2: interest -> all interest records in Interest section should be imported
+        # Note: SYEP interest records in the Interest section are monthly summaries and should be included
+        # The separate "Stock Yield Enhancement Program Securities Lent Interest Details" section is filtered out separately
+        # IMPORTANT: Skip "Borrow Fees" records from Interest section - they are summaries and we import detailed
+        # records from "Borrow Fee Details" section separately
         if section_key == 'interest':
             description = (row.get('Description') or row.get('Activity Description') or '').lower()
-            memo = (row.get('Memo') or row.get('Field Name') or '').lower()
-            text_blob = ' '.join(filter(None, [description, memo]))
-            if 'stock yield enhancement' in text_blob or 'syep' in text_blob:
-                return None  # Skip SYEP interest (duplicate of general Interest section)
+            if 'borrow fees' in description:
+                return None  # Skip Borrow Fees summary (detailed records imported from Borrow Fee Details section)
             return 'interest'
         
         # Special case 3: transfer -> keep as 'transfer' (amount sign indicates direction)
@@ -446,6 +448,37 @@ class IBKRConnector(BaseConnector):
 
             value_reader = csv.reader(io.StringIO(stripped))
             values = next(value_reader)
+            
+            # CRITICAL CHECK: Third column validation (similar to execution record validation)
+            # Rule 1: Third column must NOT contain "total" or any string containing "total"
+            if len(values) > 2:
+                third_column = values[2].strip().lower()
+                if 'total' in third_column:
+                    logger.debug(f"⏭️ Skipping row with 'total' in third column: {third_column}")
+                    continue
+            
+            # Rule 2: Each section type has an expected third column field
+            # This ensures we only process actual data records, not summary/total rows
+            # Expected third column fields by section:
+            # - Dividends: Date
+            # - Interest: Date
+            # - Deposits & Withdrawals: Date
+            # - Withholding Tax: Date or Description
+            # - Transfers: Date
+            # - Borrow Fee Details: Date or Description
+            # If third column is empty or doesn't match expected pattern, skip
+            if len(values) > 2:
+                third_column_value = values[2].strip()
+                # Skip if third column is empty (likely a summary row)
+                if not third_column_value:
+                    logger.debug(f"⏭️ Skipping row with empty third column in section: {current_section}")
+                    continue
+                # Skip if third column looks like a summary label (not a date/description)
+                # Summary labels typically don't contain dates or meaningful descriptions
+                if third_column_value.lower() in ['total', 'subtotal', 'summary', 'ending', 'starting']:
+                    logger.debug(f"⏭️ Skipping row with summary label in third column: {third_column_value}")
+                    continue
+            
             row = {}
             for idx, header in enumerate(current_headers):
                 value_idx = idx + 2  # Skip section & descriptor columns

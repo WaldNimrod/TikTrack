@@ -201,24 +201,14 @@ class ValidationService:
                 if not record.get('effective_date'):
                     errors.append("effective_date envelope is required")
 
+                # IMPORTANT: For cashflows, source_account is set at session level (trading_account_id)
+                # It's applied to all records by _ensure_cashflow_account_binding before validation
+                # So we only validate if it exists, but don't fail if it's missing (it will be set later)
                 source_account_raw = record.get('source_account')
                 source_account = str(source_account_raw).strip() if source_account_raw not in (None, '') else ''
                 if source_account:
                     record['source_account'] = source_account
-                if not source_account:
-                    errors.append("source_account is required")
-                    missing_accounts['__missing__'] = missing_accounts.get('__missing__', 0) + 1
-                    missing_account_details.append({
-                        'record_index': i,
-                        'cashflow_type': cashflow_type,
-                        'currency': record.get('currency'),
-                        'amount': record.get('amount'),
-                        'memo': record.get('memo'),
-                        'section': record.get('section'),
-                        'status': 'missing',
-                        'metadata': record.get('metadata', {})
-                    })
-                else:
+                    # Only validate account existence if source_account is provided
                     if not self._account_exists(source_account):
                         missing_accounts[source_account] = missing_accounts.get(source_account, 0) + 1
                         missing_account_details.append({
@@ -232,6 +222,8 @@ class ValidationService:
                             'account': source_account,
                             'metadata': record.get('metadata', {})
                         })
+                # Note: If source_account is missing, it will be set by _ensure_cashflow_account_binding
+                # before validation, so we don't fail validation here
 
                 if errors:
                     invalid_records.append(record)

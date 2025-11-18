@@ -353,14 +353,8 @@ class AdvancedButtonSystem {
     initializeTooltips(container) {
         if (!container) {
             this.logger.warn('initializeTooltips: No container provided');
-            console.warn('🔍 [Tooltip Debug] initializeTooltips: No container provided');
             return;
         }
-
-        buttonTooltipDebugLog('🔍 [Tooltip Debug] initializeTooltips called', {
-            container: container.id || container.className || 'unknown',
-            containerTag: container.tagName
-        });
 
         // Wait a bit for DOM to be ready
         requestAnimationFrame(() => {
@@ -368,72 +362,41 @@ class AdvancedButtonSystem {
                 // Find all buttons with data-tooltip attribute (supports both button system buttons and custom buttons)
                 const buttonsWithTooltips = container.querySelectorAll('[data-tooltip]');
                 
-                buttonTooltipDebugLog('🔍 [Tooltip Debug] Searching for buttons with data-tooltip', {
-                    container: container.id || container.className || 'unknown',
-                    found: buttonsWithTooltips.length
-                });
-                
                 if (buttonsWithTooltips.length === 0) {
-                    console.warn('🔍 [Tooltip Debug] No buttons with data-tooltip found in container');
                     return;
                 }
 
                 this.logger.debug(`initializeTooltips: Found ${buttonsWithTooltips.length} buttons with tooltips`);
-                buttonTooltipDebugLog(`🔍 [Tooltip Debug] Found ${buttonsWithTooltips.length} buttons with tooltips`);
 
                 buttonsWithTooltips.forEach((button, index) => {
                     // CRITICAL: Verify that the button is actually a descendant of the container
                     // This prevents processing buttons that are outside the intended scope
                     if (!container.contains(button)) {
-                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Skipping button - not a descendant of container`, {
-                            buttonId: button.id || `button-${index}`,
-                            container: container.id || container.className || 'unknown'
-                        });
                         return;
                     }
                     
                     // CRITICAL: Skip buttons that were already processed by processButtonElement
                     // These buttons already have their tooltips initialized and should not be processed again
                     if (button.hasAttribute('data-button-processed')) {
-                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Skipping button - already processed by processButtonElement`, {
-                            buttonId: button.id || `button-${index}`,
-                            buttonType: button.getAttribute('data-button-type')
-                        });
                         return;
                     }
                     
                     // Get tooltip config from data attributes
                     const tooltipText = button.getAttribute('data-tooltip');
-                    const buttonId = button.id || `button-${index}`;
-                    const buttonType = button.getAttribute('data-button-type');
-                    const buttonOnclick = button.getAttribute('data-onclick');
-                    
-                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Processing button ${index + 1}/${buttonsWithTooltips.length}`, {
-                        buttonId: buttonId,
-                        buttonType: buttonType,
-                        buttonOnclick: buttonOnclick,
-                        tooltipText: tooltipText,
-                        hasDataBsToggle: button.hasAttribute('data-bs-toggle')
-                    });
                     
                     // NO FALLBACKS - If data-tooltip is empty or missing, skip this button
                     if (!tooltipText || tooltipText.trim() === '') {
-                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Button ${buttonId} has data-tooltip attribute but no value - skipping`);
                         return;
                     }
 
                     // Get configuration from data attributes (read-only, don't modify)
                     const config = this._getTooltipConfig(button);
-                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Config for button ${buttonId}:`, config);
                     
                     if (config) {
-                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Initializing tooltip for button ${buttonId}`);
                         // CRITICAL: initializeTooltips is only called for buttons WITHOUT data-button-type
                         // So we don't need to check isProcessed here - those buttons are already filtered out
                         // But we still pass false to skipDataTooltipUpdate to allow normal initialization
                         this._initializeTooltip(button, config, false);
-                    } else {
-                        buttonTooltipDebugLog(`🔍 [Tooltip Debug] No config returned for button ${buttonId} - no tooltip will be shown`);
                     }
                 });
             }, 50);
@@ -550,33 +513,8 @@ class AdvancedButtonSystem {
         // CRITICAL: Verify that tooltipConfig.title matches the original data-tooltip from HTML
         // If they don't match, there's a problem - use the original HTML value
         if (tooltipConfig && originalDataTooltip && tooltipConfig.title !== originalDataTooltip) {
-            buttonTooltipDebugLog(`🔍 [Button Processing] ⚠️ WARNING: tooltipConfig.title doesn't match original data-tooltip for button ${id}`, {
-                tooltipConfigTitle: tooltipConfig.title,
-                originalDataTooltip: originalDataTooltip,
-                buttonType,
-                onClick,
-                elementHTML: element.outerHTML.substring(0, 300)
-            });
             // Use the original HTML value - it's the source of truth
             tooltipConfig.title = originalDataTooltip;
-        }
-        
-        // CRITICAL: Log tooltip config for debugging
-        if (tooltipConfig) {
-            buttonTooltipDebugLog(`🔍 [Button Processing] Button ${buttonType} (${id}) has tooltip:`, {
-                tooltipText: tooltipConfig.title,
-                dataTooltip: element.getAttribute('data-tooltip'),
-                originalDataTooltip: originalDataTooltip,
-                buttonType,
-                onClick
-            });
-        } else {
-            buttonTooltipDebugLog(`🔍 [Button Processing] Button ${buttonType} (${id}) has NO tooltip config`, {
-                dataTooltip: element.getAttribute('data-tooltip'),
-                originalDataTooltip: originalDataTooltip,
-                buttonType,
-                onClick
-            });
         }
 
         // Preserve important Bootstrap attributes
@@ -636,14 +574,6 @@ class AdvancedButtonSystem {
             // CRITICAL: Always use the original tooltipConfig from the HTML element (before processing)
             // This ensures we use the correct tooltip text from the HTML, not from any cached/stale values
             if (createdButton && tooltipConfig) {
-                // CRITICAL: Log the tooltip config to verify it's correct
-                buttonTooltipDebugLog(`🔍 [Button Processing] Setting tooltip for button ${id}`, {
-                    tooltipConfigTitle: tooltipConfig.title,
-                    buttonType: buttonType,
-                    onClick: onClick,
-                    originalDataTooltip: originalDataTooltip
-                });
-                
                 // CRITICAL: Always set data-tooltip from the original tooltipConfig (source of truth)
                 // Don't re-read from created button - use the original value from HTML
                 createdButton.setAttribute('data-tooltip', tooltipConfig.title);
@@ -652,18 +582,11 @@ class AdvancedButtonSystem {
                 // Static tooltips cannot be changed - they are locked to their original HTML value
                 if (originalDataTooltip && originalDataTooltip.trim() !== '') {
                     createdButton.setAttribute('data-tooltip-static', 'true');
-                    buttonTooltipDebugLog(`🔍 [Button Processing] Marked button ${id} as static tooltip (from HTML)`, {
-                        tooltipText: originalDataTooltip
-                    });
                 }
                 
                 // CRITICAL: Verify data-tooltip was set correctly
                 const verifyTooltip = createdButton.getAttribute('data-tooltip');
                 if (verifyTooltip !== tooltipConfig.title) {
-                    buttonTooltipDebugLog(`🔍 [Button Processing] ⚠️ WARNING: data-tooltip mismatch for button ${id}`, {
-                        expected: tooltipConfig.title,
-                        actual: verifyTooltip
-                    });
                     // Force set it again
                     createdButton.setAttribute('data-tooltip', tooltipConfig.title);
                 }
@@ -783,36 +706,20 @@ class AdvancedButtonSystem {
             page = currentPage || 'notes'; // Default to 'notes' if can't determine
         }
         
-        // First, try to get from BUTTON_TOOLTIPS_CONFIG (page-specific or global defaults)
-        if (window.BUTTON_TOOLTIPS_CONFIG && window.getButtonTooltip) {
-            const configTooltip = window.getButtonTooltip(page, buttonType, entityType);
-            if (configTooltip) {
-                buttonTooltipDebugLog(`🔍 [Default Tooltip] Found in BUTTON_TOOLTIPS_CONFIG:`, {
-                    buttonType,
-                    entityType,
-                    page,
-                    tooltip: configTooltip
-                });
-                return configTooltip;
+            // First, try to get from BUTTON_TOOLTIPS_CONFIG (page-specific or global defaults)
+            if (window.BUTTON_TOOLTIPS_CONFIG && window.getButtonTooltip) {
+                const configTooltip = window.getButtonTooltip(page, buttonType, entityType);
+                if (configTooltip) {
+                    return configTooltip;
+                }
             }
-        }
-        
-        // Second, try to get from BUTTON_TEXTS (fallback)
-        if (window.BUTTON_TEXTS && window.BUTTON_TEXTS[buttonType.toUpperCase()]) {
-            const textTooltip = window.BUTTON_TEXTS[buttonType.toUpperCase()];
-            buttonTooltipDebugLog(`🔍 [Default Tooltip] Found in BUTTON_TEXTS:`, {
-                buttonType,
-                tooltip: textTooltip
-            });
-            return textTooltip;
-        }
-        
-        buttonTooltipDebugLog(`🔍 [Default Tooltip] No default found for:`, {
-            buttonType,
-            entityType,
-            page
-        });
-        return null;
+            
+            // Second, try to get from BUTTON_TEXTS (fallback)
+            if (window.BUTTON_TEXTS && window.BUTTON_TEXTS[buttonType.toUpperCase()]) {
+                return window.BUTTON_TEXTS[buttonType.toUpperCase()];
+            }
+            
+            return null;
     }
 
     /**
@@ -832,15 +739,6 @@ class AdvancedButtonSystem {
         let tooltipText = element.getAttribute('data-tooltip');
         const hasDataTooltip = element.hasAttribute('data-tooltip') && tooltipText && tooltipText.trim() !== '';
         
-        buttonTooltipDebugLog(`🔍 [Tooltip Debug] _getTooltipConfig called for element ${elementId}`, {
-            tooltipText: tooltipText,
-            hasDataTooltip: hasDataTooltip,
-            buttonType: buttonType,
-            entityType: entityType,
-            onClick: onClick,
-            elementHTML: element.outerHTML.substring(0, 200) // First 200 chars for debugging
-        });
-        
         // If no data-tooltip, try to get default tooltip (for dynamic buttons)
         if (!hasDataTooltip) {
             // Only try default if button has data-button-type (not for custom buttons)
@@ -851,11 +749,6 @@ class AdvancedButtonSystem {
                 
                 if (defaultTooltip) {
                     tooltipText = defaultTooltip;
-                    buttonTooltipDebugLog(`🔍 [Tooltip Debug] Using default tooltip for button ${elementId}:`, {
-                        buttonType,
-                        entityType,
-                        defaultTooltip
-                    });
                     // Mark as fallback tooltip
                     element.setAttribute('data-tooltip-fallback', 'true');
                 } else {
@@ -897,8 +790,6 @@ class AdvancedButtonSystem {
             isFallback: isFallback
         };
         
-        buttonTooltipDebugLog(`🔍 [Tooltip Debug] Config created for element ${elementId}:`, config);
-        
         return config;
     }
 
@@ -911,16 +802,11 @@ class AdvancedButtonSystem {
      */
     _initializeTooltip(button, config, skipDataTooltipUpdate = false) {
         const buttonId = button.id || 'unknown';
-        buttonTooltipDebugLog(`🔍 [Tooltip Debug] _initializeTooltip called for button ${buttonId}`, {
-            config: config,
-            bootstrapAvailable: typeof bootstrap !== 'undefined',
-            TooltipAvailable: typeof bootstrap !== 'undefined' && !!bootstrap.Tooltip
-        });
         
         // Check if Bootstrap is available
         if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
             this.logger.debug('Bootstrap Tooltip not available, using native title attribute');
-            console.warn(`🔍 [Tooltip Debug] Bootstrap Tooltip not available for button ${buttonId}`);
+            this.logger.warn(`Bootstrap Tooltip not available for button ${buttonId}`);
             return;
         }
 
@@ -928,11 +814,6 @@ class AdvancedButtonSystem {
         // This ensures we use the correct tooltip text from the HTML, not any stale/cached values
         const existingTooltip = bootstrap.Tooltip.getInstance(button);
         if (existingTooltip) {
-            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Disposing existing tooltip for button ${buttonId} to recreate with correct text`, {
-                oldTitle: existingTooltip._config?.title,
-                newTitle: config.title,
-                dataTooltip: button.getAttribute('data-tooltip')
-            });
             // Always dispose and recreate - don't update in place to ensure correct text
             existingTooltip.dispose();
         }
@@ -940,11 +821,6 @@ class AdvancedButtonSystem {
         // CRITICAL: Check if button has static tooltip (from HTML) - these cannot be changed
         const isStaticTooltip = button.hasAttribute('data-tooltip-static');
         if (isStaticTooltip) {
-            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Button ${buttonId} has static tooltip - preserving original value`, {
-                currentTooltip: button.getAttribute('data-tooltip'),
-                requestedTooltip: config.title,
-                buttonType: button.getAttribute('data-button-type')
-            });
             // For static tooltips, use the existing value from HTML, not the config
             // This ensures static tooltips never change from their original HTML definition
             config.title = button.getAttribute('data-tooltip') || config.title;
@@ -958,32 +834,16 @@ class AdvancedButtonSystem {
         if (!skipDataTooltipUpdate && !isStaticTooltip) {
             // Button not yet processed and not static - update data-tooltip if it doesn't match config
             if (currentDataTooltip !== config.title) {
-                buttonTooltipDebugLog(`🔍 [Tooltip Debug] Fixing data-tooltip mismatch for button ${buttonId}`, {
-                    current: currentDataTooltip,
-                    correct: config.title
-                });
                 button.setAttribute('data-tooltip', config.title);
             }
         } else if (skipDataTooltipUpdate) {
             // Button already processed - check if data-tooltip was changed by something else
             // If it was changed, don't update the tooltip (preserve the original value)
             if (currentDataTooltip !== config.title) {
-                buttonTooltipDebugLog(`🔍 [Tooltip Debug] ⚠️ WARNING: Already processed button ${buttonId} has different data-tooltip - skipping tooltip update to preserve original`, {
-                    currentDataTooltip: currentDataTooltip,
-                    configTitle: config.title,
-                    buttonOnclick: button.getAttribute('data-onclick'),
-                    buttonType: button.getAttribute('data-button-type'),
-                    isStatic: isStaticTooltip
-                });
                 // Don't update the tooltip - the button's data-tooltip was changed by something else
                 // and we should preserve the original value
                 return;
             }
-            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Skipping data-tooltip update for already processed button ${buttonId}`, {
-                existingTooltip: currentDataTooltip,
-                configTitle: config.title,
-                isStatic: isStaticTooltip
-            });
         }
         
         // CRITICAL: Remove data-bs-original-title if it exists - we only use data-tooltip
@@ -1013,11 +873,6 @@ class AdvancedButtonSystem {
                 tooltipOptions.offset = [x || 0, y || 0];
             }
 
-            buttonTooltipDebugLog(`🔍 [Tooltip Debug] Creating Bootstrap Tooltip for button ${buttonId}`, {
-                options: tooltipOptions,
-                button: button
-            });
-
             // Initialize Bootstrap tooltip
             const tooltipInstance = new bootstrap.Tooltip(button, tooltipOptions);
             
@@ -1026,13 +881,6 @@ class AdvancedButtonSystem {
             if (button.getAttribute('data-tooltip') !== config.title) {
                 button.setAttribute('data-tooltip', config.title);
             }
-            
-            buttonTooltipDebugLog(`🔍 [Tooltip Debug] ✅ Tooltip created successfully for button ${buttonId}`, {
-                instance: tooltipInstance,
-                enabled: tooltipInstance._isEnabled,
-                config: tooltipInstance._config,
-                dataTooltip: button.getAttribute('data-tooltip')
-            });
 
             this.logger.debug('Tooltip initialized', {
                 buttonId: button.id,
@@ -1043,7 +891,7 @@ class AdvancedButtonSystem {
                 error: error.message,
                 buttonId: button.id
             });
-            console.error(`🔍 [Tooltip Debug] ❌ Error initializing tooltip for button ${buttonId}:`, error);
+            this.logger.error(`Error initializing tooltip for button ${buttonId}:`, error);
         }
     }
 
@@ -1078,10 +926,6 @@ class AdvancedButtonSystem {
                 currentTooltip: buttonElement.getAttribute('data-tooltip'),
                 requestedTooltip: newText
             });
-            buttonTooltipDebugLog(`🔍 [Update Tooltip] ⚠️ Cannot update static tooltip for button ${buttonId}`, {
-                currentTooltip: buttonElement.getAttribute('data-tooltip'),
-                requestedTooltip: newText
-            });
             return false;
         }
         
@@ -1089,12 +933,6 @@ class AdvancedButtonSystem {
             this.logger.warn('updateTooltip: Empty tooltip text provided', { buttonId });
             return false;
         }
-        
-        buttonTooltipDebugLog(`🔍 [Update Tooltip] Updating tooltip for button ${buttonId}`, {
-            oldTooltip: buttonElement.getAttribute('data-tooltip'),
-            newTooltip: newText,
-            options
-        });
         
         // Update data-tooltip attribute
         buttonElement.setAttribute('data-tooltip', newText);
@@ -1110,11 +948,10 @@ class AdvancedButtonSystem {
         // Update Bootstrap Tooltip instance if it exists
         if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
             const tooltipInstance = bootstrap.Tooltip.getInstance(buttonElement);
-            if (tooltipInstance) {
-                // Update existing tooltip
-                tooltipInstance.setContent({ '.tooltip-inner': newText });
-                buttonTooltipDebugLog(`🔍 [Update Tooltip] Updated Bootstrap tooltip instance for button ${buttonId}`);
-            } else {
+                if (tooltipInstance) {
+                    // Update existing tooltip
+                    tooltipInstance.setContent({ '.tooltip-inner': newText });
+                } else {
                 // Create new tooltip instance
                 const placement = options.placement || buttonElement.getAttribute('data-tooltip-placement') || 'top';
                 const trigger = options.trigger || buttonElement.getAttribute('data-tooltip-trigger') || 'hover';
@@ -1129,10 +966,9 @@ class AdvancedButtonSystem {
                     tooltipOptions.delay = { show: options.delay, hide: 0 };
                 }
                 
-                try {
-                    new bootstrap.Tooltip(buttonElement, tooltipOptions);
-                    buttonTooltipDebugLog(`🔍 [Update Tooltip] Created new Bootstrap tooltip instance for button ${buttonId}`);
-                } catch (error) {
+                    try {
+                        new bootstrap.Tooltip(buttonElement, tooltipOptions);
+                    } catch (error) {
                     this.logger.warn('updateTooltip: Error creating Bootstrap tooltip', {
                         buttonId,
                         error: error.message

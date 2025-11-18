@@ -78,3 +78,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-18T15:19:07+00:00 | 1.1.24.0 | 1.1.23.0 | 30bc262d3d382e89ee867818e27dfd3cf9e9ae80 | 91db23719cbffa885b60265e78e44c46b03f0161 | patch | IBKR import system improvements: record classification, session management, rich text support |
 | 2025-11-18T20:36:56+00:00 | 1.1.25.0 | 1.1.24.0 | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | 30bc262d3d382e89ee867818e27dfd3cf9e9ae80 | patch | Add comprehensive tooltip standardization scanning and reporting tools |
 | 2025-11-18T21:05:53+00:00 | 1.1.26.0 | 1.1.25.0 | e172ac5b46d6913502c75696c9e680583727e66b | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | patch | Fix linked items modal refresh and package loading order |
+| 2025-11-18T21:47:43+00:00 | 1.1.27.0 | 1.1.26.0 | 3e4ca378c2c879d09203620d9db0411a967f4492 | e172ac5b46d6913502c75696c9e680583727e66b | patch | Remove unnecessary debug console logs from button system |

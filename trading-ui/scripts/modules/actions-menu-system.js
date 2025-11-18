@@ -24,16 +24,10 @@ const actionsMenuDebugLog = (...args) => {
     }
 };
 
-// הגדרת פונקציה גלובלית לבדיקה מיידית - זמינה מיד
-actionsMenuDebugLog('🔧 ActionsMenuSystem: מגדיר את debugActionsMenu באופן גלובלי');
-actionsMenuDebugLog('🔧 ActionsMenuSystem: Script loaded at:', new Date().toISOString());
-
 // וידוא שהפונקציה מוגדרת מיד
 if (typeof window.debugActionsMenu === 'undefined') {
-    actionsMenuDebugLog('🔧 ActionsMenuSystem: מגדיר debugActionsMenu לראשונה');
     window.debugActionsMenu = () => {
     const allWrappers = document.querySelectorAll('.actions-menu-wrapper');
-    actionsMenuDebugLog(`🔍 מצאתי ${allWrappers.length} actions menu wrappers`);
     
     allWrappers.forEach((wrapper, index) => {
         const popup = wrapper.querySelector('.actions-menu-popup');
@@ -42,21 +36,10 @@ if (typeof window.debugActionsMenu === 'undefined') {
         
         if (!popup || !actionsCell || !tableRow) return;
         
-        actionsMenuDebugLog(`\n📊 Actions Menu ${index + 1}:`);
-        
         // בדיקת styles בפועל
         const popupStyle = window.getComputedStyle(popup);
         const cellStyle = window.getComputedStyle(actionsCell);
         const rowStyle = window.getComputedStyle(tableRow);
-        
-        actionsMenuDebugLog('Popup styles:', {
-            zIndex: popupStyle.zIndex,
-            position: popupStyle.position,
-            opacity: popupStyle.opacity,
-            visibility: popupStyle.visibility,
-            pointerEvents: popupStyle.pointerEvents,
-            transform: popupStyle.transform
-        });
         
         // בדיקה מקיפה של z-index במיקום הפופאפ
         const popupRect = popup.getBoundingClientRect();
@@ -85,23 +68,6 @@ if (typeof window.debugActionsMenu === 'undefined') {
             }
         });
         
-        if (higherZIndexElements.length > 0) {
-            actionsMenuDebugLog('⚠️ אלמנטים עם z-index גבוה מ-955 במיקום הפופאפ:', higherZIndexElements);
-        }
-        
-        actionsMenuDebugLog('Actions Cell styles:', {
-            zIndex: cellStyle.zIndex,
-            position: cellStyle.position,
-            overflow: cellStyle.overflow
-        });
-        
-        actionsMenuDebugLog('Table Row styles:', {
-            zIndex: rowStyle.zIndex,
-            position: rowStyle.position,
-            transform: rowStyle.transform,
-            boxShadow: rowStyle.boxShadow
-        });
-        
         // בדיקת מיקומים - popupRect כבר מוגדר למעלה
         const cellRect = actionsCell.getBoundingClientRect();
         const rowRect = tableRow.getBoundingClientRect();
@@ -110,11 +76,6 @@ if (typeof window.debugActionsMenu === 'undefined') {
         const rowHeight = Math.round(rowRect.bottom - rowRect.top);
         const cellHeight = Math.round(cellRect.bottom - cellRect.top);
         const popupHeight = Math.round(popupRect.bottom - popupRect.top);
-        
-        actionsMenuDebugLog('📏 גבהים:');
-        actionsMenuDebugLog(`   שורה: ${rowHeight}px`);
-        actionsMenuDebugLog(`   תא פעולות: ${cellHeight}px`);
-        actionsMenuDebugLog(`   תפריט פעולות: ${popupHeight}px`);
         
         actionsMenuDebugLog('מיקומים בפועל:');
         actionsMenuDebugLog('Popup:', {
@@ -227,7 +188,6 @@ window.debugActionsMenuOverflow = () => {
     });
 };
 
-actionsMenuDebugLog('✅ ActionsMenuSystem: debugActionsMenu מוגדרת וזמינה');
 
 class ActionsMenuSystem {
     constructor() {
@@ -235,18 +195,10 @@ class ActionsMenuSystem {
     }
 
     init() {
-        actionsMenuDebugLog('🔧 ActionsMenuSystem: מתחיל אתחול');
-        actionsMenuDebugLog('🔧 ActionsMenuSystem: DOM ready state:', document.readyState);
-        actionsMenuDebugLog('🔧 ActionsMenuSystem: Available elements:', document.querySelectorAll('.actions-menu-wrapper').length);
         
         if (window.Logger) {
             window.Logger.info('✅ Actions Menu System initialized', { page: "actions-menu-system", keepInfo: true });
         }
-        const debugPrinter = window.consoleCleanup?.debug || actionsMenuDebugLog;
-        debugPrinter('   → Fixed positioning to avoid table overflow clipping');
-        debugPrinter('   → RTL aware positioning');
-        debugPrinter('   → Supports 2-5 buttons dynamically');
-        debugPrinter('   → Integrated with new button system');
         
         // Set up hover event listeners to position popup dynamically
         this.attachHoverPositioning();
@@ -263,14 +215,12 @@ class ActionsMenuSystem {
      * @returns {string} - HTML for the dropdown menu
      */
     createActionsMenu(buttons) {
-        actionsMenuDebugLog('🔧 [ActionsMenuSystem] createActionsMenu called with buttons:', buttons);
         if (!buttons || buttons.length === 0) {
             console.warn('⚠️ [ActionsMenuSystem] No buttons provided');
             return '';
         }
         
         const menuButtons = buttons.map((button, index) => {
-            actionsMenuDebugLog(`🔧 [ActionsMenuSystem] Processing button ${index + 1}:`, button);
             // Handle both DOM elements and objects
             let buttonType, variant, onclick, text, title;
             
@@ -331,12 +281,6 @@ class ActionsMenuSystem {
             }
             
             const buttonHTML = `<button class="btn actions-menu-item" data-variant="small" data-button-type="${buttonType}" data-onclick='${escapedOnclick}' ${tooltipAttrs} style="margin-right: 4px;">${icon}</button>`;
-            actionsMenuDebugLog(`✅ [ActionsMenuSystem] Created button ${index + 1}:`, {
-                type: buttonType,
-                onclick: onclick,
-                escapedOnclick: escapedOnclick,
-                html: buttonHTML.substring(0, 100) + '...'
-            });
             return buttonHTML;
         }).join('');
         
@@ -348,7 +292,6 @@ class ActionsMenuSystem {
                 </div>
             </div>
         `;
-        actionsMenuDebugLog('✅ [ActionsMenuSystem] Full menu HTML created:', fullHTML.substring(0, 200) + '...');
         return fullHTML;
     }
     
@@ -482,7 +425,6 @@ class ActionsMenuSystem {
         // Add hover delay for better UX
         this.attachHoverDelay();
         
-        actionsMenuDebugLog('✅ Actions Menu Debug Logger הותקן. הרץ debugActionsMenu() כדי לבדוק');
     }
 
     /**
@@ -647,10 +589,8 @@ class ActionsMenuSystem {
         
         // קוד קונסולה לבדיקת z-index וחתיכה
         window.debugActionsMenuZIndex = () => {
-            actionsMenuDebugLog('🔍 בדיקת z-index וחתיכה של התפריט...');
             
             const allWrappers = document.querySelectorAll('.actions-menu-wrapper');
-            actionsMenuDebugLog(`מצאתי ${allWrappers.length} actions menu wrappers`);
             
             allWrappers.forEach((wrapper, index) => {
                 const popup = wrapper.querySelector('.actions-menu-popup');
@@ -734,25 +674,18 @@ class ActionsMenuSystem {
             });
         };
         
-        actionsMenuDebugLog('🔧 קוד debugActionsMenuZIndex() הותקן. הרץ debugActionsMenuZIndex() כדי לבדוק z-index וחתיכה');
     }
 }
 
 // פונקציה גלובלית ליצירת תפריט פעולות
 window.createActionsMenu = function(buttons) {
-    actionsMenuDebugLog('🔧 [window.createActionsMenu] Called with:', buttons);
-    actionsMenuDebugLog('🔧 [window.createActionsMenu] window.actionsMenuSystem exists?', !!window.actionsMenuSystem);
-    actionsMenuDebugLog('🔧 [window.createActionsMenu] ActionsMenuSystem class exists?', typeof ActionsMenuSystem);
-    
     // Try to use instance first
     if (window.actionsMenuSystem) {
-        actionsMenuDebugLog('✅ [window.createActionsMenu] Using existing instance');
         return window.actionsMenuSystem.createActionsMenu(buttons);
     }
     
     // Fallback: create instance on-the-fly if ActionsMenuSystem class is available
     if (typeof ActionsMenuSystem !== 'undefined') {
-        actionsMenuDebugLog('⚠️ [window.createActionsMenu] Creating new instance on-the-fly');
         if (!window.actionsMenuSystem) {
             window.actionsMenuSystem = new ActionsMenuSystem();
         }
@@ -783,7 +716,6 @@ window.createActionsMenu = function(buttons) {
         if (escapedOnclick) {
             escapedOnclick = escapedOnclick.replace(/'/g, '&#39;');
         }
-        actionsMenuDebugLog(`🔧 [window.createActionsMenu fallback] Button ${buttonType}:`, { onclick, escapedOnclick });
         // Convert title to data-tooltip for consistency with button system
         // If no title provided, the button system will use default tooltip via _getDefaultTooltip
         let tooltipText = title || '';
@@ -808,7 +740,6 @@ window.createActionsMenu = function(buttons) {
             </div>
         </div>
     `;
-    actionsMenuDebugLog('✅ [window.createActionsMenu fallback] Generated HTML:', fallbackHTML.substring(0, 200) + '...');
     return fallbackHTML;
 };
 

@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.1.8.0",
+    "version": "1.1.9.0",
     "major": 1,
     "minor": 1,
-    "patch": 8,
+    "patch": 9,
     "build": 0,
-    "commit": "b9156b35f3c138a91d2d03dfd08937d2f1d12310",
-    "updated_at": "2025-11-18T20:36:04+00:00",
-    "notes": "Add comprehensive tooltip standardization scanning and reporting tools"
+    "commit": "3e4ca378c2c879d09203620d9db0411a967f4492",
+    "updated_at": "2025-11-18T21:47:43+00:00",
+    "notes": "Remove unnecessary debug console logs from button system"
   },
   "development": {
-    "version": "1.1.26.0",
+    "version": "1.1.27.0",
     "major": 1,
     "minor": 1,
-    "patch": 26,
+    "patch": 27,
     "build": 0,
-    "commit": "e172ac5b46d6913502c75696c9e680583727e66b",
-    "updated_at": "2025-11-18T21:05:53+00:00",
-    "notes": "Fix linked items modal refresh and package loading order"
+    "commit": "3e4ca378c2c879d09203620d9db0411a967f4492",
+    "updated_at": "2025-11-18T21:47:43+00:00",
+    "notes": "Remove unnecessary debug console logs from button system"
   }
 }

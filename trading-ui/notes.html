@@ -29,14 +29,6 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
-    <!-- ===== CRITICAL: Debug Mode for Button Tooltips ===== -->
-    <script>
-        // Enable debug mode for button tooltips BEFORE button-system-init.js loads
-        // This allows us to see detailed logs about tooltip processing
-        window.ButtonTooltipDebugMode = true;
-        console.log('🔍 [Button Tooltip Debug] Debug mode enabled - tooltip logs will be shown');
-    </script>
-    
     <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
     <script>
         // Define showModalSafe immediately in head to ensure it's available before HTML is parsed

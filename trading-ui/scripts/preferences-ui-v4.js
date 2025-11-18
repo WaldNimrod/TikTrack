@@ -12,10 +12,20 @@
     }
 
     async initialize() {
+      // Deduplication: prevent multiple initialization calls
+      if (this.initialized) {
+        window.Logger?.debug?.('⏭️ PreferencesUIV4 already initialized, skipping re-init', {
+          page: 'preferences-ui-v4',
+        });
+        return;
+      }
+
       if (!window.PreferencesV4) {
         window.Logger?.error?.('PreferencesV4 SDK missing', { page: 'preferences-ui-v4' });
         return;
       }
+
+      this.initialized = true;
       let profileContext = null;
       try {
         // Get userId from PreferencesCore or default to 1
@@ -188,32 +198,9 @@
 
   window.PreferencesUIV4 = new PreferencesUIV4();
 
-  // Only auto-initialize on preferences page
-  // On other pages, initialization is handled by page-initialization-configs.js if needed
-  const isPreferencesPage = () => {
-    try {
-      const body = document.body;
-      if (!body || !body.classList) return false;
-      return body.classList.contains('preferences-page') || 
-             window.location.pathname === '/preferences' ||
-             window.location.pathname.includes('/preferences');
-    } catch (e) {
-      return false;
-    }
-  };
-
-  if (isPreferencesPage()) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => window.PreferencesUIV4.initialize());
-    } else {
-      window.PreferencesUIV4.initialize();
-    }
-  } else {
-    window.Logger?.debug?.('ℹ️ PreferencesUIV4: Skipping auto-initialization (not preferences page)', {
-      page: 'preferences-ui-v4',
-      pathname: window.location.pathname,
-    });
-  }
+  // Auto-initialization removed - preferences loading is now handled centrally by unified-app-initializer.js
+  // All pages with 'preferences' package will have preferences loaded through the unified initialization system
+  // This ensures single point of entry, proper cache usage, and no duplicate API calls
 })();
 
 

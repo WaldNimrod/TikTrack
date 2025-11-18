@@ -91,6 +91,9 @@ class ValidationError extends Error {
   }
 }
 
+// Expose ValidationError globally for use by preferences-validation.js
+window.ValidationError = ValidationError;
+
 // ============================================================================
 // API CLIENT CLASS
 // ============================================================================
@@ -382,6 +385,8 @@ class PreferencesCore {
     this.latestProfileContext = null;
     this.defaultPreferenceCache = new Map();
     this.defaultPreferenceEndpointAvailable = true;
+    // High-level deduplication registry
+    this._getAllPreferencesInflight = new Map();
   }
 
   /**
@@ -483,13 +488,15 @@ class PreferencesCore {
       if (!isLoaded) {
         window.Logger.debug(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: 'preferences-core-new' });
         // Load all preferences at once from API
+        // Use force: false to leverage cache - only call API if cache is missing or expired
+        // This prevents rate limiting after cache clear or hard refresh
         const preferencesDataApi = window.PreferencesData;
         if (preferencesDataApi?.loadAllPreferencesRaw) {
           try {
             const payload = await preferencesDataApi.loadAllPreferencesRaw({
               userId: finalUserId,
               profileId: finalProfileId,
-              force: true,
+              force: false, // Use cache if available - only fetch from API if cache is missing/expired
             });
 
             const allPreferences = payload?.preferences || {};
@@ -554,75 +561,96 @@ class PreferencesCore {
     const finalUserId = userId || this.currentUserId;
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
-    const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
-
-    // Check cache first via UnifiedCacheManager
-    if (window.UnifiedCacheManager) {
-      const cached = await window.UnifiedCacheManager.get(cacheKey, {
-        layer: 'localStorage',
-        ttl: 300000,
+    // High-level deduplication: prevent duplicate calls with same params
+    const dedupeKey = `getAllPreferences:u${finalUserId}:p${finalProfileId}`;
+    if (this._getAllPreferencesInflight.has(dedupeKey)) {
+      window.Logger?.debug?.('⏭️ PreferencesCore.getAllPreferences deduplicated - returning existing promise', {
+        page: 'preferences-core-new',
+        dedupeKey,
       });
-      if (cached !== null) {
-        window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
-        return cached;
-      }
+      return await this._getAllPreferencesInflight.get(dedupeKey);
     }
 
-    try {
-      // Load critical preferences first
-      const criticalPreferences = {};
-      if (criticalPrefs.length > 0) {
-        for (const prefName of criticalPrefs) {
-          criticalPreferences[prefName] = await this.getPreference(prefName, finalUserId, finalProfileId);
+    const loadPromise = (async () => {
+      try {
+        const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
+
+        // Check cache first via UnifiedCacheManager
+        if (window.UnifiedCacheManager) {
+          const cached = await window.UnifiedCacheManager.get(cacheKey, {
+            layer: 'localStorage',
+            ttl: 300000,
+          });
+          if (cached !== null) {
+            window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
+            return cached;
+          }
         }
-      }
 
-      // Load all preferences
-      const apiResult = await this.apiClient.getAllPreferences(
-        finalUserId,
-        finalProfileId,
-      );
-      const allPreferences = apiResult.preferences || {};
-      const profileContext = apiResult.profileContext || null;
-      const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined
-        ? profileContext.resolved_profile_id
-        : finalProfileId;
+        try {
+          // Load critical preferences first
+          const criticalPreferences = {};
+          if (criticalPrefs.length > 0) {
+            for (const prefName of criticalPrefs) {
+              criticalPreferences[prefName] = await this.getPreference(prefName, finalUserId, finalProfileId);
+            }
+          }
 
-      if (profileContext) {
-        this.latestProfileContext = profileContext;
-        if (profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined) {
-          this.currentProfileId = profileContext.resolved_profile_id;
+          // Load all preferences
+          const apiResult = await this.apiClient.getAllPreferences(
+            finalUserId,
+            finalProfileId,
+          );
+          const allPreferences = apiResult.preferences || {};
+          const profileContext = apiResult.profileContext || null;
+          const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined
+            ? profileContext.resolved_profile_id
+            : finalProfileId;
+
+          if (profileContext) {
+            this.latestProfileContext = profileContext;
+            if (profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined) {
+              this.currentProfileId = profileContext.resolved_profile_id;
+            }
+            if (profileContext.user?.id) {
+              this.currentUserId = profileContext.user.id;
+            } else {
+              this.currentUserId = finalUserId;
+            }
+          } else {
+            this.currentProfileId = effectiveProfileId;
+            this.currentUserId = finalUserId;
+          }
+
+          // Merge critical preferences
+          const result = { ...allPreferences, ...criticalPreferences };
+
+          // Cache the result via UnifiedCacheManager
+          if (window.UnifiedCacheManager) {
+            const cacheKeyForSave = `all_preferences_${finalUserId}_${effectiveProfileId}`;
+            await window.UnifiedCacheManager.save(cacheKeyForSave, result, {
+              layer: 'localStorage',
+              ttl: 300000,
+            });
+          }
+
+          window.Logger.info(`✅ Loaded ${Object.keys(result).length} preferences`, { page: 'preferences-core-new' });
+          return result;
+        } catch (error) {
+          window.Logger.error('❌ Error loading all preferences:', error, { page: 'preferences-core-new' });
+          return {};
         }
-        if (profileContext.user?.id) {
-          this.currentUserId = profileContext.user.id;
-        } else {
-          this.currentUserId = finalUserId;
-        }
-      } else {
-        this.currentProfileId = effectiveProfileId;
-        this.currentUserId = finalUserId;
+      } catch (error) {
+        window.Logger.error('❌ Error in getAllPreferences outer try:', error, { page: 'preferences-core-new' });
+        return {};
+      } finally {
+        this._getAllPreferencesInflight.delete(dedupeKey);
       }
-
-      // Merge critical preferences
-      const result = { ...allPreferences, ...criticalPreferences };
-
-      // Cache the result via UnifiedCacheManager
-      if (window.UnifiedCacheManager) {
-        const cacheKeyForSave = `all_preferences_${finalUserId}_${effectiveProfileId}`;
-        await window.UnifiedCacheManager.save(cacheKeyForSave, result, {
-          layer: 'localStorage',
-          ttl: 300000,
-        });
-      }
-
-      window.Logger.info(`✅ Loaded ${Object.keys(result, { page: 'preferences-core-new' }).length} preferences`);
-      return result;
-
-    } catch (error) {
-      window.Logger.error('❌ Error loading all preferences:', error, { page: 'preferences-core-new' });
-      return {};
+    })();
+      
+      this._getAllPreferencesInflight.set(dedupeKey, loadPromise);
+      return await loadPromise;
     }
-  }
 
   /**
    * Save single preference with strict validation

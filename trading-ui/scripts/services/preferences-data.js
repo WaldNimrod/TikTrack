@@ -61,12 +61,22 @@
 (function initPreferencesDataService() {
   const PAGE_LOG_CONTEXT = { page: 'preferences-data' };
 
-  // In-flight request dedupe registry
+  // In-flight request dedupe registry (low-level - per URL)
   const inflight = new Map();
+  // High-level function dedupe registry (prevents duplicate calls to same function with same params)
+  const functionInflight = new Map();
   // ETag registry per URL
   const etags = new Map();
   // Simple circuit breaker for 429 bursts
   let rateLimitedUntil = 0;
+  
+  // Helper to build function-level dedupe key
+  function buildFunctionDedupeKey(functionName, params) {
+    const userId = params?.userId ?? params?.user_id ?? 'default';
+    const profileId = params?.profileId ?? params?.profile_id ?? 'active';
+    const force = params?.force ?? false;
+    return `${functionName}:u${userId}:p${profileId}:f${force}`;
+  }
 
   // Utility to build a stable dedupe key
   function buildDedupeKey(url, options) {
@@ -224,13 +234,58 @@
         // Callers of fetchJson must manage their own cache reads; here we only short-circuit parse
         return { status: 304, fromCache: true };
       }
-      payload = await response.json();
+      
+      // For 429 errors, read as text first in case JSON parsing fails
+      if (response.status === 429) {
+        try {
+          const text = await response.text();
+          if (text) {
+            try {
+              payload = JSON.parse(text);
+            } catch (_) {
+              // If not valid JSON, create a default payload
+              payload = {
+                status: 'error',
+                error_code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Rate limit exceeded'
+              };
+            }
+          } else {
+            payload = {
+              status: 'error',
+              error_code: 'RATE_LIMIT_EXCEEDED',
+              message: 'Rate limit exceeded'
+            };
+          }
+        } catch (_) {
+          // If we can't read the response, create a default payload
+          payload = {
+            status: 'error',
+            error_code: 'RATE_LIMIT_EXCEEDED',
+            message: 'Rate limit exceeded'
+          };
+        }
+      } else {
+        // For other status codes, try JSON parsing normally
+        payload = await response.json();
+      }
     } catch (error) {
-      window.Logger?.warn?.('⚠️ Failed to parse JSON response for preferences request', {
-        ...PAGE_LOG_CONTEXT,
-        url,
-        error: error?.message,
-      });
+      // If JSON parsing failed and it's not a 429 we already handled, log warning
+      if (response.status !== 429) {
+        window.Logger?.warn?.('⚠️ Failed to parse JSON response for preferences request', {
+          ...PAGE_LOG_CONTEXT,
+          url,
+          error: error?.message,
+        });
+      }
+      // If payload is still null and it's a 429, create default payload
+      if (response.status === 429 && !payload) {
+        payload = {
+          status: 'error',
+          error_code: 'RATE_LIMIT_EXCEEDED',
+          message: 'Rate limit exceeded'
+        };
+      }
     }
 
     if (!response.ok) {
@@ -592,37 +647,56 @@
   }
 
   async function loadAllPreferencesRaw({ userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.all } = {}) {
-    const cacheKey = buildCacheKey(KEY_PREFIXES.all, [
-      `u${userId}`,
-      `p${profileId ?? 'active'}`,
-    ]);
+    // High-level deduplication: prevent duplicate calls to this function with same params
+    const dedupeKey = buildFunctionDedupeKey('loadAllPreferencesRaw', { userId, profileId, force });
+    if (functionInflight.has(dedupeKey)) {
+      window.Logger?.debug?.('⏭️ loadAllPreferencesRaw deduplicated - returning existing promise', {
+        ...PAGE_LOG_CONTEXT,
+        dedupeKey,
+      });
+      return await functionInflight.get(dedupeKey);
+    }
+    
+    const loadPromise = (async () => {
+      try {
+        const cacheKey = buildCacheKey(KEY_PREFIXES.all, [
+          `u${userId}`,
+          `p${profileId ?? 'active'}`,
+        ]);
 
-    if (!force) {
-      const cached = await readCache(cacheKey, { ttl, layer: 'localStorage' });
-      if (cached) {
-        // Auto-migrate legacy array/object formats to normalized map
-        const normalized = Array.isArray(cached?.preferences) || Array.isArray(cached)
-          ? normalizePreferencesPayload({ data: { preferences: cached?.preferences ?? cached } }, { userId, profileId })
-          : (cached?.preferences ? { ...cached } : normalizePreferencesPayload(cached, { userId, profileId }));
-        if (normalized && normalized !== cached) {
-          await saveCache(cacheKey, normalized, { ttl, layer: 'localStorage' });
+        if (!force) {
+          const cached = await readCache(cacheKey, { ttl, layer: 'localStorage' });
+          if (cached) {
+            // Auto-migrate legacy array/object formats to normalized map
+            const normalized = Array.isArray(cached?.preferences) || Array.isArray(cached)
+              ? normalizePreferencesPayload({ data: { preferences: cached?.preferences ?? cached } }, { userId, profileId })
+              : (cached?.preferences ? { ...cached } : normalizePreferencesPayload(cached, { userId, profileId }));
+            if (normalized && normalized !== cached) {
+              await saveCache(cacheKey, normalized, { ttl, layer: 'localStorage' });
+            }
+            return normalized;
+          }
         }
+
+        const params = {
+          user_id: userId,
+        };
+        if (profileId !== null && profileId !== undefined) {
+          params.profile_id = profileId;
+        }
+
+        const payload = await fetchJson('/api/preferences/user', { params });
+        const normalized = normalizePreferencesPayload(payload, { userId, profileId });
+
+        await saveCache(cacheKey, normalized, { ttl, layer: 'localStorage' });
         return normalized;
+      } finally {
+        functionInflight.delete(dedupeKey);
       }
-    }
-
-    const params = {
-      user_id: userId,
-    };
-    if (profileId !== null && profileId !== undefined) {
-      params.profile_id = profileId;
-    }
-
-    const payload = await fetchJson('/api/preferences/user', { params });
-    const normalized = normalizePreferencesPayload(payload, { userId, profileId });
-
-    await saveCache(cacheKey, normalized, { ttl, layer: 'localStorage' });
-    return normalized;
+    })();
+    
+    functionInflight.set(dedupeKey, loadPromise);
+    return await loadPromise;
   }
 
   async function savePreference({ preferenceName, value, userId = 1, profileId = null }) {
@@ -739,22 +813,41 @@
   }
 
   async function loadProfiles({ userId = 1, force = false, ttl = DEFAULT_TTL.profiles } = {}) {
-    const cacheKey = buildCacheKey(KEY_PREFIXES.profiles, [`u${userId}`]);
-
-    if (!force) {
-      const cached = await readCache(cacheKey, { ttl });
-      if (cached) {
-        return cached;
-      }
+    // High-level deduplication: prevent duplicate calls to this function with same params
+    const dedupeKey = buildFunctionDedupeKey('loadProfiles', { userId, force });
+    if (functionInflight.has(dedupeKey)) {
+      window.Logger?.debug?.('⏭️ loadProfiles deduplicated - returning existing promise', {
+        ...PAGE_LOG_CONTEXT,
+        dedupeKey,
+      });
+      return await functionInflight.get(dedupeKey);
     }
+    
+    const loadPromise = (async () => {
+      try {
+        const cacheKey = buildCacheKey(KEY_PREFIXES.profiles, [`u${userId}`]);
 
-    const payload = await fetchJson('/api/preferences/profiles', {
-      params: { user_id: userId },
-    });
+        if (!force) {
+          const cached = await readCache(cacheKey, { ttl });
+          if (cached) {
+            return cached;
+          }
+        }
 
-    const normalized = normalizeProfilesPayload(payload, userId);
-    await saveCache(cacheKey, normalized, { ttl });
-    return normalized;
+        const payload = await fetchJson('/api/preferences/profiles', {
+          params: { user_id: userId },
+        });
+
+        const normalized = normalizeProfilesPayload(payload, userId);
+        await saveCache(cacheKey, normalized, { ttl });
+        return normalized;
+      } finally {
+        functionInflight.delete(dedupeKey);
+      }
+    })();
+    
+    functionInflight.set(dedupeKey, loadPromise);
+    return await loadPromise;
   }
 
   /**

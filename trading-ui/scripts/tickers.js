@@ -1859,7 +1859,7 @@ function renderTickersTableRows(tickers) {
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-              });
+              }));
             } catch (err) {
               window.Logger?.warn('⚠️ tickers updated-cell date formatting failed', { err, tickerId: ticker?.id }, { page: 'tickers' });
               return 'לא מוגדר';

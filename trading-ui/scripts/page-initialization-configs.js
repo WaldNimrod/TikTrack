@@ -383,14 +383,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             await window.loadAccountsForPreferences();
           }
 
-          // טעינת מערכת העדפות (V4 first)
-          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
-            await window.PreferencesUIV4.initialize();
-          } else if (typeof window.initializePreferences === 'function') {
-            await window.initializePreferences();
-          } else if (typeof window.loadAllPreferences === 'function') {
-            await window.loadAllPreferences();
-          }
+          // Preferences loading is now handled by unified-app-initializer.js
+          // No need to call PreferencesUIV4.initialize() here - it's already called by initializePreferencesForPage()
+          // This prevents duplicate initialization and ensures single point of entry
 
           // Load default colors if not set
           if (typeof window.loadDefaultColors === 'function') {
@@ -667,8 +662,18 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
 
       description: 'דף מרכזי לניהול תהליכי ייבוא נתונים ושיגור המודול המאוחד',
-      lastModified: '2025-11-13',
+      lastModified: '2025-11-18',
       pageType: 'crud',
+
+      // Page-specific scripts (not part of packages)
+      pageSpecificScripts: [
+        'scripts/data_import.js',
+        'scripts/services/data-import-data.js',
+        'scripts/debug-currency-exchange-import.js',
+        'scripts/debug-import-filtering.js',
+        'scripts/monitor-import-execution.js',
+        'scripts/debug-active-session.js',
+      ],
 
       requiresFilters: false,
       requiresValidation: true,

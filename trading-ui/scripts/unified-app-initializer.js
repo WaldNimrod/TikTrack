@@ -156,6 +156,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       this.errorHandlers = [];
       this.customInitializers = [];
       this.legacySupport = true;
+      this._preferencesInitialized = false; // Track preferences initialization to prevent duplicates
     }
 
     /**
@@ -337,6 +338,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         } else {
           // window.Logger.info('⚠️ Cache system not ready, using fallback mode', { page: "unified-app-initializer" });
         }
+
+        // Initialize preferences system (standardized loading for all pages)
+        await this.initializePreferencesForPage(config);
 
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {
@@ -776,6 +780,90 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         //     isArray: Array.isArray(config.customInitializers),
         //     customInitializers: config.customInitializers
         // }, { page: "unified-app-initializer" });
+      }
+    }
+
+    /**
+     * Initialize preferences system for the page
+     * Standardized preferences loading - single point of entry for all pages
+     * 
+     * @param {Object} config - Page configuration
+     * @returns {Promise<void>}
+     */
+    async initializePreferencesForPage(config) {
+      // Check if page has preferences package
+      if (!config.packages || !config.packages.includes('preferences')) {
+        return; // Page doesn't need preferences
+      }
+
+      // Get page name from pageInfo (detected from URL) or config
+      const pageName = this.pageInfo?.name || 'unknown';
+      const isPreferencesPage = pageName === 'preferences';
+
+      // Deduplication: prevent multiple calls
+      if (this._preferencesInitialized) {
+        window.Logger?.debug?.('⏭️ Preferences already initialized, skipping', {
+          page: 'unified-app-initializer',
+          pageName,
+        });
+        return;
+      }
+
+      try {
+        // Preferences page: use PreferencesUIV4 with force: true (wants fresh data)
+        if (isPreferencesPage) {
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            window.Logger?.info?.('📄 Initializing preferences for preferences page (V4 with UI)', {
+              page: 'unified-app-initializer',
+              pageName,
+            });
+            await window.PreferencesUIV4.initialize();
+            this._preferencesInitialized = true;
+            return;
+          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+            // Fallback to PreferencesUI if V4 not available
+            window.Logger?.info?.('📄 Initializing preferences for preferences page (legacy UI)', {
+              page: 'unified-app-initializer',
+              pageName,
+            });
+            await window.PreferencesUI.initialize();
+            this._preferencesInitialized = true;
+            return;
+          }
+        }
+
+        // Other pages: use PreferencesCore.initializeWithLazyLoading() with cache (force: false)
+        // This loads critical preferences immediately from cache if available, rest in background
+        if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+          window.Logger?.info?.('📄 Initializing preferences with lazy loading (using cache)', {
+            page: 'unified-app-initializer',
+            pageName,
+          });
+          
+          // Initialize in background (non-blocking) - don't await to avoid blocking page load
+          // LazyLoader will load critical preferences immediately from cache if available
+          window.PreferencesCore.initializeWithLazyLoading().catch(error => {
+            window.Logger?.warn?.('⚠️ Preferences lazy loading initialization failed (non-critical)', {
+              page: 'unified-app-initializer',
+              pageName,
+              error: error?.message || error,
+            });
+          });
+          
+          this._preferencesInitialized = true;
+        } else {
+          window.Logger?.warn?.('⚠️ PreferencesCore.initializeWithLazyLoading not available', {
+            page: 'unified-app-initializer',
+            pageName,
+          });
+        }
+      } catch (error) {
+        window.Logger?.error?.('❌ Error initializing preferences', {
+          page: 'unified-app-initializer',
+          pageName,
+          error: error?.message || error,
+        });
+        // Don't throw - preferences loading failure shouldn't block page initialization
       }
     }
 

@@ -610,7 +610,7 @@ function renderAlertsTableRows(alerts) {
                           day: '2-digit',
                           hour: '2-digit',
                           minute: '2-digit'
-                        });
+                        }));
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ createdAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
@@ -668,7 +668,7 @@ function renderAlertsTableRows(alerts) {
                           day: '2-digit',
                           hour: '2-digit',
                           minute: '2-digit'
-                        });
+                        }));
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ triggeredAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
@@ -896,7 +896,7 @@ function renderAlertsTableRows(alerts) {
                     year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                  });
+                  }));
                 } catch (err) {
                   window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
                   return 'לא מוגדר';

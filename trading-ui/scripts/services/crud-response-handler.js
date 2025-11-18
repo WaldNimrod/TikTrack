@@ -88,6 +88,14 @@ class CRUDResponseHandler {
             console.log('✅ handleSaveResponse - Response OK, reading JSON...');
             const result = await response.json();
             console.log('✅ handleSaveResponse - JSON read successfully');
+            console.log('🔍 handleSaveResponse - result structure:', {
+                hasStatus: 'status' in result,
+                hasData: 'data' in result,
+                hasId: result?.data?.id !== undefined,
+                resultId: result?.data?.id,
+                resultKeys: Object.keys(result),
+                dataKeys: result?.data ? Object.keys(result.data) : []
+            });
             
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {

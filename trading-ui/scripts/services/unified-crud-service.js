@@ -353,24 +353,103 @@ class UnifiedCRUDService {
                             });
                             
                             if (linkedItemsEntry && linkedItemsEntry.entityType && linkedItemsEntry.entityId) {
+                                // Get mode from metadata (warningBlock or view)
+                                const modalMode = linkedItemsEntry.metadata?.mode || 'view';
+                                
                                 window.Logger?.info('🔄 Reloading linked items data after delete', {
                                     entityType: linkedItemsEntry.entityType,
                                     entityId: linkedItemsEntry.entityId,
                                     deletedEntityType: entityType,
                                     deletedEntityId: entityId,
+                                    modalMode,
                                     page: 'unified-crud-service'
                                 });
                                 
-                                // Reload linked items data
-                                const linkedItemsData = await window.loadLinkedItemsData?.(
-                                    linkedItemsEntry.entityType,
-                                    linkedItemsEntry.entityId
-                                );
+                                // Clear cache for linked items before reloading
+                                const cacheKey = `linked-items-${linkedItemsEntry.entityType}-${linkedItemsEntry.entityId}`;
+                                if (window.UnifiedCacheManager?.invalidate) {
+                                    try {
+                                        await window.UnifiedCacheManager.invalidate(cacheKey, { layer: 'memory' });
+                                        window.Logger?.debug('🔄 Cache invalidated for linked items', {
+                                            cacheKey,
+                                            page: 'unified-crud-service'
+                                        });
+                                    } catch (cacheError) {
+                                        window.Logger?.warn('⚠️ Failed to invalidate cache', {
+                                            cacheKey,
+                                            error: cacheError,
+                                            page: 'unified-crud-service'
+                                        });
+                                    }
+                                }
+                                
+                                // Also clear entityDetailsAPI cache if available
+                                if (window.entityDetailsAPI?.clearEntityCache) {
+                                    try {
+                                        window.entityDetailsAPI.clearEntityCache('linked-items', `${linkedItemsEntry.entityType}-${linkedItemsEntry.entityId}`);
+                                    } catch (e) {
+                                        // Ignore cache clear errors
+                                    }
+                                }
+                                
+                                // Reload linked items data with cache busting (force refresh)
+                                // Use direct fetch with timestamp to bypass any caching
+                                let linkedItemsData = null;
+                                try {
+                                    const url = `/api/linked-items/${linkedItemsEntry.entityType}/${linkedItemsEntry.entityId}?_t=${Date.now()}`;
+                                    window.Logger?.debug('🔄 Fetching linked items from server', {
+                                        url,
+                                        page: 'unified-crud-service'
+                                    });
+                                    
+                                    const response = await fetch(url, {
+                                        method: 'GET',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Cache-Control': 'no-cache'
+                                        }
+                                    });
+                                    
+                                    if (response.ok) {
+                                        linkedItemsData = await response.json();
+                                        window.Logger?.debug('✅ Linked items data fetched from server', {
+                                            hasData: !!linkedItemsData,
+                                            parentCount: linkedItemsData?.parent_entities?.length || 0,
+                                            childCount: linkedItemsData?.child_entities?.length || 0,
+                                            page: 'unified-crud-service'
+                                        });
+                                    } else {
+                                        window.Logger?.warn('⚠️ Failed to fetch linked items', {
+                                            status: response.status,
+                                            page: 'unified-crud-service'
+                                        });
+                                        // Fallback to loadLinkedItemsData
+                                        linkedItemsData = await window.loadLinkedItemsData?.(
+                                            linkedItemsEntry.entityType,
+                                            linkedItemsEntry.entityId
+                                        );
+                                    }
+                                } catch (fetchError) {
+                                    window.Logger?.warn('⚠️ Error fetching linked items, using fallback', {
+                                        error: fetchError,
+                                        page: 'unified-crud-service'
+                                    });
+                                    // Fallback to loadLinkedItemsData
+                                    linkedItemsData = await window.loadLinkedItemsData?.(
+                                        linkedItemsEntry.entityType,
+                                        linkedItemsEntry.entityId
+                                    );
+                                }
                                 
                                 window.Logger?.debug('🔄 Linked items data loaded', {
                                     hasData: !!linkedItemsData,
                                     parentCount: linkedItemsData?.parent_entities?.length || 0,
                                     childCount: linkedItemsData?.child_entities?.length || 0,
+                                    modalMode,
+                                    deletedItemInData: linkedItemsData ? (
+                                        (linkedItemsData.parent_entities || []).some(item => item.id === entityId && item.type === entityType) ||
+                                        (linkedItemsData.child_entities || []).some(item => item.id === entityId && item.type === entityType)
+                                    ) : false,
                                     page: 'unified-crud-service'
                                 });
                                 
@@ -385,16 +464,25 @@ class UnifiedCRUDService {
                                     });
                                     
                                     if (tables.length > 0) {
-                                        // Get all items (parent + child) - the modal shows all items in one table
+                                        // Determine which items to show based on mode (same logic as in createLinkedItemsModalContent)
+                                        // In warningBlock mode, show only child entities
+                                        // In view mode, show parent + child entities
                                         const parentEntities = linkedItemsData.parent_entities || [];
                                         const childEntities = linkedItemsData.child_entities || [];
-                                        let allItems = [...parentEntities, ...childEntities];
+                                        let allItems = modalMode === 'warningBlock' 
+                                            ? childEntities  // Only child entities in warningBlock mode
+                                            : [...parentEntities, ...childEntities];  // All entities in view mode
                                         
-                                        window.Logger?.debug('🔄 Items before sorting', {
+                                        window.Logger?.info('🔄 Items before enrichment and sorting', {
+                                            modalMode,
                                             totalItems: allItems.length,
                                             parentCount: parentEntities.length,
                                             childCount: childEntities.length,
+                                            showingOnlyChildren: modalMode === 'warningBlock',
                                             deletedItemInList: allItems.some(item => item.id === entityId && item.type === entityType),
+                                            deletedEntityType: entityType,
+                                            deletedEntityId: entityId,
+                                            allItemsSample: allItems.slice(0, 2),
                                             page: 'unified-crud-service'
                                         });
                                         
@@ -425,19 +513,68 @@ class UnifiedCRUDService {
                                             page: 'unified-crud-service'
                                         });
                                         
-                                        // Update each table with all items
+                                        // Update each table with all items (even if empty - this is normal after deletion)
                                         tables.forEach(table => {
                                             const tableId = table.id;
                                             
                                             window.Logger?.debug('🔄 Updating table', {
                                                 tableId,
                                                 itemsCount: enrichedItems.length,
+                                                willClearTable: enrichedItems.length === 0,
+                                                page: 'unified-crud-service'
+                                            });
+                                            
+                                            // Get current row count before update
+                                            const tbody = table.querySelector('tbody');
+                                            const rowsBefore = tbody ? tbody.querySelectorAll('tr').length : 0;
+                                            
+                                            window.Logger?.debug('🔄 Table state before update', {
+                                                tableId,
+                                                rowsBefore,
+                                                itemsToShow: enrichedItems.length,
                                                 page: 'unified-crud-service'
                                             });
                                             
                                             // Update table using EntityDetailsRenderer
+                                            // Note: updateLinkedItemsTableBody will clear the table if enrichedItems is empty
                                             if (window.entityDetailsRenderer?.updateLinkedItemsTableBody) {
+                                                window.Logger?.debug('🔄 Calling updateLinkedItemsTableBody', {
+                                                    tableId,
+                                                    itemsCount: enrichedItems.length,
+                                                    page: 'unified-crud-service'
+                                                });
                                                 window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, enrichedItems);
+                                                
+                                                // Verify update after a short delay
+                                                setTimeout(() => {
+                                                    const tbodyAfter = table.querySelector('tbody');
+                                                    const rowsAfter = tbodyAfter ? tbodyAfter.querySelectorAll('tr').length : 0;
+                                                    const deletedItemStillVisible = tbodyAfter ? 
+                                                        Array.from(tbodyAfter.querySelectorAll('tr')).some(row => {
+                                                            const rowId = row.getAttribute('data-item-id');
+                                                            const rowType = row.getAttribute('data-item-type');
+                                                            return rowId === String(entityId) && rowType === entityType;
+                                                        }) : false;
+                                                    
+                                                    window.Logger?.info('✅ Table update verification', {
+                                                        tableId,
+                                                        rowsBefore,
+                                                        rowsAfter,
+                                                        expectedRows: enrichedItems.length,
+                                                        deletedItemStillVisible,
+                                                        page: 'unified-crud-service'
+                                                    });
+                                                    
+                                                    if (deletedItemStillVisible) {
+                                                        window.Logger?.warn('⚠️ Deleted item still visible in table!', {
+                                                            tableId,
+                                                            deletedEntityType: entityType,
+                                                            deletedEntityId: entityId,
+                                                            page: 'unified-crud-service'
+                                                        });
+                                                    }
+                                                }, 500);
+                                                
                                                 window.Logger?.debug('✅ Table updated via EntityDetailsRenderer', {
                                                     tableId,
                                                     itemsCount: enrichedItems.length,

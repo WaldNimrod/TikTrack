@@ -492,6 +492,8 @@
     <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -536,6 +538,8 @@
     <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
     <!-- [40] Load Order: 40 -->
     <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
+    <!-- [40.1] Load Order: 40.1 - MUST BE BEFORE modal configs -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
     <!-- [41] Load Order: 41 -->
     <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
 
@@ -546,6 +550,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [41.9] Load Order: 41.9 - MUST BE BEFORE preferences-core-new.js -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [42] Load Order: 42 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [43] Load Order: 43 -->
@@ -558,12 +564,10 @@
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [47] Load Order: 47 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <!-- [47.1] Load Order: 47.1 - MUST BE BEFORE preferences-group-manager.js -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
     <!-- [48] Load Order: 48 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
-    <!-- [58.9] Preferences V4 SDK (group-first) -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [64.1] Preferences UI V4 (Group-First) -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/10: VALIDATION PACKAGE ===== -->
@@ -600,16 +604,6 @@
     <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
     <!-- [58] Load Order: 58 -->
     <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
-    <!-- [58.5] Load Order: 58.5 -->
-    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
-    <!-- [58.6] Load Order: 58.6 -->
-    <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
-    <!-- [58.7] Load Order: 58.7 -->
-    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
-    <!-- [58.8] Load Order: 58.8 -->
-    <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
-    <!-- [58.9] Load Order: 58.9 -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/modal-configs/trading-accounts-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל חשבונות מסחר -->
 

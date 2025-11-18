@@ -4580,9 +4580,21 @@ class EntityDetailsRenderer {
             return;
         }
         
-        // הגנה: אם אין נתונים תקינים, אל ננקה את הטבלה
+        // אם אין נתונים - ננקה את הטבלה (זה תקין אחרי מחיקה)
         if (sortedData.length === 0) {
-            console.warn('⚠️ [updateLinkedItemsTableBody] Empty sorted data, keeping existing table content');
+            console.log('ℹ️ [updateLinkedItemsTableBody] Empty sorted data - clearing table (this is normal after deletion)');
+            tbody.innerHTML = '';
+            
+            // Initialize tooltips and buttons even for empty table
+            this._initializeFilterTooltips(tableId);
+            setTimeout(() => {
+                if (window.initializeButtons && typeof window.initializeButtons === 'function') {
+                    window.initializeButtons();
+                } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+                    window.ButtonSystem.initializeButtons();
+                }
+            }, 100);
+            
             return;
         }
         

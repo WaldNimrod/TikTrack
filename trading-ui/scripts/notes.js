@@ -1392,7 +1392,27 @@ async function saveNote() {
       }
     }
 
+    // Debug: Log the result structure to understand what we're getting
+    window.Logger?.debug('🔍 saveNote - crudResult structure:', {
+      hasCrudResult: !!crudResult,
+      crudResultType: typeof crudResult,
+      hasData: !!crudResult?.data,
+      hasId: crudResult?.data?.id !== undefined,
+      crudResultKeys: crudResult ? Object.keys(crudResult) : [],
+      dataKeys: crudResult?.data ? Object.keys(crudResult.data) : [],
+      resultId: crudResult?.data?.id,
+      resultIdDirect: crudResult?.id,
+      page: 'notes'
+    });
+
     const resolvedNoteId = noteId || Number(crudResult?.data?.id || crudResult?.id);
+    window.Logger?.debug('🔍 saveNote - resolvedNoteId:', {
+      noteId,
+      resolvedNoteId,
+      isFinite: Number.isFinite(resolvedNoteId),
+      page: 'notes'
+    });
+
     if (Number.isFinite(resolvedNoteId) && window.TagService) {
       try {
         await window.TagService.replaceEntityTags('note', resolvedNoteId, tagIds);

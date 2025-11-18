@@ -287,10 +287,12 @@ class LazyLoader {
     // window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
 
     try {
+      // Use force: false to leverage cache - only call API if cache is missing or expired
+      // This prevents unnecessary API calls and rate limiting
       const payload = await window.PreferencesData.loadAllPreferencesRaw({
         userId,
         profileId,
-        force: true,
+        force: false, // Use cache if available - only fetch from API if cache is missing/expired
       });
 
       const allPreferences = payload?.preferences || {};
@@ -425,23 +427,50 @@ class LazyLoader {
     const lowPrefs = this.classifier.getPreferencesByClassification('low');
     this.loadingStats.low.total = lowPrefs.length;
 
-    window.Logger.debug(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: 'preferences-lazy-loader' });
-
-    // Load one by one with longer delays
-    for (const prefName of lowPrefs) {
-      try {
-        await this.loadSinglePreference(prefName, userId, profileId);
-        this.loadedPreferences.add(prefName);
-        this.loadingStats.low.loaded++;
-      } catch (error) {
-        window.Logger.warn(`⚠️ Failed to load low priority preference ${prefName}:`, error, { page: 'preferences-lazy-loader' });
-      }
-
-      // Delay between each preference
-      await new Promise(resolve => setTimeout(resolve, 200));
+    if (lowPrefs.length === 0) {
+      return;
     }
 
-    window.Logger.debug(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: 'preferences-lazy-loader' });
+    window.Logger.debug(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: 'preferences-lazy-loader' });
+
+    // Load all low priority preferences at once to avoid multiple API calls
+    // This prevents rate limiting after cache clear or hard refresh
+    try {
+      // Use force: false to leverage cache - only call API if cache is missing or expired
+      const payload = await window.PreferencesData.loadAllPreferencesRaw({
+        userId,
+        profileId,
+        force: false, // Use cache if available - only fetch from API if cache is missing/expired
+      });
+
+      const allPreferences = payload?.preferences || {};
+
+      // Mark all low priority preferences as loaded
+      for (const prefName of lowPrefs) {
+        if (Object.prototype.hasOwnProperty.call(allPreferences, prefName)) {
+          this.loadedPreferences.add(prefName);
+          this.loadingStats.low.loaded++;
+        }
+      }
+
+      window.Logger.debug(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: 'preferences-lazy-loader' });
+    } catch (error) {
+      window.Logger.warn(`⚠️ Failed to load low priority preferences:`, error, { page: 'preferences-lazy-loader' });
+      // Fallback: try loading individually (but this should rarely happen)
+      for (const prefName of lowPrefs) {
+        if (!this.loadedPreferences.has(prefName)) {
+          try {
+            await this.loadSinglePreference(prefName, userId, profileId);
+            this.loadedPreferences.add(prefName);
+            this.loadingStats.low.loaded++;
+            // Delay between each preference to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (err) {
+            window.Logger.warn(`⚠️ Failed to load low priority preference ${prefName}:`, err, { page: 'preferences-lazy-loader' });
+          }
+        }
+      }
+    }
   }
 
   /**

@@ -2365,46 +2365,9 @@ function hideDefaultProfileWarning() {
   }
 }
 
-// Auto-initialize when DOM is ready (disabled on preferences page - V4 owns that page)
-const shouldAutoInitPreferencesUI = () => {
-  try {
-    const body = document.body;
-    if (!body || !body.classList) {
-      return true;
-    }
-    // Skip legacy PreferencesUI auto-init on the main preferences page,
-    // where PreferencesUIV4 + unifiedAppInitializer manage initialization.
-    return !body.classList.contains('preferences-page');
-  } catch (e) {
-    return true;
-  }
-};
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!shouldAutoInitPreferencesUI()) {
-      window.Logger?.info?.('ℹ️ Skipping legacy PreferencesUI auto-init on preferences page (handled by PreferencesUIV4)', {
-        page: 'preferences-ui',
-      });
-      return;
-    }
-    window.Logger.info('📄 Preferences UI system initialized', { page: 'preferences-ui' });
-    if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
-      window.PreferencesUI.initialize();
-    }
-  });
-} else {
-  if (!shouldAutoInitPreferencesUI()) {
-    window.Logger?.info?.('ℹ️ Skipping legacy PreferencesUI auto-init on preferences page (handled by PreferencesUIV4)', {
-      page: 'preferences-ui',
-    });
-  } else {
-    window.Logger.info('📄 Preferences UI system initialized', { page: 'preferences-ui' });
-    if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
-      window.PreferencesUI.initialize();
-    }
-  }
-}
+// Auto-initialization removed - preferences loading is now handled centrally by unified-app-initializer.js
+// All pages with 'preferences' package will have preferences loaded through the unified initialization system
+// This ensures single point of entry, proper cache usage, and no duplicate API calls
 
 if (window.Logger && window.Logger.info) {
   window.Logger.info('✅ preferences-ui.js loaded successfully', { page: 'preferences-ui' });

@@ -4,8 +4,8 @@
 
 Complete guide for developers working with the Linked Items system in TikTrack.
 
-**Version**: 2.2.0  
-**Date**: 2025-01-12  
+**Version**: 2.3.0  
+**Date**: 2025-01-18  
 **Architecture**: Configuration-Based Schema
 
 ---
@@ -603,6 +603,38 @@ for item in linked_items:
    - All direct, through, conditional, and legacy relationships now properly validate IDs
    - Prevents unnecessary database queries for invalid IDs
    - Better logging for debugging ID validation issues
+
+### Recent Changes (v2.3.0 - 2025-01-18)
+
+1. **Linked Items Modal Refresh After Deletion**
+   - **Issue**: After deleting a linked item from the linked items modal, the display was not updating to reflect the deletion
+   - **Fix**: Enhanced `UnifiedCRUDService.deleteEntity()` to automatically refresh the linked items modal after successful deletion
+   - **Implementation**:
+     - Retrieves parent `entityType` and `entityId` from `ModalNavigationService` stack
+     - Retrieves `modalMode` (e.g., 'warningBlock') from metadata to preserve filtering
+     - Clears relevant caches (`UnifiedCacheManager` and `entityDetailsAPI` linked items cache)
+     - Performs direct fetch with cache-busting to ensure fresh data
+     - Filters data based on `modalMode` (only child entities for `warningBlock`, both for `view`)
+     - Updates all linked items tables in the modal using `entityDetailsRenderer.updateLinkedItemsTableBody`
+   - **Impact**: Linked items modal now correctly updates after deletion, maintaining the correct mode (warningBlock/view)
+
+2. **Empty Table Handling**
+   - **Issue**: When all linked items were deleted, the table still showed old data instead of being empty
+   - **Fix**: Modified `entityDetailsRenderer.updateLinkedItemsTableBody()` to explicitly clear `tbody.innerHTML` when `sortedData` is empty
+   - **Impact**: Empty state is now correctly displayed when all linked items are deleted
+
+3. **Modal Mode Preservation**
+   - **Issue**: After refresh, `warningBlock` mode was showing both parent and child entities instead of only child entities
+   - **Fix**: `modalMode` is now retrieved from `ModalNavigationService` metadata and applied during refresh
+   - **Impact**: `warningBlock` mode correctly maintains its filtering (only child entities) after refresh
+
+4. **Package Manifest Loading Order Fixes**
+   - **Issue**: Preferences scripts were loading in incorrect order, causing initialization errors
+   - **Fix**: Updated `package-manifest.js` to correct loading order:
+     - `preferences-v4.js`: loadOrder changed from 0.9 to 0.5 (must load before `preferences-core-new.js`)
+     - `preferences-ui-v4.js`: loadOrder changed from 6.1 to 5.5 (must load before `preferences-group-manager.js`)
+   - **Impact**: Preferences system now initializes correctly without order-related errors
+   - **Note**: HTML files need to be regenerated using `PageTemplateGenerator.generateScriptTagsForPage()` to reflect these changes
 
 ---
 

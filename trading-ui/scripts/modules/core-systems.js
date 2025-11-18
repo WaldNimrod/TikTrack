@@ -1124,14 +1124,12 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         console.warn('⚠️ Failed binding preferences listeners:', err);
       }
 
-      // Initial preferences load to apply CSS vars and non-CSS prefs immediately
-      try {
-        if (typeof window.loadUserPreferences === 'function') {
-          await window.loadUserPreferences({ force: true, source: 'init' });
-        }
-      } catch (e) {
-        console.warn('⚠️ Initial loadUserPreferences failed:', e);
-      }
+      // Initial preferences load removed - now handled by unified-app-initializer.js
+      // Preferences are loaded centrally through initializePreferencesForPage() which ensures:
+      // - Single point of entry
+      // - Proper cache usage (force: false for regular pages, force: true only for preferences page)
+      // - No duplicate API calls
+      // - Non-blocking initialization for better page load performance
 
       this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
       console.log('✅ Stage 4 Complete');

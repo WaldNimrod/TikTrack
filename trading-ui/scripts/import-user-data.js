@@ -1072,10 +1072,19 @@ async function loadAccountsForLinking(targetSelect) {
     }
     if (!accountOptionsCache) {
         try {
-            const response = await fetch('/api/trading-accounts/');
-            const payload = await response.json();
-            const accounts = Array.isArray(payload?.data) ? payload.data : (payload || []);
-            accountOptionsCache = accounts.filter((account) => account.status === 'open' || account.status === 'OPEN');
+            // Use DataImportData service for unified caching and to prevent duplicate API calls
+            if (window.DataImportData?.loadTradingAccountsForImport) {
+                const accounts = await window.DataImportData.loadTradingAccountsForImport();
+                accountOptionsCache = Array.isArray(accounts) 
+                    ? accounts.filter((account) => account.status === 'open' || account.status === 'OPEN')
+                    : [];
+            } else {
+                // Fallback to direct fetch if service not available
+                const response = await fetch('/api/trading-accounts/');
+                const payload = await response.json();
+                const accounts = Array.isArray(payload?.data) ? payload.data : (payload || []);
+                accountOptionsCache = accounts.filter((account) => account.status === 'open' || account.status === 'OPEN');
+            }
         } catch (error) {
             window.Logger?.error('[Import Modal] Failed to load accounts for linking', { error, page: 'import-user-data' });
             accountOptionsCache = [];
@@ -3682,14 +3691,18 @@ function ensureTickerSaveHook(retry = 0) {
 /**
  * Initialize import user data modal - called by unified system
  */
-window.initializeImportUserDataModal = function() {
+window.initializeImportUserDataModal = async function() {
     window.Logger.info('[Import Modal] Initializing import modal', { page: 'import-user-data' });
     
     // Don't setup event listeners here - they will be set up when modal opens
     // setupImportModalEventListeners();
     
-    // Load accounts
-    loadAccounts();
+    // Don't load accounts here - they will be loaded when modal opens
+    // This prevents duplicate API calls during page initialization
+    // Accounts will be loaded by loadAccounts() when openImportUserDataModal() is called
+    window.Logger.debug('[Import Modal] Skipping account load during initialization - will load when modal opens', { 
+        page: 'import-user-data' 
+    });
 };
 
 /**
@@ -3699,32 +3712,93 @@ window.initializeImportUserDataModal = function() {
 async function openImportUserDataModalWithSessionCleanup() {
     window.Logger.info('[Import Modal] Opening import modal with session cleanup', { page: 'import-user-data' });
     
-    // Check for active session and clear it before opening modal
     try {
-        const response = await fetch('/api/user-data-import/sessions/active');
-        if (response.ok) {
-            const data = await response.json();
-            if (data.session) {
-                const sessionStatus = (data.session.status || '').toLowerCase();
-                const closedStatuses = ['completed', 'failed', 'cancelled'];
-                
-                // If session is active (not closed), clear it
-                if (!closedStatuses.includes(sessionStatus)) {
-                    window.Logger.info('[Import Modal] Active session found, clearing before opening modal', { 
-                        sessionId: data.session.id, 
-                        page: 'import-user-data' 
-                    });
-                    // Clear active session silently (no user confirmation needed)
-                    await handleSessionReset(data.session.id);
+        // Check for active session and clear it before opening modal
+        // Use timeout to prevent hanging on network errors
+        let timeoutId = null;
+        try {
+            // Create abort controller for timeout
+            const controller = new AbortController();
+            timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            
+            const fetchPromise = fetch('/api/user-data-import/sessions/active', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                signal: controller.signal
+            });
+            
+            const response = await fetchPromise;
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            if (response.ok) {
+                const data = await response.json();
+                if (data.session) {
+                    const sessionStatus = (data.session.status || '').toLowerCase();
+                    const closedStatuses = ['completed', 'failed', 'cancelled'];
+                    
+                    // If session is active (not closed), clear it
+                    if (!closedStatuses.includes(sessionStatus)) {
+                        window.Logger.info('[Import Modal] Active session found, clearing before opening modal', { 
+                            sessionId: data.session.id, 
+                            page: 'import-user-data' 
+                        });
+                        // Clear active session silently (no user confirmation needed)
+                        // Skip goToStep since modal is not open yet - it will be opened after this
+                        await handleSessionReset(data.session.id, true);
+                    }
                 }
             }
+        } catch (error) {
+            // Make sure timeout is cleared even on error
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            // Network errors, timeouts, etc. - just log and continue
+            // Don't block modal opening if session check fails
+            if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+                window.Logger?.warn?.('[Import Modal] Session check timed out, continuing to open modal', { 
+                    error: error?.message,
+                    page: 'import-user-data' 
+                });
+            } else if (error.message?.includes('ERR_ADDRESS_INVALID') || error.message?.includes('Failed to fetch')) {
+                window.Logger?.warn?.('[Import Modal] Network error during session check, continuing to open modal', { 
+                    error: error?.message,
+                    page: 'import-user-data' 
+                });
+            } else {
+                window.Logger?.warn?.('[Import Modal] Failed to check/clear active session', { 
+                    error: error?.message,
+                    page: 'import-user-data' 
+                });
+            }
+            // Continue to open modal even if session check failed
         }
+        
+        // Now open the modal - this should always happen regardless of session check result
+        window.Logger.debug('[Import Modal] About to call openImportUserDataModal', { page: 'import-user-data' });
+        await openImportUserDataModal();
+        window.Logger.info('[Import Modal] openImportUserDataModal completed', { page: 'import-user-data' });
     } catch (error) {
-        window.Logger?.warn?.('[Import Modal] Failed to check/clear active session', { error: error?.message });
+        window.Logger?.error('[Import Modal] Failed to open import modal', { 
+            error: error?.message, 
+            stack: error?.stack,
+            page: 'import-user-data' 
+        });
+        if (typeof window.showDetailedNotification === 'function') {
+            window.showDetailedNotification(
+                'שגיאה בפתיחת מודול ייבוא',
+                `לא ניתן לפתוח את מודול הייבוא: ${error?.message || 'שגיאה לא ידועה'}`,
+                'error',
+                10000,
+                'import-user-data'
+            );
+        }
     }
-    
-    // Now open the modal
-    await openImportUserDataModal();
 }
 
 /**
@@ -3734,84 +3808,208 @@ async function openImportUserDataModalWithSessionCleanup() {
 async function openImportUserDataModal() {
     window.Logger.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
     
-    const modal = getImportModalElement();
-    if (!modal) {
-        window.Logger.error('[Import Modal] Modal element not found in DOM', { page: 'import-user-data' });
-        return;
-    }
-    
-    // Reset state before displaying
-    resetImportModal();
-    
-    // Ensure listeners are initialized once
-    setupImportModalEventListeners();
-    attachImportModalNavigationListeners(modal);
-    
-    if (window.ModalNavigationService?.registerModalOpen) {
-        const activeEntry = window.ModalNavigationService.getActiveEntry?.();
-        const navigationOverrides = {};
-        if (activeEntry && activeEntry.modalId === IMPORT_MODAL_ID) {
-            navigationOverrides.replaceActive = true;
-        } else if (activeEntry) {
-            navigationOverrides.parentInstanceId = activeEntry.instanceId;
-            navigationOverrides.sourceInfo = {
-                modalId: activeEntry.modalId,
-                entityType: activeEntry.entityType,
-                entityId: activeEntry.entityId,
-                instanceId: activeEntry.instanceId
-            };
+    try {
+        window.Logger.debug('[Import Modal] Step 1: Getting modal element', { page: 'import-user-data' });
+        const modal = getImportModalElement();
+        if (!modal) {
+            window.Logger.error('[Import Modal] Modal element not found in DOM', { page: 'import-user-data' });
+            throw new Error('Modal element not found in DOM. Make sure the import modal HTML is loaded.');
         }
-        await registerImportModalNavigation(navigationOverrides);
-    } else {
-        importNavigationInstanceId = null;
-    }
+        
+        window.Logger.debug('[Import Modal] Modal element found', { 
+            modalId: modal.id,
+            page: 'import-user-data' 
+        });
     
-    // Show modal using Bootstrap when available
-    if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
-        importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
-        if (!importModalBootstrapInstance) {
-            importModalBootstrapInstance = new bootstrap.Modal(modal, {
-                backdrop: true,
-                keyboard: true,
-                focus: true
+        // Reset state before displaying
+        window.Logger.debug('[Import Modal] Step 2: Resetting modal state', { page: 'import-user-data' });
+        try {
+            resetImportModal();
+            window.Logger.debug('[Import Modal] Modal state reset complete', { page: 'import-user-data' });
+        } catch (error) {
+            window.Logger?.warn('[Import Modal] Error resetting modal state, continuing', { 
+                error: error?.message,
+                page: 'import-user-data' 
             });
         }
-        importModalBootstrapInstance.show();
-    } else {
-        // Fallback manual display
-        modal.style.display = 'block';
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
-    }
         
-    // Process buttons using centralized button system
-    if (window.processButtons) {
-        window.processButtons(modal);
-        window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-    } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
-        window.advancedButtonSystem.processButtons(modal);
-        window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-    } else if (window.initializeButtons) {
-        window.initializeButtons();
-        window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+        // Ensure listeners are initialized once
+        window.Logger.debug('[Import Modal] Step 3: Setting up event listeners', { page: 'import-user-data' });
+        try {
+            setupImportModalEventListeners();
+            attachImportModalNavigationListeners(modal);
+            window.Logger.debug('[Import Modal] Event listeners setup complete', { page: 'import-user-data' });
+        } catch (error) {
+            window.Logger?.warn('[Import Modal] Error setting up event listeners, continuing', { 
+                error: error?.message,
+                page: 'import-user-data' 
+            });
+        }
+        
+        window.Logger.debug('[Import Modal] Step 4: Registering modal navigation', { page: 'import-user-data' });
+        if (window.ModalNavigationService?.registerModalOpen) {
+            try {
+                const activeEntry = window.ModalNavigationService.getActiveEntry?.();
+                const navigationOverrides = {};
+                if (activeEntry && activeEntry.modalId === IMPORT_MODAL_ID) {
+                    navigationOverrides.replaceActive = true;
+                } else if (activeEntry) {
+                    navigationOverrides.parentInstanceId = activeEntry.instanceId;
+                    navigationOverrides.sourceInfo = {
+                        modalId: activeEntry.modalId,
+                        entityType: activeEntry.entityType,
+                        entityId: activeEntry.entityId,
+                        instanceId: activeEntry.instanceId
+                    };
+                }
+                await registerImportModalNavigation(navigationOverrides);
+                window.Logger.debug('[Import Modal] Modal navigation registered', { page: 'import-user-data' });
+            } catch (error) {
+                window.Logger?.warn('[Import Modal] Error registering modal navigation, continuing', { 
+                    error: error?.message,
+                    page: 'import-user-data' 
+                });
+            }
+        } else {
+            importNavigationInstanceId = null;
+            window.Logger.debug('[Import Modal] ModalNavigationService not available, skipping navigation registration', { page: 'import-user-data' });
+        }
+        
+        // Show modal using Bootstrap when available
+        window.Logger.debug('[Import Modal] Step 5: Showing modal', { 
+            bootstrapAvailable: typeof bootstrap !== 'undefined',
+            bootstrapModalAvailable: typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function',
+            page: 'import-user-data' 
+        });
+        
+        let modalShown = false;
+        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+            try {
+                window.Logger.debug('[Import Modal] Using Bootstrap to show modal', { page: 'import-user-data' });
+                importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
+                if (!importModalBootstrapInstance) {
+                    window.Logger.debug('[Import Modal] Creating new Bootstrap Modal instance', { page: 'import-user-data' });
+                    importModalBootstrapInstance = new bootstrap.Modal(modal, {
+                        backdrop: true,
+                        keyboard: true,
+                        focus: true
+                    });
+                }
+                window.Logger.debug('[Import Modal] Calling Bootstrap modal.show()', { page: 'import-user-data' });
+                importModalBootstrapInstance.show();
+                modalShown = true;
+                window.Logger.info('[Import Modal] Bootstrap modal.show() called successfully', { page: 'import-user-data' });
+            } catch (error) {
+                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying fallback', { 
+                    error: error?.message,
+                    stack: error?.stack,
+                    page: 'import-user-data' 
+                });
+            }
+        }
+        
+        if (!modalShown) {
+            window.Logger.debug('[Import Modal] Using fallback method to show modal', { page: 'import-user-data' });
+            try {
+                modal.style.display = 'block';
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+                modalShown = true;
+                window.Logger.info('[Import Modal] Fallback modal display applied successfully', { page: 'import-user-data' });
+            } catch (error) {
+                window.Logger?.error('[Import Modal] Error in fallback modal display', { 
+                    error: error?.message,
+                    stack: error?.stack,
+                    page: 'import-user-data' 
+                });
+                throw new Error(`Failed to show modal: ${error?.message || 'Unknown error'}`);
+            }
+        }
+        
+        // Process buttons using centralized button system
+        window.Logger.debug('[Import Modal] Step 6: Processing buttons', { page: 'import-user-data' });
+        try {
+            if (window.processButtons) {
+                window.processButtons(modal);
+                window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
+            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                window.advancedButtonSystem.processButtons(modal);
+                window.Logger.debug('[Import Modal] Buttons processed by advanced button system', { page: 'import-user-data' });
+            } else if (window.initializeButtons) {
+                window.initializeButtons();
+                window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
+            } else {
+                window.Logger.debug('[Import Modal] No button processing system available', { page: 'import-user-data' });
+            }
+        } catch (error) {
+            window.Logger?.warn('[Import Modal] Error processing buttons, continuing', { 
+                error: error?.message,
+                page: 'import-user-data' 
+            });
+        }
+        
+        // Load accounts
+        window.Logger.debug('[Import Modal] Step 7: Loading accounts', { page: 'import-user-data' });
+        try {
+            await loadAccounts();
+            window.Logger.debug('[Import Modal] Accounts loaded successfully', { page: 'import-user-data' });
+        } catch (error) {
+            window.Logger?.warn('[Import Modal] Failed to load accounts, continuing anyway', { 
+                error: error?.message,
+                page: 'import-user-data' 
+            });
+            // Continue even if accounts fail to load
+        }
+        
+        // Clear any session state - modal always opens in clean state
+        window.Logger.debug('[Import Modal] Step 8: Clearing session state', { page: 'import-user-data' });
+        currentSessionId = null;
+        window.currentSessionId = null;
+        activeSessionInfo = null;
+        
+        window.Logger.debug('[Import Modal] Step 9: Applying restore state and going to step', { page: 'import-user-data' });
+        const restoredStep = applyImportModalRestoreState();
+        
+        // Initialize step 1
+        const initialStep = restoredStep && !Number.isNaN(Number(restoredStep))
+            ? Number(restoredStep)
+            : 1;
+        
+        window.Logger.debug('[Import Modal] Going to step', { 
+            step: initialStep,
+            page: 'import-user-data' 
+        });
+        
+        try {
+            goToStep(initialStep);
+            window.Logger.debug('[Import Modal] goToStep completed', { 
+                step: initialStep,
+                page: 'import-user-data' 
+            });
+        } catch (error) {
+            window.Logger?.error('[Import Modal] Error in goToStep', { 
+                error: error?.message,
+                stack: error?.stack,
+                step: initialStep,
+                page: 'import-user-data' 
+            });
+            // Don't throw - modal is already shown, just log the error
+        }
+        
+        window.Logger.info('[Import Modal] Modal opened successfully', { 
+            step: initialStep,
+            modalShown: modalShown,
+            page: 'import-user-data' 
+        });
+    } catch (error) {
+        window.Logger?.error('[Import Modal] Error in openImportUserDataModal', { 
+            error: error?.message, 
+            stack: error?.stack,
+            page: 'import-user-data' 
+        });
+        throw error; // Re-throw to be caught by caller
     }
-    
-    // Load accounts
-    await loadAccounts();
-    
-    // Clear any session state - modal always opens in clean state
-    currentSessionId = null;
-    window.currentSessionId = null;
-    activeSessionInfo = null;
-    
-    const restoredStep = applyImportModalRestoreState();
-    
-    // Initialize step 1
-    const initialStep = restoredStep && !Number.isNaN(Number(restoredStep))
-        ? Number(restoredStep)
-        : 1;
-    goToStep(initialStep);
 }
 
 /**
@@ -4280,6 +4478,7 @@ async function loadStep1Content() {
     const indicator = document.getElementById('activeSessionIndicator');
     const controlsRow = document.getElementById('activeSessionControlsRow');
     const detailsRow = document.getElementById('activeSessionDetailsRow');
+    const resumeButton = document.getElementById('resumeImportSessionBtn');
     if (indicator) {
         indicator.classList.add('d-none');
         indicator.style.display = 'none';
@@ -4291,6 +4490,10 @@ async function loadStep1Content() {
     if (detailsRow) {
         detailsRow.classList.add('d-none');
         detailsRow.style.display = 'none';
+    }
+    if (resumeButton) {
+        resumeButton.classList.add('d-none');
+        resumeButton.style.display = 'none';
     }
     
     // Ensure "Continue to Analysis" button is enabled
@@ -5133,22 +5336,17 @@ async function loadAccounts() {
         return;
     }
     
-    // Use the existing SelectPopulatorService but pass the element directly
-    if (window.SelectPopulatorService) {
-        window.Logger.debug('[Import Modal] Using SelectPopulatorService', { page: 'import-user-data' });
+    // Use DataImportData service for unified caching and to prevent duplicate API calls
+    // This service uses CacheTTLGuard to prevent multiple simultaneous requests
+    if (window.DataImportData?.loadTradingAccountsForImport) {
+        window.Logger.debug('[Import Modal] Using DataImportData service for accounts', { page: 'import-user-data' });
         try {
-            // Temporarily set the ID to ensure SelectPopulatorService finds it
-            // But we'll populate it manually to ensure it's the right element
-            const response = await fetch('/api/trading-accounts/');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const responseData = await response.json();
-            let accounts = responseData.data || responseData || [];
+            const accounts = await window.DataImportData.loadTradingAccountsForImport();
             
             // Filter only open accounts
-            accounts = accounts.filter(account => account.status === 'open');
+            const openAccounts = Array.isArray(accounts) 
+                ? accounts.filter(account => account.status === 'open')
+                : [];
             
             // Clear existing options
             accountSelect.innerHTML = '';
@@ -5160,15 +5358,15 @@ async function loadAccounts() {
             accountSelect.appendChild(emptyOption);
             
             // Add account options
-            accounts.forEach(account => {
+            openAccounts.forEach(account => {
                 const option = document.createElement('option');
                 option.value = account.id.toString(); // Ensure it's a string
-                option.textContent = account.name;
+                option.textContent = account.name || `חשבון #${account.id}`;
                 accountSelect.appendChild(option);
             });
             
-            window.Logger.info('[Import Modal] Accounts loaded successfully', { 
-                count: accounts.length, 
+            window.Logger.info('[Import Modal] Accounts loaded successfully via DataImportData', { 
+                count: openAccounts.length, 
                 page: 'import-user-data' 
             });
             
@@ -5176,12 +5374,15 @@ async function loadAccounts() {
             validateAccountSelection({ showNotification: false });
             updateAnalyzeButton();
         } catch (error) {
-            window.Logger.error('[Import Modal] Error loading accounts', { error: error.message, page: 'import-user-data' });
-            // Fallback to direct API call
+            window.Logger.error('[Import Modal] Error loading accounts via DataImportData', { 
+                error: error.message, 
+                page: 'import-user-data' 
+            });
+            // Fallback to direct API call only if service fails
             await loadAccountsFallback();
         }
     } else {
-        window.Logger.warn('[Import Modal] SelectPopulatorService not available, using fallback', { page: 'import-user-data' });
+        window.Logger.warn('[Import Modal] DataImportData service not available, using fallback', { page: 'import-user-data' });
         // Fallback to direct API call
         await loadAccountsFallback();
     }
@@ -7451,7 +7652,7 @@ function performImport(generateReport = false) {
  * Handle session reset - cancels session, clears cache, refreshes UI
  * Session is permanently closed after this operation
  */
-async function handleSessionReset(sessionId) {
+async function handleSessionReset(sessionId, skipGoToStep = false) {
     if (!sessionId) {
         // No session to reset - just clear UI and cache
         resetImportModal();
@@ -7459,7 +7660,9 @@ async function handleSessionReset(sessionId) {
         updateActiveSessionIndicator();
         updateResetSessionButtonState();
         updateAnalyzeButton();
-        goToStep(1);
+        if (!skipGoToStep) {
+            goToStep(1);
+        }
         return;
     }
 
@@ -7481,7 +7684,9 @@ async function handleSessionReset(sessionId) {
             updateActiveSessionIndicator();
             updateResetSessionButtonState();
             updateAnalyzeButton();
-            goToStep(1);
+            if (!skipGoToStep) {
+                goToStep(1);
+            }
             
             showImportUserDataNotification('סשן הייבוא בוטל בהצלחה. ניתן להתחיל תהליך חדש.', 'success');
             return;

@@ -344,6 +344,8 @@
     <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -446,6 +448,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [58.9] Load Order: 58.9 - Preferences V4 SDK (group-first) - MUST BE FIRST -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [60] Load Order: 60 -->
@@ -458,12 +462,10 @@
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [64] Load Order: 64 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
-    <!-- [58.9] Preferences V4 SDK (group-first) -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [64.1] Preferences UI V4 (Group-First) -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 7/11: VALIDATION PACKAGE ===== -->

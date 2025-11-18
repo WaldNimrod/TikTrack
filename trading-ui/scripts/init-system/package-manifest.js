@@ -689,7 +689,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.PreferencesV4',
         description: 'Preferences V4 SDK (group-first)',
         required: true,
-        loadOrder: 0.9
+        loadOrder: 0.5  // Must load before preferences-core-new.js
       },
       {
         file: 'preferences-core-new.js',
@@ -727,18 +727,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
+        file: 'preferences-ui-v4.js',
+        globalCheck: 'window.PreferencesUIV4',
+        description: 'ממשק משתמש V4 (Group-First)',
+        required: true,
+        loadOrder: 5.5  // Must load before preferences-ui.js and preferences-group-manager.js
+      },
+      {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'ממשק משתמש',
         required: true,
         loadOrder: 6
-      },
-      {
-        file: 'preferences-ui-v4.js',
-        globalCheck: 'window.PreferencesUIV4',
-        description: 'ממשק משתמש V4 (Group-First)',
-        required: true,
-        loadOrder: 6.1
       },
       {
         file: 'preferences-page.js',
@@ -1035,7 +1035,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/trades-data.js',
         globalCheck: 'window.TradesData',
         description: 'שירות נתוני טריידים (CRUD + Cache)',
-        required: false,
+        required: false,  // Required only for trades page, not all pages
         loadOrder: 0
       },
       {
@@ -1079,6 +1079,20 @@ const PACKAGE_MANIFEST = {
         description: 'שירות נתוני הערות',
         required: false,
         loadOrder: 6.5
+      },
+      {
+        file: 'services/alerts-data.js',
+        globalCheck: 'window.AlertsData',
+        description: 'שירות נתוני התראות',
+        required: false,
+        loadOrder: 6.6
+      },
+      {
+        file: 'services/tickers-data.js',
+        globalCheck: 'window.TickersData',
+        description: 'שירות נתוני טיקרים',
+        required: false,
+        loadOrder: 6.7
       },
       {
         file: 'condition-translator.js',

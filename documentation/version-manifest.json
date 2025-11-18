@@ -10,13 +10,13 @@
     "notes": "Add comprehensive tooltip standardization scanning and reporting tools"
   },
   "development": {
-    "version": "1.1.24.0",
+    "version": "1.1.26.0",
     "major": 1,
     "minor": 1,
-    "patch": 24,
+    "patch": 26,
     "build": 0,
-    "commit": "30bc262d3d382e89ee867818e27dfd3cf9e9ae80",
-    "updated_at": "2025-11-18T15:19:07+00:00",
-    "notes": "IBKR import system improvements: record classification, session management, rich text support"
+    "commit": "e172ac5b46d6913502c75696c9e680583727e66b",
+    "updated_at": "2025-11-18T21:05:53+00:00",
+    "notes": "Fix linked items modal refresh and package loading order"
   }
 }

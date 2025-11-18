@@ -76,3 +76,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-17T21:16:08+00:00 | 1.1.22.0 | 1.1.21.0 | cbdc829cabf0cbc1bdf2dfb3a8d2c3cb56a86aa7 | 5a9371ece904c2ad0f2c0c98ba26dd64fc7458be | patch | Fix import filtering and add delete imported cash flows feature |
 | 2025-11-17T22:20:31+00:00 | 1.1.23.0 | 1.1.22.0 | 91db23719cbffa885b60265e78e44c46b03f0161 | cbdc829cabf0cbc1bdf2dfb3a8d2c3cb56a86aa7 | patch | Implement generic table count update function across all pages |
 | 2025-11-18T15:19:07+00:00 | 1.1.24.0 | 1.1.23.0 | 30bc262d3d382e89ee867818e27dfd3cf9e9ae80 | 91db23719cbffa885b60265e78e44c46b03f0161 | patch | IBKR import system improvements: record classification, session management, rich text support |
+| 2025-11-18T20:36:56+00:00 | 1.1.25.0 | 1.1.24.0 | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | 30bc262d3d382e89ee867818e27dfd3cf9e9ae80 | patch | Add comprehensive tooltip standardization scanning and reporting tools |

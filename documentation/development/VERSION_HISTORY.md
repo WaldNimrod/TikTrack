@@ -79,3 +79,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-18T20:36:56+00:00 | 1.1.25.0 | 1.1.24.0 | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | 30bc262d3d382e89ee867818e27dfd3cf9e9ae80 | patch | Add comprehensive tooltip standardization scanning and reporting tools |
 | 2025-11-18T21:05:53+00:00 | 1.1.26.0 | 1.1.25.0 | e172ac5b46d6913502c75696c9e680583727e66b | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | patch | Fix linked items modal refresh and package loading order |
 | 2025-11-18T21:47:43+00:00 | 1.1.27.0 | 1.1.26.0 | 3e4ca378c2c879d09203620d9db0411a967f4492 | e172ac5b46d6913502c75696c9e680583727e66b | patch | Remove unnecessary debug console logs from button system |
+| 2025-11-19T19:12:18+00:00 | 1.1.28.0 | 1.1.27.0 | ac3504ad5f308180cfd3a57e626bc86649c1d844 | 3e4ca378c2c879d09203620d9db0411a967f4492 | patch | Add dependency analyzer and load order validator tools, fix trading accounts page tables |

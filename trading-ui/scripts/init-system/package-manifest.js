@@ -240,6 +240,13 @@ const PACKAGE_MANIFEST = {
         description: 'כלי דיבאג לבדיקת שכבות z-index של מודלים',
         required: false,
         loadOrder: 20
+      },
+      {
+        file: 'modules/core-systems.js',
+        globalCheck: 'window.UnifiedAppInitializer',
+        description: 'מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד)',
+        required: true,
+        loadOrder: 21
       }
     ],
     estimatedSize: '~280KB',
@@ -318,6 +325,13 @@ const PACKAGE_MANIFEST = {
         description: 'שירות CRUD מאוחד לכל הישויות',
         required: true,
         loadOrder: 6.5
+      },
+      {
+        file: 'services/research-data.js',
+        globalCheck: 'window.ResearchData',
+        description: 'שירות נתוני תחקיר',
+        required: false,
+        loadOrder: 6.6
       },
       {
         file: 'services/investment-calculation-service.js',
@@ -471,13 +485,6 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
-        file: 'modules/core-systems.js',
-        globalCheck: 'window.CoreSystems',
-        description: 'מערכות ליבה',
-        required: true,
-        loadOrder: 5
-      },
-      {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
         description: 'נתונים בסיסיים',
@@ -594,7 +601,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
-        required: true,
+        required: false, // Not required for tag-management page
         loadOrder: 22
       },
       {
@@ -682,7 +689,7 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 5,
-    dependencies: ['base'],
+    dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
     scripts: [
       {
         file: 'services/preferences-v4.js',
@@ -1493,12 +1500,34 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
-        file: 'unified-app-initializer.js',
-        globalCheck: 'window.UnifiedAppInitializer',
-        description: 'מאתחל אפליקציה מאוחד',
-        required: true,
+        file: 'init-system/all-pages-monitoring-test.js',
+        globalCheck: 'window.allPagesMonitoringTest',
+        description: 'בדיקה אוטומטית של כל העמודים',
+        required: false,
         loadOrder: 5
       },
+      {
+        file: 'init-system/pages-standardization-plan.js',
+        globalCheck: 'window.pagesStandardizationPlan',
+        description: 'תוכנית סטנדרטיזציה לכל העמודים',
+        required: false,
+        loadOrder: 6
+      },
+      {
+        file: 'init-system/dependency-analyzer.js',
+        globalCheck: 'window.dependencyAnalyzer',
+        description: 'ניתוח תלויות במניפסט החבילות',
+        required: false,
+        loadOrder: 7
+      },
+      {
+        file: 'init-system/load-order-validator.js',
+        globalCheck: 'window.loadOrderValidator',
+        description: 'בדיקת סדר טעינה בפועל בעמודים',
+        required: false,
+        loadOrder: 8
+      },
+      // unified-app-initializer.js removed - initialization now handled by core-systems.js
     ],
     estimatedSize: '~45KB',
     initTime: '~30ms'

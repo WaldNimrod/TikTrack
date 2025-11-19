@@ -470,6 +470,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/10: SERVICES PACKAGE ===== -->
@@ -563,9 +565,9 @@
     <!-- [46] Load Order: 46 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [47] Load Order: 47 -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
-    <!-- [47.1] Load Order: 47.1 - MUST BE BEFORE preferences-group-manager.js -->
     <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [47.1] Load Order: 47.1 - MUST BE BEFORE preferences-group-manager.js -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [48] Load Order: 48 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
 
@@ -649,7 +651,7 @@
     <!-- [67] Load Order: 67 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [68] Load Order: 68 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
@@ -657,11 +659,15 @@
 
     <!-- [69] Page-specific: trading_accounts -->
     <script src="scripts/trading_accounts.js?v=1.0.0"></script> <!-- Page-specific script for trading_accounts -->
+    <!-- [70] Page-specific: account-activity -->
+    <script src="scripts/account-activity.js?v=1.0.0"></script> <!-- מערכת תנועות חשבון -->
+    <!-- [71] Page-specific: positions-portfolio -->
+    <script src="scripts/positions-portfolio.js?v=1.0.0"></script> <!-- מערכת פוזיציות ופורטפוליו -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 69 | Unique Scripts Loaded: 69 -->
+    <!-- 📊 Total Scripts Processed: 71 | Unique Scripts Loaded: 71 -->
     <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("trading_accounts") -->
 
 </body>

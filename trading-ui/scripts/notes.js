@@ -140,16 +140,24 @@ window.loadNotesData = async function(options = {}) {
 
     window.notesData = normalizedNotes;
 
-    if (typeof window.updateNotesTable === 'function') {
-      window.updateNotesTable(normalizedNotes);
-    } else {
-      window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: 'notes' });
-    }
+    // סמן שאנחנו בתהליך עדכון כדי למנוע קריאות כפולות
+    window._notesUpdateInProgress = true;
+    
+    try {
+      if (typeof window.updateNotesTable === 'function') {
+        window.updateNotesTable(normalizedNotes);
+      } else {
+        window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: 'notes' });
+      }
 
-    if (typeof window.updateNotesSummary === 'function') {
-      window.updateNotesSummary(normalizedNotes);
-    } else {
-      window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: 'notes' });
+      if (typeof window.updateNotesSummary === 'function') {
+        window.updateNotesSummary(normalizedNotes);
+      } else {
+        window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: 'notes' });
+      }
+    } finally {
+      // הסר את הסמן אחרי שהעדכון הושלם
+      window._notesUpdateInProgress = false;
     }
 
     // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
@@ -854,7 +862,11 @@ function updateNotesTable(notes) {
       window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
 
       // עדכון table-count ו-info-summary
-      updateNotesSummary(notes);
+      // הערה: updateNotesSummary נקראת גם מ-loadNotesData, אז אין צורך לקרוא כאן שוב
+      // אם זו קריאה ישירה (לא דרך loadNotesData), נעדכן את הסיכום
+      if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
+        window.updateNotesSummary(notes);
+      }
       
       // 🔘 עדכון כפתורים דינמיים
       // NOTE: processButtons already handles tooltip initialization for buttons with data-button-type
@@ -893,43 +905,37 @@ function updateNotesTable(notes) {
 // פונקציה לעדכון סיכום הערות
 /**
  * Update the notes summary section
+ * Uses the centralized updatePageSummaryStats function from ui-utils.js
  * @param {Array} notes - Array of notes to summarize
  */
 function updateNotesSummary(notes) {
   const notesArray = Array.isArray(notes)
     ? notes
     : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('notes') : window.notesData || []);
-  try {
-    // שמירת המספר המקורי לחיפוש
-  window.originalNotesCount = notesArray.length;
-
-  // עדכון table-count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
-  if (window.updateTableCount) {
-    window.updateTableCount('.table-count', 'notes', 'הערות', notesArray.length);
-  } else {
-    // Fallback
-    const tableCountElement = document.querySelector('.table-count');
-    if (tableCountElement) {
-      tableCountElement.textContent = `${notesArray.length} הערות`;
-    }
-  }
-
-  // מערכת מאוחדת לסיכום נתונים
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.notes;
-    window.InfoSummarySystem.calculateAndRender(notesArray, config);
-  } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
   
+  try {
+    // שמירת המספר המקורי לחיפוש (נדרש לפונקציונליות ספציפית של עמוד הערות)
+    window.originalNotesCount = notesArray.length;
+
+    // עדכון table-count - משתמש בפונקציה הגנרית
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'notes', 'הערות', notesArray.length);
+    }
+
+    // שימוש בפונקציה המרכזית לסיכום נתונים - כמו בשאר העמודים
+    if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('notes', notesArray);
+    } else {
+      // Fallback - מערכת סיכום נתונים לא זמינה
+      const summaryStatsElement = document.getElementById('summaryStats');
+      if (summaryStatsElement) {
+        summaryStatsElement.innerHTML = `
+          <div style="color: #dc3545; font-weight: bold;">
+            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+          </div>
+        `;
+      }
+    }
   } catch (error) {
     window.Logger.error('שגיאה בעדכון סיכום הערות:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {

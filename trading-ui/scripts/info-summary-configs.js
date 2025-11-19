@@ -203,7 +203,7 @@ const INFO_SUMMARY_CONFIGS = {
       },
       {
         id: 'recentNotes',
-        label: 'הערות אחרונות',
+        label: 'הערות חדשות',
         calculator: 'countByConditions',
         params: {
           conditions: [
@@ -214,13 +214,22 @@ const INFO_SUMMARY_CONFIGS = {
       {
         id: 'notesWithAttachments',
         label: 'הערות עם קבצים',
-        calculator: 'countByField',
-        params: { field: 'has_attachment', value: true }
+        calculator: 'countByConditions',
+        params: {
+          conditions: [
+            { field: 'attachment', operator: '!==', value: null }
+          ]
+        }
       },
       {
-        id: 'notesByType',
-        label: 'הערות לפי סוג',
-        calculator: 'count'
+        id: 'totalLinks',
+        label: 'סה"כ קישורים',
+        calculator: 'countByConditions',
+        params: {
+          conditions: [
+            { field: 'related_id', operator: '!==', value: null }
+          ]
+        }
       }
     ]
   },

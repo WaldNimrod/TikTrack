@@ -1308,6 +1308,13 @@ window.restoreAllSectionStates = async function () {
   // In accordion mode, if no section was opened (all closed), keep all closed
   // (do not auto-open first section - let user manually open sections)
   
+  // Set flag and dispatch event to signal that sections have been restored
+  // This allows lazy loading observers to wait before initializing
+  window.sectionsRestored = true;
+  window.dispatchEvent(new CustomEvent('sections:restored', {
+    detail: { pageName, restoredCount, totalSections: sections.length, accordionMode }
+  }));
+  
   if (window.Logger) { window.Logger.debug(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections${accordionMode ? ' (accordion mode)' : ''}`, { page: "ui-utils" }); }
   return restoredCount;
 };
@@ -2061,30 +2068,37 @@ async function loadScriptsOnce(sources, options = {}) {
  */
 function updatePageSummaryStats(pageName, data, countElementId = null) {
   try {
-    // Using filtered data if available, otherwise provided data
-    let dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+    // Use provided data if available, otherwise try to get from filtered data or TableDataRegistry
+    let dataToUse = data;
 
-    if (window.TableDataRegistry) {
-      const summary = window.TableDataRegistry.getSummary(pageName);
-      if (summary) {
-        const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
-        if (Array.isArray(registryFiltered)) {
-          dataToUse = registryFiltered;
-        }
-      } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
-        const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
-        if (resolvedType) {
-          const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
-          if (Array.isArray(registryFiltered)) {
+    // Only use TableDataRegistry if no data was provided
+    if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
+      // Try filtered data first
+      dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+
+      // Then try TableDataRegistry
+      if (window.TableDataRegistry && (!Array.isArray(dataToUse) || dataToUse.length === 0)) {
+        const summary = window.TableDataRegistry.getSummary(pageName);
+        if (summary) {
+          const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
+          if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
             dataToUse = registryFiltered;
           }
+        } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
+          const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
+          if (resolvedType) {
+            const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
+            if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+              dataToUse = registryFiltered;
+            }
+          }
         }
-      }
 
-      if (!Array.isArray(dataToUse)) {
-        const registryFull = window.TableDataRegistry.getFullData(pageName);
-        if (Array.isArray(registryFull)) {
-          dataToUse = registryFull;
+        if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
+          const registryFull = window.TableDataRegistry.getFullData(pageName);
+          if (Array.isArray(registryFull) && registryFull.length > 0) {
+            dataToUse = registryFull;
+          }
         }
       }
     }

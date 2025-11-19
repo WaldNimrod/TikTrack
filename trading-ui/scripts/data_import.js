@@ -155,7 +155,6 @@
             }
 
             await refreshDataImportHistory(true);
-            registerDataImportTable();
         } catch (error) {
             Logger.error('❌ Failed to initialize Data Import page', { error, page: PAGE_NAME });
             notify('שגיאה בטעינת עמוד ייבוא הנתונים. נסה לרענן את הדף.', 'error');
@@ -209,10 +208,11 @@
             state.lastError = null;
 
             updateTableRegistry(state.sessions);
-            registerDataImportTable();
-
             renderImportSummary();
             renderImportHistoryTable();
+            
+            // Register table after rendering (only once)
+            registerDataImportTable();
         } catch (error) {
             state.lastError = error;
             Logger.error('❌ Failed to refresh import history', { error, page: PAGE_NAME });
@@ -220,7 +220,6 @@
             toggleErrorState(true, error.message || 'שגיאה לא ידועה בטעינת הנתונים');
         } finally {
             setLoadingState(false);
-            registerDataImportTable();
         }
     }
 
@@ -369,16 +368,20 @@
         const analysisTimestamp = summary.analysis_timestamp || summary.analysis?.timestamp || null;
         const previewTimestamp = summary.preview_timestamp || summary.preview?.timestamp || null;
 
+        // Use completed_at as fallback if created_at is null/undefined
         const createdSource =
             session.created_at ||
             summary.created_at ||
+            session.completed_at ||  // Fallback to completed_at
+            summary.completed_at ||  // Fallback to completed_at from summary
             analysisTimestamp;
 
         const updatedSource =
             session.completed_at ||
             summary.completed_at ||
             previewTimestamp ||
-            analysisTimestamp;
+            analysisTimestamp ||
+            createdSource;  // Fallback to createdSource if nothing else available
 
         const createdEnvelope = coerceDateEnvelope(createdSource);
         const updatedEnvelope = coerceDateEnvelope(updatedSource);
@@ -499,6 +502,12 @@
     function renderHistoryRow(session) {
         const row = document.createElement('tr');
         row.setAttribute('data-session-id', session.id);
+        row.classList.add('table-row-clickable');
+        row.style.cursor = 'pointer';
+        
+        // Add click handler to open details modal
+        row.setAttribute('data-onclick', `if(window.showEntityDetails) { window.showEntityDetails('import_session', ${session.id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('import_session', ${session.id}, 'view'); } else { window.Logger?.warn('Entity details modal not available', { page: 'data_import' }); }`);
+        row.setAttribute('title', 'לחץ לפתיחת פרטי סשן ייבוא');
 
         const statusDisplay = renderStatus(session.status);
 
@@ -522,7 +531,7 @@
                         data-size="small" 
                         data-icon="🔄" 
                         data-text="הרצה חוזרת" 
-                        data-onclick="rerunImportSession(${session.id})" 
+                        data-onclick="rerunImportSession(${session.id}); event.stopPropagation();" 
                         title="הרצה חוזרת של סשן ייבוא זה"
                         data-tooltip="הרצה חוזרת של סשן ייבוא"></button>
             </td>`

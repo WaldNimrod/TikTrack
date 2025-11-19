@@ -3121,94 +3121,6 @@ function mapSessionStatusToLabel(status) {
     return statusMap[normalized] || status;
 }
 
-/**
- * Simple session management - check for active session on modal open
- * Returns true if active session found, false otherwise
- */
-async function checkActiveSessionOnModalOpen() {
-    try {
-        const response = await fetch('/api/user-data-import/sessions/active');
-        if (!response.ok) {
-            return false;
-        }
-        
-        const data = await response.json();
-        if (!data.session) {
-            // No active session - clear UI and allow new session
-            currentSessionId = null;
-            window.currentSessionId = null;
-            activeSessionInfo = null;
-            updateActiveSessionIndicator();
-            updateResetSessionButtonState();
-            updateAnalyzeButton();
-            return false;
-        }
-        
-        const session = data.session;
-        const sessionStatus = (session.status || '').toLowerCase();
-        const closedStatuses = ['completed', 'failed', 'cancelled'];
-        
-        // If session is closed, treat as no session
-        if (closedStatuses.includes(sessionStatus)) {
-            currentSessionId = null;
-            window.currentSessionId = null;
-            activeSessionInfo = null;
-            updateActiveSessionIndicator();
-            updateResetSessionButtonState();
-            updateAnalyzeButton();
-            return false;
-        }
-        
-        // Active session found - load it
-        const summary = data.summary || {};
-        const fileAccountNumber = summary.file_account_number
-            ?? session.summary_data?.file_account_number
-            ?? session.file_account_number
-            ?? null;
-        
-        updateSymbolMetadataCache(summary?.symbol_metadata || session.symbol_metadata);
-        currentSessionId = session.id;
-        window.currentSessionId = session.id;
-        selectedAccount = session.trading_account_id ?? null;
-        const inferredConnector = typeof session.provider === 'string'
-            ? session.provider.toLowerCase()
-            : null;
-        selectedConnector = inferredConnector;
-        
-        updateActiveSessionInfo({
-            sessionId: session.id,
-            fileName: session.file_name,
-            accountId: session.trading_account_id,
-            provider: session.provider,
-            connector: inferredConnector,
-            connectorName: session.provider,
-            status: mapSessionStatusToLabel(session.status),
-            statusRaw: session.status,
-            totalRecords: summary.total_records ?? session.total_records ?? 0,
-            readyRecords: summary.imported_records
-                ?? summary.records_to_import
-                ?? Math.max(0, (session.total_records || 0) - (session.skipped_records || 0)),
-            skipRecords: summary.records_to_skip ?? session.skipped_records ?? 0,
-            fileAccountNumber
-        });
-        
-        await fetchExistingSessionDetails(session.id);
-        updateActiveSessionIndicator();
-        updateResetSessionButtonState();
-        updateAnalyzeButton();
-        
-        return true;
-    } catch (error) {
-        window.Logger?.warn?.('[Import Modal] Failed to check active session', { error: error?.message });
-        currentSessionId = null;
-        window.currentSessionId = null;
-        activeSessionInfo = null;
-        updateActiveSessionIndicator();
-        updateResetSessionButtonState();
-        updateAnalyzeButton();
-        return false;
-    }
-}
 
 async function fetchExistingSessionDetails(sessionId) {
     window.Logger?.info('[ACCOUNT_LINKING] 🔄 Fetching existing session details', {
@@ -3705,85 +3617,176 @@ window.initializeImportUserDataModal = async function() {
     });
 };
 
+// Flag to prevent concurrent calls to openImportUserDataModalWithSessionCleanup
+let isOpeningImportModal = false;
+
 /**
- * Wrapper function for opening import modal - clears active session before opening
+ * Wrapper function for opening import modal - checks and clears active session before opening
  * This is called from the button click handler
+ * 
+ * Logic:
+ * 1. Check if there's an active session (with 3 second timeout)
+ * 2. If active session exists → clear it (with 3 second timeout)
+ * 3. Open modal in clean state (always)
  */
 async function openImportUserDataModalWithSessionCleanup() {
-    window.Logger.info('[Import Modal] Opening import modal with session cleanup', { page: 'import-user-data' });
+    // Prevent concurrent calls
+    if (isOpeningImportModal) {
+        window.Logger?.warn('[Import Modal] Modal opening already in progress, ignoring duplicate call', { page: 'import-user-data' });
+        return;
+    }
+    
+    isOpeningImportModal = true;
+    
+    console.log('[Import Modal] ===== openImportUserDataModalWithSessionCleanup CALLED =====');
+    console.log('[Import Modal] Call stack:', new Error().stack);
+    console.log('[Import Modal] Function exists:', typeof openImportUserDataModalWithSessionCleanup);
+    console.log('[Import Modal] Window function exists:', typeof window.openImportUserDataModal);
+    console.log('[Import Modal] Window function === this function:', window.openImportUserDataModal === openImportUserDataModalWithSessionCleanup);
+    console.log('[Import Modal] this context:', this);
+    
+    window.Logger?.info('[Import Modal] Opening import modal with session cleanup', { page: 'import-user-data' });
+    console.log('[Import Modal] Logger called, starting try block...');
     
     try {
-        // Check for active session and clear it before opening modal
-        // Use timeout to prevent hanging on network errors
-        let timeoutId = null;
+        console.log('[Import Modal] Inside try block - Step 1: Checking for active session');
+        // Step 1: Check for active session (with timeout to prevent hanging)
+        let hasActiveSession = false;
+        let activeSessionId = null;
+        
         try {
-            // Create abort controller for timeout
             const controller = new AbortController();
-            timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
             
-            const fetchPromise = fetch('/api/user-data-import/sessions/active', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                signal: controller.signal
-            });
-            
-            const response = await fetchPromise;
-            if (timeoutId) {
+            try {
+                const response = await fetch('/api/user-data-import/sessions/active', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    signal: controller.signal
+                });
+                
                 clearTimeout(timeoutId);
-                timeoutId = null;
-            }
-            if (response.ok) {
-                const data = await response.json();
-                if (data.session) {
-                    const sessionStatus = (data.session.status || '').toLowerCase();
-                    const closedStatuses = ['completed', 'failed', 'cancelled'];
-                    
-                    // If session is active (not closed), clear it
-                    if (!closedStatuses.includes(sessionStatus)) {
-                        window.Logger.info('[Import Modal] Active session found, clearing before opening modal', { 
-                            sessionId: data.session.id, 
-                            page: 'import-user-data' 
-                        });
-                        // Clear active session silently (no user confirmation needed)
-                        // Skip goToStep since modal is not open yet - it will be opened after this
-                        await handleSessionReset(data.session.id, true);
+                
+                // Handle rate limiting - skip check and continue
+                if (response.status === 429) {
+                    window.Logger?.warn?.('[Import Modal] Rate limit during session check, skipping and opening modal', { 
+                        page: 'import-user-data' 
+                    });
+                } else if (response.ok) {
+                    const data = await response.json();
+                    if (data.session) {
+                        const sessionStatus = (data.session.status || '').toLowerCase();
+                        const closedStatuses = ['completed', 'failed', 'cancelled'];
+                        
+                        // If session is active (not closed), mark for clearing
+                        if (!closedStatuses.includes(sessionStatus)) {
+                            hasActiveSession = true;
+                            activeSessionId = data.session.id;
+                            window.Logger.info('[Import Modal] Active session found, will clear before opening modal', { 
+                                sessionId: activeSessionId, 
+                                page: 'import-user-data' 
+                            });
+                        }
                     }
+                }
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                // Network errors, timeouts - just log and continue
+                if (fetchError.name === 'AbortError' || fetchError.name === 'TimeoutError') {
+                    window.Logger?.warn?.('[Import Modal] Session check timed out, continuing to open modal', { 
+                        page: 'import-user-data' 
+                    });
+                } else {
+                    window.Logger?.warn?.('[Import Modal] Session check failed, continuing to open modal', { 
+                        error: fetchError?.message,
+                        page: 'import-user-data' 
+                    });
                 }
             }
         } catch (error) {
-            // Make sure timeout is cleared even on error
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-                timeoutId = null;
-            }
-            // Network errors, timeouts, etc. - just log and continue
-            // Don't block modal opening if session check fails
-            if (error.name === 'AbortError' || error.name === 'TimeoutError') {
-                window.Logger?.warn?.('[Import Modal] Session check timed out, continuing to open modal', { 
-                    error: error?.message,
-                    page: 'import-user-data' 
-                });
-            } else if (error.message?.includes('ERR_ADDRESS_INVALID') || error.message?.includes('Failed to fetch')) {
-                window.Logger?.warn?.('[Import Modal] Network error during session check, continuing to open modal', { 
-                    error: error?.message,
-                    page: 'import-user-data' 
-                });
-            } else {
-                window.Logger?.warn?.('[Import Modal] Failed to check/clear active session', { 
-                    error: error?.message,
-                    page: 'import-user-data' 
-                });
-            }
-            // Continue to open modal even if session check failed
+            // Any other error - just log and continue
+            window.Logger?.warn?.('[Import Modal] Session check error, continuing to open modal', { 
+                error: error?.message,
+                page: 'import-user-data' 
+            });
         }
         
-        // Now open the modal - this should always happen regardless of session check result
-        window.Logger.debug('[Import Modal] About to call openImportUserDataModal', { page: 'import-user-data' });
-        await openImportUserDataModal();
-        window.Logger.info('[Import Modal] openImportUserDataModal completed', { page: 'import-user-data' });
+        // Step 2: Clear active session if found (with timeout)
+        if (hasActiveSession && activeSessionId) {
+            try {
+                const resetController = new AbortController();
+                const resetTimeoutId = setTimeout(() => resetController.abort(), 3000); // 3 second timeout
+                
+                try {
+                    const resetResponse = await fetch(`/api/user-data-import/session/${activeSessionId}/reset`, {
+                        method: 'POST',
+                        signal: resetController.signal
+                    });
+                    
+                    clearTimeout(resetTimeoutId);
+                    
+                    // Handle rate limiting - skip reset and continue
+                    if (resetResponse.status === 429) {
+                        window.Logger?.warn?.('[Import Modal] Rate limit during session reset, skipping reset and opening modal', { 
+                            sessionId: activeSessionId,
+                            page: 'import-user-data' 
+                        });
+                    } else if (resetResponse.ok) {
+                        const resetData = await resetResponse.json().catch(() => ({}));
+                        if (resetData?.success || resetData?.status === 'success') {
+                            window.Logger.info('[Import Modal] Active session cleared successfully', { 
+                                sessionId: activeSessionId,
+                                page: 'import-user-data' 
+                            });
+                        }
+                    }
+                } catch (resetError) {
+                    clearTimeout(resetTimeoutId);
+                    // Network errors, timeouts - just log and continue
+                    if (resetError.name === 'AbortError' || resetError.name === 'TimeoutError') {
+                        window.Logger?.warn?.('[Import Modal] Session reset timed out, continuing to open modal', { 
+                            sessionId: activeSessionId,
+                            page: 'import-user-data' 
+                        });
+                    } else {
+                        window.Logger?.warn?.('[Import Modal] Session reset failed, continuing to open modal', { 
+                            sessionId: activeSessionId,
+                            error: resetError?.message,
+                            page: 'import-user-data' 
+                        });
+                    }
+                }
+            } catch (error) {
+                // Any other error - just log and continue
+                window.Logger?.warn?.('[Import Modal] Session reset error, continuing to open modal', { 
+                    sessionId: activeSessionId,
+                    error: error?.message,
+                    page: 'import-user-data' 
+                });
+            }
+        }
+        
+        // Step 3: Open modal in clean state (always happens)
+        console.log('[Import Modal] Step 3: About to call openImportUserDataModal()');
+        // Use the internal function directly to avoid recursion (window.openImportUserDataModal points to wrapper)
+        const internalOpenFunction = window._openImportUserDataModalInternal || openImportUserDataModal;
+        console.log('[Import Modal] Internal function exists:', typeof internalOpenFunction);
+        window.Logger.debug('[Import Modal] Opening modal in clean state', { page: 'import-user-data' });
+        
+        console.log('[Import Modal] Calling await internalOpenFunction()...');
+        await internalOpenFunction();
+        console.log('[Import Modal] internalOpenFunction() completed');
+        
+        window.Logger.info('[Import Modal] Modal opened successfully', { page: 'import-user-data' });
+        console.log('[Import Modal] ===== SUCCESS - Modal opened =====');
     } catch (error) {
+        console.error('[Import Modal] ===== ERROR in openImportUserDataModalWithSessionCleanup =====');
+        console.error('[Import Modal] Error message:', error?.message);
+        console.error('[Import Modal] Error stack:', error?.stack);
+        console.error('[Import Modal] Error object:', error);
+        
         window.Logger?.error('[Import Modal] Failed to open import modal', { 
             error: error?.message, 
             stack: error?.stack,
@@ -3798,12 +3801,16 @@ async function openImportUserDataModalWithSessionCleanup() {
                 'import-user-data'
             );
         }
+    } finally {
+        // Always reset the flag, even if there was an error
+        isOpeningImportModal = false;
     }
 }
 
 /**
  * Open import user data modal
  * Always opens in clean state - session management happens before this is called
+ * This function only handles modal display and initialization - no session checks
  */
 async function openImportUserDataModal() {
     window.Logger.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
@@ -3962,19 +3969,15 @@ async function openImportUserDataModal() {
             // Continue even if accounts fail to load
         }
         
-        // Clear any session state - modal always opens in clean state
+        // Clear any session state - modal always opens in clean state (new session)
         window.Logger.debug('[Import Modal] Step 8: Clearing session state', { page: 'import-user-data' });
         currentSessionId = null;
         window.currentSessionId = null;
         activeSessionInfo = null;
         
-        window.Logger.debug('[Import Modal] Step 9: Applying restore state and going to step', { page: 'import-user-data' });
-        const restoredStep = applyImportModalRestoreState();
-        
-        // Initialize step 1
-        const initialStep = restoredStep && !Number.isNaN(Number(restoredStep))
-            ? Number(restoredStep)
-            : 1;
+        // Always start at step 1 - clean state for new session
+        window.Logger.debug('[Import Modal] Step 9: Initializing step 1', { page: 'import-user-data' });
+        const initialStep = 1;
         
         window.Logger.debug('[Import Modal] Going to step', { 
             step: initialStep,
@@ -4464,37 +4467,14 @@ function showStepContent(step) {
 }
 
 /**
- * Load step 1 content (File & Account Selection)
- * Always opens in clean state - no active session management
+ * Load step 1 content - always in clean state for new session
+ * No session-related logic - just initialize the form
  */
 async function loadStep1Content() {
     // The HTML content is already in the DOM, just need to load accounts
     // Event listeners are already set up during initialization
     initializeDataTypeSelector();
     await loadAccounts();
-    
-    // Ensure step 1 is always in clean state - no active session indicators
-    // Hide any session-related UI elements
-    const indicator = document.getElementById('activeSessionIndicator');
-    const controlsRow = document.getElementById('activeSessionControlsRow');
-    const detailsRow = document.getElementById('activeSessionDetailsRow');
-    const resumeButton = document.getElementById('resumeImportSessionBtn');
-    if (indicator) {
-        indicator.classList.add('d-none');
-        indicator.style.display = 'none';
-    }
-    if (controlsRow) {
-        controlsRow.classList.add('d-none');
-        controlsRow.style.display = 'none';
-    }
-    if (detailsRow) {
-        detailsRow.classList.add('d-none');
-        detailsRow.style.display = 'none';
-    }
-    if (resumeButton) {
-        resumeButton.classList.add('d-none');
-        resumeButton.style.display = 'none';
-    }
     
     // Ensure "Continue to Analysis" button is enabled
     updateAnalyzeButton();
@@ -6236,84 +6216,23 @@ function proceedToPreviewFromProblems() {
     goToStep(3);
 }
 
+/**
+ * Resume active import session - PLACEHOLDER for future implementation
+ * Currently not implemented - modal always opens in clean state
+ * This function is kept as a placeholder for future "Rerun Session" functionality
+ */
 async function resumeActiveImportSession() {
-    const resumeBtn = document.getElementById('resumeImportSessionBtn');
-    try {
-        if (resumeBtn) {
-            resumeBtn.disabled = true;
-            resumeBtn.setAttribute('aria-disabled', 'true');
-        }
-
-        if (!currentSessionId || !activeSessionInfo) {
-            await fetchLatestActiveSession();
-        }
-
-        if (!currentSessionId || !activeSessionInfo) {
-            showImportUserDataNotification('לא נמצא סשן ייבוא פעיל להמשך', 'warning');
-            return;
-        }
-
-        const modal = document.getElementById('importUserDataModal');
-        if (!modal) {
-            showImportUserDataNotification('מודול הייבוא אינו זמין כעת', 'error');
-            return;
-        }
-
-        const connectorKey = activeSessionInfo.connector
-            || (typeof activeSessionInfo.provider === 'string'
-                ? activeSessionInfo.provider.toLowerCase()
-                : null);
-
-        const connectorSelect = modal.querySelector('#connectorSelect');
-        if (connectorSelect && connectorKey) {
-            setSelectValue(connectorSelect, connectorKey);
-            selectedConnector = connectorKey;
-        }
-
-        const accountSelect = modal.querySelector('#tradingAccountSelect');
-        if (accountSelect && activeSessionInfo.accountId) {
-            setSelectValue(accountSelect, activeSessionInfo.accountId);
-            selectedAccount = activeSessionInfo.accountId;
-        }
-
-        const taskKey = activeSessionInfo.taskType || selectedDataTypeKey || 'executions';
-        selectedDataTypeKey = taskKey;
-        updateSelectedDataTypeInfo();
-        updateAnalyzeButton();
-
-        goToStep(2);
-        setAnalysisLoadingState(true, 'טוען נתוני סשן פעיל...', 55);
-
-        const encodedTask = encodeURIComponent(taskKey);
-        const analysisResponse = await fetch(`/api/user-data-import/session/${currentSessionId}/analyze?task_type=${encodedTask}`);
-        const analysisJson = await analysisResponse.json();
-
-        if (handleAccountLinkingBlockingResponse(analysisJson, 'resume-session')) {
-            setAnalysisLoadingState(false);
-            return;
-        }
-
-        if (!(analysisJson.success || analysisJson.status === 'success')) {
-            const message = getApiErrorMessage(analysisJson, 'טעינת נתוני הניתוח נכשלה');
-            throw new Error(message);
-        }
-
-        analysisResults = analysisJson.analysis_results;
-        displayAnalysisResults(analysisResults);
-
-        setAnalysisLoadingState(false);
-        showImportUserDataNotification('הסשן הופעל מחדש. ניתן להמשיך לפתרון בעיות.', 'success');
-        updateResetSessionButtonState();
-    } catch (error) {
-        setAnalysisLoadingState(false);
-        window.Logger?.error('[Import Modal] Failed to resume active session', { error: error?.message });
-        showImportUserDataNotification(`שגיאה בשחזור הסשן: ${error?.message || 'שגיאה לא ידועה'}`, 'error');
-        updateResetSessionButtonState();
-    } finally {
-        if (resumeBtn) {
-            resumeBtn.disabled = false;
-            resumeBtn.setAttribute('aria-disabled', 'false');
-        }
+    window.Logger?.warn('[Import Modal] resumeActiveImportSession called - not yet implemented', { 
+        page: 'import-user-data' 
+    });
+    if (typeof window.showDetailedNotification === 'function') {
+        window.showDetailedNotification(
+            'פונקציונליות לא זמינה',
+            'המשך סשן פעיל - תכונה זו תתווסף בעתיד',
+            'info',
+            5000,
+            'import-user-data'
+        );
     }
 }
 
@@ -7633,6 +7552,9 @@ function performImport(generateReport = false) {
                 .join('\n');
         }
 
+        // Clear cache even on failure to ensure fresh data
+        clearImportCacheLayers({ reason: 'import-user-data:execute-failed', autoRefresh: false });
+        
         // Handle session completion with failure
         handleSessionCompletion('failed', errorMessage, errorDetails);
         
@@ -7669,9 +7591,58 @@ async function handleSessionReset(sessionId, skipGoToStep = false) {
     try {
         showImportUserDataNotification('מאפס את סשן הייבוא...', 'info');
 
-        const response = await fetch(`/api/user-data-import/session/${sessionId}/reset`, {
-            method: 'POST'
-        });
+        // Add timeout to prevent hanging on network errors or rate limits
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        
+        let response;
+        try {
+            response = await fetch(`/api/user-data-import/session/${sessionId}/reset`, {
+                method: 'POST',
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            // If rate limited or network error, just skip reset and continue
+            if (fetchError.name === 'AbortError' || fetchError.message?.includes('429') || fetchError.message?.includes('Rate limit')) {
+                window.Logger?.warn?.('[Import Modal] Session reset skipped due to rate limit or timeout', { 
+                    sessionId,
+                    error: fetchError?.message,
+                    page: 'import-user-data' 
+                });
+                // Clear state anyway and continue
+                resetImportModal();
+                clearImportCacheLayers({ reason: 'import-user-data:reset' });
+                updateActiveSessionIndicator();
+                updateResetSessionButtonState();
+                updateAnalyzeButton();
+                if (!skipGoToStep) {
+                    goToStep(1);
+                }
+                return;
+            }
+            throw fetchError;
+        }
+        
+        // Handle rate limiting response
+        if (response.status === 429) {
+            window.Logger?.warn?.('[Import Modal] Rate limit during session reset, skipping reset and continuing', { 
+                sessionId,
+                page: 'import-user-data' 
+            });
+            // Clear state anyway and continue
+            resetImportModal();
+            clearImportCacheLayers({ reason: 'import-user-data:reset' });
+            updateActiveSessionIndicator();
+            updateResetSessionButtonState();
+            updateAnalyzeButton();
+            if (!skipGoToStep) {
+                goToStep(1);
+            }
+            return;
+        }
+        
         const data = await response.json().catch(() => ({}));
         const success = data?.success === true || data?.status === 'success';
         const sessionNotFound = (data?.message || '').toLowerCase().includes('session not found');
@@ -7758,9 +7729,16 @@ function handleSessionCompletion(status, message, details = null) {
         );
     }
     
+    // Invalidate import history cache via central cache system (non-blocking)
+    if (window.DataImportData?.invalidateHistoryCache) {
+        window.DataImportData.invalidateHistoryCache().catch((error) => {
+            window.Logger?.warn?.('Failed to invalidate import history cache', { error: error?.message });
+        });
+    }
+    
     // Refresh import history
     setTimeout(() => {
-        window.refreshDataImportHistory?.();
+        window.refreshDataImportHistory?.(true); // Force refresh
     }, 500);
 }
 
@@ -8575,8 +8553,38 @@ function getImportDebugState(symbol) {
 
 // Export functions for global access
 // Export wrapper function that handles session cleanup
+// Also export the internal function for direct calls (but wrapper is preferred)
+console.log('[Import Modal] ===== EXPORTING FUNCTIONS =====');
+console.log('[Import Modal] openImportUserDataModalWithSessionCleanup exists:', typeof openImportUserDataModalWithSessionCleanup);
+console.log('[Import Modal] openImportUserDataModal exists:', typeof openImportUserDataModal);
+
+// IMPORTANT: Save reference to internal function BEFORE assigning wrapper to window
+// This prevents recursion when openImportUserDataModal() is called internally
+window._openImportUserDataModalInternal = openImportUserDataModal;
+
+// Export to window (for window.openImportUserDataModal() and direct openImportUserDataModal() calls)
+// In browser, window is the global scope, so window.openImportUserDataModal is available as openImportUserDataModal
+// This is the wrapper that handles session cleanup
 window.openImportUserDataModal = openImportUserDataModalWithSessionCleanup;
+
+console.log('[Import Modal] window.openImportUserDataModal set to:', typeof window.openImportUserDataModal);
+console.log('[Import Modal] window.openImportUserDataModal === function:', typeof window.openImportUserDataModal === 'function');
+console.log('[Import Modal] window.openImportUserDataModal === openImportUserDataModalWithSessionCleanup:', window.openImportUserDataModal === openImportUserDataModalWithSessionCleanup);
+
+// Test if function is callable
+try {
+    const testCall = window.openImportUserDataModal;
+    console.log('[Import Modal] Function is callable:', typeof testCall === 'function');
+} catch (e) {
+    console.error('[Import Modal] Error testing function:', e);
+}
+
+console.log('[Import Modal] ===== EXPORT COMPLETE =====');
+
+// Internal function already saved above (before window.openImportUserDataModal assignment)
+// This ensures no recursion when calling openImportUserDataModal() internally
 window.closeImportUserDataModal = closeImportUserDataModal;
+
 window.goToStep = goToStep;
 window.uploadFile = handleFileSelect;
 window.selectAccount = handleAccountSelect;

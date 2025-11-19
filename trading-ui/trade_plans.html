@@ -227,6 +227,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/12: SERVICES PACKAGE ===== -->
@@ -249,6 +251,8 @@
     <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -298,7 +302,7 @@
     <!-- [42] Load Order: 42 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
     <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <!-- core-systems.js removed - now loaded automatically via base package -->
     <!-- [44] Load Order: 44 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
@@ -323,6 +327,8 @@
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
     <!-- [55] Load Order: 55 -->
     <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
+    <!-- [55.5] Load Order: 55.5 -->
+    <script src="scripts/modal-configs/alerts-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל התראות -->
     <!-- [56] Load Order: 56 -->
     <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
 
@@ -341,12 +347,15 @@
     <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
 
     <!-- =============================================================== -->
+    <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/12: PREFERENCES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 5 | Description: מערכת העדפות משתמש v2.0 (6 קבצים) -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [41.5] Load Order: 41.5 - Preferences V4 SDK (group-first) - Must load before preferences-core-new.js -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [60] Load Order: 60 -->
@@ -355,16 +364,14 @@
     <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
     <!-- [62] Load Order: 62 -->
     <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
-    <!-- [63] Load Order: 63 -->
+    <!-- [45.5] Load Order: 45.5 - Preferences Validation - Must load before preferences-ui-v4.js -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
-    <!-- [64] Load Order: 64 -->
+    <!-- [45.5] Load Order: 45.5 - Preferences UI V4 (Group-First) - Must load before preferences-group-manager.js -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [64] Load Order: 64 - Preferences UI - Must load before preferences-group-manager.js -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
-    <!-- [58.9] Preferences V4 SDK (group-first) -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [64.1] Preferences UI V4 (Group-First) -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 7/12: VALIDATION PACKAGE ===== -->
@@ -470,7 +477,7 @@
     <!-- [92] Load Order: 92 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [93] Load Order: 93 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->

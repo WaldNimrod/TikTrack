@@ -492,11 +492,135 @@ await window.resetToDefaults();
 - **Indexes** על user_id, profile_id, preference_id
 - **Batch operations** לשמירה מרובה
 - **Lazy loading** של פרופילים
+- **4-Layer Cache System** - Memory → localStorage → IndexedDB → Backend
+- **Cache Warming** - העדפות נשמרות ב-Memory layer לאחר טעינה
+- **Event-Driven Architecture** - מערכות תלויות מקבלות עדכונים דרך events
 
 ### מדדי ביצועים:
 - **קריאת העדפה בודדת**: < 10ms (עם cache)
-- **טעינת כל ההעדפות**: < 50ms (56 העדפות)
+- **טעינת כל ההעדפות**: < 50ms (עם cache), < 500ms (ללא cache)
+- **טעינת העדפות קריטיות**: < 50ms (עם cache), < 500ms (ללא cache)
 - **שמירת העדפות**: < 100ms (4 העדפות)
+
+---
+
+## 🔄 Lazy Loading עם Events
+
+### Event System
+
+המערכת משדרת 4 אירועים עיקריים:
+
+1. **`preferences:critical-loaded`** - העדפות קריטיות נטענו
+   - נשלח מיד לאחר טעינת העדפות הקריטיות
+   - Detail כולל: `preferences`, `fromCache`, `cacheLayer`, `userId`, `profileId`, `loadTime`, `environment`, `criticalCount`, `totalCritical`, `timestamp`
+
+2. **`preferences:all-loaded`** - כל ההעדפות נטענו
+   - נשלח לאחר טעינת כל ההעדפות
+   - Detail כולל: `preferences`, `fromCache`, `cacheLayer`, `loadTime`, `environment`
+
+3. **`preferences:cache-hit`** - העדפות נטענו מהמטמון
+   - Detail כולל: `cacheLayer`, `loadTime`, `environment`
+
+4. **`preferences:cache-miss`** - העדפות נטענו מהשרת
+   - Detail כולל: `loadTime`, `environment`
+
+### Global Flags
+
+- **`window.__preferencesCriticalLoaded`** - Boolean flag המציין אם העדפות הקריטיות נטענו
+- **`window.__preferencesCriticalLoadedDetail`** - Object עם מידע מפורט על ההעדפות שנטענו
+
+### שימוש במערכות תלויות
+
+```javascript
+// בדיקה אם העדפות כבר נטענו
+if (window.__preferencesCriticalLoaded) {
+  // העדפות כבר נטענו, אפשר להשתמש בהן מיד
+  const defaultAccount = window.currentPreferences?.default_trading_account;
+} else {
+  // המתין לאירוע
+  window.addEventListener('preferences:critical-loaded', () => {
+    const defaultAccount = window.currentPreferences?.default_trading_account;
+    // ... use preferences
+  }, { once: true });
+}
+```
+
+ראה [PREFERENCES_LOADING_BEST_PRACTICES.md](../../02-ARCHITECTURE/FRONTEND/PREFERENCES_LOADING_BEST_PRACTICES.md) למדריך מלא.
+
+---
+
+## 💾 Cache Integration
+
+### 4-Layer Cache System
+
+המערכת משתמשת ב-4 שכבות מטמון:
+
+1. **Memory** - המהיר ביותר, נמחק עם רענון דף
+2. **localStorage** - נשמר בין רענונים, מוגבל בגודל
+3. **IndexedDB** - נשמר לטווח ארוך, יכול לאחסן כמויות גדולות
+4. **Backend** - מקור האמת, נגיש תמיד
+
+### Cache Warming
+
+לאחר טעינת העדפות משכבה כלשהי, המערכת שומרת אותן גם ב-Memory layer לביצועים מהירים יותר בפעם הבאה.
+
+### Fallback Mechanisms
+
+אם שכבה אחת נכשלת, המערכת מנסה את השכבה הבאה:
+- Memory → localStorage → IndexedDB → Backend
+
+---
+
+## 🌍 Environment Handling
+
+### Development vs Production
+
+המערכת מזהה את הסביבה ומתאימה את ההתנהגות:
+
+- **Development:**
+  - Timeout: 3 שניות
+  - Logging מפורט
+  - Debug mode פעיל
+
+- **Production:**
+  - Timeout: 5 שניות
+  - Logging מינימלי
+  - Debug mode כבוי
+
+### זיהוי סביבה
+
+```javascript
+const environment = window.API_ENV || 'development';
+const timeoutMs = environment === 'production' ? 5000 : 3000;
+```
+
+---
+
+## 📱 מצבי טעינה
+
+### 1. טעינה רגילה (עם מטמון)
+
+- **מצב:** מטמון מלא (Memory + localStorage + IndexedDB)
+- **צפוי:** טעינה מהירה (< 100ms), `preferences:cache-hit`, `fromCache: true`
+- **Performance:** < 50ms לטעינת העדפות הקריטיות
+
+### 2. ריענון קשיח (ללא מטמון)
+
+- **מצב:** Ctrl+Shift+R או ניקוי מטמון מלא
+- **צפוי:** טעינה מהשרת, `preferences:cache-miss`, `fromCache: false`, אין שגיאות 429
+- **Performance:** < 500ms לטעינת העדפות הקריטיות
+
+### 3. גלישה בסטר (ללא מטמון)
+
+- **מצב:** חלון גלישה בסטר חדש
+- **צפוי:** טעינה מהשרת, אין שגיאות 429, כל הטבלאות נטענות
+- **Performance:** < 500ms לטעינת העדפות הקריטיות
+
+### 4. פיתוח vs פרודקשן
+
+- **מצב:** בדיקה בשני הסביבות
+- **צפוי:** timeout שונים (3s dev, 5s prod), logging מותאם
+- **Performance:** זהה בשני הסביבות, אך timeout שונים
 - **Cache hit ratio**: > 95%
 - **56 העדפות** שמורות למשתמש
 

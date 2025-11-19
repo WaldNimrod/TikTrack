@@ -2,16 +2,23 @@
  * Monitoring Functions - TikTrack Frontend
  * ========================================
  * 
- * פונקציות ניטור בסיסיות - נדרשות לבדיקת מערכת איתחול
+ * פונקציות ניטור משופרות - בדיקה כפולה HTML+DOM
  * 
  * Features:
  * - runDetailedPageScan - סריקה מפורטת של עמוד
  * - waitForPageFullyLoaded - המתנה לטעינה מלאה
- * - checkForMismatches - בדיקת אי-התאמות
+ * - checkForMismatches - בדיקת אי-התאמות (משופרת עם HTML+DOM)
+ * - parseHTMLFile - קריאת ופרסור קובץ HTML
+ * - extractScriptsFromHTML - חילוץ סקריפטים מקובץ HTML
+ * - compareHTMLvsDOM - השוואה מפורטת בין HTML ל-DOM
+ * - getPackageDocumentation - מידע על תיעוד החבילות
+ * 
+ * Related Documentation:
+ * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md
  * 
  * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated January 20, 2025
+ * @version 2.0.0
+ * @lastUpdated January 27, 2025
  */
 
 if (window.Logger) {
@@ -39,9 +46,12 @@ async function waitForPageFullyLoaded() {
 }
 
 /**
- * Enhanced monitoring with real-time error detection
+ * Enhanced monitoring with real-time error detection and HTML+DOM comparison
+ * @param {string} pageName - Name of the page
+ * @param {Object} pageConfig - Page configuration
+ * @param {Array<Object>} htmlScripts - Optional: Scripts extracted from HTML file
  */
-async function checkForMismatches(pageName, pageConfig) {
+async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
     
     // Real-time error detection - capture 404 errors for scripts
     const errorLog = [];
@@ -91,7 +101,28 @@ async function checkForMismatches(pageName, pageConfig) {
     
     // Also collect full paths for duplicate detection
     const loadedScriptsFullPaths = Array.from(document.querySelectorAll('script[src]'))
-        .map(script => script.src.split('?')[0])
+        .map(script => {
+            const src = script.src.split('?')[0];
+            try {
+                // Extract relative path from full URL (remove protocol, host, port)
+                const url = new URL(src, window.location.origin);
+                const relativePath = url.pathname;
+                // Remove leading slash and normalize
+                return relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+            } catch (e) {
+                // Fallback: if URL parsing fails, try to extract path manually
+                // Remove protocol and domain
+                let relativePath = src;
+                if (src.startsWith('http://') || src.startsWith('https://')) {
+                    const pathMatch = src.match(/https?:\/\/[^\/]+(\/.*)/);
+                    if (pathMatch) {
+                        relativePath = pathMatch[1];
+                    }
+                }
+                // Remove leading slash
+                return relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+            }
+        })
         .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
     
     
@@ -236,17 +267,45 @@ async function checkForMismatches(pageName, pageConfig) {
             });
             isLoaded = !!scriptElement;
         } else {
-            // Check both full path and filename (to handle cases where path might differ)
-            isLoaded = loadedScripts.some(loadedScript => {
-                // Check full path match
-                if (loadedScript === requiredScript || loadedScript.includes(requiredScript)) {
-                    return true;
+            // Normalize required script - handle both relative and absolute paths
+            const normalizedRequired = requiredScript.split('?')[0].toLowerCase();
+            const requiredFilename = normalizedRequired.split('/').pop();
+            
+            // Generate all possible path variations for the required script
+            const possiblePaths = [
+                normalizedRequired, // Original: "api-config.js" or "scripts/api-config.js"
+                `scripts/${normalizedRequired}`, // With scripts/ prefix: "scripts/api-config.js"
+                normalizedRequired.replace(/^scripts\//, ''), // Without scripts/ prefix: "api-config.js"
+                requiredFilename // Just filename: "api-config.js"
+            ];
+            
+            // First, check against loadedScriptsFullPaths (full paths from DOM)
+            isLoaded = loadedScriptsFullPaths.some(loadedScriptFullPath => {
+                const normalizedLoaded = loadedScriptFullPath.toLowerCase();
+                const loadedFilename = normalizedLoaded.split('/').pop();
+                
+                // Check all possible path variations
+                for (const possiblePath of possiblePaths) {
+                    if (normalizedLoaded === possiblePath ||
+                        normalizedLoaded.endsWith('/' + possiblePath) ||
+                        normalizedLoaded.endsWith(possiblePath) ||
+                        normalizedLoaded.includes('/' + possiblePath)) {
+                        return true;
+                    }
                 }
-                // Check filename match (extract filename from loaded script)
-                const loadedFilename = loadedScript.split('/').pop().split('?')[0]; // Remove query params
-                const requiredFilename = scriptFilename.split('?')[0];
+                
+                // Final check: filename match (case-insensitive)
                 return loadedFilename === requiredFilename;
             });
+            
+            // If not found in full paths, check against filenames only
+            if (!isLoaded) {
+                isLoaded = loadedScripts.some(loadedScript => {
+                    // Extract filename from both (case-insensitive)
+                    const loadedFilename = loadedScript.split('/').pop().split('?')[0].toLowerCase();
+                    return loadedFilename === requiredFilename;
+                });
+            }
         }
         
         if (!isLoaded || script404) {
@@ -591,19 +650,33 @@ async function checkForMismatches(pageName, pageConfig) {
         mismatches: mismatches.length,
         mismatchDetails: mismatches,
         duplicates: duplicates,
-        loadOrderIssues: loadOrderIssues
+        loadOrderIssues: loadOrderIssues,
+        versionMismatches: versionMismatches
     };
 }
 
 /**
- * Run detailed page scan
+ * Run detailed page scan with HTML+DOM comparison
  */
 async function runDetailedPageScan(pageName, pageConfig) {
     
     // Check if we're on the correct page
-    const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+    const path = window.location.pathname;
+    let currentPage = path.split('/').pop();
+    
+    // Handle case where URL doesn't have .html extension
+    if (!currentPage || currentPage === '' || currentPage === '/') {
+        currentPage = 'index';
+    } else {
+        currentPage = currentPage.replace('.html', '');
+    }
+    
+    // Handle tag-management specifically (URL might be /tag-management without .html)
+    if (path.includes('tag-management')) {
+        currentPage = 'tag-management';
+    }
+    
     if (currentPage !== pageName) {
-
         // Return empty results since we can't scan a different page
         return {
             pageName: pageName,
@@ -615,32 +688,607 @@ async function runDetailedPageScan(pageName, pageConfig) {
                 type: 'page_mismatch',
                 message: `⚠️ לא ניתן לסרוק עמוד ${pageName} - צריך להיות על העמוד בפועל. עבור לעמוד ${pageName}.html והרץ את הבדיקה משם.`,
                 severity: 'warning'
-            }]
+            }],
+            htmlAnalysis: null,
+            domAnalysis: null,
+            comparison: null,
+            packageDocumentation: null
         };
     }
 
     // Wait for page to be fully loaded
     await waitForPageFullyLoaded();
 
-    // Run mismatch check
-    const mismatchResults = await checkForMismatches(pageName, pageConfig);
+    // Parse HTML file
+    const htmlData = await parseHTMLFile(pageName);
+    const htmlScripts = htmlData.scripts || [];
+
+    // Enrich HTML scripts with manifest data
+    const packageManifest = window.PACKAGE_MANIFEST || {};
+    const enrichedHtmlScripts = htmlScripts.map(htmlScript => {
+        const manifestInfo = getScriptLoadOrder(htmlScript.file, packageManifest);
+        return {
+            ...htmlScript,
+            loadOrder: manifestInfo?.loadOrder || 999,
+            package: manifestInfo?.package || null,
+            packageName: manifestInfo?.packageName || null,
+            matchesManifest: !!manifestInfo
+        };
+    });
+
+    // Get DOM scripts
+    const domScripts = Array.from(document.querySelectorAll('script[src]'))
+        .map(script => script.src.split('/').pop().split('?')[0])
+        .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
+
+    // Get DOM scripts with performance data
+    const domScriptsWithData = Array.from(document.querySelectorAll('script[src]'))
+        .map((script, index) => {
+            const filename = script.src.split('/').pop().split('?')[0];
+            if (filename.includes('bootstrap') || filename.includes('font-awesome')) {
+                return null;
+            }
+            
+            // Get performance entry for this script
+            const perfEntry = performance.getEntriesByName(script.src, 'resource')[0];
+            const manifestInfo = getScriptLoadOrder(filename, packageManifest);
+            
+            return {
+                file: filename,
+                position: index,
+                loadOrder: manifestInfo?.loadOrder || 999,
+                package: manifestInfo?.package || null,
+                loaded: script.src && !script.src.includes('404'),
+                loadTime: perfEntry ? perfEntry.responseEnd - perfEntry.requestStart : null,
+                fullPath: script.src
+            };
+        })
+        .filter(Boolean);
+
+    // Run mismatch check with HTML scripts
+    const mismatchResults = await checkForMismatches(pageName, pageConfig, enrichedHtmlScripts);
+
+    // Compare HTML vs DOM
+    const comparison = compareHTMLvsDOM(enrichedHtmlScripts, domScripts, pageConfig, packageManifest);
+
+    // Get package documentation
+    const packageDocumentation = getPackageDocumentation(pageConfig, packageManifest);
+
+    // Calculate manifest compliance for HTML
+    const htmlManifestCompliance = enrichedHtmlScripts.length > 0
+        ? Math.round((enrichedHtmlScripts.filter(s => s.matchesManifest).length / enrichedHtmlScripts.length) * 100)
+        : 100;
+
+    // Count version mismatches from checkForMismatches
+    const versionMismatchesCount = mismatchResults.versionMismatches ? mismatchResults.versionMismatches.length : 0;
     
+    // Build enhanced results
     const results = {
         pageName: pageName,
-        criticalErrors: 0,
+        timestamp: new Date().toISOString(),
+        criticalErrors: mismatchResults.mismatches > 0 ? 1 : 0,
         mismatches: mismatchResults.mismatches,
         duplicates: mismatchResults.duplicates,
         loadOrderIssues: mismatchResults.loadOrderIssues,
-        mismatchDetails: mismatchResults.mismatchDetails
+        mismatchDetails: mismatchResults.mismatchDetails,
+        versionMismatches: mismatchResults.versionMismatches || [],
+        versionMismatchesCount: versionMismatchesCount,
+        
+        // HTML Analysis
+        htmlAnalysis: {
+            scripts: enrichedHtmlScripts,
+            totalScripts: enrichedHtmlScripts.length,
+            manifestCompliance: htmlManifestCompliance,
+            error: htmlData.error || null
+        },
+        
+        // DOM Analysis
+        domAnalysis: {
+            scripts: domScriptsWithData,
+            totalScripts: domScriptsWithData.length,
+            failedLoads: domScriptsWithData.filter(s => !s.loaded).map(s => ({
+                file: s.file,
+                error: 'Failed to load'
+            }))
+        },
+        
+        // Comparison
+        comparison: comparison,
+        
+        // Package Documentation
+        packageDocumentation: packageDocumentation,
+        
+        // Summary
+        summary: {
+            totalIssues: mismatchResults.mismatches + 
+                        (mismatchResults.loadOrderIssues ? mismatchResults.loadOrderIssues.length : 0) +
+                        versionMismatchesCount +
+                        comparison.summary.differencesCount,
+            criticalErrors: mismatchResults.mismatches > 0 ? 1 : 0,
+            warnings: (mismatchResults.loadOrderIssues ? mismatchResults.loadOrderIssues.length : 0) +
+                     comparison.orderDifferences.filter(d => d.severity === 'warning').length,
+            htmlScriptsCount: enrichedHtmlScripts.length,
+            domScriptsCount: domScriptsWithData.length,
+            differencesCount: comparison.summary.differencesCount
+        }
     };
     
     return results;
+}
+
+/**
+ * Parse HTML file and extract script information
+ * @param {string} pageName - Name of the page (without .html extension)
+ * @returns {Promise<Object>} Object with htmlContent and scripts array
+ */
+async function parseHTMLFile(pageName) {
+    try {
+        const response = await fetch(`/${pageName}.html`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch HTML file: ${response.status} ${response.statusText}`);
+        }
+        const htmlContent = await response.text();
+        return {
+            htmlContent,
+            scripts: extractScriptsFromHTML(htmlContent, pageName)
+        };
+    } catch (error) {
+        console.error(`Error parsing HTML file for ${pageName}:`, error);
+        return {
+            htmlContent: null,
+            scripts: [],
+            error: error.message
+        };
+    }
+}
+
+/**
+ * Extract script tags from HTML content
+ * @param {string} htmlContent - HTML content to parse
+ * @param {string} pageName - Name of the page (for context)
+ * @returns {Array<Object>} Array of script objects with position, file, fullPath, etc.
+ */
+function extractScriptsFromHTML(htmlContent, pageName) {
+    const scripts = [];
+    const scriptRegex = /<script\s+src=["']([^"']+)["']/gi;
+    let match;
+    let position = 0;
+
+    while ((match = scriptRegex.exec(htmlContent)) !== null) {
+        const fullPath = match[1];
+        const filename = fullPath.split('/').pop().split('?')[0];
+        
+        // Skip bootstrap and font-awesome
+        if (filename.includes('bootstrap') || filename.includes('font-awesome')) {
+            continue;
+        }
+
+        // Extract version from query string if present
+        const versionMatch = fullPath.match(/[?&]v=([^&]+)/);
+        const version = versionMatch ? versionMatch[1] : null;
+
+        // Normalize path (remove scripts/ prefix if present, remove query params)
+        const normalizedPath = fullPath.replace(/^scripts\//, '').split('?')[0];
+
+        scripts.push({
+            position: position++,
+            file: filename,
+            fullPath: fullPath,
+            normalizedPath: normalizedPath,
+            version: version,
+            htmlPosition: match.index,
+            // Will be populated later with manifest data
+            loadOrder: null,
+            package: null,
+            matchesManifest: false
+        });
+    }
+
+    return scripts;
+}
+
+/**
+ * Normalize script path for comparison
+ * @param {string} path - Script path to normalize
+ * @returns {string} Normalized path
+ */
+function normalizeScriptPath(path) {
+    // Handle external URLs (CDN) - keep them as-is for comparison
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path.split('?')[0].toLowerCase();
+    }
+    
+    // Remove scripts/ prefix, query params, and version
+    return path
+        .replace(/^scripts\//, '')
+        .replace(/^\/scripts\//, '')
+        .split('?')[0]
+        .toLowerCase();
+}
+
+/**
+ * Get script loadOrder from package manifest
+ * @param {string} scriptFile - Script file path
+ * @param {Object} packageManifest - Package manifest object
+ * @returns {Object|null} Object with loadOrder and package info, or null if not found
+ */
+function getScriptLoadOrder(scriptFile, packageManifest) {
+    if (!packageManifest) return null;
+
+    const normalizedFile = normalizeScriptPath(scriptFile);
+    
+    for (const [pkgId, pkg] of Object.entries(packageManifest)) {
+        if (!pkg.scripts) continue;
+        
+        for (const script of pkg.scripts) {
+            const normalizedScript = normalizeScriptPath(script.file);
+            if (normalizedScript === normalizedFile || 
+                script.file.includes(normalizedFile) || 
+                normalizedFile.includes(script.file)) {
+                return {
+                    loadOrder: script.loadOrder || 999,
+                    package: pkgId,
+                    packageName: pkg.name || pkgId,
+                    required: script.required !== false,
+                    description: script.description || ''
+                };
+            }
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Compare HTML scripts vs DOM scripts
+ * @param {Array<Object>} htmlScripts - Scripts extracted from HTML file
+ * @param {Array<string>} domScripts - Scripts loaded in DOM (filenames only)
+ * @param {Object} pageConfig - Page configuration
+ * @param {Object} packageManifest - Package manifest
+ * @returns {Object} Comparison results with differences
+ */
+function compareHTMLvsDOM(htmlScripts, domScripts, pageConfig, packageManifest) {
+    const comparison = {
+        orderDifferences: [],
+        missingInDOM: [],
+        extraInDOM: [],
+        pathDifferences: [],
+        summary: {
+            htmlScriptsCount: htmlScripts.length,
+            domScriptsCount: domScripts.length,
+            differencesCount: 0
+        }
+    };
+
+    // Enrich HTML scripts with manifest data
+    const enrichedHtmlScripts = htmlScripts.map(htmlScript => {
+        const manifestInfo = getScriptLoadOrder(htmlScript.file, packageManifest);
+        return {
+            ...htmlScript,
+            loadOrder: manifestInfo?.loadOrder || 999,
+            package: manifestInfo?.package || null,
+            packageName: manifestInfo?.packageName || null,
+            matchesManifest: !!manifestInfo
+        };
+    });
+
+    // Create maps for quick lookup
+    const htmlScriptMap = new Map();
+    const domScriptMap = new Map();
+    
+    enrichedHtmlScripts.forEach((script, index) => {
+        const normalized = normalizeScriptPath(script.file);
+        htmlScriptMap.set(normalized, { ...script, htmlIndex: index });
+    });
+
+    domScripts.forEach((script, index) => {
+        const normalized = normalizeScriptPath(script);
+        if (!domScriptMap.has(normalized)) {
+            domScriptMap.set(normalized, { file: script, domIndex: index });
+        }
+    });
+
+    // Find scripts in HTML but not in DOM
+    enrichedHtmlScripts.forEach(htmlScript => {
+        const normalized = normalizeScriptPath(htmlScript.file);
+        if (!domScriptMap.has(normalized)) {
+            comparison.missingInDOM.push({
+                file: htmlScript.file,
+                htmlPosition: htmlScript.position,
+                fullPath: htmlScript.fullPath,
+                package: htmlScript.package,
+                expectedOrder: htmlScript.loadOrder
+            });
+        }
+    });
+
+    // Find scripts in DOM but not in HTML (dynamically loaded)
+    domScripts.forEach(domScript => {
+        const normalized = normalizeScriptPath(domScript);
+        if (!htmlScriptMap.has(normalized)) {
+            // Try to find source - check if it's from a package
+            const manifestInfo = getScriptLoadOrder(domScript, packageManifest);
+            comparison.extraInDOM.push({
+                file: domScript,
+                domPosition: domScripts.indexOf(domScript),
+                source: manifestInfo ? `package: ${manifestInfo.package}` : 'dynamic',
+                package: manifestInfo?.package || null
+            });
+        }
+    });
+
+    // Find order differences
+    enrichedHtmlScripts.forEach(htmlScript => {
+        const normalized = normalizeScriptPath(htmlScript.file);
+        const domScript = domScriptMap.get(normalized);
+        
+        if (domScript) {
+            const htmlIndex = htmlScript.position;
+            const domIndex = domScript.domIndex;
+            
+            // Check if order differs significantly (more than 2 positions)
+            if (Math.abs(htmlIndex - domIndex) > 2) {
+                comparison.orderDifferences.push({
+                    script: htmlScript.file,
+                    htmlPosition: htmlIndex,
+                    domPosition: domIndex,
+                    expectedOrder: htmlScript.loadOrder,
+                    package: htmlScript.package,
+                    severity: Math.abs(htmlIndex - domIndex) > 5 ? 'error' : 'warning'
+                });
+            }
+
+            // Check for path differences (version, query params)
+            // Note: This requires DOM access, so we do it carefully
+            try {
+                const htmlPath = htmlScript.fullPath.split('?')[0];
+                const domScriptElement = Array.from(document.querySelectorAll('script[src]'))
+                    .find(s => {
+                        const scriptFilename = s.src.split('/').pop().split('?')[0];
+                        return normalizeScriptPath(scriptFilename) === normalized;
+                    });
+                
+                if (domScriptElement) {
+                    const domPath = domScriptElement.src.split('?')[0];
+                    // Normalize paths for comparison (remove leading /scripts/ if present)
+                    const normalizedHtmlPath = htmlPath.replace(/^\/?scripts\//, '');
+                    const normalizedDomPath = domPath.replace(/^\/?scripts\//, '');
+                    
+                    if (normalizedHtmlPath !== normalizedDomPath && 
+                        !normalizedHtmlPath.includes(normalizedDomPath) && 
+                        !normalizedDomPath.includes(normalizedHtmlPath)) {
+                        comparison.pathDifferences.push({
+                            script: htmlScript.file,
+                            htmlPath: htmlPath,
+                            domPath: domPath,
+                            package: htmlScript.package
+                        });
+                    }
+                }
+            } catch (error) {
+                // DOM might not be fully available, skip path comparison
+                console.warn('Could not compare paths for', htmlScript.file, error);
+            }
+        }
+    });
+
+    comparison.summary.differencesCount = 
+        comparison.orderDifferences.length +
+        comparison.missingInDOM.length +
+        comparison.extraInDOM.length +
+        comparison.pathDifferences.length;
+
+    return comparison;
+}
+
+/**
+ * Get package documentation information
+ * @param {Object} pageConfig - Page configuration
+ * @param {Object} packageManifest - Package manifest
+ * @returns {Object} Package documentation information
+ */
+function getPackageDocumentation(pageConfig, packageManifest) {
+    if (!pageConfig.packages || !packageManifest) {
+        return {
+            packages: [],
+            documentationCompliance: 0,
+            issues: []
+        };
+    }
+
+    const packages = [];
+    const issues = [];
+    let totalScripts = 0;
+    let loadedScripts = 0;
+
+    // Get DOM scripts for checking if loaded (including external URLs)
+    const domScripts = Array.from(document.querySelectorAll('script[src]'))
+        .map(script => {
+            const src = script.src;
+            // For external URLs, keep full URL; for local scripts, use filename
+            if (src.startsWith('http://') || src.startsWith('https://')) {
+                return src.split('?')[0].toLowerCase();
+            }
+            return src.split('/').pop().split('?')[0];
+        })
+        .filter(src => src && !src.includes('font-awesome')); // Keep bootstrap for checking
+
+    pageConfig.packages.forEach(pkgId => {
+        const pkg = packageManifest[pkgId];
+        if (!pkg) {
+            issues.push(`Package ${pkgId} not found in manifest`);
+            return;
+        }
+
+        const pkgScripts = (pkg.scripts || [])
+            .filter(script => script.required !== false)
+            .map(script => {
+                const scriptFile = script.file;
+                // For external URLs, check full URL; for local scripts, check filename
+                let loaded = false;
+                if (scriptFile.startsWith('http://') || scriptFile.startsWith('https://')) {
+                    const normalizedScript = scriptFile.split('?')[0].toLowerCase();
+                    loaded = domScripts.some(domScript => domScript === normalizedScript || domScript.includes(scriptFile.split('/').pop()));
+                } else {
+                    const scriptFilename = scriptFile.split('/').pop().split('?')[0];
+                    loaded = domScripts.includes(scriptFilename);
+                }
+                totalScripts++;
+                if (loaded) loadedScripts++;
+                
+                return {
+                    file: script.file,
+                    loadOrder: script.loadOrder || 999,
+                    required: script.required !== false,
+                    loaded: loaded,
+                    description: script.description || ''
+                };
+            });
+
+        const pkgIssues = [];
+        const missingScripts = pkgScripts.filter(s => !s.loaded);
+        if (missingScripts.length > 0) {
+            pkgIssues.push(`Missing ${missingScripts.length} required scripts: ${missingScripts.map(s => s.file).join(', ')}`);
+        }
+
+        packages.push({
+            id: pkgId,
+            name: pkg.name || pkgId,
+            description: pkg.description || '',
+            version: pkg.version || 'unknown',
+            loadOrder: pkg.loadOrder || 999,
+            dependencies: pkg.dependencies || [],
+            scripts: pkgScripts,
+            documented: true,
+            issues: pkgIssues
+        });
+
+        issues.push(...pkgIssues);
+    });
+
+    const documentationCompliance = totalScripts > 0 
+        ? Math.round((loadedScripts / totalScripts) * 100) 
+        : 100;
+
+    return {
+        packages,
+        documentationCompliance,
+        issues,
+        totalScripts,
+        loadedScripts
+    };
+}
+
+/**
+ * Format comparison report for display
+ * @param {Object} comparison - Comparison results
+ * @returns {string} Formatted report text
+ */
+function formatComparisonReport(comparison) {
+    let report = '=== HTML vs DOM Comparison Report ===\n\n';
+    
+    report += `Summary:\n`;
+    report += `- HTML Scripts: ${comparison.summary.htmlScriptsCount}\n`;
+    report += `- DOM Scripts: ${comparison.summary.domScriptsCount}\n`;
+    report += `- Total Differences: ${comparison.summary.differencesCount}\n\n`;
+    
+    if (comparison.orderDifferences.length > 0) {
+        report += `Order Differences (${comparison.orderDifferences.length}):\n`;
+        comparison.orderDifferences.forEach((diff, index) => {
+            report += `${index + 1}. ${diff.script}: HTML pos ${diff.htmlPosition} → DOM pos ${diff.domPosition} (Expected: ${diff.expectedOrder})\n`;
+        });
+        report += '\n';
+    }
+    
+    if (comparison.missingInDOM.length > 0) {
+        report += `Missing in DOM (${comparison.missingInDOM.length}):\n`;
+        comparison.missingInDOM.forEach((m, index) => {
+            report += `${index + 1}. ${m.file} (HTML position: ${m.htmlPosition})\n`;
+        });
+        report += '\n';
+    }
+    
+    if (comparison.extraInDOM.length > 0) {
+        report += `Extra in DOM (${comparison.extraInDOM.length}):\n`;
+        comparison.extraInDOM.forEach((e, index) => {
+            report += `${index + 1}. ${e.file} (DOM position: ${e.domPosition}, Source: ${e.source})\n`;
+        });
+        report += '\n';
+    }
+    
+    if (comparison.pathDifferences.length > 0) {
+        report += `Path Differences (${comparison.pathDifferences.length}):\n`;
+        comparison.pathDifferences.forEach((p, index) => {
+            report += `${index + 1}. ${p.script}: HTML="${p.htmlPath}" vs DOM="${p.domPath}"\n`;
+        });
+        report += '\n';
+    }
+    
+    return report;
+}
+
+/**
+ * Generate fix recommendations for issues
+ * @param {Array<Object>} issues - Array of issue objects
+ * @returns {Array<Object>} Array of recommendation objects
+ */
+function generateFixRecommendations(issues) {
+    const recommendations = [];
+    
+    issues.forEach(issue => {
+        const type = issue.type || 'unknown';
+        let recommendation = {
+            type: type,
+            severity: issue.severity || 'warning',
+            message: issue.message || '',
+            fix: '',
+            priority: issue.severity === 'error' ? 'high' : 'medium'
+        };
+        
+        switch (type) {
+            case 'missing_script':
+                recommendation.fix = `הוסף את הסקריפט ${issue.file || 'החסר'} לקובץ HTML או וודא שהוא נטען דרך חבילה`;
+                break;
+            case 'extra_script':
+                recommendation.fix = `הסר את הסקריפט ${issue.file || 'הנוסף'} מהקובץ HTML או הוסף אותו למניפסט`;
+                break;
+            case 'duplicate_script':
+                recommendation.fix = `הסר את הכפילות של ${issue.file || 'הסקריפט'} מהקובץ HTML`;
+                break;
+            case 'loading_order':
+                recommendation.fix = `תקן את סדר הטעינה בקובץ HTML לפי המניפסט - ${issue.message || ''}`;
+                break;
+            case 'missing_global':
+                recommendation.fix = `הוסף את החבילה המתאימה ל-PAGE_CONFIGS או וודא שהסקריפט נטען`;
+                break;
+            case 'order_difference':
+                recommendation.fix = `תקן את סדר הטעינה של ${issue.script || 'הסקריפט'} בקובץ HTML`;
+                break;
+            case 'missing_in_dom':
+                recommendation.fix = `בדוק למה ${issue.file || 'הסקריפט'} לא נטען - ייתכן שזה 404 או שגיאת טעינה אחרת`;
+                break;
+            default:
+                recommendation.fix = `תקן את הבעיה לפי התיעוד`;
+        }
+        
+        recommendations.push(recommendation);
+    });
+    
+    return recommendations;
 }
 
 // Export functions globally
 window.runDetailedPageScan = runDetailedPageScan;
 window.waitForPageFullyLoaded = waitForPageFullyLoaded;
 window.checkForMismatches = checkForMismatches;
+window.parseHTMLFile = parseHTMLFile;
+window.extractScriptsFromHTML = extractScriptsFromHTML;
+window.normalizeScriptPath = normalizeScriptPath;
+window.getScriptLoadOrder = getScriptLoadOrder;
+window.compareHTMLvsDOM = compareHTMLvsDOM;
+window.getPackageDocumentation = getPackageDocumentation;
+window.formatComparisonReport = formatComparisonReport;
+window.generateFixRecommendations = generateFixRecommendations;
 
 if (window.Logger) {
   window.Logger.info('✅ Monitoring Functions loaded successfully', { page: 'monitoring' });

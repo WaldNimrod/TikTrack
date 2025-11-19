@@ -665,18 +665,85 @@
         ]);
 
         if (!force) {
-          const cached = await readCache(cacheKey, { ttl, layer: 'localStorage' });
+          // Try all cache layers in order: Memory → localStorage → IndexedDB → Backend
+          // UnifiedCacheManager handles this automatically, but we can specify fallback layers
+          let cached = null;
+          let cacheLayer = null;
+          
+          // Try memory first (fastest)
+          if (window.UnifiedCacheManager?.layers?.memory) {
+            cached = await readCache(cacheKey, { ttl, layer: 'memory' });
+            if (cached) {
+              cacheLayer = 'memory';
+            }
+          }
+          
+          // Try localStorage if memory miss
+          if (!cached && window.UnifiedCacheManager?.layers?.localStorage) {
+            cached = await readCache(cacheKey, { ttl, layer: 'localStorage' });
+            if (cached) {
+              cacheLayer = 'localStorage';
+            }
+          }
+          
+          // Try IndexedDB if localStorage miss
+          if (!cached && window.UnifiedCacheManager?.layers?.indexedDB) {
+            cached = await readCache(cacheKey, { ttl, layer: 'indexedDB' });
+            if (cached) {
+              cacheLayer = 'indexedDB';
+            }
+          }
+          
+          // Fallback to UnifiedCacheManager's automatic layer selection
+          if (!cached) {
+            cached = await readCache(cacheKey, { ttl });
+            if (cached) {
+              cacheLayer = 'auto';
+            }
+          }
+          
           if (cached) {
             // Auto-migrate legacy array/object formats to normalized map
             const normalized = Array.isArray(cached?.preferences) || Array.isArray(cached)
               ? normalizePreferencesPayload({ data: { preferences: cached?.preferences ?? cached } }, { userId, profileId })
               : (cached?.preferences ? { ...cached } : normalizePreferencesPayload(cached, { userId, profileId }));
+            
+            // Cache warming: save to memory for faster subsequent access
+            if (normalized && cacheLayer !== 'memory' && window.UnifiedCacheManager?.layers?.memory) {
+              try {
+                await saveCache(cacheKey, normalized, { ttl: Math.min(ttl, 300000), layer: 'memory' });
+                window.Logger?.debug?.('🔥 Cache warming: saved to memory layer', {
+                  ...PAGE_LOG_CONTEXT,
+                  key: cacheKey,
+                });
+              } catch (warmError) {
+                // Non-critical - continue even if cache warming fails
+                window.Logger?.debug?.('⚠️ Cache warming failed (non-critical)', {
+                  ...PAGE_LOG_CONTEXT,
+                  error: warmError?.message,
+                });
+              }
+            }
+            
             if (normalized && normalized !== cached) {
               await saveCache(cacheKey, normalized, { ttl, layer: 'localStorage' });
             }
+            
+            window.Logger?.debug?.('✅ Cache hit for all preferences', {
+              ...PAGE_LOG_CONTEXT,
+              cacheLayer,
+              key: cacheKey,
+            });
+            
             return normalized;
           }
         }
+
+        // Cache miss - load from backend
+        window.Logger?.debug?.('📡 Cache miss - loading from backend', {
+          ...PAGE_LOG_CONTEXT,
+          key: cacheKey,
+        });
 
         const params = {
           user_id: userId,
@@ -688,8 +755,32 @@
         const payload = await fetchJson('/api/preferences/user', { params });
         const normalized = normalizePreferencesPayload(payload, { userId, profileId });
 
+        // Save to all cache layers for optimal performance
+        // Save to localStorage (primary)
         await saveCache(cacheKey, normalized, { ttl, layer: 'localStorage' });
+        
+        // Cache warming: also save to memory for immediate access
+        if (window.UnifiedCacheManager?.layers?.memory) {
+          try {
+            await saveCache(cacheKey, normalized, { ttl: Math.min(ttl, 300000), layer: 'memory' });
+          } catch (warmError) {
+            // Non-critical
+            window.Logger?.debug?.('⚠️ Memory cache warming failed (non-critical)', {
+              ...PAGE_LOG_CONTEXT,
+              error: warmError?.message,
+            });
+          }
+        }
+        
         return normalized;
+      } catch (error) {
+        window.Logger?.error?.('❌ Error in loadAllPreferencesRaw', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message || error,
+          userId,
+          profileId,
+        });
+        throw error;
       } finally {
         functionInflight.delete(dedupeKey);
       }

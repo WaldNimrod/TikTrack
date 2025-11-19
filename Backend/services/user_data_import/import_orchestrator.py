@@ -43,6 +43,9 @@ from services.advanced_cache_service import advanced_cache_service
 from services.ticker_service import TickerService
 from services.currency_service import CurrencyService
 from services.cash_flow_service import CashFlowService as CashFlowHelperService
+from services.tag_service import TagService
+from models.tag_category import TagCategory
+from models.tag import Tag
 
 from config.logging import get_logger
 logger = get_logger(__name__)
@@ -115,6 +118,11 @@ class ImportOrchestrator:
     - _merge_rich_text: Merge rich text blocks
     - _upgrade_preview_data_structure: Upgrade preview data structure
     - _finalize_preview_data: Finalize preview data
+    
+    Tag Management:
+    - _get_import_category: Get import tag category (tags should be created manually)
+    - _get_section_tag: Get section tag (tags should be created manually)
+    - _assign_tag_to_cashflow: Assign tag to cash flow record
     """
     
     def __init__(self, db_session: Session):
@@ -290,18 +298,21 @@ class ImportOrchestrator:
             
             # Create import session
             logger.info("📝 Creating database session...")
+            # Explicitly set created_at to ensure it's not None
+            # BaseModel has server_default but it may not work in all cases
             session = ImportSession(
                 trading_account_id=trading_account_id,
                 provider=connector.get_provider_name(),
                 file_name=file_name,
                 status='analyzing',
                 connector_type=connector_type,
-                task_type=task_type_normalized
+                task_type=task_type_normalized,
+                created_at=datetime.now(timezone.utc)  # Explicitly set created_at
             )
             
             self.db_session.add(session)
             self.db_session.commit()
-            logger.info(f"✅ Import session created in database: {session.id}")
+            logger.info(f"✅ Import session created in database: {session.id}, created_at: {session.created_at}")
             
             # Store file content for processing
             logger.info("💾 Storing file content and connector info...")
@@ -2439,35 +2450,42 @@ class ImportOrchestrator:
             selected_types: Optional list of cashflow types to import (for cashflows task)
         """
         try:
-            logger.info(f"🔍 Starting execute_import for session {session_id}")
+            logger.info(f"🔍 [IMPORT] ===== STARTING EXECUTE_IMPORT FOR SESSION {session_id} =====")
+            logger.info(f"🔍 [IMPORT] Step 1: Querying import session {session_id}")
             
             import_session = self.db_session.query(ImportSession).filter(
                 ImportSession.id == session_id
             ).first()
             
             if not import_session:
-                logger.error(f"❌ Session {session_id} not found")
+                logger.error(f"❌ [IMPORT] Session {session_id} not found in database")
                 return {'success': False, 'error': 'Session not found'}
+            
+            logger.info(f"✅ [IMPORT] Session {session_id} found: status={import_session.status}, provider={import_session.provider}")
             
             if import_session.status not in ['ready', 'importing']:
                 logger.warning(
-                    "⚠️ Session %s is not ready for import (status=%s)",
+                    "⚠️ [IMPORT] Session %s is not ready for import (status=%s)",
                     session_id,
                     import_session.status
                 )
                 return {'success': False, 'error': 'Session not ready for import'}
             
             requested_task_type = (task_type or import_session.task_type or import_session.get_summary_data('task_type') or 'executions').lower()
+            logger.info(f"🔍 [IMPORT] Step 2: Task type determined: {requested_task_type}")
+            
             import_session.task_type = requested_task_type
             import_session.update_status('importing')
             self.db_session.flush()
+            logger.info(f"✅ [IMPORT] Session status updated to 'importing'")
 
             logger.info(
-                "🔍 [EXECUTE_IMPORT] Starting import for session %s with selected_types: %s",
+                "🔍 [IMPORT] Step 3: Starting import for session %s with selected_types: %s",
                 session_id,
                 selected_types
             )
             preview_result = self.generate_preview(session_id, requested_task_type, selected_types=selected_types)
+            logger.info(f"🔍 [IMPORT] Step 4: Preview generation result: success={preview_result.get('success')}")
             if not preview_result['success']:
                 error_message = preview_result.get('error', 'Failed to regenerate preview data')
                 logger.error(
@@ -2595,13 +2613,19 @@ class ImportOrchestrator:
                     'import_errors': ['No records available for import after preview regeneration.']
                 }
 
+            logger.info(f"🔍 [IMPORT] Step 5: Executing import task: {requested_task_type}")
             if requested_task_type == 'cashflows':
+                logger.info(f"🔍 [IMPORT] Calling _execute_import_cashflows for session {session_id}")
                 task_result = self._execute_import_cashflows(import_session, preview_data)
+                logger.info(f"✅ [IMPORT] _execute_import_cashflows completed: success={task_result.get('success')}, imported={task_result.get('imported_count', 0)}")
             elif requested_task_type == 'account_reconciliation':
+                logger.info(f"🔍 [IMPORT] Calling _execute_import_account_reconciliation for session {session_id}")
                 task_result = self._execute_import_account_reconciliation(import_session, preview_data)
             elif requested_task_type in {'portfolio_positions', 'taxes_and_fx'}:
+                logger.info(f"🔍 [IMPORT] Calling _execute_report_only for session {session_id}")
                 task_result = self._execute_report_only(import_session, preview_data, requested_task_type)
             else:
+                logger.info(f"🔍 [IMPORT] Calling _execute_import_executions for session {session_id}")
                 task_result = self._execute_import_executions(import_session, preview_data)
 
             if not task_result.get('success'):
@@ -2822,13 +2846,143 @@ class ImportOrchestrator:
             'cache_patterns': ['executions', 'trades', 'dashboard']
         }
 
+    # --------------------------------------------------------------------- #
+    # Tag Management Helpers
+    # --------------------------------------------------------------------- #
+    
+    def _get_import_category(
+        self,
+        user_id: int,
+        provider_name: str
+    ) -> Optional[int]:
+        """
+        Get tag category for import records.
+        
+        Looks for a category named "ייבוא נתונים [provider_name]" (e.g., "ייבוא נתונים IBKR").
+        Returns None if category doesn't exist (tags should be created manually via script).
+        
+        Args:
+            user_id: User ID (defaults to 1 for single-user system)
+            provider_name: Provider name (e.g., "IBKR", "Demo")
+            
+        Returns:
+            category_id: ID of the tag category, or None if not found
+        """
+        category_name = f"ייבוא נתונים {provider_name}"
+        
+        # Search for existing category
+        existing_category = (
+            self.db_session.query(TagCategory)
+            .filter(
+                TagCategory.user_id == user_id,
+                TagCategory.name == category_name
+            )
+            .first()
+        )
+        
+        if existing_category:
+            logger.debug(f"Found import category: {category_name} (ID: {existing_category.id})")
+            return existing_category.id
+        
+        logger.warning(f"Import category not found: {category_name}. Please run create_import_tags.py script first.")
+        return None
+    
+    def _get_section_tag(
+        self,
+        user_id: int,
+        section_name: str
+    ) -> Optional[int]:
+        """
+        Get tag for import section.
+        
+        Looks for a tag with the section name in English (as it appears in the source file).
+        Tags should be created manually via create_import_tags.py script.
+        
+        Args:
+            user_id: User ID (defaults to 1 for single-user system)
+            section_name: Section name in English (e.g., "Dividends", "Interest", "Borrow Fee Details")
+            
+        Returns:
+            tag_id: ID of the tag, or None if not found
+        """
+        from sqlalchemy import func
+        
+        # Search for existing tag by name (case-insensitive, across all categories)
+        existing_tag = (
+            self.db_session.query(Tag)
+            .filter(
+                Tag.user_id == user_id,
+                func.lower(Tag.name) == func.lower(section_name)
+            )
+            .first()
+        )
+        
+        if existing_tag:
+            logger.debug(f"Found tag: {section_name} (ID: {existing_tag.id}, Category: {existing_tag.category_id})")
+            return existing_tag.id
+        
+        logger.warning(f"Tag not found: {section_name}. Please run create_import_tags.py script first.")
+        return None
+    
+    def _assign_tag_to_cashflow(
+        self,
+        user_id: int,
+        cashflow_id: int,
+        tag_id: int
+    ) -> None:
+        """
+        Assign tag to cash flow record.
+        
+        Preserves existing tags and adds the new tag.
+        
+        Args:
+            user_id: User ID
+            cashflow_id: Cash flow record ID
+            tag_id: Tag ID to assign
+        """
+        try:
+            # Get existing tags for this cash flow
+            existing_tags = TagService.get_tags_for_entity(
+                self.db_session,
+                entity_type="cash_flow",
+                entity_id=cashflow_id,
+                user_id=user_id
+            )
+            existing_tag_ids = [tag.id for tag in existing_tags]
+            
+            # Add new tag if not already present
+            if tag_id not in existing_tag_ids:
+                existing_tag_ids.append(tag_id)
+            
+            # Replace tags (preserves existing + adds new)
+            # Use TagService.replace_tags_for_entity which handles commit internally
+            # Note: This will commit the tag links, but cashflow is already flushed so ID is available
+            TagService.replace_tags_for_entity(
+                self.db_session,
+                user_id=user_id,
+                entity_type="cash_flow",
+                entity_id=cashflow_id,
+                tag_ids=existing_tag_ids,
+                created_by=None
+            )
+            
+            logger.debug(f"Assigned tag {tag_id} to cash flow {cashflow_id}")
+        except Exception as e:
+            # Log error but don't fail the import
+            logger.warning(f"Failed to assign tag {tag_id} to cash flow {cashflow_id}: {e}", exc_info=True)
+
     def _execute_import_cashflows(
         self,
         import_session: ImportSession,
         preview_data: Dict[str, Any]
     ) -> Dict[str, Any]:
+        logger.info(f"🔍 [IMPORT] ===== _execute_import_cashflows START =====")
+        logger.info(f"🔍 [IMPORT] Session ID: {import_session.id}, Trading Account: {import_session.trading_account_id}")
+        
         raw_entries = preview_data.get('records_to_import', []) or []
         skipped_count = len(preview_data.get('records_to_skip', []) or [])
+        logger.info(f"🔍 [IMPORT] Records to import: {len(raw_entries)}, Records to skip: {skipped_count}")
+        
         from_type = CashFlowHelperService.EXCHANGE_FROM_TYPE
         to_type = CashFlowHelperService.EXCHANGE_TO_TYPE
 
@@ -2988,6 +3142,25 @@ class ImportOrchestrator:
         # Import ImportValidator for pre-import validation
         from .import_validator import ImportValidator
         
+        # Prepare tag management: get/create category and prepare user_id
+        # Use user_id=1 for single-user system (can be extended to get from trading_account in future)
+        user_id = 1
+        provider_name = import_session.provider or import_session.connector_type or "Unknown"
+        # Normalize provider name (e.g., "ibkr" -> "IBKR", "IBKRConnector" -> "IBKR")
+        if provider_name.lower() == "ibkr" or "ibkr" in provider_name.lower():
+            provider_name = "IBKR"
+        elif provider_name.lower() == "demo":
+            provider_name = "Demo"
+        else:
+            # Capitalize first letter
+            provider_name = provider_name.capitalize()
+        
+        # Get import category (tags should be created manually via create_import_tags.py)
+        import_category_id = self._get_import_category(user_id, provider_name)
+        
+        # Store cashflows for tag assignment after commit
+        cashflows_for_tagging = []
+        
         for index, record in enumerate(cashflow_records):
             try:
                 storage_type = record.get('storage_type')
@@ -3134,7 +3307,30 @@ class ImportOrchestrator:
                     trade_id=None
                 )
                 # Note: create_regular_cash_flow already calls db.add(), no need to add again
+                logger.info(f"🔍 [IMPORT] Step 6.{index + 1}: Created cashflow object, flushing to get ID...")
+                # Flush to get ID without committing (we'll commit all at once at the end)
+                self.db_session.flush()
+                logger.info(f"✅ [IMPORT] Step 6.{index + 1}: Cashflow flushed, ID={cashflow.id if hasattr(cashflow, 'id') else 'NOT_SET'}")
+                
+                # Verify cashflow.id is available
+                if not cashflow.id:
+                    logger.error(f"❌ [IMPORT] cashflow.id is None after flush for record #{index + 1}")
+                    raise ValueError("Cashflow ID is not available after flush")
+                
                 imported_count += 1
+                logger.info(f"✅ [IMPORT] Step 6.{index + 1}: Cashflow #{imported_count} created successfully (ID: {cashflow.id})")
+                
+                # Store cashflow info for tag assignment after commit
+                section_name = record.get('section')
+                if section_name:
+                    cashflows_for_tagging.append({
+                        'cashflow': cashflow,
+                        'section_name': section_name,
+                        'record_index': index + 1
+                    })
+                    logger.debug(f"🔍 [IMPORT] Stored cashflow {cashflow.id} for tag assignment (section: {section_name})")
+                else:
+                    logger.debug(f"⚠️ [IMPORT] No section_name in record for cashflow {cashflow.id}")
             except Exception as record_error:
                 logger.error(
                     "❌ Failed to create cashflow #%s: %s",
@@ -3386,11 +3582,40 @@ class ImportOrchestrator:
                         exchange_rate,
                         fee_amount
                     )
+                    
+                    # Store exchange info for tag assignment after commit
+                    # Get section name from records (prefer from_rec, fallback to to_rec, then default to "Forex Conversion")
+                    section_name = (
+                        from_rec.get('section') or 
+                        to_rec.get('section') or 
+                        from_meta.get('section') or 
+                        to_meta.get('section') or 
+                        "Forex Conversion"
+                    )
+                    
+                    # Note: create_exchange already commits, so IDs are available
+                    # But we'll assign tags after all commits to be consistent
+                    if svc_result.get('from_flow') and svc_result.get('to_flow'):
+                        cashflows_for_tagging.append({
+                            'cashflow': svc_result['from_flow'],
+                            'section_name': section_name,
+                            'record_index': f'exchange-{exchange_id}-from'
+                        })
+                        cashflows_for_tagging.append({
+                            'cashflow': svc_result['to_flow'],
+                            'section_name': section_name,
+                            'record_index': f'exchange-{exchange_id}-to'
+                        })
+                        logger.debug(f"🔍 [IMPORT] Stored exchange {exchange_id} flows for tag assignment (section: {section_name})")
             except Exception as exch_error:
                 logger.error("❌ Failed to create exchange %s: %s", exchange_id, exch_error, exc_info=True)
                 import_errors.append(f"Exchange {exchange_id} failed: {exch_error}")
 
+        logger.info(f"🔍 [IMPORT] ===== _execute_import_cashflows SUMMARY =====")
+        logger.info(f"🔍 [IMPORT] Imported count: {imported_count}, Skipped count: {skipped_count}, Errors: {len(import_errors)}")
+        
         if imported_count == 0:
+            logger.error(f"❌ [IMPORT] No cashflow records were created during import. Rolling back transaction.")
             self.db_session.rollback()
             return {
                 'success': False,
@@ -3400,7 +3625,52 @@ class ImportOrchestrator:
                 'skipped_count': skipped_count
             }
 
+        logger.info(f"✅ [IMPORT] Final flush before commit")
         self.db_session.flush()
+        
+        # Commit all cashflows first
+        logger.info(f"✅ [IMPORT] Committing all cashflows...")
+        self.db_session.commit()
+        logger.info(f"✅ [IMPORT] All cashflows committed successfully")
+        
+        # Now assign tags after commit (cashflows have IDs)
+        logger.info(f"🔍 [IMPORT] Assigning tags to {len(cashflows_for_tagging)} cashflows...")
+        for tag_info in cashflows_for_tagging:
+            cashflow = tag_info['cashflow']
+            section_name = tag_info['section_name']
+            record_index = tag_info['record_index']
+            
+            try:
+                # Refresh to ensure we have the latest state
+                self.db_session.refresh(cashflow)
+                
+                if not cashflow.id:
+                    logger.error(f"❌ [IMPORT] cashflow.id is None after commit/refresh for record #{record_index}")
+                    continue
+                
+                tag_id = self._get_section_tag(
+                    user_id=user_id,
+                    section_name=section_name
+                )
+                logger.debug(f"🔍 [IMPORT] Got tag_id: {tag_id} for section: {section_name}")
+                
+                if tag_id:
+                    self._assign_tag_to_cashflow(
+                        user_id=user_id,
+                        cashflow_id=cashflow.id,
+                        tag_id=tag_id
+                    )
+                    logger.info(f"✅ [IMPORT] Assigned tag {tag_id} to cashflow {cashflow.id} (section: {section_name})")
+                else:
+                    logger.warning(f"⚠️ [IMPORT] Tag not found for section: {section_name}. Skipping tag assignment.")
+            except Exception as tag_error:
+                # Log error but don't fail the import
+                logger.warning(
+                    f"⚠️ [IMPORT] Failed to assign tag for cashflow {cashflow.id if hasattr(cashflow, 'id') and cashflow.id else 'UNKNOWN'} (section: {section_name}): {tag_error}",
+                    exc_info=True
+                )
+        
+        logger.info(f"✅ [IMPORT] Tag assignment completed")
 
         preview_summary = preview_data.get('summary', {})
         type_stats = (
@@ -3412,6 +3682,7 @@ class ImportOrchestrator:
             type_stats=type_stats
         )
 
+        logger.info(f"✅ [IMPORT] ===== _execute_import_cashflows COMPLETED SUCCESSFULLY =====")
         return {
             'success': True,
             'imported_count': imported_count,
@@ -3788,9 +4059,13 @@ class ImportOrchestrator:
             Dict[str, Any]: Import history
         """
         try:
+            # Order by id desc (newest first) - more reliable than created_at which may be None
+            # This ensures all sessions are returned in correct order
             sessions = self.db_session.query(ImportSession).filter(
                 ImportSession.trading_account_id == trading_account_id
-            ).order_by(ImportSession.created_at.desc()).limit(limit).all()
+            ).order_by(ImportSession.id.desc()).limit(limit).all()
+            
+            logger.info(f"🔍 [IMPORT_HISTORY] Found {len(sessions)} sessions for trading_account_id={trading_account_id}, limit={limit}")
             
             return {
                 'success': True,

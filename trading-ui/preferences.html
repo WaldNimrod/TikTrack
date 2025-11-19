@@ -136,6 +136,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [41.5] Load Order: 41.5 - Preferences V4 SDK (group-first) - Must load before preferences-core-new.js -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [42] Load Order: 42 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [43] Load Order: 43 -->
@@ -191,7 +193,7 @@
     <!-- [56] Load Order: 56 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [57] Load Order: 57 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->

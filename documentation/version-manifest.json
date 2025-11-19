@@ -10,13 +10,13 @@
     "notes": "Remove unnecessary debug console logs from button system"
   },
   "development": {
-    "version": "1.1.28.0",
+    "version": "1.1.29.0",
     "major": 1,
     "minor": 1,
-    "patch": 28,
+    "patch": 29,
     "build": 0,
-    "commit": "ac3504ad5f308180cfd3a57e626bc86649c1d844",
-    "updated_at": "2025-11-19T19:12:18+00:00",
-    "notes": "Add dependency analyzer and load order validator tools, fix trading accounts page tables"
+    "commit": "77dd329fd5af732e0298ecc2330d508d9aa57128",
+    "updated_at": "2025-11-19T20:28:39+00:00",
+    "notes": "תיקון מערכת ייבוא: תיקון שיוך תגיות, ניהול מטמון מרכזי, תיקון תאריכים"
   }
 }

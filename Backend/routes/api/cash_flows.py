@@ -193,12 +193,18 @@ def get_cash_flows():
                         group['to'] = flow_entry
         
         # Enrich exchange flows with linkage details
+        # Note: Dates are already normalized by base_api.get_all, so we can use them directly
         for exchange_id, pair in exchange_pairs.items():
             from_flow = pair.get('from')
             to_flow = pair.get('to')
             if from_flow and to_flow:
                 from_flow['linked_exchange_cash_flow_id'] = to_flow.get('id')
                 to_flow['linked_exchange_cash_flow_id'] = from_flow.get('id')
+                
+                # Dates are already normalized by base_api.get_all (DateEnvelope format)
+                # Use dates directly - they should already be DateEnvelope dicts
+                to_flow_date = to_flow.get('date')
+                from_flow_date = from_flow.get('date')
                 
                 from_flow['linked_exchange_summary'] = {
                     "cash_flow_id": to_flow.get('id'),
@@ -207,7 +213,7 @@ def get_cash_flows():
                     "currency_symbol": to_flow.get('currency_symbol'),
                     "currency_name": to_flow.get('currency_name'),
                     "usd_rate": to_flow.get('usd_rate'),
-                    "date": to_flow.get('date'),
+                    "date": to_flow_date,
                     "type": to_flow.get('type')
                 }
                 to_flow['linked_exchange_summary'] = {
@@ -217,7 +223,7 @@ def get_cash_flows():
                     "currency_symbol": from_flow.get('currency_symbol'),
                     "currency_name": from_flow.get('currency_name'),
                     "usd_rate": from_flow.get('usd_rate'),
-                    "date": from_flow.get('date'),
+                    "date": from_flow_date,
                     "type": from_flow.get('type')
                 }
                 pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)

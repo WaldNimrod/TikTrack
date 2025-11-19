@@ -291,6 +291,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/11: SERVICES PACKAGE ===== -->
@@ -364,7 +366,7 @@
     <!-- [42] Load Order: 42 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
     <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <!-- core-systems.js removed - now loaded automatically via base package -->
     <!-- [44] Load Order: 44 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
@@ -426,9 +428,9 @@
     <!-- [63] Load Order: 63 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [64] Load Order: 64 -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
-    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
     <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
 
@@ -512,7 +514,7 @@
     <!-- [84] Load Order: 84 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [85] Load Order: 85 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->

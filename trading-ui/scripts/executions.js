@@ -1737,21 +1737,69 @@ window.initializeExecutionsPage = async function() {
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
 
-  // אתחול ממשק יצירת טרייד מאשכול ביצועים
-  if (window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
-    window.PendingExecutionTradeCreation.initializeExecutionsSection({
-      containerId: 'executionTradeCreationClustersContainer',
-      countElementId: 'executionTradeCreationClustersCount',
-      loadingElementId: 'executionTradeCreationClustersLoading',
-      emptyStateId: 'executionTradeCreationClustersEmpty',
-      errorElementId: 'executionTradeCreationClustersError'
-    });
+  // אתחול ממשק יצירת טרייד מאשכול ביצועים - LAZY LOADING
+  // נטען רק כשהמשתמש פותח את הסקשן trade-creation
+  const tradeCreationSection = document.getElementById('trade-creation') || document.querySelector('[data-section="trade-creation"]');
+  if (tradeCreationSection && window.PendingExecutionTradeCreation) {
+    let tradeCreationInitialized = false;
+    
+    // Initialize section but don't load data yet
+    const initializeTradeCreationSection = () => {
+      if (!tradeCreationInitialized && window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
+        tradeCreationInitialized = true;
+        window.Logger?.info('🔄 Initializing trade creation section (lazy loading)', { page: "executions" });
+        window.PendingExecutionTradeCreation.initializeExecutionsSection({
+          containerId: 'executionTradeCreationClustersContainer',
+          countElementId: 'executionTradeCreationClustersCount',
+          loadingElementId: 'executionTradeCreationClustersLoading',
+          emptyStateId: 'executionTradeCreationClustersEmpty',
+          errorElementId: 'executionTradeCreationClustersError'
+        });
+      }
+    };
+    
+    // Wait for sections to be restored before initializing observers
+    // This prevents loading data during initial page load when restoreAllSectionStates opens sections
+    let tradeCreationDebounceTimer = null;
+    const setupTradeCreationObserver = () => {
+      // Check if section is actually visible to user (not just restored state)
+      const sectionBody = tradeCreationSection.querySelector('.section-body');
+      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
+      
+      // Only initialize if section is actually open (user-initiated, not just restored state)
+      if (!isActuallyOpen) {
+        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !tradeCreationInitialized) {
+              // Debounce to avoid multiple rapid calls
+              if (tradeCreationDebounceTimer) {
+                clearTimeout(tradeCreationDebounceTimer);
+              }
+              tradeCreationDebounceTimer = setTimeout(() => {
+                initializeTradeCreationSection();
+                observer.disconnect();
+              }, 500); // 500ms debounce
+            }
+          });
+        }, { threshold: 0.1 });
+        
+        observer.observe(tradeCreationSection);
+      }
+    };
+    
+    // Wait for sections:restored event or check if already restored
+    if (window.sectionsRestored) {
+      setupTradeCreationObserver();
+    } else {
+      document.addEventListener('sections:restored', setupTradeCreationObserver, { once: true });
+    }
   }
 
   // שחזור מצב הסגירה - handled by global toggleSection system
 
-  // טעינת נתונים
-  await loadExecutionsData();
+  // טעינת נתונים - נטען ב-customInitializers, לא כאן כדי למנוע קריאה כפולה
+  // await loadExecutionsData(); // Removed - loaded in customInitializers
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
@@ -1768,21 +1816,137 @@ window.initializeExecutionsPage = async function() {
     await window.UnifiedTableSystem.sorter.applyDefaultSort('executions');
   }
 
-  // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
-  updateTickersList('add', false);
-  updateTickersList('edit', false);
+  // אתחול רשימת טיקרים - LAZY LOADING: נטען רק כשהמשתמש פותח את ה-modal
+  // updateTickersList('add', false); // Removed - lazy loading on modal open
+  // updateTickersList('edit', false); // Removed - lazy loading on modal open
 
-  // Event listeners לעדכון שדה Realized P/L לפי סוג הפעולה
+    // Event listeners לעדכון שדה Realized P/L לפי סוג הפעולה
   // ModalManagerV2 uses field.id directly from config (executionType, not addExecutionType/editExecutionType)
   // We need to attach the listener when the modal is shown, not on page load
-  // This will be handled by ModalManagerV2's onModalShown callback
-
-  // Load trade suggestions after page initialization
-  setTimeout(async () => {
-    if (typeof loadTradeSuggestionsForAll === 'function') {
-      await loadTradeSuggestionsForAll();
+  // LAZY LOADING: טעינת רשימת טיקרים רק כשהמשתמש פותח את ה-modal
+  // Use Bootstrap's shown.bs.modal event
+  document.addEventListener('shown.bs.modal', async function(event) {
+    const modalElement = event.target;
+    if (modalElement && modalElement.id === 'executionsModal') {
+      // Determine mode from modal or default to 'add'
+      const mode = modalElement.getAttribute('data-mode') || 'add';
+      const showClosedTrades = false; // ברירת מחדל
+      
+      // טעינת רשימת טיקרים רק כשהמשתמש פותח את ה-modal (lazy loading)
+      if (typeof updateTickersList === 'function') {
+        try {
+          window.Logger?.info('🔄 Loading tickers list (lazy loading - modal opened)', { mode, page: "executions" });
+          await updateTickersList(mode, showClosedTrades);
+        } catch (error) {
+          window.Logger?.warn('⚠️ Failed to load tickers list on modal open:', error, { page: "executions" });
+        }
+      }
     }
-  }, 2000); // Wait 2 seconds for page to fully load
+  });
+
+  // Load trade suggestions - LAZY LOADING: נטען רק כשהמשתמש מגיע לסקשן
+  // Event listener לטעינת המלצות כשהמשתמש פותח את סקשן suggestions
+  const suggestionsSection = document.getElementById('suggestions');
+  if (suggestionsSection && typeof loadTradeSuggestionsForAll === 'function') {
+    let suggestionsLoaded = false;
+    
+    // Wait for sections to be restored before initializing observers
+    // This prevents loading data during initial page load when restoreAllSectionStates opens sections
+    let suggestionsDebounceTimer = null;
+    const setupSuggestionsObserver = () => {
+      // Check if section is actually visible to user (not just restored state)
+      const sectionBody = suggestionsSection.querySelector('.section-body');
+      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
+      
+      // Only initialize if section is actually open (user-initiated, not just restored state)
+      if (!isActuallyOpen) {
+        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            // אם הסקשן גלוי ולא טענו עדיין את הנתונים
+            if (entry.isIntersecting && !suggestionsLoaded) {
+              // Debounce to avoid multiple rapid calls
+              if (suggestionsDebounceTimer) {
+                clearTimeout(suggestionsDebounceTimer);
+              }
+              suggestionsDebounceTimer = setTimeout(() => {
+                suggestionsLoaded = true;
+                window.Logger?.info('🔄 Loading trade suggestions (lazy loading - section visible)', { page: "executions" });
+                loadTradeSuggestionsForAll().catch(error => {
+                  window.Logger?.warn('⚠️ Failed to load trade suggestions on section open:', error, { page: "executions" });
+                  suggestionsLoaded = false; // Allow retry
+                });
+                observer.disconnect(); // Stop observing after first load
+              }, 500); // 500ms debounce
+            }
+          });
+        }, { threshold: 0.1 }); // Trigger when 10% of section is visible
+        
+        observer.observe(suggestionsSection);
+      }
+    };
+    
+    // Wait for sections:restored event or check if already restored
+    if (window.sectionsRestored) {
+      setupSuggestionsObserver();
+    } else {
+      document.addEventListener('sections:restored', setupSuggestionsObserver, { once: true });
+    }
+  }
+  
+  // Wrapper ל-toggleSection עם lazy loading לסקשנים
+  if (typeof window.toggleSection === 'function') {
+    const originalToggleSection = window.toggleSection;
+    window.toggleSection = function(sectionId) {
+      const result = originalToggleSection.call(this, sectionId);
+      
+      // LAZY LOADING: טעינת נתונים כשהמשתמש פותח סקשן
+      setTimeout(() => {
+        const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
+        if (!section) return;
+        
+        const sectionBody = section.querySelector('.section-body');
+        const isOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
+        
+        // Trade creation section - lazy loading
+        if (sectionId === 'trade-creation' && isOpen && window.PendingExecutionTradeCreation) {
+          const containerId = 'executionTradeCreationClustersContainer';
+          const container = document.getElementById(containerId);
+          
+          // אם הסקשן פתוח והקונטיינר לא מכיל נתונים, אתחל
+          if (container && (!container.children.length || container.textContent.trim() === '' || container.textContent.includes('טוען'))) {
+            if (window.PendingExecutionTradeCreation.initializeExecutionsSection) {
+              window.Logger?.info('🔄 Initializing trade creation section (lazy loading - user toggled section)', { page: "executions" });
+              window.PendingExecutionTradeCreation.initializeExecutionsSection({
+                containerId: containerId,
+                countElementId: 'executionTradeCreationClustersCount',
+                loadingElementId: 'executionTradeCreationClustersLoading',
+                emptyStateId: 'executionTradeCreationClustersEmpty',
+                errorElementId: 'executionTradeCreationClustersError'
+              });
+            }
+          }
+        }
+        
+        // Suggestions section - lazy loading
+        if (sectionId === 'suggestions' && isOpen && typeof loadTradeSuggestionsForAll === 'function') {
+          // Check if suggestions are already loaded
+          const suggestionsTable = section.querySelector('table');
+          const hasSuggestions = suggestionsTable && suggestionsTable.querySelector('tbody') && 
+                                 suggestionsTable.querySelector('tbody').children.length > 0;
+          
+          if (!hasSuggestions) {
+            window.Logger?.info('🔄 Loading trade suggestions (lazy loading - user toggled section)', { page: "executions" });
+            loadTradeSuggestionsForAll().catch(error => {
+              window.Logger?.warn('⚠️ Failed to load trade suggestions on toggle:', error, { page: "executions" });
+            });
+          }
+        }
+      }, 100); // Small delay to ensure section is fully opened
+      
+      return result;
+    };
+  }
 
   // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
   // setInterval(() => {
@@ -3063,15 +3227,15 @@ window.loadExecutionsData = async function(options = {}) {
     setupExecutionsFilterFunctions();
   }
 
-  // טעינת טבלת טיקרים חלקית
-  try {
-    const tickers = await loadTickersSummaryData();
-    updateTickersSummaryTable(tickers);
-    // window.Logger.info('✅ טבלת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים', { page: "executions" });
-  } catch (error) {
-    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקיים:', error, { page: "executions" });
-    handleApiError(error, 'טבלת טיקרים חלקית');
-  }
+  // טעינת טבלת טיקרים חלקית - LAZY LOADING: נטען רק כשנחוץ
+  // Removed from here - will be loaded on demand when needed
+  // This prevents multiple concurrent API calls on page load
+  // try {
+  //   const tickers = await loadTickersSummaryData();
+  //   updateTickersSummaryTable(tickers);
+  // } catch (error) {
+  //   handleApiError(error, 'טבלת טיקרים חלקית');
+  // }
 };
 
 // הוספת פונקציות CRUD גלובליות

@@ -867,14 +867,17 @@ function updateTradingAccountsTable(trading_accounts) {
     }).join('');
 
     // עדכון מונה הטבלה - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    const countElement = document.getElementById('accountsCount');
     if (window.updateTableCount) {
       window.updateTableCount('accountsCount', 'trading_accounts', 'חשבונות', trading_accounts.length);
-    } else {
-      // Fallback
-      const countElement = document.getElementById('accountsCount');
-      if (countElement) {
-        countElement.textContent = `${trading_accounts.length} חשבונות`;
-      }
+    } else if (countElement) {
+      // Fallback - עדכון ישיר
+      countElement.textContent = `${trading_accounts.length} חשבונות`;
+    }
+    
+    // וידוא שהמונה מתעדכן גם אם הפונקציה הגנרית לא זמינה
+    if (countElement && countElement.textContent.includes('טוען')) {
+      countElement.textContent = `${trading_accounts.length} חשבונות`;
     }
 
     if (typeof window.hideLoadingState === 'function') {

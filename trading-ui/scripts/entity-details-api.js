@@ -378,6 +378,11 @@ class EntityDetailsAPI {
             return this.fetchPositionDetails(entityId, options);
         }
         
+        // Import session uses a special endpoint
+        if (entityType === 'import_session') {
+            return this.fetchImportSessionDetails(entityId, options);
+        }
+        
         // נסה קודם את ה-endpoint החדש (מחזיר ticker object עם נתוני שוק)
         try {
             let entityData = await this.fetchFromNewEndpoint(entityType, entityId);
@@ -529,7 +534,8 @@ class EntityDetailsAPI {
             trading_account: `/api/trading-accounts/${entityId}`, // Alias for trading_account
             alert: `/api/alerts/${entityId}`,
             cash_flow: `/api/cash-flows/${entityId}`,
-            note: `/api/notes/${entityId}`
+            note: `/api/notes/${entityId}`,
+            import_session: `/api/user-data-import/session/${entityId}`
         };
 
         const endpoint = endpointMappings[entityType];
@@ -646,6 +652,55 @@ class EntityDetailsAPI {
         }
 
         return positionData;
+    }
+
+    /**
+     * Fetch import session details - קריאת פרטי סשן ייבוא
+     * @param {number|string} entityId - Session ID
+     * @param {Object} options - Additional options
+     * @returns {Promise<Object>} - Import session details payload
+     * @private
+     */
+    async fetchImportSessionDetails(entityId, options = {}) {
+        const url = `/api/user-data-import/session/${entityId}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error(`סשן ייבוא עם מזהה ${entityId} לא נמצא`);
+            }
+            throw new Error(`שגיאת שרת: ${response.status} ${response.statusText}`);
+        }
+
+        const payload = await response.json();
+        
+        // The API returns { success: true, session: {...} } or { status: 'success', session: {...} }
+        const sessionData = payload.session || payload.data || payload;
+        
+        if (!sessionData) {
+            throw new Error('השרת החזיר נתונים ריקים עבור פרטי סשן ייבוא');
+        }
+
+        // Normalize the data structure
+        const normalizedData = {
+            ...sessionData,
+            id: sessionData.id || entityId,
+            entity_type: 'import_session',
+            type: 'import_session'
+        };
+
+        // Ensure linked items array (import sessions may have linked cash flows, executions, etc.)
+        if (!Array.isArray(normalizedData.linked_items)) {
+            normalizedData.linked_items = [];
+        }
+
+        return normalizedData;
     }
 
     /**

@@ -348,6 +348,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/9: SERVICES PACKAGE ===== -->
@@ -368,8 +370,10 @@
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
     <!-- [25a] Preferences Data Service -->
     <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
-    <!-- [26] Load Order: 26 -->
+    <!-- [26] Load Order: 26 - MUST BE BEFORE unified-crud-service -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -424,6 +428,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [41.5] Load Order: 41.5 - Preferences V4 SDK (group-first) - Must load before preferences-core-new.js -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [42] Load Order: 42 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [43] Load Order: 43 -->
@@ -432,16 +438,14 @@
     <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
     <!-- [45] Load Order: 45 -->
     <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
-    <!-- [46] Load Order: 46 -->
+    <!-- [45.5] Load Order: 45.5 - Preferences Validation - Must load before preferences-ui-v4.js -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
-    <!-- [47] Load Order: 47 -->
+    <!-- [46] Load Order: 46 - Preferences UI V4 (Group-First) - Must load before preferences-ui.js -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [47] Load Order: 47 - Preferences UI - Must load before preferences-group-manager.js -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [48] Load Order: 48 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
-    <!-- [58.9] Preferences V4 SDK (group-first) -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [64.1] Preferences UI V4 (Group-First) -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/9: ENTITY SERVICES PACKAGE ===== -->
@@ -499,7 +503,7 @@
     <!-- [64] Load Order: 64 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [65] Load Order: 65 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 9/9: DASHBOARD WIDGETS ===== -->
@@ -515,14 +519,16 @@
     <!-- [68] Load Order: 68 -->
     <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- ווידג׳ט המלצות שיוך -->
     <!-- [69] Load Order: 69 -->
-    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- ווידג׳ט שיוך תוכניות למסחר -->
+    <script src="scripts/pending-execution-trade-creation.js?v=1.0.0"></script> <!-- ממשק יצירת טרייד מביצועים -->
     <!-- [70] Load Order: 70 -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
+    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- ווידג׳ט שיוך תוכניות למסחר -->
     <!-- [71] Load Order: 71 -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- תצורת מגירת חיפוש תגיות -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- רכיב התראות פעילות -->
     <!-- [72] Load Order: 72 -->
-    <script src="scripts/tag-search-controller.js?v=1.0.0"></script> <!-- בקר חיפוש תגיות -->
+    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- תצורת מגירת חיפוש תגיות -->
     <!-- [73] Load Order: 73 -->
+    <script src="scripts/tag-search-controller.js?v=1.0.0"></script> <!-- בקר חיפוש תגיות -->
+    <!-- [74] Load Order: 74 -->
     <script src="scripts/index.js?v=1.0.0"></script> <!-- לוגיקת דף הבית -->
 
     <!-- =============================================================== -->

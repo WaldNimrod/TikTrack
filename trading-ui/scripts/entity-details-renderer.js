@@ -157,7 +157,8 @@ class EntityDetailsRenderer {
             account: '#28a745',
             alert: '#ff9c05',
             cash_flow: '#20c997',
-            note: '#6c757d'
+            note: '#6c757d',
+            import_session: '#17a2b8'
         };
 
         // ניסיון לטעון צבעים מהעדפות ראשית
@@ -318,6 +319,8 @@ class EntityDetailsRenderer {
                     return this.renderCashFlow(entityData, options);
                 case 'note':
                     return this.renderNote(entityData, options);
+                case 'import_session':
+                    return this.renderImportSession(entityData, options);
                 default:
                     return this.renderGeneric(entityData, entityType, options);
             }
@@ -4544,6 +4547,154 @@ class EntityDetailsRenderer {
             </div>
         `;
     }
+    /**
+     * Render import session details - רנדור פרטי סשן ייבוא
+     * @param {Object} sessionData - Import session data
+     * @param {Object} options - Rendering options
+     * @returns {string} - HTML string
+     */
+    renderImportSession(sessionData, options = {}) {
+        try {
+            const sessionColor = this.entityColors.import_session || '#17a2b8';
+            const sourceInfo = options?.sourceInfo || null;
+            const linkedItemsOptions = Object.assign({}, options, { disableFilter: true });
+            
+            // Extract session information
+            const sessionId = sessionData.id || 'לא זמין';
+            const status = sessionData.status || 'unknown';
+            const statusDisplay = window.FieldRendererService?.renderStatus 
+                ? window.FieldRendererService.renderStatus(status, 'import_session')
+                : `<span class="badge bg-secondary">${status}</span>`;
+            
+            const provider = sessionData.provider || sessionData.connector_type || 'לא צויין';
+            const fileName = sessionData.file_name || 'לא צויין';
+            const fileSize = sessionData.file_size ? this._formatFileSize(sessionData.file_size) : 'לא זמין';
+            const tradingAccountName = sessionData.trading_account?.name 
+                || sessionData.trading_account_name 
+                || 'לא צויין';
+            
+            const totalRecords = sessionData.total_records || 0;
+            const importedRecords = sessionData.imported_records || 0;
+            const skippedRecords = sessionData.skipped_records || 0;
+            
+            const createdAt = this.formatDateTime(sessionData.created_at) || 'לא זמין';
+            const completedAt = this.formatDateTime(sessionData.completed_at) || 'לא הושלם';
+            
+            // Summary data
+            const summaryData = sessionData.summary_data || {};
+            const summaryStats = sessionData.summary_stats || {};
+            
+            // Build summary section
+            const summaryHtml = `
+                <div class="import-session-summary-section">
+                    <h6 class="border-bottom pb-2 mb-3" style="border-color: ${sessionColor} !important;">סיכום סטטיסטיקות</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <span class="text-muted fw-bold">סה"כ רשומות:</span>
+                                <span class="text-break">${totalRecords}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <span class="text-muted fw-bold">יובאו:</span>
+                                <span class="text-break text-success">${importedRecords}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <span class="text-muted fw-bold">הושמטו:</span>
+                                <span class="text-break text-warning">${skippedRecords}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return `
+                <div class="entity-details-container import-session-details">
+                    <!-- מידע בסיסי -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            ${this.renderBasicInfo(sessionData, 'import_session', sessionColor)}
+                        </div>
+                        <div class="col-md-6 d-flex flex-column gap-4">
+                            <div class="import-session-status-section">
+                                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${sessionColor} !important;">סטטוס</h6>
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <span class="text-muted fw-bold">סטטוס:</span>
+                                    <span class="text-break">${statusDisplay}</span>
+                                </div>
+                            </div>
+                            ${summaryHtml}
+                        </div>
+                    </div>
+                    
+                    <!-- פרטי קובץ -->
+                    <div class="row g-3 mt-4">
+                        <div class="col-12">
+                            <div class="import-session-file-section">
+                                <h6 class="border-bottom pb-2 mb-3" style="border-color: ${sessionColor} !important;">פרטי קובץ</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <span class="text-muted fw-bold">שם קובץ:</span>
+                                            <span class="text-break" title="${fileName}">${this._escapeHtml(fileName)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <span class="text-muted fw-bold">גודל קובץ:</span>
+                                            <span class="text-break">${fileSize}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <span class="text-muted fw-bold">ספק נתונים:</span>
+                                            <span class="text-break">${this._escapeHtml(provider)}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <span class="text-muted fw-bold">חשבון מסחר:</span>
+                                            <span class="text-break">${this._escapeHtml(tradingAccountName)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- פריטים מקושרים -->
+                    <div class="row g-3 mt-4">
+                        <div class="col-12">
+                            ${this.renderLinkedItems(sessionData.linked_items || [], sessionColor, 'import_session', sessionData.id, sourceInfo, linkedItemsOptions)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            window.Logger.error('Error rendering import session:', error, { page: "entity-details-renderer" });
+            return '<div class="alert alert-danger">שגיאה בטעינת פרטי סשן הייבוא</div>';
+        }
+    }
+    
+    /**
+     * Format file size - עיצוב גודל קובץ
+     * @param {number} bytes - File size in bytes
+     * @returns {string} - Formatted file size
+     * @private
+     */
+    _formatFileSize(bytes) {
+        if (!bytes || bytes === 0) {
+            return '0 B';
+        }
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+    
     renderGeneric(entityData, entityType, options) { return '<div>ישות כללית</div>'; }
     
     /**

@@ -72,8 +72,56 @@ class HeaderSystem {
       }, 0);
     }
 
-    // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר
+    // טעינת חשבונות לפילטר - ממתין להעדפות לפני טעינה
+    // Wait for critical preferences to be loaded before loading accounts
+    const waitForPreferences = async () => {
+      const environment = window.API_ENV || 'development';
+      const timeoutMs = environment === 'production' ? 5000 : 3000;
+      
+      return new Promise((resolve) => {
+        // Check if preferences are already loaded (check both currentPreferences and global flag)
+        if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+          resolve();
+          return;
+        }
+        
+        // Check if event already fired (race condition fix)
+        if (window.__preferencesCriticalLoaded) {
+          window.Logger?.debug?.('✅ Preferences already loaded (flag check)', {
+            page: 'header-system',
+          });
+          resolve();
+          return;
+        }
+        
+        // Wait for preferences:critical-loaded event
+        const eventHandler = () => {
+          resolve();
+        };
+        
+        window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+        
+        // Fallback timeout - continue even if event doesn't fire (backward compatibility)
+        setTimeout(() => {
+          window.removeEventListener('preferences:critical-loaded', eventHandler);
+          // Check flag one more time before timeout
+          if (window.__preferencesCriticalLoaded) {
+            window.Logger?.debug?.('✅ Preferences loaded during timeout check', {
+              page: 'header-system',
+            });
+          } else {
+            window.Logger?.warn?.('⚠️ Preferences event timeout - continuing without preferences', {
+              page: 'header-system',
+              timeout: `${timeoutMs}ms`,
+            });
+          }
+          resolve();
+        }, timeoutMs);
+      });
+    };
+    
     setTimeout(async () => {
+      await waitForPreferences();
       await HeaderSystem.loadAccountsForFilter();
     }, 100);
 
@@ -1046,10 +1094,27 @@ class HeaderSystem {
       // שימוש בפונקציה מקובץ השירותים
       let accounts = [];
 
-      if (typeof window.loadTradingAccountsFromServer === 'function') {
+      // Priority 1: Use DataImportData service with caching (if available)
+      if (window.DataImportData?.loadTradingAccountsForImport) {
+        try {
+          accounts = await window.DataImportData.loadTradingAccountsForImport();
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Failed to load accounts via DataImportData, trying fallback', {
+            page: 'header-system',
+            error: error?.message
+          });
+          // Fall through to next option
+        }
+      }
+
+      // Priority 2: Use legacy function (if available and accounts not loaded)
+      if ((!accounts || accounts.length === 0) && typeof window.loadTradingAccountsFromServer === 'function') {
         await window.loadTradingAccountsFromServer();
         accounts = window.trading_accountsData || [];
-      } else {
+      }
+
+      // Priority 3: Direct API call (only if no other method worked)
+      if (!accounts || accounts.length === 0) {
         // fallback לטעינה ישירה
         const response = await fetch('/api/trading-accounts/');
         const data = await response.json();
@@ -2960,6 +3025,68 @@ window.resetAllFilters = async function () {
       }
     }
 
+    // Wait for critical preferences to be loaded before using them
+    const environment = window.API_ENV || 'development';
+    const timeoutMs = environment === 'production' ? 5000 : 3000;
+    const waitStartTime = performance.now();
+    
+    // Wait for preferences:critical-loaded event with timeout fallback
+    await new Promise((resolve) => {
+      // Check if preferences are already loaded (check both currentPreferences and global flag)
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        const waitTime = performance.now() - waitStartTime;
+        window.Logger?.debug?.('✅ Preferences already available', {
+          page: 'header-system',
+          waitTime: `${waitTime.toFixed(2)}ms`,
+        });
+        resolve();
+        return;
+      }
+      
+      // Check if event already fired (race condition fix)
+      if (window.__preferencesCriticalLoaded) {
+        const waitTime = performance.now() - waitStartTime;
+        window.Logger?.debug?.('✅ Preferences already loaded (flag check)', {
+          page: 'header-system',
+          waitTime: `${waitTime.toFixed(2)}ms`,
+        });
+        resolve();
+        return;
+      }
+      
+      // Wait for preferences:critical-loaded event
+      const eventHandler = () => {
+        const waitTime = performance.now() - waitStartTime;
+        window.Logger?.debug?.('✅ Preferences loaded via event', {
+          page: 'header-system',
+          waitTime: `${waitTime.toFixed(2)}ms`,
+        });
+        resolve();
+      };
+      
+      window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+      
+      // Fallback timeout - continue even if event doesn't fire (backward compatibility)
+      setTimeout(() => {
+        window.removeEventListener('preferences:critical-loaded', eventHandler);
+        const waitTime = performance.now() - waitStartTime;
+        // Check flag one more time before timeout
+        if (window.__preferencesCriticalLoaded) {
+          window.Logger?.debug?.('✅ Preferences loaded during timeout check', {
+            page: 'header-system',
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        } else {
+          window.Logger?.warn?.('⚠️ Preferences event timeout - continuing without waiting', {
+            page: 'header-system',
+            timeout: `${timeoutMs}ms`,
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        }
+        resolve();
+      }, timeoutMs);
+    });
+    
     // טעינת הגדרות ברירת מחדל מהעדפות באמצעות מערכת ההעדפות הקיימת
     console.log('↻ בודק אם getPreference קיימת:', typeof window.getPreference);
     window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, {

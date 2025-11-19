@@ -1,17 +1,34 @@
 /**
- * Unified App Initializer - Comprehensive Function Index
+ * ARCHIVED - This file is replaced by modules/core-systems.js
  * ==========================================
- *
- * This file contains the final unified system that replaces all DOMContentLoaded listeners
- * and provides maximum flexibility with easy maintenance.
- *
+ * 
+ * ⚠️ DO NOT LOAD THIS FILE - It will cause conflicts with core-systems.js
+ * 
+ * This file has been archived and replaced by:
+ * - trading-ui/scripts/modules/core-systems.js (main initialization system)
+ * 
+ * If you need to load this file for any reason, you MUST:
+ * 1. Remove core-systems.js from the page first
+ * 2. Understand that this will break the unified initialization system
+ * 3. This file does NOT include the packages array support required for preferences
+ * 
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md
- *
+ * 
  * Author: TikTrack Development Team
- * Version: 3.0
+ * Version: 3.0 (ARCHIVED)
  * Last Updated: 2025-01-27
+ * Archive Date: 2025-01-27
  */
+
+// ===== ARCHIVED FILE PROTECTION =====
+// Prevent loading if core-systems.js is already loaded
+if (typeof window.UnifiedAppInitializer !== 'undefined') {
+  console.warn('⚠️ unified-app-initializer.js should not be loaded - use core-systems.js instead');
+  console.warn('⚠️ This file is archived and replaced by modules/core-systems.js');
+  console.warn('⚠️ Loading both files will cause conflicts and break preferences initialization');
+  // Don't return - allow the file to load but warn developers
+}
 
 // ===== UNIFIED APP INITIALIZER SYSTEM =====
 

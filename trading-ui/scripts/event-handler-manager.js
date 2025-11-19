@@ -98,11 +98,79 @@ class EventHandlerManager {
             
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
                 console.log('🚀 [EventHandlerManager] Executing onclick:', onclickValue);
+                console.log('🚀 [EventHandlerManager] Checking if function exists in global scope...');
+                
+                // Check if the function exists before eval
+                if (onclickValue.includes('openImportUserDataModal')) {
+                    console.log('🚀 [EventHandlerManager] openImportUserDataModal check:', {
+                        'window.openImportUserDataModal': typeof window.openImportUserDataModal,
+                        'typeof openImportUserDataModal (global)': typeof (typeof window !== 'undefined' ? window.openImportUserDataModal : undefined)
+                    });
+                }
+                
                 try {
                     // Execute the onclick handler using eval (safe because it's controlled)
                     // Note: Following documentation spec - no preventDefault/stopPropagation
                     // to allow Bootstrap modals and other standard behaviors to work
-                    const result = eval(onclickValue);
+                    // Eval runs in current scope, so window functions are available
+                    // If function is not found, try with window. prefix
+                    let result;
+                    
+                    // First, check if the function exists in global scope
+                    const functionName = onclickValue.replace(/\(.*\)/, '').trim();
+                    const functionArgs = onclickValue.match(/\((.*)\)/)?.[1] || '';
+                    console.log('🚀 [EventHandlerManager] Function name extracted:', functionName);
+                    console.log('🚀 [EventHandlerManager] Function args:', functionArgs);
+                    console.log('🚀 [EventHandlerManager] window[functionName] exists:', typeof window[functionName]);
+                    
+                    // Try direct window access first if function exists there
+                    if (window[functionName] && typeof window[functionName] === 'function') {
+                        console.log('🚀 [EventHandlerManager] Function found in window, calling directly:', functionName);
+                        try {
+                            if (functionArgs) {
+                                // Parse arguments (simple comma-separated, no complex parsing)
+                                const args = functionArgs.split(',').map(arg => {
+                                    const trimmed = arg.trim();
+                                    // Try to evaluate as JavaScript expression, fallback to string
+                                    try {
+                                        return eval(trimmed);
+                                    } catch {
+                                        return trimmed;
+                                    }
+                                });
+                                result = window[functionName](...args);
+                            } else {
+                                result = window[functionName]();
+                            }
+                            console.log('🚀 [EventHandlerManager] Direct call succeeded, result type:', typeof result);
+                        } catch (directError) {
+                            console.error('🚀 [EventHandlerManager] Direct call failed:', directError.name, directError.message);
+                            throw directError;
+                        }
+                    } else {
+                        // Fallback to eval
+                        try {
+                            console.log('🚀 [EventHandlerManager] Function not in window, attempting eval:', onclickValue);
+                            result = eval(onclickValue);
+                            console.log('🚀 [EventHandlerManager] Eval succeeded, result type:', typeof result);
+                        } catch (evalError) {
+                            console.error('🚀 [EventHandlerManager] Eval failed:', evalError.name, evalError.message);
+                            // If eval fails, try with window. prefix for global functions
+                            if (evalError.name === 'ReferenceError' && !onclickValue.includes('window.')) {
+                                const windowPrefixed = `window.${onclickValue}`;
+                                console.log('🚀 [EventHandlerManager] Retrying with window. prefix:', windowPrefixed);
+                                try {
+                                    result = eval(windowPrefixed);
+                                    console.log('🚀 [EventHandlerManager] Window-prefixed eval succeeded, result type:', typeof result);
+                                } catch (windowEvalError) {
+                                    console.error('🚀 [EventHandlerManager] Window-prefixed eval also failed:', windowEvalError.name, windowEvalError.message);
+                                    throw windowEvalError;
+                                }
+                            } else {
+                                throw evalError;
+                            }
+                        }
+                    }
                     
                     // Handle async functions (Promises) - especially ModalManagerV2.showModal
                     if (result && typeof result.then === 'function') {

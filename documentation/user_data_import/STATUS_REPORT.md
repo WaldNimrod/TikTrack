@@ -25,6 +25,7 @@
 - **ייבוא אטומי** של המרות מטבע (FROM/TO records)
 - **ניהול סשן** - אפשרות להמשיך ייבוא שנקטע
 - **Account linking** - שיוך חשבון IBKR לחשבון מסחר ב-TikTrack
+- **תגיות אוטומטיות** - כל רשומה מקבלת תגית עם שם הסקציה באנגלית בקטגוריה ייעודית
 
 ### קבצי קוד מרכזיים
 
@@ -415,6 +416,20 @@ def delete_imported_cash_flows():
 
 ## עדכונים אחרונים
 
+### 2025-01-30 - הוספת תגיות אוטומטיות לרשומות ייבוא
+
+**תכונה חדשה**:
+1. ✅ **תגיות אוטומטיות לרשומות ייבוא** - כל רשומת cash flow שנוצרת במהלך ייבוא מקבלת תגית אוטומטית
+   - **שם התגית**: שם הסקציה באנגלית כפי שמופיע בקובץ המקור (למשל "Dividends", "Interest", "Borrow Fee Details")
+   - **קטגוריה**: כל התגיות נמצאות בקטגוריה ייעודית "ייבוא נתונים [provider]" (למשל "ייבוא נתונים IBKR")
+   - **תיאור תגית**: "נוצר אוטומטית ממודול ייבוא"
+   - **יצירת תגיות**: התגיות נוצרות מראש באופן ידני באמצעות הסקריפט `Backend/scripts/create_import_tags.py`
+   - **שיוך תגיות**: המערכת רק משייכת תגיות קיימות לרשומות - לא יוצרת תגיות חדשות במהלך הייבוא
+   - **תגיות קיימות**: אם תגית עם אותו שם כבר קיימת, המערכת משתמשת בה (אפילו אם היא בקטגוריה אחרת)
+   - **רשומות Forex Exchange**: גם רשומות המרות מטבע מקבלות תגיות (לשתי הרשומות FROM/TO)
+   - **מיקום בקוד**: `Backend/services/user_data_import/import_orchestrator.py` - פונקציות `_get_import_category`, `_get_section_tag`, `_assign_tag_to_cashflow`
+   - **סקריפט יצירה**: `Backend/scripts/create_import_tags.py` - יוצר את כל התגיות הנדרשות מראש
+
 ### 2025-01-30 - סבב שיפורים משמעותי
 
 **תיקונים עיקריים**:
@@ -460,10 +475,11 @@ def delete_imported_cash_flows():
 
 ### Backend
 - `Backend/connectors/user_data_import/ibkr_connector.py` - תיקון זיהוי רשומות, validation עמודה שלישית
-- `Backend/services/user_data_import/import_orchestrator.py` - תיקונים רבים: preview, account binding, description format
+- `Backend/services/user_data_import/import_orchestrator.py` - תיקונים רבים: preview, account binding, description format, **תגיות אוטומטיות** (פונקציות `_get_import_category`, `_get_section_tag`, `_assign_tag_to_cashflow`)
 - `Backend/services/user_data_import/session_manager.py` - תיקון session resumption
 - `Backend/services/user_data_import/validation_service.py` - הרפיה של דרישת source_account
 - `Backend/routes/api/cash_flows.py` - תיקון Flask routing למחיקת רשומות
+- `Backend/scripts/create_import_tags.py` - סקריפט ליצירת תגיות ייבוא מראש
 
 ### Frontend
 - `trading-ui/scripts/import-user-data.js` - פישוט session management, תיקון errors

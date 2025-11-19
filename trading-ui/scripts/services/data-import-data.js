@@ -201,6 +201,61 @@
     }
   }
 
+  /**
+   * Invalidate import history cache
+   * 
+   * @returns {Promise<void>}
+   * 
+   * @description
+   * Invalidates import history cache via CacheSyncManager with fallback to direct invalidation.
+   * Uses 'import-session-updated' action for cache invalidation.
+   * 
+   * Cache Invalidation:
+   * - Primary: CacheSyncManager.invalidateByAction('import-session-updated')
+   * - Fallback: UnifiedCacheManager.invalidate() or clearByPattern() for 'data-import-data-*'
+   * 
+   * Related Documentation:
+   * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
+   */
+  async function invalidateHistoryCache() {
+    if (!window.UnifiedCacheManager) {
+      return;
+    }
+    // Try CacheSyncManager first (preferred method)
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('import-session-updated');
+        return;
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      }
+    }
+    
+    // Fallback to direct invalidation - clear all import history cache entries
+    const cachePattern = 'data-import-data-';
+    if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+      // Invalidate by pattern (supports wildcards)
+      await window.UnifiedCacheManager.invalidate(cachePattern + '*').catch((error) => {
+        window.Logger?.warn?.('⚠️ Failed to invalidate import history cache', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      });
+      return;
+    }
+    if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+      await window.UnifiedCacheManager.clearByPattern(cachePattern).catch((error) => {
+        window.Logger?.warn?.('⚠️ Failed to clear import history cache pattern', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      });
+    }
+  }
+
   function notifyLoadError(message, error) {
     const details = error?.message || message || 'שגיאה בטעינת נתוני ייבוא';
     window.Logger?.error?.('❌ Data import load failed', {
@@ -211,13 +266,36 @@
   }
 
   async function fetchTradingAccountsFromApi(options = {}) {
-    const { signal } = options;
+    const { signal, retryCount = 0 } = options;
     const url = buildUrlWithParams(ENDPOINTS.accounts);
     const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
       signal,
     });
+
+    // Handle rate limiting (429) with retry
+    if (response.status === 429) {
+      // If we've already retried, throw the error
+      if (retryCount >= 2) {
+        const error = new Error(`טעינת חשבונות מסחר נכשלה - הגבלת קצב (429). נסה שוב בעוד כמה שניות.`);
+        notifyLoadError(error.message, error);
+        throw error;
+      }
+
+      // Wait before retrying (exponential backoff: 1s, 2s)
+      const waitTime = (retryCount + 1) * 1000;
+      window.Logger?.warn?.('⚠️ Rate limit (429) for trading accounts, waiting before retry', {
+        ...PAGE_LOG_CONTEXT,
+        retryCount: retryCount + 1,
+        waitTime,
+      });
+
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+
+      // Retry with incremented retry count
+      return await fetchTradingAccountsFromApi({ ...options, retryCount: retryCount + 1 });
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת חשבונות מסחר נכשלה (${response.status})`);
@@ -231,55 +309,105 @@
     return normalized;
   }
 
+  // Deduplication registry for loadTradingAccountsForImport
+  // Initialize if not exists
+  if (typeof window.__loadTradingAccountsForImportInflight === 'undefined') {
+    window.__loadTradingAccountsForImportInflight = null;
+  }
+
   async function loadTradingAccountsForImport(options = {}) {
     const { force = false, ttl = DEFAULT_TTL, signal } = options;
     const loader = () => fetchTradingAccountsFromApi({ signal });
 
+    // Deduplication: If a request is already in flight, return the same promise
+    // Check BEFORE any async operations to prevent race conditions
+    if (window.__loadTradingAccountsForImportInflight && !force) {
+      window.Logger?.debug?.('⏭️ loadTradingAccountsForImport already in progress, returning existing promise', {
+        ...PAGE_LOG_CONTEXT,
+      });
+      try {
+        return await window.__loadTradingAccountsForImportInflight;
+      } catch (error) {
+        // If the existing promise failed, clear it and continue to create a new one
+        window.__loadTradingAccountsForImportInflight = null;
+        window.Logger?.warn?.('⚠️ Previous loadTradingAccountsForImport promise failed, retrying', {
+          ...PAGE_LOG_CONTEXT,
+          error: error?.message,
+        });
+      }
+    }
+
+    // Create the promise FIRST, then store it IMMEDIATELY for deduplication
+    // This prevents race conditions where multiple calls happen simultaneously
+    let loadPromise = null;
+
     try {
       if (force) {
         await invalidateAccountsCache();
+        // Clear any existing inflight promise when forcing
+        window.__loadTradingAccountsForImportInflight = null;
         return await loader();
       }
 
-      if (window.CacheTTLGuard?.ensure) {
-        const cached = await window.CacheTTLGuard.ensure(ACCOUNTS_CACHE_KEY, loader, {
-          ttl,
-          afterRead: (cachedData) => {
-            if (Array.isArray(cachedData)) {
-              window.Logger?.debug?.('📦 Import accounts served from cache', {
+      // Create the promise and store it IMMEDIATELY for deduplication
+      loadPromise = (async () => {
+        try {
+          if (window.CacheTTLGuard?.ensure) {
+            const cached = await window.CacheTTLGuard.ensure(ACCOUNTS_CACHE_KEY, loader, {
+              ttl,
+              afterRead: (cachedData) => {
+                if (Array.isArray(cachedData)) {
+                  window.Logger?.debug?.('📦 Import accounts served from cache', {
+                    ...PAGE_LOG_CONTEXT,
+                    count: cachedData.length,
+                  });
+                }
+              },
+              afterLoad: (freshData) => {
+                window.Logger?.debug?.('🔄 Import accounts fetched from API', {
+                  ...PAGE_LOG_CONTEXT,
+                  count: Array.isArray(freshData) ? freshData.length : 0,
+                });
+              },
+            });
+            if (cached) {
+              return Array.isArray(cached) ? cached : Array.isArray(cached?.data) ? cached.data : [];
+            }
+          }
+
+          if (window.UnifiedCacheManager?.get) {
+            try {
+              const cached = await window.UnifiedCacheManager.get(ACCOUNTS_CACHE_KEY, { ttl });
+              if (cached) {
+                return Array.isArray(cached) ? cached : Array.isArray(cached?.data) ? cached.data : [];
+              }
+            } catch (error) {
+              window.Logger?.warn?.('⚠️ Failed to read import accounts cache', {
                 ...PAGE_LOG_CONTEXT,
-                count: cachedData.length,
+                error: error?.message,
               });
             }
-          },
-          afterLoad: (freshData) => {
-            window.Logger?.debug?.('🔄 Import accounts fetched from API', {
-              ...PAGE_LOG_CONTEXT,
-              count: Array.isArray(freshData) ? freshData.length : 0,
-            });
-          },
-        });
-        if (cached) {
-          return Array.isArray(cached) ? cached : Array.isArray(cached?.data) ? cached.data : [];
-        }
-      }
-
-      if (window.UnifiedCacheManager?.get) {
-        try {
-          const cached = await window.UnifiedCacheManager.get(ACCOUNTS_CACHE_KEY, { ttl });
-          if (cached) {
-            return Array.isArray(cached) ? cached : Array.isArray(cached?.data) ? cached.data : [];
           }
-        } catch (error) {
-          window.Logger?.warn?.('⚠️ Failed to read import accounts cache', {
-            ...PAGE_LOG_CONTEXT,
-            error: error?.message,
-          });
-        }
-      }
 
-      return await loader();
+          return await loader();
+        } finally {
+          // Clear the inflight promise when done (only if it's still our promise)
+          if (window.__loadTradingAccountsForImportInflight === loadPromise) {
+            window.__loadTradingAccountsForImportInflight = null;
+          }
+        }
+      })();
+
+      // Store the promise IMMEDIATELY for deduplication (before any await)
+      // This ensures that concurrent calls will see this promise and reuse it
+      window.__loadTradingAccountsForImportInflight = loadPromise;
+      
+      return await loadPromise;
     } catch (error) {
+      // Clear the inflight promise on error (only if it's still our promise)
+      if (loadPromise && window.__loadTradingAccountsForImportInflight === loadPromise) {
+        window.__loadTradingAccountsForImportInflight = null;
+      }
       notifyLoadError('שגיאה בטעינת חשבונות מסחר', error);
       throw error;
     }
@@ -389,6 +517,7 @@
     loadImportHistoryData,
     fetchHistoryForAccount,
     invalidateAccountsCache,
+    invalidateHistoryCache,
   };
 
   window.Logger?.info?.('✅ Data Import Data Service initialized', PAGE_LOG_CONTEXT);

@@ -834,6 +834,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   'research-page': 'research',
   'designs-page': 'design',
   'constraints-page': 'constraint',
+  'tag-management-page': 'preference', // Tag management page - uses preference colors
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias
@@ -1082,6 +1083,78 @@ function generateAndApplyEntityCSS() {
 
 async function loadColorPreferences() {
   try {
+    // Wait for critical preferences to be loaded before using them
+    const environment = window.API_ENV || 'development';
+    const timeoutMs = environment === 'production' ? 5000 : 3000;
+    const waitStartTime = performance.now();
+    
+    // Wait for preferences:critical-loaded event with timeout fallback
+    await new Promise((resolve) => {
+      // Check if preferences are already loaded (check both currentPreferences and global flag)
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        const waitTime = performance.now() - waitStartTime;
+        if (window.Logger) {
+          window.Logger.debug('✅ Preferences already available for color scheme', {
+            page: 'color-scheme',
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        }
+        resolve();
+        return;
+      }
+      
+      // Check if event already fired (race condition fix)
+      if (window.__preferencesCriticalLoaded) {
+        const waitTime = performance.now() - waitStartTime;
+        if (window.Logger) {
+          window.Logger.debug('✅ Preferences already loaded (flag check) for color scheme', {
+            page: 'color-scheme',
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        }
+        resolve();
+        return;
+      }
+      
+      // Wait for preferences:critical-loaded event
+      const eventHandler = () => {
+        const waitTime = performance.now() - waitStartTime;
+        if (window.Logger) {
+          window.Logger.debug('✅ Preferences loaded via event for color scheme', {
+            page: 'color-scheme',
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        }
+        resolve();
+      };
+      
+      window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+      
+      // Fallback timeout - continue even if event doesn't fire (backward compatibility)
+      setTimeout(() => {
+        window.removeEventListener('preferences:critical-loaded', eventHandler);
+        const waitTime = performance.now() - waitStartTime;
+        // Check flag one more time before timeout
+        if (window.__preferencesCriticalLoaded) {
+          if (window.Logger) {
+            window.Logger.debug('✅ Preferences loaded during timeout check for color scheme', {
+              page: 'color-scheme',
+              waitTime: `${waitTime.toFixed(2)}ms`,
+            });
+          }
+        } else {
+          if (window.Logger) {
+            window.Logger.warn('⚠️ Preferences event timeout for color scheme - continuing without waiting', {
+              page: 'color-scheme',
+              timeout: `${timeoutMs}ms`,
+              waitTime: `${waitTime.toFixed(2)}ms`,
+            });
+          }
+        }
+        resolve();
+      }, timeoutMs);
+    });
+    
     // Load preferences from server - NO hardcoded colors!
     // Use the global preferences loading system
     if (window.loadUserPreferences && typeof window.loadUserPreferences === 'function') {
@@ -1542,23 +1615,26 @@ window.INVESTMENT_TYPE_COLORS = INVESTMENT_TYPE_COLORS;
 window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
 
 // Set current entity color when DOM is ready
+// Auto-initialization removed - preferences loading is now handled centrally by unified-app-initializer.js
+// Color preferences will be loaded as part of the unified preferences initialization
+// This prevents duplicate API calls and ensures single point of entry
+// 
+// If colors need to be updated after preferences load, use the preferences:updated event:
+// window.addEventListener('preferences:updated', (e) => {
+//   loadColorPreferences().then(preferences => {
+//     if (preferences) {
+//       updateCSSVariablesFromPreferences(preferences);
+//     }
+//   });
+// });
+
+// Only set current entity color from page (doesn't require preferences)
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', async () => {
     await setCurrentEntityColorFromPage();
-    // Also update CSS variables from preferences
-    const preferences = await loadColorPreferences();
-    if (preferences) {
-      updateCSSVariablesFromPreferences(preferences);
-    }
   });
 } else {
   setCurrentEntityColorFromPage();
-  // Also update CSS variables from preferences
-  loadColorPreferences().then(preferences => {
-    if (preferences) {
-      updateCSSVariablesFromPreferences(preferences);
-    }
-  });
 }
 
 // Color Scheme System loaded successfully

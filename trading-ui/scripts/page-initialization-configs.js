@@ -383,8 +383,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             await window.loadAccountsForPreferences();
           }
 
-          // Preferences loading is now handled by unified-app-initializer.js
-          // No need to call PreferencesUIV4.initialize() here - it's already called by initializePreferencesForPage()
+          // Preferences loading is now handled by core-systems.js
+          // No need to call PreferencesUIV4.initialize() here - it's already called by initializePreferencesForPage() in core-systems.js
           // This prevents duplicate initialization and ensures single point of entry
 
           // Load default colors if not set
@@ -567,29 +567,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             page: 'page-initialization-configs',
           });
 
-          // Load user preferences first
-          if (typeof window.loadUserPreferences === 'function') {
-            window.Logger.info('⚙️ Loading user preferences for Executions...', {
-              page: 'page-initialization-configs',
-            });
-
-            // Debug current profile
-            console.log('🧪 Current PreferencesCore state:', {
-              currentUserId: window.PreferencesCore?.currentUserId,
-              currentProfileId: window.PreferencesCore?.currentProfileId,
-            });
-
-            const prefs = await window.loadUserPreferences();
-            console.log('🧪 loadUserPreferences returned:', prefs);
-          } else {
-            console.warn('⚠️ loadUserPreferences not available!');
-          }
-
-          // Debug: Check if we reach this point
-          console.log('🔍 [DEBUG] Reached line 590 - about to check loadExecutionsData');
-          window.Logger?.info?.('🔍 [DEBUG] Reached line 590 - about to check loadExecutionsData', {
-            page: 'page-initialization-configs',
-          });
+          // Preferences are already loaded by core-systems.js via initializePreferencesForPage
+          // No need to call loadUserPreferences here - it causes duplicate API calls and 429 errors
 
           window.Logger.info('🔍 Checking loadExecutionsData...', {
             exists: typeof window.loadExecutionsData !== 'undefined',
@@ -724,7 +703,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.loadTradePlansData',
         'window.ModalManagerV2',
         'window.tradePlansModalConfig',
+        'window.alertsModalConfig',  // Required for editing alerts from linked items
+        'window.notesModalConfig',   // Required for editing notes from linked items
         'window.InvestmentCalculationService',
+        'window.UnifiedCRUDService',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
@@ -949,14 +931,93 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               page: 'page-initialization-configs',
             });
           }
-          // Initialize account activity system
-          if (typeof window.initAccountActivity === 'function') {
-            await window.initAccountActivity(true); // Auto-select default account
+
+          // Wait for trading accounts data to be available
+          let waitCount = 0;
+          while (!window.trading_accountsData || !Array.isArray(window.trading_accountsData) || window.trading_accountsData.length === 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitCount++;
+            if (waitCount > 50) { // 5 seconds timeout
+              window.Logger.warn('⚠️ Trading accounts data not available after timeout', {
+                page: 'page-initialization-configs',
+              });
+              break;
+            }
           }
 
-          // Initialize positions & portfolio system
+          // Wait for critical preferences to be loaded (for default account selection)
+          if (!window.__preferencesCriticalLoaded) {
+            window.Logger.info('⏳ Waiting for critical preferences to load...', {
+              page: 'page-initialization-configs',
+            });
+            await new Promise((resolve) => {
+              // Check if already loaded
+              if (window.__preferencesCriticalLoaded) {
+                resolve();
+                return;
+              }
+              
+              // Wait for event
+              const eventHandler = () => {
+                resolve();
+              };
+              window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+              
+              // Timeout fallback
+              setTimeout(() => {
+                window.removeEventListener('preferences:critical-loaded', eventHandler);
+                window.Logger.warn('⚠️ Preferences timeout - continuing without waiting', {
+                  page: 'page-initialization-configs',
+                });
+                resolve();
+              }, 3000);
+            });
+          }
+
+          // Wait for filter system to be initialized (for date range)
+          let filterWaitCount = 0;
+          while (!window.selectedDateRangeForFilter && filterWaitCount < 30) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            filterWaitCount++;
+          }
+          
+          if (!window.selectedDateRangeForFilter) {
+            // Set default if not available
+            window.selectedDateRangeForFilter = 'כל זמן';
+            window.Logger.info('ℹ️ Using default date range: כל זמן', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          window.Logger.info('✅ All required data available - initializing tables', {
+            page: 'page-initialization-configs',
+            hasAccounts: !!(window.trading_accountsData && window.trading_accountsData.length > 0),
+            hasPreferences: !!window.__preferencesCriticalLoaded,
+            dateRange: window.selectedDateRangeForFilter,
+          });
+
+          // Initialize account activity system (now with all data available)
+          if (typeof window.initAccountActivity === 'function') {
+            window.Logger.info('🔄 Initializing account activity system...', {
+              page: 'page-initialization-configs',
+            });
+            await window.initAccountActivity(true); // Auto-select default account
+          } else {
+            window.Logger.warn('⚠️ initAccountActivity not available', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Initialize positions & portfolio system (now with all data available)
           if (typeof window.initPositionsPortfolio === 'function') {
+            window.Logger.info('🔄 Initializing positions & portfolio system...', {
+              page: 'page-initialization-configs',
+            });
             await window.initPositionsPortfolio(true); // Auto-select default account
+          } else {
+            window.Logger.warn('⚠️ initPositionsPortfolio not available', {
+              page: 'page-initialization-configs',
+            });
           }
 
           console.log('✅ Trading Accounts initialization completed');
@@ -1014,13 +1075,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             page: 'page-initialization-configs',
           });
 
-          // אתחול מערכת ההעדפות לפני טעינת הנתונים
-          if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
-            window.Logger.info('⚙️ Initializing PreferencesSystem for Cash Flows...', {
-              page: 'page-initialization-configs',
-            });
-            await window.PreferencesSystem.initialize();
-          }
+          // Preferences are already loaded by core-systems.js via initializePreferencesForPage
+          // No need to call PreferencesSystem.initialize() here - it causes duplicate API calls and 429 errors
 
           if (typeof window.loadCashFlowsData === 'function') {
             await window.loadCashFlowsData();

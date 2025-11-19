@@ -41,18 +41,30 @@ class TableRegistry {
 
   _normalizeDefaultSort(tableType, defaultSortConfig) {
     const resolveChainSource = () => {
-      if (defaultSortConfig && typeof defaultSortConfig === 'object') {
+      // If defaultSortConfig is explicitly provided, use it
+      if (defaultSortConfig && typeof defaultSortConfig === 'object' && !Array.isArray(defaultSortConfig)) {
         return defaultSortConfig;
       }
       if (Array.isArray(defaultSortConfig)) {
         return defaultSortConfig;
       }
 
+      // If no defaultSortConfig provided, try to get from getDefaultSortChain
+      // This allows automatic default sort based on table structure
       const resolver =
         window.getDefaultSortChain ||
         window.tableMappings && window.tableMappings.getDefaultSortChain;
       if (typeof resolver === 'function') {
-        return resolver(tableType);
+        try {
+          const chain = resolver(tableType);
+          if (chain && (Array.isArray(chain) || typeof chain === 'object')) {
+            return chain;
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableRegistry._normalizeDefaultSort: Failed to get default sort chain for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
       }
       return null;
     };
@@ -662,6 +674,9 @@ class TableSorter {
 
     const config = this.registry.getConfig(tableType);
     if (!config) {
+      if (window.Logger) {
+        window.Logger.debug(`TableSorter.applyDefaultSort: Table "${tableType}" not registered`, { page: 'unified-table-system' });
+      }
       return null;
     }
 
@@ -673,6 +688,13 @@ class TableSorter {
 
     // Check if table has defaultSort configuration
     if (chain.length === 0) {
+      if (window.Logger) {
+        window.Logger.debug(`TableSorter.applyDefaultSort: No default sort chain for "${tableType}"`, { 
+          page: 'unified-table-system',
+          defaultSort: config.defaultSort,
+          hasGetDefaultSortChain: typeof (window.getDefaultSortChain || window.tableMappings?.getDefaultSortChain) === 'function'
+        });
+      }
       return null;
     }
 

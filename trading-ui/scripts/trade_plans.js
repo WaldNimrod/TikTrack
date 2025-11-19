@@ -3554,38 +3554,61 @@ async function deleteTradePlan(tradePlanId) {
 
 /**
  * Perform trade plan deletion
+ * Uses UnifiedCRUDService for automatic linked items modal refresh
  * @param {number|string} tradePlanId - Trade plan ID
  * @returns {Promise<void>}
  */
 async function performTradePlanDeletion(tradePlanId) {
     try {
-        // Send delete request
-        window.Logger?.info('🗑️ Sending delete request for trade plan', {
+        window.Logger?.info('🗑️ Performing trade plan deletion via UnifiedCRUDService', {
             tradePlanId,
-            endpoint: `/api/trade-plans/${tradePlanId}`,
-            page: 'trade_plans'
-        });
-        const response = await fetch(`/api/trade-plans/${tradePlanId}`, {
-            method: 'DELETE'
-        });
-        window.Logger?.info('🗑️ Delete response received', {
-            tradePlanId,
-            ok: response.ok,
-            status: response.status,
             page: 'trade_plans'
         });
         
-        // Use CRUDResponseHandler for consistent response handling
-        await CRUDResponseHandler.handleDeleteResponse(response, {
-            successMessage: 'תוכנית מסחר נמחקה בהצלחה',
-            entityName: 'תוכנית מסחר',
-            reloadFn: window.loadTradePlansData,
-            requiresHardReload: false
-        });
-        window.Logger?.info('🗑️ Trade plan deletion handled successfully', { tradePlanId, page: 'trade_plans' });
+        // Use UnifiedCRUDService for deletion - this automatically handles:
+        // - Linked items modal refresh after deletion
+        // - Cache invalidation
+        // - Response handling and notifications
+        // - Table reload
+        if (window.UnifiedCRUDService?.deleteEntity) {
+            const result = await window.UnifiedCRUDService.deleteEntity('trade_plan', tradePlanId, {
+                successMessage: 'תוכנית מסחר נמחקה בהצלחה',
+                entityName: 'תוכנית מסחר',
+                reloadFn: window.loadTradePlansData,
+                requiresHardReload: false
+            });
+            
+            window.Logger?.info('🗑️ Trade plan deletion completed via UnifiedCRUDService', {
+                tradePlanId,
+                result,
+                page: 'trade_plans'
+            });
+        } else {
+            // Fallback to direct API call if UnifiedCRUDService not available
+            window.Logger?.warn('⚠️ UnifiedCRUDService not available, using fallback', {
+                tradePlanId,
+                page: 'trade_plans'
+            });
+            
+            const response = await fetch(`/api/trade-plans/${tradePlanId}`, {
+                method: 'DELETE'
+            });
+            
+            await CRUDResponseHandler.handleDeleteResponse(response, {
+                successMessage: 'תוכנית מסחר נמחקה בהצלחה',
+                entityName: 'תוכנית מסחר',
+                reloadFn: window.loadTradePlansData,
+                requiresHardReload: false
+            });
+        }
         
     } catch (error) {
-        CRUDResponseHandler.handleError(error, 'מחיקת תוכנית מסחר');
+        window.Logger?.error('Error deleting trade plan:', error, { tradePlanId, page: 'trade_plans' });
+        if (window.CRUDResponseHandler?.handleError) {
+            window.CRUDResponseHandler.handleError(error, 'מחיקת תוכנית מסחר');
+        } else {
+            window.showErrorNotification?.('שגיאה', 'שגיאה במחיקת תוכנית מסחר');
+        }
     }
 }
 

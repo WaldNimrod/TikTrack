@@ -989,6 +989,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/12: SERVICES PACKAGE ===== -->
@@ -1061,8 +1063,6 @@
     <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- ניהול בחירת תגיות במודלים -->
     <!-- [42] Load Order: 42 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
-    <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
     <!-- [44] Load Order: 44 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
@@ -1086,9 +1086,9 @@
     <!-- [54] Load Order: 54 -->
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
     <!-- [55] Load Order: 55 -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
-    <!-- [56] Load Order: 56 -->
     <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/12: CRUD OPERATIONS PACKAGE ===== -->
@@ -1124,9 +1124,9 @@
     <!-- [63] Load Order: 63 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [64] Load Order: 64 -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
-    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
     <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
 
@@ -1233,7 +1233,7 @@
     <!-- [92] Load Order: 92 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [93] Load Order: 93 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->

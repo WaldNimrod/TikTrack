@@ -250,6 +250,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       this.errorHandlers = [];
       this.customInitializers = [];
       this.legacySupport = true;
+      this._preferencesInitialized = false; // Track preferences initialization to prevent duplicates
 
       // Dynamic Loading Support
       this.dynamicLoadingEnabled = false; // Static loading only
@@ -662,6 +663,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       ) {
         pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
         console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+      } else if (
+        typeof window.PAGE_CONFIGS !== 'undefined' &&
+        window.PAGE_CONFIGS[this.pageInfo.name]
+      ) {
+        // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
+        pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
+        console.log(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig);
       } else {
         console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
       }
@@ -673,13 +681,20 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
       const config = {
         name: this.pageInfo.name,
-        type: this.pageInfo.type,
+        type: pageConfig?.pageType || this.pageInfo.type,
         requiresFilters: pageConfig?.requiresFilters ?? this.pageInfo.requirements.filters,
         requiresValidation: pageConfig?.requiresValidation ?? this.pageInfo.requirements.validation,
         requiresTables: pageConfig?.requiresTables ?? this.pageInfo.requirements.tables,
         requiresCharts: this.pageInfo.requirements.charts,
         customInitializers: this.customInitializers,
         availableSystems: Array.from(this.availableSystems),
+        // Add packages and metadata from pageConfig (critical for preferences initialization)
+        packages: pageConfig?.packages || [],
+        requiredGlobals: pageConfig?.requiredGlobals || [],
+        description: pageConfig?.description || '',
+        pageType: pageConfig?.pageType || this.pageInfo.type,
+        preloadAssets: pageConfig?.preloadAssets || [],
+        cacheStrategy: pageConfig?.cacheStrategy || 'standard',
       };
 
       this.performanceMetrics.stageTimes.prepare = Date.now() - stageStart;
@@ -831,29 +846,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           console.log('⚠️ Cache system not ready, using localStorage fallback');
         }
 
-        // Initialize Preferences System globally (once) before services/UI that rely on getPreference
-        try {
-          if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
-            console.log('🔧 Initializing PreferencesSystem (global)...');
-            await window.PreferencesSystem.initialize();
-            // Expose current preferences for consumers expecting window.currentPreferences
-            if (window.PreferencesSystem.manager?.currentPreferences) {
-              window.currentPreferences = window.PreferencesSystem.manager.currentPreferences;
-            }
-            // Notify listeners that preferences are ready
-            window.dispatchEvent(
-              new CustomEvent('preferences:loaded', {
-                detail: {
-                  source: 'unified-initializer',
-                  profileId: window.PreferencesSystem.manager?.currentProfile,
-                },
-              })
-            );
-            console.log('✅ PreferencesSystem initialized (global)');
-          }
-        } catch (err) {
-          console.warn('⚠️ PreferencesSystem global initialization failed or unavailable:', err);
-        }
+        // Initialize preferences system (standardized loading for all pages)
+        // This ensures single point of entry, proper cache usage, and no duplicate API calls
+        await this.initializePreferencesForPage(config);
 
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {
@@ -966,6 +961,117 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     }
 
     /**
+     * Initialize preferences system for the page
+     * Standardized preferences loading - single point of entry for all pages
+     * 
+     * @param {Object} config - Page configuration
+     * @returns {Promise<void>}
+     */
+    async initializePreferencesForPage(config) {
+      // Check if page has preferences package
+      console.log('📦 Checking packages for preferences:', config.packages);
+      if (!config.packages || !config.packages.includes('preferences')) {
+        console.log('⏭️ Page does not require preferences package, skipping initialization');
+        return; // Page doesn't need preferences
+      }
+
+      // Get page name from pageInfo (detected from URL) or config
+      const pageName = this.pageInfo?.name || 'unknown';
+      const isPreferencesPage = pageName === 'preferences';
+
+      // Deduplication: prevent multiple calls
+      if (this._preferencesInitialized) {
+        window.Logger?.debug?.('⏭️ Preferences already initialized, skipping', {
+          page: 'core-systems',
+          pageName,
+        });
+        return;
+      }
+
+      try {
+        // Preferences page: use PreferencesUIV4 with force: true (wants fresh data)
+        if (isPreferencesPage) {
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            window.Logger?.info?.('📄 Initializing preferences for preferences page (V4 with UI)', {
+              page: 'core-systems',
+              pageName,
+            });
+            await window.PreferencesUIV4.initialize();
+            this._preferencesInitialized = true;
+            return;
+          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+            // Fallback to PreferencesUI if V4 not available
+            window.Logger?.info?.('📄 Initializing preferences for preferences page (legacy UI)', {
+              page: 'core-systems',
+              pageName,
+            });
+            await window.PreferencesUI.initialize();
+            this._preferencesInitialized = true;
+            return;
+          }
+        }
+
+        // Other pages: use PreferencesCore.initializeWithLazyLoading() with cache (force: false)
+        // This loads critical preferences immediately from cache if available, rest in background
+        if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+          const initStartTime = performance.now();
+          window.Logger?.info?.('📄 Initializing preferences with lazy loading (using cache)', {
+            page: 'core-systems',
+            pageName,
+          });
+          
+          // Detect environment for timeout configuration
+          const environment = window.API_ENV || 'development';
+          const timeoutMs = environment === 'production' ? 5000 : 3000; // Production: 5s, Development: 3s
+          
+          // Initialize with await to ensure critical preferences are loaded before continuing
+          // Use Promise.race with timeout to prevent indefinite blocking
+          const initPromise = window.PreferencesCore.initializeWithLazyLoading();
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(new Error(`Preferences initialization timeout after ${timeoutMs}ms`));
+            }, timeoutMs);
+          });
+          
+          try {
+            await Promise.race([initPromise, timeoutPromise]);
+            const initDuration = performance.now() - initStartTime;
+            window.Logger?.info?.('✅ Preferences lazy loading initialized successfully', {
+              page: 'core-systems',
+              pageName,
+              duration: `${initDuration.toFixed(2)}ms`,
+              environment,
+            });
+          } catch (error) {
+            const initDuration = performance.now() - initStartTime;
+            window.Logger?.warn?.('⚠️ Preferences lazy loading initialization failed or timed out', {
+              page: 'core-systems',
+              pageName,
+              duration: `${initDuration.toFixed(2)}ms`,
+              environment,
+              error: error?.message || error,
+            });
+            // Continue initialization even if preferences loading fails - don't block page load
+          }
+          
+          this._preferencesInitialized = true;
+        } else {
+          window.Logger?.warn?.('⚠️ PreferencesCore.initializeWithLazyLoading not available', {
+            page: 'core-systems',
+            pageName,
+          });
+        }
+      } catch (error) {
+        window.Logger?.error?.('❌ Error initializing preferences', {
+          page: 'core-systems',
+          pageName,
+          error: error?.message || error,
+        });
+        // Don't throw - preferences loading failure shouldn't block page initialization
+      }
+    }
+
+    /**
      * Stage 4: Finalize initialization
      */
     async finalizeInitialization(config) {
@@ -1072,22 +1178,30 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           window.__ttPreferencesListenersBound = true;
 
           // storage listener to react to changes from other tabs/pages
+          // Only reload if version actually changed to avoid unnecessary API calls
           window.addEventListener('storage', async e => {
             if (e && e.key === 'tt:preferences' && e.newValue) {
               try {
                 const payload = JSON.parse(e.newValue);
-                if (typeof window.loadUserPreferences === 'function') {
-                  await window.loadUserPreferences({ force: true, source: 'storage' });
+                const incomingVersion = payload?.version || payload?.profileContext?.versions?.last_update || payload?.profileContext?.last_update;
+                const currentVersion = window.__ttPreferencesVersion;
+                
+                // Only reload if version actually changed (avoid duplicate calls)
+                if (incomingVersion && incomingVersion !== currentVersion) {
+                  window.__ttPreferencesVersion = incomingVersion;
+                  if (typeof window.loadUserPreferences === 'function') {
+                    await window.loadUserPreferences({ force: true, source: 'storage' });
+                  }
+                  window.dispatchEvent(
+                    new CustomEvent('preferences:updated', {
+                      detail: {
+                        source: 'storage',
+                        profileId: payload.profileId,
+                        version: incomingVersion,
+                      },
+                    })
+                  );
                 }
-                window.dispatchEvent(
-                  new CustomEvent('preferences:updated', {
-                    detail: {
-                      source: 'storage',
-                      profileId: payload.profileId,
-                      version: payload.version,
-                    },
-                  })
-                );
               } catch {}
             }
           });
@@ -4058,10 +4172,14 @@ window.setDynamicLoading = function (enabled) {
 console.log('✅ Core Systems module loaded successfully (Static Loading)');
 
 // ===== PAGE INITIALIZATION CONFIGURATIONS =====
-// Unified page configurations - previously in page-initialization-configs.js
-// Moved here as part of loading system standardization (October 2025)
+// NOTE: PAGE_CONFIGS is now defined in page-initialization-configs.js
+// This file (core-systems.js) uses window.pageInitializationConfigs which is set by page-initialization-configs.js
+// The PAGE_CONFIGS definition below is kept for backward compatibility but should not be used
+// All page configurations with packages array are in page-initialization-configs.js
 
-if (typeof window.PAGE_CONFIGS === 'undefined') {
+// ARCHIVED: PAGE_CONFIGS definition removed - use page-initialization-configs.js instead
+// This ensures single source of truth and includes packages array required for preferences initialization
+if (false && typeof window.PAGE_CONFIGS === 'undefined') {
   const PAGE_CONFIGS = {
     // Main Pages
     index: {
@@ -4989,8 +5107,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined') {
   };
 
   // ===== GLOBAL EXPORT =====
-
-  window.PAGE_CONFIGS = PAGE_CONFIGS;
-  window.PAGE_CONFIGS.__SOURCE = 'core-systems';
-  window.pageInitializationConfigs = PAGE_CONFIGS;
+  // REMOVED: PAGE_CONFIGS export - use page-initialization-configs.js instead
+  // window.PAGE_CONFIGS = PAGE_CONFIGS;
+  // window.PAGE_CONFIGS.__SOURCE = 'core-systems';
+  // window.pageInitializationConfigs = PAGE_CONFIGS;
 }

@@ -272,6 +272,20 @@ class LazyLoader {
     // Start background loading for high priority
     this.startBackgroundLoading(userId, finalProfileId);
 
+    // Dispatch all-loaded event after critical preferences are loaded
+    // (background loading continues asynchronously)
+    const environment = window.API_ENV || 'development';
+    window.dispatchEvent(new CustomEvent('preferences:all-loaded', {
+      detail: {
+        userId,
+        profileId,
+        environment,
+        criticalLoaded: this.loadingStats.critical.loaded,
+        totalCritical: this.loadingStats.critical.total,
+        note: 'Background loading continues for high/medium/low priority preferences',
+      },
+    }));
+
     // window.Logger.info('✅ Lazy loading system initialized', { page: "preferences-lazy-loader" });
   }
 
@@ -281,21 +295,78 @@ class LazyLoader {
      * @param {number} profileId - Profile ID
      */
   async loadCriticalPreferences(userId, profileId) {
+    const loadStartTime = performance.now();
     const criticalPrefs = this.classifier.getPreferencesByClassification('critical');
     this.loadingStats.critical.total = criticalPrefs.length;
 
-    // window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
+    // Detect environment
+    const environment = window.API_ENV || 'development';
+    
+    // Check cache first to determine if we have a cache hit
+    let fromCache = false;
+    let cacheLayer = null;
+    let allPreferences = {};
 
     try {
-      // Use force: false to leverage cache - only call API if cache is missing or expired
-      // This prevents unnecessary API calls and rate limiting
-      const payload = await window.PreferencesData.loadAllPreferencesRaw({
-        userId,
-        profileId,
-        force: false, // Use cache if available - only fetch from API if cache is missing/expired
-      });
+      // Check if we have cached preferences before making API call
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        const cacheKey = `preference_all_u${userId}_p${profileId ?? 'active'}`;
+        const cached = await window.UnifiedCacheManager.get(cacheKey, { layer: 'localStorage' });
+        if (cached && cached.preferences) {
+          fromCache = true;
+          cacheLayer = 'localStorage';
+          allPreferences = cached.preferences;
+          window.Logger?.debug?.('✅ Cache hit for critical preferences', {
+            page: 'preferences-lazy-loader',
+            cacheLayer,
+            userId,
+            profileId,
+          });
+          
+          // Dispatch cache hit event
+          window.dispatchEvent(new CustomEvent('preferences:cache-hit', {
+            detail: {
+              cacheLayer,
+              userId,
+              profileId,
+              preferenceCount: Object.keys(allPreferences).length,
+              environment,
+            },
+          }));
+        }
+      }
 
-      const allPreferences = payload?.preferences || {};
+      // If not from cache, load from API
+      if (!fromCache) {
+        // Use force: false to leverage cache - only call API if cache is missing or expired
+        // This prevents unnecessary API calls and rate limiting
+        const payload = await window.PreferencesData.loadAllPreferencesRaw({
+          userId,
+          profileId,
+          force: false, // Use cache if available - only fetch from API if cache is missing/expired
+        });
+
+        allPreferences = payload?.preferences || {};
+        cacheLayer = 'backend';
+        
+        window.Logger?.debug?.('📡 Loaded critical preferences from API', {
+          page: 'preferences-lazy-loader',
+          cacheLayer,
+          userId,
+          profileId,
+        });
+        
+        // Dispatch cache miss event
+        window.dispatchEvent(new CustomEvent('preferences:cache-miss', {
+          detail: {
+            cacheLayer,
+            userId,
+            profileId,
+            preferenceCount: Object.keys(allPreferences).length,
+            environment,
+          },
+        }));
+      }
 
       // Mark critical preferences as loaded
       for (const prefName of criticalPrefs) {
@@ -305,8 +376,45 @@ class LazyLoader {
         }
       }
 
+      // Calculate load time
+      const loadTime = performance.now() - loadStartTime;
+
+      // Set global flag to indicate preferences are loaded (for systems that check before listening)
+      window.__preferencesCriticalLoaded = true;
+      window.__preferencesCriticalLoadedDetail = {
+        preferences: allPreferences,
+        fromCache,
+        cacheLayer,
+        userId,
+        profileId,
+        loadTime: `${loadTime.toFixed(2)}ms`,
+        environment,
+        criticalCount: this.loadingStats.critical.loaded,
+        totalCritical: this.loadingStats.critical.total,
+        timestamp: Date.now(),
+      };
+
+      // Dispatch critical-loaded event with metadata
+      window.dispatchEvent(new CustomEvent('preferences:critical-loaded', {
+        detail: window.__preferencesCriticalLoadedDetail,
+      }));
+
+      window.Logger?.info?.('✅ Critical preferences loaded', {
+        page: 'preferences-lazy-loader',
+        fromCache,
+        cacheLayer,
+        loadTime: `${loadTime.toFixed(2)}ms`,
+        criticalCount: this.loadingStats.critical.loaded,
+        totalCritical: this.loadingStats.critical.total,
+      });
+
     } catch (error) {
-      // window.Logger.error('❌ Error loading critical preferences:', error, { page: "preferences-lazy-loader" });
+      const loadTime = performance.now() - loadStartTime;
+      window.Logger?.error?.('❌ Error loading critical preferences:', error, {
+        page: 'preferences-lazy-loader',
+        loadTime: `${loadTime.toFixed(2)}ms`,
+      });
+      
       // Fallback to individual loading
       const promises = criticalPrefs.map(async prefName => {
         try {
@@ -315,12 +423,30 @@ class LazyLoader {
           this.loadingStats.critical.loaded++;
           return { name: prefName, value, success: true };
         } catch (error) {
-          // window.Logger.warn(`⚠️ Failed to load critical preference ${prefName}:`, error, { page: "preferences-lazy-loader" });
+          window.Logger?.warn?.(`⚠️ Failed to load critical preference ${prefName}:`, error, {
+            page: 'preferences-lazy-loader',
+          });
           return { name: prefName, value: null, success: false, error };
         }
       });
 
       await Promise.all(promises);
+      
+      // Dispatch error event
+      window.dispatchEvent(new CustomEvent('preferences:critical-loaded', {
+        detail: {
+          preferences: {},
+          fromCache: false,
+          cacheLayer: 'error',
+          userId,
+          profileId,
+          loadTime: `${loadTime.toFixed(2)}ms`,
+          environment,
+          error: error?.message || String(error),
+          criticalCount: this.loadingStats.critical.loaded,
+          totalCritical: this.loadingStats.critical.total,
+        },
+      }));
     }
   }
 

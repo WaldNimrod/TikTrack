@@ -721,8 +721,12 @@ async function saveTicker() {
       }
     }
 
+    // Return result so wrapper functions can check if save was successful
+    return crudResult;
+
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת טיקר');
+    throw error; // Re-throw so wrapper can handle it
   }
 }
 
@@ -2385,7 +2389,9 @@ window.registerTickersTables = function() {
         tableSelector: 'table[data-table-type="tickers"]',
         columns: getColumns('tickers'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: updated_at desc (column index 8)
+        defaultSort: { columnIndex: 8, direction: 'desc', key: 'updated_at' }
     });
 };
 // REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly

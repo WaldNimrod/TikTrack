@@ -2705,7 +2705,9 @@ window.registerNotesTables = function() {
         tableSelector: '#notesTable',
         columns: getColumns('notes'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: created_at desc (column index 2)
+        defaultSort: { columnIndex: 2, direction: 'desc', key: 'created_at' }
     });
 };
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });

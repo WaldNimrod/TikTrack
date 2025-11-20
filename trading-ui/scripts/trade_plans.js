@@ -3712,6 +3712,8 @@ window.registerTradePlansTables = function() {
         tableSelector: '#trade_plansTable',
         columns: getColumns('trade_plans'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: created_at desc (column index 1)
+        defaultSort: { columnIndex: 1, direction: 'desc', key: 'created_at' }
     });
 };

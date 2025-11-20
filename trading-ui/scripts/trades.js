@@ -4474,7 +4474,9 @@ window.registerTradesTables = function() {
         tableSelector: '#tradesTable',
         columns: getColumns('trades'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: created_at desc (column index 10)
+        defaultSort: { columnIndex: 10, direction: 'desc', key: 'created_at' }
     });
 };
 

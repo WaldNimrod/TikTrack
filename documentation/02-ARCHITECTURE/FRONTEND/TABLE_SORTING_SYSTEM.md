@@ -1,10 +1,12 @@
 # Table Sorting System - TikTrack
 # מערכת מיון טבלאות מאוחדת
 
-**תאריך עדכון:** 27 ינואר 2025  
-**גרסה:** 2.0.0  
+**תאריך עדכון:** 20 נובמבר 2025  
+**גרסה:** 2.1.0  
 **סטטוס:** ✅ פעיל ומתועד  
 **מטרה:** מערכת מיון מרכזית עם תמיכה בסידור ברירת מחדל ושמירת מצב
+
+**עדכון אחרון:** הוספת מיון ברירת מחדל אוטומטי לכל הטבלאות - תאריך desc (החדש ראשון)
 
 ---
 
@@ -39,9 +41,20 @@
 
 **פונקציות מרכזיות:**
 - `sort(tableType, columnIndex)` - סידור טבלה לפי עמודה
+- `sortByChain(tableType, sortChain)` - סידור לפי שרשרת מיון (תאריך, סטטוס, טיקר)
 - `applyDefaultSort(tableType)` - החלת סידור ברירת מחדל אם אין מצב שמור
 - `getSortState(tableType)` - קבלת מצב סידור
 - `saveSortState(tableType, columnIndex, direction)` - שמירת מצב סידור
+
+#### 3. buildCanonDefaultSortChain
+**קובץ:** `trading-ui/scripts/table-mappings.js`  
+**פונקציה:** `buildCanonDefaultSortChain(tableType)`
+
+יוצרת שרשרת מיון ברירת מחדל אוטומטית:
+1. מחפשת עמודת תאריך (created_at, date, updated_at, וכו') → desc
+2. מחפשת עמודת סטטוס → asc
+3. מחפשת עמודת טיקר → asc
+4. אם אין כלום → fallback לעמודה ראשונה asc
 
 #### 3. PageStateManager
 **קובץ:** `trading-ui/scripts/page-state-manager.js`
@@ -100,7 +113,8 @@ window.register[TabelName]Tables = function() {
         columns: getColumns('[tableType]'),
         sortable: true,
         filterable: true,
-        defaultSort: { columnIndex: 0, direction: 'asc' } // סידור ברירת מחדל
+        // Default sort: תאריך desc (החדש ראשון) או עמודה ראשונה asc אם אין תאריך
+        defaultSort: { columnIndex: 1, direction: 'desc', key: 'created_at' }
     });
 };
 ```
@@ -128,12 +142,21 @@ async function load[TableName]Data() {
 סידור ברירת מחדל מוגדר בקונפיגורציית הרישום:
 
 ```javascript
-defaultSort: { columnIndex: 0, direction: 'asc' }
+// טבלה עם תאריך - מיון לפי תאריך desc (החדש ראשון)
+defaultSort: { columnIndex: 6, direction: 'desc', key: 'created_at' }
+
+// טבלה ללא תאריך - מיון לפי עמודה ראשונה asc
+defaultSort: { columnIndex: 0, direction: 'asc', key: 'ticker_symbol' }
 ```
 
-המערכת תבדוק אם יש מצב שמור:
+**אם לא מוגדר `defaultSort` מפורש:**
+- המערכת תנסה לקבל מיון ברירת מחדל אוטומטי מ-`buildCanonDefaultSortChain`
+- הפונקציה מחפשת תאריך → desc, ואז סטטוס → asc, ואז טיקר → asc
+- אם אין כלום → fallback לעמודה ראשונה asc
+
+**המערכת תבדוק אם יש מצב שמור:**
 - אם יש מצב שמור - תשתמש בו
-- אם אין מצב שמור - תפעיל את סידור ברירת המחדל
+- אם אין מצב שמור - תפעיל את סידור ברירת המחדל (מפורש או אוטומטי)
 
 ### שמירת מצב סידור
 
@@ -173,14 +196,24 @@ TABLE_COLUMN_MAPPINGS['trade_suggestions'] = [
 
 | טבלה | tableType | קובץ רישום | defaultSort |
 |------|-----------|------------|-------------|
-| טריידים | `trades` | `trades.js` | עמודה 0, asc |
-| תכנונים | `trade_plans` | `trade_plans.js` | עמודה 0, asc |
-| ביצועים | `executions` | `executions.js` | עמודה 0, asc |
-| תזרימי מזומן | `cash_flows` | `cash_flows.js` | עמודה 0, asc |
-| התראות | `alerts` | `alerts.js` | עמודה 0, asc |
-| הערות | `notes` | `notes.js` | עמודה 0, asc |
-| טיקרים | `tickers` | `tickers.js` | עמודה 0, asc |
-| חשבונות מסחר | `trading_accounts` | `trading_accounts.js` | עמודה 0, asc |
+| טריידים | `trades` | `trades.js` | created_at (10), desc |
+| תכנונים | `trade_plans` | `trade_plans.js` | created_at (1), desc |
+| ביצועים | `executions` | `executions.js` | date (8), desc |
+| תזרימי מזומן | `cash_flows` | `cash_flows.js` | date (4), desc |
+| התראות | `alerts` | `alerts.js` | created_at (6), desc |
+| הערות | `notes` | `notes.js` | created_at (2), desc |
+| טיקרים | `tickers` | `tickers.js` | updated_at (8), desc |
+| חשבונות מסחר | `trading_accounts` | `trading_accounts.js` | updated_at (6), desc |
+| פעילות חשבון | `account_activity` | `trading_accounts.js` | date (0), desc |
+| פוזיציות | `positions` | `trading_accounts.js` | ticker_symbol (0), asc |
+| פורטפוליו | `portfolio` | `trading_accounts.js` | ticker_symbol (1), asc |
+| פריטים מקושרים | `linked_items` | `entity-details-renderer.js` | created_at (4), desc |
+| ביצועי פוזיציה | `position_executions` | `entity-details-renderer.js` | date (0), desc |
+| המלצות שיוך | `trade_suggestions` | `executions.js` | trade_created_at (5), desc |
+| קטגוריות תגיות | `tag_categories` | `tag-management-page.js` | updated_at (3), desc |
+| תגיות | `tags` | `tag-management-page.js` | last_used_at (4), desc |
+| לוח שימוש תגיות | `tag_usage_leaderboard` | `tag-management-page.js` | tag_name (0), asc |
+| היסטוריית ייבוא | `import_history` | `data_import.js` | created_at (8), desc |
 
 ## 🔄 סנכרון עם TableDataRegistry ופאג׳ינציה
 
@@ -296,7 +329,36 @@ console.log('מצב סידור:', sortState);
 
 ---
 
+---
+
+## 🆕 עדכון נובמבר 2025
+
+### מיון ברירת מחדל אוטומטי
+
+כל הטבלאות במערכת עכשיו ממוינות כברירת מחדל:
+- **טבלאות עם תאריך:** מיון לפי תאריך desc (החדש ראשון)
+- **טבלאות ללא תאריך:** מיון לפי עמודה ראשונה asc
+
+**שרשרת מיון אוטומטית:**
+1. תאריך desc (חובה אם קיים)
+2. סטטוס asc (אם קיים)
+3. טיקר asc (אם קיים)
+4. fallback לעמודה ראשונה asc
+
+**תיקונים שבוצעו:**
+- שיפור `_normalizeDefaultSort` לקריאה ל-`getDefaultSortChain` גם אם `defaultSortConfig` הוא `undefined`
+- שיפור `applyDefaultSort` לניסיון לקבל `defaultSort` דינמית אם לא נמצא בקונפיגורציה
+- הוספת `defaultSort` מפורש לכל 17 הטבלאות במערכת
+
+**קבצים שעודכנו:**
+- `trading-ui/scripts/unified-table-system.js` - תיקון לוגיקת מיון ברירת מחדל
+- כל קבצי הרישום של הטבלאות - הוספת `defaultSort` מפורש
+
+**דוח מפורט:** `reports/table-sorting-audit/FINAL_REPORT.md`
+
+---
+
 **מחבר:** TikTrack Development Team  
-**גרסה:** 2.0.0  
-**תאריך עדכון:** 27 ינואר 2025
+**גרסה:** 2.1.0  
+**תאריך עדכון:** 20 נובמבר 2025
 

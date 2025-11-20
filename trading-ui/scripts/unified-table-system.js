@@ -51,19 +51,41 @@ class TableRegistry {
 
       // If no defaultSortConfig provided, try to get from getDefaultSortChain
       // This allows automatic default sort based on table structure
+      // CRITICAL: Always try to get default sort chain, even if defaultSortConfig is undefined
       const resolver =
         window.getDefaultSortChain ||
         window.tableMappings && window.tableMappings.getDefaultSortChain;
       if (typeof resolver === 'function') {
         try {
           const chain = resolver(tableType);
-          if (chain && (Array.isArray(chain) || typeof chain === 'object')) {
-            return chain;
+          // buildCanonDefaultSortChain should always return an array (even if empty)
+          // But we check for both array and object to be safe
+          if (chain) {
+            if (Array.isArray(chain) && chain.length > 0) {
+              return chain;
+            }
+            if (typeof chain === 'object' && !Array.isArray(chain)) {
+              return chain;
+            }
+            // If chain is empty array, still return it (will be handled later)
+            if (Array.isArray(chain)) {
+              return chain;
+            }
           }
         } catch (err) {
           if (window.Logger) {
             window.Logger.warn(`TableRegistry._normalizeDefaultSort: Failed to get default sort chain for "${tableType}"`, err, { page: 'unified-table-system' });
           }
+        }
+      } else {
+        // Log if resolver is not available (for debugging)
+        if (window.Logger) {
+          window.Logger.debug(`TableRegistry._normalizeDefaultSort: getDefaultSortChain not available for "${tableType}"`, { 
+            page: 'unified-table-system',
+            hasWindowGetDefaultSortChain: typeof window.getDefaultSortChain === 'function',
+            hasTableMappings: !!window.tableMappings,
+            hasTableMappingsGetDefaultSortChain: !!(window.tableMappings && typeof window.tableMappings.getDefaultSortChain === 'function')
+          });
         }
       }
       return null;
@@ -71,6 +93,8 @@ class TableRegistry {
 
     const chainSource = resolveChainSource();
     if (!chainSource) {
+      // Return empty array if no chain source found
+      // This means the table will not have default sort
       return [];
     }
 
@@ -688,6 +712,26 @@ class TableSorter {
 
     // Check if table has defaultSort configuration
     if (chain.length === 0) {
+      // If no default sort in config, try to get it from getDefaultSortChain
+      // This handles the case where _normalizeDefaultSort didn't find it during registration
+      // (e.g., if getDefaultSortChain wasn't available at registration time)
+      const resolver =
+        window.getDefaultSortChain ||
+        window.tableMappings && window.tableMappings.getDefaultSortChain;
+      if (typeof resolver === 'function') {
+        try {
+          const dynamicChain = resolver(tableType);
+          if (Array.isArray(dynamicChain) && dynamicChain.length > 0) {
+            // Found a chain, apply it
+            return this.sortByChain(tableType, dynamicChain, { saveState: true });
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableSorter.applyDefaultSort: Failed to get default sort chain for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
+      }
+      
       if (window.Logger) {
         window.Logger.debug(`TableSorter.applyDefaultSort: No default sort chain for "${tableType}"`, { 
           page: 'unified-table-system',

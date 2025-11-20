@@ -3638,7 +3638,9 @@ window.registerAlertsTables = function() {
         tableSelector: '#alertsTable',
         columns: getColumns('alerts'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: created_at desc (column index 6)
+        defaultSort: { columnIndex: 6, direction: 'desc', key: 'created_at' }
     });
 };
 window.clearAlertTickerInfo = clearAlertTickerInfo;

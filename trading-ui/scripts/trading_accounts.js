@@ -2758,7 +2758,9 @@ window.registerTradingAccountsTables = function() {
         tableSelector: '#accountsTable',
         columns: getColumns('trading_accounts'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: updated_at desc (column index 6)
+        defaultSort: { columnIndex: 6, direction: 'desc', key: 'updated_at' }
     });
 
     // Register positions table
@@ -2798,7 +2800,9 @@ window.registerTradingAccountsTables = function() {
         tableSelector: '#portfolioTable',
         columns: getColumns('portfolio'),
         sortable: true,
-        filterable: false
+        filterable: false,
+        // Default sort: ticker_symbol asc (column index 1, fallback - no date column)
+        defaultSort: { columnIndex: 1, direction: 'asc', key: 'ticker_symbol' }
     });
 
     // Register account_activity table
@@ -2839,7 +2843,9 @@ window.registerTradingAccountsTables = function() {
         tableSelector: '#accountActivityTable',
         columns: getColumns('account_activity'),
         sortable: true,
-        filterable: false
+        filterable: false,
+        // Default sort: date desc (column index 0)
+        defaultSort: { columnIndex: 0, direction: 'desc', key: 'date' }
     });
 
     window.Logger?.info('✅ Trading accounts tables registered with UnifiedTableSystem', { 

@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.9.0",
+    "version": "1.1.10.0",
     "major": 1,
     "minor": 1,
-    "patch": 9,
+    "patch": 10,
     "build": 0,
-    "commit": "3e4ca378c2c879d09203620d9db0411a967f4492",
-    "updated_at": "2025-11-18T21:47:43+00:00",
-    "notes": "Remove unnecessary debug console logs from button system"
+    "commit": "8626427dbea71a63f8851050f0f88f0921de3727",
+    "updated_at": "2025-11-20T08:55:49+00:00",
+    "notes": "תיקון מערכת מיון טבלאות - הוספת מיון ברירת מחדל אוטומטי לכל הטבלאות"
   },
   "development": {
     "version": "1.1.29.0",

@@ -2116,6 +2116,30 @@ class EntityDetailsRenderer {
             </div>
             </section>
         `;
+        
+        // Register position_executions table with UnifiedTableSystem if not already registered
+        if (normalizedExecutions.length > 0 && window.UnifiedTableSystem?.registry && !window.UnifiedTableSystem.registry.isRegistered('position_executions')) {
+            const columns = window.TABLE_COLUMN_MAPPINGS?.position_executions || [];
+            window.UnifiedTableSystem.registry.register('position_executions', {
+                dataGetter: () => {
+                    if (window.TableDataRegistry) {
+                        return window.TableDataRegistry.getFullData('position_executions', { asReference: true });
+                    }
+                    return window.positionExecutionsData || [];
+                },
+                updateFunction: (rows) => {
+                    if (typeof window.updatePositionExecutionsTable === 'function') {
+                        window.updatePositionExecutionsTable(rows);
+                    }
+                },
+                tableSelector: '#positionExecutionsTable',
+                columns,
+                filterable: false,
+                sortable: true,
+                // Default sort: date desc (column index 0)
+                defaultSort: { columnIndex: 0, direction: 'desc', key: 'date' }
+            });
+        }
 
         return `
             <div class="entity-details-container position-details entity-position entity-details-card p-4">
@@ -2270,6 +2294,7 @@ class EntityDetailsRenderer {
 
             if (window.UnifiedTableSystem?.registry && !window.UnifiedTableSystem.registry.isRegistered(tableType)) {
                 const columns = window.TABLE_COLUMN_MAPPINGS?.linked_items || [];
+                // Default sort: created_at desc (column index 4)
                 window.UnifiedTableSystem.registry.register(tableType, {
                     dataGetter: () => {
                         if (window.TableDataRegistry) {
@@ -2282,6 +2307,7 @@ class EntityDetailsRenderer {
                     columns,
                     filterable: true,
                     sortable: true,
+                    defaultSort: { columnIndex: 4, direction: 'desc', key: 'created_at' }
                 });
             }
 
@@ -4113,6 +4139,7 @@ class EntityDetailsRenderer {
             'fee': 'עמלה',
             'dividend': 'דיבידנד',
             'interest': 'ריבית',
+            'tax': 'מיסים',
             'syep_interest': 'ריבית SYEP',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',

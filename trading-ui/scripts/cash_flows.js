@@ -206,7 +206,16 @@ function applyFallbackDateSort(data) {
       return bDate - aDate;
     });
 
-    updateCashFlowsTable(sortedData);
+    // Update pagination if it exists, otherwise update table directly
+    const paginationInstance = getCashFlowsPaginationInstance();
+    if (paginationInstance && typeof paginationInstance.setData === 'function') {
+      // Update pagination with sorted data - it will call render callback
+      paginationInstance.setData(sortedData);
+    } else {
+      // No pagination - update table directly
+      updateCashFlowsTable(sortedData);
+    }
+    
     if (typeof window.saveSortState === 'function') {
       window.saveSortState('cash_flows', 3, 'desc');
     }
@@ -392,29 +401,52 @@ function getCashFlowsPaginationInstance() {
 }
 
 /**
- * Set active cash flow type button
+ * Set active cash flow type filter (dropdown)
  * @param {string} value - Flow type value
  * @returns {void}
  */
 function setActiveCashFlowTypeButton(value) {
-  const container = document.getElementById('cashFlowTypeFilters');
-  if (!container) {
+  const select = document.getElementById('cashFlowTypeFilter');
+  if (select) {
+    select.value = value || 'all';
+  }
+}
+
+/**
+ * Setup cash flow type filter dropdown event listener
+ * @returns {void}
+ */
+function setupCashFlowTypeFilterDropdown() {
+  const select = document.getElementById('cashFlowTypeFilter');
+  if (!select) {
+    window.Logger?.warn('cashFlowTypeFilter dropdown not found', { page: 'cash_flows' });
     return;
   }
-  const colors = window.getTableColors ? window.getTableColors() : { positive: '#26baac' };
-  const buttons = container.querySelectorAll('[data-flow-type]');
-  buttons.forEach((button) => {
-    if (button.getAttribute('data-flow-type') === value) {
-      button.classList.add('active');
-      button.style.backgroundColor = '#ffffff';
-      button.style.color = colors.positive;
-      button.style.borderColor = colors.positive;
-    } else {
-      button.classList.remove('active');
-      button.style.backgroundColor = '';
-      button.style.color = '';
-      button.style.borderColor = '';
+
+  // Set initial value
+  select.value = activeCashFlowTypeFilter || 'all';
+
+  // Remove existing listeners to prevent duplicates
+  const newSelect = select.cloneNode(true);
+  select.parentNode.replaceChild(newSelect, select);
+
+  // Add change event listener
+  newSelect.addEventListener('change', async function(e) {
+    const selectedType = this.value || 'all';
+    window.Logger?.info('🔔 Dropdown change event triggered', { 
+      selectedType, 
+      page: 'cash_flows' 
+    });
+    try {
+      await filterCashFlowsByType(selectedType);
+    } catch (error) {
+      window.Logger?.error('Error in filterCashFlowsByType', error, { page: 'cash_flows' });
     }
+  });
+
+  window.Logger?.info('✅ Cash flow type filter dropdown initialized', { 
+    initialValue: activeCashFlowTypeFilter || 'all',
+    page: 'cash_flows' 
   });
 }
 
@@ -447,36 +479,78 @@ function cashFlowMatchesType(item, normalizedType) {
  * @returns {Promise<void>}
  */
 async function filterCashFlowsByType(flowType, options = {}) {
-  const { skipButtonUpdate = false } = options || {};
+  window.Logger?.info('🔍 filterCashFlowsByType called', { 
+    flowType, 
+    options, 
+    page: 'cash_flows' 
+  });
+
+  const { skipButtonUpdate = false, skipSave = false } = options || {};
   const requestedType = typeof flowType === 'string' && flowType.trim() ? flowType.trim() : 'all';
   const normalizedType = CASH_FLOW_TYPE_FILTERS.has(requestedType) ? requestedType : 'all';
   activeCashFlowTypeFilter = normalizedType;
 
+  window.Logger?.debug('Filter normalized', { 
+    requestedType, 
+    normalizedType, 
+    page: 'cash_flows' 
+  });
+
   if (!skipButtonUpdate) {
     setActiveCashFlowTypeButton(normalizedType);
+  }
+
+  // שמירת מצב הפילטר (אלא אם כן skipSave = true)
+  if (!skipSave) {
+    await saveCashFlowTypeFilterState(normalizedType);
   }
 
   const paginationInstance = getCashFlowsPaginationInstance();
   const shouldReset = normalizedType === 'all';
   const matcher = shouldReset ? null : (item) => cashFlowMatchesType(item, normalizedType);
 
-  if (paginationInstance && typeof paginationInstance.filter === 'function') {
-    paginationInstance.filter(matcher);
-    return;
-  }
+  window.Logger?.debug('Pagination check', { 
+    hasPagination: !!paginationInstance,
+    hasFilterMethod: !!(paginationInstance && typeof paginationInstance.filter === 'function'),
+    shouldReset,
+    page: 'cash_flows'
+  });
 
-  const fallbackData = filterCashFlowsLocallyByType(normalizedType);
-  window.filteredCashFlowsData = fallbackData;
-  window.cashFlowsData = fallbackData;
+  // Filter data locally first
+  const filteredData = filterCashFlowsLocallyByType(normalizedType);
+  window.filteredCashFlowsData = filteredData;
+
+  window.Logger?.debug('Data filtered', { 
+    originalCount: (Array.isArray(window.allCashFlowsData) ? window.allCashFlowsData : window.cashFlowsData || []).length,
+    filteredCount: filteredData.length,
+    page: 'cash_flows'
+  });
+
+  // Update TableDataRegistry
   if (window.TableDataRegistry?.setFilteredData) {
-    window.TableDataRegistry.setFilteredData(CASH_FLOW_TABLE_TYPE, fallbackData, {
+    window.TableDataRegistry.setFilteredData(CASH_FLOW_TABLE_TYPE, filteredData, {
       tableId: CASH_FLOWS_TABLE_ID,
       skipPageReset: false,
       filterContext: { custom: { type: normalizedType } },
       clearFilters: normalizedType === 'all',
     });
+    window.Logger?.debug('TableDataRegistry updated', { page: 'cash_flows' });
   }
-  await updateCashFlowsTable(fallbackData);
+
+  // If pagination exists, update it with filtered data
+  if (paginationInstance && typeof paginationInstance.setData === 'function') {
+    window.Logger?.info('Using pagination setData with filtered data', { 
+      filteredCount: filteredData.length,
+      page: 'cash_flows' 
+    });
+    // Update pagination with filtered data - it will call render callback
+    paginationInstance.setData(filteredData);
+    return;
+  }
+
+  // Fallback: update table directly
+  window.Logger?.info('Using direct table update (no pagination)', { page: 'cash_flows' });
+  await updateCashFlowsTable(filteredData);
 }
 
 /**
@@ -496,10 +570,62 @@ function filterCashFlowsLocallyByType(flowType) {
 }
 
 /**
+ * Save cash flow type filter state
+ * @param {string} filterType - Filter type value
+ * @returns {Promise<void>}
+ */
+async function saveCashFlowTypeFilterState(filterType) {
+  try {
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+      const pageState = await window.PageStateManager.loadPageState('cash_flows') || {};
+      if (!pageState.filters) {
+        pageState.filters = {};
+      }
+      if (!pageState.filters.custom) {
+        pageState.filters.custom = {};
+      }
+      pageState.filters.custom.cashFlowType = filterType;
+      await window.PageStateManager.savePageState('cash_flows', pageState);
+    }
+  } catch (error) {
+    window.Logger?.warn('Failed to save cash flow type filter state', { error, page: 'cash_flows' });
+  }
+}
+
+/**
+ * Load cash flow type filter state
+ * @returns {Promise<string>} Filter type or 'all' if not found
+ */
+async function loadCashFlowTypeFilterState() {
+  try {
+    if (window.PageStateManager && window.PageStateManager.initialized) {
+      const pageState = await window.PageStateManager.loadPageState('cash_flows');
+      if (pageState?.filters?.custom?.cashFlowType) {
+        const savedType = pageState.filters.custom.cashFlowType;
+        if (CASH_FLOW_TYPE_FILTERS.has(savedType)) {
+          return savedType;
+        }
+      }
+    }
+  } catch (error) {
+    window.Logger?.warn('Failed to load cash flow type filter state', { error, page: 'cash_flows' });
+  }
+  return 'all';
+}
+
+/**
  * Reapply cash flow type filter
  * @returns {Promise<void>}
  */
 async function reapplyCashFlowTypeFilter() {
+  // Load saved filter state
+  const savedFilter = await loadCashFlowTypeFilterState();
+  if (savedFilter && savedFilter !== 'all') {
+    activeCashFlowTypeFilter = savedFilter;
+  }
+  
+  // Update dropdown to reflect current filter
+  setActiveCashFlowTypeButton(activeCashFlowTypeFilter);
   await filterCashFlowsByType(activeCashFlowTypeFilter, { skipButtonUpdate: true });
 }
 
@@ -1039,7 +1165,12 @@ async function renderCashFlowsTable() {
 
   tbody.innerHTML = '';
 
-  if (!cashFlowsData || cashFlowsData.length === 0) {
+  // Use filtered data if available, otherwise use cashFlowsData
+  const dataToRender = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
+    ? window.filteredCashFlowsData
+    : (Array.isArray(cashFlowsData) ? cashFlowsData : []);
+
+  if (!dataToRender || dataToRender.length === 0) {
     tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
@@ -1047,7 +1178,7 @@ async function renderCashFlowsTable() {
   // וידוא שנתוני חשבונות מסחר נטענו
   await ensureTradingAccountsLoaded();
 
-  cashFlowsData.forEach(cashFlow => {
+  dataToRender.forEach(cashFlow => {
     const row = document.createElement('tr');
     // קבלת שם החשבון מסחר - קודם ננסה מהשרת, אחר כך fallback
     const accountName = cashFlow.account_name || getAccountNameById(cashFlow.trading_account_id) || `חשבון מסחר ${cashFlow.trading_account_id}`;
@@ -1423,7 +1554,9 @@ async function syncCashFlowsPagination(cashFlows) {
         tableType: 'cash_flows',
         data: safeCashFlows,
         render: async (pageData, context) => {
-          await updateCashFlowsTable(pageData);
+          // Skip data update and summary when called from pagination render
+          // to prevent infinite loops - pagination already handles data
+          await updateCashFlowsTable(pageData, { skipDataUpdate: true, skipSummary: true });
           if (window.setPageTableData) {
             window.setPageTableData('cash_flows', pageData, {
               tableId: 'cashFlowsTable',
@@ -2036,18 +2169,27 @@ function showCashFlowDetails(cashFlowId) {
  * @param {Array} cashFlows - Cash flows array
  * @returns {void}
  */
-async function updateCashFlowsTable(cashFlows) {
+async function updateCashFlowsTable(cashFlows, options = {}) {
+  const { skipDataUpdate = false, skipSummary = false } = options;
   const prepared = ensureExchangePairsAdjacency(Array.isArray(cashFlows) ? [...cashFlows] : []);
 
-  // עדכון הנתונים הגלובליים
-  window.cashFlowsData = prepared;
-  cashFlowsData = prepared;
+  // עדכון הנתונים הגלובליים רק אם לא מדלגים
+  if (!skipDataUpdate) {
+    window.cashFlowsData = prepared;
+    window.filteredCashFlowsData = prepared;
+    cashFlowsData = prepared;
+  } else {
+    // רק עדכן את window.filteredCashFlowsData אם זה נקרא מה-render callback
+    window.filteredCashFlowsData = prepared;
+  }
 
   // רינדור הטבלה
   await renderCashFlowsTable();
 
-  // עדכון סטטיסטיקות
-  updatePageSummaryStats();
+  // עדכון סטטיסטיקות רק אם לא מדלגים
+  if (!skipSummary) {
+    updatePageSummaryStats();
+  }
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -2266,6 +2408,12 @@ async function initializeCashFlowsPage() {
 
     // הגדרת event listeners לשדות מקור
     setupSourceFieldListeners();
+
+    // הגדרת event listener לדרופדאון סוג תזרים
+    // Use setTimeout to ensure DOM is ready
+    setTimeout(() => {
+      setupCashFlowTypeFilterDropdown();
+    }, 100);
 
     // אתחול מערכת וולידציה
     if (window.initializeValidation) {
@@ -3517,6 +3665,17 @@ async function restorePageState(pageName) {
       }
     }
 
+    // שחזור פילטר סוג תזרים (custom filter)
+    if (pageState.filters?.custom?.cashFlowType) {
+      const savedType = pageState.filters.custom.cashFlowType;
+      if (CASH_FLOW_TYPE_FILTERS.has(savedType)) {
+        activeCashFlowTypeFilter = savedType;
+        setActiveCashFlowTypeButton(savedType);
+        // Apply filter without saving again (already restored)
+        await filterCashFlowsByType(savedType, { skipButtonUpdate: true, skipSave: true });
+      }
+    }
+
     // שחזור סידור
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
@@ -3595,14 +3754,16 @@ window.registerCashFlowsTables = function() {
             return window.cashFlowsData || [];
         },
         updateFunction: (data) => {
-            // Update pagination with sorted/filtered data
-            if (Array.isArray(data) && window.PaginationSystem) {
-                const paginationInstance = getCashFlowsPaginationInstance();
-                if (paginationInstance && typeof paginationInstance.setData === 'function') {
-                    paginationInstance.setData(data);
-                }
+            // Don't call pagination.setData here - it causes infinite loops
+            // The pagination system already handles data updates through its render callback
+            // Just update the table display directly if pagination is not active
+            const paginationInstance = getCashFlowsPaginationInstance();
+            if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                // Pagination is active - let it handle the update through render callback
+                // Don't call setData here to avoid loop
+                return;
             }
-            // Update table display
+            // If no pagination, update table directly
             if (typeof window.updateCashFlowsTable === 'function') {
                 window.updateCashFlowsTable(data);
             }
@@ -3610,6 +3771,8 @@ window.registerCashFlowsTables = function() {
         tableSelector: '#cashFlowsTable',
         columns: getColumns('cash_flows'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: date desc (column index 4)
+        defaultSort: { columnIndex: 4, direction: 'desc', key: 'date' }
     });
 };

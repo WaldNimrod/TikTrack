@@ -3863,7 +3863,9 @@ window.registerExecutionsTables = function() {
         tableSelector: '#executionsTable',
         columns: getColumns('executions'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: date desc (column index 8)
+        defaultSort: { columnIndex: 8, direction: 'desc', key: 'date' }
     });
     
     // Register trade suggestions table
@@ -3882,7 +3884,9 @@ window.registerExecutionsTables = function() {
         tableSelector: '#tradeSuggestionsTable',
         columns: getColumns('trade_suggestions'),
         sortable: true,
-        filterable: false
+        filterable: false,
+        // Default sort: trade_created_at desc (column index 5)
+        defaultSort: { columnIndex: 5, direction: 'desc', key: 'trade_created_at' }
     });
 };
 

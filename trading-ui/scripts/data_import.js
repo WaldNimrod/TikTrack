@@ -792,7 +792,8 @@
             columns,
             sortable: true,
             filterable: true,
-            defaultSort: { columnIndex: 8, direction: 'desc' }
+            // Default sort: created_at desc (column index 8)
+            defaultSort: { columnIndex: 8, direction: 'desc', key: 'created_at' }
         });
 
         if (window.TableDataRegistry) {

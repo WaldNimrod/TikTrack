@@ -10,13 +10,13 @@
     "notes": "הוספת defaultSort ל-positions table"
   },
   "development": {
-    "version": "1.1.33.0",
+    "version": "1.1.34.0",
     "major": 1,
     "minor": 1,
-    "patch": 33,
+    "patch": 34,
     "build": 0,
-    "commit": "bbcb388e76c1f98abd8ea2e18ae8b033c441cc9d",
-    "updated_at": "2025-11-20T09:25:02+00:00",
-    "notes": "Additional local updates: cash flows, core systems, preferences refresh controls"
+    "commit": "94ed4ac878b5388c50b55816866a51ebde95daa3",
+    "updated_at": "2025-11-20T09:25:11+00:00",
+    "notes": "Cash flows HTML updates"
   }
 }

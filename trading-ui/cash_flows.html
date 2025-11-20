@@ -127,7 +127,7 @@
                         </div>
                         <div class="filter-container d-flex align-items-center gap-2" id="cashFlowTypeFilters">
                             <label for="cashFlowTypeFilter" class="form-label mb-0" style="font-size: 0.875rem;">סוג תזרים:</label>
-                            <select id="cashFlowTypeFilter" class="form-select form-select-sm" style="min-width: 200px;" data-filter-change="cashFlowType">
+                            <select id="cashFlowTypeFilter" class="form-select form-select-sm" style="min-width: 200px;" data-onchange="filterCashFlowsByType(this.value)">
                                 <option value="all">הכל</option>
                                 <option value="deposit">הפקדות</option>
                                 <option value="withdrawal">משיכות</option>

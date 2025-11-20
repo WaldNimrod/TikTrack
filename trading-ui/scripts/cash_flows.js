@@ -380,12 +380,23 @@ function resolveExchangeDirectionFromType(flowType) {
  * @returns {Object|null} Pagination instance or null
  */
 function getCashFlowsPaginationInstance() {
+  // Always return the instance created by syncCashFlowsPagination if it exists
+  // This ensures we use the instance with the correct render callback
   if (cashFlowsPaginationInstance) {
+    console.log('✅ [getCashFlowsPaginationInstance] Returning cached instance', {
+      hasOnAfterRender: typeof cashFlowsPaginationInstance.config?.onAfterRender === 'function',
+      tableId: cashFlowsPaginationInstance.config?.tableId
+    });
     return cashFlowsPaginationInstance;
   }
+  // Fallback: try to get from PaginationSystem
   if (window.PaginationSystem?.get) {
     const instance = window.PaginationSystem.get(CASH_FLOWS_TABLE_ID);
     if (instance) {
+      console.log('⚠️ [getCashFlowsPaginationInstance] Using PaginationSystem instance (fallback)', {
+        hasOnAfterRender: typeof instance.config?.onAfterRender === 'function',
+        tableId: instance.config?.tableId
+      });
       cashFlowsPaginationInstance = instance;
       return instance;
     }
@@ -393,22 +404,51 @@ function getCashFlowsPaginationInstance() {
   if (typeof window.getPagination === 'function') {
     const instance = window.getPagination(CASH_FLOWS_TABLE_ID);
     if (instance) {
+      console.log('⚠️ [getCashFlowsPaginationInstance] Using getPagination instance (fallback)', {
+        hasOnAfterRender: typeof instance.config?.onAfterRender === 'function',
+        tableId: instance.config?.tableId
+      });
       cashFlowsPaginationInstance = instance;
       return instance;
     }
   }
+  console.warn('⚠️ [getCashFlowsPaginationInstance] No pagination instance found');
   return null;
 }
 
 /**
- * Set active cash flow type filter (dropdown)
+ * Set active cash flow type filter (buttons and dropdown)
  * @param {string} value - Flow type value
  * @returns {void}
  */
 function setActiveCashFlowTypeButton(value) {
+  const normalizedValue = value || 'all';
+  
+  // Update dropdown
   const select = document.getElementById('cashFlowTypeFilter');
   if (select) {
-    select.value = value || 'all';
+    select.value = normalizedValue;
+  }
+  
+  // Update buttons - remove active class from all, add to selected
+  const buttons = document.querySelectorAll('#cashFlowTypeFilters button[data-flow-type]');
+  console.log('🔘 [setActiveCashFlowTypeButton] Updating buttons', {
+    normalizedValue,
+    buttonsCount: buttons.length
+  });
+  buttons.forEach(btn => {
+    const btnType = btn.getAttribute('data-flow-type');
+    if (btnType === normalizedValue) {
+      btn.classList.add('active');
+      console.log('✅ [setActiveCashFlowTypeButton] Button activated:', btnType, btn);
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Also check if buttons were found
+  if (buttons.length === 0) {
+    console.warn('⚠️ [setActiveCashFlowTypeButton] No buttons found with data-flow-type attribute');
   }
 }
 
@@ -417,162 +457,22 @@ function setActiveCashFlowTypeButton(value) {
  * @returns {void}
  */
 function setupCashFlowTypeFilterDropdown() {
-  console.log('🔧 [setupCashFlowTypeFilterDropdown] Function called!');
   const select = document.getElementById('cashFlowTypeFilter');
-  console.log('🔍 [setupCashFlowTypeFilterDropdown] Select element:', {
-    exists: !!select,
-    id: select?.id,
-    value: select?.value
-  });
-  
   if (!select) {
-    console.error('❌ [setupCashFlowTypeFilterDropdown] cashFlowTypeFilter dropdown not found!');
     window.Logger?.warn('cashFlowTypeFilter dropdown not found', { page: 'cash_flows' });
     return;
   }
 
-  console.log('✅ [setupCashFlowTypeFilterDropdown] Select found, proceeding...');
-  window.Logger?.info('🔧 Setting up cash flow type filter dropdown', { 
-    selectExists: !!select,
-    hasDataFilterChange: select.hasAttribute('data-filter-change'),
-    page: 'cash_flows' 
-  });
-
   // Set initial value
   select.value = activeCashFlowTypeFilter || 'all';
-
-  // Use EventHandlerManager delegation with data-filter-change
-  // (also set in HTML, but ensure it's set here too)
-  if (!select.hasAttribute('data-filter-change')) {
-    select.setAttribute('data-filter-change', 'cashFlowType');
-    window.Logger?.debug('Added data-filter-change attribute', { page: 'cash_flows' });
-  }
   
-  // Verify EventHandlerManager is ready
-  if (!window.EventHandlerManager || !window.EventHandlerManager.initialized) {
-    window.Logger?.warn('EventHandlerManager not initialized, using direct listener only', { page: 'cash_flows' });
-  }
-  
-  // Listen for the custom event from EventHandlerManager
-  const filterChangeHandler = async function(e) {
-    const selectedType = e.detail?.value || e.detail?.element?.value || select.value || 'all';
-    window.Logger?.info('🔔 Filter change event received from EventHandlerManager', { 
-      selectedType,
-      eventDetail: e.detail,
-      hasDetail: !!e.detail,
-      page: 'cash_flows' 
-    });
-    try {
-      await filterCashFlowsByType(selectedType);
-    } catch (error) {
-      window.Logger?.error('Error in filterCashFlowsByType', error, { page: 'cash_flows' });
-    }
-  };
-  
-  // Remove existing listener if any
-  document.removeEventListener('filterChange:cashFlowType', filterChangeHandler);
-  document.addEventListener('filterChange:cashFlowType', filterChangeHandler);
-  window.Logger?.debug('Registered filterChange:cashFlowType listener', { page: 'cash_flows' });
-  
-  // PRIMARY: Direct event listener - this MUST work!
-  const directChangeHandler = async function(e) {
-    console.log('🔔 [directChangeHandler] Change event fired!', {
-      value: this.value,
-      type: e.type,
-      target: e.target.id,
-      bubbles: e.bubbles,
-      cancelable: e.cancelable,
-      defaultPrevented: e.defaultPrevented
-    });
-    const selectedType = this.value || 'all';
-    window.Logger?.info('🔔 Dropdown change event triggered (direct)', { 
-      selectedType,
-      eventType: e.type,
-      bubbles: e.bubbles,
-      page: 'cash_flows' 
-    });
-    try {
-      await filterCashFlowsByType(selectedType);
-    } catch (error) {
-      window.Logger?.error('Error in filterCashFlowsByType', error, { page: 'cash_flows' });
-    }
-  };
-  
-  // Remove ALL existing listeners by cloning the element
-  const newSelect = select.cloneNode(true);
-  select.parentNode.replaceChild(newSelect, select);
-  const actualSelect = document.getElementById('cashFlowTypeFilter'); // Get the new element
-  
-  // Add listener to the NEW element
-  actualSelect.addEventListener('change', directChangeHandler, { capture: false, passive: false });
-  console.log('✅ [setupCashFlowTypeFilterDropdown] Direct change listener added to select element');
-  window.Logger?.debug('Registered direct change listener', { 
-    selectId: actualSelect.id,
-    hasListener: true,
-    page: 'cash_flows' 
-  });
-  
-  // Test if event works
-  console.log('🧪 [setupCashFlowTypeFilterDropdown] Testing if select can fire events...');
-  const testEvent = new Event('change', { bubbles: true, cancelable: true });
-  actualSelect.dispatchEvent(testEvent);
-  console.log('✅ [setupCashFlowTypeFilterDropdown] Test event dispatched');
-  
-  // Store handlers for cleanup if needed
-  select._cashFlowFilterHandlers = {
-    filterChange: filterChangeHandler,
-    directChange: directChangeHandler
-  };
-  
+  // EventHandlerManager will handle the change event automatically via data-onchange attribute
+  // No need for manual event listeners - just like buttons with data-onclick!
   window.Logger?.info('✅ Cash flow type filter dropdown initialized', { 
     initialValue: activeCashFlowTypeFilter || 'all',
-    hasDataFilterChange: select.hasAttribute('data-filter-change'),
-    dataFilterChangeValue: select.getAttribute('data-filter-change'),
+    hasDataOnchange: select.hasAttribute('data-onchange'),
+    dataOnchangeValue: select.getAttribute('data-onchange'),
     page: 'cash_flows' 
-  });
-  
-  // Export test functions to window for debugging - ALWAYS export
-  window.testCashFlowFilter = async function(type = 'deposit') {
-    console.log('🧪 [testCashFlowFilter] Testing filter with type:', type);
-    window.Logger?.info('🧪 Testing filter with type:', { type, page: 'cash_flows' });
-    if (typeof window.filterCashFlowsByType === 'function') {
-      try {
-        await window.filterCashFlowsByType(type);
-        console.log('✅ [testCashFlowFilter] Filter test completed');
-        window.Logger?.info('✅ Filter test completed', { page: 'cash_flows' });
-      } catch (err) {
-        console.error('❌ [testCashFlowFilter] Filter test failed:', err);
-        window.Logger?.error('❌ Filter test failed', err, { page: 'cash_flows' });
-      }
-    } else {
-      console.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
-      window.Logger?.error('❌ filterCashFlowsByType function not found', { page: 'cash_flows' });
-    }
-  };
-  
-  window.testDirectChange = function() {
-    const select = document.getElementById('cashFlowTypeFilter');
-    if (!select) {
-      console.error('❌ [testDirectChange] Select element not found');
-      window.Logger?.error('❌ Select element not found', { page: 'cash_flows' });
-      return;
-    }
-    console.log('🧪 [testDirectChange] Testing direct change event...');
-    window.Logger?.info('🧪 Testing direct change event...', { page: 'cash_flows' });
-    const oldValue = select.value;
-    select.value = select.value === 'all' ? 'deposit' : 'all';
-    console.log('   Changed value from', oldValue, 'to', select.value);
-    window.Logger?.info('Changed value', { from: oldValue, to: select.value, page: 'cash_flows' });
-    
-    const event = new Event('change', { bubbles: true, cancelable: true });
-    select.dispatchEvent(event);
-    console.log('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
-    window.Logger?.info('✅ Direct change event dispatched', { newValue: select.value, page: 'cash_flows' });
-  };
-  
-  console.log('✅ [setupCashFlowTypeFilterDropdown] Test functions exported to window:', {
-    testCashFlowFilter: typeof window.testCashFlowFilter,
-    testDirectChange: typeof window.testDirectChange
   });
 }
 
@@ -605,6 +505,10 @@ function cashFlowMatchesType(item, normalizedType) {
  * @returns {Promise<void>}
  */
 async function filterCashFlowsByType(flowType, options = {}) {
+  // Export to window for global access (needed for data-onchange)
+  window.filterCashFlowsByType = filterCashFlowsByType;
+  
+  console.log('🔍 [filterCashFlowsByType] Called with:', { flowType, options });
   window.Logger?.info('🔍 filterCashFlowsByType called', { 
     flowType, 
     options, 
@@ -665,18 +569,79 @@ async function filterCashFlowsByType(flowType, options = {}) {
 
   // If pagination exists, update it with filtered data
   if (paginationInstance && typeof paginationInstance.setData === 'function') {
+    console.log('📊 [filterCashFlowsByType] Using pagination setData', { 
+      filteredCount: filteredData.length,
+      originalCount: (Array.isArray(window.allCashFlowsData) ? window.allCashFlowsData : window.cashFlowsData || []).length,
+      hasPagination: true,
+      hasOnAfterRender: typeof paginationInstance.config?.onAfterRender === 'function',
+      page: 'cash_flows' 
+    });
     window.Logger?.info('Using pagination setData with filtered data', { 
       filteredCount: filteredData.length,
       page: 'cash_flows' 
     });
+    // Force update window.filteredCashFlowsData immediately BEFORE setData
+    window.filteredCashFlowsData = filteredData;
+    console.log('✅ [filterCashFlowsByType] window.filteredCashFlowsData updated to', filteredData.length, 'items');
     // Update pagination with filtered data - it will call render callback
     paginationInstance.setData(filteredData);
+    console.log('✅ [filterCashFlowsByType] paginationInstance.setData called with', filteredData.length, 'items');
+    
+    // Force render table immediately if render callback didn't fire
+    // This is a safety net - the render callback should handle this, but if it doesn't, we'll do it here
+    setTimeout(async () => {
+      const currentPageData = paginationInstance.getCurrentPageData();
+      console.log('🔄 [filterCashFlowsByType] Force render check - currentPageData length:', currentPageData.length);
+      if (currentPageData.length > 0 || filteredData.length === 0) {
+        console.log('🔄 [filterCashFlowsByType] Force calling updateCashFlowsTable');
+        await updateCashFlowsTable(currentPageData, { skipDataUpdate: true, skipSummary: true });
+      }
+    }, 100);
+    
+    // Show notification if filtered result is empty (and not showing all)
+    if (filteredData.length === 0 && normalizedType !== 'all') {
+      // Get display name from the select option or button
+      const select = document.getElementById('cashFlowTypeFilter');
+      let filterTypeName = '';
+      if (select) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption) {
+          filterTypeName = selectedOption.text;
+        }
+      }
+      // Fallback: try to get from button
+      if (!filterTypeName) {
+        const activeButton = document.querySelector(`#cashFlowTypeFilters button[data-flow-type="${normalizedType}"]`);
+        if (activeButton) {
+          filterTypeName = activeButton.textContent.trim();
+        }
+      }
+      // Fallback: use the type value itself
+      if (!filterTypeName) {
+        filterTypeName = normalizedType;
+      }
+      
+      const message = `לא נמצאו תזרימי מזומנים מסוג "${filterTypeName}"`;
+      // Show notification using the notification system
+      if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('סינון תזרימי מזומנים', message, 4000, 'ui', {
+          userInitiated: true
+        });
+      }
+    }
+    
     return;
   }
 
   // Fallback: update table directly
+  console.log('📊 [filterCashFlowsByType] Using direct table update (no pagination)', { 
+    filteredCount: filteredData.length,
+    hasPagination: false,
+    page: 'cash_flows' 
+  });
   window.Logger?.info('Using direct table update (no pagination)', { page: 'cash_flows' });
   await updateCashFlowsTable(filteredData);
+  console.log('✅ [filterCashFlowsByType] updateCashFlowsTable completed');
 }
 
 /**
@@ -1295,9 +1260,57 @@ async function renderCashFlowsTable() {
   const dataToRender = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
     ? window.filteredCashFlowsData
     : (Array.isArray(cashFlowsData) ? cashFlowsData : []);
+  
+  console.log('🎨 [renderCashFlowsTable] Rendering table', {
+    filteredDataLength: window.filteredCashFlowsData?.length || 0,
+    cashFlowsDataLength: cashFlowsData?.length || 0,
+    dataToRenderLength: dataToRender.length
+  });
 
   if (!dataToRender || dataToRender.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+    // Check if we're filtering (not showing all data)
+    const isFiltered = activeCashFlowTypeFilter && activeCashFlowTypeFilter !== 'all';
+    
+    let message = 'לא נמצאו תזרימי מזומנים';
+    let filterTypeName = '';
+    
+    if (isFiltered) {
+      // Get display name from the select option or button
+      const select = document.getElementById('cashFlowTypeFilter');
+      if (select) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption) {
+          filterTypeName = selectedOption.text;
+        }
+      }
+      // Fallback: try to get from button
+      if (!filterTypeName) {
+        const activeButton = document.querySelector(`#cashFlowTypeFilters button[data-flow-type="${activeCashFlowTypeFilter}"]`);
+        if (activeButton) {
+          filterTypeName = activeButton.textContent.trim();
+        }
+      }
+      // Fallback: use the type value itself
+      if (!filterTypeName) {
+        filterTypeName = activeCashFlowTypeFilter;
+      }
+      
+      message = `לא נמצאו תזרימי מזומנים מסוג "${filterTypeName}"`;
+      
+      // Show notification using the notification system
+      // showInfoNotification(title, message, duration, category, options)
+      if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('סינון תזרימי מזומנים', message, 4000, 'ui', {
+          userInitiated: true
+        });
+      } else if (typeof window.showNotification === 'function') {
+        // showNotification(message, type, title, duration, category, options)
+        window.showNotification(message, 'info', 'סינון תזרימי מזומנים', 4000, 'ui');
+      }
+    }
+    
+    // Show message in table as well
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center">${message}</td></tr>`;
     return;
   }
 
@@ -1679,14 +1692,23 @@ async function syncCashFlowsPagination(cashFlows) {
         tableId: 'cashFlowsTable',
         tableType: 'cash_flows',
         data: safeCashFlows,
-        render: async (pageData, context) => {
+        render: async ({ pageData, pagination: paginationInfo }) => {
+          console.log('🔄 [syncCashFlowsPagination] Render callback called', {
+            pageDataLength: pageData?.length || 0,
+            paginationInfo: paginationInfo,
+            pageData: pageData
+          });
           // Skip data update and summary when called from pagination render
           // to prevent infinite loops - pagination already handles data
+          // IMPORTANT: Update window.filteredCashFlowsData so renderCashFlowsTable uses the correct data
+          window.filteredCashFlowsData = Array.isArray(pageData) ? pageData : [];
+          console.log('🔄 [syncCashFlowsPagination] window.filteredCashFlowsData updated to', window.filteredCashFlowsData.length, 'items');
           await updateCashFlowsTable(pageData, { skipDataUpdate: true, skipSummary: true });
+          console.log('✅ [syncCashFlowsPagination] updateCashFlowsTable completed');
           if (window.setPageTableData) {
             window.setPageTableData('cash_flows', pageData, {
               tableId: 'cashFlowsTable',
-              pageInfo: context?.pageInfo,
+              pageInfo: paginationInfo,
             });
           }
         },

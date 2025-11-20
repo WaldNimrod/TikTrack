@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.11.0",
+    "version": "1.1.12.0",
     "major": 1,
     "minor": 1,
-    "patch": 11,
+    "patch": 12,
     "build": 0,
-    "commit": "c92ddc63c10c3816261773a59a53ae19591b2d47",
-    "updated_at": "2025-11-20T09:02:58+00:00",
-    "notes": "הוספת defaultSort ל-positions table"
+    "commit": "17dffed56f84f385a90a75686575804c162dc75f",
+    "updated_at": "2025-11-20T11:27:19+00:00",
+    "notes": "Fix cash flow type filter: restore buttons, add dropdown, fix pagination render callback"
   },
   "development": {
     "version": "1.1.35.0",

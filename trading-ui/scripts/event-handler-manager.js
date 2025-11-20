@@ -366,9 +366,20 @@ class EventHandlerManager {
             const onchangeValue = elementWithOnchange.getAttribute('data-onchange');
             if (onchangeValue && onchangeValue !== 'null' && onchangeValue !== '') {
                 console.log('🚀 [EventHandlerManager] Executing onchange:', onchangeValue);
+                console.log('🚀 [EventHandlerManager] Element value:', elementWithOnchange.value);
                 try {
-                    // Execute the onchange handler using eval (same pattern as data-onclick)
-                    const result = eval(onchangeValue);
+                    // Replace 'this.value' with the actual value before eval
+                    // This is needed because eval.call doesn't work correctly with 'this'
+                    const actualValue = elementWithOnchange.value;
+                    // Replace this.value with the actual value (handle both string and non-string)
+                    const codeToExecute = onchangeValue.replace(/this\.value/g, 
+                        typeof actualValue === 'string' ? `"${actualValue.replace(/"/g, '\\"')}"` : actualValue
+                    );
+                    console.log('🚀 [EventHandlerManager] Code after replacement:', codeToExecute);
+                    console.log('🚀 [EventHandlerManager] Actual value:', actualValue, 'Type:', typeof actualValue);
+                    
+                    // Execute the onchange handler using eval
+                    const result = eval(codeToExecute);
                     if (result && typeof result.then === 'function') {
                         result
                             .then(() => {
@@ -376,12 +387,24 @@ class EventHandlerManager {
                             })
                             .catch(error => {
                                 console.error('❌ [EventHandlerManager] Error in async onchange:', error);
+                                if (window.Logger) {
+                                    window.Logger.error('EventHandlerManager: Error in async onchange', error);
+                                }
                             });
+                    } else {
+                        console.log('✅ [EventHandlerManager] onchange executed successfully (sync)');
                     }
                     event._ehmHandled = true;
                     return;
                 } catch (error) {
                     console.error('❌ [EventHandlerManager] Error executing data-onchange:', error);
+                    if (window.Logger) {
+                        window.Logger.error('EventHandlerManager: Error executing data-onchange', {
+                            onchangeValue,
+                            error: error.message,
+                            stack: error.stack
+                        });
+                    }
                 }
             }
         }

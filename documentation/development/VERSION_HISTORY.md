@@ -83,3 +83,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-19T20:28:39+00:00 | 1.1.29.0 | 1.1.28.0 | 77dd329fd5af732e0298ecc2330d508d9aa57128 | ac3504ad5f308180cfd3a57e626bc86649c1d844 | patch | תיקון מערכת ייבוא: תיקון שיוך תגיות, ניהול מטמון מרכזי, תיקון תאריכים |
 | 2025-11-20T09:20:48+00:00 | 1.1.30.0 | 1.1.29.0 | c211d6620193e1cf3a339a59e6e497fc8b01a53b | 77dd329fd5af732e0298ecc2330d508d9aa57128 | patch | Import system improvements: simplify modal opening, dynamic UI updates, comprehensive monitoring and documentation |
 | 2025-11-20T09:23:11+00:00 | 1.1.31.0 | 1.1.30.0 | 64ce9f517e53f5f0bc4c12a8eca8bc6afc797b31 | c211d6620193e1cf3a339a59e6e497fc8b01a53b | patch | Comprehensive local updates: import system, preferences, UI improvements, and documentation |
+| 2025-11-20T09:24:52+00:00 | 1.1.32.0 | 1.1.31.0 | 205b32b2dcce7f984e77df3377ff0d12c8a42087 | 64ce9f517e53f5f0bc4c12a8eca8bc6afc797b31 | patch | Preferences HTML updates |

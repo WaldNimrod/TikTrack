@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.13.0",
+    "version": "1.2.0.0",
     "major": 1,
-    "minor": 1,
-    "patch": 13,
+    "minor": 2,
+    "patch": 0,
     "build": 0,
-    "commit": "bc6dff2069ef4449c1b9e5a65564a88f5d29d546",
-    "updated_at": "2025-11-20T11:31:33+00:00",
-    "notes": "Remove cash flow filter buttons, keep only dropdown - full project sync"
+    "commit": "568f18f6ed3ea36ed8a65f961234fd064eb697f4",
+    "updated_at": "2025-11-20T11:34:46+00:00",
+    "notes": "Update to version 1.2.0.0"
   },
   "development": {
     "version": "1.1.35.0",

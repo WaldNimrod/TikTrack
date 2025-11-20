@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="trade-history-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>היסטוריית טרייד - TikTrack</title>
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../../../../trading-ui/styles-new/master.css">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="../../../../trading-ui/styles-new/header-styles.css">
+</head>
+<body class="trade-history-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Header Section -->
+                <div class="top-section">
+                    <div class="section-header entity-trade-main-header">
+                        <div class="table-title">
+                            <i class="bi bi-clock-history"></i>
+                            היסטוריית טרייד
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
+                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
+                            <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לרשימת טריידים"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-body">
+                        <!-- Trade Selection -->
+                        <div class="mb-4">
+                            <label for="tradeSelect" class="form-label">בחירת טרייד:</label>
+                            <select id="tradeSelect" class="form-select">
+                                <option value="">בחר טרייד...</option>
+                                <option value="123">Trade #123 - AAPL</option>
+                                <option value="124">Trade #124 - TSLA</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Basic Info Card -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">נתונים בסיסיים</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>טיקר:</strong> AAPL
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>חשבון:</strong> Account #1
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>סטטוס:</strong> <span class="badge bg-success">סגור</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Timeline של הטרייד</h5>
+                                <div class="timeline-container" style="padding: 20px;">
+                                    <div class="timeline-line" style="display: flex; align-items: center; gap: 20px; position: relative;">
+                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
+                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
+                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
+                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
+                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
+                                        <span>תכנון<br>01/01</span>
+                                        <span>כניסה<br>05/01</span>
+                                        <span>ביצוע1<br>10/01</span>
+                                        <span>ביצוע2<br>15/01</span>
+                                        <span>סגירה<br>20/01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- P/L Chart Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">P/L לאורך זמן</h5>
+                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    [גרף P/L - Line Chart עם 3 קווים: ממומש, לא ממומש, כולל]
+                                </div>
+                                <div class="mt-3">
+                                    <span class="badge" style="background: #28a745;">● P/L ממומש</span>
+                                    <span class="badge" style="background: #ffc107;">● P/L לא ממומש</span>
+                                    <span class="badge" style="background: #007bff;">● P/L כולל</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Executions Table Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">טבלת ביצועים</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>תאריך</th>
+                                                <th>פעולה</th>
+                                                <th>כמות</th>
+                                                <th>מחיר</th>
+                                                <th>עמלה</th>
+                                                <th>P/L ממומש</th>
+                                                <th>P/L MTM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>05/01</td>
+                                                <td><span class="badge bg-success">Buy</span></td>
+                                                <td>100</td>
+                                                <td>$150</td>
+                                                <td>$1.50</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>10/01</td>
+                                                <td><span class="badge bg-success">Buy</span></td>
+                                                <td>50</td>
+                                                <td>$152</td>
+                                                <td>$0.75</td>
+                                                <td>-</td>
+                                                <td>$100</td>
+                                            </tr>
+                                            <tr>
+                                                <td>15/01</td>
+                                                <td><span class="badge bg-danger">Sell</span></td>
+                                                <td>30</td>
+                                                <td>$155</td>
+                                                <td>$0.50</td>
+                                                <td>$150</td>
+                                                <td>$120</td>
+                                            </tr>
+                                            <tr>
+                                                <td>20/01</td>
+                                                <td><span class="badge bg-danger">Sell</span></td>
+                                                <td>120</td>
+                                                <td>$158</td>
+                                                <td>$1.20</td>
+                                                <td>$960</td>
+                                                <td>-</td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-info">
+                                                <td colspan="2"><strong>סיכום:</strong></td>
+                                                <td><strong>סה"כ קניות: 150</strong></td>
+                                                <td><strong>סה"כ מכירות: 150</strong></td>
+                                                <td colspan="3"><strong>P/L כולל: $1,110</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Market Price Chart Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">מחיר שוק מול מחירי כניסה/יציאה</h5>
+                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    [גרף מחיר שוק - Line Chart עם נקודות כניסה/יציאה]
+                                </div>
+                                <div class="mt-3">
+                                    <span class="badge" style="background: #007bff;">─ מחיר שוק</span>
+                                    <span class="badge" style="background: #28a745;">● כניסה</span>
+                                    <span class="badge" style="background: #dc3545;">● יציאה</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Statistics Cards Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h6 class="stat-title">משך זמן</h6>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>19 ימים</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h6 class="stat-title">P/L כולל</h6>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span class="text-success">$1,110</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h6 class="stat-title">אחוז תשואה</h6>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span class="text-success">+7.4%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h6 class="stat-title">מספר ביצועים</h6>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>4</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Bottom Spacing -->
+    <div class="page-bottom-spacing"></div>
+</body>
+</html>

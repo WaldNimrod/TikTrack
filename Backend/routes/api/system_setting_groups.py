@@ -3,44 +3,41 @@
 System Setting Groups API Routes
 Date: October 30, 2025
 Description: API routes for managing system setting groups
+Updated: 17 November 2025 - Migrated to SQLAlchemy
 """
 
 from flask import Blueprint, request, jsonify
-from typing import Dict, Any
+from sqlalchemy.orm import Session
+from config.database import get_db
+from models.system_settings import SystemSettingGroup
+from services.advanced_cache_service import cache_for
 import logging
-import os
-import sqlite3
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 system_setting_groups_bp = Blueprint('system_setting_groups', __name__, url_prefix='/api/system-setting-groups')
 
-def get_db_connection():
-    """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
 @system_setting_groups_bp.route('/', methods=['GET'])
+@cache_for(ttl=600)  # Cache for 10 minutes - system settings don't change often
 def get_system_setting_groups():
-    """Get all system setting groups"""
+    """Get all system setting groups using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT * FROM system_setting_groups ORDER BY id")
-        groups = cursor.fetchall()
-        
-        conn.close()
+        groups = db.query(SystemSettingGroup).order_by(SystemSettingGroup.id).all()
         
         # Convert to list of dictionaries
         result = []
         for group in groups:
-            result.append(dict(group))
+            group_dict = {
+                'id': group.id,
+                'name': group.name,
+                'description': group.description,
+                'created_at': group.created_at.isoformat() if group.created_at else None,
+                'updated_at': group.updated_at.isoformat() if group.updated_at else None
+            }
+            result.append(group_dict)
         
         return jsonify({
             'status': 'success',
@@ -57,18 +54,16 @@ def get_system_setting_groups():
             'message': f'Error retrieving system setting groups: {str(e)}',
             'version': '1.0'
         }), 500
+    finally:
+        db.close()
 
 @system_setting_groups_bp.route('/<int:group_id>', methods=['GET'])
+@cache_for(ttl=600)
 def get_system_setting_group(group_id):
-    """Get a specific system setting group by ID"""
+    """Get a specific system setting group by ID using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT * FROM system_setting_groups WHERE id = ?", (group_id,))
-        group = cursor.fetchone()
-        
-        conn.close()
+        group = db.query(SystemSettingGroup).filter(SystemSettingGroup.id == group_id).first()
         
         if not group:
             return jsonify({
@@ -77,10 +72,18 @@ def get_system_setting_group(group_id):
                 'version': '1.0'
             }), 404
         
+        group_dict = {
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'created_at': group.created_at.isoformat() if group.created_at else None,
+            'updated_at': group.updated_at.isoformat() if group.updated_at else None
+        }
+        
         return jsonify({
             'status': 'success',
             'message': f'Retrieved system setting group {group_id}',
-            'data': dict(group),
+            'data': group_dict,
             'version': '1.0'
         }), 200
         
@@ -91,4 +94,5 @@ def get_system_setting_group(group_id):
             'message': f'Error retrieving system setting group: {str(e)}',
             'version': '1.0'
         }), 500
-
+    finally:
+        db.close()

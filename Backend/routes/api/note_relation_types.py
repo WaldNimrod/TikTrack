@@ -1,11 +1,10 @@
 from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from config.database import get_db
 from models.note_relation_type import NoteRelationType
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
-import os
-import sqlite3
 import re
 
 # Import base classes
@@ -17,39 +16,17 @@ logger = logging.getLogger(__name__)
 
 note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='/api/note-relation-types')
 
-# Initialize base API (note_relation_types uses direct SQLite, so we'll use it selectively)
-
-def get_db_connection():
-    """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
 @note_relation_types_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=600, rate_limit=60)
 @handle_database_session()
 @cache_for(ttl=600)  # Cache for 10 minutes - note relation types don't change
 def get_note_relation_types():
-    """Get all note relation types using base API patterns"""
+    """Get all note relation types using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        note_relation_types = db.query(NoteRelationType).order_by(NoteRelationType.id).all()
         
-        cursor.execute("SELECT * FROM note_relation_types ORDER BY id")
-        note_relation_types = cursor.fetchall()
-        
-        conn.close()
-        
-        result = []
-        for note_type in note_relation_types:
-            result.append({
-                'id': note_type[0],  # id is at index 0
-                'note_relation_type': note_type[1],  # note_relation_type is at index 1
-                'created_at': note_type[2]  # created_at is at index 2
-            })
+        result = [note_type.to_dict() for note_type in note_relation_types]
         
         return jsonify({
             "status": "success",
@@ -64,38 +41,30 @@ def get_note_relation_types():
             "error": {"message": "שגיאה בטעינת רשימת סוגי הקישור"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['GET'])
+@cache_for(ttl=600)
 def get_note_relation_type(type_id: int):
-    """Get note relation type by ID"""
+    """Get note relation type by ID using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        note_type = db.query(NoteRelationType).filter(NoteRelationType.id == type_id).first()
         
-        cursor.execute("SELECT * FROM note_relation_types WHERE id = ?", (type_id,))
-        note_type = cursor.fetchone()
-        
-        conn.close()
-        
-        if note_type:
-            note_type_dict = {
-                'id': note_type[0],  # id is at index 0
-                'note_relation_type': note_type[1],  # note_relation_type is at index 1
-                'created_at': note_type[2]  # created_at is at index 2
-            }
-            
+        if not note_type:
             return jsonify({
-                "status": "success",
-                "data": note_type_dict,
-                "message": "פרטי סוג הקישור נטענו בהצלחה",
+                "status": "error",
+                "error": {"message": "Note relation type not found"},
                 "version": "1.0"
-            })
+            }), 404
         
         return jsonify({
-            "status": "error",
-            "error": {"message": "Note relation type not found"},
+            "status": "success",
+            "data": note_type.to_dict(),
+            "message": "פרטי סוג הקישור נטענו בהצלחה",
             "version": "1.0"
-        }), 404
+        })
     except Exception as e:
         logger.error(f"Error getting note relation type {type_id}: {str(e)}")
         return jsonify({
@@ -103,10 +72,14 @@ def get_note_relation_type(type_id: int):
             "error": {"message": "שגיאה בטעינת פרטי סוג הקישור"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @note_relation_types_bp.route('/', methods=['POST'])
+@invalidate_cache('note_relation_types')
 def create_note_relation_type():
-    """Create new note relation type"""
+    """Create new note relation type using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
         data = request.get_json()
         note_relation_type = data.get('note_relation_type', '').strip()
@@ -135,39 +108,42 @@ def create_note_relation_type():
                 "version": "1.0"
             }), 400
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute(
-            "INSERT INTO note_relation_types (note_relation_type) VALUES (?)",
-            (note_relation_type,)
-        )
-        type_id = cursor.lastrowid
-        
-        conn.commit()
-        conn.close()
+        # Create new note relation type
+        new_type = NoteRelationType(note_relation_type=note_relation_type)
+        db.add(new_type)
+        db.commit()
+        db.refresh(new_type)
         
         return jsonify({
             "status": "success",
-            "data": {
-                'id': type_id,
-                'note_relation_type': note_relation_type,
-                'created_at': None  # Will be set by database default
-            },
+            "data": new_type.to_dict(),
             "message": "סוג קישור נוסף בהצלחה",
             "version": "1.0"
         }), 201
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error creating note relation type: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "סוג קישור זה כבר קיים במערכת"},
+            "version": "1.0"
+        }), 400
     except Exception as e:
+        db.rollback()
         logger.error(f"Error creating note relation type: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
+    finally:
+        db.close()
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['PUT'])
+@invalidate_cache('note_relation_types')
 def update_note_relation_type(type_id: int):
-    """Update note relation type"""
+    """Update note relation type using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
         data = request.get_json()
         note_relation_type = data.get('note_relation_type', '').strip()
@@ -196,13 +172,10 @@ def update_note_relation_type(type_id: int):
                 "version": "1.0"
             }), 400
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Get existing note relation type
+        note_type = db.query(NoteRelationType).filter(NoteRelationType.id == type_id).first()
         
-        # Check if note relation type exists
-        cursor.execute("SELECT id FROM note_relation_types WHERE id = ?", (type_id,))
-        if not cursor.fetchone():
-            conn.close()
+        if not note_type:
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור לא נמצא במערכת"},
@@ -210,52 +183,52 @@ def update_note_relation_type(type_id: int):
             }), 404
         
         # Update note relation type
-        cursor.execute(
-            "UPDATE note_relation_types SET note_relation_type = ? WHERE id = ?",
-            (note_relation_type, type_id)
-        )
-        
-        conn.commit()
-        conn.close()
+        note_type.note_relation_type = note_relation_type
+        db.commit()
+        db.refresh(note_type)
         
         return jsonify({
             "status": "success",
-            "data": {
-                'id': type_id,
-                'note_relation_type': note_relation_type
-            },
+            "data": note_type.to_dict(),
             "message": "סוג קישור עודכן בהצלחה",
             "version": "1.0"
         })
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error updating note relation type {type_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "סוג קישור זה כבר קיים במערכת"},
+            "version": "1.0"
+        }), 400
     except Exception as e:
+        db.rollback()
         logger.error(f"Error updating note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בעדכון סוג קישור"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['DELETE'])
+@invalidate_cache('note_relation_types')
 def delete_note_relation_type(type_id: int):
-    """Delete note relation type"""
+    """Delete note relation type using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        note_type = db.query(NoteRelationType).filter(NoteRelationType.id == type_id).first()
         
-        # Check if note relation type exists
-        cursor.execute("SELECT id FROM note_relation_types WHERE id = ?", (type_id,))
-        if not cursor.fetchone():
-            conn.close()
+        if not note_type:
             return jsonify({
                 "status": "error",
                 "error": {"message": "Note relation type not found"},
                 "version": "1.0"
             }), 404
         
-        # Delete note relation type
-        cursor.execute("DELETE FROM note_relation_types WHERE id = ?", (type_id,))
-        conn.commit()
-        conn.close()
+        db.delete(note_type)
+        db.commit()
         
         return jsonify({
             "status": "success",
@@ -263,9 +236,12 @@ def delete_note_relation_type(type_id: int):
             "version": "1.0"
         })
     except Exception as e:
+        db.rollback()
         logger.error(f"Error deleting note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה במחיקת סוג קישור"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()

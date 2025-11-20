@@ -52,17 +52,7 @@ linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/linked-it
 
 # Initialize base API (linked_items is complex, so we'll use it selectively)
 
-def get_db_connection():
-    """Get database connection"""
-    import os
-    import sqlite3
-    
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+# Removed get_db_connection() - now using SQLAlchemy via EntityDetailsService
 
 @linked_items_bp.route('/types', methods=['GET'])
 @cache_for(ttl=600)  # Cache for 10 minutes - entity types don't change
@@ -224,12 +214,11 @@ def get_linked_items(entity_type: str, entity_id: str) -> Dict[str, Any]:
             logger.warning(f"Schema not found for {entity_type}, treating all linked items as children")
             child_entities = linked_items
         
-        # Get entity details for display (using old method for now)
+        # Get entity details for display using EntityDetailsService (SQLAlchemy)
         try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            entity_details = get_entity_details(cursor, entity_type, entity_id_normalized, context)
-            conn.close()
+            entity_details = EntityDetailsService.get_entity_details(db_session, entity_type, entity_id_normalized)
+            if not entity_details:
+                entity_details = {}
         except Exception as e:
             logger.warning(f"Could not get entity details: {e}")
             entity_details = {}

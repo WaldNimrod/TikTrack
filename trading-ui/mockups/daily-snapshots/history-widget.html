@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="dashboard-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד - TikTrack</title>
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../../../../trading-ui/styles-new/master.css">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="../../../../trading-ui/styles-new/header-styles.css">
+</head>
+<body class="dashboard-page">
+    <!-- Header System -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- History Widget Section -->
+                <div class="top-section">
+                    <div class="section-header entity-trade-main-header">
+                        <div class="table-title">
+                            <i class="bi bi-clock-history"></i>
+                            היסטוריה מהירה
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="REFRESH" data-variant="small" data-icon="🔄" data-text="רענון" title="רענון נתונים"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-body">
+                        <!-- Quick Links Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">קישורים מהירים:</h6>
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <i class="bi bi-arrow-left"></i> מצב תיק אתמול
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <i class="bi bi-arrow-left"></i> טריידים פעילים
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <i class="bi bi-arrow-left"></i> שינויי מחיר היום
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mini Chart Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">P/L שבועי</h6>
+                                <div class="chart-container" style="height: 150px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    [מיני-גרף P/L שבועי - Line Chart קטן]
+                                </div>
+                                <div class="mt-2" style="font-size: 0.8rem; color: #6c757d; text-align: center;">
+                                    Mon  Tue  Wed  Thu  Fri  Sat  Sun
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">סטטיסטיקות מהירות:</h6>
+                                <div class="statistics-summary">
+                                    <div class="stat-item">
+                                        <span class="stat-label">P/L היום:</span>
+                                        <span class="stat-value text-success">+$500</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">שינוי שווי תיק:</span>
+                                        <span class="stat-value text-success">+2.5%</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">טריידים פעילים:</span>
+                                        <span class="stat-value">5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Full History Link -->
+                        <div class="text-center">
+                            <a href="#" class="btn btn-primary">פתח היסטוריה מלאה →</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other Dashboard Widgets Placeholder -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <div class="table-title">שאר ווידג'טים של הדשבורד...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Bottom Spacing -->
+    <div class="page-bottom-spacing"></div>
+</body>
+</html>

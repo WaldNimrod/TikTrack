@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="trading-journal-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יומן מסחר - TikTrack</title>
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../../../../trading-ui/styles-new/master.css">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="../../../../trading-ui/styles-new/header-styles.css">
+</head>
+<body class="trading-journal-page">
+    <!-- Header System -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Header Section -->
+                <div class="top-section">
+                    <div class="section-header entity-trade-main-header">
+                        <div class="table-title">
+                            <i class="bi bi-journal-text"></i>
+                            יומן מסחר
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="ADD" data-variant="full" data-text="הוסף רשומה" title="הוסף רשומת יומן חדשה"></button>
+                            <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
+                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-body">
+                        <!-- Calendar View Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">תצוגה חודשית</h5>
+                                <div class="mb-3 d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-chevron-right"></i> חודש קודם
+                                    </button>
+                                    <h6 class="mb-0">ינואר 2025</h6>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        חודש הבא <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                </div>
+                                <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">
+                                    <!-- Calendar Headers -->
+                                    <div class="text-center fw-bold" style="padding: 10px;">א'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ב'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ג'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ד'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ה'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ו'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ש'</div>
+                                    
+                                    <!-- Calendar Days (placeholder) -->
+                                    <div style="padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; min-height: 80px; background: #f8f9fa;">
+                                        <div class="fw-bold">1</div>
+                                        <div class="small text-success">3 טריידים</div>
+                                    </div>
+                                    <div style="padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; min-height: 80px; background: #fff;">
+                                        <div class="fw-bold">2</div>
+                                    </div>
+                                    <!-- More days... -->
+                                    <div style="padding: 10px; border: 1px solid #26baac; border-radius: 4px; min-height: 80px; background: #e6f7f5;">
+                                        <div class="fw-bold">15</div>
+                                        <div class="small text-primary">רשומת יומן</div>
+                                        <div class="small text-success">2 טריידים</div>
+                                    </div>
+                                    <!-- More calendar days would go here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Journal Entries List Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">רשומות יומן</h5>
+                                    <div>
+                                        <input type="text" class="form-control form-control-sm d-inline-block" placeholder="חיפוש..." style="width: 200px;">
+                                        <select class="form-select form-select-sm d-inline-block" style="width: 150px;">
+                                            <option>כל התאריכים</option>
+                                            <option>השבוע</option>
+                                            <option>החודש</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="list-group">
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">15 בינואר 2025</h6>
+                                                <p class="mb-1">ניתוח טרייד AAPL - כניסה טובה, יציאה מוקדמת מדי. צריך לשפר את ניהול הסיכון.</p>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-link-45deg"></i> קשור לטרייד #123
+                                                    <span class="ms-2"><i class="bi bi-emoji-smile"></i> רגש: מרוצה</span>
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-primary">ערוך</button>
+                                                <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">10 בינואר 2025</h6>
+                                                <p class="mb-1">טרייד TSLA - הצלחה גדולה! אסטרטגיית RSI עבדה מצוין.</p>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-link-45deg"></i> קשור לטרייד #124
+                                                    <span class="ms-2"><i class="bi bi-emoji-laughing"></i> רגש: שמח</span>
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-primary">ערוך</button>
+                                                <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">5 בינואר 2025</h6>
+                                                <p class="mb-1">תחילת חודש - סקירה כללית. מטרות: שיפור אחוז הצלחה, ניהול סיכון טוב יותר.</p>
+                                                <small class="text-muted">
+                                                    <span><i class="bi bi-emoji-neutral"></i> רגש: ניטרלי</span>
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-primary">ערוך</button>
+                                                <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Bottom Spacing -->
+    <div class="page-bottom-spacing"></div>
+</body>
+</html>

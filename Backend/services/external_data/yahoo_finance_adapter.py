@@ -142,7 +142,17 @@ class YahooFinanceAdapter:
             # Get user preferences (default user for now)
             user_service = UserService()
             user_preferences = user_service.get_user_preferences(1)  # Default user ID
-            timezone_str = user_preferences.get('timezone', 'Asia/Jerusalem')
+            
+            # user_preferences is a list of dicts, find the timezone preference
+            timezone_str = 'Asia/Jerusalem'  # Default
+            if isinstance(user_preferences, list):
+                for pref in user_preferences:
+                    if isinstance(pref, dict) and pref.get('preference_name') == 'timezone':
+                        timezone_str = pref.get('saved_value', pref.get('default_value', 'Asia/Jerusalem'))
+                        break
+            elif isinstance(user_preferences, dict):
+                # Fallback for dict format (if it changes in the future)
+                timezone_str = user_preferences.get('timezone', 'Asia/Jerusalem')
             
             # Validate timezone
             try:

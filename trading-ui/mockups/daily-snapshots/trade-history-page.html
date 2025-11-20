@@ -14,10 +14,285 @@
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- TikTrack Chart System (Central Chart System) -->
+    <script src="../../scripts/charts/chart-loader.js?v=1.0.0"></script>
+    <script src="../../scripts/charts/chart-theme.js?v=1.0.0"></script>
+    <script src="../../scripts/charts/chart-system.js?v=1.0.0"></script>
+    
+    <!-- Action Buttons System -->
+    <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
+    
+    <style>
+        /* Timeline Styles */
+        .timeline-container {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-view-toggle button {
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .timeline-view-toggle button.active {
+            background: #26baac;
+            color: white;
+            border-color: #26baac;
+        }
+        
+        /* Absolute Timeline */
+        .timeline-absolute-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px 0;
+        }
+        
+        .timeline-absolute {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px 0;
+            position: relative;
+            min-width: max-content;
+        }
+        
+        .timeline-absolute::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            right: 0;
+            left: 0;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+        
+        .timeline-step-absolute {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            min-width: 180px;
+        }
+        
+        .timeline-point-absolute {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #26baac;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px #26baac;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-point-absolute:hover,
+        .timeline-point-absolute.selected {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px #26baac, 0 0 10px rgba(38, 186, 172, 0.5);
+        }
+        
+        .timeline-step-info {
+            text-align: center;
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 150px;
+            margin-top: 10px;
+        }
+        
+        .timeline-step-title {
+            font-weight: bold;
+            color: #26baac;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-step-date {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-step-details {
+            font-size: 0.85rem;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-step-link {
+            font-size: 0.85rem;
+            color: #26baac;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .timeline-step-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Relative Timeline */
+        .timeline-relative {
+            display: none;
+        }
+        
+        .timeline-relative.active {
+            display: block;
+        }
+        
+        .timeline-chart-container {
+            height: 250px;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .timeline-relative-point-info {
+            font-size: 0.85rem;
+            color: #495057;
+            margin-top: 5px;
+        }
+        
+        .timeline-relative-point-link {
+            font-size: 0.85rem;
+            color: #26baac;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 3px;
+            display: inline-block;
+        }
+        
+        .timeline-relative-point-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Statistics Cards */
+        .statistics-section {
+            margin-bottom: 30px;
+        }
+        
+        .compact-stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .compact-stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        
+        .compact-stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #212529;
+        }
+        
+        .compact-stat-number.positive {
+            color: #28a745;
+        }
+        
+        .compact-stat-number.negative {
+            color: #dc3545;
+        }
+        
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .chart-legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .chart-legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 2px;
+        }
+        
+        /* Market Chart Options Info */
+        .market-chart-options {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .market-chart-options h6 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .market-chart-options ul {
+            margin: 0;
+            padding-right: 20px;
+        }
+        
+        .market-chart-options li {
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body class="trade-history-page">
     <!-- Header System - Created automatically by header-system.js -->
     <div id="unified-header"></div>
+    
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
+                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px;">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">לוח כלכלי</a>
+                        <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">רשומת יומן</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Page Content -->
     <div class="background-wrapper">
@@ -41,11 +316,42 @@
                         <!-- Trade Selection -->
                         <div class="mb-4">
                             <label for="tradeSelect" class="form-label">בחירת טרייד:</label>
-                            <select id="tradeSelect" class="form-select">
+                            <select id="tradeSelect" class="form-select" style="max-width: 300px;">
                                 <option value="">בחר טרייד...</option>
                                 <option value="123">Trade #123 - AAPL</option>
                                 <option value="124">Trade #124 - TSLA</option>
                             </select>
+                        </div>
+                        
+                        <!-- Statistics Section - Top -->
+                        <div class="statistics-section">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="compact-stat-card">
+                                        <div class="compact-stat-label">משך זמן</div>
+                                        <div class="compact-stat-number">19 ימים</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="compact-stat-card">
+                                        <div class="compact-stat-label">P/L כולל</div>
+                                        <div class="compact-stat-number positive">$1,110</div>
+                                        <div class="compact-stat-label" style="font-size: 0.8rem; color: #28a745; margin-top: 5px;">(+7.4%)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="compact-stat-card">
+                                        <div class="compact-stat-label">אחוז תשואה</div>
+                                        <div class="compact-stat-number positive">+7.4%</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="compact-stat-card">
+                                        <div class="compact-stat-label">מספר ביצועים</div>
+                                        <div class="compact-stat-number">4</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Basic Info Card -->
@@ -69,37 +375,117 @@
                         <!-- Timeline Section -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <h5 class="card-title">Timeline של הטרייד</h5>
-                                <div class="timeline-container" style="padding: 20px;">
-                                    <div class="timeline-line" style="display: flex; align-items: center; gap: 20px; position: relative;">
-                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
-                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
-                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
-                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
-                                        <div class="timeline-point" style="width: 20px; height: 20px; border-radius: 50%; background: #26baac; border: 3px solid white; box-shadow: 0 0 0 2px #26baac;"></div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">Timeline של הטרייד</h5>
+                                    <div class="timeline-view-toggle">
+                                        <button class="timeline-view-btn active" data-view="absolute" onclick="switchTimelineView('absolute')">
+                                            <i class="bi bi-list-ul"></i> מוחלט
+                                        </button>
+                                        <button class="timeline-view-btn" data-view="relative" onclick="switchTimelineView('relative')">
+                                            <i class="bi bi-graph-up"></i> יחסי
+                                        </button>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; color: #6c757d;">
-                                        <span>תכנון<br>01/01</span>
-                                        <span>כניסה<br>05/01</span>
-                                        <span>ביצוע1<br>10/01</span>
-                                        <span>ביצוע2<br>15/01</span>
-                                        <span>סגירה<br>20/01</span>
+                                </div>
+                                
+                                <!-- Absolute Timeline View -->
+                                <div class="timeline-absolute-wrapper">
+                                    <div id="timelineAbsolute" class="timeline-absolute">
+                                    <div class="timeline-step-absolute" data-step="0" onclick="selectTimelineStep(0)">
+                                        <div class="timeline-point-absolute"></div>
+                                        <div class="timeline-step-info">
+                                            <div class="timeline-step-title">תכנון</div>
+                                            <div class="timeline-step-date">01/01/2025</div>
+                                            <div class="timeline-step-details"><strong>סוג:</strong> Trade Plan | <strong>מזהה:</strong> #456</div>
+                                            <div class="timeline-step-details">Target: $160</div>
+                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(456, 'plan')">פרטים מלאים →</a>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-step-absolute" data-step="1" onclick="selectTimelineStep(1)">
+                                        <div class="timeline-point-absolute"></div>
+                                        <div class="timeline-step-info">
+                                            <div class="timeline-step-title">כניסה</div>
+                                            <div class="timeline-step-date">05/01/2025</div>
+                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #101</div>
+                                            <div class="timeline-step-details">Buy 100 @ $150</div>
+                                            <div class="timeline-step-details">Commission: $1.50</div>
+                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(101, 'execution')">פרטים מלאים →</a>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-step-absolute" data-step="2" onclick="selectTimelineStep(2)">
+                                        <div class="timeline-point-absolute"></div>
+                                        <div class="timeline-step-info">
+                                            <div class="timeline-step-title">ביצוע 1</div>
+                                            <div class="timeline-step-date">10/01/2025</div>
+                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #102</div>
+                                            <div class="timeline-step-details">Buy 50 @ $152</div>
+                                            <div class="timeline-step-details">P/L MTM: $100</div>
+                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(102, 'execution')">פרטים מלאים →</a>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-step-absolute" data-step="3" onclick="selectTimelineStep(3)">
+                                        <div class="timeline-point-absolute"></div>
+                                        <div class="timeline-step-info">
+                                            <div class="timeline-step-title">ביצוע 2</div>
+                                            <div class="timeline-step-date">15/01/2025</div>
+                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #103</div>
+                                            <div class="timeline-step-details">Sell 30 @ $155</div>
+                                            <div class="timeline-step-details">P/L ממומש: $150</div>
+                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(103, 'execution')">פרטים מלאים →</a>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-step-absolute" data-step="4" onclick="selectTimelineStep(4)">
+                                        <div class="timeline-point-absolute"></div>
+                                        <div class="timeline-step-info">
+                                            <div class="timeline-step-title">סגירה</div>
+                                            <div class="timeline-step-date">20/01/2025</div>
+                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #104</div>
+                                            <div class="timeline-step-details">Sell 120 @ $158</div>
+                                            <div class="timeline-step-details">P/L ממומש: $960</div>
+                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(104, 'execution')">פרטים מלאים →</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                
+                                <!-- Relative Timeline View -->
+                                <div id="timelineRelative" class="timeline-relative">
+                                    <div class="timeline-chart-container">
+                                        <canvas id="timelineChart"></canvas>
+                                    </div>
+                                    <div class="text-center mt-3" style="font-size: 0.9rem; color: #6c757d;">
+                                        <p>ציר X מייצג זמן במרווחים קבועים | המרווח בין נקודות מייצג את הזמן שעבר בין שלבים</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- P/L Chart Section -->
+                        <!-- P/L Chart Section with Position Size -->
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title">P/L לאורך זמן</h5>
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף P/L - Line Chart עם 3 קווים: ממומש, לא ממומש, כולל]
+                                <div class="chart-container">
+                                    <canvas id="plChart"></canvas>
                                 </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #28a745;">● P/L ממומש</span>
-                                    <span class="badge" style="background: #ffc107;">● P/L לא ממומש</span>
-                                    <span class="badge" style="background: #007bff;">● P/L כולל</span>
+                                <div class="chart-legend">
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #28a745;"></span>
+                                        <span>P/L ממומש</span>
+                                    </div>
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #ffc107;"></span>
+                                        <span>P/L לא ממומש</span>
+                                    </div>
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #007bff;"></span>
+                                        <span>P/L כולל</span>
+                                    </div>
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #6c757d; border-top: 3px solid #6c757d;"></span>
+                                        <span>גודל פוזיציה</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3" style="font-size: 0.85rem; color: #6c757d;">
+                                    <i class="bi bi-info-circle"></i> סימון שלב בטיימליין מסמן אותו גם בגרף P/L
                                 </div>
                             </div>
                         </div>
@@ -119,6 +505,7 @@
                                                 <th>עמלה</th>
                                                 <th>P/L ממומש</th>
                                                 <th>P/L MTM</th>
+                                                <th>פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -130,6 +517,7 @@
                                                 <td>$1.50</td>
                                                 <td>-</td>
                                                 <td>-</td>
+                                                <td class="actions-cell" data-entity-id="101" data-entity-type="execution" data-status="completed"></td>
                                             </tr>
                                             <tr>
                                                 <td>10/01</td>
@@ -139,6 +527,7 @@
                                                 <td>$0.75</td>
                                                 <td>-</td>
                                                 <td>$100</td>
+                                                <td class="actions-cell" data-entity-id="102" data-entity-type="execution" data-status="completed"></td>
                                             </tr>
                                             <tr>
                                                 <td>15/01</td>
@@ -148,6 +537,7 @@
                                                 <td>$0.50</td>
                                                 <td>$150</td>
                                                 <td>$120</td>
+                                                <td class="actions-cell" data-entity-id="103" data-entity-type="execution" data-status="completed"></td>
                                             </tr>
                                             <tr>
                                                 <td>20/01</td>
@@ -157,6 +547,7 @@
                                                 <td>$1.20</td>
                                                 <td>$960</td>
                                                 <td>-</td>
+                                                <td class="actions-cell" data-entity-id="104" data-entity-type="execution" data-status="completed"></td>
                                             </tr>
                                         </tbody>
                                         <tfoot>
@@ -164,7 +555,7 @@
                                                 <td colspan="2"><strong>סיכום:</strong></td>
                                                 <td><strong>סה"כ קניות: 150</strong></td>
                                                 <td><strong>סה"כ מכירות: 150</strong></td>
-                                                <td colspan="3"><strong>P/L כולל: $1,110</strong></td>
+                                                <td colspan="4"><strong>P/L כולל: $1,110</strong></td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -176,65 +567,38 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title">מחיר שוק מול מחירי כניסה/יציאה</h5>
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף מחיר שוק - Line Chart עם נקודות כניסה/יציאה]
+                                <div class="chart-container">
+                                    <canvas id="marketPriceChart"></canvas>
                                 </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #007bff;">─ מחיר שוק</span>
-                                    <span class="badge" style="background: #28a745;">● כניסה</span>
-                                    <span class="badge" style="background: #dc3545;">● יציאה</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Statistics Cards Section -->
-                        <div class="row mb-4">
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h6 class="stat-title">משך זמן</h6>
+                                <div class="chart-legend">
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #007bff;"></span>
+                                        <span>מחיר שוק</span>
                                     </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>19 ימים</span>
-                                        </div>
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #28a745; width: 12px; height: 12px; border-radius: 50%;"></span>
+                                        <span>כניסה</span>
+                                    </div>
+                                    <div class="chart-legend-item">
+                                        <span class="chart-legend-color" style="background: #dc3545; width: 12px; height: 12px; border-radius: 50%;"></span>
+                                        <span>יציאה</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h6 class="stat-title">P/L כולל</h6>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span class="text-success">$1,110</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h6 class="stat-title">אחוז תשואה</h6>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span class="text-success">+7.4%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-card">
-                                    <div class="stat-header">
-                                        <h6 class="stat-title">מספר ביצועים</h6>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-row">
-                                            <span>4</span>
-                                        </div>
-                                    </div>
+                                
+                                <!-- Market Chart Options Info -->
+                                <div class="market-chart-options">
+                                    <h6><i class="bi bi-info-circle"></i> חלופות למערכת גרפים חיצונית:</h6>
+                                    <ul>
+                                        <li><strong>TradingView Widget</strong> - פתרון מוכן, קל להטמעה, מוגבל בהתאמה אישית</li>
+                                        <li><strong>Lightweight Charts (TradingView)</strong> - ספרייה קלה ומהירה, ללא תלות, מתאימה למסחר</li>
+                                        <li><strong>Chart.js עם פלאגינים</strong> - פתרון קיים במערכת, דורש הרחבה</li>
+                                        <li><strong>D3.js</strong> - גמישות מקסימלית, דורש פיתוח נרחב</li>
+                                        <li><strong>Highcharts</strong> - ספרייה מסחרית חזקה, דורשת רישיון</li>
+                                        <li><strong>Plotly.js</strong> - פתרון חזק עם תמיכה בגרפים פיננסיים</li>
+                                    </ul>
+                                    <p style="margin-top: 10px; margin-bottom: 0; font-size: 0.85rem; color: #6c757d;">
+                                        <strong>המלצה:</strong> Lightweight Charts - אידיאלי למסחר, קל משקל, ללא תלות, וקוד פתוח.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -246,5 +610,378 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <script>
+        // Timeline View Switching
+        let currentTimelineView = 'absolute';
+        let selectedTimelineStep = null;
+        let plChart = null;
+        let timelineChart = null;
+        let marketPriceChart = null;
+        
+        function switchTimelineView(view) {
+            currentTimelineView = view;
+            
+            // Update buttons
+            document.querySelectorAll('.timeline-view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            
+            // Show/hide views
+            const absoluteView = document.getElementById('timelineAbsolute');
+            const relativeView = document.getElementById('timelineRelative');
+            
+            if (view === 'absolute') {
+                absoluteView.style.display = 'flex';
+                relativeView.classList.remove('active');
+            } else {
+                absoluteView.style.display = 'none';
+                relativeView.classList.add('active');
+                if (!timelineChart) {
+                    initTimelineChart();
+                }
+            }
+        }
+        
+        function selectTimelineStep(stepIndex) {
+            // Remove previous selection
+            document.querySelectorAll('.timeline-point-absolute').forEach(point => {
+                point.classList.remove('selected');
+            });
+            
+            // Add selection
+            const step = document.querySelector(`[data-step="${stepIndex}"]`);
+            if (step) {
+                step.querySelector('.timeline-point-absolute').classList.add('selected');
+                selectedTimelineStep = stepIndex;
+                
+                // Update P/L chart marker
+                if (plChart) {
+                    updatePLChartMarker(stepIndex);
+                }
+            }
+        }
+        
+        function initTimelineChart() {
+            const ctx = document.getElementById('timelineChart');
+            if (!ctx) return;
+            
+            // Sample data for relative timeline
+            const dates = ['01/01', '05/01', '10/01', '15/01', '20/01'];
+            const timeIntervals = [0, 4, 5, 5, 5]; // Days between steps
+            
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Timeline',
+                        data: [0, 1, 2, 3, 4],
+                        borderColor: '#26baac',
+                        backgroundColor: 'rgba(38, 186, 172, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointBackgroundColor: '#26baac',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const step = context.dataIndex;
+                                    const stepNames = ['תכנון', 'כניסה', 'ביצוע 1', 'ביצוע 2', 'סגירה'];
+                                    return stepNames[step] + ' - ' + dates[step];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            display: false
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'זמן (ימים)'
+                            }
+                        }
+                    },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            selectTimelineStep(elements[0].index);
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initPLChart() {
+            const ctx = document.getElementById('plChart');
+            if (!ctx) return;
+            
+            // Sample data
+            const dates = ['01/01', '05/01', '10/01', '15/01', '20/01'];
+            const realizedPL = [0, 0, 0, 150, 1110];
+            const unrealizedPL = [0, 0, 100, 120, 0];
+            const totalPL = [0, 0, 100, 270, 1110];
+            const positionSize = [0, 100, 150, 120, 0];
+            
+            plChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'P/L ממומש',
+                            data: realizedPL,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'P/L לא ממומש',
+                            data: unrealizedPL,
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'P/L כולל',
+                            data: totalPL,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'גודל פוזיציה',
+                            data: positionSize,
+                            borderColor: '#6c757d',
+                            backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label === 'גודל פוזיציה') {
+                                        label += context.parsed.y + ' מניות';
+                                    } else {
+                                        label += '$' + context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'תאריך'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'P/L ($)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'גודל פוזיציה'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updatePLChartMarker(stepIndex) {
+            if (!plChart) return;
+            
+            // Add vertical line at selected step
+            const chart = plChart;
+            const meta = chart.getDatasetMeta(0);
+            const xScale = chart.scales.x;
+            
+            // This would require adding a plugin to draw a vertical line
+            // For now, we'll just highlight the point
+            chart.data.datasets.forEach((dataset, i) => {
+                if (chart.getDatasetMeta(i).data[stepIndex]) {
+                    chart.getDatasetMeta(i).data[stepIndex].options.radius = 8;
+                    chart.getDatasetMeta(i).data[stepIndex].options.borderWidth = 4;
+                }
+            });
+            chart.update();
+        }
+        
+        function initMarketPriceChart() {
+            const ctx = document.getElementById('marketPriceChart');
+            if (!ctx) return;
+            
+            // Sample market price data
+            const dates = ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08/01', '09/01', '10/01', 
+                          '11/01', '12/01', '13/01', '14/01', '15/01', '16/01', '17/01', '18/01', '19/01', '20/01'];
+            const marketPrices = [148, 149, 150, 151, 150, 152, 153, 152, 154, 152, 153, 154, 155, 156, 155, 157, 158, 157, 158, 158];
+            const entryPoints = [null, null, null, null, 150, null, null, null, null, 152, null, null, null, null, null, null, null, null, null, null];
+            const exitPoints = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 155, null, null, null, null, 158];
+            
+            marketPriceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'מחיר שוק',
+                            data: marketPrices,
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'כניסה',
+                            data: entryPoints,
+                            borderColor: '#28a745',
+                            backgroundColor: '#28a745',
+                            borderWidth: 0,
+                            pointRadius: 8,
+                            pointStyle: 'circle',
+                            showLine: false
+                        },
+                        {
+                            label: 'יציאה',
+                            data: exitPoints,
+                            borderColor: '#dc3545',
+                            backgroundColor: '#dc3545',
+                            borderWidth: 0,
+                            pointRadius: 8,
+                            pointStyle: 'circle',
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label === 'מחיר שוק') {
+                                        return 'מחיר שוק: $' + context.parsed.y;
+                                    } else if (context.dataset.label === 'כניסה') {
+                                        const index = context.dataIndex;
+                                        // דוגמה: "כניסה: Buy 100# | 150$"
+                                        return 'כניסה: Buy 100# | $' + context.parsed.y;
+                                    } else if (context.dataset.label === 'יציאה') {
+                                        const index = context.dataIndex;
+                                        // דוגמה: "יציאה: מכירה 50# | 134$ , Rez. = 50$ | 5%"
+                                        if (index === 14) {
+                                            return 'יציאה: מכירה 30# | $155 , Rez. = $150 | 3.2%';
+                                        } else if (index === 19) {
+                                            return 'יציאה: מכירה 120# | $158 , Rez. = $960 | 5.1%';
+                                        }
+                                        return 'יציאה: $' + context.parsed.y;
+                                    }
+                                    return context.dataset.label + ': $' + context.parsed.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'תאריך'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'מחיר ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Function to show execution details modal
+        function showExecutionDetails(id, type) {
+            // פותח מודל עם פרטי הרשומה
+            if (window.ModalManagerV2) {
+                const modalId = type === 'plan' ? 'tradePlanModal' : 'executionModal';
+                window.ModalManagerV2.showModal(modalId, 'view', { id: id });
+            } else {
+                alert(`פרטי ${type === 'plan' ? 'תוכנית' : 'ביצוע'} #${id}`);
+            }
+        }
+        
+        // Initialize charts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initPLChart();
+            initMarketPriceChart();
+            
+            // Load action buttons for executions table
+            if (window.loadTableActionButtons) {
+                window.loadTableActionButtons('executionsTable', 'execution', {
+                    showDetails: true,
+                    showLinked: true,
+                    showEdit: true,
+                    showDelete: false // ביצועים לא נמחקים
+                });
+            }
+        });
+    </script>
 </body>
 </html>

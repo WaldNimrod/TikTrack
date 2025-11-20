@@ -2,7 +2,11 @@
   const NS = 'PreferencesV4';
   if (window[NS]) return;
 
-  const DEFAULT_GROUPS = ['colors', 'ui', 'trading'];
+  // Updated to match actual group names in database:
+  // - colors_unified (not 'colors')
+  // - ui_settings (not 'ui')
+  // - trading_settings (not 'trading')
+  const DEFAULT_GROUPS = ['colors_unified', 'ui_settings', 'trading_settings'];
   const API = {
     bootstrap: '/api/preferences/bootstrap',
     group: '/api/preferences/user/group',
@@ -99,6 +103,15 @@
         window.PreferencesData?.currentUserId ?? 
         1;
       
+      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup called', {
+        page: 'preferences-v4',
+        group,
+        profileId,
+        userId,
+        resolvedUserId,
+        url: `${API.group}?group=${group}&user_id=${resolvedUserId}${profileId != null ? `&profile_id=${profileId}` : ''}`,
+      });
+      
       const params = new URLSearchParams();
       params.set('group', group);
       params.set('user_id', String(resolvedUserId));
@@ -107,8 +120,23 @@
       const cachedETag = etagByGroup.get(group);
       if (cachedETag) headers['If-None-Match'] = cachedETag;
       const res = await doFetch(`${API.group}?${params.toString()}`, { headers, credentials: 'include' });
+      
+      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup response', {
+        page: 'preferences-v4',
+        group,
+        status: res.status,
+        statusText: res.statusText,
+        hasCachedETag: !!cachedETag,
+      });
+      
       if (res.status === 304) {
         const cached = cacheByGroup.get(group) || {};
+        window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup - 304 Not Modified, using cache', {
+          page: 'preferences-v4',
+          group,
+          cachedKeys: Object.keys(cached),
+          cachedCount: Object.keys(cached).length,
+        });
         return { group, values: cached, profileContext, etag: cachedETag, fromCache: true };
       }
       if (res.status === 401 || res.status === 403) {
@@ -121,11 +149,60 @@
         throw new Error(`GetGroup failed: ${res.status} ${errorText}`);
       }
       const json = await res.json();
+      
+      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup JSON response', {
+        page: 'preferences-v4',
+        group,
+        hasJson: !!json,
+        jsonKeys: json ? Object.keys(json) : [],
+        hasSuccess: json?.success,
+        hasData: !!json?.data,
+        dataKeys: json?.data ? Object.keys(json.data) : [],
+        hasPreferences: !!json?.data?.preferences,
+        preferencesType: typeof json?.data?.preferences,
+        preferencesIsArray: Array.isArray(json?.data?.preferences),
+        preferencesLength: Array.isArray(json?.data?.preferences) ? json.data.preferences.length : Object.keys(json?.data?.preferences || {}).length,
+        preferencesSample: json?.data?.preferences 
+          ? (Array.isArray(json.data.preferences) 
+              ? json.data.preferences.slice(0, 3) 
+              : Object.fromEntries(Object.entries(json.data.preferences).slice(0, 5)))
+          : null,
+        fullJson: json, // Full response for debugging
+      });
+      
       if (!json?.success) throw new Error(json?.error || 'Failed group fetch');
       const data = json.data;
       const et = res.headers.get('ETag') || null;
       if (et) etagByGroup.set(group, et);
-      const groupValues = data.values || {};
+      
+      // Backend returns 'preferences' not 'values' - normalize to 'values' for consistency
+      // Handle both formats for backward compatibility
+      const rawPreferences = data.preferences || data.values || {};
+      
+      // Normalize: if preferences is an array, convert to object
+      let groupValues = {};
+      if (Array.isArray(rawPreferences)) {
+        // Convert array of preference objects to key-value map
+        for (const pref of rawPreferences) {
+          const prefName = pref?.preference_name || pref?.name || pref?.html_id;
+          if (!prefName) continue;
+          const prefValue = pref?.saved_value ?? pref?.value ?? pref?.default_value ?? null;
+          groupValues[prefName] = prefValue;
+        }
+      } else if (rawPreferences && typeof rawPreferences === 'object') {
+        groupValues = rawPreferences;
+      }
+      
+      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup - normalized group values', {
+        page: 'preferences-v4',
+        group,
+        rawPreferencesType: Array.isArray(rawPreferences) ? 'array' : typeof rawPreferences,
+        rawPreferencesLength: Array.isArray(rawPreferences) ? rawPreferences.length : Object.keys(rawPreferences || {}).length,
+        groupValuesKeys: Object.keys(groupValues),
+        groupValuesCount: Object.keys(groupValues).length,
+        groupValuesSample: Object.fromEntries(Object.entries(groupValues).slice(0, 5)),
+      });
+      
       cacheByGroup.set(group, groupValues);
       // Only warn about empty groups on preferences page or if explicitly debugging
       const isPreferencesPage = document.body?.classList?.contains('preferences-page') || 
@@ -139,7 +216,8 @@
       }
       profileContext = data.profile_context || profileContext;
       window.dispatchEvent(new CustomEvent('preferences:updated', { detail: { scope: 'group', group } }));
-      return { group, values: data.values || {}, profileContext, etag: et, fromCache: false };
+      // CRITICAL: Return normalized groupValues, not data.values (which may not exist or be in wrong format)
+      return { group, values: groupValues, profileContext, etag: et, fromCache: false };
     });
   }
 

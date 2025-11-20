@@ -416,7 +416,65 @@ def delete_imported_cash_flows():
 
 ## עדכונים אחרונים
 
-### 2025-01-30 - הוספת תגיות אוטומטיות לרשומות ייבוא
+### 2025-01-30 - עדכון מקיף: פישוט, תגיות, ועדכון UI דינמי
+
+**תכונות חדשות:**
+1. ✅ **תגיות אוטומטיות לרשומות ייבוא** - כל רשומת cash flow שנוצרת במהלך ייבוא מקבלת תגית אוטומטית
+   - **שם התגית**: שם הסקציה באנגלית כפי שמופיע בקובץ המקור (למשל "Dividends", "Interest", "Borrow Fee Details")
+   - **קטגוריה**: כל התגיות נמצאות בקטגוריה ייעודית "ייבוא נתונים [provider]" (למשל "ייבוא נתונים IBKR")
+   - **תיאור תגית**: "נוצר אוטומטית ממודול ייבוא"
+   - **יצירת תגיות**: התגיות נוצרות מראש באופן ידני באמצעות הסקריפט `Backend/scripts/create_import_tags.py`
+   - **שיוך תגיות**: המערכת רק משייכת תגיות קיימות לרשומות - לא יוצרת תגיות חדשות במהלך הייבוא
+   - **תגיות קיימות**: אם תגית עם אותו שם כבר קיימת, המערכת משתמשת בה (אפילו אם היא בקטגוריה אחרת)
+   - **רשומות Forex Exchange**: גם רשומות המרות מטבע מקבלות תגיות (לשתי הרשומות FROM/TO)
+   - **מיקום בקוד**: `Backend/services/user_data_import/import_orchestrator.py` - פונקציות `_get_import_category`, `_get_section_tag`, `_assign_tag_to_cashflow`
+   - **סקריפט יצירה**: `Backend/scripts/create_import_tags.py` - יוצר את כל התגיות הנדרשות מראש
+
+2. ✅ **פישוט פתיחת מודול** - הסרת תהליכים מורכבים, פתיחה פשוטה וישירה
+   - **לפני**: wrapper functions, placeholders, internal references, תהליכים מקבילים
+   - **אחרי**: פונקציה אחת פשוטה `openImportUserDataModal()` שמטפלת בכל התהליך
+   - **יתרונות**: קוד נקי יותר, פחות באגים, תחזוקה קלה יותר
+   - **מיקום בקוד**: `trading-ui/scripts/import-user-data.js` - שורה 3739
+
+3. ✅ **עדכון UI דינמי** - רשימת טיקרים חסרים מתעדכנת מיד אחרי הוספת טיקר
+   - **תהליך**: hook על `saveTicker`, הסרת טיקר מהרשימה מיד אחרי שמירה מוצלחת
+   - **יתרונות**: משוב מיידי למשתמש, אין צורך בטעינה מחדש
+   - **חשוב**: אין לקרוא ל-`refreshPreviewData` אחרי הסרת טיקר (מבטל את העדכון המקומי)
+   - **מיקום בקוד**: `trading-ui/scripts/import-user-data.js` - `ensureTickerSaveHook()`, `removeTickerFromMissingList()`
+
+4. ✅ **ניטור מפורט** - ניטור מלא של כל תהליך השמירה והעדכון
+   - **פונקציית debug**: `window.debugTickerSaveProcess()` - קריאה בקונסולה לבדיקת מצב
+   - **ניטור אוטומטי**: כל שלב מדווח לקונסולה עם `[TICKER_SAVE_MONITOR]` או `[REMOVE_TICKER_MONITOR]`
+   - **יתרונות**: זיהוי מהיר של בעיות, הבנה מלאה של התהליך
+   - **מיקום בקוד**: `trading-ui/scripts/import-user-data.js` - `ensureTickerSaveHook()`, `removeTickerFromMissingList()`
+
+**תיקונים עיקריים:**
+1. ✅ **תיקון `saveTicker`** - הפונקציה מחזירה תוצאה כעת (`return crudResult`)
+   - **מיקום**: `trading-ui/scripts/ticker-service.js`, `trading-ui/scripts/tickers.js`
+   - **תוצאה**: `saveSuccess` מזהה נכון שהשמירה הצליחה
+
+2. ✅ **תיקון `refreshPreviewData`** - לא נקרא אחרי הסרת טיקר
+   - **סיבה**: השרת עדיין לא יודע שהטיקר נוסף, ולכן טעינה מחדש מבטלת את העדכון המקומי
+   - **פתרון**: העדכון המקומי נשמר עד שהמשתמש ממשיך לשלב הבא
+
+3. ✅ **תיקון Z-index** - מודול טיקרים מופיע מעל מודול ייבוא
+   - **מיקום**: `trading-ui/styles-new/06-components/_modals.css`
+   - **פתרון**: Z-index גבוה מאוד למודול טיקרים (1000000010-1000000012)
+
+4. ✅ **תיקון session cleanup** - ניקוי מלא אחרי ייבוא מוצלח
+   - **תהליך**: `handleSessionCompletion` מנקה את כל ה-state המקומי וה-localStorage
+   - **תוצאה**: פתיחה מחדש של התהליך לא מציגה סשן פעיל ישן
+
+5. ✅ **תיקון תרגום** - "tax" מתורגם ל-"מיסים" (לא "מס")
+   - **מיקום**: `trading-ui/scripts/import-user-data.js`, `field-renderer-service.js`, `translation-utils.js`, `entity-details-renderer.js`, `data-basic.js`
+
+6. ✅ **סידור כפתורים** - "ביצוע ייבוא + דוח" לפני "ביצוע ייבוא" בשלב 3
+   - **מיקום**: `trading-ui/data_import.html` - `previewStepActions`
+
+7. ✅ **הסרת כפתור מיותר** - "המשך סשן פעיל" הוסר לגמרה
+   - **מיקום**: `trading-ui/data_import.html` - הוסר `resumeImportSessionBtn`
+
+### 2025-01-30 - הוספת תגיות אוטומטיות לרשומות ייבוא (מידע ישן - מועבר לעיל)
 
 **תכונה חדשה**:
 1. ✅ **תגיות אוטומטיות לרשומות ייבוא** - כל רשומת cash flow שנוצרת במהלך ייבוא מקבלת תגית אוטומטית
@@ -482,7 +540,12 @@ def delete_imported_cash_flows():
 - `Backend/scripts/create_import_tags.py` - סקריפט ליצירת תגיות ייבוא מראש
 
 ### Frontend
-- `trading-ui/scripts/import-user-data.js` - פישוט session management, תיקון errors
+- `trading-ui/scripts/import-user-data.js` - **פישוט פתיחת מודול** (הסרת wrappers), **עדכון UI דינמי** (רשימת טיקרים), **ניטור מפורט**, פישוט session management, תיקון errors
+- `trading-ui/scripts/ticker-service.js` - **תיקון `saveTicker`** (החזרת תוצאה)
+- `trading-ui/scripts/tickers.js` - **תיקון `saveTicker`** (החזרת תוצאה)
+- `trading-ui/data_import.html` - **סידור כפתורים** בשלב 3, **הסרת כפתור מיותר**
+- `trading-ui/styles-new/06-components/_modals.css` - **תיקון Z-index** למודול טיקרים
+- `trading-ui/scripts/services/data-import-data.js` - **ניהול מטמון מרכזי** (`invalidateHistoryCache`)
 - `trading-ui/scripts/entity-details-renderer.js` - הוספת תמיכה ב-rich text display
 - `trading-ui/scripts/modal-manager-v2.js` - תיקון rich text editor initialization
 - `trading-ui/scripts/cash_flows.js` - תיקון deleteImportedCashFlows

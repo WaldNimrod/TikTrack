@@ -236,11 +236,6 @@
                         </div>
                         <div class="steps-header-actions d-flex align-items-center gap-2 flex-wrap" id="stepsHeaderPrimaryActions">
                             <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="uploadStepActions">
-                                <button data-button-type="TERTIARY"
-                                        data-text="המשך סשן פעיל"
-                                        data-onclick="resumeActiveImportSession()"
-                                        id="resumeImportSessionBtn"
-                                        class="d-none"></button>
                                 <button data-button-type="PRIMARY"
                                         data-text="המשך לניתוח"
                                         data-onclick="analyzeFile()"
@@ -256,13 +251,13 @@
                             </div>
                             <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="previewStepActions">
                                 <button data-button-type="PRIMARY"
-                                        data-text="ביצוע ייבוא"
-                                        data-onclick="confirmImport()"
-                                        id="confirmImportHeaderBtn"></button>
-                                <button data-button-type="PRIMARY"
                                         data-text="ביצוע ייבוא + דוח"
                                         data-onclick="confirmImport(true)"
                                         id="confirmImportAndReportHeaderBtn"></button>
+                                <button data-button-type="PRIMARY"
+                                        data-text="ביצוע ייבוא"
+                                        data-onclick="confirmImport()"
+                                        id="confirmImportHeaderBtn"></button>
                             </div>
                         </div>
                     </div>

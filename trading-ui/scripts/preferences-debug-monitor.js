@@ -278,13 +278,21 @@
       logData.hasPreferencesData = hasPreferencesData;
       logData.hasLoadTypesFunction = hasLoadTypesFunction;
 
-      // בדיקה 4: בדיקת API endpoint
+      // בדיקה 4: בדיקת API endpoint (try public first, then admin)
       try {
-        const testResponse = await fetch(`/api/preferences/admin/types?_t=${Date.now()}`, {
+        let testResponse = await fetch(`/api/preferences/types?_t=${Date.now()}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'same-origin',
         });
+        if (!testResponse.ok && testResponse.status === 404) {
+          // Fallback to admin endpoint
+          testResponse = await fetch(`/api/preferences/admin/types?_t=${Date.now()}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+          });
+        }
         logData.apiStatus = testResponse.status;
         logData.apiOk = testResponse.ok;
 
@@ -457,11 +465,17 @@
           renderFunctionExists: typeof window.renderPreferenceTypesAuditTable === 'function',
         };
 
-        // בדיקת API
+        // בדיקת API (try public first, then admin)
         try {
-          const apiResponse = await fetch(`/api/preferences/admin/types?_t=${Date.now()}`, {
+          let apiResponse = await fetch(`/api/preferences/types?_t=${Date.now()}`, {
             credentials: 'same-origin',
           });
+          if (!apiResponse.ok && apiResponse.status === 404) {
+            // Fallback to admin endpoint
+            apiResponse = await fetch(`/api/preferences/admin/types?_t=${Date.now()}`, {
+              credentials: 'same-origin',
+            });
+          }
           report.typesTable.apiStatus = apiResponse.status;
           if (apiResponse.ok) {
             const apiData = await apiResponse.json();

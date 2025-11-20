@@ -709,7 +709,9 @@ function getColumnValue(item, columnIndex, tableType) {
                 ? 'ריבית'
                 : item.type === 'syep_interest'
                   ? 'ריבית SYEP'
-                  : item.type;
+                  : item.type === 'tax'
+                    ? 'מיסים'
+                    : item.type;
       return typeDisplay;
     }
   }

@@ -39,6 +39,19 @@
   --modal-nested-offset: 40 !important;
 }
 
+/* מודל tickersModal - וידוא שהוא מופיע מעל כל המודלים האחרים */
+#tickersModal {
+  z-index: 1000000010 !important;
+}
+
+#tickersModal .modal-dialog {
+  z-index: 1000000011 !important;
+}
+
+#tickersModal .modal-content {
+  z-index: 1000000012 !important;
+}
+
 /* הגדרות מיוחדות למודלים גדולים */
 .modal-dialog.modal-lg {
   border: 2px solid #6c757d ;

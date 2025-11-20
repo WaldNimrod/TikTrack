@@ -1101,7 +1101,7 @@ function getPackageDocumentation(pageConfig, packageManifest) {
     let totalScripts = 0;
     let loadedScripts = 0;
 
-    // Get DOM scripts for checking if loaded (including external URLs)
+    // Get DOM scripts for checking if loaded (including external URLs and full paths)
     const domScripts = Array.from(document.querySelectorAll('script[src]'))
         .map(script => {
             const src = script.src;
@@ -1112,6 +1112,31 @@ function getPackageDocumentation(pageConfig, packageManifest) {
             return src.split('/').pop().split('?')[0];
         })
         .filter(src => src && !src.includes('font-awesome')); // Keep bootstrap for checking
+
+    // Also collect full paths for more accurate comparison (same as checkForMismatches)
+    const loadedScriptsFullPaths = Array.from(document.querySelectorAll('script[src]'))
+        .map(script => {
+            const src = script.src.split('?')[0];
+            try {
+                // Extract relative path from full URL (remove protocol, host, port)
+                const url = new URL(src, window.location.origin);
+                const relativePath = url.pathname;
+                // Remove leading slash and normalize
+                return relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+            } catch (e) {
+                // Fallback: if URL parsing fails, try to extract path manually
+                let relativePath = src;
+                if (src.startsWith('http://') || src.startsWith('https://')) {
+                    const pathMatch = src.match(/https?:\/\/[^\/]+(\/.*)/);
+                    if (pathMatch) {
+                        relativePath = pathMatch[1];
+                    }
+                }
+                // Remove leading slash
+                return relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+            }
+        })
+        .filter(src => src && !src.includes('bootstrap') && !src.includes('font-awesome'));
 
     pageConfig.packages.forEach(pkgId => {
         const pkg = packageManifest[pkgId];
@@ -1124,15 +1149,54 @@ function getPackageDocumentation(pageConfig, packageManifest) {
             .filter(script => script.required !== false)
             .map(script => {
                 const scriptFile = script.file;
-                // For external URLs, check full URL; for local scripts, check filename
                 let loaded = false;
+                
+                // Use the same improved logic as checkForMismatches
                 if (scriptFile.startsWith('http://') || scriptFile.startsWith('https://')) {
+                    // External script - check full URL
                     const normalizedScript = scriptFile.split('?')[0].toLowerCase();
                     loaded = domScripts.some(domScript => domScript === normalizedScript || domScript.includes(scriptFile.split('/').pop()));
                 } else {
-                    const scriptFilename = scriptFile.split('/').pop().split('?')[0];
-                    loaded = domScripts.includes(scriptFilename);
+                    // Local script - use improved path matching logic
+                    const normalizedRequired = scriptFile.split('?')[0].toLowerCase();
+                    const requiredFilename = normalizedRequired.split('/').pop();
+                    
+                    // Generate all possible path variations
+                    const possiblePaths = [
+                        normalizedRequired, // Original: "api-config.js" or "scripts/api-config.js"
+                        `scripts/${normalizedRequired}`, // With scripts/ prefix: "scripts/api-config.js"
+                        normalizedRequired.replace(/^scripts\//, ''), // Without scripts/ prefix: "api-config.js"
+                        requiredFilename // Just filename: "api-config.js"
+                    ];
+                    
+                    // First, check against loadedScriptsFullPaths (full paths from DOM)
+                    loaded = loadedScriptsFullPaths.some(loadedScriptFullPath => {
+                        const normalizedLoaded = loadedScriptFullPath.toLowerCase();
+                        const loadedFilename = normalizedLoaded.split('/').pop();
+                        
+                        // Check all possible path variations
+                        for (const possiblePath of possiblePaths) {
+                            if (normalizedLoaded === possiblePath ||
+                                normalizedLoaded.endsWith('/' + possiblePath) ||
+                                normalizedLoaded.endsWith(possiblePath) ||
+                                normalizedLoaded.includes('/' + possiblePath)) {
+                                return true;
+                            }
+                        }
+                        
+                        // Final check: filename match (case-insensitive)
+                        return loadedFilename === requiredFilename;
+                    });
+                    
+                    // If not found in full paths, check against filenames only
+                    if (!loaded) {
+                        loaded = domScripts.some(loadedScript => {
+                            const loadedFilename = loadedScript.split('/').pop().split('?')[0].toLowerCase();
+                            return loadedFilename === requiredFilename;
+                        });
+                    }
                 }
+                
                 totalScripts++;
                 if (loaded) loadedScripts++;
                 

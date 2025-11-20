@@ -989,10 +989,89 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       }
 
       try {
-        // Preferences page: use PreferencesUIV4 with force: true (wants fresh data)
+        // Preferences page: use PreferencesUIV4 with lazy loading first (like other pages)
+        // This ensures preferences are loaded to window.currentPreferences before UI initialization
         if (isPreferencesPage) {
+          // First: Bootstrap to get profile context and determine correct userId/profileId
+          let resolvedUserId = 1;
+          let resolvedProfileId = 0;
+          
+          if (window.PreferencesV4 && typeof window.PreferencesV4.bootstrap === 'function') {
+            try {
+              // Updated to match actual group names in database:
+              // - ui_settings (not 'ui')
+              // - trading_settings (not 'trading')
+              // - colors_unified (not 'colors')
+              const bootstrapResult = await window.PreferencesV4.bootstrap(['ui_settings', 'trading_settings', 'colors_unified'], null, 1);
+              const profileContext = bootstrapResult?.profileContext;
+              if (profileContext) {
+                resolvedUserId = profileContext?.user_id ?? profileContext?.user?.id ?? 1;
+                resolvedProfileId = profileContext?.resolved_profile_id ?? profileContext?.resolved_profile?.id ?? 0;
+                window.Logger?.info?.('📄 Bootstrapped profile context for preferences page', {
+                  page: 'core-systems',
+                  pageName,
+                  userId: resolvedUserId,
+                  profileId: resolvedProfileId,
+                });
+              }
+            } catch (bootstrapError) {
+              window.Logger?.warn?.('⚠️ Bootstrap failed for preferences page, using defaults', {
+                page: 'core-systems',
+                pageName,
+                error: bootstrapError?.message,
+              });
+            }
+          }
+          
+          // Second: Initialize lazy loading with correct userId/profileId
+          if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+            const initStartTime = performance.now();
+            window.Logger?.info?.('📄 Initializing preferences with lazy loading for preferences page', {
+              page: 'core-systems',
+              pageName,
+              userId: resolvedUserId,
+              profileId: resolvedProfileId,
+            });
+            
+            // Detect environment for timeout configuration
+            const environment = window.API_ENV || 'development';
+            const timeoutMs = environment === 'production' ? 5000 : 3000;
+            
+            // Initialize with correct userId/profileId to ensure preferences are loaded for the right profile
+            const initPromise = window.PreferencesCore.initializeWithLazyLoading(resolvedUserId, resolvedProfileId);
+            const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => {
+                reject(new Error(`Preferences initialization timeout after ${timeoutMs}ms`));
+              }, timeoutMs);
+            });
+            
+            try {
+              await Promise.race([initPromise, timeoutPromise]);
+              const initDuration = performance.now() - initStartTime;
+              window.Logger?.info?.('✅ Preferences lazy loading initialized for preferences page', {
+                page: 'core-systems',
+                pageName,
+                duration: `${initDuration.toFixed(2)}ms`,
+                environment,
+                userId: resolvedUserId,
+                profileId: resolvedProfileId,
+              });
+            } catch (error) {
+              const initDuration = performance.now() - initStartTime;
+              window.Logger?.warn?.('⚠️ Preferences lazy loading initialization failed or timed out for preferences page', {
+                page: 'core-systems',
+                pageName,
+                duration: `${initDuration.toFixed(2)}ms`,
+                environment,
+                error: error?.message || error,
+              });
+              // Continue - don't block page load
+            }
+          }
+          
+          // Third: Initialize UI (this will populate forms and display preferences)
           if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
-            window.Logger?.info?.('📄 Initializing preferences for preferences page (V4 with UI)', {
+            window.Logger?.info?.('📄 Initializing Preferences UI V4 for preferences page', {
               page: 'core-systems',
               pageName,
             });
@@ -1001,7 +1080,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             return;
           } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
             // Fallback to PreferencesUI if V4 not available
-            window.Logger?.info?.('📄 Initializing preferences for preferences page (legacy UI)', {
+            window.Logger?.info?.('📄 Initializing Preferences UI (legacy) for preferences page', {
               page: 'core-systems',
               pageName,
             });

@@ -383,9 +383,25 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             await window.loadAccountsForPreferences();
           }
 
-          // Preferences loading is now handled by core-systems.js
-          // No need to call PreferencesUIV4.initialize() here - it's already called by initializePreferencesForPage() in core-systems.js
-          // This prevents duplicate initialization and ensures single point of entry
+          // Initialize Preferences UI V4 (this loads user/profile data and displays it)
+          // Note: PreferencesCore.initializeWithLazyLoading() is called by core-systems.js
+          // but PreferencesUIV4.initialize() is page-specific and must be called here
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            window.Logger.info('🎨 Initializing Preferences UI V4...', {
+              page: 'page-initialization-configs',
+            });
+            await window.PreferencesUIV4.initialize();
+          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+            // Fallback to PreferencesUI if PreferencesUIV4 is not available
+            window.Logger.info('🎨 Initializing Preferences UI (fallback)...', {
+              page: 'page-initialization-configs',
+            });
+            await window.PreferencesUI.initialize();
+          } else {
+            window.Logger.warn('⚠️ PreferencesUIV4 or PreferencesUI not available', {
+              page: 'page-initialization-configs',
+            });
+          }
 
           // Load default colors if not set
           if (typeof window.loadDefaultColors === 'function') {

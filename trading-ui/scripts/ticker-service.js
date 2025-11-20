@@ -756,15 +756,19 @@ async function saveTicker() {
     });
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    await CRUDResponseHandler.handleSaveResponse(response, {
+    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       apiUrl: '/api/tickers/',
       entityName: 'טיקר'
     });
 
+    // Return result so wrapper functions can check if save was successful
+    return crudResult;
+
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת טיקר');
+    throw error; // Re-throw so wrapper can handle it
   }
 }
 

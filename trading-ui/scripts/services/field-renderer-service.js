@@ -344,6 +344,8 @@ class FieldRendererService {
             'withdrawal': 'משיכה',
             'fee': 'עמלה',
             'dividend': 'דיבידנד',
+            'tax': 'מיסים',
+            'interest': 'ריבית',
             'transfer_in': 'העברה פנימה',
             'transfer_out': 'העברה החוצה',
             'currency_exchange_from': 'המרת מט״ח - יציאה',

@@ -3594,38 +3594,54 @@ function ensureTickerSaveHook(retry = 0) {
     }
 
     const wrapped = async function(...args) {
+        const startTime = performance.now();
+        const logStep = (step, data = {}) => {
+            const elapsed = ((performance.now() - startTime) / 1000).toFixed(3);
+            console.log(`[TICKER_SAVE_MONITOR] [${elapsed}s] ${step}`, data);
+            window.Logger?.debug(`[Import Modal] Ticker save: ${step}`, { elapsed, ...data, page: 'import-user-data' });
+        };
+
+        logStep('START: Ticker save process started');
+
+        // Step 1: Sync rich text editor
         try {
+            logStep('STEP 1: Syncing rich text editor');
             syncTickerRemarksEditorToField(document.getElementById('tickersModal'));
+            logStep('STEP 1: Rich text editor synced');
         } catch (syncError) {
-            window.Logger?.debug?.('[Import Modal] Failed to sync rich text editor before saving ticker', {
-                error: syncError?.message
-            });
+            logStep('STEP 1: Failed to sync rich text editor', { error: syncError?.message });
         }
 
-        // Get ticker symbol before saving (for immediate UI update)
+        // Step 2: Get ticker symbol before saving
         const modalElement = document.getElementById('tickersModal');
         const symbolInput = modalElement?.querySelector('#tickerSymbol');
         const savedSymbol = symbolInput?.value?.toUpperCase().trim() || null;
+        logStep('STEP 2: Captured symbol', { symbol: savedSymbol });
 
+        if (!savedSymbol) {
+            logStep('ERROR: No symbol captured', { page: 'import-user-data' });
+            return await saveFn.apply(this, args);
+        }
+
+        // Step 3: Call original save function
         let saveSuccess = false;
         let result = null;
+        const saveStartTime = performance.now();
         
         try {
+            logStep('STEP 3: Calling original saveTicker function');
             result = await saveFn.apply(this, args);
+            const saveDuration = ((performance.now() - saveStartTime) / 1000).toFixed(3);
+            logStep('STEP 3: Save function completed', { duration: `${saveDuration}s` });
             
             // Check if save was successful
-            // CRUDResponseHandler.handleSaveResponse returns result object
-            // result can have: { status: 'success', data: {...} } or { success: true, data: {...} }
-            // The most reliable indicator is having an id in result.data.id or result.id
             if (result !== null && result !== undefined) {
                 if (typeof result === 'object') {
-                    // Primary check: if we have an id, it's definitely a success
                     if (result.data?.id !== undefined && result.data?.id !== null) {
                         saveSuccess = true;
                     } else if (result.id !== undefined && result.id !== null) {
                         saveSuccess = true;
                     } else {
-                        // Fallback: check status or success flags
                         saveSuccess = result.status === 'success' || 
                                      result.success === true ||
                                      (result.response && result.response.ok === true);
@@ -3635,74 +3651,72 @@ function ensureTickerSaveHook(retry = 0) {
                 }
             }
             
-            window.Logger?.info('[Import Modal] Ticker save result', {
+            logStep('STEP 4: Save result analyzed', {
                 symbol: savedSymbol,
+                saveSuccess,
                 hasResult: result !== null && result !== undefined,
                 resultType: typeof result,
                 resultStatus: result?.status,
                 resultSuccess: result?.success,
                 hasData: !!result?.data,
                 hasId: !!(result?.data?.id || result?.id),
-                resultKeys: result ? Object.keys(result) : [],
-                saveSuccess,
-                page: 'import-user-data'
+                resultKeys: result ? Object.keys(result) : []
             });
         } catch (saveError) {
-            window.Logger?.warn('[Import Modal] Error during ticker save', {
+            const saveDuration = ((performance.now() - saveStartTime) / 1000).toFixed(3);
+            logStep('ERROR: Save function failed', {
                 error: saveError?.message,
                 symbol: savedSymbol,
-                page: 'import-user-data'
+                duration: `${saveDuration}s`
             });
-            // Re-throw to let original error handling work
             throw saveError;
         }
 
-        // Immediately remove ticker from missing list if it was saved successfully
-        // Use longer delay to ensure modal closes and save completes
+        // Step 5: Remove ticker from missing list immediately if save was successful
+        // We don't need to wait for modal to close or table reload - update UI immediately
         if (savedSymbol && saveSuccess) {
-            window.Logger?.info('[Import Modal] Ticker saved successfully, will remove from missing list', {
-                symbol: savedSymbol,
-                page: 'import-user-data'
-            });
-            // Longer delay to ensure everything completes - modal closes, save completes
-            setTimeout(() => {
-                try {
-                    removeTickerFromMissingList(savedSymbol);
-                } catch (removeError) {
-                    window.Logger?.warn('[Import Modal] Failed to remove ticker from missing list', {
-                        error: removeError?.message,
-                        symbol: savedSymbol,
-                        stack: removeError?.stack,
-                        page: 'import-user-data'
-                    });
-                }
-            }, 800); // Increased delay to 800ms to ensure save completes
+            logStep('STEP 5: Save successful, removing from missing list immediately', { symbol: savedSymbol });
+            
+            // Update immediately - no delay needed
+            const removeStartTime = performance.now();
+            try {
+                logStep('STEP 5: Executing removeTickerFromMissingList', { symbol: savedSymbol });
+                removeTickerFromMissingList(savedSymbol);
+                const removeDuration = ((performance.now() - removeStartTime) / 1000).toFixed(3);
+                logStep('STEP 5: removeTickerFromMissingList completed', { 
+                    symbol: savedSymbol,
+                    duration: `${removeDuration}s`
+                });
+            } catch (removeError) {
+                const removeDuration = ((performance.now() - removeStartTime) / 1000).toFixed(3);
+                logStep('ERROR: removeTickerFromMissingList failed', {
+                    error: removeError?.message,
+                    symbol: savedSymbol,
+                    duration: `${removeDuration}s`,
+                    stack: removeError?.stack
+                });
+            }
         } else if (savedSymbol) {
-            window.Logger?.warn('[Import Modal] Ticker save result indicates failure, not removing from list', {
+            logStep('STEP 5: Save failed, not removing from list', {
                 symbol: savedSymbol,
                 result: result,
-                saveSuccess,
-                page: 'import-user-data'
+                saveSuccess
             });
-        } else {
-            window.Logger?.warn('[Import Modal] No symbol captured before save', { page: 'import-user-data' });
         }
 
-        return result;
+        // Step 6: DO NOT refresh preview data after removing ticker
+        // The server still has the old data (ticker not in system yet), so refreshing
+        // would reload the old data and undo our local UI update.
+        // The preview data will be refreshed when the user proceeds to the next step
+        // or when they explicitly refresh the preview.
+        logStep('STEP 6: Skipping refreshPreviewData - already updated UI locally, server data is stale');
 
-        // Schedule refresh in background - don't block modal closing
-        if (currentSessionId) {
-            // Use setTimeout to run refresh after modal closes (non-blocking)
-            setTimeout(() => {
-                try {
-                    refreshPreviewData();
-                } catch (error) {
-                    window.Logger?.warn('[Import Modal] Failed to refresh preview after ticker save', {
-                        error: error?.message
-                    });
-                }
-            }, 300); // Small delay to allow modal to close first
-        }
+        const totalDuration = ((performance.now() - startTime) / 1000).toFixed(3);
+        logStep('COMPLETE: Ticker save process finished', { 
+            symbol: savedSymbol,
+            saveSuccess,
+            totalDuration: `${totalDuration}s`
+        });
 
         return result;
     };
@@ -3711,6 +3725,98 @@ function ensureTickerSaveHook(retry = 0) {
     window.saveTicker = wrapped;
     window.Logger?.debug('[Import Modal] Wrapped saveTicker to refresh preview data', { page: 'import-user-data' });
 }
+
+/**
+ * Debug function for monitoring ticker save and missing list update
+ * Call from console: window.debugTickerSaveProcess()
+ */
+window.debugTickerSaveProcess = function() {
+    console.group('🔍 [TICKER_SAVE_DEBUG] Debug Information');
+    console.log('Current Step:', currentStep);
+    console.log('Has Preview Data:', !!previewData);
+    console.log('Current Session ID:', currentSessionId);
+    
+    // Get missing tickers from preview data
+    const previewMissing = previewData?.missing_tickers || [];
+    const summaryMissing = previewData?.summary?.missing_tickers || [];
+    const allMissing = [...previewMissing, ...summaryMissing];
+    
+    console.log('Preview Data Missing Tickers (previewData.missing_tickers):', previewMissing);
+    console.log('Preview Data Missing Tickers (summary.missing_tickers):', summaryMissing);
+    console.log('All Missing Tickers (combined):', allMissing);
+    console.log('Preview Data Records to Skip:', previewData?.records_to_skip?.length || 0);
+    
+    // Normalize all missing tickers for comparison
+    const normalizedMissing = allMissing.map(t => {
+        const raw = typeof t === 'string' ? t : (t.symbol || t.ticker || t.display_symbol);
+        return {
+            raw,
+            normalized: normalizeProblemTicker(raw),
+            type: typeof t,
+            isObject: typeof t === 'object',
+            objectKeys: typeof t === 'object' ? Object.keys(t) : []
+        };
+    });
+    console.log('Normalized Missing Tickers:', normalizedMissing);
+    
+    console.log('saveTicker function:', typeof window.saveTicker);
+    console.log('saveTicker is wrapped:', window.saveTicker?.__importUserDataWrapper || false);
+    console.log('removeTickerFromMissingList function:', typeof removeTickerFromMissingList);
+    console.log('displayMissingTickers function:', typeof displayMissingTickers);
+    console.log('refreshPreviewData function:', typeof refreshPreviewData);
+    
+    // Check if we're on step 2
+    const missingTickersSection = document.getElementById('missingTickersSection');
+    const missingTickersTableBody = document.getElementById('missingTickersTableBody');
+    console.log('Missing Tickers Section exists:', !!missingTickersSection);
+    console.log('Missing Tickers Table Body exists:', !!missingTickersTableBody);
+    console.log('Missing Tickers Section visible:', missingTickersSection?.style.display !== 'none');
+    
+    if (missingTickersTableBody) {
+        const rows = Array.from(missingTickersTableBody.querySelectorAll('tr'));
+        console.log('Current rows in table:', rows.length);
+        
+        const tableSymbols = rows.map((row, idx) => {
+            const firstCell = row.querySelector('td');
+            const cellText = firstCell ? firstCell.textContent.trim() : '';
+            return {
+                index: idx,
+                cellText,
+                normalized: normalizeProblemTicker(cellText),
+                rowHtml: row.outerHTML.substring(0, 150) + '...'
+            };
+        });
+        console.log('Table Symbols:', tableSymbols);
+        
+        // Compare table with preview data
+        const tableNormalized = tableSymbols.map(t => t.normalized);
+        const previewNormalized = normalizedMissing.map(t => t.normalized);
+        const inTableButNotInPreview = tableNormalized.filter(s => !previewNormalized.includes(s));
+        const inPreviewButNotInTable = previewNormalized.filter(s => !tableNormalized.includes(s));
+        
+        console.log('Comparison:', {
+            tableCount: tableNormalized.length,
+            previewCount: previewNormalized.length,
+            inTableButNotInPreview,
+            inPreviewButNotInTable,
+            match: tableNormalized.length === previewNormalized.length && 
+                   tableNormalized.every(s => previewNormalized.includes(s)) &&
+                   previewNormalized.every(s => tableNormalized.includes(s))
+        });
+    }
+    
+    console.groupEnd();
+    return {
+        currentStep,
+        hasPreviewData: !!previewData,
+        currentSessionId,
+        missingTickers: allMissing,
+        normalizedMissing,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        saveTickerWrapped: window.saveTicker?.__importUserDataWrapper || false,
+        tableRowCount: missingTickersTableBody ? missingTickersTableBody.querySelectorAll('tr').length : 0
+    };
+};
 
 /**
  * Initialize import user data modal - called by unified system
@@ -7991,22 +8097,31 @@ function displayMissingTickers(missingTickers) {
  * Remove ticker from missing list immediately after it's created
  */
 function removeTickerFromMissingList(symbol) {
+    const startTime = performance.now();
+    const logStep = (step, data = {}) => {
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(3);
+        console.log(`[REMOVE_TICKER_MONITOR] [${elapsed}s] ${step}`, data);
+        window.Logger?.debug(`[Import Modal] removeTickerFromMissingList: ${step}`, { elapsed, ...data, page: 'import-user-data' });
+    };
+
+    logStep('START: removeTickerFromMissingList called', { symbol, symbolType: typeof symbol });
+
     if (!symbol) {
-        window.Logger?.warn('[Import Modal] removeTickerFromMissingList called without symbol', { page: 'import-user-data' });
+        logStep('ERROR: No symbol provided');
         return;
     }
     
     const normalizedSymbol = normalizeProblemTicker(symbol);
     if (!normalizedSymbol) {
-        window.Logger?.warn('[Import Modal] Failed to normalize ticker symbol', { symbol, page: 'import-user-data' });
+        logStep('ERROR: Failed to normalize symbol', { symbol, symbolType: typeof symbol });
         return;
     }
     
-    window.Logger?.debug('[Import Modal] Removing ticker from missing list', {
-        symbol: normalizedSymbol,
-        hasPreviewData: !!previewData,
-        currentStep,
-        page: 'import-user-data'
+    logStep('STEP 1: Symbol normalized', { 
+        originalSymbol: symbol, 
+        normalizedSymbol, 
+        hasPreviewData: !!previewData, 
+        currentStep 
     });
     
     // Get current missing tickers from preview data
@@ -8019,37 +8134,118 @@ function removeTickerFromMissingList(symbol) {
         currentMissing = availableMissing;
     }
     
-    window.Logger?.debug('[Import Modal] Current missing tickers before removal', {
+    // Detailed analysis of current missing tickers
+    const detailedMissing = currentMissing.map((ticker, index) => {
+        const rawSymbol = typeof ticker === 'string' 
+            ? ticker 
+            : (ticker.symbol || ticker.ticker || ticker.display_symbol);
+        const normalized = normalizeProblemTicker(rawSymbol);
+        return {
+            index,
+            raw: rawSymbol,
+            normalized,
+            type: typeof ticker,
+            isObject: typeof ticker === 'object',
+            objectKeys: typeof ticker === 'object' ? Object.keys(ticker) : [],
+            matches: normalized === normalizedSymbol
+        };
+    });
+    
+    logStep('STEP 2: Current missing tickers retrieved', {
         count: currentMissing.length,
+        detailed: detailedMissing,
         symbols: currentMissing.map(t => typeof t === 'string' ? t : (t.symbol || t.ticker || t.display_symbol)),
-        page: 'import-user-data'
+        normalizedSymbols: detailedMissing.map(d => d.normalized),
+        matchingCount: detailedMissing.filter(d => d.matches).length,
+        matchingIndices: detailedMissing.filter(d => d.matches).map(d => d.index)
+    });
+    
+    // Get table state BEFORE removal
+    const tableBody = document.getElementById('missingTickersTableBody');
+    const tableRowsBefore = tableBody ? Array.from(tableBody.querySelectorAll('tr')).map((row, idx) => {
+        const firstCell = row.querySelector('td');
+        const cellText = firstCell ? firstCell.textContent.trim() : '';
+        return {
+            index: idx,
+            cellText,
+            normalized: normalizeProblemTicker(cellText),
+            matches: normalizeProblemTicker(cellText) === normalizedSymbol,
+            rowHtml: row.outerHTML.substring(0, 100) + '...'
+        };
+    }) : [];
+    
+    logStep('STEP 2.5: Table state BEFORE removal', {
+        tableBodyExists: !!tableBody,
+        rowCount: tableRowsBefore.length,
+        rows: tableRowsBefore,
+        matchingRows: tableRowsBefore.filter(r => r.matches).map(r => r.index)
     });
     
     // Filter out the saved ticker
-    const filteredMissing = currentMissing.filter((ticker) => {
+    const filteredMissing = currentMissing.filter((ticker, index) => {
         const tickerSymbol = typeof ticker === 'string' 
             ? ticker 
             : (ticker.symbol || ticker.ticker || ticker.display_symbol);
         const normalizedTickerSymbol = normalizeProblemTicker(tickerSymbol);
-        return normalizedTickerSymbol !== normalizedSymbol;
+        const shouldKeep = normalizedTickerSymbol !== normalizedSymbol;
+        
+        if (!shouldKeep) {
+            logStep(`FILTER: Removing ticker at index ${index}`, {
+                index,
+                tickerSymbol,
+                normalizedTickerSymbol,
+                targetNormalized: normalizedSymbol,
+                match: normalizedTickerSymbol === normalizedSymbol,
+                tickerType: typeof ticker,
+                tickerValue: ticker
+            });
+        }
+        
+        return shouldKeep;
     });
     
-    window.Logger?.debug('[Import Modal] Filtered missing tickers after removal', {
-        count: filteredMissing.length,
-        removed: currentMissing.length - filteredMissing.length,
-        page: 'import-user-data'
+    const removedCount = currentMissing.length - filteredMissing.length;
+    const removedItems = currentMissing.filter((ticker, index) => {
+        const tickerSymbol = typeof ticker === 'string' 
+            ? ticker 
+            : (ticker.symbol || ticker.ticker || ticker.display_symbol);
+        const normalizedTickerSymbol = normalizeProblemTicker(tickerSymbol);
+        return normalizedTickerSymbol === normalizedSymbol;
+    });
+    
+    logStep('STEP 3: Filtered missing tickers', {
+        before: currentMissing.length,
+        after: filteredMissing.length,
+        removed: removedCount,
+        removedSymbol: normalizedSymbol,
+        removedItems: removedItems.map(item => ({
+            raw: typeof item === 'string' ? item : (item.symbol || item.ticker || item.display_symbol),
+            normalized: normalizeProblemTicker(typeof item === 'string' ? item : (item.symbol || item.ticker || item.display_symbol)),
+            type: typeof item
+        })),
+        remainingSymbols: filteredMissing.map(t => {
+            const raw = typeof t === 'string' ? t : (t.symbol || t.ticker || t.display_symbol);
+            return {
+                raw,
+                normalized: normalizeProblemTicker(raw)
+            };
+        })
     });
     
     // Update preview data to reflect the change
     if (previewData) {
         if (Array.isArray(previewData.missing_tickers)) {
             previewData.missing_tickers = filteredMissing;
+            logStep('STEP 4: Updated previewData.missing_tickers', { count: filteredMissing.length });
         }
         if (previewData.summary) {
             if (Array.isArray(previewData.summary.missing_tickers)) {
                 previewData.summary.missing_tickers = filteredMissing;
+                logStep('STEP 4: Updated previewData.summary.missing_tickers', { count: filteredMissing.length });
             }
         }
+    } else {
+        logStep('WARNING: previewData is null, cannot update', {});
     }
     
     // Also update records_to_skip to remove records with this ticker
@@ -8062,28 +8258,79 @@ function removeTickerFromMissingList(symbol) {
             }
             return true;
         });
-        window.Logger?.debug('[Import Modal] Updated records_to_skip', {
+        logStep('STEP 5: Updated records_to_skip', {
             before: beforeSkipCount,
             after: previewData.records_to_skip.length,
-            page: 'import-user-data'
+            removed: beforeSkipCount - previewData.records_to_skip.length
         });
     }
     
     // Update display immediately - only if we're on step 2 (problem resolution)
     if (currentStep === 2) {
-        window.Logger?.info('[Import Modal] Updating missing tickers display', {
+        logStep('STEP 6: Calling displayMissingTickers', {
             before: currentMissing.length,
             after: filteredMissing.length,
             symbol: normalizedSymbol,
-            page: 'import-user-data'
+            filteredCount: filteredMissing.length
         });
-        displayMissingTickers(filteredMissing);
+        try {
+            displayMissingTickers(filteredMissing);
+            
+            // Get table state AFTER removal
+            const tableBodyAfter = document.getElementById('missingTickersTableBody');
+            const tableRowsAfter = tableBodyAfter ? Array.from(tableBodyAfter.querySelectorAll('tr')).map((row, idx) => {
+                const firstCell = row.querySelector('td');
+                const cellText = firstCell ? firstCell.textContent.trim() : '';
+                return {
+                    index: idx,
+                    cellText,
+                    normalized: normalizeProblemTicker(cellText),
+                    matches: normalizeProblemTicker(cellText) === normalizedSymbol
+                };
+            }) : [];
+            
+            logStep('STEP 6: displayMissingTickers completed', {
+                tableBodyExists: !!tableBodyAfter,
+                rowCountAfter: tableRowsAfter.length,
+                rowsAfter: tableRowsAfter,
+                stillContainsTarget: tableRowsAfter.some(r => r.matches),
+                comparison: {
+                    beforeCount: tableRowsBefore.length,
+                    afterCount: tableRowsAfter.length,
+                    expectedAfter: filteredMissing.length,
+                    removedFromTable: tableRowsBefore.length - tableRowsAfter.length,
+                    targetSymbol: normalizedSymbol,
+                    targetStillInTable: tableRowsAfter.some(r => r.matches)
+                },
+                allSymbolsAfter: tableRowsAfter.map(r => r.normalized)
+            });
+        } catch (displayError) {
+            logStep('ERROR: displayMissingTickers failed', {
+                error: displayError?.message,
+                stack: displayError?.stack
+            });
+        }
     } else {
-        window.Logger?.debug('[Import Modal] Not on step 2, skipping display update', {
-            currentStep,
-            page: 'import-user-data'
-        });
+        logStep('STEP 6: Skipping display update (not on step 2)', { currentStep });
     }
+
+    const totalDuration = ((performance.now() - startTime) / 1000).toFixed(3);
+    logStep('COMPLETE: removeTickerFromMissingList finished', { 
+        symbol: normalizedSymbol,
+        originalSymbol: symbol,
+        removedCount,
+        beforeCount: currentMissing.length,
+        afterCount: filteredMissing.length,
+        totalDuration: `${totalDuration}s`,
+        summary: {
+            targetSymbol: normalizedSymbol,
+            itemsRemoved: removedCount,
+            itemsRemaining: filteredMissing.length,
+            success: removedCount > 0 && filteredMissing.length === currentMissing.length - removedCount,
+            tableBeforeCount: tableRowsBefore.length,
+            tableAfterCount: currentStep === 2 ? (document.getElementById('missingTickersTableBody')?.querySelectorAll('tr').length || 0) : 'N/A'
+        }
+    });
 }
 
 /**

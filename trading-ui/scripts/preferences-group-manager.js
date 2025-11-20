@@ -46,6 +46,7 @@ class PreferencesGroupManager {
       'section5': 'notification_settings',
       'section6': 'colors_unified',
       'section7': 'chart_settings_unified',
+      'section8': 'ui_settings',
     };
     this.currentUserId = 1;
     this.currentProfileId = null;

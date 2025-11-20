@@ -189,18 +189,58 @@ class PreferencesAPIClient {
       window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available', { page: 'preferences-core-new' });
       return null;
     }
+    
+    window.Logger?.info?.('🔍 DEBUG: PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
+      page: 'preferences-core-new',
+      userId: userId || this.defaultUserId,
+      profileId,
+    });
+    
     const payload = await window.PreferencesData.loadAllPreferencesRaw({
       userId: userId || this.defaultUserId,
       profileId,
       force: true,
     });
 
-    return {
+    // DEBUG: Log payload
+    window.Logger?.info?.('🔍 DEBUG: PreferencesAPIClient.getAllPreferences received payload', {
+      page: 'preferences-core-new',
+      userId: userId || this.defaultUserId,
+      profileId,
+      hasPayload: !!payload,
+      payloadKeys: payload ? Object.keys(payload) : [],
+      hasPreferences: !!payload?.preferences,
+      preferencesType: typeof payload?.preferences,
+      preferencesIsArray: Array.isArray(payload?.preferences),
+      preferencesCount: payload?.preferences 
+        ? (Array.isArray(payload.preferences) 
+            ? payload.preferences.length 
+            : Object.keys(payload.preferences).length)
+        : 0,
+      preferencesSample: payload?.preferences
+        ? (Array.isArray(payload.preferences)
+            ? payload.preferences.slice(0, 3)
+            : Object.fromEntries(Object.entries(payload.preferences).slice(0, 5)))
+        : null,
+    });
+
+    const result = {
       preferences: payload.preferences || {},
       profileContext: payload.profileContext || null,
       requestedProfileId: payload.requestedProfileId ?? null,
       resolvedProfileId: payload.resolvedProfileId ?? null,
     };
+    
+    // DEBUG: Log result
+    window.Logger?.info?.('🔍 DEBUG: PreferencesAPIClient.getAllPreferences returning result', {
+      page: 'preferences-core-new',
+      hasPreferences: !!result.preferences,
+      preferencesType: typeof result.preferences,
+      preferencesCount: Object.keys(result.preferences || {}).length,
+      preferencesSample: Object.fromEntries(Object.entries(result.preferences || {}).slice(0, 5)),
+    });
+
+    return result;
   }
 
   /**
@@ -597,11 +637,49 @@ class PreferencesCore {
           }
 
           // Load all preferences
+          window.Logger?.info?.('🔍 DEBUG: Calling apiClient.getAllPreferences', {
+            page: 'preferences-core-new',
+            userId: finalUserId,
+            profileId: finalProfileId,
+          });
+          
           const apiResult = await this.apiClient.getAllPreferences(
             finalUserId,
             finalProfileId,
           );
-          const allPreferences = apiResult.preferences || {};
+          
+          // DEBUG: Log API result
+          window.Logger?.info?.('🔍 DEBUG: apiClient.getAllPreferences result', {
+            page: 'preferences-core-new',
+            userId: finalUserId,
+            profileId: finalProfileId,
+            hasApiResult: !!apiResult,
+            apiResultKeys: apiResult ? Object.keys(apiResult) : [],
+            hasPreferences: !!apiResult?.preferences,
+            preferencesType: typeof apiResult?.preferences,
+            preferencesIsArray: Array.isArray(apiResult?.preferences),
+            preferencesLength: Array.isArray(apiResult?.preferences) ? apiResult.preferences.length : Object.keys(apiResult?.preferences || {}).length,
+            preferencesSample: apiResult?.preferences 
+              ? (Array.isArray(apiResult.preferences) 
+                  ? apiResult.preferences.slice(0, 3) 
+                  : Object.fromEntries(Object.entries(apiResult.preferences).slice(0, 5)))
+              : null,
+            fullApiResult: apiResult, // Full result for debugging
+          });
+          
+          let allPreferences = apiResult.preferences || {};
+          
+          // DEBUG: Log extracted preferences
+          window.Logger?.info?.('🔍 DEBUG: Extracted preferences from API result', {
+            page: 'preferences-core-new',
+            userId: finalUserId,
+            profileId: finalProfileId,
+            allPreferencesType: typeof allPreferences,
+            allPreferencesIsArray: Array.isArray(allPreferences),
+            allPreferencesKeys: Object.keys(allPreferences),
+            allPreferencesCount: Object.keys(allPreferences).length,
+            allPreferencesSample: Object.fromEntries(Object.entries(allPreferences).slice(0, 5)),
+          });
           const profileContext = apiResult.profileContext || null;
           const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined
             ? profileContext.resolved_profile_id
@@ -620,6 +698,60 @@ class PreferencesCore {
           } else {
             this.currentProfileId = effectiveProfileId;
             this.currentUserId = finalUserId;
+          }
+
+          // If no preferences loaded, load all default values from preference_types table
+          // This ensures the system always has default values to work with
+          if (Object.keys(allPreferences).length === 0) {
+            window.Logger?.info?.('⚠️ No user preferences found, loading default values from preference_types table', {
+              page: 'preferences-core-new',
+              userId: finalUserId,
+              profileId: effectiveProfileId,
+            });
+            
+            try {
+              // Try to load preference types metadata to get all preference names
+              if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceTypes === 'function') {
+                const typesData = await window.PreferencesData.loadPreferenceTypes({ force: false });
+                const types = typesData?.types || typesData?.data?.types || typesData || [];
+                
+                if (Array.isArray(types) && types.length > 0) {
+                  // Load default value for each preference type
+                  const defaultPreferences = {};
+                  for (const prefType of types) {
+                    const prefName = prefType?.preference_name || prefType?.name || prefType?.html_id;
+                    if (!prefName) continue;
+                    
+                    try {
+                      const defaultValue = await this.getDefaultPreference(prefName);
+                      if (defaultValue !== null && defaultValue !== undefined) {
+                        defaultPreferences[prefName] = defaultValue;
+                      } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
+                        // Fallback: use default_value from types data if available
+                        defaultPreferences[prefName] = prefType.default_value;
+                      }
+                    } catch (defaultError) {
+                      // Non-critical - continue loading other defaults
+                      window.Logger?.debug?.(`⚠️ Failed to load default for ${prefName}: ${defaultError?.message}`, {
+                        page: 'preferences-core-new',
+                      });
+                    }
+                  }
+                  
+                  if (Object.keys(defaultPreferences).length > 0) {
+                    allPreferences = defaultPreferences;
+                    window.Logger?.info?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
+                      page: 'preferences-core-new',
+                    });
+                  }
+                }
+              }
+            } catch (defaultLoadError) {
+              window.Logger?.warn?.('⚠️ Failed to load default preferences, continuing with empty preferences', {
+                page: 'preferences-core-new',
+                error: defaultLoadError?.message,
+              });
+            }
           }
 
           // Merge critical preferences

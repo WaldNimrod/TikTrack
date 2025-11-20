@@ -396,15 +396,31 @@
   }
 
   function normalizePreferenceEntries(rawPreferences) {
+    // DEBUG: Log input
+    window.Logger?.debug?.('🔍 DEBUG: normalizePreferenceEntries input', {
+      ...PAGE_LOG_CONTEXT,
+      inputType: Array.isArray(rawPreferences) ? 'array' : typeof rawPreferences,
+      inputLength: Array.isArray(rawPreferences) ? rawPreferences.length : 'N/A',
+      inputSample: Array.isArray(rawPreferences) && rawPreferences.length > 0 
+        ? rawPreferences.slice(0, 3) 
+        : rawPreferences,
+    });
+    
     if (Array.isArray(rawPreferences)) {
       const map = {};
-      rawPreferences.forEach((pref) => {
+      let skippedCount = 0;
+      rawPreferences.forEach((pref, index) => {
         const key =
           pref?.preference_name ||
           pref?.preferenceName ||
           pref?.name ||
           pref?.html_id;
         if (!key) {
+          skippedCount++;
+          window.Logger?.debug?.(`⚠️ Skipping preference entry ${index} - no key found`, {
+            ...PAGE_LOG_CONTEXT,
+            entry: pref,
+          });
           return;
         }
         const value =
@@ -415,13 +431,39 @@
           null;
         map[key] = value;
       });
+      
+      // DEBUG: Log output
+      window.Logger?.debug?.('🔍 DEBUG: normalizePreferenceEntries output (array)', {
+        ...PAGE_LOG_CONTEXT,
+        inputLength: rawPreferences.length,
+        outputKeys: Object.keys(map),
+        outputCount: Object.keys(map).length,
+        skippedCount,
+        sampleEntries: Object.fromEntries(Object.entries(map).slice(0, 5)),
+      });
+      
       return { map, metadata: rawPreferences };
     }
 
     if (rawPreferences && typeof rawPreferences === 'object') {
+      // DEBUG: Log output
+      window.Logger?.debug?.('🔍 DEBUG: normalizePreferenceEntries output (object)', {
+        ...PAGE_LOG_CONTEXT,
+        inputKeys: Object.keys(rawPreferences),
+        outputKeys: Object.keys(rawPreferences),
+        outputCount: Object.keys(rawPreferences).length,
+      });
+      
       return { map: rawPreferences, metadata: [] };
     }
 
+    // DEBUG: Log empty output
+    window.Logger?.warn?.('⚠️ DEBUG: normalizePreferenceEntries returning empty map', {
+      ...PAGE_LOG_CONTEXT,
+      inputType: typeof rawPreferences,
+      inputValue: rawPreferences,
+    });
+    
     return { map: {}, metadata: [] };
   }
 
@@ -753,7 +795,39 @@
         }
 
         const payload = await fetchJson('/api/preferences/user', { params });
+        
+        // DEBUG: Log raw API response
+        window.Logger?.info?.('🔍 DEBUG: Raw API response from /api/preferences/user', {
+          ...PAGE_LOG_CONTEXT,
+          userId,
+          profileId,
+          hasPayload: !!payload,
+          payloadKeys: payload ? Object.keys(payload) : [],
+          hasData: !!payload?.data,
+          dataKeys: payload?.data ? Object.keys(payload.data) : [],
+          preferencesType: Array.isArray(payload?.data?.preferences) ? 'array' : typeof payload?.data?.preferences,
+          preferencesLength: Array.isArray(payload?.data?.preferences) ? payload.data.preferences.length : 'N/A',
+          preferencesSample: Array.isArray(payload?.data?.preferences) && payload.data.preferences.length > 0 
+            ? payload.data.preferences.slice(0, 3) 
+            : payload?.data?.preferences,
+          fullPayload: payload, // Full payload for debugging
+        });
+        
         const normalized = normalizePreferencesPayload(payload, { userId, profileId });
+        
+        // DEBUG: Log normalized result
+        window.Logger?.info?.('🔍 DEBUG: Normalized preferences payload', {
+          ...PAGE_LOG_CONTEXT,
+          userId,
+          profileId,
+          hasPreferences: !!normalized?.preferences,
+          preferencesType: typeof normalized?.preferences,
+          preferencesKeys: normalized?.preferences ? Object.keys(normalized.preferences) : [],
+          preferencesCount: normalized?.preferences ? Object.keys(normalized.preferences).length : 0,
+          preferencesSample: normalized?.preferences ? Object.fromEntries(Object.entries(normalized.preferences).slice(0, 5)) : null,
+          hasProfileContext: !!normalized?.profileContext,
+          normalizedKeys: normalized ? Object.keys(normalized) : [],
+        });
 
         // Save to all cache layers for optimal performance
         // Save to localStorage (primary)
@@ -1120,9 +1194,25 @@
       }
     }
 
-    const payload = await fetchJson('/api/preferences/admin/types', {
-      credentials: 'same-origin',
-    });
+    // Use public endpoint first, fallback to admin endpoint if needed
+    let payload;
+    try {
+      payload = await fetchJson('/api/preferences/types', {
+        credentials: 'same-origin',
+      });
+    } catch (error) {
+      // Fallback to admin endpoint if public endpoint fails
+      if (error?.status === 404 || error?.status === 401) {
+        window.Logger?.debug?.('Public types endpoint not available, trying admin endpoint', {
+          ...PAGE_LOG_CONTEXT,
+        });
+        payload = await fetchJson('/api/preferences/admin/types', {
+          credentials: 'same-origin',
+        });
+      } else {
+        throw error;
+      }
+    }
     const normalized = normalizeTypesPayload(payload);
 
     await saveCache(cacheKey, normalized, { ttl });

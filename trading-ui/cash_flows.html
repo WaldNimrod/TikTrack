@@ -125,20 +125,22 @@
                             <button data-button-type="DELETE" data-variant="warning" data-size="small" data-onclick="deleteImportedCashFlows()" data-text="מחק רשומות מייבוא" title="מחק את כל רשומות תזרימי המזומנים שמקורן בייבוא (source='file_import')" data-tooltip="מחיקת כל הרשומות מייבוא - לבדיקות" data-tooltip-placement="top"></button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
                         </div>
-                        <div class="filter-buttons-container button-row" id="cashFlowTypeFilters">
-                            <button data-button-type="FILTER" data-variant="normal" data-size="small" data-text="הכל" data-onclick="filterCashFlowsByType('all')" data-flow-type="all" title="הצג כל התזרימים" data-tooltip="הצג כל התזרימים" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="הפקדות" data-onclick="filterCashFlowsByType('deposit')" data-flow-type="deposit" title="תראה רק תזרימי הפקדה" data-tooltip="הצג הפקדות בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="משיכות" data-onclick="filterCashFlowsByType('withdrawal')" data-flow-type="withdrawal" title="תראה רק משיכות" data-tooltip="הצג משיכות בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="העברות נכנסות" data-onclick="filterCashFlowsByType('transfer_in')" data-flow-type="transfer_in" title="סינון העברות שנכנסו לחשבון" data-tooltip="העברות נכנסות בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="העברות יוצאות" data-onclick="filterCashFlowsByType('transfer_out')" data-flow-type="transfer_out" title="סינון העברות שיצאו מהחשבון" data-tooltip="העברות יוצאות בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="דיבידנדים" data-onclick="filterCashFlowsByType('dividend')" data-flow-type="dividend" title="הצג תזרים מסוג דיבידנד בלבד" data-tooltip="דיבידנדים בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="ריבית" data-onclick="filterCashFlowsByType('interest')" data-flow-type="interest" title="הצג תזרימי ריבית רגילה" data-tooltip="ריבית בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="SYEP" data-onclick="filterCashFlowsByType('syep_interest')" data-flow-type="syep_interest" title="הצג ריבית SYEP בלבד" data-tooltip="זרמי SYEP בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="עמלות" data-onclick="filterCashFlowsByType('fee')" data-flow-type="fee" title="הצג עמלות בלבד" data-tooltip="עמלות בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="המרות מטבע" data-onclick="filterCashFlowsByType('exchange')" data-flow-type="exchange" title="הצג רק רשומות של המרות מטבע" data-tooltip="המרות מטבע בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <span class="filter-separator">|</span>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="אחר חיובי" data-onclick="filterCashFlowsByType('other_positive')" data-flow-type="other_positive" title="הצג רק תזרימי Other חיובי" data-tooltip="Other Positive בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-size="small" data-text="אחר שלילי" data-onclick="filterCashFlowsByType('other_negative')" data-flow-type="other_negative" title="הצג רק תזרימי Other שלילי" data-tooltip="Other Negative בלבד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                        <div class="filter-container d-flex align-items-center gap-2" id="cashFlowTypeFilters">
+                            <label for="cashFlowTypeFilter" class="form-label mb-0" style="font-size: 0.875rem;">סוג תזרים:</label>
+                            <select id="cashFlowTypeFilter" class="form-select form-select-sm" style="min-width: 200px;" data-filter-change="cashFlowType">
+                                <option value="all">הכל</option>
+                                <option value="deposit">הפקדות</option>
+                                <option value="withdrawal">משיכות</option>
+                                <option value="transfer_in">העברות נכנסות</option>
+                                <option value="transfer_out">העברות יוצאות</option>
+                                <option value="dividend">דיבידנדים</option>
+                                <option value="interest">ריבית</option>
+                                <option value="syep_interest">SYEP</option>
+                                <option value="fee">עמלות</option>
+                                <option value="exchange">המרות מטבע</option>
+                                <option value="other_positive">אחר חיובי</option>
+                                <option value="other_negative">אחר שלילי</option>
+                            </select>
                         </div>
                     </div>
 

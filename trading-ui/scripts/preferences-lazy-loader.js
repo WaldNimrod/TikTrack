@@ -354,6 +354,7 @@ class LazyLoader {
           cacheLayer,
           userId,
           profileId,
+          count: Object.keys(allPreferences).length,
         });
         
         // Dispatch cache miss event
@@ -367,6 +368,67 @@ class LazyLoader {
           },
         }));
       }
+      
+      // If no preferences loaded (neither from cache nor API), load default values
+      // This ensures the system always has default values to work with
+      if (Object.keys(allPreferences).length === 0) {
+        window.Logger?.info?.('⚠️ No user preferences found, loading default values from preference_types table', {
+          page: 'preferences-lazy-loader',
+          userId,
+          profileId,
+        });
+        
+        try {
+          // Try to load preference types metadata to get all preference names
+          if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceTypes === 'function') {
+            const typesData = await window.PreferencesData.loadPreferenceTypes({ force: false });
+            const types = typesData?.types || typesData?.data?.types || typesData || [];
+            
+            if (Array.isArray(types) && types.length > 0) {
+              // Load default value for each preference type
+              const defaultPreferences = {};
+              for (const prefType of types) {
+                const prefName = prefType?.preference_name || prefType?.name || prefType?.html_id;
+                if (!prefName) continue;
+                
+                try {
+                  // Try to get default value from PreferencesCore
+                  if (window.PreferencesCore && typeof window.PreferencesCore.getDefaultPreference === 'function') {
+                    const defaultValue = await window.PreferencesCore.getDefaultPreference(prefName);
+                    if (defaultValue !== null && defaultValue !== undefined) {
+                      defaultPreferences[prefName] = defaultValue;
+                    } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
+                      // Fallback: use default_value from types data if available
+                      defaultPreferences[prefName] = prefType.default_value;
+                    }
+                  } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
+                    // Fallback: use default_value from types data if PreferencesCore not available
+                    defaultPreferences[prefName] = prefType.default_value;
+                  }
+                } catch (defaultError) {
+                  // Non-critical - continue loading other defaults
+                  window.Logger?.debug?.(`⚠️ Failed to load default for ${prefName}: ${defaultError?.message}`, {
+                    page: 'preferences-lazy-loader',
+                  });
+                }
+              }
+              
+              if (Object.keys(defaultPreferences).length > 0) {
+                allPreferences = defaultPreferences;
+                cacheLayer = 'defaults';
+                window.Logger?.info?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
+                  page: 'preferences-lazy-loader',
+                });
+              }
+            }
+          }
+        } catch (defaultLoadError) {
+          window.Logger?.warn?.('⚠️ Failed to load default preferences, continuing with empty preferences', {
+            page: 'preferences-lazy-loader',
+            error: defaultLoadError?.message,
+          });
+        }
+      }
 
       // Mark critical preferences as loaded
       for (const prefName of criticalPrefs) {
@@ -378,6 +440,35 @@ class LazyLoader {
 
       // Calculate load time
       const loadTime = performance.now() - loadStartTime;
+
+      // CRITICAL: Update global preference stores so other systems can access them
+      // This is essential for systems that check window.currentPreferences before event listeners are set up
+      if (!window.currentPreferences) {
+        window.currentPreferences = {};
+      }
+      if (!window.userPreferences) {
+        window.userPreferences = {};
+      }
+      
+      // CRITICAL: Update global preference stores with CORRECT userId/profileId
+      // Merge loaded preferences into global stores (don't overwrite, merge to preserve any existing values)
+      Object.assign(window.currentPreferences, allPreferences);
+      Object.assign(window.userPreferences, allPreferences);
+      
+      // Update PreferencesCore state with CORRECT profile
+      if (window.PreferencesCore) {
+        window.PreferencesCore.currentUserId = userId;
+        window.PreferencesCore.currentProfileId = profileId;
+      }
+      
+      window.Logger?.info?.('✅ Updated window.currentPreferences with loaded preferences', {
+        page: 'preferences-lazy-loader',
+        preferencesCount: Object.keys(allPreferences).length,
+        currentPreferencesCount: Object.keys(window.currentPreferences).length,
+        userId,
+        profileId,
+        note: 'Preferences loaded and merged into global stores',
+      });
 
       // Set global flag to indicate preferences are loaded (for systems that check before listening)
       window.__preferencesCriticalLoaded = true;

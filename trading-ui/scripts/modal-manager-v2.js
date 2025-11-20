@@ -4736,6 +4736,10 @@ class ModalManagerV2 {
             
             for (const select of selects) {
                 const selectId = select.id;
+                // Skip empty IDs (might be dynamically created elements)
+                if (!selectId || selectId.trim() === '') {
+                    continue;
+                }
                 const result = findFieldConfig(selectId, config);
                 if (!result) {
                     console.warn(`⚠️ Field config not found for ${selectId}`);

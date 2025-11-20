@@ -360,6 +360,19 @@ class EventHandlerManager {
     handleDelegatedChange(event) {
         const target = event.target;
         
+        // Debug logging for filter changes
+        if (target.matches('[data-filter-change]')) {
+            const filterType = target.getAttribute('data-filter-change');
+            if (window.Logger) {
+                window.Logger.debug('🔔 [EventHandlerManager] Detected filter change', {
+                    filterType,
+                    elementId: target.id,
+                    value: target.value,
+                    hasDataFilterChange: target.hasAttribute('data-filter-change')
+                });
+            }
+        }
+        
         // Handle form field changes
         if (target.matches('[data-field-change]')) {
             const fieldName = target.getAttribute('data-field-change');
@@ -532,12 +545,26 @@ class EventHandlerManager {
     handleFilterChange(filterType, element, event) {
         // Trigger filter change handlers
         const eventName = `filterChange:${filterType}`;
+        if (window.Logger) {
+            window.Logger.info('🔔 [EventHandlerManager] handleFilterChange called', {
+                filterType,
+                eventName,
+                elementId: element.id,
+                value: element.value
+            });
+        }
         this.dispatchCustomEvent(eventName, {
             filterType,
             element,
             value: element.value,
             originalEvent: event
         });
+        if (window.Logger) {
+            window.Logger.debug('✅ [EventHandlerManager] Custom event dispatched', {
+                eventName,
+                page: 'event-handler-manager'
+            });
+        }
     }
 
     /**

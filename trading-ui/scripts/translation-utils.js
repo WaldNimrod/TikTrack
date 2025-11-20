@@ -216,7 +216,7 @@ function translateCashFlowType(type) {
     'interest': 'ריבית',
     'syep_interest': 'ריבית SYEP',
     'bonus': 'בונוס',
-    'tax': 'מס',
+    'tax': 'מיסים',
     'transfer_in': 'העברה מחשבון אחר',
     'transfer_out': 'העברה לחשבון אחר',
     'currency_exchange_from': 'המרת מט״ח - יציאה',

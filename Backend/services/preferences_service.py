@@ -339,6 +339,10 @@ class PreferencesService:
 
         with self._session_scope() as session:
             profile_id = profile_id or self._get_active_profile_id(session, user_id)
+            
+            # DEBUG: Log query parameters
+            logger.info(f"🔍 DEBUG: get_all_user_preferences - user_id={user_id}, profile_id={profile_id}")
+            
             stmt = (
                 select(PreferenceType, UserPreference.saved_value)
                 .outerjoin(
@@ -352,6 +356,17 @@ class PreferencesService:
                 .where(PreferenceType.is_active.is_(True))
             )
             rows = session.execute(stmt).all()
+            
+            # DEBUG: Log query results
+            logger.info(f"🔍 DEBUG: get_all_user_preferences - found {len(rows)} preference types (is_active=True)")
+            if len(rows) > 0:
+                logger.info(f"🔍 DEBUG: First 3 preference types: {[(pref.preference_name, saved if saved is not None else pref.default_value) for pref, saved in rows[:3]]}")
+            else:
+                # Check if there are any preference types at all (even inactive)
+                total_count = session.query(PreferenceType).count()
+                active_count = session.query(PreferenceType).filter(PreferenceType.is_active.is_(True)).count()
+                logger.warning(f"⚠️ DEBUG: No active preference types found! Total preference types: {total_count}, Active: {active_count}")
+            
             data = [
                 {
                     "preference_name": pref.preference_name,
@@ -361,6 +376,11 @@ class PreferencesService:
                 }
                 for pref, saved in rows
             ]
+            
+            # DEBUG: Log final data
+            logger.info(f"🔍 DEBUG: get_all_user_preferences - returning {len(data)} preferences")
+            if len(data) > 0:
+                logger.info(f"🔍 DEBUG: First 3 preferences in result: {data[:3]}")
         if use_cache and cache_key:
             self.cache[cache_key] = data
             self.cache_timestamps[cache_key] = time.time()

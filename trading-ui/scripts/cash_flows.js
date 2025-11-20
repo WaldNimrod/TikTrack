@@ -417,24 +417,49 @@ function setActiveCashFlowTypeButton(value) {
  * @returns {void}
  */
 function setupCashFlowTypeFilterDropdown() {
+  console.log('🔧 [setupCashFlowTypeFilterDropdown] Function called!');
   const select = document.getElementById('cashFlowTypeFilter');
+  console.log('🔍 [setupCashFlowTypeFilterDropdown] Select element:', {
+    exists: !!select,
+    id: select?.id,
+    value: select?.value
+  });
+  
   if (!select) {
+    console.error('❌ [setupCashFlowTypeFilterDropdown] cashFlowTypeFilter dropdown not found!');
     window.Logger?.warn('cashFlowTypeFilter dropdown not found', { page: 'cash_flows' });
     return;
   }
 
+  console.log('✅ [setupCashFlowTypeFilterDropdown] Select found, proceeding...');
+  window.Logger?.info('🔧 Setting up cash flow type filter dropdown', { 
+    selectExists: !!select,
+    hasDataFilterChange: select.hasAttribute('data-filter-change'),
+    page: 'cash_flows' 
+  });
+
   // Set initial value
   select.value = activeCashFlowTypeFilter || 'all';
 
-  // Remove existing listeners to prevent duplicates
-  const newSelect = select.cloneNode(true);
-  select.parentNode.replaceChild(newSelect, select);
-
-  // Add change event listener
-  newSelect.addEventListener('change', async function(e) {
-    const selectedType = this.value || 'all';
-    window.Logger?.info('🔔 Dropdown change event triggered', { 
-      selectedType, 
+  // Use EventHandlerManager delegation with data-filter-change
+  // (also set in HTML, but ensure it's set here too)
+  if (!select.hasAttribute('data-filter-change')) {
+    select.setAttribute('data-filter-change', 'cashFlowType');
+    window.Logger?.debug('Added data-filter-change attribute', { page: 'cash_flows' });
+  }
+  
+  // Verify EventHandlerManager is ready
+  if (!window.EventHandlerManager || !window.EventHandlerManager.initialized) {
+    window.Logger?.warn('EventHandlerManager not initialized, using direct listener only', { page: 'cash_flows' });
+  }
+  
+  // Listen for the custom event from EventHandlerManager
+  const filterChangeHandler = async function(e) {
+    const selectedType = e.detail?.value || e.detail?.element?.value || select.value || 'all';
+    window.Logger?.info('🔔 Filter change event received from EventHandlerManager', { 
+      selectedType,
+      eventDetail: e.detail,
+      hasDetail: !!e.detail,
       page: 'cash_flows' 
     });
     try {
@@ -442,11 +467,112 @@ function setupCashFlowTypeFilterDropdown() {
     } catch (error) {
       window.Logger?.error('Error in filterCashFlowsByType', error, { page: 'cash_flows' });
     }
+  };
+  
+  // Remove existing listener if any
+  document.removeEventListener('filterChange:cashFlowType', filterChangeHandler);
+  document.addEventListener('filterChange:cashFlowType', filterChangeHandler);
+  window.Logger?.debug('Registered filterChange:cashFlowType listener', { page: 'cash_flows' });
+  
+  // PRIMARY: Direct event listener - this MUST work!
+  const directChangeHandler = async function(e) {
+    console.log('🔔 [directChangeHandler] Change event fired!', {
+      value: this.value,
+      type: e.type,
+      target: e.target.id,
+      bubbles: e.bubbles,
+      cancelable: e.cancelable,
+      defaultPrevented: e.defaultPrevented
+    });
+    const selectedType = this.value || 'all';
+    window.Logger?.info('🔔 Dropdown change event triggered (direct)', { 
+      selectedType,
+      eventType: e.type,
+      bubbles: e.bubbles,
+      page: 'cash_flows' 
+    });
+    try {
+      await filterCashFlowsByType(selectedType);
+    } catch (error) {
+      window.Logger?.error('Error in filterCashFlowsByType', error, { page: 'cash_flows' });
+    }
+  };
+  
+  // Remove ALL existing listeners by cloning the element
+  const newSelect = select.cloneNode(true);
+  select.parentNode.replaceChild(newSelect, select);
+  const actualSelect = document.getElementById('cashFlowTypeFilter'); // Get the new element
+  
+  // Add listener to the NEW element
+  actualSelect.addEventListener('change', directChangeHandler, { capture: false, passive: false });
+  console.log('✅ [setupCashFlowTypeFilterDropdown] Direct change listener added to select element');
+  window.Logger?.debug('Registered direct change listener', { 
+    selectId: actualSelect.id,
+    hasListener: true,
+    page: 'cash_flows' 
   });
-
+  
+  // Test if event works
+  console.log('🧪 [setupCashFlowTypeFilterDropdown] Testing if select can fire events...');
+  const testEvent = new Event('change', { bubbles: true, cancelable: true });
+  actualSelect.dispatchEvent(testEvent);
+  console.log('✅ [setupCashFlowTypeFilterDropdown] Test event dispatched');
+  
+  // Store handlers for cleanup if needed
+  select._cashFlowFilterHandlers = {
+    filterChange: filterChangeHandler,
+    directChange: directChangeHandler
+  };
+  
   window.Logger?.info('✅ Cash flow type filter dropdown initialized', { 
     initialValue: activeCashFlowTypeFilter || 'all',
+    hasDataFilterChange: select.hasAttribute('data-filter-change'),
+    dataFilterChangeValue: select.getAttribute('data-filter-change'),
     page: 'cash_flows' 
+  });
+  
+  // Export test functions to window for debugging - ALWAYS export
+  window.testCashFlowFilter = async function(type = 'deposit') {
+    console.log('🧪 [testCashFlowFilter] Testing filter with type:', type);
+    window.Logger?.info('🧪 Testing filter with type:', { type, page: 'cash_flows' });
+    if (typeof window.filterCashFlowsByType === 'function') {
+      try {
+        await window.filterCashFlowsByType(type);
+        console.log('✅ [testCashFlowFilter] Filter test completed');
+        window.Logger?.info('✅ Filter test completed', { page: 'cash_flows' });
+      } catch (err) {
+        console.error('❌ [testCashFlowFilter] Filter test failed:', err);
+        window.Logger?.error('❌ Filter test failed', err, { page: 'cash_flows' });
+      }
+    } else {
+      console.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
+      window.Logger?.error('❌ filterCashFlowsByType function not found', { page: 'cash_flows' });
+    }
+  };
+  
+  window.testDirectChange = function() {
+    const select = document.getElementById('cashFlowTypeFilter');
+    if (!select) {
+      console.error('❌ [testDirectChange] Select element not found');
+      window.Logger?.error('❌ Select element not found', { page: 'cash_flows' });
+      return;
+    }
+    console.log('🧪 [testDirectChange] Testing direct change event...');
+    window.Logger?.info('🧪 Testing direct change event...', { page: 'cash_flows' });
+    const oldValue = select.value;
+    select.value = select.value === 'all' ? 'deposit' : 'all';
+    console.log('   Changed value from', oldValue, 'to', select.value);
+    window.Logger?.info('Changed value', { from: oldValue, to: select.value, page: 'cash_flows' });
+    
+    const event = new Event('change', { bubbles: true, cancelable: true });
+    select.dispatchEvent(event);
+    console.log('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
+    window.Logger?.info('✅ Direct change event dispatched', { newValue: select.value, page: 'cash_flows' });
+  };
+  
+  console.log('✅ [setupCashFlowTypeFilterDropdown] Test functions exported to window:', {
+    testCashFlowFilter: typeof window.testCashFlowFilter,
+    testDirectChange: typeof window.testDirectChange
   });
 }
 
@@ -2370,6 +2496,7 @@ function applyUserPreferences(preferences) {
  * @returns {Promise<void>}
  */
 async function initializeCashFlowsPage() {
+  console.log('🚀 [initializeCashFlowsPage] Starting initialization...');
   window.Logger.info('Initializing cash flows page', { page: 'cash_flows' });
 
   try {
@@ -2410,8 +2537,10 @@ async function initializeCashFlowsPage() {
     setupSourceFieldListeners();
 
     // הגדרת event listener לדרופדאון סוג תזרים
+    console.log('🔧 [initializeCashFlowsPage] Setting up cash flow type filter dropdown...');
     // Use setTimeout to ensure DOM is ready
     setTimeout(() => {
+      console.log('⏰ [initializeCashFlowsPage] setTimeout callback - calling setupCashFlowTypeFilterDropdown');
       setupCashFlowTypeFilterDropdown();
     }, 100);
 
@@ -3315,6 +3444,37 @@ window.reapplyCashFlowTypeFilter = reapplyCashFlowTypeFilter;
 window.deleteCashFlow = deleteCashFlow;
 window.deleteImportedCashFlows = deleteImportedCashFlows;
 window.performCashFlowDeletion = performCashFlowDeletion;
+
+// Export test functions to window for debugging (always available)
+window.testCashFlowFilter = async function(type = 'deposit') {
+  console.log('🧪 [testCashFlowFilter] Testing filter with type:', type);
+  if (typeof window.filterCashFlowsByType === 'function') {
+    try {
+      await window.filterCashFlowsByType(type);
+      console.log('✅ [testCashFlowFilter] Filter test completed');
+    } catch (err) {
+      console.error('❌ [testCashFlowFilter] Filter test failed:', err);
+    }
+  } else {
+    console.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
+  }
+};
+
+window.testDirectChange = function() {
+  const select = document.getElementById('cashFlowTypeFilter');
+  if (!select) {
+    console.error('❌ [testDirectChange] Select element not found');
+    return;
+  }
+  console.log('🧪 [testDirectChange] Testing direct change event...');
+  const oldValue = select.value;
+  select.value = select.value === 'all' ? 'deposit' : 'all';
+  console.log('   Changed value from', oldValue, 'to', select.value);
+  
+  const event = new Event('change', { bubbles: true, cancelable: true });
+  select.dispatchEvent(event);
+  console.log('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
+};
 // REMOVED: window exports for removed modal wrapper functions
 // Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
 // Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly

@@ -87,6 +87,8 @@
    - Validation של כל רשומה (ImportValidator)
    - יצירת רשומות רגילות (CashFlowHelperService.create_regular_cash_flow)
    - יצירת רשומות Forex (CashFlowHelperService.create_exchange)
+   - **Commit כל הרשומות** - commit יחיד אחרי יצירת כל הרשומות
+   - **שיוך תגיות אוטומטיות** - אחרי commit, שיוך תגיות לכל הרשומות (כולל exchanges)
 
 **נקודת סינון 2**: `execute_import`
 - Double-check filtering לפני ייבוא
@@ -124,10 +126,29 @@
 2. **ImportValidator**: Validation לפני יצירה (type, amount, fee_amount, currency)
 3. **3 נקודות סינון**: `_build_preview_payload`, `execute_import`, `_execute_import_cashflows`
 
+## תגיות אוטומטיות
+
+**תהליך שיוך תגיות:**
+1. כל רשומה נוצרת ב-`_execute_import_cashflows`
+2. רשומות נאספות ל-`cashflows_for_tagging` עם `section_name`
+3. אחרי יצירת כל הרשומות (כולל exchanges), מתבצע **commit יחיד**
+4. אחרי ה-commit, מתבצעת שיוך תגיות:
+   - `_get_section_tag()` - מחפש תגית לפי שם סקציה
+   - `_assign_tag_to_cashflow()` - משייך תגית דרך `TagService.replace_tags_for_entity`
+5. גם רשומות Forex Exchange מקבלות תגיות (לשתי הרשומות FROM/TO)
+
+**⚠️ חשוב:**
+- שיוך תגיות מתבצע **אחרי** commit, לא לפני
+- `TagService.replace_tags_for_entity` מבצע commit משלו, לכן חייבים להפריד
+- התגיות נוצרות מראש (לא במהלך הייבוא) - ראה `Backend/scripts/create_import_tags.py`
+
 ## קישורים רלוונטיים
 
 - `Backend/services/user_data_import/import_orchestrator.py` - תהליך הייבוא
 - `Backend/connectors/user_data_import/ibkr_connector.py` - פרסור קובץ IBKR
 - `Backend/services/user_data_import/import_validator.py` - Validation לפני ייבוא
-- `trading-ui/scripts/import-user-data.js` - Frontend import modal
+- `Backend/services/tag_service.py` - ניהול תגיות (מערכת כללית)
+- `Backend/scripts/create_import_tags.py` - יצירת תגיות ייבוא מראש
+- `trading-ui/scripts/import-user-data.js` - Frontend import modal (9000+ שורות)
+- `trading-ui/scripts/services/data-import-data.js` - API calls ו-cache management
 

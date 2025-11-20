@@ -8,7 +8,11 @@
       this.currentUserId = null;
       this.currentProfileId = null;
       this.initialized = false;
-      this.requiredGroups = ['ui', 'trading', 'colors'];
+      // Updated to match actual group names in database:
+      // - ui_settings (not 'ui')
+      // - trading_settings (not 'trading')
+      // - colors_unified (not 'colors')
+      this.requiredGroups = ['ui_settings', 'trading_settings', 'colors_unified'];
     }
 
     async initialize() {
@@ -26,25 +30,50 @@
       }
 
       this.initialized = true;
+      
+      // Step 1: Initialize lazy loading FIRST (like other pages)
+      // This ensures preferences are loaded to window.currentPreferences before UI initialization
+      const userId = window.PreferencesCore?.currentUserId ?? 1;
+      const profileId = window.PreferencesCore?.currentProfileId ?? null;
+      
+      if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+        window.Logger?.info?.('🚀 Initializing preferences with lazy loading (step 1)...', {
+          page: 'preferences-ui-v4',
+          userId,
+          profileId,
+        });
+        try {
+          await window.PreferencesCore.initializeWithLazyLoading(userId, profileId);
+          window.Logger?.info?.('✅ Lazy loading initialized, preferences should be in window.currentPreferences', {
+            page: 'preferences-ui-v4',
+            preferencesCount: Object.keys(window.currentPreferences || {}).length,
+          });
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Lazy loading initialization failed, continuing with direct loading', {
+            page: 'preferences-ui-v4',
+            error: error?.message,
+          });
+        }
+      }
+      
+      // Step 2: Bootstrap to get profile context
       let profileContext = null;
       try {
-        // Get userId from PreferencesCore or default to 1
-        const userId = window.PreferencesCore?.currentUserId ?? 1;
         const bootstrapResult = await window.PreferencesV4.bootstrap(this.requiredGroups, null, userId);
         profileContext = bootstrapResult?.profileContext ?? null;
-        this.currentUserId = profileContext?.user_id ?? profileContext?.user?.id ?? null;
-        this.currentProfileId = profileContext?.resolved_profile_id ?? profileContext?.resolved_profile?.id ?? null;
+        this.currentUserId = profileContext?.user_id ?? profileContext?.user?.id ?? userId;
+        this.currentProfileId = profileContext?.resolved_profile_id ?? profileContext?.resolved_profile?.id ?? profileId;
       } catch (error) {
         window.Logger?.warn?.('PreferencesV4 bootstrap failed, continuing without profile context', {
           page: 'preferences-ui-v4',
           error: error?.message,
         });
-        this.currentUserId = null;
-        this.currentProfileId = null;
+        this.currentUserId = userId;
+        this.currentProfileId = profileId;
         profileContext = null;
       }
 
-      // Only render if we have profile context
+      // Step 3: Render user/profile info
       if (profileContext) {
         this._renderUser(profileContext);
         this._renderProfile(profileContext);
@@ -54,9 +83,113 @@
         });
       }
 
-      // Load required groups (served from cache if 304)
-      const userId = this.currentUserId ?? window.PreferencesCore?.currentUserId ?? 1;
-      await Promise.all(this.requiredGroups.map(g => window.PreferencesV4.getGroup(g, null, userId)));
+      // Step 4: Load required groups (for UI display)
+      const finalUserId = this.currentUserId ?? userId;
+      const finalProfileId = this.currentProfileId ?? profileId;
+      
+      window.Logger?.info?.('📦 Loading preference groups for UI...', {
+        page: 'preferences-ui-v4',
+        groups: this.requiredGroups,
+        userId: finalUserId,
+        profileId: finalProfileId,
+      });
+      
+      await Promise.all(this.requiredGroups.map(g => window.PreferencesV4.getGroup(g, finalProfileId, finalUserId)));
+
+      // Step 5: Ensure ALL preferences are loaded to window.currentPreferences with CORRECT profile
+      // This is a fallback in case lazy loading didn't populate it, or to refresh with latest data
+      // CRITICAL: Use finalUserId and finalProfileId (from bootstrap) not initial userId/profileId
+      if (window.PreferencesCore && typeof window.PreferencesCore.getAllPreferences === 'function') {
+        try {
+          window.Logger?.info?.('📥 Loading all preferences to window.currentPreferences...', {
+            page: 'preferences-ui-v4',
+            userId: finalUserId,
+            profileId: finalProfileId,
+            note: 'Using profile from bootstrap, not initial values',
+          });
+          const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
+          
+          // PreferencesCore.getAllPreferences() returns the preferences object directly
+          // (it's not wrapped in { preferences: {...} })
+          const preferencesMap = allPreferences && typeof allPreferences === 'object' ? allPreferences : {};
+          
+          // Update global preferences stores with CORRECT userId/profileId
+          // CRITICAL: Initialize globals if they don't exist, then merge (don't overwrite)
+          if (!window.currentPreferences) {
+            window.currentPreferences = {};
+          }
+          if (!window.userPreferences) {
+            window.userPreferences = {};
+          }
+          
+          if (window.PreferencesUI && typeof window.PreferencesUI.updateGlobalPreferences === 'function') {
+            window.PreferencesUI.updateGlobalPreferences(preferencesMap, finalUserId, finalProfileId, profileContext);
+          } else {
+            // Fallback: update globals directly with CORRECT profile
+            // Use Object.assign to merge, not overwrite (preserves any existing values)
+            Object.assign(window.currentPreferences, preferencesMap);
+            Object.assign(window.userPreferences, preferencesMap);
+            if (window.PreferencesCore) {
+              window.PreferencesCore.currentUserId = finalUserId;
+              window.PreferencesCore.currentProfileId = finalProfileId;
+              if (profileContext) {
+                window.PreferencesCore.latestProfileContext = profileContext;
+              }
+            }
+          }
+          
+          // Always dispatch preferences:critical-loaded event (even if empty) for other systems
+          // This allows color-scheme-system, header-system, etc. to continue initialization
+          const preferencesCount = Object.keys(preferencesMap).length;
+          window.__preferencesCriticalLoaded = true;
+          window.__preferencesCriticalLoadedDetail = {
+            preferences: preferencesMap,
+            fromCache: false,
+            cacheLayer: 'api',
+            userId,
+            profileId,
+            loadTime: '0ms',
+            environment: window.API_ENV || 'development',
+            criticalCount: preferencesCount,
+            totalCritical: preferencesCount,
+            timestamp: Date.now(),
+          };
+          
+          window.dispatchEvent(new CustomEvent('preferences:critical-loaded', {
+            detail: window.__preferencesCriticalLoadedDetail,
+          }));
+          
+          if (preferencesCount > 0) {
+            window.Logger?.info?.('✅ Dispatched preferences:critical-loaded event', {
+              page: 'preferences-ui-v4',
+              count: preferencesCount,
+            });
+          } else {
+            window.Logger?.warn?.('⚠️ Dispatched preferences:critical-loaded event with empty preferences', {
+              page: 'preferences-ui-v4',
+              userId,
+              profileId,
+              note: 'This may indicate no preferences exist in database or API issue',
+            });
+          }
+          
+          window.Logger?.info?.('✅ Loaded all preferences to window.currentPreferences', {
+            page: 'preferences-ui-v4',
+            count: preferencesCount,
+            isEmpty: preferencesCount === 0,
+          });
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Failed to load all preferences, continuing with groups only', {
+            page: 'preferences-ui-v4',
+            error: error?.message,
+            errorStack: error?.stack,
+          });
+        }
+      } else {
+        window.Logger?.warn?.('⚠️ PreferencesCore.getAllPreferences not available', {
+          page: 'preferences-ui-v4',
+        });
+      }
 
       // Load profiles to dropdown (only if profileSelect element exists - preferences page only)
       const profileSelect = document.getElementById('profileSelect');
@@ -170,11 +303,12 @@
     }
 
     _applyUiGroup() {
-      const ui = window.PreferencesV4.groupCache.get('ui') || {};
-      const pageSize = ui['ui.page_size'] ?? 25;
+      // Updated to use correct group name: ui_settings (not 'ui')
+      const ui = window.PreferencesV4.groupCache.get('ui_settings') || {};
+      const pageSize = ui['tablePageSize'] ?? ui['ui.page_size'] ?? 25;
       const pageSizeEl = document.querySelector('[data-pref-ui-page-size]');
       if (pageSizeEl) pageSizeEl.value = pageSize;
-      const theme = ui['ui.theme'] ?? 'light';
+      const theme = ui['theme'] ?? ui['ui.theme'] ?? 'light';
       document.documentElement.dataset.theme = theme;
     }
 

@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.1.12.0",
+    "version": "1.1.13.0",
     "major": 1,
     "minor": 1,
-    "patch": 12,
+    "patch": 13,
     "build": 0,
-    "commit": "17dffed56f84f385a90a75686575804c162dc75f",
-    "updated_at": "2025-11-20T11:27:19+00:00",
-    "notes": "Fix cash flow type filter: restore buttons, add dropdown, fix pagination render callback"
+    "commit": "bc6dff2069ef4449c1b9e5a65564a88f5d29d546",
+    "updated_at": "2025-11-20T11:31:33+00:00",
+    "notes": "Remove cash flow filter buttons, keep only dropdown - full project sync"
   },
   "development": {
     "version": "1.1.35.0",

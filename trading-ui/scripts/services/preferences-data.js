@@ -796,8 +796,7 @@
 
         const payload = await fetchJson('/api/preferences/user', { params });
         
-        // DEBUG: Log raw API response
-        window.Logger?.info?.('🔍 DEBUG: Raw API response from /api/preferences/user', {
+        window.Logger?.debug?.('🔍 Raw API response from /api/preferences/user', {
           ...PAGE_LOG_CONTEXT,
           userId,
           profileId,
@@ -815,8 +814,7 @@
         
         const normalized = normalizePreferencesPayload(payload, { userId, profileId });
         
-        // DEBUG: Log normalized result
-        window.Logger?.info?.('🔍 DEBUG: Normalized preferences payload', {
+        window.Logger?.debug?.('🔍 Normalized preferences payload', {
           ...PAGE_LOG_CONTEXT,
           userId,
           profileId,

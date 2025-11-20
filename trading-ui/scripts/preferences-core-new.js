@@ -190,7 +190,7 @@ class PreferencesAPIClient {
       return null;
     }
     
-    window.Logger?.info?.('🔍 DEBUG: PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
+    window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
       page: 'preferences-core-new',
       userId: userId || this.defaultUserId,
       profileId,
@@ -202,26 +202,15 @@ class PreferencesAPIClient {
       force: true,
     });
 
-    // DEBUG: Log payload
-    window.Logger?.info?.('🔍 DEBUG: PreferencesAPIClient.getAllPreferences received payload', {
+    window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences received payload', {
       page: 'preferences-core-new',
       userId: userId || this.defaultUserId,
       profileId,
-      hasPayload: !!payload,
-      payloadKeys: payload ? Object.keys(payload) : [],
-      hasPreferences: !!payload?.preferences,
-      preferencesType: typeof payload?.preferences,
-      preferencesIsArray: Array.isArray(payload?.preferences),
       preferencesCount: payload?.preferences 
         ? (Array.isArray(payload.preferences) 
             ? payload.preferences.length 
             : Object.keys(payload.preferences).length)
         : 0,
-      preferencesSample: payload?.preferences
-        ? (Array.isArray(payload.preferences)
-            ? payload.preferences.slice(0, 3)
-            : Object.fromEntries(Object.entries(payload.preferences).slice(0, 5)))
-        : null,
     });
 
     const result = {
@@ -231,11 +220,8 @@ class PreferencesAPIClient {
       resolvedProfileId: payload.resolvedProfileId ?? null,
     };
     
-    // DEBUG: Log result
-    window.Logger?.info?.('🔍 DEBUG: PreferencesAPIClient.getAllPreferences returning result', {
+    window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences returning result', {
       page: 'preferences-core-new',
-      hasPreferences: !!result.preferences,
-      preferencesType: typeof result.preferences,
       preferencesCount: Object.keys(result.preferences || {}).length,
       preferencesSample: Object.fromEntries(Object.entries(result.preferences || {}).slice(0, 5)),
     });
@@ -637,7 +623,7 @@ class PreferencesCore {
           }
 
           // Load all preferences
-          window.Logger?.info?.('🔍 DEBUG: Calling apiClient.getAllPreferences', {
+          window.Logger?.debug?.('🔍 Calling apiClient.getAllPreferences', {
             page: 'preferences-core-new',
             userId: finalUserId,
             profileId: finalProfileId,
@@ -648,37 +634,20 @@ class PreferencesCore {
             finalProfileId,
           );
           
-          // DEBUG: Log API result
-          window.Logger?.info?.('🔍 DEBUG: apiClient.getAllPreferences result', {
+          window.Logger?.debug?.('🔍 apiClient.getAllPreferences result', {
             page: 'preferences-core-new',
             userId: finalUserId,
             profileId: finalProfileId,
-            hasApiResult: !!apiResult,
-            apiResultKeys: apiResult ? Object.keys(apiResult) : [],
-            hasPreferences: !!apiResult?.preferences,
-            preferencesType: typeof apiResult?.preferences,
-            preferencesIsArray: Array.isArray(apiResult?.preferences),
-            preferencesLength: Array.isArray(apiResult?.preferences) ? apiResult.preferences.length : Object.keys(apiResult?.preferences || {}).length,
-            preferencesSample: apiResult?.preferences 
-              ? (Array.isArray(apiResult.preferences) 
-                  ? apiResult.preferences.slice(0, 3) 
-                  : Object.fromEntries(Object.entries(apiResult.preferences).slice(0, 5)))
-              : null,
-            fullApiResult: apiResult, // Full result for debugging
+            preferencesCount: Array.isArray(apiResult?.preferences) ? apiResult.preferences.length : Object.keys(apiResult?.preferences || {}).length,
           });
           
           let allPreferences = apiResult.preferences || {};
           
-          // DEBUG: Log extracted preferences
-          window.Logger?.info?.('🔍 DEBUG: Extracted preferences from API result', {
+          window.Logger?.debug?.('🔍 Extracted preferences from API result', {
             page: 'preferences-core-new',
             userId: finalUserId,
             profileId: finalProfileId,
-            allPreferencesType: typeof allPreferences,
-            allPreferencesIsArray: Array.isArray(allPreferences),
-            allPreferencesKeys: Object.keys(allPreferences),
             allPreferencesCount: Object.keys(allPreferences).length,
-            allPreferencesSample: Object.fromEntries(Object.entries(allPreferences).slice(0, 5)),
           });
           const profileContext = apiResult.profileContext || null;
           const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined

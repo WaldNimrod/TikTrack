@@ -2078,26 +2078,26 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
 
       // Then try TableDataRegistry
       if (window.TableDataRegistry && (!Array.isArray(dataToUse) || dataToUse.length === 0)) {
-        const summary = window.TableDataRegistry.getSummary(pageName);
-        if (summary) {
-          const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
+      const summary = window.TableDataRegistry.getSummary(pageName);
+      if (summary) {
+        const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
           if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+          dataToUse = registryFiltered;
+        }
+      } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
+        const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
+        if (resolvedType) {
+          const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
+            if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
             dataToUse = registryFiltered;
           }
-        } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
-          const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
-          if (resolvedType) {
-            const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
-            if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
-              dataToUse = registryFiltered;
-            }
-          }
         }
+      }
 
         if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
-          const registryFull = window.TableDataRegistry.getFullData(pageName);
+        const registryFull = window.TableDataRegistry.getFullData(pageName);
           if (Array.isArray(registryFull) && registryFull.length > 0) {
-            dataToUse = registryFull;
+          dataToUse = registryFull;
           }
         }
       }

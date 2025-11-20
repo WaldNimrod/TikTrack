@@ -229,6 +229,21 @@
       // Populate known UI elements
       this._applyUiGroup();
       this._populatePreferencesTable();
+      
+      // CRITICAL: Populate all form fields with loaded preferences
+      await this._populateAllFormFields();
+      
+      // CRITICAL: Update summary info automatically after page load
+      if (typeof window.updatePreferencesSummary === 'function') {
+        window.Logger?.info?.('📊 Updating preferences summary after initialization...', { 
+          page: 'preferences-ui-v4' 
+        });
+        await window.updatePreferencesSummary();
+      } else {
+        window.Logger?.warn?.('⚠️ updatePreferencesSummary function not available', { 
+          page: 'preferences-ui-v4' 
+        });
+      }
 
       // Bind events
       window.addEventListener('preferences:updated', (e) => {
@@ -236,6 +251,11 @@
         if (scope === 'group') {
           this._applyUiGroup();
           this._populatePreferencesTable();
+          this._populateAllFormFields();
+          // Also update summary when preferences are updated
+          if (typeof window.updatePreferencesSummary === 'function') {
+            window.updatePreferencesSummary();
+          }
         }
       });
 
@@ -327,6 +347,176 @@
       tbody.innerHTML = rows.map(r => (
         `<tr><td>${r.group}</td><td>${r.name}</td><td>${String(r.value)}</td></tr>`
       )).join('');
+    }
+
+    /**
+     * Populate all form fields with loaded preferences
+     * This fills all inputs, selects, checkboxes, and color pickers with values from window.currentPreferences
+     */
+    async _populateAllFormFields() {
+      window.Logger?.info?.('📋 Populating all form fields with preferences...', { 
+        page: 'preferences-ui-v4',
+        preferencesCount: Object.keys(window.currentPreferences || {}).length 
+      });
+      
+      if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
+        window.Logger?.warn?.('⚠️ No preferences available to populate forms', { page: 'preferences-ui-v4' });
+        return;
+      }
+
+      const form = document.getElementById('preferencesForm');
+      if (!form) {
+        window.Logger?.warn?.('⚠️ preferencesForm not found', { page: 'preferences-ui-v4' });
+        return;
+      }
+
+      let populatedCount = 0;
+      let skippedCount = 0;
+      const skippedKeys = [];
+
+      // Get all form fields
+      const allInputs = form.querySelectorAll('input, select, textarea');
+      
+      allInputs.forEach(input => {
+        const key = input.id || input.name;
+        if (!key) return;
+
+        const value = window.currentPreferences[key];
+        
+        // Skip if no value found
+        if (value === undefined || value === null) {
+          skippedCount++;
+          if (skippedKeys.length < 20) { // Limit logging
+            skippedKeys.push(key);
+          }
+          return;
+        }
+
+        try {
+          if (input.type === 'checkbox') {
+            // Handle boolean values
+            const boolValue = value === true || value === 'true' || value === '1' || value === 1;
+            input.checked = boolValue;
+            populatedCount++;
+          } else if (input.type === 'radio') {
+            // Find radio with matching value
+            const radioGroup = form.querySelectorAll(`[name="${input.name}"][value="${value}"]`);
+            if (radioGroup.length > 0) {
+              radioGroup[0].checked = true;
+              populatedCount++;
+            }
+          } else if (input.type === 'color') {
+            // Handle color inputs - convert to #rrggbb format
+            let colorValue = String(value).trim();
+            if (colorValue.startsWith('#')) {
+              // If 8-digit hex (with alpha), strip alpha (e.g., #00000020 -> #000000)
+              if (colorValue.length === 9 && /^#[0-9A-Fa-f]{8}$/i.test(colorValue)) {
+                colorValue = colorValue.substring(0, 7);
+              }
+              // Ensure valid 6-digit hex
+              if (colorValue.length === 7 && /^#[0-9A-Fa-f]{6}$/i.test(colorValue)) {
+                input.value = colorValue;
+                populatedCount++;
+              } else {
+                // Invalid format - use default black
+                input.value = '#000000';
+                window.Logger?.debug?.('⚠️ Invalid color format, using default', { 
+                  page: 'preferences-ui-v4',
+                  key,
+                  originalValue: value,
+                  processedValue: colorValue
+                });
+                populatedCount++;
+              }
+            } else {
+              // Try to convert other formats or use default
+              input.value = colorValue || '#000000';
+              populatedCount++;
+            }
+          } else if (input.type === 'number') {
+            // Handle number inputs
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+              input.value = numValue;
+              populatedCount++;
+            }
+          } else if (input.tagName === 'SELECT') {
+            // Handle select dropdowns
+            // Try exact match first
+            if (input.querySelector(`option[value="${value}"]`)) {
+              input.value = value;
+              populatedCount++;
+            } else {
+              // Try case-insensitive match
+              const options = Array.from(input.options);
+              const matchingOption = options.find(opt => 
+                String(opt.value).toLowerCase() === String(value).toLowerCase()
+              );
+              if (matchingOption) {
+                input.value = matchingOption.value;
+                populatedCount++;
+              } else {
+                window.Logger?.debug?.('⚠️ Option not found in select', { 
+                  page: 'preferences-ui-v4',
+                  key,
+                  value,
+                  availableOptions: options.map(o => o.value).slice(0, 5)
+                });
+              }
+            }
+          } else {
+            // Handle text inputs
+            input.value = String(value);
+            populatedCount++;
+          }
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Error populating field', { 
+            page: 'preferences-ui-v4',
+            key,
+            error: error?.message 
+          });
+        }
+      });
+
+      window.Logger?.info?.('✅ Form fields populated', { 
+        page: 'preferences-ui-v4',
+        populatedCount,
+        skippedCount,
+        totalFields: allInputs.length,
+        skippedKeysSample: skippedKeys.slice(0, 10)
+      });
+
+      // Also use PreferencesGroupManager if available (for better field matching)
+      if (window.PreferencesGroupManager && typeof window.PreferencesGroupManager.populateGroupFields === 'function') {
+        window.Logger?.info?.('📋 Using PreferencesGroupManager for enhanced field population...', { 
+          page: 'preferences-ui-v4' 
+        });
+        
+        // Map of section IDs to group names
+        const sectionToGroupMap = {
+          'section2': 'basic_settings',
+          'section3': 'trading_settings',
+          'section4': 'filter_settings',
+          'section5': 'notification_settings',
+          'section6': 'colors_unified',
+          'section7': 'chart_settings_unified',
+          'section8': 'ui_settings',
+        };
+
+        for (const [sectionId, groupName] of Object.entries(sectionToGroupMap)) {
+          const groupValues = window.PreferencesV4.groupCache.get(groupName);
+          if (groupValues) {
+            const result = window.PreferencesGroupManager.populateGroupFields(sectionId, groupValues);
+            window.Logger?.debug?.('Populated group fields', { 
+              page: 'preferences-ui-v4',
+              sectionId,
+              groupName,
+              populatedCount: result.populatedCount,
+              unresolvedCount: result.unresolvedKeys?.length || 0
+            });
+          }
+        }
+      }
     }
   }
 

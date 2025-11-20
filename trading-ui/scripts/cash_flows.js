@@ -430,26 +430,8 @@ function setActiveCashFlowTypeButton(value) {
     select.value = normalizedValue;
   }
   
-  // Update buttons - remove active class from all, add to selected
-  const buttons = document.querySelectorAll('#cashFlowTypeFilters button[data-flow-type]');
-  console.log('🔘 [setActiveCashFlowTypeButton] Updating buttons', {
-    normalizedValue,
-    buttonsCount: buttons.length
-  });
-  buttons.forEach(btn => {
-    const btnType = btn.getAttribute('data-flow-type');
-    if (btnType === normalizedValue) {
-      btn.classList.add('active');
-      console.log('✅ [setActiveCashFlowTypeButton] Button activated:', btnType, btn);
-    } else {
-      btn.classList.remove('active');
-    }
-  });
-  
-  // Also check if buttons were found
-  if (buttons.length === 0) {
-    console.warn('⚠️ [setActiveCashFlowTypeButton] No buttons found with data-flow-type attribute');
-  }
+  // Buttons removed - only dropdown remains
+  // No need to update buttons anymore
 }
 
 /**
@@ -609,13 +591,7 @@ async function filterCashFlowsByType(flowType, options = {}) {
           filterTypeName = selectedOption.text;
         }
       }
-      // Fallback: try to get from button
-      if (!filterTypeName) {
-        const activeButton = document.querySelector(`#cashFlowTypeFilters button[data-flow-type="${normalizedType}"]`);
-        if (activeButton) {
-          filterTypeName = activeButton.textContent.trim();
-        }
-      }
+      // Buttons removed - only dropdown remains
       // Fallback: use the type value itself
       if (!filterTypeName) {
         filterTypeName = normalizedType;
@@ -1283,13 +1259,7 @@ async function renderCashFlowsTable() {
           filterTypeName = selectedOption.text;
         }
       }
-      // Fallback: try to get from button
-      if (!filterTypeName) {
-        const activeButton = document.querySelector(`#cashFlowTypeFilters button[data-flow-type="${activeCashFlowTypeFilter}"]`);
-        if (activeButton) {
-          filterTypeName = activeButton.textContent.trim();
-        }
-      }
+      // Buttons removed - only dropdown remains
       // Fallback: use the type value itself
       if (!filterTypeName) {
         filterTypeName = activeCashFlowTypeFilter;

@@ -237,7 +237,7 @@ class LazyLoader {
      * @param {number} profileId - Profile ID (0 for default profile)
      */
   async initialize(userId = 1, profileId = 0) {
-    window.Logger.info(`🚀 LAZY LOADER DEBUG: initialize(userId=${userId}, profileId=${profileId})`, { page: 'preferences-lazy-loader' });
+    window.Logger.debug(`🚀 LazyLoader.initialize(userId=${userId}, profileId=${profileId})`, { page: 'preferences-lazy-loader' });
 
     // Check if PreferencesCore is available
     if (!window.PreferencesCore) {
@@ -247,7 +247,7 @@ class LazyLoader {
 
     // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : 0;
-    window.Logger.info(`🔍 LAZY LOADER DEBUG: Using finalProfileId=${finalProfileId}`, { page: 'preferences-lazy-loader' });
+    window.Logger.debug(`🔍 LazyLoader using finalProfileId=${finalProfileId}`, { page: 'preferences-lazy-loader' });
 
     // Debounce duplicate initialize for same (user,profile) key
     const initKey = `${userId}:${finalProfileId}`;
@@ -257,7 +257,7 @@ class LazyLoader {
     }
 
     if (this.currentProfileId !== undefined && this.currentProfileId !== null && this.currentProfileId !== finalProfileId) {
-      window.Logger.info(`🔄 LAZY LOADER DEBUG: Profile changed from ${this.currentProfileId} to ${finalProfileId} - clearing internal state`, { page: 'preferences-lazy-loader' });
+      window.Logger.debug(`🔄 LazyLoader profile changed from ${this.currentProfileId} to ${finalProfileId} - clearing internal state`, { page: 'preferences-lazy-loader' });
       this.loadedPreferences.clear();
       this.loadingPromises.clear();
     }

@@ -1014,12 +1014,9 @@ class PreferencesUI {
         }
       }
 
-      // 🔍 Cache & Profile Debug Logging
-      window.Logger.info(`🔍 CACHE DEBUG: Loading preferences for user ${finalUserId}, profile ${resolvedProfileId}`, { page: 'preferences-ui' });
-
       // Initialize lazy loading if available
       if (window.LazyLoader) {
-        window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling LazyLoader.initialize(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: 'preferences-ui' });
+        window.Logger.debug(`🔍 Calling LazyLoader.initialize(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: 'preferences-ui' });
 
         await window.LazyLoader.initialize(
           finalUserId,
@@ -1028,10 +1025,10 @@ class PreferencesUI {
 
         // Get loading stats
         const stats = window.LazyLoader.getLoadingStats();
-        window.Logger.info(`🔍 CACHE DEBUG: Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%, { page: "preferences-ui" })`);
+        window.Logger.debug(`🔍 Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`, { page: 'preferences-ui' });
 
         // Load ALL preferences at once from API
-        window.Logger.info(`🔍 PREFERENCES UI DEBUG: Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: 'preferences-ui' });
+        window.Logger.debug(`🔍 Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: 'preferences-ui' });
 
         const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, resolvedProfileId);
         window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: 'preferences-ui' }).length} preferences from API`);
@@ -2019,7 +2016,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
         }
         : profiles.find(p => p.active);
 
-      window.Logger.info('🔍 PROFILE DEBUG: Found active profile:', activeProfile, { page: 'preferences-ui' });
+      window.Logger.debug('🔍 Found active profile:', activeProfile, { page: 'preferences-ui' });
 
       if (activeProfile) {
         // Update PreferencesUI currentProfileId
@@ -2033,7 +2030,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
         if (activeOption) {
           activeOption.selected = true;
           profileSelect.value = activeOption.value;
-          window.Logger.info(`🔍 UI DEBUG: Selected active profile in dropdown: ${activeProfile.name}`, { page: 'preferences-ui' });
+          window.Logger.debug(`🔍 Selected active profile in dropdown: ${activeProfile.name}`, { page: 'preferences-ui' });
         } else {
           window.Logger.warn(`⚠️ Active profile option not found in dropdown: ${activeProfile.name}`, { page: 'preferences-ui' });
         }
@@ -2043,7 +2040,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
         if (defaultOption) {
           defaultOption.selected = true;
           profileSelect.value = defaultOption.value;
-          window.Logger.info('🔍 UI DEBUG: No active profile found, selected default', { page: 'preferences-ui' });
+          window.Logger.debug('🔍 No active profile found, selected default', { page: 'preferences-ui' });
         }
       }
 
@@ -2097,7 +2094,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
             activeUserIdDisplay.textContent = idText;
           }
         }
-        window.Logger.info(`🔍 UI DEBUG: Updated active profile card to: ${activeProfile.name}`, {
+        window.Logger.debug(`🔍 Updated active profile card to: ${activeProfile.name}`, {
           page: 'preferences-ui',
           profileId: activeProfile.id,
         });
@@ -2133,7 +2130,7 @@ window.loadProfilesToDropdown = async function(userId = null) {
           window.PreferencesUI.updateActiveUserDisplay(profileContext?.user || null);
           window.PreferencesUI.updateActiveProfileDisplay(null);
         }
-        window.Logger.info('🔍 UI DEBUG: Updated active profile card to: ברירת מחדל (no active profile)', { page: 'preferences-ui' });
+        window.Logger.debug('🔍 Updated active profile card to: ברירת מחדל (no active profile)', { page: 'preferences-ui' });
 
         // Default profile is active - disable all preferences
         window.Logger.info('🔒 Default profile active - disabling all preferences interface', { page: 'preferences-ui' });

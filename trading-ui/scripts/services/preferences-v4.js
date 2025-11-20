@@ -103,13 +103,12 @@
         window.PreferencesData?.currentUserId ?? 
         1;
       
-      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup called', {
+      window.Logger?.debug?.('🔍 PreferencesV4.getGroup called', {
         page: 'preferences-v4',
         group,
         profileId,
         userId,
         resolvedUserId,
-        url: `${API.group}?group=${group}&user_id=${resolvedUserId}${profileId != null ? `&profile_id=${profileId}` : ''}`,
       });
       
       const params = new URLSearchParams();
@@ -121,20 +120,18 @@
       if (cachedETag) headers['If-None-Match'] = cachedETag;
       const res = await doFetch(`${API.group}?${params.toString()}`, { headers, credentials: 'include' });
       
-      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup response', {
+      window.Logger?.debug?.('🔍 PreferencesV4.getGroup response', {
         page: 'preferences-v4',
         group,
         status: res.status,
-        statusText: res.statusText,
         hasCachedETag: !!cachedETag,
       });
       
       if (res.status === 304) {
         const cached = cacheByGroup.get(group) || {};
-        window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup - 304 Not Modified, using cache', {
+        window.Logger?.debug?.('🔍 PreferencesV4.getGroup - 304 Not Modified, using cache', {
           page: 'preferences-v4',
           group,
-          cachedKeys: Object.keys(cached),
           cachedCount: Object.keys(cached).length,
         });
         return { group, values: cached, profileContext, etag: cachedETag, fromCache: true };
@@ -150,24 +147,12 @@
       }
       const json = await res.json();
       
-      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup JSON response', {
+      window.Logger?.debug?.('🔍 PreferencesV4.getGroup JSON response', {
         page: 'preferences-v4',
         group,
-        hasJson: !!json,
-        jsonKeys: json ? Object.keys(json) : [],
         hasSuccess: json?.success,
-        hasData: !!json?.data,
-        dataKeys: json?.data ? Object.keys(json.data) : [],
         hasPreferences: !!json?.data?.preferences,
-        preferencesType: typeof json?.data?.preferences,
-        preferencesIsArray: Array.isArray(json?.data?.preferences),
-        preferencesLength: Array.isArray(json?.data?.preferences) ? json.data.preferences.length : Object.keys(json?.data?.preferences || {}).length,
-        preferencesSample: json?.data?.preferences 
-          ? (Array.isArray(json.data.preferences) 
-              ? json.data.preferences.slice(0, 3) 
-              : Object.fromEntries(Object.entries(json.data.preferences).slice(0, 5)))
-          : null,
-        fullJson: json, // Full response for debugging
+        preferencesCount: Array.isArray(json?.data?.preferences) ? json.data.preferences.length : Object.keys(json?.data?.preferences || {}).length,
       });
       
       if (!json?.success) throw new Error(json?.error || 'Failed group fetch');
@@ -193,14 +178,10 @@
         groupValues = rawPreferences;
       }
       
-      window.Logger?.info?.('🔍 DEBUG: PreferencesV4.getGroup - normalized group values', {
+      window.Logger?.debug?.('🔍 PreferencesV4.getGroup - normalized group values', {
         page: 'preferences-v4',
         group,
-        rawPreferencesType: Array.isArray(rawPreferences) ? 'array' : typeof rawPreferences,
-        rawPreferencesLength: Array.isArray(rawPreferences) ? rawPreferences.length : Object.keys(rawPreferences || {}).length,
-        groupValuesKeys: Object.keys(groupValues),
         groupValuesCount: Object.keys(groupValues).length,
-        groupValuesSample: Object.fromEntries(Object.entries(groupValues).slice(0, 5)),
       });
       
       cacheByGroup.set(group, groupValues);

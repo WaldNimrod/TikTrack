@@ -147,18 +147,68 @@
         throw new Error('Failed to reload preferences data');
       }
       
+      // Small delay to ensure preferences are in window.currentPreferences
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Step 3: Refresh UI (populate forms with new data)
       window.Logger?.info?.('Step 3/3: Refreshing UI...', { page: 'preferences-refresh-controls' });
+      
+      // Check current state before update
+      const beforeState = {
+        preferencesCount: Object.keys(window.currentPreferences || {}).length,
+        summaryPreferencesCount: document.getElementById('preferencesCount')?.textContent || 'N/A',
+        hasPreferencesUIV4: Boolean(window.PreferencesUIV4),
+        hasPreferencesUI: Boolean(window.PreferencesUI),
+      };
+      window.Logger?.info?.('State before UI refresh', { 
+        page: 'preferences-refresh-controls',
+        ...beforeState 
+      });
       
       // Update summary
       await window.updatePreferencesSummary();
       
       // Populate forms if PreferencesUIV4 is available
-      if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.populateForms === 'function') {
-        await window.PreferencesUIV4.populateForms();
+      // Note: We reset initialized flag to allow re-initialization
+      if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+        window.Logger?.info?.('Using PreferencesUIV4.initialize()', { page: 'preferences-refresh-controls' });
+        // Reset initialized flag to allow re-initialization
+        window.PreferencesUIV4.initialized = false;
+        await window.PreferencesUIV4.initialize();
+        
+        // CRITICAL: Also explicitly populate form fields after initialization
+        // This ensures all fields (especially colors) are populated even if initialize() didn't do it
+        if (typeof window.PreferencesUIV4._populateAllFormFields === 'function') {
+          window.Logger?.info?.('Explicitly populating all form fields after initialization', { 
+            page: 'preferences-refresh-controls' 
+          });
+          await window.PreferencesUIV4._populateAllFormFields();
+        }
       } else if (window.PreferencesUI && typeof window.PreferencesUI.loadAllPreferences === 'function') {
+        window.Logger?.info?.('Using PreferencesUI.loadAllPreferences()', { page: 'preferences-refresh-controls' });
         await window.PreferencesUI.loadAllPreferences();
+      } else {
+        window.Logger?.warn?.('No UI refresh method available', { 
+          page: 'preferences-refresh-controls',
+          hasPreferencesUIV4: Boolean(window.PreferencesUIV4),
+          hasPreferencesUI: Boolean(window.PreferencesUI),
+        });
       }
+      
+      // Wait a bit for UI to update
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Check state after update
+      const afterState = {
+        preferencesCount: Object.keys(window.currentPreferences || {}).length,
+        summaryPreferencesCount: document.getElementById('preferencesCount')?.textContent || 'N/A',
+      };
+      window.Logger?.info?.('State after UI refresh', { 
+        page: 'preferences-refresh-controls',
+        ...afterState,
+        changed: beforeState.preferencesCount !== afterState.preferencesCount || 
+                 beforeState.summaryPreferencesCount !== afterState.summaryPreferencesCount,
+      });
       
       window.Logger?.info?.('✅ Full preferences refresh completed', { page: 'preferences-refresh-controls' });
       

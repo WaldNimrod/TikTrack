@@ -27,3 +27,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-20T08:55:49+00:00 | 1.1.10.0 | 1.1.9.0 | 8626427dbea71a63f8851050f0f88f0921de3727 | 3e4ca378c2c879d09203620d9db0411a967f4492 | patch | תיקון מערכת מיון טבלאות - הוספת מיון ברירת מחדל אוטומטי לכל הטבלאות |
 | 2025-11-20T09:02:58+00:00 | 1.1.11.0 | 1.1.10.0 | c92ddc63c10c3816261773a59a53ae19591b2d47 | 8626427dbea71a63f8851050f0f88f0921de3727 | patch | הוספת defaultSort ל-positions table |
 | 2025-11-20T11:27:19+00:00 | 1.1.12.0 | 1.1.11.0 | 17dffed56f84f385a90a75686575804c162dc75f | c92ddc63c10c3816261773a59a53ae19591b2d47 | patch | Fix cash flow type filter: restore buttons, add dropdown, fix pagination render callback |
+| 2025-11-20T11:31:33+00:00 | 1.1.13.0 | 1.1.12.0 | bc6dff2069ef4449c1b9e5a65564a88f5d29d546 | 17dffed56f84f385a90a75686575804c162dc75f | patch | Remove cash flow filter buttons, keep only dropdown - full project sync |

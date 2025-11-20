@@ -200,3 +200,4 @@ The database structure is **fully compatible** with the PostgreSQL migration inf
 The PostgreSQL migration infrastructure is fully compatible with the current database structure.
 
 
+

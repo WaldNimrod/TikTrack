@@ -25,3 +25,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-18T20:36:04+00:00 | 1.1.8.0 | 1.1.7.0 | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | 64e500c3670ac27aae13283697b5c0337d2289d2 | patch | Add comprehensive tooltip standardization scanning and reporting tools |
 | 2025-11-18T21:47:43+00:00 | 1.1.9.0 | 1.1.8.0 | 3e4ca378c2c879d09203620d9db0411a967f4492 | b9156b35f3c138a91d2d03dfd08937d2f1d12310 | patch | Remove unnecessary debug console logs from button system |
 | 2025-11-20T08:55:49+00:00 | 1.1.10.0 | 1.1.9.0 | 8626427dbea71a63f8851050f0f88f0921de3727 | 3e4ca378c2c879d09203620d9db0411a967f4492 | patch | תיקון מערכת מיון טבלאות - הוספת מיון ברירת מחדל אוטומטי לכל הטבלאות |
+| 2025-11-20T09:02:58+00:00 | 1.1.11.0 | 1.1.10.0 | c92ddc63c10c3816261773a59a53ae19591b2d47 | 8626427dbea71a63f8851050f0f88f0921de3727 | patch | הוספת defaultSort ל-positions table |

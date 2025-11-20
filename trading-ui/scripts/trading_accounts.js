@@ -2780,7 +2780,9 @@ window.registerTradingAccountsTables = function() {
         tableSelector: '#positionsTable',
         columns: getColumns('positions'),
         sortable: true,
-        filterable: false
+        filterable: false,
+        // Default sort: ticker_symbol asc (column index 0, fallback - no date column)
+        defaultSort: { columnIndex: 0, direction: 'asc', key: 'ticker_symbol' }
     });
 
     // Register portfolio table

@@ -1727,12 +1727,30 @@ async function saveAlert() {
   
   const isEdit = !!alertId;
   
+  // Convert condition_number to string (backend expects string)
+  // Ensure it's a valid number string
+  let conditionNumberStr = '';
+  if (conditionNumber) {
+    const numericValue = parseFloat(conditionNumber);
+    if (!isNaN(numericValue)) {
+      conditionNumberStr = String(numericValue);
+    }
+  }
+  
+  // Validate that condition_number is not empty
+  if (!conditionNumberStr) {
+    if (window.showValidationWarning) {
+      window.showValidationWarning('alertValue', 'יש להזין ערך תקין לתנאי');
+    }
+    return;
+  }
+  
   const alertPayload = {
     related_type_id: parseInt(relatedType) || null,
     related_id: parseInt(relatedId) || null,
     condition_attribute: conditionAttribute,
     condition_operator: conditionOperator,
-    condition_number: conditionNumber,
+    condition_number: conditionNumberStr,
     message: message || null,
     status: status || 'open',
     is_triggered: isTriggered || 'false',

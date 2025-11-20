@@ -18,3 +18,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-14T22:52:17+00:00 | 1.1.1.0 | 1.0.8.0 | 87cdd25fd639298da485550f8bd5ee10917c034d | 0d5f54c8d41e340b2105b04a094442ec6f8701f5 | set | Production release 1.1.1 |
 | 2025-11-17T01:41:42+00:00 | 1.1.2.0 | 1.1.1.0 | ce4723012a8068511a987cc50ac3e101db2665b8 | 87cdd25fd639298da485550f8bd5ee10917c034d | patch | Production update from main - 2025-11-17 |
 | 2025-11-17T17:59:27+00:00 | 1.1.3.0 | 1.1.2.0 | bf4f75468c466eb9827a4f2c67b39a612b56b934 | ce4723012a8068511a987cc50ac3e101db2665b8 | patch | Add unified production update system |
+| 2025-11-20T15:09:51+00:00 | 1.2.0.0 | 1.1.3.0 | 47f8278b473d2fcce259ad035b43c04ea5560bfe | bf4f75468c466eb9827a4f2c67b39a612b56b934 | set | Production release 1.2.0.0 |

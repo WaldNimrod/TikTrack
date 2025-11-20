@@ -86,3 +86,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-20T09:24:52+00:00 | 1.1.32.0 | 1.1.31.0 | 205b32b2dcce7f984e77df3377ff0d12c8a42087 | 64ce9f517e53f5f0bc4c12a8eca8bc6afc797b31 | patch | Preferences HTML updates |
 | 2025-11-20T09:25:02+00:00 | 1.1.33.0 | 1.1.32.0 | bbcb388e76c1f98abd8ea2e18ae8b033c441cc9d | 205b32b2dcce7f984e77df3377ff0d12c8a42087 | patch | Additional local updates: cash flows, core systems, preferences refresh controls |
 | 2025-11-20T09:25:11+00:00 | 1.1.34.0 | 1.1.33.0 | 94ed4ac878b5388c50b55816866a51ebde95daa3 | bbcb388e76c1f98abd8ea2e18ae8b033c441cc9d | patch | Cash flows HTML updates |
+| 2025-11-20T09:25:18+00:00 | 1.1.35.0 | 1.1.34.0 | 831c3e48474ac279a811b6f4243e1640dfbed48e | 94ed4ac878b5388c50b55816866a51ebde95daa3 | patch | Event handler manager updates |

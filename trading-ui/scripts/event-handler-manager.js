@@ -360,6 +360,32 @@ class EventHandlerManager {
     handleDelegatedChange(event) {
         const target = event.target;
         
+        // Handle data-onchange attribute (like data-onclick for buttons)
+        const elementWithOnchange = target.closest('select[data-onchange], input[data-onchange]');
+        if (elementWithOnchange) {
+            const onchangeValue = elementWithOnchange.getAttribute('data-onchange');
+            if (onchangeValue && onchangeValue !== 'null' && onchangeValue !== '') {
+                console.log('🚀 [EventHandlerManager] Executing onchange:', onchangeValue);
+                try {
+                    // Execute the onchange handler using eval (same pattern as data-onclick)
+                    const result = eval(onchangeValue);
+                    if (result && typeof result.then === 'function') {
+                        result
+                            .then(() => {
+                                console.log('✅ [EventHandlerManager] Async onchange completed successfully');
+                            })
+                            .catch(error => {
+                                console.error('❌ [EventHandlerManager] Error in async onchange:', error);
+                            });
+                    }
+                    event._ehmHandled = true;
+                    return;
+                } catch (error) {
+                    console.error('❌ [EventHandlerManager] Error executing data-onchange:', error);
+                }
+            }
+        }
+        
         // Debug logging for filter changes
         if (target.matches('[data-filter-change]')) {
             const filterType = target.getAttribute('data-filter-change');

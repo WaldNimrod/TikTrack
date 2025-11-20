@@ -1374,8 +1374,8 @@ async function renderCashFlowsTable() {
           });
         }
         menuItems.push(
-          { type: 'EDIT', onclick: `window.loadCurrencyExchange && window.loadCurrencyExchange('${exchangeId}').then(() => { window.ModalManagerV2 && window.ModalManagerV2.showModal('cashFlowModal', 'edit'); })`, title: 'ערוך המרת מטבע' },
-          { type: 'DELETE', onclick: `window.deleteCurrencyExchange && window.deleteCurrencyExchange('${exchangeId}')`, title: 'מחק המרת מטבע' }
+          { type: 'EDIT', onclick: `editCashFlow(${cashFlow.id})`, title: 'ערוך המרת מטבע' },
+          { type: 'DELETE', onclick: `deleteCurrencyExchange('${exchangeId}')`, title: 'מחק המרת מטבע' }
         );
         const result = window.createActionsMenu(menuItems);
         return result || '';
@@ -1384,7 +1384,7 @@ async function renderCashFlowsTable() {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
         const result = window.createActionsMenu([
           { type: 'VIEW', onclick: `showCashFlowDetails(${cashFlow.id})`, title: 'הצג פרטי תזרים' },
-          { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', ${cashFlow.id})`, title: 'ערוך תזרים' },
+          { type: 'EDIT', onclick: `editCashFlow(${cashFlow.id})`, title: 'ערוך תזרים' },
           { type: 'DELETE', onclick: `deleteCashFlow(${cashFlow.id})`, title: 'מחק תזרים' }
         ]);
         return result || '';
@@ -1662,21 +1662,28 @@ async function syncCashFlowsPagination(cashFlows) {
         tableId: 'cashFlowsTable',
         tableType: 'cash_flows',
         data: safeCashFlows,
-        render: async ({ pageData, pagination: paginationInfo }) => {
+        render: async (pageData, context = {}) => {
+          // Handle both signature formats:
+          // 1. Old: ({ pageData, pagination: paginationInfo }) - direct from pagination
+          // 2. New: (pageData, { pageInfo, ... }) - from updateTableWithPagination
+          const actualPageData = Array.isArray(pageData) ? pageData : (pageData?.pageData || []);
+          const paginationInfo = context?.pageInfo || pageData?.pagination || {};
+          
           console.log('🔄 [syncCashFlowsPagination] Render callback called', {
-            pageDataLength: pageData?.length || 0,
+            pageDataLength: actualPageData?.length || 0,
             paginationInfo: paginationInfo,
-            pageData: pageData
+            currentPage: paginationInfo.currentPage,
+            totalPages: paginationInfo.totalPages,
           });
           // Skip data update and summary when called from pagination render
           // to prevent infinite loops - pagination already handles data
           // IMPORTANT: Update window.filteredCashFlowsData so renderCashFlowsTable uses the correct data
-          window.filteredCashFlowsData = Array.isArray(pageData) ? pageData : [];
+          window.filteredCashFlowsData = actualPageData;
           console.log('🔄 [syncCashFlowsPagination] window.filteredCashFlowsData updated to', window.filteredCashFlowsData.length, 'items');
-          await updateCashFlowsTable(pageData, { skipDataUpdate: true, skipSummary: true });
+          await updateCashFlowsTable(actualPageData, { skipDataUpdate: true, skipSummary: true });
           console.log('✅ [syncCashFlowsPagination] updateCashFlowsTable completed');
           if (window.setPageTableData) {
-            window.setPageTableData('cash_flows', pageData, {
+            window.setPageTableData('cash_flows', actualPageData, {
               tableId: 'cashFlowsTable',
               pageInfo: paginationInfo,
             });
@@ -3237,7 +3244,9 @@ function getExchangeIdFromCashFlow(cashFlow) {
     if (!groupId) {
         return null;
     }
-    return groupId.replace('exchange_', '');
+    // Remove 'exchange_' prefix if present - backend expects just the UUID
+    const uuid = typeof groupId === 'string' ? groupId.replace(/^exchange_/, '') : String(groupId).replace(/^exchange_/, '');
+    return uuid || null;
 }
 
 // Export save function for ModalManagerV2
@@ -3415,17 +3424,73 @@ function initializeExternalIdFields() {
  * @returns {void}
  */
 async function editCashFlow(id) {
-    // Use ModalManagerV2 directly
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-        await window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
-        if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
-            await window.TagUIManager.hydrateSelectForEntity('cashFlowTags', 'cash_flow', id, { force: true });
+    try {
+        // First, try to load the cash flow data to check if it's a currency exchange
+        let response;
+        let cashFlowData = null;
+        let isExchange = false;
+        let exchangeId = null;
+        
+        try {
+            response = await fetch(`/api/cash-flows/${id}`);
+            if (response.ok) {
+                const result = await response.json();
+                cashFlowData = result.data || result;
+                
+                // Check if this is a currency exchange
+                isExchange = window.isCurrencyExchange ? window.isCurrencyExchange(cashFlowData) : false;
+                
+                if (isExchange) {
+                    exchangeId = window.getExchangeIdFromCashFlow ? window.getExchangeIdFromCashFlow(cashFlowData) : null;
+                }
+            } else if (response.status === 404) {
+                // Cash flow not found - might be a currency exchange, try to find it
+                // For currency exchanges, we need to find the exchange ID from the table data
+                // This is a fallback - ideally the cash flow should exist
+                window.Logger?.warn(`Cash flow ${id} not found, might be part of currency exchange`, { page: "cash_flows" });
+                // We'll handle this case below
+            }
+        } catch (fetchError) {
+            window.Logger?.warn(`Error loading cash flow ${id}, will try alternative approach`, { error: fetchError, page: "cash_flows" });
         }
-        hydrateCashFlowExchangeDisplay(id);
-    } else {
-        window.Logger?.error('ModalManagerV2 לא זמין', { page: "cash_flows" });
+        
+        if (isExchange && exchangeId) {
+            // For currency exchange - use loadCurrencyExchange which loads both FROM and TO flows
+            // Show modal first in edit mode with exchange tab active
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                await window.ModalManagerV2.showModal('cashFlowModal', 'edit', cashFlowData, { 
+                    isCurrencyExchange: true,
+                    exchangeId: exchangeId 
+                });
+                
+                // Wait a bit for modal to be fully rendered
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Load exchange data (both FROM and TO flows) - this populates the form fields
+                if (window.loadCurrencyExchange && typeof window.loadCurrencyExchange === 'function') {
+                    await window.loadCurrencyExchange(exchangeId);
+                } else {
+                    throw new Error('loadCurrencyExchange function not available');
+                }
+            } else {
+                throw new Error('ModalManagerV2 not available');
+            }
+        } else {
+            // For regular cash flow - use standard edit modal
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+                await window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', id);
+                if (window.TagUIManager && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
+                    await window.TagUIManager.hydrateSelectForEntity('cashFlowTags', 'cash_flow', id, { force: true });
+                }
+                hydrateCashFlowExchangeDisplay(id);
+            } else {
+                throw new Error('ModalManagerV2 not available');
+            }
+        }
+    } catch (error) {
+        window.Logger?.error('Error editing cash flow', { error, page: "cash_flows" });
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+            window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל עריכה: ${error.message}`);
         }
     }
 }

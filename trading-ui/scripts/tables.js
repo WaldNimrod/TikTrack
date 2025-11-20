@@ -1275,13 +1275,24 @@ window.ensureTablePagination = function(tableId, options = {}) {
 
   const existing = window.getPagination(tableId);
   if (existing) {
+    console.log(`🔄 [ensureTablePagination] Updating existing pagination for table ${tableId}`, {
+      tableId,
+      hasExistingOnAfterRender: typeof existing.config.onAfterRender === 'function',
+      hasNewOnAfterRender: typeof options.onAfterRender === 'function',
+    });
+    
     if (options.tableType && !existing.tableType) {
       existing.tableType = options.tableType;
       existing.config.tableType = options.tableType;
     }
 
     if (typeof options.onAfterRender === 'function') {
+      console.log(`✅ [ensureTablePagination] Updating onAfterRender callback for table ${tableId}`);
       existing.config.onAfterRender = options.onAfterRender;
+      console.log(`✅ [ensureTablePagination] onAfterRender updated - is now:`, {
+        isFunction: typeof existing.config.onAfterRender === 'function',
+        functionName: existing.config.onAfterRender?.name || 'anonymous',
+      });
     }
 
     if (typeof options.onFilteredDataChange === 'function') {
@@ -1295,6 +1306,10 @@ window.ensureTablePagination = function(tableId, options = {}) {
     return existing;
   }
 
+  console.log(`🆕 [ensureTablePagination] Creating new pagination for table ${tableId}`, {
+    tableId,
+    hasOnAfterRender: typeof options.onAfterRender === 'function',
+  });
   return window.createPagination(tableId, options);
 };
 
@@ -1342,14 +1357,26 @@ window.updateTableWithPagination = async function({
     tableType: resolvedTableType,
     pageSize,
     onAfterRender: async ({ pageData, pagination: paginationInfo }) => {
+      console.log(`🔄 [updateTableWithPagination.onAfterRender] Called for table ${tableId}`, {
+        tableId,
+        pageDataLength: pageData?.length || 0,
+        currentPage: paginationInfo?.currentPage,
+        totalPages: paginationInfo?.totalPages,
+        hasRender: typeof render === 'function',
+      });
       try {
+        console.log(`📞 [updateTableWithPagination.onAfterRender] Calling render callback for table ${tableId}`, {
+          pageDataLength: pageData?.length || 0,
+        });
         await render(pageData, {
           skipPagination: true,
           pageInfo: paginationInfo,
           tableId,
           tableType: resolvedTableType,
         });
+        console.log(`✅ [updateTableWithPagination.onAfterRender] Render callback completed for table ${tableId}`);
       } catch (error) {
+        console.error(`❌ [updateTableWithPagination.onAfterRender] Render callback failed for table ${tableId}:`, error);
         console.warn(`updateTableWithPagination: render callback failed for table ${tableId}`, error);
       }
     },

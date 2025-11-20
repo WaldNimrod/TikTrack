@@ -48,6 +48,7 @@ let selectedAccount = null;
 let selectedConnector = null;
 let analysisResults = null;
 let previewData = null;
+
 let dataTypeAvailabilityMap = {};
 let selectedDataTypeKey = 'account_reconciliation';
 let currencyCacheByCode = null;
@@ -2109,7 +2110,7 @@ const CASHFLOW_TYPE_LABELS = {
     dividend_accrual: 'שינויים בצבירת דיבידנד',
     interest: 'ריבית',
     interest_accrual: 'שינויים בצבירת ריבית',
-    tax: 'ניכויי מס',
+    tax: 'מיסים',
     fee: 'עמלות',
     borrow_fee: 'Borrow Fee',
     syep_activity: 'פעילות SYEP',
@@ -2727,20 +2728,23 @@ function isSessionActive(status) {
 function updateResetSessionButtonState() {
     const resetButton = document.getElementById('resetImportSessionBtn');
     const resumeButton = document.getElementById('resumeImportSessionBtn');
-    // Only show buttons if there's an active (not closed) session
+    
+    // ALWAYS hide resume button - feature removed
+    if (resumeButton) {
+        resumeButton.classList.add('d-none');
+        resumeButton.style.display = 'none';
+        resumeButton.disabled = true;
+        resumeButton.setAttribute('aria-disabled', 'true');
+    }
+    
+    // Only show reset button if there's an active (not closed) session
     // Use raw status if available (more reliable), otherwise use translated status
     const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
     const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
 
     // CRITICAL: Always sync button visibility with session indicator
-    // If there's no active session, hide both button and info
+    // If there's no active session, hide reset button and info
     if (!hasActiveSession) {
-        if (resumeButton) {
-            resumeButton.classList.add('d-none');
-            resumeButton.style.display = 'none';
-            resumeButton.disabled = true;
-            resumeButton.setAttribute('aria-disabled', 'true');
-        }
         if (resetButton) {
             resetButton.classList.add('d-none');
             resetButton.style.display = 'none';
@@ -2751,17 +2755,7 @@ function updateResetSessionButtonState() {
         return;
     }
 
-    // If we have an active session, show buttons and ensure info is visible
-    if (resumeButton) {
-        resumeButton.classList.remove('d-none');
-        resumeButton.style.display = 'inline-flex';
-        // Force display if still hidden
-        if (window.getComputedStyle(resumeButton).display === 'none') {
-            resumeButton.style.display = 'inline-flex';
-        }
-        resumeButton.disabled = false;
-        resumeButton.setAttribute('aria-disabled', 'false');
-    }
+    // If we have an active session, show reset button and ensure info is visible
     if (resetButton) {
         resetButton.classList.remove('d-none');
         resetButton.style.display = 'inline-flex';
@@ -3400,14 +3394,16 @@ async function loadCurrencyCache() {
 }
 
 async function ensureTickersModalConfigLoaded(options = {}) {
-    const { forceReload = false, timeoutMs = 6000 } = options;
+    const { forceReload = false, timeoutMs = 10000 } = options;
 
     if (!window.tickersModalConfig && window.__TICKERS_MODAL_CONFIG_SOURCE__) {
         window.tickersModalConfig = window.__TICKERS_MODAL_CONFIG_SOURCE__;
+        window.Logger?.debug('[Import Modal] Loaded tickersModalConfig from __TICKERS_MODAL_CONFIG_SOURCE__', { page: 'import-user-data' });
     }
 
     const isConfigReady = () => Boolean(window.tickersModalConfig && typeof window.tickersModalConfig === 'object');
     if (!forceReload && isConfigReady()) {
+        window.Logger?.debug('[Import Modal] Tickers modal config already loaded', { page: 'import-user-data' });
         return true;
     }
 
@@ -3484,10 +3480,31 @@ async function ensureTickersModalConfigLoaded(options = {}) {
             }, timeoutMs);
 
             scriptElement.addEventListener('load', () => {
-                checkReady();
+                window.Logger?.debug('[Import Modal] Tickers config script loaded', { page: 'import-user-data' });
+                if (!checkReady()) {
+                    // If config still not ready after load, wait a bit more
+                    setTimeout(() => {
+                        if (checkReady()) {
+                            complete(true);
+                        } else {
+                            window.Logger?.warn('[Import Modal] Tickers config script loaded but config not ready', { 
+                                tickersModalConfig: typeof window.tickersModalConfig,
+                                __TICKERS_MODAL_CONFIG_SOURCE__: typeof window.__TICKERS_MODAL_CONFIG_SOURCE__,
+                                page: 'import-user-data' 
+                            });
+                        }
+                    }, 200);
+                }
             }, { once: true });
 
-            scriptElement.addEventListener('error', () => complete(false), { once: true });
+            scriptElement.addEventListener('error', (error) => {
+                window.Logger?.error('[Import Modal] Failed to load tickers config script', { 
+                    error: error.message || 'Script load error',
+                    src: scriptElement.src,
+                    page: 'import-user-data' 
+                });
+                complete(false);
+            }, { once: true });
         });
     })();
 
@@ -3495,7 +3512,16 @@ async function ensureTickersModalConfigLoaded(options = {}) {
     const loaded = await tickersModalConfigPromise;
     if (!loaded) {
         tickersModalConfigPromise = null;
-        window.Logger?.warn('[Import Modal] Unable to load tickers modal configuration', { page: 'import-user-data' });
+        window.Logger?.warn('[Import Modal] Unable to load tickers modal configuration', { 
+            tickersModalConfig: typeof window.tickersModalConfig,
+            __TICKERS_MODAL_CONFIG_SOURCE__: typeof window.__TICKERS_MODAL_CONFIG_SOURCE__,
+            page: 'import-user-data' 
+        });
+    } else {
+        window.Logger?.debug('[Import Modal] Tickers modal configuration loaded successfully', { 
+            hasConfig: Boolean(window.tickersModalConfig),
+            page: 'import-user-data' 
+        });
     }
     return loaded;
 }
@@ -3576,7 +3602,93 @@ function ensureTickerSaveHook(retry = 0) {
             });
         }
 
-        const result = await saveFn.apply(this, args);
+        // Get ticker symbol before saving (for immediate UI update)
+        const modalElement = document.getElementById('tickersModal');
+        const symbolInput = modalElement?.querySelector('#tickerSymbol');
+        const savedSymbol = symbolInput?.value?.toUpperCase().trim() || null;
+
+        let saveSuccess = false;
+        let result = null;
+        
+        try {
+            result = await saveFn.apply(this, args);
+            
+            // Check if save was successful
+            // CRUDResponseHandler.handleSaveResponse returns result object
+            // result can have: { status: 'success', data: {...} } or { success: true, data: {...} }
+            // The most reliable indicator is having an id in result.data.id or result.id
+            if (result !== null && result !== undefined) {
+                if (typeof result === 'object') {
+                    // Primary check: if we have an id, it's definitely a success
+                    if (result.data?.id !== undefined && result.data?.id !== null) {
+                        saveSuccess = true;
+                    } else if (result.id !== undefined && result.id !== null) {
+                        saveSuccess = true;
+                    } else {
+                        // Fallback: check status or success flags
+                        saveSuccess = result.status === 'success' || 
+                                     result.success === true ||
+                                     (result.response && result.response.ok === true);
+                    }
+                } else if (result === true) {
+                    saveSuccess = true;
+                }
+            }
+            
+            window.Logger?.info('[Import Modal] Ticker save result', {
+                symbol: savedSymbol,
+                hasResult: result !== null && result !== undefined,
+                resultType: typeof result,
+                resultStatus: result?.status,
+                resultSuccess: result?.success,
+                hasData: !!result?.data,
+                hasId: !!(result?.data?.id || result?.id),
+                resultKeys: result ? Object.keys(result) : [],
+                saveSuccess,
+                page: 'import-user-data'
+            });
+        } catch (saveError) {
+            window.Logger?.warn('[Import Modal] Error during ticker save', {
+                error: saveError?.message,
+                symbol: savedSymbol,
+                page: 'import-user-data'
+            });
+            // Re-throw to let original error handling work
+            throw saveError;
+        }
+
+        // Immediately remove ticker from missing list if it was saved successfully
+        // Use longer delay to ensure modal closes and save completes
+        if (savedSymbol && saveSuccess) {
+            window.Logger?.info('[Import Modal] Ticker saved successfully, will remove from missing list', {
+                symbol: savedSymbol,
+                page: 'import-user-data'
+            });
+            // Longer delay to ensure everything completes - modal closes, save completes
+            setTimeout(() => {
+                try {
+                    removeTickerFromMissingList(savedSymbol);
+                } catch (removeError) {
+                    window.Logger?.warn('[Import Modal] Failed to remove ticker from missing list', {
+                        error: removeError?.message,
+                        symbol: savedSymbol,
+                        stack: removeError?.stack,
+                        page: 'import-user-data'
+                    });
+                }
+            }, 800); // Increased delay to 800ms to ensure save completes
+        } else if (savedSymbol) {
+            window.Logger?.warn('[Import Modal] Ticker save result indicates failure, not removing from list', {
+                symbol: savedSymbol,
+                result: result,
+                saveSuccess,
+                page: 'import-user-data'
+            });
+        } else {
+            window.Logger?.warn('[Import Modal] No symbol captured before save', { page: 'import-user-data' });
+        }
+
+        return result;
 
         // Schedule refresh in background - don't block modal closing
         if (currentSessionId) {
@@ -3617,19 +3729,14 @@ window.initializeImportUserDataModal = async function() {
     });
 };
 
-// Flag to prevent concurrent calls to openImportUserDataModalWithSessionCleanup
+// Flag to prevent concurrent calls to openImportUserDataModal
 let isOpeningImportModal = false;
 
 /**
- * Wrapper function for opening import modal - checks and clears active session before opening
- * This is called from the button click handler
- * 
- * Logic:
- * 1. Check if there's an active session (with 3 second timeout)
- * 2. If active session exists → clear it (with 3 second timeout)
- * 3. Open modal in clean state (always)
+ * Open import user data modal
+ * This is the single entry point - handles session cleanup and modal opening
  */
-async function openImportUserDataModalWithSessionCleanup() {
+async function openImportUserDataModal() {
     // Prevent concurrent calls
     if (isOpeningImportModal) {
         window.Logger?.warn('[Import Modal] Modal opening already in progress, ignoring duplicate call', { page: 'import-user-data' });
@@ -3638,86 +3745,54 @@ async function openImportUserDataModalWithSessionCleanup() {
     
     isOpeningImportModal = true;
     
-    console.log('[Import Modal] ===== openImportUserDataModalWithSessionCleanup CALLED =====');
-    console.log('[Import Modal] Call stack:', new Error().stack);
-    console.log('[Import Modal] Function exists:', typeof openImportUserDataModalWithSessionCleanup);
-    console.log('[Import Modal] Window function exists:', typeof window.openImportUserDataModal);
-    console.log('[Import Modal] Window function === this function:', window.openImportUserDataModal === openImportUserDataModalWithSessionCleanup);
-    console.log('[Import Modal] this context:', this);
-    
-    window.Logger?.info('[Import Modal] Opening import modal with session cleanup', { page: 'import-user-data' });
-    console.log('[Import Modal] Logger called, starting try block...');
-    
     try {
-        console.log('[Import Modal] Inside try block - Step 1: Checking for active session');
-        // Step 1: Check for active session (with timeout to prevent hanging)
+        window.Logger?.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
+        
+        // Step 1: Check and clear active session (with timeout to prevent hanging)
         let hasActiveSession = false;
         let activeSessionId = null;
         
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
             
             try {
                 const response = await fetch('/api/user-data-import/sessions/active', {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     signal: controller.signal
                 });
                 
                 clearTimeout(timeoutId);
                 
-                // Handle rate limiting - skip check and continue
                 if (response.status === 429) {
-                    window.Logger?.warn?.('[Import Modal] Rate limit during session check, skipping and opening modal', { 
-                        page: 'import-user-data' 
-                    });
+                    window.Logger?.warn?.('[Import Modal] Rate limit during session check, skipping', { page: 'import-user-data' });
                 } else if (response.ok) {
                     const data = await response.json();
                     if (data.session) {
                         const sessionStatus = (data.session.status || '').toLowerCase();
                         const closedStatuses = ['completed', 'failed', 'cancelled'];
-                        
-                        // If session is active (not closed), mark for clearing
                         if (!closedStatuses.includes(sessionStatus)) {
                             hasActiveSession = true;
                             activeSessionId = data.session.id;
-                            window.Logger.info('[Import Modal] Active session found, will clear before opening modal', { 
-                                sessionId: activeSessionId, 
-                                page: 'import-user-data' 
-                            });
                         }
                     }
                 }
             } catch (fetchError) {
                 clearTimeout(timeoutId);
-                // Network errors, timeouts - just log and continue
-                if (fetchError.name === 'AbortError' || fetchError.name === 'TimeoutError') {
-                    window.Logger?.warn?.('[Import Modal] Session check timed out, continuing to open modal', { 
-                        page: 'import-user-data' 
-                    });
-                } else {
-                    window.Logger?.warn?.('[Import Modal] Session check failed, continuing to open modal', { 
-                        error: fetchError?.message,
-                        page: 'import-user-data' 
-                    });
+                if (fetchError.name !== 'AbortError' && fetchError.name !== 'TimeoutError') {
+                    window.Logger?.warn?.('[Import Modal] Session check failed', { error: fetchError?.message, page: 'import-user-data' });
                 }
             }
         } catch (error) {
-            // Any other error - just log and continue
-            window.Logger?.warn?.('[Import Modal] Session check error, continuing to open modal', { 
-                error: error?.message,
-                page: 'import-user-data' 
-            });
+            window.Logger?.warn?.('[Import Modal] Session check error', { error: error?.message, page: 'import-user-data' });
         }
         
-        // Step 2: Clear active session if found (with timeout)
+        // Step 2: Clear active session if found
         if (hasActiveSession && activeSessionId) {
             try {
                 const resetController = new AbortController();
-                const resetTimeoutId = setTimeout(() => resetController.abort(), 3000); // 3 second timeout
+                const resetTimeoutId = setTimeout(() => resetController.abort(), 3000);
                 
                 try {
                     const resetResponse = await fetch(`/api/user-data-import/session/${activeSessionId}/reset`, {
@@ -3727,133 +3802,45 @@ async function openImportUserDataModalWithSessionCleanup() {
                     
                     clearTimeout(resetTimeoutId);
                     
-                    // Handle rate limiting - skip reset and continue
                     if (resetResponse.status === 429) {
-                        window.Logger?.warn?.('[Import Modal] Rate limit during session reset, skipping reset and opening modal', { 
-                            sessionId: activeSessionId,
-                            page: 'import-user-data' 
-                        });
+                        window.Logger?.warn?.('[Import Modal] Rate limit during session reset', { sessionId: activeSessionId, page: 'import-user-data' });
                     } else if (resetResponse.ok) {
-                        const resetData = await resetResponse.json().catch(() => ({}));
-                        if (resetData?.success || resetData?.status === 'success') {
-                            window.Logger.info('[Import Modal] Active session cleared successfully', { 
-                                sessionId: activeSessionId,
-                                page: 'import-user-data' 
-                            });
-                        }
+                        window.Logger.info('[Import Modal] Active session cleared', { sessionId: activeSessionId, page: 'import-user-data' });
                     }
                 } catch (resetError) {
                     clearTimeout(resetTimeoutId);
-                    // Network errors, timeouts - just log and continue
-                    if (resetError.name === 'AbortError' || resetError.name === 'TimeoutError') {
-                        window.Logger?.warn?.('[Import Modal] Session reset timed out, continuing to open modal', { 
-                            sessionId: activeSessionId,
-                            page: 'import-user-data' 
-                        });
-                    } else {
-                        window.Logger?.warn?.('[Import Modal] Session reset failed, continuing to open modal', { 
-                            sessionId: activeSessionId,
-                            error: resetError?.message,
-                            page: 'import-user-data' 
-                        });
+                    if (resetError.name !== 'AbortError' && resetError.name !== 'TimeoutError') {
+                        window.Logger?.warn?.('[Import Modal] Session reset failed', { error: resetError?.message, page: 'import-user-data' });
                     }
                 }
             } catch (error) {
-                // Any other error - just log and continue
-                window.Logger?.warn?.('[Import Modal] Session reset error, continuing to open modal', { 
-                    sessionId: activeSessionId,
-                    error: error?.message,
-                    page: 'import-user-data' 
-                });
+                window.Logger?.warn?.('[Import Modal] Session reset error', { error: error?.message, page: 'import-user-data' });
             }
         }
         
-        // Step 3: Open modal in clean state (always happens)
-        console.log('[Import Modal] Step 3: About to call openImportUserDataModal()');
-        // Use the internal function directly to avoid recursion (window.openImportUserDataModal points to wrapper)
-        const internalOpenFunction = window._openImportUserDataModalInternal || openImportUserDataModal;
-        console.log('[Import Modal] Internal function exists:', typeof internalOpenFunction);
-        window.Logger.debug('[Import Modal] Opening modal in clean state', { page: 'import-user-data' });
-        
-        console.log('[Import Modal] Calling await internalOpenFunction()...');
-        await internalOpenFunction();
-        console.log('[Import Modal] internalOpenFunction() completed');
-        
-        window.Logger.info('[Import Modal] Modal opened successfully', { page: 'import-user-data' });
-        console.log('[Import Modal] ===== SUCCESS - Modal opened =====');
-    } catch (error) {
-        console.error('[Import Modal] ===== ERROR in openImportUserDataModalWithSessionCleanup =====');
-        console.error('[Import Modal] Error message:', error?.message);
-        console.error('[Import Modal] Error stack:', error?.stack);
-        console.error('[Import Modal] Error object:', error);
-        
-        window.Logger?.error('[Import Modal] Failed to open import modal', { 
-            error: error?.message, 
-            stack: error?.stack,
-            page: 'import-user-data' 
-        });
-        if (typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
-                'שגיאה בפתיחת מודול ייבוא',
-                `לא ניתן לפתוח את מודול הייבוא: ${error?.message || 'שגיאה לא ידועה'}`,
-                'error',
-                10000,
-                'import-user-data'
-            );
-        }
-    } finally {
-        // Always reset the flag, even if there was an error
-        isOpeningImportModal = false;
-    }
-}
-
-/**
- * Open import user data modal
- * Always opens in clean state - session management happens before this is called
- * This function only handles modal display and initialization - no session checks
- */
-async function openImportUserDataModal() {
-    window.Logger.info('[Import Modal] Opening import modal', { page: 'import-user-data' });
-    
-    try {
-        window.Logger.debug('[Import Modal] Step 1: Getting modal element', { page: 'import-user-data' });
+        // Step 3: Open modal
+        window.Logger.debug('[Import Modal] Getting modal element', { page: 'import-user-data' });
         const modal = getImportModalElement();
         if (!modal) {
-            window.Logger.error('[Import Modal] Modal element not found in DOM', { page: 'import-user-data' });
             throw new Error('Modal element not found in DOM. Make sure the import modal HTML is loaded.');
         }
         
-        window.Logger.debug('[Import Modal] Modal element found', { 
-            modalId: modal.id,
-            page: 'import-user-data' 
-        });
-    
         // Reset state before displaying
-        window.Logger.debug('[Import Modal] Step 2: Resetting modal state', { page: 'import-user-data' });
         try {
             resetImportModal();
-            window.Logger.debug('[Import Modal] Modal state reset complete', { page: 'import-user-data' });
         } catch (error) {
-            window.Logger?.warn('[Import Modal] Error resetting modal state, continuing', { 
-                error: error?.message,
-                page: 'import-user-data' 
-            });
+            window.Logger?.warn('[Import Modal] Error resetting modal state, continuing', { error: error?.message, page: 'import-user-data' });
         }
         
         // Ensure listeners are initialized once
-        window.Logger.debug('[Import Modal] Step 3: Setting up event listeners', { page: 'import-user-data' });
         try {
             setupImportModalEventListeners();
             attachImportModalNavigationListeners(modal);
-            window.Logger.debug('[Import Modal] Event listeners setup complete', { page: 'import-user-data' });
         } catch (error) {
-            window.Logger?.warn('[Import Modal] Error setting up event listeners, continuing', { 
-                error: error?.message,
-                page: 'import-user-data' 
-            });
+            window.Logger?.warn('[Import Modal] Error setting up event listeners, continuing', { error: error?.message, page: 'import-user-data' });
         }
         
-        window.Logger.debug('[Import Modal] Step 4: Registering modal navigation', { page: 'import-user-data' });
+        // Register modal navigation
         if (window.ModalNavigationService?.registerModalOpen) {
             try {
                 const activeEntry = window.ModalNavigationService.getActiveEntry?.();
@@ -3870,150 +3857,99 @@ async function openImportUserDataModal() {
                     };
                 }
                 await registerImportModalNavigation(navigationOverrides);
-                window.Logger.debug('[Import Modal] Modal navigation registered', { page: 'import-user-data' });
             } catch (error) {
-                window.Logger?.warn('[Import Modal] Error registering modal navigation, continuing', { 
-                    error: error?.message,
-                    page: 'import-user-data' 
-                });
+                window.Logger?.warn('[Import Modal] Error registering modal navigation, continuing', { error: error?.message, page: 'import-user-data' });
             }
-        } else {
-            importNavigationInstanceId = null;
-            window.Logger.debug('[Import Modal] ModalNavigationService not available, skipping navigation registration', { page: 'import-user-data' });
         }
         
         // Show modal using Bootstrap when available
-        window.Logger.debug('[Import Modal] Step 5: Showing modal', { 
-            bootstrapAvailable: typeof bootstrap !== 'undefined',
-            bootstrapModalAvailable: typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function',
-            page: 'import-user-data' 
-        });
-        
         let modalShown = false;
         if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
             try {
-                window.Logger.debug('[Import Modal] Using Bootstrap to show modal', { page: 'import-user-data' });
                 importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
                 if (!importModalBootstrapInstance) {
-                    window.Logger.debug('[Import Modal] Creating new Bootstrap Modal instance', { page: 'import-user-data' });
                     importModalBootstrapInstance = new bootstrap.Modal(modal, {
                         backdrop: true,
                         keyboard: true,
                         focus: true
                     });
                 }
-                window.Logger.debug('[Import Modal] Calling Bootstrap modal.show()', { page: 'import-user-data' });
                 importModalBootstrapInstance.show();
                 modalShown = true;
-                window.Logger.info('[Import Modal] Bootstrap modal.show() called successfully', { page: 'import-user-data' });
             } catch (error) {
-                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying fallback', { 
-                    error: error?.message,
-                    stack: error?.stack,
-                    page: 'import-user-data' 
-                });
+                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying fallback', { error: error?.message, page: 'import-user-data' });
             }
         }
         
         if (!modalShown) {
-            window.Logger.debug('[Import Modal] Using fallback method to show modal', { page: 'import-user-data' });
             try {
                 modal.style.display = 'block';
                 modal.classList.add('show');
                 modal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('modal-open');
                 modalShown = true;
-                window.Logger.info('[Import Modal] Fallback modal display applied successfully', { page: 'import-user-data' });
             } catch (error) {
-                window.Logger?.error('[Import Modal] Error in fallback modal display', { 
-                    error: error?.message,
-                    stack: error?.stack,
-                    page: 'import-user-data' 
-                });
                 throw new Error(`Failed to show modal: ${error?.message || 'Unknown error'}`);
             }
         }
         
         // Process buttons using centralized button system
-        window.Logger.debug('[Import Modal] Step 6: Processing buttons', { page: 'import-user-data' });
         try {
             if (window.processButtons) {
                 window.processButtons(modal);
-                window.Logger.debug('[Import Modal] Buttons processed by centralized button system', { page: 'import-user-data' });
-            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+            } else if (window.advancedButtonSystem?.processButtons) {
                 window.advancedButtonSystem.processButtons(modal);
-                window.Logger.debug('[Import Modal] Buttons processed by advanced button system', { page: 'import-user-data' });
             } else if (window.initializeButtons) {
                 window.initializeButtons();
-                window.Logger.debug('[Import Modal] Buttons initialized via initializeButtons()', { page: 'import-user-data' });
-            } else {
-                window.Logger.debug('[Import Modal] No button processing system available', { page: 'import-user-data' });
             }
         } catch (error) {
-            window.Logger?.warn('[Import Modal] Error processing buttons, continuing', { 
-                error: error?.message,
-                page: 'import-user-data' 
-            });
+            window.Logger?.warn('[Import Modal] Error processing buttons, continuing', { error: error?.message, page: 'import-user-data' });
         }
         
         // Load accounts
-        window.Logger.debug('[Import Modal] Step 7: Loading accounts', { page: 'import-user-data' });
         try {
             await loadAccounts();
-            window.Logger.debug('[Import Modal] Accounts loaded successfully', { page: 'import-user-data' });
         } catch (error) {
-            window.Logger?.warn('[Import Modal] Failed to load accounts, continuing anyway', { 
-                error: error?.message,
-                page: 'import-user-data' 
-            });
-            // Continue even if accounts fail to load
+            window.Logger?.warn('[Import Modal] Failed to load accounts, continuing anyway', { error: error?.message, page: 'import-user-data' });
         }
         
-        // Clear any session state - modal always opens in clean state (new session)
-        window.Logger.debug('[Import Modal] Step 8: Clearing session state', { page: 'import-user-data' });
+        // Clear session state - modal always opens in clean state
         currentSessionId = null;
         window.currentSessionId = null;
         activeSessionInfo = null;
         
-        // Always start at step 1 - clean state for new session
-        window.Logger.debug('[Import Modal] Step 9: Initializing step 1', { page: 'import-user-data' });
-        const initialStep = 1;
-        
-        window.Logger.debug('[Import Modal] Going to step', { 
-            step: initialStep,
-            page: 'import-user-data' 
-        });
-        
+        // Always start at step 1
         try {
-            goToStep(initialStep);
-            window.Logger.debug('[Import Modal] goToStep completed', { 
-                step: initialStep,
-                page: 'import-user-data' 
-            });
+            goToStep(1);
         } catch (error) {
-            window.Logger?.error('[Import Modal] Error in goToStep', { 
-                error: error?.message,
-                stack: error?.stack,
-                step: initialStep,
-                page: 'import-user-data' 
-            });
-            // Don't throw - modal is already shown, just log the error
+            window.Logger?.error('[Import Modal] Error in goToStep', { error: error?.message, page: 'import-user-data' });
         }
         
-        window.Logger.info('[Import Modal] Modal opened successfully', { 
-            step: initialStep,
-            modalShown: modalShown,
-            page: 'import-user-data' 
-        });
+        window.Logger.info('[Import Modal] Modal opened successfully', { page: 'import-user-data' });
     } catch (error) {
-        window.Logger?.error('[Import Modal] Error in openImportUserDataModal', { 
+        window.Logger?.error('[Import Modal] Failed to open import modal', { 
             error: error?.message, 
             stack: error?.stack,
             page: 'import-user-data' 
         });
-        throw error; // Re-throw to be caught by caller
+        if (typeof window.showDetailedNotification === 'function') {
+            window.showDetailedNotification(
+                'שגיאה בפתיחת מודול ייבוא',
+                `לא ניתן לפתוח את מודול הייבוא: ${error?.message || 'שגיאה לא ידועה'}`,
+                'error',
+                10000,
+                'import-user-data'
+            );
+        }
+        throw error;
+    } finally {
+        isOpeningImportModal = false;
     }
 }
+
+// Export function to window immediately after definition
+window.openImportUserDataModal = openImportUserDataModal;
+
 
 /**
  * Close import user data modal
@@ -4088,7 +4024,7 @@ function closeImportUserDataModal() {
  */
 function resetImportModal() {
     // Reset modal state - always opens in clean state
-    // Session management happens before modal opens (in openImportUserDataModalWithSessionCleanup)
+    // Session management happens before modal opens (in openImportUserDataModal)
     currentStep = 1;
     selectedFile = null;
     window.selectedFile = null; // Make it global
@@ -4627,6 +4563,21 @@ function updateHeaderActions(step) {
     const previewActions = document.getElementById('previewStepActions');
     if (previewActions) {
         setElementDisplay(previewActions, step === 3 ? 'flex' : 'none');
+    }
+    
+    // ALWAYS hide resume session button - feature removed completely
+    const resumeButton = document.getElementById('resumeImportSessionBtn');
+    if (resumeButton) {
+        resumeButton.classList.add('d-none');
+        resumeButton.style.display = 'none';
+        resumeButton.disabled = true;
+        resumeButton.setAttribute('aria-disabled', 'true');
+        resumeButton.style.visibility = 'hidden';
+    }
+    
+    // In other steps, let updateResetSessionButtonState handle visibility for reset button
+    if (step !== 1) {
+        updateResetSessionButtonState();
     }
 }
 
@@ -7136,15 +7087,66 @@ async function openAddTickerModal(symbol, currency = 'USD') {
             canUseModal = false;
             window.Logger?.error('[Import Modal] Tickers modal configuration failed to load', { page: 'import-user-data' });
             showImportUserDataNotification('שגיאה בטעינת מודול הטיקר הכללי', 'error');
+        } else {
+            // Ensure modal is created if config is loaded but modal doesn't exist
+            if (window.tickersModalConfig && window.ModalManagerV2) {
+                const modalElement = document.getElementById('tickersModal');
+                if (!modalElement) {
+                    // Modal doesn't exist, create it
+                    try {
+                        if (typeof window.initializeTickersModal === 'function') {
+                            window.initializeTickersModal();
+                        } else if (window.ModalManagerV2.createCRUDModal) {
+                            window.ModalManagerV2.createCRUDModal(window.tickersModalConfig);
+                        }
+                        // Wait a bit for modal to be created
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (createError) {
+                        window.Logger?.error('[Import Modal] Failed to create tickers modal', { 
+                            error: createError.message, 
+                            page: 'import-user-data' 
+                        });
+                    }
+                }
+            }
         }
     }
 
     if (canUseModal) {
         try {
-            await showModal('tickersModal', 'add');
+            await showModal('tickersModal', 'add', null);
 
+            // Wait for modal to be fully visible
             const modalElement = document.getElementById('tickersModal');
             if (modalElement) {
+            // Wait for Bootstrap modal to be fully shown
+            await new Promise((resolve) => {
+                const checkModal = () => {
+                    if (modalElement.classList.contains('show') && 
+                        modalElement.style.display !== 'none' &&
+                        modalElement.offsetParent !== null) {
+                        // Ensure modal is on top by setting z-index
+                        const currentZIndex = parseInt(window.getComputedStyle(modalElement).zIndex) || 0;
+                        if (currentZIndex < 1000000010) {
+                            modalElement.style.zIndex = '1000000010';
+                            const dialog = modalElement.querySelector('.modal-dialog');
+                            if (dialog) {
+                                dialog.style.zIndex = '1000000011';
+                            }
+                            const content = modalElement.querySelector('.modal-content');
+                            if (content) {
+                                content.style.zIndex = '1000000012';
+                            }
+                        }
+                        resolve();
+                    } else {
+                        modalElement.addEventListener('shown.bs.modal', resolve, { once: true });
+                        // Fallback timeout
+                        setTimeout(resolve, 500);
+                    }
+                };
+                checkModal();
+            });
                 const applyPrefill = async () => {
                     const symbolInput = modalElement.querySelector('#tickerSymbol');
                     const nameInput = modalElement.querySelector('#tickerName');
@@ -7706,6 +7708,8 @@ function handleSessionCompletion(status, message, details = null) {
     updateActiveSessionIndicator();
     updateResetSessionButtonState();
     updateAnalyzeButton();
+    // Unlock connector dropdown after session completion
+    syncAccountAndConnectorLockState();
     
     // Show notification based on status
     const statusMessages = {
@@ -7981,6 +7985,105 @@ function displayMissingTickers(missingTickers) {
         .map((entry) => renderMissingTickerRow(entry.item))
         .join('');
     markProblemTableReady('missingTickersTable');
+}
+
+/**
+ * Remove ticker from missing list immediately after it's created
+ */
+function removeTickerFromMissingList(symbol) {
+    if (!symbol) {
+        window.Logger?.warn('[Import Modal] removeTickerFromMissingList called without symbol', { page: 'import-user-data' });
+        return;
+    }
+    
+    const normalizedSymbol = normalizeProblemTicker(symbol);
+    if (!normalizedSymbol) {
+        window.Logger?.warn('[Import Modal] Failed to normalize ticker symbol', { symbol, page: 'import-user-data' });
+        return;
+    }
+    
+    window.Logger?.debug('[Import Modal] Removing ticker from missing list', {
+        symbol: normalizedSymbol,
+        hasPreviewData: !!previewData,
+        currentStep,
+        page: 'import-user-data'
+    });
+    
+    // Get current missing tickers from preview data
+    let currentMissing = [];
+    if (previewData) {
+        const summary = previewData.summary || {};
+        const availableMissing = []
+            .concat(Array.isArray(previewData.missing_tickers) ? previewData.missing_tickers : [])
+            .concat(Array.isArray(summary.missing_tickers) ? summary.missing_tickers : []);
+        currentMissing = availableMissing;
+    }
+    
+    window.Logger?.debug('[Import Modal] Current missing tickers before removal', {
+        count: currentMissing.length,
+        symbols: currentMissing.map(t => typeof t === 'string' ? t : (t.symbol || t.ticker || t.display_symbol)),
+        page: 'import-user-data'
+    });
+    
+    // Filter out the saved ticker
+    const filteredMissing = currentMissing.filter((ticker) => {
+        const tickerSymbol = typeof ticker === 'string' 
+            ? ticker 
+            : (ticker.symbol || ticker.ticker || ticker.display_symbol);
+        const normalizedTickerSymbol = normalizeProblemTicker(tickerSymbol);
+        return normalizedTickerSymbol !== normalizedSymbol;
+    });
+    
+    window.Logger?.debug('[Import Modal] Filtered missing tickers after removal', {
+        count: filteredMissing.length,
+        removed: currentMissing.length - filteredMissing.length,
+        page: 'import-user-data'
+    });
+    
+    // Update preview data to reflect the change
+    if (previewData) {
+        if (Array.isArray(previewData.missing_tickers)) {
+            previewData.missing_tickers = filteredMissing;
+        }
+        if (previewData.summary) {
+            if (Array.isArray(previewData.summary.missing_tickers)) {
+                previewData.summary.missing_tickers = filteredMissing;
+            }
+        }
+    }
+    
+    // Also update records_to_skip to remove records with this ticker
+    if (previewData && Array.isArray(previewData.records_to_skip)) {
+        const beforeSkipCount = previewData.records_to_skip.length;
+        previewData.records_to_skip = previewData.records_to_skip.filter(record => {
+            if (record.reason === 'missing_ticker') {
+                const recordSymbol = record.missing_ticker || record.record?.symbol;
+                return normalizeProblemTicker(recordSymbol) !== normalizedSymbol;
+            }
+            return true;
+        });
+        window.Logger?.debug('[Import Modal] Updated records_to_skip', {
+            before: beforeSkipCount,
+            after: previewData.records_to_skip.length,
+            page: 'import-user-data'
+        });
+    }
+    
+    // Update display immediately - only if we're on step 2 (problem resolution)
+    if (currentStep === 2) {
+        window.Logger?.info('[Import Modal] Updating missing tickers display', {
+            before: currentMissing.length,
+            after: filteredMissing.length,
+            symbol: normalizedSymbol,
+            page: 'import-user-data'
+        });
+        displayMissingTickers(filteredMissing);
+    } else {
+        window.Logger?.debug('[Import Modal] Not on step 2, skipping display update', {
+            currentStep,
+            page: 'import-user-data'
+        });
+    }
 }
 
 /**
@@ -8474,6 +8577,12 @@ function refreshPreviewData() {
             // Refresh the current step display only if modal is still open
             if (currentStep === 2) {
                 displayProblemResolutionDetailed(data.preview_data);
+                // Also update missing tickers list explicitly
+                const summary = data.preview_data?.summary || {};
+                const missingTickers = []
+                    .concat(Array.isArray(data.preview_data?.missing_tickers) ? data.preview_data.missing_tickers : [])
+                    .concat(Array.isArray(summary.missing_tickers) ? summary.missing_tickers : []);
+                displayMissingTickers(missingTickers);
             } else if (currentStep === 3) {
                 displayProblemResolutionDetailed(data.preview_data);
             } else if (currentStep === 4) {
@@ -8551,35 +8660,11 @@ function getImportDebugState(symbol) {
     };
 }
 
-// Export functions for global access
-// Export wrapper function that handles session cleanup
-// Also export the internal function for direct calls (but wrapper is preferred)
-console.log('[Import Modal] ===== EXPORTING FUNCTIONS =====');
-console.log('[Import Modal] openImportUserDataModalWithSessionCleanup exists:', typeof openImportUserDataModalWithSessionCleanup);
-console.log('[Import Modal] openImportUserDataModal exists:', typeof openImportUserDataModal);
-
-// IMPORTANT: Save reference to internal function BEFORE assigning wrapper to window
-// This prevents recursion when openImportUserDataModal() is called internally
-window._openImportUserDataModalInternal = openImportUserDataModal;
-
-// Export to window (for window.openImportUserDataModal() and direct openImportUserDataModal() calls)
-// In browser, window is the global scope, so window.openImportUserDataModal is available as openImportUserDataModal
-// This is the wrapper that handles session cleanup
-window.openImportUserDataModal = openImportUserDataModalWithSessionCleanup;
-
-console.log('[Import Modal] window.openImportUserDataModal set to:', typeof window.openImportUserDataModal);
-console.log('[Import Modal] window.openImportUserDataModal === function:', typeof window.openImportUserDataModal === 'function');
-console.log('[Import Modal] window.openImportUserDataModal === openImportUserDataModalWithSessionCleanup:', window.openImportUserDataModal === openImportUserDataModalWithSessionCleanup);
-
-// Test if function is callable
-try {
-    const testCall = window.openImportUserDataModal;
-    console.log('[Import Modal] Function is callable:', typeof testCall === 'function');
-} catch (e) {
-    console.error('[Import Modal] Error testing function:', e);
-}
+// Note: window.openImportUserDataModal is already set above (line 3951, right after openImportUserDataModal definition)
+// No need to set it again here
 
 console.log('[Import Modal] ===== EXPORT COMPLETE =====');
+console.log('[Import Modal] 💡 Debug function available: debugTickerModal() - Run in console to diagnose ticker modal issues');
 
 // Internal function already saved above (before window.openImportUserDataModal assignment)
 // This ensures no recursion when calling openImportUserDataModal() internally
@@ -8592,6 +8677,149 @@ window.analyzeFile = analyzeFile;
 window.acceptDuplicate = acceptDuplicate;
 window.rejectDuplicate = rejectDuplicate;
 window.openAddTickerModal = openAddTickerModal;
+
+/**
+ * Debug function for ticker modal - run in console: debugTickerModal()
+ */
+/**
+ * Debug function for ticker modal
+ * Usage in console: debugTickerModal() or debugTickerModal('AAPL', 'USD')
+ */
+window.debugTickerModal = function(symbol = 'TEST', currency = 'USD') {
+    console.group('🔍 [DEBUG] Ticker Modal Diagnostic');
+    
+    // 0. Check if function exists
+    console.log('0️⃣ Function Check:');
+    console.log('  openAddTickerModal exists:', typeof window.openAddTickerModal === 'function' ? '✅' : '❌');
+    console.log('  openAddTickerModal type:', typeof window.openAddTickerModal);
+    
+    // 1. Check ModalManagerV2
+    console.log('\n1️⃣ ModalManagerV2 Check:');
+    console.log('  ModalManagerV2 exists:', typeof window.ModalManagerV2 !== 'undefined' ? '✅' : '❌');
+    if (window.ModalManagerV2) {
+        console.log('  showModal method:', typeof window.ModalManagerV2.showModal === 'function' ? '✅' : '❌');
+        console.log('  createCRUDModal method:', typeof window.ModalManagerV2.createCRUDModal === 'function' ? '✅' : '❌');
+    }
+    console.log('  showModalSafe exists:', typeof window.showModalSafe === 'function' ? '✅' : '❌');
+    
+    // 2. Check tickers modal config
+    console.log('\n2️⃣ Tickers Modal Config:');
+    console.log('  tickersModalConfig exists:', typeof window.tickersModalConfig !== 'undefined' ? '✅' : '❌');
+    console.log('  __TICKERS_MODAL_CONFIG_SOURCE__ exists:', typeof window.__TICKERS_MODAL_CONFIG_SOURCE__ !== 'undefined' ? '✅' : '❌');
+    if (window.tickersModalConfig) {
+        console.log('  Config ID:', window.tickersModalConfig.id);
+        console.log('  Config entityType:', window.tickersModalConfig.entityType);
+        console.log('  Config fields count:', window.tickersModalConfig.fields?.length || 0);
+    }
+    
+    // 3. Check if modal exists in DOM
+    console.log('\n3️⃣ DOM Elements:');
+    const modalElement = document.getElementById('tickersModal');
+    console.log('  Modal element exists:', modalElement ? '✅' : '❌');
+    if (modalElement) {
+        console.log('  Modal has show class:', modalElement.classList.contains('show') ? '✅' : '❌');
+        console.log('  Modal display style:', window.getComputedStyle(modalElement).display);
+        console.log('  Modal visibility:', window.getComputedStyle(modalElement).visibility);
+        console.log('  Modal opacity:', window.getComputedStyle(modalElement).opacity);
+        console.log('  Modal offsetParent:', modalElement.offsetParent !== null ? '✅' : '❌');
+        console.log('  Modal offsetWidth:', modalElement.offsetWidth);
+        console.log('  Modal offsetHeight:', modalElement.offsetHeight);
+        console.log('  Modal z-index:', window.getComputedStyle(modalElement).zIndex);
+        
+        // Check form
+        const form = modalElement.querySelector('form');
+        console.log('  Form exists:', form ? '✅' : '❌');
+        
+        // Check key fields
+        const fields = {
+            tickerSymbol: modalElement.querySelector('#tickerSymbol'),
+            tickerName: modalElement.querySelector('#tickerName'),
+            tickerType: modalElement.querySelector('#tickerType'),
+            tickerCurrency: modalElement.querySelector('#tickerCurrency'),
+            tickerTags: modalElement.querySelector('#tickerTags')
+        };
+        console.log('  Key fields:');
+        Object.entries(fields).forEach(([name, element]) => {
+            console.log(`    ${name}:`, element ? '✅' : '❌');
+        });
+    }
+    
+    // 4. Check Bootstrap
+    console.log('\n4️⃣ Bootstrap Check:');
+    const bootstrapAvailable = typeof bootstrap !== 'undefined';
+    console.log('  Bootstrap available:', bootstrapAvailable ? '✅' : '❌');
+    if (bootstrapAvailable) {
+        console.log('  Bootstrap.Modal exists:', typeof bootstrap.Modal !== 'undefined' ? '✅' : '❌');
+        if (modalElement && bootstrap.Modal) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            console.log('  Modal instance exists:', modalInstance ? '✅' : '❌');
+            if (modalInstance) {
+                console.log('  Modal is shown:', modalInstance._isShown ? '✅' : '❌');
+            }
+        }
+    }
+    
+    // 5. Check modal manager registration
+    console.log('\n5️⃣ Modal Manager Registration:');
+    if (window.ModalManagerV2 && window.ModalManagerV2.modals) {
+        const modalInfo = window.ModalManagerV2.modals.get('tickersModal');
+        console.log('  Modal registered:', modalInfo ? '✅' : '❌');
+        if (modalInfo) {
+            console.log('  Modal config:', modalInfo.config?.id);
+            console.log('  Modal element:', modalInfo.element ? '✅' : '❌');
+        }
+    } else {
+        console.log('  ModalManagerV2.modals not available');
+    }
+    
+    // 6. Test opening modal
+    console.log('\n6️⃣ Test Opening Modal:');
+    console.log('  Attempting to open modal with:', { symbol, currency });
+    
+    const testOpen = async () => {
+        try {
+            console.log('  Calling openAddTickerModal...');
+            const result = await window.openAddTickerModal(symbol, currency);
+            console.log('  Result:', result);
+            
+            // Wait a bit and check again
+            setTimeout(() => {
+                const modalAfter = document.getElementById('tickersModal');
+                if (modalAfter) {
+                    console.log('  Modal after open:');
+                    console.log('    Has show class:', modalAfter.classList.contains('show') ? '✅' : '❌');
+                    console.log('    Display:', window.getComputedStyle(modalAfter).display);
+                    console.log('    Visible:', modalAfter.offsetParent !== null ? '✅' : '❌');
+                } else {
+                    console.log('  ❌ Modal not found after open attempt');
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('  ❌ Error opening modal:', error);
+            console.error('  Error stack:', error.stack);
+        }
+    };
+    
+    console.log('  Run: testOpen() to test opening');
+    window.testTickerModalOpen = testOpen;
+    
+    // 7. Check dependencies
+    console.log('\n7️⃣ Dependencies:');
+    console.log('  SelectPopulatorService:', typeof window.SelectPopulatorService !== 'undefined' ? '✅' : '❌');
+    console.log('  ensureModalManagerReady:', typeof ensureModalManagerReady === 'function' ? '✅' : '❌');
+    console.log('  ensureTickersModalConfigLoaded:', typeof ensureTickersModalConfigLoaded === 'function' ? '✅' : '❌');
+    
+    console.groupEnd();
+    console.log('\n💡 To test opening modal, run: testTickerModalOpen()');
+    return {
+        modalElement,
+        modalManagerReady: typeof window.ModalManagerV2 !== 'undefined',
+        configReady: typeof window.tickersModalConfig !== 'undefined',
+        bootstrapReady: typeof bootstrap !== 'undefined',
+        testOpen
+    };
+};
+
 window.showConfirmationModal = showConfirmationModal;
 window.closeConfirmationModal = closeConfirmationModal;
 window.executeImport = executeImport;

@@ -30,34 +30,35 @@ POSTGRES_URL = os.getenv(
 )
 
 # Target tables (PostgreSQL) → Source tables (SQLite)
-# Group B: Users, Preferences, Trading Methods
+# ORDER MATTERS: Parent tables must be copied before child tables
+# Group B: Users, Preferences, Trading Methods (ordered by dependencies)
 TABLE_MAP: Dict[str, str] = {
+    # Level 1: No dependencies
     "users": "users",
-    "preference_types": "preference_types",
-    "preference_groups": "preference_groups",
-    "preference_profiles": "preference_profiles",
-    "user_preferences": "user_preferences_v3",  # consolidate onto a single canonical table
-    "preferences_legacy": "preferences_legacy",  # preserve as backup/history
-    "trading_methods": "trading_methods",
-    "method_parameters": "method_parameters",
-    # Group C: Constraints and Connectivity
-    "constraints": "constraints",
-    "constraint_validations": "constraint_validations",
-    "enum_values": "enum_values",
-    "note_relation_types": "note_relation_types",
-    "link_types": "link_types",  # if exists
-    # Group D: Currencies and Financial Aux Data
-    "currencies": "currencies",
+    "preference_groups": "preference_groups",  # Must be before preference_types
+    "preference_profiles": "preference_profiles",  # Must be before user_preferences
+    "currencies": "currencies",  # Must be before tickers/quotes
     "external_data_providers": "external_data_providers",
-    "quotes_last": "quotes_last",  # cache table for last quotes
-    # Group E: System Configuration
-    "system_setting_types": "system_setting_types",
-    "system_settings": "system_settings",
+    "trading_methods": "trading_methods",
+    "note_relation_types": "note_relation_types",
+    "tag_categories": "tag_categories",  # Must be before tags
     "system_setting_groups": "system_setting_groups",
-    "system_setting_profiles": "system_setting_profiles",  # if exists
-    # Group F: Tags System
-    "tag_categories": "tag_categories",
-    "tags": "tags",
+    # Level 2: Depend on Level 1
+    "preference_types": "preference_types",  # Depends on preference_groups
+    "user_preferences": "user_preferences_v3",  # Depends on preference_profiles, preference_types
+    "preferences_legacy": "preferences_legacy",  # preserve as backup/history
+    "method_parameters": "method_parameters",  # Depends on trading_methods
+    "tags": "tags",  # Depends on tag_categories
+    "system_setting_types": "system_setting_types",  # Depends on system_setting_groups
+    "system_settings": "system_settings",  # Depends on system_setting_types
+    # Group C: Constraints and Connectivity
+    "constraints": "constraints",  # Must be before enum_values
+    "constraint_validations": "constraint_validations",  # Depends on constraints
+    "enum_values": "enum_values",  # Depends on constraints
+    # Group D: Currencies and Financial Aux Data
+    # Note: quotes_last depends on tickers, but tickers are Group A (not migrated)
+    # So we skip quotes_last or handle it separately
+    # "quotes_last": "quotes_last",  # Skip - depends on tickers which aren't migrated
 }
 
 
@@ -84,13 +85,23 @@ def fetch_rows(sqlite_conn: sqlite3.Connection, table: str) -> List[Dict]:
 
 
 def disable_fk_constraints(engine: Engine) -> None:
-    with engine.begin() as conn:
-        conn.exec_driver_sql("SET session_replication_role = replica;")
+    # Try to disable FK constraints, but continue if permission denied
+    try:
+        with engine.begin() as conn:
+            conn.exec_driver_sql("SET session_replication_role = replica;")
+    except Exception:
+        # If we don't have permission, we'll proceed anyway
+        # Foreign key constraints will be checked during insert
+        pass
 
 
 def enable_fk_constraints(engine: Engine) -> None:
-    with engine.begin() as conn:
-        conn.exec_driver_sql("SET session_replication_role = DEFAULT;")
+    # Try to enable FK constraints, but continue if permission denied
+    try:
+        with engine.begin() as conn:
+            conn.exec_driver_sql("SET session_replication_role = DEFAULT;")
+    except Exception:
+        pass
 
 
 def truncate_table(engine: Engine, table: Table) -> None:
@@ -108,7 +119,9 @@ def insert_rows(engine: Engine, table: Table, rows: Sequence[Dict]) -> None:
 def copy_table(
     sqlite_conn: sqlite3.Connection, engine: Engine, metadata: MetaData, target: str, source: str
 ) -> TableCopyResult:
-    table = Table(target, metadata, autoload_with=engine)
+    # Refresh metadata to avoid conflicts
+    metadata.clear()
+    table = Table(target, metadata, autoload_with=engine, schema='public')
     rows = fetch_rows(sqlite_conn, source)
     truncate_table(engine, table)
     insert_rows(engine, table, rows)

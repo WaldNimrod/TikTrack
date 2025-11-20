@@ -821,6 +821,65 @@ class ModalManagerV2 {
                 `;
                 
             case 'select':
+                // Check if this is a tag multi-select field
+                const isTagMultiSelect = (field.additionalClasses && (
+                    (Array.isArray(field.additionalClasses) && field.additionalClasses.includes('tag-multi-select')) ||
+                    (typeof field.additionalClasses === 'string' && field.additionalClasses.includes('tag-multi-select'))
+                )) || (field.classList && Array.isArray(field.classList) && field.classList.includes('tag-multi-select'));
+                
+                // If it's a tag multi-select, render it with badge container like tag-multi-select type
+                if (isTagMultiSelect) {
+                    const initialTags = Array.isArray(field.defaultValue)
+                        ? field.defaultValue.join(',')
+                        : (field.defaultValue || '');
+                    const badgeContainerId = `${field.id}TagBadgeContainer`;
+                    const extraAttributes = [];
+                    if (field.multiple) {
+                        extraAttributes.push('multiple');
+                    }
+                    if (field.attributes && typeof field.attributes === 'object') {
+                        Object.entries(field.attributes).forEach(([attrKey, attrValue]) => {
+                            if (attrValue === true) {
+                                extraAttributes.push(attrKey);
+                            } else if (attrValue !== false && attrValue !== null && attrValue !== undefined) {
+                                extraAttributes.push(`${attrKey}="${attrValue}"`);
+                            }
+                        });
+                    }
+                    if (field.dataset && typeof field.dataset === 'object') {
+                        Object.entries(field.dataset).forEach(([dataKey, dataValue]) => {
+                            if (dataValue !== undefined && dataValue !== null) {
+                                extraAttributes.push(`data-${dataKey}="${dataValue}"`);
+                            }
+                        });
+                    }
+                    
+                    return `
+                        <div class="mb-3">
+                            <label for="${field.id}" class="form-label">
+                                ${field.label} ${requiredStar}
+                            </label>
+                            <select 
+                                class="form-select tag-multi-select"
+                                id="${field.id}"
+                                name="${field.name || field.id}"
+                                ${requiredAttr}
+                                ${disabledAttr}
+                                ${readOnlyAttr}
+                                data-tag-category="${field.tagCategory ?? ''}"
+                                data-include-inactive="${field.includeInactive ? 'true' : 'false'}"
+                                data-initial-value="${initialTags}"
+                                ${extraAttributes.join(' ')}>
+                                <option value="" disabled>טוען תגיות...</option>
+                            </select>
+                            <div id="${badgeContainerId}" class="mt-2 tag-picker-badges text-start small"></div>
+                            ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    `;
+                }
+                
+                // Regular select field
                 let optionsHTML = '';
                 if (field.includeEmpty !== false) {
                     const emptyText = field.emptyText || 'בחר...';
@@ -1052,9 +1111,9 @@ class ModalManagerV2 {
      * @param {Object} entityData - נתוני הישות (לעריכה/צפייה)
      * @returns {Promise<void>}
      */
-    async showModal(modalId, mode = 'add', entityData = null) {
+    async showModal(modalId, mode = 'add', entityData = null, options = {}) {
         try {
-            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, modalsCount: this.modals.size });
+            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, options, modalsCount: this.modals.size });
             
             // בדיקה שהמודל קיים - אם לא, ננסה ליצור אותו מהקונפיגורציה
             if (!this.modals.has(modalId)) {
@@ -1156,7 +1215,12 @@ class ModalManagerV2 {
             
             // Initialize tabs if exists
             if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs) && modalInfo.config.tabs.length > 0) {
-                this.initializeTabs(modalElement, modalInfo.config);
+                // For cash flow modal - handle currency exchange vs regular flow
+                if (modalId === 'cashFlowModal') {
+                    this.initializeCashFlowTabs(modalElement, modalInfo.config, mode, entityData, options);
+                } else {
+                    this.initializeTabs(modalElement, modalInfo.config);
+                }
             }
             
             // יישום צבעים
@@ -2396,33 +2460,185 @@ class ModalManagerV2 {
      * @private
      */
     async _hydrateTagFieldsForModal(modalElement, defaultEntityType, entityId) {
-        if (!modalElement || !window.TagUIManager) {
+        if (!modalElement) {
+            window.Logger?.warn('⚠️ _hydrateTagFieldsForModal: modalElement not available', {
+                page: 'modal-manager-v2'
+            });
             return;
         }
 
+        // Wait for TagUIManager to be available (it might load after modal opens)
+        if (!window.TagUIManager) {
+            window.Logger?.info('🏷️ TagUIManager not available yet, waiting...', {
+                modalId: modalElement.id,
+                page: 'modal-manager-v2'
+            });
+            
+            // Retry mechanism: wait for TagUIManager to be available
+            let retries = 0;
+            const maxRetries = 10;
+            const retryDelay = 100; // 100ms between retries
+            
+            while (retries < maxRetries && !window.TagUIManager) {
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                retries++;
+            }
+            
+            if (!window.TagUIManager) {
+                window.Logger?.warn('⚠️ TagUIManager not available after waiting', {
+                    modalId: modalElement.id,
+                    retries,
+                    page: 'modal-manager-v2'
+                });
+                return;
+            }
+            
+            window.Logger?.info('🏷️ TagUIManager became available after waiting', {
+                modalId: modalElement.id,
+                retries,
+                page: 'modal-manager-v2'
+            });
+        }
+
+        // First, initialize all tag selects (sets up event listeners and ensures they're ready)
+        if (typeof window.TagUIManager.initializeModal === 'function') {
+            try {
+                window.Logger?.info('🏷️ Initializing tag picker in modal', { 
+                    modalId: modalElement.id,
+                    entityType: defaultEntityType,
+                    page: 'modal-manager-v2' 
+                });
+                window.TagUIManager.initializeModal(modalElement);
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { 
+                    error: error.message || error,
+                    modalId: modalElement.id, 
+                    page: 'modal-manager-v2' 
+                });
+            }
+        }
+
+        // Wait a bit to ensure DOM is ready
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         const tagSelects = modalElement.querySelectorAll('select.tag-multi-select');
+        window.Logger?.info('🏷️ _hydrateTagFieldsForModal called', {
+            modalId: modalElement.id,
+            defaultEntityType,
+            entityId,
+            tagSelectsCount: tagSelects.length,
+            selectIds: Array.from(tagSelects).map(s => s.id),
+            page: 'modal-manager-v2'
+        });
+        
         if (!tagSelects.length) {
+            window.Logger?.info('🏷️ No tag selects found in modal', { modalId: modalElement.id, page: 'modal-manager-v2' });
             return;
         }
 
         for (const select of tagSelects) {
             const targetEntityType = select.dataset.tagEntity || defaultEntityType;
             if (!targetEntityType || !select.id) {
+                window.Logger?.warn('⚠️ Skipping tag select - missing entityType or id', {
+                    selectId: select.id,
+                    targetEntityType,
+                    defaultEntityType,
+                    hasTagEntity: !!select.dataset.tagEntity,
+                    page: 'modal-manager-v2'
+                });
                 continue;
             }
+            
+            // For edit mode: load existing tags for the entity
             if (entityId && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
                 try {
+                    window.Logger?.info('🏷️ Hydrating tag select for entity (edit mode)', {
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        entityId,
+                        page: 'modal-manager-v2'
+                    });
                     await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
                 } catch (error) {
                     window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
-                        error,
+                        error: error.message || error,
+                        errorStack: error.stack,
                         selectId: select.id,
                         entityType: targetEntityType,
                         entityId,
                         page: 'modal-manager-v2'
                     });
                 }
+            } else {
+                // For add mode: ensure tags are populated - refreshSelectOptions will populate if not already done
+                if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
+                    window.Logger?.info('🏷️ Refreshing tag select options (add mode)', {
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        hasTagService: !!window.TagService,
+                        hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // Retry mechanism: wait for TagService to be available
+                    let retries = 0;
+                    const maxRetries = 5;
+                    const retryDelay = 200; // 200ms between retries
+                    
+                    while (retries < maxRetries) {
+                        try {
+                            // Check if TagService is available
+                            if (window.TagService && typeof window.TagService.fetchTags === 'function') {
+                                await window.TagUIManager.refreshSelectOptions(select);
+                                window.Logger?.info('🏷️ Tag select refreshed successfully', {
+                                    selectId: select.id,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                break; // Success, exit retry loop
+                            } else {
+                                window.Logger?.debug('🏷️ TagService not available yet, waiting...', {
+                                    selectId: select.id,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                // Wait a bit and retry
+                                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                                retries++;
+                            }
+                        } catch (error) {
+                            if (retries >= maxRetries - 1) {
+                                // Last retry failed, log warning
+                                window.Logger?.warn?.('⚠️ Failed to refresh tag select options in add mode after retries', {
+                                    error: error.message || error,
+                                    errorStack: error.stack,
+                                    selectId: select.id,
+                                    entityType: targetEntityType,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                            } else {
+                                window.Logger?.debug('🏷️ Error refreshing tag select, retrying...', {
+                                    selectId: select.id,
+                                    error: error.message || error,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                // Wait and retry
+                                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                                retries++;
+                            }
+                        }
+                    }
+                } else {
+                    window.Logger?.warn('⚠️ TagUIManager.refreshSelectOptions not available', {
+                        selectId: select.id,
+                        page: 'modal-manager-v2'
+                    });
+                }
             }
+            
+            // Load suggestions for both add and edit modes
             if (typeof window.TagUIManager.loadSuggestionsForSelect === 'function') {
                 const suggestionEntityId = entityId && targetEntityType === defaultEntityType ? entityId : null;
                 window.TagUIManager.loadSuggestionsForSelect(select, {
@@ -3727,6 +3943,7 @@ class ModalManagerV2 {
                 'name': 'tickerName',
                 'type': 'tickerType',
                 'currency_id': 'tickerCurrency',
+                'status': 'tickerStatus',
                 'remarks': 'tickerRemarks',
                 'sector': 'tickerSector',
                 'industry': 'tickerIndustry'
@@ -4136,6 +4353,140 @@ class ModalManagerV2 {
         
         // Initialize currency exchange calculations if exchange tab is active by default
         if (activeTabId === 'exchange') {
+            this.initializeCurrencyExchangeCalculations(modalElement);
+        }
+    }
+    
+    /**
+     * Initialize cash flow tabs with currency exchange detection - אתחול טאבים של תזרימי מזומנים עם זיהוי המרת מטבע
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit)
+     * @param {Object} entityData - נתוני הישות (לעריכה)
+     * @param {Object} options - אפשרויות נוספות (isCurrencyExchange, exchangeId)
+     * @private
+     */
+    initializeCashFlowTabs(modalElement, config, mode, entityData, options = {}) {
+        if (!config.tabs || !Array.isArray(config.tabs) || config.tabs.length === 0) {
+            return;
+        }
+        
+        const tabsContainer = modalElement.querySelector(`#${config.id}Tabs`);
+        if (!tabsContainer) {
+            console.warn(`⚠️ Tabs container not found for modal ${config.id}`);
+            return;
+        }
+        
+        // Determine if this is a currency exchange
+        let isCurrencyExchange = false;
+        
+        if (options.isCurrencyExchange) {
+            // Explicitly marked as currency exchange
+            isCurrencyExchange = true;
+        } else if (mode === 'edit' && entityData) {
+            // Check entityData for currency exchange indicators
+            if (window.isCurrencyExchange && typeof window.isCurrencyExchange === 'function') {
+                isCurrencyExchange = window.isCurrencyExchange(entityData);
+            } else {
+                // Fallback check
+                const type = entityData.type || '';
+                const externalId = entityData.external_id || '';
+                isCurrencyExchange = (
+                    type === 'currency_exchange_from' || 
+                    type === 'currency_exchange_to' ||
+                    (typeof externalId === 'string' && externalId.startsWith('exchange_')) ||
+                    entityData.linked_exchange_cash_flow_id ||
+                    entityData.exchange_pair_summary
+                );
+            }
+        }
+        
+        // Find tab buttons and panes
+        const tabButtons = tabsContainer.querySelectorAll('button[data-tab-id]');
+        const tabPanes = modalElement.querySelectorAll('.tab-pane');
+        
+        // Show/hide tabs based on currency exchange status
+        tabButtons.forEach(button => {
+            const tabId = button.getAttribute('data-tab-id');
+            const tabPane = modalElement.querySelector(`#${config.id}Tab${tabId}`);
+            
+            if (tabId === 'regular') {
+                // Regular tab - show only for non-exchange flows
+                if (isCurrencyExchange) {
+                    button.style.display = 'none';
+                    if (tabPane) {
+                        tabPane.style.display = 'none';
+                    }
+                } else {
+                    button.style.display = '';
+                    if (tabPane) {
+                        tabPane.style.display = '';
+                    }
+                }
+            } else if (tabId === 'exchange') {
+                // Exchange tab - show only for exchange flows
+                if (isCurrencyExchange) {
+                    button.style.display = '';
+                    if (tabPane) {
+                        tabPane.style.display = '';
+                    }
+                    // Activate exchange tab
+                    button.classList.add('active');
+                    if (tabPane) {
+                        tabPane.classList.add('show', 'active');
+                    }
+                    // Deactivate regular tab
+                    const regularButton = tabsContainer.querySelector('button[data-tab-id="regular"]');
+                    const regularPane = modalElement.querySelector(`#${config.id}Tabregular`);
+                    if (regularButton) {
+                        regularButton.classList.remove('active');
+                    }
+                    if (regularPane) {
+                        regularPane.classList.remove('show', 'active');
+                    }
+                } else {
+                    button.style.display = 'none';
+                    if (tabPane) {
+                        tabPane.style.display = 'none';
+                    }
+                }
+            }
+        });
+        
+        // Update save button onclick based on active tab
+        const saveBtn = modalElement.querySelector(`#${config.id}SaveBtn`);
+        if (saveBtn) {
+            if (isCurrencyExchange && config.onSaveExchange) {
+                saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+            } else if (config.onSave) {
+                saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+            }
+        }
+        
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', (e) => {
+                const tabId = e.target.getAttribute('data-tab-id');
+                
+                // Update save button onclick based on selected tab
+                if (saveBtn) {
+                    if (tabId === 'exchange' && config.onSaveExchange) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+                    } else if (config.onSave) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+                    }
+                }
+                
+                // Initialize currency exchange calculations if exchange tab is active
+                if (tabId === 'exchange') {
+                    this.initializeCurrencyExchangeCalculations(modalElement);
+                }
+            });
+        });
+        
+        // Initialize currency exchange calculations if exchange tab is active
+        if (isCurrencyExchange) {
             this.initializeCurrencyExchangeCalculations(modalElement);
         }
     }
@@ -4841,10 +5192,42 @@ class ModalManagerV2 {
             else if ((selectId.includes('Ticker') || selectId.includes('ticker')) && 
                       !selectId.includes('Type') && !selectId.includes('Currency') &&
                       selectId !== 'tickerType' && selectId !== 'tickerCurrency') {
-                // Ticker select (e.g., cashFlowTicker, tradePlanTicker)
-                await window.SelectPopulatorService.populateTickersSelect(select, {
-                    includeEmpty: true
-                });
+                // Special handling for executionTicker - only show tickers with open/closed trades or plans
+                if (selectId === 'executionTicker' && window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
+                    try {
+                        const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
+                            useCache: true
+                        });
+                        
+                        // If no relevant tickers, fallback to all tickers
+                        const tickersToShow = relevantTickers.length > 0 
+                            ? relevantTickers 
+                            : (await window.tickerService.getTickers() || []);
+                        
+                        // Use tickerService.updateTickerSelect if available, otherwise use SelectPopulatorService
+                        if (window.tickerService.updateTickerSelect && typeof window.tickerService.updateTickerSelect === 'function') {
+                            window.tickerService.updateTickerSelect(selectId, tickersToShow, 'בחר טיקר...');
+                        } else {
+                            // Fallback to SelectPopulatorService with filter
+                            await window.SelectPopulatorService.populateTickersSelect(select, {
+                                includeEmpty: true,
+                                filterFn: (ticker) => tickersToShow.some(t => t.id === ticker.id)
+                            });
+                        }
+                        console.log(`✅ נטענו ${tickersToShow.length} טיקרים רלוונטיים (עם טריידים/תכנונים פתוחים/סגורים) ל-${selectId}`);
+                    } catch (error) {
+                        console.warn(`⚠️ שגיאה בטעינת טיקרים רלוונטיים ל-${selectId}, משתמש בכל הטיקרים:`, error);
+                        // Fallback to all tickers
+                        await window.SelectPopulatorService.populateTickersSelect(select, {
+                            includeEmpty: true
+                        });
+                    }
+                } else {
+                    // Regular ticker select (e.g., cashFlowTicker, tradePlanTicker)
+                    await window.SelectPopulatorService.populateTickersSelect(select, {
+                        includeEmpty: true
+                    });
+                }
             } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
                 await window.SelectPopulatorService.populateTradePlansSelect(select, {
                     includeEmpty: true
@@ -4868,7 +5251,7 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - אלמנט המודל
      * @private
      */
-    handleModalShown(modalElement) {
+    async handleModalShown(modalElement) {
         const modalId = modalElement.id;
         
         if (this.modals.has(modalId)) {
@@ -4876,14 +5259,13 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
-        if (window.TagUIManager && typeof window.TagUIManager.initializeModal === 'function') {
-            try {
-                window.TagUIManager.initializeModal(modalElement);
-            } catch (error) {
-                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
-            }
-        }
-        this._hydrateTagFieldsForModal(modalElement, modalElement.dataset.entityType || null, null);
+        // Get entityType from modal config or dataset
+        const modalInfo = this.modals.get(modalId);
+        const entityType = modalInfo?.config?.entityType || modalElement.dataset.entityType || null;
+        
+        // Hydrate tag fields FIRST - this will also call initializeModal internally
+        // Must be async and awaited, and pass entityType from config
+        await this._hydrateTagFieldsForModal(modalElement, entityType, null);
         
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');

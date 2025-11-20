@@ -1063,9 +1063,11 @@ class PreferencesCore {
 
       // Initialize lazy loader if available
       if (window.LazyLoader) {
-        // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
+        // Ensure profileId is explicitly set (null means use active profile from server, not 0 or 1)
         const finalUserId = userId || this.currentUserId || 1;
-        const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
+        // If profileId is null/undefined, pass null to let server determine active profile
+        // Don't use cached currentProfileId if it might be stale (e.g., from SQLite migration)
+        const finalProfileId = profileId !== null && profileId !== undefined ? profileId : null;
 
         await window.LazyLoader.initialize(
           finalUserId,

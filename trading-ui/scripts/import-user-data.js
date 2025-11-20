@@ -2662,10 +2662,39 @@ function ensureRichTextEditorForTickerRemarks(modalElement) {
         return null;
     }
 
-    if (textarea.getAttribute('data-rich-text-enhanced') === 'true') {
-        return TICKER_REMARKS_EDITOR_ID;
+    // Check if editor already exists in DOM (not just the attribute)
+    const existingEditor = document.getElementById(TICKER_REMARKS_EDITOR_ID);
+    let isEnhanced = textarea.getAttribute('data-rich-text-enhanced') === 'true';
+    
+    // If marked as enhanced but editor doesn't exist in DOM, reset the attribute
+    if (isEnhanced && !existingEditor) {
+        textarea.removeAttribute('data-rich-text-enhanced');
+        setElementDisplay(textarea, '');
+        isEnhanced = false;
+    }
+    
+    // If editor exists in DOM, verify it's actually initialized in RichTextEditorService
+    if (isEnhanced && existingEditor) {
+        // Verify editor is actually initialized in RichTextEditorService
+        if (window.RichTextEditorService && window.RichTextEditorService.getEditorInstance) {
+            const editorInstance = window.RichTextEditorService.getEditorInstance(TICKER_REMARKS_EDITOR_ID);
+            if (editorInstance) {
+                // Editor exists and is valid - return its ID
+                return TICKER_REMARKS_EDITOR_ID;
+            } else {
+                // Editor container exists but not initialized - need to recreate
+                textarea.removeAttribute('data-rich-text-enhanced');
+                setElementDisplay(textarea, '');
+                existingEditor.remove(); // Remove the orphaned container
+                isEnhanced = false;
+            }
+        } else {
+            // RichTextEditorService not available, but container exists - assume it's valid
+            return TICKER_REMARKS_EDITOR_ID;
+        }
     }
 
+    // Editor doesn't exist or was destroyed - create it
     const editorContainer = document.createElement('div');
     editorContainer.id = TICKER_REMARKS_EDITOR_ID;
     editorContainer.classList.add('rich-text-editor-container');

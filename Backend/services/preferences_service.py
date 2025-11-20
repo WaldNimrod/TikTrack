@@ -59,6 +59,9 @@ class PreferencesService:
         self.constraint_service = ConstraintService()
         # Legacy compatibility for scripts/tests still touching the sqlite path directly
         self.db_path = str(DB_PATH)
+        # Import cache settings to respect CACHE_ENABLED in development
+        from config.settings import CACHE_ENABLED
+        self._cache_enabled = CACHE_ENABLED
 
     # ------------------------------------------------------------------ #
     # Session helpers
@@ -83,6 +86,9 @@ class PreferencesService:
         return f"preferences:{user_id}:{profile_id}:{suffix}"
 
     def _is_cache_valid(self, key: str) -> bool:
+        # If cache is disabled (development mode), always return False
+        if not self._cache_enabled:
+            return False
         timestamp = self.cache_timestamps.get(key)
         return timestamp is not None and (time.time() - timestamp) < self.CACHE_TTL
 
@@ -162,8 +168,19 @@ class PreferencesService:
         """
         with self._session_scope() as session:
             resolved_profile_id = requested_profile_id or profile_id
-            resolved_profile_id = resolved_profile_id or self._get_active_profile_id(session, user_id)
-            profile = session.get(PreferenceProfile, resolved_profile_id)
+            # If specific profile_id requested, try to use it
+            if resolved_profile_id:
+                profile = session.get(PreferenceProfile, resolved_profile_id)
+                # If profile not found or doesn't belong to user, fall back to active profile
+                if not profile or profile.user_id != user_id:
+                    resolved_profile_id = None  # Fall back to active profile
+            
+            # If no profile_id specified or fallback needed, get active profile
+            if not resolved_profile_id:
+                resolved_profile_id = self._get_active_profile_id(session, user_id)
+                profile = session.get(PreferenceProfile, resolved_profile_id)
+            
+            # Final validation
             if not profile or profile.user_id != user_id:
                 raise ProfileNotFoundError(f"Profile {resolved_profile_id} not found for user {user_id}")
 
@@ -320,7 +337,7 @@ class PreferencesService:
                 for pref, saved in rows
             ]
 
-        if use_cache:
+        if use_cache and self._cache_enabled:
             self.cache[key] = data
             self.cache_timestamps[key] = time.time()
         return data
@@ -334,7 +351,7 @@ class PreferencesService:
         cache_key = None
         if profile_id is not None:
             cache_key = self._cache_key(user_id, profile_id, "all")
-        if use_cache and cache_key and self._is_cache_valid(cache_key):
+        if use_cache and self._cache_enabled and cache_key and self._is_cache_valid(cache_key):
             return self.cache[cache_key]
 
         with self._session_scope() as session:
@@ -381,7 +398,7 @@ class PreferencesService:
             logger.info(f"🔍 DEBUG: get_all_user_preferences - returning {len(data)} preferences")
             if len(data) > 0:
                 logger.info(f"🔍 DEBUG: First 3 preferences in result: {data[:3]}")
-        if use_cache and cache_key:
+        if use_cache and self._cache_enabled and cache_key:
             self.cache[cache_key] = data
             self.cache_timestamps[cache_key] = time.time()
         return data

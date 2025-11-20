@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- No Cache Headers for Mockups -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>היסטוריית טרייד - TikTrack</title>
     
     <!-- TikTrack ITCSS Master Styles -->
@@ -57,15 +61,36 @@
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             padding: 10px 0;
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .timeline-absolute-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .timeline-absolute-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .timeline-absolute-wrapper::-webkit-scrollbar-thumb {
+            background: #26baac;
+            border-radius: 4px;
+        }
+        
+        .timeline-absolute-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #1e9b8f;
         }
         
         .timeline-absolute {
             display: flex;
             align-items: flex-start;
-            gap: 20px;
-            padding: 20px 0;
+            gap: 40px;
+            padding: 20px 40px;
             position: relative;
             min-width: max-content;
+            width: 100%;
         }
         
         .timeline-absolute::before {
@@ -86,7 +111,8 @@
             align-items: center;
             position: relative;
             z-index: 1;
-            min-width: 180px;
+            min-width: 200px;
+            max-width: 250px;
         }
         
         .timeline-point-absolute {
@@ -149,9 +175,11 @@
         /* Relative Timeline */
         .timeline-relative {
             display: none;
+            width: 100%;
         }
         
         .timeline-relative.active {
+            display: block;
             display: block;
         }
         
@@ -269,27 +297,23 @@
     <div id="unified-header"></div>
     
     <!-- Mockups Navigation -->
-    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
-                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px;">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">לוח כלכלי</a>
-                        <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">רשומת יומן</a>
-                    </div>
-                </div>
+    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <span style="font-weight: bold; color: #495057; font-size: 0.9rem; white-space: nowrap;">
+                    <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
+                </span>
+                <a href="trade-history-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">היסטוריית טרייד</a>
+                <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">מצב תיק היסטורי</a>
+                <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">היסטוריית מחירים</a>
+                <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">ניתוח השוואתי</a>
+                <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">יומן מסחר</a>
+                <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">ניתוח אסטרטגיות</a>
+                <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">לוח כלכלי</a>
+                <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">ווידג'ט היסטוריה</a>
+                <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">תיעוד רגשי</a>
+                <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">השוואת תאריכים</a>
+                <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">רשומת יומן</a>
             </div>
         </div>
     </div>
@@ -306,9 +330,15 @@
                             היסטוריית טרייד
                         </div>
                         <div class="table-actions">
-                            <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                            <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לרשימת טריידים"></button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="exportData()" title="ייצא נתונים">
+                                <i class="bi bi-download"></i> ייצא
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="showSettings()" title="הגדרות תצוגה">
+                                <i class="bi bi-gear"></i> הגדרות
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="window.history.back()" title="חזור לרשימת טריידים">
+                                <i class="bi bi-arrow-right"></i> חזור
+                            </button>
                         </div>
                     </div>
                     
@@ -359,14 +389,50 @@
                             <div class="card-body">
                                 <h5 class="card-title">נתונים בסיסיים</h5>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
+                                        <strong>מספר טרייד:</strong> #123
+                                    </div>
+                                    <div class="col-md-3">
                                         <strong>טיקר:</strong> AAPL
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <strong>חשבון:</strong> Account #1
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <strong>סטטוס:</strong> <span class="badge bg-success">סגור</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-3">
+                                        <strong>סוג השקעה:</strong> Swing
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>צד:</strong> Long
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>כמות מתוכננת:</strong> 150 מניות
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>סכום מתוכנן:</strong> $22,500
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-3">
+                                        <strong>מחיר כניסה מתוכנן:</strong> $150
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>תאריך פתיחה:</strong> 05/01/2025
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>תאריך סגירה:</strong> 20/01/2025
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>P/L כולל:</strong> <span style="color: #28a745; font-weight: bold;">$1,110</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-3" style="display: none;">
+                                    <div class="col-md-12">
+                                        <strong>הערות:</strong> טרייד מוצלח עם תשואה של 7.4%
                                     </div>
                                 </div>
                             </div>
@@ -388,8 +454,8 @@
                                 </div>
                                 
                                 <!-- Absolute Timeline View -->
-                                <div class="timeline-absolute-wrapper">
-                                    <div id="timelineAbsolute" class="timeline-absolute">
+                                <div class="timeline-absolute-wrapper" id="timelineAbsoluteWrapper">
+                                    <div id="timelineAbsolute" class="timeline-absolute" style="display: flex;">
                                     <div class="timeline-step-absolute" data-step="0" onclick="selectTimelineStep(0)">
                                         <div class="timeline-point-absolute"></div>
                                         <div class="timeline-step-info">
@@ -448,12 +514,13 @@
                                 </div>
                                 
                                 <!-- Relative Timeline View -->
-                                <div id="timelineRelative" class="timeline-relative">
-                                    <div class="timeline-chart-container">
+                                <div id="timelineRelative" class="timeline-relative" style="display: none;">
+                                    <div class="timeline-chart-container" style="height: 300px; position: relative;">
                                         <canvas id="timelineChart"></canvas>
                                     </div>
                                     <div class="text-center mt-3" style="font-size: 0.9rem; color: #6c757d;">
                                         <p>ציר X מייצג זמן במרווחים קבועים | המרווח בין נקודות מייצג את הזמן שעבר בין שלבים</p>
+                                        <p style="margin-top: 5px;">לחץ על נקודה לפרטים מלאים</p>
                                     </div>
                                 </div>
                             </div>
@@ -463,7 +530,7 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title">P/L לאורך זמן</h5>
-                                <div class="chart-container">
+                                <div class="chart-container" style="height: 400px; position: relative;">
                                     <canvas id="plChart"></canvas>
                                 </div>
                                 <div class="chart-legend">
@@ -569,7 +636,7 @@
                         <div class="card mb-4">
                             <div class="card-body">
                                 <h5 class="card-title">מחיר שוק מול מחירי כניסה/יציאה</h5>
-                                <div class="chart-container">
+                                <div class="chart-container" style="height: 400px; position: relative;">
                                     <canvas id="marketPriceChart"></canvas>
                                 </div>
                                 <div class="chart-legend">
@@ -631,17 +698,27 @@
             document.querySelector(`[data-view="${view}"]`).classList.add('active');
             
             // Show/hide views
+            const absoluteViewWrapper = document.getElementById('timelineAbsoluteWrapper');
             const absoluteView = document.getElementById('timelineAbsolute');
             const relativeView = document.getElementById('timelineRelative');
             
             if (view === 'absolute') {
-                absoluteView.style.display = 'flex';
-                relativeView.classList.remove('active');
+                if (absoluteViewWrapper) absoluteViewWrapper.style.display = 'block';
+                if (absoluteView) absoluteView.style.display = 'flex';
+                if (relativeView) {
+                    relativeView.style.display = 'none';
+                    relativeView.classList.remove('active');
+                }
             } else {
-                absoluteView.style.display = 'none';
-                relativeView.classList.add('active');
-                if (!timelineChart) {
-                    initTimelineChart();
+                if (absoluteViewWrapper) absoluteViewWrapper.style.display = 'none';
+                if (absoluteView) absoluteView.style.display = 'none';
+                if (relativeView) {
+                    relativeView.style.display = 'block';
+                    relativeView.classList.add('active');
+                    // Initialize chart if not already done
+                    if (!timelineChart) {
+                        setTimeout(() => initTimelineChart(), 100);
+                    }
                 }
             }
         }
@@ -665,15 +742,102 @@
             }
         }
         
-        function initTimelineChart() {
-            const ctx = document.getElementById('timelineChart');
-            if (!ctx) return;
+        async function initTimelineChart() {
+            const container = '#timelineChart';
+            if (!document.querySelector(container)) return;
             
             // Sample data for relative timeline
             const dates = ['01/01', '05/01', '10/01', '15/01', '20/01'];
             const timeIntervals = [0, 4, 5, 5, 5]; // Days between steps
+            const stepData = [
+                { step: 0, type: 'Trade Plan', id: 456, date: '01/01' },
+                { step: 1, type: 'Execution', id: 101, date: '05/01' },
+                { step: 2, type: 'Execution', id: 102, date: '10/01' },
+                { step: 3, type: 'Execution', id: 103, date: '15/01' },
+                { step: 4, type: 'Execution', id: 104, date: '20/01' }
+            ];
             
-            timelineChart = new Chart(ctx, {
+            // Use ChartSystem for basic charts
+            if (window.ChartSystem) {
+                timelineChart = await window.ChartSystem.create({
+                    id: 'timelineChart',
+                    type: 'line',
+                    container: container,
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Timeline',
+                            data: [0, 1, 2, 3, 4],
+                            borderColor: '#26baac',
+                            backgroundColor: 'rgba(38, 186, 172, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 8,
+                            pointBackgroundColor: '#26baac',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        const index = context[0].dataIndex;
+                                        const step = stepData[index];
+                                        return step ? `${step.type} #${step.id} - ${step.date}` : '';
+                                    },
+                                    label: function(context) {
+                                        const index = context.dataIndex;
+                                        const step = stepData[index];
+                                        if (step) {
+                                            return `סוג: ${step.type} | מזהה: #${step.id}`;
+                                        }
+                                        return '';
+                                    },
+                                    afterLabel: function(context) {
+                                        const index = context.dataIndex;
+                                        const step = stepData[index];
+                                        if (step) {
+                                            return 'לחץ לפרטים מלאים';
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'תאריך'
+                                }
+                            },
+                            y: {
+                                display: false
+                            }
+                        },
+                        onClick: function(event, elements) {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const step = stepData[index];
+                                if (step) {
+                                    const type = step.type === 'Trade Plan' ? 'plan' : 'execution';
+                                    showExecutionDetails(step.id, type);
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Fallback to direct Chart.js if ChartSystem not available
+                const ctx = document.getElementById('timelineChart');
+                timelineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: dates,
@@ -727,9 +891,9 @@
             });
         }
         
-        function initPLChart() {
-            const ctx = document.getElementById('plChart');
-            if (!ctx) return;
+        async function initPLChart() {
+            const container = '#plChart';
+            if (!document.querySelector(container)) return;
             
             // Sample data
             const dates = ['01/01', '05/01', '10/01', '15/01', '20/01'];
@@ -738,7 +902,117 @@
             const totalPL = [0, 0, 100, 270, 1110];
             const positionSize = [0, 100, 150, 120, 0];
             
-            plChart = new Chart(ctx, {
+            // Use ChartSystem for basic charts
+            if (window.ChartSystem) {
+                plChart = await window.ChartSystem.create({
+                    id: 'plChart',
+                    type: 'line',
+                    container: container,
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: 'P/L ממומש',
+                                data: realizedPL,
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'P/L לא ממומש',
+                                data: unrealizedPL,
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'P/L כולל',
+                                data: totalPL,
+                                borderColor: '#007bff',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'גודל פוזיציה',
+                                data: positionSize,
+                                borderColor: '#6c757d',
+                                backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.dataset.label === 'גודל פוזיציה') {
+                                            label += context.parsed.y + ' מניות';
+                                        } else {
+                                            label += '$' + context.parsed.y.toLocaleString();
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'תאריך'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'P/L ($)'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'גודל פוזיציה (מניות)'
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Fallback to direct Chart.js if ChartSystem not available
+                const ctx = document.getElementById('plChart');
+                plChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: dates,
@@ -862,9 +1136,11 @@
             chart.update();
         }
         
+        // Note: Market Price Chart uses external charting system (not ChartSystem)
+        // This is a placeholder - will be replaced with Lightweight Charts or similar
         function initMarketPriceChart() {
-            const ctx = document.getElementById('marketPriceChart');
-            if (!ctx) return;
+            const container = '#marketPriceChart';
+            if (!document.querySelector(container)) return;
             
             // Sample market price data
             const dates = ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08/01', '09/01', '10/01', 
@@ -873,6 +1149,16 @@
             const entryPoints = [null, null, null, null, 150, null, null, null, null, 152, null, null, null, null, null, null, null, null, null, null];
             const exitPoints = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 155, null, null, null, null, 158];
             
+            // Execution data for tooltips
+            const executionData = {
+                4: { type: 'Buy', qty: 100, price: 150, id: 101 },
+                9: { type: 'Buy', qty: 50, price: 152, id: 102 },
+                14: { type: 'Sell', qty: 30, price: 155, realized: 150, percent: 3.2, id: 103 },
+                19: { type: 'Sell', qty: 120, price: 158, realized: 960, percent: 5.1, id: 104 }
+            };
+            
+            // For now, use Chart.js as placeholder (will be replaced with external system)
+            const ctx = document.getElementById('marketPriceChart');
             marketPriceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -969,18 +1255,65 @@
             }
         }
         
+        // Helper functions
+        function exportData() {
+            alert('ייצוא נתונים - ייושם בעתיד');
+        }
+        
+        function showSettings() {
+            alert('הגדרות תצוגה - ייושם בעתיד');
+        }
+        
         // Initialize charts on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initPLChart();
-            initMarketPriceChart();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for ChartSystem to be ready
+            let retries = 0;
+            while (!window.ChartSystem && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            // Initialize charts using ChartSystem (async)
+            try {
+                await initPLChart();
+            } catch (e) {
+                console.error('Error initializing P/L chart:', e);
+            }
+            
+            // Timeline chart will be initialized when switching to relative view
+            // initTimelineChart(); // Don't initialize on load, only on view switch
+            
+            // Market price chart (uses Chart.js directly as placeholder)
+            try {
+                initMarketPriceChart();
+            } catch (e) {
+                console.error('Error initializing market price chart:', e);
+            }
             
             // Load action buttons for executions table
             if (window.loadTableActionButtons) {
-                window.loadTableActionButtons('executionsTable', 'execution', {
-                    showDetails: true,
-                    showLinked: true,
-                    showEdit: true,
-                    showDelete: false // ביצועים לא נמחקים
+                try {
+                    window.loadTableActionButtons('executionsTable', 'execution', {
+                        showDetails: true,
+                        showLinked: true,
+                        showEdit: true,
+                        showDelete: false // ביצועים לא נמחקים
+                    });
+                } catch (e) {
+                    console.error('Error loading action buttons:', e);
+                    // Fallback: manually add action buttons
+                    document.querySelectorAll('#executionsTable .actions-cell').forEach(cell => {
+                        if (!cell.innerHTML.trim()) {
+                            cell.innerHTML = '<button class="btn btn-sm btn-outline-secondary" title="פעולות">⋮</button>';
+                        }
+                    });
+                }
+            } else {
+                // Fallback: manually add action buttons
+                document.querySelectorAll('#executionsTable .actions-cell').forEach(cell => {
+                    if (!cell.innerHTML.trim()) {
+                        cell.innerHTML = '<button class="btn btn-sm btn-outline-secondary" title="פעולות">⋮</button>';
+                    }
                 });
             }
         });

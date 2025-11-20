@@ -79,6 +79,20 @@
             },
             {
                 type: 'select',
+                id: 'tickerStatus',
+                label: 'סטטוס',
+                required: true,
+                options: [
+                    { value: 'open', label: 'פתוח' },
+                    { value: 'closed', label: 'סגור' },
+                    { value: 'cancelled', label: 'מבוטל' }
+                ],
+                defaultValue: 'closed',
+                rowClass: 'row',
+                colClass: 'col-md-6'
+            },
+            {
+                type: 'select',
                 id: 'tickerTags',
                 label: 'תגיות',
                 options: [],
@@ -146,6 +160,10 @@
             tickerCurrency: {
                 required: true,
                 type: 'int' // currency_id הוא Integer
+            },
+            tickerStatus: {
+                required: true,
+                enum: ['open', 'closed', 'cancelled']
             },
             tickerRemarks: {
                 required: false,

@@ -864,6 +864,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
       // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
       // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+      // - 'modules': מודולים (modal-manager-v2, modal-navigation-manager, tag-ui-manager)
       // - 'crud': מערכות CRUD ו-entity-details
       // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
       // - 'info-summary': מערכת סיכום נתונים מאוחדת
@@ -873,6 +874,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'base',
         'services',
         'ui-advanced',
+        'modules',
         'crud',
         'preferences',
         'validation',
@@ -889,6 +891,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.loadTradingAccountsDataForTradingAccountsPage',
         'window.ModalManagerV2',
         'window.tradingAccountsModalConfig',
+        'window.TagUIManager',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',

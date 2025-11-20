@@ -206,6 +206,10 @@ class ResponseOptimizer:
         if any(ext in request_path for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico']):
             return 'static'
         
+        # Mockups pages - no cache (development/testing)
+        if '/mockups/' in request_path:
+            return 'sensitive'  # Use 'sensitive' cache type which has no-cache headers
+        
         # Sensitive pages - no cache
         if any(path in request_path for path in ['/login', '/admin', '/settings']):
             return 'sensitive'

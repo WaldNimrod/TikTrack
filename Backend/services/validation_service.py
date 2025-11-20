@@ -44,7 +44,7 @@ class ValidationService:
                 SELECT c.id, c.constraint_type, c.column_name, c.constraint_definition, 
                        c.is_active
                 FROM constraints c 
-                WHERE c.table_name = :table_name AND c.is_active = 1
+                WHERE c.table_name = :table_name AND c.is_active = TRUE
             """)
             
             constraints = db.execute(constraints_query, {"table_name": table_name}).fetchall()
@@ -205,7 +205,7 @@ class ValidationService:
     def _validate_enum(db: Session, constraint_id: int, value: Any) -> bool:
         """Validate ENUM constraint - only checks active enum values"""
         try:
-            enum_query = text("SELECT value FROM enum_values WHERE constraint_id = :constraint_id AND is_active = 1")
+            enum_query = text("SELECT value FROM enum_values WHERE constraint_id = :constraint_id AND is_active = TRUE")
             enum_values = db.execute(enum_query, {"constraint_id": constraint_id}).fetchall()
             valid_values = [row[0] for row in enum_values]
             logger.info(f"Validating ENUM value '{value}' against active values: {valid_values}")

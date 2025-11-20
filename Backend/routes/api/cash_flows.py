@@ -9,6 +9,7 @@ from services.advanced_cache_service import cache_for, invalidate_cache
 from services.cash_flow_service import CashFlowService as CashFlowHelperService
 from services.account_activity_service import AccountActivityService
 from services.tag_service import TagService
+from services.preferences_service import PreferencesService
 import logging
 import uuid
 from datetime import datetime
@@ -20,6 +21,17 @@ from .base_entity_decorators import api_endpoint, handle_database_session, valid
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
+
+# Initialize preferences service for date normalization
+preferences_service = PreferencesService()
+
+def _get_date_normalizer():
+    """Resolve timezone and create a DateNormalizationService for cash flows endpoints."""
+    timezone_name = DateNormalizationService.resolve_timezone(
+        request,
+        preferences_service=preferences_service
+    )
+    return DateNormalizationService(timezone_name)
 
 EXCHANGE_FROM_TYPE = CashFlowHelperService.EXCHANGE_FROM_TYPE
 EXCHANGE_TO_TYPE = CashFlowHelperService.EXCHANGE_TO_TYPE
@@ -315,6 +327,7 @@ def get_cash_flow(cash_flow_id: int):
     """Get cash flow by ID"""
     try:
         db: Session = next(get_db())
+        normalizer = _get_date_normalizer()
         cash_flow = db.query(CashFlow).options(
             joinedload(CashFlow.account),
             joinedload(CashFlow.currency)
@@ -340,22 +353,29 @@ def get_cash_flow(cash_flow_id: int):
                 if counterpart:
                     cf_dict['linked_exchange_cash_flow_id'] = counterpart.id
             
+            # Normalize dates to DateEnvelope format
+            cf_dict = normalizer.normalize_output(cf_dict)
+            
             return jsonify({
                 "status": "success",
                 "data": cf_dict,
                 "message": "Cash flow retrieved successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Cash flow not found"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting cash flow {cash_flow_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve cash flow"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     # Don't close db here - handle_database_session decorator will do it

@@ -676,6 +676,7 @@ async function saveTicker() {
   const nameFieldId = resolveFieldId(['tickerName', 'addTickerName']);
   const typeFieldId = resolveFieldId(['tickerType', 'addTickerType']);
   const currencyFieldId = resolveFieldId(['tickerCurrency', 'addTickerCurrency']);
+  const statusFieldId = resolveFieldId(['tickerStatus', 'addTickerStatus']);
   const remarksFieldId = resolveFieldId(['tickerRemarks', 'addTickerRemarks']);
 
   // איסוף נתונים מהטופס באמצעות DataCollectionService
@@ -684,6 +685,7 @@ async function saveTicker() {
     name: { id: nameFieldId, type: 'text' },
     type: { id: typeFieldId, type: 'text' },
     currency_id: { id: currencyFieldId, type: 'int' },
+    status: { id: statusFieldId, type: 'text' },
     remarks: { id: remarksFieldId, type: 'text' }
   });
 
@@ -691,6 +693,7 @@ async function saveTicker() {
   const name = tickerData.name?.trim() || '';
   const type = tickerData.type || 'stock'; // ברירת מחדל: מניה
   const currency_id = tickerData.currency_id || 1; // ברירת מחדל: USD
+  const status = tickerData.status || 'closed'; // ברירת מחדל: סגור
   const remarks = tickerData.remarks?.trim() || '';
 
   // ולידציה מקיפה
@@ -722,6 +725,13 @@ async function saveTicker() {
     return;
   }
 
+  if (!status || !['open', 'closed', 'cancelled'].includes(status)) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'יש לבחור סטטוס תקין');
+    }
+    return;
+  }
+
   // בדיקה אם הסמל כבר קיים במערכת
   const existingTicker = (window.tickersData || []).find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
   if (existingTicker) {
@@ -734,8 +744,7 @@ async function saveTicker() {
     return;
   }
 
-  // טיקר חדש תמיד יהיה "closed" (אין לו טריידים)
-  const finalStatus = 'closed';
+  const finalStatus = status;
 
   try {
     const tickerPayload = {
@@ -783,13 +792,14 @@ async function saveTicker() {
  */
 async function updateTicker() {
   // שימוש ב-DataCollectionService לאיסוף נתונים
+  const statusFieldId = resolveFieldId(['tickerStatus', 'editTickerStatus']);
   const tickerData = DataCollectionService.collectFormData({
-    symbol: { id: 'editTickerSymbol', type: 'text' },
-    name: { id: 'editTickerName', type: 'text' },
-    type: { id: 'editTickerType', type: 'text' },
-    currency_id: { id: 'editTickerCurrency', type: 'int' },
-    remarks: { id: 'editTickerRemarks', type: 'text' },
-    status: { id: 'editTickerStatus', type: 'text' }
+    symbol: { id: 'tickerSymbol', type: 'text' },
+    name: { id: 'tickerName', type: 'text' },
+    type: { id: 'tickerType', type: 'text' },
+    currency_id: { id: 'tickerCurrency', type: 'int' },
+    remarks: { id: 'tickerRemarks', type: 'text' },
+    status: { id: statusFieldId, type: 'text' }
   });
 
   const symbol = tickerData.symbol.trim().toUpperCase();
@@ -826,7 +836,7 @@ async function updateTicker() {
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleUpdateResponse(response, {
-      modalId: 'editTickerModal',
+      modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
       entityName: 'טיקר'

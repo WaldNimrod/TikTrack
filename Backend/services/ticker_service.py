@@ -100,8 +100,8 @@ class TickerService:
                         WHERE c.table_name = :table
                           AND c.column_name = :column
                           AND c.constraint_type = 'ENUM'
-                          AND c.is_active = 1
-                          AND ev.is_active = 1
+                          AND c.is_active = TRUE
+                          AND ev.is_active = TRUE
                         ORDER BY ev.sort_order
                     """),
                     {"table": "tickers", "column": "type"}

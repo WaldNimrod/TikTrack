@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.1.37.0",
+    "version": "1.1.38.0",
     "major": 1,
     "minor": 1,
-    "patch": 37,
+    "patch": 38,
     "build": 0,
-    "commit": "0d54decd53cf3ab9c57fd1e93fad652acf531b9a",
-    "updated_at": "2025-11-20T17:19:39+00:00",
-    "notes": "Fix yahoo_finance_adapter timezone loading - handle list format from UserService"
+    "commit": "ffd527b15aa5a11b6dd7a7d899415f8f4158b921",
+    "updated_at": "2025-11-20T17:20:04+00:00",
+    "notes": "Update trade-history-page.html mockup"
   }
 }

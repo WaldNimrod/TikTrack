@@ -89,3 +89,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-20T09:25:18+00:00 | 1.1.35.0 | 1.1.34.0 | 831c3e48474ac279a811b6f4243e1640dfbed48e | 94ed4ac878b5388c50b55816866a51ebde95daa3 | patch | Event handler manager updates |
 | 2025-11-20T16:39:05+00:00 | 1.1.36.0 | 1.1.35.0 | 92daa6dbc299f51c8f8cda3c64b498b66a013bb1 | 831c3e48474ac279a811b6f4243e1640dfbed48e | patch | Migrate routes/services to SQLAlchemy, fix DB name references - preparation for PostgreSQL migration |
 | 2025-11-20T17:19:39+00:00 | 1.1.37.0 | 1.1.36.0 | 0d54decd53cf3ab9c57fd1e93fad652acf531b9a | 92daa6dbc299f51c8f8cda3c64b498b66a013bb1 | patch | Fix yahoo_finance_adapter timezone loading - handle list format from UserService |
+| 2025-11-20T17:20:04+00:00 | 1.1.38.0 | 1.1.37.0 | ffd527b15aa5a11b6dd7a7d899415f8f4158b921 | 0d54decd53cf3ab9c57fd1e93fad652acf531b9a | patch | Update trade-history-page.html mockup |

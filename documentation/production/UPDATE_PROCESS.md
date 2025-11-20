@@ -11,8 +11,14 @@
 ### שיטה חדשה (מומלץ) - Master Script
 
 ```bash
-# הרצת כל התהליך בפקודה אחת
+# הרצת כל התהליך בפקודה אחת (עדכון patch רגיל)
 python scripts/production-update/master.py
+
+# עדכון Major.Minor (למשל 1.2.0.0)
+python scripts/production-update/master.py --set-version 1.2.0.0 --allow-major-minor
+
+# Dry run (בדיקה ללא ביצוע)
+python scripts/production-update/master.py --dry-run --set-version 1.2.0.0 --allow-major-minor
 ```
 
 ### שיטה קלאסית (עדיין נתמכת)
@@ -179,6 +185,41 @@ python scripts/release/post_update_validation.py --health-url http://localhost:5
 #### בדיקות ידניות שכדאי לוודא
 - צפייה ב־`production/Backend/logs/app.log`.
 - פתיחת UI ובדיקת עמודים מרכזיים (trades, alerts, preferences).
+
+#### בדיקות נוספות מומלצות (לפני עדכון Major.Minor)
+1. **בדיקת שינויים מקומיים:**
+   ```bash
+   git status --short
+   git diff --stat origin/production
+   ```
+   - וודא שאין שינויים מקומיים שצריך לשמור לפני המיזוג
+   - בדוק מה יימחק/יוחלף במיזוג מ-main
+
+2. **בדיקת קונפליקטים צפויים:**
+   ```bash
+   git fetch origin main
+   git merge-tree $(git merge-base HEAD origin/main) HEAD origin/main
+   ```
+   - Master Script מטפל בקונפליקטים אוטומטית (main תמיד מנצח)
+   - אבל כדאי לבדוק מראש קבצים רגישים
+
+3. **בדיקת הגדרות production אחרי המיזוג:**
+   ```bash
+   cd production/Backend
+   python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
+       print(f'UI: {UI_DIR}'); \
+       print(f'DB: {DB_PATH}'); \
+       print(f'Port: {PORT}'); \
+       print(f'Production: {IS_PRODUCTION}')"
+   ```
+   - וודא ש-`IS_PRODUCTION = True`
+   - וודא ש-`PORT = 5001`
+   - וודא ש-`DB_PATH` מצביע על `tiktrack.db`
+
+4. **בדיקת UI אחרי העדכון:**
+   - בדוק עמודים מרכזיים: trades, alerts, executions, preferences
+   - בדוק שהכל נטען ללא שגיאות JavaScript
+   - בדוק שהסגנונות (CSS) נטענו נכון
 
 ### שלב 5: עדכון גרסה
 

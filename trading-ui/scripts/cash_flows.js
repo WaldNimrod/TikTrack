@@ -3444,6 +3444,8 @@ window.reapplyCashFlowTypeFilter = reapplyCashFlowTypeFilter;
 window.deleteCashFlow = deleteCashFlow;
 window.deleteImportedCashFlows = deleteImportedCashFlows;
 window.performCashFlowDeletion = performCashFlowDeletion;
+// Export initializeCashFlowsPage EARLY so custom initializer can find it
+window.initializeCashFlowsPage = initializeCashFlowsPage;
 
 // Export test functions to window for debugging (always available)
 window.testCashFlowFilter = async function(type = 'deposit') {

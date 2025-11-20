@@ -20,6 +20,21 @@
 
 ## 📚 מסמכי תיעוד
 
+### יומן עדכונים
+**קובץ:** [MOCKUPS_UPDATES_LOG.md](MOCKUPS_UPDATES_LOG.md)
+
+**תיאור:** יומן עדכוני מוקאפים - תיעוד כל השינויים והעדכונים במוקאפים.
+
+**תוכן:**
+- רשימת כל העדכונים
+- תאריכי עדכון
+- קבצים מעודכנים
+- דרישות מבנה עמוד
+
+**סטטוס:** ✅ מעודכן
+
+---
+
 ### גישת User-Centered Design (גרסה 2.0)
 
 #### 1. מחקר משתמשים ופרסונות
@@ -55,9 +70,10 @@
 #### 3. מוקאפים
 **תיקייה:** [mockups/](mockups/)
 
-**תיאור:** Wireframes ותיאור מפורט לכל אחד מ-6 הממשקים.
+**תיאור:** Wireframes ותיאור מפורט לכל אחד מ-11 הממשקים (6 קיימים + 5 חדשים).
 
 **תוכן:**
+**מוקאפים Markdown:**
 - [trade-history-page.md](mockups/trade-history-page.md) - עמוד היסטוריית טרייד
 - [portfolio-state-page.md](mockups/portfolio-state-page.md) - עמוד מצב תיק היסטורי
 - [price-history-page.md](mockups/price-history-page.md) - עמוד היסטוריית מחירים
@@ -65,7 +81,21 @@
 - [history-widget.md](mockups/history-widget.md) - ווידג'ט היסטוריה בדשבורד
 - [date-comparison-modal.md](mockups/date-comparison-modal.md) - מודל השוואת תאריכים
 
-**סטטוס:** ✅ הושלם
+**מוקאפים HTML:**
+- [mockups/html/](mockups/html/) - 11 מוקאפים HTML מלאים
+  - trade-history-page.html
+  - portfolio-state-page.html
+  - price-history-page.html
+  - comparative-analysis-page.html
+  - history-widget.html
+  - date-comparison-modal.html
+  - trading-journal-page.html (חדש)
+  - journal-entry-modal.html (חדש)
+  - economic-calendar-page.html (חדש)
+  - emotional-tracking-widget.html (חדש)
+  - strategy-analysis-page.html (חדש)
+
+**סטטוס:** ✅ הושלם + עודכן
 
 ---
 

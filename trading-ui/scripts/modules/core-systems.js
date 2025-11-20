@@ -4421,37 +4421,9 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
       requiresFilters: true,
       requiresValidation: false,
       requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          console.log('💰 [Cash Flows Initializer] Starting...');
-          console.log('💰 [Cash Flows Initializer] Checking functions:', {
-            hasInitializeCashFlowsModals: typeof window.initializeCashFlowsModals === 'function',
-            hasInitializeCashFlowsPage: typeof window.initializeCashFlowsPage === 'function'
-          });
-
-          // אתחול modals
-          if (typeof window.initializeCashFlowsModals === 'function') {
-            console.log('💰 [Cash Flows Initializer] Calling initializeCashFlowsModals...');
-            window.initializeCashFlowsModals();
-          } else {
-            console.warn('💰 [Cash Flows Initializer] initializeCashFlowsModals not found!');
-          }
-
-          // אתחול דף
-          if (typeof window.initializeCashFlowsPage === 'function') {
-            console.log('💰 [Cash Flows Initializer] Calling initializeCashFlowsPage...');
-            try {
-              await window.initializeCashFlowsPage();
-              console.log('💰 [Cash Flows Initializer] initializeCashFlowsPage completed');
-            } catch (error) {
-              console.error('💰 [Cash Flows Initializer] initializeCashFlowsPage failed:', error);
-            }
-          } else {
-            console.error('💰 [Cash Flows Initializer] initializeCashFlowsPage not found in window!');
-            console.error('💰 [Cash Flows Initializer] Available window functions:', Object.keys(window).filter(k => k.includes('CashFlow')));
-          }
-        },
-      ],
+      // No custom initializers - use standard initialization pattern
+      // Page-specific initialization should be called from the page script itself
+      // using DOMContentLoaded or the standard initialization hooks
     },
 
     // Data Management

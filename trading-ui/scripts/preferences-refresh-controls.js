@@ -201,8 +201,9 @@
       // Update profiles count
       try {
         if (window.PreferencesData && typeof window.PreferencesData.loadProfiles === 'function') {
-          const profiles = await window.PreferencesData.loadProfiles();
-          const profilesCount = Array.isArray(profiles) ? profiles.length : 0;
+          const userId = window.PreferencesCore?.currentUserId ?? 1;
+          const profiles = await window.PreferencesData.loadProfiles({ userId, force: true });
+          const profilesCount = Array.isArray(profiles) ? profiles.length : (profiles?.data?.length || 0);
           const profilesCountEl = document.getElementById('profilesCount');
           if (profilesCountEl) {
             profilesCountEl.textContent = profilesCount || '0';
@@ -229,14 +230,20 @@
       // Update groups count
       try {
         if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceGroupsMetadata === 'function') {
-          const groupsData = await window.PreferencesData.loadPreferenceGroupsMetadata();
-          const groupsCount = groupsData?.count || groupsData?.groups?.length || 0;
+          const groupsData = await window.PreferencesData.loadPreferenceGroupsMetadata({ force: true });
+          // Handle different response formats
+          const groupsCount = groupsData?.count || 
+                            groupsData?.data?.count || 
+                            (Array.isArray(groupsData?.groups) ? groupsData.groups.length : 0) ||
+                            (Array.isArray(groupsData?.data?.groups) ? groupsData.data.groups.length : 0) ||
+                            0;
           const groupsCountEl = document.getElementById('groupsCount');
           if (groupsCountEl) {
             groupsCountEl.textContent = groupsCount || '0';
             window.Logger?.info?.('Updated groups count', { 
               page: 'preferences-refresh-controls',
-              count: groupsCount 
+              count: groupsCount,
+              groupsDataKeys: groupsData ? Object.keys(groupsData) : []
             });
           }
         } else {

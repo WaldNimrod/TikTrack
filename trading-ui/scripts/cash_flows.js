@@ -2562,10 +2562,17 @@ async function initializeCashFlowsPage() {
   }
 }
 
-// הפעלת אתחול כשהדף נטען
-// document.addEventListener('DOMContentLoaded', function () {
-//   initializeCashFlowsPage();
-// });
+// הפעלת אתחול כשהדף נטען - סטנדרטי כמו כל העמודים
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log('🚀 [cash_flows.js] DOMContentLoaded - calling initializeCashFlowsPage');
+    initializeCashFlowsPage();
+  });
+} else {
+  // DOM already loaded
+  console.log('🚀 [cash_flows.js] DOM already loaded - calling initializeCashFlowsPage immediately');
+  initializeCashFlowsPage();
+}
 
 // ===== CRUD FUNCTIONS =====
 

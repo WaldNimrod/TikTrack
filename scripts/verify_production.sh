@@ -101,6 +101,66 @@ info "Found $py_count Python files"
 
 echo ""
 
+# Check for file differences
+info "Checking for file differences..."
+DEV_BACKEND="$PROJECT_ROOT/Backend"
+different_files=()
+missing_files=()
+
+if [ -d "$DEV_BACKEND" ] && [ -d "$PRODUCTION_BACKEND" ]; then
+    # Find Python files in dev
+    while IFS= read -r dev_file; do
+        rel_path="${dev_file#$DEV_BACKEND/}"
+        prod_file="$PRODUCTION_BACKEND/$rel_path"
+        
+        # Skip certain files
+        if [[ "$rel_path" == *"__pycache__"* ]] || [[ "$rel_path" == *".pyc"* ]]; then
+            continue
+        fi
+        
+        if [ ! -f "$prod_file" ]; then
+            missing_files+=("$rel_path")
+        elif [ -f "$dev_file" ] && [ -f "$prod_file" ]; then
+            # Compare files (simple diff check)
+            if ! cmp -s "$dev_file" "$prod_file" 2>/dev/null; then
+                different_files+=("$rel_path")
+            fi
+        fi
+    done < <(find "$DEV_BACKEND" -name "*.py" -type f | head -100)
+    
+    if [ ${#different_files[@]} -gt 0 ]; then
+        warn "File Differences" "${#different_files[@]} files differ from development"
+        echo "   First 5 different files:"
+        for i in "${!different_files[@]}"; do
+            if [ $i -lt 5 ]; then
+                echo "     - ${different_files[$i]}"
+            fi
+        done
+        if [ ${#different_files[@]} -gt 5 ]; then
+            echo "     ... and $(( ${#different_files[@]} - 5 )) more"
+        fi
+    fi
+    
+    if [ ${#missing_files[@]} -gt 0 ]; then
+        warn "Missing Files" "${#missing_files[@]} files missing in production"
+        echo "   First 5 missing files:"
+        for i in "${!missing_files[@]}"; do
+            if [ $i -lt 5 ]; then
+                echo "     - ${missing_files[$i]}"
+            fi
+        done
+        if [ ${#missing_files[@]} -gt 5 ]; then
+            echo "     ... and $(( ${#missing_files[@]} - 5 )) more"
+        fi
+    fi
+    
+    if [ ${#different_files[@]} -eq 0 ] && [ ${#missing_files[@]} -eq 0 ]; then
+        echo -e "${GREEN}✅${NC} All files synchronized"
+    fi
+fi
+
+echo ""
+
 # Summary
 echo "=" * 60
 if [ $errors -eq 0 ]; then

@@ -12,8 +12,9 @@
 
 ## 📋 תהליך עדכון פרודקשן - סקירה מהירה
 
-### תהליך מלא (6 שלבים):
+### תהליך מלא (7 שלבים):
 
+0. **הכנה בסביבת הפיתוח** - שמירת שינויים ויצירת changelog
 1. **עדכון main branch** - משיכת שינויים אחרונים
 2. **מיזוג main → production** - העברת שינויים לפרודקשן
 3. **סינכרון קוד** - העתקת קבצים פעילים לפרודקשן
@@ -24,6 +25,102 @@
 ---
 
 ## 🚀 תהליך מפורט
+
+### שלב 0: הכנה בסביבת הפיתוח (קריטי!)
+
+**⚠️ שלב זה חובה לפני כל sync לפרודקשן!**
+
+#### 0.1: בדיקת שינויים לא שמורים
+
+```bash
+# בדוק שיש שינויים לא שמורים
+git status
+
+# אם יש שינויים - שמור אותם
+git add .
+git commit -m "feat: [תיאור השינויים]"
+```
+
+#### 0.2: Push ל-main
+
+```bash
+# ודא שאתה ב-main branch
+git checkout main
+
+# Push את כל השינויים
+git push origin main
+```
+
+#### 0.3: יצירת Changelog
+
+```bash
+# יצירת changelog אוטומטי
+python3 scripts/production-update/prepare_changelog.py
+```
+
+**מה הסקריפט עושה:**
+- בודק שינויים לא שמורים
+- מזהה שינויים קריטיים (config, DB schema, server)
+- יוצר changelog עם רשימת שינויים
+- שומר ב-`_Tmp/production_sync_changelog_[timestamp].md`
+
+#### 0.4: Pre-Sync Validation
+
+```bash
+# בדיקת מוכנות לסנכרון
+python3 scripts/pre_sync_validation.py
+```
+
+**מה הסקריפט בודק:**
+- שינויים לא שמורים ב-git
+- קבצי backup/debug
+- קבצים קריטיים קיימים
+
+**תוצאה צפויה:**
+```
+✅ Pre-sync validation passed!
+   Ready to sync to production
+```
+
+#### Checklist לפני המשך:
+
+- [ ] כל השינויים נשמרו ב-git
+- [ ] כל השינויים נדחפו ל-main
+- [ ] Changelog נוצר
+- [ ] Pre-sync validation עבר בהצלחה
+- [ ] אין שינויים לא שמורים
+
+---
+
+### שלב 0.5: שמירת שינויים בפרודקשן (קריטי!)
+
+**⚠️ שלב זה חובה לפני כל merge!**
+
+אם יש שינויים שנעשו ישירות בסביבת הפרודקשן (למשל ב-`config/settings.py`), הם חייבים להישמר לפני המיזוג.
+
+```bash
+# 1. מעבר ל-production worktree (אם יש)
+cd /path/to/TikTrackApp-Production
+
+# 2. בדיקת שינויים לא שמורים בפרודקשן
+git status
+
+# 3. שמירת שינויים בפרודקשן (אם יש)
+# זה קריטי! שינויים ב-config/settings.py וכו' חייבים להישמר
+git add production/Backend/config/
+git commit -m "chore: Preserve production config changes [תאריך]"
+git push origin production
+```
+
+**קבצים שצריך לשמור:**
+- `production/Backend/config/settings.py` - הגדרות production
+- `production/Backend/config/logging.py` - הגדרות logging
+- `production/Backend/config/database.py` - הגדרות database
+- כל שינוי אחר שנעשה ישירות בפרודקשן
+
+**⚠️ חשוב:** Conflict resolver ב-`scripts/production-update/utils/conflict_resolver.py` שומר אוטומטית על קבצי config של production במהלך merge, אבל רק אם הם כבר ב-git!
+
+---
 
 ### שלב 1: עדכון Main Branch
 
@@ -44,11 +141,44 @@ git log --oneline -10
 
 ### שלב 2: מיזוג Main → Production
 
+**התהליך מבוסס על `scripts/production-update/master.py` הקיים ב-production branch**
+
+#### אופציה 1: שימוש ב-Master Script (מומלץ)
+
 ```bash
 # עבור לענף פרודקשן
 git checkout production
 
-# משוך עדכונים אחרונים של פרודקשן (אם יש)
+# משוך עדכונים אחרונים של פרודקשן
+git pull origin production
+
+# מיזוג שינויים מ-main
+git merge main
+
+# הרצת Master Script (11 שלבים אוטומטיים)
+python3 scripts/production-update/master.py
+```
+
+**Master Script מבצע:**
+- Step 1: Collect Changes - איסוף שינויים מ-main
+- Step 2: Merge Main - מיזוג main → production (עם conflict resolver אוטומטי)
+- Step 3: Cleanup Documentation - ניקוי דוקומנטציה
+- Step 4: Backup Database - גיבוי DB
+- Step 5: Sync Code - סנכרון קוד (Backend + UI) + post-sync transformations
+- Step 6: Cleanup Backups - ניקוי קבצי גיבוי
+- Step 7: Fix Config - תיקון הגדרות production
+- Step 8: Validate - בדיקות ואימות
+- Step 9: Bump Version - עדכון גרסה
+- Step 10: Commit & Push - Git commit & push
+- Step 11: Start Server - הפעלת שרת (אופציונלי)
+
+#### אופציה 2: תהליך ידני
+
+```bash
+# עבור לענף פרודקשן
+git checkout production
+
+# משוך עדכונים אחרונים של פרודקשן
 git pull origin production
 
 # מיזוג שינויים מ-main
@@ -62,13 +192,17 @@ git commit -m "Merge main into production: [תאריך/תיאור]"
 
 **⚠️ חשוב:**
 - אם יש קונפליקטים, פתור אותם בזהירות
-- **בקונפליקטים:** השתמש ב-`git checkout --theirs` עבור רוב הקבצים (לקחת מ-main)
+- **בקונפליקטים:** Conflict resolver שומר אוטומטית על קבצי config של production
 - ודא שהקבצים ב-`production/Backend/` לא נפגעו
 - **קריטי:** אחרי המיזוג, תמיד תקן את `production/Backend/config/settings.py` ו-`config/logging.py` (ראה שלב 3.5)
 
 ---
 
 ### שלב 3: סינכרון קוד לפרודקשן
+
+**אם השתמשת ב-Master Script, שלב זה כבר בוצע אוטומטית!**
+
+אם לא, הרץ ידנית:
 
 ```bash
 # ודא שאתה ב-production branch
@@ -79,17 +213,32 @@ git checkout production
 ```
 
 **מה הסקריפט עושה:**
-- מעתיק קבצים פעילים מ-`Backend/` ל-`production/Backend/`
-- מעתיק UI מ-`trading-ui/` ל-`production/trading-ui/`
-- שומר רק על קבצים פעילים (ללא tests/migrations)
+- **גיבוי DB** - מגבה את ה-DB לפני מחיקת production directory
+- **מעתיק קבצים פעילים** מ-`Backend/` ל-`production/Backend/`
+- **מעתיק UI** מ-`trading-ui/` ל-`production/trading-ui/` (עם copy_function=shutil.copy2)
+- **שומר רק על קבצים פעילים** (ללא tests/migrations)
+- **משחזר DB** - משחזר את ה-DB אחרי sync
+- **בודק קבצים קריטיים** - verifies critical files (header-system.js, header-styles.css, וכו')
 
 **תוצאה צפויה:**
 ```
+💾 Backing up production DB before sync...
+   ✅ DB backed up to: db_backup_before_sync.db
 ✅ Backend sync completed: ~157 files copied
-✅ UI sync completed: ~490 files copied
+✅ UI sync completed: ~490 files
+   📄 CSS files: ~60
+   📄 JS files: ~270
+   📄 HTML files: ~50
+🔍 Verifying critical files...
+  ✅ scripts/header-system.js
+  ✅ styles-new/header-styles.css
+  ✅ data_import.html
+  ✅ index.html
+💾 Restoring production DB from backup...
+   ✅ DB restored
 ```
 
-**⚠️ חשוב:** הסקריפט `sync_to_production.py` מעתיק את `config/settings.py` מ-Backend, אבל הקובץ ב-production צריך להיות hardcoded ל-production mode!
+**⚠️ חשוב:** הסקריפט `sync_to_production.py` מעתיק את `config/settings.py` מ-Backend, אבל הקובץ ב-production צריך להיות hardcoded ל-production mode! (Post-sync transformer מתקן זאת אוטומטית)
 
 ---
 
@@ -137,7 +286,22 @@ Production: True
 
 ### שלב 4: בדיקות ואימות
 
-#### בדיקה 1: אימות הפרדה
+**אם השתמשת ב-Master Script, חלק מהבדיקות כבר בוצעו אוטומטית!**
+
+#### בדיקה 1: Sync Verification
+
+```bash
+# בדיקת sync עם checksums
+python3 scripts/sync_verifier.py
+```
+
+**תוצאה צפויה:**
+```
+✅ All critical files verified
+✅ Sync verification passed!
+```
+
+#### בדיקה 2: אימות הפרדה
 
 ```bash
 # בדיקת הפרדה מלאה
@@ -149,16 +313,25 @@ Production: True
 ✅ Isolation verification passed
 ```
 
-#### בדיקה 2: אימות מבנה
+#### בדיקה 3: אימות מבנה
 
 ```bash
-# בדיקת מבנה כללי
+# בדיקת מבנה כללי (עם רשימת קבצים שונים)
 ./scripts/verify_production.sh
 ```
 
 **תוצאה צפויה:**
 ```
 ✅ Verification passed
+```
+
+**אם יש קבצים שונים:**
+```
+⚠️  File Differences: 5 files differ from development
+   First 5 different files:
+     - routes/api/tickers.py
+     - services/alert_service.py
+     ...
 ```
 
 #### בדיקה 3: בדיקת הגדרות
@@ -261,31 +434,22 @@ git push origin production
 אם אתה בטוח שהכל תקין ורוצה תהליך מהיר:
 
 ```bash
-# 1. עדכון ומיזוג
-git checkout main && git pull origin main
+# 0. הכנה בסביבת הפיתוח
+git checkout main
+git add . && git commit -m "feat: [תיאור]" && git push origin main
+python3 scripts/production-update/prepare_changelog.py
+python3 scripts/pre_sync_validation.py
+
+# 1. עדכון ומיזוג (בסביבת הפרודקשן)
+cd /path/to/TikTrackApp-Production
 git checkout production && git pull origin production
 git merge main
 
-# 2. סינכרון
-./scripts/sync_to_production.py
+# 2. הרצת Master Script (כולל sync, בדיקות, commit)
+python3 scripts/production-update/master.py
 
-# 3. בדיקה מהירה
-./scripts/verify_production_isolation.sh
-
-# 4. עדכון גרסה
-python3 scripts/versioning/bump-version.py \
-  --env production \
-  --bump patch \
-  --note "Quick update - $(date +%Y-%m-%d)"
-
-# 5. Commit & Push
-git add documentation/version-manifest.json \
-        documentation/production/VERSION_HISTORY.md \
-        scripts/versioning/ \
-        documentation/production/ \
-        scripts/
-git commit -m "feat: Update production from main"
-git push origin production
+# 3. תיעוד עדכוני שרת (אם צריך)
+python3 scripts/production-update/document_server_changes.py
 ```
 
 ---
@@ -441,10 +605,18 @@ echo "🎉 Production update completed successfully!"
 
 ## 🔗 קבצים רלוונטיים
 
-- `scripts/sync_to_production.py` - סקריפט סינכרון קוד
-- `scripts/sync_ui_to_production.py` - סקריפט סינכרון UI
+### סקריפטים מרכזיים:
+- `scripts/production-update/master.py` - Master Script (11 שלבים אוטומטיים)
+- `scripts/sync_to_production.py` - סקריפט סינכרון קוד (עם DB protection)
+- `scripts/sync_ui_to_production.py` - סקריפט סינכרון UI (עם verification)
+- `scripts/sync_verifier.py` - בדיקת sync עם checksums
+- `scripts/pre_sync_validation.py` - בדיקת מוכנות לפני sync
+- `scripts/production-update/prepare_changelog.py` - יצירת changelog
+- `scripts/production-update/document_server_changes.py` - תיעוד עדכוני שרת
+
+### בדיקות:
 - `scripts/verify_production_isolation.sh` - בדיקת הפרדה
-- `scripts/verify_production.sh` - בדיקת מבנה כללי
+- `scripts/verify_production.sh` - בדיקת מבנה כללי (עם רשימת קבצים שונים)
 - `production/Backend/config/settings.py` - **הגדרות פרודקשן (חייב להיות hardcoded!)**
 - `production/Backend/config/logging.py` - הגדרות לוגים (חייב להיות hardcoded!)
 - `production/Backend/routes/api/currencies.py` - **Endpoint מטבעות (משתמש ב-production DB)**

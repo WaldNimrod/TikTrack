@@ -390,7 +390,6 @@ class EntityDetailsRenderer {
                         minute: '2-digit'
                     });
                 }
-                }
             } catch (e) {
                 updatedAtDisplay = updatedAt;
             }

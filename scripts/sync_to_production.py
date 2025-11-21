@@ -46,6 +46,9 @@ ALLOWED_SCRIPTS = {
     'cleanup_import_sessions.py'  # For periodic cleanup of old import sessions
 }
 
+# Note: Migration scripts are in Backend/migrations/ and should be run manually in production
+# They are not copied automatically by sync_to_production.py
+
 # Excluded patterns
 EXCLUDED_PATTERNS = {
     '__pycache__',

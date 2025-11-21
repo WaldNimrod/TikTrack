@@ -68,40 +68,8 @@
 }
 
 /* ============================================================================
-   Session Controls
+   Session Controls - Removed old session continuation UI from step 1
    ============================================================================ */
-
-#activeSessionControlsRow {
-    display: none;
-}
-
-#activeSessionControlsRow.active {
-    display: flex;
-}
-
-#activeSessionDetailsRow {
-    display: none;
-}
-
-#activeSessionDetailsRow.active {
-    display: flex;
-}
-
-#activeSessionIndicator {
-    display: none;
-}
-
-#activeSessionIndicator.active {
-    display: block;
-}
-
-#resumeImportSessionBtn {
-    display: none;
-}
-
-#resumeImportSessionBtn.active {
-    display: inline-block;
-}
 
 /* ============================================================================
    File Info and Account Detection

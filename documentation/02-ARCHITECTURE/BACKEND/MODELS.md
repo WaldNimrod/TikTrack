@@ -75,6 +75,37 @@ class Ticker(Base):
     # Relationships
     trades = relationship('Trade', back_populates='ticker')
     alerts = relationship('Alert', back_populates='ticker')
+    provider_symbols = relationship('TickerProviderSymbol', back_populates='ticker', cascade='all, delete-orphan')
+```
+
+### **3.1. TickerProviderSymbol Model** (January 2025)
+```python
+class TickerProviderSymbol(Base):
+    """
+    Maps internal ticker symbols to provider-specific symbols.
+    Allows different external data providers to use different symbol formats.
+    
+    Example: Ticker "500X" might need "500X.MI" for Yahoo Finance.
+    """
+    __tablename__ = 'ticker_provider_symbols'
+    
+    id = Column(Integer, primary_key=True)
+    ticker_id = Column(Integer, ForeignKey('tickers.id', ondelete='CASCADE'), nullable=False, index=True)
+    provider_id = Column(Integer, ForeignKey('external_data_providers.id'), nullable=False, index=True)
+    provider_symbol = Column(String(50), nullable=False, comment="Provider-specific symbol format")
+    is_primary = Column(Boolean, default=False, nullable=False, comment="Primary mapping for provider")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())
+    
+    # Relationships
+    ticker = relationship('Ticker', back_populates='provider_symbols')
+    provider = relationship('ExternalDataProvider')
+    
+    # Constraints
+    __table_args__ = (
+        UniqueConstraint('ticker_id', 'provider_id', name='uq_ticker_provider_symbol'),
+        Index('idx_ticker_provider_symbols_provider_symbol', 'provider_symbol'),
+    )
 ```
 
 ### **4. Alert Model**
@@ -142,6 +173,7 @@ class Currency(Base):
 - **Account → CashFlows**: One account can have many cash flows
 - **Ticker → Trades**: One ticker can have many trades
 - **Ticker → Alerts**: One ticker can have many alerts
+- **Ticker → ProviderSymbols**: One ticker can have many provider symbol mappings (January 2025)
 - **Currency → Accounts**: One currency can be used by many accounts
 
 ### **Foreign Key Constraints**

@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total_files": 141,
+    "total_files": 142,
     "by_category": {
       "config": 5,
       "routes": 52,
-      "services": 52,
+      "services": 53,
       "models": 22,
       "utils": 9,
       "scripts": 0,
@@ -110,6 +110,7 @@
       "services/smart_query_optimizer.py",
       "services/system_settings_service.py",
       "services/ticker_service.py",
+      "services/ticker_symbol_mapping_service.py",
       "services/trade_plan_service.py",
       "services/trade_service.py",
       "services/trading_account_service.py",
@@ -342,7 +343,13 @@
       "models/ticker.py",
       "services/user_service.py",
       "models/user.py",
-      "models/external_data.py"
+      "models/external_data.py",
+      "services/ticker_symbol_mapping_service.py"
+    ],
+    "services/ticker_symbol_mapping_service.py": [
+      "models/ticker.py",
+      "models/external_data.py",
+      "services/cache_service.py"
     ],
     "services/system_settings_service.py": [
       "models/system_settings.py",

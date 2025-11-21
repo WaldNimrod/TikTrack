@@ -264,86 +264,6 @@
 
                     <div class="import-step" id="step-upload" data-step="1">
                         <div class="step-content">
-                            <div class="row g-3 align-items-center d-none" id="activeSessionControlsRow">
-                                <div class="col-12 col-lg-6 d-flex align-items-center justify-content-lg-start justify-content-center">
-                                    <div class="summary-card info-card d-flex align-items-center flex-wrap active-session-warning-card w-100">
-                                        <div class="summary-title flex-grow-1">קיים סשן פתוח, ניתן להמשיך או לנקות</div>
-                                        <button data-button-type="WARNING"
-                                                data-text="נקה סשן פעיל"
-                                                data-onclick="confirmResetImportSession()"
-                                                data-entity-type="cash_flow"
-                                                id="resetImportSessionBtn"
-                                                class="d-none"></button>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-lg-6">
-                                    <div class="d-flex justify-content-lg-start justify-content-center gap-2 flex-wrap" id="activeSessionActions"></div>
-                                </div>
-                            </div>
-
-                            <div class="row g-3 d-none" id="activeSessionDetailsRow">
-                                <div class="col-12">
-                                    <div class="summary-card active-session-card active-session-warning-card d-none" id="activeSessionIndicator">
-                                        <h4>
-                                            <i class="bi bi-activity"></i>
-                                            סשן ייבוא פעיל
-                                        </h4>
-                                        <div class="summary-details">
-                                            <div class="detail-item">
-                                                <span class="detail-label">מזהה סשן:</span>
-                                                <span class="detail-value" id="activeSessionIdValue"></span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">מצב:</span>
-                                                <span class="detail-value" id="activeSessionStatusValue"></span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">קובץ:</span>
-                                                <span class="detail-value" id="activeSessionFileValue"></span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">חשבון:</span>
-                                                <span class="detail-value" id="activeSessionAccountValue"></span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">ספק:</span>
-                                                <span class="detail-value" id="activeSessionProviderValue"></span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">מספר חשבון ברוקר:</span>
-                                                <span class="detail-value" id="activeSessionBrokerAccountValue">לא זמין</span>
-                                            </div>
-                                        </div>
-                                        <div class="summary-details">
-                                            <div class="detail-item">
-                                                <span class="detail-label">סה"כ רשומות:</span>
-                                                <span class="detail-value" id="activeSessionTotalRecords">0</span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">לייבוא:</span>
-                                                <span class="detail-value" id="activeSessionReadyRecords">0</span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">להשמטה:</span>
-                                                <span class="detail-value" id="activeSessionSkipRecords">0</span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">טיקרים חסרים:</span>
-                                                <span class="detail-value" id="activeSessionMissingTickers">0</span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">כפילויות:</span>
-                                                <span class="detail-value" id="activeSessionDuplicateRecords">0</span>
-                                            </div>
-                                            <div class="detail-item">
-                                                <span class="detail-label">רשומות קיימות:</span>
-                                                <span class="detail-value" id="activeSessionExistingRecords">0</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="row g-3 align-items-start">
                                 <div class="col-12 col-lg-4">
                                     <div class="connector-section">
@@ -683,13 +603,14 @@
                                                     <th>כמות</th>
                                                     <th>מחיר</th>
                                                     <th>תאריך</th>
+                                                    <th>תאריך ושעה</th>
                                                     <th>רמת ביטחון</th>
                                                     <th class="text-center">פעולות</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="existingRecordsTableBody">
                                                 <tr>
-                                                    <td colspan="7">אין רשומות קיימות למעקב.</td>
+                                                    <td colspan="8">אין רשומות קיימות למעקב.</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -708,13 +629,14 @@
                                                     <th>כמות</th>
                                                     <th>מחיר</th>
                                                     <th>תאריך</th>
+                                                    <th>תאריך ושעה</th>
                                                     <th>רמת ביטחון</th>
                                                     <th class="text-center">פעולות</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="withinFileDuplicatesTableBody">
                                                 <tr>
-                                                    <td colspan="7">אין כפילויות פעילות בקובץ.</td>
+                                                    <td colspan="8">אין כפילויות פעילות בקובץ.</td>
                                                 </tr>
                                             </tbody>
                                         </table>

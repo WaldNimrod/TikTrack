@@ -1046,6 +1046,48 @@ def reset_import_session(session_id: int):
             'message': f'Failed to reset session: {str(e)}'
         }), 500
 
+@user_data_import_bp.route('/session/<int:session_id>', methods=['DELETE'])
+def delete_import_session(session_id: int):
+    """
+    Delete an import session.
+    
+    Args:
+        session_id: Import session ID to delete
+        
+    Returns:
+        JSON response with success status
+    """
+    try:
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            result = orchestrator.delete_session(session_id)
+            
+            if not result.get('success'):
+                status_code = 404 if result.get('error') == 'Session not found' else 400
+                return jsonify({
+                    'success': False,
+                    'status': 'error',
+                    'error': result.get('error', 'Failed to delete session')
+                }), status_code
+            
+            return jsonify({
+                'success': True,
+                'status': 'success',
+                'message': 'Session deleted successfully'
+            }), 200
+        
+        finally:
+            db_session.close()
+    
+    except Exception as e:
+        logger.error(f"Failed to delete import session {session_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'status': 'error',
+            'error': f'Failed to delete session: {str(e)}'
+        }), 500
+
 @user_data_import_bp.route('/session/<int:session_id>/status', methods=['GET'])
 def get_session_status(session_id: int):
     """

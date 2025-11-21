@@ -587,8 +587,177 @@ function restoreTickersSectionState() {
 // פונקציות שמירה ועדכון
 // ========================================
 
+// ===== PROVIDER SYMBOL MAPPING FUNCTIONS =====
+// Functions for managing provider symbol mappings
+
+/**
+ * Load provider symbol mappings for a ticker (for edit mode)
+ * 
+ * @function loadTickerProviderSymbols
+ * @param {number} tickerId - ID of the ticker
+ * @async
+ * @returns {Promise<void>}
+ */
+async function loadTickerProviderSymbols(tickerId) {
+  if (!tickerId) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/tickers/${tickerId}/provider-symbols`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        // No mappings found - that's OK
+        return;
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const mappings = result.data || [];
+
+    if (mappings.length > 0) {
+      populateProviderSymbolFields(mappings);
+    }
+  } catch (error) {
+    console.error('Error loading provider symbols:', error);
+    // Don't show error to user - mappings are optional
+  }
+}
+
+/**
+ * Initialize provider symbol fields when modal is shown
+ * This is called when the tickers modal is displayed
+ */
+function initializeProviderSymbolFields() {
+  // Load providers when modal is shown
+  const modal = document.getElementById('tickersModal');
+  if (modal) {
+    // Use Bootstrap modal event
+    modal.addEventListener('shown.bs.modal', async function(event) {
+      // Always load provider fields first
+      await loadProviderSymbolFields();
+      
+      // If in edit mode, load existing mappings
+      const modalElement = event.target;
+      const mode = modalElement.dataset.mode || modalElement.querySelector('[data-mode]')?.dataset.mode;
+      if (mode === 'edit') {
+        // Try to get ticker ID from modal
+        const tickerIdInput = document.getElementById('tickerId');
+        if (tickerIdInput && tickerIdInput.value) {
+          const tickerId = parseInt(tickerIdInput.value);
+          if (tickerId) {
+            await loadTickerProviderSymbols(tickerId);
+          }
+        }
+      }
+    }, { once: false }); // Allow multiple calls (for add/edit)
+  }
+}
+
+// Initialize on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeProviderSymbolFields);
+} else {
+  initializeProviderSymbolFields();
+}
+
 // ===== SAVE AND UPDATE FUNCTIONS =====
 // Ticker saving, updating, and data management
+
+/**
+ * Load external data providers and populate provider symbol fields
+ * 
+ * @function loadProviderSymbolFields
+ * @async
+ * @returns {Promise<void>}
+ */
+async function loadProviderSymbolFields() {
+  const fieldsContainer = document.getElementById('providerSymbolsFields');
+  if (!fieldsContainer) {
+    return;
+  }
+
+  try {
+    // Load providers from API
+    const response = await fetch('/api/external-data-providers/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const providers = (result.data || []).filter(p => p.is_active);
+
+    if (providers.length === 0) {
+      fieldsContainer.innerHTML = '<p class="text-muted small">אין ספקי נתונים פעילים</p>';
+      return;
+    }
+
+    // Generate fields for each provider
+    const fieldsHTML = providers.map(provider => `
+      <div class="mb-3">
+        <label for="providerSymbol_${provider.name}" class="form-label small">
+          ${provider.display_name || provider.name}
+        </label>
+        <input type="text" 
+               class="form-control form-control-sm" 
+               id="providerSymbol_${provider.name}" 
+               name="providerSymbol_${provider.name}"
+               placeholder="השאר ריק אם לא נדרש מיפוי"
+               maxlength="50">
+        <small class="form-text text-muted">
+          אם ספק זה דורש סימבול שונה, הזן כאן (למשל: 500X.MI)
+        </small>
+      </div>
+    `).join('');
+
+    fieldsContainer.innerHTML = fieldsHTML;
+  } catch (error) {
+    console.error('Error loading providers:', error);
+    fieldsContainer.innerHTML = '<p class="text-danger small">שגיאה בטעינת ספקי נתונים</p>';
+  }
+}
+
+/**
+ * Collect provider symbols from form
+ * 
+ * @function collectProviderSymbols
+ * @returns {Object} Dictionary of provider_name -> provider_symbol
+ */
+function collectProviderSymbols() {
+  const providerSymbols = {};
+  const inputs = document.querySelectorAll('[id^="providerSymbol_"]');
+  
+  inputs.forEach(input => {
+    const providerName = input.id.replace('providerSymbol_', '');
+    const symbol = input.value.trim();
+    if (symbol) {
+      providerSymbols[providerName] = symbol;
+    }
+  });
+
+  return Object.keys(providerSymbols).length > 0 ? providerSymbols : null;
+}
+
+/**
+ * Populate provider symbol fields with existing mappings
+ * 
+ * @function populateProviderSymbolFields
+ * @param {Array} mappings - Array of provider symbol mappings
+ * @returns {void}
+ */
+function populateProviderSymbolFields(mappings) {
+  if (!mappings || mappings.length === 0) {
+    return;
+  }
+
+  mappings.forEach(mapping => {
+    const input = document.getElementById(`providerSymbol_${mapping.provider_name}`);
+    if (input) {
+      input.value = mapping.provider_symbol || '';
+    }
+  });
+}
 
 /**
  * Save new ticker
@@ -614,6 +783,12 @@ async function saveTicker() {
   });
   const tagIds = Array.isArray(tickerData.tag_ids) ? tickerData.tag_ids : [];
   delete tickerData.tag_ids;
+
+  // Collect provider symbols
+  const providerSymbols = collectProviderSymbols();
+  if (providerSymbols) {
+    tickerData.provider_symbols = providerSymbols;
+  }
 
   const tickerId = tickerData.id ? parseInt(tickerData.id) : null;
   const symbol = tickerData.symbol?.trim().toUpperCase();
@@ -767,6 +942,12 @@ async function updateTicker() {
 
   const { id, symbol, name, type, currency_id, status, remarks, tag_ids = [] } = tickerData;
   const tagIds = Array.isArray(tag_ids) ? tag_ids : [];
+  
+  // Collect provider symbols
+  const providerSymbols = collectProviderSymbols();
+  if (providerSymbols) {
+    tickerData.provider_symbols = providerSymbols;
+  }
   
   // קבלת הטיקר הקיים לבדיקות ולידציה
   const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));

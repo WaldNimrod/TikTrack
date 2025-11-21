@@ -123,9 +123,26 @@ External Data Integration
 2. **Tickers API** → `/api/tickers/` returns tickers with integrated market data ✅
 3. **TickerService** → Joins tickers with latest market data quotes ✅
 4. **MarketDataQuote** → Latest price data from external providers ✅
-5. **Yahoo Finance Adapter** → Calculates daily change when not provided by Yahoo ✅
+5. **Yahoo Finance Adapter** → Uses provider symbol mapping when available ✅
+   - Checks `ticker_provider_symbols` table for provider-specific symbols
+   - Falls back to internal ticker symbol if no mapping exists
+   - Example: "500X" → "500X.MI" for Yahoo Finance
 6. **Unified Response** → Single API call returns complete ticker + market data ✅
 7. **UI Display** → Renders all data with proper formatting and RTL support ✅
+
+### **Ticker Provider Symbol Mapping** (January 2025)
+The system now supports provider-specific symbol mappings to handle cases where external providers require different symbol formats than internal ticker symbols.
+
+**Key Features**:
+- Separate mapping table (`ticker_provider_symbols`) stores provider-specific symbols
+- Automatic fallback to internal symbol if no mapping exists
+- Server-side processing - frontend is transparent
+- Optional usage - most tickers work without mapping
+- Auto-mapping during import when `display_symbol` differs from internal symbol
+
+**Example**: Ticker "500X" maps to "500X.MI" for Yahoo Finance, but stored as "500X" internally.
+
+**Documentation**: See [Ticker Provider Symbol Mapping](TICKER_PROVIDER_SYMBOL_MAPPING.md) for complete details.
 
 **Note**: This unified approach provides better performance and user experience compared to separate API endpoints.
 

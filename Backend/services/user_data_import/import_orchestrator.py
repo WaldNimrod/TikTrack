@@ -3803,6 +3803,10 @@ class ImportOrchestrator:
                 ticker.name = company_name.strip()
                 updated = True
 
+            # Create provider symbol mapping if display_symbol differs from internal symbol
+            # This handles cases like "500X" -> "500X.MI" for Yahoo Finance
+            self._create_provider_symbol_mapping_if_needed(ticker, metadata)
+
             rich_text_block = self._build_links_rich_text(metadata)
             if not rich_text_block:
                 continue
@@ -3818,6 +3822,62 @@ class ImportOrchestrator:
 
         if updated:
             self.db_session.flush()
+    
+    def _create_provider_symbol_mapping_if_needed(
+        self,
+        ticker: Ticker,
+        metadata: Dict[str, Any]
+    ) -> None:
+        """
+        Create provider symbol mapping if display_symbol differs from internal symbol
+        
+        This method checks if the display_symbol (from metadata) is different from
+        the ticker's internal symbol, and if so, creates a mapping for Yahoo Finance.
+        
+        Example: If ticker.symbol = "500X" and metadata.display_symbol = "500X.MI",
+        this will create a mapping so Yahoo Finance uses "500X.MI".
+        """
+        try:
+            from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+            from models.external_data import ExternalDataProvider
+            
+            display_symbol = metadata.get('display_symbol', '').strip()
+            internal_symbol = (ticker.symbol or '').strip()
+            
+            # If display_symbol is different from internal symbol, create mapping
+            if display_symbol and display_symbol.upper() != internal_symbol.upper():
+                # Get Yahoo Finance provider ID
+                yahoo_provider = self.db_session.query(ExternalDataProvider).filter(
+                    ExternalDataProvider.name == 'yahoo_finance'
+                ).first()
+                
+                if yahoo_provider:
+                    # Check if mapping already exists
+                    existing_mapping = TickerSymbolMappingService.get_provider_symbol(
+                        self.db_session,
+                        ticker.id,
+                        yahoo_provider.id
+                    )
+                    
+                    # Only create if doesn't exist or is different
+                    if not existing_mapping or existing_mapping != display_symbol:
+                        TickerSymbolMappingService.set_provider_symbol(
+                            self.db_session,
+                            ticker.id,
+                            yahoo_provider.id,
+                            display_symbol,
+                            is_primary=True
+                        )
+                        logger.info(
+                            f"Created provider symbol mapping for ticker {ticker.symbol} (ID: {ticker.id}): "
+                            f"{internal_symbol} -> {display_symbol} (Yahoo Finance)"
+                        )
+                else:
+                    logger.warning("Yahoo Finance provider not found - cannot create symbol mapping")
+                    
+        except Exception as e:
+            logger.warning(f"Failed to create provider symbol mapping for ticker {ticker.id}: {e}")
+            # Don't fail the whole import if mapping creation fails
 
     def _normalise_symbol_metadata(self, metadata: Any) -> Dict[str, Dict[str, Any]]:
         if isinstance(metadata, dict):
@@ -3999,6 +4059,23 @@ class ImportOrchestrator:
             self.db_session.rollback()
             logger.error(f"Failed to reset session {session_id}: {error}", exc_info=True)
             return {'success': False, 'error': str(error)}
+    
+    def delete_session(self, session_id: int) -> Dict[str, Any]:
+        """
+        Delete an import session.
+        
+        Args:
+            session_id: Import session ID to delete
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            result = self.session_manager.delete_session(session_id)
+            return result
+        except Exception as e:
+            logger.error(f"❌ Failed to delete session {session_id}: {str(e)}")
+            return {'success': False, 'error': str(e)}
     
     def get_session_status(self, session_id: int) -> Dict[str, Any]:
         """

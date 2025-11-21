@@ -416,6 +416,50 @@ class ImportSessionManager:
             logger.error(f"❌ Failed to cleanup old sessions: {str(e)}")
             return 0
     
+    def delete_session(self, session_id: int) -> Dict[str, Any]:
+        """
+        Delete a specific import session and clean up its cache entries.
+        
+        Args:
+            session_id: Session ID to delete
+            
+        Returns:
+            Dict with success status
+        """
+        try:
+            # Get session
+            session = self.get_session(session_id)
+            if not session:
+                return {'success': False, 'error': 'Session not found'}
+            
+            # Clean up cache entries
+            try:
+                from services.advanced_cache_service import advanced_cache_service
+                cache_keys = [
+                    f"import_session_{session_id}_summary",
+                    f"import_session_{session_id}_analysis",
+                    f"import_session_{session_id}_preview"
+                ]
+                for key in cache_keys:
+                    try:
+                        advanced_cache_service.delete(key)
+                    except Exception as e:
+                        logger.debug(f"Cache cleanup failed for key {key}: {str(e)}")
+            except Exception as e:
+                logger.debug(f"Cache cleanup failed for session {session_id}: {str(e)}")
+            
+            # Delete session
+            self.db_session.delete(session)
+            self.db_session.commit()
+            
+            logger.info(f"✅ Deleted session {session_id}")
+            return {'success': True}
+            
+        except Exception as e:
+            self.db_session.rollback()
+            logger.error(f"❌ Failed to delete session {session_id}: {str(e)}")
+            return {'success': False, 'error': str(e)}
+    
     def get_session_stats(self) -> Dict[str, Any]:
         """
         Get overall session statistics.

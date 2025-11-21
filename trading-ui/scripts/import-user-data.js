@@ -676,7 +676,7 @@ function syncAccountAndConnectorLockState() {
     const connectorSelect = modal.querySelector('#connectorSelect');
     // Lock provider selection only when a real session flow is in progress:
     // - an existing active session AND one of: file loaded, pending account-linking, or analysis results
-    // This keeps the provider selectable for a fresh upload even if an old session exists in storage.
+    // Removed old session lock logic - connector is always selectable in step 1
     const lockConnector = Boolean(
         currentSessionId && (selectedFile || pendingAccountLinking || analysisResults)
     );
@@ -2755,48 +2755,9 @@ function isSessionActive(status) {
 }
 
 function updateResetSessionButtonState() {
-    const resetButton = document.getElementById('resetImportSessionBtn');
-    const resumeButton = document.getElementById('resumeImportSessionBtn');
-    
-    // ALWAYS hide resume button - feature removed
-    if (resumeButton) {
-        resumeButton.classList.add('d-none');
-        resumeButton.style.display = 'none';
-        resumeButton.disabled = true;
-        resumeButton.setAttribute('aria-disabled', 'true');
-    }
-    
-    // Only show reset button if there's an active (not closed) session
-    // Use raw status if available (more reliable), otherwise use translated status
-    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
-    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
-
-    // CRITICAL: Always sync button visibility with session indicator
-    // If there's no active session, hide reset button and info
-    if (!hasActiveSession) {
-        if (resetButton) {
-            resetButton.classList.add('d-none');
-            resetButton.style.display = 'none';
-            resetButton.disabled = true;
-            resetButton.setAttribute('aria-disabled', 'true');
-        }
-        // Don't call updateActiveSessionIndicator here - it will be called separately
-        return;
-    }
-
-    // If we have an active session, show reset button and ensure info is visible
-    if (resetButton) {
-        resetButton.classList.remove('d-none');
-        resetButton.style.display = 'inline-flex';
-        // Force display if still hidden
-        if (window.getComputedStyle(resetButton).display === 'none') {
-            resetButton.style.display = 'inline-flex';
-        }
-        resetButton.disabled = false;
-        resetButton.setAttribute('aria-disabled', 'false');
-    }
-    
-    // Ensure indicator is also visible (will be called separately, but ensure consistency)
+    // Removed - reset session button removed from step 1
+    // Sessions can be managed from the sessions table instead
+    return;
 }
 
 function getApiErrorMessage(response, fallback = 'שגיאה לא ידועה') {
@@ -2911,32 +2872,9 @@ function updateActiveSessionInfo(updates = {}) {
 }
 
 function updateActiveSessionIndicator() {
-    const indicator = document.getElementById('activeSessionIndicator');
-    const controlsRow = document.getElementById('activeSessionControlsRow');
-    const detailsRow = document.getElementById('activeSessionDetailsRow');
-    if (!indicator) {
-        return;
-    }
-    
-    // Check if there's an active (not closed) session
-    // Use raw status if available (more reliable), otherwise use translated status
-    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
-    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
-    
-    if (!hasActiveSession) {
-        indicator.classList.add('d-none');
-        indicator.style.display = 'none';
-        indicator.setAttribute('data-has-session', 'false');
-        if (controlsRow) {
-            controlsRow.classList.add('d-none');
-            controlsRow.style.display = 'none';
-        }
-        if (detailsRow) {
-            detailsRow.classList.add('d-none');
-            detailsRow.style.display = 'none';
-        }
-        return;
-    }
+    // Removed - old session indicator feature removed from step 1
+    // Sessions can be continued from the sessions table instead
+    return;
     
     // Show indicator and remove d-none class
     indicator.classList.remove('d-none');
@@ -3310,6 +3248,60 @@ function renderImportDate(value, fallback = '') {
     } catch (error) {
         if (window.Logger?.warn) {
             window.Logger.warn('[Import Modal] Failed to render date value', { value, error: error.message });
+        }
+    }
+    return fallback;
+}
+
+/**
+ * Render date and time for duplicate records - shows full date and time
+ */
+function renderImportDateTime(value, fallback = '—') {
+    try {
+        if (typeof window.dateUtils?.ensureDateEnvelope === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope(value);
+            if (envelope && typeof envelope === 'object') {
+                // Try to get full date-time display
+                if (envelope.display && envelope.display.includes(':')) {
+                    return envelope.display;
+                }
+                if (envelope.local && envelope.local.includes(':')) {
+                    return envelope.local;
+                }
+                if (envelope.utc && envelope.utc.includes(':')) {
+                    return envelope.utc;
+                }
+                // If no time component, try to format with time
+                if (window.FieldRendererService?.renderDate) {
+                    const dateDisplay = window.FieldRendererService.renderDate(envelope);
+                    // If FieldRendererService includes time, use it
+                    if (dateDisplay && dateDisplay.includes(':')) {
+                        return dateDisplay;
+                    }
+                }
+                // Fallback to date only
+                return envelope.display || envelope.local || envelope.utc || fallback;
+            }
+        }
+        if (value && typeof value === 'object') {
+            if (value.display && value.display.includes(':')) {
+                return value.display;
+            }
+            if (value.local && value.local.includes(':')) {
+                return value.local;
+            }
+            return value.display || value.local || value.utc || fallback;
+        }
+        if (value) {
+            // If it's a string, check if it has time component
+            if (typeof value === 'string' && value.includes(':')) {
+                return value;
+            }
+            return value;
+        }
+    } catch (error) {
+        if (window.Logger?.warn) {
+            window.Logger.warn('[Import Modal] Failed to render date-time value', { value, error: error.message });
         }
     }
     return fallback;
@@ -4700,15 +4692,7 @@ function updateHeaderActions(step) {
         setElementDisplay(previewActions, step === 3 ? 'flex' : 'none');
     }
     
-    // ALWAYS hide resume session button - feature removed completely
-    const resumeButton = document.getElementById('resumeImportSessionBtn');
-    if (resumeButton) {
-        resumeButton.classList.add('d-none');
-        resumeButton.style.display = 'none';
-        resumeButton.disabled = true;
-        resumeButton.setAttribute('aria-disabled', 'true');
-        resumeButton.style.visibility = 'hidden';
-    }
+    // Removed - resume session button removed completely from step 1
     
     // In other steps, let updateResetSessionButtonState handle visibility for reset button
     if (step !== 1) {
@@ -4974,7 +4958,7 @@ function displayExistingRecords(existingRecords) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(7, 'אין רשומות קיימות למעקב.');
+        tableBody.innerHTML = renderTableEmptyRow(8, 'אין רשומות קיימות למעקב.');
         markProblemTableReady('existingRecordsTable');
         return;
     }
@@ -7146,8 +7130,10 @@ function acceptDuplicate(index, type) {
         }
         if (data.success || data.status === 'success') {
             showImportUserDataNotification('כפילות אושרה', 'success');
-            // Refresh preview data
-            refreshPreviewData();
+            // Refresh preview data - wait a bit to ensure backend commit is complete
+            setTimeout(() => {
+                refreshPreviewData();
+            }, 100);
         } else {
             showImportUserDataNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
         }
@@ -7181,8 +7167,10 @@ function rejectDuplicate(index, type) {
         }
         if (data.success || data.status === 'success') {
             showImportUserDataNotification('כפילות נדחתה', 'success');
-            // Refresh preview data
-            refreshPreviewData();
+            // Refresh preview data - wait a bit to ensure backend commit is complete
+            setTimeout(() => {
+                refreshPreviewData();
+            }, 100);
         } else {
             showImportUserDataNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
         }
@@ -8007,6 +7995,7 @@ function displayProblemResolutionDetailed(data) {
                     <th>מטבע</th>
                     <th>תאריך</th>
                     <th>חשבון</th>
+                    <th>תאריך ושעה</th>
                     <th>רמת ביטחון</th>
                     <th class="text-center">פעולות</th>
                 `;
@@ -8019,6 +8008,7 @@ function displayProblemResolutionDetailed(data) {
                     <th>מטבע</th>
                     <th>תאריך</th>
                     <th>חשבון</th>
+                    <th>תאריך ושעה</th>
                     <th>רמת ביטחון</th>
                     <th class="text-center">פעולות</th>
                 `;
@@ -8382,7 +8372,7 @@ function displayWithinFileDuplicates(duplicates, activeMatchIndexSet = new Set()
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(7, 'אין כפילויות פעילות בקובץ.');
+        tableBody.innerHTML = renderTableEmptyRow(8, 'אין כפילויות פעילות בקובץ.');
         markProblemTableReady('withinFileDuplicatesTable');
         return;
     }
@@ -8681,12 +8671,14 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
     let col3 = escapeHtml(buildValueOrFallback(record?.quantity ?? duplicate.quantity, '—'));
     let col4 = escapeHtml(buildValueOrFallback(record?.price ?? duplicate.price, '—'));
     let col5 = escapeHtml(renderImportDate(record?.date || duplicate.date, '—'));
+    let col6 = escapeHtml(renderImportDateTime(record?.date || duplicate.date, '—')); // Date and time column
     // Cashflows-style mapping
     if (isCashflow) {
         const typeLabel = resolveCashflowTypeLabel(record?.cashflow_type);
         const amountStr = formatAmount(record?.amount ?? duplicate.amount ?? 0);
         const currencyStr = record?.currency || duplicate.currency || '—';
         const dateStr = escapeHtml(renderImportDate(record?.effective_date || duplicate.effective_date, '—'));
+        const dateTimeStr = escapeHtml(renderImportDateTime(record?.effective_date || duplicate.effective_date, '—')); // Date and time column
         const accountDisplay = (typeof window.getTradingAccountName === 'function' && record?.source_account)
             ? escapeHtml(window.getTradingAccountName(record.source_account))
             : escapeHtml(buildValueOrFallback(record?.source_account ?? duplicate.source_account, '-'));
@@ -8695,6 +8687,7 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
         col3 = escapeHtml(currencyStr);
         col4 = dateStr;
         col5 = accountDisplay;
+        col6 = dateTimeStr; // Date and time for cashflows
     }
     const confidence = duplicate.confidence_score || duplicate.confidence || 0;
     const confidenceClass = getConfidenceClass(confidence);
@@ -8735,6 +8728,7 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
             <td>${escapeHtml(col3)}</td>
             <td>${escapeHtml(col4)}</td>
             <td>${escapeHtml(col5)}</td>
+            <td>${escapeHtml(col6)}</td>
             <td><span class="confidence-text ${confidenceClass}">${confidence}%</span></td>
             <td class="text-center table-action-buttons">
                 ${acceptButton}
@@ -8774,33 +8768,11 @@ function renderDuplicateMatchRows(matches) {
         }
         const confidence = match.confidence_score || match.confidence || 0;
         const confidenceClass = getConfidenceClass(confidence);
-        const matchIndex = getPreviewRecordIndex(record, match, match.record_index);
 
-        const acceptMatchButton = `
-            <button
-                data-button-type="APPROVE"
-                data-variant="small"
-                data-onclick="acceptDuplicate(${matchIndex}, 'within_file_duplicate_match')"
-                data-text="אשר"
-                title="אשר רשומה תואמת"
-                aria-label="אשר רשומה תואמת">
-            </button>
-        `;
-
-        const rejectMatchButton = `
-            <button
-                data-button-type="REJECT"
-                data-variant="small"
-                data-onclick="rejectDuplicate(${matchIndex}, 'within_file_duplicate_match')"
-                data-text="דחה"
-                title="דחה רשומה תואמת"
-                aria-label="דחה רשומה תואמת">
-            </button>
-        `;
-
+        // Removed buttons from match rows - only main row has action buttons
         return `
             <tr class="duplicate-match-row">
-                <td colspan="7">
+                <td colspan="8">
                     <div class="duplicate-match-container">
                         <div class="duplicate-match-details">
                             <strong>רשומה תואמת:</strong>
@@ -8810,10 +8782,6 @@ function renderDuplicateMatchRows(matches) {
                             <span>${escapeHtml(m4)}</span>
                             <span>${escapeHtml(m5)}</span>
                             <span class="confidence-text ${confidenceClass}">${confidence}%</span>
-                        </div>
-                        <div class="duplicate-match-actions">
-                            ${acceptMatchButton}
-                            ${rejectMatchButton}
                         </div>
                     </div>
                 </td>
@@ -9161,7 +9129,10 @@ function renderExecutionProblemSections(data) {
 
 function renderExecutionStyleProblems(data) {
     const skipRecords = data.records_to_skip || [];
-    const withinFileDuplicates = skipRecords.filter(record => record.reason === 'within_file_duplicate');
+    // Filter out rejected duplicates - they should not be displayed
+    const withinFileDuplicates = skipRecords.filter(record => 
+        record.reason === 'within_file_duplicate' && !record.rejected
+    );
     const activeMatchIndexSet = new Set(
         skipRecords
             .filter(record => record.reason === 'within_file_duplicate_match' && typeof record.record_index === 'number')
@@ -9170,7 +9141,10 @@ function renderExecutionStyleProblems(data) {
 
     displayWithinFileDuplicates(withinFileDuplicates, activeMatchIndexSet);
 
-    const existingRecords = skipRecords.filter(record => record.reason === 'existing_record');
+    // Filter out rejected existing records - they should not be displayed
+    const existingRecords = skipRecords.filter(record => 
+        record.reason === 'existing_record' && !record.rejected
+    );
     displayExistingRecords(existingRecords);
 }
 
@@ -9472,7 +9446,6 @@ function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
         'analysisContinueBtn',
         'confirmImportHeaderBtn',
         'confirmImportAndReportHeaderBtn',
-        'resetImportSessionBtn',
         'cancelImportStepBtn'
     ];
 

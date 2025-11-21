@@ -35,6 +35,30 @@ echo "Production PostgreSQL Setup"
 echo "=========================================="
 echo ""
 
+# Pre-flight checks
+echo -e "${BLUE}Pre-flight checks...${NC}"
+
+# Check workflow
+if [ -f "${SCRIPT_DIR}/enforce_workflow.sh" ]; then
+    echo "Running workflow check..."
+    if ! "${SCRIPT_DIR}/enforce_workflow.sh" >/dev/null 2>&1; then
+        echo -e "${YELLOW}⚠️  Workflow check warnings (continuing anyway)${NC}"
+    fi
+fi
+
+# Check pre-change safety
+if [ -f "${SCRIPT_DIR}/pre_change_check.sh" ]; then
+    echo "Running pre-change safety check..."
+    # Skip interactive parts for automated script
+    export SKIP_INTERACTIVE=1
+    if ! "${SCRIPT_DIR}/pre_change_check.sh" >/dev/null 2>&1; then
+        echo -e "${YELLOW}⚠️  Pre-change check warnings (continuing anyway)${NC}"
+    fi
+    unset SKIP_INTERACTIVE
+fi
+
+echo ""
+
 # Check if container is running
 if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
     echo -e "${RED}❌ Error: PostgreSQL container '${CONTAINER_NAME}' is not running${NC}"

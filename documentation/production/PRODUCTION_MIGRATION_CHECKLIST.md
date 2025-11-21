@@ -8,10 +8,14 @@
 
 ## ✅ **לפני המיגרציה**
 
+- [ ] **הרצת `enforce_workflow.sh`** - בדיקת תהליך עבודה
+- [ ] **הרצת `pre_change_check.sh`** - בדיקת בטיחות לפני שינוי
 - [ ] גיבוי מלא של SQLite של הפרודקשן
 - [ ] גיבוי קוד ל-Git
 - [ ] Docker container `tiktrack-postgres-dev` רץ
 - [ ] סקריפטי המיגרציה זמינים בפרודקשן
+- [ ] בדיקת database name נכון (`TikTrack-db-production`)
+- [ ] בדיקת פורט נכון (`5001`)
 
 ---
 

@@ -40,6 +40,24 @@
 
 ## 🚀 **שלב 2: ביצוע המיגרציה**
 
+### **צעד 0: בדיקת תהליך עבודה (חובה!)**
+
+```bash
+cd /Users/nimrod/Documents/TikTrack/TikTrackApp-Production
+
+# בדוק תהליך עבודה
+./scripts/db/enforce_workflow.sh
+
+# בדיקת בטיחות לפני שינוי
+./scripts/db/pre_change_check.sh
+```
+
+**למה זה חשוב:**
+- וידוא שאתה בסביבה הנכונה
+- וידוא שה-database name נכון
+- יצירת גיבוי אוטומטי
+- מניעת טעויות
+
 ### **צעד 1: גיבוי SQLite**
 
 ```bash

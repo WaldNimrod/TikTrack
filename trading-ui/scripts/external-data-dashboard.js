@@ -481,6 +481,68 @@
     }
 
     /**
+     * Initialize performance monitoring
+     * @returns {void}
+     */
+    initializePerformanceMonitoring() {
+      // Update performance info when page loads
+      const updatePerformanceInfo = () => {
+        // Page load time
+        const loadTimeElement = getElement('page-load-time');
+        if (loadTimeElement && window.performance && window.performance.timing) {
+          const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+          if (!Number.isNaN(loadTime) && loadTime >= 0) {
+            loadTimeElement.textContent = `${Math.round(loadTime)}ms`;
+          } else {
+            // Fallback to performance.now() if timing is not available
+            const pageLoadTime = performance.now();
+            loadTimeElement.textContent = `${Math.round(pageLoadTime)}ms`;
+          }
+        } else if (loadTimeElement) {
+          // Fallback if performance.timing is not available
+          const pageLoadTime = performance.now();
+          loadTimeElement.textContent = `${Math.round(pageLoadTime)}ms`;
+        }
+
+        // Memory usage
+        const memoryElement = getElement('memory-usage');
+        if (memoryElement && window.performance && window.performance.memory) {
+          const memoryUsedMB = Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024 * 100) / 100;
+          memoryElement.textContent = `${memoryUsedMB}MB`;
+        } else if (memoryElement) {
+          memoryElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+
+        // User Agent
+        const userAgentElement = getElement('user-agent');
+        if (userAgentElement && navigator.userAgent) {
+          const userAgent = navigator.userAgent;
+          // Truncate to 50 characters if too long
+          userAgentElement.textContent = userAgent.length > 50 
+            ? userAgent.substring(0, 50) + '...' 
+            : userAgent;
+        }
+
+        // Platform
+        const platformElement = getElement('platform');
+        if (platformElement && navigator.platform) {
+          platformElement.textContent = navigator.platform;
+        }
+      };
+
+      // Update immediately if DOM is ready
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        // Small delay to ensure performance metrics are available
+        setTimeout(updatePerformanceInfo, 100);
+      } else {
+        // Wait for page load
+        window.addEventListener('load', () => {
+          setTimeout(updatePerformanceInfo, 100);
+        });
+      }
+    }
+
+    /**
      * Initialize the dashboard
      * @returns {Promise<void>}
      */
@@ -494,6 +556,7 @@
 
       this.initializeHeader();
       this.setupEventListeners();
+      this.initializePerformanceMonitoring();
 
       try {
         await this.loadInitialData();
@@ -1332,31 +1395,69 @@
         // Try to get settings from status data if available
         if (this.statusData?.providers?.details && this.statusData.providers.details.length > 0) {
           const yahooProvider = this.statusData.providers.details.find(p => p.name === 'yahoo_finance');
+          logger.debug(`${MODULE_NAME}:update-current-settings:yahoo-provider`, { 
+            found: !!yahooProvider,
+            provider: yahooProvider ? {
+              name: yahooProvider.name,
+              cache_ttl_hot: yahooProvider.cache_ttl_hot,
+              cache_ttl_warm: yahooProvider.cache_ttl_warm,
+              rate_limit_per_hour: yahooProvider.rate_limit_per_hour
+            } : null
+          });
+          
           if (yahooProvider) {
             // Get from provider settings
-            const hotTtlMinutes = yahooProvider.cache_ttl_hot ? Math.round(yahooProvider.cache_ttl_hot / 60) : null;
-            const warmTtlMinutes = yahooProvider.cache_ttl_warm ? Math.round(yahooProvider.cache_ttl_warm / 60) : null;
-            const maxRequests = yahooProvider.rate_limit_per_hour || null;
+            // cache_ttl_hot and cache_ttl_warm are in SECONDS, convert to minutes
+            const hotTtlMinutes = yahooProvider.cache_ttl_hot != null ? Math.round(yahooProvider.cache_ttl_hot / 60) : null;
+            const warmTtlMinutes = yahooProvider.cache_ttl_warm != null ? Math.round(yahooProvider.cache_ttl_warm / 60) : null;
+            const maxRequests = yahooProvider.rate_limit_per_hour != null ? yahooProvider.rate_limit_per_hour : null;
 
+            logger.debug(`${MODULE_NAME}:update-current-settings:values`, {
+              hotTtlMinutes,
+              warmTtlMinutes,
+              maxRequests,
+              hotCacheElement: !!hotCacheElement,
+              warmCacheElement: !!warmCacheElement,
+              maxRequestsElement: !!maxRequestsElement
+            });
+            
             if (hotCacheElement) {
-              hotCacheElement.textContent = hotTtlMinutes
+              hotCacheElement.textContent = hotTtlMinutes !== null && hotTtlMinutes !== undefined
                 ? `${formatNumber(hotTtlMinutes)} דקות`
                 : NOT_AVAILABLE_TEXT;
             }
 
             if (warmCacheElement) {
-              warmCacheElement.textContent = warmTtlMinutes
+              warmCacheElement.textContent = warmTtlMinutes !== null && warmTtlMinutes !== undefined
                 ? `${formatNumber(warmTtlMinutes)} דקות`
                 : NOT_AVAILABLE_TEXT;
             }
 
             if (maxRequestsElement) {
-              maxRequestsElement.textContent = maxRequests
+              maxRequestsElement.textContent = maxRequests !== null && maxRequests !== undefined
                 ? `${formatNumber(maxRequests)} לשעה`
                 : NOT_AVAILABLE_TEXT;
             }
+            
+            logger.debug(`${MODULE_NAME}:update-current-settings:success`, {
+              hotCacheText: hotCacheElement?.textContent,
+              warmCacheText: warmCacheElement?.textContent,
+              maxRequestsText: maxRequestsElement?.textContent
+            });
+            
             return;
+          } else {
+            logger.warn(`${MODULE_NAME}:update-current-settings:yahoo-not-found`, {
+              providers: this.statusData.providers.details.map(p => p.name)
+            });
           }
+        } else {
+          logger.warn(`${MODULE_NAME}:update-current-settings:no-providers`, {
+            hasStatusData: !!this.statusData,
+            hasProviders: !!this.statusData?.providers,
+            hasDetails: !!this.statusData?.providers?.details,
+            detailsLength: this.statusData?.providers?.details?.length || 0
+          });
         }
 
         // Fallback: Try to get from cache TTL settings in status

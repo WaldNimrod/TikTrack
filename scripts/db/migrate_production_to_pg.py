@@ -210,6 +210,17 @@ def copy_table(
 
 def main() -> None:
     ensure_inputs()
+    
+    # Safety check: verify database name
+    if "production" not in POSTGRES_DB.lower():
+        print("⚠️  WARNING: Database name does not contain 'production'")
+        print(f"   Current: {POSTGRES_DB}")
+        print("   Expected: TikTrack-db-production")
+        response = input("Continue anyway? (y/N): ")
+        if response.lower() != 'y':
+            print("Aborted.")
+            return
+    
     sqlite_conn = sqlite3.connect(str(SQLITE_PATH))
     engine = create_engine(POSTGRES_URL)
     metadata = MetaData()

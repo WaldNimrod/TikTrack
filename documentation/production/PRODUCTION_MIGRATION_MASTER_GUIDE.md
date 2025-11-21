@@ -357,6 +357,10 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 
 ## 🎯 **התחל כאן**
 
+⚠️ **חשוב:** לפני שהפרודקשן יוכל להשתמש בסקריפטים, **חובה למזג את `new-db-uopgrde` ל-`main`**!
+
+👉 **[מדריך מזיגה ל-main](PRODUCTION_MIGRATION_BRANCH_MERGE.md)** - **קרא קודם!**
+
 👉 **[מדריך ביצוע מלא](PRODUCTION_MIGRATION_EXECUTION_GUIDE.md)** - שלבים מפורטים
 
 👉 **[סקריפט התקנה](scripts/db/setup_production_postgresql.sh)** - הרץ זה ראשון

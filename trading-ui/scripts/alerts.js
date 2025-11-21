@@ -1750,6 +1750,149 @@ window.debugAlertForm = function() {
   };
 };
 
+/**
+ * Debug function to test what would be sent to backend
+ * בדיקת מה נשלח בפועל ל-backend
+ */
+window.testAlertPayload = async function() {
+  console.group('🧪 [TEST] Alert Payload Test');
+  
+  // Find form
+  let form = document.getElementById('alertsModalForm');
+  if (!form) {
+    form = document.getElementById('addAlertForm');
+  }
+  
+  if (!form) {
+    console.error('❌ Form not found!');
+    console.groupEnd();
+    return;
+  }
+  
+  // Collect data exactly as saveAlert does
+  const relatedType = form.querySelector('#alertRelatedType')?.value || '';
+  const relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  
+  const alertTypeField = form.querySelector('#alertType');
+  const alertConditionField = form.querySelector('#alertCondition');
+  const alertValueField = form.querySelector('#alertValue');
+  
+  let alertTypeValue = '';
+  if (alertTypeField) {
+    alertTypeValue = alertTypeField.value || 
+                    alertTypeField.getAttribute('value') || 
+                    (alertTypeField.selectedIndex >= 0 ? alertTypeField.options[alertTypeField.selectedIndex]?.value : '') ||
+                    '';
+  }
+  
+  let alertConditionValue = '';
+  if (alertConditionField) {
+    alertConditionValue = alertConditionField.value || 
+                         alertConditionField.getAttribute('value') || 
+                         (alertConditionField.selectedIndex >= 0 ? alertConditionField.options[alertConditionField.selectedIndex]?.value : '') ||
+                         '';
+  }
+  
+  const conditionAttribute = alertTypeValue || 'price';
+  const conditionOperator = alertConditionValue || 'more_than';
+  const conditionNumber = alertValueField?.value || '';
+  
+  // Get message
+  let message = '';
+  if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
+    message = window.RichTextEditorService.getContent('alertName') || '';
+  } else {
+    message = form.querySelector('#alertName')?.value || '';
+  }
+  
+  // Get status
+  const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+  const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+  const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+  
+  const status = statusHidden;
+  const isTriggered = isTriggeredHidden;
+  
+  // Get expiry_date
+  const expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+  
+  // Build payload exactly as saveAlert does
+  const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
+  const finalConditionOperator = (conditionOperator && conditionOperator.trim() !== '') ? conditionOperator : 'more_than';
+  
+  let conditionNumberStr = '';
+  if (conditionNumber) {
+    const numericValue = parseFloat(conditionNumber);
+    if (!isNaN(numericValue)) {
+      conditionNumberStr = String(numericValue);
+    }
+  }
+  
+  const alertPayload = {
+    related_type_id: parseInt(relatedType) || null,
+    related_id: parseInt(relatedId) || null,
+    condition_attribute: finalConditionAttribute,
+    condition_operator: finalConditionOperator,
+    condition_number: conditionNumberStr,
+    message: message || null,
+    status: status || 'open',
+    is_triggered: isTriggered || 'false',
+  };
+  
+  if (expiryDate) {
+    alertPayload.expiry_date = expiryDate;
+  }
+  
+  console.log('📋 Collected Values:', {
+    relatedType,
+    relatedId,
+    conditionAttribute,
+    conditionOperator,
+    conditionNumber,
+    message: message.substring(0, 50) + '...',
+    status,
+    isTriggered,
+    expiryDate
+  });
+  
+  console.log('📋 Final Payload:', alertPayload);
+  console.log('📋 Payload JSON:', JSON.stringify(alertPayload, null, 2));
+  
+  // Test sending to backend
+  console.log('📤 Testing payload to backend...');
+  try {
+    const response = await fetch('/api/alerts/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(alertPayload),
+    });
+    
+    console.log('📥 Response status:', response.status);
+    console.log('📥 Response ok:', response.ok);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        console.error('❌ Error data:', errorData);
+      } catch (e) {
+        console.error('❌ Could not parse error as JSON');
+      }
+    } else {
+      const result = await response.json();
+      console.log('✅ Success response:', result);
+    }
+  } catch (error) {
+    console.error('❌ Network error:', error);
+  }
+  
+  console.groupEnd();
+  return alertPayload;
+};
+
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   

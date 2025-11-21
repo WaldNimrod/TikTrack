@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="conditions-test-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>מערכת בדיקת תנאים - TikTrack</title>
+    
+    <!-- 
+    ===== CONDITIONS TEST PAGE =====
+    
+    This page follows the proper TikTrack architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Unified initialization system
+    5. Standard page structure
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet"><link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- 01-settings - Variables and Settings -->
+    
+    
+    
+    
+    
+    
+    
+    <!-- 02-tools - Functions and Mixins -->
+    
+    
+    
+    
+    <!-- 03-generic - Reset and Normalization -->
+    
+    
+    
+    <!-- 04-elements - Basic HTML Elements -->
+    
+    
+    
+    
+    
+    <!-- 05-objects - Layout Structures -->
+    
+    
+    
+    <!-- 06-components - UI Components -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!-- 07-pages - Page-specific Styles -->
+    
+    
+    <!-- 08-themes - Themes -->
+    
+    
+    <!-- 09-utilities - Utility Classes -->
+    
+
+    <!-- Header Styles - Separate from ITCSS -->
+    
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+</head>
+<body class="conditions-test-page">
+    <!-- Unified Header -->
+    <div id="unified-header"></div>
+    
+    <!-- Background Wrapper -->
+    <div class="background-wrapper">
+        <!-- Page Body -->
+        <div class="page-body">
+            <!-- Top Section -->
+            <div class="top-section" data-section="top">
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/development.svg" alt="בדיקת תנאים" class="section-icon">
+                        מערכת בדיקת תנאים - Conditions
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-success" id="runAllTestsBtn">
+                            <i class="fas fa-play-circle"></i>
+                            Run All Tests
+                        </button>
+                        <button class="btn btn-secondary" id="clearLogsBtn">
+                            <i class="fas fa-trash"></i>
+                            Clear Logs
+                        </button>
+                        <button class="btn btn-primary" id="copyLogBtn">
+                            <i class="fas fa-copy"></i>
+                            Copy Log
+                        </button>
+                        <button class="btn btn-warning" id="resetAllBtn">
+                            <i class="fas fa-redo"></i>
+                            Reset All
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="info-summary" id="testSummary">
+                        <div>סה"כ בדיקות: <strong id="totalTests">7</strong></div>
+                        <div>הצלחות: <strong id="passedTests">0</strong></div>
+                        <div>כשלונות: <strong id="failedTests">0</strong></div>
+                        <div>זמן ביצוע: <strong id="totalDuration">0s</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Content Section 1 - Test Controls -->
+                <div class="content-section" id="test-controls">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="שלבי בדיקה" class="section-icon">
+                            שלבי בדיקה
+                        </div>
+                        <div class="table-count" id="testCount">7 בדיקות</div>
+                    </div>
+                    <div class="section-body">
+                        
+                        <!-- Test 1: Load Methods -->
+                        <div class="test-item" data-test="load-methods">
+                            <div class="test-item-header">
+                                <span class="test-number">1</span>
+                                <span class="test-name">טעינת שיטות מסחר</span>
+                                <span class="test-status" id="status-1">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="load-methods">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-1"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 2: Create Condition -->
+                        <div class="test-item" data-test="create-condition">
+                            <div class="test-item-header">
+                                <span class="test-number">2</span>
+                                <span class="test-name">יצירת תנאי חדש</span>
+                                <span class="test-status" id="status-2">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="create-condition">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-2"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 3: Read Conditions -->
+                        <div class="test-item" data-test="read-conditions">
+                            <div class="test-item-header">
+                                <span class="test-number">3</span>
+                                <span class="test-name">קריאת תנאים קיימים</span>
+                                <span class="test-status" id="status-3">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="read-conditions">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-3"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 4: Edit Condition -->
+                        <div class="test-item" data-test="edit-condition">
+                            <div class="test-item-header">
+                                <span class="test-number">4</span>
+                                <span class="test-name">עריכת תנאי</span>
+                                <span class="test-status" id="status-4">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="edit-condition">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-4"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 5: Delete Condition -->
+                        <div class="test-item" data-test="delete-condition">
+                            <div class="test-item-header">
+                                <span class="test-number">5</span>
+                                <span class="test-name">מחיקת תנאי</span>
+                                <span class="test-status" id="status-5">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="delete-condition">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-5"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 6: Create Alert -->
+                        <div class="test-item" data-test="create-alert">
+                            <div class="test-item-header">
+                                <span class="test-number">6</span>
+                                <span class="test-name">יצירת התראה מתנאי</span>
+                                <span class="test-status" id="status-6">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="create-alert">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-6"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 7: Inheritance Test -->
+                        <div class="test-item" data-test="inheritance-test">
+                            <div class="test-item-header">
+                                <span class="test-number">7</span>
+                                <span class="test-name">בדיקת ירושה (Trade מ-Trade Plan)</span>
+                                <span class="test-status" id="status-7">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="inheritance-test">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-7"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 8: Evaluate Single Condition -->
+                        <div class="test-item" data-test="evaluate-single">
+                            <div class="test-item-header">
+                                <span class="test-number">8</span>
+                                <span class="test-name">הערכת תנאי יחיד</span>
+                                <span class="test-status" id="status-8">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-single">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-8"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 9: Evaluate All Conditions -->
+                        <div class="test-item" data-test="evaluate-all">
+                            <div class="test-item-header">
+                                <span class="test-number">9</span>
+                                <span class="test-name">הערכת כל התנאים</span>
+                                <span class="test-status" id="status-9">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-all">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-9"></span>
+                            </div>
+                        </div>
+
+                        <!-- Test 10: Alert Auto-Generation -->
+                        <div class="test-item" data-test="alert-auto-generation">
+                            <div class="test-item-header">
+                                <span class="test-number">10</span>
+                                <span class="test-name">יצירת התראות אוטומטית</span>
+                                <span class="test-status" id="status-10">⚪</span>
+                            </div>
+                            <div class="test-item-controls">
+                                <button class="btn btn-sm btn-primary run-test-btn" data-test="alert-auto-generation">
+                                    <i class="fas fa-play"></i>
+                                    Run Test
+                                </button>
+                                <span class="test-duration" id="duration-10"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+
+                <!-- Content Section 2 - Quick Stats & Links -->
+                <div class="content-section" id="quick-stats">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="סטטיסטיקות מהירות" class="section-icon">
+                            סטטיסטיקות מהירות וקישורים
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-info" id="refreshStatsBtn">
+                                <i class="fas fa-sync-alt"></i>
+                                רענן
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="quick-stats-container">
+                            <!-- Quick Stats -->
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-label">טריידים פעילים</div>
+                                    <div class="stat-value" id="activeTradesCount">טוען...</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">תנאים פעילים</div>
+                                    <div class="stat-value" id="activeConditionsCount">טוען...</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">שיטות מסחר</div>
+                                    <div class="stat-value" id="tradingMethodsCount">טוען...</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">תכניות מסחר</div>
+                                    <div class="stat-value" id="tradePlansCount">טוען...</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Links -->
+                            <div class="quick-links">
+                                <h5>קישורים מהירים:</h5>
+                                <div class="links-grid">
+                                    <a href="trade_plans.html" class="quick-link">
+                                        <i class="fas fa-chart-line"></i>
+                                        תכניות מסחר
+                                    </a>
+                                    <a href="trades.html" class="quick-link">
+                                        <i class="fas fa-exchange-alt"></i>
+                                        טריידים
+                                    </a>
+                                    <a href="alerts.html" class="quick-link">
+                                        <i class="fas fa-bell"></i>
+                                        התראות
+                                    </a>
+                                    <a href="index.html" class="quick-link">
+                                        <i class="fas fa-home"></i>
+                                        דף הבית
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 3 - Log Display -->
+                <div class="content-section" id="log-display">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="Log Output" class="section-icon">
+                            Log Output
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-secondary" id="copyFormattedBtn">
+                                <i class="fas fa-code"></i>
+                                Copy Formatted
+                            </button>
+                            <button class="btn btn-sm btn-secondary" id="copyRawBtn">
+                                <i class="fas fa-file-text"></i>
+                                Copy Raw
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="log-content" id="logContent">
+                            <div class="log-entry info">
+                                <span class="log-timestamp">[2025-10-19 15:30:45]</span>
+                                <span class="log-level">INFO:</span>
+                                <span class="log-message">מערכת בדיקת תנאים מוכנה לשימוש</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 3 - Conditions UI Demo -->
+                <div class="content-section" id="conditions-ui-demo">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/development.svg" alt="ממשק תנאים לדוגמה" class="section-icon">
+                            ממשק תנאים לדוגמה - Conditions UI Demo
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-success" id="addConditionBtn">
+                                <i class="fas fa-plus"></i>
+                                תנאי חדש
+                            </button>
+                            <button class="btn btn-sm btn-primary" id="refreshConditionsBtn">
+                                <i class="fas fa-sync"></i>
+                                רענון
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="conditions-ui-container">
+                            <!-- Conditions List -->
+                            <div class="conditions-list" id="conditionsList">
+                                <div class="conditions-list-header">
+                                    <h4>רשימת תנאים</h4>
+                                    <div class="evaluation-controls">
+                                        <button class="btn btn-sm btn-info" id="evaluateAllBtn">
+                                            <i class="fas fa-calculator"></i>
+                                            הערך הכל
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" id="refreshEvaluationsBtn">
+                                            <i class="fas fa-sync"></i>
+                                            רענן הערכות
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="conditions-list-body" id="conditionsListBody">
+                                    <div class="text-center p-3 text-muted">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        טוען תנאים...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Condition Form -->
+                            <div class="condition-form" id="conditionForm" >
+                                <div class="condition-form-header">
+                                    <h4 id="formTitle">תנאי חדש</h4>
+                                    <button class="btn btn-sm btn-secondary" id="closeFormBtn">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="condition-form-body">
+                                    <div class="mb-3">
+                                        <label for="methodSelect" class="form-label">שיטת מסחר</label>
+                                        <select class="form-select" id="methodSelect">
+                                            <option value="">בחר שיטה...</option>
+                                        </select>
+                                    </div>
+                                    <div id="parametersContainer"></div>
+                                    <div class="mb-3">
+                                        <label for="logicalOperator" class="form-label">אופרטור לוגי</label>
+                                        <select class="form-select" id="logicalOperator">
+                                            <option value="NONE">ללא</option>
+                                            <option value="AND">AND</option>
+                                            <option value="OR">OR</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="conditionGroup" class="form-label">קבוצה</label>
+                                        <input type="number" class="form-control" id="conditionGroup" value="0" min="0">
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="isActive" checked>
+                                        <label class="form-check-label" for="isActive">
+                                            פעיל
+                                        </label>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary" id="saveConditionBtn">
+                                            <i class="fas fa-save"></i>
+                                            שמירה
+                                        </button>
+                                        <button class="btn btn-secondary" id="cancelFormBtn">
+                                            <i class="fas fa-times"></i>
+                                            ביטול
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- Bootstrap JS -->
+    
+    <!-- TikTrack Base Package Scripts -->
+    <!-- Page Configs and Initializer -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: conditions-test | Generated: 2025-11-15T00:29:03.503Z -->
+    <!-- 📦 Packages: base, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [25] Load Order: 25 -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [26] Page-specific: conditions-test -->
+    <script src="scripts/conditions-test.js?v=1.0.0"></script> <!-- Page-specific script for conditions-test -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 26 | Unique Scripts Loaded: 26 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("conditions-test") -->
+
+<style>
+        /* Conditions UI Demo Styles */
+        .conditions-ui-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            min-height: 400px;
+        }
+
+        .conditions-list {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .conditions-list-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .evaluation-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .conditions-list-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .conditions-list-body {
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .condition-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #fff;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .condition-item:hover {
+            border-color: #29a6a8;
+            box-shadow: 0 2px 4px rgba(41, 166, 168, 0.1);
+        }
+
+        .evaluation-status {
+            margin-top: 8px;
+        }
+
+        .evaluation-result {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .evaluation-result.met {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .evaluation-result.not-met {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .evaluation-result small {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .condition-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .condition-method-name {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .condition-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .condition-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .condition-status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .condition-parameters {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .condition-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .condition-form {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #fff;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .condition-form-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .condition-form-header h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .condition-form-body {
+            padding: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .conditions-ui-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Quick Stats Styles */
+        .quick-stats-container {
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-item:hover {
+            border-color: #29a6a8;
+            box-shadow: 0 2px 8px rgba(41, 166, 168, 0.1);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #29a6a8;
+        }
+
+        .quick-links {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+
+        .quick-links h5 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 15px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .quick-link:hover {
+            background: #29a6a8;
+            color: white;
+            border-color: #29a6a8;
+            text-decoration: none;
+        }
+
+        .quick-link i {
+            font-size: 16px;
+        }
+    </style>
+    
+    <!-- Initialize the page -->
+    <script>
+        // Configuration is already defined in page-initialization-configs.js
+        
+        // Initialize conditions test page
+        async function initializeConditionsTestPage() {
+            console.log('🔧 initializeConditionsTestPage() called');
+            try {
+                if (window.conditionsTestManager) {
+                    console.log('🔧 conditionsTestManager found, initializing...');
+                    await window.conditionsTestManager.initialize();
+                } else {
+                    console.log('🔧 conditionsTestManager not found!');
+                }
+            } catch (error) {
+                console.error('🔧 Failed to initialize conditions test page:', error);
+            }
+        }
+        
+        // Make function globally available
+        window.initializeConditionsTestPage = initializeConditionsTestPage;
+        
+        // Unified initialization - UI Standardization Round C
+        if (window.unifiedAppInitializer) {
+            window.unifiedAppInitializer.initialize();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+/**
+ * Page Headers - כותרות עמודים
+ * 
+ * קובץ זה מכיל את הסגנונות הספציפיים לכותרות כל עמוד
+ * מבוסס על הסגנונות מהמערכת הישנה
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== סגנונות כותרות עמודים עם צבעים ספציפיים ===== */
+
+/* עמוד מעקב טריידים - כחול */
+.tracking-page .section-header,
+.tracking-page .top-section .section-header,
+.trades-page .section-header,
+.trades-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-color);
+}
+
+/* עמוד חשבונות מסחר - ירוק */
+.accounts-page .section-header,
+.accounts-page .top-section .section-header,
+.trading-accounts-page .section-header,
+.trading-accounts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trading-account-color);
+}
+
+/* עמוד תכנון טריידים - כחול כהה */
+.planning-page .section-header,
+.planning-page .top-section .section-header,
+.trade-plans-page .section-header,
+.trade-plans-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-plan-color);
+}
+
+/* עמוד התראות - כתום */
+.alerts-page .section-header,
+.alerts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-alert-color);
+}
+
+/* עמוד תזרים מזומנים - ירוק טורקיז */
+.cash-flows-page .section-header,
+.cash-flows-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-cash-flow-color);
+}
+
+/* עמוד עסקאות - כחול טורקיז */
+.executions-page .section-header,
+.executions-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-execution-color);
+}
+
+/* עמוד הערות - סגול */
+.notes-page .section-header,
+.notes-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-note-color);
+}
+
+/* עמוד העדפות - אפור */
+.preferences-page .section-header,
+.preferences-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-preference-color);
+}
+
+/* עמוד טיקרים */
+.tickers-page .section-header,
+.tickers-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-ticker-color);
+}
+
+/* עמוד מחקר */
+.research-page .section-header,
+.research-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-research-color);
+}
+
+/* עמוד עיצובים */
+.designs-page .section-header,
+.designs-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-design-color);
+}
+
+/* עמוד אילוצים */
+.constraints-page .section-header,
+.constraints-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-constraint-color);
+}
+
+/* עמוד בסיס נתונים - אפור */
+.db-display-page .section-header,
+.db-display-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-8, #495057);
+}
+
+/* עמוד טבלאות עזר - אפור */
+.extra-data-page .section-header,
+.extra-data-page .top-section .section-header,
+.db-extradata-page .section-header,
+.db-extradata-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-6, #6c757d);
+}
+
+/* עמודי כלי פיתוח - צבע development */
+.development-page .section-header,
+.development-page .top-section .section-header,
+.init-system-page .section-header,
+.init-system-page .top-section .section-header,
+.system-management-page .section-header,
+.system-management-page .top-section .section-header,
+.server-monitor-page .section-header,
+.server-monitor-page .top-section .section-header,
+.notifications-center-page .section-header,
+.notifications-center-page .top-section .section-header,
+.external-data-dashboard-page .section-header,
+.external-data-dashboard-page .top-section .section-header,
+.crud-testing-dashboard-page .section-header,
+.crud-testing-dashboard-page .top-section .section-header,
+.code-quality-dashboard-page .section-header,
+.code-quality-dashboard-page .top-section .section-header,
+.css-management-page .section-header,
+.css-management-page .top-section .section-header,
+.chart-management-page .section-header,
+.chart-management-page .top-section .section-header,
+.cache-management-page .section-header,
+.cache-management-page .top-section .section-header,
+.background-tasks-page .section-header,
+.background-tasks-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-development-color);
+}
+
+/* עמוד דף הבית */
+.index-page .section-header,
+.index-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-color);
+}
+
+/* ===== סגנונות כותרות עם איקונים ===== */
+
+/* ===== כותרות בתוך section-header - אחידות ===== */
+.section-header .table-title,
+.section-header .section-title {
+  /* Layout - אחיד */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto; /* לא מתרחב - ברוחב התוכן בלבד */
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  
+  /* Typography - אחיד */
+  font-size: 1.125rem; /* 18px - זהה ל-section-header */
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--current-entity-color-dark, #333333);
+  margin: 0;
+  text-align: right;
+  direction: rtl;
+}
+
+/* התאמה לכותרת עם איקון התראות */
+.section-header .table-title .section-alert-icon,
+.section-header .section-title .section-alert-icon,
+.alerts-header h3 .section-alert-icon {
+  margin: 0;
+}
+
+/* ===== סגנונות איקון התראות בכותרת הסקשן ===== */
+.section-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-end: 20px;
+  margin-inline-start: 0;
+  color: var(--entity-alert-color, #ff9c05);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.section-alert-icon:hover {
+  transform: scale(1.1);
+  color: var(--entity-alert-text, #e55a00);
+}
+
+/* ===== סגנונות איקון בכותרת הקומפוננט ===== */
+.title-bell-icon {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-inline-start: 8px;
+  color: var(--entity-alert-color, #ff9c05);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.title-bell-icon:hover {
+  transform: scale(1.1);
+  color: var(--entity-alert-text, #e55a00);
+}
+
+/* ===== סגנונות אייקון טריידים פעילים ===== */
+.active-trades-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--entity-trade-bg, rgba(0, 123, 255, 0.1));
+  border: 1px solid var(--entity-trade-border, rgba(0, 123, 255, 0.3));
+  border-radius: 50%;
+  color: var(--entity-trade-color, #26baac);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-inline-start: 8px;
+  transition: all 0.3s ease;
+}
+
+.active-trades-icon:hover {
+  background: var(--entity-trade-color, #26baac);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ===== סגנונות איקון טבלה ===== */
+.table-icon {
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* ===== סגנונות כותרות דינמיות ===== */
+/* הוסר - משתמשים ב-entity-trading_account-main-header */
+
+.entity-trading_account-main-header {
+  border-bottom: 2px solid var(--entity-trading-account-color);
+  background-color: var(--entity-trading-account-bg, rgba(40, 167, 69, 0.1));
+  border-left: 4px solid var(--entity-trading-account-color);
+}
+
+.entity-trading_account-sub-header {
+  border-bottom: 1px solid var(--entity-trading-account-color);
+  background-color: var(--entity-trading-account-bg, rgba(40, 167, 69, 0.05));
+  border-left: 3px solid var(--entity-trading-account-color);
+}
+
+.entity-trade-main-header {
+  border-bottom: 2px solid var(--entity-trade-color);
+}
+
+.entity-alert-main-header {
+  border-bottom: 2px solid var(--entity-alert-color);
+}
+
+.entity-cash-flow-main-header {
+  border-bottom: 2px solid var(--entity-cash-flow-color);
+}
+
+.entity-note-main-header {
+  border-bottom: 2px solid var(--entity-note-color);
+}
+
+.entity-ticker-main-header {
+  border-bottom: 2px solid var(--entity-ticker-color);
+}
+
+.entity-execution-main-header {
+  border-bottom: 2px solid var(--entity-execution-color);
+}
+
+.entity-trade-plan-main-header {
+  border-bottom: 2px solid var(--entity-trade-plan-color);
+}
+
+.entity-preference-main-header {
+  border-bottom: 2px solid var(--entity-preference-color);
+}
+
+.entity-preference-sub-header {
+  border-bottom: 1px solid var(--entity-preference-color);
+}
+
+.entity-research-main-header {
+  border-bottom: 2px solid var(--entity-research-color);
+}
+
+.entity-research-sub-header {
+  border-bottom: 1px solid var(--entity-research-color);
+}
+
+.entity-design-main-header {
+  border-bottom: 2px solid var(--entity-design-color);
+}
+
+.entity-design-sub-header {
+  border-bottom: 1px solid var(--entity-design-color);
+}
+
+.entity-constraint-main-header {
+  border-bottom: 2px solid var(--entity-constraint-color);
+}
+
+.entity-constraint-sub-header {
+  border-bottom: 1px solid var(--entity-constraint-color);
+}
+
+.entity-development-main-header {
+  border-bottom: 2px solid var(--entity-development-color);
+}
+
+.entity-development-sub-header {
+  border-bottom: 1px solid var(--entity-development-color);
+}
+
+.entity-info-main-header {
+  border-bottom: 2px solid var(--entity-info-color);
+}
+
+.entity-info-sub-header {
+  border-bottom: 1px solid var(--entity-info-color);
+}
+
+
+
+

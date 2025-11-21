@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="economic-calendar-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- No Cache Headers for Mockups -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>יומן כלכלי - TikTrack</title>
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../../styles-new/master.css">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="../../styles-new/header-styles.css">
+</head>
+<body class="economic-calendar-page">
+    <!-- Header System -->
+    <div id="unified-header"></div>
+    
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
+                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px;">לוח כלכלי</a>
+                        <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">רשומת יומן</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Header Section -->
+                <div class="top-section">
+                    <div class="section-header entity-trade-main-header">
+                        <div class="table-title">
+                            <i class="bi bi-calendar-event"></i>
+                            יומן כלכלי
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
+                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-body">
+                        <!-- Filters Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">פילטרים</h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="countryFilter" class="form-label">מדינה:</label>
+                                        <select id="countryFilter" class="form-select" multiple>
+                                            <option value="US" selected>ארה"ב</option>
+                                            <option value="EU">אירופה</option>
+                                            <option value="UK">בריטניה</option>
+                                            <option value="JP">יפן</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="importanceFilter" class="form-label">חשיבות:</label>
+                                        <select id="importanceFilter" class="form-select" multiple>
+                                            <option value="high" selected>גבוהה</option>
+                                            <option value="medium" selected>בינונית</option>
+                                            <option value="low">נמוכה</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="eventTypeFilter" class="form-label">סוג אירוע:</label>
+                                        <select id="eventTypeFilter" class="form-select" multiple>
+                                            <option value="interest-rate" selected>ריבית</option>
+                                            <option value="gdp" selected>תוצר</option>
+                                            <option value="employment">תעסוקה</option>
+                                            <option value="inflation">אינפלציה</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Calendar View Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3 d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-chevron-right"></i> חודש קודם
+                                    </button>
+                                    <h6 class="mb-0">ינואר 2025</h6>
+                                    <button class="btn btn-sm btn-outline-secondary">
+                                        חודש הבא <i class="bi bi-chevron-left"></i>
+                                    </button>
+                                </div>
+                                <div class="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">
+                                    <!-- Calendar Headers -->
+                                    <div class="text-center fw-bold" style="padding: 10px;">א'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ב'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ג'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ד'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ה'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ו'</div>
+                                    <div class="text-center fw-bold" style="padding: 10px;">ש'</div>
+                                    
+                                    <!-- Calendar Days with Events -->
+                                    <div style="padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; min-height: 100px; background: #fff;">
+                                        <div class="fw-bold">15</div>
+                                        <div class="small">
+                                            <span class="badge bg-danger">ריבית FED</span>
+                                        </div>
+                                    </div>
+                                    <div style="padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; min-height: 100px; background: #fff;">
+                                        <div class="fw-bold">20</div>
+                                        <div class="small">
+                                            <span class="badge bg-warning">תוצר ארה"ב</span>
+                                        </div>
+                                    </div>
+                                    <!-- More calendar days would go here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Events List Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">אירועים כלכליים</h5>
+                                <div class="list-group">
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <span class="badge bg-danger">גבוהה</span>
+                                                    <span class="badge bg-primary">ריבית</span>
+                                                    <span class="badge bg-secondary">ארה"ב</span>
+                                                </div>
+                                                <h6 class="mb-1">החלטת ריבית FED</h6>
+                                                <p class="mb-1">15 בינואר 2025, 20:00</p>
+                                                <p class="mb-1 text-muted">החלטת ריבית של הבנק המרכזי של ארה"ב. השפעה צפויה על השוק.</p>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-link-45deg"></i> קשור לטריידים: #123, #124
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <span class="badge bg-warning">בינונית</span>
+                                                    <span class="badge bg-primary">תוצר</span>
+                                                    <span class="badge bg-secondary">ארה"ב</span>
+                                                </div>
+                                                <h6 class="mb-1">דוח תוצר ארה"ב</h6>
+                                                <p class="mb-1">20 בינואר 2025, 15:30</p>
+                                                <p class="mb-1 text-muted">דוח רבעוני על התוצר המקומי הגולמי של ארה"ב.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <span class="badge bg-warning">בינונית</span>
+                                                    <span class="badge bg-primary">תעסוקה</span>
+                                                    <span class="badge bg-secondary">ארה"ב</span>
+                                                </div>
+                                                <h6 class="mb-1">דוח תעסוקה NFP</h6>
+                                                <p class="mb-1">25 בינואר 2025, 15:30</p>
+                                                <p class="mb-1 text-muted">דוח תעסוקה חודשי - Non-Farm Payrolls.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Bottom Spacing -->
+    <div class="page-bottom-spacing"></div>
+</body>
+</html>

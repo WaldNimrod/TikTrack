@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עמוד עיצובים - TikTrack</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
+    <!-- ITCSS Architecture - Complete Implementation -->
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Header Styles - Separate CSS file -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
+</head>
+
+<body class="designs-page" data-entity-type="ticker">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Top Section Start -->
+                <div class="top-section" id="topSection" data-section="top">
+                    <div class="section-header">
+                        <h1>🔘 מערכת הכפתורים המרכזית</h1>
+                        <div class="section-actions">
+                            <button data-button-type="TOGGLE" data-onclick="toggleAllSections()" data-classes="btn filter-toggle-btn" data-attributes="title='הצג/הסתר סקשן'">▼ הצג/הסתר סקשן</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p>עמוד זה מציג את כל הכפתורים הזמינים במערכת המרכזית שלנו, עם דוגמאות פעילות וקוד לשילוב.</p>
+                    </div>
+                </div>
+                <!-- Top Section End -->
+
+                <!-- UI Content Section 1 Start -->
+                <div class="content-section" id="section1">
+                    <div class="section-header text-center">
+                        <h2>📋 כל הכפתורים הזמינים במערכת</h2>
+                        <p class="section-subtitle text-muted mb-0">
+                            <small id="buttonTableCount">0 רשומות</small>
+                        </p>
+                    </div>
+                    <div class="section-body">
+                        <div class="button-system-demo">
+                            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3 mb-3">
+                                <div id="buttonCategoryFilters" class="filter-toggle-group" role="group" aria-label="פילטר סוגי כפתורים"></div>
+                                <div class="d-flex gap-2 align-items-center w-100 w-lg-auto">
+                                    <input type="text" id="buttonFilter" class="form-control" placeholder="🔍 חפש לפי שם, תיאור או סוג..." oninput="filterButtons()">
+                                </div>
+                            </div>
+
+                            <div class="table-responsive mb-4">
+                                <table class="table table-striped table-hover" id="buttonSystemTable">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th style="width: 24%;">דוגמאות חיות</th>
+                                            <th style="width: 14%;">שם הכפתור</th>
+                                            <th style="width: 16%;">תיאור</th>
+                                            <th style="width: 12%;">משתנה צבע</th>
+                                            <th style="width: 10%;">HTML (ישן)</th>
+                                            <th style="width: 10%;">HTML (חדש)</th>
+                                            <th style="width: 10%;">JavaScript</th>
+                                            <th style="width: 4%;">פעולות</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="buttonTableBody"></tbody>
+                                </table>
+                            </div>
+
+                            <!-- Button Variants Demo -->
+                            <div class="button-variants-demo mb-4">
+                                <h5>דוגמאות וריאציות כפתורים:</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6>קטן - רק איקון</h6>
+                                        <div id="smallButtonsDemo"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>רגיל - רק טקסט</h6>
+                                        <div id="normalButtonsDemo"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>מלא - איקון + טקסט</h6>
+                                        <div id="fullButtonsDemo"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p style="margin-bottom: 15px; font-size: 14px; line-height: 1.4;">להלן רשימה מלאה של כל הכפתורים הזמינים במערכת המרכזית, עם דוגמאות פעילות וקוד לשילוב:</p>
+                            
+                            <div class="button-stats mt-4">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h5 class="card-title" id="totalButtons">0</h5>
+                                                <p class="card-text">סה"כ כפתורים</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h5 class="card-title" id="activeButtons">0</h5>
+                                                <p class="card-text">כפתורים פעילים</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h5 class="card-title" id="categoriesCount">0</h5>
+                                                <p class="card-text">קטגוריות</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h5 class="card-title" id="lastUpdate">עכשיו</h5>
+                                                <p class="card-text">עדכון אחרון</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->   
+
+                <!-- Diagnostics Section -->
+                <div class="content-section" id="diagnosticsSection">
+                    <div class="section-header d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                        <div>
+                            <h2>🧪 דיאגנוסטיקה</h2>
+                            <p class="mb-0 text-muted">שמירת תוצאות הבדיקות האחרונות של מערכת הכפתורים</p>
+                        </div>
+                        <div class="section-actions d-flex gap-2">
+                            <button data-button-type="SEARCH" data-variant="small" data-onclick="checkButtonColors()" data-text="בדיקות צבע"></button>
+                            <button data-button-type="REACTIVATE" data-variant="small" data-onclick="fixButtonColors()" data-text="תיקון אוטומטי"></button>
+                            <button data-button-type="COPY" data-variant="small" data-onclick="window.copyButtonSystemDetailedLog && window.copyButtonSystemDetailedLog()" data-text="העתק לוג"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div id="diagnosticsOutput" class="card border-0 shadow-sm bg-light-subtle">
+                            <div class="card-body">
+                                <p class="text-muted mb-0">טרם הופעלו בדיקות צבעים בעמוד זה.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UI Content Section 2 Start - וריאנטים מורחבים -->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>🎨 וריאנטים מורחבים</h2>
+                    </div>
+                    <div class="section-body">
+                        <h5>גדלים</h5>
+                        <div class="mb-3">
+                            <button data-button-type="ADD" data-size="small" data-text="קטן"></button>
+                            <button data-button-type="ADD" data-size="normal" data-text="רגיל"></button>
+                            <button data-button-type="ADD" data-size="large" data-text="גדול"></button>
+                            <button data-button-type="ADD" data-size="xlarge" data-text="גדול מאוד"></button>
+                        </div>
+                        
+                        <h5>סגנונות</h5>
+                        <div class="mb-3">
+                            <button data-button-type="ADD" data-text="רגיל"></button>
+                            <button data-button-type="ADD" data-style="negative" data-text="נגטיב"></button>
+                    </div>
+                        
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End -->
+
+                <!-- Dynamic Color Map Section -->
+                <div class="content-section" id="colorMapSection">
+                    <div class="section-header d-flex flex-column flex-md-row align-items-md-center justify-content-md-between gap-2">
+                        <div>
+                            <h2>🎨 מפת צבעים דינאמית</h2>
+                            <p class="mb-0 text-muted">בחירת צבעים מדויקת למפתחים ולמעצבים</p>
+                            <p class="section-subtitle text-muted mb-0">
+                                <small id="colorTokensCount">0 צבעים</small>
+                            </p>
+                        </div>
+                        <div class="section-actions d-flex gap-2">
+                            <button data-button-type="REFRESH" data-variant="small" data-onclick="window.renderColorTables && window.renderColorTables()" data-text="רענון ערכים"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-3 mb-3">
+                            <div id="colorGroupFilters" class="filter-toggle-group" role="group" aria-label="פילטר קבוצות צבעים"></div>
+                            <div class="text-muted small">הערכים מוצגים כפי שהדפדפן מיישם אותם לאחר ההעדפות.</div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="colorTokensTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 14%;">קבוצה</th>
+                                        <th style="width: 18%;">שם</th>
+                                        <th style="width: 20%;">מזהה / משתנה</th>
+                                        <th style="width: 18%;">ערך נוכחי</th>
+                                        <th style="width: 22%;">פרטים</th>
+                                        <th style="width: 8%;">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="colorTokensBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UI Content Section 3 - Entity Colors Demo -->
+                <div class="ui-content-section">
+                    <div class="section-header">
+                        <h4>צבעי ישויות</h4>
+                        <p>השוואת כפתורים מרכזיים בצבעי ישות שונים</p>
+                    </div>
+                    <div class="section-content">
+                        <div class="table-responsive">
+                            <table class="table table-striped entity-colors-table">
+                                <thead>
+                                    <tr>
+                                        <th>כפתור</th>
+                                        <th>טיקרים</th>
+                                        <th>טריידים</th>
+                                        <th>תכניות</th>
+                                        <th>התראות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>הוספה</strong></td>
+                                        <td><button data-button-type="ADD" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                        <td><button data-button-type="ADD" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                        <td><button data-button-type="ADD" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                        <td><button data-button-type="ADD" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="הוסף"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>סגירה</strong></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                        <td><button data-button-type="CLOSE" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="סגור"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>קישור</strong></td>
+                                        <td><button data-button-type="LINK" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                        <td><button data-button-type="LINK" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                        <td><button data-button-type="LINK" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                        <td><button data-button-type="LINK" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="קישור"></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>שמירה</strong></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="ticker" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="trade" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="trade_plan" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                        <td><button data-button-type="SAVE" data-entity-type="alert" data-style="negative" data-size="large" data-variant="full" data-text="שמור"></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End -->
+            </div>
+        </div>
+        <div class="page-bottom-spacing"></div>
+        <div class="notification-container" id="notificationContainer"></div>
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+    </div>
+
+    <!-- Button System Demo Styles -->
+    <style>
+        .section-header.text-center {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+        }
+
+        /* Button System Demo Styles */
+        .button-system-demo {
+            width: 100%;
+        }
+
+        .button-system-demo .table-responsive {
+            overflow-x: auto;
+        }
+
+        .button-system-demo table {
+            min-width: 960px;
+            table-layout: auto;
+        }
+
+        .button-system-demo th,
+        .button-system-demo td {
+            padding: 8px 12px;
+            vertical-align: top;
+        }
+
+        .button-system-demo .live-example-cell {
+            min-width: 240px;
+        }
+
+        .button-system-demo .variant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .variant-grid-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .variant-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .entity-variant-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .button-system-demo .btn {
+            font-size: 14px;
+            padding: 6px 12px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .code-block {
+            font-size: 11px;
+            background: #f8f9fa;
+            padding: 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            word-break: break-all;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            direction: ltr;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .color-chip {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            display: inline-block;
+        }
+
+        .color-details-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .color-details-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .color-details-list code {
+            font-size: 11px;
+        }
+
+        .filter-toggle-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-toggle-group .btn {
+            min-width: 110px;
+        }
+
+        .filter-toggle-group .btn.active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-color);
+        }
+
+        .button-variants-demo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .button-variants-demo h5 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .button-variants-demo h6 {
+            color: #6c757d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .button-variants-demo .btn {
+            margin-inline-end: 8px;
+            margin-bottom: 8px;
+        }
+    </style>
+
+    
+    
+    <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: designs | Generated: 2025-11-15T00:29:03.497Z -->
+    <!-- 📦 Packages: base, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [25] Load Order: 25 -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [26] Page-specific: designs -->
+    <script src="scripts/designs.js?v=1.0.0"></script> <!-- Page-specific script for designs -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 26 | Unique Scripts Loaded: 26 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("designs") -->
+
+
+
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="comparative-analysis-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- No Cache Headers for Mockups -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ניתוח השוואתי - TikTrack</title>
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../../styles-new/master.css">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="../../styles-new/header-styles.css">
+</head>
+<body class="comparative-analysis-page">
+    <!-- Header System -->
+    <div id="unified-header"></div>
+    
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
+                            <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
+                        </span>
+                        <a href="trade-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית טרייד</a>
+                        <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">מצב תיק היסטורי</a>
+                        <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית מחירים</a>
+                        <a href="comparative-analysis-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px;">ניתוח השוואתי</a>
+                        <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">יומן מסחר</a>
+                        <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח אסטרטגיות</a>
+                        <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">לוח כלכלי</a>
+                        <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ווידג'ט היסטוריה</a>
+                        <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">תיעוד רגשי</a>
+                        <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">השוואת תאריכים</a>
+                        <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">רשומת יומן</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Header Section -->
+                <div class="top-section">
+                    <div class="section-header entity-trade-main-header">
+                        <div class="table-title">
+                            <i class="bi bi-bar-chart"></i>
+                            ניתוח השוואתי
+                        </div>
+                        <div class="table-actions">
+                            <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
+                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
+                            <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-body">
+                        <!-- Date Range Selection -->
+                        <div class="mb-4">
+                            <label for="dateRangeStart" class="form-label">תקופה:</label>
+                            <div class="d-flex gap-2">
+                                <input type="date" id="dateRangeStart" class="form-control" value="2025-01-01" style="max-width: 200px;">
+                                <span class="align-self-center">עד</span>
+                                <input type="date" id="dateRangeEnd" class="form-control" value="2025-01-31" style="max-width: 200px;">
+                            </div>
+                        </div>
+                        
+                        <!-- Filters Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">פילטרים</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="investmentTypes" class="form-label">סוגי השקעות:</label>
+                                        <select id="investmentTypes" class="form-select" multiple>
+                                            <option value="swing" selected>swing</option>
+                                            <option value="day" selected>day</option>
+                                            <option value="long-term" selected>long-term</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="tradingMethods" class="form-label">שיטות מסחר:</label>
+                                        <select id="tradingMethods" class="form-select" multiple>
+                                            <option value="Moving Average" selected>Moving Average</option>
+                                            <option value="RSI" selected>RSI</option>
+                                            <option value="MACD">MACD</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">עם/בלי תוכנית:</label>
+                                        <div>
+                                            <input type="checkbox" id="withPlan" class="form-check-input" checked>
+                                            <label for="withPlan" class="form-check-label">עם תוכנית</label>
+                                        </div>
+                                        <div>
+                                            <input type="checkbox" id="withoutPlan" class="form-check-input" checked>
+                                            <label for="withoutPlan" class="form-check-label">בלי תוכנית</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="timeToEntry" class="form-label">משך זמן מתכנון לכניסה:</label>
+                                        <select id="timeToEntry" class="form-select">
+                                            <option value="">כל הזמנים</option>
+                                            <option value="<1">פחות מיום</option>
+                                            <option value="1-7">1-7 ימים</option>
+                                            <option value=">7">יותר מ-7 ימים</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button class="btn btn-primary">החל פילטרים</button>
+                                        <button class="btn btn-outline-secondary">איפוס</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Comparison Table Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">טבלת השוואות</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>קטגוריה</th>
+                                                <th>טריידים</th>
+                                                <th>P/L ממוצע</th>
+                                                <th>P/L כולל</th>
+                                                <th>אחוז הצלחה</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>swing</strong></td>
+                                                <td>25</td>
+                                                <td>$500</td>
+                                                <td class="text-success">$12,500</td>
+                                                <td>68%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>day</strong></td>
+                                                <td>15</td>
+                                                <td>$300</td>
+                                                <td class="text-success">$4,500</td>
+                                                <td>60%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>long-term</strong></td>
+                                                <td>10</td>
+                                                <td>$800</td>
+                                                <td class="text-success">$8,000</td>
+                                                <td>80%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Moving Average</strong></td>
+                                                <td>20</td>
+                                                <td>$400</td>
+                                                <td class="text-success">$8,000</td>
+                                                <td>65%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>RSI</strong></td>
+                                                <td>15</td>
+                                                <td>$350</td>
+                                                <td class="text-success">$5,250</td>
+                                                <td>67%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>עם תוכנית</strong></td>
+                                                <td>30</td>
+                                                <td>$600</td>
+                                                <td class="text-success">$18,000</td>
+                                                <td>70%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>בלי תוכנית</strong></td>
+                                                <td>20</td>
+                                                <td>$250</td>
+                                                <td class="text-success">$5,000</td>
+                                                <td>55%</td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-info">
+                                                <td><strong>סיכום:</strong></td>
+                                                <td><strong>סה"כ קטגוריות: 7</strong></td>
+                                                <td><strong>סה"כ טריידים: 50</strong></td>
+                                                <td colspan="2"><strong>P/L כולל: $25,000</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bar Chart Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">P/L לפי קטגוריה</h5>
+                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    [גרף Bar Chart - P/L לפי קטגוריה]
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pie Chart Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">התפלגות לפי קטגוריה</h5>
+                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                                    [גרף Pie Chart - התפלגות לפי קטגוריה]
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Heatmap Section -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Heatmap - מטריצת השוואות</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>P/L כולל</th>
+                                                <th>אחוז הצלחה</th>
+                                                <th>P/L ממוצע</th>
+                                                <th>טריידים</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>swing</strong></td>
+                                                <td class="table-success">12.5K</td>
+                                                <td class="table-warning">68%</td>
+                                                <td class="table-success">$500</td>
+                                                <td class="table-success">25</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>day</strong></td>
+                                                <td class="table-warning">4.5K</td>
+                                                <td class="table-warning">60%</td>
+                                                <td class="table-warning">$300</td>
+                                                <td class="table-warning">15</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>long-term</strong></td>
+                                                <td class="table-success">8.0K</td>
+                                                <td class="table-success">80%</td>
+                                                <td class="table-success">$800</td>
+                                                <td class="table-warning">10</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>MA</strong></td>
+                                                <td class="table-warning">8.0K</td>
+                                                <td class="table-warning">65%</td>
+                                                <td class="table-warning">$400</td>
+                                                <td class="table-success">20</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>RSI</strong></td>
+                                                <td class="table-warning">5.25K</td>
+                                                <td class="table-warning">67%</td>
+                                                <td class="table-warning">$350</td>
+                                                <td class="table-warning">15</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3">
+                                    <span class="badge bg-success">🟢 = טוב</span>
+                                    <span class="badge bg-warning">🟡 = בינוני</span>
+                                    <span class="badge bg-danger">🔴 = רע</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Page Bottom Spacing -->
+    <div class="page-bottom-spacing"></div>
+</body>
+</html>

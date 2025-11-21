@@ -1,0 +1,461 @@
+/* Modal base colors */
+.modal-content { background-color: #ffffff; }
+.modal-body { background-color: #ffffff; }
+/* Linked Items Modal - Component Styles (ITCSS: Components layer) */
+
+.linked-items-container .linked-items-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 8px 12px;
+  align-items: start;
+}
+
+/* Ensure modal fits viewport and prevents horizontal overflow */
+#linkedItemsModal .modal-dialog { max-width: min(96vw, 1000px); }
+#linkedItemsModal .modal-body { overflow-x: hidden; }
+.linked-items-container { max-width: 100%; overflow-x: hidden; }
+.linked-items-container .linked-item-row { width: 100%; box-sizing: border-box; }
+.linked-items-container .linked-item-actions { display: flex; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+
+/* Responsive: single column on medium/small screens */
+@media (max-width: 992px) {
+  .linked-items-container .linked-items-list { grid-template-columns: 1fr; }
+  .linked-items-container .linked-item-title,
+  .linked-items-container .linked-item-description,
+  .linked-items-container .linked-item-basic-details { white-space: normal; }
+}
+
+.linked-items-container .linked-item-row {
+  border-radius: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.linked-items-container .linked-item-row:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.linked-items-container .linked-item-row .linked-item-col { 
+  padding: 0 2px; display: flex; align-items: flex-start; gap: 6px; 
+}
+
+/* Dynamic width distribution by percentage */
+.linked-items-container .linked-item-row .linked-item-col:first-child { flex: 0 0 auto; min-width: 0; }
+.linked-items-container .linked-item-row .linked-item-col:nth-child(2) { flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: flex-start; }
+.linked-items-container .linked-item-row .linked-item-col:last-child { flex: 0 0 auto; min-width: 0; }
+.linked-items-container .linked-item-actions-col { margin-inline-start: auto; justify-content: flex-end; }
+.linked-items-container .linked-item-meta { flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: flex-start; text-align: right; gap: 4px; }
+/* actions column already pushed to line end via margin-inline-start:auto above */
+.linked-items-container .linked-item-status { display: block; align-self: flex-start; }
+.linked-items-container .linked-item-basic-details { display: block; align-self: flex-start; margin-top: 2px; }
+
+.linked-items-container .linked-item-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.linked-items-container .linked-item-description { font-size: 12px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.linked-items-container .linked-item-basic-details { font-size: 12px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.linked-items-container .linked-item-type .badge { 
+  border-radius: 4px; 
+  padding: 4px 8px; 
+  font-size: 0.85em;
+  font-weight: 500;
+}
+.linked-items-container .linked-item-row .badge { margin: 0 4px; }
+
+.entity-linked-items-table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.entity-linked-items-table th.col-linked-entity,
+.entity-linked-items-table td.col-linked-entity {
+  min-width: 170px;
+  max-width: 220px;
+}
+
+.entity-linked-items-table th.col-linked-status,
+.entity-linked-items-table td.col-linked-status {
+  width: 120px;
+}
+
+.entity-linked-items-table th.col-linked-side,
+.entity-linked-items-table td.col-linked-side {
+  width: 110px;
+}
+
+.entity-linked-items-table th.col-linked-investment,
+.entity-linked-items-table td.col-linked-investment {
+  width: 140px;
+}
+
+.entity-linked-items-table th.col-linked-date,
+.entity-linked-items-table td.col-linked-date {
+  width: 160px;
+}
+
+.entity-linked-items-table th.col-linked-actions,
+.entity-linked-items-table td.col-linked-actions {
+  width: 150px;
+  min-width: 140px;
+  white-space: nowrap;
+}
+
+.entity-linked-items-table th.col-linked-actions {
+  font-weight: 500;
+  color: var(--bs-body-color);
+}
+
+.linked-items-table-link {
+  color: inherit;
+}
+
+.linked-items-table-icon {
+  --linked-item-color: #e9ecef;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--linked-item-color);
+  flex-shrink: 0;
+}
+
+.linked-items-table-icon-image {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.linked-items-table-icon.entity-trade { --linked-item-color: var(--entity-trade-color, #26baac); }
+.linked-items-table-icon.entity-trade_plan { --linked-item-color: var(--entity-trade-plan-color, #28a745); }
+.linked-items-table-icon.entity-execution { --linked-item-color: var(--entity-execution-color, #17a2b8); }
+.linked-items-table-icon.entity-trading_account { --linked-item-color: var(--entity-trading-account-color, #28a745); }
+.linked-items-table-icon.entity-ticker { --linked-item-color: var(--entity-ticker-color, #20c997); }
+.linked-items-table-icon.entity-alert { --linked-item-color: var(--entity-alert-color, #dc3545); }
+.linked-items-table-icon.entity-cash_flow { --linked-item-color: var(--entity-cash-flow-color, #fd7e14); }
+.linked-items-table-icon.entity-note { --linked-item-color: var(--entity-note-color, #6c757d); }
+.linked-items-table-icon.entity-position { --linked-item-color: var(--entity-position-color, #0d6efd); }
+
+.linked-items-table-text {
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.linked-items-table-name {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Colored start-border per entity type using logical property */
+.linked-items-container .linked-item-row.trade { border-inline-start: 4px solid var(--entity-trade-color); }
+.linked-items-container .linked-item-row.account,
+.linked-items-container .linked-item-row.trading_account { border-inline-start: 4px solid var(--entity-trading-account-color); }
+.linked-items-container .linked-item-row.ticker { border-inline-start: 4px solid var(--entity-ticker-color); }
+.linked-items-container .linked-item-row.alert { border-inline-start: 4px solid var(--entity-alert); }
+.linked-items-container .linked-item-row.cash_flow { border-inline-start: 4px solid var(--entity-cash-flow-color); }
+.linked-items-container .linked-item-row.note { border-inline-start: 4px solid var(--entity-note); }
+.linked-items-container .linked-item-row.trade_plan { border-inline-start: 4px solid var(--entity-trade-plan-color); }
+.linked-items-container .linked-item-row.execution { border-inline-start: 4px solid var(--entity-execution); }
+
+/* ===== Modal headers colored by entity type - אחידים ===== */
+/* כל הצבעים מהעדפות בלבד - צבע רקע מלא כמו כותרות סקשנים */
+.modal-header.entity-trade { 
+  background-color: color-mix(in srgb, var(--entity-trade-color) 15%, white); 
+  color: var(--entity-trade-color);
+  border-bottom: 2px solid var(--entity-trade-color);
+}
+.modal-header.entity-ticker { 
+  background-color: var(--entity-ticker-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-ticker-color);
+}
+.modal-header.entity-account,
+.modal-header.entity-trading_account { 
+  background-color: var(--entity-trading-account-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-trading-account-color);
+}
+.modal-header.entity-alert { 
+  background-color: var(--entity-alert-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-alert-color);
+}
+.modal-header.entity-cash_flow, 
+.modal-header.entity-cash-flow { 
+  background-color: var(--entity-cash-flow-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-cash-flow-color);
+}
+.modal-header.entity-note { 
+  background-color: var(--entity-note-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-note-color);
+}
+.modal-header.entity-trade_plan, 
+.modal-header.entity-trade-plan { 
+  background-color: var(--entity-trade-plan-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-trade-plan-color);
+}
+.modal-header.entity-execution { 
+  background-color: var(--entity-execution-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-execution-color);
+}
+.modal-header.entity-preference { 
+  background-color: var(--entity-preference-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-preference-color);
+}
+.modal-header.entity-research { 
+  background-color: var(--entity-research-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-research-color);
+}
+.modal-header.entity-design { 
+  background-color: var(--entity-design-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-design-color);
+}
+.modal-header.entity-constraint { 
+  background-color: var(--entity-constraint-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-constraint-color);
+}
+.modal-header.entity-development { 
+  background-color: var(--entity-development-color); 
+  color: white;
+  border-bottom: 2px solid var(--entity-development-color);
+}
+.modal-header.entity-position { 
+  background-color: var(--entity-position-color, var(--entity-trade-color)); 
+  color: white;
+  border-bottom: 2px solid var(--entity-position-color, var(--entity-trade-color));
+}
+
+/* Header actions (export/close) inherit entity text color */
+#linkedItemsModal .modal-header .export-btn {
+  border-color: currentColor;
+  color: currentColor;
+  background-color: transparent;
+}
+
+/* כפתור סגירה במודול linked-items - משתמש בהגדרות הסטנדרטיות */
+
+/* Footer alignment: end of line (left in RTL) */
+#linkedItemsModal .modal-footer { justify-content: flex-end; }
+
+/* כפתור סגירה מותאם אישית - הוסר לטובת הסטנדרט */
+
+/* Related object badge (used inside tables) */
+.linked-object-badge {
+  display: inline-grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  background-color: var(--entity-badge-bg);
+  border: 1px solid var(--entity-badge-border);
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  line-height: 1.2;
+  direction: rtl;
+}
+.linked-object-badge:hover { filter: brightness(0.98); }
+.linked-object-badge .linked-object-kind { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.linked-object-badge .linked-object-icon { width: 36px; height: 36px; display: inline-block; justify-self: start; }
+.linked-object-badge .linked-object-type { font-size: 15px; font-weight: 700; line-height: 1; display: inline-block; color: #333; }
+.linked-object-badge .linked-object-center { display: inline-flex; flex-direction: column; align-items: flex-end; text-align: right; min-width: 60px; max-width: 60px; }
+.linked-object-badge .linked-object-symbol { font-size: 12px; color: #333; font-weight: 600; line-height: 1.1; }
+.linked-object-badge .linked-object-date { font-size: 11px; color: #666; line-height: 1.2; margin-top: 2px; }
+/* Trading Account center: allow up to 2 lines for account name, no date */
+.linked-object-badge.entity-account .linked-object-center,
+.linked-object-badge.entity-trading_account .linked-object-center { align-items: flex-start; text-align: right; max-width: 60px; min-width: 60px; }
+.linked-object-badge.entity-account .linked-object-symbol,
+.linked-object-badge.entity-trading_account .linked-object-symbol { font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; white-space: normal; line-height: 1.2; }
+.linked-object-badge .linked-object-status { margin-inline-start: 6px; justify-self: end; }
+
+/* Colors per entity (fallbacks; dynamic system may override via CSS vars) */
+/* Background + border tints per entity (keeps text legible) */
+.linked-object-badge.entity-trade       { background: rgba(0,123,255,0.08);  border-color: rgba(0,123,255,0.25); }
+.linked-object-badge.entity-account,
+.linked-object-badge.entity-trading_account { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
+.linked-object-badge.entity-ticker      { background: rgba(23,162,184,0.10); border-color: rgba(23,162,184,0.28); }
+.linked-object-badge.entity-alert       { background: rgba(252,90,6,0.10);   border-color: rgba(252,90,6,0.28); }
+.linked-object-badge.entity-cash_flow   { background: color-mix(in srgb, var(--entity-cash-flow-color) 12%, transparent); border-color: color-mix(in srgb, var(--entity-cash-flow-color) 30%, transparent); }
+.linked-object-badge.entity-note        { background: rgba(52,58,64,0.08);   border-color: rgba(52,58,64,0.22); }
+.linked-object-badge.entity-trade_plan  { background: color-mix(in srgb, var(--entity-trade-plan-color) 12%, transparent); border-color: color-mix(in srgb, var(--entity-trade-plan-color) 30%, transparent); }
+.linked-object-badge.entity-execution   { background: rgba(40,167,69,0.10);  border-color: rgba(40,167,69,0.28); }
+
+
+.linked-object-card.notes-linked-object {
+  display: inline-flex;
+  flex-direction: row;
+  direction: rtl;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: nowrap;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.linked-object-card.notes-linked-object:focus {
+  outline: 2px solid var(--tt-green, #26baac);
+  outline-offset: 4px;
+}
+
+.linked-object-card.notes-linked-object .linked-object-card-icon {
+  flex: 0 0 48px;
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 4px;
+}
+
+.linked-object-card-icon-img {
+  width: 100%;
+  height: 100%;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: contain;
+  display: block;
+}
+
+
+.linked-object-card.notes-linked-object .linked-object-card-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  text-align: right;
+  min-width: 0;
+  direction: rtl;
+}
+
+
+.linked-object-card.notes-linked-object .linked-object-card-title {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  direction: rtl;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.linked-object-card.notes-linked-object .linked-object-card-title .linked-object-card-type {
+  font-weight: 700;
+  color: #333;
+}
+
+.linked-object-card.notes-linked-object .linked-object-card-title .linked-object-card-name {
+  font-weight: 700;
+  color: var(--tt-green, #26baac);
+}
+
+.linked-object-card.notes-linked-object .linked-object-card-title .linked-object-card-date {
+  font-weight: 400;
+  color: #666;
+}
+
+
+.linked-object-card.notes-linked-object .linked-object-card-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  direction: rtl;
+}
+
+.linked-object-card.notes-linked-object .linked-object-card-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 100%;
+  direction: rtl;
+}
+
+.linked-object-card.notes-linked-object .linked-object-card-meta .status-badge {
+  margin-inline: 0;
+}
+
+/* ========================================
+   Pending Assignment Badge
+   For executions waiting for trade assignment
+   ======================================== */
+
+.linked-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.linked-badge.pending-assignment {
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    cursor: default;
+}
+
+.linked-badge.pending-assignment::before {
+    content: "⏳ ";
+    font-size: 1rem;
+}
+
+.linked-badge.pending-assignment:hover {
+    background-color: #ffe69c;
+    border-color: #ffb300;
+}
+
+.linked-badge.entity-trade {
+    background-color: rgba(0,123,255,0.08);
+    border-color: rgba(0,123,255,0.25);
+    color: #004085;
+}
+
+.linked-badge.entity-trade:hover {
+    background-color: rgba(0,123,255,0.15);
+}
+
+.linked-badge.entity-ticker {
+    background-color: rgba(23,162,184,0.10);
+    border-color: rgba(23,162,184,0.28);
+    color: #0c5460;
+}
+

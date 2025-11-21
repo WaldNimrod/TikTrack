@@ -389,7 +389,8 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
     const forcedDirection = sortOptions.direction || sortOptions.forceDirection || null;
     let newDirection = forcedDirection ? (forcedDirection === 'desc' ? 'desc' : 'asc') : 'asc';
 
-    // Get data from Registry if available (filteredData for proper sorting)
+    // CRITICAL FIX: Get data from Registry - must use FULL data for sorting, not filtered/page data
+    // Sorting must be applied to ALL data before pagination, not just current page
     let dataToSort = data;
     let tableId = null;
     if (window.TableDataRegistry) {
@@ -397,10 +398,16 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
       if (table) {
         tableId = table.id;
       }
-      // Try to get filtered data from Registry first
-      const registryFilteredData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
-      if (Array.isArray(registryFilteredData) && registryFilteredData.length > 0) {
-        dataToSort = registryFilteredData;
+      // Try to get FULL data from Registry first (all records, not just current page)
+      const registryFullData = window.TableDataRegistry.getFullData(tableType, { asReference: true });
+      if (Array.isArray(registryFullData) && registryFullData.length > 0) {
+        dataToSort = registryFullData;
+      } else {
+        // Fallback to filteredData if fullData is not available
+        const registryFilteredData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+        if (Array.isArray(registryFilteredData) && registryFilteredData.length > 0) {
+          dataToSort = registryFilteredData;
+        }
       }
     }
 

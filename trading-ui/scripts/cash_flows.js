@@ -4102,13 +4102,14 @@ window.registerCashFlowsTables = function() {
             return window.cashFlowsData || [];
         },
         updateFunction: (data) => {
-            // Don't call pagination.setData here - it causes infinite loops
-            // The pagination system already handles data updates through its render callback
-            // Just update the table display directly if pagination is not active
+            // CRITICAL FIX: Sorting must update pagination with FULL sorted data
+            // The pagination system will handle slicing to current page
             const paginationInstance = getCashFlowsPaginationInstance();
             if (paginationInstance && typeof paginationInstance.setData === 'function') {
-                // Pagination is active - let it handle the update through render callback
-                // Don't call setData here to avoid loop
+                // Update pagination with full sorted data - it will slice to current page
+                // This ensures sorting is applied to ALL data, not just current page
+                paginationInstance.setData(Array.isArray(data) ? data : []);
+                // Pagination will trigger render callback automatically
                 return;
             }
             // If no pagination, update table directly

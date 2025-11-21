@@ -82,7 +82,7 @@ const options = {
 
 - **תמיד מעבירים ל־`updateTableWithPagination` את המערך המלא** (לא את נתוני העמוד הנוכחי). הרינדור מקבל את ה־slice דרך callback.
 - **Header System + פילטרים פנימיים**: אחרי החלת פילטרים יש לקרוא ל־`updateTableWithPagination({ skipRegistry: true })` עבור הטבלה הרלוונטית. כך הפילטרים נשמרים ב־PageStateManager וב־UnifiedCacheManager, ומופעלים שוב אחרי רענון.
-- **Sorting**: ההרשמה ל־`UnifiedTableSystem` דואגת כעת ש־`dataGetter` ישלוף קודם כל את הנתונים מה־Registry (filtered/full). פונקציות `updateFunction` של טבלאות שמשתמשות בפאג׳ינציה חייבות להפעיל מחדש את `sync<Table>Pagination` כדי שהמיון יבוצע על כל הדאטה ואז יחולקו עמודים חדשים.
+- **Sorting**: **תיקון קריטי (ינואר 2025)** - המיון חייב להתבצע על **כל הנתונים** לפני החלוקה לעמודים. ההרשמה ל־`UnifiedTableSystem` דואגת כעת ש־`dataGetter` ישלוף קודם כל את הנתונים מה־Registry באמצעות `getFullData` (לא `getFilteredData`). פונקציות `updateFunction` של טבלאות שמשתמשות בפאג׳ינציה חייבות לעדכן את pagination עם הנתונים הממוינים המלאים באמצעות `paginationInstance.setData(sortedData)`, כך שהמיון יבוצע על כל הדאטה ואז יחולקו עמודים חדשים.
 - **Cache Modes (Dev/Prod)**: אין הבדל בקוד בין Dev ל־Prod – כל שליפת נתונים עוברת דרך `UnifiedCacheManager`, ולכן `updateTableWithPagination` תמיד מקבל את אותן רשומות בלי קשר לשכבת המטמון שממנה נשלפו.
 
 > ⚠️ **אסור** למתוחן לדרוס את מערך הנתונים הגלובלי (למשל `window.positionsPortfolioState.positionsData`) עם ה־page slice. הנתון הקנוני צריך להשאר מלא כדי שמערכת המיון/פילטרים/סיכומים תעבוד מול כלל הרשומות.

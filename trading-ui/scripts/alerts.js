@@ -1527,6 +1527,91 @@ function parseAlertCondition(condition) {
  * @async
  * @returns {Promise<void>}
  */
+/**
+ * Debug function for alert form - run in console: debugAlertForm()
+ * בדיקת כל השדות בטופס התראות
+ */
+window.debugAlertForm = function() {
+  console.group('🔍 [DEBUG] Alert Form Diagnostic');
+  
+  // Find form
+  let form = document.getElementById('alertsModalForm');
+  if (!form) {
+    form = document.getElementById('addAlertForm');
+  }
+  
+  if (!form) {
+    console.error('❌ Form not found!');
+    console.groupEnd();
+    return;
+  }
+  
+  console.log('✅ Form found:', form.id);
+  
+  // Check all alert fields
+  const fieldsToCheck = [
+    'alertRelatedType',
+    'alertRelatedObject',
+    'alertType',
+    'alertCondition',
+    'alertValue',
+    'alertName',
+    'alertStatusCombined',
+    'alertStatus_hidden',
+    'alertIsTriggered_hidden',
+    'alertExpiryDate',
+    'alertTags'
+  ];
+  
+  const fieldValues = {};
+  fieldsToCheck.forEach(fieldId => {
+    const field = form.querySelector(`#${fieldId}`);
+    if (field) {
+      const value = field.value || field.getAttribute('value') || '';
+      const selectedOption = field.options ? field.options[field.selectedIndex] : null;
+      fieldValues[fieldId] = {
+        exists: true,
+        value: value,
+        type: field.type || field.tagName,
+        selectedOption: selectedOption ? selectedOption.text : null,
+        options: field.options ? Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})) : null
+      };
+    } else {
+      fieldValues[fieldId] = { exists: false };
+    }
+  });
+  
+  console.log('📋 Field Values:', fieldValues);
+  
+  // Check ModalManagerV2 form structure
+  const modal = document.getElementById('alertsModal');
+  if (modal) {
+    console.log('✅ Modal found');
+    const modalForm = modal.querySelector('form');
+    if (modalForm) {
+      console.log('✅ Form in modal found:', modalForm.id);
+    } else {
+      console.warn('⚠️ No form found in modal');
+    }
+  } else {
+    console.warn('⚠️ Modal not found');
+  }
+  
+  // Test field collection
+  const testCollection = {
+    relatedType: form.querySelector('#alertRelatedType')?.value || '',
+    relatedId: form.querySelector('#alertRelatedObject')?.value || '',
+    conditionAttribute: form.querySelector('#alertType')?.value || '',
+    conditionOperator: form.querySelector('#alertCondition')?.value || '',
+    conditionNumber: form.querySelector('#alertValue')?.value || ''
+  };
+  
+  console.log('🧪 Test Collection:', testCollection);
+  
+  console.groupEnd();
+  return fieldValues;
+};
+
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
@@ -1791,6 +1876,36 @@ async function saveAlert() {
 
   // שולח התראה חדשה או מעדכן קיימת
   try {
+    // Detailed logging before sending
+    console.group('🔧 [SAVE ALERT] Detailed Debug Info');
+    console.log('📋 Form ID:', form.id);
+    console.log('📋 Is Edit:', isEdit);
+    console.log('📋 Alert ID:', alertId);
+    console.log('📋 Raw Field Values:', {
+      relatedType,
+      relatedId,
+      conditionAttribute,
+      conditionOperator,
+      conditionNumber,
+      status,
+      isTriggered
+    });
+    console.log('📋 Final Payload:', alertPayload);
+    console.log('📋 Payload JSON:', JSON.stringify(alertPayload, null, 2));
+    
+    // Check if any required fields are missing
+    const missingFields = [];
+    if (!finalConditionAttribute || finalConditionAttribute === '') missingFields.push('condition_attribute');
+    if (!finalConditionOperator || finalConditionOperator === '') missingFields.push('condition_operator');
+    if (!conditionNumberStr || conditionNumberStr === '') missingFields.push('condition_number');
+    
+    if (missingFields.length > 0) {
+      console.error('❌ Missing required fields:', missingFields);
+      window.Logger?.error('Missing required fields', { missingFields, page: 'alerts' });
+    }
+    
+    console.groupEnd();
+    
     window.Logger.info('🔧 === SAVING ALERT ===', { page: "alerts" });
     window.Logger.info('🔧 Is Edit:', isEdit, { page: "alerts" });
     window.Logger.info('🔧 Alert ID:', alertId, { page: "alerts" });

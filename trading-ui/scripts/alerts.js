@@ -1529,10 +1529,10 @@ function parseAlertCondition(condition) {
  */
 /**
  * Debug function for alert form - run in console: debugAlertForm()
- * בדיקת כל השדות בטופס התראות
+ * בדיקת כל השדות בטופס התראות - גרסה מפורטת
  */
 window.debugAlertForm = function() {
-  console.group('🔍 [DEBUG] Alert Form Diagnostic');
+  console.group('🔍 [DEBUG] Alert Form Diagnostic - Advanced');
   
   // Find form
   let form = document.getElementById('alertsModalForm');
@@ -1547,8 +1547,9 @@ window.debugAlertForm = function() {
   }
   
   console.log('✅ Form found:', form.id);
+  console.log('📋 Form HTML:', form.outerHTML.substring(0, 500) + '...');
   
-  // Check all alert fields
+  // Check all alert fields with detailed info
   const fieldsToCheck = [
     'alertRelatedType',
     'alertRelatedObject',
@@ -1565,39 +1566,121 @@ window.debugAlertForm = function() {
   
   const fieldValues = {};
   fieldsToCheck.forEach(fieldId => {
-    const field = form.querySelector(`#${fieldId}`);
+    console.group(`🔍 Checking field: ${fieldId}`);
+    
+    // Try multiple selectors
+    const selectors = [
+      `#${fieldId}`,
+      `[id="${fieldId}"]`,
+      `[name="${fieldId}"]`,
+      `input#${fieldId}`,
+      `select#${fieldId}`,
+      `textarea#${fieldId}`
+    ];
+    
+    let field = null;
+    let foundSelector = null;
+    
+    for (const selector of selectors) {
+      field = form.querySelector(selector);
+      if (field) {
+        foundSelector = selector;
+        break;
+      }
+    }
+    
+    // Also check in modal
+    if (!field) {
+      const modal = document.getElementById('alertsModal');
+      if (modal) {
+        for (const selector of selectors) {
+          field = modal.querySelector(selector);
+          if (field) {
+            foundSelector = selector + ' (in modal)';
+            break;
+          }
+        }
+      }
+    }
+    
     if (field) {
       const value = field.value || field.getAttribute('value') || '';
-      const selectedOption = field.options ? field.options[field.selectedIndex] : null;
-      fieldValues[fieldId] = {
+      const selectedIndex = field.selectedIndex !== undefined ? field.selectedIndex : -1;
+      const selectedOption = field.options && selectedIndex >= 0 ? field.options[selectedIndex] : null;
+      
+      const fieldInfo = {
         exists: true,
+        foundWith: foundSelector,
+        tagName: field.tagName,
+        type: field.type || 'N/A',
+        id: field.id,
+        name: field.name,
+        className: field.className,
         value: value,
-        type: field.type || field.tagName,
-        selectedOption: selectedOption ? selectedOption.text : null,
-        options: field.options ? Array.from(field.options).map(opt => ({value: opt.value, text: opt.text})) : null
+        valueType: typeof value,
+        valueLength: value ? value.length : 0,
+        selectedIndex: selectedIndex,
+        selectedOption: selectedOption ? {
+          value: selectedOption.value,
+          text: selectedOption.text,
+          selected: selectedOption.selected
+        } : null,
+        options: field.options ? Array.from(field.options).map((opt, idx) => ({
+          index: idx,
+          value: opt.value,
+          text: opt.text,
+          selected: opt.selected,
+          defaultSelected: opt.defaultSelected
+        })) : null,
+        attributes: Array.from(field.attributes).reduce((acc, attr) => {
+          acc[attr.name] = attr.value;
+          return acc;
+        }, {}),
+        innerHTML: field.innerHTML ? field.innerHTML.substring(0, 200) : null
       };
+      
+      fieldValues[fieldId] = fieldInfo;
+      console.log('✅ Field found:', fieldInfo);
     } else {
-      fieldValues[fieldId] = { exists: false };
+      fieldValues[fieldId] = { exists: false, triedSelectors: selectors };
+      console.error('❌ Field not found with any selector:', selectors);
     }
+    
+    console.groupEnd();
   });
   
-  console.log('📋 Field Values:', fieldValues);
+  console.group('📋 Summary - All Field Values');
+  console.table(fieldValues);
+  console.groupEnd();
   
   // Check ModalManagerV2 form structure
   const modal = document.getElementById('alertsModal');
   if (modal) {
-    console.log('✅ Modal found');
+    console.group('🔍 Modal Structure');
+    console.log('✅ Modal found:', modal.id);
     const modalForm = modal.querySelector('form');
     if (modalForm) {
       console.log('✅ Form in modal found:', modalForm.id);
+      console.log('📋 Form action:', modalForm.action);
+      console.log('📋 Form method:', modalForm.method);
+      console.log('📋 Form elements count:', modalForm.elements.length);
+      console.log('📋 Form elements:', Array.from(modalForm.elements).map(el => ({
+        tagName: el.tagName,
+        id: el.id,
+        name: el.name,
+        type: el.type || 'N/A',
+        value: el.value || ''
+      })));
     } else {
       console.warn('⚠️ No form found in modal');
     }
+    console.groupEnd();
   } else {
     console.warn('⚠️ Modal not found');
   }
   
-  // Test field collection
+  // Test field collection exactly as saveAlert does
+  console.group('🧪 Test Collection (as in saveAlert)');
   const testCollection = {
     relatedType: form.querySelector('#alertRelatedType')?.value || '',
     relatedId: form.querySelector('#alertRelatedObject')?.value || '',
@@ -1606,10 +1689,65 @@ window.debugAlertForm = function() {
     conditionNumber: form.querySelector('#alertValue')?.value || ''
   };
   
-  console.log('🧪 Test Collection:', testCollection);
+  // Also test with multiple methods
+  const alertTypeField = form.querySelector('#alertType');
+  const alertConditionField = form.querySelector('#alertCondition');
+  const alertValueField = form.querySelector('#alertValue');
+  
+  const detailedCollection = {
+    alertType: {
+      field: alertTypeField ? 'found' : 'not found',
+      value: alertTypeField?.value || '',
+      selectedIndex: alertTypeField?.selectedIndex || -1,
+      selectedOption: alertTypeField?.options?.[alertTypeField?.selectedIndex]?.value || '',
+      allOptions: alertTypeField ? Array.from(alertTypeField.options).map(opt => ({
+        value: opt.value,
+        text: opt.text,
+        selected: opt.selected
+      })) : []
+    },
+    alertCondition: {
+      field: alertConditionField ? 'found' : 'not found',
+      value: alertConditionField?.value || '',
+      selectedIndex: alertConditionField?.selectedIndex || -1,
+      selectedOption: alertConditionField?.options?.[alertConditionField?.selectedIndex]?.value || '',
+      allOptions: alertConditionField ? Array.from(alertConditionField.options).map(opt => ({
+        value: opt.value,
+        text: opt.text,
+        selected: opt.selected
+      })) : []
+    },
+    alertValue: {
+      field: alertValueField ? 'found' : 'not found',
+      value: alertValueField?.value || '',
+      type: alertValueField?.type || 'N/A'
+    }
+  };
+  
+  console.log('📋 Simple Collection:', testCollection);
+  console.log('📋 Detailed Collection:', detailedCollection);
+  console.groupEnd();
+  
+  // Check what would be sent
+  console.group('📤 What would be sent to backend');
+  const finalPayload = {
+    related_type_id: parseInt(testCollection.relatedType) || null,
+    related_id: parseInt(testCollection.relatedId) || null,
+    condition_attribute: testCollection.conditionAttribute || 'price',
+    condition_operator: testCollection.conditionOperator || 'more_than',
+    condition_number: testCollection.conditionNumber || '',
+  };
+  console.log('📋 Final Payload:', finalPayload);
+  console.log('📋 Payload JSON:', JSON.stringify(finalPayload, null, 2));
+  console.groupEnd();
   
   console.groupEnd();
-  return fieldValues;
+  return {
+    fieldValues,
+    testCollection,
+    detailedCollection,
+    finalPayload
+  };
 };
 
 async function saveAlert() {
@@ -1655,11 +1793,56 @@ async function saveAlert() {
     const alertConditionField = form.querySelector('#alertCondition');
     const alertValueField = form.querySelector('#alertValue');
     
-    conditionAttribute = alertTypeField?.value || alertTypeField?.getAttribute('value') || 'price';
-    conditionOperator = alertConditionField?.value || alertConditionField?.getAttribute('value') || 'more_than';
+    // Try multiple ways to get the value
+    let alertTypeValue = '';
+    if (alertTypeField) {
+      alertTypeValue = alertTypeField.value || 
+                      alertTypeField.getAttribute('value') || 
+                      (alertTypeField.selectedIndex >= 0 ? alertTypeField.options[alertTypeField.selectedIndex]?.value : '') ||
+                      '';
+    }
+    
+    let alertConditionValue = '';
+    if (alertConditionField) {
+      alertConditionValue = alertConditionField.value || 
+                           alertConditionField.getAttribute('value') || 
+                           (alertConditionField.selectedIndex >= 0 ? alertConditionField.options[alertConditionField.selectedIndex]?.value : '') ||
+                           '';
+    }
+    
+    conditionAttribute = alertTypeValue || 'price';
+    conditionOperator = alertConditionValue || 'more_than';
     conditionNumber = alertValueField?.value || '';
     
-    // Debug logging
+    // Debug logging with detailed info
+    console.log('🔍 [saveAlert] Field Collection Debug:', {
+      alertTypeField: {
+        exists: !!alertTypeField,
+        id: alertTypeField?.id,
+        value: alertTypeField?.value,
+        selectedIndex: alertTypeField?.selectedIndex,
+        selectedOption: alertTypeField?.options?.[alertTypeField?.selectedIndex]?.value,
+        allOptions: alertTypeField ? Array.from(alertTypeField.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})) : null,
+        finalValue: conditionAttribute
+      },
+      alertConditionField: {
+        exists: !!alertConditionField,
+        id: alertConditionField?.id,
+        value: alertConditionField?.value,
+        selectedIndex: alertConditionField?.selectedIndex,
+        selectedOption: alertConditionField?.options?.[alertConditionField?.selectedIndex]?.value,
+        allOptions: alertConditionField ? Array.from(alertConditionField.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})) : null,
+        finalValue: conditionOperator
+      },
+      alertValueField: {
+        exists: !!alertValueField,
+        id: alertValueField?.id,
+        value: alertValueField?.value,
+        type: alertValueField?.type,
+        finalValue: conditionNumber
+      }
+    });
+    
     window.Logger?.info('🔍 Alert form fields:', {
       alertTypeField: alertTypeField ? 'found' : 'not found',
       alertTypeValue: conditionAttribute,

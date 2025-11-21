@@ -88,9 +88,12 @@ def get_system_status():
                         'last_successful_request': status.get('last_successful_request') or adapter.build_time_payload(provider.last_successful_request),
                         'last_error': provider.last_error,
                         'error_count': provider.error_count,
+                        'rate_limit_per_hour': provider.rate_limit_per_hour,
                         'rate_limit_remaining': status.get('rate_limit_remaining', 0),
                         'recent_success_rate': status.get('recent_success_rate', 0),
                         'market_status': status.get('market_status'),
+                        'cache_ttl_hot': provider.cache_ttl_hot,
+                        'cache_ttl_warm': provider.cache_ttl_warm,
                         'metrics_timestamp': status.get('timestamp')
                     })
                     
@@ -585,13 +588,20 @@ def get_detailed_cache_stats():
             cache_stats = cache_manager.get_cache_stats()
             
             response = {
-                'success': True,
+                'status': 'success',
                 'timestamp': datetime.now(timezone.utc).isoformat(),
-                'total_quotes': cache_stats.total_quotes,
-                'total_intraday_slots': cache_stats.total_intraday_slots,
-                'cache_hit_rate': cache_stats.cache_hit_rate,
-                'stale_data': cache_stats.stale_data_count,
-                'avg_quote_age_minutes': cache_stats.avg_quote_age_minutes if hasattr(cache_stats, 'avg_quote_age_minutes') else 0
+                'data': {
+                    'total_entries': cache_stats.total_quotes,
+                    'total_quotes': cache_stats.total_quotes,
+                    'total_intraday_slots': cache_stats.total_intraday_slots,
+                    'expired_entries': cache_stats.stale_data_count,
+                    'stale_data': cache_stats.stale_data_count,
+                    'stale_data_count': cache_stats.stale_data_count,
+                    'hit_rate': cache_stats.cache_hit_rate,
+                    'cache_hit_rate': cache_stats.cache_hit_rate,
+                    'estimated_memory_mb': 0,  # Not calculated for external data cache
+                    'avg_quote_age_minutes': cache_stats.avg_quote_age_minutes if hasattr(cache_stats, 'avg_quote_age_minutes') else 0
+                }
             }
             
             return jsonify(response), 200

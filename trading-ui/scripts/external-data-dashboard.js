@@ -776,6 +776,21 @@
       this.renderStatusIndicators(data);
       this.updateProviderLastUpdateTimes(data ? data.providers?.details || [] : []);
       this.updateStatisticsCards(data);
+      
+      // Update cache stats display with fresh status data
+      if (data?.cache) {
+        this.cacheStats = {
+          status: 'success',
+          data: {
+            total_entries: data.cache.total_quotes || 0,
+            expired_entries: data.cache.stale_data_count || 0,
+            hit_rate: data.cache.cache_hit_rate || 0,
+            estimated_memory_mb: 0 // Not available from status endpoint
+          }
+        };
+        this.renderCacheStats();
+      }
+      
       // Update cache settings display with fresh status data
       this.updateCurrentSettings().catch(error => {
         logger.error(`${MODULE_NAME}:update-current-settings:failed`, { error });
@@ -1203,20 +1218,39 @@
      */
     async loadCacheStats(showNotification = false) {
       try {
-        const response = await fetch('/api/cache/stats');
+        // Try to get from external data cache stats endpoint
+        let response = await fetch('/api/external-data/status/cache/stats');
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+          // Fallback to general cache stats
+          response = await fetch('/api/cache/stats');
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+          }
         }
         const data = await response.json();
         this.cacheStats = data;
         this.renderCacheStats();
         if (showNotification) {
           notification.success('נתוני מטמון', 'סטטיסטיקות המטמון נטענו בהצלחה');
-      }
-    } catch (error) {
-        this.cacheStats = null;
-        this.renderCacheStats();
+        }
+      } catch (error) {
+        // If statusData is available, use cache data from there
+        if (this.statusData?.cache) {
+          this.cacheStats = {
+            status: 'success',
+            data: {
+              total_entries: this.statusData.cache.total_quotes || 0,
+              expired_entries: this.statusData.cache.stale_data_count || 0,
+              hit_rate: this.statusData.cache.cache_hit_rate || 0,
+              estimated_memory_mb: 0 // Not available from status endpoint
+            }
+          };
+          this.renderCacheStats();
+        } else {
+          this.cacheStats = null;
+          this.renderCacheStats();
+        }
         this.handleError('שגיאה בטעינת סטטיסטיקות מטמון', error, 'load-cache-stats');
       }
     }
@@ -1230,28 +1264,49 @@
       if (!cacheStatsElement) {
         return;
       }
-      if (!this.cacheStats || this.cacheStats.status !== 'success') {
+
+      // Try to get stats from cacheStats first, then from statusData
+      let stats = null;
+      
+      if (this.cacheStats && this.cacheStats.status === 'success') {
+        stats = this.cacheStats.data;
+      } else if (this.statusData?.cache) {
+        // Use cache data from status endpoint
+        stats = {
+          total_entries: this.statusData.cache.total_quotes || 0,
+          expired_entries: this.statusData.cache.stale_data_count || 0,
+          hit_rate: this.statusData.cache.cache_hit_rate || 0,
+          estimated_memory_mb: 0 // Not available from status endpoint
+        };
+      }
+
+      if (!stats) {
         cacheStatsElement.innerHTML = '<div class="text-muted text-center p-3">נתוני מטמון לא זמינים</div>';
         return;
       }
 
-      const stats = this.cacheStats.data;
-    cacheStatsElement.innerHTML = `
+      // Handle both formats: external-data format (total_quotes) and general format (total_entries)
+      const totalEntries = stats.total_entries || stats.total_quotes || 0;
+      const expiredEntries = stats.expired_entries || stats.stale_data || stats.stale_data_count || 0;
+      const hitRate = stats.hit_rate || stats.cache_hit_rate || 0;
+      const memoryMB = stats.estimated_memory_mb || stats.memory_usage_mb || 0;
+
+      cacheStatsElement.innerHTML = `
             <div class="cache-stats-grid">
                 <div class="stat-card">
-            <div class="stat-value">${formatNumber(stats.total_entries)}</div>
+            <div class="stat-value">${formatNumber(totalEntries)}</div>
             <div class="stat-label">רשומות במטמון</div>
                 </div>
                 <div class="stat-card">
-            <div class="stat-value">${formatNumber(stats.expired_entries)}</div>
+            <div class="stat-value">${formatNumber(expiredEntries)}</div>
             <div class="stat-label">רשומות פג תוקף</div>
                 </div>
                 <div class="stat-card">
-            <div class="stat-value">${formatPercent(stats.hit_rate)}</div>
+            <div class="stat-value">${formatPercent(hitRate)}</div>
                     <div class="stat-label">אחוז פגיעות</div>
                 </div>
                 <div class="stat-card">
-            <div class="stat-value">${formatDecimal(stats.estimated_memory_mb, 2)}MB</div>
+            <div class="stat-value">${formatDecimal(memoryMB, 2)}MB</div>
             <div class="stat-label">שימוש בזיכרון</div>
                 </div>
             </div>
@@ -2479,6 +2534,9 @@
                 padding: 15,
                 usePointStyle: true
               }
+            },
+            title: {
+              display: false
             }
           },
           scales: {
@@ -2549,6 +2607,9 @@
                 padding: 15,
                 usePointStyle: true
               }
+            },
+            title: {
+              display: false
             }
           }
         }
@@ -2613,6 +2674,19 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            },
+            title: {
+              display: false
+            }
+          },
           scales: {
             y: {
               beginAtZero: true
@@ -2697,6 +2771,9 @@
                 padding: 15,
                 usePointStyle: true
               }
+            },
+            title: {
+              display: false
             }
           },
           scales: {

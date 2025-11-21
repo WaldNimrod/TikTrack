@@ -68,6 +68,9 @@ def sync_ui_to_production():
         print()
 
         ensure_critical_ui_paths(source_ui, target_ui)
+        
+        # CRITICAL: Force update header files to match source (main always wins)
+        force_update_header_files(source_ui, target_ui)
 
         print("=" * 70)
         print("✅ UI sync completed successfully!")
@@ -103,6 +106,35 @@ def ensure_critical_ui_paths(source_ui: Path, target_ui: Path) -> None:
 
         print(f"  🆗 Restored: {rel_path}")
     print("🔒 Critical UI paths verified.\n")
+
+
+def force_update_header_files(source_ui: Path, target_ui: Path) -> None:
+    """
+    Force update header files to match source (main always wins).
+    This ensures header menu structure and styles are always up-to-date.
+    """
+    print("🔧 Force updating header files (main always wins)...")
+    
+    # Critical header files that must always match source
+    header_files = [
+        Path("scripts/header-system.js"),
+        Path("styles-new/header-styles.css"),
+    ]
+    
+    for rel_path in header_files:
+        src = source_ui / rel_path
+        dst = target_ui / rel_path
+        
+        if not src.exists():
+            print(f"  ⚠️  Source file not found: {rel_path}")
+            continue
+        
+        # Always copy from source (main always wins)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        print(f"  ✅ Force updated: {rel_path}")
+    
+    print("🔒 Header files force updated (main always wins).\n")
 
 if __name__ == "__main__":
     success = sync_ui_to_production()

@@ -36,6 +36,19 @@ class ConflictResolver:
         'production/Backend/config/',
     ]
     
+    # UI files that should always use main version (main always wins)
+    MAIN_WINS_UI_FILES = [
+        'production/trading-ui/scripts/header-system.js',
+        'production/trading-ui/styles-new/header-styles.css',
+    ]
+    
+    # Patterns for UI files where main always wins
+    MAIN_WINS_UI_PATTERNS = [
+        'production/trading-ui/scripts/header-system.js',
+        'production/trading-ui/styles-new/header-styles.css',
+        'production/trading-ui/styles-new/',
+    ]
+    
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.logger = get_logger()
@@ -115,6 +128,13 @@ class ConflictResolver:
     
     def _determine_strategy(self, file_path: str) -> str:
         """Determine resolution strategy for a file"""
+        # UI header files - main always wins (critical for menu structure and styles)
+        if file_path in self.MAIN_WINS_UI_FILES:
+            return 'theirs'
+        
+        if any(file_path.startswith(pattern) for pattern in self.MAIN_WINS_UI_PATTERNS):
+            return 'theirs'
+        
         # Production config files - keep production
         if any(file_path.startswith(pattern) for pattern in self.PRODUCTION_PATTERNS):
             return 'ours'

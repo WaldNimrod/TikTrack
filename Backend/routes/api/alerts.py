@@ -55,9 +55,17 @@ def create_alert():
     """Create new alert"""
     try:
         data = request.get_json()
+        logger.info(f"🔍 [create_alert] Received data: {data}")
+        logger.info(f"🔍 [create_alert] condition_attribute in data: {'condition_attribute' in data}")
+        logger.info(f"🔍 [create_alert] condition_attribute value: {data.get('condition_attribute')}")
+        logger.info(f"🔍 [create_alert] condition_attribute type: {type(data.get('condition_attribute'))}")
+        
         # Sanitize HTML content for message field
         if 'message' in data and data['message']:
             data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
+        
+        logger.info(f"🔍 [create_alert] After sanitize - condition_attribute: {data.get('condition_attribute')}")
+        
         db: Session = g.db
         alert = AlertService.create(db, data)
         normalizer = _get_date_normalizer()

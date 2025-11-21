@@ -1564,9 +1564,26 @@ async function saveAlert() {
     // New form structure (ModalManagerV2)
     relatedType = form.querySelector('#alertRelatedType')?.value || '';
     relatedId = form.querySelector('#alertRelatedObject')?.value || '';
-    conditionAttribute = form.querySelector('#alertType')?.value || '';
-    conditionOperator = form.querySelector('#alertCondition')?.value || '';
-    conditionNumber = form.querySelector('#alertValue')?.value || '';
+    
+    // Get condition fields - ensure they are not null/undefined
+    const alertTypeField = form.querySelector('#alertType');
+    const alertConditionField = form.querySelector('#alertCondition');
+    const alertValueField = form.querySelector('#alertValue');
+    
+    conditionAttribute = alertTypeField?.value || alertTypeField?.getAttribute('value') || 'price';
+    conditionOperator = alertConditionField?.value || alertConditionField?.getAttribute('value') || 'more_than';
+    conditionNumber = alertValueField?.value || '';
+    
+    // Debug logging
+    window.Logger?.info('🔍 Alert form fields:', {
+      alertTypeField: alertTypeField ? 'found' : 'not found',
+      alertTypeValue: conditionAttribute,
+      alertConditionField: alertConditionField ? 'found' : 'not found',
+      alertConditionValue: conditionOperator,
+      alertValueField: alertValueField ? 'found' : 'not found',
+      alertValueValue: conditionNumber,
+      page: 'alerts'
+    });
     if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
       message = window.RichTextEditorService.getContent('alertName') || '';
     } else {
@@ -1659,19 +1676,17 @@ async function saveAlert() {
     hasErrors = true;
   }
 
-  // בדיקת תנאי התראה
-  if (!conditionAttribute) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionAttribute', 'יש לבחור מאפיין לתנאי');
-    }
-    hasErrors = true;
+  // בדיקת תנאי התראה - עם ברירות מחדל
+  if (!conditionAttribute || conditionAttribute === '') {
+    // Use default value from config if not set
+    conditionAttribute = 'price';
+    window.Logger?.warn('⚠️ conditionAttribute was empty, using default: price', { page: 'alerts' });
   }
 
-  if (!conditionOperator) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionOperator', 'יש לבחור אופרטור לתנאי');
-    }
-    hasErrors = true;
+  if (!conditionOperator || conditionOperator === '') {
+    // Use default value from config if not set
+    conditionOperator = 'more_than';
+    window.Logger?.warn('⚠️ conditionOperator was empty, using default: more_than', { page: 'alerts' });
   }
 
   if (!conditionNumber) {
@@ -1745,11 +1760,24 @@ async function saveAlert() {
     return;
   }
   
+  // Ensure condition fields are not null/undefined/empty
+  const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
+  const finalConditionOperator = (conditionOperator && conditionOperator.trim() !== '') ? conditionOperator : 'more_than';
+  
+  window.Logger?.info('🔍 Final alert payload values:', {
+    condition_attribute: finalConditionAttribute,
+    condition_operator: finalConditionOperator,
+    condition_number: conditionNumberStr,
+    original_conditionAttribute: conditionAttribute,
+    original_conditionOperator: conditionOperator,
+    page: 'alerts'
+  });
+  
   const alertPayload = {
     related_type_id: parseInt(relatedType) || null,
     related_id: parseInt(relatedId) || null,
-    condition_attribute: conditionAttribute,
-    condition_operator: conditionOperator,
+    condition_attribute: finalConditionAttribute,
+    condition_operator: finalConditionOperator,
     condition_number: conditionNumberStr,
     message: message || null,
     status: status || 'open',

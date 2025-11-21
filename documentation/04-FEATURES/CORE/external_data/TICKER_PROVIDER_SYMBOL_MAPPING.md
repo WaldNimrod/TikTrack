@@ -187,7 +187,29 @@ Mapping created automatically
 **Changes**:
 - `POST /api/tickers` - Accepts optional `provider_symbols` field
 - `PUT /api/tickers/{id}` - Accepts optional `provider_symbols` field
+- `GET /api/tickers/{id}` - Returns ticker with `provider_symbols` if they exist
+- `GET /api/tickers/{id}/provider-symbols` - Returns all mappings for a ticker
 - Creates/updates mappings after ticker creation/update
+
+### Entity Details Service
+
+**Location**: `Backend/services/entity_details_service.py`
+
+**Changes**:
+- `get_entity_details()` - Automatically loads `provider_symbols` for ticker entities
+- Returns provider symbol mappings in the entity details response
+- Used by the Entity Details modal in the frontend
+
+### Frontend Display
+
+**Location**: `trading-ui/scripts/entity-details-renderer.js`
+
+**Features**:
+- Displays provider symbol mappings in the ticker details modal
+- Shows mappings in a dedicated section after creation date
+- Format: Provider name → Provider symbol (e.g., "Yahoo Finance: SP5C.MI")
+- Consistent styling with other ticker fields (right-aligned, RTL)
+- Rich text support for ticker remarks field
 
 ## Examples
 
@@ -286,7 +308,35 @@ python3 Backend/migrations/create_ticker_provider_symbols_table.py down
 - [Developer Guide](../03-DEVELOPMENT/GUIDES/TICKER_PROVIDER_SYMBOL_MAPPING_DEVELOPER_GUIDE.md) - Developer guide
 - [API Documentation](../../api/TICKERS_API.md) - API reference
 
+## Frontend Integration
+
+### Entity Details Modal
+
+The ticker details modal displays provider symbol mappings when available:
+
+1. **Location**: After creation date in the ticker details section
+2. **Format**: Each mapping displayed as "Provider Name: Provider Symbol"
+3. **Styling**: Consistent with other ticker fields (right-aligned, RTL)
+4. **Example**:
+   ```
+   מיפויי ספקים
+   Yahoo Finance: SP5C.MI
+   ```
+
+### Rich Text Support
+
+Ticker remarks field supports rich text formatting:
+- HTML formatting (bold, italic, lists, links)
+- Line breaks preserved
+- Safe HTML sanitization using `RichTextEditorService`
+- Consistent with notes and cash flow descriptions
+
 ## Version History
+
+- **v1.1** (November 2025): UI enhancements
+  - Provider symbols displayed in entity details modal
+  - Rich text support for ticker remarks
+  - Improved frontend integration
 
 - **v1.0** (January 2025): Initial implementation
   - Separate mapping table

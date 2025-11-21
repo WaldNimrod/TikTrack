@@ -408,6 +408,39 @@ def test_yahoo_adapter_with_mapping():
     # Yahoo API was called with "500X.MI"
 ```
 
+## Frontend Display
+
+### Entity Details Modal
+
+Provider symbol mappings are automatically displayed in the ticker entity details modal:
+
+**Location**: `trading-ui/scripts/entity-details-renderer.js`
+
+```javascript
+// Provider symbols are automatically loaded via EntityDetailsService
+// and displayed in renderTickerSpecific()
+```
+
+**Display Format**:
+- Section title: "מיפויי ספקים" (Provider Mappings)
+- Each mapping: "Provider Name: Provider Symbol"
+- Right-aligned, RTL layout
+- Consistent styling with other ticker fields
+
+**Example Display**:
+```
+מיפויי ספקים
+Yahoo Finance: SP5C.MI
+```
+
+### Rich Text Support
+
+Ticker remarks field supports rich text:
+- Uses `_sanitizeRichText()` for safe HTML rendering
+- Supports HTML formatting (bold, italic, lists, links)
+- Preserves line breaks
+- Consistent with notes and cash flow descriptions
+
 ## Related Documentation
 
 - [Architecture Documentation](../04-FEATURES/CORE/external_data/TICKER_PROVIDER_SYMBOL_MAPPING.md)

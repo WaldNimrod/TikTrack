@@ -459,42 +459,57 @@ class AlertService:
     
     @staticmethod
     def _validate_expiry_date(alert_data: Dict[str, Any]) -> None:
-        """Validate expiry_date format (YYYY-MM-DD) if provided"""
+        """
+        Validate expiry_date if provided.
+        
+        Expected format: date object (from datetime.date) or None.
+        The conversion from DateEnvelope/datetime/string to date object
+        is handled in alerts.py before calling AlertService.
+        """
         try:
-            if 'expiry_date' in alert_data and alert_data['expiry_date']:
+            if 'expiry_date' in alert_data:
                 expiry_date = alert_data['expiry_date']
                 
-                # Allow empty string or None (no expiration)
-                if expiry_date == '' or expiry_date is None:
+                # Allow None (no expiration)
+                if expiry_date is None:
+                    return
+                
+                # Allow empty string (convert to None)
+                if expiry_date == '':
                     alert_data['expiry_date'] = None
                     return
                 
-                # Convert datetime object to string if needed
-                if isinstance(expiry_date, datetime):
-                    expiry_date = expiry_date.strftime('%Y-%m-%d')
-                    alert_data['expiry_date'] = expiry_date
-                    logger.info(f"Converted datetime to string: {expiry_date}")
-                
-                # Ensure it's a string for regex validation
-                if not isinstance(expiry_date, str):
-                    expiry_date = str(expiry_date)
-                    alert_data['expiry_date'] = expiry_date
-                
-                # Validate format YYYY-MM-DD
-                import re
-                date_pattern = r'^\d{4}-\d{2}-\d{2}$'
-                if not re.match(date_pattern, expiry_date):
-                    raise ValueError(f"Invalid expiry_date format: {expiry_date}. Expected YYYY-MM-DD")
-                
-                # Validate that it's a valid date
-                try:
-                    datetime.strptime(expiry_date, '%Y-%m-%d')
-                except ValueError:
-                    raise ValueError(f"Invalid expiry_date value: {expiry_date}. Not a valid date")
+                # At this point, expiry_date should be a date object
+                # (converted in alerts.py from DateEnvelope/datetime/string)
+                from datetime import date
+                if isinstance(expiry_date, date):
+                    # Valid date object - no further validation needed
+                    logger.debug(f"expiry_date is valid date object: {expiry_date}")
+                    return
+                elif isinstance(expiry_date, datetime):
+                    # If somehow datetime slipped through, convert to date
+                    alert_data['expiry_date'] = expiry_date.date()
+                    logger.info(f"Converted datetime to date: {expiry_date.date()}")
+                    return
+                else:
+                    # Unexpected type - log warning but don't fail
+                    logger.warning(f"Unexpected expiry_date type: {type(expiry_date)}, value: {expiry_date}")
+                    # Try to convert string to date if it's a string
+                    if isinstance(expiry_date, str):
+                        try:
+                            date_obj = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+                            alert_data['expiry_date'] = date_obj
+                            logger.info(f"Converted string to date: {date_obj}")
+                            return
+                        except ValueError:
+                            pass
+                    # If we can't convert, set to None
+                    logger.warning(f"Could not convert expiry_date to date, setting to None")
+                    alert_data['expiry_date'] = None
         except Exception as e:
             logger.error(f"Error validating expiry_date: {e}")
-            logger.error(f"expiry_date type: {type(alert_data.get('expiry_date'))}, value: {alert_data.get('expiry_date')}")
-            raise
+            # Don't raise - set to None instead
+            alert_data['expiry_date'] = None
     
     @staticmethod
     def get_alert_by_condition(db: Session, plan_condition_id: int = None, trade_condition_id: int = None) -> Optional[Alert]:

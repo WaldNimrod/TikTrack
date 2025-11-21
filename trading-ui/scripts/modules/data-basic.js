@@ -163,16 +163,13 @@ const LEGACY_TABLE_COLUMN_MAPPINGS = {
     'condition_number',      // 12 - Condition Number
   ],
 
-  // טבלת הערות (Notes) - Notes Page Structure
+  // טבלת הערות (Notes) - Notes Page Structure (LEGACY - use table-mappings.js instead)
   'notes': [
-    'symbol',                // 0 - Symbol (סימבול) - עמודה ראשונה בטבלה
-    'related_object',        // 1 - Related Object (אובייקט מקושר) - עמודה שנייה
-    'content',               // 2 - Content (תוכן) - עמודה שלישית
-    'attachment',            // 3 - Attachment (קובץ מצורף) - עמודה רביעית
-    'created_at',            // 4 - Created At (נוצר ב) - עמודה חמישית
-    'id',                    // 5 - ID (לא מוצג בטבלה)
-    'related_type_id',       // 6 - Related Type ID (לא מוצג בטבלה)
-    'related_id',            // 7 - Related ID (לא מוצג בטבלה)
+    'related_object',        // 0 - אובייקט מקושר
+    'content',               // 1 - תוכן
+    'attachment',            // 2 - קובץ מצורף
+    'created_at',            // 3 - נוצר ב
+    'updated_at',            // 4 - עודכן
   ],
 
   // Legacy mappings for backward compatibility
@@ -428,22 +425,13 @@ function getColumnValue(item, columnIndex, tableType) {
       return result;
     }
 
-    // Special handling for notes table
+    // Special handling for notes table (LEGACY - should use table-mappings.js instead)
+    // This is only used as fallback if table-mappings.js is not loaded
     if (tableType === 'notes') {
       let result = item[fieldName];
       
       // Handle special cases for notes table display
-      if (fieldName === 'symbol') {
-        // For symbol column, we need to extract the actual symbol from the complex display
-        if (item.related_type_id === 4) { // ticker
-          result = item.related_id ? `טיקר ${item.related_id}` : '';
-        } else if (item.related_type_id === 2 || item.related_type_id === 3) { // trade or plan
-          // For trades/plans, we need to get the ticker symbol
-          result = ''; // Will be populated by the display logic
-        } else {
-          result = ''; // For accounts and general notes
-        }
-      } else if (fieldName === 'related_object') {
+      if (fieldName === 'related_object') {
         // For related object, use the unified system
         if (window.getRelatedObjectDisplay) {
           const relatedInfo = window.getRelatedObjectDisplay(item, {}, { showLink: false, format: 'minimal' });
@@ -466,7 +454,7 @@ function getColumnValue(item, columnIndex, tableType) {
       
       // Handle null/undefined values for sorting
       if (result === null || result === undefined) {
-        if (fieldName === 'created_at') {
+        if (fieldName === 'created_at' || fieldName === 'updated_at') {
           result = -Infinity; // Use -Infinity for date fields
         } else {
           result = ''; // Use empty string for text fields

@@ -146,7 +146,11 @@ function resolveColumnValue(item, columnIndex, tableType) {
       'source',        // 5 - מקור (Source)
     ],
     'notes': [
-      'id', 'title', 'content', 'type', 'status', 'created_at',
+      'related_object',  // 0 - אובייקט מקושר
+      'content',         // 1 - תוכן
+      'attachment',      // 2 - קובץ מצורף
+      'created_at',      // 3 - נוצר ב
+      'updated_at',      // 4 - עודכן
     ],
     'linked_items': [
       'linked_to',     // 0 - מקושר ל (משולב: type + name)

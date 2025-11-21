@@ -912,13 +912,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          console.log('🏦 Initializing Trading Accounts...');
-          console.log('🔍 Checking function availability:');
-          console.log(
-            '  - loadTradingAccountsDataForTradingAccountsPage:',
-            typeof window.loadTradingAccountsDataForTradingAccountsPage
-          );
-          console.log('  - loadAccountsData:', typeof window.loadAccountsData);
+          // Function availability is tracked internally
           window.Logger.info('🏦 Initializing Trading Accounts...', {
             page: 'page-initialization-configs',
           });
@@ -939,7 +933,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               ? window.loadTradingAccountsDataForTradingAccountsPage
               : window.loadAccountsData;
           if (typeof loadTradingAccounts === 'function') {
-            console.log('📡 Calling trading accounts loader via service...');
+            // Removed debug log - service calls are tracked internally
             window.Logger.info('📡 Calling trading accounts loader via service...', {
               page: 'page-initialization-configs',
             });

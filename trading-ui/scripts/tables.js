@@ -14,9 +14,7 @@
  */
 
 // ===== LOADING TRACKING =====
-console.log('🟢 [tables.js] FILE LOADING STARTED');
-console.log('🟢 [tables.js] window.TABLE_COLUMN_MAPPINGS exists:', !!window.TABLE_COLUMN_MAPPINGS);
-console.log('🟢 [tables.js] window.getColumnValue exists:', typeof window.getColumnValue === 'function');
+// Removed debug logs - file loading is tracked internally
 
 // ===== GLOBAL SORTING SYSTEM =====
 
@@ -370,14 +368,14 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
     return data;
   }
 
-  console.log(`[sortTableData] Starting sort: tableType=${tableType}, columnIndex=${columnIndex}, dataLength=${data?.length || 0}, hasUpdateFunction=${typeof updateFunction === 'function'}`);
+  // Removed debug log - sort operation is tracked internally
   window._sortTableDataInProgress = true;
 
   const complete = (direction, sortedData) => {
     if (typeof window.updateSortIcons === 'function') {
       window.updateSortIcons(tableType, columnIndex, direction);
     }
-    console.log(`[sortTableData] Completed sort: tableType=${tableType}, columnIndex=${columnIndex}, sortedLength=${sortedData?.length || 0}`);
+    // Removed debug log - sort completion is tracked internally
     window._sortTableDataInProgress = false;
   };
 
@@ -780,14 +778,7 @@ window.sortAnyTable = function (tableType, columnIndex, data, updateFunction) {
  */
 window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, updateFunction) {
   // CRITICAL: Always log to console to trace calls - this is the first line of the function
-  console.log('🔍 [sortTable] FUNCTION CALLED', {
-    tableTypeOrColumnIndex: typeof tableTypeOrColumnIndex === 'string' ? tableTypeOrColumnIndex : typeof tableTypeOrColumnIndex,
-    columnIndex: columnIndex,
-    hasDataArray: !!dataArray,
-    hasUpdateFunction: !!updateFunction,
-    argsLength: arguments.length,
-    stackTrace: new Error().stack.split('\n').slice(0, 3).join('\n')
-  });
+  // SortTable function call is tracked internally
   // Handle call with only columnIndex (number) - find table from DOM
   // This is used by older tables that call sortTable(0) without tableType
   if (typeof tableTypeOrColumnIndex === 'number' && (columnIndex === undefined || typeof columnIndex !== 'number') && arguments.length === 1) {
@@ -1049,7 +1040,7 @@ window.closeModalGlobal = window.closeModal;
  */
 window.loadTableData = async function(tableType, updateFunction) {
   try {
-    console.log(`📊 Loading data for table type: ${tableType}`);
+    // Removed debug log - table data loading is tracked internally
     
     // Show loading state if function exists
     if (typeof window.showLoadingState === 'function') {
@@ -1063,7 +1054,7 @@ window.loadTableData = async function(tableType, updateFunction) {
     }
     
     const data = await response.json();
-    console.log(`✅ Loaded ${data.length} records for ${tableType}`);
+    // Removed debug log - table data loaded is tracked internally
     
     // Call update function if provided
     if (typeof updateFunction === 'function') {
@@ -1103,7 +1094,7 @@ window.loadTableData = async function(tableType, updateFunction) {
  */
 window.refreshTable = async function(tableType, updateFunction) {
   try {
-    console.log(`🔄 Refreshing table: ${tableType}`);
+    // Removed debug log - table refresh is tracked internally
     
     // Clear any cached data for this table type
     if (window.tableData && window.tableData[tableType]) {
@@ -1158,7 +1149,7 @@ window.loadTableDataFromCache = async function(tableId, filters = {}, serverLoad
       ttl: 300000 // 5 דקות
     });
     
-    console.log(`✅ Loaded table ${tableId} data from cache`);
+    // Removed debug log - cache load is tracked internally
     return data || [];
     
   } catch (error) {
@@ -1193,7 +1184,7 @@ window.saveTableDataToCache = async function(tableId, data, filters = {}) {
     });
     
     if (result) {
-      console.log(`✅ Saved table ${tableId} data to cache`);
+      // Removed debug log - cache save is tracked internally
     }
     
     return result;
@@ -1279,11 +1270,7 @@ window.ensureTablePagination = function(tableId, options = {}) {
 
   const existing = window.getPagination(tableId);
   if (existing) {
-    console.log(`🔄 [ensureTablePagination] Updating existing pagination for table ${tableId}`, {
-      tableId,
-      hasExistingOnAfterRender: typeof existing.config.onAfterRender === 'function',
-      hasNewOnAfterRender: typeof options.onAfterRender === 'function',
-    });
+    // Pagination update is tracked internally
     
     if (options.tableType && !existing.tableType) {
       existing.tableType = options.tableType;
@@ -1291,12 +1278,8 @@ window.ensureTablePagination = function(tableId, options = {}) {
     }
 
     if (typeof options.onAfterRender === 'function') {
-      console.log(`✅ [ensureTablePagination] Updating onAfterRender callback for table ${tableId}`);
+      // Pagination callback update is tracked internally
       existing.config.onAfterRender = options.onAfterRender;
-      console.log(`✅ [ensureTablePagination] onAfterRender updated - is now:`, {
-        isFunction: typeof existing.config.onAfterRender === 'function',
-        functionName: existing.config.onAfterRender?.name || 'anonymous',
-      });
     }
 
     if (typeof options.onFilteredDataChange === 'function') {
@@ -1310,10 +1293,7 @@ window.ensureTablePagination = function(tableId, options = {}) {
     return existing;
   }
 
-  console.log(`🆕 [ensureTablePagination] Creating new pagination for table ${tableId}`, {
-    tableId,
-    hasOnAfterRender: typeof options.onAfterRender === 'function',
-  });
+  // Pagination creation is tracked internally
   return window.createPagination(tableId, options);
 };
 
@@ -1361,24 +1341,16 @@ window.updateTableWithPagination = async function({
     tableType: resolvedTableType,
     pageSize,
     onAfterRender: async ({ pageData, pagination: paginationInfo }) => {
-      console.log(`🔄 [updateTableWithPagination.onAfterRender] Called for table ${tableId}`, {
-        tableId,
-        pageDataLength: pageData?.length || 0,
-        currentPage: paginationInfo?.currentPage,
-        totalPages: paginationInfo?.totalPages,
-        hasRender: typeof render === 'function',
-      });
+      // Pagination callback is tracked internally
       try {
-        console.log(`📞 [updateTableWithPagination.onAfterRender] Calling render callback for table ${tableId}`, {
-          pageDataLength: pageData?.length || 0,
-        });
+        // Render callback is tracked internally
         await render(pageData, {
           skipPagination: true,
           pageInfo: paginationInfo,
           tableId,
           tableType: resolvedTableType,
         });
-        console.log(`✅ [updateTableWithPagination.onAfterRender] Render callback completed for table ${tableId}`);
+        // Removed debug log - render callback completion is tracked internally
       } catch (error) {
         console.error(`❌ [updateTableWithPagination.onAfterRender] Render callback failed for table ${tableId}:`, error);
         console.warn(`updateTableWithPagination: render callback failed for table ${tableId}`, error);
@@ -1459,7 +1431,7 @@ window.saveTableState = async function(tableId, state) {
     });
     
     if (result) {
-      console.log(`✅ Saved table ${tableId} state to cache`);
+      // Removed debug log - state save is tracked internally
     }
     
     return result;
@@ -1488,7 +1460,7 @@ window.loadTableState = async function(tableId) {
     const state = await window.UnifiedCacheManager.get(`table-${tableId}-state`);
     
     if (state) {
-      console.log(`✅ Loaded table ${tableId} state from cache`);
+      // Removed debug log - state load is tracked internally
     }
     
     return state;

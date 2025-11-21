@@ -2986,7 +2986,8 @@ class ModalManagerV2 {
                                         day: '2-digit',
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                    }));
+                                      });
+                                    }
                                 }
                             } catch (e) {
                                 // Keep original value if parsing fails

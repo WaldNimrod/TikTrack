@@ -38,10 +38,7 @@
  * @lastUpdated January 15, 2025
  */
 
-// Logger will be available after initialization
-try {
-  console.log('🚀 header-system.js loaded');
-} catch (_) {}
+// Removed debug log - file loading is tracked internally
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v6.0.0...', { page: 'header-system' });
 }
@@ -57,7 +54,7 @@ class HeaderSystem {
 
   init() {
     if (this.isInitialized) {
-      console.log('⚠️ HeaderSystem.init already initialized');
+      // Removed debug log - initialization state is tracked internally
       return;
     }
 
@@ -490,30 +487,14 @@ class HeaderSystem {
     // בדיקת מעבר עכבר לכפתורי פילטר
     setTimeout(() => {
       const filterButtons = document.querySelectorAll('.filter-toggle[data-onclick]');
-      console.log('🔍 Found filter buttons:', filterButtons.length);
-
       filterButtons.forEach((btn, index) => {
-        console.log(`🔍 Button ${index}:`, {
-          id: btn.id,
-          className: btn.className,
-          dataOnclick: btn.getAttribute('data-onclick'),
-          visible: btn.offsetParent !== null,
-          clickable: btn.offsetWidth > 0 && btn.offsetHeight > 0,
-        });
-
         // בדיקת מעבר עכבר
         btn.addEventListener('mouseenter', () => {
-          console.log('🖱️ Mouse ENTER on filter button:', btn.id, btn.getAttribute('data-onclick'));
+          // Mouse enter event tracked
         });
 
         btn.addEventListener('click', e => {
-          console.log('🖱️ CLICK on filter button:', btn.id, btn.getAttribute('data-onclick'));
-          console.log('🖱️ Event details:', {
-            target: e.target,
-            currentTarget: e.currentTarget,
-            bubbles: e.bubbles,
-            cancelable: e.cancelable,
-          });
+          // Click event tracked
         });
       });
     }, 1000);
@@ -537,6 +518,147 @@ class HeaderSystem {
         });
       }
     }, 100);
+
+    // ===== ניטור ובדיקה לתפריטי משנה - פתיחה כפולה =====
+    setTimeout(() => {
+      console.log('🔍 [HeaderSystem] Starting dropdown menu monitoring...');
+      
+      const dropdownItems = document.querySelectorAll('.tiktrack-nav-item.dropdown');
+      console.log(`🔍 [HeaderSystem] Found ${dropdownItems.length} dropdown menu items`);
+      
+      dropdownItems.forEach((item, index) => {
+        const menu = item.querySelector('.tiktrack-dropdown-menu');
+        if (!menu) {
+          console.warn(`⚠️ [HeaderSystem] Dropdown item ${index} has no menu`);
+          return;
+        }
+        
+        const menuId = menu.id || `menu-${index}`;
+        console.log(`🔍 [HeaderSystem] Monitoring dropdown ${index}:`, {
+          itemClass: item.className,
+          menuId: menuId,
+          menuVisible: menu.offsetParent !== null,
+          menuOpacity: window.getComputedStyle(menu).opacity,
+          menuVisibility: window.getComputedStyle(menu).visibility,
+          menuDisplay: window.getComputedStyle(menu).display,
+        });
+        
+        // ניטור mouseenter
+        item.addEventListener('mouseenter', (e) => {
+          const computedStyle = window.getComputedStyle(menu);
+          console.log(`🖱️ [HeaderSystem] MOUSEENTER on dropdown ${index}:`, {
+            menuId: menuId,
+            timestamp: new Date().toISOString(),
+            opacity: computedStyle.opacity,
+            visibility: computedStyle.visibility,
+            display: computedStyle.display,
+            transform: computedStyle.transform,
+            zIndex: computedStyle.zIndex,
+            eventTarget: e.target.tagName,
+            eventCurrentTarget: e.currentTarget.tagName,
+          });
+          
+          // בדיקה אם התפריט כבר פתוח
+          setTimeout(() => {
+            const afterStyle = window.getComputedStyle(menu);
+            const visibleMenus = document.querySelectorAll('.tiktrack-dropdown-menu[style*="opacity: 1"], .tiktrack-dropdown-menu[style*="visibility: visible"]');
+            const allMenus = document.querySelectorAll('.tiktrack-dropdown-menu');
+            
+            console.log(`📊 [HeaderSystem] After mouseenter (${index}):`, {
+              menuId: menuId,
+              opacity: afterStyle.opacity,
+              visibility: afterStyle.visibility,
+              display: afterStyle.display,
+              visibleMenusCount: visibleMenus.length,
+              totalMenusCount: allMenus.length,
+              allVisibleMenus: Array.from(visibleMenus).map(m => m.id || 'no-id'),
+            });
+            
+            // בדיקה אם יש תפריטים כפולים
+            if (visibleMenus.length > 1) {
+              console.warn(`⚠️ [HeaderSystem] Multiple menus visible! Count: ${visibleMenus.length}`);
+              visibleMenus.forEach((m, i) => {
+                console.warn(`  Menu ${i}:`, {
+                  id: m.id || 'no-id',
+                  parent: m.parentElement?.className || 'no-parent',
+                  opacity: window.getComputedStyle(m).opacity,
+                  visibility: window.getComputedStyle(m).visibility,
+                });
+              });
+            }
+          }, 50);
+        }, { capture: true });
+        
+        // ניטור mouseleave
+        item.addEventListener('mouseleave', (e) => {
+          const computedStyle = window.getComputedStyle(menu);
+          console.log(`🖱️ [HeaderSystem] MOUSELEAVE on dropdown ${index}:`, {
+            menuId: menuId,
+            timestamp: new Date().toISOString(),
+            opacity: computedStyle.opacity,
+            visibility: computedStyle.visibility,
+            display: computedStyle.display,
+          });
+        }, { capture: true });
+        
+        // ניטור שינויים ב-CSS
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+              const computedStyle = window.getComputedStyle(menu);
+              console.log(`🔄 [HeaderSystem] Style changed for dropdown ${index}:`, {
+                menuId: menuId,
+                opacity: computedStyle.opacity,
+                visibility: computedStyle.visibility,
+                display: computedStyle.display,
+                transform: computedStyle.transform,
+                newStyle: menu.getAttribute('style'),
+              });
+            }
+          });
+        });
+        
+        observer.observe(menu, {
+          attributes: true,
+          attributeFilter: ['style', 'class'],
+        });
+      });
+      
+      // בדיקת CSS rules שמשפיעים על התפריטים
+      console.log('🔍 [HeaderSystem] Checking CSS rules...');
+      const styleSheets = Array.from(document.styleSheets);
+      styleSheets.forEach((sheet, sheetIndex) => {
+        try {
+          const rules = Array.from(sheet.cssRules || sheet.rules || []);
+          rules.forEach((rule, ruleIndex) => {
+            if (rule.selectorText && (
+              rule.selectorText.includes('tiktrack-dropdown-menu') ||
+              rule.selectorText.includes('tiktrack-nav-item')
+            )) {
+              console.log(`📝 [HeaderSystem] CSS Rule found:`, {
+                sheetIndex: sheetIndex,
+                ruleIndex: ruleIndex,
+                selector: rule.selectorText,
+                href: sheet.href || 'inline',
+                cssText: rule.cssText.substring(0, 100),
+              });
+            }
+          });
+        } catch (e) {
+          // Cross-origin stylesheets may throw errors
+        }
+      });
+      
+      console.log('✅ [HeaderSystem] Dropdown menu monitoring initialized');
+      
+      // Display tracking info
+      console.log('\n📊 ===== MENU OPENING TRACKING ACTIVE =====');
+      console.log('💡 All menu open/close events are being tracked');
+      console.log('💡 Use window.printMenuTrackingSummary() to see summary');
+      console.log('💡 Use window.printMenuTrackingSummary("statusFilterMenu") for specific menu');
+      console.log('💡 Use window.getMenuTrackingSummary() for full data object');
+      console.log('==========================================\n');
+    }, 500);
   }
 
   static addStyles() {
@@ -1978,10 +2100,160 @@ function logFilterMenuDiagnostics(menuId) {
 // ===== Portal helpers for filter menus =====
 let __headerFilterPortals = new Map();
 
+// ===== ניטור מפורט לפתיחה כפולה =====
+let __menuOpenTracking = {
+  calls: new Map(), // Track all function calls
+  timestamps: new Map(), // Track timestamps
+  callCounts: new Map(), // Track call counts
+};
+
+function trackMenuOpen(functionName, menuId, details = {}) {
+  const timestamp = Date.now();
+  const callId = `${functionName}_${menuId}_${timestamp}`;
+  
+  // Get stack trace
+  const stack = new Error().stack;
+  const stackLines = stack ? stack.split('\n').slice(2, 8).map(line => line.trim()) : [];
+  
+  // Track call
+  const callInfo = {
+    functionName,
+    menuId,
+    timestamp,
+    callId,
+    stack: stackLines,
+    details,
+    previousCall: __menuOpenTracking.timestamps.get(`${functionName}_${menuId}`),
+  };
+  
+  __menuOpenTracking.calls.set(callId, callInfo);
+  __menuOpenTracking.timestamps.set(`${functionName}_${menuId}`, timestamp);
+  
+  const count = (__menuOpenTracking.callCounts.get(`${functionName}_${menuId}`) || 0) + 1;
+  __menuOpenTracking.callCounts.set(`${functionName}_${menuId}`, count);
+  
+  // Calculate time since previous call
+  const timeSincePrevious = callInfo.previousCall 
+    ? timestamp - callInfo.previousCall 
+    : null;
+  
+  console.log(`📊 [TRACK] ${functionName} called for ${menuId}:`, {
+    callNumber: count,
+    timestamp: new Date(timestamp).toISOString(),
+    timeSincePrevious: timeSincePrevious ? `${timeSincePrevious}ms` : 'first call',
+    details,
+    stack: stackLines.slice(0, 3), // First 3 stack lines
+  });
+  
+  // Check for rapid duplicate calls
+  if (timeSincePrevious !== null && timeSincePrevious < 100) {
+    console.warn(`⚠️ [TRACK] RAPID DUPLICATE CALL detected! ${functionName} for ${menuId} called ${timeSincePrevious}ms after previous call`);
+    console.warn(`   Previous call:`, __menuOpenTracking.calls.get(`${functionName}_${menuId}_${callInfo.previousCall}`));
+    console.warn(`   Current call:`, callInfo);
+  }
+  
+  return callInfo;
+}
+
+// Expose tracking for debugging
+window.__menuOpenTracking = __menuOpenTracking;
+window.trackMenuOpen = trackMenuOpen;
+
+// Function to get tracking summary
+window.getMenuTrackingSummary = function(menuId = null) {
+  const calls = Array.from(__menuOpenTracking.calls.values());
+  const filtered = menuId ? calls.filter(c => c.menuId === menuId) : calls;
+  
+  const summary = {
+    totalCalls: filtered.length,
+    byFunction: {},
+    byMenu: {},
+    rapidDuplicates: [],
+    timeline: filtered.sort((a, b) => a.timestamp - b.timestamp),
+  };
+  
+  filtered.forEach(call => {
+    // By function
+    if (!summary.byFunction[call.functionName]) {
+      summary.byFunction[call.functionName] = [];
+    }
+    summary.byFunction[call.functionName].push(call);
+    
+    // By menu
+    if (!summary.byMenu[call.menuId]) {
+      summary.byMenu[call.menuId] = [];
+    }
+    summary.byMenu[call.menuId].push(call);
+    
+    // Check for rapid duplicates
+    if (call.previousCall) {
+      const timeDiff = call.timestamp - call.previousCall;
+      if (timeDiff < 100) {
+        summary.rapidDuplicates.push({
+          functionName: call.functionName,
+          menuId: call.menuId,
+          timeDiff,
+          call1: call,
+          call2: __menuOpenTracking.calls.get(`${call.functionName}_${call.menuId}_${call.previousCall}`),
+        });
+      }
+    }
+  });
+  
+  return summary;
+};
+
+// Function to print tracking summary
+window.printMenuTrackingSummary = function(menuId = null) {
+  const summary = window.getMenuTrackingSummary(menuId);
+  
+  console.log('📊 ===== MENU TRACKING SUMMARY =====');
+  console.log(`Total calls tracked: ${summary.totalCalls}`);
+  if (menuId) {
+    console.log(`Filtered by menu: ${menuId}`);
+  }
+  
+  console.log('\n📈 By Function:');
+  Object.keys(summary.byFunction).forEach(funcName => {
+    console.log(`  ${funcName}: ${summary.byFunction[funcName].length} calls`);
+  });
+  
+  console.log('\n📋 By Menu:');
+  Object.keys(summary.byMenu).forEach(menu => {
+    console.log(`  ${menu}: ${summary.byMenu[menu].length} calls`);
+  });
+  
+  if (summary.rapidDuplicates.length > 0) {
+    console.log('\n⚠️ RAPID DUPLICATES DETECTED:');
+    summary.rapidDuplicates.forEach(dup => {
+      console.log(`  ${dup.functionName} for ${dup.menuId}: ${dup.timeDiff}ms apart`);
+    });
+  }
+  
+  console.log('\n⏱️ Timeline (first 10):');
+  summary.timeline.slice(0, 10).forEach(call => {
+    const time = new Date(call.timestamp).toISOString();
+    console.log(`  [${time}] ${call.functionName} - ${call.menuId}`);
+  });
+  
+  console.log('\n💡 Use window.getMenuTrackingSummary() for full data');
+  console.log('💡 Use window.getMenuTrackingSummary("statusFilterMenu") for specific menu');
+  
+  return summary;
+};
+
 function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
+  trackMenuOpen('openFilterMenuPortal', originalMenuEl.id, {
+    kind,
+    buttonId: anchorBtn?.id,
+    alreadyHasPortal: __headerFilterPortals.has(originalMenuEl.id),
+    menuHasShowClass: originalMenuEl.classList.contains('show'),
+  });
+  
   try {
     // If already portaled, just ensure position and return
     if (__headerFilterPortals.has(originalMenuEl.id)) {
+      console.log(`🔄 [TRACK] Portal already exists for ${originalMenuEl.id}, repositioning only`);
       positionPortal(__headerFilterPortals.get(originalMenuEl.id), anchorBtn);
       return;
     }
@@ -2036,15 +2308,29 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
       id: originalMenuEl.id,
       portalId: portal.id,
     });
+    
+    trackMenuOpen('openFilterMenuPortal_COMPLETE', originalMenuEl.id, {
+      kind,
+      portalId: portal.id,
+      portalCreated: true,
+    });
   } catch (e) {
     console.warn('⚠️ Failed to open portal menu:', e?.message);
   }
 }
 
 function closeFilterMenuPortal(originalMenuEl) {
+  trackMenuOpen('closeFilterMenuPortal', originalMenuEl.id, {
+    hasPortal: __headerFilterPortals.has(originalMenuEl.id),
+    menuHasShowClass: originalMenuEl.classList.contains('show'),
+  });
+  
   try {
     const portal = __headerFilterPortals.get(originalMenuEl.id);
-    if (!portal) return;
+    if (!portal) {
+      console.log(`⏭️ [TRACK] No portal to close for ${originalMenuEl.id}`);
+      return;
+    }
 
     // Fade out effect
     portal.style.opacity = '0';
@@ -2054,6 +2340,10 @@ function closeFilterMenuPortal(originalMenuEl) {
       portal.remove();
       __headerFilterPortals.delete(originalMenuEl.id);
       console.log('🧩 Portal removed for menu', originalMenuEl.id);
+      
+      trackMenuOpen('closeFilterMenuPortal_COMPLETE', originalMenuEl.id, {
+        portalRemoved: true,
+      });
     }, 200); // Match transition duration
   } catch (e) {
     console.warn('⚠️ Failed to close portal menu:', e?.message);
@@ -2079,19 +2369,30 @@ function positionPortal(portalEl, anchorBtn) {
 
 // ===== Auto-close other filter menus when opening one =====
 function closeAllFilterMenus() {
+  trackMenuOpen('closeAllFilterMenus', 'ALL', {
+    activePortals: Array.from(__headerFilterPortals.keys()),
+  });
+  
   const menuIds = [
     'statusFilterMenu',
     'typeFilterMenu',
     'accountFilterMenu',
     'dateRangeFilterMenu',
   ];
+  
+  const closedMenus = [];
   menuIds.forEach(id => {
     const menu = document.getElementById(id);
     if (menu && menu.classList.contains('show')) {
+      closedMenus.push(id);
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
     }
   });
+  
+  if (closedMenus.length > 0) {
+    console.log(`🔄 [TRACK] closeAllFilterMenus closed ${closedMenus.length} menus:`, closedMenus);
+  }
 
   // Also close any existing portals
   if (__headerFilterPortals) {
@@ -2385,7 +2686,25 @@ function updatePortalSelections() {
   }
 }
 
+// Track if setupHoverBehavior has been called to prevent duplicates
+let __setupHoverBehaviorCalled = false;
+
 function setupHoverBehavior() {
+  // Prevent duplicate calls
+  if (__setupHoverBehaviorCalled) {
+    console.warn('⚠️ [TRACK] setupHoverBehavior already called! Skipping duplicate call.');
+    console.trace('Stack trace of duplicate call:');
+    return;
+  }
+  
+  __setupHoverBehaviorCalled = true;
+  
+  trackMenuOpen('setupHoverBehavior', 'SYSTEM', {
+    timestamp: Date.now(),
+  });
+  
+  console.log('🔧 [TRACK] setupHoverBehavior called - checking for duplicate event listeners');
+  
   const filterButtons = [
     { buttonId: 'statusFilterToggle', menuId: 'statusFilterMenu', type: 'status' },
     { buttonId: 'typeFilterToggle', menuId: 'typeFilterMenu', type: 'type' },
@@ -2398,72 +2717,169 @@ function setupHoverBehavior() {
     const menu = document.getElementById(menuId);
 
     if (button && menu) {
+      // Check for existing event listeners BEFORE adding new ones
+      const existingListeners = getEventListeners(button);
+      console.log(`🔍 [TRACK] Button ${buttonId} existing listeners:`, {
+        mouseenter: existingListeners?.mouseenter?.length || 0,
+        mouseleave: existingListeners?.mouseleave?.length || 0,
+        click: existingListeners?.click?.length || 0,
+      });
+      
+      // Store reference to handlers for cleanup
+      if (!button.__hoverHandlers) {
+        button.__hoverHandlers = {
+          mouseenter: null,
+          mouseleave: null,
+          click: null,
+        };
+      } else {
+        // Remove old handlers if they exist
+        console.warn(`⚠️ [TRACK] Button ${buttonId} already has hover handlers! Removing old ones...`);
+        if (button.__hoverHandlers.mouseenter) {
+          button.removeEventListener('mouseenter', button.__hoverHandlers.mouseenter);
+        }
+        if (button.__hoverHandlers.mouseleave) {
+          button.removeEventListener('mouseleave', button.__hoverHandlers.mouseleave);
+        }
+        if (button.__hoverHandlers.click) {
+          button.removeEventListener('click', button.__hoverHandlers.click, true);
+        }
+      }
+      
       // Remove existing click handlers
       button.removeAttribute('data-onclick');
 
       // Prevent click events from triggering toggle actions
-      button.addEventListener(
-        'click',
-        e => {
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          console.log(`🚫 Click prevented on ${buttonId}`);
-          return false;
-        },
-        true
-      ); // Use capture phase to catch before other handlers
+      const clickHandler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        console.log(`🚫 Click prevented on ${buttonId}`);
+        return false;
+      };
+      button.__hoverHandlers.click = clickHandler;
+      button.addEventListener('click', clickHandler, true); // Use capture phase to catch before other handlers
 
       // Add hover events
-      button.addEventListener('mouseenter', () => {
+      const mouseenterHandler = (e) => {
+        // Prevent event bubbling
+        if (e) {
+          e.stopPropagation();
+        }
+        
+        trackMenuOpen('mouseenter_HOVER', menuId, {
+          buttonId,
+          type,
+          menuHasShowClass: menu.classList.contains('show'),
+          hasExistingTimeout: hoverTimeouts.has(buttonId),
+          eventTarget: e?.target?.tagName,
+          eventCurrentTarget: e?.currentTarget?.tagName,
+        });
+        
         // Clear any existing timeout
         if (hoverTimeouts.has(buttonId)) {
-          clearTimeout(hoverTimeouts.get(buttonId));
+          const existingTimeout = hoverTimeouts.get(buttonId);
+          clearTimeout(existingTimeout);
           hoverTimeouts.delete(buttonId);
+          console.log(`🔄 [TRACK] Cleared existing hover timeout for ${buttonId}`);
         }
 
         // Open menu after short delay
-        hoverTimeouts.set(
-          buttonId,
-          setTimeout(() => {
-            if (!menu.classList.contains('show')) {
-              closeAllFilterMenus();
-              menu.classList.add('show');
-              openFilterMenuPortal(menu, button, type);
-              console.log(`🖱️ Hover opened ${menuId}`);
-            }
-          }, 150)
-        ); // 150ms delay
-      });
+        const timeoutId = setTimeout(() => {
+          trackMenuOpen('hoverTimeout_EXECUTE', menuId, {
+            buttonId,
+            type,
+            menuHasShowClass: menu.classList.contains('show'),
+            delay: 150,
+          });
+          
+          if (!menu.classList.contains('show')) {
+            trackMenuOpen('hoverTimeout_OPENING', menuId, {
+              buttonId,
+              type,
+              action: 'opening menu',
+            });
+            
+            closeAllFilterMenus();
+            menu.classList.add('show');
+            openFilterMenuPortal(menu, button, type);
+            console.log(`🖱️ Hover opened ${menuId}`);
+          } else {
+            console.log(`⏭️ [TRACK] Menu ${menuId} already has 'show' class, skipping open`);
+          }
+        }, 150); // 150ms delay
+        
+        hoverTimeouts.set(buttonId, timeoutId);
+        console.log(`⏰ [TRACK] Set hover timeout for ${buttonId}, will execute in 150ms`);
+      };
+      button.__hoverHandlers.mouseenter = mouseenterHandler;
+      button.addEventListener('mouseenter', mouseenterHandler);
 
-      button.addEventListener('mouseleave', () => {
+      const mouseleaveHandler = (e) => {
+        // Prevent event bubbling
+        if (e) {
+          e.stopPropagation();
+        }
+        
+        trackMenuOpen('mouseleave_HOVER', menuId, {
+          buttonId,
+          type,
+          menuHasShowClass: menu.classList.contains('show'),
+          hasExistingTimeout: hoverTimeouts.has(buttonId),
+          eventTarget: e?.target?.tagName,
+          eventCurrentTarget: e?.currentTarget?.tagName,
+        });
+        
         // Clear open timeout
         if (hoverTimeouts.has(buttonId)) {
-          clearTimeout(hoverTimeouts.get(buttonId));
+          const existingTimeout = hoverTimeouts.get(buttonId);
+          clearTimeout(existingTimeout);
           hoverTimeouts.delete(buttonId);
+          console.log(`🔄 [TRACK] Cleared hover timeout on mouseleave for ${buttonId}`);
         }
 
         // Defer close; only close if neither button nor portal is hovered
-        hoverTimeouts.set(
-          buttonId,
-          setTimeout(() => {
-            const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
-            const buttonHovered = button.matches(':hover');
-            const portalHovered = portal ? portal.matches(':hover') : false;
-            const menuHovered = menu.matches(':hover');
-            if (
-              !buttonHovered &&
-              !portalHovered &&
-              !menuHovered &&
-              menu.classList.contains('show')
-            ) {
-              menu.classList.remove('show');
-              closeFilterMenuPortal(menu);
-              console.log(`🖱️ Hover closed ${menuId}`);
-            }
-          }, 220)
-        ); // short defer to allow cursor to enter portal
-      });
+        const timeoutId = setTimeout(() => {
+          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+          const buttonHovered = button.matches(':hover');
+          const portalHovered = portal ? portal.matches(':hover') : false;
+          const menuHovered = menu.matches(':hover');
+          
+          trackMenuOpen('mouseleaveTimeout_CHECK', menuId, {
+            buttonId,
+            type,
+            buttonHovered,
+            portalHovered,
+            menuHovered,
+            menuHasShowClass: menu.classList.contains('show'),
+            hasPortal: !!portal,
+          });
+          
+          if (
+            !buttonHovered &&
+            !portalHovered &&
+            !menuHovered &&
+            menu.classList.contains('show')
+          ) {
+            trackMenuOpen('mouseleaveTimeout_CLOSING', menuId, {
+              buttonId,
+              type,
+              action: 'closing menu',
+            });
+            
+            menu.classList.remove('show');
+            closeFilterMenuPortal(menu);
+            console.log(`🖱️ Hover closed ${menuId}`);
+          } else {
+            console.log(`⏭️ [TRACK] Menu ${menuId} not closed - still hovered or not showing`);
+          }
+        }, 220); // short defer to allow cursor to enter portal
+        
+        hoverTimeouts.set(buttonId, timeoutId);
+        console.log(`⏰ [TRACK] Set close timeout for ${buttonId}, will check in 220ms`);
+      };
+      button.__hoverHandlers.mouseleave = mouseleaveHandler;
+      button.addEventListener('mouseleave', mouseleaveHandler);
 
       // Also handle menu hover to keep it open
       menu.addEventListener('mouseenter', () => {

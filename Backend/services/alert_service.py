@@ -3,7 +3,7 @@ from sqlalchemy import func, case
 from models.alert import Alert
 from models.note_relation_type import NoteRelationType
 from services.validation_service import ValidationService
-from datetime import datetime
+from datetime import datetime, date
 import logging
 from typing import List, Optional, Dict, Any
 
@@ -481,7 +481,6 @@ class AlertService:
                 
                 # At this point, expiry_date should be a date object
                 # (converted in alerts.py from DateEnvelope/datetime/string)
-                from datetime import date
                 if isinstance(expiry_date, date):
                     # Valid date object - no further validation needed
                     logger.debug(f"expiry_date is valid date object: {expiry_date}")

@@ -9,6 +9,8 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from config.settings import DB_PATH
+
 # Add Backend to path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
@@ -21,7 +23,7 @@ def cleanup_old_import_sessions():
     """Clean up import sessions older than 90 days"""
     
     # Database path
-    db_path = backend_dir / "db" / "simpleTrade_new.db"
+    db_path = Path(DB_PATH)
     
     if not db_path.exists():
         print(f"❌ Database not found at: {db_path}")

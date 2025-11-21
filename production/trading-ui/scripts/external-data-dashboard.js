@@ -481,6 +481,68 @@
     }
 
     /**
+     * Initialize performance monitoring
+     * @returns {void}
+     */
+    initializePerformanceMonitoring() {
+      // Update performance info when page loads
+      const updatePerformanceInfo = () => {
+        // Page load time
+        const loadTimeElement = getElement('page-load-time');
+        if (loadTimeElement && window.performance && window.performance.timing) {
+          const loadTime = window.performance.timing.loadEventEnd - window.performance.timing.navigationStart;
+          if (!Number.isNaN(loadTime) && loadTime >= 0) {
+            loadTimeElement.textContent = `${Math.round(loadTime)}ms`;
+          } else {
+            // Fallback to performance.now() if timing is not available
+            const pageLoadTime = performance.now();
+            loadTimeElement.textContent = `${Math.round(pageLoadTime)}ms`;
+          }
+        } else if (loadTimeElement) {
+          // Fallback if performance.timing is not available
+          const pageLoadTime = performance.now();
+          loadTimeElement.textContent = `${Math.round(pageLoadTime)}ms`;
+        }
+
+        // Memory usage
+        const memoryElement = getElement('memory-usage');
+        if (memoryElement && window.performance && window.performance.memory) {
+          const memoryUsedMB = Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024 * 100) / 100;
+          memoryElement.textContent = `${memoryUsedMB}MB`;
+        } else if (memoryElement) {
+          memoryElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+
+        // User Agent
+        const userAgentElement = getElement('user-agent');
+        if (userAgentElement && navigator.userAgent) {
+          const userAgent = navigator.userAgent;
+          // Truncate to 50 characters if too long
+          userAgentElement.textContent = userAgent.length > 50 
+            ? userAgent.substring(0, 50) + '...' 
+            : userAgent;
+        }
+
+        // Platform
+        const platformElement = getElement('platform');
+        if (platformElement && navigator.platform) {
+          platformElement.textContent = navigator.platform;
+        }
+      };
+
+      // Update immediately if DOM is ready
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        // Small delay to ensure performance metrics are available
+        setTimeout(updatePerformanceInfo, 100);
+      } else {
+        // Wait for page load
+        window.addEventListener('load', () => {
+          setTimeout(updatePerformanceInfo, 100);
+        });
+      }
+    }
+
+    /**
      * Initialize the dashboard
      * @returns {Promise<void>}
      */
@@ -494,6 +556,7 @@
 
       this.initializeHeader();
       this.setupEventListeners();
+      this.initializePerformanceMonitoring();
 
       try {
         await this.loadInitialData();
@@ -620,7 +683,23 @@
         const duration = performance.now() - startTime;
         const result = payload?.data || {};
         const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
-        const fetched = Number.isFinite(Number(result.fetched)) ? Number(result.fetched) : 0;
+        // Handle case where fetched might be an object (due to middleware timestamp conversion bug)
+        // The DateNormalizationService incorrectly converts "fetched" (a count) to a timestamp
+        let fetched = 0;
+        if (typeof result.fetched === 'number') {
+          fetched = Number.isFinite(result.fetched) ? result.fetched : 0;
+        } else if (typeof result.fetched === 'object' && result.fetched !== null) {
+          // If middleware incorrectly converted count to timestamp object, we can't reliably recover it
+          // The epochMs value represents milliseconds since epoch, not the original count
+          // e.g., fetched=1 might become epochMs=1000 (1 second), not 1000 items
+          // With the Backend fix, this should no longer happen, but handle it gracefully
+          fetched = 0; // Can't reliably determine, treat as unknown/error
+          logger.warn(`${MODULE_NAME}:refresh-all:fetched-converted-to-timestamp`, {
+            fetched_object: result.fetched,
+            requested,
+            message: 'fetched was incorrectly converted to timestamp by middleware - treating as 0'
+          });
+        }
         const failedSymbols = Array.isArray(result.failed_symbols) ? result.failed_symbols : [];
         const skippedEntries = Array.isArray(result.skipped) ? result.skipped : [];
 
@@ -648,10 +727,19 @@
           developerDetails.push(`• מזהה בקשה: ${safeText(payload.requestId)}`);
         }
 
-        if (failedSymbols.length) {
+        // Always show failed symbols if any, or indicate which symbols were requested but not fetched
+        if (failedSymbols.length > 0) {
           const truncatedFailed = failedSymbols.slice(0, 10).join(', ');
           const hasMoreFailures = failedSymbols.length > 10 ? ' (קיימים נוספים…) ' : '';
           developerDetails.push(`• סימבולים שנכשלו: ${truncatedFailed}${hasMoreFailures}`);
+        } else if (requested > 0 && fetched === 0) {
+          // If we requested symbols but got 0, something went wrong but failed_symbols is empty
+          // This can happen if the API doesn't return failed_symbols properly
+          developerDetails.push(`• סימבולים שנכשלו: כל הסימבולים (${requested} טיקרים לא הצליחו להיטען)`);
+        } else if (requested > 0 && fetched < requested && failedSymbols.length === 0) {
+          // Partial failure but no failed_symbols returned - try to infer from requested vs fetched
+          const missingCount = requested - fetched;
+          developerDetails.push(`• סימבולים שנכשלו: ${missingCount} טיקרים (רשימה לא זמינה מה-API)`);
         }
 
         if (skippedEntries.length) {
@@ -751,6 +839,25 @@
       this.renderStatusIndicators(data);
       this.updateProviderLastUpdateTimes(data ? data.providers?.details || [] : []);
       this.updateStatisticsCards(data);
+      
+      // Update cache stats display with fresh status data
+      if (data?.cache) {
+        this.cacheStats = {
+          status: 'success',
+          data: {
+            total_entries: data.cache.total_quotes || 0,
+            expired_entries: data.cache.stale_data_count || 0,
+            hit_rate: data.cache.cache_hit_rate || 0,
+            estimated_memory_mb: 0 // Not available from status endpoint
+          }
+        };
+        this.renderCacheStats();
+      }
+      
+      // Update cache settings display with fresh status data
+      this.updateCurrentSettings().catch(error => {
+        logger.error(`${MODULE_NAME}:update-current-settings:failed`, { error });
+      });
       this.updateChartsFromStatus(data).catch((error) => {
         logger.error(`${MODULE_NAME}:update-charts-failed`, { error });
       });
@@ -1027,7 +1134,35 @@
      * @returns {Promise<void>}
      */
     async updateChartsFromStatus(data) {
+      if (!data) {
+        return;
+      }
+
+      // Check if charts section is visible before creating charts
+      const chartsSection = document.getElementById('charts-section');
+      const isChartsSectionVisible = chartsSection && 
+        chartsSection.querySelector('.section-body')?.style.display !== 'none';
+
+      // Only create charts if section is visible
+      if (!isChartsSectionVisible) {
+        logger.debug(`${MODULE_NAME}:charts-section-hidden`, { message: 'Charts section is hidden, skipping chart updates' });
+        return;
+      }
+
+      // Ensure Chart.js is loaded and defaults are configured
+      if (window.Chart && window.ChartLoader) {
+        try {
+          await window.ChartLoader.load();
+          if (typeof window.ChartLoader._configureDefaults === 'function') {
+            window.ChartLoader._configureDefaults();
+          }
+        } catch (error) {
+          logger.warn(`${MODULE_NAME}:chart-loader-config`, { error });
+        }
+      }
+
       await Promise.all([
+        this.updateResponseTimeChart(),
         this.updateDataQualityChart(data),
         this.updateProviderComparisonChart(data),
         this.updateErrorAnalysisChart()
@@ -1146,20 +1281,39 @@
      */
     async loadCacheStats(showNotification = false) {
       try {
-        const response = await fetch('/api/cache/stats');
+        // Try to get from external data cache stats endpoint
+        let response = await fetch('/api/external-data/status/cache/stats');
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+          // Fallback to general cache stats
+          response = await fetch('/api/cache/stats');
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`${response.status} ${response.statusText} - ${errorText}`);
+          }
         }
         const data = await response.json();
         this.cacheStats = data;
         this.renderCacheStats();
         if (showNotification) {
           notification.success('נתוני מטמון', 'סטטיסטיקות המטמון נטענו בהצלחה');
-      }
-    } catch (error) {
-        this.cacheStats = null;
-        this.renderCacheStats();
+        }
+      } catch (error) {
+        // If statusData is available, use cache data from there
+        if (this.statusData?.cache) {
+          this.cacheStats = {
+            status: 'success',
+            data: {
+              total_entries: this.statusData.cache.total_quotes || 0,
+              expired_entries: this.statusData.cache.stale_data_count || 0,
+              hit_rate: this.statusData.cache.cache_hit_rate || 0,
+              estimated_memory_mb: 0 // Not available from status endpoint
+            }
+          };
+          this.renderCacheStats();
+        } else {
+          this.cacheStats = null;
+          this.renderCacheStats();
+        }
         this.handleError('שגיאה בטעינת סטטיסטיקות מטמון', error, 'load-cache-stats');
       }
     }
@@ -1173,62 +1327,176 @@
       if (!cacheStatsElement) {
         return;
       }
-      if (!this.cacheStats || this.cacheStats.status !== 'success') {
+
+      // Try to get stats from cacheStats first, then from statusData
+      let stats = null;
+      
+      if (this.cacheStats && this.cacheStats.status === 'success') {
+        stats = this.cacheStats.data;
+      } else if (this.statusData?.cache) {
+        // Use cache data from status endpoint
+        stats = {
+          total_entries: this.statusData.cache.total_quotes || 0,
+          expired_entries: this.statusData.cache.stale_data_count || 0,
+          hit_rate: this.statusData.cache.cache_hit_rate || 0,
+          estimated_memory_mb: 0 // Not available from status endpoint
+        };
+      }
+
+      if (!stats) {
         cacheStatsElement.innerHTML = '<div class="text-muted text-center p-3">נתוני מטמון לא זמינים</div>';
         return;
       }
 
-      const stats = this.cacheStats.data;
-    cacheStatsElement.innerHTML = `
+      // Handle both formats: external-data format (total_quotes) and general format (total_entries)
+      const totalEntries = stats.total_entries || stats.total_quotes || 0;
+      const expiredEntries = stats.expired_entries || stats.stale_data || stats.stale_data_count || 0;
+      const hitRate = stats.hit_rate || stats.cache_hit_rate || 0;
+      const memoryMB = stats.estimated_memory_mb || stats.memory_usage_mb || 0;
+
+      cacheStatsElement.innerHTML = `
             <div class="cache-stats-grid">
                 <div class="stat-card">
-            <div class="stat-value">${formatNumber(stats.total_entries)}</div>
+            <div class="stat-value">${formatNumber(totalEntries)}</div>
             <div class="stat-label">רשומות במטמון</div>
                 </div>
                 <div class="stat-card">
-            <div class="stat-value">${formatNumber(stats.expired_entries)}</div>
+            <div class="stat-value">${formatNumber(expiredEntries)}</div>
             <div class="stat-label">רשומות פג תוקף</div>
                 </div>
                 <div class="stat-card">
-            <div class="stat-value">${formatPercent(stats.hit_rate)}</div>
+            <div class="stat-value">${formatPercent(hitRate)}</div>
                     <div class="stat-label">אחוז פגיעות</div>
                 </div>
                 <div class="stat-card">
-            <div class="stat-value">${formatDecimal(stats.estimated_memory_mb, 2)}MB</div>
+            <div class="stat-value">${formatDecimal(memoryMB, 2)}MB</div>
             <div class="stat-label">שימוש בזיכרון</div>
                 </div>
             </div>
         `;
 
-      this.updateCurrentSettings(stats);
+      // Update current settings from status data (not from cache stats)
+      this.updateCurrentSettings().catch(error => {
+        logger.error(`${MODULE_NAME}:update-current-settings:failed`, { error });
+      });
     }
 
     /**
      * Update current cache settings display
-     * @param {Object} cacheStats - Cache statistics object
-     * @returns {void}
+     * Loads settings from status data (providers) and cache TTL settings
+     * @returns {Promise<void>}
      */
-    updateCurrentSettings(cacheStats) {
+    async updateCurrentSettings() {
       const hotCacheElement = getElement('current-hot-cache');
       const warmCacheElement = getElement('current-warm-cache');
       const maxRequestsElement = getElement('current-max-requests');
 
-      if (hotCacheElement) {
-        hotCacheElement.textContent = cacheStats?.hot_ttl_minutes
-          ? `${formatNumber(cacheStats.hot_ttl_minutes)} דקות`
-          : NOT_AVAILABLE_TEXT;
-      }
+      try {
+        // Try to get settings from status data if available
+        if (this.statusData?.providers?.details && this.statusData.providers.details.length > 0) {
+          const yahooProvider = this.statusData.providers.details.find(p => p.name === 'yahoo_finance');
+          logger.debug(`${MODULE_NAME}:update-current-settings:yahoo-provider`, { 
+            found: !!yahooProvider,
+            provider: yahooProvider ? {
+              name: yahooProvider.name,
+              cache_ttl_hot: yahooProvider.cache_ttl_hot,
+              cache_ttl_warm: yahooProvider.cache_ttl_warm,
+              rate_limit_per_hour: yahooProvider.rate_limit_per_hour
+            } : null
+          });
+          
+          if (yahooProvider) {
+            // Get from provider settings
+            // cache_ttl_hot and cache_ttl_warm are in SECONDS, convert to minutes
+            const hotTtlMinutes = yahooProvider.cache_ttl_hot != null ? Math.round(yahooProvider.cache_ttl_hot / 60) : null;
+            const warmTtlMinutes = yahooProvider.cache_ttl_warm != null ? Math.round(yahooProvider.cache_ttl_warm / 60) : null;
+            const maxRequests = yahooProvider.rate_limit_per_hour != null ? yahooProvider.rate_limit_per_hour : null;
 
-      if (warmCacheElement) {
-        warmCacheElement.textContent = cacheStats?.warm_ttl_minutes
-          ? `${formatNumber(cacheStats.warm_ttl_minutes)} דקות`
-          : NOT_AVAILABLE_TEXT;
-      }
+            logger.debug(`${MODULE_NAME}:update-current-settings:values`, {
+              hotTtlMinutes,
+              warmTtlMinutes,
+              maxRequests,
+              hotCacheElement: !!hotCacheElement,
+              warmCacheElement: !!warmCacheElement,
+              maxRequestsElement: !!maxRequestsElement
+            });
+            
+            if (hotCacheElement) {
+              hotCacheElement.textContent = hotTtlMinutes !== null && hotTtlMinutes !== undefined
+                ? `${formatNumber(hotTtlMinutes)} דקות`
+                : NOT_AVAILABLE_TEXT;
+            }
 
-      if (maxRequestsElement) {
-        maxRequestsElement.textContent = cacheStats?.max_requests_per_hour
-          ? `${formatNumber(cacheStats.max_requests_per_hour)} לשעה`
-          : NOT_AVAILABLE_TEXT;
+            if (warmCacheElement) {
+              warmCacheElement.textContent = warmTtlMinutes !== null && warmTtlMinutes !== undefined
+                ? `${formatNumber(warmTtlMinutes)} דקות`
+                : NOT_AVAILABLE_TEXT;
+            }
+
+            if (maxRequestsElement) {
+              maxRequestsElement.textContent = maxRequests !== null && maxRequests !== undefined
+                ? `${formatNumber(maxRequests)} לשעה`
+                : NOT_AVAILABLE_TEXT;
+            }
+            
+            logger.debug(`${MODULE_NAME}:update-current-settings:success`, {
+              hotCacheText: hotCacheElement?.textContent,
+              warmCacheText: warmCacheElement?.textContent,
+              maxRequestsText: maxRequestsElement?.textContent
+            });
+            
+            return;
+          } else {
+            logger.warn(`${MODULE_NAME}:update-current-settings:yahoo-not-found`, {
+              providers: this.statusData.providers.details.map(p => p.name)
+            });
+          }
+        } else {
+          logger.warn(`${MODULE_NAME}:update-current-settings:no-providers`, {
+            hasStatusData: !!this.statusData,
+            hasProviders: !!this.statusData?.providers,
+            hasDetails: !!this.statusData?.providers?.details,
+            detailsLength: this.statusData?.providers?.details?.length || 0
+          });
+        }
+
+        // Fallback: Try to get from cache TTL settings in status
+        if (this.statusData?.cache?.ttl_minutes) {
+          const ttlMinutes = this.statusData.cache.ttl_minutes;
+          const hotTtl = ttlMinutes.hot || ttlMinutes.hot_ttl || null;
+          const warmTtl = ttlMinutes.warm || ttlMinutes.warm_ttl || null;
+
+          if (hotCacheElement && hotTtl) {
+            hotCacheElement.textContent = `${formatNumber(hotTtl)} דקות`;
+          }
+          if (warmCacheElement && warmTtl) {
+            warmCacheElement.textContent = `${formatNumber(warmTtl)} דקות`;
+          }
+        }
+
+        // Load fresh status if not available
+        if (!this.statusData) {
+          await this.loadSystemStatus();
+          // Recursive call with fresh data
+          await this.updateCurrentSettings();
+          return;
+        }
+
+        // Set to NOT_AVAILABLE if still not found
+        if (hotCacheElement && !hotCacheElement.textContent) {
+          hotCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+        if (warmCacheElement && !warmCacheElement.textContent) {
+          warmCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+        if (maxRequestsElement && !maxRequestsElement.textContent) {
+          maxRequestsElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:update-current-settings:error`, { error });
+        if (hotCacheElement) hotCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        if (warmCacheElement) warmCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        if (maxRequestsElement) maxRequestsElement.textContent = NOT_AVAILABLE_TEXT;
       }
     }
 
@@ -2326,8 +2594,12 @@
       const selector = '#responseTimeChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas || !this.performanceSamples.length) {
-        this.destroyChart(chartId, 'responseTimeChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent || !this.performanceSamples.length) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'responseTimeChart');
+        }
         return;
       }
 
@@ -2355,6 +2627,19 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            },
+            title: {
+              display: false
+            }
+          },
           scales: {
             y: {
               beginAtZero: true
@@ -2386,8 +2671,12 @@
       const selector = '#dataQualityChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas || !data?.cache) {
-        this.destroyChart(chartId, 'dataQualityChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent || !data?.cache) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'dataQualityChart');
+        }
         return;
       }
 
@@ -2410,7 +2699,20 @@
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            },
+            title: {
+              display: false
+            }
+          }
         }
       };
 
@@ -2437,8 +2739,12 @@
       const selector = '#providerComparisonChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas || !data?.providers?.details?.length) {
-        this.destroyChart(chartId, 'providerComparisonChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent || !data?.providers?.details?.length) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'providerComparisonChart');
+        }
         return;
       }
 
@@ -2469,6 +2775,19 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            },
+            title: {
+              display: false
+            }
+          },
           scales: {
             y: {
               beginAtZero: true
@@ -2499,8 +2818,12 @@
       const selector = '#errorAnalysisChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas) {
-        this.destroyChart(chartId, 'errorAnalysisChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'errorAnalysisChart');
+        }
         return;
       }
 
@@ -2541,6 +2864,19 @@
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            },
+            title: {
+              display: false
+            }
+          },
           scales: {
             x: {
               beginAtZero: true
@@ -2829,61 +3165,38 @@ window.ExternalDataDashboard = ExternalDataDashboard;
 
   if (!window.externalDataDashboard) {
     window.externalDataDashboard = new ExternalDataDashboard();
+    // Auto-initialize when DOM is ready (fallback if core-systems.js doesn't initialize it)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', async () => {
+        if (!window.externalDataDashboard.isInitialized) {
+          try {
+            await window.externalDataDashboard.init();
+          } catch (error) {
+            logger.error(`${MODULE_NAME}:auto-init-failed`, { error });
+          }
+        }
+      });
+    } else {
+      // DOM already loaded, initialize immediately if not already initialized
+      if (!window.externalDataDashboard.isInitialized) {
+        window.externalDataDashboard.init().catch((error) => {
+          logger.error(`${MODULE_NAME}:auto-init-failed`, { error });
+        });
+      }
+    }
   }
 
   /**
-   * Toggle all sections visibility
-   * @returns {void}
+   * NOTE: toggleSection and toggleAllSections are provided by the general system
+   * in ui-basic.js / ui-utils.js. Do not override them here.
+   * The general system handles:
+   * - Proper section-body toggling (not entire section)
+   * - State persistence via UnifiedCacheManager
+   * - Accordion mode support
+   * - Icon management
+   * 
+   * If you need custom section toggle behavior, extend the general system instead.
    */
-  window.toggleAllSections = function () {
-    const sections = document.querySelectorAll('.section-content, .section-body');
-    const toggleBtn = document.querySelector('.filter-toggle-btn .section-toggle-icon');
-    if (!sections.length) {
-      return;
-    }
-    const shouldExpand = Array.from(sections).some(
-      (section) => section.style.display === 'none' || section.classList.contains('collapsed')
-    );
-    sections.forEach((section) => {
-      if (shouldExpand) {
-        section.style.display = 'block';
-        section.classList.remove('collapsed');
-      } else {
-        section.style.display = 'none';
-        section.classList.add('collapsed');
-      }
-    });
-    if (toggleBtn) {
-      toggleBtn.textContent = shouldExpand ? '▼' : '▶';
-    }
-  };
-
-  /**
-   * Toggle section visibility by ID
-   * @param {string} sectionId - Section ID to toggle
-   * @returns {void}
-   */
-  window.toggleSection = function (sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) {
-      return;
-    }
-    const icon = document.querySelector(`[onclick*="${sectionId}"] .section-toggle-icon`);
-    const isCollapsed = section.style.display === 'none' || section.classList.contains('collapsed');
-    if (isCollapsed) {
-      section.style.display = 'block';
-      section.classList.remove('collapsed');
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    } else {
-      section.style.display = 'none';
-      section.classList.add('collapsed');
-      if (icon) {
-        icon.textContent = '▶';
-      }
-    }
-  };
 
   /**
    * Copy detailed log to clipboard (local wrapper)

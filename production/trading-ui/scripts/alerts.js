@@ -592,9 +592,12 @@ function renderAlertsTableRows(alerts) {
       const createdEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(createdSource)
         : createdSource;
+      // Use dateUtils for consistent date parsing
       const createdDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(createdEnvelope || null)
-        : (createdEnvelope ? new Date(createdEnvelope) : null);
+        : (createdEnvelope && typeof createdEnvelope === 'object' && typeof createdEnvelope.epochMs === 'number'
+          ? new Date(createdEnvelope.epochMs)
+          : (createdEnvelope ? new Date(createdEnvelope) : null));
       const createdAtDisplay = createdEnvelope
         ? (
             window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'
@@ -604,13 +607,24 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (createdDateObj && !Number.isNaN(createdDateObj.getTime())) {
-                        return window.formatDate ? window.formatDate(createdDateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(createdDateObj, { includeTime: true }) : createdDateObj.toLocaleString('he-IL', {
+                        // Use FieldRendererService or dateUtils for formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(createdDateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(createdDateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(createdDateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
+                        return createdDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
                           day: '2-digit',
                           hour: '2-digit',
                           minute: '2-digit'
-                        }));
+                        });
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ createdAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
@@ -650,9 +664,12 @@ function renderAlertsTableRows(alerts) {
       const triggeredEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(triggeredSource)
         : triggeredSource;
+      // Use dateUtils for consistent date parsing
       const triggeredDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(triggeredEnvelope || null)
-        : (triggeredEnvelope ? new Date(triggeredEnvelope) : null);
+        : (triggeredEnvelope && typeof triggeredEnvelope === 'object' && typeof triggeredEnvelope.epochMs === 'number'
+          ? new Date(triggeredEnvelope.epochMs)
+          : (triggeredEnvelope ? new Date(triggeredEnvelope) : null));
       const triggeredAtDisplay = triggeredEnvelope
         ? (
             window.FieldRendererService?.renderDate
@@ -662,13 +679,24 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (triggeredDateObj && !Number.isNaN(triggeredDateObj.getTime())) {
-                        return window.formatDate ? window.formatDate(triggeredDateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(triggeredDateObj, { includeTime: true }) : triggeredDateObj.toLocaleString('he-IL', {
+                        // Use FieldRendererService or dateUtils for formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(triggeredDateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(triggeredDateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(triggeredDateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
+                        return triggeredDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
                           day: '2-digit',
                           hour: '2-digit',
                           minute: '2-digit'
-                        }));
+                        });
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ triggeredAt fallback formatting failed', { error, alertId: alert?.id }, { page: 'alerts' });
@@ -747,9 +775,12 @@ function renderAlertsTableRows(alerts) {
       const expiryEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(expirySource)
         : expirySource;
+      // Use dateUtils for consistent date parsing
       const expiryDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(expiryEnvelope || null)
-        : (expiryEnvelope ? new Date(expiryEnvelope) : null);
+        : (expiryEnvelope && typeof expiryEnvelope === 'object' && typeof expiryEnvelope.epochMs === 'number'
+          ? new Date(expiryEnvelope.epochMs)
+          : (expiryEnvelope ? new Date(expiryEnvelope) : null));
       const expiryDisplay = expiryEnvelope
         ? (
             window.FieldRendererService?.renderDate
@@ -759,7 +790,18 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (expiryDateObj && !Number.isNaN(expiryDateObj.getTime())) {
-                        return window.formatDate ? window.formatDate(expiryDateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(expiryDateObj) : expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+                        // Use FieldRendererService or dateUtils for formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(expiryDateObj, false);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(expiryDateObj);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(expiryDateObj, { includeTime: false });
+                        }
+                        // Last resort: use toLocaleDateString
+                        return expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
                       }
                     } catch (error) {
                       window.Logger?.warn('⚠️ expiry date fallback failed', { error, alertId: alert?.id }, { page: 'alerts' });

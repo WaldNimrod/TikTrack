@@ -1,0 +1,44 @@
+{
+  "start_time": "2025-11-21T21:36:32.395414",
+  "steps": [
+    {
+      "number": 5,
+      "name": "sync_code",
+      "success": false,
+      "duration_seconds": 0.0001819133758544922,
+      "timestamp": "2025-11-21T21:36:32.404919",
+      "details": {
+        "success": false,
+        "error": "name 'os' is not defined"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Code sync error: name 'os' is not defined",
+      "step": "sync_code",
+      "timestamp": "2025-11-21T21:36:32.404895"
+    },
+    {
+      "message": "Step 5 (sync_code) failed",
+      "step": "sync_code",
+      "timestamp": "2025-11-21T21:36:32.404921"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.009842,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-21T21:36:32.405256",
+  "success": false
+}

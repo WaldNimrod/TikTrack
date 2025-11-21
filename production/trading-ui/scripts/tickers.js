@@ -1735,6 +1735,7 @@ function renderTickersTableRows(tickers) {
       if (value instanceof Date) {
         return Number.isNaN(value.getTime()) ? null : value;
       }
+      // Use dateUtils for consistent date parsing
       if (typeof value === 'object') {
         const nestedCandidate = value.local || value.utc || value.iso || value.timestamp;
         return parseValidDate(nestedCandidate);

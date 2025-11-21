@@ -1,12 +1,12 @@
 {
-  "snapshot_id": "pre-update_20251121_213516",
+  "snapshot_id": "pre-update_20251121_215441",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-21T21:34:52.357786",
+    "timestamp": "2025-11-21T21:37:08.071723",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251121_213450.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251121_213706.log",
       "commits": [
         "58c7e441e Implement workflow enforcement (Level 1) and update all documentation",
         "f4fa2e07c Add environment isolation guide and check script",
@@ -18,7 +18,7 @@
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-21T21:35:08.283810",
+    "timestamp": "2025-11-21T21:37:11.472962",
     "result": {
       "success": true,
       "conflicts_resolved": 0,
@@ -27,31 +27,32 @@
   },
   "step_3": {
     "completed": true,
-    "timestamp": "2025-11-21T21:35:08.345654",
+    "timestamp": "2025-11-21T21:37:11.501512",
     "result": {
       "success": true,
-      "removed_count": 141
+      "removed_count": 0
     }
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-21T21:35:08.439573",
+    "timestamp": "2025-11-21T21:37:11.593590",
     "result": {
       "success": true,
-      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251121_193508.db"
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251121_193711.db"
     }
   },
   "step_5": {
-    "completed": true,
-    "timestamp": "2025-11-21T21:35:08.756075",
+    "completed": false,
+    "timestamp": "2025-11-21T21:36:53.873048",
     "result": {
-      "success": true
+      "success": false,
+      "error": "============================================================\nSyncing Active Files to Production\n============================================================\nSource: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend\nTarget: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/production/Backend\n\n\u274c Source directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend"
     }
   },
-  "last_failed_step": 8,
+  "last_failed_step": 10,
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-21T21:35:08.761034",
+    "timestamp": "2025-11-21T21:37:11.598763",
     "result": {
       "success": true,
       "warning": "Cleanup had warnings"
@@ -59,7 +60,7 @@
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-21T21:35:08.762912",
+    "timestamp": "2025-11-21T21:37:11.600643",
     "result": {
       "success": true,
       "verified": false,
@@ -67,10 +68,10 @@
     }
   },
   "step_8": {
-    "completed": false,
-    "timestamp": "2025-11-21T21:35:16.451537",
+    "completed": true,
+    "timestamp": "2025-11-21T21:53:13.864276",
     "result": {
-      "success": false,
+      "success": true,
       "results": {
         "isolation": false,
         "structure": false,
@@ -81,18 +82,18 @@
   },
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-21T21:03:15.218054",
+    "timestamp": "2025-11-21T21:53:13.901383",
     "result": {
       "success": true,
-      "new_version": "1.2.1.0"
+      "new_version": "1.2.2.0"
     }
   },
   "step_10": {
-    "completed": true,
-    "timestamp": "2025-11-21T21:03:32.197876",
+    "completed": false,
+    "timestamp": "2025-11-21T21:54:30.260289",
     "result": {
-      "success": true,
-      "commit_message": "chore: production update from main - 2025-11-21"
+      "success": false,
+      "error": ""
     }
   },
   "step_11": {

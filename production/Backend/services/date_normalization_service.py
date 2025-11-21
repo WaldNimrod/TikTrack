@@ -49,7 +49,7 @@ class DateNormalizationService:
         r"^\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?(Z|[+-]\d{2}:?\d{2})?$"
     )
     _ISO_DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-    _DATE_KEY_HINTS = ("date", "time", "timestamp", "_at", "_on", "fetched", "asof")
+    _DATE_KEY_HINTS = ("date", "time", "timestamp", "_at", "_on", "fetched_at", "asof")
     _DEFAULT_DISPLAY_FORMAT = "%d.%m.%Y %H:%M"
 
     def __init__(self, user_timezone: str = "UTC") -> None:
@@ -311,6 +311,11 @@ class DateNormalizationService:
         
         # IMPORTANT: Never convert condition fields - they are not dates!
         if key and any(excluded in key.lower() for excluded in ['condition_attribute', 'condition_operator', 'condition_number', 'status', 'is_triggered']):
+            return False
+        
+        # IMPORTANT: Never convert numeric count fields - they are not timestamps!
+        # These are typically integer counts like fetched, failed, requested, total, count, length, size
+        if key and key.lower() in ['fetched', 'failed', 'requested', 'total', 'count', 'length', 'size', 'skipped']:
             return False
         
         if isinstance(value, datetime):

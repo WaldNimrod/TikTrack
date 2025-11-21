@@ -1,13 +1,13 @@
 /**
  * Validation Utils - Comprehensive Function Index
  * ==========================================
- *
+ * 
  * This file contains a comprehensive validation system with real-time and submission validation support.
  * Includes field validation, form validation, custom validation rules, and advanced validation features.
- *
+ * 
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/VALIDATION_SYSTEM.md
- *
+ * 
  * Author: TikTrack Development Team
  * Version: 3.0
  * Last Updated: 2025-01-27
@@ -16,7 +16,8 @@
 // ===== CONSTANTS =====
 
 // כללי ולידציה ברירת מחדל
-const DEFAULT_VALIDATION_RULES = window.DEFAULT_VALIDATION_RULES || {
+if (typeof window.DEFAULT_VALIDATION_RULES === 'undefined') {
+const DEFAULT_VALIDATION_RULES = {
   text: {
     required: false,
     minLength: 0,
@@ -47,8 +48,8 @@ const DEFAULT_VALIDATION_RULES = window.DEFAULT_VALIDATION_RULES || {
     customValidation: null,
   },
 };
-
-window.DEFAULT_VALIDATION_RULES = DEFAULT_VALIDATION_RULES;
+  window.DEFAULT_VALIDATION_RULES = DEFAULT_VALIDATION_RULES;
+}
 
 // ===== HELPER FUNCTIONS =====
 
@@ -90,7 +91,20 @@ function getFieldLabel(field) {
  * @returns {boolean} האם התאריך תקין
  */
 function isValidDate(dateString) {
-  const date = new Date(dateString);
+  // Use dateUtils for consistent date parsing (if available)
+  let date;
+  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+    const envelope = window.dateUtils.ensureDateEnvelope(dateString);
+    if (envelope && envelope.epochMs) {
+      date = new Date(envelope.epochMs);
+    } else {
+      date = new Date(dateString);
+    }
+  } else if (dateString && typeof dateString === 'object' && typeof dateString.epochMs === 'number') {
+    date = new Date(dateString.epochMs);
+  } else {
+    date = new Date(dateString);
+  }
   return !isNaN(date.getTime());
 }
 
@@ -421,8 +435,21 @@ function validateDateField(input, rules = {}) {
     return true;
   }
 
-  // בדיקה שהערך הוא תאריך תקין
-  const dateValue = new Date(value);
+  // בדיקה שהערך הוא תאריך תקין - Use dateUtils for consistent date parsing
+  let dateValue;
+  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+    const envelope = window.dateUtils.ensureDateEnvelope(value);
+    if (envelope && envelope.epochMs) {
+      dateValue = new Date(envelope.epochMs);
+    } else {
+      dateValue = new Date(value);
+    }
+  } else if (value && typeof value === 'object' && typeof value.epochMs === 'number') {
+    dateValue = new Date(value.epochMs);
+  } else {
+    dateValue = new Date(value);
+  }
+  
   if (isNaN(dateValue.getTime())) {
     const fieldLabel = getFieldLabel(input);
     const errorMsg = `${fieldLabel} - תאריך לא תקין`;
@@ -432,10 +459,30 @@ function validateDateField(input, rules = {}) {
 
   // בדיקת תאריך מינימלי
   if (mergedRules.minDate) {
-    const minDate = new Date(mergedRules.minDate);
+    let minDate;
+    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+      const envelope = window.dateUtils.ensureDateEnvelope(mergedRules.minDate);
+      if (envelope && envelope.epochMs) {
+        minDate = new Date(envelope.epochMs);
+      } else {
+        minDate = new Date(mergedRules.minDate);
+      }
+    } else {
+      minDate = new Date(mergedRules.minDate);
+    }
+    
     if (dateValue < minDate) {
       const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - תאריך מינימלי: ${minDate.toLocaleDateString('he-IL')}`;
+      // Use FieldRendererService or dateUtils for date formatting
+      let minDateDisplay;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        minDateDisplay = window.FieldRendererService.renderDate(minDate, false);
+      } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+        minDateDisplay = window.dateUtils.formatDate(minDate, { includeTime: false });
+      } else {
+        minDateDisplay = minDate.toLocaleDateString('he-IL');
+      }
+      const errorMsg = `${fieldLabel} - תאריך מינימלי: ${minDateDisplay}`;
       showFieldError(input, errorMsg);
       return errorMsg;
     }
@@ -443,10 +490,30 @@ function validateDateField(input, rules = {}) {
 
   // בדיקת תאריך מקסימלי
   if (mergedRules.maxDate) {
-    const maxDate = new Date(mergedRules.maxDate);
+    let maxDate;
+    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+      const envelope = window.dateUtils.ensureDateEnvelope(mergedRules.maxDate);
+      if (envelope && envelope.epochMs) {
+        maxDate = new Date(envelope.epochMs);
+      } else {
+        maxDate = new Date(mergedRules.maxDate);
+      }
+    } else {
+      maxDate = new Date(mergedRules.maxDate);
+    }
+    
     if (dateValue > maxDate) {
       const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - תאריך מקסימלי: ${maxDate.toLocaleDateString('he-IL')}`;
+      // Use FieldRendererService or dateUtils for date formatting
+      let maxDateDisplay;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        maxDateDisplay = window.FieldRendererService.renderDate(maxDate, false);
+      } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+        maxDateDisplay = window.dateUtils.formatDate(maxDate, { includeTime: false });
+      } else {
+        maxDateDisplay = maxDate.toLocaleDateString('he-IL');
+      }
+      const errorMsg = `${fieldLabel} - תאריך מקסימלי: ${maxDateDisplay}`;
       showFieldError(input, errorMsg);
       return errorMsg;
     }
@@ -599,24 +666,24 @@ function validateTickerSymbol(value) {
 function validateDateRange(startFieldId, endFieldId, errorMessage) {
   const startField = document.getElementById(startFieldId);
   const endField = document.getElementById(endFieldId);
-
-  if (!startField || !endField) {return true;}
-
+  
+  if (!startField || !endField) return true;
+  
   const startValue = startField.value;
   const endValue = endField.value;
-
+  
   if (startValue && endValue) {
     const startDate = new Date(startValue);
     const endDate = new Date(endValue);
-
+    
     if (endDate < startDate) {
       showFieldError(endField, errorMessage || 'תאריך סיום לא יכול להיות לפני תאריך התחלה');
       return false;
     }
-
+    
     clearFieldValidation(endField);
   }
-
+  
   return true;
 }
 
@@ -631,20 +698,20 @@ function validateEntityForm(formId, fieldConfigs) {
   let isValid = true;
   const errors = {};
   const errorMessages = [];
-
+  
   fieldConfigs.forEach(config => {
     const field = document.getElementById(config.id);
-    if (!field) {return;}
-
+    if (!field) return;
+    
     const result = validateField(field, config.rules || {required: true});
-
+    
     if (result !== true) {
       isValid = false;
       errors[config.id] = result;
       errorMessages.push(`${config.name}: ${result}`);
     }
   });
-
+  
   return {isValid, errors, errorMessages};
 }
 
@@ -658,22 +725,22 @@ function validateEntityForm(formId, fieldConfigs) {
  */
 async function validateWithConfirmation(title, message, validationFn) {
   const validationResult = await validationFn();
-
+  
   if (!validationResult.isValid) {
     if (window.showErrorNotification) {
       window.showErrorNotification(title, validationResult.message);
     }
     return false;
   }
-
+  
   // הצגת דיאלוג אישור
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (window.showConfirmationDialog) {
       window.showConfirmationDialog(
         title,
         message,
         () => resolve(true),
-        () => resolve(false),
+        () => resolve(false)
       );
     } else {
       resolve(window.confirm(`${title}\n\n${message}`));

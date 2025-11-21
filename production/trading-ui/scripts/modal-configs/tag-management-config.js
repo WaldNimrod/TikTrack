@@ -150,5 +150,3 @@ window.tagModalConfig = tagModalConfig;
 
 
 
-
-

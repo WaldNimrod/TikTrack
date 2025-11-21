@@ -144,10 +144,6 @@ class ConditionsInitializer {
         } else {
             throw new Error('CRUD Manager component not available');
         }
-
-        if (this.components.validator && this.components.crudManager) {
-            this.components.validator.crudManager = this.components.crudManager;
-        }
         
         // Initialize form generator
         if (window.conditionsFormGenerator) {

@@ -302,6 +302,9 @@ class NotificationsCenter {
     // אתחול סטטיסטיקות
     this.updateStats();
 
+    // חיבור לאירועי WebSocket
+    this.setupWebSocketEvents();
+
     // טעינת היסטוריה
     this.loadHistory().then(() => {
       console.log('✅ היסטוריה נטענה בהצלחה');
@@ -327,15 +330,88 @@ class NotificationsCenter {
   }
 
   initUI() {
+    // עדכון סטטוס חיבור
+    this.updateConnectionStatus('connecting');
+
     // הגדרות התראות הועברו למערכת ההעדפות הגלובלית
 
     // עדכון סטטיסטיקות
     this.updateStatsUI();
+    
+    // בדיקת חיבור WebSocket אחרי טעינה
+    setTimeout(() => {
+      try {
+        if (this && typeof this.checkWebSocketConnection === 'function') {
+          this.checkWebSocketConnection();
+        }
+      } catch (error) {
+        console.warn('⚠️ Error in WebSocket connection check:', error);
+      }
+    }, 1000);
   }
 
   setupWebSocketEvents() {
-    // מערכת ה-WebSocket בוטלה. הפונקציה נשמרת לצורך תאימות אך אינה מבצעת פעולה.
-    this.updateConnectionStatus?.('disabled');
+    if (window.realtimeNotificationsClient) {
+      // אירועי חיבור
+      window.realtimeNotificationsClient.on('connect', () => {
+        this.updateConnectionStatus('connected');
+        this.addNotification('info', 'מרכז התראות', 'חובר לשרת בהצלחה', 'now');
+      });
+
+      window.realtimeNotificationsClient.on('disconnect', () => {
+        this.updateConnectionStatus('disconnected');
+        this.addNotification('warning', 'מרכז התראות', 'נותק מהשרת', 'now');
+      });
+
+      // אירועי התראות - עובדים עם מערכת ההעדפות הגלובלית
+      window.realtimeNotificationsClient.on('background_task_started', data => {
+        if (this.preferences.enableBackgroundTaskNotifications === 'true' || this.preferences.enableBackgroundTaskNotifications === true) {
+          this.addNotification('info', 'משימה ברקע', `התחילה: ${data.task_name}`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('background_task_completed', data => {
+        if (this.preferences.enableBackgroundTaskNotifications === 'true' || this.preferences.enableBackgroundTaskNotifications === true) {
+          this.addNotification('success', 'משימה הושלמה', `${data.task_name} הושלמה בהצלחה`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('background_task_failed', data => {
+        if (this.preferences.enableBackgroundTaskNotifications === 'true' || this.preferences.enableBackgroundTaskNotifications === true) {
+          this.addNotification('error', 'שגיאה במשימה', `${data.task_name} נכשלה: ${data.error}`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('data_updated', data => {
+        if (this.preferences.enableDataUpdateNotifications === 'true' || this.preferences.enableDataUpdateNotifications === true) {
+          this.addNotification('info', 'נתונים עודכנו', `${data.table} עודכן בהצלחה`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('data_error', data => {
+        if (this.preferences.enableDataUpdateNotifications === 'true' || this.preferences.enableDataUpdateNotifications === true) {
+          this.addNotification('error', 'שגיאת נתונים', `שגיאה ב-${data.table}: ${data.error}`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('external_data_update', data => {
+        if (this.preferences.enableExternalDataNotifications === 'true' || this.preferences.enableExternalDataNotifications === true) {
+          this.addNotification('success', 'נתונים חיצוניים', `${data.provider} עודכן: ${data.ticker_count} טיקרים`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('external_data_error', data => {
+        if (this.preferences.enableExternalDataNotifications === 'true' || this.preferences.enableExternalDataNotifications === true) {
+          this.addNotification('error', 'שגיאת נתונים חיצוניים', `${data.provider}: ${data.error}`, 'now');
+        }
+      });
+
+      window.realtimeNotificationsClient.on('system_event', data => {
+        if (this.preferences.enableSystemEventNotifications === 'true' || this.preferences.enableSystemEventNotifications === true) {
+          this.addNotification('info', 'אירוע מערכת', data.message, 'now');
+        }
+      });
+    }
   }
 
   addNotification(type, title, message, time = 'now') {
@@ -376,7 +452,8 @@ class NotificationsCenter {
       title,
       message,
       category,
-      time: time === 'now' ? new Date() : new Date(time),
+      // Use dateUtils for consistent date handling
+      time: time === 'now' ? (window.dateUtils?.getToday ? window.dateUtils.getToday() : new Date()) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(time) : new Date(time)),
       timestamp: Date.now(),
     };
 
@@ -468,7 +545,8 @@ class NotificationsCenter {
     oscillator.stop(audioContext.currentTime + 0.1);
   }
 
-  updateConnectionStatus(status = 'disabled') {
+  updateConnectionStatus(status = 'connecting') {
+    // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
     const overallStatusElement = document.getElementById('overallStatus');
     const websocketStatus = document.getElementById('websocketStatus');
     const connectionTimeElement = document.getElementById('connectionTime');
@@ -479,12 +557,52 @@ class NotificationsCenter {
       return;
     }
 
-    websocketStatus.textContent = 'לא פעיל';
-    websocketStatus.className = 'text-muted';
-    connectionTimeElement.textContent = '-';
-    messagesSentElement.textContent = '0';
-    overallStatusElement.textContent = 'מצב אונליין מבוטל';
-    overallStatusElement.className = 'text-muted';
+    switch (status) {
+    case 'connected':
+      websocketStatus.textContent = 'מחובר';
+      websocketStatus.className = 'text-success';
+      overallStatusElement.textContent = 'מחובר';
+      overallStatusElement.className = 'text-success';
+      break;
+    case 'disconnected':
+      websocketStatus.textContent = 'מנותק';
+      websocketStatus.className = 'text-danger';
+      connectionTimeElement.textContent = '-';
+      messagesSentElement.textContent = '0';
+      overallStatusElement.textContent = 'מנותק';
+      overallStatusElement.className = 'text-danger';
+      break;
+    case 'connecting':
+      websocketStatus.textContent = 'מתחבר...';
+      websocketStatus.className = 'text-warning';
+      connectionTimeElement.textContent = '-';
+      messagesSentElement.textContent = '0';
+      overallStatusElement.textContent = 'מתחבר...';
+      overallStatusElement.className = 'text-warning';
+      break;
+    }
+
+    // עדכון זמן חיבור והודעות
+    if (status === 'connected' && window.realtimeNotificationsClient) {
+      try {
+        const stats = window.realtimeNotificationsClient.getConnectionStats();
+
+        if (stats && stats.connectedAt) {
+          const connectionTime = new Date(stats.connectedAt);
+          const now = new Date();
+          const diff = Math.floor((now - connectionTime) / 1000);
+          connectionTimeElement.textContent = NotificationsCenter.formatDuration(diff);
+        } else {
+          connectionTimeElement.textContent = 'עכשיו';
+        }
+
+        messagesSentElement.textContent = stats && stats.totalMessages ? stats.totalMessages : 0;
+      } catch {
+        // שגיאה בעדכון סטטיסטיקות חיבור
+        connectionTimeElement.textContent = 'עכשיו';
+        messagesSentElement.textContent = '0';
+      }
+    }
   }
 
 
@@ -603,8 +721,17 @@ class NotificationsCenter {
     
     if (newMessagesCount) {
       // ספירת הודעות חדשות מהשעה האחרונה
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      const newMessages = this.history.filter(n => new Date(n.time) > oneHourAgo).length;
+      // Use dateUtils for consistent date handling
+      let oneHourAgo;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        oneHourAgo = window.dateUtils.toDateObject({ epochMs: Date.now() - 60 * 60 * 1000 });
+      } else {
+        oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      }
+      const newMessages = this.history.filter(n => {
+        const msgTime = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(n.time) : new Date(n.time);
+        return msgTime > oneHourAgo;
+      }).length;
       newMessagesCount.textContent = newMessages;
     }
     
@@ -726,16 +853,27 @@ class NotificationsCenter {
   static getTimeAgo(_date) {
     // בדיקה שהפרמטר הוא אובייקט Date תקין
     let date = _date;
+    // Use dateUtils for consistent date parsing
     if (!date || !(date instanceof Date)) {
       try {
-        date = new Date(date);
+        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+          date = window.dateUtils.toDateObject(date);
+        } else {
+          date = new Date(date);
+        }
       } catch (error) {
         // console.warn('שגיאה בהמרת תאריך:', error);
         return 'לא ידוע';
       }
     }
 
-    const now = new Date();
+    // Use dateUtils for consistent date handling
+    let now;
+    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+      now = window.dateUtils.getToday();
+    } else {
+      now = new Date();
+    }
     const diff = Math.floor((now - date) / 1000);
 
     if (diff < 60) {return 'עכשיו';}
@@ -935,7 +1073,20 @@ class NotificationsCenter {
   }
 
   checkWebSocketConnection() {
-    this.updateConnectionStatus('disabled');
+    // בדיקת חיבור WebSocket
+    if (window.realtimeNotificationsClient) {
+      const isConnected = window.realtimeNotificationsClient.isConnected();
+      console.log('🔍 בדיקת חיבור WebSocket:', isConnected ? 'מחובר' : 'לא מחובר');
+      
+      if (isConnected) {
+        this.updateConnectionStatus('connected');
+      } else {
+        this.updateConnectionStatus('disconnected');
+      }
+    } else {
+      // realtimeNotificationsClient not available - this is normal in some contexts
+      this.updateConnectionStatus('disconnected');
+    }
   }
 
   // שמירה לקובץ לוג

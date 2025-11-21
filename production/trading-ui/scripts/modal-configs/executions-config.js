@@ -35,6 +35,7 @@ const executionsModalConfig = {
             required: true,
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
+            populateFromService: 'tickers', // שימוש ב-SelectPopulatorService לטיקרים (כמו ב-cash flows)
             width: 300,
             style: 'width: 300px; min-width: 200px;',
             rowClass: 'row',

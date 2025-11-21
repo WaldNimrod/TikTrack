@@ -336,8 +336,26 @@ function populateAccountActivityTable(data) {
 
   // Sort by date (oldest first for balance calculation)
   allMovements.sort((a, b) => {
-    const dateA = a.date ? new Date(a.date) : new Date(0);
-    const dateB = b.date ? new Date(b.date) : new Date(0);
+    // Use dateUtils for consistent date parsing
+    let dateA, dateB;
+    if (a.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateA = window.dateUtils.toDateObject(a.date);
+      } else {
+        dateA = new Date(a.date);
+      }
+    } else {
+      dateA = new Date(0);
+    }
+    if (b.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateB = window.dateUtils.toDateObject(b.date);
+      } else {
+        dateB = new Date(b.date);
+      }
+    } else {
+      dateB = new Date(0);
+    }
     return dateA - dateB;
   });
 
@@ -359,8 +377,26 @@ function populateAccountActivityTable(data) {
 
   // Now sort newest first for display
   allMovements.sort((a, b) => {
-    const dateA = a.date ? new Date(a.date) : new Date(0);
-    const dateB = b.date ? new Date(b.date) : new Date(0);
+    // Use dateUtils for consistent date parsing
+    let dateA, dateB;
+    if (a.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateA = window.dateUtils.toDateObject(a.date);
+      } else {
+        dateA = new Date(a.date);
+      }
+    } else {
+      dateA = new Date(0);
+    }
+    if (b.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateB = window.dateUtils.toDateObject(b.date);
+      } else {
+        dateB = new Date(b.date);
+      }
+    } else {
+      dateB = new Date(0);
+    }
     return dateB - dateA;
   });
 
@@ -417,7 +453,25 @@ function renderMovementRow(movement, runningBalance) {
     if (movementDateEnvelope && window.dateUtils?.formatDate) {
       dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope);
     } else {
-      dateCell.textContent = movementDateValue ? new Date(movementDateValue).toLocaleDateString('he-IL') : '-';
+      // Use dateUtils for consistent date parsing
+      if (movementDateValue) {
+        let dateObj;
+        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+          dateObj = window.dateUtils.toDateObject(movementDateValue);
+        } else {
+          dateObj = new Date(movementDateValue);
+        }
+        // Use FieldRendererService or dateUtils for consistent date formatting
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          dateCell.textContent = window.FieldRendererService.renderDate(dateObj, false);
+        } else if (window.dateUtils?.formatDate) {
+          dateCell.textContent = window.dateUtils.formatDate(dateObj, { includeTime: false });
+        } else {
+          dateCell.textContent = dateObj.toLocaleDateString('he-IL');
+        }
+      } else {
+        dateCell.textContent = '-';
+      }
     }
   }
   row.appendChild(dateCell);
@@ -621,7 +675,13 @@ function updateActivitySummary(data) {
   if (tableTitleDateRange || summaryDateRange) {
     const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
     let startDate = null;
-    let endDate = new Date(); // Today
+    // Use dateUtils for consistent date handling
+    let endDate;
+    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+      endDate = window.dateUtils.getToday();
+    } else {
+      endDate = new Date(); // Today
+    }
 
     // Get account opening date for "כל זמן" case
     let accountOpeningDate = null;
@@ -706,7 +766,13 @@ function updateActivitySummary(data) {
     let dateRangeText = '';
     const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
     let startDate = null;
-    let endDate = new Date(); // Today
+    // Use dateUtils for consistent date handling
+    let endDate;
+    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+      endDate = window.dateUtils.getToday();
+    } else {
+      endDate = new Date(); // Today
+    }
 
     // Get account opening date for "כל זמן" case
     let accountOpeningDate = null;

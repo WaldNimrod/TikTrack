@@ -64,39 +64,6 @@ const API_ENDPOINTS = {
   },
 };
 
-// Unified log system defaults
-const BACKGROUND_TASKS_LOG_CONTAINER_ID = 'unified-logs-container';
-const BACKGROUND_TASKS_LOG_DEFAULT_OPTIONS = {
-  displayConfig: 'default',
-  autoRefresh: true,
-  refreshInterval: 15000,
-  autoLoad: true,
-};
-
-/**
- * Ensure unified log display for background tasks is ready
- */
-async function loadBackgroundTasksLogDisplay(options = {}) {
-  const container = document.getElementById(BACKGROUND_TASKS_LOG_CONTAINER_ID);
-  if (!container) {
-    window.Logger?.warn?.('Background tasks log container missing', { page: 'background-tasks' });
-    return null;
-  }
-
-  if (typeof window.showBackgroundTasksLog !== 'function' || !window.UnifiedLogAPI) {
-    window.Logger?.warn?.('Unified Log API not ready yet for background tasks log', { page: 'background-tasks' });
-    return null;
-  }
-
-  const mergedOptions = { ...BACKGROUND_TASKS_LOG_DEFAULT_OPTIONS, ...options };
-  await window.showBackgroundTasksLog(BACKGROUND_TASKS_LOG_CONTAINER_ID, mergedOptions);
-  window.Logger?.info?.('Background tasks log initialized via Unified Log System', {
-    page: 'background-tasks',
-    options: mergedOptions,
-  });
-  return true;
-}
-
 // Utility functions
 const utils = {
   /**
@@ -1006,37 +973,6 @@ window.refreshStatus = function() {
 
 window.refreshTasks = function() {
   eventHandlers.refreshTasks();
-};
-
-window.initializeBackgroundTasksLog = async function(options = {}) {
-  try {
-    await loadBackgroundTasksLogDisplay(options);
-  } catch (error) {
-    console.error('❌ Failed to initialize background tasks log:', error);
-    utils.showNotification('שגיאה בטעינת לוג משימות רקע: ' + error.message, 'error');
-  }
-};
-
-window.refreshBackgroundTasksLog = async function(options = {}) {
-  const buttonId = 'refresh-background-tasks-log';
-  utils.showLoading(buttonId, true);
-  try {
-    const hasDisplay = Boolean(
-      window.UnifiedLogAPI?.activeDisplays?.has?.(BACKGROUND_TASKS_LOG_CONTAINER_ID)
-    );
-
-    if (hasDisplay && typeof window.UnifiedLogAPI.refreshLog === 'function') {
-      await window.UnifiedLogAPI.refreshLog(BACKGROUND_TASKS_LOG_CONTAINER_ID);
-      window.Logger?.info?.('Background tasks log refreshed', { page: 'background-tasks' });
-    } else {
-      await loadBackgroundTasksLogDisplay(options);
-    }
-  } catch (error) {
-    console.error('❌ Failed to refresh background tasks log:', error);
-    utils.showNotification('שגיאה ברענון לוג משימות רקע: ' + error.message, 'error');
-  } finally {
-    utils.showLoading(buttonId, false);
-  }
 };
 
 window.showHistoryDetails = function(executionId) {

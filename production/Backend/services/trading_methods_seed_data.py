@@ -1,10 +1,11 @@
 """
-Production-safe seed data for trading methods master records.
-Derived from Backend/migrations/seed_conditions_master_data.py
+Trading Methods Seed Data
+=========================
+Seed data for trading methods - extracted from migrations for production use.
+This file contains METHODS_DEFINITION that is used by trading_methods API.
 """
 
 import json
-
 
 METHODS_DEFINITION = [
     {
@@ -26,7 +27,7 @@ METHODS_DEFINITION = [
                 "max_value": "200",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 1,
+                "sort_order": 1
             },
             {
                 "parameter_key": "ma_type",
@@ -34,12 +35,9 @@ METHODS_DEFINITION = [
                 "parameter_name_he": "סוג ממוצע נע",
                 "parameter_type": "dropdown",
                 "default_value": "SMA",
-                "validation_rule": json.dumps(
-                    {"allowed_values": ["SMA", "EMA", "WMA"]},
-                    ensure_ascii=False,
-                ),
+                "validation_rule": json.dumps({"allowed_values": ["SMA", "EMA", "WMA"]}, ensure_ascii=False),
                 "is_required": True,
-                "sort_order": 2,
+                "sort_order": 2
             },
             {
                 "parameter_key": "comparison_type",
@@ -49,12 +47,12 @@ METHODS_DEFINITION = [
                 "default_value": "above",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["above", "below", "cross_up", "cross_down"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 3,
-            },
-        ],
+                "sort_order": 3
+            }
+        ]
     },
     {
         "name_en": "Volume Analysis",
@@ -75,7 +73,7 @@ METHODS_DEFINITION = [
                 "max_value": "200",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 1,
+                "sort_order": 1
             },
             {
                 "parameter_key": "volume_multiplier",
@@ -87,7 +85,7 @@ METHODS_DEFINITION = [
                 "max_value": "10",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 2,
+                "sort_order": 2
             },
             {
                 "parameter_key": "comparison_type",
@@ -97,12 +95,12 @@ METHODS_DEFINITION = [
                 "default_value": "above",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["above", "below"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 3,
-            },
-        ],
+                "sort_order": 3
+            }
+        ]
     },
     {
         "name_en": "Support & Resistance",
@@ -121,7 +119,7 @@ METHODS_DEFINITION = [
                 "default_value": None,
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 1,
+                "sort_order": 1
             },
             {
                 "parameter_key": "level_type",
@@ -131,10 +129,10 @@ METHODS_DEFINITION = [
                 "default_value": "support",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["support", "resistance"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 2,
+                "sort_order": 2
             },
             {
                 "parameter_key": "tolerance_pct",
@@ -146,7 +144,7 @@ METHODS_DEFINITION = [
                 "max_value": "10",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 3,
+                "sort_order": 3
             },
             {
                 "parameter_key": "comparison_type",
@@ -156,12 +154,12 @@ METHODS_DEFINITION = [
                 "default_value": "near",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["near", "above", "below", "break_up", "break_down"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 4,
-            },
-        ],
+                "sort_order": 4
+            }
+        ]
     },
     {
         "name_en": "Trend Lines",
@@ -180,10 +178,10 @@ METHODS_DEFINITION = [
                 "default_value": "uptrend",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["uptrend", "downtrend"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 1,
+                "sort_order": 1
             },
             {
                 "parameter_key": "lookback_period",
@@ -195,7 +193,7 @@ METHODS_DEFINITION = [
                 "max_value": "200",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 2,
+                "sort_order": 2
             },
             {
                 "parameter_key": "comparison_type",
@@ -205,10 +203,10 @@ METHODS_DEFINITION = [
                 "default_value": "bounce",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["bounce", "break_up", "break_down"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 3,
+                "sort_order": 3
             },
             {
                 "parameter_key": "tolerance_pct",
@@ -220,9 +218,9 @@ METHODS_DEFINITION = [
                 "max_value": "10",
                 "validation_rule": None,
                 "is_required": False,
-                "sort_order": 4,
-            },
-        ],
+                "sort_order": 4
+            }
+        ]
     },
     {
         "name_en": "Technical Patterns",
@@ -241,10 +239,10 @@ METHODS_DEFINITION = [
                 "default_value": "cup_handle",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["cup_handle", "head_shoulders", "triangle"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 1,
+                "sort_order": 1
             },
             {
                 "parameter_key": "lookback_period",
@@ -256,9 +254,9 @@ METHODS_DEFINITION = [
                 "max_value": "200",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 2,
-            },
-        ],
+                "sort_order": 2
+            }
+        ]
     },
     {
         "name_en": "Fibonacci Retracement",
@@ -279,7 +277,7 @@ METHODS_DEFINITION = [
                 "max_value": "200",
                 "validation_rule": None,
                 "is_required": True,
-                "sort_order": 1,
+                "sort_order": 1
             },
             {
                 "parameter_key": "comparison_type",
@@ -289,10 +287,10 @@ METHODS_DEFINITION = [
                 "default_value": "in_zone",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["in_zone", "above", "below"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": True,
-                "sort_order": 2,
+                "sort_order": 2
             },
             {
                 "parameter_key": "fib_type",
@@ -302,12 +300,11 @@ METHODS_DEFINITION = [
                 "default_value": "retracement",
                 "validation_rule": json.dumps(
                     {"allowed_values": ["retracement", "extension"]},
-                    ensure_ascii=False,
+                    ensure_ascii=False
                 ),
                 "is_required": False,
-                "sort_order": 3,
-            },
-        ],
-    },
+                "sort_order": 3
+            }
+        ]
+    }
 ]
-

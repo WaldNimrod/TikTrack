@@ -23,6 +23,22 @@
 
 ## 🖥️ **משימות ממשק משתמש (UI Tasks)**
 
+### **עמוד הערות (Notes Page) - `notes.js`**
+
+#### **1. תיקון מיון עמודת "עודכן"** ⚠️ **בטיפול**
+- **תיאור**: תיקון בעיית מיון בעמודת "עודכן" בטבלת הערות
+- **מיקום**: `trading-ui/scripts/notes.js`, `trading-ui/scripts/table-mappings.js`, `Backend/models/note.py`
+- **סטטוס**: בטיפול - הוספתי `updated_at` למודל ולטבלה, עדיין צריך לבדוק שהמיון עובד
+- **עדיפות**: בינונית
+- **דרישות**:
+  - [x] הוספת `updated_at` למודל `Note`
+  - [x] הוספת עמודת `updated_at` לטבלה `notes` ב-PostgreSQL
+  - [x] עדכון `update_note` לעדכן את `updated_at` בעת עדכון
+  - [x] עדכון `table-mappings.js` עם `dateEnvelope` עבור `updated_at`
+  - [ ] בדיקה שהמיון עובד בפועל
+  - [ ] וידוא שהטבלה נרשמת ב-`UnifiedTableSystem` בזמן
+  - [ ] הסרת לוגים זמניים
+
 ### **עמוד עסקעות (Executions Page) - `executions.js`**
 
 #### **1. ניתוב לדף טיקר** ❌ **לא התחיל**

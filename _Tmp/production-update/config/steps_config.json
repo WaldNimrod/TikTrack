@@ -1,0 +1,56 @@
+{
+  "steps": {
+    "01_collect_changes": {
+      "name": "Collect Changes",
+      "description": "Fetch and summarize latest commits from main branch"
+    },
+    "02_merge_main": {
+      "name": "Merge Main",
+      "description": "Merge main branch into production"
+    },
+    "03_cleanup_documentation": {
+      "name": "Cleanup Documentation",
+      "description": "Remove temporary documentation files"
+    },
+    "04_backup_database": {
+      "name": "Backup Database",
+      "description": "Create backup of production database"
+    },
+    "05_schema_check": {
+      "name": "Schema & Data Check",
+      "description": "Detect schema and data changes between dev and production"
+    },
+    "05_sync_code": {
+      "name": "Sync Code to Production",
+      "description": "Sync Backend and UI code, apply post-sync transformations"
+    },
+    "06_cleanup_backups": {
+      "name": "Cleanup Backups",
+      "description": "Remove old backup files"
+    },
+    "07_schema_data_sync": {
+      "name": "Schema & Data Sync",
+      "description": "Synchronize schema and data (migrations, reference data, preferences, groups)"
+    },
+    "08_file_verification": {
+      "name": "File Verification",
+      "description": "Verify all files are properly synchronized"
+    },
+    "08_validate": {
+      "name": "Validate Production",
+      "description": "Run validation and tests on production environment"
+    },
+    "09_bump_version": {
+      "name": "Bump Version",
+      "description": "Update version number for production release"
+    },
+    "10_commit_push": {
+      "name": "Commit & Push",
+      "description": "Git commit and push to production branch"
+    },
+    "11_start_server": {
+      "name": "Start Server",
+      "description": "Start production server (optional)"
+    }
+  }
+}

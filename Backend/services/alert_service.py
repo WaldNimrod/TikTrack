@@ -469,6 +469,17 @@ class AlertService:
                     alert_data['expiry_date'] = None
                     return
                 
+                # Convert datetime object to string if needed
+                if isinstance(expiry_date, datetime):
+                    expiry_date = expiry_date.strftime('%Y-%m-%d')
+                    alert_data['expiry_date'] = expiry_date
+                    logger.info(f"Converted datetime to string: {expiry_date}")
+                
+                # Ensure it's a string for regex validation
+                if not isinstance(expiry_date, str):
+                    expiry_date = str(expiry_date)
+                    alert_data['expiry_date'] = expiry_date
+                
                 # Validate format YYYY-MM-DD
                 import re
                 date_pattern = r'^\d{4}-\d{2}-\d{2}$'
@@ -482,6 +493,7 @@ class AlertService:
                     raise ValueError(f"Invalid expiry_date value: {expiry_date}. Not a valid date")
         except Exception as e:
             logger.error(f"Error validating expiry_date: {e}")
+            logger.error(f"expiry_date type: {type(alert_data.get('expiry_date'))}, value: {alert_data.get('expiry_date')}")
             raise
     
     @staticmethod

@@ -54,11 +54,27 @@ def get_alert(alert_id: int):
 def create_alert():
     """Create new alert"""
     try:
+        # Get raw request data for debugging
+        raw_data = request.get_data(as_text=True)
+        logger.info(f"🔍 [create_alert] Raw request data: {raw_data[:500]}")
+        
         data = request.get_json()
         logger.info(f"🔍 [create_alert] Received data: {data}")
-        logger.info(f"🔍 [create_alert] condition_attribute in data: {'condition_attribute' in data}")
-        logger.info(f"🔍 [create_alert] condition_attribute value: {data.get('condition_attribute')}")
-        logger.info(f"🔍 [create_alert] condition_attribute type: {type(data.get('condition_attribute'))}")
+        logger.info(f"🔍 [create_alert] condition_attribute in data: {'condition_attribute' in data if data else False}")
+        logger.info(f"🔍 [create_alert] condition_attribute value: {data.get('condition_attribute') if data else 'N/A'}")
+        logger.info(f"🔍 [create_alert] condition_attribute type: {type(data.get('condition_attribute')) if data else 'N/A'}")
+        logger.info(f"🔍 [create_alert] All keys in data: {list(data.keys()) if data else 'No data'}")
+        
+        # Check if condition_attribute is explicitly None or missing
+        if data and 'condition_attribute' in data:
+            if data['condition_attribute'] is None:
+                logger.warning(f"⚠️ [create_alert] condition_attribute is explicitly None in request!")
+            elif data['condition_attribute'] == '':
+                logger.warning(f"⚠️ [create_alert] condition_attribute is empty string in request!")
+            else:
+                logger.info(f"✅ [create_alert] condition_attribute has value: {data['condition_attribute']}")
+        else:
+            logger.warning(f"⚠️ [create_alert] condition_attribute not in data!")
         
         # Sanitize HTML content for message field
         if 'message' in data and data['message']:

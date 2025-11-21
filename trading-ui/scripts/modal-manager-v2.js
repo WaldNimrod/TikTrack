@@ -5633,139 +5633,27 @@ class ModalManagerV2 {
                     usingPreserved: !!preservedValue
                 });
                 
-                // Remove existing listeners
-                const newTickerSelect = tickerSelect.cloneNode(true);
-                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
+                // CRITICAL: Don't clone and re-populate - this causes double loading that clears the value!
+                // The select was already populated by populateSelects and populateForm with the correct value.
+                // We only need to add the change event listener.
+                // This matches the behavior in cash flows where selects with populateFromService don't get cloned.
                 
-                // Mark as initialized to prevent double processing
-                newTickerSelect.dataset.specialHandlersInitialized = 'true';
+                // Mark as initialized to prevent any future processing
+                tickerSelect.dataset.specialHandlersInitialized = 'true';
+                if (originalValue && originalValue !== '') {
+                    tickerSelect.dataset.valuePreserved = 'true';
+                    tickerSelect.dataset.preservedValue = String(originalValue);
+                }
                 
-                console.log(`🔍 [initializeSpecialHandlers] After clone`, {
-                    optionsAfter: newTickerSelect.options.length,
-                    valueAfter: newTickerSelect.value
+                console.log(`✅ [initializeSpecialHandlers] executionTicker already populated by populateForm, skipping clone/re-populate`, {
+                    currentValue: tickerSelect.value,
+                    optionsCount: tickerSelect.options.length,
+                    preservedValue: preservedValue,
+                    originalValue: originalValue
                 });
                 
-                // ALWAYS re-populate tickers after clone to ensure they're available
-                // This is necessary because cloneNode might not preserve options correctly in all browsers
-                // or the options might be cleared by other code
-                // CRITICAL: Pass defaultValue to preserve the selected value in edit mode!
-                if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
-                    // Use same logic as _populateSingleSelect for executionTicker
-                    // CRITICAL: Pass originalValue as defaultValue to preserve selection in edit mode
-                    (async () => {
-                        try {
-                            console.log(`🔍 [initializeSpecialHandlers] Re-populating executionTicker after clone...`, {
-                                originalValue: originalValue,
-                                willUseAsDefault: !!originalValue
-                            });
-                            if (window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
-                                const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
-                                    useCache: true
-                                });
-                                
-                                if (relevantTickers.length > 0) {
-                                    await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
-                                        includeEmpty: true,
-                                        filterFn: (ticker) => relevantTickers.some(t => t.id === ticker.id),
-                                        defaultValue: originalValue // CRITICAL: Pass original value to preserve selection
-                                    });
-                                    console.log(`✅ [initializeSpecialHandlers] Re-populated executionTicker with ${relevantTickers.length} relevant tickers`, {
-                                        defaultValue: originalValue,
-                                        actualValue: newTickerSelect.value
-                                    });
-                                } else {
-                                    await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
-                                        includeEmpty: true,
-                                        defaultValue: originalValue // CRITICAL: Pass original value to preserve selection
-                                    });
-                                    console.log(`✅ [initializeSpecialHandlers] Re-populated executionTicker with all tickers (no relevant tickers)`, {
-                                        defaultValue: originalValue,
-                                        actualValue: newTickerSelect.value
-                                    });
-                                }
-                            } else {
-                                await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
-                                    includeEmpty: true,
-                                    defaultValue: originalValue // CRITICAL: Pass original value to preserve selection
-                                });
-                                console.log(`✅ [initializeSpecialHandlers] Re-populated executionTicker with all tickers (fallback)`, {
-                                    defaultValue: originalValue,
-                                    actualValue: newTickerSelect.value
-                                });
-                            }
-                            console.log(`✅ [initializeSpecialHandlers] Re-population complete`, {
-                                optionsAfter: newTickerSelect.options.length,
-                                valueAfter: newTickerSelect.value,
-                                expectedValue: originalValue,
-                                match: newTickerSelect.value === String(originalValue)
-                            });
-                            
-                            // CRITICAL: After re-population, ALWAYS verify and restore value if needed
-                            // This is necessary because the async populate might complete after other code runs
-                            if (originalValue && originalValue !== '' && newTickerSelect.value !== String(originalValue)) {
-                                console.warn(`⚠️ [initializeSpecialHandlers] Value mismatch after re-population, restoring...`, {
-                                    expected: originalValue,
-                                    actual: newTickerSelect.value,
-                                    optionsCount: newTickerSelect.options.length,
-                                    hasOption: Array.from(newTickerSelect.options).some(opt => opt.value === String(originalValue))
-                                });
-                                // Try to restore manually - multiple attempts with different matching strategies
-                                let matchingOption = Array.from(newTickerSelect.options).find(opt => 
-                                    opt.value === String(originalValue)
-                                );
-                                if (!matchingOption) {
-                                    matchingOption = Array.from(newTickerSelect.options).find(opt => 
-                                        String(opt.value) === String(originalValue)
-                                    );
-                                }
-                                if (!matchingOption) {
-                                    matchingOption = Array.from(newTickerSelect.options).find(opt => 
-                                        parseInt(opt.value) === parseInt(originalValue)
-                                    );
-                                }
-                                if (matchingOption) {
-                                    newTickerSelect.value = matchingOption.value;
-                                    console.log(`✅ [initializeSpecialHandlers] Manually restored value: ${matchingOption.value} (${matchingOption.textContent})`);
-                                } else {
-                                    console.error(`❌ [initializeSpecialHandlers] Could not restore value ${originalValue} - option not found in list`, {
-                                        availableOptions: Array.from(newTickerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent }))
-                                    });
-                                }
-                            } else if (originalValue && originalValue !== '') {
-                                console.log(`✅ [initializeSpecialHandlers] Value correctly preserved: ${newTickerSelect.value}`);
-                            }
-                            
-                            // CRITICAL: Set a flag to prevent any subsequent re-population from clearing this value
-                            newTickerSelect.dataset.valuePreserved = 'true';
-                            newTickerSelect.dataset.preservedValue = String(originalValue || '');
-                        } catch (error) {
-                            console.error(`❌ [initializeSpecialHandlers] Error re-populating executionTicker:`, error);
-                        }
-                    })();
-                } else {
-                    // If SelectPopulatorService not available, still try to restore value
-                    if (originalValue) {
-                        newTickerSelect.value = originalValue;
-                        console.log(`✅ [initializeSpecialHandlers] Restored value directly (no repopulation): ${originalValue}`);
-                    }
-                }
-                
-                // Restore value after clone (critical for edit mode!)
-                // Note: This is called synchronously, but populateTickersSelect above is async
-                // So we also restore in the async block above after population completes
-                // CRITICAL: Use preservedValue if available (from populateForm), otherwise use originalValue
-                const valueToRestore = preservedValue || originalValue;
-                if (valueToRestore) {
-                    // Temporarily set the value on the original select so _restoreSelectValueAfterClone can read it
-                    if (originalTickerSelect && !originalTickerSelect.value && preservedValue) {
-                        originalTickerSelect.value = preservedValue;
-                        console.log(`💾 [initializeSpecialHandlers] Set originalTickerSelect.value to preservedValue: ${preservedValue}`);
-                    }
-                }
-                this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'executionTicker');
-                
-                // Add change listener
-                newTickerSelect.addEventListener('change', async (e) => {
+                // Add change listener (without cloning)
+                tickerSelect.addEventListener('change', async (e) => {
                     const tickerId = e.target.value;
                     if (tickerId && window.loadExecutionTickerInfo) {
                         await window.loadExecutionTickerInfo(tickerId);

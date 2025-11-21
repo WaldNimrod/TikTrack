@@ -953,7 +953,8 @@ function getColumnValue(item, columnIndex, tableType) {
     return item[fieldName] || '';
   }
   
-  // Notes table - special handling for calculated fields
+  // Notes table - special handling ONLY for calculated fields
+  // Date fields (created_at, updated_at) will be handled by the general date handling below
   if (tableType === 'notes') {
     if (fieldName === 'related_object') {
       // This is a calculated field - we need to get it from the display
@@ -970,28 +971,8 @@ function getColumnValue(item, columnIndex, tableType) {
       // Return attachment filename for sorting
       return item.attachment || '';
     }
-    // For date fields (created_at, updated_at), handle DateEnvelope properly
-    if (fieldName === 'created_at' || fieldName === 'updated_at') {
-      const rawValue = item[fieldName];
-      // If sortType is dateEnvelope, extract epochMs for proper sorting
-      if (sortType === 'dateEnvelope' || sortType === 'date') {
-        const epochValue = extractEpochForSort(rawValue);
-        if (epochValue !== null) {
-          return epochValue;
-        }
-        // Fallback: try to parse as date string
-        if (rawValue && typeof rawValue === 'string') {
-          const parsed = parseSortDateValue(rawValue);
-          if (parsed !== 0) {
-            return parsed;
-          }
-        }
-      }
-      // Return raw value if not dateEnvelope or parsing failed
-      return rawValue || '';
-    }
-    // For other fields, return directly
-    return item[fieldName] || '';
+    // For all other fields (including created_at, updated_at), let the general handling below take care of it
+    // This ensures consistent date handling for all date fields
   }
   
   // Alerts table - special handling for calculated fields

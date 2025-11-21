@@ -1,0 +1,88 @@
+{
+  "steps": {
+    "01_collect_changes": {
+      "name": "Collect Changes from Main",
+      "description": "Fetch and log changes from main branch",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 30
+    },
+    "02_merge_main": {
+      "name": "Merge Main to Production",
+      "description": "Merge main branch into production branch",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 60
+    },
+    "03_cleanup_documentation": {
+      "name": "Cleanup Documentation",
+      "description": "Remove unwanted documentation files",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 30
+    },
+    "04_backup_database": {
+      "name": "Backup Database",
+      "description": "Create database backup before update",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 120
+    },
+    "05_sync_code": {
+      "name": "Sync Code to Production",
+      "description": "Sync Backend and UI code to production",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 180
+    },
+    "06_cleanup_backups": {
+      "name": "Cleanup Backup Files",
+      "description": "Remove backup files from production",
+      "required": true,
+      "can_skip": true,
+      "timeout_seconds": 60
+    },
+    "07_fix_config": {
+      "name": "Fix Production Config",
+      "description": "Restore and verify production configuration",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 30
+    },
+    "08_validate": {
+      "name": "Validate Production",
+      "description": "Run validation and tests",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 300
+    },
+    "09_bump_version": {
+      "name": "Bump Version",
+      "description": "Update version number",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 30
+    },
+    "10_commit_push": {
+      "name": "Commit and Push",
+      "description": "Git commit and push to production branch",
+      "required": true,
+      "can_skip": false,
+      "timeout_seconds": 60
+    },
+    "11_start_server": {
+      "name": "Start Production Server",
+      "description": "Start production server (optional)",
+      "required": false,
+      "can_skip": true,
+      "timeout_seconds": 30
+    }
+  },
+  "defaults": {
+    "backup_label": "pre-update",
+    "version_bump": "patch",
+    "commit_message_template": "chore: production update from main - {date}",
+    "keep_backups_count": 5
+  }
+}
+

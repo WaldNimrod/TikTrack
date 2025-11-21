@@ -1239,14 +1239,13 @@ class ModalManagerV2 {
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
                 
-                // CRITICAL: For executions modal, save ticker value before initializeSpecialHandlers clones it
-                // This ensures the value is preserved after cloneNode
+                // CRITICAL: For executions modal, save ticker value after populateForm
+                // This ensures the value is preserved when initializeSpecialHandlers clones the select
                 if (modalId === 'executionsModal') {
                     const tickerSelect = modalElement.querySelector('#executionTicker');
                     if (tickerSelect && tickerSelect.value) {
-                        // Store the value in a data attribute so initializeSpecialHandlers can use it
                         tickerSelect.dataset.preservedValue = tickerSelect.value;
-                        console.log(`💾 [showModal] Preserved executionTicker value before initializeSpecialHandlers: ${tickerSelect.value}`);
+                        console.log(`💾 [showModal] Preserved executionTicker value after populateForm: ${tickerSelect.value}`);
                     }
                 }
                 
@@ -3060,45 +3059,21 @@ class ModalManagerV2 {
                                         currentOptionsCount: field.options.length
                                     });
                                     
-                                    // Special handling for executionTicker - use same logic as _populateSingleSelect
-                                    if (field.id === 'executionTicker' && window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
-                                        try {
-                                            const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
-                                                useCache: true
-                                            });
-                                            
-                                            if (relevantTickers.length > 0) {
-                                                await window.SelectPopulatorService.populateTickersSelect(field, {
-                                                    includeEmpty: true,
-                                                    filterFn: (ticker) => relevantTickers.some(t => t.id === ticker.id),
-                                                    defaultValue: defaultValueForSelect
-                                                });
-                                                console.log(`✅ [populateForm] Populated executionTicker with ${relevantTickers.length} relevant tickers, defaultValue: ${defaultValueForSelect}`);
-                                            } else {
-                                                await window.SelectPopulatorService.populateTickersSelect(field, {
-                                                    includeEmpty: true,
-                                                    defaultValue: defaultValueForSelect
-                                                });
-                                                console.log(`✅ [populateForm] Populated executionTicker with all tickers (no relevant), defaultValue: ${defaultValueForSelect}`);
-                                            }
-                                        } catch (error) {
-                                            console.warn(`⚠️ Error populating executionTicker in populateForm, using fallback:`, error);
-                                            await window.SelectPopulatorService.populateTickersSelect(field, {
-                                                includeEmpty: true,
-                                                defaultValue: defaultValueForSelect
-                                            });
-                                        }
-                                    } else {
-                                        await window.SelectPopulatorService.populateTickersSelect(field, {
-                                            includeEmpty: true,
-                                            defaultValue: defaultValueForSelect // Pass the value we want to set
-                                        });
-                                    }
+                                    // Always populate tickers select with defaultValue to ensure value is set
+                                    // This is the working solution - not elegant but works
+                                    await window.SelectPopulatorService.populateTickersSelect(field, {
+                                        includeEmpty: true,
+                                        defaultValue: defaultValueForSelect // Pass the value we want to set
+                                    });
                                     console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`, {
                                         expectedValue: defaultValueForSelect,
                                         actualValue: field.value,
                                         hasOption: Array.from(field.options).some(opt => opt.value === String(defaultValueForSelect))
                                     });
+                                    
+                                    // CRITICAL: Skip the general select value setting below for ticker fields
+                                    // We already handled it above, and the general code might reset it
+                                    field.dataset.tickerHandled = 'true';
                                 }
                             } catch (populateError) {
                                 console.error(`❌ Failed to populate select ${field.id}:`, populateError);
@@ -3119,6 +3094,13 @@ class ModalManagerV2 {
                         if (field.options.length <= 1) {
                             console.error(`❌ Select ${field.id} still has no options after retries - cannot set value ${selectValue}`);
                         }
+                    }
+                    
+                    // CRITICAL: Skip general select value setting for ticker fields that were already handled
+                    if (field.dataset.tickerHandled === 'true') {
+                        console.log(`⏭️ Skipping general select value setting for ${field.id} - already handled by ticker-specific code`);
+                        // Skip to next iteration in the for loop
+                        continue;
                     }
                     
                     // Check if the value exists in options before trying to set it
@@ -5358,111 +5340,19 @@ class ModalManagerV2 {
                 });
             } 
             // Ticker select fields (but NOT tickerType or tickerCurrency)
+            // Note: executionTicker with populateFromService will be handled above via populateFromService: 'tickers', not here
             else if ((selectId.includes('Ticker') || selectId.includes('ticker')) && 
                       !selectId.includes('Type') && !selectId.includes('Currency') &&
                       selectId !== 'tickerType' && selectId !== 'tickerCurrency') {
-                console.log(`🔍 [DEBUG] Processing ticker select: ${selectId}`, {
-                    isExecutionTicker: selectId === 'executionTicker',
-                    isTradePlanTicker: selectId === 'tradePlanTicker',
-                    selectElement: select,
-                    selectExists: !!select,
-                    selectOptionsBefore: select.options.length,
-                    tickerServiceAvailable: !!(window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function'),
-                    selectPopulatorAvailable: !!(window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function')
+                // Regular ticker select (e.g., tradePlanTicker)
+                // executionTicker with populateFromService is handled above, so it won't reach here
+                await window.SelectPopulatorService.populateTickersSelect(select, {
+                    includeEmpty: true
                 });
-                
-                // For executionTicker, we want tickers with open/closed trades or plans
-                // Same approach as tradePlanTicker - use SelectPopulatorService directly
-                if (selectId === 'executionTicker' && window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
-                    // CRITICAL: Check if this select was already processed by initializeSpecialHandlers
-                    // This prevents double population that clears the value
-                    if (select.dataset.specialHandlersInitialized === 'true' && select.dataset.valuePreserved === 'true') {
-                        console.log(`⏭️ [DEBUG executionTicker] Select already initialized and value preserved, skipping re-population`, {
-                            preservedValue: select.dataset.preservedValue,
-                            currentValue: select.value
-                        });
-                        // Still ensure the value is set correctly
-                        const preservedValue = select.dataset.preservedValue;
-                        if (preservedValue && preservedValue !== '' && select.value !== preservedValue) {
-                            const matchingOption = Array.from(select.options).find(opt => 
-                                opt.value === preservedValue || 
-                                String(opt.value) === String(preservedValue) ||
-                                parseInt(opt.value) === parseInt(preservedValue)
-                            );
-                            if (matchingOption) {
-                                select.value = matchingOption.value;
-                                console.log(`✅ [DEBUG executionTicker] Restored preserved value: ${matchingOption.value}`);
-                            }
-                        }
-                        return; // Skip re-population
-                    }
-                    
-                    try {
-                        // Save current value before populating (if in edit mode)
-                        const currentValue = select.value || select.dataset.preservedValue;
-                        console.log(`🔍 [DEBUG executionTicker] Fetching relevant tickers...`, {
-                            currentValue: currentValue,
-                            willPreserve: !!currentValue
-                        });
-                        const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
-                            useCache: true
-                        });
-                        console.log(`🔍 [DEBUG executionTicker] Got ${relevantTickers.length} relevant tickers:`, relevantTickers.map(t => ({ id: t.id, symbol: t.symbol })));
-                        
-                        // If we have relevant tickers, use filter; otherwise show all (no filter)
-                        if (relevantTickers.length > 0) {
-                            console.log(`🔍 [DEBUG executionTicker] Using filter with ${relevantTickers.length} tickers`);
-                            await window.SelectPopulatorService.populateTickersSelect(select, {
-                                includeEmpty: true,
-                                filterFn: (ticker) => relevantTickers.some(t => t.id === ticker.id),
-                                defaultValue: currentValue // CRITICAL: Preserve current value
-                            });
-                            console.log(`✅ נטענו ${relevantTickers.length} טיקרים ל-${selectId} (עם טריידים/תכנונים פתוחים/סגורים)`, {
-                                selectOptionsAfter: select.options.length,
-                                selectValue: select.value,
-                                expectedValue: currentValue,
-                                match: select.value === String(currentValue)
-                            });
-                        } else {
-                            // No relevant tickers - show all (same as tradePlanTicker when no filter)
-                            console.log(`🔍 [DEBUG executionTicker] No relevant tickers, showing all`);
-                            await window.SelectPopulatorService.populateTickersSelect(select, {
-                                includeEmpty: true,
-                                defaultValue: currentValue // CRITICAL: Preserve current value
-                            });
-                            console.log(`✅ נטענו כל הטיקרים ל-${selectId} (אין טריידים/תכנונים)`, {
-                                selectOptionsAfter: select.options.length,
-                                selectValue: select.value,
-                                expectedValue: currentValue,
-                                match: select.value === String(currentValue)
-                            });
-                        }
-                    } catch (error) {
-                        console.warn(`⚠️ שגיאה בטעינת טיקרים רלוונטיים ל-${selectId}, משתמש בכל הטיקרים:`, error);
-                        // Fallback to all tickers (same as tradePlanTicker)
-                        const currentValue = select.value || select.dataset.preservedValue;
-                        await window.SelectPopulatorService.populateTickersSelect(select, {
-                            includeEmpty: true,
-                            defaultValue: currentValue // CRITICAL: Preserve current value
-                        });
-                        console.log(`✅ [FALLBACK] נטענו כל הטיקרים ל-${selectId}`, {
-                            selectOptionsAfter: select.options.length,
-                            selectValue: select.value,
-                            expectedValue: currentValue,
-                            match: select.value === String(currentValue)
-                        });
-                    }
-                } else {
-                    // Regular ticker select (e.g., cashFlowTicker, tradePlanTicker)
-                    console.log(`🔍 [DEBUG ${selectId}] Regular ticker select (like tradePlanTicker)`);
-                    await window.SelectPopulatorService.populateTickersSelect(select, {
-                        includeEmpty: true
-                    });
-                    console.log(`✅ נטענו טיקרים ל-${selectId}`, {
-                        selectOptionsAfter: select.options.length,
-                        selectValue: select.value
-                    });
-                }
+                console.log(`✅ נטענו טיקרים ל-${selectId}`, {
+                    selectOptionsAfter: select.options.length,
+                    selectValue: select.value
+                });
             } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
                 await window.SelectPopulatorService.populateTradePlansSelect(select, {
                     includeEmpty: true
@@ -5607,53 +5497,40 @@ class ModalManagerV2 {
         
         // For Executions modal - handle ticker and account selection
         if (modalId === 'executionsModal') {
-            // Handle ticker selection
+            // Handle ticker selection - clone and re-populate to ensure value is preserved
+            // This is the working solution - not elegant but works
             const tickerSelect = modalElement.querySelector('#executionTicker');
             if (tickerSelect) {
-                // CRITICAL: Check if this select was already processed (has data attribute)
-                // This prevents double processing when initializeSpecialHandlers is called multiple times
-                if (tickerSelect.dataset.specialHandlersInitialized === 'true') {
-                    console.log(`⏭️ [initializeSpecialHandlers] executionTicker already initialized, skipping...`);
-                    return; // Already processed, skip
-                }
-                
-                // Save original before cloning
-                const originalTickerSelect = tickerSelect;
-                // CRITICAL: Check for preserved value from populateForm (set before cloneNode)
-                // This ensures we use the value that was set by populateForm, not the empty value from populateSelects
+                // CRITICAL: Get preserved value from data attribute (set by populateForm)
+                // OR use current value if preserved value not available
                 const preservedValue = tickerSelect.dataset.preservedValue;
                 const originalValue = preservedValue || tickerSelect.value;
-                const originalOptionsCount = tickerSelect.options.length;
+                console.log(`💾 [initializeSpecialHandlers] executionTicker - preservedValue: ${preservedValue}, currentValue: ${tickerSelect.value}, will use: ${originalValue}`);
                 
-                console.log(`🔍 [initializeSpecialHandlers] Cloning executionTicker`, {
-                    optionsBefore: originalOptionsCount,
-                    valueBefore: originalValue,
-                    preservedValue: preservedValue,
-                    currentValue: tickerSelect.value,
-                    usingPreserved: !!preservedValue
-                });
+                // Clone to remove existing listeners
+                const newTickerSelect = tickerSelect.cloneNode(true);
+                tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
                 
-                // CRITICAL: Don't clone and re-populate - this causes double loading that clears the value!
-                // The select was already populated by populateSelects and populateForm with the correct value.
-                // We only need to add the change event listener.
-                // This matches the behavior in cash flows where selects with populateFromService don't get cloned.
+                console.log(`🔄 [initializeSpecialHandlers] After clone - originalValue: ${originalValue}, newSelect.value: ${newTickerSelect.value}`);
                 
-                // Mark as initialized to prevent any future processing
-                tickerSelect.dataset.specialHandlersInitialized = 'true';
-                if (originalValue && originalValue !== '') {
-                    tickerSelect.dataset.valuePreserved = 'true';
-                    tickerSelect.dataset.preservedValue = String(originalValue);
+                // Re-populate with original value as defaultValue
+                if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+                    (async () => {
+                        try {
+                            console.log(`🔄 [initializeSpecialHandlers] Re-populating with defaultValue: ${originalValue}`);
+                            await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
+                                includeEmpty: true,
+                                defaultValue: originalValue // CRITICAL: Use the preserved value
+                            });
+                            console.log(`✅ [initializeSpecialHandlers] Re-populated, final value: ${newTickerSelect.value}, expected: ${originalValue}`);
+                        } catch (error) {
+                            console.error(`❌ Error re-populating executionTicker:`, error);
+                        }
+                    })();
                 }
                 
-                console.log(`✅ [initializeSpecialHandlers] executionTicker already populated by populateForm, skipping clone/re-populate`, {
-                    currentValue: tickerSelect.value,
-                    optionsCount: tickerSelect.options.length,
-                    preservedValue: preservedValue,
-                    originalValue: originalValue
-                });
-                
-                // Add change listener (without cloning)
-                tickerSelect.addEventListener('change', async (e) => {
+                // Add change listener
+                newTickerSelect.addEventListener('change', async (e) => {
                     const tickerId = e.target.value;
                     if (tickerId && window.loadExecutionTickerInfo) {
                         await window.loadExecutionTickerInfo(tickerId);

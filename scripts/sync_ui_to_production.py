@@ -42,23 +42,66 @@ def sync_ui_to_production():
     # Copy entire directory
     print(f"📁 Copying UI files...")
     try:
-        shutil.copytree(source_ui, target_ui, ignore=shutil.ignore_patterns(
-            'node_modules',
-            '.git',
-            '__pycache__',
-            '*.pyc',
-            '.DS_Store',
-            'coverage',
-            '*.log'
-        ))
+        # Use copytree with copy_function=shutil.copy2 to preserve metadata (timestamps, permissions)
+        # This ensures files are properly copied with timestamps
+        shutil.copytree(
+            source_ui, 
+            target_ui, 
+            ignore=shutil.ignore_patterns(
+                'node_modules',
+                '.git',
+                '__pycache__',
+                '*.pyc',
+                '.DS_Store',
+                'coverage',
+                '*.log'
+            ),
+            copy_function=shutil.copy2,  # Preserve metadata (timestamps, permissions)
+            dirs_exist_ok=False
+        )
         
         # Count files
         ui_files = list(target_ui.rglob('*'))
         ui_files = [f for f in ui_files if f.is_file()]
         
+        # Count CSS files specifically
+        css_files = [f for f in ui_files if f.suffix == '.css']
+        
+        # Count JS files
+        js_files = [f for f in ui_files if f.suffix == '.js']
+        
+        # Count HTML files
+        html_files = [f for f in ui_files if f.suffix == '.html']
+        
         print(f"✅ Successfully copied {len(ui_files)} files")
+        print(f"   📄 CSS files: {len(css_files)}")
+        print(f"   📄 JS files: {len(js_files)}")
+        print(f"   📄 HTML files: {len(html_files)}")
         print(f"📁 Location: {target_ui}")
         print()
+        
+        # Verify critical files were copied
+        critical_files = [
+            'scripts/header-system.js',
+            'styles-new/header-styles.css',
+            'data_import.html',
+            'index.html'
+        ]
+        
+        print("🔍 Verifying critical files...")
+        all_critical_ok = True
+        for rel_path in critical_files:
+            target_file = target_ui / rel_path
+            if target_file.exists():
+                print(f"  ✅ {rel_path}")
+            else:
+                print(f"  ❌ MISSING: {rel_path}")
+                all_critical_ok = False
+        
+        if not all_critical_ok:
+            print("  ⚠️  Some critical files are missing!")
+        print()
+        
         print("=" * 70)
         print("✅ UI sync completed successfully!")
         print("=" * 70)

@@ -620,7 +620,23 @@
         const duration = performance.now() - startTime;
         const result = payload?.data || {};
         const requested = Number.isFinite(Number(result.requested)) ? Number(result.requested) : 0;
-        const fetched = Number.isFinite(Number(result.fetched)) ? Number(result.fetched) : 0;
+        // Handle case where fetched might be an object (due to middleware timestamp conversion bug)
+        // The DateNormalizationService incorrectly converts "fetched" (a count) to a timestamp
+        let fetched = 0;
+        if (typeof result.fetched === 'number') {
+          fetched = Number.isFinite(result.fetched) ? result.fetched : 0;
+        } else if (typeof result.fetched === 'object' && result.fetched !== null) {
+          // If middleware incorrectly converted count to timestamp object, we can't reliably recover it
+          // The epochMs value represents milliseconds since epoch, not the original count
+          // e.g., fetched=1 might become epochMs=1000 (1 second), not 1000 items
+          // With the Backend fix, this should no longer happen, but handle it gracefully
+          fetched = 0; // Can't reliably determine, treat as unknown/error
+          logger.warn(`${MODULE_NAME}:refresh-all:fetched-converted-to-timestamp`, {
+            fetched_object: result.fetched,
+            requested,
+            message: 'fetched was incorrectly converted to timestamp by middleware - treating as 0'
+          });
+        }
         const failedSymbols = Array.isArray(result.failed_symbols) ? result.failed_symbols : [];
         const skippedEntries = Array.isArray(result.skipped) ? result.skipped : [];
 
@@ -648,10 +664,19 @@
           developerDetails.push(`• מזהה בקשה: ${safeText(payload.requestId)}`);
         }
 
-        if (failedSymbols.length) {
+        // Always show failed symbols if any, or indicate which symbols were requested but not fetched
+        if (failedSymbols.length > 0) {
           const truncatedFailed = failedSymbols.slice(0, 10).join(', ');
           const hasMoreFailures = failedSymbols.length > 10 ? ' (קיימים נוספים…) ' : '';
           developerDetails.push(`• סימבולים שנכשלו: ${truncatedFailed}${hasMoreFailures}`);
+        } else if (requested > 0 && fetched === 0) {
+          // If we requested symbols but got 0, something went wrong but failed_symbols is empty
+          // This can happen if the API doesn't return failed_symbols properly
+          developerDetails.push(`• סימבולים שנכשלו: כל הסימבולים (${requested} טיקרים לא הצליחו להיטען)`);
+        } else if (requested > 0 && fetched < requested && failedSymbols.length === 0) {
+          // Partial failure but no failed_symbols returned - try to infer from requested vs fetched
+          const missingCount = requested - fetched;
+          developerDetails.push(`• סימבולים שנכשלו: ${missingCount} טיקרים (רשימה לא זמינה מה-API)`);
         }
 
         if (skippedEntries.length) {
@@ -2829,6 +2854,25 @@ window.ExternalDataDashboard = ExternalDataDashboard;
 
   if (!window.externalDataDashboard) {
     window.externalDataDashboard = new ExternalDataDashboard();
+    // Auto-initialize when DOM is ready (fallback if core-systems.js doesn't initialize it)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', async () => {
+        if (!window.externalDataDashboard.isInitialized) {
+          try {
+            await window.externalDataDashboard.init();
+          } catch (error) {
+            logger.error(`${MODULE_NAME}:auto-init-failed`, { error });
+          }
+        }
+      });
+    } else {
+      // DOM already loaded, initialize immediately if not already initialized
+      if (!window.externalDataDashboard.isInitialized) {
+        window.externalDataDashboard.init().catch((error) => {
+          logger.error(`${MODULE_NAME}:auto-init-failed`, { error });
+        });
+      }
+    }
   }
 
   /**

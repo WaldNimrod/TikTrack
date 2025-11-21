@@ -348,11 +348,34 @@ async function deleteNote(id) {
               ? window.FieldRendererService.renderDate(createdEnvelope)
               : (function fallbackDateDisplay(value) {
                   try {
-                    const parsed = new Date(
-                      value?.utc || value?.local || value
-                    );
+                    // Use dateUtils for consistent date parsing
+                    let parsed;
+                    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                      const envelope = window.dateUtils.ensureDateEnvelope(value);
+                      if (envelope && envelope.epochMs) {
+                        parsed = new Date(envelope.epochMs);
+                      } else {
+                        parsed = new Date(value?.utc || value?.local || value);
+                      }
+                    } else if (value && typeof value === 'object' && typeof value.epochMs === 'number') {
+                      parsed = new Date(value.epochMs);
+                    } else {
+                      parsed = new Date(value?.utc || value?.local || value);
+                    }
+                    
                     if (!Number.isNaN(parsed.getTime())) {
-                      return window.formatDate ? window.formatDate(parsed) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(parsed) : parsed.toLocaleDateString('he-IL'));
+                      // Use FieldRendererService or dateUtils for formatting
+                      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(parsed, false);
+                      }
+                      if (window.formatDate) {
+                        return window.formatDate(parsed);
+                      }
+                      if (window.dateUtils?.formatDate) {
+                        return window.dateUtils.formatDate(parsed, { includeTime: false });
+                      }
+                      // Last resort: use toLocaleDateString
+                      return parsed.toLocaleDateString('he-IL');
                     }
                   } catch (err) {
                     window.Logger?.warn('⚠️ fallbackDateDisplay failed', { err, value }, { page: 'notes' });
@@ -575,8 +598,31 @@ async function updateNotesTable(notes) {
             ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
             : (() => {
                 try {
-                  const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
+                  // Use dateUtils for consistent date parsing
+                  let parsed;
+                  const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
+                  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                    const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+                    if (envelope && envelope.epochMs) {
+                      parsed = new Date(envelope.epochMs);
+                    } else {
+                      parsed = new Date(dateValue);
+                    }
+                  } else if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
+                    parsed = new Date(dateValue.epochMs);
+                  } else {
+                    parsed = new Date(dateValue);
+                  }
+                  
                   if (!Number.isNaN(parsed.getTime())) {
+                    // Use FieldRendererService or dateUtils for formatting
+                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                      return window.FieldRendererService.renderDate(parsed, false);
+                    }
+                    if (window.dateUtils?.formatDate) {
+                      return window.dateUtils.formatDate(parsed, { includeTime: false });
+                    }
+                    // Last resort: use toLocaleDateString
                     return parsed.toLocaleDateString('he-IL');
                   }
                 } catch (error) {

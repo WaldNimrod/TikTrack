@@ -90,7 +90,20 @@ function getFieldLabel(field) {
  * @returns {boolean} האם התאריך תקין
  */
 function isValidDate(dateString) {
-  const date = new Date(dateString);
+  // Use dateUtils for consistent date parsing (if available)
+  let date;
+  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+    const envelope = window.dateUtils.ensureDateEnvelope(dateString);
+    if (envelope && envelope.epochMs) {
+      date = new Date(envelope.epochMs);
+    } else {
+      date = new Date(dateString);
+    }
+  } else if (dateString && typeof dateString === 'object' && typeof dateString.epochMs === 'number') {
+    date = new Date(dateString.epochMs);
+  } else {
+    date = new Date(dateString);
+  }
   return !isNaN(date.getTime());
 }
 
@@ -421,8 +434,21 @@ function validateDateField(input, rules = {}) {
     return true;
   }
 
-  // בדיקה שהערך הוא תאריך תקין
-  const dateValue = new Date(value);
+  // בדיקה שהערך הוא תאריך תקין - Use dateUtils for consistent date parsing
+  let dateValue;
+  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+    const envelope = window.dateUtils.ensureDateEnvelope(value);
+    if (envelope && envelope.epochMs) {
+      dateValue = new Date(envelope.epochMs);
+    } else {
+      dateValue = new Date(value);
+    }
+  } else if (value && typeof value === 'object' && typeof value.epochMs === 'number') {
+    dateValue = new Date(value.epochMs);
+  } else {
+    dateValue = new Date(value);
+  }
+  
   if (isNaN(dateValue.getTime())) {
     const fieldLabel = getFieldLabel(input);
     const errorMsg = `${fieldLabel} - תאריך לא תקין`;
@@ -432,10 +458,30 @@ function validateDateField(input, rules = {}) {
 
   // בדיקת תאריך מינימלי
   if (mergedRules.minDate) {
-    const minDate = new Date(mergedRules.minDate);
+    let minDate;
+    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+      const envelope = window.dateUtils.ensureDateEnvelope(mergedRules.minDate);
+      if (envelope && envelope.epochMs) {
+        minDate = new Date(envelope.epochMs);
+      } else {
+        minDate = new Date(mergedRules.minDate);
+      }
+    } else {
+      minDate = new Date(mergedRules.minDate);
+    }
+    
     if (dateValue < minDate) {
       const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - תאריך מינימלי: ${minDate.toLocaleDateString('he-IL')}`;
+      // Use FieldRendererService or dateUtils for date formatting
+      let minDateDisplay;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        minDateDisplay = window.FieldRendererService.renderDate(minDate, false);
+      } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+        minDateDisplay = window.dateUtils.formatDate(minDate, { includeTime: false });
+      } else {
+        minDateDisplay = minDate.toLocaleDateString('he-IL');
+      }
+      const errorMsg = `${fieldLabel} - תאריך מינימלי: ${minDateDisplay}`;
       showFieldError(input, errorMsg);
       return errorMsg;
     }
@@ -443,10 +489,30 @@ function validateDateField(input, rules = {}) {
 
   // בדיקת תאריך מקסימלי
   if (mergedRules.maxDate) {
-    const maxDate = new Date(mergedRules.maxDate);
+    let maxDate;
+    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+      const envelope = window.dateUtils.ensureDateEnvelope(mergedRules.maxDate);
+      if (envelope && envelope.epochMs) {
+        maxDate = new Date(envelope.epochMs);
+      } else {
+        maxDate = new Date(mergedRules.maxDate);
+      }
+    } else {
+      maxDate = new Date(mergedRules.maxDate);
+    }
+    
     if (dateValue > maxDate) {
       const fieldLabel = getFieldLabel(input);
-      const errorMsg = `${fieldLabel} - תאריך מקסימלי: ${maxDate.toLocaleDateString('he-IL')}`;
+      // Use FieldRendererService or dateUtils for date formatting
+      let maxDateDisplay;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        maxDateDisplay = window.FieldRendererService.renderDate(maxDate, false);
+      } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+        maxDateDisplay = window.dateUtils.formatDate(maxDate, { includeTime: false });
+      } else {
+        maxDateDisplay = maxDate.toLocaleDateString('he-IL');
+      }
+      const errorMsg = `${fieldLabel} - תאריך מקסימלי: ${maxDateDisplay}`;
       showFieldError(input, errorMsg);
       return errorMsg;
     }

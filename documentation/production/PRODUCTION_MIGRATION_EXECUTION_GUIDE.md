@@ -282,3 +282,4 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -c "DROP DATABASE \"Tik
 **תאריך עדכון אחרון:** נובמבר 2025  
 **גרסה:** 1.0
 
+

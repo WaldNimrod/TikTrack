@@ -107,15 +107,28 @@
                 },
                 description: 'הוסף תגיות לטיקר לצורך סיווג ופילטרים'
             },
-            // שורה אחרונה: הערות (בשורה מלאה)
+            // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
             {
-                type: 'textarea',
+                type: 'rich-text',
                 id: 'tickerRemarks',
                 label: 'הערות',
                 required: false,
-                rows: 3,
                 placeholder: 'הכנס הערות נוספות על הטיקר...',
-                maxLength: 500
+                maxLength: 5000,
+                options: {
+                    direction: 'rtl',
+                    placeholder: 'הכנס הערות נוספות על הטיקר...',
+                    toolbar: [
+                        [{ 'header': [2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                        [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
             },
             // אזור בדיקת נתונים חיצוניים (נוסף דינמית)
             {
@@ -167,7 +180,7 @@
             },
             tickerRemarks: {
                 required: false,
-                maxLength: 500
+                maxLength: 5000
             }
         },
         onSave: 'saveTicker'

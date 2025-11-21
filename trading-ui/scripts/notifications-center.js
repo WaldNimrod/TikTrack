@@ -376,7 +376,8 @@ class NotificationsCenter {
       title,
       message,
       category,
-      time: time === 'now' ? new Date() : new Date(time),
+      // Use dateUtils for consistent date handling
+      time: time === 'now' ? (window.dateUtils?.getToday ? window.dateUtils.getToday() : new Date()) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(time) : new Date(time)),
       timestamp: Date.now(),
     };
 
@@ -603,8 +604,17 @@ class NotificationsCenter {
     
     if (newMessagesCount) {
       // ספירת הודעות חדשות מהשעה האחרונה
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      const newMessages = this.history.filter(n => new Date(n.time) > oneHourAgo).length;
+      // Use dateUtils for consistent date handling
+      let oneHourAgo;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        oneHourAgo = window.dateUtils.toDateObject({ epochMs: Date.now() - 60 * 60 * 1000 });
+      } else {
+        oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      }
+      const newMessages = this.history.filter(n => {
+        const msgTime = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(n.time) : new Date(n.time);
+        return msgTime > oneHourAgo;
+      }).length;
       newMessagesCount.textContent = newMessages;
     }
     
@@ -726,16 +736,27 @@ class NotificationsCenter {
   static getTimeAgo(_date) {
     // בדיקה שהפרמטר הוא אובייקט Date תקין
     let date = _date;
+    // Use dateUtils for consistent date parsing
     if (!date || !(date instanceof Date)) {
       try {
-        date = new Date(date);
+        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+          date = window.dateUtils.toDateObject(date);
+        } else {
+          date = new Date(date);
+        }
       } catch (error) {
         // console.warn('שגיאה בהמרת תאריך:', error);
         return 'לא ידוע';
       }
     }
 
-    const now = new Date();
+    // Use dateUtils for consistent date handling
+    let now;
+    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+      now = window.dateUtils.getToday();
+    } else {
+      now = new Date();
+    }
     const diff = Math.floor((now - date) / 1000);
 
     if (diff < 60) {return 'עכשיו';}

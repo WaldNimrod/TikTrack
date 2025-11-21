@@ -47,7 +47,6 @@ No connection to testing system!
 
 from flask import Flask, jsonify, request, send_from_directory, g, Request
 from flask_cors import CORS
-import sqlite3
 import os
 from datetime import datetime
 from typing import Dict, Any, Optional, List
@@ -71,7 +70,6 @@ from config.settings import (
     PORT,
     IS_PRODUCTION,
     ENVIRONMENT,
-    DB_PATH,
     UI_DIR
 )
 
@@ -1561,104 +1559,15 @@ def get_yahoo_quotes() -> Any:
 
 # Database and UI paths are now imported from config.settings
 # They are automatically set based on environment (development/production)
-
-# Check if DB file exists
-if not DB_PATH.exists():
-    raise FileNotFoundError(f"Database not found at: {DB_PATH}")
+# Database connection is handled via SQLAlchemy through config.database
 
 # Check if UI directory exists
 if not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 
 # UI Directory validation - removed debug prints
-
-def get_db_connection() -> sqlite3.Connection:
-    try:
-        # Enhanced SQLite settings for stability
-        # Convert Path object to string for sqlite3.connect
-        db_path_str = str(DB_PATH)
-        conn = sqlite3.connect(
-            db_path_str, 
-            timeout=30.0,  # Longer timeout
-            check_same_thread=False  # Allow multi-thread usage
-        )
-        conn.row_factory = sqlite3.Row
-        
-        # WAL mode settings for better performance
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA synchronous=NORMAL")
-        conn.execute("PRAGMA cache_size=10000")
-        conn.execute("PRAGMA temp_store=MEMORY")
-        conn.execute("PRAGMA foreign_keys=ON")
-        
-        return conn
-    except Exception as e:
-        # Database connection error - removed debug print
-        raise
-
-def update_ticker_open_status(ticker_id: int) -> None:
-    """
-    Updates the active_trades field of a ticker according to open plans and trades status
-    """
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Check if there are active plans
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM trade_plans 
-            WHERE ticker_id = ? AND status = 'open'
-        """, (ticker_id,))
-        open_plans = cursor.fetchone()['count']
-        
-        # Check if there are active trades
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM trades 
-            WHERE ticker_id = ? AND status = 'open'
-        """, (ticker_id,))
-        open_trades = cursor.fetchone()['count']
-        
-        # Update active_trades field
-        is_active = (open_plans > 0 or open_trades > 0)
-        cursor.execute("""
-            UPDATE tickers 
-            SET active_trades = ? 
-            WHERE id = ?
-        """, (is_active, ticker_id))
-        
-        conn.commit()
-        # active_trades update completed - removed debug print
-        
-    except Exception as e:
-        # active_trades update error - removed debug print
-        conn.rollback()
-    finally:
-        conn.close()
-
-def update_all_tickers_open_status() -> None:
-    """
-    Updates the active_trades field of all tickers
-    """
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Get all tickers
-        cursor.execute("SELECT id FROM tickers")
-        tickers = cursor.fetchall()
-        
-        for ticker in tickers:
-            update_ticker_open_status(ticker['id'])
-        
-        # All tickers active_trades update completed - removed debug print
-        
-    except Exception as e:
-        # Error updating all tickers - removed debug print
-        pass
-    finally:
-        conn.close()
+# Note: Database operations now use SQLAlchemy through config.database
+# Ticker active_trades updates are handled via routes/api/tickers.py endpoints
 
 # Routes are now handled by pages_bp blueprint
 
@@ -2102,40 +2011,41 @@ def save_file():
 @rate_limit_api(requests_per_minute=60)
 def get_system_setting(setting_key):
     """Get system setting by key"""
+    from config.database import get_db
+    from services.system_settings_service import SystemSettingsService
+    from models.system_settings import SystemSettingType
+    
+    db = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        svc = SystemSettingsService(db)
         
-        # Get setting value
-        cursor.execute("""
-            SELECT s.value, t.data_type, t.description, t.default_value
-            FROM system_settings s
-            JOIN system_setting_types t ON s.type_id = t.id
-            WHERE t.key = ? AND t.is_active = 1
-        """, (setting_key,))
+        # Get setting type for metadata
+        s_type = db.query(SystemSettingType).filter(
+            SystemSettingType.key == setting_key,
+            SystemSettingType.is_active == True
+        ).first()
         
-        result = cursor.fetchone()
-        conn.close()
-        
-        if result:
-            value, data_type, description, default_value = result
-            return jsonify({
-                "success": True,
-                "data": {
-                    "key": setting_key,
-                    "value": value,
-                    "data_type": data_type,
-                    "description": description,
-                    "default_value": default_value
-                },
-                "timestamp": datetime.now().isoformat()
-            }), 200
-        else:
+        if not s_type:
             return jsonify({
                 "success": False,
                 "error": f"System setting not found: {setting_key}",
                 "timestamp": datetime.now().isoformat()
             }), 404
+        
+        # Get setting value
+        value = svc.get_setting(setting_key)
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "key": setting_key,
+                "value": value,
+                "data_type": s_type.data_type,
+                "description": s_type.description,
+                "default_value": s_type.default_value
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
             
     except Exception as e:
         return jsonify({
@@ -2143,11 +2053,17 @@ def get_system_setting(setting_key):
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }), 500
+    finally:
+        db.close()
 
 @app.route("/api/system/settings/<setting_key>", methods=["POST"])
 @rate_limit_api(requests_per_minute=30)
 def update_system_setting(setting_key):
     """Update system setting by key"""
+    from config.database import get_db
+    from services.system_settings_service import SystemSettingsService
+    
+    db = next(get_db())
     try:
         data = request.get_json()
         if not data or 'value' not in data:
@@ -2159,32 +2075,19 @@ def update_system_setting(setting_key):
         new_value = data['value']
         updated_by = data.get('updated_by', 'system')
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        svc = SystemSettingsService(db)
+        success = svc.set_setting(setting_key, new_value, updated_by)
         
-        # Update setting value
-        cursor.execute("""
-            UPDATE system_settings 
-            SET value = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE type_id = (
-                SELECT id FROM system_setting_types 
-                WHERE key = ? AND is_active = 1
-            )
-        """, (new_value, updated_by, setting_key))
-        
-        if cursor.rowcount > 0:
-            conn.commit()
-            conn.close()
+        if success:
             return jsonify({
                 "success": True,
                 "message": f"System setting {setting_key} updated successfully",
                 "timestamp": datetime.now().isoformat()
             }), 200
         else:
-            conn.close()
             return jsonify({
                 "success": False,
-                "error": f"System setting not found: {setting_key}",
+                "error": f"System setting not found or update failed: {setting_key}",
                 "timestamp": datetime.now().isoformat()
             }), 404
             
@@ -2194,6 +2097,8 @@ def update_system_setting(setting_key):
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }), 500
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     # 🎯 **Flask Development Server**

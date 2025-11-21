@@ -4665,19 +4665,25 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
           }
 
           // Initialize External Data Dashboard
-          if (typeof ExternalDataDashboard !== 'undefined' && !window.externalDataDashboard) {
+          if (typeof ExternalDataDashboard !== 'undefined') {
             try {
-              window.externalDataDashboard = new ExternalDataDashboard();
-              window.externalDataDashboard.init();
-              console.log('✅ External Data Dashboard initialized');
+              // Create instance if it doesn't exist
+              if (!window.externalDataDashboard) {
+                window.externalDataDashboard = new ExternalDataDashboard();
+              }
+              
+              // Initialize if not already initialized
+              if (!window.externalDataDashboard.isInitialized) {
+                await window.externalDataDashboard.init();
+                console.log('✅ External Data Dashboard initialized');
+              } else {
+                console.log('✅ External Data Dashboard already initialized');
+              }
             } catch (error) {
               console.error('❌ Failed to initialize External Data Dashboard:', error);
             }
           } else {
-            console.log('🔍 External Data Dashboard check:', {
-              ExternalDataDashboard: typeof ExternalDataDashboard,
-              externalDataDashboard: typeof window.externalDataDashboard,
-            });
+            console.warn('⚠️ ExternalDataDashboard class not available');
           }
 
           // Initialize Unified Log System

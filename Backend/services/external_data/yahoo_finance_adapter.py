@@ -397,6 +397,18 @@ class YahooFinanceAdapter:
                 logger.debug(f"Request successful: {url}")
                 return data
                 
+            except requests.exceptions.HTTPError as e:
+                if e.response and e.response.status_code == 404:
+                    # Symbol not found in Yahoo Finance - likely European/unsupported ticker
+                    # Don't retry 404 errors - symbol simply doesn't exist in Yahoo Finance
+                    logger.warning(f"Symbol not found in Yahoo Finance (404): {url.split('/')[-1].split('?')[0]} - This may be a European or unsupported ticker")
+                    return None  # Don't retry 404 errors
+                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                if attempt < self.retry_attempts:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                else:
+                    logger.error(f"All retry attempts failed for {url}")
+                    return None
             except requests.exceptions.RequestException as e:
                 logger.warning(f"Request attempt {attempt + 1} failed: {e}")
                 if attempt < self.retry_attempts:

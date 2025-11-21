@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>ביצועים - TikTrack</title>
+    
+    <!-- 
+    ===== CORRECTED EXECUTIONS PAGE =====
+    
+    This page has been corrected to follow the proper architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Scripts moved to body
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css?v=0da3519a_20251102_104906">
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
+    <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
+    <script>
+        // Define showModalSafe immediately in head to ensure it's available before HTML is parsed
+        // This prevents "showModalSafe is not a function" errors when data-onclick attributes are processed
+        window.showModalSafe = async function(modalId, mode = 'add') {
+            try {
+                console.log(`🔍 [showModalSafe] Called with:`, { modalId, mode, ModalManagerV2Available: !!window.ModalManagerV2 });
+                
+                // If ModalManagerV2 is not available, wait for it (up to 2 seconds)
+                if (!window.ModalManagerV2) {
+                    console.warn('⚠️ [showModalSafe] ModalManagerV2 not available, waiting...');
+                    for (let i = 0; i < 20; i++) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        if (window.ModalManagerV2) {
+                            console.log(`✅ [showModalSafe] ModalManagerV2 became available after ${(i + 1) * 100}ms`);
+                            break;
+                        }
+                    }
+                }
+                
+                if (window.ModalManagerV2 && window.ModalManagerV2.showModal) {
+                    console.log(`✅ [showModalSafe] Calling ModalManagerV2.showModal`);
+                    await window.ModalManagerV2.showModal(modalId, mode);
+                    console.log(`✅ [showModalSafe] Modal shown successfully`);
+                } else {
+                    console.error('❌ [showModalSafe] ModalManagerV2 not available after wait');
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ [showModalSafe] Error showing modal:', error);
+                console.error('   Error stack:', error.stack);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל: ${error.message}`);
+                }
+            }
+        };
+        console.log('✅ [showModalSafe] Helper function created in <head> - available immediately');
+    </script>
+    
+    <!-- Import User Data Modal Styles - Now using ITCSS -->
+    
+    <!-- Additional styles for import modal -->
+    <style>
+        .step-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .step-actions .btn {
+            font-size: 0.875rem;
+            padding: 0.375rem 0.75rem;
+        }
+    </style>
+</head>
+
+<body class="executions-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Executions area - top-Section -->
+                <div class="top-section" data-section="top">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/executions.svg" alt="ביצועים" class="section-icon">
+                        ביצועים
+                    </div>
+                    <div class="table-actions">
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Data summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>סה"כ ביצועים: <strong id="totalExecutions">0</strong> (<span id="totalBuyExecutions" class="buy-color">0</span> קניה / <span id="totalSellExecutions" class="sell-color">0</span> מכירה)</div>
+                        <div>סה"כ קניה: <strong id="totalBuyAmount">$0</strong></div>
+                        <div>סה"כ מכירות: <strong id="totalSellAmount">$0</strong></div>
+                        <div>מאזן: <strong id="balanceAmount">$0</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Executions management area - content-section -->
+                <div class="content-section" id="main">
+                    <!-- Executions header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/executions.svg" alt="ניהול ביצועים" class="section-icon">
+                            ניהול ביצועים
+                        </div>
+                        <div class="table-count" id="executionsCount">טוען...</div>
+                        <div class="table-actions">
+                            <button data-button-type="ADD" data-entity-type="execution" data-variant="full" data-onclick="window.showModalSafe('executionsModal','add')" data-text="הוסף ביצוע" id="addExecutionBtn" title="הוסף ביצוע חדש"></button>
+                            <button data-button-type="IMPORT" data-variant="full" data-onclick="openImportUserDataModal()" data-text="📥 ייבוא נתוני משתמש" title="ייבוא ביצועים מקובץ CSV"></button>
+                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר"></button>
+                        </div>
+                    </div>
+
+                    <!-- Executions table -->
+                    <div class="section-body">
+                        <div class="table-responsive" id="executionsContainer">
+                            <table class="table table-hover" id="executionsTable" data-table-type="executions">
+                                <thead>
+                                    <tr>
+                                        <th class="col-trade">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="טרייד" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 0)" ></button>
+                                        </th>
+                                        <th class="col-ticker">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="טיקר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 1)" ></button>
+                                        </th>
+                                        <th class="col-action">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="פעולה" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 2)" ></button>
+                                        </th>
+                                        <th class="col-account">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="חשבון מסחר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 3)" ></button>
+                                        </th>
+                                        <th class="col-quantity">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="כמות" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 4)" ></button>
+                                        </th>
+                                        <th class="col-price">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מחיר" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 5)" ></button>
+                                        </th>
+                                        <th class="col-realized-pl">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="Realized P/L" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 6)" ></button>
+                                        </th>
+                                        <th class="col-mtm-pl">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="MTM P/L" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 7)" ></button>
+                                        </th>
+                                        <th class="col-execution-date">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 8)" ></button>
+                                        </th>
+                                        <th class="col-source">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מקור" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 9)" ></button>
+                                        </th>
+                                        <th class="col-updated">
+                                            <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="עודכן" data-classes="btn-link sortable-header" data-onclick="window.sortTable('executions', 10)" ></button>
+                                        </th>
+                                        <th class="col-actions actions-cell actions-3-items">
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="12" class="loading">טוען ביצועים...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Trade creation clusters section -->
+            <div class="content-section" id="tradeCreationClustersSection" data-section="trade-creation">
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/trades.svg" alt="יצירת טרייד מהביצועים" class="section-icon">
+                        יצירת טריידים מאשכול ביצועים
+                    </div>
+                    <div class="table-count" id="executionTradeCreationClustersCount">0</div>
+                    <div class="table-actions">
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('trade-creation')" data-text="הצג/הסתר"></button>
+                    </div>
+                </div>
+                <div class="section-body d-flex flex-column gap-3">
+                    <div id="executionTradeCreationClustersLoading" class="d-flex align-items-center text-muted small d-none">
+                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                        <span>טוען אשכולות ליצירת טרייד...</span>
+                    </div>
+                    <div id="executionTradeCreationClustersError" class="alert alert-danger d-none" role="alert"></div>
+                    <div id="executionTradeCreationClustersEmpty" class="alert alert-success d-none" role="status">
+                        אין כרגע ביצועים זמינים ליצירת טרייד חדש.
+                    </div>
+                    <div id="executionTradeCreationClustersContainer" class="d-flex flex-column gap-3"></div>
+                </div>
+            </div>
+
+            <!-- UI Content Section 2 Start-->
+            <!-- Executions trade assignment suggestions area - content-section -->
+            <div class="content-section" id="suggestions" data-section="suggestions">
+                <!-- Suggestions header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/executions.svg" alt="המלצות שיוך" class="section-icon">
+                        המלצות שיוך לטריידים
+                    </div>
+                    <div class="table-count" id="suggestionsCount">טוען...</div>
+                    <div class="table-actions">
+                        <button data-button-type="PRIMARY" data-variant="full" data-onclick="acceptAllSuggestions()" data-text="קבל הכל" title="קבל את כל ההמלצות"></button>
+                        <button data-button-type="SECONDARY" data-variant="full" data-onclick="rejectAllSuggestions()" data-text="דחה הכל" title="דחה את כל ההמלצות"></button>
+                        <button data-button-type="SAVE" data-variant="full" data-onclick="applySelectedSuggestions()" data-text="שייך נבחרים" title="שייך את ההמלצות המסומנות"></button>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('suggestions')" data-text="הצג/הסתר"></button>
+                    </div>
+                </div>
+
+                <!-- Suggestions content -->
+                <div class="section-body">
+                    <div id="tradeSuggestionsContainer"></div>
+                </div>
+            </div>
+            <!-- UI Content Section 2 End-->
+        </div>
+
+        <!-- Bottom page spacing -->
+        <div class="spacer-bottom"></div>
+
+        <!-- Notification system -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- Toast container for notifications -->
+        <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- Import User Data Modal -->
+    <div class="modal" id="importUserDataModal" tabindex="-1" role="dialog" aria-labelledby="importUserDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importUserDataModalLabel">
+                        <i class="bi bi-cloud-upload"></i>
+                        ייבוא ביצועים (Executions)
+                    </h5>
+                    <button
+                        data-button-type="CLOSE"
+                        data-variant="small"
+                        data-onclick="closeImportUserDataModal()"
+                        data-text=""
+                        title="סגור את מודל הייבוא"
+                        aria-label="סגור את מודל הייבוא">
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                    <!-- Progress Steps Indicator -->
+                    <div class="import-steps-indicator">
+                        <div class="step" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">העלאה</div>
+                                    </div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">ניתוח + פתרון בעיות</div>
+                                </div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">תצוגה מקדימה + אישור</div>
+                                    </div>
+                                </div>
+
+                    <!-- Step 1+2: Upload + Account Selection (COMBINED) -->
+                    <div class="import-step" id="step-upload" data-step="1">
+                        <div class="step-content">
+                            <div class="connector-section">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <label for="connectorSelect">בחר ספק נתונים:</label>
+                                    <button data-button-type="SECONDARY" data-text="איפוס תהליך"
+                                            data-onclick="confirmResetImportSession()" id="resetImportSessionBtn"></button>
+                                </div>
+                                <select id="connectorSelect" class="form-select">
+                                    <option value="">בחר ספק נתונים...</option>
+                                    <option value="ibkr">Interactive Brokers (IBKR)</option>
+                                    <option value="demo">Demo Data</option>
+                                </select>
+                                <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
+                            </div>
+
+                            <div class="summary-card active-session-card d-none" id="activeSessionIndicator">
+                                <h4>
+                                    <i class="bi bi-activity"></i>
+                                    סשן ייבוא פעיל
+                                </h4>
+                                <div class="summary-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">מזהה סשן:</span>
+                                        <span class="detail-value" id="activeSessionIdValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">מצב:</span>
+                                        <span class="detail-value" id="activeSessionStatusValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">קובץ:</span>
+                                        <span class="detail-value" id="activeSessionFileValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">חשבון:</span>
+                                        <span class="detail-value" id="activeSessionAccountValue"></span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">ספק:</span>
+                                        <span class="detail-value" id="activeSessionProviderValue"></span>
+                                    </div>
+                                </div>
+                                <div class="summary-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">סה"כ רשומות:</span>
+                                        <span class="detail-value" id="activeSessionTotalRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">לייבוא:</span>
+                                        <span class="detail-value" id="activeSessionReadyRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">להשמטה:</span>
+                                        <span class="detail-value" id="activeSessionSkipRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">טיקרים חסרים:</span>
+                                        <span class="detail-value" id="activeSessionMissingTickers">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">כפילויות:</span>
+                                        <span class="detail-value" id="activeSessionDuplicateRecords">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">רשומות קיימות:</span>
+                                        <span class="detail-value" id="activeSessionExistingRecords">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="upload-section">
+                                <div class="file-drop-zone" id="dropZone">
+                                    <i class="bi bi-cloud-upload"></i>
+                                    <p>גרור קובץ CSV או לחץ לבחירה</p>
+                                    <input type="file" id="fileInput" accept=".csv" hidden>
+                                </div>
+                                <div class="file-info d-none" id="fileInfo">
+                                    <div class="file-details">
+                                        <span class="file-name" id="fileName"></span>
+                                        <span class="file-size" id="fileSize"></span>
+                                    </div>
+                                    <button data-button-type="SECONDARY" data-text="החלף קובץ" data-onclick="resetFile()"></button>
+                                </div>
+                            </div>
+                            
+                            <div class="account-section">
+                                <label>בחר חשבון מסחר:</label>
+                                <select id="tradingAccountSelect" class="form-select">
+                                    <option value="">בחר חשבון מסחר...</option>
+                                        </select>
+                                    </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="PRIMARY" data-text="המשך לניתוח" 
+                                        data-onclick="analyzeFile()" id="analyzeBtn" disabled></button>
+                            </div>
+                                    </div>
+                                </div>
+
+                    <!-- Step 2: Analysis Results + Problem Resolution -->
+                    <div class="import-step d-none" id="step-analysis" data-step="2">
+                        <div class="step-content">
+                            <h3>תוצאות ניתוח</h3>
+                            <div class="summary-card import-type-selection d-none" id="dataTypeSelectionCard">
+                                <div class="summary-header">
+                                    <div class="summary-title">
+                                        <i class="bi bi-diagram-3"></i>
+                                        בחירת תהליך ייבוא
+                                    </div>
+                                    <div class="summary-subtitle">
+                                        <span id="dataTypeDetectedLabel">מזהה את סוגי הנתונים שהקובץ מכיל ומאפשר לבחור את התהליך הרצוי</span>
+                                    </div>
+                                </div>
+                                <div class="summary-body">
+                                    <div class="data-type-list" id="dataTypeList">
+                                        <!-- ימולא דינמית -->
+                                    </div>
+                                </div>
+                                <div class="summary-footer">
+                                    <button data-button-type="PRIMARY" data-text="המשך לתהליך הנבחר" id="confirmDataTypeBtn" data-onclick="confirmSelectedDataType()" disabled></button>
+                                    <button data-button-type="SECONDARY" data-text="פלייסהולדר – תהליכים נוספים בקרוב" id="dataTypePlaceholderBtn" class="d-none"></button>
+                                </div>
+                            </div>
+                            <div class="analysis-cards">
+                                <div class="analysis-card total">
+                                    <div class="card-icon"><i class="bi bi-file-text"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="totalRecords">0</div>
+                                        <div class="card-label">סה"כ רשומות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card valid">
+                                    <div class="card-icon"><i class="bi bi-check-circle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="validRecords">0</div>
+                                        <div class="card-label">רשומות תקינות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card invalid">
+                                    <div class="card-icon"><i class="bi bi-x-circle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="invalidRecords">0</div>
+                                        <div class="card-label">רשומות לא תקינות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card duplicates">
+                                    <div class="card-icon"><i class="bi bi-files"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="duplicateRecords">0</div>
+                                        <div class="card-label">רשומות כפולות</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card missing-tickers">
+                                    <div class="card-icon"><i class="bi bi-question-circle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="missingTickersCount">0</div>
+                                        <div class="card-label">טיקרים חסרים</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card missing-records">
+                                    <div class="card-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="missingTickerRecords">0</div>
+                                        <div class="card-label">רשומות עם טיקר חסר</div>
+                                    </div>
+                                </div>
+                                <div class="analysis-card existing-records">
+                                    <div class="card-icon"><i class="bi bi-database"></i></div>
+                                    <div class="card-content">
+                                        <div class="card-number" id="existingRecords">0</div>
+                                        <div class="card-label">רשומות קיימות במערכת</div>
+            </div>
+        </div>
+    </div>
+
+                            <!-- Problem Resolution Section -->
+                            <div class="problem-resolution-section d-none" id="problemResolutionSection">
+                                <h3>פתרון בעיות</h3>
+                            
+                            <!-- Missing Tickers Section -->
+                            <div class="problem-section d-none" id="missingTickersSection">
+                                <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
+                                <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
+                                <div class="problem-card-container" id="missingTickersContainer">
+                                    <!-- Missing ticker cards will be populated here -->
+                        </div>
+                    </div>
+                    
+                            <!-- Existing Records Section -->
+                            <div class="problem-section d-none" id="existingRecordsSection">
+                                <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
+                                <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
+                                <div class="problem-card-container" id="existingRecordsContainer">
+                                    <!-- Existing records cards will be populated here -->
+                    </div>
+                </div>
+
+                            <!-- Within-File Duplicates Section -->
+                            <div class="problem-section d-none" id="withinFileDuplicatesSection">
+                                <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
+                                <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזה רשומה לייבא:</p>
+                                <div class="problem-card-container" id="withinFileDuplicatesContainer">
+                                    <!-- Within-file duplicate cards will be populated here -->
+                    </div>
+                </div>
+
+                            
+                            </div>
+                            <!-- End of Problem Resolution Section -->
+                            
+                            <div class="step-actions">
+                                <button data-button-type="BACK" data-text="חזור" data-onclick="goToStep(1)"></button>
+                                <button data-button-type="PRIMARY" data-text="המשך לתצוגה מקדימה" 
+                                        data-onclick="confirmSelectedDataType()" data-id="btn-preview-continue" disabled></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Preview + Confirmation -->
+                    <div class="import-step d-none" id="step-preview" data-step="3">
+                        <div class="step-content">
+                            <h3>תצוגה מקדימה ואישור</h3>
+                            
+                            <!-- Confirmation Summary -->
+                            <div class="confirmation-summary">
+                        <div class="summary-card">
+                                    <h4>סיכום הייבוא</h4>
+                            <div class="summary-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">קובץ:</span>
+                                            <span class="detail-value" id="confirmFileName"></span>
+                                </div>
+                                <div class="detail-item">
+                                            <span class="detail-label">חשבון מסחר:</span>
+                                            <span class="detail-value" id="confirmAccountName"></span>
+                                </div>
+                                <div class="detail-item">
+                                            <span class="detail-label">סה"כ רשומות:</span>
+                                            <span class="detail-value" id="confirmTotalRecords"></span>
+                                </div>
+                                <div class="detail-item">
+                                            <span class="detail-label">רשומות לייבוא:</span>
+                                            <span class="detail-value" id="confirmImportRecords"></span>
+                                </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">רשומות להשמטה:</span>
+                                            <span class="detail-value" id="confirmSkipRecords"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                            <!-- Preview Summary -->
+                            <div class="preview-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">רשומות לייבוא:</span>
+                                    <span class="summary-value" id="previewImportCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">רשומות להשמטה:</span>
+                                    <span class="summary-value" id="previewSkipCount">0</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">אחוז ייבוא:</span>
+                                    <span class="summary-value" id="previewImportRate">0%</span>
+            </div>
+                </div>
+                
+                            <!-- Records to Import -->
+                            <div class="preview-section">
+                                <h4><i class="bi bi-check-circle text-success"></i> רשומות לייבוא</h4>
+                                <div class="table-container">
+                                    <table class="import-table" id="importTable">
+                                <thead>
+                                    <tr>
+                                                <th>סמל</th>
+                                                <th>פעולה</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
+                                                <th>Realized P/L</th>
+                                                <th>MTM P/L</th>
+                                        <th>תאריך</th>
+                                    </tr>
+                                </thead>
+                                        <tbody id="importTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                            <!-- Records to Skip -->
+                            <div class="preview-section">
+                                <h4><i class="bi bi-x-circle text-danger"></i> רשומות להשמטה</h4>
+                                <div class="table-container">
+                                    <table class="import-table" id="skipTable">
+                                <thead>
+                                    <tr>
+                                                <th>סמל</th>
+                                                <th>פעולה</th>
+                                        <th>כמות</th>
+                                        <th>מחיר</th>
+                                        <th>עמלה</th>
+                                                <th>Realized P/L</th>
+                                                <th>MTM P/L</th>
+                                        <th>תאריך</th>
+                                        <th>סיבה</th>
+                                    </tr>
+                                </thead>
+                                        <tbody id="skipTableBody">
+                                </tbody>
+                            </table>
+                                </div>
+                            </div>
+                            
+                            <div class="step-actions">
+                                <button data-button-type="BACK" data-text="חזור" data-onclick="goToStep(2)"></button>
+                                <button data-button-type="CANCEL" data-text="ביטול" data-bs-dismiss="modal"></button>
+                                <button data-button-type="SAVE" data-text="ביצוע ייבוא" data-onclick="confirmImport()"></button>
+                                <button data-button-type="DOWNLOAD" data-text="ביצוע ייבוא + הורדת דוח" data-onclick="confirmImport(true)"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JavaScript - Removed duplicate (5.3.0), using 5.3.3 from base package -->
+    
+            <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: executions | Generated: 2025-11-15T00:29:03.493Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, modules, crud, preferences, validation, entity-services, entity-details, info-summary, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/11: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/11: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: שירותים כלליים -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- שירות איסוף נתונים -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- שירות רנדור שדות -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- שירות מילוי select boxes -->
+    <!-- [24] Load Order: 24 -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [25a] Preferences Data Service -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- שירות תגיות מרכזי (ניהול ואחזור תגיות) -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter למסירת ערכי מיון אחידים (DateEnvelope, legacy) -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
+    <!-- [31] Load Order: 31 -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [32] Load Order: 32 -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+    <!-- [Data Services] Load Order: After services -->
+    <script src="scripts/services/executions-data.js?v=1.0.0"></script> <!-- שירות נתונים לביצועים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PENDING EXECUTION TRADE CREATION ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: After entity-services -->
+    <!-- [Pending Execution Trade Creation] -->
+    <script src="scripts/pending-execution-trade-creation.js?v=1.0.0"></script> <!-- ממשק יצירת טרייד מביצועים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/11: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: ממשק משתמש מתקדם -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- מיפוי טבלאות -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/tables.js?v=1.0.0"></script> <!-- מערכת טבלאות -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- רישום נתוני טבלאות -->
+    <!-- [37] Load Order: 37 -->
+    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- מערכת עימוד -->
+    <!-- [38] Load Order: 38 -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- מערכת תפריט פעולות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/11: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3.5 | Description: מודולים כלליים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [39] Load Order: 39 -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- מערכת ניווט מודולים מקוננים -->
+    <!-- [40] Load Order: 40 -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- מנהל מודלים V2 -->
+    <!-- [41] Load Order: 41 -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- ניהול בחירת תגיות במודלים -->
+    <!-- [42] Load Order: 42 -->
+    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
+    <!-- [43] Load Order: 43 -->
+    <!-- core-systems.js removed - now loaded automatically via base package -->
+    <!-- [44] Load Order: 44 -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
+    <!-- [45] Load Order: 45 -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- ממשק בסיסי -->
+    <!-- [46] Load Order: 46 -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- נתונים מתקדמים -->
+    <!-- [47] Load Order: 47 -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- ממשק מתקדם -->
+    <!-- [48] Load Order: 48 -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- מודול תקשורת -->
+    <!-- [49] Load Order: 49 -->
+    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- מודול עסקי -->
+    <!-- [50] Load Order: 50 -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- סנכרון localStorage -->
+    <!-- [51] Load Order: 51 -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
+    <!-- [52] Load Order: 52 -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
+    <!-- [53] Load Order: 53 -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
+    <!-- [54] Load Order: 54 -->
+    <script src="scripts/modal-configs/executions-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל ביצועים -->
+    <!-- [55] Load Order: 55 -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
+    <!-- [57] Load Order: 57 -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/11: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: מערכות לניהול נתונים וטבלאות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- כלי עזר תאריכים -->
+    <!-- [57] Load Order: 57 -->
+    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- כלי עזר נתונים כלליים -->
+    <!-- [58] Load Order: 58 -->
+    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- מערכת טבלאות מרכזית מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/11: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: מערכת העדפות משתמש v2.0 (6 קבצים) -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [58.9] Preferences V4 SDK (group-first) -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [59] Load Order: 59 -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
+    <!-- [60] Load Order: 60 -->
+    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- מערכת צבעים (60+ העדפות) -->
+    <!-- [61] Load Order: 61 -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- ניהול פרופילים -->
+    <!-- [62] Load Order: 62 -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
+    <!-- [63] Load Order: 63 -->
+    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [47.1] Load Order: 47.1 - MUST BE BEFORE preferences-ui.js -->
+    <!-- [64] Load Order: 64 -->
+    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
+    <!-- [65] Load Order: 65 -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/11: VALIDATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6 | Description: מערכות ולידציה -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [66] Load Order: 66 -->
+    <script src="scripts/validation-utils.js?v=1.0.0"></script> <!-- כלי ולידציה -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/11: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 10 | Description: שירותי ישויות -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [67] Load Order: 67 -->
+    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- שירות חשבונות -->
+    <!-- [68] Load Order: 68 -->
+    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- שירות התראות -->
+    <!-- [69] Load Order: 69 -->
+    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- שירות טיקרים -->
+    <!-- [70] Load Order: 70 -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- שירות תכניות מסחר -->
+    <!-- [71] Load Order: 71 -->
+    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- מתרגם תנאים -->
+    <!-- [72] Load Order: 72 -->
+    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
+    <!-- [73] Load Order: 73 -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
+    <!-- [74] Load Order: 74 -->
+    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
+    <!-- [75] Load Order: 75 -->
+    <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- פילטרים של אובייקטים קשורים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/11: ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: מערכות פרטי ישויות -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [76] Load Order: 76 -->
+    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- API פרטי ישויות -->
+    <!-- [77] Load Order: 77 -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- מציג פרטי ישויות -->
+    <!-- [78] Load Order: 78 -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- מודל פרטי ישויות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/11: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 18 | Description: מערכת סיכום נתונים מאוחדת לכל העמודים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [79] Load Order: 79 -->
+    <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- מערכת סיכום נתונים ליבה -->
+    <!-- [80] Load Order: 80 -->
+    <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- תצורות עמודים לסיכום נתונים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/11: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [81] Load Order: 81 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [82] Load Order: 82 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [83] Load Order: 83 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [84] Load Order: 84 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [85] Load Order: 85 -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [86] Page-specific: executions -->
+    <!-- Debug scripts -->
+    <script src="scripts/debug-execution-ticker-loading.js?v=1.0.0"></script>
+    <script src="scripts/debug-populate-form-dates.js?v=1.0.0"></script>
+    
+    <script src="scripts/executions.js?v=1.0.0"></script> <!-- Page-specific script for executions -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 86 | Unique Scripts Loaded: 86 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("executions") -->
+
+</body>
+</html>

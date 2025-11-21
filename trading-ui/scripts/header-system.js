@@ -1595,8 +1595,19 @@ class HeaderSystem {
             return true;
           }
 
-          const date = new Date(dateString);
-          const today = new Date();
+          // Use dateUtils for consistent date parsing
+          let date;
+          if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+            date = window.dateUtils.toDateObject(dateString);
+          } else {
+            date = new Date(dateString);
+          }
+          let today;
+          if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+            today = window.dateUtils.getToday();
+          } else {
+            today = new Date();
+          }
           today.setHours(0, 0, 0, 0);
 
           switch (dateRange) {
@@ -1604,15 +1615,31 @@ class HeaderSystem {
               return date.toDateString() === today.toDateString();
 
             case 'אתמול':
-              const yesterday = new Date(today);
-              yesterday.setDate(today.getDate() - 1);
+              // Use dateUtils for consistent date handling
+              let yesterday;
+              if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                const yesterdayEpoch = today.getTime() - (24 * 60 * 60 * 1000);
+                yesterday = window.dateUtils.toDateObject({ epochMs: yesterdayEpoch });
+              } else {
+                yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+              }
               return date.toDateString() === yesterday.toDateString();
 
             // השבוע = מתחילת השבוע הקלנדארי (יום ראשון) עד היום
             case 'השבוע': {
-              const startOfWeek = new Date(today);
-              const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
-              startOfWeek.setDate(today.getDate() - dayOfWeek);
+              // Use dateUtils for consistent date handling
+              let startOfWeek;
+              if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                const daysToSubtract = dayOfWeek;
+                const startOfWeekEpoch = today.getTime() - (daysToSubtract * 24 * 60 * 60 * 1000);
+                startOfWeek = window.dateUtils.toDateObject({ epochMs: startOfWeekEpoch });
+              } else {
+                startOfWeek = new Date(today);
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                startOfWeek.setDate(today.getDate() - dayOfWeek);
+              }
               startOfWeek.setHours(0, 0, 0, 0);
               date.setHours(0, 0, 0, 0);
               return date >= startOfWeek && date <= today;

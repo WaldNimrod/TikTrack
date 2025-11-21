@@ -60,17 +60,34 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 - Working Rules: `documentation/DOCUMENTATION_WORKING_RULES.md`
 
 ## Server Management Rules - CRITICAL
-**השתמש רק ב-`./start_server.sh` להפעלת השרת - אין להפעיל את השרת ישירות**
+**השתמש רק ב-`./start_server.sh` להפעלת השרת - הסקריפט מגדיר אוטומטית PostgreSQL בסביבת פיתוח**
 
-### Server Startup Rules:
-- **ONLY USE**: `./start_server.sh` to start the server
-- **NEVER RUN**: `python3 Backend/app.py` directly
+### Database Migration Status:
+- **✅ COMPLETED**: Migration from SQLite to PostgreSQL (November 2025)
+- **✅ ACTIVE**: PostgreSQL is now the primary database
+- **❌ DEPRECATED**: SQLite is no longer in use (moved to archive)
+
+### Server Startup Rules (PostgreSQL):
+- **ONLY USE**: `./start_server.sh` to start the server (automatically configures PostgreSQL in development)
+- **ALTERNATIVE**: `./start_pg_server.sh` (convenience wrapper, same as start_server.sh)
+- **NEVER RUN**: `python3 Backend/app.py` directly (will fail - no database connection)
+- **ALWAYS CHECK**: PostgreSQL Docker container is running: `docker ps | grep postgres`
 - **ALWAYS CHECK**: for running processes before starting
-- **IF PORT OCCUPIED**: Look for existing processes first
+
+### PostgreSQL Environment Variables (Automatic):
+The `start_server.sh` script automatically sets these in development mode:
+```bash
+export POSTGRES_HOST=localhost
+export POSTGRES_DB=TikTrack-db-development
+export POSTGRES_USER=TikTrakDBAdmin
+export POSTGRES_PASSWORD="BigMeZoo1974!?"
+```
+**Note**: If these are already set, the script uses existing values.
 
 ### Active Server Files (ONLY These):
 - **`Backend/app.py`** - Main server file (ONLY active server)
-- **`start_server.sh`** - Startup script (ONLY way to start)
+- **`start_server.sh`** - Main startup script (automatically configures PostgreSQL)
+- **`start_pg_server.sh`** - Convenience wrapper (calls start_server.sh)
 - **`Backend/utils/server_lock_manager.py`** - Process management
 - **`Backend/routes/api/server_management.py`** - Server management API
 - **`Backend/routes/api/server_logs.py`** - Server logs API
@@ -79,16 +96,22 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 - **❌ REMOVED**: dev_server.py, dev_server_optimized.py
 - **❌ REMOVED**: restart-bg.sh, run-background.sh
 - **❌ REMOVED**: trading-ui/server.py
+- **❌ DEPRECATED**: SQLite database (Backend/db/tiktrack.db moved to archive)
 - **All old server scripts moved to archive/**
 
 ### Process Management:
 - The system automatically detects and prevents multiple server instances
 - If you see "port already in use" error, check for existing processes
 - Use `./start_server.sh --check-only` to check for conflicts
-- Server runs in foreground mode for development (shows live logs)
+- Server runs in background mode (returns control immediately)
+- Script automatically checks PostgreSQL container health before starting
 
 ### Troubleshooting:
-- If server won't start: Check `./start_server.sh --check-only`
-- If multiple processes: Kill existing with `kill [PID]`
-- Always use Ctrl+C to stop server gracefully
+- **If server won't start**: 
+  1. Check PostgreSQL container: `docker ps | grep postgres`
+  2. Start PostgreSQL if needed: `docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev`
+  3. Check conflicts: `./start_server.sh --check-only`
+- **If no data appears**: Server was started without PostgreSQL env vars - restart with `./start_server.sh`
+- **If multiple processes**: Kill existing with `kill [PID]`
+- **Always use**: `./start_server.sh` (automatically configures PostgreSQL)
 - Check logs in `Backend/logs/` for detailed information

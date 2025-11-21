@@ -1336,14 +1336,31 @@ async function updateExecutionsTableMain(executions, options = {}) {
                         return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
                       }
                       try {
-                        const dateObj = new Date(epoch);
-                        return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                        // Use dateUtils to convert epoch to Date object
+                        let dateObj;
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject({ epochMs: epoch });
+                        } else {
+                          dateObj = new Date(epoch);
+                        }
+                        // Use FieldRendererService or dateUtils for consistent date formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(dateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(dateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(dateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
+                        return dateObj.toLocaleString('he-IL', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit'
-                        }));
+                        });
                       } catch (err) {
                         window.Logger?.warn('⚠️ executions updated-cell date formatting failed', { err, executionId: execution?.id }, { page: 'executions' });
                         return 'לא מוגדר';
@@ -1473,8 +1490,20 @@ function isDateInRange(dateString, dateRange) {
     dateOnly = dateString.split(' ')[0];
   }
 
-  const date = new Date(dateOnly);
-  const today = new Date();
+  // Use dateUtils for consistent date parsing
+  let date;
+  if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+    date = window.dateUtils.toDateObject(dateOnly);
+  } else {
+    date = new Date(dateOnly);
+  }
+  
+  let today;
+  if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+    today = window.dateUtils.getToday();
+  } else {
+    today = new Date();
+  }
   today.setHours(23, 59, 59, 999); // סוף היום
 
   // Parsed date
@@ -2222,8 +2251,18 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
         let creationDate = 'תאריך לא ידוע';
         if (trade.created_at) {
           try {
-            const date = new Date(trade.created_at);
-            creationDate = window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL'));
+            // Use FieldRendererService or dateUtils for consistent date formatting
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+              creationDate = window.FieldRendererService.renderDate(trade.created_at, false);
+            } else if (window.formatDate) {
+              const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+              creationDate = window.formatDate(date);
+            } else if (window.dateUtils?.formatDate) {
+              creationDate = window.dateUtils.formatDate(trade.created_at, { includeTime: false });
+            } else {
+              const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+              creationDate = date.toLocaleDateString('he-IL');
+            }
           } catch {
             // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
           }
@@ -3132,12 +3171,25 @@ function setupExecutionsFilterFunctions() {
     if (!dateRange || dateRange === 'all' || dateRange === 'הכול') {
       filteredExecutions = [...originalExecutions];
     } else {
-      const today = new Date();
+      // Use dateUtils for consistent date handling
+      let today;
+      if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+        today = window.dateUtils.getToday();
+      } else {
+        today = new Date();
+      }
       const yesterday = new Date(today);
       yesterday.setDate(yesterday.getDate() - 1);
 
       filteredExecutions = originalExecutions.filter(execution => {
-        const executionDate = new Date(execution.execution_date || execution.created_at);
+        // Use dateUtils to parse execution date
+        let executionDate;
+        const dateValue = execution.execution_date || execution.created_at;
+        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+          executionDate = window.dateUtils.toDateObject(dateValue);
+        } else {
+          executionDate = new Date(dateValue);
+        }
 
         switch (dateRange) {
         case 'today':
@@ -3440,8 +3492,18 @@ function updateTickersSummaryTable(tickers = null) {
     let creationDate = 'תאריך לא ידוע';
     if (ticker.created_at) {
       try {
-        const date = new Date(ticker.created_at);
-        creationDate = window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL'));
+        // Use FieldRendererService or dateUtils for consistent date formatting
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          creationDate = window.FieldRendererService.renderDate(ticker.created_at, false);
+        } else if (window.formatDate) {
+          const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(ticker.created_at) : new Date(ticker.created_at);
+          creationDate = window.formatDate(date);
+        } else if (window.dateUtils?.formatDate) {
+          creationDate = window.dateUtils.formatDate(ticker.created_at, { includeTime: false });
+        } else {
+          const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(ticker.created_at) : new Date(ticker.created_at);
+          creationDate = date.toLocaleDateString('he-IL');
+        }
       } catch {
         // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', ticker.created_at, { page: "executions" });
       }
@@ -3696,9 +3758,21 @@ async function deleteExecution(executionId) {
                                ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
             const quantity = execution.quantity || '0';
             const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
-            const date = execution.date || execution.execution_date ? 
-                         (window.formatDate ? window.formatDate(execution.date || execution.execution_date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(execution.date || execution.execution_date) : new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL'))) : 
-                         'לא מוגדר';
+            // Use FieldRendererService or dateUtils for consistent date formatting
+            let date = 'לא מוגדר';
+            const dateValue = execution.date || execution.execution_date;
+            if (dateValue) {
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                date = window.FieldRendererService.renderDate(dateValue, false);
+              } else if (window.formatDate) {
+                date = window.formatDate(dateValue);
+              } else if (window.dateUtils?.formatDate) {
+                date = window.dateUtils.formatDate(dateValue, { includeTime: false });
+              } else {
+                const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(dateValue) : new Date(dateValue);
+                date = dateObj.toLocaleDateString('he-IL');
+              }
+            }
             executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
         }
         
@@ -4103,7 +4177,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
         ? FieldRenderer.renderExecutionDate(executionDateValue)
         : (FieldRenderer?.renderDate
             ? FieldRenderer.renderDate(executionDateValue, true)
-            : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : new Date(executionDateValue).toLocaleDateString('he-IL'))) : '-'));
+            : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(executionDateValue).toLocaleDateString('he-IL') : new Date(executionDateValue).toLocaleDateString('he-IL')))) : '-'));
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
     const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action === 'buy' ? 'קניה' : 'מכירה');
@@ -4114,7 +4188,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     
     const tradeEnvelope = suggestion.trade_created_at || suggestion.created_at;
     const tradeLocalValue = tradeEnvelope?.local || tradeEnvelope?.utc || tradeEnvelope?.display || suggestion.created_at;
-    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? (window.formatDate ? window.formatDate(tradeLocalValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(tradeLocalValue) : new Date(tradeLocalValue).toLocaleDateString('he-IL'))) : '-');
+    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? (window.formatDate ? window.formatDate(tradeLocalValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(tradeLocalValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(tradeLocalValue).toLocaleDateString('he-IL') : new Date(tradeLocalValue).toLocaleDateString('he-IL')))) : '-');
     const tradeSortValue = tradeEnvelope?.epochMs ?? suggestion.trade_created_at_epoch ?? tradeEnvelope?.utc ?? tradeLocalValue ?? '';
     const tradeStatus = FieldRenderer?.renderStatus ? FieldRenderer.renderStatus(suggestion.status, 'trade') : (suggestion.status === 'open' || suggestion.status === 'active' ? 'פעיל' : suggestion.status === 'closed' ? 'סגור' : suggestion.status);
     const tradeSide = FieldRenderer?.renderSide ? FieldRenderer.renderSide(suggestion.side) : (suggestion.side || '-');
@@ -4658,7 +4732,9 @@ function buildTradeSuggestionsFlatList(sourceData) {
             } else if (typeof window.dateUtils?.formatDate === 'function') {
                 display = window.dateUtils.formatDate(timestamp);
             } else {
-                display = new Date(timestamp).toLocaleDateString('he-IL');
+                // Use dateUtils to convert timestamp to Date object
+                const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject({ epochMs: timestamp }) : new Date(timestamp);
+                display = dateObj.toLocaleDateString('he-IL');
             }
         } catch {
             display = new Date(timestamp).toISOString().split('T')[0];

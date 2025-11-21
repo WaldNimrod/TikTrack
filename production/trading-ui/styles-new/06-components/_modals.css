@@ -1,0 +1,676 @@
+/**
+ * מודלים - Modals
+ * 
+ * קובץ זה מכיל את הסגנונות של כל המודלים במערכת
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* מודל בסיסי - שימוש במערכת ה-z-index הגלובלית */
+.modal {
+  --modal-nested-offset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset));
+  direction: rtl;
+}
+
+.modal-dialog {
+  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset) + 1);
+}
+
+.modal-content {
+  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset) + 2);
+}
+
+/* מודל מקונן - ללא רקע נוסף ואופסט z-index מוסכם */
+.modal.modal-nested {
+  --modal-nested-offset: 20;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* מודל מקונן ברמה שנייה (מודל מקונן מעל מודל מקונן) - z-index גבוה יותר */
+.modal.modal-nested.modal-nested-level-2 {
+  --modal-nested-offset: 40 !important;
+}
+
+/* מודל tickersModal - וידוא שהוא מופיע מעל כל המודלים האחרים */
+#tickersModal {
+  z-index: 1000000010 !important;
+}
+
+#tickersModal .modal-dialog {
+  z-index: 1000000011 !important;
+}
+
+#tickersModal .modal-content {
+  z-index: 1000000012 !important;
+}
+
+/* הגדרות מיוחדות למודלים גדולים */
+.modal-dialog.modal-lg {
+  border: 2px solid #6c757d ;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) ;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.modal-content {
+  background: var(--apple-bg-elevated);
+  border-radius: 6px;
+  box-shadow: var(--apple-shadow-heavy);
+  border: 1px solid var(--apple-border-light);
+  direction: rtl;
+  text-align: right;
+}
+
+.modal-backdrop {
+  z-index: var(--z-index-modal-backdrop, 1040);
+}
+
+/* ===== Modal Navigation System ===== */
+/* Backdrop גלובלי - תמיד רק אחד */
+#globalModalBackdrop,
+.global-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040; /* Base z-index, יוגדל דינמית */
+}
+
+/* Breadcrumb navigation בכותרת מודול */
+.modal-navigation-breadcrumb {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--current-entity-color-dark, #6c757d);
+  direction: rtl;
+  text-align: right;
+}
+
+.modal-breadcrumb-trail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  color: var(--current-entity-color-dark, #6c757d);
+  font-weight: 500;
+}
+
+.breadcrumb-item:not(:last-child) {
+  cursor: default;
+}
+
+/* קישורי Breadcrumb - ב-bold, שקיפות 0.8, לחיצה פעילה */
+.breadcrumb-link {
+  color: var(--current-entity-color-dark, #6c757d);
+  font-weight: bold;
+  opacity: 0.8;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.breadcrumb-link:active {
+  opacity: 0.6;
+}
+
+/* המודול הנוכחי ב-breadcrumb - ב-bold, שקיפות 0.8, ללא קישור */
+.breadcrumb-current {
+  color: var(--current-entity-color-dark, #6c757d);
+  font-weight: bold;
+  opacity: 0.8;
+  cursor: default;
+}
+
+/* כפתור חזור בכותרת מודול */
+button[data-button-type="BACK"] {
+  display: none; /* מוסתר כברירת מחדל */
+  flex-shrink: 0;
+}
+
+button[data-button-type="BACK"][data-navigation-listener="true"] {
+  display: flex; /* מוצג כשיש היסטוריה - מנוהל על ידי modal-navigation-manager */
+  visibility: visible;
+  pointer-events: auto;
+  order: 997; /* מימין לכפתור סגירה - order נמוך יותר = מימין ב-RTL */
+}
+
+/* Modal header layout עם navigation */
+.modal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+  direction: rtl;
+}
+
+/* Entity Details Modal - כותרת מותאמת */
+.modal-header.modal-header-colored {
+  align-items: flex-start;
+}
+
+.modal-header-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-header-title-section .modal-title {
+  margin: 0;
+  text-align: start;
+}
+
+/* Breadcrumb - במרכז בין הכותרת לכפתורים */
+.modal-navigation-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  margin: 0 1rem;
+  order: 1; /* בין הכותרת (order: 0) לכפתורים (order: 2) */
+}
+
+.modal-header-title-section {
+  order: 0; /* משמאל (הכי שמאלה ב-RTL) */
+}
+
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  order: 2; /* מימין (הכי ימינה ב-RTL) */
+}
+
+/* הודעות - וידוא שהן מופיעות מעל הכל */
+.toast {
+  z-index: 1000000002 ;
+}
+
+.toast-container {
+  z-index: 1000000002 ;
+}
+
+/* וידוא שכל המודלים מופיעים מעל הכל */
+/* וידוא שהרקע לא חוסם את המודלים */
+.modal-backdrop.show {
+  z-index: var(--z-index-modal-backdrop, 1040);
+}
+
+/* מודלים ספציפיים עם z-index גבוה יותר */
+/* הוסר: #linkedItemsModal - משתמש ב-modal-nested class עם z-index דינמי */
+#addAlertModal,
+#editAlertModal,
+#addExecutionModal,
+#editExecutionModal,
+#deleteExecutionModal,
+#warningModal,
+#addAccountModal,
+#editAccountModal,
+#addTradeModal,
+#editTradeModal,
+#addTradePlanModal,
+#editTradePlanModal,
+#addCashFlowModal,
+#editCashFlowModal,
+#addNoteModal,
+#editNoteModal,
+#addTickerModal,
+#editTickerModal,
+#loadingModal,
+#log-test-modal {
+  z-index: 999999999 ;
+}
+
+#addAlertModal .modal-dialog,
+#editAlertModal .modal-dialog,
+#addExecutionModal .modal-dialog,
+#editExecutionModal .modal-dialog,
+#deleteExecutionModal .modal-dialog,
+#warningModal .modal-dialog,
+#addAccountModal .modal-dialog,
+#editAccountModal .modal-dialog,
+#addTradeModal .modal-dialog,
+#editTradeModal .modal-dialog,
+#addTradePlanModal .modal-dialog,
+#editTradePlanModal .modal-dialog,
+#addCashFlowModal .modal-dialog,
+#editCashFlowModal .modal-dialog,
+#addNoteModal .modal-dialog,
+#editNoteModal .modal-dialog,
+#addTickerModal .modal-dialog,
+#editTickerModal .modal-dialog,
+#loadingModal .modal-dialog,
+#log-test-modal .modal-dialog {
+  z-index: 1000000000 ;
+}
+
+#addAlertModal .modal-content,
+#editAlertModal .modal-content,
+#addExecutionModal .modal-content,
+#editExecutionModal .modal-content,
+#deleteExecutionModal .modal-content,
+#warningModal .modal-content,
+#addAccountModal .modal-content,
+#editAccountModal .modal-content,
+#addTradeModal .modal-content,
+#editTradeModal .modal-content,
+#addTradePlanModal .modal-content,
+#editTradePlanModal .modal-content,
+#addCashFlowModal .modal-content,
+#editCashFlowModal .modal-content,
+#addNoteModal .modal-content,
+#editNoteModal .modal-content,
+#addTickerModal .modal-content,
+#editTickerModal .modal-content,
+#loadingModal .modal-content,
+#log-test-modal .modal-content {
+  z-index: 1000000001 ;
+}
+
+/* מניעת סגירת מודלים בלחיצה על הרקע */
+.modal[data-bs-backdrop="static"] {
+  pointer-events: auto ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop {
+  pointer-events: none ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-content {
+  pointer-events: auto ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-dialog {
+  pointer-events: auto ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-header,
+.modal[data-bs-backdrop="static"] .modal-body,
+.modal[data-bs-backdrop="static"] .modal-footer {
+  pointer-events: auto ;
+}
+
+/* מניעת סגירת מודלים בלחיצה על הרקע - Bootstrap override */
+.modal[data-bs-backdrop="static"] .modal-backdrop.show {
+  pointer-events: none ;
+}
+
+.modal[data-bs-backdrop="static"].show .modal-backdrop {
+  pointer-events: none ;
+}
+
+/* הגדרה גלובלית לכל המודלים - מניעת סגירה בלחיצה על הרקע */
+.modal .modal-backdrop {
+  pointer-events: none ;
+}
+
+.modal .modal-content {
+  pointer-events: auto ;
+}
+
+.modal .modal-dialog {
+  pointer-events: auto ;
+}
+
+.modal .modal-header,
+.modal .modal-body,
+.modal .modal-footer {
+  pointer-events: auto ;
+}
+
+/* מניעת סגירת מודלים בלחיצה על הרקע - הגדרה כללית */
+.modal.show .modal-backdrop {
+  pointer-events: none ;
+}
+
+.modal.show .modal-content {
+  pointer-events: auto ;
+}
+
+/* מניעת אנימציה בלחיצה על הרקע */
+.modal[data-bs-backdrop="static"] .modal-backdrop {
+  pointer-events: none ;
+  opacity: 0.5 ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop.show {
+  pointer-events: none ;
+  opacity: 0.5 ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop.fade {
+  pointer-events: none ;
+  opacity: 0.5 ;
+}
+
+.modal[data-bs-backdrop="static"] .modal-backdrop.fade.show {
+  pointer-events: none ;
+  opacity: 0.5 ;
+}
+
+/* כותרת מודל */
+.modal-header {
+  text-align: right;
+  direction: rtl;
+}
+
+/* תוכן מודל */
+.modal-body {
+  text-align: right;
+  direction: rtl;
+}
+
+/* כפתורי מודל */
+.modal-footer {
+  justify-content: flex-end; /* שמאל ב-RTL - סוף השורה */
+  direction: rtl;
+}
+
+
+/* כפתור סגירה - פינה שמאלית עליונה */
+.modal .btn-close {
+  position: absolute;
+  top: 1rem;
+  left: 1rem; /* שמאל ב-RTL - סוף השורה */
+  opacity: 1;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='m.5 3.5 3 3-3 3 1 1 3-3 3 3 1-1-3-3 3-3-1-1-3 3-3-3z'/%3e%3c/svg%3e") no-repeat center center;
+  background-size: 16px;
+  width: 1em;
+  height: 1em;
+  padding: 0.25em;
+  border: 0;
+  border-radius: 0.375rem;
+}
+
+/* כפתורי סגירה במודולים - ישן (Bootstrap) */
+.modal-header .btn-close {
+  opacity: 1;
+  visibility: visible;
+  color: white;
+  filter: brightness(0) invert(1);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  content: none;
+}
+
+/* ===== כפתורי סגירה וחזרה - מנוהלים על ידי מערכת הכפתורים ===== */
+.modal-header button[data-button-type="CLOSE"],
+.modal-header button[data-button-type="BACK"] {
+  flex-shrink: 0; /* לא יתכווץ */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* גובה אחיד לשני הכפתורים - 32px (override ל-variant="small" של CLOSE) */
+  height: 32px !important;
+  min-height: 32px;
+  max-height: 32px;
+  /* padding ו-font-size אחיד לשני הכפתורים - override ל-CLOSE variant="small" */
+  padding: 6px 12px !important;
+  font-size: 14px !important;
+  color: var(--current-entity-color-dark, #6c757d); /* צבע מינימליסטי - גוון כהה של הישות */
+  border: 1px solid var(--current-entity-color-dark, #6c757d);
+  background: transparent;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.modal-header button[data-button-type="BACK"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.modal-header button[data-button-type="CLOSE"] {
+  order: 998; /* משמאל (הכי שמאלה) - order גבוה יותר = משמאל ב-RTL */
+}
+
+.modal-header button[data-button-type="BACK"] {
+  order: 997; /* מימין לכפתור סגירה - order נמוך יותר = מימין ב-RTL */
+}
+
+.modal-header button[data-button-type="CLOSE"]:hover,
+.modal-header button[data-button-type="BACK"]:hover:not(:disabled) {
+  background: var(--current-entity-color-dark, #6c757d);
+  color: white;
+  border-color: var(--current-entity-color-dark, #6c757d);
+}
+
+.modal-header button[data-button-type="BACK"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* כפתור סגירה בכותרת רגילה - צבע לבן (על רקע צבעוני) */
+.modal-header:not(.modal-header-colored):not(.modal-header-danger):not(.modal-header-warning):not(.modal-header-success) .btn-close {
+  opacity: 1;
+  visibility: visible;
+  color: white; /* לבן על רקע צבעוני של הישות */
+  filter: brightness(0) invert(1);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* ===== כותרת מודל צבעונית - רקע בהיר, טקסט כהה ===== */
+.modal-header-colored {
+  /* רקע בהיר של הישות - עם !important כדי לדרוס סגנונות אחרים */
+  background-color: var(--current-entity-color-light) !important;
+  background: var(--current-entity-color-light) !important;
+  color: var(--current-entity-color-dark);
+  border-bottom: 2px solid var(--current-entity-color-dark, var(--current-entity-color));
+  /* כל הסגנונות האחרים זהים ל-.modal-header */
+}
+
+.modal-header-colored .modal-title {
+  color: var(--current-entity-color-dark) !important;
+}
+
+.modal-header-colored .btn-close {
+  color: var(--current-entity-color-dark);
+  filter: none;
+}
+
+/* כפתור סגירה בכותרת צבעונית - מנוהל על ידי מערכת הכפתורים */
+
+/* כותרת מודל סכנה - רקע אדום */
+.modal-header-danger {
+  background-color: var(--danger-color, #dc3545);
+  color: white;
+  border-bottom: 1px solid var(--danger-color, #dc3545);
+}
+
+.modal-header-danger .modal-title {
+  color: white;
+}
+
+.modal-header-danger .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
+}
+
+/* כותרת מודל אזהרה - רקע כתום */
+.modal-header-warning {
+  background-color: var(--warning-color, #ffc107);
+  color: white;
+  border-bottom: 1px solid var(--warning-color, #ffc107);
+}
+
+.modal-header-warning .modal-title {
+  color: white;
+}
+
+.modal-header-warning .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
+}
+
+/* כותרת מודל הצלחה - רקע ירוק */
+.modal-header-success {
+  background-color: var(--success-color, #28a745);
+  color: white;
+  border-bottom: 1px solid var(--success-color, #28a745);
+}
+
+.modal-header-success .modal-title {
+  color: white;
+}
+
+.modal-header-success .btn-close {
+  color: white;
+  filter: brightness(0) invert(1);
+}
+
+/* וידוא שהודעות שגיאה מופיעות מעל המודול */
+.modal .invalid-feedback {
+  position: relative;
+  z-index: 1060;
+}
+
+/* הודעות שגיאה בתוך המודול */
+.modal-body .invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* שדות עם שגיאה */
+.modal-body .form-control.is-invalid,
+.modal-body .form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* כפתורי מחיקה בתוך modals - הוסרו, מוגדרים ב-_bootstrap-overrides.css */
+
+/* מודל זהיר */
+#warningModal .table {
+  margin-bottom: 0;
+}
+
+#warningModal .table th {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  font-weight: 600;
+}
+
+#warningModal .table td {
+  border-color: #dee2e6;
+  vertical-align: middle;
+}
+
+/* ===== MODAL SYSTEM V2 - UNIFIED ENTITY COLORS ===== */
+/* כל הצבעים מהעדפות בלבד - בלי צבעים קבועים! */
+/* All colors from preferences only - NO hardcoded colors! */
+
+/* Base styles - משתמשים בצבעים מ-_layout.css */
+/* כפתורי שמירה - צבע הישות מההעדפות */
+.modal[data-entity-type] [data-button-type="SAVE"] {
+  background-color: var(--entity-color, var(--primary-color));
+  color: white;
+  border-color: var(--entity-color, var(--primary-color));
+}
+
+/* כל הישויות - כפתורי שמירה */
+.modal[data-entity-type="trade"] [data-button-type="SAVE"] {
+  background-color: var(--entity-trade-color);
+  border-color: var(--entity-trade-color);
+}
+
+.modal[data-entity-type="ticker"] [data-button-type="SAVE"] {
+  background-color: var(--entity-ticker-color);
+  border-color: var(--entity-ticker-color);
+}
+
+.modal[data-entity-type="account"] [data-button-type="SAVE"],
+.modal[data-entity-type="trading_account"] [data-button-type="SAVE"] {
+  background-color: var(--entity-trading-account-color);
+  border-color: var(--entity-trading-account-color);
+}
+
+.modal[data-entity-type="alert"] [data-button-type="SAVE"] {
+  background-color: var(--entity-alert-color);
+  border-color: var(--entity-alert-color);
+}
+
+.modal[data-entity-type="cash_flow"] [data-button-type="SAVE"],
+.modal[data-entity-type="cash-flow"] [data-button-type="SAVE"] {
+  background-color: var(--entity-cash-flow-color);
+  border-color: var(--entity-cash-flow-color);
+}
+
+.modal[data-entity-type="note"] [data-button-type="SAVE"] {
+  background-color: var(--entity-note-color);
+  border-color: var(--entity-note-color);
+}
+
+.modal[data-entity-type="trade_plan"] [data-button-type="SAVE"],
+.modal[data-entity-type="trade-plan"] [data-button-type="SAVE"] {
+  background-color: var(--entity-trade-plan-color);
+  border-color: var(--entity-trade-plan-color);
+}
+
+.modal[data-entity-type="execution"] [data-button-type="SAVE"] {
+  background-color: var(--entity-execution-color);
+  border-color: var(--entity-execution-color);
+}
+
+/* ===== Entity Details Modal - Loading and Error States ===== */
+.entity-details-loading,
+.entity-details-error {
+  min-height: 300px;
+}
+
+.entity-details-loading .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.entity-details-card {
+  border-radius: 12px;
+  border: 1px solid var(--entity-card-border, rgba(15, 23, 42, 0.08));
+  background-color: var(--entity-card-bg, #ffffff);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.entity-details-card .entity-card-header {
+  border-bottom: 1px solid var(--entity-card-divider, rgba(15, 23, 42, 0.08));
+}
+
+.entity-details-card .entity-card-title {
+  color: var(--entity-card-title, var(--bs-body-color));
+}
+
+.entity-details-card .entity-card-subtitle {
+  color: var(--entity-card-subtitle-color, var(--bs-secondary-color));
+}
+
+.entity-position {
+  --entity-card-border: var(--entity-position-border, rgba(13, 110, 253, 0.3));
+  --entity-card-divider: rgba(13, 110, 253, 0.2);
+  --entity-card-title: var(--entity-position-color, #0d6efd);
+  --entity-card-subtitle-color: var(--entity-position-text, #0a58ca);
+}

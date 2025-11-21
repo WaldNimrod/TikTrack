@@ -1,0 +1,121 @@
+{
+  "backend_allowed_dirs": [
+    "config",
+    "routes",
+    "services",
+    "models",
+    "utils",
+    "connectors"
+  ],
+  "backend_allowed_root_files": [
+    "app.py",
+    "requirements.txt"
+  ],
+  "backend_allowed_scripts": [
+    "backup_database.py",
+    "create_production_db.py",
+    "map_active_files.py",
+    "cleanup_import_sessions.py"
+  ],
+  "backend_excluded_patterns": [
+    "__pycache__",
+    ".pyc",
+    ".pyo",
+    ".pyd",
+    ".db",
+    ".db-shm",
+    ".db-wal",
+    ".log"
+  ],
+  "ui_excluded_patterns": [
+    "node_modules",
+    ".git",
+    "__pycache__",
+    "*.pyc",
+    ".DS_Store",
+    "coverage",
+    "*.log",
+    "*.backup",
+    "*.bak",
+    "*backup*",
+    "*old*"
+  ],
+  "documentation_dirs_to_remove": [
+    "01-OVERVIEW",
+    "02-ARCHITECTURE",
+    "03-API_REFERENCE",
+    "04-FEATURES",
+    "04-USAGE_EXAMPLES",
+    "05-PAGE_DOCUMENTATION",
+    "05-REPORTS",
+    "05-USER-GUIDES",
+    "06-ARCHIVE",
+    "06-CODING_STANDARDS",
+    "07-INDEXES",
+    "api",
+    "backend",
+    "database",
+    "developers",
+    "features",
+    "guides",
+    "infrastructure-improvement",
+    "issues",
+    "pages",
+    "plans",
+    "project",
+    "reports",
+    "rules",
+    "systems",
+    "testing",
+    "todo",
+    "tools",
+    "user",
+    "USER_GUIDES",
+    "user-guides"
+  ],
+  "documentation_files_to_remove": [
+    "BROWSER_CACHE_SOLUTION_IMPLEMENTED.md",
+    "CACHE_TESTING_INTERFACE_ADDED.md",
+    "CHANGELOG.md",
+    "CRITICAL_BROWSER_CACHE_ISSUE_ANALYSIS.md",
+    "CRITICAL_SYSTEMS_VERIFICATION_REPORT.md",
+    "CRUD_UI_FIX_PLAYBOOK.md",
+    "CSS_MASTER_FILE_GUIDE.md",
+    "DATA_LOAD_ERROR_STANDARDIZATION_REPORT.md",
+    "DOCS_AUDIT_REPORT.md",
+    "DOCUMENTATION_CLEANUP_REPORT.md",
+    "DOCUMENTATION_CONSOLIDATION_REPORT.md",
+    "FUTURE_DEVELOPMENT_ROADMAP.md",
+    "LOADING_STANDARDIZATION_PROGRESS.md",
+    "LOADING_SYSTEM_STANDARDIZATION_REPORT.md",
+    "LOGGER_SYSTEM_SPECIFICATION.md",
+    "PREFERENCES_MIGRATION_GUIDE.md",
+    "PREFERENCES_USER_GUIDE.md",
+    "RTL_HEBREW_GUIDE.md",
+    "SCATTERED_FILES_INVENTORY.md",
+    "TESTING_AND_VALIDATION.md",
+    "TESTING_CHECKLIST_LOADING_STANDARDIZATION.md",
+    "USER_MANAGEMENT_SYSTEM.md",
+    "תבנית עמוד ניהול - 20251026.html"
+  ],
+  "documentation_frontend_files_to_keep": [
+    "GENERAL_SYSTEMS_LIST.md",
+    "JAVASCRIPT_ARCHITECTURE.md",
+    "README.md"
+  ],
+  "documentation_dirs_to_keep": [
+    "03-DEVELOPMENT",
+    "development",
+    "frontend",
+    "production",
+    "server"
+  ],
+  "documentation_root_files_to_keep": [
+    "INDEX.md",
+    "README.md",
+    "PAGES_LIST.md",
+    "DOCUMENTATION_WORKING_RULES.md",
+    "version-manifest.json"
+  ]
+}
+

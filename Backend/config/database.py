@@ -44,17 +44,17 @@ def init_db() -> None:
     """יצירת כל הטבלאות"""
     from models.base import Base
     from models import ticker, trade, trading_account, trade_plan, alert, cash_flow, note, execution, currency, note_relation_type, user, preferences
-    # SQLite does not allow subqueries in CHECK constraints; strip problematic ones for sqlite engines
-    if USING_SQLITE:
-        try:
-            from sqlalchemy import CheckConstraint
-            from models.ticker import Ticker
-            removable_names = {"active_trades_consistency", "ticker_status_auto_update"}
-            table = Ticker.__table__
-            for constraint in list(table.constraints):
-                if isinstance(constraint, CheckConstraint) and getattr(constraint, "name", None) in removable_names:
-                    table.constraints.remove(constraint)
-        except Exception:
-            # Best-effort; if stripping fails, proceed and let create raise
-            pass
+    # SQLite and PostgreSQL do not allow subqueries in CHECK constraints; strip problematic ones
+    # These constraints will be implemented as triggers instead
+    try:
+        from sqlalchemy import CheckConstraint
+        from models.ticker import Ticker
+        removable_names = {"active_trades_consistency", "ticker_status_auto_update"}
+        table = Ticker.__table__
+        for constraint in list(table.constraints):
+            if isinstance(constraint, CheckConstraint) and getattr(constraint, "name", None) in removable_names:
+                table.constraints.remove(constraint)
+    except Exception:
+        # Best-effort; if stripping fails, proceed and let create raise
+        pass
     Base.metadata.create_all(bind=engine, checkfirst=True)

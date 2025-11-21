@@ -25,17 +25,41 @@
 > אוטומטית (שיתוף פעולה טוב עם Cursor). למעקב לייב אחרי הלוגים אפשר להוסיף
 > `--attach`, או להשתמש ב-`tail -f Backend/server_output.log`.
 
-### 🧪 **שרת פיתוח (פורט ‎8080)**
-- שימוש: בדיקות מקומיות, עבודה עם DB פיתוח (`Backend/db/simpleTrade_new.db`)
-- סקריפט:  
+### 🧪 **שרת פיתוח (פורט ‎8080) - PostgreSQL**
+> **✅ מעודכן (נובמבר 2025):** `start_server.sh` מגדיר אוטומטית PostgreSQL בסביבת פיתוח!
+
+- **שימוש**: בדיקות מקומיות, עבודה עם PostgreSQL (Docker container)
+- **דרישות מוקדמות**: 
+  - PostgreSQL Docker container חייב לרוץ: `docker ps | grep postgres`
+  - אם לא רץ: `docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev`
+- **סקריפט (הדרך המומלצת להפעיל):**  
   ```bash
   ./start_server.sh
   ```
-- פקודות נוספות:  
+  > **✅ הסקריפט מגדיר אוטומטית משתני סביבה של PostgreSQL בסביבת פיתוח!**
+- **מה הסקריפט עושה:**
+  1. בודק אם PostgreSQL container רץ (בסביבת פיתוח)
+  2. מגדיר אוטומטית משתני סביבה של PostgreSQL (אם לא מוגדרים)
+  3. בודק את בריאות ה-container
+  4. מפעיל את השרת עם ההגדרות הנכונות
+- **פקודות נוספות:**  
   ```bash
   ./start_server.sh --check-only   # בדיקת קונפליקטים
   ./start_server.sh --force        # הפעלה למרות קונפליקט (לא מומלץ)
+  ./start_server.sh --attach       # מעקב אחרי לוגים בזמן אמת
   ```
+- **אלטרנטיבה (wrapper):**
+  ```bash
+  ./start_pg_server.sh  # עוטף את start_server.sh (לשמירת תאימות)
+  ```
+- **משתני סביבה (מוגדרים אוטומטית ב-`start_server.sh` בסביבת פיתוח):**
+  ```bash
+  POSTGRES_HOST=localhost
+  POSTGRES_DB=TikTrack-db-development
+  POSTGRES_USER=TikTrakDBAdmin
+  POSTGRES_PASSWORD="BigMeZoo1974!?"
+  ```
+  > **הערה**: אם המשתנים כבר מוגדרים, הסקריפט משתמש בערכים הקיימים.
 
 ### 🏭 **שרת פרודקשן מקומי (פורט ‎5001)**
 - שימוש: סימולציה של סביבת הייצור מול `production/Backend` ו־`production/trading-ui`

@@ -477,6 +477,7 @@ def link_trading_account(session_id: int):
     The request body may include an optional `account_number` to override the detected value,
     but the server will still validate that a number exists.
     """
+    normalizer = _get_date_normalizer()
     payload = request.get_json(silent=True) or {}
     override_account_number = payload.get('account_number')
     target_trading_account_id = payload.get('trading_account_id')
@@ -492,16 +493,21 @@ def link_trading_account(session_id: int):
                 target_trading_account_id=target_trading_account_id,
                 confirm_overwrite=confirm_overwrite
             )
+            # Normalize dates in result
+            normalized_result = normalizer.normalize_output(result)
+            normalized_result['timestamp'] = normalizer.now_envelope()
             status_code = 200 if result.get('success') else 400
-            return jsonify(result), status_code
+            return jsonify(normalized_result), status_code
         finally:
             db_session.close()
     except Exception as exc:
         logger.error("Failed to link trading account: %s", exc, exc_info=True)
-        return jsonify({
+        error_payload = {
             'success': False,
-            'error': f'Failed to link account: {exc}'
-        }), 500
+            'error': f'Failed to link account: {exc}',
+            'timestamp': normalizer.now_envelope()
+        }
+        return jsonify(error_payload), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/account-link/status', methods=['GET'])
 def get_account_link_status(session_id: int):

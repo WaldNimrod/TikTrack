@@ -60,7 +60,13 @@ class ModalManagerV2 {
         }
 
         if (!assignedValue) {
-            const today = new Date();
+            // Use dateUtils for consistent date handling
+            let today;
+            if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+              today = window.dateUtils.getToday();
+            } else {
+              today = new Date();
+            }
             today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
             assignedValue = includeTime
                 ? today.toISOString().slice(0, 16)
@@ -798,7 +804,13 @@ class ModalManagerV2 {
                 // Handle 'today' special value for datetime-local
                 let dateValue = field.defaultValue || '';
                 if (dateValue === 'today') {
-                    const today = new Date();
+                    // Use dateUtils for consistent date handling
+                    let today;
+                    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+                      today = window.dateUtils.getToday();
+                    } else {
+                      today = new Date();
+                    }
                     dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm                                                                   
                 }
                 const dateStyle = field.style || (field.width ? `width: ${field.width}px` : '');
@@ -821,6 +833,65 @@ class ModalManagerV2 {
                 `;
                 
             case 'select':
+                // Check if this is a tag multi-select field
+                const isTagMultiSelect = (field.additionalClasses && (
+                    (Array.isArray(field.additionalClasses) && field.additionalClasses.includes('tag-multi-select')) ||
+                    (typeof field.additionalClasses === 'string' && field.additionalClasses.includes('tag-multi-select'))
+                )) || (field.classList && Array.isArray(field.classList) && field.classList.includes('tag-multi-select'));
+                
+                // If it's a tag multi-select, render it with badge container like tag-multi-select type
+                if (isTagMultiSelect) {
+                    const initialTags = Array.isArray(field.defaultValue)
+                        ? field.defaultValue.join(',')
+                        : (field.defaultValue || '');
+                    const badgeContainerId = `${field.id}TagBadgeContainer`;
+                    const extraAttributes = [];
+                    if (field.multiple) {
+                        extraAttributes.push('multiple');
+                    }
+                    if (field.attributes && typeof field.attributes === 'object') {
+                        Object.entries(field.attributes).forEach(([attrKey, attrValue]) => {
+                            if (attrValue === true) {
+                                extraAttributes.push(attrKey);
+                            } else if (attrValue !== false && attrValue !== null && attrValue !== undefined) {
+                                extraAttributes.push(`${attrKey}="${attrValue}"`);
+                            }
+                        });
+                    }
+                    if (field.dataset && typeof field.dataset === 'object') {
+                        Object.entries(field.dataset).forEach(([dataKey, dataValue]) => {
+                            if (dataValue !== undefined && dataValue !== null) {
+                                extraAttributes.push(`data-${dataKey}="${dataValue}"`);
+                            }
+                        });
+                    }
+                    
+                    return `
+                        <div class="mb-3">
+                            <label for="${field.id}" class="form-label">
+                                ${field.label} ${requiredStar}
+                            </label>
+                            <select 
+                                class="form-select tag-multi-select"
+                                id="${field.id}"
+                                name="${field.name || field.id}"
+                                ${requiredAttr}
+                                ${disabledAttr}
+                                ${readOnlyAttr}
+                                data-tag-category="${field.tagCategory ?? ''}"
+                                data-include-inactive="${field.includeInactive ? 'true' : 'false'}"
+                                data-initial-value="${initialTags}"
+                                ${extraAttributes.join(' ')}>
+                                <option value="" disabled>טוען תגיות...</option>
+                            </select>
+                            <div id="${badgeContainerId}" class="mt-2 tag-picker-badges text-start small"></div>
+                            ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    `;
+                }
+                
+                // Regular select field
                 let optionsHTML = '';
                 if (field.includeEmpty !== false) {
                     const emptyText = field.emptyText || 'בחר...';
@@ -1052,9 +1123,9 @@ class ModalManagerV2 {
      * @param {Object} entityData - נתוני הישות (לעריכה/צפייה)
      * @returns {Promise<void>}
      */
-    async showModal(modalId, mode = 'add', entityData = null) {
+    async showModal(modalId, mode = 'add', entityData = null, options = {}) {
         try {
-            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, modalsCount: this.modals.size });
+            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, options, modalsCount: this.modals.size });
             
             // בדיקה שהמודל קיים - אם לא, ננסה ליצור אותו מהקונפיגורציה
             if (!this.modals.has(modalId)) {
@@ -1156,7 +1227,12 @@ class ModalManagerV2 {
             
             // Initialize tabs if exists
             if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs) && modalInfo.config.tabs.length > 0) {
-                this.initializeTabs(modalElement, modalInfo.config);
+                // For cash flow modal - handle currency exchange vs regular flow
+                if (modalId === 'cashFlowModal') {
+                    this.initializeCashFlowTabs(modalElement, modalInfo.config, mode, entityData, options);
+                } else {
+                    this.initializeTabs(modalElement, modalInfo.config);
+                }
             }
             
             // יישום צבעים
@@ -1166,6 +1242,7 @@ class ModalManagerV2 {
             // Note: populateSelects already handles defaultFromPreferences
             await this.populateSelects(modalElement, modalInfo.config);
             
+            
             if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
                 window.initializeExternalIdFields();
             }
@@ -1173,6 +1250,16 @@ class ModalManagerV2 {
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
+                
+                // CRITICAL: For executions modal, save ticker value after populateForm
+                // This ensures the value is preserved when initializeSpecialHandlers clones the select
+                if (modalId === 'executionsModal') {
+                    const tickerSelect = modalElement.querySelector('#executionTicker');
+                    if (tickerSelect && tickerSelect.value) {
+                        tickerSelect.dataset.preservedValue = tickerSelect.value;
+                        console.log(`💾 [showModal] Preserved executionTicker value after populateForm: ${tickerSelect.value}`);
+                    }
+                }
                 
                 // After populating form, update external_id field state for executions modal
                 if (modalId === 'executionsModal') {
@@ -2396,33 +2483,185 @@ class ModalManagerV2 {
      * @private
      */
     async _hydrateTagFieldsForModal(modalElement, defaultEntityType, entityId) {
-        if (!modalElement || !window.TagUIManager) {
+        if (!modalElement) {
+            window.Logger?.warn('⚠️ _hydrateTagFieldsForModal: modalElement not available', {
+                page: 'modal-manager-v2'
+            });
             return;
         }
 
+        // Wait for TagUIManager to be available (it might load after modal opens)
+        if (!window.TagUIManager) {
+            window.Logger?.info('🏷️ TagUIManager not available yet, waiting...', {
+                modalId: modalElement.id,
+                page: 'modal-manager-v2'
+            });
+            
+            // Retry mechanism: wait for TagUIManager to be available
+            let retries = 0;
+            const maxRetries = 10;
+            const retryDelay = 100; // 100ms between retries
+            
+            while (retries < maxRetries && !window.TagUIManager) {
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                retries++;
+            }
+            
+            if (!window.TagUIManager) {
+                window.Logger?.warn('⚠️ TagUIManager not available after waiting', {
+                    modalId: modalElement.id,
+                    retries,
+                    page: 'modal-manager-v2'
+                });
+                return;
+            }
+            
+            window.Logger?.info('🏷️ TagUIManager became available after waiting', {
+                modalId: modalElement.id,
+                retries,
+                page: 'modal-manager-v2'
+            });
+        }
+
+        // First, initialize all tag selects (sets up event listeners and ensures they're ready)
+        if (typeof window.TagUIManager.initializeModal === 'function') {
+            try {
+                window.Logger?.info('🏷️ Initializing tag picker in modal', { 
+                    modalId: modalElement.id,
+                    entityType: defaultEntityType,
+                    page: 'modal-manager-v2' 
+                });
+                window.TagUIManager.initializeModal(modalElement);
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { 
+                    error: error.message || error,
+                    modalId: modalElement.id, 
+                    page: 'modal-manager-v2' 
+                });
+            }
+        }
+
+        // Wait a bit to ensure DOM is ready
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         const tagSelects = modalElement.querySelectorAll('select.tag-multi-select');
+        window.Logger?.info('🏷️ _hydrateTagFieldsForModal called', {
+            modalId: modalElement.id,
+            defaultEntityType,
+            entityId,
+            tagSelectsCount: tagSelects.length,
+            selectIds: Array.from(tagSelects).map(s => s.id),
+            page: 'modal-manager-v2'
+        });
+        
         if (!tagSelects.length) {
+            window.Logger?.info('🏷️ No tag selects found in modal', { modalId: modalElement.id, page: 'modal-manager-v2' });
             return;
         }
 
         for (const select of tagSelects) {
             const targetEntityType = select.dataset.tagEntity || defaultEntityType;
             if (!targetEntityType || !select.id) {
+                window.Logger?.warn('⚠️ Skipping tag select - missing entityType or id', {
+                    selectId: select.id,
+                    targetEntityType,
+                    defaultEntityType,
+                    hasTagEntity: !!select.dataset.tagEntity,
+                    page: 'modal-manager-v2'
+                });
                 continue;
             }
+            
+            // For edit mode: load existing tags for the entity
             if (entityId && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
                 try {
+                    window.Logger?.info('🏷️ Hydrating tag select for entity (edit mode)', {
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        entityId,
+                        page: 'modal-manager-v2'
+                    });
                     await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
                 } catch (error) {
                     window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
-                        error,
+                        error: error.message || error,
+                        errorStack: error.stack,
                         selectId: select.id,
                         entityType: targetEntityType,
                         entityId,
                         page: 'modal-manager-v2'
                     });
                 }
+            } else {
+                // For add mode: ensure tags are populated - refreshSelectOptions will populate if not already done
+                if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
+                    window.Logger?.info('🏷️ Refreshing tag select options (add mode)', {
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        hasTagService: !!window.TagService,
+                        hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // Retry mechanism: wait for TagService to be available
+                    let retries = 0;
+                    const maxRetries = 5;
+                    const retryDelay = 200; // 200ms between retries
+                    
+                    while (retries < maxRetries) {
+                        try {
+                            // Check if TagService is available
+                            if (window.TagService && typeof window.TagService.fetchTags === 'function') {
+                                await window.TagUIManager.refreshSelectOptions(select);
+                                window.Logger?.info('🏷️ Tag select refreshed successfully', {
+                                    selectId: select.id,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                break; // Success, exit retry loop
+                            } else {
+                                window.Logger?.debug('🏷️ TagService not available yet, waiting...', {
+                                    selectId: select.id,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                // Wait a bit and retry
+                                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                                retries++;
+                            }
+                        } catch (error) {
+                            if (retries >= maxRetries - 1) {
+                                // Last retry failed, log warning
+                                window.Logger?.warn?.('⚠️ Failed to refresh tag select options in add mode after retries', {
+                                    error: error.message || error,
+                                    errorStack: error.stack,
+                                    selectId: select.id,
+                                    entityType: targetEntityType,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                            } else {
+                                window.Logger?.debug('🏷️ Error refreshing tag select, retrying...', {
+                                    selectId: select.id,
+                                    error: error.message || error,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                // Wait and retry
+                                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                                retries++;
+                            }
+                        }
+                    }
+                } else {
+                    window.Logger?.warn('⚠️ TagUIManager.refreshSelectOptions not available', {
+                        selectId: select.id,
+                        page: 'modal-manager-v2'
+                    });
+                }
             }
+            
+            // Load suggestions for both add and edit modes
             if (typeof window.TagUIManager.loadSuggestionsForSelect === 'function') {
                 const suggestionEntityId = entityId && targetEntityType === defaultEntityType ? entityId : null;
                 window.TagUIManager.loadSuggestionsForSelect(select, {
@@ -2684,6 +2923,14 @@ class ModalManagerV2 {
                 continue;
             }
             
+            // CRITICAL: For date fields, prefer DateEnvelope over display string
+            // Check if this is a date field and if there's a _envelope version
+            let actualValue = value;
+            if ((key === 'date' || key.endsWith('_date') || key.includes('Date')) && data[`${key}_envelope`]) {
+                actualValue = data[`${key}_envelope`];
+                console.log(`🔍 [populateForm] Using ${key}_envelope instead of ${key} (DateEnvelope detected)`);
+            }
+            
             // Try direct match first (search in form and all tab panes)
             let field = form.querySelector(`#${key}, [name="${key}"]`);
             if (!field) {
@@ -2707,7 +2954,7 @@ class ModalManagerV2 {
             }
             
             if (field) {
-                console.log(`✅ Found field for ${key} (value: ${value}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
+                console.log(`✅ Found field for ${key} (value: ${actualValue}, valueType: ${typeof actualValue}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
                 
                 // Check if this is a display field (div with id but not an input)
                 if (field.tagName === 'DIV' && field.id && field.classList.contains('form-control-plaintext')) {
@@ -2717,9 +2964,23 @@ class ModalManagerV2 {
                         // Format date for display
                         if (displayText) {
                             try {
-                                const date = new Date(displayText);
+                                // Use dateUtils for consistent date parsing
+                                let date;
+                                if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                                  date = window.dateUtils.toDateObject(displayText);
+                                } else {
+                                  date = new Date(displayText);
+                                }
                                 if (!isNaN(date.getTime())) {
-                                    displayText = window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleString('he-IL', {
+                                    // Use FieldRendererService or dateUtils for consistent date formatting
+                                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                                      displayText = window.FieldRendererService.renderDate(date, true);
+                                    } else if (window.formatDate) {
+                                      displayText = window.formatDate(date, true);
+                                    } else if (window.dateUtils?.formatDate) {
+                                      displayText = window.dateUtils.formatDate(date, { includeTime: true });
+                                    } else {
+                                      displayText = date.toLocaleString('he-IL', {
                                         year: 'numeric',
                                         month: '2-digit',
                                         day: '2-digit',
@@ -2815,11 +3076,30 @@ class ModalManagerV2 {
                                     console.log(`✅ Populated currencies select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
                                 } else if (field.id.includes('Ticker') || field.id.includes('ticker')) {
                                     console.log(`   Populating tickers select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
+                                    console.log(`   🔍 [populateForm] Ticker field details:`, {
+                                        fieldId: field.id,
+                                        key: key,
+                                        value: value,
+                                        selectValue: selectValue,
+                                        defaultValueForSelect: defaultValueForSelect,
+                                        currentOptionsCount: field.options.length
+                                    });
+                                    
+                                    // Always populate tickers select with defaultValue to ensure value is set
+                                    // This is the working solution - not elegant but works
                                     await window.SelectPopulatorService.populateTickersSelect(field, {
                                         includeEmpty: true,
                                         defaultValue: defaultValueForSelect // Pass the value we want to set
                                     });
-                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
+                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`, {
+                                        expectedValue: defaultValueForSelect,
+                                        actualValue: field.value,
+                                        hasOption: Array.from(field.options).some(opt => opt.value === String(defaultValueForSelect))
+                                    });
+                                    
+                                    // CRITICAL: Skip the general select value setting below for ticker fields
+                                    // We already handled it above, and the general code might reset it
+                                    field.dataset.tickerHandled = 'true';
                                 }
                             } catch (populateError) {
                                 console.error(`❌ Failed to populate select ${field.id}:`, populateError);
@@ -2840,6 +3120,13 @@ class ModalManagerV2 {
                         if (field.options.length <= 1) {
                             console.error(`❌ Select ${field.id} still has no options after retries - cannot set value ${selectValue}`);
                         }
+                    }
+                    
+                    // CRITICAL: Skip general select value setting for ticker fields that were already handled
+                    if (field.dataset.tickerHandled === 'true') {
+                        console.log(`⏭️ Skipping general select value setting for ${field.id} - already handled by ticker-specific code`);
+                        // Skip to next iteration in the for loop
+                        continue;
                     }
                     
                     // Check if the value exists in options before trying to set it
@@ -2960,30 +3247,76 @@ class ModalManagerV2 {
                         field.dataset.pendingContent = value || '';
                         console.warn(`⚠️ RichTextEditorService not available for field ${field.id}, storing pending content`);
                     }
-                } else if (field.type === 'date' && value) {
+                } else if (field.type === 'date' && actualValue) {
                     // Date type - value should be in YYYY-MM-DD format
-                    // Use centralized date utils to handle DateEnvelope, Date objects, datetime objects, and strings
-                    // Same approach as notes page - handle all date formats properly
+                    // CRITICAL: Server returns DateEnvelope objects, not strings!
+                    // DateEnvelope structure: { utc, epochMs, local, timezone, display }
+                    console.log(`🔍 [populateForm] Processing date field ${field.id}`, {
+                        actualValue,
+                        actualValueType: typeof actualValue,
+                        originalValue: value,
+                        isDateEnvelope: window.dateUtils ? window.dateUtils.isDateEnvelope(actualValue) : (actualValue && typeof actualValue === 'object' && 'epochMs' in actualValue && 'utc' in actualValue),
+                        isDateObject: actualValue instanceof Date,
+                        isString: typeof actualValue === 'string',
+                        valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                    });
+                    
                     let dateObj = null;
                     
-                    // Handle Date objects directly (server may return Date objects)
-                    if (value instanceof Date) {
-                        dateObj = new Date(value.getTime());
+                    // Priority 1: Check if it's a DateEnvelope object (server returns this!)
+                    if (actualValue && typeof actualValue === 'object' && ('epochMs' in actualValue || 'utc' in actualValue || 'local' in actualValue)) {
+                        console.log(`🔍 [populateForm] Detected DateEnvelope for ${field.id}`, {
+                            utc: actualValue.utc,
+                            epochMs: actualValue.epochMs,
+                            local: actualValue.local,
+                            timezone: actualValue.timezone
+                        });
+                        
+                        // Use dateUtils if available (preferred method)
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(actualValue);
+                            console.log(`✅ [populateForm] Converted DateEnvelope to Date object via dateUtils:`, dateObj ? dateObj.toISOString() : null);
+                        } else {
+                            // Fallback: parse from DateEnvelope fields
+                            if (actualValue.epochMs && typeof actualValue.epochMs === 'number') {
+                                dateObj = new Date(actualValue.epochMs);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.epochMs to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.utc && typeof actualValue.utc === 'string') {
+                                dateObj = new Date(actualValue.utc);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.utc to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.local && typeof actualValue.local === 'string') {
+                                dateObj = new Date(actualValue.local);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.local to Date object:`, dateObj.toISOString());
+                            }
+                        }
                     }
-                    // Use centralized date utils for DateEnvelope, strings, and other formats
+                    // Priority 2: Handle Date objects directly (server may return Date objects)
+                    else if (actualValue instanceof Date) {
+                        // Use dateUtils for consistent date handling
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject(actualValue);
+                        } else {
+                          dateObj = new Date(actualValue.getTime());
+                        }
+                        console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
+                    }
+                    // Priority 3: Use centralized date utils for strings and other formats
                     else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
-                        dateObj = window.dateUtils.toDateObject(value);
+                        dateObj = window.dateUtils.toDateObject(actualValue);
+                        console.log(`✅ [populateForm] Converted via dateUtils.toDateObject:`, dateObj ? dateObj.toISOString() : null);
                     }
-                    // Fallback if date-utils not loaded
-                    else if (typeof value === 'string') {
-                        dateObj = new Date(value);
+                    // Priority 4: Fallback if date-utils not loaded
+                    else if (typeof actualValue === 'string') {
+                        dateObj = new Date(actualValue);
+                        console.log(`✅ [populateForm] Parsed string value:`, dateObj.toISOString());
                     }
                     else {
                         // Try to convert to string and parse
                         try {
-                            dateObj = new Date(value.toString());
+                            dateObj = new Date(actualValue.toString());
+                            console.log(`✅ [populateForm] Parsed via toString():`, dateObj.toISOString());
                         } catch (e) {
-                            console.warn(`⚠️ Failed to parse date value for ${field.id}:`, value, e);
+                            console.warn(`⚠️ Failed to parse date value for ${field.id}:`, actualValue, e);
                         }
                     }
                     
@@ -2993,34 +3326,92 @@ class ModalManagerV2 {
                         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
                         const day = String(dateObj.getDate()).padStart(2, '0');
                         field.value = `${year}-${month}-${day}`;
-                        console.log(`✅ Set date field ${field.id} to: ${field.value}`);
+                        console.log(`✅ Set date field ${field.id} to: ${field.value}`, {
+                            originalValue: value,
+                            actualValue: actualValue,
+                            dateObj: dateObj.toISOString(),
+                            formatted: field.value
+                        });
                     } else {
-                        console.warn(`⚠️ Invalid date value for ${field.id}:`, value, { dateObj, isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj' });
+                        console.error(`❌ Invalid date value for ${field.id}:`, {
+                            actualValue,
+                            actualValueType: typeof actualValue,
+                            originalValue: value,
+                            dateObj,
+                            isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
+                            valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                        });
                     }
-                } else if (field.type === 'datetime-local' && value) {
-                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
-                    // Use centralized date utils to handle DateEnvelope, Date objects, datetime objects, and strings
-                    // Same approach as notes page - handle all date formats properly
+                } else if (field.type === 'datetime-local' && actualValue) {
+                    // Convert date value to datetime-local format (YYYY-MM-DDTHH:MM)
+                    // CRITICAL: Server returns DateEnvelope objects, not strings!
+                    // DateEnvelope structure: { utc, epochMs, local, timezone, display }
+                    console.log(`🔍 [populateForm] Processing datetime-local field ${field.id}`, {
+                        actualValue,
+                        actualValueType: typeof actualValue,
+                        originalValue: value,
+                        isDateEnvelope: window.dateUtils ? window.dateUtils.isDateEnvelope(actualValue) : (actualValue && typeof actualValue === 'object' && 'epochMs' in actualValue && 'utc' in actualValue),
+                        isDateObject: actualValue instanceof Date,
+                        isString: typeof actualValue === 'string',
+                        valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                    });
+                    
                     let dateObj = null;
                     
-                    // Handle Date objects directly (server may return Date objects)
-                    if (value instanceof Date) {
-                        dateObj = new Date(value.getTime());
+                    // Priority 1: Check if it's a DateEnvelope object (server returns this!)
+                    if (actualValue && typeof actualValue === 'object' && ('epochMs' in actualValue || 'utc' in actualValue || 'local' in actualValue)) {
+                        console.log(`🔍 [populateForm] Detected DateEnvelope for ${field.id}`, {
+                            utc: actualValue.utc,
+                            epochMs: actualValue.epochMs,
+                            local: actualValue.local,
+                            timezone: actualValue.timezone
+                        });
+                        
+                        // Use dateUtils if available (preferred method)
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(actualValue);
+                            console.log(`✅ [populateForm] Converted DateEnvelope to Date object via dateUtils:`, dateObj ? dateObj.toISOString() : null);
+                        } else {
+                            // Fallback: parse from DateEnvelope fields
+                            if (actualValue.epochMs && typeof actualValue.epochMs === 'number') {
+                                dateObj = new Date(actualValue.epochMs);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.epochMs to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.utc && typeof actualValue.utc === 'string') {
+                                dateObj = new Date(actualValue.utc);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.utc to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.local && typeof actualValue.local === 'string') {
+                                dateObj = new Date(actualValue.local);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.local to Date object:`, dateObj.toISOString());
+                            }
+                        }
                     }
-                    // Use centralized date utils for DateEnvelope, strings, and other formats
+                    // Priority 2: Handle Date objects directly (server may return Date objects)
+                    else if (actualValue instanceof Date) {
+                        // Use dateUtils for consistent date handling
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject(actualValue);
+                        } else {
+                          dateObj = new Date(actualValue.getTime());
+                        }
+                        console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
+                    }
+                    // Priority 3: Use centralized date utils for strings and other formats
                     else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
-                        dateObj = window.dateUtils.toDateObject(value);
+                        dateObj = window.dateUtils.toDateObject(actualValue);
+                        console.log(`✅ [populateForm] Converted via dateUtils.toDateObject:`, dateObj ? dateObj.toISOString() : null);
                     }
-                    // Fallback if date-utils not loaded
-                    else if (typeof value === 'string') {
-                        dateObj = new Date(value);
+                    // Priority 4: Fallback if date-utils not loaded
+                    else if (typeof actualValue === 'string') {
+                        dateObj = new Date(actualValue);
+                        console.log(`✅ [populateForm] Parsed string value:`, dateObj.toISOString());
                     }
                     else {
                         // Try to convert to string and parse
                         try {
-                            dateObj = new Date(value.toString());
+                            dateObj = new Date(actualValue.toString());
+                            console.log(`✅ [populateForm] Parsed via toString():`, dateObj.toISOString());
                         } catch (e) {
-                            console.warn(`⚠️ Failed to parse datetime value for ${field.id}:`, value, e);
+                            console.warn(`⚠️ Failed to parse datetime value for ${field.id}:`, actualValue, e);
                         }
                     }
                     
@@ -3032,9 +3423,21 @@ class ModalManagerV2 {
                         const hours = String(dateObj.getHours()).padStart(2, '0');
                         const minutes = String(dateObj.getMinutes()).padStart(2, '0');
                         field.value = `${year}-${month}-${day}T${hours}:${minutes}`;
-                        console.log(`✅ Set datetime-local field ${field.id} to: ${field.value}`);
+                        console.log(`✅ Set datetime-local field ${field.id} to: ${field.value}`, {
+                            originalValue: value,
+                            actualValue: actualValue,
+                            dateObj: dateObj.toISOString(),
+                            formatted: field.value
+                        });
                     } else {
-                        console.warn(`⚠️ Invalid datetime value for ${field.id}:`, value, { dateObj, isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj' });
+                        console.error(`❌ Invalid datetime value for ${field.id}:`, {
+                            actualValue,
+                            actualValueType: typeof actualValue,
+                            originalValue: value,
+                            dateObj,
+                            isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
+                            valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                        });
                     }
                 } else if (field.type === 'file') {
                     // File inputs cannot have their value set programmatically for security reasons
@@ -3727,6 +4130,7 @@ class ModalManagerV2 {
                 'name': 'tickerName',
                 'type': 'tickerType',
                 'currency_id': 'tickerCurrency',
+                'status': 'tickerStatus',
                 'remarks': 'tickerRemarks',
                 'sector': 'tickerSector',
                 'industry': 'tickerIndustry'
@@ -4136,6 +4540,140 @@ class ModalManagerV2 {
         
         // Initialize currency exchange calculations if exchange tab is active by default
         if (activeTabId === 'exchange') {
+            this.initializeCurrencyExchangeCalculations(modalElement);
+        }
+    }
+    
+    /**
+     * Initialize cash flow tabs with currency exchange detection - אתחול טאבים של תזרימי מזומנים עם זיהוי המרת מטבע
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit)
+     * @param {Object} entityData - נתוני הישות (לעריכה)
+     * @param {Object} options - אפשרויות נוספות (isCurrencyExchange, exchangeId)
+     * @private
+     */
+    initializeCashFlowTabs(modalElement, config, mode, entityData, options = {}) {
+        if (!config.tabs || !Array.isArray(config.tabs) || config.tabs.length === 0) {
+            return;
+        }
+        
+        const tabsContainer = modalElement.querySelector(`#${config.id}Tabs`);
+        if (!tabsContainer) {
+            console.warn(`⚠️ Tabs container not found for modal ${config.id}`);
+            return;
+        }
+        
+        // Determine if this is a currency exchange
+        let isCurrencyExchange = false;
+        
+        if (options.isCurrencyExchange) {
+            // Explicitly marked as currency exchange
+            isCurrencyExchange = true;
+        } else if (mode === 'edit' && entityData) {
+            // Check entityData for currency exchange indicators
+            if (window.isCurrencyExchange && typeof window.isCurrencyExchange === 'function') {
+                isCurrencyExchange = window.isCurrencyExchange(entityData);
+            } else {
+                // Fallback check
+                const type = entityData.type || '';
+                const externalId = entityData.external_id || '';
+                isCurrencyExchange = (
+                    type === 'currency_exchange_from' || 
+                    type === 'currency_exchange_to' ||
+                    (typeof externalId === 'string' && externalId.startsWith('exchange_')) ||
+                    entityData.linked_exchange_cash_flow_id ||
+                    entityData.exchange_pair_summary
+                );
+            }
+        }
+        
+        // Find tab buttons and panes
+        const tabButtons = tabsContainer.querySelectorAll('button[data-tab-id]');
+        const tabPanes = modalElement.querySelectorAll('.tab-pane');
+        
+        // Show/hide tabs based on currency exchange status
+        tabButtons.forEach(button => {
+            const tabId = button.getAttribute('data-tab-id');
+            const tabPane = modalElement.querySelector(`#${config.id}Tab${tabId}`);
+            
+            if (tabId === 'regular') {
+                // Regular tab - show only for non-exchange flows
+                if (isCurrencyExchange) {
+                    button.style.display = 'none';
+                    if (tabPane) {
+                        tabPane.style.display = 'none';
+                    }
+                } else {
+                    button.style.display = '';
+                    if (tabPane) {
+                        tabPane.style.display = '';
+                    }
+                }
+            } else if (tabId === 'exchange') {
+                // Exchange tab - show only for exchange flows
+                if (isCurrencyExchange) {
+                    button.style.display = '';
+                    if (tabPane) {
+                        tabPane.style.display = '';
+                    }
+                    // Activate exchange tab
+                    button.classList.add('active');
+                    if (tabPane) {
+                        tabPane.classList.add('show', 'active');
+                    }
+                    // Deactivate regular tab
+                    const regularButton = tabsContainer.querySelector('button[data-tab-id="regular"]');
+                    const regularPane = modalElement.querySelector(`#${config.id}Tabregular`);
+                    if (regularButton) {
+                        regularButton.classList.remove('active');
+                    }
+                    if (regularPane) {
+                        regularPane.classList.remove('show', 'active');
+                    }
+                } else {
+                    button.style.display = 'none';
+                    if (tabPane) {
+                        tabPane.style.display = 'none';
+                    }
+                }
+            }
+        });
+        
+        // Update save button onclick based on active tab
+        const saveBtn = modalElement.querySelector(`#${config.id}SaveBtn`);
+        if (saveBtn) {
+            if (isCurrencyExchange && config.onSaveExchange) {
+                saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+            } else if (config.onSave) {
+                saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+            }
+        }
+        
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', (e) => {
+                const tabId = e.target.getAttribute('data-tab-id');
+                
+                // Update save button onclick based on selected tab
+                if (saveBtn) {
+                    if (tabId === 'exchange' && config.onSaveExchange) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+                    } else if (config.onSave) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+                    }
+                }
+                
+                // Initialize currency exchange calculations if exchange tab is active
+                if (tabId === 'exchange') {
+                    this.initializeCurrencyExchangeCalculations(modalElement);
+                }
+            });
+        });
+        
+        // Initialize currency exchange calculations if exchange tab is active
+        if (isCurrencyExchange) {
             this.initializeCurrencyExchangeCalculations(modalElement);
         }
     }
@@ -4838,12 +5376,18 @@ class ModalManagerV2 {
                 });
             } 
             // Ticker select fields (but NOT tickerType or tickerCurrency)
+            // Note: executionTicker with populateFromService will be handled above via populateFromService: 'tickers', not here
             else if ((selectId.includes('Ticker') || selectId.includes('ticker')) && 
                       !selectId.includes('Type') && !selectId.includes('Currency') &&
                       selectId !== 'tickerType' && selectId !== 'tickerCurrency') {
-                // Ticker select (e.g., cashFlowTicker, tradePlanTicker)
+                // Regular ticker select (e.g., tradePlanTicker)
+                // executionTicker with populateFromService is handled above, so it won't reach here
                 await window.SelectPopulatorService.populateTickersSelect(select, {
                     includeEmpty: true
+                });
+                console.log(`✅ נטענו טיקרים ל-${selectId}`, {
+                    selectOptionsAfter: select.options.length,
+                    selectValue: select.value
                 });
             } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
                 await window.SelectPopulatorService.populateTradePlansSelect(select, {
@@ -4868,7 +5412,7 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - אלמנט המודל
      * @private
      */
-    handleModalShown(modalElement) {
+    async handleModalShown(modalElement) {
         const modalId = modalElement.id;
         
         if (this.modals.has(modalId)) {
@@ -4876,14 +5420,13 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
-        if (window.TagUIManager && typeof window.TagUIManager.initializeModal === 'function') {
-            try {
-                window.TagUIManager.initializeModal(modalElement);
-            } catch (error) {
-                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
-            }
-        }
-        this._hydrateTagFieldsForModal(modalElement, modalElement.dataset.entityType || null, null);
+        // Get entityType from modal config or dataset
+        const modalInfo = this.modals.get(modalId);
+        const entityType = modalInfo?.config?.entityType || modalElement.dataset.entityType || null;
+        
+        // Hydrate tag fields FIRST - this will also call initializeModal internally
+        // Must be async and awaited, and pass entityType from config
+        await this._hydrateTagFieldsForModal(modalElement, entityType, null);
         
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
@@ -4990,18 +5533,37 @@ class ModalManagerV2 {
         
         // For Executions modal - handle ticker and account selection
         if (modalId === 'executionsModal') {
-            // Handle ticker selection
+            // Handle ticker selection - clone and re-populate to ensure value is preserved
+            // This is the working solution - not elegant but works
             const tickerSelect = modalElement.querySelector('#executionTicker');
             if (tickerSelect) {
-                // Save original before cloning
-                const originalTickerSelect = tickerSelect;
+                // CRITICAL: Get preserved value from data attribute (set by populateForm)
+                // OR use current value if preserved value not available
+                const preservedValue = tickerSelect.dataset.preservedValue;
+                const originalValue = preservedValue || tickerSelect.value;
+                console.log(`💾 [initializeSpecialHandlers] executionTicker - preservedValue: ${preservedValue}, currentValue: ${tickerSelect.value}, will use: ${originalValue}`);
                 
-                // Remove existing listeners
+                // Clone to remove existing listeners
                 const newTickerSelect = tickerSelect.cloneNode(true);
                 tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
                 
-                // Restore value after clone (critical for edit mode!)
-                this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'executionTicker');
+                console.log(`🔄 [initializeSpecialHandlers] After clone - originalValue: ${originalValue}, newSelect.value: ${newTickerSelect.value}`);
+                
+                // Re-populate with original value as defaultValue
+                if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+                    (async () => {
+                        try {
+                            console.log(`🔄 [initializeSpecialHandlers] Re-populating with defaultValue: ${originalValue}`);
+                            await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
+                                includeEmpty: true,
+                                defaultValue: originalValue // CRITICAL: Use the preserved value
+                            });
+                            console.log(`✅ [initializeSpecialHandlers] Re-populated, final value: ${newTickerSelect.value}, expected: ${originalValue}`);
+                        } catch (error) {
+                            console.error(`❌ Error re-populating executionTicker:`, error);
+                        }
+                    })();
+                }
                 
                 // Add change listener
                 newTickerSelect.addEventListener('change', async (e) => {
@@ -5060,37 +5622,51 @@ class ModalManagerV2 {
                 console.log('✅ Added source field listener for executionExternalId');
             }
             
-            // Handle execution type field - enable/disable Realized P/L field based on execution type
-            // Realized P/L נדרש רק ל-sell (מכירה) ו-cover (כיסוי) - סגירת פוזיציות
-            // Realized P/L לא נדרש ל-buy (קנייה) ו-short (מכירה בחסר) - פתיחת פוזיציות
+            // Handle execution type field - enable/disable Realized P/L and MTM P/L fields based on execution type
+            // Realized P/L and MTM P/L נדרשים רק ל-sell (מכירה) ו-cover (כיסוי) - סגירת פוזיציות
+            // Realized P/L and MTM P/L לא נדרשים ל-buy (קנייה) ו-short (מכירה בחסר) - פתיחת פוזיציות
             const executionTypeSelect = modalElement.querySelector('#executionType');
             const realizedPLField = modalElement.querySelector('#executionRealizedPL');
+            const mtmPLField = modalElement.querySelector('#executionMTMPL');
             
-            if (executionTypeSelect && realizedPLField) {
-                // Function to update Realized P/L field state
-                const updateRealizedPLField = () => {
-                    const executionType = executionTypeSelect.value;
-                    if (executionType === 'sell' || executionType === 'cover') {
-                        // Enable Realized P/L for sell and cover (closing positions)
+            // Function to update both Realized P/L and MTM P/L fields state (same logic for both)
+            const updatePLFields = () => {
+                const executionType = executionTypeSelect.value;
+                if (executionType === 'sell' || executionType === 'cover') {
+                    // Enable P/L fields for sell and cover (closing positions)
+                    if (realizedPLField) {
                         realizedPLField.disabled = false;
                         realizedPLField.required = true;
-                        console.log(`🔓 Enabled executionRealizedPL (type: ${executionType})`);
-                    } else {
-                        // Disable Realized P/L for buy, short, and any unknown types (opening positions)
+                    }
+                    if (mtmPLField) {
+                        mtmPLField.disabled = false;
+                        mtmPLField.required = false; // MTM P/L is optional even when enabled
+                    }
+                    console.log(`🔓 Enabled P/L fields (type: ${executionType})`);
+                } else {
+                    // Disable P/L fields for buy, short, and any unknown types (opening positions)
+                    if (realizedPLField) {
                         realizedPLField.disabled = true;
                         realizedPLField.required = false;
                         realizedPLField.value = '';
-                        console.log(`🔒 Disabled executionRealizedPL (type: ${executionType})`);
                     }
-                };
-                
+                    if (mtmPLField) {
+                        mtmPLField.disabled = true;
+                        mtmPLField.required = false;
+                        mtmPLField.value = '';
+                    }
+                    console.log(`🔒 Disabled P/L fields (type: ${executionType})`);
+                }
+            };
+            
+            if (executionTypeSelect) {
                 // Set initial state
-                updateRealizedPLField();
+                updatePLFields();
                 
                 // Add change listener
-                executionTypeSelect.addEventListener('change', updateRealizedPLField);
+                executionTypeSelect.addEventListener('change', updatePLFields);
                 
-                console.log('✅ Added execution type listener for executionRealizedPL');
+                console.log('✅ Added execution type listener for executionRealizedPL and executionMTMPL');
             }
         }
         

@@ -1,0 +1,295 @@
+/**
+ * Index Hero Section - סקשן עליון של עמוד הבית
+ * 
+ * קובץ זה מכיל את הסגנונות הספציפיים לסקשן העליון של עמוד הבית
+ * כולל באנר הירו, סלוגן, סטטיסטיקות וקישורים מהירים
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 15, 2025
+ */
+
+/* ===== סגנונות באנר הירו ===== */
+
+.hero-banner {
+  position: relative;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* רקע בצבע ראשי עם שקיפות 0.2 מאחורי האיור */
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-color, #26baac);
+  opacity: 0.2;
+  z-index: -1; /* מאחורי האיור */
+}
+
+/* רווח מתחת לסקשן העליון */
+.top-section {
+  margin-bottom: 10px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-bg-illustration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  z-index: 1;
+  pointer-events: none; /* לא מפריע לאינטראקציה */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 2rem;
+  color: var(--text-primary, #212529);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin: 1rem;
+}
+
+.hero-text {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary, #212529);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  color: var(--text-secondary, #6c757d);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== סגנונות סטטיסטיקות הירו ===== */
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.hero-stat {
+  text-align: center;
+  padding: 1rem;
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e9ecef);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.hero-stat:hover {
+  transform: translateY(-2px);
+  background: var(--card-bg-hover, #f8f9fa);
+  border-color: var(--primary-color, #26baac);
+  box-shadow: 0 4px 16px rgba(38, 186, 172, 0.12);
+}
+
+.hero-stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary, #212529);
+}
+
+.hero-stat-number.positive {
+  color: var(--success-color, #28a745);
+}
+
+.hero-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6c757d);
+  font-weight: 500;
+}
+
+/* ===== סגנונות קישורים מהירים ===== */
+
+.hero-quick-links {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  z-index: 3;
+}
+
+.quick-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.quick-link-icon:hover {
+  background: var(--primary-color, #26baac);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(38, 186, 172, 0.2);
+  color: white;
+  border-color: var(--primary-color, #26baac);
+}
+
+.quick-link-icon.gradient-bg {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+}
+
+/* ===== סגנונות באנר הודעה ===== */
+
+.announcement-banner {
+  background: linear-gradient(135deg, 
+    var(--entity-alert-color, #ff9c05) 0%, 
+    var(--entity-alert-color, #e55a00) 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(255, 156, 5, 0.2);
+}
+
+.announcement-banner .banner-icon {
+  font-size: 2rem;
+  margin-inline-end: 1rem;
+}
+
+.announcement-banner h5 {
+  color: white;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.announcement-banner .banner-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.announcement-banner .btn-light {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  color: var(--entity-alert-color, #ff9c05);
+  font-weight: 600;
+}
+
+.announcement-banner .btn-light:hover {
+  background: white;
+  transform: translateY(-1px);
+}
+
+/* .announcement-banner .btn-outline-light - הוסר, מוגדר ב-_bootstrap-overrides.css */
+
+/* ===== סגנונות כפתורים מרכזיים ===== */
+
+.section-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-inline-end: 1rem;
+}
+
+.section-actions .btn {
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.section-actions .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== רספונסיביות ===== */
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .hero-quick-links {
+    position: relative;
+    top: auto;
+    left: auto;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .announcement-banner .row {
+    text-align: center;
+  }
+  
+  .announcement-banner .col-md-4 {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-banner {
+    min-height: 300px;
+  }
+  
+  .hero-content {
+    padding: 1rem;
+  }
+  
+  .hero-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-inline-end: 0;
+  }
+}

@@ -94,3 +94,4 @@ elif [ -n "$DB_PATH" ]; then
     log_info "Database: SQLite ($(basename "$DB_PATH"))"
 fi
 
+

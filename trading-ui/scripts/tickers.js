@@ -608,6 +608,7 @@ async function saveTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
+    status: { id: 'tickerStatus', type: 'text' },
     remarks: { id: 'tickerRemarks', type: 'text' },
     tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
@@ -619,6 +620,7 @@ async function saveTicker() {
   const name = tickerData.name?.trim();
   const type = tickerData.type;
   const currency_id = tickerData.currency_id;
+  const status = tickerData.status || 'closed'; // ברירת מחדל: סגור
   const remarks = tickerData.remarks?.trim();
 
   // בדיקה אם זה מצב עריכה - אם כן, קרא ל-updateTicker
@@ -656,6 +658,13 @@ async function saveTicker() {
     return;
   }
 
+  if (!status || !['open', 'closed', 'cancelled'].includes(status)) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'יש לבחור סטטוס תקין');
+    }
+    return;
+  }
+
   // בדיקה אם הסמל כבר קיים במערכת (רק למצב הוספה)
   const existingTicker = (window.tickersData || []).find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
   if (existingTicker) {
@@ -668,8 +677,7 @@ async function saveTicker() {
     return;
   }
 
-  // טיקר חדש תמיד יהיה "closed" (אין לו טריידים)
-  const finalStatus = 'closed';
+  const finalStatus = status;
 
   try {
     const tickerPayload = {
@@ -752,14 +760,15 @@ async function updateTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
+    status: { id: 'tickerStatus', type: 'text' },
     remarks: { id: 'tickerRemarks', type: 'text' },
     tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
 
-  const { id, symbol, name, type, currency_id, remarks, tag_ids = [] } = tickerData;
+  const { id, symbol, name, type, currency_id, status, remarks, tag_ids = [] } = tickerData;
   const tagIds = Array.isArray(tag_ids) ? tag_ids : [];
   
-  // קבלת הסטטוס מהטיקר הקיים (הטופס החדש לא כולל שדה סטטוס)
+  // קבלת הטיקר הקיים לבדיקות ולידציה
   const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));
   if (!originalTicker) {
     if (window.showErrorNotification) {
@@ -767,7 +776,6 @@ async function updateTicker() {
     }
     return;
   }
-  const status = originalTicker.status; // שמירה על הסטטוס הקיים
 
   // ולידציה בסיסית (הסרת ולידציה גלובלית ישנה - הטופס החדש לא משתמש ב-editTickerForm)
   if (!symbol || symbol.length === 0) {
@@ -798,6 +806,13 @@ async function updateTicker() {
     return;
   }
 
+  if (!status || !['open', 'closed', 'cancelled'].includes(status)) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'יש לבחור סטטוס תקין');
+    }
+    return;
+  }
+
   // בדיקה אם הסמל כבר קיים בטיקרים אחרים (לא בטיקר הנוכחי)
   const existingTicker = (window.tickersData || []).find(t =>
     t.symbol.toUpperCase() === symbol.toUpperCase() &&
@@ -813,18 +828,7 @@ async function updateTicker() {
     return;
   }
 
-  // טיפול בסטטוס "לא מבוטל" - צריך לקבוע אם זה "open" או "closed"
-  let finalStatus = status;
-  if (status === 'not_cancelled') {
-    // בדיקה אם יש טריידים או תכנונים פתוחים לטיקר זה
-    const ticker = (window.tickersData || []).find(t => t.id === parseInt(id));
-    if (ticker) {
-      // אם יש טריידים או תכנונים פתוחים - סטטוס "open", אחרת "closed"
-      finalStatus = ticker.active_trades ? 'open' : 'closed';
-    } else {
-      finalStatus = 'closed'; // ברירת מחדל
-    }
-  }
+  const finalStatus = status;
 
   // בדיקה אם הסטטוס השתנה ל"מבוטל" - אם כן, בדוק פריטים מקושרים
   // (originalTicker כבר הוגדר למעלה)
@@ -1731,6 +1735,7 @@ function renderTickersTableRows(tickers) {
       if (value instanceof Date) {
         return Number.isNaN(value.getTime()) ? null : value;
       }
+      // Use dateUtils for consistent date parsing
       if (typeof value === 'object') {
         const nestedCandidate = value.local || value.utc || value.iso || value.timestamp;
         return parseValidDate(nestedCandidate);

@@ -18,6 +18,13 @@ from .base_entity_utils import BaseEntityUtils
 
 # Import user service
 from services.user_service import UserService
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
+
+preferences_service = PreferencesService()
+
+def _get_users_normalizer():
+    return BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
 
 logger = logging.getLogger(__name__)
 
@@ -186,33 +193,40 @@ def create_user():
 @users_bp.route('/<int:user_id>', methods=['PUT'])
 def update_user(user_id: int):
     """Update user"""
+    normalizer = _get_users_normalizer()
     try:
         data = request.get_json()
         if not data:
-            return jsonify({
-                'status': 'error',
-                'message': 'No data provided'
-            }), 400
+            payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                'No data provided'
+            )
+            return jsonify(payload), 400
         
         user = user_service.update_user(user_id, **data)
         if user:
-            return jsonify({
-                'status': 'success',
-                'data': user,
-                'message': f'User {user_id} updated successfully'
-            }), 200
+            # Normalize dates in user dict
+            normalized_user = normalizer.normalize_output(user)
+            payload = BaseEntityUtils.create_success_payload(
+                normalizer,
+                normalized_user,
+                f'User {user_id} updated successfully'
+            )
+            return jsonify(payload), 200
         else:
-            return jsonify({
-                'status': 'error',
-                'message': f'User {user_id} not found or update failed'
-            }), 404
+            payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f'User {user_id} not found or update failed'
+            )
+            return jsonify(payload), 404
             
     except Exception as e:
         logger.error(f"Error updating user {user_id}: {e}")
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
+        payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            str(e)
+        )
+        return jsonify(payload), 500
 
 @users_bp.route('/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id: int):

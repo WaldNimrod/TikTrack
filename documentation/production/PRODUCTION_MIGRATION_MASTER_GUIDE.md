@@ -39,6 +39,14 @@
 
 ## 📚 **מסמכים וקבצים**
 
+### **דרישות מוקדמות:**
+
+0. **[דרישות מוקדמות בסביבת הפיתוח](PRODUCTION_MIGRATION_PREREQUISITES.md)** ⚠️ **קרא קודם!**
+   - מה צריך לבדוק לפני המיגרציה
+   - בדיקות בסביבת הפיתוח
+   - סקריפט בדיקה אוטומטית
+   - **👉 התחל כאן לפני הכל!**
+
 ### **מדריכים מפורטים:**
 
 1. **[מדריך ביצוע מלא](PRODUCTION_MIGRATION_EXECUTION_GUIDE.md)**
@@ -85,6 +93,11 @@
 5. **`scripts/db/production_start_server_template.sh`**
    - תבנית קוד לעדכון `start_server.sh`
    - העתק את הקוד משם
+
+6. **`scripts/db/check_production_prerequisites.sh`** ⚠️ **הרץ קודם!**
+   - בודק את כל הדרישות המוקדמות
+   - הרץ לפני המיגרציה
+   - **👉 הרץ זה ראשון!**
 
 ---
 
@@ -344,7 +357,12 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 
 ## 🎯 **התחל כאן**
 
+⚠️ **חשוב:** לפני שהפרודקשן יוכל להשתמש בסקריפטים, **חובה למזג את `new-db-uopgrde` ל-`main`**!
+
+👉 **[מדריך מזיגה ל-main](PRODUCTION_MIGRATION_BRANCH_MERGE.md)** - **קרא קודם!**
+
 👉 **[מדריך ביצוע מלא](PRODUCTION_MIGRATION_EXECUTION_GUIDE.md)** - שלבים מפורטים
 
 👉 **[סקריפט התקנה](scripts/db/setup_production_postgresql.sh)** - הרץ זה ראשון
+
 

@@ -6,6 +6,7 @@ from services.advanced_cache_service import cache_for, invalidate_cache
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
 from services.tag_service import TagService
+from datetime import datetime
 import logging
 
 # Import base classes
@@ -54,10 +55,75 @@ def get_alert(alert_id: int):
 def create_alert():
     """Create new alert"""
     try:
+        # Get raw request data for debugging
+        raw_data = request.get_data(as_text=True)
+        logger.info(f"🔍 [create_alert] Raw request data: {raw_data[:500]}")
+        
         data = request.get_json()
+        logger.info(f"🔍 [create_alert] Received data: {data}")
+        logger.info(f"🔍 [create_alert] condition_attribute in data: {'condition_attribute' in data if data else False}")
+        logger.info(f"🔍 [create_alert] condition_attribute value: {data.get('condition_attribute') if data else 'N/A'}")
+        logger.info(f"🔍 [create_alert] condition_attribute type: {type(data.get('condition_attribute')) if data else 'N/A'}")
+        logger.info(f"🔍 [create_alert] All keys in data: {list(data.keys()) if data else 'No data'}")
+        
+        # Check if condition_attribute is explicitly None or missing
+        if data and 'condition_attribute' in data:
+            if data['condition_attribute'] is None:
+                logger.warning(f"⚠️ [create_alert] condition_attribute is explicitly None in request!")
+            elif data['condition_attribute'] == '':
+                logger.warning(f"⚠️ [create_alert] condition_attribute is empty string in request!")
+            else:
+                logger.info(f"✅ [create_alert] condition_attribute has value: {data['condition_attribute']}")
+        else:
+            logger.warning(f"⚠️ [create_alert] condition_attribute not in data!")
+        
         # Sanitize HTML content for message field
         if 'message' in data and data['message']:
             data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
+        
+        logger.info(f"🔍 [create_alert] After sanitize - condition_attribute: {data.get('condition_attribute')}")
+        
+        # Convert expiry_date to date object (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
+        # Following the same pattern as cash_flows.py
+        if 'expiry_date' in data and data['expiry_date']:
+            try:
+                expiry_input = data['expiry_date']
+                date_obj = None
+                normalizer = _get_date_normalizer()
+                
+                if isinstance(expiry_input, dict):
+                    # DateEnvelope format - normalize it
+                    normalized = normalizer.normalize_input_payload({"expiry_date": expiry_input})
+                    dt = normalized.get("expiry_date") if isinstance(normalized, dict) else None
+                    if isinstance(dt, datetime):
+                        date_obj = dt.date()
+                elif isinstance(expiry_input, datetime):
+                    # Already a datetime object (from normalize_input_payload)
+                    date_obj = expiry_input.date()
+                elif isinstance(expiry_input, str):
+                    # String format - try parsing
+                    try:
+                        date_obj = datetime.strptime(expiry_input, '%Y-%m-%d').date()
+                    except ValueError:
+                        try:
+                            date_obj = datetime.fromisoformat(expiry_input.replace('Z', '+00:00')).date()
+                        except ValueError:
+                            date_obj = None
+                
+                if date_obj:
+                    data['expiry_date'] = date_obj
+                    logger.info(f"✅ [create_alert] Converted expiry_date to date object: {date_obj}")
+                else:
+                    # If conversion failed, set to None (optional field)
+                    logger.warning(f"⚠️ [create_alert] Could not convert expiry_date, setting to None")
+                    data['expiry_date'] = None
+            except Exception as e:
+                logger.warning(f"⚠️ [create_alert] Error converting expiry_date: {e}, setting to None")
+                data['expiry_date'] = None
+        elif 'expiry_date' in data and not data['expiry_date']:
+            # Empty string or None - set to None
+            data['expiry_date'] = None
+        
         db: Session = g.db
         alert = AlertService.create(db, data)
         normalizer = _get_date_normalizer()
@@ -89,6 +155,47 @@ def update_alert(alert_id: int):
         # Sanitize HTML content for message field
         if 'message' in data and data['message']:
             data['message'] = BaseEntityUtils.sanitize_rich_text(data['message'])
+        
+        # Convert expiry_date to date object (same as create_alert)
+        if 'expiry_date' in data and data['expiry_date']:
+            try:
+                expiry_input = data['expiry_date']
+                date_obj = None
+                normalizer = _get_date_normalizer()
+                
+                if isinstance(expiry_input, dict):
+                    # DateEnvelope format - normalize it
+                    normalized = normalizer.normalize_input_payload({"expiry_date": expiry_input})
+                    dt = normalized.get("expiry_date") if isinstance(normalized, dict) else None
+                    if isinstance(dt, datetime):
+                        date_obj = dt.date()
+                elif isinstance(expiry_input, datetime):
+                    # Already a datetime object (from normalize_input_payload)
+                    date_obj = expiry_input.date()
+                elif isinstance(expiry_input, str):
+                    # String format - try parsing
+                    try:
+                        date_obj = datetime.strptime(expiry_input, '%Y-%m-%d').date()
+                    except ValueError:
+                        try:
+                            date_obj = datetime.fromisoformat(expiry_input.replace('Z', '+00:00')).date()
+                        except ValueError:
+                            date_obj = None
+                
+                if date_obj:
+                    data['expiry_date'] = date_obj
+                    logger.info(f"✅ [update_alert] Converted expiry_date to date object: {date_obj}")
+                else:
+                    # If conversion failed, set to None (optional field)
+                    logger.warning(f"⚠️ [update_alert] Could not convert expiry_date, setting to None")
+                    data['expiry_date'] = None
+            except Exception as e:
+                logger.warning(f"⚠️ [update_alert] Error converting expiry_date: {e}, setting to None")
+                data['expiry_date'] = None
+        elif 'expiry_date' in data and not data['expiry_date']:
+            # Empty string or None - set to None
+            data['expiry_date'] = None
+        
         db: Session = g.db
         alert = AlertService.update(db, alert_id, data)
         normalizer = _get_date_normalizer()

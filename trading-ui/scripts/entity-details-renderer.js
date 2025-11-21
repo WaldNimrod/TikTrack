@@ -372,13 +372,25 @@ class EntityDetailsRenderer {
         if (updatedAt) {
             try {
                 const date = new Date(updatedAt);
-                updatedAtDisplay = date.toLocaleString('he-IL', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+                // Use FieldRendererService or dateUtils for consistent date formatting
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                    updatedAtDisplay = window.FieldRendererService.renderDate(date, true);
+                } else if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                    updatedAtDisplay = window.dateUtils.formatDateTime(date);
+                } else if (window.formatDate) {
+                    updatedAtDisplay = window.formatDate(date, true);
+                } else if (window.dateUtils?.formatDate) {
+                    updatedAtDisplay = window.dateUtils.formatDate(date, { includeTime: true });
+                } else {
+                    updatedAtDisplay = date.toLocaleString('he-IL', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+                }
             } catch (e) {
                 updatedAtDisplay = updatedAt;
             }
@@ -1920,7 +1932,20 @@ class EntityDetailsRenderer {
                     const qtySign = qty > 0 ? '+' : (qty < 0 ? '-' : '');
                     const qtyHtml = `<span class="${qtyClass}" dir="ltr">${qtySign}#${Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>`;
                 const feeHtml = renderAmount(exec.fee || 0, true);
-                    const dateText = exec.date ? (window.formatDate ? window.formatDate(exec.date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(exec.date, { includeTime: true }) : new Date(exec.date).toLocaleString('he-IL'))) : 'לא זמין';
+                    // Use FieldRendererService or dateUtils for consistent date formatting
+                    let dateText = 'לא זמין';
+                    if (exec.date) {
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                            dateText = window.FieldRendererService.renderDate(exec.date, true);
+                        } else if (window.formatDate) {
+                            dateText = window.formatDate(exec.date, true);
+                        } else if (window.dateUtils?.formatDate) {
+                            dateText = window.dateUtils.formatDate(exec.date, { includeTime: true });
+                        } else {
+                            const dateObj = exec.date instanceof Date ? exec.date : new Date(exec.date);
+                            dateText = dateObj.toLocaleString('he-IL');
+                        }
+                    }
                     const priceHtml = renderAmount(exec.price || 0, false, 2);
                 const totalHtml = renderAmount(exec.total || 0, true);
 
@@ -1947,7 +1972,20 @@ class EntityDetailsRenderer {
                 const qtyClass = qty > 0 ? 'numeric-value-positive' : (qty < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
                 const qtySign = qty > 0 ? '+' : (qty < 0 ? '-' : '');
                 const qtyHtml = `<span class="${qtyClass}" dir="ltr">${qtySign}#${Math.abs(qty).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>`;
-                const dateText = exec.date ? new Date(exec.date).toLocaleString('he-IL') : 'לא זמין';
+                // Use FieldRendererService or dateUtils for consistent date formatting
+                let dateText = 'לא זמין';
+                if (exec.date) {
+                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        dateText = window.FieldRendererService.renderDate(exec.date, true);
+                    } else if (window.formatDate) {
+                        dateText = window.formatDate(exec.date, true);
+                    } else if (window.dateUtils?.formatDate) {
+                        dateText = window.dateUtils.formatDate(exec.date, { includeTime: true });
+                    } else {
+                        const dateObj = exec.date instanceof Date ? exec.date : new Date(exec.date);
+                        dateText = dateObj.toLocaleString('he-IL');
+                    }
+                }
                 const priceHtml = renderAmount(exec.price || 0, false, 2);
                 const feeHtml = renderAmount(exec.fee || 0, true);
                 const totalHtml = renderAmount(exec.total || 0, true);
@@ -3730,41 +3768,74 @@ class EntityDetailsRenderer {
                 if (display) return display;
                 const localVal = dateInput.local || dateInput.LOCAL;
                 if (localVal) {
+                    // Use FieldRendererService or dateUtils for consistent date formatting
+                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(dateInput, true);
+                    }
                     const d = new Date(localVal);
                     if (!isNaN(d.getTime())) {
-                        return window.formatDate ? window.formatDate(d, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(d, { includeTime: true }) : d.toLocaleDateString('he-IL', {
+                        if (window.formatDate) {
+                            return window.formatDate(d, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                            return window.dateUtils.formatDate(d, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleDateString
+                        return d.toLocaleDateString('he-IL', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
-                        }));
+                        });
                     }
                 }
                 const utcVal = dateInput.utc || dateInput.UTC;
                 if (utcVal) {
+                    // Use FieldRendererService or dateUtils for consistent date formatting
+                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(dateInput, true);
+                    }
                     const d = new Date(utcVal);
                     if (!isNaN(d.getTime())) {
-                        return window.formatDate ? window.formatDate(d, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(d, { includeTime: true }) : d.toLocaleDateString('he-IL', {
+                        if (window.formatDate) {
+                            return window.formatDate(d, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                            return window.dateUtils.formatDate(d, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleDateString
+                        return d.toLocaleDateString('he-IL', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
-                        }));
+                        });
                     }
                 }
                 const epoch = dateInput.epochMs || dateInput.epochms || dateInput.epoch;
                 if (epoch) {
+                    // Use FieldRendererService or dateUtils for consistent date formatting
+                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(dateInput, true);
+                    }
                     const d = new Date(Number(epoch));
                     if (!isNaN(d.getTime())) {
-                        return window.formatDate ? window.formatDate(d, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(d, { includeTime: true }) : d.toLocaleDateString('he-IL', {
+                        if (window.formatDate) {
+                            return window.formatDate(d, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                            return window.dateUtils.formatDate(d, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleDateString
+                        return d.toLocaleDateString('he-IL', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
-                        }));
+                        });
                     }
                 }
             }
@@ -3772,20 +3843,42 @@ class EntityDetailsRenderer {
             if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
                 const [y, m, d] = dateInput.split('-').map(Number);
                 const dateOnly = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0);
-                return window.formatDate ? window.formatDate(dateOnly) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateOnly) : dateOnly.toLocaleDateString('he-IL', {
+                // Use FieldRendererService or dateUtils for consistent date formatting
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                    return window.FieldRendererService.renderDate(dateOnly, false);
+                }
+                if (window.formatDate) {
+                    return window.formatDate(dateOnly);
+                }
+                if (window.dateUtils?.formatDate) {
+                    return window.dateUtils.formatDate(dateOnly, { includeTime: false });
+                }
+                // Last resort: use toLocaleDateString
+                return dateOnly.toLocaleDateString('he-IL', {
                     year: 'numeric',
                     month: '2-digit',
                     day: '2-digit'
-                }));
+                });
             }
             const date = new Date(dateInput);
-            return window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleDateString('he-IL', {
+            // Use FieldRendererService or dateUtils for consistent date formatting
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                return window.FieldRendererService.renderDate(date, true);
+            }
+            if (window.formatDate) {
+                return window.formatDate(date, true);
+            }
+            if (window.dateUtils?.formatDate) {
+                return window.dateUtils.formatDate(date, { includeTime: true });
+            }
+            // Last resort: use toLocaleDateString
+            return date.toLocaleDateString('he-IL', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit'
-            }));
+            });
         } catch (error) {
             return typeof dateInput === 'string' ? dateInput : 'לא זמין';
         }

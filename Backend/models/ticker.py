@@ -39,7 +39,7 @@ class Ticker(BaseModel):
     __tablename__ = "tickers"
     __table_args__ = (
         CheckConstraint(
-            "(active_trades = 1 AND EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = 'open')) OR (active_trades = 0 AND NOT EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = 'open')) OR active_trades IS NULL",
+            "(active_trades IS TRUE AND EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = 'open')) OR (active_trades IS FALSE AND NOT EXISTS (SELECT 1 FROM trades WHERE trades.ticker_id = tickers.id AND trades.status = 'open')) OR active_trades IS NULL",
             name="active_trades_consistency"
         ),
         CheckConstraint(

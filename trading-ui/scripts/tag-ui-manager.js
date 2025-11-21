@@ -22,6 +22,11 @@
     };
 
     async function ensureTags({ categoryId = null, includeInactive = false } = {}) {
+        if (!window.TagService || typeof window.TagService.fetchTags !== 'function') {
+            window.Logger?.warn('⚠️ TagService not available', { page: 'tag-ui-manager' });
+            return [];
+        }
+        
         if (!state.fetchPromise) {
             state.fetchPromise = window.TagService.fetchTags({
                 categoryId,
@@ -58,8 +63,23 @@
         const categoryId = categoryIdAttr ? Number.parseInt(categoryIdAttr, 10) : null;
         const includeInactive = select.dataset.includeInactive === 'true';
 
+        window.Logger?.info('🏷️ populateSelect called', { 
+            selectId: select.id,
+            categoryId,
+            includeInactive,
+            hasTagService: !!window.TagService,
+            hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+            page: 'tag-ui-manager' 
+        });
+
         try {
             const tags = await ensureTags({ categoryId, includeInactive });
+            window.Logger?.info('🏷️ Tags fetched successfully', { 
+                selectId: select.id,
+                tagsCount: tags.length,
+                page: 'tag-ui-manager' 
+            });
+            
             select.innerHTML = '';
 
             const fragment = document.createDocumentFragment();
@@ -71,8 +91,19 @@
                 setSelectedValues(select, initial);
             }
             updateBadgeDisplay(select);
+            
+            window.Logger?.info('🏷️ Tag select populated successfully', { 
+                selectId: select.id,
+                optionsCount: select.options.length,
+                page: 'tag-ui-manager' 
+            });
         } catch (error) {
-            window.Logger?.warn('⚠️ Failed to populate tag select', { error, elementId: select.id, page: 'tag-ui-manager' });
+            window.Logger?.warn('⚠️ Failed to populate tag select', { 
+                error: error.message || error, 
+                errorStack: error.stack,
+                elementId: select.id, 
+                page: 'tag-ui-manager' 
+            });
         }
     }
 
@@ -150,10 +181,30 @@
 
     function initializeModal(modalElement) {
         const selects = modalElement.querySelectorAll(`select.${SELECT_CLASS}`);
-        selects.forEach(initializeSelect);
+        window.Logger?.info('🏷️ TagUIManager.initializeModal called', { 
+            modalId: modalElement.id, 
+            selectsCount: selects.length,
+            selectIds: Array.from(selects).map(s => s.id),
+            page: 'tag-ui-manager' 
+        });
+        selects.forEach(select => {
+            window.Logger?.info('🏷️ Initializing tag select', { 
+                selectId: select.id,
+                hasTagService: !!window.TagService,
+                hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+                page: 'tag-ui-manager' 
+            });
+            initializeSelect(select);
+        });
     }
 
     async function refreshSelectOptions(select) {
+        window.Logger?.info('🏷️ refreshSelectOptions called', { 
+            selectId: select.id,
+            hasTagService: !!window.TagService,
+            hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+            page: 'tag-ui-manager' 
+        });
         state.fetchPromise = null;
         state.allTags = null;
         await populateSelect(select);

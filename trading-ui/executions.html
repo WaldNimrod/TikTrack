@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Favicon will be set by global-favicon.js -->
-    <title>עסקאות - TikTrack</title>
+    <title>ביצועים - TikTrack</title>
     
     <!-- 
     ===== CORRECTED EXECUTIONS PAGE =====
@@ -101,8 +101,8 @@
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/executions.svg" alt="עסקעות" class="section-icon">
-                        עסקעות
+                        <img src="images/icons/executions.svg" alt="ביצועים" class="section-icon">
+                        ביצועים
                     </div>
                     <div class="table-actions">
                         <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר"></button>
@@ -115,7 +115,7 @@
 
                     <!-- Data summary -->
                     <div class="info-summary" id="summaryStats">
-                        <div>סה"כ עסקעות: <strong id="totalExecutions">0</strong> (<span id="totalBuyExecutions" class="buy-color">0</span> קניה / <span id="totalSellExecutions" class="sell-color">0</span> מכירה)</div>
+                        <div>סה"כ ביצועים: <strong id="totalExecutions">0</strong> (<span id="totalBuyExecutions" class="buy-color">0</span> קניה / <span id="totalSellExecutions" class="sell-color">0</span> מכירה)</div>
                         <div>סה"כ קניה: <strong id="totalBuyAmount">$0</strong></div>
                         <div>סה"כ מכירות: <strong id="totalSellAmount">$0</strong></div>
                         <div>מאזן: <strong id="balanceAmount">$0</strong></div>
@@ -130,8 +130,8 @@
                     <!-- Executions header -->
                     <div class="section-header">
                         <div class="table-title">
-                            <img src="images/icons/executions.svg" alt="ניהול עסקעות" class="section-icon">
-                            ניהול עסקעות
+                            <img src="images/icons/executions.svg" alt="ניהול ביצועים" class="section-icon">
+                            ניהול ביצועים
                         </div>
                         <div class="table-count" id="executionsCount">טוען...</div>
                         <div class="table-actions">
@@ -186,7 +186,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="12" class="loading">טוען עסקעות...</td>
+                                        <td colspan="12" class="loading">טוען ביצועים...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -306,7 +306,7 @@
                                 <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
                             </div>
 
-                            <div class="summary-card active-session-card" id="activeSessionIndicator" style="display:none;">
+                            <div class="summary-card active-session-card d-none" id="activeSessionIndicator">
                                 <h4>
                                     <i class="bi bi-activity"></i>
                                     סשן ייבוא פעיל
@@ -367,7 +367,7 @@
                                     <p>גרור קובץ CSV או לחץ לבחירה</p>
                                     <input type="file" id="fileInput" accept=".csv" hidden>
                                 </div>
-                                <div class="file-info" id="fileInfo" style="display:none;">
+                                <div class="file-info d-none" id="fileInfo">
                                     <div class="file-details">
                                         <span class="file-name" id="fileName"></span>
                                         <span class="file-size" id="fileSize"></span>
@@ -391,10 +391,10 @@
                                 </div>
 
                     <!-- Step 2: Analysis Results + Problem Resolution -->
-                    <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
+                    <div class="import-step d-none" id="step-analysis" data-step="2">
                         <div class="step-content">
                             <h3>תוצאות ניתוח</h3>
-                            <div class="summary-card import-type-selection" id="dataTypeSelectionCard" style="display:none;">
+                            <div class="summary-card import-type-selection d-none" id="dataTypeSelectionCard">
                                 <div class="summary-header">
                                     <div class="summary-title">
                                         <i class="bi bi-diagram-3"></i>
@@ -411,7 +411,7 @@
                                 </div>
                                 <div class="summary-footer">
                                     <button data-button-type="PRIMARY" data-text="המשך לתהליך הנבחר" id="confirmDataTypeBtn" data-onclick="confirmSelectedDataType()" disabled></button>
-                                    <button data-button-type="SECONDARY" data-text="פלייסהולדר – תהליכים נוספים בקרוב" id="dataTypePlaceholderBtn" style="display:none;"></button>
+                                    <button data-button-type="SECONDARY" data-text="פלייסהולדר – תהליכים נוספים בקרוב" id="dataTypePlaceholderBtn" class="d-none"></button>
                                 </div>
                             </div>
                             <div class="analysis-cards">
@@ -467,11 +467,11 @@
     </div>
 
                             <!-- Problem Resolution Section -->
-                            <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
+                            <div class="problem-resolution-section d-none" id="problemResolutionSection">
                                 <h3>פתרון בעיות</h3>
                             
                             <!-- Missing Tickers Section -->
-                            <div class="problem-section" id="missingTickersSection" style="display:none;">
+                            <div class="problem-section d-none" id="missingTickersSection">
                                 <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
                                 <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
                                 <div class="problem-card-container" id="missingTickersContainer">
@@ -480,7 +480,7 @@
                     </div>
                     
                             <!-- Existing Records Section -->
-                            <div class="problem-section" id="existingRecordsSection" style="display:none;">
+                            <div class="problem-section d-none" id="existingRecordsSection">
                                 <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
                                 <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
                                 <div class="problem-card-container" id="existingRecordsContainer">
@@ -489,7 +489,7 @@
                 </div>
 
                             <!-- Within-File Duplicates Section -->
-                            <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
+                            <div class="problem-section d-none" id="withinFileDuplicatesSection">
                                 <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
                                 <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזה רשומה לייבא:</p>
                                 <div class="problem-card-container" id="withinFileDuplicatesContainer">
@@ -510,7 +510,7 @@
                     </div>
                     
                     <!-- Step 3: Preview + Confirmation -->
-                    <div class="import-step" id="step-preview" data-step="3" style="display:none;">
+                    <div class="import-step d-none" id="step-preview" data-step="3">
                         <div class="step-content">
                             <h3>תצוגה מקדימה ואישור</h3>
                             
@@ -626,8 +626,7 @@
         </div>
     </div>
     
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
+    <!-- Bootstrap JavaScript - Removed duplicate (5.3.0), using 5.3.3 from base package -->
     
             <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
@@ -684,6 +683,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/11: SERVICES PACKAGE ===== -->
@@ -702,8 +703,12 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
     <!-- [25] Load Order: 25 -->
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [25a] Preferences Data Service -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -713,11 +718,20 @@
     <!-- [30] Load Order: 30 -->
     <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
     <!-- [31] Load Order: 31 -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
     <!-- [32] Load Order: 32 -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [33] Load Order: 33 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+    <!-- [Data Services] Load Order: After services -->
+    <script src="scripts/services/executions-data.js?v=1.0.0"></script> <!-- שירות נתונים לביצועים -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PENDING EXECUTION TRADE CREATION ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: After entity-services -->
+    <!-- [Pending Execution Trade Creation] -->
+    <script src="scripts/pending-execution-trade-creation.js?v=1.0.0"></script> <!-- ממשק יצירת טרייד מביצועים -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/11: UI ADVANCED PACKAGE ===== -->
@@ -753,7 +767,7 @@
     <!-- [42] Load Order: 42 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
     <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <!-- core-systems.js removed - now loaded automatically via base package -->
     <!-- [44] Load Order: 44 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
@@ -771,12 +785,16 @@
     <!-- [51] Load Order: 51 -->
     <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
     <!-- [52] Load Order: 52 -->
-    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני עסקאות -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
     <!-- [53] Load Order: 53 -->
     <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
     <!-- [54] Load Order: 54 -->
-    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
+    <script src="scripts/modal-configs/executions-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל ביצועים -->
     <!-- [55] Load Order: 55 -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
+    <!-- [56] Load Order: 56 -->
+    <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
+    <!-- [57] Load Order: 57 -->
     <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
 
     <!-- =============================================================== -->
@@ -800,6 +818,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [58.9] Preferences V4 SDK (group-first) -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [60] Load Order: 60 -->
@@ -810,6 +830,8 @@
     <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
     <!-- [63] Load Order: 63 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [47.1] Load Order: 47.1 - MUST BE BEFORE preferences-ui.js -->
     <!-- [64] Load Order: 64 -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [65] Load Order: 65 -->
@@ -893,13 +915,17 @@
     <!-- [84] Load Order: 84 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [85] Load Order: 85 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
     <!-- [86] Page-specific: executions -->
+    <!-- Debug scripts -->
+    <script src="scripts/debug-execution-ticker-complete.js?v=1.0.0"></script>
+    <script src="scripts/debug-populate-form-dates.js?v=1.0.0"></script>
+    
     <script src="scripts/executions.js?v=1.0.0"></script> <!-- Page-specific script for executions -->
 
     <!-- =============================================================== -->

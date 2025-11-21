@@ -8,18 +8,48 @@
  * @lastUpdated January 5, 2025
  */
 
-/* מודל בסיסי - מבוסס על apple-theme.css */
+/* מודל בסיסי - שימוש במערכת ה-z-index הגלובלית */
 .modal {
+  --modal-nested-offset: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  z-index: 999999999 ;
+  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset));
   direction: rtl;
 }
 
-/* הגדרות z-index גבוהות לכל המודלים באתר */
 .modal-dialog {
-  z-index: 1000000000 ;
+  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset) + 1);
+}
+
+.modal-content {
+  z-index: calc(var(--z-index-modal, 1050) + var(--modal-nested-offset) + 2);
+}
+
+/* מודל מקונן - ללא רקע נוסף ואופסט z-index מוסכם */
+.modal.modal-nested {
+  --modal-nested-offset: 20;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* מודל מקונן ברמה שנייה (מודל מקונן מעל מודל מקונן) - z-index גבוה יותר */
+.modal.modal-nested.modal-nested-level-2 {
+  --modal-nested-offset: 40 !important;
+}
+
+/* מודל tickersModal - וידוא שהוא מופיע מעל כל המודלים האחרים */
+#tickersModal {
+  z-index: 1000000010 !important;
+}
+
+#tickersModal .modal-dialog {
+  z-index: 1000000011 !important;
+}
+
+#tickersModal .modal-content {
+  z-index: 1000000012 !important;
 }
 
 /* הגדרות מיוחדות למודלים גדולים */
@@ -31,7 +61,6 @@
 }
 
 .modal-content {
-  z-index: 1000000001 ;
   background: var(--apple-bg-elevated);
   border-radius: 6px;
   box-shadow: var(--apple-shadow-heavy);
@@ -41,7 +70,7 @@
 }
 
 .modal-backdrop {
-  z-index: 999999998 ;
+  z-index: var(--z-index-modal-backdrop, 1040);
 }
 
 /* ===== Modal Navigation System ===== */
@@ -181,30 +210,18 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 }
 
 /* וידוא שכל המודלים מופיעים מעל הכל */
-.modal.show {
-  z-index: 999999999 ;
-}
-
-.modal.show .modal-dialog {
-  z-index: 1000000000 ;
-}
-
-.modal.show .modal-content {
-  z-index: 1000000001 ;
-}
-
 /* וידוא שהרקע לא חוסם את המודלים */
 .modal-backdrop.show {
-  z-index: 999999998 ;
+  z-index: var(--z-index-modal-backdrop, 1040);
 }
 
 /* מודלים ספציפיים עם z-index גבוה יותר */
+/* הוסר: #linkedItemsModal - משתמש ב-modal-nested class עם z-index דינמי */
 #addAlertModal,
 #editAlertModal,
 #addExecutionModal,
 #editExecutionModal,
 #deleteExecutionModal,
-#linkedItemsModal,
 #warningModal,
 #addAccountModal,
 #editAccountModal,
@@ -228,7 +245,6 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 #addExecutionModal .modal-dialog,
 #editExecutionModal .modal-dialog,
 #deleteExecutionModal .modal-dialog,
-#linkedItemsModal .modal-dialog,
 #warningModal .modal-dialog,
 #addAccountModal .modal-dialog,
 #editAccountModal .modal-dialog,
@@ -252,7 +268,6 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
 #addExecutionModal .modal-content,
 #editExecutionModal .modal-content,
 #deleteExecutionModal .modal-content,
-#linkedItemsModal .modal-content,
 #warningModal .modal-content,
 #addAccountModal .modal-content,
 #editAccountModal .modal-content,

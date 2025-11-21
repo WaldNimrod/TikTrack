@@ -378,6 +378,40 @@ describe('Linked Items Integration', () => {
         });
     });
 
+    describe('Integration with UnifiedCRUDService', () => {
+        test('should use UnifiedCRUDService for delete operations', () => {
+            // Mock UnifiedCRUDService
+            global.window.UnifiedCRUDService = {
+                deleteEntity: jest.fn().mockResolvedValue(true)
+            };
+            
+            const deleteFunction = LinkedItemsService._getDeleteFunctionForType('note', 123);
+            
+            expect(deleteFunction).toBeDefined();
+            expect(deleteFunction).toContain('UnifiedCRUDService');
+            expect(deleteFunction).toContain('deleteEntity');
+        });
+        
+        test('should handle unlink trade from plan using UnifiedCRUDService', () => {
+            // Mock UnifiedCRUDService
+            global.window.UnifiedCRUDService = {
+                updateEntity: jest.fn().mockResolvedValue({ data: { id: 123 } })
+            };
+            
+            const item = {
+                id: 123,
+                type: 'trade',
+                trade_plan_id: 456
+            };
+            
+            const unlinkFunction = LinkedItemsService._getUnlinkFunctionForTradePlan(item, 'trade_plan', 456);
+            
+            expect(unlinkFunction).toBeDefined();
+            expect(unlinkFunction).toContain('UnifiedCRUDService');
+            expect(unlinkFunction).toContain('updateEntity');
+        });
+    });
+    
     describe('Backward Compatibility', () => {
         test('should maintain global exports', () => {
             expect(global.window.showLinkedItemsModal).toBeDefined();

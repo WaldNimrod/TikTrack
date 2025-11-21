@@ -12,17 +12,27 @@ Date: January 2025
 
 from flask import Blueprint, request, jsonify, g
 from services.preferences_service import preferences_service, ValidationError
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 import logging
 import json
 from datetime import datetime
+import hashlib
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
+# Canonical import (guarded by CI): enforce absolute path usage for auth decorator
+from routes.api.base_entity_decorators import require_authentication  # noqa: F401
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
+
+def _get_preferences_version(user_id: int, profile_id: Optional[int]) -> Tuple[Optional[str], int]:
+    """
+    Retrieve the latest update timestamp for the given user/profile combination.
+    """
+    return preferences_service.get_preferences_version_info(user_id, profile_id)
+
 
 # Create blueprint
 preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/preferences')
@@ -32,6 +42,109 @@ preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/preferences
 # ============================================================================
 # Default Preferences Endpoints
 # ============================================================================
+
+@preferences_bp.route('/bootstrap', methods=['GET'])
+@require_authentication()
+def bootstrap_preferences() -> Any:
+    """
+    Bootstrap endpoint returning a single payload with:
+    - profile_context (resolved user/profile and versions)
+    - core preference groups (colors, ui, trading)
+    - version_hash used as ETag
+    Supports If-None-Match for conditional GET (304 when unchanged).
+    
+    Returns:
+        JSON response with:
+        - success: Boolean
+        - data: Object containing profile_context, groups, version_hash
+        - error: Error message if failed
+        
+    Status Codes:
+        - 200: Success
+        - 304: Not Modified (If-None-Match header matches)
+        - 401: Unauthorized
+    """
+    try:
+        # Authenticated user
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
+
+        requested_profile_id = request.args.get('profile_id', type=int)
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+
+        # Build profile context first
+        profile_context = preferences_service.build_profile_context(
+            user_id=user_id,
+            requested_profile_id=requested_profile_id
+        )
+        resolved_profile_id = profile_context['resolved_profile_id']
+
+        # Load core groups
+        core_groups = {}
+        for group_name in ('colors', 'ui', 'trading'):
+            try:
+                core_groups[group_name] = preferences_service.get_group_preferences(
+                    user_id=user_id,
+                    group_name=group_name,
+                    profile_id=resolved_profile_id,
+                    use_cache=use_cache
+                )
+            except Exception as e:
+                logger.warning(f"Failed loading group '{group_name}' for user {user_id}, profile {resolved_profile_id}: {e}")
+                core_groups[group_name] = []
+
+        # Compute version hash (ETag) from profile_context versions + group content sizes
+        last_update = profile_context.get('versions', {}).get('last_update') or ''
+        sizes = '|'.join(
+            f"{name}:{len(core_groups.get(name) or [])}"
+            for name in ('colors', 'ui', 'trading')
+        )
+        etag_source = f"{user_id}:{resolved_profile_id}:{last_update}:{sizes}"
+        etag = hashlib.sha256(etag_source.encode('utf-8')).hexdigest()
+
+        # If-None-Match support
+        client_etag = request.headers.get('If-None-Match')
+        if client_etag and client_etag == etag:
+            response = jsonify({})
+            response.status_code = 304
+            response.headers['ETag'] = etag
+            return response
+
+        payload = {
+            "success": True,
+            "data": {
+                "user_id": user_id,
+                "requested_profile_id": requested_profile_id,
+                "profile_id": resolved_profile_id,
+                "profile_context": profile_context,
+                "groups": {
+                    "colors": core_groups['colors'],
+                    "ui": core_groups['ui'],
+                    "trading": core_groups['trading'],
+                },
+                "version_hash": etag,
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+
+        response = jsonify(payload)
+        response.headers['ETag'] = etag
+        # Cache-control kept conservative for dev; can be tuned in production
+        response.headers['Cache-Control'] = 'no-cache'
+        return response, 200
+
+    except Exception as e:
+        logger.error(f"Error in bootstrap endpoint: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
 
 @preferences_bp.route('/default', methods=['GET'])
 def get_default_preference() -> Any:
@@ -78,6 +191,7 @@ def get_default_preference() -> Any:
 # ============================================================================
 
 @preferences_bp.route('/user/group', methods=['GET'])
+@require_authentication()
 def get_user_group_preferences() -> Any:
     """
     קבלת העדפות קבוצה של משתמש
@@ -97,7 +211,14 @@ def get_user_group_preferences() -> Any:
                 'timestamp': datetime.now().isoformat()
             }), 400
         
-        user_id = request.args.get('user_id', 1, type=int)
+        # Enforce authenticated user
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'error': 'Authentication required',
+                'timestamp': datetime.now().isoformat()
+            }), 401
         requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
@@ -114,8 +235,17 @@ def get_user_group_preferences() -> Any:
             profile_id=resolved_profile_id,
             use_cache=use_cache
         )
-        
-        return jsonify({
+        # Compute ETag and handle If-None-Match
+        last_update = profile_context.get('versions', {}).get('last_update') or ''
+        etag_source = f"{user_id}:{resolved_profile_id}:{group_name}:{last_update}:{len(group_preferences)}"
+        group_etag = hashlib.sha256(etag_source.encode('utf-8')).hexdigest()
+        client_etag = request.headers.get('If-None-Match')
+        if client_etag and client_etag == group_etag:
+            resp = jsonify({})
+            resp.status_code = 304
+            resp.headers['ETag'] = group_etag
+            return resp
+        resp = jsonify({
             'success': True,
             'data': {
                 'user_id': user_id,
@@ -127,6 +257,9 @@ def get_user_group_preferences() -> Any:
             },
             'timestamp': datetime.now().isoformat()
         })
+        resp.headers['ETag'] = group_etag
+        resp.headers['Cache-Control'] = 'no-cache'
+        return resp
         
     except Exception as e:
         logger.error(f"Error getting user group preferences: {str(e)}")
@@ -137,6 +270,7 @@ def get_user_group_preferences() -> Any:
         }), 500
 
 @preferences_bp.route('/user/preference', methods=['GET'])
+@require_authentication()
 def get_user_preference() -> Any:
     """
     קבלת העדפה בודדת של משתמש
@@ -156,7 +290,13 @@ def get_user_preference() -> Any:
                 'timestamp': datetime.now().isoformat()
             }), 400
         
-        user_id = request.args.get('user_id', 1, type=int)
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'error': 'Authentication required',
+                'timestamp': datetime.now().isoformat()
+            }), 401
         requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
@@ -173,8 +313,17 @@ def get_user_preference() -> Any:
             profile_id=resolved_profile_id,
             use_cache=use_cache
         )
-        
-        return jsonify({
+        # ETag for single preference
+        last_update = profile_context.get('versions', {}).get('last_update') or ''
+        etag_source = f"{user_id}:{resolved_profile_id}:{preference_name}:{last_update}:{preference_value}"
+        pref_etag = hashlib.sha256(str(etag_source).encode('utf-8')).hexdigest()
+        client_etag = request.headers.get('If-None-Match')
+        if client_etag and client_etag == pref_etag:
+            resp = jsonify({})
+            resp.status_code = 304
+            resp.headers['ETag'] = pref_etag
+            return resp
+        resp = jsonify({
             'success': True,
             'data': {
                 'user_id': user_id,
@@ -186,6 +335,9 @@ def get_user_preference() -> Any:
             },
             'timestamp': datetime.now().isoformat()
         })
+        resp.headers['ETag'] = pref_etag
+        resp.headers['Cache-Control'] = 'no-cache'
+        return resp
         
     except Exception as e:
         logger.error(f"Error getting user preference: {str(e)}")
@@ -196,6 +348,7 @@ def get_user_preference() -> Any:
         }), 500
 
 @preferences_bp.route('/user', methods=['GET'])
+@require_authentication()
 def get_user_preferences() -> Any:
     """
     קבלת העדפות משתמש
@@ -205,7 +358,14 @@ def get_user_preferences() -> Any:
         - use_cache (optional): האם להשתמש במטמון (default: true)
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)  # ברירת מחדל: משתמש 1
+        # Enforce authenticated user; do not allow overriding via query
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
@@ -216,13 +376,34 @@ def get_user_preferences() -> Any:
         resolved_profile_id = profile_context['resolved_profile_id']
         
         # קבלת כל ההעדפות לפי הפרופיל שנבחר בפועל
+        logger.info(f"🔍 DEBUG: /api/preferences/user - user_id={user_id}, requested_profile_id={requested_profile_id}, resolved_profile_id={resolved_profile_id}, use_cache={use_cache}")
+        
         preferences = preferences_service.get_all_user_preferences(
             user_id=user_id,
             profile_id=resolved_profile_id,
             use_cache=use_cache
         )
         
-        return jsonify({
+        # DEBUG: Log preferences result
+        logger.info(f"🔍 DEBUG: /api/preferences/user - get_all_user_preferences returned {len(preferences)} preferences")
+        if len(preferences) > 0:
+            logger.info(f"🔍 DEBUG: First 3 preferences: {preferences[:3]}")
+        else:
+            logger.warning(f"⚠️ DEBUG: /api/preferences/user - No preferences returned! user_id={user_id}, profile_id={resolved_profile_id}")
+        
+        # ETag for full user preferences
+        last_update = profile_context.get('versions', {}).get('last_update') or ''
+        etag_source = f"{user_id}:{resolved_profile_id}:{last_update}:{len(preferences)}"
+        user_etag = hashlib.sha256(etag_source.encode('utf-8')).hexdigest()
+        client_etag = request.headers.get('If-None-Match')
+        if client_etag and client_etag == user_etag:
+            logger.info(f"🔍 DEBUG: /api/preferences/user - 304 Not Modified (ETag match)")
+            resp = jsonify({})
+            resp.status_code = 304
+            resp.headers['ETag'] = user_etag
+            return resp
+        
+        response_data = {
             "success": True,
             "data": {
                 "user_id": user_id,
@@ -233,7 +414,15 @@ def get_user_preferences() -> Any:
                 "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
-        }), 200
+        }
+        
+        # DEBUG: Log response
+        logger.info(f"🔍 DEBUG: /api/preferences/user - Returning response with {len(preferences)} preferences")
+        
+        resp = jsonify(response_data)
+        resp.headers['ETag'] = user_etag
+        resp.headers['Cache-Control'] = 'no-cache'
+        return resp, 200
         
     except Exception as e:
         logger.error(f"Error getting user preferences: {e}")
@@ -244,6 +433,7 @@ def get_user_preferences() -> Any:
         }), 500
 
 @preferences_bp.route('/user', methods=['POST'])
+@require_authentication()
 def save_user_preferences() -> Any:
     """
     שמירת העדפות משתמש
@@ -261,7 +451,14 @@ def save_user_preferences() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        user_id = data.get('user_id', 1)  # ברירת מחדל: משתמש 1
+        # Enforce authenticated user; ignore provided user_id
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         preferences = data.get('preferences', {})
         profile_id = data.get('profile_id')
         
@@ -304,6 +501,7 @@ def save_user_preferences() -> Any:
         }), 500
 
 @preferences_bp.route('/user/single', methods=['GET'])
+@require_authentication()
 def get_single_preference() -> Any:
     """
     קבלת העדפה בודדת
@@ -314,7 +512,13 @@ def get_single_preference() -> Any:
         - use_cache (optional): האם להשתמש במטמון
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         preference_name = request.args.get('preference_name')
         requested_profile_id = request.args.get('profile_id', type=int)
         use_cache = request.args.get('use_cache', 'true').lower() == 'true'
@@ -332,38 +536,56 @@ def get_single_preference() -> Any:
         )
         resolved_profile_id = profile_context['resolved_profile_id']
         
-        # קבלת העדפה
-        value = preferences_service.get_preference(
-            user_id=user_id,
-            preference_name=preference_name,
-            profile_id=resolved_profile_id,
-            use_cache=use_cache
-        )
+        is_default_value = False
+        try:
+            value = preferences_service.get_preference(
+                user_id=user_id,
+                preference_name=preference_name,
+                profile_id=resolved_profile_id,
+                use_cache=use_cache
+            )
+        except ValidationError as validation_error:
+            logger.warning(
+                "Preference '%s' not found for user %s (profile %s): %s",
+                preference_name,
+                user_id,
+                resolved_profile_id,
+                validation_error,
+            )
+            value = None
         
-        # אם העדפה לא נמצאה (value is None), נסה לקבל default value
         if value is None:
             try:
                 default_value = preferences_service.get_default_preference(preference_name)
-                if default_value is not None:
-                    value = default_value
-                    logger.info(f"Using default value for preference '{preference_name}': {default_value}")
-                else:
-                    # גם default לא קיים - החזר 404
-                    return jsonify({
-                        "success": False,
-                        "error": f"Preference '{preference_name}' not found",
-                        "data": {
-                            "user_id": user_id,
-                            "preference_name": preference_name,
-                            "value": None,
-                            "profile_id": profile_id,
-                            "is_default": False
-                        },
-                        "timestamp": datetime.now().isoformat()
-                    }), 404
-            except Exception as default_error:
-                logger.warning(f"Could not get default value for '{preference_name}': {default_error}")
-                # המשך עם None
+            except ValidationError as default_error:
+                logger.warning(
+                    "Default value for preference '%s' unavailable: %s",
+                    preference_name,
+                    default_error,
+                )
+                default_value = None
+            
+            if default_value is None:
+                return jsonify({
+                    "success": False,
+                    "error": f"Preference '{preference_name}' not found",
+                    "data": {
+                        "user_id": user_id,
+                        "preference_name": preference_name,
+                        "value": None,
+                        "profile_id": resolved_profile_id,
+                        "is_default": False
+                    },
+                    "timestamp": datetime.now().isoformat()
+                }), 404
+            
+            value = default_value
+            is_default_value = True
+            logger.info(
+                "Using default value for preference '%s': %s",
+                preference_name,
+                default_value,
+            )
         
         return jsonify({
             "success": True,
@@ -373,7 +595,7 @@ def get_single_preference() -> Any:
                 "value": value,
                 "requested_profile_id": requested_profile_id,
                 "profile_id": resolved_profile_id,
-                "is_default": value is not None,
+                "is_default": is_default_value,
                 "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
@@ -388,6 +610,7 @@ def get_single_preference() -> Any:
         }), 500
 
 @preferences_bp.route('/user/single', methods=['POST'])
+@require_authentication()
 def save_single_preference() -> Any:
     """
     שמירת העדפה בודדת
@@ -406,7 +629,13 @@ def save_single_preference() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        user_id = data.get('user_id', 1)
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         preference_name = data.get('preference_name')
         value = data.get('value')
         profile_id = data.get('profile_id')
@@ -453,6 +682,7 @@ def save_single_preference() -> Any:
         }), 500
 
 @preferences_bp.route('/user/multiple', methods=['POST'])
+@require_authentication()
 def get_multiple_preferences() -> Any:
     """
     קבלת העדפות מרובות
@@ -471,7 +701,13 @@ def get_multiple_preferences() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        user_id = data.get('user_id', 1)
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         preference_names = data.get('preference_names', [])
         profile_id = data.get('profile_id')
         use_cache = data.get('use_cache', True)
@@ -487,22 +723,18 @@ def get_multiple_preferences() -> Any:
         logger.info(f"API: Getting preferences for user {user_id}, profile {profile_id}, use_cache={use_cache}")
         preferences = preferences_service.get_preferences_by_names(
             user_id=user_id,
-            preference_names=preference_names,
+            names=preference_names,
             profile_id=profile_id,
             use_cache=use_cache
         )
         logger.info(f"API: Got preferences: {preferences}")
         
-        # קבלת הפרופיל שנבחר בפועל (אם לא צוין, יחזיר את הפרופיל הפעיל)
-        if profile_id is None:
-            try:
-                active_profile_info = preferences_service.get_active_profile_info(user_id)
-                actual_profile_id = active_profile_info['profile_id']
-            except Exception as e:
-                logger.warning(f"Could not get active profile for user {user_id}: {e}")
-                actual_profile_id = None
-        else:
-            actual_profile_id = profile_id
+        # בניית context אחיד
+        profile_context = preferences_service.build_profile_context(
+            user_id=user_id,
+            requested_profile_id=profile_id
+        )
+        actual_profile_id = profile_context['resolved_profile_id']
         
         return jsonify({
             "success": True,
@@ -512,7 +744,8 @@ def get_multiple_preferences() -> Any:
                 "preferences": preferences,
                 "count": len(preferences),
                 "profile_id": profile_id,
-                "actual_profile_id": actual_profile_id
+                "actual_profile_id": actual_profile_id,
+                "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
         }), 200
@@ -530,18 +763,35 @@ def get_multiple_preferences() -> Any:
 # ============================================================================
 
 @preferences_bp.route('/profiles', methods=['GET'])
+@require_authentication()
 def get_user_profiles() -> Any:
     """
     קבלת פרופילים של משתמש
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)
+        # Enforce authenticated user; do not allow overriding via query
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         
         # קבלת פרופילים
         profiles = preferences_service.get_user_profiles(user_id)
         profile_context = preferences_service.build_profile_context(user_id=user_id)
         
-        return jsonify({
+        # ETag for profiles list
+        etag_source = f"{user_id}:{len(profiles)}:{profile_context.get('resolved_profile_id')}"
+        profiles_etag = hashlib.sha256(etag_source.encode('utf-8')).hexdigest()
+        client_etag = request.headers.get('If-None-Match')
+        if client_etag and client_etag == profiles_etag:
+            resp = jsonify({})
+            resp.status_code = 304
+            resp.headers['ETag'] = profiles_etag
+            return resp
+        resp = jsonify({
             "success": True,
             "data": {
                 "user_id": user_id,
@@ -550,7 +800,10 @@ def get_user_profiles() -> Any:
                 "profile_context": profile_context
             },
             "timestamp": datetime.now().isoformat()
-        }), 200
+        })
+        resp.headers['ETag'] = profiles_etag
+        resp.headers['Cache-Control'] = 'no-cache'
+        return resp, 200
         
     except Exception as e:
         logger.error(f"Error getting user profiles: {e}")
@@ -561,6 +814,7 @@ def get_user_profiles() -> Any:
         }), 500
 
 @preferences_bp.route('/profiles', methods=['POST'])
+@require_authentication()
 def create_profile() -> Any:
     """
     יצירת פרופיל חדש
@@ -581,10 +835,11 @@ def create_profile() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        user_id = data.get('user_id')
-        profile_name = data.get('profile_name')
+        # Enforce authenticated user; ignore provided user_id
+        user_id = getattr(g, 'user_id', None)
+        profile_name = (data.get('profile_name') or '').strip()
         description = data.get('description', '')
-        created_by = data.get('created_by')
+        created_by = user_id
         is_default = data.get('is_default', False)
         
         # בדיקת פרמטרים חובה
@@ -648,13 +903,21 @@ def create_profile() -> Any:
         }), 500
 
 @preferences_bp.route('/profiles/activate', methods=['POST'])
+@require_authentication()
 def activate_profile() -> Any:
     """
     הפעלת פרופיל
     """
     try:
         data = request.get_json()
-        user_id = data.get('user_id')
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        # Enforce authenticated user; ignore provided user_id
+        user_id = getattr(g, 'user_id', None)
         profile_id = data.get('profile_id')
         
         # Check if user_id and profile_id are provided (note: profile_id can be 0 for default profile)
@@ -749,10 +1012,35 @@ def check_preference_type() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_bp.route('/admin/types', methods=['GET'])
+@preferences_bp.route('/types', methods=['GET'])
 def get_preference_types() -> Any:
     """
-    קבלת סוגי העדפות (Admin)
+    קבלת סוגי העדפות (Public - לא דורש הרשאות)
+    """
+    try:
+        preference_types = preferences_service.get_all_preference_types()
+        return jsonify({
+            "success": True,
+            "data": {
+                "preference_types": preference_types,
+                "count": len(preference_types)
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    
+    except Exception as e:
+        logger.error(f"Error getting preference types: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/admin/types', methods=['GET'])
+@require_authentication()
+def get_preference_types_admin() -> Any:
+    """
+    קבלת סוגי העדפות (Admin - עם הרשאות)
     """
     try:
         preference_types = preferences_service.get_all_preference_types()
@@ -900,66 +1188,33 @@ def get_preferences_version() -> Any:
     try:
         user_id = request.args.get('user_id', 1, type=int)
         profile_id = request.args.get('profile_id', type=int)
-        
-        # קבלת timestamp של העדכון האחרון של העדפות
-        # אם אין עדכונים, נחזיר גרסה סטטית
-        try:
-            import sqlite3
-            
-            # Use preferences_service db_path
-            db_path = preferences_service.db_path
-            
-            # Get active profile if not specified
-            if profile_id is None:
-                profile_id = preferences_service._get_active_profile_id(user_id)
-            
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                SELECT MAX(updated_at) 
-                FROM user_preferences_v3 
-                WHERE user_id = ? AND profile_id = ?
-            ''', (user_id, profile_id))
-            
-            result = cursor.fetchone()
-            conn.close()
-            
-            last_update = result[0] if result and result[0] else None
-            
-            # אם יש עדכון אחרון, נשתמש בו כגרסה
-            # אחרת נשתמש בגרסה סטטית
-            if last_update:
-                # המרת timestamp למחרוזת ייחודית (format: YYYYMMDDTHHMMSS)
-                # Remove spaces, colons, and hyphens for a clean version string
-                version = last_update.replace(' ', 'T').replace(':', '').replace('-', '')
-            else:
-                # גרסה סטטית
-                version = "3.1.0"
-            
+
+        last_update, resolved_profile_id = _get_preferences_version(user_id, profile_id)
+
+        if not last_update:
             return jsonify({
-                "success": True,
+                "success": False,
+                "error": "No preference updates were found for the requested profile.",
                 "data": {
-                    "version": version,
-                    "last_update": last_update,
                     "user_id": user_id,
-                    "profile_id": profile_id
+                    "profile_id": resolved_profile_id
                 },
                 "timestamp": datetime.now().isoformat()
-            }), 200
-            
-        except Exception as db_error:
-            logger.warning(f"Could not get last update timestamp: {db_error}")
-            # Fallback to static version
-            return jsonify({
-                "success": True,
-                "data": {
-                    "version": "3.1.0",
-                    "last_update": None
-                },
-                "timestamp": datetime.now().isoformat()
-            }), 200
-        
+            }), 404
+
+        version = last_update.replace(' ', 'T').replace(':', '').replace('-', '')
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "version": version,
+                "last_update": last_update,
+                "user_id": user_id,
+                "profile_id": resolved_profile_id
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+
     except Exception as e:
         logger.error(f"Error getting preferences version: {e}")
         return jsonify({
@@ -1003,22 +1258,46 @@ def check_preferences_updates() -> Any:
     """
     try:
         user_id = request.args.get('user_id', 1, type=int)
-        
-        # בדיקה פשוטה - האם יש שינויים לאחרונה
-        # נשתמשטאמפ של העדפות אחרונות
-        
-        # פשוט נחזיר True - יש עדכונים
-        
-        # פשוט נחזיר True - יש עדכונים
-        has_updates = True
-        
+        profile_id = request.args.get('profile_id', type=int)
+        since_param = request.args.get('since')
+
+        last_update, resolved_profile_id = _get_preferences_version(user_id, profile_id)
+
+        if not last_update:
+            return jsonify({
+                "success": True,
+                "hasUpdates": False,
+                "lastUpdate": None,
+                "user_id": user_id,
+                "profile_id": resolved_profile_id,
+                "timestamp": datetime.now().isoformat()
+            }), 200
+
+        last_update_iso = last_update.replace(' ', 'T')
+        since_dt = None
+
+        if since_param:
+            try:
+                since_dt = datetime.fromisoformat(since_param.replace(' ', 'T'))
+            except ValueError:
+                return jsonify({
+                    "success": False,
+                    "error": "Invalid 'since' parameter format. Use ISO8601.",
+                    "timestamp": datetime.now().isoformat()
+                }), 400
+
+        last_update_dt = datetime.fromisoformat(last_update_iso)
+        has_updates = since_dt is None or last_update_dt > since_dt
+
         return jsonify({
             "success": True,
             "hasUpdates": has_updates,
-            "lastUpdate": datetime.now().isoformat(),
+            "lastUpdate": last_update_iso,
+            "user_id": user_id,
+            "profile_id": resolved_profile_id,
             "timestamp": datetime.now().isoformat()
         }), 200
-        
+
     except Exception as e:
         logger.error(f"Error checking preferences updates: {e}")
         return jsonify({

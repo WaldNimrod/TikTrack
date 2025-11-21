@@ -20,6 +20,49 @@
  * @author TikTrack Development Team
  * @version 1.0.0
  * @lastUpdated October 13, 2025 - Initial Hybrid Testing Implementation
+ * 
+ * ============================================================================
+ * FUNCTION INDEX - CRUD Enhanced Testing System
+ * ============================================================================
+ * 
+ * Class: CRUDEnhancedTester
+ * 
+ * Initialization:
+ * - constructor() - Initialize CRUD testing system
+ * - initializeEntitiesMapping() - Map all entities in the system
+ * 
+ * Testing Operations:
+ * - smartEntityTest(entityName) - Run smart test for specific entity
+ * - runAllEntitiesTest() - Run tests for all entities
+ * - testPageLoad(pageUrl) - Test page loading
+ * - testAPILoad(apiUrl) - Test API load endpoint
+ * - testAPICreate(apiUrl, testData) - Test API create endpoint
+ * - testAPIUpdate(apiUrl, recordId, updateData) - Test API update endpoint
+ * - testAPIDelete(apiUrl, recordId) - Test API delete endpoint
+ * 
+ * Reporting:
+ * - generateSmartReport(results, totalTime) - Generate smart test report
+ * - generateRecommendations(result) - Generate recommendations from result
+ * - generateUrgentActions(result) - Generate urgent actions
+ * - generateGeneralRecommendations(results) - Generate general recommendations
+ * - calculatePriorities(results) - Calculate test priorities
+ * - displayFinalReport(report) - Display final test report
+ * - populateFinalReportCard(report) - Populate final report card
+ * - saveReportToStorage(report) - Save report to storage
+ * 
+ * Utilities:
+ * - sleep(ms) - Sleep for specified milliseconds
+ * - updateStatsDisplay() - Update statistics display
+ * - updateRealTimeResults(result) - Update real-time results display
+ * 
+ * Export Functions (Global):
+ * - generateHTMLReport(report) - Generate HTML report
+ * - generateMarkdownReport(report) - Generate Markdown report
+ * - generateTextReport(report) - Generate text report
+ * - getScoreClass(score) - Get CSS class for score
+ * - downloadFile(content, filename, contentType) - Download file
+ * 
+ * ============================================================================
  */
 
 class CRUDEnhancedTester {

@@ -29,7 +29,6 @@ from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
 import threading
-from config.settings import DB_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -101,8 +100,8 @@ class TickerService:
                         WHERE c.table_name = :table
                           AND c.column_name = :column
                           AND c.constraint_type = 'ENUM'
-                          AND c.is_active = 1
-                          AND ev.is_active = 1
+                          AND c.is_active = TRUE
+                          AND ev.is_active = TRUE
                         ORDER BY ev.sort_order
                     """),
                     {"table": "tickers", "column": "type"}
@@ -540,72 +539,66 @@ class TickerService:
         }
         
         try:
-            # Use the linked_items system to get all child entities
-            from routes.api.linked_items import get_ticker_child_entities
-            import sqlite3
+            # Use EntityDetailsService to get all child entities (SQLAlchemy)
+            from services.entity_details_service import EntityDetailsService
             
-            # Get database connection for linked_items
-            conn = sqlite3.connect(str(DB_PATH))
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
+            # Get all linked items using EntityDetailsService
+            linked_items = EntityDetailsService.get_linked_items(db, 'ticker', ticker_id)
             
-            try:
-                # Get all child entities using the linked_items system
-                child_entities = get_ticker_child_entities(cursor, ticker_id)
-                
-                # Categorize entities by type
-                for entity in child_entities:
-                    if entity['type'] == 'trade':
-                        # Check if trade is open
-                        trade = db.query(Trade).filter(Trade.id == entity['id']).first()
-                        if trade and trade.status == 'open':
-                            result['open_trades'].append({
-                                'id': entity['id'],
-                                'ticker_symbol': trade.ticker.symbol if trade.ticker else 'Unknown',
-                                'status': entity['status'],
-                                'account_name': trade.account.name if trade.account else 'Unknown',
-                                'notes': trade.notes,
-                                'created_at': entity['created_at']
-                            })
-                    
-                    elif entity['type'] == 'trade_plan':
-                        # Check if trade plan is open
-                        plan = db.query(TradePlan).filter(TradePlan.id == entity['id']).first()
-                        if plan and plan.status == 'open':
-                            result['open_trade_plans'].append({
-                                'id': entity['id'],
-                                'ticker': {'symbol': plan.ticker.symbol} if plan.ticker else {'symbol': 'Unknown'},
-                                'status': entity['status'],
-                                'account': {'name': plan.account.name} if plan.account else {'name': 'Unknown'},
-                                'target_price': plan.target_price,
-                                'created_at': entity['created_at']
-                            })
-                    
-                    elif entity['type'] == 'note':
-                        result['notes'].append({
+            # Filter to get only child entities (linked_items returns all, we need to categorize)
+            # For now, treat all as potential children - the schema will determine parent/child
+            child_entities = linked_items
+            
+            # Categorize entities by type
+            for entity in child_entities:
+                if entity['type'] == 'trade':
+                    # Check if trade is open
+                    trade = db.query(Trade).filter(Trade.id == entity['id']).first()
+                    if trade and trade.status == 'open':
+                        result['open_trades'].append({
                             'id': entity['id'],
-                            'content': entity['description'],
-                            'created_at': entity['created_at']
-                        })
-                    
-                    elif entity['type'] == 'alert':
-                        result['alerts'].append({
-                            'id': entity['id'],
-                            'message': entity['description'].replace('התראה: ', ''),
+                            'ticker_symbol': trade.ticker.symbol if trade.ticker else 'Unknown',
                             'status': entity['status'],
+                            'account_name': trade.account.name if trade.account else 'Unknown',
+                            'notes': trade.notes,
                             'created_at': entity['created_at']
                         })
                 
-                # Check if there are any linked items
-                result['has_linked_items'] = (
-                    len(result['open_trades']) > 0 or
-                    len(result['open_trade_plans']) > 0 or
-                    len(result['notes']) > 0 or
-                    len(result['alerts']) > 0
-                )
+                elif entity['type'] == 'trade_plan':
+                    # Check if trade plan is open
+                    plan = db.query(TradePlan).filter(TradePlan.id == entity['id']).first()
+                    if plan and plan.status == 'open':
+                        result['open_trade_plans'].append({
+                            'id': entity['id'],
+                            'ticker': {'symbol': plan.ticker.symbol} if plan.ticker else {'symbol': 'Unknown'},
+                            'status': entity['status'],
+                            'account': {'name': plan.account.name} if plan.account else {'name': 'Unknown'},
+                            'target_price': plan.target_price,
+                            'created_at': entity['created_at']
+                        })
                 
-            finally:
-                conn.close()
+                elif entity['type'] == 'note':
+                    result['notes'].append({
+                        'id': entity['id'],
+                        'content': entity['description'],
+                        'created_at': entity['created_at']
+                    })
+                
+                elif entity['type'] == 'alert':
+                    result['alerts'].append({
+                        'id': entity['id'],
+                        'message': entity['description'].replace('התראה: ', ''),
+                        'status': entity['status'],
+                        'created_at': entity['created_at']
+                    })
+            
+            # Check if there are any linked items
+            result['has_linked_items'] = (
+                len(result['open_trades']) > 0 or
+                len(result['open_trade_plans']) > 0 or
+                len(result['notes']) > 0 or
+                len(result['alerts']) > 0
+            )
                 
         except Exception as e:
             logger.error(f"Error checking linked items for ticker {ticker_id}: {str(e)}")
@@ -630,8 +623,7 @@ class TickerService:
         import logging
         logger = logging.getLogger(__name__)
         
-        from routes.api.linked_items import get_child_entities, get_parent_entities
-        import sqlite3
+        from services.entity_details_service import EntityDetailsService
         
         result = {
             'entity_type': entity_type,
@@ -648,15 +640,45 @@ class TickerService:
         }
         
         try:
-            # Get database connection for linked_items
-            conn = sqlite3.connect(str(DB_PATH))
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
+            # Get all linked items using EntityDetailsService (SQLAlchemy)
+            linked_items = EntityDetailsService.get_linked_items(db, entity_type, entity_id)
             
-            try:
-                # Get all child entities using the linked_items system
-                child_entities = get_child_entities(cursor, entity_type, entity_id)
-                parent_entities = get_parent_entities(cursor, entity_type, entity_id)
+            # Separate into children and parents based on schema
+            from services.entity_relationship_schema import ENTITY_RELATIONSHIPS
+            
+            child_entities = []
+            parent_entities = []
+            
+            if entity_type in ENTITY_RELATIONSHIPS:
+                entity_schema = ENTITY_RELATIONSHIPS[entity_type]
+                
+                # Get list of child types from schema
+                child_types = set()
+                if 'children' in entity_schema:
+                    children = entity_schema['children']
+                    if isinstance(children, dict):
+                        child_types = set(children.keys())
+                
+                # Get list of parent types from schema
+                parent_types = set()
+                if 'parents' in entity_schema:
+                    parents = entity_schema['parents']
+                    if isinstance(parents, dict):
+                        parent_types = set(parents.keys())
+                
+                # Separate linked items
+                for item in linked_items:
+                    item_type = item.get('type')
+                    if item_type in child_types:
+                        child_entities.append(item)
+                    elif item_type in parent_types:
+                        parent_entities.append(item)
+                    else:
+                        # If not in schema, assume it's a child (for backward compatibility)
+                        child_entities.append(item)
+            else:
+                # Fallback: if schema not found, treat all as children
+                child_entities = linked_items
                 
                 result['child_entities'] = child_entities
                 result['parent_entities'] = parent_entities
@@ -736,9 +758,6 @@ class TickerService:
                     len(result['executions']) > 0 or
                     len(result['cash_flows']) > 0
                 )
-                
-            finally:
-                conn.close()
                 
         except Exception as e:
             logger.error(f"Error checking linked items for {entity_type} {entity_id}: {str(e)}")

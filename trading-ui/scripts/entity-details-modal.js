@@ -282,6 +282,21 @@ class EntityDetailsModal {
                 }
             }
             
+            // בדיקה אם המודל נפתח כמודל מקונן (יש מודל אחר פתוח)
+            const isNested = options.source?.sourceModal === 'linked-items' || 
+                           (window.ModalNavigationService && window.ModalNavigationService.getStack().length > 0);
+            
+            // הוספת modal-nested class אם נפתח כמודל מקונן
+            if (isNested && this.modal) {
+                this.modal.classList.add('modal-nested', 'modal-nested-level-2');
+                // הגדרת offset גבוה יותר למודל מקונן (40 במקום 20)
+                this.modal.style.setProperty('--modal-nested-offset', '40');
+            } else if (this.modal) {
+                // הסרת modal-nested אם לא מקונן
+                this.modal.classList.remove('modal-nested', 'modal-nested-level-2');
+                this.modal.style.removeProperty('--modal-nested-offset');
+            }
+            
             // הצגת מצב טעינה
             this.showLoadingState();
 
@@ -325,7 +340,24 @@ class EntityDetailsModal {
     hide() {
         try {
             if (this.modal && this.isVisible()) {
-                // הסרה ממערכת ניהול הניווט (תקרה אוטומטית ב-handleModalHidden)
+                // אם יש מודל מקונן (יש מודל אחר פתוח) - השתמש ב-goBack
+                if (window.ModalNavigationService?.canGoBack && window.ModalNavigationService.canGoBack()) {
+                    // יש מודל מקונן - חזור למודל הקודם
+                    window.ModalNavigationService.goBack().catch((error) => {
+                        window.Logger?.warn('Failed to go back via navigation service, using fallback', { error: error?.message }, { page: "entity-details-modal" });
+                        // fallback - סגירה רגילה
+                        const bsModal = bootstrap.Modal.getInstance(this.modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        } else {
+                            this.modal.style.display = 'none';
+                            this.modal.classList.remove('show');
+                        }
+                    });
+                    return;
+                }
+                
+                // אין מודל מקונן - סגירה רגילה
                 const bsModal = bootstrap.Modal.getInstance(this.modal);
                 if (bsModal) {
                     bsModal.hide();
@@ -387,6 +419,18 @@ class EntityDetailsModal {
         if (!entityType || entityId === null || entityId === undefined) {
             window.Logger?.warn('EntityDetailsModal restore received entry without entity info', {
                 entry,
+                page: 'entity-details-modal'
+            });
+            return;
+        }
+
+        // בדיקה אם המודל כבר פתוח עם אותם נתונים - אם כן, לא צריך לטעון מחדש
+        if (this.isVisible() && 
+            this.currentEntityType === entityType && 
+            this.currentEntityId === entityId) {
+            window.Logger?.debug('EntityDetailsModal restore skipped - modal already open with same data', {
+                entityType,
+                entityId,
                 page: 'entity-details-modal'
             });
             return;
@@ -1075,7 +1119,7 @@ class EntityDetailsModal {
         }, 100);
         
         // Initialize tooltips for linked items filter buttons after content is displayed
-        // Use multiple attempts to ensure tooltips are initialized even if systems load slowly
+        // Use centralized button system instead of manual initialization
         const initializeTooltips = (attempt = 1, maxAttempts = 5) => {
             if (attempt > maxAttempts) {
                 console.warn(`🔍 [Tooltip Debug] Max attempts reached (${maxAttempts}), stopping tooltip initialization`);
@@ -1098,86 +1142,37 @@ class EntityDetailsModal {
                 searchScope: searchScope.id || searchScope.className || 'unknown'
             });
             
-            // If we found containers, initialize tooltips
-            if (filterContainers.length > 0 || filterButtonsContainers.length > 0) {
+            // Use centralized button system to initialize tooltips
+            if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+                // Process all found containers
                 const containersToProcess = filterContainers.length > 0 ? filterContainers : filterButtonsContainers;
                 
+                if (containersToProcess.length > 0) {
+                    containersToProcess.forEach(container => {
+                        console.log(`🔍 [Tooltip Debug] Initializing tooltips for container: ${container.id}`);
+                        window.advancedButtonSystem.initializeTooltips(container);
+                    });
+                } else if (buttonsWithTooltip.length > 0) {
+                    // If no containers but buttons found, find parent container
+                    const container = buttonsWithTooltip[0].closest('.filter-buttons-container');
+                    if (container) {
+                        console.log(`🔍 [Tooltip Debug] Initializing tooltips for container: ${container.id || 'unknown'}`);
+                        window.advancedButtonSystem.initializeTooltips(container);
+                    }
+                }
+            } else if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
+                // Fallback: use renderer method if button system not available
+                const containersToProcess = filterContainers.length > 0 ? filterContainers : filterButtonsContainers;
                 containersToProcess.forEach(container => {
-                    // Extract tableId from container ID (linkedItemsFilter_linkedItemsTable_alert_2 -> linkedItemsTable_alert_2)
                     const containerId = container.id;
                     const tableId = containerId.replace('linkedItemsFilter_', '');
-                    console.log(`🔍 [Tooltip Debug] Initializing tooltips for tableId: ${tableId}`);
-                    
-                    if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
-                        window.entityDetailsRenderer._initializeFilterTooltips(tableId);
-                    } else {
-                        // Fallback: initialize tooltips directly if renderer method not available
-                        initializeTooltipsDirectly(container);
-                    }
+                    window.entityDetailsRenderer._initializeFilterTooltips(tableId);
                 });
-            } else if (buttonsWithTooltip.length > 0) {
-                // Fallback: if we found buttons but no containers, initialize directly
-                console.log(`🔍 [Tooltip Debug] Found ${buttonsWithTooltip.length} buttons with data-tooltip, initializing directly`);
-                const container = buttonsWithTooltip[0].closest('.filter-buttons-container');
-                if (container) {
-                    initializeTooltipsDirectly(container);
-                }
             } else if (attempt < maxAttempts) {
                 // Retry after a delay if nothing found yet
                 setTimeout(() => initializeTooltips(attempt + 1, maxAttempts), 200);
                 return;
             }
-            
-            // Also try finding tables directly as fallback
-            if ((filterContainers.length === 0 && filterButtonsContainers.length === 0) && attempt < maxAttempts) {
-                const linkedItemsTables = searchScope.querySelectorAll('[id^="linkedItemsTable_"]');
-                console.log(`🔍 [Tooltip Debug] Fallback: Found ${linkedItemsTables.length} linked items tables`);
-                linkedItemsTables.forEach(table => {
-                    const tableId = table.id;
-                    if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
-                        window.entityDetailsRenderer._initializeFilterTooltips(tableId);
-                    }
-                });
-            }
-        };
-        
-        // Helper function to initialize tooltips directly
-        const initializeTooltipsDirectly = (container) => {
-            const buttonsWithTooltip = container.querySelectorAll('[data-tooltip]');
-            if (buttonsWithTooltip.length === 0) return;
-            
-            console.log(`🔍 [Tooltip Debug] Direct initialization for ${buttonsWithTooltip.length} buttons`);
-            
-            // Check if Bootstrap is available
-            if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
-                console.warn('🔍 [Tooltip Debug] Bootstrap not available, skipping direct initialization');
-                return;
-            }
-            
-            buttonsWithTooltip.forEach((btn) => {
-                try {
-                    // Destroy existing tooltip if exists
-                    const existingTooltip = bootstrap.Tooltip.getInstance(btn);
-                    if (existingTooltip) {
-                        existingTooltip.dispose();
-                    }
-                    
-                    const tooltipText = btn.getAttribute('data-tooltip');
-                    const placement = btn.getAttribute('data-tooltip-placement') || 'top';
-                    const trigger = btn.getAttribute('data-tooltip-trigger') || 'hover';
-                    
-                    if (tooltipText) {
-                        new bootstrap.Tooltip(btn, {
-                            title: tooltipText,
-                            placement: placement,
-                            trigger: trigger
-                        });
-                        console.log(`✅ [Tooltip Debug] Directly initialized tooltip for button: ${btn.id || btn.getAttribute('data-type')}`);
-                    }
-                } catch (error) {
-                    console.error(`❌ [Tooltip Debug] Error initializing tooltip:`, error);
-                }
-            });
         };
         
         // Start initialization with delay to ensure DOM is ready
@@ -1267,20 +1262,29 @@ class EntityDetailsModal {
         this.currentEntityType = null;
         this.currentEntityId = null;
         
-        if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
+        // רישום סגירה במערכת הניווט (רק אם לא נסגר דרך goBack)
+        // goBack כבר מטפל בהסרה מה-stack דרך registerModalClose עם internal: true
+        if (window.ModalNavigationService?.registerModalClose) {
+            // רק אם המודל עדיין ב-stack (לא נסגר דרך goBack)
+            const stack = window.ModalNavigationService.getStack();
+            const isInStack = stack.some(entry => entry.modalId === this.modalId && entry.instanceId === this.navigationInstanceId);
+            if (isInStack) {
+                window.ModalNavigationService.registerModalClose(this.modalId, { instanceId: this.navigationInstanceId });
+            }
+        } else if (window.registerModalNavigationClose) {
             window.registerModalNavigationClose(this.modalId);
         }
 
         this.navigationInstanceId = null;
 
-                const contentElement = document.getElementById('entityDetailsContent');
-                if (contentElement) {
-                    contentElement.innerHTML = '';
-                    if (window.Logger) {
+        const contentElement = document.getElementById('entityDetailsContent');
+        if (contentElement) {
+            contentElement.innerHTML = '';
+            if (window.Logger) {
                 window.Logger.debug('✅ Cleared modal content after hide', {
-                            modalId: this.modal?.id,
-                            page: "entity-details-modal"
-                        });
+                    modalId: this.modal?.id,
+                    page: "entity-details-modal"
+                });
             }
         }
     }

@@ -30,8 +30,7 @@
  * - removeCurrentAttachment() - removeCurrentAttachment function
  * - showAddNoteModal() - * Replace current attachment
  * 
- * EVENT HANDLING (4)
- * - restoreNotesSectionState() - restoreNotesSectionState function
+ * EVENT HANDLING (3)
  * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
  * - clearNoteValidationErrors() - clearNoteValidationErrors function
  * - setEditorContent() - * קבלת תוכן מעורך הטקסט
@@ -141,21 +140,35 @@ window.loadNotesData = async function(options = {}) {
 
     window.notesData = normalizedNotes;
 
-    if (typeof window.updateNotesTable === 'function') {
-      window.updateNotesTable(normalizedNotes);
-    } else {
-      window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: 'notes' });
+    // סמן שאנחנו בתהליך עדכון כדי למנוע קריאות כפולות
+    window._notesUpdateInProgress = true;
+    
+    try {
+      if (typeof window.updateNotesTable === 'function') {
+        await window.updateNotesTable(normalizedNotes);
+      } else {
+        window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: 'notes' });
+      }
+
+      if (typeof window.updateNotesSummary === 'function') {
+        window.updateNotesSummary(normalizedNotes);
+      } else {
+        window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: 'notes' });
+      }
+    } finally {
+      // הסר את הסמן אחרי שהעדכון הושלם
+      window._notesUpdateInProgress = false;
     }
 
-    if (typeof window.updateNotesSummary === 'function') {
-      window.updateNotesSummary(normalizedNotes);
+    // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('notesCount', 'notes', 'הערות', normalizedNotes.length);
     } else {
-      window.Logger.warn('⚠️ updateNotesSummary לא זמין', { page: 'notes' });
-    }
-
-    const countElement = document.getElementById('notesCount');
-    if (countElement) {
-      countElement.textContent = `${normalizedNotes.length} הערות`;
+      // Fallback
+      const countElement = document.getElementById('notesCount');
+      if (countElement) {
+        countElement.textContent = `${normalizedNotes.length} הערות`;
+      }
     }
 
     if (typeof window.registerNotesTables === 'function') {
@@ -187,10 +200,9 @@ window.loadNotesData = async function(options = {}) {
 // REMOVED: uploadFile - unused function
 
 /**
- * Download file from note
- * @function downloadFile
- * @param {string} noteId - Note ID
- * @param {string} fileName - File name
+ * Download file attached to note
+ * @param {number|string} noteId - Note ID
+ * @param {string} fileName - File name to download
  * @returns {void}
  */
 function downloadFile(noteId, fileName) {
@@ -275,13 +287,24 @@ function openNoteDetails(_id) {
 /**
  * Edit note
  * @function editNote
- * @param {string} _id - Note ID
+ * @param {string|number} _id - Note ID (must be numeric)
  * @returns {void}
  */
 function editNote(_id) {
+  // Ensure ID is a valid number
+  const noteId = parseInt(_id);
+  if (!noteId || isNaN(noteId)) {
+    window.Logger?.error('⚠️ Invalid note ID for edit', { _id, noteId, page: "notes" });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'מספר זיהוי הערה לא תקין');
+    }
+    return;
+  }
+  
   // Use ModalManagerV2 directly
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-    window.ModalManagerV2.showEditModal('notesModal', 'note', _id);
+    window.Logger?.debug('🔍 Opening edit modal for note', { noteId, page: 'notes' });
+    window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
   } else {
     window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
   }
@@ -325,10 +348,33 @@ async function deleteNote(id) {
               ? window.FieldRendererService.renderDate(createdEnvelope)
               : (function fallbackDateDisplay(value) {
                   try {
-                    const parsed = new Date(
-                      value?.utc || value?.local || value
-                    );
+                    // Use dateUtils for consistent date parsing
+                    let parsed;
+                    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                      const envelope = window.dateUtils.ensureDateEnvelope(value);
+                      if (envelope && envelope.epochMs) {
+                        parsed = new Date(envelope.epochMs);
+                      } else {
+                        parsed = new Date(value?.utc || value?.local || value);
+                      }
+                    } else if (value && typeof value === 'object' && typeof value.epochMs === 'number') {
+                      parsed = new Date(value.epochMs);
+                    } else {
+                      parsed = new Date(value?.utc || value?.local || value);
+                    }
+                    
                     if (!Number.isNaN(parsed.getTime())) {
+                      // Use FieldRendererService or dateUtils for formatting
+                      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(parsed, false);
+                      }
+                      if (window.formatDate) {
+                        return window.formatDate(parsed);
+                      }
+                      if (window.dateUtils?.formatDate) {
+                        return window.dateUtils.formatDate(parsed, { includeTime: false });
+                      }
+                      // Last resort: use toLocaleDateString
                       return parsed.toLocaleDateString('he-IL');
                     }
                   } catch (err) {
@@ -368,53 +414,14 @@ async function deleteNote(id) {
 
 // פונקציה לשחזור מצב הסגירה
 /**
- * Restore the state of notes sections from localStorage
- * Restores the collapsed/expanded state of various sections
+ * Restore the state of notes sections
+ * REMOVED: This function has been removed. Section state restoration is now handled by:
+ * - PageStateManager.loadPageState() - loads saved section states
+ * - restoreAllSectionStates() - restores all sections using PageStateManager
+ * 
+ * This function used localStorage directly, which is now replaced by PageStateManager.
+ * The restorePageState() function (line 2539) now handles section restoration via PageStateManager.
  */
-function restoreNotesSectionState() {
-  try {
-    // שחזור מצב top-section (התראות וסיכום)
-    const topCollapsed = localStorage.getItem('notesTopSectionHidden') === 'true';
-  const topSection = document.querySelector('.top-section');
-
-  if (topSection) {
-    const sectionBody = topSection.querySelector('.section-body');
-    const toggleBtn = topSection.querySelector('button[onclick="toggleSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody && topCollapsed) {
-      sectionBody.style.display = 'none';
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    }
-  }
-
-  // שחזור מצב סקשן ההערות
-  const notesCollapsed = localStorage.getItem('notesMainSectionHidden') === 'true';
-  const contentSections = document.querySelectorAll('.content-section');
-  const notesSection = contentSections[0];
-
-  if (notesSection) {
-    const sectionBody = notesSection.querySelector('.section-body');
-    const toggleBtn = notesSection.querySelector('button[onclick="toggleSection(\'main\')"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody && notesCollapsed) {
-      sectionBody.style.display = 'none';
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    }
-  }
-  
-  } catch (error) {
-    window.Logger.error('שגיאה בשחזור מצב סקשנים:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בשחזור מצב סקשנים', error.message);
-    }
-  }
-}
 
 // פונקציות נוספות
 
@@ -424,7 +431,7 @@ window.editNote = editNote;
 window.deleteNote = deleteNote;
 // window.toggleSection removed - using global version from ui-utils.js
 // toggleSection export removed - use toggleSection('main') instead
-window.restoreNotesSectionState = restoreNotesSectionState;
+// REMOVED: window.restoreNotesSectionState - use PageStateManager + restoreAllSectionStates() instead
 
 // פונקציה לטעינת נתונים
 // הפונקציה loadNotesData מוגדרת כבר בשורה 99 כ-window.loadNotesData
@@ -438,9 +445,9 @@ window.restoreNotesSectionState = restoreNotesSectionState;
  * @param {Array} trades - Trades array
  * @param {Array} tradePlans - Trade plans array
  * @param {Array} tickers - Tickers array
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function updateNotesTable(notes) {
+async function updateNotesTable(notes) {
   try {
     window.Logger.info('🟢🟢🟢 updateNotesTable נקראה (פונקציה רגילה) עם', notes ? notes.length : 0, 'הערות', { page: "notes" });
     window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
@@ -458,36 +465,90 @@ function updateNotesTable(notes) {
     let tradePlans = [];
     let tickers = [];
 
-    // פונקציה לטעינת נתונים נוספים
+    // פונקציה לטעינת נתונים נוספים באמצעות שירותי ישויות כלליים כשאפשר
     const loadAdditionalData = async () => {
       try {
-        window.Logger.info('📡 טוען נתונים נוספים עבור הערות...', { page: "notes" });
-        const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-          fetch('/api/trading-accounts/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/trades/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/trade-plans/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-          fetch('/api/tickers/').then(r => r.ok ? r.json() : ({ data: [] })).catch(() => ({ data: [] })),
-        ]);
+        window.Logger.info('📡 טוען נתונים נוספים עבור הערות (שירותי ישויות)...', { page: "notes" });
 
-        // ודא שהתשובות הן מערכים - גם אם ה-API מחזיר שגיאה
-        const accountsData = Array.isArray(accountsResponse) ? accountsResponse : (Array.isArray(accountsResponse?.data) ? accountsResponse.data : []);
-        const tradesData = Array.isArray(tradesResponse) ? tradesResponse : (Array.isArray(tradesResponse?.data) ? tradesResponse.data : []);
-        const tradePlansData = Array.isArray(tradePlansResponse) ? tradePlansResponse : (Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data : []);
-        const tickersData = Array.isArray(tickersResponse) ? tickersResponse : (Array.isArray(tickersResponse?.data) ? tickersResponse.data : []);
+        const loadAccounts = async () => {
+          if (typeof window.getAccounts === 'function') {
+            return await window.getAccounts();
+          }
+          const response = await fetch('/api/trading-accounts/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTrades = async () => {
+          // כרגע אין שירות טריידים כללי – שימוש ב-API ישיר
+          const response = await fetch('/api/trades/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const loadTradePlans = async () => {
+          try {
+            // בדיקה אם TradePlansData זמין לפני שימוש ב-service
+            // אם לא זמין, נדלג על השימוש ב-service ונעבור ישירות ל-API
+            if (window.TradePlansData && typeof window.TradePlansData.loadTradePlansData === 'function') {
+              if (window.tradePlanService && typeof window.tradePlanService.loadTradePlansData === 'function') {
+                const data = await window.tradePlanService.loadTradePlansData();
+                return Array.isArray(data) ? data : [];
+              }
+              if (typeof window.loadTradePlansData === 'function') {
+                const data = await window.loadTradePlansData();
+                return Array.isArray(data) ? data : [];
+              }
+            }
+            // אם TradePlansData לא זמין, נשתמש ב-API ישיר
+            const response = await fetch('/api/trade-plans/');
+            if (!response.ok) { return []; }
+            const payload = await response.json();
+            return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+          } catch (error) {
+            // אם יש שגיאה, נחזיר מערך ריק במקום לזרוק שגיאה
+            window.Logger?.warn('⚠️ שגיאה בטעינת תוכניות מסחר, מחזיר מערך ריק', { error: error.message }, { page: 'notes' });
+            return [];
+          }
+        };
+
+        const loadTickers = async () => {
+          if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+            const data = await window.tickerService.getTickers();
+            return Array.isArray(data) ? data : [];
+          }
+          if (typeof window.getTickers === 'function') {
+            const data = await window.getTickers();
+            return Array.isArray(data) ? data : [];
+          }
+          const response = await fetch('/api/tickers/');
+          if (!response.ok) { return []; }
+          const payload = await response.json();
+          return Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+        };
+
+        const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+          loadAccounts(),
+          loadTrades(),
+          loadTradePlans(),
+          loadTickers()
+        ]);
 
         accounts = accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         trades = tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         tradePlans = tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         tickers = tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
         
-        window.Logger.info('✅ נתונים נוספים נטענו:', {
+        window.Logger.info('✅ נתונים נוספים נטענו (שירותי ישויות):', {
           accounts: accounts.length,
           trades: trades.length,
           tradePlans: tradePlans.length,
           tickers: tickers.length
         }, { page: "notes" });
       } catch (error) {
-        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים:', error, { page: "notes" });
+        window.Logger.error('❌ שגיאה בטעינת נתונים נוספים (שירותי ישויות):', error, { page: "notes" });
         // המשך עם מערכים ריקים
         accounts = [];
         trades = [];
@@ -497,36 +558,37 @@ function updateNotesTable(notes) {
     };
 
     // טעינת נתונים ועדכון הטבלה
-    loadAdditionalData().then(() => {
-      // בדיקה שהנתונים קיימים
-      if (!notes || !Array.isArray(notes)) {
-        window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
-        return;
-      }
+    await loadAdditionalData();
+    
+    // בדיקה שהנתונים קיימים
+    if (!notes || !Array.isArray(notes)) {
+      window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
+      return;
+    }
 
-      if (notes.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center text-muted">
-            <div style="padding: 20px;">
-              <h5>📝 אין הערות</h5>
-              <p>לא נמצאו הערות במערכת</p>
-              <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()"></button>
-            </div>
-          </td>
-        </tr>
-      `;
-      
-        // 🔘 עדכון כפתורים דינמיים
-        if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-          window.ButtonSystem.initializeButtons();
-        }
-        return;
+    if (notes.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center text-muted">
+          <div style="padding: 20px;">
+            <h5>📝 אין הערות</h5>
+            <p>לא נמצאו הערות במערכת</p>
+            <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()" data-tooltip="הוסף הערה ראשונה למערכת" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+          </div>
+        </td>
+      </tr>
+    `;
+    
+      // 🔘 עדכון כפתורים דינמיים
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
       }
+      return;
+    }
 
-      // בניית שורות הטבלה
-      const rows = notes.map(note => {
+    // בניית שורות הטבלה
+    const rows = notes.map(note => {
         const createdEnvelope = window.dateUtils?.ensureDateEnvelope
           ? window.dateUtils.ensureDateEnvelope(note.created_at)
           : note.created_at;
@@ -536,8 +598,31 @@ function updateNotesTable(notes) {
             ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
             : (() => {
                 try {
-                  const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
+                  // Use dateUtils for consistent date parsing
+                  let parsed;
+                  const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
+                  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                    const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+                    if (envelope && envelope.epochMs) {
+                      parsed = new Date(envelope.epochMs);
+                    } else {
+                      parsed = new Date(dateValue);
+                    }
+                  } else if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
+                    parsed = new Date(dateValue.epochMs);
+                  } else {
+                    parsed = new Date(dateValue);
+                  }
+                  
                   if (!Number.isNaN(parsed.getTime())) {
+                    // Use FieldRendererService or dateUtils for formatting
+                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                      return window.FieldRendererService.renderDate(parsed, false);
+                    }
+                    if (window.dateUtils?.formatDate) {
+                      return window.dateUtils.formatDate(parsed, { includeTime: false });
+                    }
+                    // Last resort: use toLocaleDateString
                     return parsed.toLocaleDateString('he-IL');
                   }
                 } catch (error) {
@@ -550,46 +635,79 @@ function updateNotesTable(notes) {
           : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
 
         // הצגת תוכן HTML עם הגבלה ל-20 תווים
-        const contentDisplay = (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function')
-          ? window.FieldRendererService.renderTextPreview(note.content, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' })
-          : (() => {
-              const fallbackPlain = (note.content || '').replace(/<[^>]*>/g, '').trim();
-              if (!fallbackPlain) {
-                return 'ללא תוכן';
-              }
-              const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
-              const escape = (text) => String(text)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-              return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
-            })();
+        // Debug: Check note content
+        const noteContent = note.content || '';
+        const noteAttachment = note.attachment || null;
+        
+        // Ensure content is processed correctly
+        const contentDisplay = (() => {
+          // Check if content exists and is not empty
+          if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
+            window.Logger?.warn('⚠️ Note content is empty', { noteId: note?.id, content: noteContent, page: 'notes' });
+            return 'ללא תוכן';
+          }
+          
+          // Use FieldRendererService if available
+          if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
+            try {
+              return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
+            } catch (error) {
+              window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
+            }
+          }
+          
+          // Fallback: strip HTML and truncate
+          const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
+          if (!fallbackPlain) {
+            return 'ללא תוכן';
+          }
+          const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+          const escape = (text) => String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+          return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+        })();
 
         // הצגת קובץ עם אייקון ו-10 תווים ראשונים
         let attachmentDisplay = '-';
-        if (note.attachment) {
-          const fileName = note.attachment;
-          const fileExtension = fileName.split('.').pop()?.toLowerCase();
-          let fileIcon = '📄'; // ברירת מחדל
+        // Only show attachment if it exists and is not empty/null
+        if (noteAttachment && noteAttachment !== null && noteAttachment !== '') {
+          // Ensure attachment is a string before processing
+          const fileName = typeof noteAttachment === 'string' ? noteAttachment : String(noteAttachment || '');
+          
+          // Only process if fileName is a valid non-empty string (not just whitespace)
+          if (fileName && fileName.trim() && fileName !== 'null' && fileName !== 'undefined') {
+            try {
+              const fileExtension = fileName.split('.').pop()?.toLowerCase();
+              let fileIcon = '📄'; // ברירת מחדל
 
-          // קביעת אייקון לפי סוג הקובץ
-          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
-            fileIcon = '🖼️';
-          } else if (['pdf'].includes(fileExtension)) {
-            fileIcon = '📕';
-          } else if (['doc', 'docx'].includes(fileExtension)) {
-            fileIcon = '📘';
-          } else if (['txt'].includes(fileExtension)) {
-            fileIcon = '📄';
-          } else if (['xls', 'xlsx'].includes(fileExtension)) {
-            fileIcon = '📊';
+              // קביעת אייקון לפי סוג הקובץ
+              if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+                fileIcon = '🖼️';
+              } else if (['pdf'].includes(fileExtension)) {
+                fileIcon = '📕';
+              } else if (['doc', 'docx'].includes(fileExtension)) {
+                fileIcon = '📘';
+              } else if (['txt'].includes(fileExtension)) {
+                fileIcon = '📄';
+              } else if (['xls', 'xlsx'].includes(fileExtension)) {
+                fileIcon = '📊';
+              }
+
+              // הצגת אייקון + 10 תווים ראשונים
+              const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
+              attachmentDisplay = `${fileIcon} ${shortName}`;
+            } catch (error) {
+              window.Logger?.warn('⚠️ Error processing attachment', { error, noteId: note?.id, attachment: noteAttachment, page: 'notes' });
+              attachmentDisplay = '-';
+            }
+          } else {
+            // Invalid attachment value - show dash
+            attachmentDisplay = '-';
           }
-
-          // הצגת אייקון + 10 תווים ראשונים
-          const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
-          attachmentDisplay = `${fileIcon} ${shortName}`;
         }
 
       // קביעת האובייקט המקושר באמצעות המערכת הכללית
@@ -718,38 +836,129 @@ function updateNotesTable(notes) {
         `;
       }
 
+        // Debug: Log note data to verify content and attachment are correct
+        window.Logger?.debug('🔍 Building note table row', {
+          noteId: note?.id,
+          hasContent: !!noteContent,
+          contentLength: noteContent?.length || 0,
+          contentPreview: noteContent ? String(noteContent).substring(0, 50) : 'null',
+          hasAttachment: !!noteAttachment,
+          attachmentValue: noteAttachment,
+          contentDisplay: contentDisplay.substring(0, 50),
+          attachmentDisplay,
+          page: 'notes'
+        });
+
         return `
           <tr class="table-cell-clickable">
-          <td class="related-cell">${relatedCellHtml}</td>
-            <td>${contentDisplay}</td>
-            <td data-date='${dateSortValue}'>${dateDisplay}</td>
-            <td>${attachmentDisplay}</td>
+            <td class="related-cell">${relatedCellHtml}</td>
+            <td class="col-content">${contentDisplay}</td>
+            <td class="col-attachment">${attachmentDisplay}</td>
+            <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
             ${(() => {
-              if (typeof window.renderUpdatedCell === 'function') {
-                return window.renderUpdatedCell(note, {
-                  fields: ['updated_at', 'created_at'],
-                  columnClass: 'col-updated'
-                });
-              }
-              const fallbackDate = window.toDateObject
-                ? window.toDateObject(note.updated_at || note.created_at)
-                : (note.updated_at || note.created_at ? new Date(note.updated_at || note.created_at) : null);
-              if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+              // Prefer FieldRendererService.renderDate for consistent date formatting
+              const rawDate = note.updated_at || note.created_at || null;
+              
+              if (!rawDate) {
                 return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
               }
-              const absolute = fallbackDate.toLocaleString('he-IL');
-              const duration = typeof window.getDurationSince === 'function'
-                ? window.getDurationSince(fallbackDate, { fallback: absolute })
-                : absolute;
-              return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+              // Use FieldRendererService.renderDate for proper date formatting
+              let dateDisplay = '';
+              let epoch = null;
+
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                // Use FieldRendererService to render date with time
+                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                
+                // Get epoch for sorting
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                } else if (rawDate instanceof Date) {
+                  epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                  const parsed = Date.parse(rawDate);
+                  epoch = Number.isNaN(parsed) ? null : parsed;
+                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                  epoch = rawDate.epochMs;
+                }
+              } else {
+                // Fallback: work directly with date envelope objects or raw values
+                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                  ? window.dateUtils.ensureDateEnvelope(rawDate)
+                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                    ? rawDate
+                    : null;
+
+                // Derive epoch milliseconds in a canonical way
+                epoch = (() => {
+                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                  }
+                  if (typeof window.getEpochMilliseconds === 'function') {
+                    return window.getEpochMilliseconds(envelope || rawDate);
+                  }
+                  if (envelope && typeof envelope.epochMs === 'number') {
+                    return envelope.epochMs;
+                  }
+                  if (rawDate instanceof Date) {
+                    return rawDate.getTime();
+                  }
+                  if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    return Number.isNaN(parsed) ? null : parsed;
+                  }
+                  return null;
+                })();
+
+                if (epoch === null || Number.isNaN(epoch)) {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+
+                // Build date display using unified date utilities
+                dateDisplay = (() => {
+                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                    return window.dateUtils.formatDateTime(envelope || rawDate);
+                  }
+                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                  }
+                  try {
+                    const dateObj = new Date(epoch);
+                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }));
+                  } catch (err) {
+                    window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
+                    return 'לא מוגדר';
+                  }
+                })();
+              }
+
+              if (!dateDisplay || dateDisplay === '-') {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+
+              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
             })()}
             <td class='actions-cell'>
               ${(() => {
                 if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                // Ensure note.id is properly escaped and is a number
+                const noteId = note?.id ? parseInt(note.id) : null;
+                if (!noteId) {
+                  window.Logger?.warn('⚠️ Note ID is missing or invalid', { note, page: 'notes' });
+                  return '<!-- Invalid note ID -->';
+                }
                 const result = window.createActionsMenu([
-                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${note.id}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-                  { type: 'EDIT', onclick: `editNote(${note.id})`, title: 'ערוך הערה' },
-                  { type: 'DELETE', onclick: `deleteNote(${note.id})`, title: 'מחק הערה' }
+                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+                  { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
+                  { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
                 ]);
                 return result || '';
               })()}
@@ -758,18 +967,41 @@ function updateNotesTable(notes) {
         `;
       }).join('');
 
-      tbody.innerHTML = rows;
-      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
-      window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
+    tbody.innerHTML = rows;
+    window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
+    window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
 
-      // עדכון table-count ו-info-summary
-      updateNotesSummary(notes);
-      
-      // 🔘 עדכון כפתורים דינמיים
-      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-        window.ButtonSystem.initializeButtons();
+    // עדכון table-count ו-info-summary
+    // הערה: updateNotesSummary נקראת גם מ-loadNotesData, אז אין צורך לקרוא כאן שוב
+    // אם זו קריאה ישירה (לא דרך loadNotesData), נעדכן את הסיכום
+    if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
+      window.updateNotesSummary(notes);
+    }
+    
+    // 🔘 עדכון כפתורים דינמיים
+    // NOTE: processButtons already handles tooltip initialization for buttons with data-button-type
+    // initializeTooltips is only needed for custom buttons without data-button-type
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+      // Process all buttons including actions-menu buttons
+      // This will also initialize tooltips for buttons with data-button-type
+      window.advancedButtonSystem.processButtons(tbody);
+    } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+      window.ButtonSystem.initializeButtons();
+    }
+    
+    // 🔘 אתחול טולטיפים רק לכפתורים מותאמים אישית (ללא data-button-type)
+    // כפתורים עם data-button-type כבר טופלו ב-processButtons
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+      // Initialize tooltips for custom filter buttons (if any don't have data-button-type)
+      const filterContainer = document.querySelector('.filter-buttons-container');
+      if (filterContainer) {
+        // Only initialize tooltips for buttons without data-button-type
+        const customFilterButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-type]):not([data-button-processed])');
+        if (customFilterButtons.length > 0) {
+          window.advancedButtonSystem.initializeTooltips(filterContainer);
+        }
       }
-    });
+    }
   
   } catch (error) {
     window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
@@ -782,38 +1014,37 @@ function updateNotesTable(notes) {
 // פונקציה לעדכון סיכום הערות
 /**
  * Update the notes summary section
+ * Uses the centralized updatePageSummaryStats function from ui-utils.js
  * @param {Array} notes - Array of notes to summarize
  */
 function updateNotesSummary(notes) {
   const notesArray = Array.isArray(notes)
     ? notes
     : (window.TableDataRegistry ? window.TableDataRegistry.getFilteredData('notes') : window.notesData || []);
-  try {
-    // שמירת המספר המקורי לחיפוש
-  window.originalNotesCount = notesArray.length;
-
-  // עדכון table-count
-  const tableCountElement = document.querySelector('.table-count');
-  if (tableCountElement) {
-    tableCountElement.textContent = `${notesArray.length} הערות`;
-  }
-
-  // מערכת מאוחדת לסיכום נתונים
-  if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS) {
-    const config = window.INFO_SUMMARY_CONFIGS.notes;
-    window.InfoSummarySystem.calculateAndRender(notesArray, config);
-  } else {
-    // מערכת סיכום נתונים לא זמינה
-    const summaryStatsElement = document.getElementById('summaryStats');
-    if (summaryStatsElement) {
-      summaryStatsElement.innerHTML = `
-        <div style="color: #dc3545; font-weight: bold;">
-          ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-        </div>
-      `;
-    }
-  }
   
+  try {
+    // שמירת המספר המקורי לחיפוש (נדרש לפונקציונליות ספציפית של עמוד הערות)
+    window.originalNotesCount = notesArray.length;
+
+    // עדכון table-count - משתמש בפונקציה הגנרית
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'notes', 'הערות', notesArray.length);
+    }
+
+    // שימוש בפונקציה המרכזית לסיכום נתונים - כמו בשאר העמודים
+    if (typeof window.updatePageSummaryStats === 'function') {
+      window.updatePageSummaryStats('notes', notesArray);
+    } else {
+      // Fallback - מערכת סיכום נתונים לא זמינה
+      const summaryStatsElement = document.getElementById('summaryStats');
+      if (summaryStatsElement) {
+        summaryStatsElement.innerHTML = `
+          <div style="color: #dc3545; font-weight: bold;">
+            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
+          </div>
+        `;
+      }
+    }
   } catch (error) {
     window.Logger.error('שגיאה בעדכון סיכום הערות:', error, { page: "notes" });
     if (typeof window.showErrorNotification === 'function') {
@@ -825,11 +1056,12 @@ function updateNotesSummary(notes) {
 // פונקציה לעדכון גלובלי של הטבלה (נדרשת עבור הפילטרים)
 /**
  * Update grid from component filters
- * @param {Array} _selectedStatuses - Selected statuses filter
- * @param {Array} _selectedTypes - Selected types filter
- * @param {Array} _selectedAccounts - Selected accounts filter
- * @param {Object} _selectedDateRange - Selected date range filter
- * @param {string} _searchTerm - Search term filter
+ * @param {Array} _selectedStatuses - Selected statuses (unused)
+ * @param {Array} _selectedTypes - Selected types (unused)
+ * @param {Array} _selectedAccounts - Selected accounts (unused)
+ * @param {Object} _selectedDateRange - Selected date range (unused)
+ * @param {string} _searchTerm - Search term (unused)
+ * @returns {void}
  */
 function updateGridFromComponent(
   _selectedStatuses,
@@ -861,7 +1093,12 @@ function updateGridFromComponent(
 // REMOVED: Orphaned code - radio button event listeners not in function
 
 /**
- * מילוי select עם נתונים
+ * Populate select element with data
+ * @param {string} selectId - Select element ID
+ * @param {Array} data - Data array to populate
+ * @param {string} field - Field name to display
+ * @param {string} [prefix=''] - Prefix for option text
+ * @returns {void}
  */
 function populateSelect(selectId, data, field, prefix = '') {
   try {
@@ -1033,6 +1270,7 @@ function updateRadioButtons(accounts = [], trades = [], tradePlans = [], tickers
 /**
  * Handle note relation type change
  * Called when radio button for relation type changes
+ * @returns {void}
  */
 function onNoteRelationTypeChange() {
   // הפונקציה הזו נקראת בעת שינוי רדיו באטון
@@ -1040,6 +1278,12 @@ function onNoteRelationTypeChange() {
   // אבל אנחנו צריכים אותה לעבוד גם בעת טעינת נתונים לעריכה
 }
 
+/**
+ * Populate edit select by type
+ * @param {string} relationType - Relation type
+ * @param {number|string} selectedId - Selected ID
+ * @returns {Promise<void>}
+ */
 async function populateEditSelectByType(relationType, selectedId) {
   try {
     let data = [];
@@ -1130,7 +1374,25 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
   return result.isValid;
 }
 
-// פונקציות שמירה ומחיקה
+/**
+ * Save note (handles both add and edit modes)
+ * 
+ * שומר הערה חדשה או מעדכן הערה קיימת.
+ * תומך בשמירה עם קבצים מצורפים ותגיות.
+ * 
+ * @function saveNote
+ * @global
+ * @returns {Promise<void>}
+ * @throws {Error} When form validation fails or API call fails
+ * 
+ * @example
+ * // Save a new note
+ * await window.saveNote();
+ * 
+ * @example
+ * // Update existing note (when form is in edit mode)
+ * await window.saveNote();
+ */
 async function saveNote() {
   const form = document.getElementById('notesModalForm') || document.getElementById('addNoteForm');
   if (!form) {
@@ -1232,7 +1494,40 @@ async function saveNote() {
       crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
     }
 
+    // Cache invalidation after CRUDResponseHandler processes the response
+    if (crudResult && window.CacheSyncManager?.invalidateByAction) {
+      try {
+        const action = noteId ? 'note-updated' : 'note-created';
+        await window.CacheSyncManager.invalidateByAction(action);
+      } catch (cacheError) {
+        window.Logger?.warn('⚠️ Failed to invalidate cache after note save', {
+          error: cacheError,
+          page: 'notes'
+        });
+      }
+    }
+
+    // Debug: Log the result structure to understand what we're getting
+    window.Logger?.debug('🔍 saveNote - crudResult structure:', {
+      hasCrudResult: !!crudResult,
+      crudResultType: typeof crudResult,
+      hasData: !!crudResult?.data,
+      hasId: crudResult?.data?.id !== undefined,
+      crudResultKeys: crudResult ? Object.keys(crudResult) : [],
+      dataKeys: crudResult?.data ? Object.keys(crudResult.data) : [],
+      resultId: crudResult?.data?.id,
+      resultIdDirect: crudResult?.id,
+      page: 'notes'
+    });
+
     const resolvedNoteId = noteId || Number(crudResult?.data?.id || crudResult?.id);
+    window.Logger?.debug('🔍 saveNote - resolvedNoteId:', {
+      noteId,
+      resolvedNoteId,
+      isFinite: Number.isFinite(resolvedNoteId),
+      page: 'notes'
+    });
+
     if (Number.isFinite(resolvedNoteId) && window.TagService) {
       try {
         await window.TagService.replaceEntityTags('note', resolvedNoteId, tagIds);
@@ -1253,6 +1548,10 @@ async function saveNote() {
   }
 }
 
+/**
+ * Update note from modal
+ * @returns {Promise<void>}
+ */
 async function updateNoteFromModal() {
   
   // שימוש ב-DataCollectionService לאיסוף נתונים
@@ -1363,17 +1662,36 @@ async function updateNoteFromModal() {
 
 // פונקציה זו הוסרה - שימוש במערכת הגלובלית showDeleteWarning
 
+/**
+ * Confirm and delete a note
+ * Closes the delete confirmation modal using ModalManagerV2 and deletes the note
+ * 
+ * @function confirmDeleteNote
+ * @param {number} noteId - ID of the note to delete
+ * @returns {Promise<void>}
+ * @since 2.1.0 - Updated to use ModalManagerV2.hideModal() instead of direct Bootstrap modal
+ */
 async function confirmDeleteNote(noteId) {
-  // סגירת המודל
-  const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
-  if (modal) {
-    modal.hide();
+  // סגירת המודל דרך ModalManagerV2
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+    window.ModalManagerV2.hideModal('deleteNoteModal');
+  } else {
+    // Fallback ל-Bootstrap modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
+    if (modal) {
+      modal.hide();
+    }
   }
 
   // מחיקת ההערה
   await deleteNoteFromServer(noteId);
 }
 
+/**
+ * Delete note from server
+ * @param {number|string} noteId - Note ID
+ * @returns {Promise<void>}
+ */
 async function deleteNoteFromServer(noteId) {
   const maxRetries = 3;
   let retryCount = 0;
@@ -1615,7 +1933,10 @@ function setupNoteValidationEvents() {
   }
 }
 
-// פונקציה לביטול בחירת קובץ
+/**
+ * Clear selected file
+ * @returns {void}
+ */
 function clearSelectedFile() {
   try {
     const fileInput = document.getElementById('editNoteAttachment');
@@ -1655,7 +1976,7 @@ function clearSelectedFile() {
  * דוגמאות שימוש:
  * sortTable(0); // סידור לפי עמודת ID
  * sortTable(1); // סידור לפי עמודת תוכן
- * sortTable(3); // סידור לפי עמודת תאריך יצירה
+ * sortTable(3); // סידור לפי עמודת נוצר ב:
  *
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
@@ -1959,27 +2280,15 @@ function filterNotesByType(type) {
   const buttons = document.querySelectorAll('[data-type]');
   buttons.forEach(btn => {
     btn.classList.remove('active');
-    if (btn.getAttribute('data-type') === 'all') {
-      const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
-      btn.style.backgroundColor = 'white';
-      btn.style.color = colors.positive;
-      btn.style.borderColor = colors.positive;
-    } else {
-      btn.classList.add('btn');
-    }
+    // השארת הסגנון לניהול ע"י מערכת הכפתורים / CSS גלובלי
+    btn.style.backgroundColor = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
   });
 
   const activeButton = document.querySelector(`[data-type="${type}"]`);
   if (activeButton) {
-    if (type === 'all') {
-      const colors = window.getTableColors ? window.getTableColors() : { positive: '#28a745' };
-      activeButton.style.backgroundColor = 'white';
-      activeButton.style.color = colors.positive;
-      activeButton.style.borderColor = colors.positive;
-    } else {
-      activeButton.classList.remove('btn');
-      activeButton.classList.add('active');
-    }
+    activeButton.classList.add('active');
   }
 
   let filteredNotes;
@@ -2040,7 +2349,12 @@ function getTypeDisplayName(type) {
 // פונקציה לצפייה בהערה
 /**
  * View a note
+ * Opens the note view modal using the global entity details system or fallback to Bootstrap modal
+ * 
+ * @function viewNote
  * @param {number} noteId - ID of the note to view
+ * @returns {void}
+ * @since 2.1.0 - Updated to use ModalManagerV2 for modal management when available
  */
 function viewNote(noteId) {
   try {
@@ -2057,9 +2371,20 @@ function viewNote(noteId) {
         loadNoteForViewing(noteId);
       }
 
-      // הצגת המודל
-      const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
-      modal.show();
+      // הצגת המודל דרך ModalManagerV2 (אם זמין) או fallback ל-Bootstrap
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        // אם יש config ל-viewNoteModal, נשתמש ב-ModalManagerV2
+        // אחרת, נשתמש ב-Bootstrap (מודל view-only מיוחד)
+        const modalElement = document.getElementById('viewNoteModal');
+        if (modalElement) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+          modal.show();
+        }
+      } else {
+        // Fallback ל-Bootstrap modal
+        const modal = new bootstrap.Modal(document.getElementById('viewNoteModal'));
+        modal.show();
+      }
     }
   
   } catch (error) {
@@ -2070,7 +2395,11 @@ function viewNote(noteId) {
   }
 }
 
-// פונקציה לטעינת נתוני הערה לצפייה
+/**
+ * Load note data for viewing
+ * @param {number|string} noteId - Note ID
+ * @returns {Promise<void>}
+ */
 async function loadNoteForViewing(noteId) {
   try {
     let payload;
@@ -2101,7 +2430,7 @@ async function loadNoteForViewing(noteId) {
                 try {
                   const parsed = new Date(createdEnvelope?.utc || createdEnvelope?.local || note.created_at);
                   if (!Number.isNaN(parsed.getTime())) {
-                    return parsed.toLocaleString('he-IL');
+                    return window.formatDate ? window.formatDate(parsed, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(parsed, { includeTime: true }) : parsed.toLocaleString('he-IL'));
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ viewNote created fallback failed', { error, noteId }, { page: 'notes' });
@@ -2114,29 +2443,36 @@ async function loadNoteForViewing(noteId) {
     // הצגת קובץ מצורף
     const attachmentElement = document.getElementById('viewNoteAttachment');
     if (note.attachment) {
-      const fileName = note.attachment;
-      const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      let fileIcon = '📄';
+      // Ensure attachment is a string before processing
+      const fileName = typeof note.attachment === 'string' ? note.attachment : String(note.attachment || '');
+      
+      // Only process if fileName is a valid non-empty string
+      if (fileName && fileName.trim()) {
+        const fileExtension = fileName.split('.').pop()?.toLowerCase();
+        let fileIcon = '📄';
 
-      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
-        fileIcon = '🖼️';
-      } else if (['pdf'].includes(fileExtension)) {
-        fileIcon = '📕';
-      } else if (['doc', 'docx'].includes(fileExtension)) {
-        fileIcon = '📘';
-      } else if (['txt'].includes(fileExtension)) {
-        fileIcon = '📄';
-      } else if (['xls', 'xlsx'].includes(fileExtension)) {
-        fileIcon = '📊';
+        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+          fileIcon = '🖼️';
+        } else if (['pdf'].includes(fileExtension)) {
+          fileIcon = '📕';
+        } else if (['doc', 'docx'].includes(fileExtension)) {
+          fileIcon = '📘';
+        } else if (['txt'].includes(fileExtension)) {
+          fileIcon = '📄';
+        } else if (['xls', 'xlsx'].includes(fileExtension)) {
+          fileIcon = '📊';
+        }
+
+        attachmentElement.innerHTML = `
+          <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm">
+            ${fileIcon} ${fileName}
+          </a>
+        `;
+      } else {
+        attachmentElement.innerHTML = '<span class="text-muted">אין קובץ מצורף</span>';
       }
-
-      attachmentElement.innerHTML = `
-        <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm">
-          ${fileIcon} ${fileName}
-        </a>
-      `;
     } else {
-      attachmentElement.textContent = 'אין קובץ מצורף';
+      attachmentElement.innerHTML = '<span class="text-muted">אין קובץ מצורף</span>';
     }
 
   } catch {
@@ -2196,24 +2532,35 @@ function getNoteRelatedDisplay(note) {
 // פונקציה לעריכת הערה נוכחית
 /**
  * Edit current note
- * Opens edit modal for the currently viewing note
+ * Closes the view modal using ModalManagerV2 and opens edit modal for the currently viewing note
+ * 
+ * @function editCurrentNote
+ * @returns {void}
+ * @since 2.1.0 - Updated to use ModalManagerV2.hideModal() instead of direct Bootstrap modal
  */
 function editCurrentNote() {
   try {
     const noteId = window.currentViewingNoteId;
     if (noteId) {
-      // סגירת מודל הצפייה
-      const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
-      viewModal.hide();
+      // סגירת מודל הצפייה דרך ModalManagerV2
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('viewNoteModal');
+      } else {
+        // Fallback ל-Bootstrap modal
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
+        if (viewModal) {
+          viewModal.hide();
+        }
+      }
 
-    // פתיחת מודל העריכה
-    // Use ModalManagerV2 directly
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
-      window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
-    } else {
-      window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+      // פתיחת מודל העריכה
+      // Use ModalManagerV2 directly
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+        window.ModalManagerV2.showEditModal('notesModal', 'note', noteId);
+      } else {
+        window.Logger?.error('ModalManagerV2 לא זמין', { page: "notes" });
+      }
     }
-  }
   
   } catch (error) {
     window.Logger.error('שגיאה בעריכת הערה הנוכחית:', error, { page: "notes" });
@@ -2238,35 +2585,43 @@ function displayCurrentAttachment(attachment) {
   }
 
   if (attachment) {
-    const fileName = attachment;
-    const fileExtension = fileName.split('.').pop()?.toLowerCase();
-    let fileIcon = '📄';
+    // Ensure attachment is a string before processing
+    const fileName = typeof attachment === 'string' ? attachment : String(attachment || '');
+    
+    // Only process if fileName is a valid non-empty string
+    if (fileName && fileName.trim()) {
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      let fileIcon = '📄';
 
-    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
-      fileIcon = '🖼️';
-    } else if (['pdf'].includes(fileExtension)) {
-      fileIcon = '📕';
-    } else if (['doc', 'docx'].includes(fileExtension)) {
-      fileIcon = '📘';
-    } else if (['txt'].includes(fileExtension)) {
-      fileIcon = '📄';
-    } else if (['xls', 'xlsx'].includes(fileExtension)) {
-      fileIcon = '📊';
+      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+        fileIcon = '🖼️';
+      } else if (['pdf'].includes(fileExtension)) {
+        fileIcon = '📕';
+      } else if (['doc', 'docx'].includes(fileExtension)) {
+        fileIcon = '📘';
+      } else if (['txt'].includes(fileExtension)) {
+        fileIcon = '📄';
+      } else if (['xls', 'xlsx'].includes(fileExtension)) {
+        fileIcon = '📊';
+      }
+
+      displayElement.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>${fileIcon}</span>
+          <span>${fileName}</span>
+          <a href="/api/notes/files/${fileName}" 
+             target="_blank" 
+             class="btn btn-sm" 
+             style="margin-right: auto;">
+            👁️ צפה
+          </a>
+        </div>
+      `;
+      actionsElement.style.display = 'block';
+    } else {
+      displayElement.textContent = 'אין קובץ מצורף';
+      actionsElement.style.display = 'none';
     }
-
-    displayElement.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span>${fileIcon}</span>
-        <span>${fileName}</span>
-        <a href="/api/notes/files/${fileName}" 
-           target="_blank" 
-           class="btn btn-sm" 
-           style="margin-right: auto;">
-          👁️ צפה
-        </a>
-      </div>
-    `;
-    actionsElement.style.display = 'block';
   } else {
     displayElement.textContent = 'אין קובץ מצורף';
     actionsElement.style.display = 'none';
@@ -2419,7 +2774,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('notes', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('notes', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
@@ -2471,7 +2829,9 @@ window.registerNotesTables = function() {
         tableSelector: '#notesTable',
         columns: getColumns('notes'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: created_at desc (column index 3 after attachment moved before date)
+        defaultSort: { columnIndex: 3, direction: 'desc', key: 'created_at' }
     });
 };
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });
@@ -2494,12 +2854,12 @@ window.showEditNoteModal = async function(noteId) {
             await window.TagUIManager.hydrateSelectForEntity('editNoteTags', 'note', noteId, { force: true });
         }
     } else {
-        console.error('ModalManagerV2 not available');
+        window.Logger.error('ModalManagerV2 not available', { page: 'notes' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
         }
     }
 };
 
-window.restoreNotesSectionState = restoreNotesSectionState;
+// REMOVED: window.restoreNotesSectionState - use PageStateManager + restoreAllSectionStates() instead
 

@@ -51,6 +51,16 @@ const tradingAccountsModalConfig = {
             colClass: 'col-md-6'
         },
         {
+            type: 'text',
+            id: 'brokerAccountNumber',
+            label: 'מספר חשבון ברוקר',
+            required: false,
+            placeholder: 'לדוגמה: U1234567',
+            description: 'משמש לשיוך ייבוא חשבונות וברוקרים חיצוניים (IBKR, וכו\').',
+            rowClass: 'row',
+            colClass: 'col-md-6'
+        },
+        {
             type: 'select',
             id: 'accountStatus',
             label: 'סטטוס',
@@ -63,6 +73,22 @@ const tradingAccountsModalConfig = {
             defaultValue: 'open',
             rowClass: 'row',
             colClass: 'col-md-6'
+        },
+        {
+            type: 'select',
+            id: 'accountTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'trading_account'
+            },
+            description: 'סמן תגיות שיסייעו בניהול החשבונות'
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {
@@ -107,6 +133,10 @@ const tradingAccountsModalConfig = {
         accountNotes: {
             required: false,
             maxLength: 500
+        },
+        brokerAccountNumber: {
+            required: false,
+            maxLength: 64
         }
     },
     onSave: 'saveTradingAccount'

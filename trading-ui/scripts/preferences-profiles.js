@@ -26,6 +26,30 @@
 window.Logger.info('📄 Loading preferences-profiles.js v1.0.0...', { page: 'preferences-profiles' });
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Profiles System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - ProfileManager - Core profile operations (get, switch, create, delete)
+ * 
+ * Global Functions:
+ * - switchProfile(profileId, userId) - Switch active profile
+ * - createProfile(name, description, userId) - Create new profile
+ * - deleteProfile(profileId, userId) - Delete profile
+ * - getProfiles(userId) - Get user profiles
+ * 
+ * Global Instances:
+ * - window.ProfileManager - Main profile manager instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // PROFILE MANAGER CLASS
 // ============================================================================
 
@@ -46,17 +70,8 @@ class ProfileManager {
      */
   async getProfiles(userId = 1) {
     try {
-      const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to load profiles');
-      }
-
-      return result.data.profiles || [];
+      const result = await window.PreferencesData.loadProfiles({ userId, force: true });
+      return result.profiles || [];
     } catch (error) {
       window.Logger.error('❌ Error loading profiles:', error, { page: 'preferences-profiles' });
       return [];
@@ -78,42 +93,12 @@ class ProfileManager {
       this.currentUserId = userId;
       this.currentProfileId = profileId;
 
-      // Step 1: Call API to activate profile
-      // Special handling for default profile (ID: 0) - skip API call
+      // Step 1: Activate profile via data service
       if (profileId === 0) {
         window.Logger.info('🔄 Default profile (ID: 0) selected - skipping API activation', { page: 'preferences-profiles' });
         // For default profile, we don't need to call the API - just update local state
       } else {
-        const response = await fetch('/api/preferences/profiles/activate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            profile_id: profileId,
-          }),
-        });
-
-        if (!response.ok) {
-          // Get error details from response body
-          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-          try {
-            const errorData = await response.json();
-            if (errorData.error) {
-              errorMessage += ` - ${errorData.error}`;
-            }
-          } catch (e) {
-            // If response is not JSON, use status text
-          }
-          throw new Error(errorMessage);
-        }
-
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to activate profile');
-        }
-
+        await window.PreferencesData.activateProfile({ profileId, userId });
         window.Logger.info('✅ Profile activated successfully', { page: 'preferences-profiles' });
       }
 
@@ -192,27 +177,11 @@ class ProfileManager {
     try {
       window.Logger.info(`🔄 Creating profile: ${profileName}`, { page: 'preferences-profiles' });
 
-      const response = await fetch('/api/preferences/profiles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          profile_name: profileName,
-          description: description || `פרופיל ${profileName}`,
-          is_default: false,
-        }),
+      const result = await window.PreferencesData.createProfile({
+        name: profileName,
+        description,
+        userId,
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to create profile');
-      }
 
       const profileId = result.data?.profile_id || result.data?.id;
       window.Logger.info(`✅ Profile created with ID: ${profileId}`, { page: 'preferences-profiles' });
@@ -256,18 +225,7 @@ class ProfileManager {
     try {
       window.Logger.info(`🔄 Deleting profile ID: ${profileId}`, { page: 'preferences-profiles' });
 
-      const response = await fetch(`/api/preferences/profiles/${profileId}?user_id=${userId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to delete profile');
-      }
+      await window.PreferencesData.deleteProfile({ profileId, userId });
 
       window.Logger.info('✅ Profile deleted successfully', { page: 'preferences-profiles' });
 

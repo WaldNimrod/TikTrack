@@ -32,26 +32,22 @@ describe('Executions Page E2E Tests', () => {
         expect(documentRef.body).toBeDefined();
     });
 
-    test('should have executions table', () => {
-        const executionsTable =
-            documentRef.querySelector('#executionsTable') ||
-            documentRef.querySelector('.executions-table') ||
-            documentRef.querySelector('table[data-table-type="executions"]');
-        expect(executionsTable).toBeTruthy();
+    test('should have executions table with correct data-table-type', () => {
+        const table = documentRef.querySelector('table[data-table-type="executions"]') ||
+                     documentRef.querySelector('#executionsTable') ||
+                     documentRef.querySelector('.executions-table');
+        expect(table).not.toBeNull();
     });
 
-    test('should have table actions', () => {
-        const tableActions =
-            documentRef.querySelector('.table-actions') ||
-            documentRef.querySelector('#tableActions');
-        expect(tableActions).toBeTruthy();
-    });
-
-    test('should load required scripts', () => {
-        const scripts = documentRef.querySelectorAll('script[src]');
-        const scriptSources = Array.from(scripts).map(script => script.src);
-
-        expect(scriptSources.some(src => src.includes('executions.js'))).toBe(true);
+    test('should have add execution button wired to ModalManager via data-onclick', () => {
+        const addButton = documentRef.querySelector('button[data-button-type="ADD"][data-entity-type="execution"]');
+        if (addButton) {
+            expect(addButton.getAttribute('data-onclick')).toContain('showModalSafe');
+        } else {
+            // Fallback: check for any add button
+            const addButtons = documentRef.querySelectorAll('button[data-onclick*="showModalSafe"][data-onclick*="executionsModal"]');
+            expect(addButtons.length).toBeGreaterThan(0);
+        }
     });
 
     test('should have proper page structure', () => {

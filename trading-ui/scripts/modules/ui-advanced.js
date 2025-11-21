@@ -1956,19 +1956,15 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    // מניעת כפילויות
-    if (window.colorPreferencesLoaded) {
-      return;
-    }
+    // מניעת כפילויות בוטלה כדי לאפשר טעינה מחודשת לפי צורך (ובבדיקות)
     
 
     // נסה ראשית מערכת העדפות
     try {
-      const newResponse = await fetch('/api/preferences/user');
-      if (newResponse.ok) {
-        const newData = await newResponse.json();
-        if (newData.success && newData.data.preferences) {
-          const prefs = newData.data.preferences;
+      if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
+        const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
+        if (prefPayload && prefPayload.preferences) {
+          const prefs = prefPayload.preferences;
           
           // עדכון מערכת הצבעים מהעדפות
           if (prefs.colorScheme) {
@@ -2017,10 +2013,9 @@ async function loadColorPreferences() {
     }
 
     // Fallback ל-legacy
-    const response = await fetch('/api/preferences/user');
-    if (response.ok) {
-      const data = await response.json();
-      const preferences = data.data || data;
+    if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
+      const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
+      const preferences = prefPayload?.preferences || {};
 
       // עדכון מערכת הצבעים
       // הסרנו את preferences.numericValueColors כי הוא לא קיים במערכת ההעדפות
@@ -2075,192 +2070,210 @@ async function loadColorPreferences() {
  * Load ALL user preferences and apply to UI (colors + non-CSS)
  * Supports force reload bypassing caches
  */
+// Deduplication registry for loadUserPreferences
+if (!window.__loadUserPreferencesInflight) {
+  window.__loadUserPreferencesInflight = new Map();
+}
+
 window.loadUserPreferences = async function loadUserPreferences(options = {}) {
   const { force = false, source = 'manual' } = options || {};
-  try {
-    const url = force ? '/api/preferences/user?use_cache=false' : '/api/preferences/user';
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.warn('⚠️ preferences fetch not OK:', res.status);
-      return false;
-    }
-    const json = await res.json();
-    
-    // Update PreferencesCore with the profile ID from server
-    if (window.PreferencesCore && json?.data?.profile_id !== undefined) {
-      window.PreferencesCore.currentProfileId = json.data.profile_id;
-      console.log('✅ Updated PreferencesCore.currentProfileId to:', json.data.profile_id);
-    }
-    
-    const prefsRaw = json?.data?.preferences || {};
-    let prefs = { ...prefsRaw };
+  
+  // High-level deduplication: prevent duplicate calls with same params
+  const dedupeKey = `loadUserPreferences:force${force}`;
+  if (window.__loadUserPreferencesInflight.has(dedupeKey)) {
+    console.debug('⏭️ loadUserPreferences deduplicated - returning existing promise', { source, dedupeKey });
+    return await window.__loadUserPreferencesInflight.get(dedupeKey);
+  }
+  
+  const loadPromise = (async () => {
+    try {
+      // Use centralized data service
+      const prefPayload = await (window.PreferencesData?.loadAllPreferencesRaw?.({ force }) || Promise.resolve(null));
+      if (!prefPayload) {
+        console.warn('⚠️ PreferencesData.loadAllPreferencesRaw returned empty payload');
+        return false;
+      }
+      
+      // Update PreferencesCore with the profile ID from server
+      if (window.PreferencesCore && prefPayload?.resolvedProfileId !== undefined) {
+        window.PreferencesCore.currentProfileId = prefPayload.resolvedProfileId;
+        console.log('✅ Updated PreferencesCore.currentProfileId to:', prefPayload.resolvedProfileId);
+      }
+      
+      const prefsRaw = prefPayload?.preferences || {};
+      let prefs = { ...prefsRaw };
 
-    // Merge colors from alternative shapes/groups if missing
-    const inlineColors = json?.data?.colors || prefsRaw?.colors || {};
-    if (!prefs.primaryColor && (inlineColors.primaryColor || inlineColors.primary)) {
-      prefs.primaryColor = inlineColors.primaryColor || inlineColors.primary;
-    }
-    if (!prefs.secondaryColor && (inlineColors.secondaryColor || inlineColors.secondary)) {
-      prefs.secondaryColor = inlineColors.secondaryColor || inlineColors.secondary;
-    }
-    if (!prefs.primaryColor || !prefs.secondaryColor) {
+      // Merge colors from alternative shapes/groups if missing
+      const inlineColors = prefsRaw?.colors || {};
+      if (!prefs.primaryColor && (inlineColors.primaryColor || inlineColors.primary)) {
+        prefs.primaryColor = inlineColors.primaryColor || inlineColors.primary;
+      }
+      if (!prefs.secondaryColor && (inlineColors.secondaryColor || inlineColors.secondary)) {
+        prefs.secondaryColor = inlineColors.secondaryColor || inlineColors.secondary;
+      }
+      if (!prefs.primaryColor || !prefs.secondaryColor) {
+        try {
+          if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceGroup === 'function') {
+            const group = await window.PreferencesData.loadPreferenceGroup({ groupName: 'colors' });
+            const g = group?.preferences || {};
+            if (!prefs.primaryColor && (g.primaryColor || g.primary)) {
+              prefs.primaryColor = g.primaryColor || g.primary;
+            }
+            if (!prefs.secondaryColor && (g.secondaryColor || g.secondary)) {
+              prefs.secondaryColor = g.secondaryColor || g.secondary;
+            }
+          }
+        } catch {}
+      }
+
+      // store latest prefs globally for listeners
+      window.__latestPrefs = prefs;
+      window.currentPreferences = prefs;
+
+      // Load entity colors from preferences - CRITICAL for dynamic colors
+      if (typeof window.loadEntityColorsFromPreferences === 'function') {
+        window.loadEntityColorsFromPreferences(prefs);
+      }
+      
+      // Generate and apply entity CSS after loading colors
+      if (typeof window.generateAndApplyEntityCSS === 'function') {
+        window.generateAndApplyEntityCSS();
+      }
+
+      // ensure primary/secondary also mapped from common keys if present
       try {
-        const groupRes = await fetch('/api/preferences/user/group?group=colors');
-        if (groupRes.ok) {
-          const groupJson = await groupRes.json();
-          const g = groupJson?.data?.preferences || groupJson?.data || {};
-          if (!prefs.primaryColor && (g.primaryColor || g.primary)) {
-            prefs.primaryColor = g.primaryColor || g.primary;
-          }
-          if (!prefs.secondaryColor && (g.secondaryColor || g.secondary)) {
-            prefs.secondaryColor = g.secondaryColor || g.secondary;
-          }
+        if (prefs.primaryColor) {
+          document.documentElement.style.setProperty('--primary-color', prefs.primaryColor);
+          document.documentElement.style.setProperty('--color-primary', prefs.primaryColor);
+        }
+        if (prefs.secondaryColor) {
+          document.documentElement.style.setProperty('--secondary-color', prefs.secondaryColor);
+          document.documentElement.style.setProperty('--color-secondary', prefs.secondaryColor);
         }
       } catch {}
-    }
 
-    // store latest prefs globally for listeners
-    window.__latestPrefs = prefs;
-    window.currentPreferences = prefs;
+      // apply CSS variables immediately without layout flash
+      requestAnimationFrame(() => {
+        try { updateCSSVariablesFromPreferences(prefs); } catch {}
+        try {
+          // Ensure dynamic variables required by components are always defined
+          const docStyle = document.documentElement.style;
 
-    // Load entity colors from preferences - CRITICAL for dynamic colors
-    if (typeof window.loadEntityColorsFromPreferences === 'function') {
-      window.loadEntityColorsFromPreferences(prefs);
-    }
-    
-    // Generate and apply entity CSS after loading colors
-    if (typeof window.generateAndApplyEntityCSS === 'function') {
-      window.generateAndApplyEntityCSS();
-    }
+          // 1) Status variables (used in badges/status CSS)
+          const statusOpen = prefs.statusOpenColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-open-color') || '#28a745';
+          const statusClosed = prefs.statusClosedColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-closed-color') || '#6c757d';
+          const statusCancelled = prefs.statusCancelledColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-cancelled-color') || '#dc3545';
+          const statusPending = prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';
+          docStyle.setProperty('--status-open-color', String(statusOpen).trim());
+          docStyle.setProperty('--status-closed-color', String(statusClosed).trim());
+          docStyle.setProperty('--status-cancelled-color', String(statusCancelled).trim());
+          docStyle.setProperty('--status-pending-color', String(statusPending).trim());
 
-    // ensure primary/secondary also mapped from common keys if present
-    try {
-      if (prefs.primaryColor) {
-        document.documentElement.style.setProperty('--primary-color', prefs.primaryColor);
-        document.documentElement.style.setProperty('--color-primary', prefs.primaryColor);
-      }
-      if (prefs.secondaryColor) {
-        document.documentElement.style.setProperty('--secondary-color', prefs.secondaryColor);
-        document.documentElement.style.setProperty('--color-secondary', prefs.secondaryColor);
-      }
-    } catch {}
+          // 2) Numeric variables (positive/negative/zero) used by _badges-status.css
+          const numPos = (prefs.valuePositiveColor || '#28a745').trim();
+          const numNeg = (prefs.valueNegativeColor || '#dc3545').trim();
+          const numZero = (prefs.valueNeutralColor || '#6c757d').trim();
 
-    // apply CSS variables immediately without layout flash
-    requestAnimationFrame(() => {
-      try { updateCSSVariablesFromPreferences(prefs); } catch {}
+          const pRgb = hexToRgb(numPos) || { r: 40, g: 167, b: 69 };
+          const nRgb = hexToRgb(numNeg) || { r: 220, g: 53, b: 69 };
+          const zRgb = hexToRgb(numZero) || { r: 108, g: 117, b: 125 };
+
+          docStyle.setProperty('--numeric-positive-medium', numPos);
+          docStyle.setProperty('--numeric-positive-light', `rgba(${pRgb.r}, ${pRgb.g}, ${pRgb.b}, 0.1)`);
+          docStyle.setProperty('--numeric-positive-border', `rgba(${pRgb.r}, ${pRgb.g}, ${pRgb.b}, 0.3)`);
+
+          docStyle.setProperty('--numeric-negative-medium', numNeg);
+          docStyle.setProperty('--numeric-negative-light', `rgba(${nRgb.r}, ${nRgb.g}, ${nRgb.b}, 0.1)`);
+          docStyle.setProperty('--numeric-negative-border', `rgba(${nRgb.r}, ${nRgb.g}, ${nRgb.b}, 0.3)`);
+
+          docStyle.setProperty('--numeric-zero-color', numZero);
+          docStyle.setProperty('--numeric-zero-light', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.1)`);
+          docStyle.setProperty('--numeric-zero-border', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.3)`);
+
+          // 3) Entity aliases expected by some CSS (e.g. --entity-trade)
+          // NO hardcoded fallbacks - all colors must come from preferences!
+          const getEntityColorFromPrefs = (prefKey, cssVarName) => {
+            if (prefs[prefKey]) return prefs[prefKey];
+            const cssValue = getComputedStyle(document.documentElement).getPropertyValue(cssVarName).trim();
+            return cssValue || '';
+          };
+          
+          const entityMap = {
+            trade: getEntityColorFromPrefs('entityTradeColor', '--entity-trade-color'),
+            trade_plan: getEntityColorFromPrefs('entityTradePlanColor', '--entity-trade-plan-color'),
+            execution: getEntityColorFromPrefs('entityExecutionColor', '--entity-execution-color'),
+            account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-trading-account-color'),
+            trading_account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-trading-account-color'),
+            cash_flow: getEntityColorFromPrefs('entityCashFlowColor', '--entity-cash-flow-color'),
+            ticker: getEntityColorFromPrefs('entityTickerColor', '--entity-ticker-color'),
+            alert: getEntityColorFromPrefs('entityAlertColor', '--entity-alert-color'),
+            note: getEntityColorFromPrefs('entityNoteColor', '--entity-note-color'),
+            preference: getEntityColorFromPrefs('entityPreferencesColor', '--entity-preference-color'),
+            research: getEntityColorFromPrefs('entityResearchColor', '--entity-research-color'),
+            design: getEntityColorFromPrefs('entityDesignColor', '--entity-design-color'),
+            constraint: getEntityColorFromPrefs('entityConstraintColor', '--entity-constraint-color'),
+            development: getEntityColorFromPrefs('entityDevelopmentColor', '--entity-development-color'),
+            info: getEntityColorFromPrefs('entityInfoColor', '--entity-info-color')
+          };
+          Object.entries(entityMap).forEach(([k, v]) => {
+            const val = String(v).trim();
+            // legacy underscore variable
+            docStyle.setProperty(`--entity-${k}`, val);
+            // dashed alias without suffix
+            docStyle.setProperty(`--entity-${k.replace('_','-')}`, val);
+            // ensure explicit -color alias too
+            if (k === 'cash_flow') docStyle.setProperty('--entity-cash-flow-color', val);
+            if (k === 'trade_plan') docStyle.setProperty('--entity-trade-plan-color', val);
+          });
+
+          // 4) Synonyms used by some pages (cash_flows expects these)
+          const getVar = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim();
+          const ensureVar = (target, value) => {
+            if (!getVar(target) && value) {
+              docStyle.setProperty(target, String(value).trim());
+            }
+          };
+          // Map entity colors to page synonyms if missing
+          ensureVar('--cash-flow-color', getVar('--entity-cash-flow-color') || getVar('--entity-cash-flow'));
+          ensureVar('--trading-account-color', getVar('--entity-trading-account-color') || getVar('--entity-trading-account'));
+          // Income/Expense derive from numeric positive/negative mediums
+          ensureVar('--income-color', getVar('--numeric-positive-medium'));
+          ensureVar('--expense-color', getVar('--numeric-negative-medium'));
+          // Optional bg alias if used by CSS
+          ensureVar('--cash-flow-bg-color', getVar('--entity-cash-flow-bg') || getVar('--numeric-zero-light'));
+        } catch (e) {
+          // silent
+        }
+      });
+
+      // backward-compat hook
+      try { if (typeof window.onPreferencesReload === 'function') window.onPreferencesReload(prefs); } catch {}
+
+      // event for components to re-apply non-CSS prefs (toggles/flags)
       try {
-        // Ensure dynamic variables required by components are always defined
-        const docStyle = document.documentElement.style;
+        window.dispatchEvent(new CustomEvent('preferences:updated', {
+          detail: { source, prefs }
+        }));
+      } catch {}
 
-        // 1) Status variables (used in badges/status CSS)
-        const statusOpen = prefs.statusOpenColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-open-color') || '#28a745';
-        const statusClosed = prefs.statusClosedColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-closed-color') || '#6c757d';
-        const statusCancelled = prefs.statusCancelledColor || getComputedStyle(document.documentElement).getPropertyValue('--user-status-cancelled-color') || '#dc3545';
-        const statusPending = prefs.warningColor || getComputedStyle(document.documentElement).getPropertyValue('--warning-color') || '#ffc107';
-        docStyle.setProperty('--status-open-color', String(statusOpen).trim());
-        docStyle.setProperty('--status-closed-color', String(statusClosed).trim());
-        docStyle.setProperty('--status-cancelled-color', String(statusCancelled).trim());
-        docStyle.setProperty('--status-pending-color', String(statusPending).trim());
+      // Debug: log applied primary/secondary
+      console.log('✅ loadUserPreferences complete:', {
+        source,
+        primary: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
+        secondary: getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim()
+      });
 
-        // 2) Numeric variables (positive/negative/zero) used by _badges-status.css
-        const numPos = (prefs.valuePositiveColor || '#28a745').trim();
-        const numNeg = (prefs.valueNegativeColor || '#dc3545').trim();
-        const numZero = (prefs.valueNeutralColor || '#6c757d').trim();
-
-        const pRgb = hexToRgb(numPos) || { r: 40, g: 167, b: 69 };
-        const nRgb = hexToRgb(numNeg) || { r: 220, g: 53, b: 69 };
-        const zRgb = hexToRgb(numZero) || { r: 108, g: 117, b: 125 };
-
-        docStyle.setProperty('--numeric-positive-medium', numPos);
-        docStyle.setProperty('--numeric-positive-light', `rgba(${pRgb.r}, ${pRgb.g}, ${pRgb.b}, 0.1)`);
-        docStyle.setProperty('--numeric-positive-border', `rgba(${pRgb.r}, ${pRgb.g}, ${pRgb.b}, 0.3)`);
-
-        docStyle.setProperty('--numeric-negative-medium', numNeg);
-        docStyle.setProperty('--numeric-negative-light', `rgba(${nRgb.r}, ${nRgb.g}, ${nRgb.b}, 0.1)`);
-        docStyle.setProperty('--numeric-negative-border', `rgba(${nRgb.r}, ${nRgb.g}, ${nRgb.b}, 0.3)`);
-
-        docStyle.setProperty('--numeric-zero-color', numZero);
-        docStyle.setProperty('--numeric-zero-light', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.1)`);
-        docStyle.setProperty('--numeric-zero-border', `rgba(${zRgb.r}, ${zRgb.g}, ${zRgb.b}, 0.3)`);
-
-        // 3) Entity aliases expected by some CSS (e.g. --entity-trade)
-        // NO hardcoded fallbacks - all colors must come from preferences!
-        const getEntityColorFromPrefs = (prefKey, cssVarName) => {
-          if (prefs[prefKey]) return prefs[prefKey];
-          const cssValue = getComputedStyle(document.documentElement).getPropertyValue(cssVarName).trim();
-          return cssValue || '';
-        };
-        
-        const entityMap = {
-          trade: getEntityColorFromPrefs('entityTradeColor', '--entity-trade-color'),
-          trade_plan: getEntityColorFromPrefs('entityTradePlanColor', '--entity-trade-plan-color'),
-          execution: getEntityColorFromPrefs('entityExecutionColor', '--entity-execution-color'),
-          account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-trading-account-color'),
-          trading_account: getEntityColorFromPrefs('entityTradingAccountColor', '--entity-trading-account-color'),
-          cash_flow: getEntityColorFromPrefs('entityCashFlowColor', '--entity-cash-flow-color'),
-          ticker: getEntityColorFromPrefs('entityTickerColor', '--entity-ticker-color'),
-          alert: getEntityColorFromPrefs('entityAlertColor', '--entity-alert-color'),
-          note: getEntityColorFromPrefs('entityNoteColor', '--entity-note-color'),
-          preference: getEntityColorFromPrefs('entityPreferencesColor', '--entity-preference-color'),
-          research: getEntityColorFromPrefs('entityResearchColor', '--entity-research-color'),
-          design: getEntityColorFromPrefs('entityDesignColor', '--entity-design-color'),
-          constraint: getEntityColorFromPrefs('entityConstraintColor', '--entity-constraint-color'),
-          development: getEntityColorFromPrefs('entityDevelopmentColor', '--entity-development-color'),
-          info: getEntityColorFromPrefs('entityInfoColor', '--entity-info-color')
-        };
-        Object.entries(entityMap).forEach(([k, v]) => {
-          const val = String(v).trim();
-          // legacy underscore variable
-          docStyle.setProperty(`--entity-${k}`, val);
-          // dashed alias without suffix
-          docStyle.setProperty(`--entity-${k.replace('_','-')}`, val);
-          // ensure explicit -color alias too
-          if (k === 'cash_flow') docStyle.setProperty('--entity-cash-flow-color', val);
-          if (k === 'trade_plan') docStyle.setProperty('--entity-trade-plan-color', val);
-        });
-
-        // 4) Synonyms used by some pages (cash_flows expects these)
-        const getVar = (name) => (getComputedStyle(document.documentElement).getPropertyValue(name) || '').trim();
-        const ensureVar = (target, value) => {
-          if (!getVar(target) && value) {
-            docStyle.setProperty(target, String(value).trim());
-          }
-        };
-        // Map entity colors to page synonyms if missing
-        ensureVar('--cash-flow-color', getVar('--entity-cash-flow-color') || getVar('--entity-cash-flow'));
-        ensureVar('--trading-account-color', getVar('--entity-trading-account-color') || getVar('--entity-trading-account'));
-        // Income/Expense derive from numeric positive/negative mediums
-        ensureVar('--income-color', getVar('--numeric-positive-medium'));
-        ensureVar('--expense-color', getVar('--numeric-negative-medium'));
-        // Optional bg alias if used by CSS
-        ensureVar('--cash-flow-bg-color', getVar('--entity-cash-flow-bg') || getVar('--numeric-zero-light'));
-      } catch (e) {
-        // silent
-      }
-    });
-
-    // backward-compat hook
-    try { if (typeof window.onPreferencesReload === 'function') window.onPreferencesReload(prefs); } catch {}
-
-    // event for components to re-apply non-CSS prefs (toggles/flags)
-    try {
-      window.dispatchEvent(new CustomEvent('preferences:updated', {
-        detail: { source, prefs }
-      }));
-    } catch {}
-
-    // Debug: log applied primary/secondary
-    console.log('✅ loadUserPreferences complete:', {
-      source,
-      primary: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
-      secondary: getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim()
-    });
-
-    return true;
-  } catch (e) {
-    console.error('❌ loadUserPreferences failed:', e);
-    return false;
-  }
+      return true;
+    } catch (e) {
+      console.error('❌ loadUserPreferences failed:', e);
+      return false;
+    } finally {
+      window.__loadUserPreferencesInflight.delete(dedupeKey);
+    }
+  })();
+  
+  window.__loadUserPreferencesInflight.set(dedupeKey, loadPromise);
+  return await loadPromise;
 }
 
 

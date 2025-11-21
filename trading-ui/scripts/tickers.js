@@ -222,7 +222,9 @@ async function loadCurrenciesData() {
 }
 
 /**
- * קבלת סמל מטבע לפי מזהה
+ * Get currency symbol by currency ID
+ * @param {number|string} currencyId - Currency ID
+ * @returns {string} Currency symbol or 'N/A' if not found
  */
 function getCurrencySymbol(currencyId) {
   try {
@@ -233,13 +235,15 @@ function getCurrencySymbol(currencyId) {
     const currency = window.currenciesData.find(c => c.id === currencyId);
     return currency ? currency.symbol : currencyId || 'N/A';
   } catch (error) {
-    console.error('getCurrencySymbol failed:', error);
+    window.Logger.error('getCurrencySymbol failed', { page: 'tickers', error: error?.message || error });
     return currencyId || 'N/A';
   }
 }
 
 /**
- * קבלת עיצוב סוג טיקר
+ * Get ticker type style configuration
+ * @param {string} type - Ticker type
+ * @returns {Object} Style object with backgroundColor, color, padding, etc.
  */
 function getTickerTypeStyle(type) {
   try {
@@ -255,7 +259,7 @@ function getTickerTypeStyle(type) {
       textAlign: 'center',
     };
   } catch (error) {
-    console.error('getTickerTypeStyle failed:', error);
+    window.Logger.error('getTickerTypeStyle failed', { page: 'tickers', error: error?.message || error });
     return {
       backgroundColor: '#6c757d',
       color: '#ffffff',
@@ -270,7 +274,9 @@ function getTickerTypeStyle(type) {
 }
 
 /**
- * קבלת עיצוב סטטוס טיקר
+ * Get ticker status style configuration
+ * @param {string} status - Ticker status ('open', 'closed', 'cancelled')
+ * @returns {Object} Style object with backgroundColor, color, padding, etc.
  */
 function getTickerStatusStyle(status) {
   try {
@@ -292,7 +298,7 @@ function getTickerStatusStyle(status) {
       textAlign: 'center',
     };
   } catch (error) {
-    console.error('getTickerStatusStyle failed:', error);
+    window.Logger.error('getTickerStatusStyle failed', { page: 'tickers', error: error?.message || error });
     return {
       backgroundColor: '#e8f5e8',
       color: '#388e3c',
@@ -307,7 +313,9 @@ function getTickerStatusStyle(status) {
 }
 
 /**
- * קבלת תווית סטטוס טיקר
+ * Get ticker status label in Hebrew
+ * @param {string} status - Ticker status ('open', 'closed', 'cancelled')
+ * @returns {string} Status label in Hebrew
  */
 function getTickerStatusLabel(status) {
   try {
@@ -318,13 +326,15 @@ function getTickerStatusLabel(status) {
     };
     return labels[status] || 'פתוח';
   } catch (error) {
-    console.error('getTickerStatusLabel failed:', error);
+    window.Logger.error('getTickerStatusLabel failed', { page: 'tickers', error: error?.message || error });
     return 'פתוח';
   }
 }
 
 /**
- * פונקציה ליצירת אפשרויות מטבע בטופס
+ * Generate currency options HTML for select elements
+ * @param {Object|null} [ticker=null] - Ticker object for pre-selection
+ * @returns {string} HTML string with option elements
  */
 let currenciesUnavailableNotified = false;
 
@@ -357,7 +367,7 @@ function generateTickerCurrencyOptions(ticker = null) {
 
     return options;
   } catch (error) {
-    console.error('generateTickerCurrencyOptions failed:', error);
+    window.Logger.error('generateTickerCurrencyOptions failed', { page: 'tickers', error: error?.message || error });
     if (!currenciesUnavailableNotified) {
       currenciesUnavailableNotified = true;
       if (typeof window.showErrorNotification === 'function') {
@@ -369,7 +379,9 @@ function generateTickerCurrencyOptions(ticker = null) {
 }
 
 /**
- * פונקציה לעדכון אפשרויות מטבע בטופס
+ * Update currency options in add/edit ticker forms
+ * @param {Object|null} [ticker=null] - Ticker object for pre-selection in edit mode
+ * @returns {void}
  */
 function updateCurrencyOptions(ticker = null) {
   try {
@@ -392,7 +404,7 @@ function updateCurrencyOptions(ticker = null) {
         : editOptions;
     }
   } catch (error) {
-    console.error('updateCurrencyOptions failed:', error);
+    window.Logger.error('updateCurrencyOptions failed', { page: 'tickers', error: error?.message || error });
   }
 }
 
@@ -400,27 +412,35 @@ function updateCurrencyOptions(ticker = null) {
 // Status updates and activity tracking
 
 /**
- * Update active trades field for tickers
- * Updates active_trades field based on open trades
+ * Update active trades field for tickers using entity service
  * 
- * @function updateActiveTradesField
- * @async
+ * עדכון שדה active_trades עבור טיקרים באמצעות שירות ישויות
+ * 
+ * Updates active_trades field based on open trades. Uses TradesData service
+ * instead of direct API calls. Falls back to direct API call if service is unavailable.
+ * 
+ * Update active trades field for tickers
  * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
  */
 async function updateActiveTradesField() {
   // Updating active_trades field for tickers
 
   try {
-    // טעינת טריידים מהשרת
-    const tradesResponse = await fetch('/api/trades/');
-    if (!tradesResponse.ok) {
-      // window.Logger.warn('⚠️ Could not load trades for active_trades update', { page: "tickers" });
-      return;
+    // טעינת טריידים באמצעות שירות ישויות (preferred method)
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      if (!tradesResponse.ok) {
+        // window.Logger.warn('⚠️ Could not load trades for active_trades update', { page: "tickers" });
+        return;
+      }
+      const data = await tradesResponse.json();
+      trades = data.data || data || [];
     }
-
-    const tradesData = await tradesResponse.json();
-
-    const trades = tradesData.data || tradesData;
 
     // יצירת מפה של טיקרים עם טריידים פתוחים
     const tickersWithOpenTrades = new Set();
@@ -535,7 +555,7 @@ function restoreTickersSectionState() {
       // window.Logger.warn('⚠️ restoreSectionStates function not available globally', { page: "tickers" });
     }
   } catch (error) {
-    console.error('restoreTickersSectionState failed:', error);
+    window.Logger.error('restoreTickersSectionState failed', { page: 'tickers', error: error?.message || error });
   }
 }
 
@@ -588,6 +608,7 @@ async function saveTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
+    status: { id: 'tickerStatus', type: 'text' },
     remarks: { id: 'tickerRemarks', type: 'text' },
     tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
@@ -599,6 +620,7 @@ async function saveTicker() {
   const name = tickerData.name?.trim();
   const type = tickerData.type;
   const currency_id = tickerData.currency_id;
+  const status = tickerData.status || 'closed'; // ברירת מחדל: סגור
   const remarks = tickerData.remarks?.trim();
 
   // בדיקה אם זה מצב עריכה - אם כן, קרא ל-updateTicker
@@ -636,6 +658,13 @@ async function saveTicker() {
     return;
   }
 
+  if (!status || !['open', 'closed', 'cancelled'].includes(status)) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'יש לבחור סטטוס תקין');
+    }
+    return;
+  }
+
   // בדיקה אם הסמל כבר קיים במערכת (רק למצב הוספה)
   const existingTicker = (window.tickersData || []).find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
   if (existingTicker) {
@@ -648,8 +677,7 @@ async function saveTicker() {
     return;
   }
 
-  // טיקר חדש תמיד יהיה "closed" (אין לו טריידים)
-  const finalStatus = 'closed';
+  const finalStatus = status;
 
   try {
     const tickerPayload = {
@@ -661,13 +689,20 @@ async function saveTicker() {
       remarks: remarks || null
     };
 
-    const response = await fetch('/api/tickers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tickerPayload),
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.TickersData && window.TickersData.createTicker) {
+      response = await window.TickersData.createTicker(tickerPayload);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch('/api/tickers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tickerPayload),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
@@ -694,8 +729,12 @@ async function saveTicker() {
       }
     }
 
+    // Return result so wrapper functions can check if save was successful
+    return crudResult;
+
   } catch (error) {
     CRUDResponseHandler.handleError(error, 'שמירת טיקר');
+    throw error; // Re-throw so wrapper can handle it
   }
 }
 
@@ -707,7 +746,9 @@ async function saveTicker() {
  * - פונקציה: window.showLinkedItemsWarning('ticker', id)
  * - מונע ביטול כאשר יש פריטים פתוחים
  *
+ * Update ticker
  * Note: updated_at field is NOT modified during user updates - it's reserved for future pricing system updates
+ * @returns {Promise<void>}
  */
 async function updateTicker() {
   
@@ -719,14 +760,15 @@ async function updateTicker() {
     name: { id: 'tickerName', type: 'text' },
     type: { id: 'tickerType', type: 'text' },
     currency_id: { id: 'tickerCurrency', type: 'int' },
+    status: { id: 'tickerStatus', type: 'text' },
     remarks: { id: 'tickerRemarks', type: 'text' },
     tag_ids: { id: 'tickerTags', type: 'tags', default: [] }
   });
 
-  const { id, symbol, name, type, currency_id, remarks, tag_ids = [] } = tickerData;
+  const { id, symbol, name, type, currency_id, status, remarks, tag_ids = [] } = tickerData;
   const tagIds = Array.isArray(tag_ids) ? tag_ids : [];
   
-  // קבלת הסטטוס מהטיקר הקיים (הטופס החדש לא כולל שדה סטטוס)
+  // קבלת הטיקר הקיים לבדיקות ולידציה
   const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));
   if (!originalTicker) {
     if (window.showErrorNotification) {
@@ -734,7 +776,6 @@ async function updateTicker() {
     }
     return;
   }
-  const status = originalTicker.status; // שמירה על הסטטוס הקיים
 
   // ולידציה בסיסית (הסרת ולידציה גלובלית ישנה - הטופס החדש לא משתמש ב-editTickerForm)
   if (!symbol || symbol.length === 0) {
@@ -765,6 +806,13 @@ async function updateTicker() {
     return;
   }
 
+  if (!status || !['open', 'closed', 'cancelled'].includes(status)) {
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאת וולידציה', 'יש לבחור סטטוס תקין');
+    }
+    return;
+  }
+
   // בדיקה אם הסמל כבר קיים בטיקרים אחרים (לא בטיקר הנוכחי)
   const existingTicker = (window.tickersData || []).find(t =>
     t.symbol.toUpperCase() === symbol.toUpperCase() &&
@@ -780,18 +828,7 @@ async function updateTicker() {
     return;
   }
 
-  // טיפול בסטטוס "לא מבוטל" - צריך לקבוע אם זה "open" או "closed"
-  let finalStatus = status;
-  if (status === 'not_cancelled') {
-    // בדיקה אם יש טריידים או תכנונים פתוחים לטיקר זה
-    const ticker = (window.tickersData || []).find(t => t.id === parseInt(id));
-    if (ticker) {
-      // אם יש טריידים או תכנונים פתוחים - סטטוס "open", אחרת "closed"
-      finalStatus = ticker.active_trades ? 'open' : 'closed';
-    } else {
-      finalStatus = 'closed'; // ברירת מחדל
-    }
-  }
+  const finalStatus = status;
 
   // בדיקה אם הסטטוס השתנה ל"מבוטל" - אם כן, בדוק פריטים מקושרים
   // (originalTicker כבר הוגדר למעלה)
@@ -871,13 +908,20 @@ async function updateTicker() {
       remarks: remarks || null,
     };
 
-    const response = await fetch(`/api/tickers/${parseInt(id)}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(tickerPayload),
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.TickersData && window.TickersData.updateTicker) {
+      response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch(`/api/tickers/${parseInt(id)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tickerPayload),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
@@ -910,7 +954,9 @@ async function updateTicker() {
 }
 
 /**
- * ביטול טיקר
+ * Cancel ticker (change status to cancelled)
+ * @param {number|string} id - Ticker ID
+ * @returns {Promise<void>}
  */
 async function cancelTicker(id) {
 
@@ -980,7 +1026,9 @@ async function checkLinkedItemsAndCancelTicker(tickerId) {
 }
 
 /**
- * ביצוע הביטול בפועל
+ * Perform ticker cancellation (actual API call)
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function performTickerCancellation(tickerId) {
   try {
@@ -1085,7 +1133,9 @@ async function checkLinkedItemsBeforeCancelTicker(tickerId) {
 }
 
 /**
- * קבלת סימבול הטיקר לפי ID
+ * Get ticker symbol by ID
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {string|null} Ticker symbol or null
  */
 function getTickerSymbol(tickerId) {
   try {
@@ -1098,7 +1148,7 @@ function getTickerSymbol(tickerId) {
     }
     return `טיקר ${tickerId}`;
   } catch (error) {
-    console.error('getTickerSymbol failed:', error);
+    window.Logger.error('getTickerSymbol failed', { page: 'tickers', tickerId, error: error?.message || error });
     return `טיקר ${tickerId}`;
   }
 }
@@ -1150,7 +1200,9 @@ async function updateAllTickerStatuses() {
 // Function removed - not used anywhere
 
 /**
- * ביצוע ביטול טיקר
+ * Perform ticker cancellation (legacy function)
+ * @param {number|string} id - Ticker ID
+ * @returns {Promise<void>}
  */
 async function performCancelTicker(id) {
 
@@ -1339,7 +1391,9 @@ async function checkLinkedItemsAndDeleteTicker(tickerId) {
 }
 
 /**
- * ביצוע המחיקה בפועל
+ * Perform ticker deletion (actual API call)
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function performTickerDeletion(tickerId) {
   try {
@@ -1490,9 +1544,16 @@ async function confirmDeleteTicker(id) {
   const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 
   try {
-    const response = await fetch(`/api/tickers/${id}`, {
-      method: 'DELETE',
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.TickersData && window.TickersData.deleteTicker) {
+      response = await window.TickersData.deleteTicker(id);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch(`/api/tickers/${id}`, {
+        method: 'DELETE',
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     await CRUDResponseHandler.handleDeleteResponse(response, {
@@ -1528,44 +1589,53 @@ async function confirmDeleteTicker(id) {
 // REMOVED: clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() from unified-cache-manager.js instead
 
 /**
- * טעינת נתוני טיקרים - גרסה פשוטה
+ * Internal function for loading tickers data
+ * @param {Object} [options={}] - Loading options (force, signal, etc.)
+ * @returns {Promise<Array>} Array of tickers
  */
-async function loadTickersData() {
+async function loadTickersDataInternal(options = {}) {
   try {
-    window.Logger.info('Loading tickers data (bypass cache)', { page: "tickers" });
+    window.Logger.info('Loading tickers data', { page: "tickers" });
     
-    // ניקוי מטמון לפני טעינה
-    if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
-      await window.UnifiedCacheManager.clearAllCache('Light');
-    } else if (typeof window.clearAllCache === 'function') {
-      window.clearAllCache();
-    }
-    // Clear local tickers data
-    window.tickersData = [];
-    tickersData = [];
-    
-    // טעינת מטבעות אם עוד לא נטענו
-    if (!window.currenciesLoaded) {
-      await loadCurrenciesData();
-    }
-
-    // קריאה ישירה לשרת עם timestamp למניעת cache
-    const response = await fetch(`/api/tickers/?_t=${Date.now()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
+    // Use TickersData service if available, otherwise fallback to direct API call
+    let rawTickers = [];
+    if (window.TickersData?.loadTickersData) {
+      rawTickers = await window.TickersData.loadTickersData({ force: options.force || false });
+      window.Logger.info('📊 נתונים שהתקבלו מ-TickersData service:', rawTickers.length, 'טיקרים', { page: "tickers" });
+    } else {
+      // Fallback: direct API call with cache bypass
+      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.clearAllCache === 'function') {
+        await window.UnifiedCacheManager.clearAllCache('Light');
+      } else if (typeof window.clearAllCache === 'function') {
+        window.clearAllCache();
       }
-    });
+      // Clear local tickers data
+      window.tickersData = [];
+      tickersData = [];
+      
+      // טעינת מטבעות אם עוד לא נטענו
+      if (!window.currenciesLoaded) {
+        await loadCurrenciesData();
+      }
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // קריאה ישירה לשרת עם timestamp למניעת cache
+      const response = await fetch(`/api/tickers/?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      rawTickers = data?.data || data;
     }
-
-    const data = await response.json();
 
     // שמירת הנתונים
-    const rawTickers = data?.data || data;
     tickersData = Array.isArray(rawTickers)
       ? rawTickers.map(ticker => ({
           ...ticker,
@@ -1595,19 +1665,27 @@ async function loadTickersData() {
     // Restore page state (filters, sort, sections, entity filters)
     await restorePageState('tickers');
 
+    // יישום צבעי ישות על כותרות אחרי טעינת הנתונים
+    if (window.applyEntityColorsToHeaders) {
+      window.applyEntityColorsToHeaders('ticker');
+    }
   } catch (error) {
     handleApiError(error, 'טעינת נתוני טיקרים');
-
-  }
-
-  // יישום צבעי ישות על כותרות אחרי טעינת הנתונים
-  if (window.applyEntityColorsToHeaders) {
-    window.applyEntityColorsToHeaders('ticker');
+    throw error;
   }
 }
 
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+window.loadTickersData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  return await loadTickersDataInternal({ ...options, force: true });
+};
+
 /**
- * עדכון סטטיסטיקות סיכום טיקרים
+ * Update tickers summary statistics
+ * @param {Array} tickers - Array of tickers to summarize
+ * @returns {void}
  */
 function updateTickersSummaryStats(tickers) {
   const tickersArray = Array.isArray(tickers)
@@ -1631,13 +1709,15 @@ function updateTickersSummaryStats(tickers) {
       }
     }
   } catch (error) {
-    console.error('updateTickersSummaryStats failed:', error);
+    window.Logger.error('updateTickersSummaryStats failed', { page: 'tickers', error: error?.message || error });
   }
 }
 
 
 /**
- * עדכון טבלת טיקרים - גרסה פשוטה
+ * Render tickers table rows
+ * @param {Array} tickers - Array of tickers to render
+ * @returns {void}
  */
 function renderTickersTableRows(tickers) {
   try {
@@ -1655,6 +1735,7 @@ function renderTickersTableRows(tickers) {
       if (value instanceof Date) {
         return Number.isNaN(value.getTime()) ? null : value;
       }
+      // Use dateUtils for consistent date parsing
       if (typeof value === 'object') {
         const nestedCandidate = value.local || value.utc || value.iso || value.timestamp;
         return parseValidDate(nestedCandidate);
@@ -1717,28 +1798,96 @@ function renderTickersTableRows(tickers) {
            </span>`;
 
       const updatedCellHtml = (() => {
-        if (typeof window.renderUpdatedCell === 'function') {
-          return window.renderUpdatedCell(ticker, {
-            fields: ['updated_at', 'yahoo_updated_at', 'fetched_at', 'last_updated_at'],
-            columnClass: 'col-updated'
-          });
-        }
-        const fallbackDate = parseValidDate(ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at);
-        if (!fallbackDate) {
+        // Prefer FieldRendererService.renderDate for consistent date formatting
+        const rawDate = ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at || null;
+        
+        if (!rawDate) {
           return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
         }
-        const absolute = fallbackDate.toLocaleString('he-IL');
-        const duration = typeof window.getDurationSince === 'function'
-          ? window.getDurationSince(fallbackDate, { fallback: absolute })
-          : absolute;
-        return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+        // Use FieldRendererService.renderDate for proper date formatting
+        let dateDisplay = '';
+        let epoch = null;
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          // Use FieldRendererService to render date with time
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          
+          // Get epoch for sorting
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          // Fallback: use parseValidDate if available, otherwise work with date envelope objects
+          const fallbackDate = typeof parseValidDate === 'function' 
+            ? parseValidDate(rawDate)
+            : (rawDate instanceof Date ? rawDate : (typeof rawDate === 'string' ? new Date(rawDate) : null));
+          
+          if (!fallbackDate || !(fallbackDate instanceof Date) || Number.isNaN(fallbackDate.getTime())) {
+            return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+          }
+
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(fallbackDate)
+            : null;
+
+          // Derive epoch milliseconds in a canonical way
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || fallbackDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || fallbackDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            return fallbackDate.getTime();
+          })();
+
+          // Build date display using unified date utilities
+          dateDisplay = (() => {
+            if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+              return window.dateUtils.formatDateTime(envelope || fallbackDate);
+            }
+            if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+              return window.dateUtils.formatDate(envelope || fallbackDate, { includeTime: true });
+            }
+            try {
+              return window.formatDate ? window.formatDate(fallbackDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(fallbackDate, { includeTime: true }) : fallbackDate.toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }));
+            } catch (err) {
+              window.Logger?.warn('⚠️ tickers updated-cell date formatting failed', { err, tickerId: ticker?.id }, { page: 'tickers' });
+              return 'לא מוגדר';
+            }
+          })();
+        }
+
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+        }
+
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
       })();
 
       return `
                 <tr>
                     <td title="${ticker.symbol || 'N/A'}">
                         <span class="ticker-symbol-link" 
-                              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
+                              data-onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
                               title="לחץ לצפייה בפרטי הטיקר">
                             <strong>${ticker.symbol || 'N/A'}</strong>
                         </span>
@@ -1806,10 +1955,15 @@ function renderTickersTableRows(tickers) {
     // כפיית reflow של הדפדפן
     tbody.offsetHeight;
 
-    // עדכון הספירה
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
-      countElement.textContent = `${tickers.length} טיקרים`;
+    // עדכון הספירה - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'tickers', 'טיקרים', tickers.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('.table-count');
+      if (countElement) {
+        countElement.textContent = `${tickers.length} טיקרים`;
+      }
     }
     
     window.Logger.debug(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`, { page: "tickers" });
@@ -1827,6 +1981,12 @@ function renderTickersTableRows(tickers) {
   }
 }
 
+/**
+ * Update tickers table with new data
+ * @param {Array} tickers - Array of tickers to display
+ * @param {Object} [options={}] - Options (skipPagination, etc.)
+ * @returns {Promise<void>}
+ */
 async function updateTickersTable(tickers, options = {}) {
   const { skipPagination = false } = options;
   const safeTickers = Array.isArray(tickers) ? tickers : [];
@@ -1881,7 +2041,7 @@ window.toggleTickersSection = function() {
     if (typeof window.toggleSection === 'function') {
         window.toggleSection('tickers');
     } else {
-        console.error('toggleSection not available');
+        window.Logger.error('toggleSection not available', { page: 'tickers' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת הסתרת סקשנים לא זמינה. אנא רענן את הדף.');
         }
@@ -1906,7 +2066,7 @@ window.clearTickersCache = async function() {
                 window.Logger.info('✅ Tickers cache cleared via UnifiedCacheManager', { page: "tickers" });
             }
         } catch (error) {
-            console.warn('Failed to clear cache via UnifiedCacheManager:', error);
+            window.Logger.warn('Failed to clear cache via UnifiedCacheManager', { page: 'tickers', error: error?.message || error });
             // Fallback to window.clearAllCache if available
             if (typeof window.clearAllCache === 'function') {
                 await window.clearAllCache();
@@ -1916,7 +2076,7 @@ window.clearTickersCache = async function() {
         // Fallback to global clearAllCache
         await window.clearAllCache();
     } else {
-        console.warn('No cache clearing system available');
+        window.Logger.warn('No cache clearing system available', { page: 'tickers' });
     }
 };
 
@@ -1945,7 +2105,7 @@ async function checkTickerExternalData() {
     const warningDiv = document.getElementById('tickerExternalDataWarning');
     
     if (!symbolField || !checkBtn || !resultDiv || !warningDiv) {
-        console.warn('⚠️ Elements not found for external data check');
+        window.Logger.warn('Elements not found for external data check', { page: 'tickers' });
         return;
     }
     
@@ -1975,6 +2135,13 @@ async function checkTickerExternalData() {
         const quoteData = await window.ExternalDataService.getQuote(symbol, { forceRefresh: true });
         
         if (quoteData && quoteData.price) {
+            const currencyResolution = typeof window.resolveExternalCurrencySymbol === 'function'
+                ? window.resolveExternalCurrencySymbol(quoteData.currency, symbol)
+                : {
+                    symbol: (typeof quoteData.currency === 'string' && quoteData.currency.trim()) || '',
+                    hasCurrency: Boolean(quoteData.currency)
+                };
+
             // Success - Display ticker info
             // המרת נתונים לפורמט שמצפה FieldRendererService.renderTickerInfo
             // ExternalDataService מחזיר: price, change_amount_day, change_pct_day, volume, currency
@@ -1985,7 +2152,7 @@ async function checkTickerExternalData() {
                 daily_change: parseFloat(quoteData.change_amount_day || quoteData.change_amount || 0),
                 daily_change_percent: parseFloat(quoteData.change_pct_day || quoteData.change_percent || 0),
                 volume: parseInt(quoteData.volume || 0),
-                currency_symbol: (quoteData.currency === 'USD' || !quoteData.currency) ? '$' : quoteData.currency
+                currency_symbol: currencyResolution.symbol
             };
             
             // Render using FieldRendererService
@@ -2009,6 +2176,10 @@ async function checkTickerExternalData() {
                 `;
             }
             
+            const currencyNotice = currencyResolution.hasCurrency
+                ? ''
+                : `<div class="text-warning small mt-2">לא התקבל מטבע מהספק, המחיר מוצג ללא סמל מטבע.</div>`;
+
             resultDiv.innerHTML = `
                 <div class="alert alert-success mb-0">
                     <div class="d-flex align-items-center gap-2 mb-2">
@@ -2016,6 +2187,7 @@ async function checkTickerExternalData() {
                         <strong>נתונים נמצאו עבור ${symbol}</strong>
                     </div>
                     ${tickerInfoHTML}
+                    ${currencyNotice}
                 </div>
             `;
             resultDiv.style.display = 'block';
@@ -2027,8 +2199,7 @@ async function checkTickerExternalData() {
         }
         
     } catch (error) {
-        console.error('❌ Error checking external data:', error);
-        window.Logger?.error(`Error checking external data for ${symbol}`, error, { page: 'tickers' });
+        window.Logger?.error('Error checking external data', { page: 'tickers', symbol, error: error?.message || error });
         
         // Show warning
         warningDiv.innerHTML = `
@@ -2120,7 +2291,7 @@ window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.restoreTickersSectionState = restoreTickersSectionState;
 // Note: saveTicker already exported above
 // REMOVED: window.clearTickersCache - use window.UnifiedCacheManager.clearAllCache() or window.clearAllCache() directly
-window.loadTickersData = loadTickersData;
+// Note: window.loadTickersData is already defined as wrapper function above (line 1650)
 window.loadColorsAndApplyToHeaders = loadColorsAndApplyToHeaders;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.refreshYahooFinanceDataSilently = refreshYahooFinanceDataSilently;
@@ -2166,7 +2337,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('tickers', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('tickers', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
@@ -2220,7 +2394,9 @@ window.registerTickersTables = function() {
         tableSelector: 'table[data-table-type="tickers"]',
         columns: getColumns('tickers'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: updated_at desc (column index 8)
+        defaultSort: { columnIndex: 8, direction: 'desc', key: 'updated_at' }
     });
 };
 // REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
@@ -2439,7 +2615,11 @@ async function refreshYahooFinanceDataSilently() {
   }
 }
 
-// פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
+/**
+ * Filter tickers by type
+ * @param {string} type - Ticker type to filter by ('all', 'stock', 'etf', 'bond', 'crypto', 'forex', 'other')
+ * @returns {void}
+ */
 function filterTickersByType(type) {
   try {
     window.Logger.info(`🔍 Filtering tickers by type: ${type}`, { page: "tickers" });
@@ -2496,23 +2676,34 @@ function filterTickersByType(type) {
       window.updateTickersTable(filteredData);
     }
 
-    // עדכון ספירת הטיקרים
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
+    // עדכון ספירת הטיקרים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
       const typeText = type === 'all' ? 'כל הטיקרים' : getTypeDisplayName(type);
-      countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
+      const itemName = type !== 'all' ? `טיקרים (${typeText})` : 'טיקרים';
+      window.updateTableCount('.table-count', 'tickers', itemName, filteredData.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('.table-count');
+      if (countElement) {
+        const typeText = type === 'all' ? 'כל הטיקרים' : getTypeDisplayName(type);
+        countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
+      }
     }
 
     window.Logger.info(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`, { page: "tickers" });
   } catch (error) {
-    console.error('filterTickersByType failed:', error);
+    window.Logger.error('filterTickersByType failed', { page: 'tickers', type, error: error?.message || error });
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'שגיאה בסינון טיקרים');
     }
   }
 }
 
-// פונקציה עזר לקבלת שם תצוגה לסוג
+/**
+ * Get display name for ticker type in Hebrew
+ * @param {string} type - Ticker type
+ * @returns {string} Display name in Hebrew
+ */
 function getTypeDisplayName(type) {
   try {
     const typeNames = {
@@ -2526,7 +2717,7 @@ function getTypeDisplayName(type) {
     };
     return typeNames[type] || type;
   } catch (error) {
-    console.error('getTypeDisplayName failed:', error);
+    window.Logger.error('getTypeDisplayName failed', { page: 'tickers', type, error: error?.message || error });
     return type;
   }
 }

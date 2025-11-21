@@ -219,6 +219,9 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
       (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) ||
       `טיקר ${itemId}`;
     modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
+  } else if (itemType === 'tag') {
+    const tagName = data.tagName || data.tag?.name || `תגית ${itemId ?? ''}`.trim();
+    modalTitle = `ישויות עם התגית ${tagName}`;
   } else if (itemType === 'trade_plan') {
     modalTitle = 'פריטים מקושרים לתוכנית השקעה';
   } else if (itemType === 'trading_account') {
@@ -257,25 +260,54 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     }
   }
   
-  const modal = new bootstrap.Modal(modalElement);
-  
-  // Add event listener for backdrop cleanup when modal is hidden
-  modalElement.addEventListener('hidden.bs.modal', () => {
-    // ניקוי backdrop - חובה! זה מבטיח שה-backdrop תמיד יוסר כשהמודול נסגר
-    if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-      window.modalNavigationManager.manageBackdrop();
-    }
+  // יצירת Bootstrap modal instance ללא backdrop (ננהל אותו באופן מרכזי)
+  const modal = new bootstrap.Modal(modalElement, {
+    backdrop: false, // ננהל backdrop מרכזית
+    keyboard: true
   });
   
-  // ניקוי backdrops שנוצרו על ידי Bootstrap - חשוב מאוד!
-  modalElement.addEventListener('shown.bs.modal', () => {
-    if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-      window.modalNavigationManager.manageBackdrop();
-      setTimeout(() => {
-        window.modalNavigationManager.manageBackdrop();
-      }, 100);
+  modalElement.addEventListener('hidden.bs.modal', () => {
+    // רישום סגירה במערכת הניווט (רק אם לא נסגר דרך goBack)
+    // goBack כבר מטפל בהסרה מה-stack דרך registerModalClose עם internal: true
+    if (window.ModalNavigationService?.registerModalClose) {
+      // רק אם המודל עדיין ב-stack (לא נסגר דרך goBack)
+      const stack = window.ModalNavigationService.getStack();
+      const isInStack = stack.some(entry => entry.modalId === modalElement.id);
+      if (isInStack) {
+        window.ModalNavigationService.registerModalClose(modalElement.id);
+      }
+    } else if (window.registerModalNavigationClose) {
+      window.registerModalNavigationClose(modalElement.id);
     }
-    
+  }, { once: true });
+  
+  modalElement.addEventListener('shown.bs.modal', async () => {
+    // רישום המודל במערכת הניווט
+    if (window.ModalNavigationService?.registerModalOpen) {
+      await window.ModalNavigationService.registerModalOpen(modalElement, {
+        modalId,
+        modalType: 'linked-items-modal',
+        entityType: itemType,
+        entityId: itemId ?? null,
+        title: modalTitle,
+        metadata: { mode }
+      });
+    } else if (window.pushModalToNavigation) {
+      await window.pushModalToNavigation(modalElement, {
+        modalId,
+        modalType: 'linked-items-modal',
+        entityType: itemType,
+        entityId: itemId ?? null,
+        title: modalTitle,
+        metadata: { mode }
+      });
+    }
+
+    // עדכון UI של ניווט (breadcrumb וכפתור חזרה)
+    if (window.modalNavigationManager?.updateModalNavigation) {
+      window.modalNavigationManager.updateModalNavigation(modalElement);
+    }
+
     // Initialize tooltips for filter buttons after modal is shown
     setTimeout(() => {
       if (window.entityDetailsRenderer && window.entityDetailsRenderer._initializeFilterTooltips) {
@@ -291,17 +323,9 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
         window.ButtonSystem.initializeButtons();
       }
     }, 200);
-  });
+  }, { once: true });
   
   modal.show();
-  
-  // ניקוי מיידי אחרי show() - Bootstrap עלול ליצור backdrop גם אחרי show()
-  if (window.modalNavigationManager && typeof window.modalNavigationManager.manageBackdrop === 'function') {
-    window.modalNavigationManager.manageBackdrop();
-    setTimeout(() => {
-      window.modalNavigationManager.manageBackdrop();
-    }, 100);
-  }
 }
 
 /**
@@ -339,6 +363,11 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) ||
       `טיקר ${itemId}`;
     itemName = tickerSymbol;
+    break;
+  }
+  case 'tag': {
+    const tagName = data.tagName || data.tag?.name || `תגית ${itemId ?? ''}`.trim();
+    itemName = tagName;
     break;
   }
   case 'alert':
@@ -841,11 +870,14 @@ function createModal(id, title, content, mode = 'view') {
   }
 
   // Create new modal with mode-specific styling
+  // כולל תמיכה ב-ModalNavigationService (breadcrumb וכפתור חזרה)
+  // שימוש ב-modal-nested class למודלים מקוננים (z-index נכון)
   const modalHtml = `
-    <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
+    <div class="modal fade modal-nested" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}" ${mode === 'warningBlock' ? 'style="background: linear-gradient(135deg, #dc3545, #c82333) !important; color: white !important; border-bottom: 2px solid #c82333 !important;"' : ''}>
+            <div class="modal-navigation-breadcrumb" id="${id}Breadcrumb" style="display: none;"></div>
             <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>
@@ -1442,7 +1474,7 @@ function getRelatedObjectDisplay(item, dataSources = {}, options = {}) {
       }
       relatedIcon = '📈';
       relatedClass = 'related-trade entity-trade-badge';
-      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
+      relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#26baac';
       relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
       break;
     }

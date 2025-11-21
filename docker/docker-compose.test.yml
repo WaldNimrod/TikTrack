@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: tiktrack-postgres-test
+    environment:
+      POSTGRES_DB: ${POSTGRES_TEST_DB:-tiktrack_test}
+      POSTGRES_USER: ${POSTGRES_TEST_USER:-tiktrack_test}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD:-tiktrack_test_password}
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_TEST_USER:-tiktrack_test} -d ${POSTGRES_TEST_DB:-tiktrack_test}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend-test:
+    build:
+      context: ../Backend
+    container_name: tiktrack-backend-test
+    command: ["pytest", "-q"]
+    environment:
+      TIKTRACK_ENV: testing
+      POSTGRES_HOST: postgres-test
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_TEST_DB:-tiktrack_test}
+      POSTGRES_USER: ${POSTGRES_TEST_USER:-tiktrack_test}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD:-tiktrack_test_password}
+      DATABASE_URL: >-
+        postgresql+psycopg2://${POSTGRES_TEST_USER:-tiktrack_test}:${POSTGRES_TEST_PASSWORD:-tiktrack_test_password}@postgres-test:5432/${POSTGRES_TEST_DB:-tiktrack_test}
+      TESTING: "1"
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+
+volumes:
+  postgres-test-data:
+
+
+

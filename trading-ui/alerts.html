@@ -135,11 +135,66 @@
                         <div class="filter-buttons-container button-row">
                             <button data-button-type="ADD" data-entity-type="alert" data-variant="full" data-onclick="window.showModalSafe('alertsModal','add')" data-text="הוסף התראה" title="הוסף התראה חדשה"></button>
                             <div class="action-separator"></div>
-                            <button data-button-type="FILTER" data-variant="normal" data-text="הכל" data-classes="btn-sm active" data-onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" data-tooltip="הצג הכל" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="🏦" data-text="חשבונות" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" data-tooltip="סינון לפי חשבון מסחר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="💼" data-text="טריידים" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" data-tooltip="סינון לפי טרייד" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="📝" data-text="תוכניות" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" data-tooltip="סינון לפי תכנית השקעה" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-                            <button data-button-type="FILTER" data-variant="full" data-icon="📈" data-text="טיקרים" data-classes="btn-sm btn-outline-primary filter-icon-btn" data-onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" data-tooltip="סינון לפי טיקר" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="⚙️"
+                                data-classes="btn-sm active"
+                                data-onclick="filterAlertsByRelatedObjectType('all')"
+                                data-type="all"
+                                title="הצג הכל"
+                                data-tooltip="הצג הכל - כל סוגי הישויות"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="🏦"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('account')"
+                                data-type="account"
+                                title="התראות על חשבונות"
+                                data-tooltip="סינון לפי: חשבונות"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="💼"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('trade')"
+                                data-type="trade"
+                                title="התראות על טריידים"
+                                data-tooltip="סינון לפי: טריידים"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="📝"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('trade_plan')"
+                                data-type="trade_plan"
+                                title="התראות על תוכניות השקעה"
+                                data-tooltip="סינון לפי: תוכניות"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
+                            <button
+                                data-button-type="FILTER"
+                                data-variant="small"
+                                data-icon="📈"
+                                data-classes="btn-sm filter-icon-btn"
+                                data-onclick="filterAlertsByRelatedObjectType('ticker')"
+                                data-type="ticker"
+                                title="התראות על טיקרים"
+                                data-tooltip="סינון לפי: טיקרים"
+                                data-tooltip-placement="top"
+                                data-tooltip-trigger="hover">
+                            </button>
                             
                             <span class="filter-separator">|</span>
                         </div>
@@ -211,7 +266,6 @@
     </div>
     
     <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js?v=0da3519a_20251102_104906"></script>
     
         <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
@@ -268,6 +322,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/11: SERVICES PACKAGE ===== -->
@@ -286,8 +342,12 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
     <!-- [25] Load Order: 25 -->
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [25a] Preferences Data Service -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 - MUST BE BEFORE investment-calculation-service -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -297,11 +357,13 @@
     <!-- [30] Load Order: 30 -->
     <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
     <!-- [31] Load Order: 31 -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
     <!-- [32] Load Order: 32 -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [33] Load Order: 33 -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- שירות עורך טקסט עשיר -->
+    <!-- [Data Services] Load Order: After services -->
+    <script src="scripts/services/alerts-data.js?v=1.0.0"></script> <!-- שירות נתונים להתראות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/11: UI ADVANCED PACKAGE ===== -->
@@ -337,7 +399,7 @@
     <!-- [42] Load Order: 42 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
     <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
+    <!-- core-systems.js removed - now loaded automatically via base package -->
     <!-- [44] Load Order: 44 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
@@ -355,13 +417,17 @@
     <!-- [51] Load Order: 51 -->
     <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
     <!-- [52] Load Order: 52 -->
-    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני עסקאות -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
     <!-- [53] Load Order: 53 -->
     <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
     <!-- [54] Load Order: 54 -->
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
     <!-- [55] Load Order: 55 -->
+    <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
+    <!-- [56] Load Order: 56 -->
     <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
+    <!-- [57] Load Order: 57 -->
+    <script src="scripts/modal-configs/alerts-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל התראות -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/11: CRUD OPERATIONS PACKAGE ===== -->
@@ -384,6 +450,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [58.9] Load Order: 58.9 - Preferences V4 SDK (group-first) - MUST BE FIRST -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [60] Load Order: 60 -->
@@ -395,6 +463,8 @@
     <!-- [63] Load Order: 63 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [64] Load Order: 64 -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
@@ -477,7 +547,7 @@
     <!-- [84] Load Order: 84 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [85] Load Order: 85 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->

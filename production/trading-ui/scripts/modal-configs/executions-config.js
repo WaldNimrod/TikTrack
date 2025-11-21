@@ -18,7 +18,16 @@ const executionsModalConfig = {
     size: 'lg',
     headerType: 'dynamic', // צבעים דינמיים לפי ישות
     fields: [
-        // שורה ראשונה: טיקר + חשבון מסחר
+        // שורה ראשונה: נתוני שוק (כמו במודול התראות - למעלה)
+        {
+            type: 'display',
+            id: 'executionTickerInfo',
+            label: 'נתוני שוק',
+            rowClass: 'row',
+            colClass: 'col-md-12',
+            renderFn: 'renderTickerInfo'
+        },
+        // שורה שנייה: טיקר + חשבון מסחר
         {
             type: 'select',
             id: 'executionTicker',
@@ -44,7 +53,7 @@ const executionsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה שנייה: סוג ביצוע + כמות
+        // שורה שלישית: סוג ביצוע + כמות
         {
             type: 'select',
             id: 'executionType',
@@ -76,7 +85,7 @@ const executionsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה שלישית: מחיר + תאריך ושעה
+        // שורה רביעית: מחיר + תאריך ושעה
         {
             type: 'number',
             id: 'executionPrice',
@@ -101,7 +110,7 @@ const executionsModalConfig = {
             rowClass: 'row',
             colClass: 'col-md-6'
         },
-        // שורה רביעית: קישור לטרייד (מעל העמלה)
+        // שורה חמישית: קישור לטרייד (מעל העמלה)
         {
             type: 'linkButton',
             id: 'linkedTrade',
@@ -114,7 +123,7 @@ const executionsModalConfig = {
             width: 300,
             style: 'width: 300px; min-width: 200px;'
         },
-        // שורה חמישית: עמלה (בשורה מלאה)
+        // שורה שישית: עמלה (בשורה מלאה)
         {
             type: 'number',
             id: 'executionCommission',
@@ -178,10 +187,27 @@ const executionsModalConfig = {
             required: false,
             step: 1,
             placeholder: 'הכנס MTM P/L...',
+            disabled: true,  // Will be enabled/disabled based on action type (same as Realized P/L)
             width: 300,
             style: 'width: 300px; min-width: 200px;',
             rowClass: 'row',
             colClass: 'col-md-6'
+        },
+        {
+            type: 'select',
+            id: 'executionTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row',
+            colClass: 'col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'execution'
+            },
+            description: 'הוסף תגיות לתיעוד הביצוע'
         },
         {
             type: 'rich-text',
@@ -269,22 +295,37 @@ function initializeExecutionsModal() {
     return false;
 }
 
-// Attempt to initialize immediately if ModalManagerV2 is available
-if (window.ModalManagerV2) {
-    console.log('✅ ModalManagerV2 available, initializing Executions modal...');
-    if (initializeExecutionsModal()) {
-        console.log('✅ Executions modal initialized successfully');
-    } else {
-        console.warn('⚠️ Failed to initialize Executions modal');
-    }
-} else {
-    console.log('⚠️ ModalManagerV2 not yet available, waiting...');
-    // Wait for ModalManagerV2 to be available
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+// יצירת המודל כאשר הקובץ נטען - כמו ב-cash-flows-config.js
+// Wait for DOMContentLoaded to ensure all dependencies are loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Try immediately if ModalManagerV2 is available
+        if (window.ModalManagerV2) {
+            console.log('✅ ModalManagerV2 available on DOMContentLoaded, initializing Executions modal...');
+            if (initializeExecutionsModal()) {
+                console.log('✅ Executions modal initialized successfully');
+            } else {
+                console.warn('⚠️ Failed to initialize Executions modal');
+                // Fallback: wait for ModalManagerV2
+                waitForModalManager();
+            }
+        } else {
+            console.log('⚠️ ModalManagerV2 not yet available on DOMContentLoaded, waiting...');
             waitForModalManager();
-        });
+        }
+    });
+} else {
+    // DOM already loaded - try immediately
+    if (window.ModalManagerV2) {
+        console.log('✅ ModalManagerV2 available, initializing Executions modal...');
+        if (initializeExecutionsModal()) {
+            console.log('✅ Executions modal initialized successfully');
+        } else {
+            console.warn('⚠️ Failed to initialize Executions modal');
+            waitForModalManager();
+        }
     } else {
+        console.log('⚠️ ModalManagerV2 not yet available, waiting...');
         waitForModalManager();
     }
 }
@@ -292,7 +333,7 @@ if (window.ModalManagerV2) {
 // Helper function to wait for ModalManagerV2
 function waitForModalManager() {
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 50; // Increased from 10 to 50 (10 seconds total)
     const interval = 200; // 200ms between attempts
     
     const checkInterval = setInterval(() => {
@@ -306,7 +347,7 @@ function waitForModalManager() {
                 console.warn('⚠️ Failed to initialize Executions modal');
             }
         } else if (attempts >= maxAttempts) {
-            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts`);
+            console.warn(`⚠️ ModalManagerV2 not available after ${maxAttempts} attempts (${maxAttempts * interval / 1000}s)`);
             clearInterval(checkInterval);
         }
     }, interval);

@@ -11,7 +11,7 @@ Documentation: documentation/02-ARCHITECTURE/BACKEND/POSITION_PORTFOLIO_SERVICE.
 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, or_, func, desc
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime, timezone
 import logging
 
@@ -255,24 +255,22 @@ class PositionPortfolioService:
             return None
     
     @staticmethod
-    def calculate_all_account_positions(
+    def _calculate_all_account_positions_internal(
         db: Session,
         trading_account_id: int,
         include_closed: bool = False,
         include_market_data: bool = True
-    ) -> List[Dict[str, Any]]:
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """
-        Calculate all positions for a specific account
-        
-        Args:
-            db: Database session
-            trading_account_id: Trading account ID
-            include_closed: Whether to include closed positions (quantity = 0)
-            include_market_data: Whether to include market price data
-            
-        Returns:
-            List of position dictionaries
+        Internal helper that calculates positions and returns diagnostics metadata
         """
+        diagnostics = {
+            'account_id': trading_account_id,
+            'include_closed': include_closed,
+            'include_market_data': include_market_data,
+            'execution_pairs_count': 0,
+            'positions_count': 0
+        }
         try:
             # Get all unique ticker+account combinations that have executions
             ticker_account_pairs = db.query(
@@ -281,6 +279,7 @@ class PositionPortfolioService:
             ).filter(
                 Execution.trading_account_id == trading_account_id
             ).distinct().all()
+            diagnostics['execution_pairs_count'] = len(ticker_account_pairs)
             
             positions = []
             for ticker_id, account_id in ticker_account_pairs:
@@ -324,12 +323,50 @@ class PositionPortfolioService:
                 else:
                     position['percent_of_account'] = 0.0
             
+            diagnostics['positions_count'] = len(positions)
+            diagnostics['has_positions'] = len(positions) > 0
             logger.info(f"Calculated {len(positions)} positions for account {trading_account_id}")
-            return positions
+            return positions, diagnostics
             
         except Exception as e:
             logger.error(f"Error calculating all positions for account {trading_account_id}: {str(e)}")
-            return []
+            diagnostics['error'] = str(e)
+            return [], diagnostics
+    
+    @staticmethod
+    def calculate_all_account_positions(
+        db: Session,
+        trading_account_id: int,
+        include_closed: bool = False,
+        include_market_data: bool = True
+    ) -> List[Dict[str, Any]]:
+        """
+        Calculate all positions for a specific account (without diagnostics)
+        """
+        positions, _ = PositionPortfolioService._calculate_all_account_positions_internal(
+            db=db,
+            trading_account_id=trading_account_id,
+            include_closed=include_closed,
+            include_market_data=include_market_data
+        )
+        return positions
+    
+    @staticmethod
+    def calculate_all_account_positions_with_metadata(
+        db: Session,
+        trading_account_id: int,
+        include_closed: bool = False,
+        include_market_data: bool = True
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+        """
+        Calculate all positions for a specific account and return diagnostics metadata
+        """
+        return PositionPortfolioService._calculate_all_account_positions_internal(
+            db=db,
+            trading_account_id=trading_account_id,
+            include_closed=include_closed,
+            include_market_data=include_market_data
+        )
     
     @staticmethod
     def calculate_portfolio_summary(
@@ -361,11 +398,24 @@ class PositionPortfolioService:
             
             all_positions = []
             positions_by_key = {} if unify_accounts else None
+            diagnostics = {
+                'accounts_processed': len(accounts),
+                'accounts_with_executions': [],
+                'accounts_without_executions': []
+            }
             
             for account in accounts:
-                account_positions = PositionPortfolioService.calculate_all_account_positions(
-                    db, account.id, include_closed, include_market_data=True
+                account_positions, metadata = PositionPortfolioService.calculate_all_account_positions_with_metadata(
+                    db=db,
+                    trading_account_id=account.id,
+                    include_closed=include_closed,
+                    include_market_data=True
                 )
+                
+                if metadata.get('execution_pairs_count', 0) == 0:
+                    diagnostics['accounts_without_executions'].append(account.id)
+                else:
+                    diagnostics['accounts_with_executions'].append(account.id)
                 
                 for position in account_positions:
                     # Apply side filter
@@ -503,6 +553,7 @@ class PositionPortfolioService:
                 else:
                     position['percent_of_same_type'] = None
             
+            diagnostics['positions_count'] = len(all_positions)
             summary = {
                 'positions': all_positions,
                 'summary': {
@@ -516,6 +567,8 @@ class PositionPortfolioService:
                     'total_pl_percent': ((total_realized_pl + total_unrealized_pl) / total_cost * 100) if total_cost > 0 else 0.0
                 }
             }
+            
+            summary['diagnostics'] = diagnostics
             
             logger.info(f"Calculated portfolio summary: {len(all_positions)} positions, total value: {total_market_value}")
             return summary

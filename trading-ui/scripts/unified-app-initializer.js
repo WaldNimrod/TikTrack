@@ -1,24 +1,41 @@
 /**
- * Unified App Initializer - Comprehensive Function Index
+ * ARCHIVED - This file is replaced by modules/core-systems.js
  * ==========================================
- *
- * This file contains the final unified system that replaces all DOMContentLoaded listeners
- * and provides maximum flexibility with easy maintenance.
- *
+ * 
+ * ⚠️ DO NOT LOAD THIS FILE - It will cause conflicts with core-systems.js
+ * 
+ * This file has been archived and replaced by:
+ * - trading-ui/scripts/modules/core-systems.js (main initialization system)
+ * 
+ * If you need to load this file for any reason, you MUST:
+ * 1. Remove core-systems.js from the page first
+ * 2. Understand that this will break the unified initialization system
+ * 3. This file does NOT include the packages array support required for preferences
+ * 
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md
- *
+ * 
  * Author: TikTrack Development Team
- * Version: 3.0
+ * Version: 3.0 (ARCHIVED)
  * Last Updated: 2025-01-27
+ * Archive Date: 2025-01-27
  */
+
+// ===== ARCHIVED FILE PROTECTION =====
+// Prevent loading if core-systems.js is already loaded
+if (typeof window.UnifiedAppInitializer !== 'undefined') {
+  console.warn('⚠️ unified-app-initializer.js should not be loaded - use core-systems.js instead');
+  console.warn('⚠️ This file is archived and replaced by modules/core-systems.js');
+  console.warn('⚠️ Loading both files will cause conflicts and break preferences initialization');
+  // Don't return - allow the file to load but warn developers
+}
 
 // ===== UNIFIED APP INITIALIZER SYSTEM =====
 
 const UNIFIED_INIT_DEBUG_ENABLED = window.UnifiedInitializerDebugMode === true;
 const unifiedInitDebugLog = (...args) => {
   if (UNIFIED_INIT_DEBUG_ENABLED) {
-    console.log(...args);
+    window.Logger?.debug(...args, { page: 'unified-app-initializer' });
   }
 };
 
@@ -156,6 +173,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       this.errorHandlers = [];
       this.customInitializers = [];
       this.legacySupport = true;
+      this._preferencesInitialized = false; // Track preferences initialization to prevent duplicates
     }
 
     /**
@@ -337,6 +355,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         } else {
           // window.Logger.info('⚠️ Cache system not ready, using fallback mode', { page: "unified-app-initializer" });
         }
+
+        // Initialize preferences system (standardized loading for all pages)
+        await this.initializePreferencesForPage(config);
 
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {
@@ -760,17 +781,12 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               // console.log(`✅ Custom initializer ${i + 1} completed`);
               // window.Logger.info(`✅ Custom initializer ${i + 1} completed`, { page: "unified-app-initializer" });
             } catch (error) {
-              console.error(`❌ Error in custom initializer ${i + 1}:`, error);
-              window.Logger.error(`❌ Error in custom initializer ${i + 1}:`, error, {
-                page: 'unified-app-initializer',
-              });
+              window.Logger.error(`Error in custom initializer ${i + 1}`, { page: 'unified-app-initializer', error: error?.message || error, initializerIndex: i + 1 });
             }
           } else {
-            console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
             window.Logger.warn(
-              `⚠️ Custom initializer ${i + 1} is not a function:`,
-              typeof initializer,
-              { page: 'unified-app-initializer' }
+              `Custom initializer ${i + 1} is not a function`,
+              { page: 'unified-app-initializer', initializerIndex: i + 1, type: typeof initializer }
             );
           }
         }
@@ -781,6 +797,90 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         //     isArray: Array.isArray(config.customInitializers),
         //     customInitializers: config.customInitializers
         // }, { page: "unified-app-initializer" });
+      }
+    }
+
+    /**
+     * Initialize preferences system for the page
+     * Standardized preferences loading - single point of entry for all pages
+     * 
+     * @param {Object} config - Page configuration
+     * @returns {Promise<void>}
+     */
+    async initializePreferencesForPage(config) {
+      // Check if page has preferences package
+      if (!config.packages || !config.packages.includes('preferences')) {
+        return; // Page doesn't need preferences
+      }
+
+      // Get page name from pageInfo (detected from URL) or config
+      const pageName = this.pageInfo?.name || 'unknown';
+      const isPreferencesPage = pageName === 'preferences';
+
+      // Deduplication: prevent multiple calls
+      if (this._preferencesInitialized) {
+        window.Logger?.debug?.('⏭️ Preferences already initialized, skipping', {
+          page: 'unified-app-initializer',
+          pageName,
+        });
+        return;
+      }
+
+      try {
+        // Preferences page: use PreferencesUIV4 with force: true (wants fresh data)
+        if (isPreferencesPage) {
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            window.Logger?.info?.('📄 Initializing preferences for preferences page (V4 with UI)', {
+              page: 'unified-app-initializer',
+              pageName,
+            });
+            await window.PreferencesUIV4.initialize();
+            this._preferencesInitialized = true;
+            return;
+          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+            // Fallback to PreferencesUI if V4 not available
+            window.Logger?.info?.('📄 Initializing preferences for preferences page (legacy UI)', {
+              page: 'unified-app-initializer',
+              pageName,
+            });
+            await window.PreferencesUI.initialize();
+            this._preferencesInitialized = true;
+            return;
+          }
+        }
+
+        // Other pages: use PreferencesCore.initializeWithLazyLoading() with cache (force: false)
+        // This loads critical preferences immediately from cache if available, rest in background
+        if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+          window.Logger?.info?.('📄 Initializing preferences with lazy loading (using cache)', {
+            page: 'unified-app-initializer',
+            pageName,
+          });
+          
+          // Initialize in background (non-blocking) - don't await to avoid blocking page load
+          // LazyLoader will load critical preferences immediately from cache if available
+          window.PreferencesCore.initializeWithLazyLoading().catch(error => {
+            window.Logger?.warn?.('⚠️ Preferences lazy loading initialization failed (non-critical)', {
+              page: 'unified-app-initializer',
+              pageName,
+              error: error?.message || error,
+            });
+          });
+          
+          this._preferencesInitialized = true;
+        } else {
+          window.Logger?.warn?.('⚠️ PreferencesCore.initializeWithLazyLoading not available', {
+            page: 'unified-app-initializer',
+            pageName,
+          });
+        }
+      } catch (error) {
+        window.Logger?.error?.('❌ Error initializing preferences', {
+          page: 'unified-app-initializer',
+          pageName,
+          error: error?.message || error,
+        });
+        // Don't throw - preferences loading failure shouldn't block page initialization
       }
     }
 
@@ -1020,10 +1120,10 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Show Critical Error
      */
     showCriticalError(validationResult) {
-      console.group('⚠️ אי-התאמה: תיעוד מערכת ≠ עמוד בפועל');
+      window.Logger.warn('⚠️ אי-התאמה: תיעוד מערכת ≠ עמוד בפועל', { page: 'unified-app-initializer' });
 
       // Add monitoring system explanation
-      console.group('⚠️ IMPORTANT FOR DEVELOPERS:');
+      window.Logger.warn('⚠️ IMPORTANT FOR DEVELOPERS:', { page: 'unified-app-initializer' });
       window.Logger.info(
         'This is a MONITORING AND VALIDATION system, NOT an automatic script loader.',
         { page: 'unified-app-initializer' }
@@ -1076,7 +1176,6 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       window.Logger.info('- Management Interface: /init-system-management', {
         page: 'unified-app-initializer',
       });
-      console.groupEnd();
 
       if (validationResult.errors.length > 0) {
         window.Logger.error('שגיאות:', validationResult.errors, {
@@ -1100,8 +1199,6 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           );
         });
       }
-
-      console.groupEnd();
 
       // הצג מודול שגיאה מפורט עם כל ההנחיות
       this.showDetailedErrorModal(validationResult);
@@ -1266,7 +1363,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Show Real Error (for critical issues like duplicates, load order)
      */
     showRealError(errorType, errorData) {
-      console.group('❌ שגיאה חמורה - דורש תיקון מיידי');
+      window.Logger.error('❌ שגיאה חמורה - דורש תיקון מיידי', { page: 'unified-app-initializer', errorType });
 
       switch (errorType) {
         case 'DUPLICATE_SCRIPT':
@@ -1301,8 +1398,6 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           });
           break;
       }
-
-      console.groupEnd();
 
       // Show error modal (critical error modal for real errors)
       if (typeof window.showCriticalErrorModal === 'function') {
@@ -1377,35 +1472,34 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     logPackageLoading(packages) {
       if (!packages || packages.length === 0) return;
 
-      console.group('📦 טוען חבילות:');
+      window.Logger.info('📦 טוען חבילות:', { page: 'unified-app-initializer', packageCount: packages.length });
       packages.forEach(pkgName => {
         const pkg = window.PACKAGE_MANIFEST?.[pkgName];
         if (pkg) {
           window.Logger.info(
-            `  ✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime}, { page: "unified-app-initializer" })`
+            `✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime})`,
+            { page: 'unified-app-initializer', package: pkgName }
           );
         } else {
-          window.Logger.warn(`  ⚠️ ${pkgName} (לא מוגדר, { page: "unified-app-initializer" })`);
+          window.Logger.warn(`⚠️ ${pkgName} (לא מוגדר)`, { page: 'unified-app-initializer', package: pkgName });
         }
       });
-      console.groupEnd();
     }
 
     /**
      * Log System Status
      */
     logSystemStatus() {
-      console.group('📊 סטטוס מערכות');
-      window.Logger.info(`  ⏱️ זמן אתחול: ${this.performanceMetrics.totalTime}ms`, {
+      window.Logger.info('📊 סטטוס מערכות', { page: 'unified-app-initializer' });
+      window.Logger.info(`⏱️ זמן אתחול: ${this.performanceMetrics.totalTime}ms`, {
         page: 'unified-app-initializer',
       });
-      window.Logger.info(`  📦 חבילות: ${this.pageConfig?.packages?.length || 0}`, {
+      window.Logger.info(`📦 חבילות: ${this.pageConfig?.packages?.length || 0}`, {
         page: 'unified-app-initializer',
       });
-      window.Logger.info(`  ✅ מערכות זמינות: ${this.availableSystems.size}`, {
+      window.Logger.info(`✅ מערכות זמינות: ${this.availableSystems.size}`, {
         page: 'unified-app-initializer',
       });
-      console.groupEnd();
     }
 
     /**
@@ -1550,9 +1644,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       await handlePageSpecificFunctions();
     }, 1000);
   } catch (error) {
-    console.error('❌ Unified App auto-initialization failed:', error);
-    window.Logger.error('❌ Unified App auto-initialization failed:', error, {
+    window.Logger.error('Unified App auto-initialization failed', {
       page: 'unified-app-initializer',
+      error: error?.message || error,
     });
   }
 });

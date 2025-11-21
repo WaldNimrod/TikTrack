@@ -1,0 +1,20 @@
+#!/bin/bash
+# Post-merge hook - Cleanup documentation after merge
+# ====================================================
+# Automatically runs cleanup_documentation.py after every merge
+
+# Get the script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+CLEANUP_SCRIPT="$PROJECT_ROOT/scripts/cleanup_documentation.py"
+
+# Only run if cleanup script exists
+if [ -f "$CLEANUP_SCRIPT" ]; then
+    echo ""
+    echo "🧹 Running documentation cleanup after merge..."
+    python3 "$CLEANUP_SCRIPT" 2>&1 | grep -v "^$" || true
+    echo ""
+fi
+
+exit 0
+

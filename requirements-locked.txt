@@ -82,6 +82,7 @@ simple-websocket==1.1.0
 six @ file:///AppleInternal/Library/BuildRoots/39d9dc1a-2111-11f0-be06-226177e5bb69/Library/Caches/com.apple.xbs/Sources/python3/six-1.15.0-py2.py3-none-any.whl
 soupsieve==2.8
 SQLAlchemy==2.0.23
+psycopg2-binary==2.9.9
 tinycss2==1.4.0
 tinyhtml5==2.0.0
 tomli==2.2.1

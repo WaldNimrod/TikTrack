@@ -72,6 +72,12 @@ class ActiveAlertsComponent extends HTMLElement {
       tickers: [],
     };
     this._relatedDataLoaded = false;
+    this.activeFilterType = 'all';
+    this._currentFilteredAlerts = null;
+    this._filtersInitialized = false;
+    this.cacheKey = 'alerts-data';
+    this.defaultTitleText = 'התראות פעילות';
+    this.emptyTitleText = 'אין התראות פעילות';
   }
 
   connectedCallback() {
@@ -110,35 +116,24 @@ class ActiveAlertsComponent extends HTMLElement {
       <div class="active-alerts" data-role="container">
         <div class="active-alerts__header">
           <div class="active-alerts__title-group">
-            <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
-            <span class="active-alerts__title-text" data-role="title-text">התראות פעילות</span>
+            <button
+              type="button"
+              class="active-alerts__title-trigger"
+              data-onclick="navigateToPage('alerts')"
+              aria-label="פתח עמוד ההתראות">
+              <span class="active-alerts__title-icon" aria-hidden="true">🔔</span>
+              <span class="active-alerts__title-text" data-role="title-text">${this.defaultTitleText}</span>
+            </button>
             <span class="active-alerts__count-badge is-hidden" data-role="count" aria-live="polite">0</span>
-              </div>
-          <div class="active-alerts__legend" data-role="legend">
-            <div class="active-alerts__legend-item" data-entity-type="ticker">
-              <img src="images/icons/tickers.svg" alt="טיקר" class="active-alerts__legend-icon">
-              <span class="active-alerts__legend-label">טיקר</span>
-            </div>
-            <div class="active-alerts__legend-item" data-entity-type="trade_plan">
-              <img src="images/icons/trade_plans.svg" alt="תוכנית" class="active-alerts__legend-icon">
-              <span class="active-alerts__legend-label">תוכנית</span>
-              </div>
-            <div class="active-alerts__legend-item" data-entity-type="trade">
-              <img src="images/icons/trades.svg" alt="טרייד" class="active-alerts__legend-icon">
-              <span class="active-alerts__legend-label">טרייד</span>
-            </div>
-            <div class="active-alerts__legend-item" data-entity-type="trading_account">
-              <img src="images/icons/trading_accounts.svg" alt="חשבון מסחר" class="active-alerts__legend-icon">
-              <span class="active-alerts__legend-label">חשבון</span>
-              </div>
-            </div>
-              </div>
+          </div>
+          <div class="active-alerts__filters" data-role="filters" aria-label="סינון לפי סוג התראה"></div>
+        </div>
 
         <div class="active-alerts__body">
           <div class="active-alerts__loading is-hidden" data-role="loading">
             <span class="active-alerts__loading-spinner" aria-hidden="true"></span>
             <span class="active-alerts__loading-text">טוען התראות...</span>
-            </div>
+          </div>
           <div class="active-alerts__list is-hidden" data-role="list" role="list"></div>
           <div class="active-alerts__empty is-hidden" data-role="empty-state">
             <span class="active-alerts__empty-icon" aria-hidden="true">🔕</span>
@@ -149,19 +144,193 @@ class ActiveAlertsComponent extends HTMLElement {
     `;
 
     this.cacheElements();
+    this.initializeFilters();
     this.updateHeaderState();
   }
 
   cacheElements() {
     this._elements = {
       container: this.querySelector('[data-role="container"]'),
+      titleGroup: this.querySelector('.active-alerts__title-group'),
+      titleTrigger: this.querySelector('.active-alerts__title-trigger'),
       titleText: this.querySelector('[data-role="title-text"]'),
       countBadge: this.querySelector('[data-role="count"]'),
-      legend: this.querySelector('[data-role="legend"]'),
+      filters: this.querySelector('[data-role="filters"]'),
       list: this.querySelector('[data-role="list"]'),
       emptyState: this.querySelector('[data-role="empty-state"]'),
       loading: this.querySelector('[data-role="loading"]'),
     };
+  }
+
+  initializeFilters(retryCount = 0) {
+    if (this._filtersInitialized) {
+      this.updateFilterButtons();
+      return;
+    }
+
+    const container = this._elements?.filters;
+    if (!container) {
+      return;
+    }
+
+    const canGenerateFilters = typeof window.generateEntityTypeFilterButtons === 'function'
+      && typeof window.generateAllFilterButton === 'function';
+
+    if (!canGenerateFilters) {
+      if (retryCount < 8) {
+        setTimeout(() => this.initializeFilters(retryCount + 1), 200);
+      }
+      return;
+    }
+
+    const allButtonHtml = window.generateAllFilterButton({
+      interactionMode: 'none',
+      buttonClassName: 'active-alerts__filter-button active-alerts__filter-button--all',
+      disableInlineStyles: true,
+      label: 'הכל',
+    });
+
+    const entityButtonsHtml = window.generateEntityTypeFilterButtons(this.getFilterTypes(), {
+      interactionMode: 'none',
+      buttonClassName: 'active-alerts__filter-button',
+      disableInlineStyles: true,
+      iconSize: 18,
+      showLabel: true,
+      labelClassName: 'active-alerts__filter-label',
+      iconClassName: 'active-alerts__filter-icon',
+    });
+
+    container.innerHTML = `
+      <div class="active-alerts__filters-inner">
+        ${allButtonHtml}
+        ${entityButtonsHtml}
+      </div>
+    `;
+
+    const buttons = container.querySelectorAll('button[data-type]');
+    buttons.forEach(button => {
+      const normalizedType = this.normalizeFilterType(button.dataset.type);
+      button.dataset.type = normalizedType;
+      button.type = 'button';
+      if (!button.classList.contains('active-alerts__filter-button')) {
+        button.classList.add('active-alerts__filter-button');
+      }
+      button.setAttribute('data-onclick', `window.ActiveAlertsFilterRouter && window.ActiveAlertsFilterRouter('${normalizedType}')`);
+    });
+
+    this._filtersInitialized = true;
+    this.updateFilterButtons();
+  }
+
+  getFilterTypes() {
+    return ['trading_account', 'trade', 'trade_plan', 'ticker'];
+  }
+
+  normalizeFilterType(type) {
+    if (!type) {
+      return 'all';
+    }
+
+    const normalized = String(type).trim();
+    if (!normalized) {
+      return 'all';
+    }
+
+    if (normalized === 'all') {
+      return 'all';
+    }
+
+    if (normalized === 'account') {
+      return 'trading_account';
+    }
+
+    const supportedTypes = this.getFilterTypes();
+    return supportedTypes.includes(normalized) ? normalized : 'all';
+  }
+
+  mapFilterTypeToRelatedTypeId(type) {
+    const mapping = {
+      trading_account: 1,
+      account: 1,
+      trade: 2,
+      trade_plan: 3,
+      ticker: 4,
+    };
+    return Object.prototype.hasOwnProperty.call(mapping, type) ? mapping[type] : null;
+  }
+
+  applyFilter(type) {
+    const normalized = this.normalizeFilterType(type);
+    if (normalized === this.activeFilterType) {
+      return true;
+    }
+
+    this.activeFilterType = normalized;
+    this.resetFilteredAlertsCache();
+    this.updateFilterButtons();
+    this.renderAlerts();
+    return true;
+  }
+
+  updateFilterButtons() {
+    const container = this._elements?.filters;
+    if (!container) {
+      return;
+    }
+
+    const buttons = container.querySelectorAll('button[data-type]');
+    buttons.forEach(button => {
+      const buttonType = this.normalizeFilterType(button.dataset.type);
+      const isActive = buttonType === this.activeFilterType;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+      button.disabled = this.alerts.length === 0 && buttonType !== 'all';
+    });
+  }
+
+  getFilteredAlerts(force = false) {
+    if (!force && Array.isArray(this._currentFilteredAlerts)) {
+      return this._currentFilteredAlerts;
+    }
+
+    const alertsArray = Array.isArray(this.alerts) ? this.alerts : [];
+    const filterType = this.normalizeFilterType(this.activeFilterType);
+
+    if (filterType === 'all') {
+      this._currentFilteredAlerts = alertsArray;
+      return this._currentFilteredAlerts;
+    }
+
+    const targetTypeId = this.mapFilterTypeToRelatedTypeId(filterType);
+    if (targetTypeId === null) {
+      this._currentFilteredAlerts = [];
+      return this._currentFilteredAlerts;
+    }
+
+    this._currentFilteredAlerts = alertsArray.filter(alert => Number(alert?.related_type_id) === targetTypeId);
+    return this._currentFilteredAlerts;
+  }
+
+  resetFilteredAlertsCache() {
+    this._currentFilteredAlerts = null;
+  }
+
+  updateEmptyStateMessage(totalCount, filteredCount) {
+    const emptyState = this._elements?.emptyState;
+    if (!emptyState) {
+      return;
+    }
+
+    const textElement = emptyState.querySelector('.active-alerts__empty-text');
+    if (!textElement) {
+      return;
+    }
+
+    if (totalCount === 0) {
+      textElement.textContent = 'אין התראות חדשות';
+    } else if (filteredCount === 0) {
+      textElement.textContent = 'אין התראות מתאימות לסינון הנוכחי';
+    }
   }
 
   /**
@@ -169,10 +338,96 @@ class ActiveAlertsComponent extends HTMLElement {
    */
   checkGlobalFunctions() {
     if (this._functionsChecked) {return;}
-      this._functionsChecked = true;
+    this._functionsChecked = true;
   }
 
-  async loadActiveAlerts() {
+  getCacheKey() {
+    return this.cacheKey;
+  }
+
+  getCacheManager() {
+    return window.UnifiedCacheManager || window.unifiedCacheManager || null;
+  }
+
+  getCacheTTL() {
+    const env = String(window.API_ENV || 'development').toLowerCase();
+    return env === 'production' ? 60000 : 0;
+  }
+
+  shouldUseCache() {
+    const manager = this.getCacheManager();
+    return Boolean(manager && manager.initialized === true && this.getCacheTTL() > 0);
+  }
+
+  async saveAlertsToCache(alerts) {
+    if (!this.shouldUseCache()) {
+      return;
+    }
+
+    const manager = this.getCacheManager();
+    if (typeof manager?.save !== 'function') {
+      return;
+    }
+
+    try {
+      await manager.save(this.getCacheKey(), alerts, {
+        layer: 'memory',
+        ttl: this.getCacheTTL(),
+        dependencies: ['accounts-data'],
+        compress: false,
+      });
+    } catch (error) {
+      this.log('warn', 'Failed to persist alerts data into cache', { error: error?.message });
+    }
+  }
+
+  async invalidateAlertsCache() {
+    const manager = this.getCacheManager();
+    const cacheKey = this.getCacheKey();
+
+    if (manager) {
+      try {
+        if (typeof manager.invalidate === 'function') {
+          await manager.invalidate(cacheKey);
+        } else if (typeof manager.clearByPattern === 'function') {
+          await manager.clearByPattern(cacheKey);
+        } else if (typeof manager.remove === 'function') {
+          await manager.remove(cacheKey);
+        }
+      } catch (error) {
+        this.log('warn', 'Failed to invalidate frontend alerts cache', { error: error?.message });
+      }
+    }
+
+    if (window.CacheSyncManager?.invalidateByAction) {
+      try {
+        await window.CacheSyncManager.invalidateByAction('alert-updated');
+      } catch (error) {
+        this.log('warn', 'CacheSyncManager invalidateByAction failed', { error: error?.message });
+      }
+    }
+  }
+
+  async fetchAlertsFromApi() {
+    const response = await fetch('/api/alerts/unread', { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const apiData = await response.json();
+    return Array.isArray(apiData?.data) ? apiData.data : [];
+  }
+
+  applyAlertsState(alerts) {
+    this.alerts = Array.isArray(alerts) ? alerts : [];
+    this.resetFilteredAlertsCache();
+    this.renderAlerts();
+    this.updateHeaderState();
+    this.updateSectionHeaderAlertIcon();
+  }
+
+  async loadActiveAlerts(options = {}) {
+    const { force = false } = options;
     if (this.isLoading) {
       return;
     }
@@ -180,23 +435,62 @@ class ActiveAlertsComponent extends HTMLElement {
     this.isLoading = true;
     this.setLoadingState(true);
 
+    const cacheManager = this.getCacheManager();
+    const cacheEnabled = !force && this.shouldUseCache();
+
+    const finalize = async (alerts, source) => {
+      const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
+      await this.ensureRelatedData();
+      this.applyAlertsState(normalizedAlerts);
+      this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+    };
+
     try {
-      const response = await fetch('/api/alerts/unread');
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      if (cacheEnabled && typeof window.CacheTTLGuard?.ensure === 'function') {
+        let resolvedFromCache = false;
+        const cacheOptions = {
+          layer: 'memory',
+          ttl: this.getCacheTTL(),
+          dependencies: ['accounts-data'],
+          afterRead: () => { resolvedFromCache = true; },
+        };
+
+        const result = await window.CacheTTLGuard.ensure(this.getCacheKey(), async () => await this.fetchAlertsFromApi(), cacheOptions);
+
+        await finalize(result, resolvedFromCache ? 'cache-hit' : 'api-refresh');
+        return;
       }
 
-      const apiData = await response.json();
-      this.alerts = Array.isArray(apiData?.data) ? apiData.data : [];
+      if (cacheEnabled && cacheManager) {
+        let alerts = [];
+        try {
+          alerts = await cacheManager.get?.(this.getCacheKey(), {
+            ttl: this.getCacheTTL(),
+            dependencies: ['accounts-data'],
+          });
+        } catch (error) {
+          this.log('warn', 'Failed to read alerts cache, falling back to API', { error: error?.message });
+        }
 
-      await this.ensureRelatedData();
+        if (Array.isArray(alerts) && alerts.length) {
+          await finalize(alerts, 'cache-hit');
+          return;
+        }
 
-      this.renderAlerts();
-      this.updateHeaderState();
-      this.updateSectionHeaderAlertIcon();
-      this.log('info', 'Active alerts loaded', { count: this.alerts.length });
+        const freshAlerts = await this.fetchAlertsFromApi();
+        await this.saveAlertsToCache(freshAlerts);
+        await finalize(freshAlerts, 'api-refresh');
+        return;
+      }
+
+      const freshAlerts = await this.fetchAlertsFromApi();
+      if (this.shouldUseCache()) {
+        await this.saveAlertsToCache(freshAlerts);
+      }
+      await finalize(freshAlerts, force ? 'api-force' : 'api-direct');
     } catch (error) {
       this.alerts = [];
+      this.resetFilteredAlertsCache();
       this.renderAlerts();
       this.updateHeaderState();
       this.updateSectionHeaderAlertIcon();
@@ -204,32 +498,56 @@ class ActiveAlertsComponent extends HTMLElement {
     } finally {
       this.isLoading = false;
       this.setLoadingState(false);
+      this.updateHeaderState();
     }
   }
 
   updateHeaderState() {
-    const hasAlerts = this.alerts.length > 0;
+    const totalCount = Array.isArray(this.alerts) ? this.alerts.length : 0;
+    const filteredAlerts = this.getFilteredAlerts();
+    const filteredCount = filteredAlerts.length;
+    const hasAnyAlerts = totalCount > 0;
+    const hasFilteredAlerts = filteredCount > 0;
+
+    if (this._elements?.container) {
+      this._elements.container.classList.toggle('active-alerts--empty', !hasAnyAlerts);
+    }
 
     if (this._elements?.countBadge) {
-      this._elements.countBadge.textContent = String(this.alerts.length);
-      this._elements.countBadge.classList.toggle('is-hidden', !hasAlerts);
+      const countText = !hasAnyAlerts || this.activeFilterType === 'all'
+        ? String(totalCount)
+        : `${filteredCount}/${totalCount}`;
+      this._elements.countBadge.textContent = countText;
+      this._elements.countBadge.classList.toggle('is-hidden', !hasAnyAlerts);
+      if (this.activeFilterType !== 'all' && hasAnyAlerts) {
+        this._elements.countBadge.setAttribute('title', `מסונן: ${filteredCount} מתוך ${totalCount}`);
+      } else {
+        this._elements.countBadge.removeAttribute('title');
+      }
     }
 
     if (this._elements?.titleText) {
-      this._elements.titleText.classList.toggle('active-alerts__title-text--muted', !hasAlerts);
+      const targetText = hasAnyAlerts ? this.defaultTitleText : this.emptyTitleText;
+      if (this._elements.titleText.textContent !== targetText) {
+        this._elements.titleText.textContent = targetText;
+      }
+      this._elements.titleText.classList.toggle('active-alerts__title-text--muted', !hasAnyAlerts);
     }
 
-    if (this._elements?.legend) {
-      this._elements.legend.classList.toggle('is-hidden', !hasAlerts);
+    if (this._elements?.filters) {
+      this._elements.filters.classList.toggle('is-hidden', !hasAnyAlerts);
     }
 
-    if (this._elements?.list) {
-      this._elements.list.classList.toggle('is-hidden', !hasAlerts);
+    if (!this.isLoading && this._elements?.list) {
+      this._elements.list.classList.toggle('is-hidden', !hasFilteredAlerts);
     }
 
-    if (this._elements?.emptyState) {
-      this._elements.emptyState.classList.toggle('is-hidden', hasAlerts);
+    if (!this.isLoading && this._elements?.emptyState) {
+      this.updateEmptyStateMessage(totalCount, filteredCount);
+      this._elements.emptyState.classList.toggle('is-hidden', hasFilteredAlerts);
     }
+
+    this.updateFilterButtons();
   }
 
   renderAlerts() {
@@ -240,11 +558,13 @@ class ActiveAlertsComponent extends HTMLElement {
 
     listContainer.innerHTML = '';
 
-    if (!this.alerts.length) {
+    const filteredAlerts = this.getFilteredAlerts(true);
+    if (!filteredAlerts.length) {
+      this.updateHeaderState();
       return;
     }
 
-    const sortedAlerts = [...this.alerts].sort((a, b) => {
+    const sortedAlerts = filteredAlerts.slice().sort((a, b) => {
       const timeA = new Date(a.triggered_at || a.created_at || 0);
       const timeB = new Date(b.triggered_at || b.created_at || 0);
       return timeB - timeA;
@@ -260,6 +580,7 @@ class ActiveAlertsComponent extends HTMLElement {
     });
 
     listContainer.appendChild(fragment);
+    this.updateHeaderState();
   }
 
   createAlertCardElement(alert) {
@@ -283,12 +604,16 @@ class ActiveAlertsComponent extends HTMLElement {
     if (Number.isFinite(alertId)) {
       card.dataset.alertId = String(alertId);
     }
+    const entityTypeAttr = relatedType || 'alert';
+    card.dataset.entityType = entityTypeAttr;
+    card.classList.add(`active-alerts__card--${entityTypeAttr.replace(/_/g, '-')}`);
+    this.applyEntityColorTheme(card, entityTypeAttr);
 
     const header = document.createElement('div');
     header.className = 'active-alerts__card-header';
 
     header.appendChild(this.createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol));
-    header.appendChild(this.createStatusElement(alert));
+    header.appendChild(this.createDetailsButton(alert));
 
     const body = document.createElement('div');
     body.className = 'active-alerts__card-body';
@@ -355,6 +680,110 @@ class ActiveAlertsComponent extends HTMLElement {
     return card;
   }
 
+  applyEntityColorTheme(cardElement, entityType) {
+    if (!cardElement) {
+      return;
+    }
+
+    const normalizedType = this.normalizeColorEntityType(entityType);
+    if (!normalizedType) {
+      return;
+    }
+
+    const backgroundColor = typeof window.getEntityBackgroundColor === 'function'
+      ? window.getEntityBackgroundColor(normalizedType)
+      : '';
+    const borderColor = typeof window.getEntityBorderColor === 'function'
+      ? window.getEntityBorderColor(normalizedType)
+      : '';
+    const textColor = typeof window.getEntityTextColor === 'function'
+      ? window.getEntityTextColor(normalizedType)
+      : '';
+
+    if (backgroundColor) {
+      cardElement.style.setProperty('--active-alert-card-bg', backgroundColor);
+    }
+    if (borderColor) {
+      cardElement.style.setProperty('--active-alert-card-border', borderColor);
+    }
+    if (textColor) {
+      cardElement.style.setProperty('--active-alert-card-text', textColor);
+    }
+  }
+
+  normalizeColorEntityType(entityType) {
+    if (!entityType) {
+      return 'alert';
+    }
+
+    const normalized = String(entityType).trim().toLowerCase();
+    if (normalized === 'account') {
+      return 'trading_account';
+    }
+
+    switch (normalized) {
+    case 'trading_account':
+    case 'trade':
+    case 'trade_plan':
+    case 'ticker':
+    case 'alert':
+      return normalized;
+    default:
+      return normalized || 'alert';
+    }
+  }
+
+  normalizeConditionAttribute(attribute) {
+    if (attribute === null || attribute === undefined) {
+      return '';
+    }
+
+    const normalized = String(attribute).trim();
+
+    if (!normalized || normalized === '-' || normalized === 'null' || normalized === 'undefined') {
+      return '';
+    }
+
+    return normalized;
+  }
+
+  normalizeConditionOperator(operator) {
+    if (operator === null || operator === undefined) {
+      return '';
+    }
+
+    const normalized = String(operator).trim();
+
+    if (!normalized || normalized === '-' || normalized === 'null' || normalized === 'undefined') {
+      return '';
+    }
+
+    return normalized;
+  }
+
+  normalizeConditionNumber(number) {
+    if (number === null || number === undefined) {
+      return '';
+    }
+
+    if (typeof number === 'number') {
+      return number;
+    }
+
+    const normalized = String(number).trim();
+
+    if (!normalized || normalized === '-' || normalized === 'null' || normalized === 'undefined') {
+      return '';
+    }
+
+    const numericValue = Number(normalized.replace(/,/g, ''));
+    if (Number.isFinite(numericValue)) {
+      return numericValue;
+    }
+
+    return normalized;
+  }
+
   createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol) {
     const container = document.createElement('div');
     container.className = 'active-alerts__header-linked';
@@ -373,7 +802,7 @@ class ActiveAlertsComponent extends HTMLElement {
           if (linkedElement) {
             linkedElement.classList.add('active-alerts__linked-entity');
             if (symbol) {
-              linkedElement.addEventListener('click', (event) => {
+              linkedElement.addEventListener('click', event => {
                 event.preventDefault();
                 this.handleSymbolClick(symbol);
               });
@@ -451,10 +880,10 @@ class ActiveAlertsComponent extends HTMLElement {
 
     try {
       const [accountsRes, tradesRes, tradePlansRes, tickersRes] = await Promise.all([
-        fetch('/api/trading_accounts/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
-        fetch('/api/trades/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
-        fetch('/api/trade_plans/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
-        fetch('/api/tickers/').then(r => (r.ok ? r.json() : { data: [] })).catch(() => ({ data: [] })),
+        fetch('/api/trading-accounts/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch('/api/trades/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch('/api/trade-plans/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch('/api/tickers/').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
       ]);
 
       this._relatedData = {
@@ -488,8 +917,8 @@ class ActiveAlertsComponent extends HTMLElement {
 
     try {
       const response = await fetch(`/api/alerts/${alertId}/mark-read`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
@@ -503,14 +932,17 @@ class ActiveAlertsComponent extends HTMLElement {
       }
 
       this.alerts = this.alerts.filter(alert => Number(alert.id) !== alertId);
+      this.resetFilteredAlertsCache();
       this.updateHeaderState();
       this.updateSectionHeaderAlertIcon();
+
+      await this.invalidateAlertsCache();
 
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('התראה עודכנה', 'התראה סומנה כנקראה');
       }
 
-      await this.loadActiveAlerts();
+      await this.loadActiveAlerts({ force: true });
       this.log('info', 'Alert marked as read', { alertId });
     } catch (error) {
       this.log('error', 'Failed to mark alert as read', { alertId, error: error?.message });
@@ -687,6 +1119,26 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   getIconPath(relatedType) {
+    if (window.LinkedItemsService && typeof window.LinkedItemsService.getLinkedItemIcon === 'function') {
+      try {
+        return window.LinkedItemsService.getLinkedItemIcon(relatedType);
+      } catch (error) {
+        this.log('warn', 'Failed to resolve icon via LinkedItemsService', { relatedType, error: error?.message });
+      }
+    }
+
+    const iconMap = {
+      trading_account: 'images/icons/trading_accounts.svg',
+      trade: 'images/icons/trades.svg',
+      trade_plan: 'images/icons/trade_plans.svg',
+      ticker: 'images/icons/tickers.svg',
+      alert: 'images/icons/alerts.svg',
+      default: 'images/icons/alerts.svg',
+    };
+
+    return iconMap[relatedType] || iconMap.default;
+  }
+
   findTickerSymbol(tickers, tickerId) {
     const ticker = tickers.find(tk => tk && Number(tk.id) === Number(tickerId));
     return ticker?.symbol || null;
@@ -783,34 +1235,35 @@ class ActiveAlertsComponent extends HTMLElement {
     return badge;
   }
 
-    if (window.LinkedItemsService && typeof window.LinkedItemsService.getLinkedItemIcon === 'function') {
-      try {
-        return window.LinkedItemsService.getLinkedItemIcon(relatedType);
-      } catch (error) {
-        this.log('warn', 'Failed to resolve icon via LinkedItemsService', { relatedType, error: error?.message });
-      }
-    }
-
-    const fallback = {
-      trading_account: 'images/icons/trading_accounts.svg',
-      trade: 'images/icons/trades.svg',
-      trade_plan: 'images/icons/trade_plans.svg',
-      ticker: 'images/icons/tickers.svg',
-      alert: 'images/icons/alerts.svg',
-    };
-
-    return fallback[relatedType] || 'images/icons/alerts.svg';
-  }
-
   buildConditionText(alert) {
     if (!alert) {return '';}
 
-    if (typeof window.translateConditionFields === 'function' &&
-      alert.condition_attribute && alert.condition_operator !== undefined && alert.condition_number !== undefined) {
-      try {
-        return window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number);
-      } catch (error) {
-        this.log('warn', 'translateConditionFields failed', { error: error?.message });
+    const attributeRaw = alert?.condition_attribute ?? alert?.attribute ?? alert?.conditionAttribute;
+    const operatorRaw = alert?.condition_operator ?? alert?.operator ?? alert?.conditionOperator;
+    const numberRaw = alert?.condition_number ?? alert?.condition_value ?? alert?.conditionValue ?? alert?.value;
+
+    const attribute = this.normalizeConditionAttribute(attributeRaw);
+    const operator = this.normalizeConditionOperator(operatorRaw);
+    const number = this.normalizeConditionNumber(numberRaw);
+
+    if (attribute && operator !== undefined && number !== undefined) {
+      if (window.AlertConditionRenderer && typeof window.AlertConditionRenderer.renderConditionText === 'function') {
+        try {
+          const rendered = window.AlertConditionRenderer.renderConditionText(attribute, operator, number);
+          if (rendered) {
+            return rendered;
+          }
+        } catch (error) {
+          this.log('warn', 'AlertConditionRenderer.renderConditionText failed', { error: error?.message });
+        }
+      }
+
+      if (typeof window.translateConditionFields === 'function') {
+        try {
+          return window.translateConditionFields(attribute, operator, number);
+        } catch (error) {
+          this.log('warn', 'translateConditionFields failed', { error: error?.message });
+        }
       }
     }
 
@@ -825,36 +1278,30 @@ class ActiveAlertsComponent extends HTMLElement {
     return '';
   }
 
-  createStatusElement(alert) {
-    const statusContainer = document.createElement('div');
-    statusContainer.className = 'active-alerts__status';
+  createDetailsButton(alert) {
+    const container = document.createElement('div');
+    container.className = 'active-alerts__details';
 
-    if (window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function') {
-      try {
-        statusContainer.innerHTML = window.FieldRendererService.renderStatus(alert.status, 'alert');
-        return statusContainer;
-      } catch (error) {
-        this.log('warn', 'renderStatus failed', { error: error?.message });
+    const alertId = Number(alert?.id);
+    if (Number.isFinite(alertId)) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('data-button-type', 'VIEW');
+      button.setAttribute('data-variant', 'small');
+      button.setAttribute('data-tooltip', 'פרטי התראה');
+      button.setAttribute('data-tooltip-placement', 'top');
+      button.setAttribute('data-tooltip-trigger', 'hover');
+      button.setAttribute('aria-label', 'פרטי התראה');
+      button.setAttribute('data-onclick', `window.showEntityDetails && window.showEntityDetails('alert', ${alertId}, { mode: 'view' })`);
+
+      container.appendChild(button);
+
+      if (typeof window.processButtons === 'function') {
+        window.processButtons(container);
       }
     }
 
-    const statusSpan = document.createElement('span');
-    statusSpan.className = 'active-alerts__status-text';
-    statusSpan.textContent = this.getStatusDisplay(alert);
-    statusContainer.appendChild(statusSpan);
-    return statusContainer;
-  }
-
-  getStatusDisplay(alert) {
-    if (typeof window.getAlertStatusDisplay === 'function') {
-      try {
-        return window.getAlertStatusDisplay(alert.status, alert.is_triggered);
-      } catch (error) {
-        this.log('warn', 'getAlertStatusDisplay failed', { error: error?.message });
-      }
-    }
-
-    return alert?.status ? String(alert.status) : 'לא זמין';
+    return container;
   }
 
   formatAlertTimestamp(alert) {
@@ -891,8 +1338,9 @@ class ActiveAlertsComponent extends HTMLElement {
   toDate(value) {
     if (!value) {return null;}
 
-    if (typeof window.toDateObject === 'function') {
-      const converted = window.toDateObject(value);
+    // Use window.dateUtils.toDateObject (window.toDateObject doesn't exist)
+    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+      const converted = window.dateUtils.toDateObject(value);
       if (converted instanceof Date && !Number.isNaN(converted.getTime())) {
         return converted;
       }
@@ -995,8 +1443,8 @@ class ActiveAlertsComponent extends HTMLElement {
 
     // הוספת event listener לאיקון
     bellButton.addEventListener('click', () => {
-        this.openSectionWithAlerts();
-      });
+      this.openSectionWithAlerts();
+    });
 
     // הוספה לכותרת הסקשן - בצד שמאל (ימין ב-RTL) ליד כפתור הסגירה
     const tableActions = this._sectionHeader.querySelector('.table-actions');
@@ -1146,6 +1594,19 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 }
 
+if (typeof window.ActiveAlertsFilterRouter !== 'function') {
+  window.ActiveAlertsFilterRouter = function (type) {
+    const normalizedType = typeof type === 'string' ? type : 'all';
+    const components = document.querySelectorAll('active-alerts');
+    components.forEach(component => {
+      if (typeof component.applyFilter === 'function') {
+        component.applyFilter(normalizedType);
+      }
+    });
+    return true;
+  };
+}
+
 customElements.define('active-alerts', ActiveAlertsComponent);
 
 // פונקציה לעדכון הקומפוננטה כאשר הפונקציות הגלובליות נטענות
@@ -1204,34 +1665,33 @@ window.addEventListener('popstate', () => {
 
 // פונקציה גלובלית להצגת הודעה על אובייקט מקושר
 if (typeof window.showLinkedObjectMessage !== 'function') {
-window.showLinkedObjectMessage = function () {
+  window.showLinkedObjectMessage = function () {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('אובייקט מקושר', 'הקישור לאובייקט המקושר יופעל בהמשך');
-  }
-};
+    }
+  };
 }
 
 // פונקציה גלובלית לפתיחת דף טיקר
 if (typeof window.showTickerPage !== 'function') {
-window.showTickerPage = function (symbol) {
+  window.showTickerPage = function (symbol) {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('דף טיקר', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
-  }
-};
+    }
+  };
 }
 
 // פונקציה גלובלית להצגת מודל אובייקטים מקושרים
 if (typeof window.showRelatedObjectModal !== 'function') {
-window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
+  window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
     if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification(
-      'אובייקט מקושר',
+      window.showInfoNotification(
+        'אובייקט מקושר',
         `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`,
       );
-  }
-};
+    }
+  };
 }
 
 // הפונקציות formatAlertCondition ו-parseAlertCondition הועברו לקובץ alerts.js
-
 

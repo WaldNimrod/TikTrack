@@ -53,8 +53,17 @@ const cashFlowModalConfig = {
             width: 300,
             style: 'width: 300px; min-width: 200px;',
             defaultFromPreferences: true, // ברירת מחדל מהעדפות
+            populateFromService: 'accounts', // שימוש ב-SelectPopulatorService לחשבונות
             rowClass: 'row',
             colClass: 'col-md-6'
+        },
+        {
+            type: 'display',
+            id: 'cashFlowExchangePairDisplay',
+            label: 'צמד המרה',
+            rowClass: 'row',
+            colClass: 'col-12',
+            description: 'כאשר התזרים הוא חלק מהמרת מטבע יוצג כאן הצמד המלא.'
         },
         // שורה שנייה: סכום + מטבע (ברירת מחדל מהעדפות)
         {
@@ -77,6 +86,7 @@ const cashFlowModalConfig = {
             width: 300,
             style: 'width: 300px; min-width: 200px;',
             defaultFromPreferences: true, // ברירת מחדל מטבע ראשי מהעדפות
+            populateFromService: 'currencies', // שימוש ב-SelectPopulatorService למטבעות
             rowClass: 'row',
             colClass: 'col-md-6'
         },

@@ -11,6 +11,7 @@
    - קלאסים תחת `Backend/connectors/user_data_import`.
    - מחזירים רשימות dict-ים אחידים לכל `task_type`.
    - שומרים `_raw_row` + `metadata` מלא לכל רישום.
+   - החל מ-נובמבר 2025 זיהוי `Stock Yield Enhancement Program` מתבצע גם בתוך מקטעי Interest כללים (לא רק ב-`Stock Yield Enhancement Program Securities Lent Interest Details`) כדי שכל רשומת SYEP תישמר עם `cashflow_type=syep_interest`.
 2. **Normalization Service** – `NormalizationService.normalize_records()`:
    - אחראי על המרת השדות לפורמט הקנוני.
    - עבור Cashflows חובה לשמור `metadata` עם המפתחות:
@@ -42,7 +43,7 @@
 | `deposit` | `deposit` | — |
 | `withdrawal` | `withdrawal` | — |
 | `transfer` | `transfer_in` / `transfer_out` | לפי סימן הסכום |
-| `forex_conversion` | `transfer_in` / `transfer_out` | הערה: `Forex conversion` |
+| `forex_conversion` | `currency_exchange_to` / `currency_exchange_from` | הערה: `Forex conversion` |
 | `dividend` | `dividend` | — |
 | `dividend_accrual` | `other_positive` / `other_negative` | לפי סימן הסכום |
 | `interest` | `interest` | — |
@@ -50,7 +51,7 @@
 | `tax` | `tax` | — |
 | `fee` | `fee` | — |
 | `borrow_fee` | `fee` | הערה: `Borrow fee` |
-| `syep_interest` | `interest` | הערה: `SYEP interest` |
+| `syep_interest` | `syep_interest` | הערה: `SYEP interest` |
 | `cash_adjustment` | `other_positive` / `other_negative` | לפי סימן הסכום |
 | אחר | `other_positive` / `other_negative` | `mapping_note` = שם המקור |
 
@@ -61,14 +62,67 @@
 - כל נקודת קצה שמחזירה סשנים משתמשת ב-`_project_storage_payload` → `DateNormalizationService` כדי להחזיר `DateEnvelope`.
 - Frontend מסתמך על הפורמט הזה לצורך הצגות בלוח המוביל ובכרטיסי סטטוס.
 
+### ניהול סשנים פעילים (עדכון ינואר 2025)
+- **`get_latest_active_session()`** – מחזיר רק סשנים פעילים תוך סינון חכם:
+  - **לא מחזיר**: סשנים עם status `completed`, `failed`, `cancelled`
+  - **לא מחזיר**: סשנים ישנים (יותר מ-24 שעות) שנשארו תקועים ב-`analyzing`/`ready`/`importing`
+  - **לא מחזיר**: סשנים ללא `created_at` (סשנים ישנים מ-legacy)
+  - **מחזיר רק**: סשנים שנוצרו ב-24 השעות האחרונות עם status פעיל
+- **ניקוי אוטומטי**: אחרי ייבוא מוצלח, ה-Frontend מנקה את כל נתוני הסשן:
+  - `currentSessionId`, `activeSessionInfo`, `pendingAccountLinking`
+  - `analysisResults`, `previewData`, `selectedFile`
+  - localStorage (`clearStoredActiveSession()`)
+- **תוצאה**: פתיחה מחדש של התהליך לא תציג סשן פעיל ישן
+
 ## Account Linking Prerequisite (Phase 1 – Nov 2025)
-- טבלת `trading_accounts` הורחבה עם העמודה `external_account_number` (טקסט ייחודי, Nullable). הערך הזה הוא המזהה הקנוני של החשבון אצל הברוקר.
-- בכל קריאה ל-`analyze_file`, `generate_preview` ו-`execute_import`, ה-`ImportOrchestrator` שולף את מספר החשבון מתוך קטעי `account_reconciliation` של הקובץ (IBKR: Account Information/Base Currency). אם המספר לא קיים או לא תואם ל-`external_account_number`, הפעולה נחסמת.
-- במצב חסימה מוחזר payload עם `error_code: ACCOUNT_LINK_REQUIRED` + אובייקט `linking` (סטטוס: `unlinked`/`mismatch`/`missing_in_file`, מספרים מהקובץ ומהמערכת, מזהה הסשן). הלקוח חייב לטפל בשגיאה לפני המשך התהליך.
-- Endpoint חדש: `POST /api/user-data-import/session/<id>/link-account` (body אופציונלי `account_number`). הקריאה מעדכנת את `trading_accounts.external_account_number` לערך שנמצא בקובץ ומאמתת שהערך אינו משויך לחשבון אחר.
-- לאחר שיוך מוצלח ה-UI מריץ מחדש את תהליך הניתוח כדי להישאר מסונכרן.
-- כל נקודות הקצה של הייבוא (upload/analyze/preview/execute/refresh-preview) עשויות להחזיר את אותה שגיאת ACCOUNT_LINK_REQUIRED, ולכן הקליינט חייב להאזין לערך `error_code` ולא רק לשדה `success`.
-- ממשק המשתמש מציב את תהליך "בדיקת שיוך חשבון" ראשון ברשימת התהליכים ופותח מודל ייעודי (`accountLinkingModal`) בכל פעם שנדרשת פעולה מצד המשתמש. הכפתור הראשי במודל משתמש ב-Button System ומזרים את הקריאה ל-Endpoint החדש.
+- טבלת `trading_accounts` הורחבה עם העמודה `external_account_number` (טקסט ייחודי). העמודה משמשת כקישור הקנוני לחשבון החיצוני ומוצגת/נערכת דרך מודל חשבון המסחר (`brokerAccountNumber`).
+- החל מנובמבר 2025 אין יותר בחירת חשבון ידנית במסך הייבוא. הלקוח מעלה קובץ → המערכת קוראת את מספר החשבון מהקובץ (`extract_account_metadata`) ומאתרת אוטומטית את החשבון המתאים:
+  - **מזהה מוכר** – השרת קושר את ה-session לחשבון שמצא ומחזיר `ACCOUNT_LINK_REQUIRED` עם `status=pending_confirmation`. ה-UI מציג חלון "אישור חשבון" עם פרטי החשבון המלאים. רק לאחר אישור (או בחירה ידנית של חשבון אחר) מותר להמשיך לניתוח.
+  - **מזהה לא מוכר** – מוחזר `status=unlinked/mismatch` יחד עם מספר הקובץ. ה-UI פותח את מודול השיוך במצב בחירה ומציג אזהרה אם החשבון שנבחר כבר מכיל מספר חיצוני. ניתן לעדכן את השיוך רק דרך המודל.
+- נקודות קצה חדשות:
+  - `GET /api/user-data-import/session/<id>/account-link/status` – החזרת מצב השיוך הנוכחי (סטטוס, חשבון מזוהה, מספר מהקובץ).
+  - `POST /api/user-data-import/session/<id>/account-link/confirm` – מאשר שיוך אוטומטי (מצב pending) ומסמן את הסשן כ-`linking_confirmed`.
+  - `POST /api/user-data-import/session/<id>/account-link/select` – שומר שיוך לחשבון שנבחר ידנית. **עדכון ינואר 2025**: המערכת כעת **מסירה אוטומטית** שיוך ישן אם החשבון הנבחר כבר מכיל `external_account_number` אחר. במקום להחזיר שגיאה, המערכת:
+    1. מסירה את ה-`external_account_number` מהחשבון הישן
+    2. מבצעת commit מיידי לשחרור ה-unique constraint
+    3. ממשיכה לשייך את החשבון החדש
+    4. מעדכנת את הסשן עם החשבון החדש
+  - הנתיב ההיסטורי `POST /session/<id>/link-account` נשאר כתמיכה אחורה אך קורא לאותה לוגיקה חדשה.
+- `_enforce_account_link` מוסיף סטטוסי linking חדשים (`pending_confirmation`, `linked`, `missing_in_file`) ומחזיר תמיד `linking.recognized_account` על מנת שה-UI יוכל להציג את שם החשבון/המטבע.
+- לאחר שיוך מוצלח (`linking_confirmed=True`) נקראים שוב `analyze_file`/`generate_preview` ברקע כך שאין צורך להעלות את הקובץ מחדש.
+- ה-UI מציג כרטיס זיהוי חדש בשלב 1: מספר מהקובץ + חשבון מזוהה במערכת. כל שינוי במצב השיוך (אישור, בחירה, ביטול) מעדכן את הכרטיס ואת המדדים של הסשן הפעיל.
+- מודל עריכת חשבון מסחר כולל שדה `brokerAccountNumber` שממפה ישירות ל-`external_account_number` ומוודא ייחודיות מול שאר החשבונות.
+
+### File Precheck & Step 1 Layout (Nov 2025)
+- נוסף Endpoint חדש `POST /api/user-data-import/precheck` שמריץ בדיקה קלה דרך הקונקטור ברגע שהמשתמש בוחר קובץ. כל קונקטור (לדוגמה `IBKRConnector.precheck_file`) מאמת מבנה בסיסי, מחפש כותרות קריטיות ומחזיר `success/warnings/errors`.
+- ה-Frontend (`runFilePrecheck()` ב-`import-user-data.js`) שולח את הקובץ מיד לאחר הבחירה או שינוי ספק/תהליך, מציג Badge מצב (`idle/pending/success/error`) ומונע לחיצה על כפתור "ניתוח" עד שהבדיקה הצליחה. הודעות האזהרה מוצגות דרך Notification System.
+- פריסת שלב 1 עודכנה: שורה ראשונה – בחירת ספק → בחירת תהליך → כרטיס הסבר. שורה שנייה – בחירת קובץ (כולל סטטוס הבדיקה) → כרטיס זיהוי חשבון שמופיע רק כאשר קיים session פעיל.
+- איפוס סשן (`resetImportSession`) מאפס גם את כרטיס הזיהוי והסטטוס של הבדיקה כך שהמשתמש לא רואה נתונים היסטוריים.
+- בעת הפעלת `analyze_file` התהליך מתחיל בזיהוי החשבון: ה-Orchestrator יוצר session, שומר את מספר החשבון ונעצר עם `ACCOUNT_LINK_REQUIRED` עד לאישור. לאחר שהמשתמש מאשר/מעדכן שיוך, ה-UI אינו מעלה את הקובץ שוב אלא מריץ `reanalyseSessionForTask` (GET `/session/<id>/analyze`) על אותו session ולכן כל השלבים שאחרי הקישור מתבצעים רק פעם אחת.
+- **עדכון ינואר 2025 – Precheck ללא קובץ**: ה-Frontend כעת בודק בקפידה שיש קובץ תקין (`instanceof File` ו-`size > 0`) לפני שליחת בקשות precheck. זה מונע שגיאות 400 כאשר פותחים את המודול עם סשן פעיל אך ללא קובץ נבחר.
+- **עדכון ינואר 2025 – הצגת מספר חשבון**: ה-UI מציג כעת את `external_account_number` (מספר החשבון החיצוני) באופן בולט במודול השיוך, כדי להבהיר למשתמש מה המערכת משווה ומזהה.
+
+## Task Plugins – Portfolio Positions & Taxes/Fx (Nov 2025)
+### Portfolio Positions (`task_type=portfolio_positions`)
+- **Connector**: `IBKRConnector` מפרק את המקטעים `Open Positions`, `Forex Balances`, `Net Asset Value` ו-`Change in NAV` ומחזיר רשומות אחידות (כולל `_raw_row`, `statement_period`, `statement_period_end` ו-`account_id`).
+- **Normalization**: `_normalize_portfolio_record` מוסיף envelope של תאריך (`statement_period_end`), מזהה חיצוני ייחודי (`account_id + symbol + period`), ושומר את כל הערכים המספריים (`quantity`, `market_value`, `cost_basis`, `unrealized_pl`) כ-float.
+- **Validation**: `_validate_portfolio_records` קובע סטטיסטיקות `currency_totals`, `asset_category_totals`, ורשימת `zero_quantity_positions` (משמשת לבעיות בממשק). אין Persist – זה דו"ח חכם בלבד.
+- **Duplicate Detection**: `DuplicateDetectionService` מחזיר `clean_records` ללא עיבוד נוסף (פלט ריק עבור כפילויות). כל לוגיקת האכיפה נשארת ב-Validation.
+- **Orchestrator**: `_build_analysis_payload` ו-`_build_preview_payload` מוסיפים `positions_detected`, summary לנתוני המטבע/קטגוריה ו-Payload קל ל-UI. `execute_import` מפעיל `_execute_report_only` – אין כתיבה ל-DB, רק סימון שהדו"ח הושלם.
+- **UI**: `renderPortfolioAnalysisSummary()` משתמש בשדות החדשים כדי להציג כרטיסי-מטבע, כרטיסי קטגוריה ורשימת "פוזיציות אפס". תצוגת ה-Preview מציגה טבלאות ייעודיות (סמל, קטגוריה, מטבע, כמות, עלות, שווי, רווח/הפסד).
+
+### Taxes & FX (`task_type=taxes_and_fx`)
+- **Connector**: מנתח את `Withholding Tax`, `Change in NAV`, `Mark-to-Market Performance Summary` (רק מט"ח) ועסקאות `forex_conversion` שנוצרו בשלב התזרימים. כל רשומה מתויגת עם `record_type` (tax_cashflow / withholding_tax / forex_conversion / nav_component).
+- **Normalization**: `_normalize_tax_fx_record` יוצר מזהה אחיד על בסיס `record_type + currency + amount + date`, מוסיף שדות לפירוט המרות מטבע (source/target currencies, quantity, price).
+- **Validation**: `_validate_tax_fx_records` מאמת סכומים ומייצר:
+  - `totals_by_currency` – סכום המיסים/עמלות לפי מטבע.
+  - `totals_by_type` – פירוט לפי סוג רשומה (withholding, cash_report, forex_conversion).
+  - `nav_components` – Diff מתוך Change in NAV.
+  - `forex_trades` – רשימת העסקאות ששימשו לחישוב הפרשי מטבע (משמש את ה-UI כרשימת "אירועים לבדיקה").
+- **Duplicate Detection**: משתמש ב-`_passthrough_duplicate_result`, אין חיפוש כפילויות במודול זה.
+- **Orchestrator/UI**: בדומה לפורטפוליו – דו"ח בלבד (`_execute_report_only`). `renderTaxFxAnalysisSummary()` מציג כרטיסי מטבעות/סוגים ואת רכיבי ה-NAV. ה-Preview ייעודי (סוג, מטבע, תיאור, תאריך, נתוני FX).
+
+> הערה: שני ה-Task Plugins חדשים משתמשים בכל המערכות הגנריות (Modal, Button, Notification, ModalNavigationService). אין קוד UI חדש מחוץ לקומפוננטים הסטנדרטיים.
 
 ## ממשק משתמש (עמוד `data_import.html`)
 - טוען את המערכת דרך סקריפט `trading-ui/scripts/import-user-data.js`:
@@ -119,14 +173,38 @@
 - אסור להכניס קוד לוגי לקובצי הדוקומנטציה (הם משקפים מצב קיים בלבד).
 
 ## שלב 2 – הרחבת אובייקט חשבון (תכנון)
-- השדה `external_account_number` הוא הצעד הראשון במעבר לחיבור חשבונות דרך API. בשלב הבא נוסיף לטבלת `trading_accounts` עמודות עבור `margin_status`, `base_currency_code`, רשימות `entitlements` ו-`missing_documents` כדי לשמר את תוצאות תהליך ה-Account Reconciliation ללא תלות ב-session JSON.
-- נתוני ה-`summary_values` ו-`account_aliases` שעד כה נשמרו רק ב-`summary_data` יועברו לטבלת בת (או JSON column) שתזין את Dashboard החשבונות וה-Broker API sync.
-- אחרי הרחבת הסכמה נריץ sync דו-כיווני: Account Linking → Broker API (OAuth או session token) כדי למשוך נתונים חיים במקום קובצי CSV. המימוש הנוכחי כבר מכיל את ה-hook הדרוש (`link_trading_account_to_file`) כך שהחיבור יהיה backwards compatible.
+- השדה `external_account_number` הוא הצעד הראשון במעבר לחיבור חשבונות דרך API. בשלב הבא נוסיף לטבלת `trading_accounts` עמודות עבור `margin_status`, `base_currency_code`, רשימות `entitlements` ו-`missing_documents` כדי לשמר את תוצאות תהליך ה-Account Reconciliation ודו"חות ה-Portfolio/Tax ללא תלות ב-session JSON.
+- נתוני ה-`summary_values`, `account_aliases`, `currency_totals` (מהדו"ח), ו-`totals_by_currency` (מיסים/FX) יועברו לטבלאות ייעודיות / JSON column שישמשו את Dashboard ואת Broker API sync.
+- שני ה-Task Plugins החדשים נבנו מראש כ-"report only" כך שאפשר למפות אותם בקלות ל-Webhook/Streaming כאשר חיבור ה-API לבורסה יהיה מוכן (אותו payload יהפוך ל-events ולא רק Preview).
+- אחרי הרחבת הסכמה נריץ sync דו-כיווני: Account Linking → Broker API (OAuth או session token) כדי למשוך נתונים חיים במקום קובצי CSV. המימוש הנוכחי כבר מכיל את ה-hooks הדרושים (`link_trading_account_to_file`, `_execute_report_only`) כך שהחיבור יהיה backwards compatible.
 - מדריך זה יתעדכן מחדש כאשר העמודות החדשות יתווספו (שלב 2), כולל מדיניות מיגרציה, בדיקות רגרסיה ויישום Endpointים לחשיפת הסטטוס ל-UI ולקונסולת הפיתוח.
 
 ## הצעות להמשך
 - הוספת Task רשמי ל-`account_reconciliation` עם Persist מלא.
 - הרחבת דוחות live כדי לכלול diff מטבע/חשבונות לפני ואחרי הייבוא.
 - ניתוח אוטומטי של פערים (alerts) על בסיס `mapping_note`.
+
+## עדכונים אחרונים (ינואר 2025)
+
+### ניקוי סשנים אוטומטי
+- **Backend**: `get_latest_active_session()` מסנן כעת סשנים ישנים (יותר מ-24 שעות) וסשנים ללא `created_at`
+- **Frontend**: אחרי ייבוא מוצלח, כל נתוני הסשן מתנקים אוטומטית (`performImport()`)
+- **תוצאה**: פתיחה מחדש של התהליך לא מציגה סשן פעיל ישן
+
+### שיפור Account Linking
+- **הסרה אוטומטית של שיוך ישן**: כאשר משנים שיוך חשבון, המערכת מסירה אוטומטית את השיוך הישן במקום להחזיר שגיאה
+- **Commit מיידי**: המערכת מבצעת commit לפני שיוך חדש כדי לשחרר unique constraints
+- **רענון סשן**: אחרי שיוך מוצלח, הסשן מתעדכן אוטומטית והמידע מוצג נכון ב-UI
+
+### שיפורי UI
+- **Precheck ללא קובץ**: בדיקה קפדנית של קובץ תקין לפני precheck
+- **הצגת מספר חשבון**: `external_account_number` מוצג בולט במודול השיוך
+- **סידור כפתורים**: כפתור "אשר חשבון מזוהה" הועבר למוטב המודול
+- **ביצועים**: רענון תצוגה מקדימה (`refreshPreviewData`) רץ כעת ברקע ללא חסימת UI
+
+### תיעוד קוד
+- **JSDoc מלא**: כל הפונקציות ב-`import-user-data.js` מתועדות עם JSDoc מלא
+- **Docstrings Python**: כל הפונקציות ב-`import_orchestrator.py` מתועדות עם docstrings
+- **אינדקס פונקציות**: אינדקס מלא של כל הפונקציות במערכת
 
 

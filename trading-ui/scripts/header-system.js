@@ -72,8 +72,56 @@ class HeaderSystem {
       }, 0);
     }
 
-    // טעינת חשבונות לפילטר - עם עיכוב קצר לוודא שה-HTML נוצר
+    // טעינת חשבונות לפילטר - ממתין להעדפות לפני טעינה
+    // Wait for critical preferences to be loaded before loading accounts
+    const waitForPreferences = async () => {
+      const environment = window.API_ENV || 'development';
+      const timeoutMs = environment === 'production' ? 5000 : 3000;
+      
+      return new Promise((resolve) => {
+        // Check if preferences are already loaded (check both currentPreferences and global flag)
+        if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+          resolve();
+          return;
+        }
+        
+        // Check if event already fired (race condition fix)
+        if (window.__preferencesCriticalLoaded) {
+          window.Logger?.debug?.('✅ Preferences already loaded (flag check)', {
+            page: 'header-system',
+          });
+          resolve();
+          return;
+        }
+        
+        // Wait for preferences:critical-loaded event
+        const eventHandler = () => {
+          resolve();
+        };
+        
+        window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+        
+        // Fallback timeout - continue even if event doesn't fire (backward compatibility)
+        setTimeout(() => {
+          window.removeEventListener('preferences:critical-loaded', eventHandler);
+          // Check flag one more time before timeout
+          if (window.__preferencesCriticalLoaded) {
+            window.Logger?.debug?.('✅ Preferences loaded during timeout check', {
+              page: 'header-system',
+            });
+          } else {
+            window.Logger?.warn?.('⚠️ Preferences event timeout - continuing without preferences', {
+              page: 'header-system',
+              timeout: `${timeoutMs}ms`,
+            });
+          }
+          resolve();
+        }, timeoutMs);
+      });
+    };
+    
     setTimeout(async () => {
+      await waitForPreferences();
       await HeaderSystem.loadAccountsForFilter();
     }, 100);
 
@@ -146,11 +194,9 @@ class HeaderSystem {
                       </a>
                     </li>
 
-
-
                     <li class="tiktrack-nav-item dropdown">
-                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
-                        <span class="nav-text">הגדרות</span>
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="data">
+                        <span class="nav-text">נתונים</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
@@ -158,12 +204,20 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/trading_accounts">חשבונות מסחר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/executions">ביצועים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                      </ul>
+                    </li>
+
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                        <span class="nav-text">הגדרות</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
-                        <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
@@ -172,7 +226,7 @@ class HeaderSystem {
 
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
-                        <span class="nav-text">כלי פיתוח</span>
+                        <span class="nav-text">פיתוח</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
@@ -237,16 +291,12 @@ class HeaderSystem {
                       </a>
                     </li>
 
-                    <li class="tiktrack-nav-item dropdown">
-                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" id="initSystemCheckBtn" 
-                         title="ניטור מערכת איתחול">
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
+                         title="ניטור מערכת איתחול"
+                         data-onclick="initSystemCheck?.runPageCheck(event)">
                         <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
-                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
-                      <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.runPageCheck(event)">בדיקת מערכת איתחול</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="#" data-onclick="initSystemCheck?.generateScriptLoadingCode(event)">ייצר קוד טעינה</a></li>
-                      </ul>
                     </li>
                   </ul>
                 </nav>
@@ -1044,10 +1094,27 @@ class HeaderSystem {
       // שימוש בפונקציה מקובץ השירותים
       let accounts = [];
 
-      if (typeof window.loadTradingAccountsFromServer === 'function') {
+      // Priority 1: Use DataImportData service with caching (if available)
+      if (window.DataImportData?.loadTradingAccountsForImport) {
+        try {
+          accounts = await window.DataImportData.loadTradingAccountsForImport();
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Failed to load accounts via DataImportData, trying fallback', {
+            page: 'header-system',
+            error: error?.message
+          });
+          // Fall through to next option
+        }
+      }
+
+      // Priority 2: Use legacy function (if available and accounts not loaded)
+      if ((!accounts || accounts.length === 0) && typeof window.loadTradingAccountsFromServer === 'function') {
         await window.loadTradingAccountsFromServer();
         accounts = window.trading_accountsData || [];
-      } else {
+      }
+
+      // Priority 3: Direct API call (only if no other method worked)
+      if (!accounts || accounts.length === 0) {
         // fallback לטעינה ישירה
         const response = await fetch('/api/trading-accounts/');
         const data = await response.json();
@@ -1528,8 +1595,19 @@ class HeaderSystem {
             return true;
           }
 
-          const date = new Date(dateString);
-          const today = new Date();
+          // Use dateUtils for consistent date parsing
+          let date;
+          if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+            date = window.dateUtils.toDateObject(dateString);
+          } else {
+            date = new Date(dateString);
+          }
+          let today;
+          if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+            today = window.dateUtils.getToday();
+          } else {
+            today = new Date();
+          }
           today.setHours(0, 0, 0, 0);
 
           switch (dateRange) {
@@ -1537,15 +1615,31 @@ class HeaderSystem {
               return date.toDateString() === today.toDateString();
 
             case 'אתמול':
-              const yesterday = new Date(today);
-              yesterday.setDate(today.getDate() - 1);
+              // Use dateUtils for consistent date handling
+              let yesterday;
+              if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                const yesterdayEpoch = today.getTime() - (24 * 60 * 60 * 1000);
+                yesterday = window.dateUtils.toDateObject({ epochMs: yesterdayEpoch });
+              } else {
+                yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+              }
               return date.toDateString() === yesterday.toDateString();
 
             // השבוע = מתחילת השבוע הקלנדארי (יום ראשון) עד היום
             case 'השבוע': {
-              const startOfWeek = new Date(today);
-              const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
-              startOfWeek.setDate(today.getDate() - dayOfWeek);
+              // Use dateUtils for consistent date handling
+              let startOfWeek;
+              if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                const daysToSubtract = dayOfWeek;
+                const startOfWeekEpoch = today.getTime() - (daysToSubtract * 24 * 60 * 60 * 1000);
+                startOfWeek = window.dateUtils.toDateObject({ epochMs: startOfWeekEpoch });
+              } else {
+                startOfWeek = new Date(today);
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                startOfWeek.setDate(today.getDate() - dayOfWeek);
+              }
               startOfWeek.setHours(0, 0, 0, 0);
               date.setHours(0, 0, 0, 0);
               return date >= startOfWeek && date <= today;
@@ -2958,6 +3052,68 @@ window.resetAllFilters = async function () {
       }
     }
 
+    // Wait for critical preferences to be loaded before using them
+    const environment = window.API_ENV || 'development';
+    const timeoutMs = environment === 'production' ? 5000 : 3000;
+    const waitStartTime = performance.now();
+    
+    // Wait for preferences:critical-loaded event with timeout fallback
+    await new Promise((resolve) => {
+      // Check if preferences are already loaded (check both currentPreferences and global flag)
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        const waitTime = performance.now() - waitStartTime;
+        window.Logger?.debug?.('✅ Preferences already available', {
+          page: 'header-system',
+          waitTime: `${waitTime.toFixed(2)}ms`,
+        });
+        resolve();
+        return;
+      }
+      
+      // Check if event already fired (race condition fix)
+      if (window.__preferencesCriticalLoaded) {
+        const waitTime = performance.now() - waitStartTime;
+        window.Logger?.debug?.('✅ Preferences already loaded (flag check)', {
+          page: 'header-system',
+          waitTime: `${waitTime.toFixed(2)}ms`,
+        });
+        resolve();
+        return;
+      }
+      
+      // Wait for preferences:critical-loaded event
+      const eventHandler = () => {
+        const waitTime = performance.now() - waitStartTime;
+        window.Logger?.debug?.('✅ Preferences loaded via event', {
+          page: 'header-system',
+          waitTime: `${waitTime.toFixed(2)}ms`,
+        });
+        resolve();
+      };
+      
+      window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+      
+      // Fallback timeout - continue even if event doesn't fire (backward compatibility)
+      setTimeout(() => {
+        window.removeEventListener('preferences:critical-loaded', eventHandler);
+        const waitTime = performance.now() - waitStartTime;
+        // Check flag one more time before timeout
+        if (window.__preferencesCriticalLoaded) {
+          window.Logger?.debug?.('✅ Preferences loaded during timeout check', {
+            page: 'header-system',
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        } else {
+          window.Logger?.warn?.('⚠️ Preferences event timeout - continuing without waiting', {
+            page: 'header-system',
+            timeout: `${timeoutMs}ms`,
+            waitTime: `${waitTime.toFixed(2)}ms`,
+          });
+        }
+        resolve();
+      }, timeoutMs);
+    });
+    
     // טעינת הגדרות ברירת מחדל מהעדפות באמצעות מערכת ההעדפות הקיימת
     console.log('↻ בודק אם getPreference קיימת:', typeof window.getPreference);
     window.Logger.info('↻ בודק אם getPreference קיימת:', typeof window.getPreference, {

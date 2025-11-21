@@ -5,18 +5,18 @@
     "minor": 2,
     "patch": 0,
     "build": 0,
-    "commit": "47f8278b473d2fcce259ad035b43c04ea5560bfe",
-    "updated_at": "2025-11-20T15:09:51+00:00",
-    "notes": "Production release 1.2.0.0"
+    "commit": "568f18f6ed3ea36ed8a65f961234fd064eb697f4",
+    "updated_at": "2025-11-20T11:34:46+00:00",
+    "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.1.7.0",
+    "version": "1.1.39.0",
     "major": 1,
     "minor": 1,
-    "patch": 7,
+    "patch": 39,
     "build": 0,
-    "commit": "f0d829446119bf084124c4de1460898f30d84ec9",
-    "updated_at": "2025-11-15T15:52:46+00:00",
-    "notes": "Conditions dev playbook"
+    "commit": "81eb68e2ca2fbd3661dee61ffaa345816cc10c81",
+    "updated_at": "2025-11-20T17:22:46+00:00",
+    "notes": "Add documentation updates and backup completeness check script"
   }
 }

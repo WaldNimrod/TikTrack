@@ -1,13 +1,13 @@
 /**
  * Account Service - Comprehensive Function Index
  * ==========================================
- * 
+ *
  * This file contains the account service for TikTrack.
  * Provides advanced account management functions with caching and status filtering.
- * 
+ *
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/ACCOUNT_SERVICE_SYSTEM.md
- * 
+ *
  * Author: TikTrack Development Team
  * Version: 1.0
  * Last Updated: 2025-01-27
@@ -73,7 +73,7 @@ function clearCache() {
  */
 async function getAccounts() {
   try {
-    const response = await fetch('/api/accounts/');
+    const response = await fetch('/api/trading-accounts/');
     if (response.ok) {
       const data = await response.json();
       const accounts = data.data || data || [];
@@ -133,8 +133,26 @@ async function getAccountsByStatus(status) {
  * @returns {Promise<boolean>} Success status
  */
 async function cancelAccount(accountId) {
-  // ביטול חשבון מסחר
+  // ביטול חשבון מסחר – השתמש בתהליך המאוחד של trading_accounts
+  if (typeof window.cancelTradingAccountWithLinkedItemsCheck === 'function') {
+    await window.cancelTradingAccountWithLinkedItemsCheck(accountId);
+    return true;
+  }
 
+  if (
+    typeof window.checkLinkedItemsAndPerformAction === 'function' &&
+    typeof window.performTradingAccountCancellation === 'function'
+  ) {
+    await window.checkLinkedItemsAndPerformAction(
+      'account',
+      accountId,
+      'cancel',
+      window.performTradingAccountCancellation,
+    );
+    return true;
+  }
+
+  // Fallback legacy flow (should not be used anymore)
   const response = await fetch(`/api/accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -146,9 +164,10 @@ async function cancelAccount(accountId) {
     throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון מסחר');
   }
 
-  // ניקוי ה-cache
   clearCache();
-
+  if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
+    await window.loadTradingAccountsDataForTradingAccountsPage({ force: true });
+  }
   return true;
 }
 

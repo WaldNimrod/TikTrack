@@ -34,6 +34,37 @@
 // window.Logger.info('📄 Loading preferences-core.js v3.0.0...', { page: "preferences-core-new" });
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Core System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - PreferencesAPIClient - HTTP communication with backend
+ * - PreferencesCacheManager - Cache operations (4-layer cache)
+ * - PreferencesValidationManager - Preference validation
+ * - PreferencesProfileManager - Profile operations
+ * - PreferencesCore - Main coordinator class
+ * 
+ * Global Functions (Backward Compatibility):
+ * - getPreference(preferenceName, userId, profileId) - Get single preference
+ * - savePreference(preferenceName, value, userId, profileId) - Save single preference
+ * - getAllPreferences(userId, profileId) - Get all preferences
+ * - saveAllPreferences(preferences, userId, profileId) - Save multiple preferences
+ * - getCurrentPreference(preferenceName, options) - Get cached preference with fallbacks
+ * - initializePreferencesWithLazyLoading(userId, profileId) - Initialize with lazy loading
+ * - initializePreferences(userId, profileId) - Initialize preferences (legacy alias)
+ * 
+ * Global Instances:
+ * - window.PreferencesCore - Main preferences core instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // ERROR CLASSES
 // ============================================================================
 
@@ -60,6 +91,9 @@ class ValidationError extends Error {
   }
 }
 
+// Expose ValidationError globally for use by preferences-validation.js
+window.ValidationError = ValidationError;
+
 // ============================================================================
 // API CLIENT CLASS
 // ============================================================================
@@ -75,11 +109,13 @@ class PreferencesAPIClient {
   }
 
   /**
-     * Generic GET request
-     * @param {string} endpoint - API endpoint
-     * @param {Object} params - Query parameters
-     * @returns {Promise<any>} Response data
-     */
+   * Generic GET request
+   * @function PreferencesAPIClient.get
+   * @param {string} endpoint - API endpoint
+   * @param {Object} params - Query parameters
+   * @returns {Promise<any>} Response data
+   * @throws {APIError} If HTTP request fails
+   */
   async get(endpoint, params = {}) {
     const url = new URL(`${this.baseURL}${endpoint}`, window.location.origin);
 
@@ -130,20 +166,16 @@ class PreferencesAPIClient {
      * @returns {Promise<any>} Preference value
      */
   async getPreference(preferenceName, userId = null, profileId = null) {
-    const params = {
-      preference_name: preferenceName,
-      user_id: userId || this.defaultUserId,
-    };
-
-    if (profileId !== null && profileId !== undefined) {
-      params.profile_id = profileId;
-      window.Logger.debug(`🔍 API DEBUG: getPreference(${preferenceName}) - using provided profileId: ${profileId}`, { page: 'preferences-core-new' });
+    if (!window.PreferencesData?.loadPreference || typeof window.PreferencesData.loadPreference !== 'function') {
+      window.Logger?.warn?.('[PreferencesCore] loadPreference API is not available', { page: 'preferences-core-new' });
+      return null;
     }
-
-    window.Logger.debug('🔍 API DEBUG: Requesting preference with params:', params, { page: 'preferences-core-new' });
-
-    const result = await this.get('/user/single', params);
-    return result.data?.value;
+    const result = await window.PreferencesData.loadPreference({
+      preferenceName,
+      userId: userId || this.defaultUserId,
+      profileId,
+    });
+    return result?.value ?? null;
   }
 
   /**
@@ -153,23 +185,48 @@ class PreferencesAPIClient {
      * @returns {Promise<Object>} All preferences
      */
   async getAllPreferences(userId = null, profileId = null) {
-    const params = {
-      user_id: userId || this.defaultUserId,
-    };
-
-    if (profileId !== null && profileId !== undefined) {
-      params.profile_id = profileId;
+    if (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
+      window.Logger?.warn?.('[PreferencesAPIClient] loadAllPreferencesRaw API is not available', { page: 'preferences-core-new' });
+      return null;
     }
+    
+    window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences calling loadAllPreferencesRaw', {
+      page: 'preferences-core-new',
+      userId: userId || this.defaultUserId,
+      profileId,
+    });
+    
+    const payload = await window.PreferencesData.loadAllPreferencesRaw({
+      userId: userId || this.defaultUserId,
+      profileId,
+      force: true,
+    });
 
-    const result = await this.get('/user', params);
-    const data = result?.data || {};
+    window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences received payload', {
+      page: 'preferences-core-new',
+      userId: userId || this.defaultUserId,
+      profileId,
+      preferencesCount: payload?.preferences 
+        ? (Array.isArray(payload.preferences) 
+            ? payload.preferences.length 
+            : Object.keys(payload.preferences).length)
+        : 0,
+    });
 
-    return {
-      preferences: data.preferences || {},
-      profileContext: data.profile_context || null,
-      requestedProfileId: data.requested_profile_id ?? null,
-      resolvedProfileId: data.profile_id ?? null,
+    const result = {
+      preferences: payload.preferences || {},
+      profileContext: payload.profileContext || null,
+      requestedProfileId: payload.requestedProfileId ?? null,
+      resolvedProfileId: payload.resolvedProfileId ?? null,
     };
+    
+    window.Logger?.debug?.('🔍 PreferencesAPIClient.getAllPreferences returning result', {
+      page: 'preferences-core-new',
+      preferencesCount: Object.keys(result.preferences || {}).length,
+      preferencesSample: Object.fromEntries(Object.entries(result.preferences || {}).slice(0, 5)),
+    });
+
+    return result;
   }
 
   /**
@@ -180,21 +237,17 @@ class PreferencesAPIClient {
      * @returns {Promise<Object>} Group preferences
      */
   async getGroupPreferences(groupName, userId = null, profileId = null) {
-    const params = {
-      group: groupName,
-      user_id: userId || this.defaultUserId,
-    };
-
-    if (profileId !== null && profileId !== undefined) {
-      params.profile_id = profileId;
-    }
-
-    const result = await this.get('/user/group', params);
+    const result = await window.PreferencesData.loadPreferenceGroup({
+      groupName,
+      userId: userId || this.defaultUserId,
+      profileId,
+      force: true,
+    });
     return {
-      preferences: result.data?.preferences || {},
-      profileContext: result.data?.profile_context || null,
-      requestedProfileId: result.data?.requested_profile_id ?? null,
-      resolvedProfileId: result.data?.profile_id ?? null,
+      preferences: result?.preferences || {},
+      profileContext: result?.profileContext || null,
+      requestedProfileId: result?.requestedProfileId ?? null,
+      resolvedProfileId: result?.resolvedProfileId ?? null,
     };
   }
 
@@ -207,18 +260,13 @@ class PreferencesAPIClient {
      * @returns {Promise<boolean>} Success status
      */
   async savePreference(preferenceName, value, userId = null, profileId = null) {
-    const data = {
-      preference_name: preferenceName,
+    const result = await window.PreferencesData.savePreference({
+      preferenceName,
       value,
-      user_id: userId || this.defaultUserId,
-    };
-
-    if (profileId) {
-      data.profile_id = profileId;
-    }
-
-    const result = await this.post('/user/single', data);
-    return result.success;
+      userId: userId || this.defaultUserId,
+      profileId,
+    });
+    return result?.success !== false;
   }
 
   /**
@@ -229,29 +277,31 @@ class PreferencesAPIClient {
      * @returns {Promise<Object>} Save results
      */
   async savePreferences(preferences, userId = null, profileId = null) {
-    const results = {
-      saved: 0,
-      errors: 0,
-      details: {},
-    };
+    const result = await window.PreferencesData.savePreferences({
+      preferences,
+      userId: userId || this.defaultUserId,
+      profileId,
+    });
 
-    for (const [name, value] of Object.entries(preferences)) {
-      try {
-        const success = await this.savePreference(name, value, userId, profileId);
-        if (success) {
-          results.saved++;
-          results.details[name] = { status: 'success' };
-        } else {
-          results.errors++;
-          results.details[name] = { status: 'error', message: 'Save failed' };
-        }
-      } catch (error) {
-        results.errors++;
-        results.details[name] = { status: 'error', message: error.message };
-      }
+    if (result?.success === false) {
+      return {
+        saved: 0,
+        errors: Object.keys(preferences).length,
+        details: Object.keys(preferences).reduce((acc, key) => {
+          acc[key] = { status: 'error', message: result.error || 'Save failed' };
+          return acc;
+        }, {}),
+      };
     }
 
-    return results;
+    return {
+      saved: Object.keys(preferences).length,
+      errors: 0,
+      details: Object.keys(preferences).reduce((acc, key) => {
+        acc[key] = { status: 'success' };
+        return acc;
+      }, {}),
+    };
   }
 }
 
@@ -332,12 +382,7 @@ class PreferencesValidationManager {
      */
   async checkPreferenceExists(preferenceName) {
     try {
-      const response = await fetch(`/api/preferences/types/check?name=${preferenceName}`);
-      if (response.ok) {
-        const result = await response.json();
-        return result.exists;
-      }
-      return false;
+      return await window.PreferencesData.checkPreferenceExists(preferenceName);
     } catch (error) {
       // window.Logger.error(`❌ Error checking preference existence:`, error, { page: "preferences-core-new" });
       return false;
@@ -366,6 +411,8 @@ class PreferencesCore {
     this.latestProfileContext = null;
     this.defaultPreferenceCache = new Map();
     this.defaultPreferenceEndpointAvailable = true;
+    // High-level deduplication registry
+    this._getAllPreferencesInflight = new Map();
   }
 
   /**
@@ -389,24 +436,18 @@ class PreferencesCore {
       return null;
     }
 
+    if (!window.PreferencesData?.loadDefaultPreference) {
+      window.Logger?.warn?.('[PreferencesCore] loadDefaultPreference API is not available', { page: 'preferences-core-new' });
+      this.defaultPreferenceCache.set(preferenceName, null);
+      return null;
+    }
+
     try {
-      const response = await fetch(`/api/preferences/default?preference_name=${encodeURIComponent(preferenceName)}`);
-      if (response.status === 404) {
-        this.defaultPreferenceEndpointAvailable = false;
-        this.defaultPreferenceCache.set(preferenceName, null);
-        window.Logger?.warn?.('⚠️ Default preferences API not available, falling back to local caches only', { page: 'preferences-core-new' });
-        return null;
-      }
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to get default preference');
-      }
-
-      const defaultValue = result.data?.default_value ?? null;
+      const defaultValue = await window.PreferencesData.loadDefaultPreference(preferenceName, {
+        userId: this.currentUserId || this.defaultUserId,
+        profileId: this.currentProfileId,
+        force: true,
+      });
       this.defaultPreferenceCache.set(preferenceName, defaultValue);
       return defaultValue;
     } catch (error) {
@@ -473,31 +514,34 @@ class PreferencesCore {
       if (!isLoaded) {
         window.Logger.debug(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: 'preferences-core-new' });
         // Load all preferences at once from API
-        try {
-          const response = await fetch(`/api/preferences/user?user_id=${finalUserId}&profile_id=${finalProfileId}`);
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-
-          const result = await response.json();
-          if (!result.success) {
-            throw new Error(result.error || 'Failed to load preferences');
-          }
-
-          const allPreferences = result.data.preferences;
-          const value = allPreferences[preferenceName];
-
-          // Save to UnifiedCacheManager
-          if (window.UnifiedCacheManager) {
-            await window.UnifiedCacheManager.save(cacheKey, value, {
-              layer: 'localStorage',
-              ttl: 300000,
+        // Use force: false to leverage cache - only call API if cache is missing or expired
+        // This prevents rate limiting after cache clear or hard refresh
+        const preferencesDataApi = window.PreferencesData;
+        if (preferencesDataApi?.loadAllPreferencesRaw) {
+          try {
+            const payload = await preferencesDataApi.loadAllPreferencesRaw({
+              userId: finalUserId,
+              profileId: finalProfileId,
+              force: false, // Use cache if available - only fetch from API if cache is missing/expired
             });
-          }
 
-          return value;
-        } catch (error) {
-          window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
+            const allPreferences = payload?.preferences || {};
+            const value = allPreferences[preferenceName];
+
+            if (window.UnifiedCacheManager) {
+              await window.UnifiedCacheManager.save(cacheKey, value, {
+                layer: 'localStorage',
+                ttl: 300000,
+              });
+            }
+
+            return value;
+          } catch (error) {
+            window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
+            return null;
+          }
+        } else {
+          window.Logger?.warn?.('[PreferencesCore] loadAllPreferencesRaw API is not available - returning null', { page: 'preferences-core-new' });
           return null;
         }
       }
@@ -529,96 +573,199 @@ class PreferencesCore {
   }
 
   /**
-     * Get all preferences with lazy loading
-     * @param {number} userId - User ID
-     * @param {number} profileId - Profile ID
-     * @param {Array<string>} criticalPrefs - Critical preferences to load immediately
-     * @returns {Promise<Object>} Preferences object
-     */
+   * Get all preferences with lazy loading
+   * @function PreferencesCore.getAllPreferences
+   * @param {number} [userId=null] - User ID (uses currentUserId if not provided)
+   * @param {number} [profileId=null] - Profile ID (uses currentProfileId if not provided, 0 for default)
+   * @param {Array<string>} [criticalPrefs=[]] - Critical preferences to load immediately
+   * @returns {Promise<Object>} Preferences object with all preference values
+   * @example
+   * const allPrefs = await window.PreferencesCore.getAllPreferences(1, 2);
+   */
   async getAllPreferences(userId = null, profileId = null, criticalPrefs = []) {
     // For default profile, use 0 explicitly
     const finalUserId = userId || this.currentUserId;
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
-    const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
-
-    // Check cache first via UnifiedCacheManager
-    if (window.UnifiedCacheManager) {
-      const cached = await window.UnifiedCacheManager.get(cacheKey, {
-        layer: 'localStorage',
-        ttl: 300000,
+    // High-level deduplication: prevent duplicate calls with same params
+    const dedupeKey = `getAllPreferences:u${finalUserId}:p${finalProfileId}`;
+    if (this._getAllPreferencesInflight.has(dedupeKey)) {
+      window.Logger?.debug?.('⏭️ PreferencesCore.getAllPreferences deduplicated - returning existing promise', {
+        page: 'preferences-core-new',
+        dedupeKey,
       });
-      if (cached !== null) {
-        window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
-        return cached;
-      }
+      return await this._getAllPreferencesInflight.get(dedupeKey);
     }
 
-    try {
-      // Load critical preferences first
-      const criticalPreferences = {};
-      if (criticalPrefs.length > 0) {
-        for (const prefName of criticalPrefs) {
-          criticalPreferences[prefName] = await this.getPreference(prefName, finalUserId, finalProfileId);
+    const loadPromise = (async () => {
+      try {
+        const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
+
+        // Check cache first via UnifiedCacheManager
+        if (window.UnifiedCacheManager) {
+          const cached = await window.UnifiedCacheManager.get(cacheKey, {
+            layer: 'localStorage',
+            ttl: 300000,
+          });
+          if (cached !== null) {
+            window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
+            return cached;
+          }
         }
-      }
 
-      // Load all preferences
-      const apiResult = await this.apiClient.getAllPreferences(
-        finalUserId,
-        finalProfileId,
-      );
-      const allPreferences = apiResult.preferences || {};
-      const profileContext = apiResult.profileContext || null;
-      const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined
-        ? profileContext.resolved_profile_id
-        : finalProfileId;
+        try {
+          // Load critical preferences first
+          const criticalPreferences = {};
+          if (criticalPrefs.length > 0) {
+            for (const prefName of criticalPrefs) {
+              criticalPreferences[prefName] = await this.getPreference(prefName, finalUserId, finalProfileId);
+            }
+          }
 
-      if (profileContext) {
-        this.latestProfileContext = profileContext;
-        if (profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined) {
-          this.currentProfileId = profileContext.resolved_profile_id;
+          // Load all preferences
+          window.Logger?.debug?.('🔍 Calling apiClient.getAllPreferences', {
+            page: 'preferences-core-new',
+            userId: finalUserId,
+            profileId: finalProfileId,
+          });
+          
+          const apiResult = await this.apiClient.getAllPreferences(
+            finalUserId,
+            finalProfileId,
+          );
+          
+          window.Logger?.debug?.('🔍 apiClient.getAllPreferences result', {
+            page: 'preferences-core-new',
+            userId: finalUserId,
+            profileId: finalProfileId,
+            preferencesCount: Array.isArray(apiResult?.preferences) ? apiResult.preferences.length : Object.keys(apiResult?.preferences || {}).length,
+          });
+          
+          let allPreferences = apiResult.preferences || {};
+          
+          window.Logger?.debug?.('🔍 Extracted preferences from API result', {
+            page: 'preferences-core-new',
+            userId: finalUserId,
+            profileId: finalProfileId,
+            allPreferencesCount: Object.keys(allPreferences).length,
+          });
+          const profileContext = apiResult.profileContext || null;
+          const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined
+            ? profileContext.resolved_profile_id
+            : finalProfileId;
+
+          if (profileContext) {
+            this.latestProfileContext = profileContext;
+            if (profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined) {
+              this.currentProfileId = profileContext.resolved_profile_id;
+            }
+            if (profileContext.user?.id) {
+              this.currentUserId = profileContext.user.id;
+            } else {
+              this.currentUserId = finalUserId;
+            }
+          } else {
+            this.currentProfileId = effectiveProfileId;
+            this.currentUserId = finalUserId;
+          }
+
+          // If no preferences loaded, load all default values from preference_types table
+          // This ensures the system always has default values to work with
+          if (Object.keys(allPreferences).length === 0) {
+            window.Logger?.info?.('⚠️ No user preferences found, loading default values from preference_types table', {
+              page: 'preferences-core-new',
+              userId: finalUserId,
+              profileId: effectiveProfileId,
+            });
+            
+            try {
+              // Try to load preference types metadata to get all preference names
+              if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceTypes === 'function') {
+                const typesData = await window.PreferencesData.loadPreferenceTypes({ force: false });
+                const types = typesData?.types || typesData?.data?.types || typesData || [];
+                
+                if (Array.isArray(types) && types.length > 0) {
+                  // Load default value for each preference type
+                  const defaultPreferences = {};
+                  for (const prefType of types) {
+                    const prefName = prefType?.preference_name || prefType?.name || prefType?.html_id;
+                    if (!prefName) continue;
+                    
+                    try {
+                      const defaultValue = await this.getDefaultPreference(prefName);
+                      if (defaultValue !== null && defaultValue !== undefined) {
+                        defaultPreferences[prefName] = defaultValue;
+                      } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
+                        // Fallback: use default_value from types data if available
+                        defaultPreferences[prefName] = prefType.default_value;
+                      }
+                    } catch (defaultError) {
+                      // Non-critical - continue loading other defaults
+                      window.Logger?.debug?.(`⚠️ Failed to load default for ${prefName}: ${defaultError?.message}`, {
+                        page: 'preferences-core-new',
+                      });
+                    }
+                  }
+                  
+                  if (Object.keys(defaultPreferences).length > 0) {
+                    allPreferences = defaultPreferences;
+                    window.Logger?.info?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
+                      page: 'preferences-core-new',
+                    });
+                  }
+                }
+              }
+            } catch (defaultLoadError) {
+              window.Logger?.warn?.('⚠️ Failed to load default preferences, continuing with empty preferences', {
+                page: 'preferences-core-new',
+                error: defaultLoadError?.message,
+              });
+            }
+          }
+
+          // Merge critical preferences
+          const result = { ...allPreferences, ...criticalPreferences };
+
+          // Cache the result via UnifiedCacheManager
+          if (window.UnifiedCacheManager) {
+            const cacheKeyForSave = `all_preferences_${finalUserId}_${effectiveProfileId}`;
+            await window.UnifiedCacheManager.save(cacheKeyForSave, result, {
+              layer: 'localStorage',
+              ttl: 300000,
+            });
+          }
+
+          window.Logger.info(`✅ Loaded ${Object.keys(result).length} preferences`, { page: 'preferences-core-new' });
+          return result;
+        } catch (error) {
+          window.Logger.error('❌ Error loading all preferences:', error, { page: 'preferences-core-new' });
+          return {};
         }
-        if (profileContext.user?.id) {
-          this.currentUserId = profileContext.user.id;
-        } else {
-          this.currentUserId = finalUserId;
-        }
-      } else {
-        this.currentProfileId = effectiveProfileId;
-        this.currentUserId = finalUserId;
+      } catch (error) {
+        window.Logger.error('❌ Error in getAllPreferences outer try:', error, { page: 'preferences-core-new' });
+        return {};
+      } finally {
+        this._getAllPreferencesInflight.delete(dedupeKey);
       }
-
-      // Merge critical preferences
-      const result = { ...allPreferences, ...criticalPreferences };
-
-      // Cache the result via UnifiedCacheManager
-      if (window.UnifiedCacheManager) {
-        const cacheKeyForSave = `all_preferences_${finalUserId}_${effectiveProfileId}`;
-        await window.UnifiedCacheManager.save(cacheKeyForSave, result, {
-          layer: 'localStorage',
-          ttl: 300000,
-        });
-      }
-
-      window.Logger.info(`✅ Loaded ${Object.keys(result, { page: 'preferences-core-new' }).length} preferences`);
-      return result;
-
-    } catch (error) {
-      window.Logger.error('❌ Error loading all preferences:', error, { page: 'preferences-core-new' });
-      return {};
+    })();
+      
+      this._getAllPreferencesInflight.set(dedupeKey, loadPromise);
+      return await loadPromise;
     }
-  }
 
   /**
-     * Save single preference with strict validation
-     * @param {string} preferenceName - Preference name
-     * @param {any} value - Preference value
-     * @param {number} userId - User ID
-     * @param {number} profileId - Profile ID
-     * @param {string} dataType - Expected data type
-     * @returns {Promise<Object>} Save result with validation
-     */
+   * Save single preference with strict validation
+   * @function PreferencesCore.savePreference
+   * @param {string} preferenceName - Preference name
+   * @param {any} value - Preference value
+   * @param {number} [userId=null] - User ID (uses currentUserId if not provided)
+   * @param {number} [profileId=null] - Profile ID (uses currentProfileId if not provided, 0 for default)
+   * @param {string} [dataType='string'] - Data type for validation
+   * @returns {Promise<Object>} Save result with validation status
+   * @throws {ValidationError} If validation fails
+   * @example
+   * await window.PreferencesCore.savePreference('primaryCurrency', 'EUR', 1, 2);
+   */
   async savePreference(preferenceName, value, userId = null, profileId = null, dataType = 'string') {
     try {
       // Strict validation if available
@@ -916,9 +1063,11 @@ class PreferencesCore {
 
       // Initialize lazy loader if available
       if (window.LazyLoader) {
-        // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
+        // Ensure profileId is explicitly set (null means use active profile from server, not 0 or 1)
         const finalUserId = userId || this.currentUserId || 1;
-        const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
+        // If profileId is null/undefined, pass null to let server determine active profile
+        // Don't use cached currentProfileId if it might be stale (e.g., from SQLite migration)
+        const finalProfileId = profileId !== null && profileId !== undefined ? profileId : null;
 
         await window.LazyLoader.initialize(
           finalUserId,

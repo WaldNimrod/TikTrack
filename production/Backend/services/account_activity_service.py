@@ -192,7 +192,7 @@ class AccountActivityService:
                 # Filter currency exchanges: only process other_negative flow for display
                 # But still include all flows for balance calculation
                 external_id = cf.external_id
-                is_exchange = CashFlowHelperService.is_currency_exchange(external_id)
+                is_exchange = CashFlowHelperService.is_currency_exchange(external_id, getattr(cf, 'type', None))
                 
                 currency_id = cf.currency_id or 1  # Default to USD
                 currency_symbol_raw = cf.currency.symbol if cf.currency else 'USD'
@@ -226,7 +226,8 @@ class AccountActivityService:
                         # We've already processed this exchange for display - skip
                         continue
                     
-                    if cf.type == 'other_negative':
+                    direction = CashFlowHelperService.get_exchange_direction(getattr(cf, 'type', None))
+                    if direction == 'from':
                         # This is the flow we want to show - mark exchange as seen and include
                         exchange_ids_seen.add(external_id)
                         # Add to movements for display
@@ -434,7 +435,7 @@ class AccountActivityService:
         ).all()
         
         for cf in cash_flows:
-            if cf.type in ['deposit', 'dividend', 'interest']:
+            if cf.type in ['deposit', 'dividend', 'interest', 'syep_interest']:
                 balance += float(cf.amount)
             elif cf.type in ['withdrawal', 'fee']:
                 balance -= float(cf.amount)

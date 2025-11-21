@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func, case
 from models.alert import Alert
 from models.note_relation_type import NoteRelationType
 from services.validation_service import ValidationService
-from datetime import datetime
+from datetime import datetime, date
 import logging
 from typing import List, Optional, Dict, Any
 
@@ -51,6 +52,10 @@ class AlertService:
     def create(db: Session, alert_data: Dict[str, Any]) -> Alert:
         """Create a new alert"""
         try:
+            logger.info(f"AlertService.create called with data: {alert_data}")
+            logger.info(f"condition_attribute in data: {'condition_attribute' in alert_data}")
+            logger.info(f"condition_attribute value: {alert_data.get('condition_attribute')}")
+            
             # Set default value for is_triggered
             if 'is_triggered' not in alert_data:
                 alert_data['is_triggered'] = 'false'
@@ -65,8 +70,12 @@ class AlertService:
                 related_type_id = AlertService._get_relation_type_id(db, related_type)
                 alert_data['related_type_id'] = related_type_id
             
+            logger.info(f"Before _process_condition_fields - condition_attribute: {alert_data.get('condition_attribute')}")
+            
             # Handle new condition fields
             AlertService._process_condition_fields(alert_data)
+            
+            logger.info(f"After _process_condition_fields - condition_attribute: {alert_data.get('condition_attribute')}")
             
             # Validate expiry_date format if provided
             AlertService._validate_expiry_date(alert_data)
@@ -347,6 +356,8 @@ class AlertService:
     def _process_condition_fields(alert_data: Dict[str, Any]) -> None:
         """Process condition fields for new format"""
         try:
+            logger.info(f"Processing condition fields - input data: {alert_data}")
+            
             # If legacy condition field is provided, convert to new format
             if 'condition' in alert_data and alert_data['condition']:
                 legacy_condition = alert_data['condition']
@@ -385,59 +396,119 @@ class AlertService:
                         # Remove legacy field
                         del alert_data['condition']
             
-            # Set defaults for new fields if not provided
+            # IMPORTANT: Check if fields already exist and are not None/empty before setting defaults
+            # Only set defaults if field is truly missing, not if it's None or empty string
+            # BUT: If field exists and has a value, preserve it!
             if 'condition_attribute' not in alert_data:
+                logger.warning(f"condition_attribute missing, setting default")
                 alert_data['condition_attribute'] = 'price'
+            elif not alert_data.get('condition_attribute'):
+                # Field exists but is None or empty - set default
+                logger.warning(f"condition_attribute is None or empty, setting default. Current value: {alert_data.get('condition_attribute')}")
+                alert_data['condition_attribute'] = 'price'
+            else:
+                logger.info(f"condition_attribute already set to: {alert_data.get('condition_attribute')}")
+                
             if 'condition_operator' not in alert_data:
+                logger.warning(f"condition_operator missing, setting default")
                 alert_data['condition_operator'] = 'more_than'
+            elif not alert_data.get('condition_operator'):
+                logger.warning(f"condition_operator is None or empty, setting default. Current value: {alert_data.get('condition_operator')}")
+                alert_data['condition_operator'] = 'more_than'
+            else:
+                logger.info(f"condition_operator already set to: {alert_data.get('condition_operator')}")
+                
             if 'condition_number' not in alert_data:
+                logger.warning(f"condition_number missing, setting default")
                 alert_data['condition_number'] = '0'
+            elif not alert_data.get('condition_number'):
+                logger.warning(f"condition_number is None or empty, setting default. Current value: {alert_data.get('condition_number')}")
+                alert_data['condition_number'] = '0'
+            else:
+                logger.info(f"condition_number already set to: {alert_data.get('condition_number')}")
+            
+            logger.info(f"After processing - condition_attribute: {alert_data.get('condition_attribute')}, condition_operator: {alert_data.get('condition_operator')}, condition_number: {alert_data.get('condition_number')}")
             
             # Validate new condition fields
-            valid_attributes = ['price', 'change', 'ma', 'volume']
+            valid_attributes = ['price', 'change', 'ma', 'volume', 'balance']
             valid_operators = ['more_than', 'less_than', 'cross', 'cross_up', 'cross_down', 'change', 'change_up', 'change_down', 'equals']
             
-            if alert_data['condition_attribute'] not in valid_attributes:
-                raise ValueError(f"Invalid condition_attribute: {alert_data['condition_attribute']}")
-            if alert_data['condition_operator'] not in valid_operators:
-                raise ValueError(f"Invalid condition_operator: {alert_data['condition_operator']}")
+            condition_attribute = alert_data.get('condition_attribute')
+            if not condition_attribute or condition_attribute not in valid_attributes:
+                logger.error(f"Invalid condition_attribute: {condition_attribute}. Valid values: {valid_attributes}")
+                raise ValueError(f"Invalid condition_attribute: {condition_attribute}")
+            
+            condition_operator = alert_data.get('condition_operator')
+            if not condition_operator or condition_operator not in valid_operators:
+                logger.error(f"Invalid condition_operator: {condition_operator}. Valid values: {valid_operators}")
+                raise ValueError(f"Invalid condition_operator: {condition_operator}")
             
             # Validate condition_number is numeric
-            try:
-                float(alert_data['condition_number'])
-            except ValueError:
-                raise ValueError(f"Invalid condition_number: {alert_data['condition_number']}")
+            condition_number = alert_data.get('condition_number')
+            if condition_number:
+                try:
+                    float(condition_number)
+                except (ValueError, TypeError):
+                    logger.error(f"Invalid condition_number: {condition_number}")
+                    raise ValueError(f"Invalid condition_number: {condition_number}")
                 
         except Exception as e:
             logger.error(f"Error processing condition fields: {e}")
+            logger.error(f"Alert data at error: {alert_data}")
             raise
     
     @staticmethod
     def _validate_expiry_date(alert_data: Dict[str, Any]) -> None:
-        """Validate expiry_date format (YYYY-MM-DD) if provided"""
+        """
+        Validate expiry_date if provided.
+        
+        Expected format: date object (from datetime.date) or None.
+        The conversion from DateEnvelope/datetime/string to date object
+        is handled in alerts.py before calling AlertService.
+        """
         try:
-            if 'expiry_date' in alert_data and alert_data['expiry_date']:
+            if 'expiry_date' in alert_data:
                 expiry_date = alert_data['expiry_date']
                 
-                # Allow empty string or None (no expiration)
-                if expiry_date == '' or expiry_date is None:
+                # Allow None (no expiration)
+                if expiry_date is None:
+                    return
+                
+                # Allow empty string (convert to None)
+                if expiry_date == '':
                     alert_data['expiry_date'] = None
                     return
                 
-                # Validate format YYYY-MM-DD
-                import re
-                date_pattern = r'^\d{4}-\d{2}-\d{2}$'
-                if not re.match(date_pattern, expiry_date):
-                    raise ValueError(f"Invalid expiry_date format: {expiry_date}. Expected YYYY-MM-DD")
-                
-                # Validate that it's a valid date
-                try:
-                    datetime.strptime(expiry_date, '%Y-%m-%d')
-                except ValueError:
-                    raise ValueError(f"Invalid expiry_date value: {expiry_date}. Not a valid date")
+                # At this point, expiry_date should be a date object
+                # (converted in alerts.py from DateEnvelope/datetime/string)
+                if isinstance(expiry_date, date):
+                    # Valid date object - no further validation needed
+                    logger.debug(f"expiry_date is valid date object: {expiry_date}")
+                    return
+                elif isinstance(expiry_date, datetime):
+                    # If somehow datetime slipped through, convert to date
+                    alert_data['expiry_date'] = expiry_date.date()
+                    logger.info(f"Converted datetime to date: {expiry_date.date()}")
+                    return
+                else:
+                    # Unexpected type - log warning but don't fail
+                    logger.warning(f"Unexpected expiry_date type: {type(expiry_date)}, value: {expiry_date}")
+                    # Try to convert string to date if it's a string
+                    if isinstance(expiry_date, str):
+                        try:
+                            date_obj = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+                            alert_data['expiry_date'] = date_obj
+                            logger.info(f"Converted string to date: {date_obj}")
+                            return
+                        except ValueError:
+                            pass
+                    # If we can't convert, set to None
+                    logger.warning(f"Could not convert expiry_date to date, setting to None")
+                    alert_data['expiry_date'] = None
         except Exception as e:
             logger.error(f"Error validating expiry_date: {e}")
-            raise
+            # Don't raise - set to None instead
+            alert_data['expiry_date'] = None
     
     @staticmethod
     def get_alert_by_condition(db: Session, plan_condition_id: int = None, trade_condition_id: int = None) -> Optional[Alert]:
@@ -562,4 +633,57 @@ class AlertService:
         except Exception as e:
             db.rollback()
             logger.error(f"Error deleting condition alerts: {e}")
+            raise
+
+    @staticmethod
+    def default_condition_stats() -> Dict[str, Any]:
+        return {
+            'total': 0,
+            'open': 0,
+            'closed': 0,
+            'triggered': 0,
+            'last_triggered_at': None
+        }
+
+    @staticmethod
+    def get_condition_alert_stats(
+        db: Session,
+        condition_ids: List[int],
+        condition_type: str = 'plan'
+    ) -> Dict[int, Dict[str, Any]]:
+        """Return aggregated alert statistics for the provided condition IDs."""
+        if not condition_ids:
+            return {}
+
+        # Determine which column to aggregate on
+        condition_column = Alert.plan_condition_id if condition_type == 'plan' else Alert.trade_condition_id
+
+        try:
+            rows = (
+                db.query(
+                    condition_column.label('condition_id'),
+                    func.count(Alert.id).label('total_alerts'),
+                    func.sum(case((Alert.status == 'closed', 1), else_=0)).label('closed_alerts'),
+                    func.sum(case((Alert.status != 'closed', 1), else_=0)).label('open_alerts'),
+                    func.sum(case((Alert.is_triggered == 'true', 1), else_=0)).label('triggered_alerts'),
+                    func.max(Alert.triggered_at).label('last_triggered_at')
+                )
+                .filter(condition_column.in_(condition_ids))
+                .group_by(condition_column)
+                .all()
+            )
+
+            stats_map: Dict[int, Dict[str, Any]] = {}
+            for row in rows:
+                stats_map[row.condition_id] = {
+                    'total': int(row.total_alerts or 0),
+                    'open': int(row.open_alerts or 0),
+                    'closed': int(row.closed_alerts or 0),
+                    'triggered': int(row.triggered_alerts or 0),
+                    'last_triggered_at': row.last_triggered_at.isoformat() if row.last_triggered_at else None
+                }
+
+            return stats_map
+        except Exception as exc:
+            logger.error(f"Error aggregating alert stats for conditions: {exc}")
             raise

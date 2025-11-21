@@ -199,9 +199,9 @@ background-color: var(--status-pending-color);
 
 /* סוג טרייד - רק צבעים */
 .badge-type {
-  background-color: color-mix(in srgb, var(--current-entity-color, #007bff) 10%, transparent);
-  color: var(--current-entity-color, #007bff);
-  border: 1px solid var(--current-entity-color, #007bff);
+  background-color: color-mix(in srgb, var(--current-entity-color, #26baac) 10%, transparent);
+  color: var(--current-entity-color, #26baac);
+  border: 1px solid var(--current-entity-color, #26baac);
 }
 
 .badge-type.text-success {

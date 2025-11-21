@@ -33,6 +33,7 @@ from services.position_calculator_service import PositionCalculatorService
 from services.currency_service import CurrencyService
 from services.tag_service import TagService, SUPPORTED_ENTITY_TYPES as TAG_SUPPORTED_ENTITY_TYPES
 from services.user_service import UserService
+from services.cash_flow_service import CashFlowService as CashFlowHelperService
 from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
@@ -85,9 +86,32 @@ class EntityDetailsService:
     ENTITY_FIELDS = {
         'ticker': ['id', 'symbol', 'name', 'type', 'status', 'sector', 'currency_id', 
                   'remarks', 'active_trades', 'created_at', 'updated_at', 'deleted_at'],
-        'trade': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'trade_plan_id', 'quantity', 'entry_price',
-                 'exit_price', 'trade_type', 'status', 'profit_loss', 'total_pl', 'side', 'investment_type', 
-                 'closed_at', 'cancelled_at', 'cancel_reason', 'notes', 'created_at', 'updated_at'],
+        'trade': [
+            'id',
+            'symbol',
+            'trading_account_id',
+            'ticker_id',
+            'trade_plan_id',
+            # Planning snapshot fields on the trade itself
+            'planned_quantity',
+            'planned_amount',
+            'entry_price',
+            # Legacy / derived fields (may be populated by other services)
+            'quantity',
+            'exit_price',
+            'trade_type',
+            'status',
+            'profit_loss',
+            'total_pl',
+            'side',
+            'investment_type',
+            'closed_at',
+            'cancelled_at',
+            'cancel_reason',
+            'notes',
+            'created_at',
+            'updated_at',
+        ],
         'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'investment_type', 'side', 
                       'planned_amount', 'entry_price', 'entry_conditions', 'target_price', 'stop_price', 
                       'target_percentage', 'stop_percentage', 'status', 'cancelled_at', 
@@ -397,6 +421,39 @@ class EntityDetailsService:
                 # Default values when not provided
                 entity_dict['source'] = entity_dict.get('source') or 'manual'
                 entity_dict['external_id'] = entity_dict.get('external_id') or None
+
+                external_id = entity_dict.get('external_id')
+                flow_type = entity_dict.get('type')
+                if external_id and CashFlowHelperService.is_currency_exchange(external_id, flow_type):
+                    exchange_flows = CashFlowHelperService.get_exchange_flows(db, external_id)
+                    current_flow = next((flow for flow in exchange_flows if flow.id == entity_id), None)
+                    counterpart_flow = next((flow for flow in exchange_flows if flow.id != entity_id), None)
+
+                    entity_dict['exchange_group_id'] = external_id
+                    if current_flow:
+                        entity_dict['exchange_direction'] = CashFlowHelperService.get_exchange_direction(current_flow.type)
+
+                    if counterpart_flow:
+                        counterpart_date = getattr(counterpart_flow, 'date', None)
+                        if counterpart_date and hasattr(counterpart_date, 'isoformat'):
+                            counterpart_date = counterpart_date.isoformat()
+                        entity_dict['linked_exchange_cash_flow_id'] = counterpart_flow.id
+                        entity_dict['linked_exchange_summary'] = {
+                            "cash_flow_id": counterpart_flow.id,
+                            "amount": getattr(counterpart_flow, 'amount', None),
+                            "currency_id": getattr(counterpart_flow, 'currency_id', None),
+                            "currency_symbol": getattr(getattr(counterpart_flow, 'currency', None), 'symbol', None),
+                            "currency_name": getattr(getattr(counterpart_flow, 'currency', None), 'name', None),
+                            "usd_rate": getattr(counterpart_flow, 'usd_rate', None),
+                            "date": counterpart_date,
+                            "type": getattr(counterpart_flow, 'type', None)
+                        }
+
+                    from_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'from'), None)
+                    to_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'to'), None)
+                    pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow_model, to_flow_model)
+                    if pair_summary:
+                        entity_dict['exchange_pair_summary'] = pair_summary
 
             # Attach tags metadata from tagging system without overriding existing data
             tag_assignments = EntityDetailsService._load_entity_tags(
@@ -1980,6 +2037,43 @@ class EntityDetailsService:
                                 'created_at': _format_datetime(trade.ticker.created_at),
                                 'updated_at': _format_datetime(getattr(trade.ticker, 'updated_at', None))
                             })
+
+            # Add paired cash flow for currency exchanges
+            if CashFlowHelperService.is_currency_exchange(cash_flow.external_id, getattr(cash_flow, 'type', None)):
+                exchange_flows = CashFlowHelperService.get_exchange_flows(db, cash_flow.external_id)
+                counterpart_flow = next((flow for flow in exchange_flows if flow.id != cash_flow.id), None)
+                from_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'from'), None)
+                to_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'to'), None)
+                pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow_model, to_flow_model)
+
+                if counterpart_flow:
+                    direction = CashFlowHelperService.get_exchange_direction(counterpart_flow.type)
+                    currency_symbol = getattr(getattr(counterpart_flow, 'currency', None), 'symbol', None)
+                    currency_name = getattr(getattr(counterpart_flow, 'currency', None), 'name', None)
+                    amount_value = getattr(counterpart_flow, 'amount', None)
+                    amount_display = f"{abs(amount_value or 0):,.2f}" if amount_value is not None else 'N/A'
+                    description = f"צד {'שלילי' if direction == 'from' else 'חיובי'} • {amount_display} {currency_symbol or ''}".strip()
+
+                    linked_items.append({
+                        'id': counterpart_flow.id,
+                        'type': 'cash_flow',
+                        'title': 'תזרים צמוד',
+                        'name': description,
+                        'description': description,
+                        'status': 'exchange_pair',
+                        'side': direction,
+                        'investment_type': None,
+                        'amount': amount_value,
+                        'currency_symbol': currency_symbol,
+                        'currency_name': currency_name,
+                        'exchange_group_id': cash_flow.external_id,
+                        'exchange_direction': direction,
+                        'metadata': {
+                            'exchange_pair_summary': pair_summary
+                        },
+                        'created_at': _format_datetime(counterpart_flow.created_at),
+                        'updated_at': _format_datetime(getattr(counterpart_flow, 'updated_at', None))
+                    })
             
             logger.debug(f"Found {len(linked_items)} linked items for cash_flow {cash_flow_id}")
                 

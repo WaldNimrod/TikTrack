@@ -47,6 +47,13 @@ class InfoSummarySystem {
       
       // Count by any field/value
       countByField: (data, params) => {
+        if (params.operator === 'truthy') {
+          // Check if field exists and is truthy (not null, undefined, empty string, or 0)
+          return data.filter(item => {
+            const value = item[params.field];
+            return value !== null && value !== undefined && value !== '' && value !== 0;
+          }).length;
+        }
         return data.filter(item => item[params.field] === params.value).length;
       },
       
@@ -90,14 +97,35 @@ class InfoSummarySystem {
       countByConditions: (data, params) => {
         return data.filter(item => {
           return params.conditions.every(condition => {
+            const fieldValue = item[condition.field];
+            const compareValue = condition.value;
+            
             if (condition.operator === '===') {
-              return item[condition.field] === condition.value;
+              return fieldValue === compareValue;
             } else if (condition.operator === '!==') {
-              return item[condition.field] !== condition.value;
+              return fieldValue !== compareValue;
             } else if (condition.operator === '>') {
-              return parseFloat(item[condition.field]) > condition.value;
+              // Support both date and number comparisons
+              if (compareValue instanceof Date) {
+                const itemDate = fieldValue instanceof Date 
+                  ? fieldValue 
+                  : (fieldValue ? new Date(fieldValue) : null);
+                if (!itemDate || isNaN(itemDate.getTime())) return false;
+                return itemDate > compareValue;
+              } else {
+                return parseFloat(fieldValue) > compareValue;
+              }
             } else if (condition.operator === '<') {
-              return parseFloat(item[condition.field]) < condition.value;
+              // Support both date and number comparisons
+              if (compareValue instanceof Date) {
+                const itemDate = fieldValue instanceof Date 
+                  ? fieldValue 
+                  : (fieldValue ? new Date(fieldValue) : null);
+                if (!itemDate || isNaN(itemDate.getTime())) return false;
+                return itemDate < compareValue;
+              } else {
+                return parseFloat(fieldValue) < compareValue;
+              }
             }
             return false;
           });
@@ -415,6 +443,52 @@ class InfoSummarySystem {
     }
   }
 
+  _getRegistryData(config) {
+    if (!config || typeof config.tableType !== 'string') {
+      return { available: false, data: null };
+    }
+    if (!window.TableDataRegistry) {
+      return { available: false, data: null };
+    }
+    const summary = window.TableDataRegistry.getSummary(config.tableType);
+    if (!summary) {
+      return { available: false, data: null };
+    }
+    const filtered = window.TableDataRegistry.getFilteredData(config.tableType, { asReference: false });
+    if (Array.isArray(filtered)) {
+      return { available: true, data: filtered };
+    }
+    return { available: true, data: [] };
+  }
+
+  _resolveDataSource(data, config) {
+    // Priority 1: Use provided data if it exists and has items (don't override with empty registry)
+    if (Array.isArray(data) && data.length > 0) {
+      return data;
+    }
+
+    // Priority 2: Try registry only if no data provided or data is empty
+    const registry = this._getRegistryData(config);
+    if (registry.available && Array.isArray(registry.data) && registry.data.length > 0) {
+      return registry.data;
+    }
+
+    // Priority 3: Fallback to provided data even if empty (preserve what was passed)
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    // Priority 4: Last resort - try to get from TableDataRegistry full data
+    if (config && typeof config.tableType === 'string' && window.TableDataRegistry) {
+      const fullData = window.TableDataRegistry.getFullData(config.tableType, { asReference: false });
+      if (Array.isArray(fullData) && fullData.length > 0) {
+        return fullData;
+      }
+    }
+
+    return [];
+  }
+
   /**
    * Main method: Calculate and render summary statistics
    * @param {Array} data - The data array
@@ -422,9 +496,16 @@ class InfoSummarySystem {
    * @returns {Promise<void>}
    */
   async calculateAndRender(data, config) {
-    console.log('🔍 InfoSummarySystem.calculateAndRender called with:', { dataLength: data?.length, statsCount: config?.stats?.length, containerId: config?.containerId });
+    const dataset = this._resolveDataSource(data, config);
+    console.log('🔍 InfoSummarySystem.calculateAndRender called with:', {
+      providedDataLength: Array.isArray(data) ? data.length : null,
+      resolvedDataLength: Array.isArray(dataset) ? dataset.length : null,
+      statsCount: config?.stats?.length,
+      containerId: config?.containerId,
+      tableType: config?.tableType || null,
+    });
     
-    if (!data || !Array.isArray(data)) {
+    if (!Array.isArray(dataset)) {
       console.warn('Invalid data provided to InfoSummarySystem');
       return;
     }
@@ -437,7 +518,7 @@ class InfoSummarySystem {
     try {
       // Calculate statistics (now async to support async calculators)
       console.log('⚙️ Calculating stats from data...');
-      const stats = await this.calculateStatsFromData(data, config.stats);
+      const stats = await this.calculateStatsFromData(dataset, config.stats);
       console.log('✅ Stats calculated:', stats);
       
       // Render the summary

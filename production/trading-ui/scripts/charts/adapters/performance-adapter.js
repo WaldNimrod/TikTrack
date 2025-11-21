@@ -1,147 +1,163 @@
 /**
  * Performance Data Adapter - TikTrack Chart System
  * מתאם נתוני ביצועים - מערכת גרפים TikTrack
- * 
+ *
  * @version 1.0.0
  * @lastUpdated December 2024
  * @author TikTrack Development Team
  */
 
-console.log('📊 Performance Data Adapter initialized');
+const PERFORMANCE_ADAPTER_MODULE = 'charts/performance-adapter';
+
+const logPerformanceAdapterEvent = (level, message, details = {}) => {
+  if (typeof window !== 'undefined' && window.Logger && typeof window.Logger[level] === 'function') {
+    window.Logger[level](message, { module: PERFORMANCE_ADAPTER_MODULE, ...details });
+  }
+};
+
+const notifyPerformanceAdapterError = (message, error) => {
+  if (typeof window !== 'undefined' && typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification(message);
+  }
+  logPerformanceAdapterEvent('error', message, { error });
+};
+
+logPerformanceAdapterEvent('info', '📊 Performance Data Adapter initialized');
 
 /**
  * Performance Data Adapter
  * מתאם נתוני ביצועים
  */
 class PerformanceAdapter {
-    constructor(config = {}) {
-        this.dataSource = config.dataSource || '/api/performance';
-        this.cache = new Map();
-        this.cacheTimeout = config.cacheTimeout || 300000; // 5 minutes
-    }
+  constructor(config = {}) {
+    this.dataSource = config.dataSource || '/api/performance';
+    this.cache = new Map();
+    this.cacheTimeout = config.cacheTimeout || 300000; // 5 minutes
+    this.defaultColors = {
+      primary: '#26baac',
+      success: '#28a745',
+      warning: '#ffc107',
+      danger: '#dc3545',
+    };
+  }
 
-    /**
+  getChartColors() {
+    if (typeof window.getChartColor === 'function') {
+      return {
+        primary: window.getChartColor('primary'),
+        success: window.getChartColor('success'),
+        warning: window.getChartColor('warning'),
+        danger: window.getChartColor('danger'),
+      };
+    }
+    return this.defaultColors;
+  }
+
+  /**
      * Get performance data
      * קבל נתוני ביצועים
      * @param {Object} params - Query parameters
      * @returns {Promise<Object>} Performance data
      */
-    async getData(params = {}) {
-        const cacheKey = JSON.stringify(params);
-        const cached = this.cache.get(cacheKey);
-        
-        // Return cached data if still valid
-        if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-            console.log('📊 Using cached performance data');
-            return cached.data;
-        }
+  async getData(params = {}) {
+    const cacheKey = JSON.stringify(params);
+    const cached = this.cache.get(cacheKey);
 
-        try {
-            // Return empty data - no real performance data available yet
-            const emptyData = { dates: [], values: [] };
-            
-            // Cache the empty data
-            this.cache.set(cacheKey, {
-                data: emptyData,
-                timestamp: Date.now()
-            });
-            
-            console.log('📊 Performance data retrieved (empty - no real data available)');
-            return emptyData;
-        } catch (error) {
-            console.error('❌ Error fetching performance data:', error);
-            return { dates: [], values: [] };
-        }
+    // Return cached data if still valid
+    if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+      logPerformanceAdapterEvent('info', '📊 Using cached performance data', { cacheKey });
+      return cached.data;
     }
 
-    /**
+    const query = new URLSearchParams(params).toString();
+    const requestUrl = query ? `${this.dataSource}?${query}` : this.dataSource;
+    try {
+      logPerformanceAdapterEvent('info', '📊 Fetching performance data from API...', { requestUrl });
+      const response = await fetch(requestUrl, {
+        method: 'GET',
+        headers: { 'Cache-Control': 'no-store' },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load performance data (${response.status})`);
+      }
+
+      const payload = await response.json();
+      const normalized = payload?.data ?? payload;
+
+      if (!normalized || !Array.isArray(normalized.dates) || !Array.isArray(normalized.values)) {
+        throw new Error('Invalid performance payload received from server');
+      }
+
+      const data = {
+        dates: normalized.dates,
+        values: normalized.values,
+      };
+
+      this.cache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+
+      logPerformanceAdapterEvent('info', '📊 Performance data retrieved successfully', { cacheKey, total: normalized.values.length });
+      return data;
+    } catch (error) {
+      notifyPerformanceAdapterError('טעינת נתוני ביצועים נכשלה. נסה שוב מאוחר יותר.', error);
+      throw error;
+    }
+  }
+
+  /**
      * Format data for charts
      * עיצוב נתונים עבור גרפים
      * @param {Object} rawData - Raw data
      * @returns {Object} Formatted chart data
      */
-    formatData(rawData) {
-        const colors = window.getChartColor ? {
-            primary: window.getChartColor('primary'),
-            success: window.getChartColor('success'),
-            warning: window.getChartColor('warning'),
-            danger: window.getChartColor('danger')
-        } : {
-            primary: '#007bff',
-            success: '#28a745',
-            warning: '#ffc107',
-            danger: '#dc3545'
-        };
+  formatData(rawData) {
+    const colors = this.getChartColors();
 
-        return {
-            labels: rawData.dates || [],
-            datasets: [{
-                label: 'ביצועי תיק (%)',
-                data: rawData.values || [],
-                borderColor: colors.primary,
-                backgroundColor: colors.primary + '20',
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: colors.primary,
-                pointBorderColor: colors.primary,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        };
-    }
+    return {
+      labels: rawData.dates || [],
+      datasets: [{
+        label: 'ביצועי תיק (%)',
+        data: rawData.values || [],
+        borderColor: colors.primary,
+        backgroundColor: colors.primary + '20',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: colors.primary,
+        pointBorderColor: colors.primary,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }],
+    };
+  }
 
-    /**
-     * Generate mock data for testing
-     * צור נתוני דמה לבדיקה
-     * @param {Object} params - Parameters
-     * @returns {Object} Mock data
-     */
-    generateMockData(params = {}) {
-        const days = params.days || 30;
-        const dates = [];
-        const values = [];
-        
-        const today = new Date();
-        for (let i = days - 1; i >= 0; i--) {
-            const date = new Date(today);
-            date.setDate(date.getDate() - i);
-            dates.push(date.toLocaleDateString('he-IL'));
-            
-            // Generate realistic performance data
-            const baseValue = 100;
-            const variation = (Math.random() - 0.5) * 10;
-            const trend = (days - i) * 0.1;
-            values.push(Math.max(0, baseValue + variation + trend));
-        }
-        
-        return { dates, values };
-    }
-
-    /**
+  /**
      * Clear cache
      * נקה מטמון
      */
-    clearCache() {
-        this.cache.clear();
-        console.log('🗑️ Performance adapter cache cleared');
-    }
+  clearCache() {
+    this.cache.clear();
+    logPerformanceAdapterEvent('info', '🗑️ Performance adapter cache cleared');
+  }
 
-    /**
+  /**
      * Get cache status
      * קבל סטטוס מטמון
      * @returns {Object} Cache status
      */
-    getCacheStatus() {
-        return {
-            size: this.cache.size,
-            timeout: this.cacheTimeout
-        };
-    }
+  getCacheStatus() {
+    return {
+      size: this.cache.size,
+      timeout: this.cacheTimeout,
+    };
+  }
 }
 
 // Create global instance
 window.PerformanceAdapter = new PerformanceAdapter();
 
-console.log('✅ Performance Data Adapter ready');
+logPerformanceAdapterEvent('info', '✅ Performance Data Adapter ready');
 

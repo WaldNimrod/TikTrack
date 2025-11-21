@@ -31,6 +31,9 @@ from services.account_activity_service import AccountActivityService
 from services.position_portfolio_service import PositionPortfolioService
 from services.position_calculator_service import PositionCalculatorService
 from services.currency_service import CurrencyService
+from services.tag_service import TagService, SUPPORTED_ENTITY_TYPES as TAG_SUPPORTED_ENTITY_TYPES
+from services.user_service import UserService
+from services.cash_flow_service import CashFlowService as CashFlowHelperService
 from typing import List, Optional, Dict, Any, Union, Tuple
 import logging
 import time
@@ -64,6 +67,9 @@ class EntityDetailsService:
         >>> linked = service.get_linked_items(db_session, 'ticker', 1)
     """
     
+    USER_SERVICE = UserService()
+    _default_user_id_cache: Optional[int] = None
+    
     # Entity type mappings
     ENTITY_MODELS = {
         'ticker': Ticker,
@@ -80,9 +86,32 @@ class EntityDetailsService:
     ENTITY_FIELDS = {
         'ticker': ['id', 'symbol', 'name', 'type', 'status', 'sector', 'currency_id', 
                   'remarks', 'active_trades', 'created_at', 'updated_at', 'deleted_at'],
-        'trade': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'trade_plan_id', 'quantity', 'entry_price',
-                 'exit_price', 'trade_type', 'status', 'profit_loss', 'total_pl', 'side', 'investment_type', 
-                 'closed_at', 'cancelled_at', 'cancel_reason', 'notes', 'created_at', 'updated_at'],
+        'trade': [
+            'id',
+            'symbol',
+            'trading_account_id',
+            'ticker_id',
+            'trade_plan_id',
+            # Planning snapshot fields on the trade itself
+            'planned_quantity',
+            'planned_amount',
+            'entry_price',
+            # Legacy / derived fields (may be populated by other services)
+            'quantity',
+            'exit_price',
+            'trade_type',
+            'status',
+            'profit_loss',
+            'total_pl',
+            'side',
+            'investment_type',
+            'closed_at',
+            'cancelled_at',
+            'cancel_reason',
+            'notes',
+            'created_at',
+            'updated_at',
+        ],
         'trade_plan': ['id', 'symbol', 'trading_account_id', 'ticker_id', 'investment_type', 'side', 
                       'planned_amount', 'entry_price', 'entry_conditions', 'target_price', 'stop_price', 
                       'target_percentage', 'stop_percentage', 'status', 'cancelled_at', 
@@ -392,6 +421,49 @@ class EntityDetailsService:
                 # Default values when not provided
                 entity_dict['source'] = entity_dict.get('source') or 'manual'
                 entity_dict['external_id'] = entity_dict.get('external_id') or None
+
+                external_id = entity_dict.get('external_id')
+                flow_type = entity_dict.get('type')
+                if external_id and CashFlowHelperService.is_currency_exchange(external_id, flow_type):
+                    exchange_flows = CashFlowHelperService.get_exchange_flows(db, external_id)
+                    current_flow = next((flow for flow in exchange_flows if flow.id == entity_id), None)
+                    counterpart_flow = next((flow for flow in exchange_flows if flow.id != entity_id), None)
+
+                    entity_dict['exchange_group_id'] = external_id
+                    if current_flow:
+                        entity_dict['exchange_direction'] = CashFlowHelperService.get_exchange_direction(current_flow.type)
+
+                    if counterpart_flow:
+                        counterpart_date = getattr(counterpart_flow, 'date', None)
+                        if counterpart_date and hasattr(counterpart_date, 'isoformat'):
+                            counterpart_date = counterpart_date.isoformat()
+                        entity_dict['linked_exchange_cash_flow_id'] = counterpart_flow.id
+                        entity_dict['linked_exchange_summary'] = {
+                            "cash_flow_id": counterpart_flow.id,
+                            "amount": getattr(counterpart_flow, 'amount', None),
+                            "currency_id": getattr(counterpart_flow, 'currency_id', None),
+                            "currency_symbol": getattr(getattr(counterpart_flow, 'currency', None), 'symbol', None),
+                            "currency_name": getattr(getattr(counterpart_flow, 'currency', None), 'name', None),
+                            "usd_rate": getattr(counterpart_flow, 'usd_rate', None),
+                            "date": counterpart_date,
+                            "type": getattr(counterpart_flow, 'type', None)
+                        }
+
+                    from_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'from'), None)
+                    to_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'to'), None)
+                    pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow_model, to_flow_model)
+                    if pair_summary:
+                        entity_dict['exchange_pair_summary'] = pair_summary
+
+            # Attach tags metadata from tagging system without overriding existing data
+            tag_assignments = EntityDetailsService._load_entity_tags(
+                db,
+                entity_type,
+                entity_id
+            )
+            entity_dict['tag_assignments'] = tag_assignments
+            if 'tags' not in entity_dict:
+                entity_dict['tags'] = tag_assignments
 
             # Add ticker object with market data for trade and trade_plan
             if entity_type in ['trade', 'trade_plan']:
@@ -786,6 +858,91 @@ class EntityDetailsService:
             raise
     
     # ===== PRIVATE HELPER METHODS =====
+
+    @classmethod
+    def _get_default_user_id(cls) -> Optional[int]:
+        """Resolve and cache the default user ID for tagging operations."""
+        if cls._default_user_id_cache is not None:
+            return cls._default_user_id_cache
+
+        try:
+            default_user = cls.USER_SERVICE.get_default_user()
+            if default_user and default_user.get('id'):
+                cls._default_user_id_cache = int(default_user['id'])
+                return cls._default_user_id_cache
+            logger.warning("Default user not found while attempting to load entity tags")
+        except Exception as exc:
+            logger.error("Failed to resolve default user id for tagging: %s", exc)
+
+        return None
+
+    @classmethod
+    def _load_entity_tags(cls, db: Session, entity_type: str, entity_id: int) -> List[Dict[str, Any]]:
+        """
+        Load tags for the requested entity using the unified TagService.
+        Returns a list of serialized tags ready for the frontend renderer.
+        """
+        normalized_type = (entity_type or '').lower().strip()
+        if normalized_type == 'account':
+            normalized_type = 'trading_account'
+
+        if normalized_type not in TAG_SUPPORTED_ENTITY_TYPES:
+            return []
+
+        user_id = cls._get_default_user_id()
+        if not user_id:
+            return []
+
+        try:
+            tags = TagService.get_tags_for_entity(db, normalized_type, entity_id, user_id)
+            return [cls._serialize_tag(tag) for tag in tags]
+        except Exception as exc:
+            logger.warning(
+                "Failed to load tags for %s %s: %s",
+                normalized_type,
+                entity_id,
+                str(exc)
+            )
+            return []
+
+    @classmethod
+    def _serialize_tag(cls, tag) -> Dict[str, Any]:
+        """Serialize tag ORM object to JSON-friendly structure with category metadata."""
+        base = tag.to_dict() if hasattr(tag, 'to_dict') else dict(tag)
+        category = base.get('category') or {}
+
+        serialized = {
+            'id': base.get('id'),
+            'name': base.get('name'),
+            'slug': base.get('slug'),
+            'description': base.get('description'),
+            'category_id': base.get('category_id'),
+            'is_active': base.get('is_active', True),
+            'usage_count': base.get('usage_count', 0),
+            'last_used_at': cls._isoformat_if_possible(base.get('last_used_at')),
+            'created_at': cls._isoformat_if_possible(base.get('created_at')),
+            'updated_at': cls._isoformat_if_possible(base.get('updated_at')),
+            'display_name': base.get('name'),
+            'category_name': category.get('name'),
+            'category_color': category.get('color_hex'),
+            'color_hex': base.get('color_hex') or category.get('color_hex')
+        }
+
+        serialized['category'] = category if category else None
+
+        return serialized
+
+    @staticmethod
+    def _isoformat_if_possible(value: Any) -> Optional[str]:
+        """Convert datetime-like values to ISO strings when possible."""
+        if value is None:
+            return None
+        if hasattr(value, 'isoformat'):
+            try:
+                return value.isoformat()
+            except Exception:
+                return str(value)
+        return str(value)
     
     @staticmethod
     def _entity_to_dict(entity, entity_type: str) -> Dict[str, Any]:
@@ -1880,6 +2037,43 @@ class EntityDetailsService:
                                 'created_at': _format_datetime(trade.ticker.created_at),
                                 'updated_at': _format_datetime(getattr(trade.ticker, 'updated_at', None))
                             })
+
+            # Add paired cash flow for currency exchanges
+            if CashFlowHelperService.is_currency_exchange(cash_flow.external_id, getattr(cash_flow, 'type', None)):
+                exchange_flows = CashFlowHelperService.get_exchange_flows(db, cash_flow.external_id)
+                counterpart_flow = next((flow for flow in exchange_flows if flow.id != cash_flow.id), None)
+                from_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'from'), None)
+                to_flow_model = next((flow for flow in exchange_flows if CashFlowHelperService.get_exchange_direction(flow.type) == 'to'), None)
+                pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow_model, to_flow_model)
+
+                if counterpart_flow:
+                    direction = CashFlowHelperService.get_exchange_direction(counterpart_flow.type)
+                    currency_symbol = getattr(getattr(counterpart_flow, 'currency', None), 'symbol', None)
+                    currency_name = getattr(getattr(counterpart_flow, 'currency', None), 'name', None)
+                    amount_value = getattr(counterpart_flow, 'amount', None)
+                    amount_display = f"{abs(amount_value or 0):,.2f}" if amount_value is not None else 'N/A'
+                    description = f"צד {'שלילי' if direction == 'from' else 'חיובי'} • {amount_display} {currency_symbol or ''}".strip()
+
+                    linked_items.append({
+                        'id': counterpart_flow.id,
+                        'type': 'cash_flow',
+                        'title': 'תזרים צמוד',
+                        'name': description,
+                        'description': description,
+                        'status': 'exchange_pair',
+                        'side': direction,
+                        'investment_type': None,
+                        'amount': amount_value,
+                        'currency_symbol': currency_symbol,
+                        'currency_name': currency_name,
+                        'exchange_group_id': cash_flow.external_id,
+                        'exchange_direction': direction,
+                        'metadata': {
+                            'exchange_pair_summary': pair_summary
+                        },
+                        'created_at': _format_datetime(counterpart_flow.created_at),
+                        'updated_at': _format_datetime(getattr(counterpart_flow, 'updated_at', None))
+                    })
             
             logger.debug(f"Found {len(linked_items)} linked items for cash_flow {cash_flow_id}")
                 

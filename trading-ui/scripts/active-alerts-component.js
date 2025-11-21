@@ -1338,8 +1338,9 @@ class ActiveAlertsComponent extends HTMLElement {
   toDate(value) {
     if (!value) {return null;}
 
-    if (typeof window.toDateObject === 'function') {
-      const converted = window.toDateObject(value);
+    // Use window.dateUtils.toDateObject (window.toDateObject doesn't exist)
+    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+      const converted = window.dateUtils.toDateObject(value);
       if (converted instanceof Date && !Number.isNaN(converted.getTime())) {
         return converted;
       }

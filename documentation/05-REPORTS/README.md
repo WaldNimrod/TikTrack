@@ -34,6 +34,7 @@ Contains comprehensive analysis reports and system evaluations.
 - `JAVASCRIPT_ARCHITECTURE_ANALYSIS.md`
 - `SITE_WIDE_V2_SCAN_REPORT.md`
 - `V1_VS_V2_COMPARISON_ANALYSIS.md`
+- `PAGES_OPTIMIZATION_SCAN_REPORT.md` - דוח סריקה מקיפה לאופטימיזציה רוחבית לכל העמודים ✅ **חדש! ינואר 2025**
 
 ## 🔗 Related Documentation
 

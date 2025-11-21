@@ -5,6 +5,7 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.tag_service import TagService
 import logging
 import os
 import uuid
@@ -138,36 +139,28 @@ def get_notes():
         db = next(get_db())
         logger.info("✅ Database connection established")
         
-        # Use direct SQL with text() from SQLAlchemy
+        # Use SQLAlchemy ORM to ensure correct column mapping
         try:
-            result = db.execute(text("SELECT * FROM notes ORDER BY created_at DESC"))
-            notes_data = result.fetchall()
-            logger.info(f"✅ Successfully retrieved {len(notes_data)} notes using direct SQL")
+            notes = db.query(Note).order_by(Note.created_at.desc()).all()
+            logger.info(f"✅ Successfully retrieved {len(notes)} notes using ORM")
             
-            # Convert to dictionaries
+            # Convert to dictionaries using to_dict() which handles column mapping correctly
             notes_list = []
-            for row in notes_data:
+            for note in notes:
+                note_dict = note.to_dict()
+                
                 # Set related_type according to related_type_id
                 related_type = None
-                if row[4] == 1:  # related_type_id (now at index 4)
+                if note.related_type_id == 1:
                     related_type = 'trading_account'
-                elif row[4] == 2:
+                elif note.related_type_id == 2:
                     related_type = 'trade'
-                elif row[4] == 3:
+                elif note.related_type_id == 3:
                     related_type = 'trade_plan'
-                elif row[4] == 4:
+                elif note.related_type_id == 4:
                     related_type = 'ticker'
                 
-                note_dict = {
-                    'id': row[0],
-                    'content': row[1],
-                    'attachment': row[2],
-                    'created_at': row[3],
-                    'related_type_id': row[4],
-                    'related_id': row[5],
-                    'related_type': related_type
-                }
-                
+                note_dict['related_type'] = related_type
                 notes_list.append(note_dict)
             
         except Exception as sql_error:
@@ -541,6 +534,15 @@ def delete_note(note_id: int):
             # Delete attached file if exists
             if note.attachment:
                 delete_uploaded_file(note.attachment)
+
+            try:
+                TagService.remove_all_tags_for_entity(db, 'note', note_id)
+            except ValueError as tag_error:
+                logger.warning(
+                    "Failed to remove tags for note %s before deletion: %s",
+                    note_id,
+                    tag_error,
+                )
             
             # Delete note from database
             db.delete(note)

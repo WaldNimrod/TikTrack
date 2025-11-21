@@ -28,6 +28,15 @@
 3. טיפול בשגיאה: במקרה של כשל, פתח את מודול הפרטים → העתק את הטבלה דרך הכפתור ייעודי ושלח ב-Slack/git issue.
 4. Function Index ידני: אם רוצים לעדכן את האינדקס עצמו, ניתן להריץ `node scripts/generators/generate-function-index.js` ורק אז להפעיל את הבדיקה מחדש.
 
+### 🔁 תהליך הרצת טסטים סטנדרטי (Front + Back)
+- **הפעלה מלאה (חובה לפני PR):**
+  - Frontend: `npm run test -- --coverage --runInBand`
+  - Backend: `python3 -m pytest`
+- **Preferences Focus:**  
+  - Frontend: `npx jest --runTestsByPath tests/unit/preferences-page.test.js tests/integration/preferences-integration.test.js tests/component/preferences-flow.test.js`  
+  - Backend: `python3 -m pytest Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py`
+- **תעוד תוצאות:** לאחר כל ריצה משמעותית יש לעדכן את `tests/TEST_STATUS_REPORT.md` (סעיף “איך להריץ את כל הטסטים”) עם תאריך/פקודות/כיסוי, ולצרף את הפקודות בפול-ריקווסט.
+
 ### רפרנסים מהירים
 - Frontend: `trading-ui/scripts/code-quality-dashboard.js`, `trading-ui/scripts/linter-realtime-monitor.js`, `trading-ui/code-quality-dashboard.html`
 - Backend: `Backend/routes/api/quality_check.py` (`build_function_index_report`, `run_script` helpers), `Backend/routes/api/quality_lint.py`

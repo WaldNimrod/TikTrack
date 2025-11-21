@@ -4,8 +4,8 @@
 
 Complete guide for developers working with the Linked Items system in TikTrack.
 
-**Version**: 2.2.0  
-**Date**: 2025-01-12  
+**Version**: 2.3.0  
+**Date**: 2025-01-18  
 **Architecture**: Configuration-Based Schema
 
 ---
@@ -316,6 +316,109 @@ describe('EntityDetailsAPI', () => {
 
 ---
 
+## Modal Configuration Loading
+
+### Integration with Package Manifest System
+
+The Linked Items System integrates fully with TikTrack's package manifest and page initialization system. Modal configurations must be loaded according to the system's loading standards.
+
+### Required Modal Configs
+
+When opening edit modals from linked items, the following modal configs must be loaded:
+
+- **notes-config.js**: Required for editing notes from linked items
+- **trades-config.js**: Required for editing trades from linked items
+- **alerts-config.js**: Required for editing alerts from linked items
+- Other entity-specific configs as needed
+
+### Loading Strategy
+
+#### Option A: Preload (Recommended)
+
+Load modal configs in the page HTML before they're needed:
+
+```html
+<!-- In trades.html -->
+<script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script>
+<script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script>
+<script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script>
+```
+
+**Advantages:**
+- Simple and direct
+- Works with existing loading system
+- No dynamic loading needed
+- Rich Text Editor initializes immediately
+
+**Package Manifest Configuration:**
+
+```javascript
+// In package-manifest.js
+{
+  file: 'modal-configs/notes-config.js',
+  globalCheck: 'window.notesModalConfig',
+  description: 'קונפיגורציית מודל הערות',
+  required: true,  // Changed from false
+  loadOrder: 22
+}
+```
+
+#### Option B: Dynamic Loading (Fallback)
+
+The system includes a fallback mechanism for dynamic loading if a modal config is not preloaded:
+
+```javascript
+// In linked-items-service.js
+// Automatically attempts to load config if not found
+// This is a fallback - preloading is preferred
+```
+
+**Note:** Dynamic loading is less reliable and may cause timing issues with Rich Text Editor initialization in nested modals.
+
+### Rich Text Editor in Nested Modals
+
+When opening edit modals (especially notes) from linked items, the modal opens as a nested modal. The Rich Text Editor requires special handling:
+
+#### Requirements
+
+1. **Modal Config Preloaded**: `notes-config.js` must be loaded in the page HTML
+2. **Quill.js Available**: Quill.js must be loaded before the modal opens
+3. **Container Visibility**: The editor container must be visible when initialized
+4. **Nested Modal Detection**: The system must detect nested modals correctly
+
+#### Configuration
+
+```javascript
+// In notes-config.js
+{
+  type: 'rich-text',
+  id: 'noteContent',
+  options: {
+    minHeight: 200,  // Required for nested modals
+    direction: 'rtl',
+    // ... other options
+  }
+}
+```
+
+#### Initialization Flow
+
+1. Modal opens as nested (detected via `ModalNavigationService` and DOM check)
+2. `modal-nested` class is applied before `modal.show()`
+3. Rich Text Editor initialization waits for modal to be fully visible
+4. Retry mechanism (5 attempts) ensures editor initializes even if container not immediately visible
+5. `minHeight` is automatically set if container has no size
+
+#### Troubleshooting Rich Text Editor
+
+**Problem**: Editor doesn't appear in nested modal
+
+**Solutions:**
+1. Ensure `notes-config.js` is loaded in page HTML
+2. Check that `minHeight` is set in field options
+3. Verify Quill.js is loaded (check `window.Quill`)
+4. Check console for visibility warnings from `RichTextEditorService`
+
 ## Troubleshooting
 
 ### Common Issues
@@ -500,6 +603,38 @@ for item in linked_items:
    - All direct, through, conditional, and legacy relationships now properly validate IDs
    - Prevents unnecessary database queries for invalid IDs
    - Better logging for debugging ID validation issues
+
+### Recent Changes (v2.3.0 - 2025-01-18)
+
+1. **Linked Items Modal Refresh After Deletion**
+   - **Issue**: After deleting a linked item from the linked items modal, the display was not updating to reflect the deletion
+   - **Fix**: Enhanced `UnifiedCRUDService.deleteEntity()` to automatically refresh the linked items modal after successful deletion
+   - **Implementation**:
+     - Retrieves parent `entityType` and `entityId` from `ModalNavigationService` stack
+     - Retrieves `modalMode` (e.g., 'warningBlock') from metadata to preserve filtering
+     - Clears relevant caches (`UnifiedCacheManager` and `entityDetailsAPI` linked items cache)
+     - Performs direct fetch with cache-busting to ensure fresh data
+     - Filters data based on `modalMode` (only child entities for `warningBlock`, both for `view`)
+     - Updates all linked items tables in the modal using `entityDetailsRenderer.updateLinkedItemsTableBody`
+   - **Impact**: Linked items modal now correctly updates after deletion, maintaining the correct mode (warningBlock/view)
+
+2. **Empty Table Handling**
+   - **Issue**: When all linked items were deleted, the table still showed old data instead of being empty
+   - **Fix**: Modified `entityDetailsRenderer.updateLinkedItemsTableBody()` to explicitly clear `tbody.innerHTML` when `sortedData` is empty
+   - **Impact**: Empty state is now correctly displayed when all linked items are deleted
+
+3. **Modal Mode Preservation**
+   - **Issue**: After refresh, `warningBlock` mode was showing both parent and child entities instead of only child entities
+   - **Fix**: `modalMode` is now retrieved from `ModalNavigationService` metadata and applied during refresh
+   - **Impact**: `warningBlock` mode correctly maintains its filtering (only child entities) after refresh
+
+4. **Package Manifest Loading Order Fixes**
+   - **Issue**: Preferences scripts were loading in incorrect order, causing initialization errors
+   - **Fix**: Updated `package-manifest.js` to correct loading order:
+     - `preferences-v4.js`: loadOrder changed from 0.9 to 0.5 (must load before `preferences-core-new.js`)
+     - `preferences-ui-v4.js`: loadOrder changed from 6.1 to 5.5 (must load before `preferences-group-manager.js`)
+   - **Impact**: Preferences system now initializes correctly without order-related errors
+   - **Note**: HTML files need to be regenerated using `PageTemplateGenerator.generateScriptTagsForPage()` to reflect these changes
 
 ---
 

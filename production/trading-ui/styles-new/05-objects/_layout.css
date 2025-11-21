@@ -479,9 +479,9 @@
 }
 
 .btn[data-entity-type]:hover {
-  background: var(--current-entity-color, #007bff);
+  background: var(--current-entity-color, #26baac);
   color: white;
-  border-color: var(--current-entity-color, #007bff);
+  border-color: var(--current-entity-color, #26baac);
 }
 
 .btn[data-entity-type="ticker"] {
@@ -503,9 +503,9 @@
 }
 
 .btn[data-entity-type="trade"]:hover {
-  background: var(--entity-trade-color, #007bff);
+  background: var(--entity-trade-color, #26baac);
   color: white;
-  border-color: var(--entity-trade-color, #007bff);
+  border-color: var(--entity-trade-color, #26baac);
 }
 
 .btn[data-entity-type="account"],

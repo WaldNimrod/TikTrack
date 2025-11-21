@@ -26,15 +26,14 @@ const tradePlansModalConfig = {
             required: true,
             options: [], // יטען דינמית מ-API
             placeholder: 'בחר טיקר...',
-            rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            rowClass: 'row g-3 align-items-end',
+            colClass: 'col-md-4 col-sm-12'
         },
         {
             type: 'display',
             id: 'tradePlanTickerInfo',
             label: 'נתוני שוק',
-            rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-4 col-sm-12'
         },
         // שורה שנייה: צד + סוג השקעה
         {
@@ -197,6 +196,70 @@ const tradePlansModalConfig = {
             description: 'תצוגת נתוני השקעה, סיכון וסיכוי עבור התוכנית',
             rowClass: 'row',
             colClass: 'col-12'
+        },
+        {
+            type: 'select',
+            id: 'tradePlanTags',
+            label: 'תגיות',
+            options: [],
+            multiple: true,
+            includeEmpty: false,
+            additionalClasses: ['tag-multi-select'],
+            rowClass: 'row g-3 align-items-end',
+            colClass: 'col-md-4 col-12',
+            attributes: {
+                'data-initial-value': '',
+                'data-tag-entity': 'trade_plan'
+            },
+            description: 'בחר תגיות שיסייעו בארגון ומעקב אחר תוכנית זו'
+        },
+        {
+            type: 'custom',
+            id: 'tradePlanConditionsControls',
+            rowClass: 'row g-3 align-items-end',
+            colClass: 'col-md-8 col-12',
+            html: `
+                <div class="conditions-control-wrapper d-flex flex-column gap-2" data-conditions-controls="trade-plan">
+                    <div id="tradePlanConditionsSummary" class="conditions-summary-table" data-conditions-summary>
+                        <div class="text-muted small mb-0">
+                            תנאים פעילים יוצגו כאן לאחר שמירת התכנון.
+                        </div>
+                    </div>
+                    <div class="text-muted small" data-conditions-disabled-hint>
+                        ניהול תנאים יהיה זמין לאחר שמירת התכנון.
+                    </div>
+                    <div class="d-flex justify-content-end flex-wrap gap-2" dir="rtl">
+                        <button
+                            type="button"
+                            id="tradePlanEvaluateConditionsButton"
+                            data-button-type="REFRESH"
+                            data-variant="small"
+                            data-style="outline"
+                            data-classes=" btn-outline-secondary"
+                            data-icon="↻"
+                            data-text=""
+                            data-size="small"
+                            data-onclick="handleTradePlanEvaluateConditionsClick()"
+                            data-tooltip="בדיקת תנאים מול השוק"
+                            aria-label="בדיקת תנאים">
+                        </button>
+                        <button
+                            type="button"
+                            id="tradePlanOpenConditionsButton"
+                            data-button-type="ADD"
+                            data-variant="small"
+                            data-style="outline"
+                            data-classes=" btn-outline-primary"
+                            data-icon="➕"
+                            data-text=""
+                            data-size="small"
+                            data-onclick="handleTradePlanConditionsButtonClick()"
+                            data-tooltip="הוסף תנאי"
+                            aria-label="הוסף תנאי">
+                        </button>
+                    </div>
+                </div>
+            `
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {

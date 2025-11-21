@@ -214,10 +214,13 @@ function translateCashFlowType(type) {
     'dividend': 'דיבידנד',
     'fee': 'עמלה',
     'interest': 'ריבית',
+    'syep_interest': 'ריבית SYEP',
     'bonus': 'בונוס',
-    'tax': 'מס',
+    'tax': 'מיסים',
     'transfer_in': 'העברה מחשבון אחר',
     'transfer_out': 'העברה לחשבון אחר',
+    'currency_exchange_from': 'המרת מט״ח - יציאה',
+    'currency_exchange_to': 'המרת מט״ח - כניסה',
     'other_positive': 'אחר חיובי',
     'other_negative': 'אחר שלילי',
     'opening_balance': 'יתרת פתיחה',
@@ -767,6 +770,7 @@ function translateConditionFields(attribute, operator, number) {
     'change': 'שינוי',
     'ma': 'ממוצע נע',
     'volume': 'נפח מסחר',
+    'balance': 'יתרה',
   };
 
   // תרגום האופרטור לסימנים חשבונאיים
@@ -793,6 +797,11 @@ function translateConditionFields(attribute, operator, number) {
   } else if (attribute === 'volume') {
     // עיצוב נפח עם פסיקים
     formattedNumber = parseInt(number).toLocaleString('he-IL');
+  } else if (attribute === 'balance') {
+    const asNumber = Number(number);
+    formattedNumber = Number.isFinite(asNumber)
+      ? asNumber.toLocaleString('he-IL')
+      : number;
   }
 
   return `${translatedAttribute} ${operatorSymbol} ${formattedNumber}`;

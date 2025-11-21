@@ -16,6 +16,20 @@
 
 console.log('📊 Chart System initialized');
 
+const CHART_SYSTEM_ERROR_TITLE = 'שגיאת תרשימים';
+
+function notifyChartSystemError(message, error, context = {}) {
+    const metadata = { page: 'chart-system', ...context };
+    if (typeof window.Logger?.error === 'function') {
+        window.Logger.error(message, error, metadata);
+    }
+    if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification(CHART_SYSTEM_ERROR_TITLE, message, 6000, 'system');
+    } else if (typeof window.showNotification === 'function') {
+        window.showNotification(message, 'error');
+    }
+}
+
 /**
  * Main Chart System class
  * @class ChartSystem
@@ -121,11 +135,14 @@ class ChartSystem {
                     const rawData = await adapter.getData(config.adapterConfig || {});
                     chartData = adapter.formatData(rawData);
                 } catch (error) {
-                    console.warn(`⚠️ Adapter '${config.adapter}' failed:`, error);
-                    // Use fallback data
+                    const errorMessage = `הטעינת נתונים למתאם '${config.adapter}' נכשלה${config.id ? ` (chart: ${config.id})` : ''}`;
+                    notifyChartSystemError(errorMessage, error, { chartId: config.id, adapter: config.adapter });
+                    throw error;
                 }
             } else {
-                console.warn(`⚠️ Adapter '${config.adapter}' not found`);
+                const errorMessage = `מתאם התרשימים '${config.adapter}' לא קיים`;
+                notifyChartSystemError(errorMessage, null, { chartId: config.id, adapter: config.adapter });
+                throw new Error(errorMessage);
             }
         }
 

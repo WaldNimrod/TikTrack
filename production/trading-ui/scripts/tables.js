@@ -56,6 +56,7 @@ function sortTable(columnIndex, data, tableType, updateFunction) {
  * @returns {*} Column value
  */
 function resolveColumnValue(item, columnIndex, tableType) {
+
   // Special handling for linked_items table
   if (tableType === 'linked_items') {
     switch (columnIndex) {
@@ -145,7 +146,11 @@ function resolveColumnValue(item, columnIndex, tableType) {
       'source',        // 5 - מקור (Source)
     ],
     'notes': [
-      'id', 'title', 'content', 'type', 'status', 'created_at',
+      'related_object',  // 0 - אובייקט מקושר
+      'content',         // 1 - תוכן
+      'attachment',      // 2 - קובץ מצורף
+      'created_at',      // 3 - נוצר ב
+      'updated_at',      // 4 - עודכן
     ],
     'linked_items': [
       'linked_to',     // 0 - מקושר ל (משולב: type + name)
@@ -192,6 +197,7 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
     ? window.tableMappings.getColumnKey(tableType, columnIndex)
     : null;
 
+
   // Custom sorting for tickers table
   if (tableType === 'tickers') {
     if (columnKey === 'status') {
@@ -227,6 +233,8 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
     }
   }
 
+  // Custom sorting for cash_flows table - removed, using generic system
+
   // Custom sorting for other table types can be added here
   // if (tableType === 'trades') { ... }
   // if (tableType === 'accounts') { ... }
@@ -234,7 +242,128 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
   return null; // No custom logic applies
 }
 
-window.sortTableData = async function (columnIndex, data, tableType, updateFunction) {
+function compareTableRows(a, b, tableType, columnIndex, direction = 'asc') {
+  const adapterAvailable = typeof window.TableSortValueAdapter?.getSortValue === 'function';
+  const sortType = typeof window.getColumnSortType === 'function'
+    ? window.getColumnSortType(tableType, columnIndex)
+    : null;
+  const isNumericSort = ['numeric', 'numeric-string', 'number'].includes(sortType);
+  const isDateSort = ['dateEnvelope', 'date'].includes(sortType);
+
+  const rawAValue = resolveColumnValue(a, columnIndex, tableType);
+  const rawBValue = resolveColumnValue(b, columnIndex, tableType);
+
+  const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, rawAValue, rawBValue);
+  if (customSortResult !== null) {
+    const primaryResult = direction === 'asc' ? customSortResult : -customSortResult;
+    if (primaryResult !== 0) {
+      return primaryResult;
+    }
+  } else {
+    let aValue = rawAValue;
+    let bValue = rawBValue;
+
+    const columnKey = (window.tableMappings && typeof window.tableMappings.getColumnKey === 'function')
+      ? window.tableMappings.getColumnKey(tableType, columnIndex)
+      : null;
+
+    const aEnvelope = columnKey && a ? a[`${columnKey}_envelope`] : null;
+    const bEnvelope = columnKey && b ? b[`${columnKey}_envelope`] : null;
+
+    const getEpoch = (input) => {
+      if (!input && input !== 0) {
+        return null;
+      }
+      if (window.getEpochMilliseconds) {
+        const epoch = window.getEpochMilliseconds(input);
+        if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+          return epoch;
+        }
+      }
+      if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+        const epoch = window.dateUtils.getEpochMilliseconds(input);
+        if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+          return epoch;
+        }
+      }
+      return null;
+    };
+
+    if (aEnvelope || bEnvelope) {
+      const epochA = getEpoch(aEnvelope || rawAValue);
+      const epochB = getEpoch(bEnvelope || rawBValue);
+
+      if (epochA !== null) {
+        aValue = epochA;
+      }
+      if (epochB !== null) {
+        bValue = epochB;
+      }
+    }
+
+    if (adapterAvailable && sortType) {
+      const adaptedA = window.TableSortValueAdapter.getSortValue({ value: rawAValue, type: sortType });
+      const adaptedB = window.TableSortValueAdapter.getSortValue({ value: rawBValue, type: sortType });
+      if (adaptedA !== null && adaptedA !== undefined) {
+        aValue = adaptedA;
+      }
+      if (adaptedB !== null && adaptedB !== undefined) {
+        bValue = adaptedB;
+      }
+    } else if (sortType === 'dateEnvelope') {
+      aValue = rawAValue?.epochMs ?? rawAValue?.utc ?? rawAValue;
+      bValue = rawBValue?.epochMs ?? rawBValue?.utc ?? rawBValue;
+    }
+
+    if (isNumericSort) {
+      const parsedA = Number(aValue);
+      const parsedB = Number(bValue);
+      if (!Number.isNaN(parsedA) && !Number.isNaN(parsedB)) {
+        aValue = parsedA;
+        bValue = parsedB;
+      }
+    } else if (!sortType && !isNaN(aValue) && !isNaN(bValue)) {
+      aValue = parseFloat(aValue);
+      bValue = parseFloat(bValue);
+    }
+
+    if (isDateSort) {
+      const parsedA = aValue instanceof Date ? aValue : new Date(aValue);
+      const parsedB = bValue instanceof Date ? bValue : new Date(bValue);
+      if (!Number.isNaN(parsedA.getTime()) && !Number.isNaN(parsedB.getTime())) {
+        aValue = parsedA;
+        bValue = parsedB;
+      }
+    } else if (!sortType && isDateValue(aValue) && isDateValue(bValue)) {
+      aValue = new Date(aValue);
+      bValue = new Date(bValue);
+    }
+
+    if (sortType === 'string' || (!sortType && typeof aValue === 'string' && typeof bValue === 'string')) {
+      // General string sorting with locale support
+      const aStr = (aValue || '').toString();
+      const bStr = (bValue || '').toString();
+      const result = aStr.localeCompare(bStr, 'he-IL', { sensitivity: 'base' });
+      if (result !== 0) {
+        return direction === 'asc' ? result : -result;
+      }
+    } else {
+      // Numeric or other comparison
+      if (aValue < bValue) {
+        return direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return direction === 'asc' ? 1 : -1;
+      }
+    }
+  }
+
+  return 0;
+}
+
+window.compareTableRows = compareTableRows;
+
+window.sortTableData = async function (columnIndex, data, tableType, updateFunction, options = {}) {
   if (window._sortTableDataInProgress) {
     console.warn(`[sortTableData] Recursion detected: sort already in progress for ${tableType} column ${columnIndex}, returning original data`);
     console.trace('[sortTableData] Stack trace for rejected call');
@@ -258,147 +387,99 @@ window.sortTableData = async function (columnIndex, data, tableType, updateFunct
       return Array.isArray(data) ? [] : data;
     }
 
-    // קבלת מצב סידור נוכחי דרך UnifiedCacheManager
-    // בודקים את המצב הכללי של הטבלה כדי לראות אם העמודה הנוכחית כבר מסודרת
-    let currentTableState = null;
-    let isCurrentColumn = false;
-    let currentDirection = 'asc';
-    
-    if (window.UnifiedCacheManager) {
-      try {
-        // בודקים את המצב הכללי של הטבלה
-        const tableStateKey = `sortState_${tableType}`;
-        currentTableState = await window.UnifiedCacheManager.get(tableStateKey, {
-          layer: 'localStorage'
-        });
-        
-        // אם יש מצב כללי והעמודה הנוכחית היא העמודה שכבר מסודרת
-        if (currentTableState && 
-            typeof currentTableState.columnIndex === 'number' && 
-            currentTableState.columnIndex === columnIndex) {
-          isCurrentColumn = true;
-          currentDirection = currentTableState.direction || 'asc';
+    const sortOptions = typeof options === 'object' && options !== null ? { ...options } : {};
+    const forcedDirection = sortOptions.direction || sortOptions.forceDirection || null;
+    let newDirection = forcedDirection ? (forcedDirection === 'desc' ? 'desc' : 'asc') : 'asc';
+
+    // Get data from Registry if available (filteredData for proper sorting)
+    let dataToSort = data;
+    let tableId = null;
+    if (window.TableDataRegistry) {
+      const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+      if (table) {
+        tableId = table.id;
+      }
+      // Try to get filtered data from Registry first
+      const registryFilteredData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+      if (Array.isArray(registryFilteredData) && registryFilteredData.length > 0) {
+        dataToSort = registryFilteredData;
+      }
+    }
+
+    if (!forcedDirection) {
+      // קבלת מצב סידור נוכחי דרך UnifiedCacheManager
+      // בודקים את המצב הכללי של הטבלה כדי לראות אם העמודה הנוכחית כבר מסודרת
+      let currentTableState = null;
+      let isCurrentColumn = false;
+      let currentDirection = 'asc';
+
+      if (window.UnifiedCacheManager) {
+        try {
+          // בודקים את המצב הכללי של הטבלה
+          const tableStateKey = `sortState_${tableType}`;
+          currentTableState = await window.UnifiedCacheManager.get(tableStateKey, {
+            layer: 'localStorage'
+          });
+
+          // אם יש מצב כללי והעמודה הנוכחית היא העמודה שכבר מסודרת
+          if (
+            currentTableState &&
+            typeof currentTableState.columnIndex === 'number' &&
+            currentTableState.columnIndex === columnIndex
+          ) {
+            isCurrentColumn = true;
+            currentDirection = currentTableState.direction || 'asc';
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`sortTableData: Failed to get table state for "${tableType}"`, err, { page: "tables" });
+          }
         }
+      }
+
+      // אם זו העמודה שכבר מסודרת, הופכים את הכיוון. אחרת, מתחילים עם 'asc'
+      newDirection = isCurrentColumn && currentDirection === 'asc'
+        ? 'desc'
+        : isCurrentColumn && currentDirection === 'desc'
+          ? 'asc'
+          : 'asc';
+    }
+
+    if (sortOptions.saveState !== false) {
+      await window.saveSortState(tableType, columnIndex, newDirection, {
+        chain: sortOptions.chain || null,
+        pageName: sortOptions.pageName || null
+      });
+    }
+
+    const sortedData = [...dataToSort].sort((a, b) => {
+      return compareTableRows(a, b, tableType, columnIndex, newDirection);
+    });
+
+    // Update TableDataRegistry with sorted data
+    if (window.TableDataRegistry && tableId) {
+      try {
+        window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
       } catch (err) {
         if (window.Logger) {
-          window.Logger.warn(`sortTableData: Failed to get table state for "${tableType}"`, err, { page: "tables" });
+          window.Logger.warn(`sortTableData: Failed to update TableDataRegistry for "${tableType}"`, err, { page: "tables" });
         }
       }
     }
 
-    // אם זו העמודה שכבר מסודרת, הופכים את הכיוון. אחרת, מתחילים עם 'asc'
-    const newDirection = isCurrentColumn && currentDirection === 'asc' ? 'desc' : 
-                        isCurrentColumn && currentDirection === 'desc' ? 'asc' : 
-                        'asc';
-    await window.saveSortState(tableType, columnIndex, newDirection);
-
-    const adapterAvailable = typeof window.TableSortValueAdapter?.getSortValue === 'function';
-    const sortType = typeof window.getColumnSortType === 'function'
-      ? window.getColumnSortType(tableType, columnIndex)
-      : null;
-    const isNumericSort = ['numeric', 'numeric-string', 'number'].includes(sortType);
-    const isDateSort = ['dateEnvelope', 'date'].includes(sortType);
-
-    const sortedData = [...data].sort((a, b) => {
-      const rawAValue = resolveColumnValue(a, columnIndex, tableType);
-      const rawBValue = resolveColumnValue(b, columnIndex, tableType);
-
-      const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, rawAValue, rawBValue);
-      if (customSortResult !== null) {
-        const primaryResult = newDirection === 'asc' ? customSortResult : -customSortResult;
-        if (primaryResult !== 0) return primaryResult;
-      } else {
-        let aValue = rawAValue;
-        let bValue = rawBValue;
-
-        const columnKey = (window.tableMappings && typeof window.tableMappings.getColumnKey === 'function')
-          ? window.tableMappings.getColumnKey(tableType, columnIndex)
-          : null;
-
-        const aEnvelope = columnKey && a ? a[`${columnKey}_envelope`] : null;
-        const bEnvelope = columnKey && b ? b[`${columnKey}_envelope`] : null;
-
-        const getEpoch = (input) => {
-          if (!input && input !== 0) {
-            return null;
-          }
-          if (window.getEpochMilliseconds) {
-            const epoch = window.getEpochMilliseconds(input);
-            if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
-              return epoch;
-            }
-          }
-          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-            const epoch = window.dateUtils.getEpochMilliseconds(input);
-            if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
-              return epoch;
-            }
-          }
-          return null;
-        };
-
-        if (aEnvelope || bEnvelope) {
-          const epochA = getEpoch(aEnvelope || rawAValue);
-          const epochB = getEpoch(bEnvelope || rawBValue);
-
-          if (epochA !== null) {
-            aValue = epochA;
-          }
-          if (epochB !== null) {
-            bValue = epochB;
-          }
+    // Update pagination instance with sorted data
+    if (tableId && window.PaginationSystem) {
+      try {
+        const paginationInstance = window.PaginationSystem.get(tableId);
+        if (paginationInstance && typeof paginationInstance.setData === 'function') {
+          paginationInstance.setData(sortedData);
         }
-
-        if (adapterAvailable && sortType) {
-          const adaptedA = window.TableSortValueAdapter.getSortValue({ value: rawAValue, type: sortType });
-          const adaptedB = window.TableSortValueAdapter.getSortValue({ value: rawBValue, type: sortType });
-          if (adaptedA !== null && adaptedA !== undefined) {
-            aValue = adaptedA;
-          }
-          if (adaptedB !== null && adaptedB !== undefined) {
-            bValue = adaptedB;
-          }
-        } else if (sortType === 'dateEnvelope') {
-          aValue = rawAValue?.epochMs ?? rawAValue?.utc ?? rawAValue;
-          bValue = rawBValue?.epochMs ?? rawBValue?.utc ?? rawBValue;
-        }
-
-        if (isNumericSort) {
-          const parsedA = Number(aValue);
-          const parsedB = Number(bValue);
-          if (!Number.isNaN(parsedA) && !Number.isNaN(parsedB)) {
-            aValue = parsedA;
-            bValue = parsedB;
-          }
-        } else if (!sortType && !isNaN(aValue) && !isNaN(bValue)) {
-          aValue = parseFloat(aValue);
-          bValue = parseFloat(bValue);
-        }
-
-        if (isDateSort) {
-          const parsedA = aValue instanceof Date ? aValue : new Date(aValue);
-          const parsedB = bValue instanceof Date ? bValue : new Date(bValue);
-          if (!Number.isNaN(parsedA.getTime()) && !Number.isNaN(parsedB.getTime())) {
-            aValue = parsedA;
-            bValue = parsedB;
-          }
-        } else if (!sortType && isDateValue(aValue) && isDateValue(bValue)) {
-          aValue = new Date(aValue);
-          bValue = new Date(bValue);
-        }
-
-        if (aValue < bValue) {
-          const primaryResult = newDirection === 'asc' ? -1 : 1;
-          if (primaryResult !== 0) return primaryResult;
-        }
-        if (aValue > bValue) {
-          const primaryResult = newDirection === 'asc' ? 1 : -1;
-          if (primaryResult !== 0) return primaryResult;
+      } catch (err) {
+        if (window.Logger) {
+          window.Logger.warn(`sortTableData: Failed to update pagination for "${tableType}"`, err, { page: "tables" });
         }
       }
-
-      return 0;
-    });
+    }
 
     if (typeof updateFunction !== 'function') {
       complete(newDirection, sortedData);
@@ -516,11 +597,14 @@ function isDateValue(value) {
  * @param {number} columnIndex - Column index
  * @param {string} direction - Sort direction (asc/desc)
  */
-window.saveSortState = async function (tableType, columnIndex, direction) {
+window.saveSortState = async function (tableType, columnIndex, direction, options = {}) {
+  const sortOptions = typeof options === 'object' && options !== null ? options : {};
   const sortState = {
     columnIndex,
     direction,
     timestamp: Date.now(),
+    tableType,
+    chain: Array.isArray(sortOptions.chain) ? sortOptions.chain : null
   };
   
   // שמירה רק דרך UnifiedCacheManager
@@ -536,7 +620,7 @@ window.saveSortState = async function (tableType, columnIndex, direction) {
     const tableStateKey = `sortState_${tableType}`;
     await window.UnifiedCacheManager.save(tableStateKey, sortState, {
       layer: 'localStorage',
-      ttl: null, // persistent
+      ttl: 3600000, // 1 hour - consistent with table state TTL
       syncToBackend: false
     });
     
@@ -552,14 +636,17 @@ window.saveSortState = async function (tableType, columnIndex, direction) {
     if (window.PageStateManager && window.PageStateManager.initialized) {
       try {
         // קבלת שם העמוד הנוכחי
-        const pageName = (typeof window.getCurrentPageName === 'function') 
-          ? window.getCurrentPageName() 
-          : tableType; // Fallback ל-tableType אם אין getCurrentPageName
+        const pageName = sortOptions.pageName
+          || (typeof window.getCurrentPageName === 'function'
+            ? window.getCurrentPageName()
+            : tableType); // Fallback ל-tableType אם אין getCurrentPageName
         
         // שמירת מצב סידור דרך PageStateManager
         await window.PageStateManager.saveSort(pageName, {
+          tableType,
           columnIndex,
-          direction
+          direction,
+          chain: sortState.chain || undefined
         });
         
         if (window.Logger) {
@@ -624,6 +711,37 @@ window.getSortState = async function (tableType) {
     direction: 'asc',
     timestamp: Date.now(),
   };
+};
+
+window.loadSortState = async function (tableType, options = {}) {
+  const sortState = await window.getSortState(tableType);
+  if (
+    sortState &&
+    sortState.columnIndex !== undefined &&
+    sortState.columnIndex !== null &&
+    sortState.columnIndex >= 0
+  ) {
+    return sortState;
+  }
+
+  const sortOptions = typeof options === 'object' && options !== null ? options : {};
+  const pageName = sortOptions.pageName || (typeof window.getCurrentPageName === 'function'
+    ? window.getCurrentPageName()
+    : null);
+
+  if (pageName && window.PageStateManager && typeof window.PageStateManager.loadSort === 'function') {
+    const state = await window.PageStateManager.loadSort(pageName, tableType);
+    if (state) {
+      return {
+        columnIndex: state.columnIndex ?? -1,
+        direction: state.direction || 'asc',
+        chain: state.chain || null,
+        timestamp: state.timestamp || Date.now()
+      };
+    }
+  }
+
+  return sortState;
 };
 
 /**
@@ -770,11 +888,20 @@ window.sortTable = function (tableTypeOrColumnIndex, columnIndex, dataArray, upd
 window.restoreAnyTableSort = async function (tableType, data, updateFunction) {
   // Use UnifiedTableSystem if available
   if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
-    const sortState = await window.getSortState(tableType);
+    const sortState = await window.loadSortState(tableType);
     if (sortState && sortState.columnIndex >= 0) {
-      // Use UnifiedTableSystem sorter
+      if (
+        Array.isArray(sortState.chain) &&
+        window.UnifiedTableSystem.sorter &&
+        typeof window.UnifiedTableSystem.sorter.sortByChain === 'function'
+      ) {
+        return await window.UnifiedTableSystem.sorter.sortByChain(tableType, sortState.chain, { saveState: true });
+      }
       if (window.UnifiedTableSystem.sorter && typeof window.UnifiedTableSystem.sorter.sort === 'function') {
-        return await window.UnifiedTableSystem.sorter.sort(tableType, sortState.columnIndex);
+        return await window.UnifiedTableSystem.sorter.sort(tableType, sortState.columnIndex, {
+          direction: sortState.direction || 'asc',
+          saveState: true
+        });
       }
     } else {
       // No saved state, try to apply default sort
@@ -785,11 +912,16 @@ window.restoreAnyTableSort = async function (tableType, data, updateFunction) {
   }
   
   // Fallback: use old method
-  const sortState = await window.getSortState(tableType);
+  const sortState = await window.loadSortState(tableType);
   if (sortState && sortState.columnIndex >= 0) {
     // Restoring sort state for table
     if (data && updateFunction) {
-      await window.sortTableData(sortState.columnIndex, data, tableType, updateFunction);
+      const options = {
+        direction: sortState.direction || 'asc',
+        saveState: true,
+        chain: sortState.chain || null
+      };
+      await window.sortTableData(sortState.columnIndex, data, tableType, updateFunction, options);
     }
   }
 };
@@ -1147,13 +1279,24 @@ window.ensureTablePagination = function(tableId, options = {}) {
 
   const existing = window.getPagination(tableId);
   if (existing) {
+    console.log(`🔄 [ensureTablePagination] Updating existing pagination for table ${tableId}`, {
+      tableId,
+      hasExistingOnAfterRender: typeof existing.config.onAfterRender === 'function',
+      hasNewOnAfterRender: typeof options.onAfterRender === 'function',
+    });
+    
     if (options.tableType && !existing.tableType) {
       existing.tableType = options.tableType;
       existing.config.tableType = options.tableType;
     }
 
     if (typeof options.onAfterRender === 'function') {
+      console.log(`✅ [ensureTablePagination] Updating onAfterRender callback for table ${tableId}`);
       existing.config.onAfterRender = options.onAfterRender;
+      console.log(`✅ [ensureTablePagination] onAfterRender updated - is now:`, {
+        isFunction: typeof existing.config.onAfterRender === 'function',
+        functionName: existing.config.onAfterRender?.name || 'anonymous',
+      });
     }
 
     if (typeof options.onFilteredDataChange === 'function') {
@@ -1167,6 +1310,10 @@ window.ensureTablePagination = function(tableId, options = {}) {
     return existing;
   }
 
+  console.log(`🆕 [ensureTablePagination] Creating new pagination for table ${tableId}`, {
+    tableId,
+    hasOnAfterRender: typeof options.onAfterRender === 'function',
+  });
   return window.createPagination(tableId, options);
 };
 
@@ -1214,14 +1361,26 @@ window.updateTableWithPagination = async function({
     tableType: resolvedTableType,
     pageSize,
     onAfterRender: async ({ pageData, pagination: paginationInfo }) => {
+      console.log(`🔄 [updateTableWithPagination.onAfterRender] Called for table ${tableId}`, {
+        tableId,
+        pageDataLength: pageData?.length || 0,
+        currentPage: paginationInfo?.currentPage,
+        totalPages: paginationInfo?.totalPages,
+        hasRender: typeof render === 'function',
+      });
       try {
+        console.log(`📞 [updateTableWithPagination.onAfterRender] Calling render callback for table ${tableId}`, {
+          pageDataLength: pageData?.length || 0,
+        });
         await render(pageData, {
           skipPagination: true,
           pageInfo: paginationInfo,
           tableId,
           tableType: resolvedTableType,
         });
+        console.log(`✅ [updateTableWithPagination.onAfterRender] Render callback completed for table ${tableId}`);
       } catch (error) {
+        console.error(`❌ [updateTableWithPagination.onAfterRender] Render callback failed for table ${tableId}:`, error);
         console.warn(`updateTableWithPagination: render callback failed for table ${tableId}`, error);
       }
     },

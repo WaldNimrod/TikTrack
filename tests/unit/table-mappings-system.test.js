@@ -150,6 +150,63 @@ describe('Table mappings general system', () => {
     expect(appWindow.formatDate).toHaveBeenCalled();
   });
 
+  test('buildDateEnvelope uses currentPreferences timezone even without setter', () => {
+    const { appWindow } = bootstrapTablesSystem();
+    const originalSetter = appWindow.setUserTimezone;
+    delete appWindow.setUserTimezone;
+    appWindow.currentPreferences = { timezone: 'Asia/Tokyo' };
+
+    const envelope = appWindow.tableMappings.buildDateEnvelope('2024-05-06');
+    expect(envelope.timezone).toBe('Asia/Tokyo');
+
+    appWindow.setUserTimezone = originalSetter;
+  });
+
+  test('buildDateEnvelope uses PreferencesSystem fallback and setter when available', () => {
+    const { appWindow } = bootstrapTablesSystem();
+    delete appWindow.currentPreferences;
+    appWindow.PreferencesSystem = {
+      manager: { currentPreferences: { timezone: 'Europe/London' } }
+    };
+    appWindow.setUserTimezone = jest.fn();
+
+    const envelope = appWindow.tableMappings.buildDateEnvelope('2024-05-07');
+    expect(envelope.timezone).toBe('Europe/London');
+    expect(appWindow.setUserTimezone).toHaveBeenCalledWith('Europe/London');
+  });
+
+  test('buildDateEnvelope falls back to Intl timezone when preferences missing', () => {
+    const { appWindow } = bootstrapTablesSystem();
+    delete appWindow.currentPreferences;
+    delete appWindow.PreferencesSystem;
+    const originalIntl = global.Intl.DateTimeFormat;
+    global.Intl.DateTimeFormat = () => ({
+      resolvedOptions: () => ({ timeZone: undefined })
+    });
+    appWindow.setUserTimezone = jest.fn();
+
+    const envelope = appWindow.tableMappings.buildDateEnvelope(1700000000000);
+    expect(envelope.timezone).toBe('UTC');
+    expect(appWindow.setUserTimezone).toHaveBeenCalledWith('UTC');
+
+    global.Intl.DateTimeFormat = originalIntl;
+  });
+
+  test('buildDateEnvelope returns UTC when timezone resolution throws', () => {
+    const { appWindow } = bootstrapTablesSystem();
+    delete appWindow.currentPreferences;
+    delete appWindow.PreferencesSystem;
+    const originalIntl = global.Intl.DateTimeFormat;
+    global.Intl.DateTimeFormat = () => { throw new Error('tz failure'); };
+    appWindow.setUserTimezone = jest.fn();
+
+    const envelope = appWindow.tableMappings.buildDateEnvelope(1700000000000);
+    expect(envelope.timezone).toBe('UTC');
+    expect(appWindow.setUserTimezone).not.toHaveBeenCalled();
+
+    global.Intl.DateTimeFormat = originalIntl;
+  });
+
   test('getColumnValue handles multiple table-specific cases', () => {
     const { appWindow } = bootstrapTablesSystem();
     appWindow.translateConditionFields = jest.fn(() => 'translated-condition');
@@ -328,6 +385,7 @@ describe('Table mappings general system', () => {
     const suggestionReasonsIndex = appWindow.getColumnIndexByKey('trade_suggestions', 'match_reasons_text');
     expect(appWindow.getColumnValue(suggestionData, suggestionReasonsIndex, 'trade_suggestions')).toBe('ratio>2');
   });
+
 
   test('getColumnValue covers simple fallback branches for linked, activity, execution and cash flow tables', () => {
     const { appWindow } = bootstrapTablesSystem();
@@ -655,6 +713,13 @@ describe('Table mappings general system', () => {
     expect(chain.find(step => step.priority === 'ticker')).toBeTruthy();
   });
 
+  test('getDefaultSortChain returns empty array for unsupported tables', () => {
+    const { appWindow } = bootstrapTablesSystem();
+    const chain = appWindow.getDefaultSortChain('non_existing_sort_table');
+    expect(Array.isArray(chain)).toBe(true);
+    expect(chain).toHaveLength(0);
+  });
+
   test('compareTableRows sorts linked items using LinkedItemsService labels', () => {
     const { appWindow } = bootstrapTablesSystem();
     appWindow.LinkedItemsService = {
@@ -759,6 +824,31 @@ describe('Table mappings general system', () => {
     const nullResult = await appWindow.sortTableData(0, null, 'trades');
     expect(nullResult).toBeNull();
   });
+
+  test('sortTableData prevents nested reentry from update function callbacks', async () => {
+    const { appWindow } = bootstrapTablesSystem();
+    const columnIndex = appWindow.getColumnIndexByKey('trades', 'ticker_symbol');
+    const dataset = [
+      { ticker_symbol: 'B' },
+      { ticker_symbol: 'A' },
+    ];
+
+    let nestedCallPromise = Promise.resolve();
+    const updateFunction = jest.fn(sortedRows => {
+      // Attempt to trigger a nested sort inside updateFunction (should be rejected by guard)
+      nestedCallPromise = appWindow.sortTableData(columnIndex, dataset, 'trades');
+      return sortedRows;
+    });
+
+    const sorted = await appWindow.sortTableData(columnIndex, dataset, 'trades', updateFunction);
+    expect(updateFunction).toHaveBeenCalledTimes(1);
+    expect(sorted[0].ticker_symbol).toBe('A');
+
+    const nestedResult = await nestedCallPromise;
+    expect(nestedResult).toBe(dataset);
+    expect(appWindow._sortTableDataInProgress).toBe(false);
+  });
+
 
   test('sortTableData logs warning when cache retrieval fails', async () => {
     const { appWindow } = bootstrapTablesSystem();

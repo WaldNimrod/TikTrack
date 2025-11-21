@@ -21,46 +21,47 @@ let tableData = {};
  * Initialize the database extra data display page
  */
 function initDatabaseExtraData() {
-  console.log('🔄 Initializing database extra data page...');
+  window.Logger?.info('Initializing database extra data page', { page: 'db_extradata' });
   
   // Load all tables
   loadAllTables();
   
-  console.log('✅ Database extra data page initialized successfully');
+  window.Logger?.info('Database extra data page initialized successfully', { page: 'db_extradata' });
 }
 
 /**
  * Load all extra data tables
  */
 async function loadAllTables() {
-  console.log('🔄 Loading all extra data tables...');
+  window.Logger?.debug('Loading all extra data tables', { page: 'db_extradata' });
   
   // API endpoints and their corresponding container IDs
   const tables = [
-    { api: 'constraints', container: 'constraintsContainer' },
-    { api: 'currencies', container: 'currenciesContainer' },
-    { api: 'preference_groups', container: 'preferenceGroupsContainer' },
-    { api: 'system_setting_groups', container: 'systemSettingGroupsContainer' },
-    { api: 'external_data_providers', container: 'externalDataProvidersContainer' },
-    { api: 'quotes_last', container: 'quotesLastContainer' },
-    { api: 'plan_conditions', container: 'planConditionsContainer' },
-    { api: 'user_preferences', container: 'userPreferencesContainer' }
+    { type: 'constraints', apiSlug: 'constraints', container: 'constraintsContainer' },
+    { type: 'currencies', apiSlug: 'currencies', container: 'currenciesContainer' },
+    { type: 'preference_groups', apiSlug: 'preference-groups', container: 'preferenceGroupsContainer' },
+    { type: 'system_setting_groups', apiSlug: 'system-setting-groups', container: 'systemSettingGroupsContainer' },
+    { type: 'external_data_providers', apiSlug: 'external-data-providers', container: 'externalDataProvidersContainer' },
+    { type: 'quotes_last', apiSlug: 'quotes-last', container: 'quotesLastContainer' },
+    { type: 'plan_conditions', apiSlug: 'plan-conditions', container: 'planConditionsContainer' },
+    { type: 'user_preferences', apiSlug: 'user-preferences', container: 'userPreferencesContainer' }
   ];
   
   totalRecords = 0;
   
   for (const table of tables) {
     try {
-      console.log(`📊 Loading ${table.api}...`);
-      await loadTableData(table.api, table.container);
+      window.Logger?.debug('Loading table', { page: 'db_extradata', type: table.type, apiSlug: table.apiSlug });
+      await loadTableData(table.type, table.apiSlug, table.container);
     } catch (error) {
-      console.error(`Error loading ${table.api}:`, error);
+      const identifier = table.apiSlug || table.type;
+      window.Logger?.error('Error loading table', { page: 'db_extradata', identifier, error: error?.message || error });
     }
   }
   
   // Update summary stats
   updateSummaryStats();
-  console.log('✅ All extra data tables loaded');
+  window.Logger?.info('All extra data tables loaded', { page: 'db_extradata' });
 }
 
 // ===== DATA LOADING =====
@@ -70,15 +71,15 @@ async function loadAllTables() {
  * @param {string} tableType - The table type to load
  * @param {string} containerId - The container ID for the table
  */
-async function loadTableData(tableType, containerId) {
+async function loadTableData(tableType, apiSlug, containerId) {
   try {
-    console.log(`📊 Loading data for table type: ${tableType}`);
+    window.Logger?.debug('Loading data for table type', { page: 'db_extradata', tableType });
 
     // Show loading state
     showLoadingState(tableType);
 
     // Fetch data from server
-    const data = await fetchTableData(tableType);
+    const data = await fetchTableData(apiSlug);
 
     // Store data
     tableData[tableType] = data;
@@ -92,10 +93,11 @@ async function loadTableData(tableType, containerId) {
     // Add to total records
     totalRecords += data.length;
 
-    console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+    window.Logger?.debug('Data loaded for table type', { page: 'db_extradata', tableType, recordCount: data.length });
 
   } catch (error) {
-    console.error(`❌ Error loading ${tableType}:`, error);
+    const identifier = apiSlug || tableType;
+    window.Logger?.error('Error loading table data', { page: 'db_extradata', identifier, error: error?.message || error });
     // Show error state
     updateTableDisplay([], tableType, containerId);
     updateTableInfo(tableType, 0);
@@ -107,22 +109,22 @@ async function loadTableData(tableType, containerId) {
  * @param {string} tableType - The table type to fetch
  * @returns {Array} The table data
  */
-async function fetchTableData(tableType) {
-  console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);
+async function fetchTableData(apiSlug) {
+  window.Logger?.debug('Fetching data from API', { page: 'db_extradata', apiSlug, url: `/api/${apiSlug}/` });
   
-  const response = await fetch(`/api/${tableType}/`);
+  const response = await fetch(`/api/${apiSlug}/`);
   
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   
   const result = await response.json();
-  console.log(`📥 Received response for ${tableType}:`, result);
+  window.Logger?.debug('Received response', { page: 'db_extradata', apiSlug, result });
   
   if (result.data && Array.isArray(result.data)) {
     return result.data;
   } else {
-    console.warn(`⚠️ No data array found in response for ${tableType}`);
+    window.Logger?.warn('No data array found in response', { page: 'db_extradata', apiSlug });
     return [];
   }
 }
@@ -173,23 +175,23 @@ function updateTableDisplay(data, tableType, containerId) {
   
   const tableContainer = document.getElementById(containerId);
   if (!tableContainer) {
-    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    window.Logger?.error('Table container not found', { page: 'db_extradata', tableType, containerId });
     return;
   }
 
   const table = document.getElementById(tableId);
   if (!table) {
-    console.error(`❌ Table not found: ${tableId}`);
+    window.Logger?.error('Table not found', { page: 'db_extradata', tableId });
     return;
   }
 
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    console.error(`❌ Table body not found in table ${tableId}`);
+    window.Logger?.error('Table body not found', { page: 'db_extradata', tableId });
     return;
   }
 
-  console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
+  window.Logger?.debug('Updating table display', { page: 'db_extradata', tableType, recordCount: data.length });
 
   // Create table headers from first data row
   const thead = table.querySelector('thead');
@@ -203,7 +205,7 @@ function updateTableDisplay(data, tableType, containerId) {
   tbody.innerHTML = rows;
 
   // Update table count
-  updateTableCount(tableType, data.length);
+  // Count indicator handled by updateTableInfo()
 }
 
 /**
@@ -280,7 +282,7 @@ function updateTableInfo(tableType, recordCount) {
   if (countElement) {
     countElement.textContent = `${recordCount} records`;
   } else {
-    console.log(`ℹ️ No count element found for ${countElementId}`);
+    window.Logger?.debug('No count element found', { page: 'db_extradata', countElementId });
   }
 }
 
@@ -416,7 +418,7 @@ function toggleSection(sectionId) {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('➕ Database extra data page DOM loaded');
+  window.Logger?.info('Database extra data page DOM loaded', { page: 'db_extradata' });
   
   // Initialize the page
   initDatabaseExtraData();
@@ -425,5 +427,17 @@ document.addEventListener('DOMContentLoaded', function() {
 // Export for global access
 window.initDatabaseExtraData = initDatabaseExtraData;
 window.toggleSection = toggleSection;
+window.loadExtraData = async function loadExtraData() {
+  await loadAllTables();
+};
 
-console.log('✅ DB Extra Data script loaded successfully');
+if (typeof window.loadUserPreferences !== 'function') {
+  window.loadUserPreferences = async function loadUserPreferencesFallback(options = {}) {
+    if (window.PreferencesSystem?.initialize && !window.PreferencesSystem.initialized) {
+      await window.PreferencesSystem.initialize();
+    }
+    return window.PreferencesSystem?.getAllPreferences?.() || true;
+  };
+}
+
+window.Logger?.info('DB Extra Data script loaded successfully', { page: 'db_extradata' });

@@ -519,7 +519,7 @@ class ConditionsTestManager {
     async getTradePlanId() {
         try {
             // Use direct fetch to avoid infinite loop
-            const response = await fetch('/api/trade_plans/');
+            const response = await fetch('/api/trade-plans/');
             const data = await response.json();
             
             console.log('Trade plans response:', data);
@@ -530,7 +530,7 @@ class ConditionsTestManager {
             } else {
                 console.log('No trade plans found, creating new one...');
                 // If no trade plans exist, create one first
-                const createResponse = await fetch('/api/trade_plans/', {
+                const createResponse = await fetch('/api/trade-plans/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -888,7 +888,7 @@ class ConditionsTestManager {
             document.getElementById('tradingMethodsCount').textContent = methodsCount;
 
             // Load trade plans count
-            const plansResponse = await this.makeApiCall('/api/trade_plans/', 'GET');
+            const plansResponse = await this.makeApiCall('/api/trade-plans/', 'GET');
             const plansCount = plansResponse.data ? plansResponse.data.length : 0;
             document.getElementById('tradePlansCount').textContent = plansCount;
 
@@ -1591,6 +1591,34 @@ class ConditionsUIManager {
 // Global instance
 let conditionsTestManager;
 let conditionsUIManager;
+
+// Expose manager constructor and loader to global scope for unified systems
+window.ConditionsTestManager = ConditionsTestManager;
+
+window.loadConditionsTest = async function loadConditionsTest() {
+  try {
+    if (!(window.conditionsTestManager instanceof ConditionsTestManager)) {
+      conditionsTestManager = new ConditionsTestManager();
+      window.conditionsTestManager = conditionsTestManager;
+    }
+
+    if (
+      window.conditionsTestManager &&
+      typeof window.conditionsTestManager.initialize === 'function' &&
+      !window.conditionsTestManager.initialized
+    ) {
+      await window.conditionsTestManager.initialize();
+    }
+
+    return window.conditionsTestManager;
+  } catch (error) {
+    window.Logger?.error('❌ Failed to load Conditions Test system', error, {
+      page: 'conditions-test',
+      source: 'loadConditionsTest',
+    });
+    throw error;
+  }
+};
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {

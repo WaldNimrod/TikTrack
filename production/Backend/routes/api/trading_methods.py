@@ -11,7 +11,7 @@ from typing import Dict, Any
 from models.trading_method import TradingMethod, MethodParameter
 from services.conditions_validation_service import ConditionsValidationService
 from config.database import get_db
-from services.trading_methods_seed_data import METHODS_DEFINITION
+from migrations.seed_conditions_master_data import METHODS_DEFINITION
 
 logger = logging.getLogger(__name__)
 

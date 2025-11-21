@@ -6,6 +6,8 @@ production/Backend/logs/*.log
 logs/
 .logs/
 Backend/logs/
+# Server output log (explicitly excluded - large file)
+Backend/server_output.log
 
 # Backup files (not needed in git)
 *.tar.gz

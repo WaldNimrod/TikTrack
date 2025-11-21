@@ -95,7 +95,7 @@ class FileMapper:
         return imports
     
     def is_backend_file(self, module_path: str) -> bool:
-        """Check if module originates in the backend directory"""
+        """Check if module is from Backend directory"""
         # Check if it's a standard library or external package
         if module_path.split('.')[0] in ['os', 'sys', 'json', 'datetime', 'typing', 
                                          'flask', 'sqlite3', 'pathlib', 'logging',

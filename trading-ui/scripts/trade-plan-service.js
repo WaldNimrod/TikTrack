@@ -46,6 +46,26 @@
 let tradePlansData = [];
 let isDataLoaded = false;
 
+function normalizeTradePlansPayload(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  throw new Error('Invalid trade plans payload');
+}
+
+function notifyTradePlanLoadError(message, error, context = {}) {
+  const metadata = { page: 'trade_plan_service', ...context };
+  if (typeof window.Logger?.error === 'function') {
+    window.Logger.error(message, error, metadata);
+  }
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה בטעינת תכניות מסחר', message, 6000, 'system');
+  }
+}
+
 /**
  * טעינת נתוני תכניות מסחר מהשרת
  */
@@ -55,24 +75,24 @@ let isDataLoaded = false;
  * @async
  * @returns {Promise<Array>} Array of trade plans
  */
-async function loadTradePlansData() {
+async function loadTradePlansData(options = {}) {
+  const { force = false } = options;
+  const loader = window.TradePlansData?.loadTradePlansData;
+  if (typeof loader !== 'function') {
+    const error = new Error('TradePlansData loader unavailable');
+    isDataLoaded = false;
+    notifyTradePlanLoadError('שכבת הנתונים של תכניות המסחר לא זמינה', error, { stage: 'missing-loader' });
+    throw error;
+  }
+
   try {
-    const loader = window.TradePlansData?.loadTradePlansData;
-    const data = typeof loader === 'function'
-      ? await loader()
-      : [];
-
-    tradePlansData = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.data)
-        ? data.data
-        : [];
-
+    const payload = await loader({ force });
+    tradePlansData = normalizeTradePlansPayload(payload);
     isDataLoaded = true;
     return tradePlansData;
   } catch (error) {
     isDataLoaded = false;
-    window.Logger?.error('❌ Failed to load trade plans data', error, { page: 'trade_plan_service' });
+    notifyTradePlanLoadError('טעינת נתוני תכניות המסחר נכשלה', error, { stage: 'load-failure' });
     throw error;
   }
 }
@@ -300,7 +320,13 @@ window.tradePlanService = {
 // Individual function exports
 window.getTradePlans = getTradePlans;
 window.isTradePlansLoaded = isTradePlansLoaded;
-window.loadTradePlansData = loadTradePlansData;
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+const originalLoadTradePlansData = loadTradePlansData;
+window.loadTradePlansData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  return await originalLoadTradePlansData({ ...options, force: true });
+};
 window.formatTradePlanStatus = formatTradePlanStatus;
 window.parseTradePlanStatus = parseTradePlanStatus;
 window.getTradePlanById = getTradePlanById;

@@ -1342,7 +1342,7 @@ class SystemManagement {
     const statusLog = document.createElement('div');
     statusLog.className = 'log-entry log-info';
     statusLog.innerHTML = `
-      <div class="log-timestamp">${new Date().toLocaleTimeString('he-IL')}</div>
+      <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
       <div class="log-level">INFO</div>
       <div class="log-message">מערכת ניהול מערכת נטענה בהצלחה - ציון מערכת: ${data.system_score || 0}/100</div>
     `;
@@ -1357,7 +1357,7 @@ class SystemManagement {
 
       logEntry.className = `log-entry ${logLevel}`;
       logEntry.innerHTML = `
-        <div class="log-timestamp">${new Date().toLocaleTimeString('he-IL')}</div>
+        <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
         <div class="log-level">${levelText}</div>
         <div class="log-message">${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}</div>
       `;
@@ -1581,7 +1581,7 @@ class SystemManagement {
               const alertItem = document.createElement('div');
               alertItem.className = `alert-item ${alert.level}`;
 
-              const timestamp = new Date(alert.timestamp).toLocaleTimeString('he-IL');
+              const timestamp = window.formatTimeOnly ? window.formatTimeOnly(new Date(alert.timestamp)) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date(alert.timestamp)) : new Date(alert.timestamp).toLocaleTimeString('he-IL'));
 
               alertItem.innerHTML = `
                 <div class="alert-timestamp">${timestamp}</div>
@@ -1595,7 +1595,7 @@ class SystemManagement {
             const noAlertsItem = document.createElement('div');
             noAlertsItem.className = 'alert-item info';
             noAlertsItem.innerHTML = `
-              <div class="alert-timestamp">${new Date().toLocaleTimeString('he-IL')}</div>
+              <div class="alert-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
               <div class="alert-level">INFO</div>
               <div class="alert-message">אין התראות פעילות</div>
             `;
@@ -1714,30 +1714,18 @@ class SystemManagement {
     try {
       console.log(`💾 Saving primary data provider: ${provider}`);
 
-      const response = await fetch('/api/preferences/user/preference', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          preference_name: 'primaryDataProvider',
-          value: provider,
-          user_id: 1,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          console.log('✅ Primary data provider saved successfully');
+      if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+        const success = await window.PreferencesCore.savePreference('primaryDataProvider', provider);
+        if (success) {
+          console.log('✅ Primary data provider saved successfully via PreferencesCore');
           if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);
           }
         } else {
-          throw new Error(result.message || 'Failed to save primary data provider');
+          throw new Error('Failed to save primary data provider');
         }
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new Error('PreferencesCore.savePreference not available');
       }
     } catch (error) {
       console.error('❌ Error saving primary data provider:', error);
@@ -1755,17 +1743,12 @@ class SystemManagement {
     try {
       console.log('📡 Loading primary data provider...');
 
-      const response = await fetch('/api/preferences/user/preference?name=primaryDataProvider&user_id=1');
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          const provider = result.data.value;
-          const select = document.getElementById('primaryDataProvider');
-          if (select) {
-            select.value = provider;
-            console.log(`✅ Primary data provider loaded: ${provider}`);
-          }
+      if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+        const provider = await window.PreferencesCore.getPreference('primaryDataProvider');
+        const select = document.getElementById('primaryDataProvider');
+        if (select && provider !== undefined && provider !== null) {
+          select.value = provider;
+          console.log(`✅ Primary data provider loaded: ${provider}`);
         }
       }
     } catch (error) {

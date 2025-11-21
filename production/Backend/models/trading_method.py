@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .base import BaseModel
 from typing import Dict, Any, List
+import json
 
 class TradingMethod(BaseModel):
     """Trading method catalog with parameters"""
@@ -37,6 +38,7 @@ class TradingMethod(BaseModel):
         """Convert to dictionary with relationships"""
         result = {
             'id': self.id,
+            'method_key': self._generate_method_key(),
             'name_en': self.name_en,
             'name_he': self.name_he,
             'category': self.category,
@@ -65,6 +67,18 @@ class TradingMethod(BaseModel):
     
     def __repr__(self) -> str:
         return f"<TradingMethod(id={self.id}, name_en='{self.name_en}', category='{self.category}')>"
+
+    def _generate_method_key(self) -> str:
+        """Generate a stable method key derived from the English name."""
+        if not self.name_en:
+            return ''
+        return (
+            self.name_en.lower()
+            .replace('&', 'and')
+            .replace('/', '_')
+            .replace('-', '_')
+            .replace(' ', '_')
+        )
 
 
 class MethodParameter(BaseModel):
@@ -100,7 +114,7 @@ class MethodParameter(BaseModel):
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary"""
-        return {
+        result = {
             'id': self.id,
             'method_id': self.method_id,
             'parameter_key': self.parameter_key,
@@ -118,6 +132,12 @@ class MethodParameter(BaseModel):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
+        if self.validation_rule:
+            try:
+                result['validation'] = json.loads(self.validation_rule)
+            except (TypeError, ValueError):
+                result['validation'] = self.validation_rule
+        return result
     
     def get_display_name(self, language: str = 'he') -> str:
         """Get display name in specified language"""
@@ -134,6 +154,13 @@ class MethodParameter(BaseModel):
         
         if value is None or value == '':
             return True, ""  # Optional field, empty is OK
+        
+        validation_config: Dict[str, Any] | None = None
+        if self.validation_rule:
+            try:
+                validation_config = json.loads(self.validation_rule)
+            except (TypeError, ValueError):
+                validation_config = None
         
         # Type-specific validation
         if self.parameter_type == 'number':
@@ -158,9 +185,34 @@ class MethodParameter(BaseModel):
             except ValueError:
                 return False, "Invalid period format"
         
+        elif self.parameter_type == 'percentage':
+            try:
+                pct_value = float(value)
+                if pct_value < 0 or pct_value > 100:
+                    return False, "Percentage must be between 0 and 100"
+                if self.min_value and pct_value < float(self.min_value):
+                    return False, f"Percentage must be >= {self.min_value}"
+                if self.max_value and pct_value > float(self.max_value):
+                    return False, f"Percentage must be <= {self.max_value}"
+            except ValueError:
+                return False, "Invalid percentage format"
+        
+        elif self.parameter_type == 'price':
+            try:
+                price_value = float(value)
+                if price_value < 0:
+                    return False, "Price must be non-negative"
+            except ValueError:
+                return False, "Invalid price format"
+        
         elif self.parameter_type == 'boolean':
             if value not in ['true', 'false', True, False, '1', '0', 1, 0]:
                 return False, "Invalid boolean value"
+        
+        elif self.parameter_type == 'dropdown' and validation_config:
+            allowed = validation_config.get('allowed_values')
+            if allowed and value not in allowed:
+                return False, f"Value must be one of: {', '.join(str(v) for v in allowed)}"
         
         # Add more type validations as needed
         

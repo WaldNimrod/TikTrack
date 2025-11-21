@@ -1,0 +1,125 @@
+{
+  "start_time": "2025-11-20T17:07:11.780019",
+  "steps": [
+    {
+      "number": 5,
+      "name": "sync_code",
+      "success": true,
+      "duration_seconds": 0.3064122200012207,
+      "timestamp": "2025-11-20T17:07:12.092224",
+      "details": {
+        "success": true
+      }
+    },
+    {
+      "number": 6,
+      "name": "cleanup_backups",
+      "success": true,
+      "duration_seconds": 0.006160736083984375,
+      "timestamp": "2025-11-20T17:07:12.098649",
+      "details": {
+        "success": true,
+        "warning": "Cleanup had warnings"
+      }
+    },
+    {
+      "number": 7,
+      "name": "fix_config",
+      "success": true,
+      "duration_seconds": 0.0019221305847167969,
+      "timestamp": "2025-11-20T17:07:12.100856",
+      "details": {
+        "success": true,
+        "verified": false,
+        "warning": "Settings mismatch"
+      }
+    },
+    {
+      "number": 8,
+      "name": "validate",
+      "success": false,
+      "duration_seconds": 0.17613983154296875,
+      "timestamp": "2025-11-20T17:07:12.277182",
+      "details": {
+        "success": false,
+        "results": {
+          "isolation": false,
+          "structure": false,
+          "post_validation": false,
+          "ui_tests": true
+        }
+      }
+    }
+  ],
+  "files_updated": [
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T17:07:11.966057",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/demo_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T17:07:11.966061",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/ibkr_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T17:07:11.966066",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: scripts/map_active_files.py"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T17:07:11.966075",
+      "details": {
+        "action": "sync",
+        "details": "✅ Copied: 168 files"
+      }
+    },
+    {
+      "path": "production/trading-ui/*",
+      "timestamp": "2025-11-20T17:07:12.092179",
+      "details": {
+        "action": "sync",
+        "details": "✅ Successfully copied 511 files"
+      }
+    }
+  ],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [
+    {
+      "message": "Production settings may need verification",
+      "step": "fix_config",
+      "timestamp": "2025-11-20T17:07:12.099164"
+    },
+    {
+      "message": "Isolation verification had issues",
+      "step": "validate",
+      "timestamp": "2025-11-20T17:07:12.204707"
+    }
+  ],
+  "errors": [
+    "Step 8 (validate) failed"
+  ],
+  "summary": {
+    "total_duration_seconds": 0.497605,
+    "steps_completed": 3,
+    "steps_failed": 1,
+    "files_updated_count": 5,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 2,
+    "errors_count": 1
+  },
+  "end_time": "2025-11-20T17:07:12.277624",
+  "success": false
+}

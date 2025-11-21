@@ -142,7 +142,17 @@ class YahooFinanceAdapter:
             # Get user preferences (default user for now)
             user_service = UserService()
             user_preferences = user_service.get_user_preferences(1)  # Default user ID
-            timezone_str = user_preferences.get('timezone', 'Asia/Jerusalem')
+            
+            # user_preferences is a list of dicts, find the timezone preference
+            timezone_str = 'Asia/Jerusalem'  # Default
+            if isinstance(user_preferences, list):
+                for pref in user_preferences:
+                    if isinstance(pref, dict) and pref.get('preference_name') == 'timezone':
+                        timezone_str = pref.get('saved_value', pref.get('default_value', 'Asia/Jerusalem'))
+                        break
+            elif isinstance(user_preferences, dict):
+                # Fallback for dict format (if it changes in the future)
+                timezone_str = user_preferences.get('timezone', 'Asia/Jerusalem')
             
             # Validate timezone
             try:
@@ -176,7 +186,7 @@ class YahooFinanceAdapter:
                 'epochMs': epoch_ms,
                 'local': local_time.isoformat(),
                 'timezone': self.user_timezone,
-                'display': local_time.strftime('%d/%m/%Y %H:%M')
+                'display': local_time.strftime('%d.%m.%Y %H:%M')
             }
 
         except Exception as error:
@@ -387,6 +397,18 @@ class YahooFinanceAdapter:
                 logger.debug(f"Request successful: {url}")
                 return data
                 
+            except requests.exceptions.HTTPError as e:
+                if e.response and e.response.status_code == 404:
+                    # Symbol not found in Yahoo Finance - likely European/unsupported ticker
+                    # Don't retry 404 errors - symbol simply doesn't exist in Yahoo Finance
+                    logger.warning(f"Symbol not found in Yahoo Finance (404): {url.split('/')[-1].split('?')[0]} - This may be a European or unsupported ticker")
+                    return None  # Don't retry 404 errors
+                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                if attempt < self.retry_attempts:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                else:
+                    logger.error(f"All retry attempts failed for {url}")
+                    return None
             except requests.exceptions.RequestException as e:
                 logger.warning(f"Request attempt {attempt + 1} failed: {e}")
                 if attempt < self.retry_attempts:
@@ -1148,7 +1170,9 @@ class YahooFinanceAdapter:
         try:
             logger.debug(f"🔄 Updating quotes_last table for ticker {ticker_id}")
             
-            from sqlalchemy import text
+            from models.quotes_last import QuotesLast
+            from sqlalchemy.dialects.postgresql import insert
+            from config.settings import USING_SQLITE
 
             asof_utc = quote.asof_utc
             if asof_utc is None:
@@ -1157,36 +1181,53 @@ class YahooFinanceAdapter:
                 asof_utc = asof_utc.replace(tzinfo=timezone.utc)
 
             fetched_at = datetime.now(timezone.utc)
-
             provider_name = quote.source or 'yahoo_finance'
 
-            self.db_session.execute(
-                text("""
-                INSERT OR REPLACE INTO quotes_last 
-                (ticker_id, price, change_amount, change_percent, volume, provider, source,
-                 currency, asof_utc, fetched_at, last_updated, is_stale, quality_score)
-                VALUES (:ticker_id, :price, :change_amount, :change_percent, :volume, :provider, :source,
-                        :currency, :asof_utc, :fetched_at, :last_updated, :is_stale, :quality_score)
-                """),
-                {
-                    "ticker_id": ticker_id,
-                    "price": quote.price,
-                    "change_amount": quote.change_amount,
-                    "change_percent": quote.change_pct,
-                    "volume": quote.volume,
-                    "provider": provider_name,
-                    "source": provider_name,
-                    "currency": quote.currency or 'USD',
-                    "asof_utc": asof_utc,
-                    "fetched_at": fetched_at,
-                    "last_updated": fetched_at,
-                    "is_stale": 0,
-                    "quality_score": 1.0,
-                }
-            )
+            # Prepare data
+            quote_data = {
+                "ticker_id": ticker_id,
+                "price": quote.price,
+                "change_amount": quote.change_amount,
+                "change_percent": quote.change_pct,
+                "volume": quote.volume,
+                "provider": provider_name,
+                "source": provider_name,
+                "currency": quote.currency or 'USD',
+                "asof_utc": asof_utc,
+                "fetched_at": fetched_at,
+                "last_updated": fetched_at,
+                "is_stale": False,
+                "quality_score": 1.0,
+            }
+
+            # Use upsert logic - compatible with both SQLite and PostgreSQL
+            if USING_SQLITE:
+                # SQLite: Use INSERT OR REPLACE
+                existing = self.db_session.query(QuotesLast).filter(
+                    QuotesLast.ticker_id == ticker_id
+                ).first()
+                
+                if existing:
+                    # Update existing record
+                    for key, value in quote_data.items():
+                        setattr(existing, key, value)
+                else:
+                    # Create new record
+                    new_quote = QuotesLast(**quote_data)
+                    self.db_session.add(new_quote)
+            else:
+                # PostgreSQL: Use ON CONFLICT
+                stmt = insert(QuotesLast).values(**quote_data)
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=['ticker_id'],
+                    set_=quote_data
+                )
+                self.db_session.execute(stmt)
             
+            self.db_session.commit()
             logger.debug(f"✅ Updated quotes_last for ticker {ticker_id}")
             
         except Exception as e:
             logger.error(f"❌ Error updating quotes_last for ticker {ticker_id}: {e}")
+            self.db_session.rollback()
             # Don't raise - this is not critical enough to fail the whole operation

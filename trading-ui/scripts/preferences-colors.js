@@ -30,6 +30,32 @@ if (window.Logger && window.Logger.info) {
 }
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Colors System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - ColorManager - Core color operations (load, save, validate)
+ * - ColorPickerManager - UI color pickers management
+ * 
+ * Global Functions:
+ * - loadColorsForPreferences(userId, profileId) - Load all colors for preferences page
+ * - resetAllColorsToDefaults() - Reset all colors to default values
+ * - getColorPreference(colorName) - Get color by name
+ * - setColorPreference(colorName, colorValue) - Set color preference
+ * 
+ * Global Instances:
+ * - window.ColorManager - Main color manager instance
+ * - window.ColorPickerManager - Main color picker manager instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // COLOR MANAGER CLASS
 // ============================================================================
 
@@ -147,15 +173,6 @@ class ColorManager {
       // Get all color preference names
       const colorNames = Object.keys(this.defaultColors);
 
-      // Load colors in batches to avoid overwhelming the server
-      const batchSize = 10;
-      const batches = [];
-      for (let i = 0; i < colorNames.length; i += batchSize) {
-        batches.push(colorNames.slice(i, i + batchSize));
-      }
-
-      const allColors = {};
-
       const finalUserId = userId !== null && userId !== undefined
         ? userId
         : window.PreferencesCore?.currentUserId || window.PreferencesUI?.currentUserId || 1;
@@ -163,32 +180,19 @@ class ColorManager {
         ? profileId
         : window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null;
 
-      for (const batch of batches) {
-        const batchPromises = batch.map(async colorName => {
-          try {
-            const url = new URL('/api/preferences/user/single', window.location.origin);
-            url.searchParams.append('preference_name', colorName);
-            url.searchParams.append('user_id', finalUserId);
-            if (finalProfileId !== null && finalProfileId !== undefined) {
-              url.searchParams.append('profile_id', finalProfileId);
-            }
-            const response = await fetch(url);
-            if (response.ok) {
-              const result = await response.json();
-              return { name: colorName, value: result.data?.value || this.defaultColors[colorName] };
-            }
-          } catch (error) {
-            window.Logger.warn(`⚠️ Failed to load color ${colorName}:`, error, { page: 'preferences-colors' });
-          }
-          return { name: colorName, value: this.defaultColors[colorName] };
-        });
+      const fetched = await window.PreferencesData.loadPreferencesByNames({
+        names: colorNames,
+        userId: finalUserId,
+        profileId: finalProfileId,
+        force: true,
+      });
 
-        const batchResults = await Promise.all(batchPromises);
-        batchResults.forEach(({ name, value }) => {
-          allColors[name] = value;
-          this.colorCache.set(name, value);
-        });
-      }
+      const allColors = {};
+      colorNames.forEach(name => {
+        const value = fetched?.[name] ?? this.defaultColors[name];
+        allColors[name] = value;
+        this.colorCache.set(name, value);
+      });
 
       window.Logger.info(`✅ Loaded ${Object.keys(allColors, { page: 'preferences-colors' }).length} color preferences`);
       return allColors;
@@ -220,27 +224,17 @@ class ColorManager {
       ? profileId
       : window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null;
 
+    const fetched = await window.PreferencesData.loadPreferencesByNames({
+      names: groupColors,
+      userId: finalUserId,
+      profileId: finalProfileId,
+      force: true,
+    });
+
     const groupData = {};
-    for (const colorName of groupColors) {
-      try {
-        const url = new URL('/api/preferences/user/single', window.location.origin);
-        url.searchParams.append('preference_name', colorName);
-        url.searchParams.append('user_id', finalUserId);
-        if (finalProfileId !== null && finalProfileId !== undefined) {
-          url.searchParams.append('profile_id', finalProfileId);
-        }
-        const response = await fetch(url);
-        if (response.ok) {
-          const result = await response.json();
-          groupData[colorName] = result.data?.value || this.defaultColors[colorName];
-        } else {
-          groupData[colorName] = this.defaultColors[colorName];
-        }
-      } catch (error) {
-        window.Logger.warn(`⚠️ Failed to load color ${colorName}:`, error, { page: 'preferences-colors' });
-        groupData[colorName] = this.defaultColors[colorName];
-      }
-    }
+    groupColors.forEach(colorName => {
+      groupData[colorName] = fetched?.[colorName] ?? this.defaultColors[colorName];
+    });
 
     return groupData;
   }
@@ -267,38 +261,21 @@ class ColorManager {
         ? profileId
         : window.PreferencesCore?.currentProfileId ?? window.PreferencesUI?.currentProfileId ?? null;
 
-      const payload = {
-        preference_name: colorName,
+      await window.PreferencesData.savePreference({
+        preferenceName: colorName,
         value: colorValue,
-        user_id: finalUserId,
-      };
-      if (finalProfileId !== null && finalProfileId !== undefined) {
-        payload.profile_id = finalProfileId;
-      }
-
-      const response = await fetch('/api/preferences/user/single', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        userId: finalUserId,
+        profileId: finalProfileId,
       });
 
-      if (response.ok) {
-        // Update cache
-        this.colorCache.set(colorName, colorValue);
+      this.colorCache.set(colorName, colorValue);
 
-        // Sync with ColorSchemeSystem if available
-        if (window.ColorSchemeSystem) {
-          await this.syncWithColorScheme(colorName, colorValue);
-        }
-
-        window.Logger.info(`✅ Saved color ${colorName}: ${colorValue}`, { page: 'preferences-colors' });
-        return true;
-      } else {
-        const error = await response.text();
-        throw new Error(`Save failed: ${error}`);
+      if (window.ColorSchemeSystem) {
+        await this.syncWithColorScheme(colorName, colorValue);
       }
+
+      window.Logger.info(`✅ Saved color ${colorName}: ${colorValue}`, { page: 'preferences-colors' });
+      return true;
 
     } catch (error) {
       window.Logger.error(`❌ Error saving color ${colorName}:`, error, { page: 'preferences-colors' });

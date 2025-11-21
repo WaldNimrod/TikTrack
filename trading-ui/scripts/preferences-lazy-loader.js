@@ -76,21 +76,9 @@ class PreferenceClassifier {
         'chartAutoRefresh',
         'chartRefreshInterval',
 
-        // Status colors
-        'statusOpenColor',
-        'statusClosedColor',
-        'statusCancelledColor',
-
-        // Notification colors
-        'notificationSuccessColor',
-        'notificationErrorColor',
-        'notificationWarningColor',
-        'notificationInfoColor',
-
-        // Value colors
-        'valuePositiveColor',
-        'valueNegativeColor',
-        'valueNeutralColor',
+        // Note: colors are loaded via the unified colors system (group/all),
+        // so we avoid point-fetching color preferences here to prevent 404s
+        // when specific color keys are not defined as standalone preferences.
 
         // Filter defaults
         'defaultDateRangeFilter',
@@ -233,6 +221,7 @@ class LazyLoader {
     this.backgroundLoader = null;
     this.currentUserId = 1;
     this.currentProfileId = 0;
+    this._bootedForKey = null;
 
     this.loadingStats = {
       critical: { loaded: 0, total: 0 },
@@ -248,7 +237,7 @@ class LazyLoader {
      * @param {number} profileId - Profile ID (0 for default profile)
      */
   async initialize(userId = 1, profileId = 0) {
-    window.Logger.info(`🚀 LAZY LOADER DEBUG: initialize(userId=${userId}, profileId=${profileId})`, { page: 'preferences-lazy-loader' });
+    window.Logger.debug(`🚀 LazyLoader.initialize(userId=${userId}, profileId=${profileId})`, { page: 'preferences-lazy-loader' });
 
     // Check if PreferencesCore is available
     if (!window.PreferencesCore) {
@@ -258,22 +247,44 @@ class LazyLoader {
 
     // Ensure profileId is explicitly set (0 for default profile, not null/undefined)
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : 0;
-    window.Logger.info(`🔍 LAZY LOADER DEBUG: Using finalProfileId=${finalProfileId}`, { page: 'preferences-lazy-loader' });
+    window.Logger.debug(`🔍 LazyLoader using finalProfileId=${finalProfileId}`, { page: 'preferences-lazy-loader' });
+
+    // Debounce duplicate initialize for same (user,profile) key
+    const initKey = `${userId}:${finalProfileId}`;
+    if (this._bootedForKey === initKey) {
+      window.Logger.debug('⏭️ LazyLoader initialize skipped (same user/profile)', { page: 'preferences-lazy-loader' });
+      return;
+    }
 
     if (this.currentProfileId !== undefined && this.currentProfileId !== null && this.currentProfileId !== finalProfileId) {
-      window.Logger.info(`🔄 LAZY LOADER DEBUG: Profile changed from ${this.currentProfileId} to ${finalProfileId} - clearing internal state`, { page: 'preferences-lazy-loader' });
+      window.Logger.debug(`🔄 LazyLoader profile changed from ${this.currentProfileId} to ${finalProfileId} - clearing internal state`, { page: 'preferences-lazy-loader' });
       this.loadedPreferences.clear();
       this.loadingPromises.clear();
     }
 
     this.currentUserId = userId;
     this.currentProfileId = finalProfileId;
+    this._bootedForKey = initKey;
 
     // Load critical preferences immediately
     await this.loadCriticalPreferences(userId, finalProfileId);
 
     // Start background loading for high priority
     this.startBackgroundLoading(userId, finalProfileId);
+
+    // Dispatch all-loaded event after critical preferences are loaded
+    // (background loading continues asynchronously)
+    const environment = window.API_ENV || 'development';
+    window.dispatchEvent(new CustomEvent('preferences:all-loaded', {
+      detail: {
+        userId,
+        profileId,
+        environment,
+        criticalLoaded: this.loadingStats.critical.loaded,
+        totalCritical: this.loadingStats.critical.total,
+        note: 'Background loading continues for high/medium/low priority preferences',
+      },
+    }));
 
     // window.Logger.info('✅ Lazy loading system initialized', { page: "preferences-lazy-loader" });
   }
@@ -284,29 +295,140 @@ class LazyLoader {
      * @param {number} profileId - Profile ID
      */
   async loadCriticalPreferences(userId, profileId) {
+    const loadStartTime = performance.now();
     const criticalPrefs = this.classifier.getPreferencesByClassification('critical');
     this.loadingStats.critical.total = criticalPrefs.length;
 
-    // window.Logger.info(`🔥 Loading ${criticalPrefs.length} critical preferences...`, { page: "preferences-lazy-loader" });
+    // Detect environment
+    const environment = window.API_ENV || 'development';
+    
+    // Check cache first to determine if we have a cache hit
+    let fromCache = false;
+    let cacheLayer = null;
+    let allPreferences = {};
 
     try {
-      // Load all preferences at once from API
-      const url = new URL('/api/preferences/user', window.location.origin);
-      url.searchParams.append('user_id', userId);
-      if (profileId !== null && profileId !== undefined) {
-        url.searchParams.append('profile_id', profileId);
-      }
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // Check if we have cached preferences before making API call
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        const cacheKey = `preference_all_u${userId}_p${profileId ?? 'active'}`;
+        const cached = await window.UnifiedCacheManager.get(cacheKey, { layer: 'localStorage' });
+        if (cached && cached.preferences) {
+          fromCache = true;
+          cacheLayer = 'localStorage';
+          allPreferences = cached.preferences;
+          window.Logger?.debug?.('✅ Cache hit for critical preferences', {
+            page: 'preferences-lazy-loader',
+            cacheLayer,
+            userId,
+            profileId,
+          });
+          
+          // Dispatch cache hit event
+          window.dispatchEvent(new CustomEvent('preferences:cache-hit', {
+            detail: {
+              cacheLayer,
+              userId,
+              profileId,
+              preferenceCount: Object.keys(allPreferences).length,
+              environment,
+            },
+          }));
+        }
       }
 
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to load preferences');
-      }
+      // If not from cache, load from API
+      if (!fromCache) {
+        // Use force: false to leverage cache - only call API if cache is missing or expired
+        // This prevents unnecessary API calls and rate limiting
+        const payload = await window.PreferencesData.loadAllPreferencesRaw({
+          userId,
+          profileId,
+          force: false, // Use cache if available - only fetch from API if cache is missing/expired
+        });
 
-      const allPreferences = result.data.preferences;
+        allPreferences = payload?.preferences || {};
+        cacheLayer = 'backend';
+        
+        window.Logger?.debug?.('📡 Loaded critical preferences from API', {
+          page: 'preferences-lazy-loader',
+          cacheLayer,
+          userId,
+          profileId,
+          count: Object.keys(allPreferences).length,
+        });
+        
+        // Dispatch cache miss event
+        window.dispatchEvent(new CustomEvent('preferences:cache-miss', {
+          detail: {
+            cacheLayer,
+            userId,
+            profileId,
+            preferenceCount: Object.keys(allPreferences).length,
+            environment,
+          },
+        }));
+      }
+      
+      // If no preferences loaded (neither from cache nor API), load default values
+      // This ensures the system always has default values to work with
+      if (Object.keys(allPreferences).length === 0) {
+        window.Logger?.info?.('⚠️ No user preferences found, loading default values from preference_types table', {
+          page: 'preferences-lazy-loader',
+          userId,
+          profileId,
+        });
+        
+        try {
+          // Try to load preference types metadata to get all preference names
+          if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceTypes === 'function') {
+            const typesData = await window.PreferencesData.loadPreferenceTypes({ force: false });
+            const types = typesData?.types || typesData?.data?.types || typesData || [];
+            
+            if (Array.isArray(types) && types.length > 0) {
+              // Load default value for each preference type
+              const defaultPreferences = {};
+              for (const prefType of types) {
+                const prefName = prefType?.preference_name || prefType?.name || prefType?.html_id;
+                if (!prefName) continue;
+                
+                try {
+                  // Try to get default value from PreferencesCore
+                  if (window.PreferencesCore && typeof window.PreferencesCore.getDefaultPreference === 'function') {
+                    const defaultValue = await window.PreferencesCore.getDefaultPreference(prefName);
+                    if (defaultValue !== null && defaultValue !== undefined) {
+                      defaultPreferences[prefName] = defaultValue;
+                    } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
+                      // Fallback: use default_value from types data if available
+                      defaultPreferences[prefName] = prefType.default_value;
+                    }
+                  } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
+                    // Fallback: use default_value from types data if PreferencesCore not available
+                    defaultPreferences[prefName] = prefType.default_value;
+                  }
+                } catch (defaultError) {
+                  // Non-critical - continue loading other defaults
+                  window.Logger?.debug?.(`⚠️ Failed to load default for ${prefName}: ${defaultError?.message}`, {
+                    page: 'preferences-lazy-loader',
+                  });
+                }
+              }
+              
+              if (Object.keys(defaultPreferences).length > 0) {
+                allPreferences = defaultPreferences;
+                cacheLayer = 'defaults';
+                window.Logger?.info?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
+                  page: 'preferences-lazy-loader',
+                });
+              }
+            }
+          }
+        } catch (defaultLoadError) {
+          window.Logger?.warn?.('⚠️ Failed to load default preferences, continuing with empty preferences', {
+            page: 'preferences-lazy-loader',
+            error: defaultLoadError?.message,
+          });
+        }
+      }
 
       // Mark critical preferences as loaded
       for (const prefName of criticalPrefs) {
@@ -316,8 +438,74 @@ class LazyLoader {
         }
       }
 
+      // Calculate load time
+      const loadTime = performance.now() - loadStartTime;
+
+      // CRITICAL: Update global preference stores so other systems can access them
+      // This is essential for systems that check window.currentPreferences before event listeners are set up
+      if (!window.currentPreferences) {
+        window.currentPreferences = {};
+      }
+      if (!window.userPreferences) {
+        window.userPreferences = {};
+      }
+      
+      // CRITICAL: Update global preference stores with CORRECT userId/profileId
+      // Merge loaded preferences into global stores (don't overwrite, merge to preserve any existing values)
+      Object.assign(window.currentPreferences, allPreferences);
+      Object.assign(window.userPreferences, allPreferences);
+      
+      // Update PreferencesCore state with CORRECT profile
+      if (window.PreferencesCore) {
+        window.PreferencesCore.currentUserId = userId;
+        window.PreferencesCore.currentProfileId = profileId;
+      }
+      
+      window.Logger?.info?.('✅ Updated window.currentPreferences with loaded preferences', {
+        page: 'preferences-lazy-loader',
+        preferencesCount: Object.keys(allPreferences).length,
+        currentPreferencesCount: Object.keys(window.currentPreferences).length,
+        userId,
+        profileId,
+        note: 'Preferences loaded and merged into global stores',
+      });
+
+      // Set global flag to indicate preferences are loaded (for systems that check before listening)
+      window.__preferencesCriticalLoaded = true;
+      window.__preferencesCriticalLoadedDetail = {
+        preferences: allPreferences,
+        fromCache,
+        cacheLayer,
+        userId,
+        profileId,
+        loadTime: `${loadTime.toFixed(2)}ms`,
+        environment,
+        criticalCount: this.loadingStats.critical.loaded,
+        totalCritical: this.loadingStats.critical.total,
+        timestamp: Date.now(),
+      };
+
+      // Dispatch critical-loaded event with metadata
+      window.dispatchEvent(new CustomEvent('preferences:critical-loaded', {
+        detail: window.__preferencesCriticalLoadedDetail,
+      }));
+
+      window.Logger?.info?.('✅ Critical preferences loaded', {
+        page: 'preferences-lazy-loader',
+        fromCache,
+        cacheLayer,
+        loadTime: `${loadTime.toFixed(2)}ms`,
+        criticalCount: this.loadingStats.critical.loaded,
+        totalCritical: this.loadingStats.critical.total,
+      });
+
     } catch (error) {
-      // window.Logger.error('❌ Error loading critical preferences:', error, { page: "preferences-lazy-loader" });
+      const loadTime = performance.now() - loadStartTime;
+      window.Logger?.error?.('❌ Error loading critical preferences:', error, {
+        page: 'preferences-lazy-loader',
+        loadTime: `${loadTime.toFixed(2)}ms`,
+      });
+      
       // Fallback to individual loading
       const promises = criticalPrefs.map(async prefName => {
         try {
@@ -326,12 +514,30 @@ class LazyLoader {
           this.loadingStats.critical.loaded++;
           return { name: prefName, value, success: true };
         } catch (error) {
-          // window.Logger.warn(`⚠️ Failed to load critical preference ${prefName}:`, error, { page: "preferences-lazy-loader" });
+          window.Logger?.warn?.(`⚠️ Failed to load critical preference ${prefName}:`, error, {
+            page: 'preferences-lazy-loader',
+          });
           return { name: prefName, value: null, success: false, error };
         }
       });
 
       await Promise.all(promises);
+      
+      // Dispatch error event
+      window.dispatchEvent(new CustomEvent('preferences:critical-loaded', {
+        detail: {
+          preferences: {},
+          fromCache: false,
+          cacheLayer: 'error',
+          userId,
+          profileId,
+          loadTime: `${loadTime.toFixed(2)}ms`,
+          environment,
+          error: error?.message || String(error),
+          criticalCount: this.loadingStats.critical.loaded,
+          totalCritical: this.loadingStats.critical.total,
+        },
+      }));
     }
   }
 
@@ -438,23 +644,50 @@ class LazyLoader {
     const lowPrefs = this.classifier.getPreferencesByClassification('low');
     this.loadingStats.low.total = lowPrefs.length;
 
-    window.Logger.debug(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: 'preferences-lazy-loader' });
-
-    // Load one by one with longer delays
-    for (const prefName of lowPrefs) {
-      try {
-        await this.loadSinglePreference(prefName, userId, profileId);
-        this.loadedPreferences.add(prefName);
-        this.loadingStats.low.loaded++;
-      } catch (error) {
-        window.Logger.warn(`⚠️ Failed to load low priority preference ${prefName}:`, error, { page: 'preferences-lazy-loader' });
-      }
-
-      // Delay between each preference
-      await new Promise(resolve => setTimeout(resolve, 200));
+    if (lowPrefs.length === 0) {
+      return;
     }
 
-    window.Logger.debug(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: 'preferences-lazy-loader' });
+    window.Logger.debug(`🐌 Loading ${lowPrefs.length} low priority preferences in background...`, { page: 'preferences-lazy-loader' });
+
+    // Load all low priority preferences at once to avoid multiple API calls
+    // This prevents rate limiting after cache clear or hard refresh
+    try {
+      // Use force: false to leverage cache - only call API if cache is missing or expired
+      const payload = await window.PreferencesData.loadAllPreferencesRaw({
+        userId,
+        profileId,
+        force: false, // Use cache if available - only fetch from API if cache is missing/expired
+      });
+
+      const allPreferences = payload?.preferences || {};
+
+      // Mark all low priority preferences as loaded
+      for (const prefName of lowPrefs) {
+        if (Object.prototype.hasOwnProperty.call(allPreferences, prefName)) {
+          this.loadedPreferences.add(prefName);
+          this.loadingStats.low.loaded++;
+        }
+      }
+
+      window.Logger.debug(`✅ Loaded ${this.loadingStats.low.loaded}/${lowPrefs.length} low priority preferences`, { page: 'preferences-lazy-loader' });
+    } catch (error) {
+      window.Logger.warn(`⚠️ Failed to load low priority preferences:`, error, { page: 'preferences-lazy-loader' });
+      // Fallback: try loading individually (but this should rarely happen)
+      for (const prefName of lowPrefs) {
+        if (!this.loadedPreferences.has(prefName)) {
+          try {
+            await this.loadSinglePreference(prefName, userId, profileId);
+            this.loadedPreferences.add(prefName);
+            this.loadingStats.low.loaded++;
+            // Delay between each preference to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (err) {
+            window.Logger.warn(`⚠️ Failed to load low priority preference ${prefName}:`, err, { page: 'preferences-lazy-loader' });
+          }
+        }
+      }
+    }
   }
 
   /**

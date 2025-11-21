@@ -2,6 +2,45 @@
  * Chart Management Page Script
  * ===========================
  * Controls the development dashboard for managing Chart.js demos.
+ * 
+ * @version 1.0.0
+ * @author TikTrack Development Team
+ * 
+ * ============================================================================
+ * FUNCTION INDEX - Chart Management Page
+ * ============================================================================
+ * 
+ * Class: ChartManagement
+ * 
+ * Initialization:
+ * - constructor() - Initialize ChartManagement instance
+ * - init() - Initialize chart management system
+ * - ensureChartSystem() - Ensure Chart.js system is loaded
+ * - registerAdapters() - Register performance and trades adapters
+ * 
+ * DOM Management:
+ * - cacheElements() - Cache DOM elements for performance
+ * - attachEvents() - Attach event listeners
+ * - ensureChartsListContainer() - Ensure charts list container exists
+ * - ensureChartContainer(chartId, title) - Ensure chart container exists
+ * 
+ * Chart Operations:
+ * - refreshChartsStatus() - Refresh charts status display
+ * - renderChart({ id, title, type, generator, data, container, options }) - Render chart
+ * - createTestChart() - Create test chart
+ * - createPerformanceChart() - Create performance chart
+ * - createAccountChart() - Create account chart
+ * - createMixedChart() - Create mixed chart
+ * - updateTestChart() - Update test chart
+ * - refreshAllCharts() - Refresh all charts
+ * - removeChart(chartId) - Remove chart by ID
+ * - destroyAllCharts() - Destroy all charts
+ * 
+ * Export:
+ * - exportAllCharts(format) - Export all charts
+ * - exportTestChart(format) - Export test chart
+ * 
+ * ============================================================================
  */
 
 ;(function () {
@@ -192,6 +231,10 @@
         return;
       }
 
+      /**
+       * Generator function for test chart data
+       * @returns {Promise<Object>} Chart data object
+       */
       const generator = async () => {
         const raw = await this.tradesAdapter.getData({ limit: 200 });
         return { data: this.tradesAdapter.formatDataForStatusChart(raw) };
@@ -212,6 +255,10 @@
         return;
       }
 
+      /**
+       * Generator function for performance chart data
+       * @returns {Promise<Object>} Chart data object
+       */
       const generator = async () => {
         const raw = await this.performanceAdapter.getData();
         return { data: this.performanceAdapter.formatData(raw) };
@@ -230,6 +277,10 @@
         return;
       }
 
+      /**
+       * Generator function for account chart data
+       * @returns {Promise<Object>} Chart data object
+       */
       const generator = async () => {
         const raw = await this.tradesAdapter.getData({ include_accounts: true });
         return { data: this.tradesAdapter.formatDataForAccountChart(raw) };
@@ -255,6 +306,10 @@
         return;
       }
 
+      /**
+       * Generator function for mixed chart data
+       * @returns {Promise<Object>} Chart data object with labels and datasets
+       */
       const generator = async () => {
         const raw = await this.tradesAdapter.getData({ limit: 200 });
         const labels = raw.data?.map(trade => trade.created_at?.slice(0, 10)) || [];
@@ -398,11 +453,21 @@
 
   const chartManagement = new ChartManagement();
 
+  /**
+   * Load and initialize chart management instance
+   * @returns {Promise<ChartManagement>} Initialized chart management instance
+   */
   async function loadChartManagement() {
     await chartManagement.init();
     return chartManagement;
   }
 
+  /**
+   * Expose action handler globally
+   * @param {string} action - Action name to expose
+   * @param {Function} handler - Handler function
+   * @returns {void}
+   */
   function expose(action, handler) {
     window[action] = async (...args) => {
       await loadChartManagement();

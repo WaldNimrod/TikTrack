@@ -48,20 +48,29 @@ def get_account_positions(account_id: int):
         # Parse query parameters
         include_closed = request.args.get('include_closed', 'false').lower() == 'true'
         
-        positions = PositionPortfolioService.calculate_all_account_positions(
+        positions, diagnostics = PositionPortfolioService.calculate_all_account_positions_with_metadata(
             db=db,
             trading_account_id=account_id,
             include_closed=include_closed,
             include_market_data=True
         )
         
+        if diagnostics.get('execution_pairs_count', 0) == 0:
+            diagnostics['issue'] = 'missing_executions'
+            diagnostics['message'] = (
+                "לא נמצאו Executions לחשבון זה. יש להוסיף נתוני ביצוע (Buy/Sell) כדי לחשב פוזיציות ופורטפוליו."
+            )
+        
+        response_data = {
+            "account_id": account_id,
+            "positions": positions,
+            "count": len(positions),
+            "diagnostics": diagnostics
+        }
+        
         return jsonify({
             "status": "success",
-            "data": {
-                "account_id": account_id,
-                "positions": positions,
-                "count": len(positions)
-            },
+            "data": response_data,
             "message": f"Retrieved {len(positions)} positions for account {account_id}",
             "version": "1.0"
         }), 200

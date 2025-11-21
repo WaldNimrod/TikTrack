@@ -11,16 +11,34 @@
 
 - ✅ תצורת Jest מרובת-פרויקטים (`unit` / `integration` / `component`) רצה יציב סביב ~5.5 שניות להפעלה מלאה עם כיסוי לאחר הוספת סוויטות הטבלאות.  
 - ✅ `npm run test -- --coverage --runInBand` (5.50 שניות) ירוק: 66/66 סוויטות פעילות, 762/762 טסטים ירוקים, 0 דילוגים.  
-- ⚙️ נוספו טסטי fallback ייעודיים ל־`TradesAdapter`, `PerformanceAdapter`, `TickerService` ו־`SystemManagement`, כך שכל מודולי הפולבק נבדקים ללא נתוני דמה.  
+- ⚙️ נוספו טסטי fallback ייעודיים ל־`TradesAdapter`, `PerformanceAdapter`, `TickerService`, `SystemManagement` ו־`TradePlanService`, כך שכל מודולי הפולבק נבדקים ללא נתוני דמה.  
+- ⚙️ `resolveExternalCurrencySymbol` ב־`ticker-service.js` נבדק כעת כדי לוודא שמטבע חסר מזוהה ומתריע במקום להציג `$` דיפולטי.  
+- ⚙️ Chart System כופה כעת טעינה תקינה של adapters – אם מתאם חסר/נכשל מתקבלת חריגה + התראה, ומכוסה ב־`fallback-handling.test.js`.  
+- 🛡️ נוספו בדיקות Flask (`test_indexeddb_and_preferences_routes.py`) שמוודאות כי `/api/indexeddb/*` מחזירים 503 עם הודעה אמיתית וכי `preferences` מחזירים חותמת זמן אמיתית במקום גרסאות דיפולטיות.  
+- ה- 🛡️ `test_quality_check_routes.py` מריץ את `/api/quality-check/function-index` במסלול אמיתי ומוודא שגם מסלול השגיאה מחזיר ‎500 במקום נתוני דמה, כך שאין קיצור דרך במערכת הדוחות.  
+- 🛡️ נוספו טסטים ייעודיים ל־Positions (`test_positions_routes.py`) ולמערכת ה־Import Orchestrator (`test_user_data_import_routes.py`) שמוודאים שכל ה־routes החדשים משתמשים באורקסטרטור אמיתי, מחזירים קודי סטטוס נכונים, ובמקרה של שגיאה זורקים 500 עם הודעת מדיניות ה־fallbacks.  
+- 🔁 טסט חדש ב־`table-mappings-system.test.js` מדגים ריצה רקורסיבית אמיתית של `sortTableData` דרך `updateFunction` כדי לוודא שה־guard הגלובלי חוסם כניסה כפולה ומחזיר את המערך המקורי ללא יציאה משליטה.  
 - ✅ DOM Loader וה־test-loader עודכנו לתמיכה בטעינת סקריפטים של הטיקר/ניהול מערכת יחד עם המערכות הכלליות.  
 - ✅ הכיסוי הכללי: Statements ‎90.47‎%, Branches ‎66.69‎%, Functions ‎93.05‎%, Lines ‎92.07‎% – יעד שלב 2 (≥90%) נשמר. נותרו חריגים בודדים מתחת ל־90%: `scripts/tag-events.js` (78.94% Statements) ו-`scripts/services/tag-service.js` (79.10% Statements) שסומנו להמשך טיפול.
 - ⚠️ `npm run check:all` עדיין נכשל (81,413 שגיאות, 4,801 אזהרות – בעיקר `no-console`, `indent`, `arrow-parens`).  
 - ✅ בדיקות Backend (`python3 -m pytest`) נשארות ירוקות – 44 טסטים כבסיס השוואה תקין.
 
+## ⚙️ איך להריץ את כל הטסטים (Front + Back)
+
+| מטרה | פקודה | הערות |
+| --- | --- | --- |
+| Jest מלא + כיסוי | `npm run test -- --coverage --runInBand` | מריץ את שלושת הפרויקטים (`unit` / `integration` / `component`). חובה אחרי שינוי Frontend כללי. |
+| Jest ממוקד | `npx jest --runTestsByPath tests/unit/<file>.test.js` | שימושי לפני PR למודול ספציפי (למשל `preferences`, `tables`). |
+| Pytest מלא | `python3 -m pytest` | מריץ את כל 91 הטסטים (routes + services + tasks). חובה אחרי שינוי Backend / DB. |
+| נתיבי העדפות (Frontend) | `npx jest --runTestsByPath tests/unit/preferences-page.test.js tests/integration/preferences-integration.test.js tests/component/preferences-flow.test.js` | מוודא UI/flow/async של Preferences v3. |
+| נתיבי העדפות (Backend) | `python3 -m pytest Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py` | מכסה `/api/preferences/version` ו־`/api/preferences/user/check-updates` מול DB אמיתי. |
+
+> 💡 **TIP:** לכל שינוי שמשפיע על העדפות (UI או API) חובה להריץ גם את שני הסטים לעיל ולציין את הפקודות בדוח ה-PR.
+
 ### הפריטים שנותרו לטיפול
 | תחום | סטטוס נוכחי | הערות |
 | --- | --- | --- |
-| Code Coverage | ✅ Statements 90.47%, Lines 92.07% (יעד ≥90% הושג) | כל מערכות הטבלאות, value adapters ו־trades/performance adapters מכוסות; חריגי `tag-events.js` ו-`tag-service.js` נשארו כרשימת מעקב. |
+| Code Coverage | ✅ Statements 90.47%, Lines 92.07% (יעד ≥90% הושג) | כל מערכות הטבלאות, value adapters ו־trades/performance adapters מכוסות; חריגי `tag-events.js` ו-`tag-service.js` נשארו כרשימת מעקב (תחת טיפול). |
 | טסטים מדולגים | ✅ 0 טסטים מדולגים | כל 14 בדיקות ה־Playwright legacy טופלו (3 קבצים הוסרו, 11 הועברו למערך אינטגרציה מעודכן). |
 | ESLint (`npm run check:all`) | ⚠️ עדיין נכשל | 81,413 שגיאות ו־4,801 אזהרות – מטופל בשלבי הריפקטורינג הבאים. |
 

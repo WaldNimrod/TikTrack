@@ -101,7 +101,7 @@
                 utc: iso,
                 local: iso,
                 epochMs: parsed,
-                display: new Date(parsed).toLocaleString('he-IL')
+                display: window.formatDate ? window.formatDate(new Date(parsed), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(parsed), { includeTime: true }) : new Date(parsed).toLocaleString('he-IL'))
             };
         }
 
@@ -147,7 +147,7 @@
             }
 
             if (typeof window.processButtons === 'function') {
-                window.processButtons();
+                window.processButtons(document);
             }
 
             if (typeof window.restoreAllSectionStates === 'function') {
@@ -155,7 +155,6 @@
             }
 
             await refreshDataImportHistory(true);
-            registerDataImportTable();
         } catch (error) {
             Logger.error('❌ Failed to initialize Data Import page', { error, page: PAGE_NAME });
             notify('שגיאה בטעינת עמוד ייבוא הנתונים. נסה לרענן את הדף.', 'error');
@@ -190,8 +189,15 @@
                 Logger.warn('⚠️ No trading accounts found', { page: PAGE_NAME });
             }
 
-            const historyPromises = accounts.map(fetchHistoryForAccount);
-            const historyResults = await Promise.all(historyPromises);
+            const historyResults = [];
+            for (const account of accounts) {
+                // קריאה סדרתית כדי להפחית עומס וקונפליקטים על שכבת ה-DB
+                // המערכת המרכזית מנהלת לוגינג פנימי ב-fetchHistoryForAccount עבור שגיאות.
+                /* eslint-disable no-await-in-loop */
+                const accountHistory = await fetchHistoryForAccount(account);
+                /* eslint-enable no-await-in-loop */
+                historyResults.push(accountHistory);
+            }
 
             const sessions = historyResults
                 .flat()
@@ -202,10 +208,11 @@
             state.lastError = null;
 
             updateTableRegistry(state.sessions);
-            registerDataImportTable();
-
             renderImportSummary();
             renderImportHistoryTable();
+            
+            // Register table after rendering (only once)
+            registerDataImportTable();
         } catch (error) {
             state.lastError = error;
             Logger.error('❌ Failed to refresh import history', { error, page: PAGE_NAME });
@@ -213,18 +220,22 @@
             toggleErrorState(true, error.message || 'שגיאה לא ידועה בטעינת הנתונים');
         } finally {
             setLoadingState(false);
-            registerDataImportTable();
         }
     }
 
     /**
      * Fetch trading accounts from the API.
+     * Uses DataImportData service for unified caching and error handling.
      * @async
      * @function fetchTradingAccounts
      * @returns {Promise<Array<Object>>}
      */
     async function fetchTradingAccounts() {
         try {
+            if (window.DataImportData?.loadTradingAccountsForImport) {
+                return await window.DataImportData.loadTradingAccountsForImport();
+            }
+            // Fallback to direct fetch if service not available
             const response = await fetch(API_ENDPOINTS.accounts, {
                 method: 'GET',
                 headers: {
@@ -247,6 +258,7 @@
 
     /**
      * Fetch import history for a specific account.
+     * Uses DataImportData service for unified caching and error handling.
      * @async
      * @function fetchHistoryForAccount
      * @param {Object} account - Trading account object.
@@ -258,32 +270,66 @@
         }
 
         try {
-            const response = await fetch(API_ENDPOINTS.history(account.id), {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
+            let sessions = [];
+            
+            if (window.DataImportData?.loadImportHistoryData) {
+                sessions = await window.DataImportData.loadImportHistoryData({
+                    accountId: account.id,
+                    limit: 20
+                });
+                Logger.debug('📦 Fetched history via DataImportData service', {
+                    accountId: account.id,
+                    sessionsCount: Array.isArray(sessions) ? sessions.length : 0,
+                    page: PAGE_NAME
+                });
+            } else {
+                // Fallback to direct fetch if service not available
+                const response = await fetch(API_ENDPOINTS.history(account.id), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
-            if (!response.ok) {
-                throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                if (!response.ok) {
+                    throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                }
+
+                const payload = await response.json();
+                sessions = payload.sessions || payload.data || [];
+                Logger.debug('📦 Fetched history via direct fetch', {
+                    accountId: account.id,
+                    sessionsCount: Array.isArray(sessions) ? sessions.length : 0,
+                    page: PAGE_NAME
+                });
             }
 
-            const payload = await response.json();
-            const sessions = payload.sessions || payload.data || [];
-
             if (!Array.isArray(sessions)) {
+                Logger.warn('⚠️ Sessions is not an array', {
+                    accountId: account.id,
+                    sessionsType: typeof sessions,
+                    sessions,
+                    page: PAGE_NAME
+                });
                 return [];
             }
 
-            return sessions.map(session => ({
+            const enrichedSessions = sessions.map(session => ({
                 ...session,
                 trading_account_id: account.id,
                 trading_account_name: resolveAccountDisplayName(account)
             }));
+
+            Logger.debug('✅ Enriched sessions with account info', {
+                accountId: account.id,
+                enrichedCount: enrichedSessions.length,
+                page: PAGE_NAME
+            });
+
+            return enrichedSessions;
         } catch (error) {
             Logger.error('❌ Failed to fetch history for account', {
-                error,
+                error: error?.message || error,
                 accountId: account.id,
                 page: PAGE_NAME
             });
@@ -322,16 +368,20 @@
         const analysisTimestamp = summary.analysis_timestamp || summary.analysis?.timestamp || null;
         const previewTimestamp = summary.preview_timestamp || summary.preview?.timestamp || null;
 
+        // Use completed_at as fallback if created_at is null/undefined
         const createdSource =
             session.created_at ||
             summary.created_at ||
+            session.completed_at ||  // Fallback to completed_at
+            summary.completed_at ||  // Fallback to completed_at from summary
             analysisTimestamp;
 
         const updatedSource =
             session.completed_at ||
             summary.completed_at ||
             previewTimestamp ||
-            analysisTimestamp;
+            analysisTimestamp ||
+            createdSource;  // Fallback to createdSource if nothing else available
 
         const createdEnvelope = coerceDateEnvelope(createdSource);
         const updatedEnvelope = coerceDateEnvelope(updatedSource);
@@ -452,6 +502,12 @@
     function renderHistoryRow(session) {
         const row = document.createElement('tr');
         row.setAttribute('data-session-id', session.id);
+        row.classList.add('table-row-clickable');
+        row.style.cursor = 'pointer';
+        
+        // Add click handler to open details modal
+        row.setAttribute('data-onclick', `if(window.showEntityDetails) { window.showEntityDetails('import_session', ${session.id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('import_session', ${session.id}, 'view'); } else { window.Logger?.warn('Entity details modal not available', { page: 'data_import' }); }`);
+        row.setAttribute('title', 'לחץ לפתיחת פרטי סשן ייבוא');
 
         const statusDisplay = renderStatus(session.status);
 
@@ -468,7 +524,17 @@
             `<td class="col-imported text-center">${session.importedRecords}</td>`,
             `<td class="col-skipped text-center">${session.skippedRecords}</td>`,
             `<td class="col-created">${createdDisplay || 'לא זמין'}</td>`,
-            `<td class="col-updated">${updatedDisplay || 'לא זמין'}</td>`
+            `<td class="col-updated">${updatedDisplay || 'לא זמין'}</td>`,
+            `<td class="col-actions text-center">
+                <button data-button-type="ACTION" 
+                        data-variant="primary" 
+                        data-size="small" 
+                        data-icon="🔄" 
+                        data-text="הרצה חוזרת" 
+                        data-onclick="rerunImportSession(${session.id}); event.stopPropagation();" 
+                        title="הרצה חוזרת של סשן ייבוא זה"
+                        data-tooltip="הרצה חוזרת של סשן ייבוא"></button>
+            </td>`
         ].join('');
 
         return row;
@@ -522,6 +588,32 @@
             return '';
         }
 
+        if (typeof value === 'string') {
+            const normalized = value.trim();
+            if (!normalized) {
+                return '';
+            }
+            if (normalized.toLowerCase() === 'invalid date' || normalized.toLowerCase() === 'nan') {
+                return 'לא זמין';
+            }
+            if (/^\d+$/.test(normalized)) {
+                const asNumber = Number(normalized);
+                if (Number.isFinite(asNumber)) {
+                    const numericDate = new Date(asNumber);
+                    if (!Number.isNaN(numericDate.getTime())) {
+                        return window.formatDate ? window.formatDate(numericDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(numericDate, { includeTime: true }) : numericDate.toLocaleString('he-IL'));
+                    }
+                }
+            }
+        }
+
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            const numericDate = new Date(value);
+            if (!Number.isNaN(numericDate.getTime())) {
+                return window.formatDate ? window.formatDate(numericDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(numericDate, { includeTime: true }) : numericDate.toLocaleString('he-IL'));
+            }
+        }
+
         if (typeof window.renderImportDate === 'function') {
             const rendered = window.renderImportDate(value, '');
             if (rendered) {
@@ -534,10 +626,24 @@
             if (window.FieldRendererService?.renderDate) {
                 const rendered = window.FieldRendererService.renderDate(envelope, true);
                 if (rendered) {
-                    return rendered;
+                    const renderedNormalized = rendered.trim();
+                    return renderedNormalized.toLowerCase() === 'invalid date'
+                        ? 'לא זמין'
+                        : renderedNormalized;
                 }
             }
-            return envelope.display || envelope.local || envelope.utc || '';
+            const candidate = envelope.utc || envelope.local || envelope.display || '';
+            if (candidate) {
+                const parsedCandidate = new Date(candidate);
+                if (!Number.isNaN(parsedCandidate.getTime())) {
+                    return window.formatDate ? window.formatDate(parsedCandidate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(parsedCandidate, { includeTime: true }) : parsedCandidate.toLocaleString('he-IL'));
+                }
+                if (typeof candidate === 'string' && candidate.trim().toLowerCase() === 'invalid date') {
+                    return 'לא זמין';
+                }
+                return candidate;
+            }
+            return 'לא זמין';
         }
 
         if (window.dateUtils?.formatDateTime) {
@@ -550,10 +656,13 @@
 
         const date = new Date(value);
         if (Number.isNaN(date.getTime())) {
-            return typeof value === 'string' ? value : '';
+            if (typeof value === 'string') {
+                return value.trim().toLowerCase() === 'invalid date' ? 'לא זמין' : value;
+            }
+            return 'לא זמין';
         }
 
-        return date.toLocaleString('he-IL');
+        return window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleString('he-IL'));
     }
 
     /**
@@ -683,7 +792,8 @@
             columns,
             sortable: true,
             filterable: true,
-            defaultSort: { columnIndex: 8, direction: 'desc' }
+            // Default sort: created_at desc (column index 8)
+            defaultSort: { columnIndex: 8, direction: 'desc', key: 'created_at' }
         });
 
         if (window.TableDataRegistry) {
@@ -704,9 +814,46 @@
         Logger.info('📊 Registered import history table with UnifiedTableSystem', { page: PAGE_NAME });
     }
 
+    /**
+     * Rerun import session - placeholder function for future implementation
+     * @function rerunImportSession
+     * @param {number} sessionId - Session ID to rerun
+     */
+    function rerunImportSession(sessionId) {
+        Logger.info('🔄 Rerun import session requested', { sessionId, page: PAGE_NAME });
+        
+        // TODO: Implement rerun logic
+        // This will:
+        // 1. Load session data from database
+        // 2. Restore file content (if available)
+        // 3. Open import modal with pre-filled data
+        // 4. Allow user to modify settings and re-import
+        
+        if (typeof window.showNotification === 'function') {
+            window.showNotification(
+                'הרצה חוזרת של סשן ייבוא',
+                'פונקציה זו תיושם בקרוב. היא תאפשר להריץ מחדש סשן ייבוא קיים עם אפשרות לעדכן הגדרות.',
+                'info',
+                5000
+            );
+        } else {
+            alert(`הרצה חוזרת של סשן ייבוא #${sessionId}\n\nפונקציה זו תיושם בקרוב.`);
+        }
+    }
+
     // Expose globals for the unified initializer
     window.initializeDataImportPage = initializeDataImportPage;
     window.refreshDataImportHistory = refreshDataImportHistory;
     window.registerDataImportTable = registerDataImportTable;
+    window.rerunImportSession = rerunImportSession;
 })();
+
+
+
+
+
+
+
+
+
 

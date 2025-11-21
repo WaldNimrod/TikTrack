@@ -190,6 +190,12 @@ class SelectPopulatorService {
             ? selectIdOrElement
             : (selectIdOrElement?.id || selectIdOrElement?.name || selectIdOrElement?.getAttribute?.('data-select-id') || 'element');
         
+        console.log(`🔍 [SelectPopulatorService] populateTickersSelect called for: ${selectIdentifier}`, {
+            isString: typeof selectIdOrElement === 'string',
+            options: options,
+            hasFilterFn: !!(options.filterFn && typeof options.filterFn === 'function')
+        });
+        
         // Support both ID string and element object
         const select = typeof selectIdOrElement === 'string' 
             ? document.getElementById(selectIdOrElement)
@@ -199,8 +205,16 @@ class SelectPopulatorService {
             return;
         }
         
+        console.log(`🔍 [SelectPopulatorService] Select element found:`, {
+            id: select.id,
+            optionsBefore: select.options.length,
+            valueBefore: select.value,
+            innerHTMLBefore: select.innerHTML.substring(0, 100)
+        });
+        
         try {
             // טעינת טיקרים מ-API
+            console.log(`🔍 [SelectPopulatorService] Fetching tickers from /api/tickers/...`);
             const response = await fetch('/api/tickers/');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -208,13 +222,17 @@ class SelectPopulatorService {
             
             const responseData = await response.json();
             let tickers = responseData.data || responseData || [];
+            console.log(`🔍 [SelectPopulatorService] Got ${tickers.length} tickers from API`);
             
             // סינון אם נדרש
             if (options.filterFn && typeof options.filterFn === 'function') {
+                const beforeFilter = tickers.length;
                 tickers = tickers.filter(options.filterFn);
+                console.log(`🔍 [SelectPopulatorService] Filtered ${beforeFilter} → ${tickers.length} tickers`);
             }
             
             // מילוי ה-select
+            console.log(`🔍 [SelectPopulatorService] Calling _populateSelect with ${tickers.length} tickers...`);
             this._populateSelect(select, tickers, {
                 valueField: 'id',
                 textField: 'symbol',
@@ -223,7 +241,11 @@ class SelectPopulatorService {
                 defaultValue: options.defaultValue
             });
             
-            console.log(`✅ נטענו ${tickers.length} טיקרים ל-${selectIdentifier}`);
+            console.log(`✅ נטענו ${tickers.length} טיקרים ל-${selectIdentifier}`, {
+                optionsAfter: select.options.length,
+                valueAfter: select.value,
+                optionsList: Array.from(select.options).slice(0, 5).map(opt => ({ value: opt.value, text: opt.textContent }))
+            });
             
         } catch (error) {
             console.error('❌ שגיאה בטעינת טיקרים:', error);
@@ -595,8 +617,17 @@ class SelectPopulatorService {
      * @private
      */
     static _populateSelect(select, items, config) {
+        const selectId = select.id || 'unknown';
+        console.log(`🔍 [SelectPopulatorService._populateSelect] Called for ${selectId}`, {
+            itemsCount: items.length,
+            config: config,
+            optionsBefore: select.options.length,
+            innerHTMLBefore: select.innerHTML.substring(0, 100)
+        });
+        
         // ניקוי האופציות הקיימות
         select.innerHTML = '';
+        console.log(`🔍 [SelectPopulatorService._populateSelect] Cleared innerHTML for ${selectId}`);
         
         // הוספת אופציה ריקה אם נדרש
         if (config.includeEmpty) {
@@ -604,6 +635,7 @@ class SelectPopulatorService {
             emptyOption.value = '';
             emptyOption.textContent = config.emptyText || 'בחר...';
             select.appendChild(emptyOption);
+            console.log(`🔍 [SelectPopulatorService._populateSelect] Added empty option for ${selectId}`);
         }
         
         // הוספת כל הפריטים
@@ -625,6 +657,11 @@ class SelectPopulatorService {
             }
             
             select.appendChild(option);
+        });
+        
+        console.log(`🔍 [SelectPopulatorService._populateSelect] Added ${items.length} options to ${selectId}`, {
+            optionsAfter: select.options.length,
+            firstFewOptions: Array.from(select.options).slice(0, 3).map(opt => ({ value: opt.value, text: opt.textContent }))
         });
         
         // סימון ברירת מחדל לפי value או לפי טקסט

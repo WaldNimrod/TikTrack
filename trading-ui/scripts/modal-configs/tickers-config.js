@@ -79,6 +79,20 @@
             },
             {
                 type: 'select',
+                id: 'tickerStatus',
+                label: 'סטטוס',
+                required: true,
+                options: [
+                    { value: 'open', label: 'פתוח' },
+                    { value: 'closed', label: 'סגור' },
+                    { value: 'cancelled', label: 'מבוטל' }
+                ],
+                defaultValue: 'closed',
+                rowClass: 'row',
+                colClass: 'col-md-6'
+            },
+            {
+                type: 'select',
                 id: 'tickerTags',
                 label: 'תגיות',
                 options: [],
@@ -93,15 +107,28 @@
                 },
                 description: 'הוסף תגיות לטיקר לצורך סיווג ופילטרים'
             },
-            // שורה אחרונה: הערות (בשורה מלאה)
+            // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
             {
-                type: 'textarea',
+                type: 'rich-text',
                 id: 'tickerRemarks',
                 label: 'הערות',
                 required: false,
-                rows: 3,
                 placeholder: 'הכנס הערות נוספות על הטיקר...',
-                maxLength: 500
+                maxLength: 5000,
+                options: {
+                    direction: 'rtl',
+                    placeholder: 'הכנס הערות נוספות על הטיקר...',
+                    toolbar: [
+                        [{ 'header': [2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': ['right', 'center', 'left', 'justify'] }],
+                        [{ 'direction': 'rtl' }, { 'direction': 'ltr' }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
             },
             // אזור בדיקת נתונים חיצוניים (נוסף דינמית)
             {
@@ -147,9 +174,13 @@
                 required: true,
                 type: 'int' // currency_id הוא Integer
             },
+            tickerStatus: {
+                required: true,
+                enum: ['open', 'closed', 'cancelled']
+            },
             tickerRemarks: {
                 required: false,
-                maxLength: 500
+                maxLength: 5000
             }
         },
         onSave: 'saveTicker'

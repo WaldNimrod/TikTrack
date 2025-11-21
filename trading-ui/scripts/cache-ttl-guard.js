@@ -19,7 +19,11 @@
     'executions-data': { ttl: 45 * 1000 },
     'trading-accounts-data': { ttl: 60 * 1000 },
     'accounts-data': { ttl: 60 * 1000 },
-    'dashboard-data': { ttl: 60 * 1000 }
+    'dashboard-data': { ttl: 60 * 1000 },
+    'preference-data': { ttl: 120 * 1000, layer: 'localStorage' },
+    'profile-data': { ttl: 120 * 1000 },
+    'preference-groups': { ttl: 300 * 1000 },
+    'preference-types': { ttl: 900 * 1000 }
   };
 
   async function ensure(key, loaderFn, options = {}) {

@@ -25,46 +25,46 @@ let totalRecords = 0;
  * Initialize the database display page
  */
 function initDatabaseDisplay() {
-  console.log('🔄 Initializing database display page...');
+  window.Logger?.info('Initializing database display page', { page: 'db_display' });
 
   // Load all tables
   loadAllTables();
 
-  console.log('✅ Database display page initialized successfully');
+  window.Logger?.info('Database display page initialized successfully', { page: 'db_display' });
 }
 
 /**
  * Load all tables data
  */
 async function loadAllTables() {
-  console.log('🔄 Loading all tables...');
+  window.Logger?.debug('Loading all tables', { page: 'db_display' });
   
   // API endpoints and their corresponding container IDs
   const tables = [
     { api: 'trading-accounts', container: 'accountsContainer' },
     { api: 'trades', container: 'tradesContainer' },
     { api: 'tickers', container: 'tickersContainer' },
-    { api: 'trade_plans', container: 'tradePlansContainer' },
+    { api: 'trade-plans', container: 'tradePlansContainer' },
     { api: 'executions', container: 'executionsContainer' },
     { api: 'alerts', container: 'alertsContainer' },
     { api: 'notes', container: 'notesContainer' },
-    { api: 'cash_flows', container: 'cashFlowsContainer' }
+    { api: 'cash-flows', container: 'cashFlowsContainer' }
   ];
   
   totalRecords = 0;
   
   for (const table of tables) {
     try {
-      console.log(`📊 Loading ${table.api}...`);
+      window.Logger?.debug('Loading table', { page: 'db_display', api: table.api });
       await loadTableData(table.api, table.container);
     } catch (error) {
-      console.error(`Error loading ${table.api}:`, error);
+      window.Logger?.error('Error loading table', { page: 'db_display', api: table.api, error: error?.message || error });
     }
   }
   
   // Update summary stats
   updateSummaryStats();
-  console.log('✅ All tables loaded');
+  window.Logger?.info('All tables loaded', { page: 'db_display' });
 }
 
 // ===== DATA LOADING =====
@@ -76,7 +76,7 @@ async function loadAllTables() {
  */
 async function loadTableData(tableType, containerId) {
   try {
-    console.log(`📊 Loading data for table type: ${tableType}`);
+    window.Logger?.debug('Loading data for table type', { page: 'db_display', tableType });
 
     // Show loading state
     showLoadingState(tableType);
@@ -96,10 +96,10 @@ async function loadTableData(tableType, containerId) {
     // Add to total records
     totalRecords += data.length;
 
-    console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+    window.Logger?.debug('Data loaded for table type', { page: 'db_display', tableType, recordCount: data.length });
 
   } catch (error) {
-    console.error(`❌ Error loading data for ${tableType}:`, error);
+    window.Logger?.error('Error loading data for table type', { page: 'db_display', tableType, error: error?.message || error });
     showErrorState(tableType, error.message);
   }
 }
@@ -111,14 +111,14 @@ async function loadTableData(tableType, containerId) {
  */
 async function fetchTableData(tableType) {
   try {
-    console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);
+    window.Logger?.debug('Fetching data from API', { page: 'db_display', tableType, url: `/api/${tableType}/` });
     const response = await fetch(`/api/${tableType}/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log(`📥 Received response for ${tableType}:`, result);
+    window.Logger?.debug('Received response', { page: 'db_display', tableType, result });
 
     if (result.status === 'success') {
       return result.data || [];
@@ -126,7 +126,7 @@ async function fetchTableData(tableType) {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
   } catch (error) {
-    console.error(`❌ Error fetching ${tableType} data:`, error);
+    window.Logger?.error('Error fetching data', { page: 'db_display', tableType, error: error?.message || error });
     // Return empty array on error
     return [];
   }
@@ -147,23 +147,23 @@ function updateTableDisplay(data, tableType, containerId) {
   
   const tableContainer = document.getElementById(containerId);
   if (!tableContainer) {
-    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    window.Logger?.error('Table container not found', { page: 'db_display', tableType, containerId });
     return;
   }
 
   const table = document.getElementById(tableId);
   if (!table) {
-    console.error(`❌ Table not found: ${tableId}`);
+    window.Logger?.error('Table not found', { page: 'db_display', tableId });
     return;
   }
 
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    console.error(`❌ Table body not found in table ${tableId}`);
+    window.Logger?.error('Table body not found', { page: 'db_display', tableId });
     return;
   }
 
-  console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
+  window.Logger?.debug('Updating table display', { page: 'db_display', tableType, recordCount: data.length });
 
   // Create table headers from first data row
   const thead = table.querySelector('thead');
@@ -188,11 +188,11 @@ function getSectionId(tableType) {
     'trading-accounts': 'accountsSection',
     'trades': 'tradesSection',
     'tickers': 'tickersSection',
-    'trade_plans': 'tradePlansSection',
+    'trade-plans': 'tradePlansSection',
     'executions': 'executionsSection',
     'alerts': 'alertsSection',
     'notes': 'notesSection',
-    'cash_flows': 'cashFlowsSection'
+    'cash-flows': 'cashFlowsSection'
   };
   return mapping[tableType] || tableType + 'Section';
 }
@@ -207,11 +207,11 @@ function getContainerId(tableType) {
     'trading-accounts': 'accountsContainer',
     'trades': 'tradesContainer',
     'tickers': 'tickersContainer',
-    'trade_plans': 'tradePlansContainer',
+    'trade-plans': 'tradePlansContainer',
     'executions': 'executionsContainer',
     'alerts': 'alertsContainer',
     'notes': 'notesContainer',
-    'cash_flows': 'cashFlowsContainer'
+    'cash-flows': 'cashFlowsContainer'
   };
   return mapping[tableType] || tableType + 'Container';
 }
@@ -226,11 +226,11 @@ function getTableId(tableType) {
     'trading-accounts': 'accountsTable',
     'trades': 'tradesTable',
     'tickers': 'tickersTable',
-    'trade_plans': 'tradePlansTable',
+    'trade-plans': 'tradePlansTable',
     'executions': 'executionsTable',
     'alerts': 'alertsTable',
     'notes': 'notesTable',
-    'cash_flows': 'cashFlowsTable'
+    'cash-flows': 'cashFlowsTable'
   };
   return mapping[tableType] || tableType + 'Table';
 }
@@ -318,7 +318,7 @@ function updateTableInfo(tableType, recordCount) {
   if (countElement) {
     countElement.textContent = `${recordCount} records`;
   } else {
-    console.log(`ℹ️ No count element found for ${countElementId}`);
+    window.Logger?.debug('No count element found', { page: 'db_display', countElementId });
   }
 }
 
@@ -332,11 +332,11 @@ function getCountElementId(tableType) {
     'trading-accounts': 'accountsCount',
     'trades': 'tradesCount',
     'tickers': 'tickersCount',
-    'trade_plans': 'tradePlansCount',
+    'trade-plans': 'tradePlansCount',
     'executions': 'executionsCount',
     'alerts': 'alertsCount',
     'notes': 'notesCount',
-    'cash_flows': 'cashFlowsCount'
+    'cash-flows': 'cashFlowsCount'
   };
   return mapping[tableType] || tableType + 'Count';
 }
@@ -367,14 +367,26 @@ function updateSummaryStats() {
 // Export functions to global scope
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
+window.loadDatabaseInfo = async function loadDatabaseInfo() {
+  await loadAllTables();
+};
+
+if (typeof window.loadUserPreferences !== 'function') {
+  window.loadUserPreferences = async function loadUserPreferencesFallback(options = {}) {
+    if (window.PreferencesSystem?.initialize && !window.PreferencesSystem.initialized) {
+      await window.PreferencesSystem.initialize();
+    }
+    return window.PreferencesSystem?.getAllPreferences?.() || true;
+  };
+}
 
 
 // ===== INITIALIZATION =====
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('➕ Database display page DOM loaded');
+  window.Logger?.info('Database display page DOM loaded', { page: 'db_display' });
   initDatabaseDisplay();
 });
 
-console.log('✅ DB Display script loaded successfully');
+window.Logger?.info('DB Display script loaded successfully', { page: 'db_display' });

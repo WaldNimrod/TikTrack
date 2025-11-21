@@ -114,6 +114,13 @@ if (typeof window !== 'undefined') {
 const CACHE_DEPENDENCIES = {
     // User Level
     'user-preferences': [],
+    'preference-data': ['user-preferences'],
+    'preference-single': ['preference-data'],
+    'preference-group': ['preference-data'],
+    'preference-multiple': ['preference-data'],
+    'preference-groups': ['preference-data'],
+    'preference-types': ['preference-data'],
+    'profile-data': ['user-preferences'],
     'user-profile': ['user-preferences'],
     
     // Account Level  
@@ -170,6 +177,13 @@ const CACHE_DEPENDENCIES = {
 // TTL Policies Configuration
 const TTL_POLICIES = {
     'user-preferences': 'long',      // 24 hours
+    'preference-data': 'medium',
+    'preference-single': 'medium',
+    'preference-group': 'medium',
+    'preference-multiple': 'medium',
+    'preference-groups': 'long',
+    'preference-types': 'long',
+    'profile-data': 'medium',
     'user-profile': 'long',          // 24 hours
     'accounts-data': 'medium',       // 30 minutes
     'account-{id}': 'medium',        // 30 minutes
@@ -230,6 +244,13 @@ class UnifiedCacheManager {
         // מדיניות מטמון ברירת מחדל
         this.defaultPolicies = {
             'user-preferences': { layer: 'localStorage', ttl: null, compress: false },
+            'preference-data': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['user-preferences'] },
+            'preference-single': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['preference-data'] },
+            'preference-group': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['preference-data'] },
+            'preference-multiple': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['preference-data'] },
+            'profile-data': { layer: 'memory', ttl: 120000, compress: false, dependencies: ['user-preferences'] },
+            'preference-groups': { layer: 'memory', ttl: 300000, compress: false, dependencies: ['preference-data'] },
+            'preference-types': { layer: 'memory', ttl: 900000, compress: false, dependencies: ['preference-data'] },
             'preference_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
             'all_preferences_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
             'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },

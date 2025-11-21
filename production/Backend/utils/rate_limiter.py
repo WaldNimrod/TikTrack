@@ -18,6 +18,7 @@ Date: September 2025
 """
 
 import time
+import json
 from collections import defaultdict, deque
 from typing import Dict, Any, Optional, Callable
 from flask import request, jsonify, g
@@ -34,11 +35,11 @@ class RateLimiter:
     def __init__(self):
         self.rate_limits: Dict[str, deque] = defaultdict(deque)
         self.endpoint_limits: Dict[str, Dict[str, int]] = {
-            'default': {'requests': 1000, 'window': 60},  # 1000 requests per minute (was 10)
-            'api': {'requests': 1000, 'window': 60},      # 1000 requests per minute (was 10)
-            'auth': {'requests': 100, 'window': 60},      # 100 requests per minute (was 5)
-            'upload': {'requests': 200, 'window': 60},    # 200 requests per minute (was 10)
-            'admin': {'requests': 2000, 'window': 60},    # 2000 requests per minute (was 20)
+            'default': {'requests': 5000, 'window': 60},  # 5000 requests per minute (increased for development)
+            'api': {'requests': 5000, 'window': 60},      # 5000 requests per minute (increased for development)
+            'auth': {'requests': 500, 'window': 60},      # 500 requests per minute (increased for development)
+            'upload': {'requests': 1000, 'window': 60},    # 1000 requests per minute (increased for development)
+            'admin': {'requests': 10000, 'window': 60},    # 10000 requests per minute (increased for development)
         }
         self.last_cleanup = time.time()
         self.cleanup_interval = 300  # 5 minutes
@@ -335,11 +336,16 @@ class RateLimitMiddleware:
         self.rate_limiter = RateLimiter()
     
     def __call__(self, environ, start_response):
+        path_info = environ.get('PATH_INFO', '') or ''
+
+        # Skip rate limiting for static assets and HTML pages
+        if not (path_info == '/api' or path_info.startswith('/api/')):
+            return self.app(environ, start_response)
+
         # Get client identifier
         client_id = environ.get('REMOTE_ADDR', 'unknown')
         
         # Get endpoint type
-        path_info = environ.get('PATH_INFO', '')
         endpoint_type = self.rate_limiter.get_endpoint_type(path_info)
         
         # Check rate limit
@@ -366,7 +372,7 @@ class RateLimitMiddleware:
             }
             
             start_response(status_code, headers)
-            return [str(response_body).encode()]
+            return [json.dumps(response_body).encode('utf-8')]
         
         # Continue with normal request
         return self.app(environ, start_response)

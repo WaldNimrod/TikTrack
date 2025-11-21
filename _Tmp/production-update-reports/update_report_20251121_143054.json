@@ -1,0 +1,97 @@
+{
+  "start_time": "2025-11-21T14:30:47.864730",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 1.6882421970367432,
+      "timestamp": "2025-11-21T14:30:49.561400",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251121_143047.log",
+        "commits": [
+          "f2be77d4 feat: Add production update system - initial handoff",
+          "c987c32e Add documentation updates and backup completeness check script",
+          "81eb68e2 Update trade-history-page.html mockup",
+          "ffd527b1 Fix: yahoo_finance_adapter timezone loading - handle UserService list format",
+          "0d54decd Fix: Migrate all routes and services to SQLAlchemy, fix DB name references"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "merge_main",
+      "success": true,
+      "duration_seconds": 4.5566020011901855,
+      "timestamp": "2025-11-21T14:30:54.118781",
+      "details": {
+        "success": true,
+        "conflicts_resolved": 0,
+        "conflicts_unresolved": 0
+      }
+    },
+    {
+      "number": 3,
+      "name": "cleanup_documentation",
+      "success": true,
+      "duration_seconds": 0.06183600425720215,
+      "timestamp": "2025-11-21T14:30:54.180950",
+      "details": {
+        "success": true,
+        "removed_count": 141
+      }
+    },
+    {
+      "number": 4,
+      "name": "backup_database",
+      "success": false,
+      "duration_seconds": 0.02423095703125,
+      "timestamp": "2025-11-21T14:30:54.205536",
+      "details": {
+        "success": false,
+        "error": "❌ Target database not found: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/Backend/db/tiktrack.db\n"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251121_143047.log",
+      "timestamp": "2025-11-21T14:30:49.561364",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    }
+  ],
+  "files_deleted": [
+    {
+      "path": "documentation/*",
+      "timestamp": "2025-11-21T14:30:54.180932",
+      "reason": "Cleanup removed 141 items"
+    }
+  ],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Database backup failed: ❌ Target database not found: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/Backend/db/tiktrack.db\n",
+      "step": "backup_database",
+      "timestamp": "2025-11-21T14:30:54.205496"
+    },
+    "Step 4 (backup_database) failed"
+  ],
+  "summary": {
+    "total_duration_seconds": 6.34127,
+    "steps_completed": 3,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 1,
+    "files_deleted_count": 1,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-21T14:30:54.206000",
+  "success": false
+}

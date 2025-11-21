@@ -178,7 +178,15 @@ class ServerMonitor {
     }
     
     if (lastCheck) {
-      lastCheck.textContent = new Date().toLocaleTimeString('he-IL');
+      // Use FieldRendererService or dateUtils for consistent date formatting
+      const now = window.dateUtils?.now ? window.dateUtils.now() : new Date();
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        lastCheck.textContent = window.FieldRendererService.renderDate(now, true);
+      } else if (window.dateUtils && typeof window.dateUtils.formatTime === 'function') {
+        lastCheck.textContent = window.dateUtils.formatTime(now);
+      } else {
+        lastCheck.textContent = now.toLocaleTimeString('he-IL');
+      }
     }
 
     // עדכון סטטיסטיקות סיכום
@@ -223,9 +231,11 @@ class ServerMonitor {
 
   // הוספת לוג
   addLog(type, title, message) {
+    // Use dateUtils for consistent date handling (if available)
+    const timestamp = window.dateUtils?.now ? window.dateUtils.now() : new Date();
     const logEntry = {
-      id: Date.now(),
-      timestamp: new Date(),
+      id: window.dateUtils?.getEpochMilliseconds ? window.dateUtils.getEpochMilliseconds(timestamp) : Date.now(),
+      timestamp: timestamp,
       type: type,
       title: title,
       message: message
@@ -290,8 +300,10 @@ class ServerMonitor {
 
   // חישוב זמן שעבר
   getTimeAgo(timestamp) {
-    const now = new Date();
-    const diff = now - timestamp;
+    // Use dateUtils for consistent date handling (if available)
+    const now = window.dateUtils?.now ? window.dateUtils.now() : new Date();
+    const timestampDate = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    const diff = now - timestampDate;
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -299,7 +311,14 @@ class ServerMonitor {
     if (seconds < 60) return `לפני ${seconds} שניות`;
     if (minutes < 60) return `לפני ${minutes} דקות`;
     if (hours < 24) return `לפני ${hours} שעות`;
-    return timestamp.toLocaleDateString('he-IL');
+    
+    // Use FieldRendererService or dateUtils for date formatting
+    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+      return window.FieldRendererService.renderDate(timestampDate, false);
+    } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+      return window.dateUtils.formatDate(timestampDate, { includeTime: false });
+    }
+    return timestampDate.toLocaleDateString('he-IL');
   }
 
   // העתקת לוג מפורט
@@ -307,16 +326,36 @@ class ServerMonitor {
     try {
       console.log('📋 ServerMonitor - מעתיק לוג מפורט');
       
+      // Use dateUtils for consistent date handling (if available)
+      const now = window.dateUtils?.now ? window.dateUtils.now() : new Date();
+      let nowDisplay;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        nowDisplay = window.FieldRendererService.renderDate(now, true);
+      } else if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+        nowDisplay = window.dateUtils.formatDateTime(now);
+      } else {
+        nowDisplay = now.toLocaleString('he-IL');
+      }
+      
       let logText = '=== לוג מפורט - ניטור שרת ===\n';
-      logText += `תאריך: ${new Date().toLocaleString('he-IL')}\n`;
+      logText += `תאריך: ${nowDisplay}\n`;
       logText += `סטטוס: ${this.isMonitoring ? 'פעיל' : 'מושהה'}\n`;
       logText += `מספר לוגים: ${this.logs.length}\n\n`;
       
       logText += '=== לוגים ===\n';
       this.logs.forEach((log, index) => {
+        let timestampDisplay;
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          timestampDisplay = window.FieldRendererService.renderDate(log.timestamp, true);
+        } else if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+          timestampDisplay = window.dateUtils.formatDateTime(log.timestamp);
+        } else {
+          timestampDisplay = log.timestamp.toLocaleString('he-IL');
+        }
+        
         logText += `${index + 1}. [${log.type.toUpperCase()}] ${log.title}\n`;
         logText += `   הודעה: ${log.message}\n`;
-        logText += `   זמן: ${log.timestamp.toLocaleString('he-IL')}\n\n`;
+        logText += `   זמן: ${timestampDisplay}\n\n`;
       });
       
       // העתקה ללוח

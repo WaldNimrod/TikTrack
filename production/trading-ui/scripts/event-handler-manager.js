@@ -98,11 +98,79 @@ class EventHandlerManager {
             
             if (onclickValue && onclickValue !== 'null' && onclickValue !== '') {
                 console.log('🚀 [EventHandlerManager] Executing onclick:', onclickValue);
+                console.log('🚀 [EventHandlerManager] Checking if function exists in global scope...');
+                
+                // Check if the function exists before eval
+                if (onclickValue.includes('openImportUserDataModal')) {
+                    console.log('🚀 [EventHandlerManager] openImportUserDataModal check:', {
+                        'window.openImportUserDataModal': typeof window.openImportUserDataModal,
+                        'typeof openImportUserDataModal (global)': typeof (typeof window !== 'undefined' ? window.openImportUserDataModal : undefined)
+                    });
+                }
+                
                 try {
                     // Execute the onclick handler using eval (safe because it's controlled)
                     // Note: Following documentation spec - no preventDefault/stopPropagation
                     // to allow Bootstrap modals and other standard behaviors to work
-                    const result = eval(onclickValue);
+                    // Eval runs in current scope, so window functions are available
+                    // If function is not found, try with window. prefix
+                    let result;
+                    
+                    // First, check if the function exists in global scope
+                    const functionName = onclickValue.replace(/\(.*\)/, '').trim();
+                    const functionArgs = onclickValue.match(/\((.*)\)/)?.[1] || '';
+                    console.log('🚀 [EventHandlerManager] Function name extracted:', functionName);
+                    console.log('🚀 [EventHandlerManager] Function args:', functionArgs);
+                    console.log('🚀 [EventHandlerManager] window[functionName] exists:', typeof window[functionName]);
+                    
+                    // Try direct window access first if function exists there
+                    if (window[functionName] && typeof window[functionName] === 'function') {
+                        console.log('🚀 [EventHandlerManager] Function found in window, calling directly:', functionName);
+                        try {
+                            if (functionArgs) {
+                                // Parse arguments (simple comma-separated, no complex parsing)
+                                const args = functionArgs.split(',').map(arg => {
+                                    const trimmed = arg.trim();
+                                    // Try to evaluate as JavaScript expression, fallback to string
+                                    try {
+                                        return eval(trimmed);
+                                    } catch {
+                                        return trimmed;
+                                    }
+                                });
+                                result = window[functionName](...args);
+                            } else {
+                                result = window[functionName]();
+                            }
+                            console.log('🚀 [EventHandlerManager] Direct call succeeded, result type:', typeof result);
+                        } catch (directError) {
+                            console.error('🚀 [EventHandlerManager] Direct call failed:', directError.name, directError.message);
+                            throw directError;
+                        }
+                    } else {
+                        // Fallback to eval
+                        try {
+                            console.log('🚀 [EventHandlerManager] Function not in window, attempting eval:', onclickValue);
+                            result = eval(onclickValue);
+                            console.log('🚀 [EventHandlerManager] Eval succeeded, result type:', typeof result);
+                        } catch (evalError) {
+                            console.error('🚀 [EventHandlerManager] Eval failed:', evalError.name, evalError.message);
+                            // If eval fails, try with window. prefix for global functions
+                            if (evalError.name === 'ReferenceError' && !onclickValue.includes('window.')) {
+                                const windowPrefixed = `window.${onclickValue}`;
+                                console.log('🚀 [EventHandlerManager] Retrying with window. prefix:', windowPrefixed);
+                                try {
+                                    result = eval(windowPrefixed);
+                                    console.log('🚀 [EventHandlerManager] Window-prefixed eval succeeded, result type:', typeof result);
+                                } catch (windowEvalError) {
+                                    console.error('🚀 [EventHandlerManager] Window-prefixed eval also failed:', windowEvalError.name, windowEvalError.message);
+                                    throw windowEvalError;
+                                }
+                            } else {
+                                throw evalError;
+                            }
+                        }
+                    }
                     
                     // Handle async functions (Promises) - especially ModalManagerV2.showModal
                     if (result && typeof result.then === 'function') {
@@ -292,6 +360,68 @@ class EventHandlerManager {
     handleDelegatedChange(event) {
         const target = event.target;
         
+        // Handle data-onchange attribute (like data-onclick for buttons)
+        const elementWithOnchange = target.closest('select[data-onchange], input[data-onchange]');
+        if (elementWithOnchange) {
+            const onchangeValue = elementWithOnchange.getAttribute('data-onchange');
+            if (onchangeValue && onchangeValue !== 'null' && onchangeValue !== '') {
+                console.log('🚀 [EventHandlerManager] Executing onchange:', onchangeValue);
+                console.log('🚀 [EventHandlerManager] Element value:', elementWithOnchange.value);
+                try {
+                    // Replace 'this.value' with the actual value before eval
+                    // This is needed because eval.call doesn't work correctly with 'this'
+                    const actualValue = elementWithOnchange.value;
+                    // Replace this.value with the actual value (handle both string and non-string)
+                    const codeToExecute = onchangeValue.replace(/this\.value/g, 
+                        typeof actualValue === 'string' ? `"${actualValue.replace(/"/g, '\\"')}"` : actualValue
+                    );
+                    console.log('🚀 [EventHandlerManager] Code after replacement:', codeToExecute);
+                    console.log('🚀 [EventHandlerManager] Actual value:', actualValue, 'Type:', typeof actualValue);
+                    
+                    // Execute the onchange handler using eval
+                    const result = eval(codeToExecute);
+                    if (result && typeof result.then === 'function') {
+                        result
+                            .then(() => {
+                                console.log('✅ [EventHandlerManager] Async onchange completed successfully');
+                            })
+                            .catch(error => {
+                                console.error('❌ [EventHandlerManager] Error in async onchange:', error);
+                                if (window.Logger) {
+                                    window.Logger.error('EventHandlerManager: Error in async onchange', error);
+                                }
+                            });
+                    } else {
+                        console.log('✅ [EventHandlerManager] onchange executed successfully (sync)');
+                    }
+                    event._ehmHandled = true;
+                    return;
+                } catch (error) {
+                    console.error('❌ [EventHandlerManager] Error executing data-onchange:', error);
+                    if (window.Logger) {
+                        window.Logger.error('EventHandlerManager: Error executing data-onchange', {
+                            onchangeValue,
+                            error: error.message,
+                            stack: error.stack
+                        });
+                    }
+                }
+            }
+        }
+        
+        // Debug logging for filter changes
+        if (target.matches('[data-filter-change]')) {
+            const filterType = target.getAttribute('data-filter-change');
+            if (window.Logger) {
+                window.Logger.debug('🔔 [EventHandlerManager] Detected filter change', {
+                    filterType,
+                    elementId: target.id,
+                    value: target.value,
+                    hasDataFilterChange: target.hasAttribute('data-filter-change')
+                });
+            }
+        }
+        
         // Handle form field changes
         if (target.matches('[data-field-change]')) {
             const fieldName = target.getAttribute('data-field-change');
@@ -464,12 +594,26 @@ class EventHandlerManager {
     handleFilterChange(filterType, element, event) {
         // Trigger filter change handlers
         const eventName = `filterChange:${filterType}`;
+        if (window.Logger) {
+            window.Logger.info('🔔 [EventHandlerManager] handleFilterChange called', {
+                filterType,
+                eventName,
+                elementId: element.id,
+                value: element.value
+            });
+        }
         this.dispatchCustomEvent(eventName, {
             filterType,
             element,
             value: element.value,
             originalEvent: event
         });
+        if (window.Logger) {
+            window.Logger.debug('✅ [EventHandlerManager] Custom event dispatched', {
+                eventName,
+                page: 'event-handler-manager'
+            });
+        }
     }
 
     /**

@@ -1,10 +1,18 @@
-from flask import Blueprint, send_from_directory, request, make_response, send_file
-from config.settings import UI_DIR
-import os
 from typing import Any
+
+from flask import Blueprint, send_from_directory, request, make_response, send_file, redirect
+
+from config.settings import UI_DIR
+
 
 # Create Blueprint
 pages_bp = Blueprint('pages', __name__)
+
+
+@pages_bp.route('/code-quality-dashboard')
+def code_quality_dashboard() -> Any:
+    """Code Quality dashboard"""
+    return send_from_directory(UI_DIR, "code-quality-dashboard.html")
 
 
 @pages_bp.route('/')
@@ -98,6 +106,11 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
+@pages_bp.route('/tag-management')
+def tag_management() -> Any:
+    """Tag management page"""
+    return send_from_directory(UI_DIR, "tag-management.html")
+
 @pages_bp.route('/preferences-new')
 def preferences_new() -> Any:
     """New preferences page"""
@@ -120,8 +133,8 @@ def test_header_only() -> Any:
 
 @pages_bp.route('/linter-realtime-monitor')
 def linter_realtime_monitor() -> Any:
-    """Linter realtime monitor page"""
-    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
+    """Legacy route - redirect to unified code quality dashboard"""
+    return redirect('/code-quality-dashboard', code=302)
 
 @pages_bp.route('/chart-management')
 def chart_management() -> Any:

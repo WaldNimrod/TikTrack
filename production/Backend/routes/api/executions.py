@@ -7,6 +7,7 @@ from services.advanced_cache_service import cache_for, cache_with_deps, invalida
 from services.execution_trade_matching_service import ExecutionTradeMatchingService
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.tag_service import TagService
 import logging
 
 # Import base classes
@@ -26,15 +27,17 @@ class ExecutionService:
     def get_all(self, db: Session, filters=None):
         return db.query(Execution).options(
             joinedload(Execution.trading_account),
-            joinedload(Execution.ticker),
-            joinedload(Execution.trade)
+            joinedload(Execution.ticker)
+            # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).all()
     
     def get_by_id(self, db: Session, execution_id: int):
         return db.query(Execution).options(
             joinedload(Execution.trading_account),
-            joinedload(Execution.ticker),
-            joinedload(Execution.trade)
+            joinedload(Execution.ticker)
+            # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).filter(Execution.id == execution_id).first()
 
 # Initialize base API
@@ -199,6 +202,14 @@ def delete_execution(execution_id: int):
         db: Session = g.db
         execution = db.query(Execution).filter(Execution.id == execution_id).first()
         if execution:
+            try:
+                TagService.remove_all_tags_for_entity(db, 'execution', execution_id)
+            except ValueError as tag_error:
+                logger.warning(
+                    "Failed to remove tags for execution %s before deletion: %s",
+                    execution_id,
+                    tag_error,
+                )
             db.delete(execution)
             db.commit()
             normalizer = _get_date_normalizer()

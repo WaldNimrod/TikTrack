@@ -102,6 +102,169 @@ class RichTextEditorService {
                 return this._editors.get(editorId);
             }
 
+            // בדיקה שהקונטיינר גלוי (Quill נכשל אם הקונטיינר מוסתר)
+            // בדיקה מחמירה יותר למודולים מקוננים
+            const modalElement = container.closest('.modal');
+            
+            // בדיקה אם המודל מקונן - בדיקה כפולה:
+            // 1. אם יש class modal-nested
+            // 2. אם יש מודל אחר פתוח (בדיקה כמו ב-modal-manager-v2.js)
+            let isNested = false;
+            if (modalElement) {
+                isNested = modalElement.classList.contains('modal-nested');
+                // אם לא נמצא class, נבדוק אם יש מודל אחר פתוח
+                if (!isNested) {
+                    const otherOpenModals = document.querySelectorAll('.modal.show');
+                    for (const otherModal of otherOpenModals) {
+                        if (otherModal !== modalElement && otherModal.id !== container.id) {
+                            isNested = true;
+                            break;
+                        }
+                    }
+                }
+                // בדיקה נוספת דרך ModalNavigationService
+                if (!isNested && window.ModalNavigationService && 
+                    window.ModalNavigationService.getStack && 
+                    typeof window.ModalNavigationService.getStack === 'function') {
+                    const stack = window.ModalNavigationService.getStack();
+                    isNested = stack.length > 1;
+                }
+            }
+            
+            // בדיקה אם המודל עצמו גלוי (חשוב למודולים מקוננים)
+            const isModalVisible = modalElement && 
+                                 (modalElement.classList.contains('show') || modalElement.style.display === 'block');
+            
+            // בדיקות visibility בסיסיות
+            const hasOffsetParent = container.offsetParent !== null;
+            const hasDisplay = container.style.display !== 'none' && !container.classList.contains('d-none');
+            const hasSize = container.offsetWidth > 0 && container.offsetHeight > 0;
+            const hasVisibility = getComputedStyle(container).visibility !== 'hidden';
+            const hasOpacity = getComputedStyle(container).opacity !== '0';
+            
+            // בדיקה נוספת עם getBoundingClientRect
+            const rect = container.getBoundingClientRect();
+            const hasRectSize = rect.width > 0 && rect.height > 0;
+            
+            // למודולים מקוננים, ננסה לאתחל גם אם offsetParent הוא null
+            // כל עוד המודל עצמו גלוי והקונטיינר קיים ב-DOM
+            // CRITICAL: למודולים מקוננים, offsetParent יכול להיות null גם כשהמודל גלוי
+            const isVisible = hasOffsetParent && hasDisplay && hasSize && hasVisibility && hasOpacity;
+            const isInViewport = isNested ? 
+                hasRectSize : // למודולים מקוננים, רק נבדוק שיש גודל
+                (hasRectSize && rect.top >= 0 && rect.left >= 0);
+            
+            // למודולים מקוננים, ננסה לאתחל גם אם offsetParent הוא null
+            // כל עוד המודל עצמו גלוי והקונטיינר קיים ב-DOM
+            if (!isVisible || !isInViewport) {
+                if (isNested && isModalVisible) {
+                    // למודולים מקוננים, ננסה בכל זאת אם המודל גלוי
+                    // גם אם offsetParent הוא null (זה יכול לקרות במודלים מקוננים)
+                    // נבדוק אם הקונטיינר קיים ב-DOM ואם יש לו parent element
+                    const hasParent = container.parentElement !== null;
+                    const parentHasSize = container.parentElement && 
+                                        (container.parentElement.offsetWidth > 0 || container.parentElement.offsetHeight > 0);
+                    
+                    // CRITICAL: למודולים מקוננים, ננסה לאתחל גם אם אין גודל
+                    // כל עוד המודל גלוי והקונטיינר קיים ב-DOM
+                    if (hasParent) {
+                        window.Logger?.warn(`RichTextEditorService: קונטיינר "${editorId}" לא עובר בדיקות visibility מלאות (nested modal), אבל המודל גלוי - מנסה לאתחל בכל זאת`, {
+                            editorId,
+                            offsetParent: hasOffsetParent,
+                            display: container.style.display,
+                            hasDNone: container.classList.contains('d-none'),
+                            width: container.offsetWidth,
+                            height: container.offsetHeight,
+                            rectWidth: rect.width,
+                            rectHeight: rect.height,
+                            rectTop: rect.top,
+                            rectLeft: rect.left,
+                            visibility: getComputedStyle(container).visibility,
+                            opacity: getComputedStyle(container).opacity,
+                            isModalVisible,
+                            modalHasShow: modalElement?.classList.contains('show'),
+                            hasParent,
+                            parentHasSize,
+                            isNested,
+                            page: 'rich-text-editor-service'
+                        });
+                        // נמשיך לאתחל למרות הבדיקות - ננסה לאתחל את Quill
+                        // אבל נצטרך לוודא שהקונטיינר מוכן לפני
+                        // ננסה להגדיר גודל מינימלי אם אין - CRITICAL למודולים מקוננים
+                        const minHeight = options.minHeight || 200;
+                        if (!hasSize && !hasRectSize) {
+                            // ננסה להגדיר גודל מינימלי מהקונפיגורציה או ברירת מחדל
+                            if (!container.style.minHeight) {
+                                container.style.minHeight = `${minHeight}px`;
+                            }
+                            // ננסה גם להגדיר width אם אין
+                            if (!container.style.width) {
+                                if (container.parentElement && container.parentElement.offsetWidth > 0) {
+                                    container.style.width = '100%';
+                                } else if (modalElement) {
+                                    // אם אין parent עם גודל, ננסה להשתמש בגודל המודל
+                                    const modalContent = modalElement.querySelector('.modal-content');
+                                    if (modalContent && modalContent.offsetWidth > 0) {
+                                        container.style.width = '100%';
+                                    }
+                                }
+                            }
+                            window.Logger?.debug(`RichTextEditorService: הגדרת minHeight ${minHeight}px לקונטיינר "${editorId}" (nested modal, no size)`, {
+                                editorId,
+                                minHeight,
+                                page: 'rich-text-editor-service'
+                            });
+                        } else if (!container.style.minHeight) {
+                            // גם אם יש גודל, נגדיר minHeight כדי להבטיח שהקונטיינר תמיד יהיה גלוי
+                            container.style.minHeight = `${minHeight}px`;
+                            window.Logger?.debug(`RichTextEditorService: הגדרת minHeight ${minHeight}px לקונטיינר "${editorId}" (nested modal, preventive)`, {
+                                editorId,
+                                minHeight,
+                                page: 'rich-text-editor-service'
+                            });
+                        }
+                    } else {
+                        // אין parent - לא נוכל לאתחל
+                        window.Logger?.warn(`RichTextEditorService: קונטיינר "${editorId}" לא גלוי ואין parent (nested modal). יאותחל עם retry mechanism.`, {
+                            editorId,
+                            offsetParent: hasOffsetParent,
+                            display: container.style.display,
+                            hasDNone: container.classList.contains('d-none'),
+                            width: container.offsetWidth,
+                            height: container.offsetHeight,
+                            rectWidth: rect.width,
+                            rectHeight: rect.height,
+                            rectTop: rect.top,
+                            rectLeft: rect.left,
+                            visibility: getComputedStyle(container).visibility,
+                            opacity: getComputedStyle(container).opacity,
+                            isModalVisible,
+                            modalHasShow: modalElement?.classList.contains('show'),
+                            hasParent,
+                            isNested,
+                            page: 'rich-text-editor-service'
+                        });
+                        return null;
+                    }
+                } else {
+                    // למודולים רגילים, נחזיר null
+                    window.Logger?.warn(`RichTextEditorService: קונטיינר "${editorId}" לא גלוי. נסה שוב לאחר שהמודל מוצג במלואו.`, {
+                        editorId,
+                        offsetParent: hasOffsetParent,
+                        display: container.style.display,
+                        hasDNone: container.classList.contains('d-none'),
+                        width: container.offsetWidth,
+                        height: container.offsetHeight,
+                        rectWidth: rect.width,
+                        rectHeight: rect.height,
+                        visibility: getComputedStyle(container).visibility,
+                        opacity: getComputedStyle(container).opacity,
+                        page: 'rich-text-editor-service'
+                    });
+                    return null;
+                }
+            }
+
             // מיזוג אפשרויות עם ברירות מחדל
             const mergedOptions = this._mergeOptions(this._defaultOptions, options);
 

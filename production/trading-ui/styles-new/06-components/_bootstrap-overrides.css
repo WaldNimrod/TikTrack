@@ -545,8 +545,17 @@
   overflow: hidden;
 }
 
-.modal-content {
+/* הוסר: modal-nested משתמש ב-z-index דינמי דרך CSS variables */
+.modal:not(.modal-nested) .modal-content {
   z-index: 1000000001 !important;
+  background: var(--apple-bg-elevated);
+  border-radius: 6px;
+  box-shadow: var(--apple-shadow-heavy);
+  border: 1px solid var(--apple-border-light);
+}
+
+/* מודלים מקוננים משתמשים ב-z-index דינמי */
+.modal.modal-nested .modal-content {
   background: var(--apple-bg-elevated);
   border-radius: 6px;
   box-shadow: var(--apple-shadow-heavy);
@@ -567,17 +576,16 @@
 }
 
 /* וידוא שכל המודלים מופיעים מעל הכל */
-.modal.show {
+/* הוסר: modal-nested משתמש ב-z-index דינמי דרך CSS variables */
+.modal.show:not(.modal-nested) {
   z-index: 999999999 !important;
 }
 
-.modal.show .modal-dialog {
+.modal.show:not(.modal-nested) .modal-dialog {
   z-index: 1000000000 !important;
 }
 
-.modal.show .modal-content {
-  z-index: 1000000001 !important;
-}
+/* הוסר: modal-content z-index - כבר מוגדר למעלה */
 
 /* וידוא שהרקע לא חוסם את המודלים */
 .modal-backdrop.show {
@@ -585,12 +593,12 @@
 }
 
 /* מודלים ספציפיים עם z-index גבוה יותר */
+/* הוסר: #linkedItemsModal - משתמש ב-modal-nested class עם z-index דינמי */
 #addAlertModal,
 #editAlertModal,
 #addExecutionModal,
 #editExecutionModal,
 #deleteExecutionModal,
-#linkedItemsModal,
 #warningModal {
   z-index: 999999999 !important;
 }
@@ -600,7 +608,6 @@
 #addExecutionModal .modal-dialog,
 #editExecutionModal .modal-dialog,
 #deleteExecutionModal .modal-dialog,
-#linkedItemsModal .modal-dialog,
 #warningModal .modal-dialog {
   z-index: 1000000000 !important;
 }
@@ -610,7 +617,6 @@
 #addExecutionModal .modal-content,
 #editExecutionModal .modal-content,
 #deleteExecutionModal .modal-content,
-#linkedItemsModal .modal-content,
 #warningModal .modal-content {
   z-index: 1000000001 !important;
 }

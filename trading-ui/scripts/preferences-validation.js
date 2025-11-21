@@ -31,6 +31,33 @@ if (window.Logger && window.Logger.info) {
 }
 
 // ============================================================================
+// FUNCTION INDEX
+// ============================================================================
+/**
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Validation System
+ * ============================================================================
+ * 
+ * Core Classes:
+ * - PreferenceValidator - Core validation logic
+ * - ExistenceError - Error for preference not found
+ * - FormatError - Error for invalid format
+ * - ConstraintError - Error for constraint violation
+ * 
+ * Global Functions:
+ * - validatePreference(preferenceName, value, dataType) - Validate preference
+ * - checkPreferenceExists(preferenceName) - Check if preference exists
+ * - validatePreferenceFormat(value, dataType) - Validate format
+ * - validatePreferenceConstraints(value, constraints) - Validate constraints
+ * 
+ * Global Instances:
+ * - window.PreferenceValidator - Main validator instance
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
+ */
+
+// ============================================================================
 // VALIDATION ERROR CLASSES
 // ============================================================================
 
@@ -104,17 +131,9 @@ class ExistenceChecker {
     }
 
     try {
-      const response = await fetch(`/api/preferences/types/check?name=${preferenceName}`);
-      if (response.ok) {
-        const result = await response.json();
-        const exists = result.exists;
-
-        // Cache the result
-        this.setCached(preferenceName, exists);
-
-        return exists;
-      }
-      return false;
+      const exists = await window.PreferencesData.checkPreferenceExists(preferenceName);
+      this.setCached(preferenceName, exists);
+      return exists;
     } catch (error) {
       window.Logger.error(`❌ Error checking preference existence for ${preferenceName}:`, error, { page: 'preferences-validation' });
       return false;
@@ -350,6 +369,7 @@ class ConstraintValidator {
     this.constraints.set('default_trading_account', {
       min: 1,
       type: 'number',
+      allowEmpty: true,
     });
 
     // String length constraints
@@ -370,6 +390,11 @@ class ConstraintValidator {
     const constraint = this.constraints.get(preferenceName);
     if (!constraint) {
       return true; // No constraints defined
+    }
+
+    const isEmptyValue = value === '' || value === null || value === undefined;
+    if (constraint.allowEmpty && isEmptyValue) {
+      return true;
     }
 
     // Number constraints
@@ -419,6 +444,14 @@ class ConstraintValidator {
      */
   getConstraintError(preferenceName, value) {
     const constraint = this.constraints.get(preferenceName);
+    if (!constraint) {
+      return null;
+    }
+
+    const isEmptyValue = value === '' || value === null || value === undefined;
+    if (constraint.allowEmpty && isEmptyValue) {
+      return null;
+    }
 
     // Log constraint details for debugging
     window.Logger.debug(`🔍 Checking constraints for ${preferenceName}:`, {

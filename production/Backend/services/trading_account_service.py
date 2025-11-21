@@ -36,7 +36,17 @@ class TradingAccountService:
     def create(db: Session, data: Dict[str, Any]) -> TradingAccount:
         """Create new trading_account"""
         # Validate that all fields exist in the TradingAccount model
-        allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes', 'opening_balance'}
+        allowed_fields = {
+            'name',
+            'currency_id',
+            'status',
+            'cash_balance',
+            'total_value',
+            'total_pl',
+            'notes',
+            'opening_balance',
+            'external_account_number'
+        }
         invalid_fields = set(data.keys()) - allowed_fields
         if invalid_fields:
             raise ValueError(f"Invalid fields: {', '.join(invalid_fields)}. Allowed fields: {', '.join(allowed_fields)}")

@@ -254,11 +254,6 @@ function showModal(modalId, options = {}) {
   // הצגת המודל
   const bootstrapModal = new bootstrap.Modal(modal, modalOptions);
   bootstrapModal.show();
-  
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
 }
 
 /**
@@ -365,6 +360,7 @@ window.uiUtils = {
  */
 async function cancelItem(itemType, itemId, itemName = null, currentStatus = null) {
   // Global cancel function called for
+  window.Logger?.info('cancelItem invoked', { itemType, itemId, itemName, currentStatus });
 
   // בדיקה אם האובייקט כבר מבוטל
   if (currentStatus === 'cancelled') {
@@ -378,44 +374,98 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
     return;
   }
 
-  // הגדרת הפעולה הנוכחית לביטול
-  window.currentAction = 'cancel';
-
-  // בדיקת פריטים מקושרים לפני הביטול
   try {
-    // Use relative URL to work with both development (8080) and production (5001)
-    const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
+    let hasLinkedItems = false;
 
-    if (response.ok) {
-      const linkedItemsData = await response.json();
-      const childEntities = linkedItemsData.child_entities || [];
-      const parentEntities = linkedItemsData.parent_entities || [];
-      const allEntities = [...childEntities, ...parentEntities];
+    if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+      window.Logger?.info('cancelItem using global checkLinkedItemsBeforeAction', { itemType, itemId });
+      hasLinkedItems = await window.checkLinkedItemsBeforeAction(itemType, itemId, 'cancel');
+      window.Logger?.info('cancelItem linked items result (global)', { itemType, itemId, hasLinkedItems });
+    } else {
+      window.currentAction = 'cancel';
 
-      if (allEntities.length > 0) {
-        // יש פריטים מקושרים - הצגת אזהרה
-        // Linked items found
+      const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
+      window.Logger?.info('cancelItem fallback linked-items fetch', {
+        itemType,
+        itemId,
+        ok: response.ok,
+        status: response.status,
+      });
 
-        if (typeof window.showLinkedItemsModal === 'function') {
-          window.showLinkedItemsModal(allEntities, itemType, itemId);
-        } else {
-          handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
-          if (window.showErrorNotification) {
-            const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
-              ? window.LinkedItemsService.getEntityLabel(itemType) 
-              : itemType;
-            window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
+      if (response.ok) {
+        const linkedItemsData = await response.json();
+        const childEntities = linkedItemsData.child_entities || [];
+        const parentEntities = linkedItemsData.parent_entities || [];
+
+        window.Logger?.info('cancelItem fallback linked-items counts', {
+          itemType,
+          itemId,
+          childCount: childEntities.length,
+          parentCount: parentEntities.length,
+        });
+
+        if (childEntities.length > 0) {
+          hasLinkedItems = true;
+          if (typeof window.showLinkedItemsModal === 'function') {
+            window.Logger?.info('cancelItem showing linked items modal (fallback)', { itemType, itemId });
+            window.showLinkedItemsModal(linkedItemsData, itemType, itemId, 'warningBlock');
+          } else {
+            handleFunctionNotFound('showLinkedItemsModal', 'פונקציית הצגת פריטים מקושרים לא נמצאה');
+            if (window.showErrorNotification) {
+              const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+                ? window.LinkedItemsService.getEntityLabel(itemType) 
+                : itemType;
+              window.showErrorNotification('שגיאה בביטול', `לא ניתן לבטל ${entityLabel} זה - יש פריטים מקושרים אליו`);
+            }
           }
         }
-        return;
       }
+
+      delete window.currentAction;
+    }
+
+    if (hasLinkedItems) {
+      window.Logger?.info('cancelItem aborted due to linked items', { itemType, itemId });
+      return;
     }
   } catch {
     // Linked items check failed, proceeding with cancellation
+    window.Logger?.warn('cancelItem linked-items check failed, proceeding', { itemType, itemId });
   }
 
-  // אין פריטים מקושרים - ביצוע הביטול
-  // No linked items found, proceeding with cancellation
+  const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel) 
+    ? window.LinkedItemsService.getEntityLabel(itemType) 
+    : itemType;
+  const displayName = itemName || `${entityLabel} ${itemId}`;
+
+  let confirmed = true;
+  if (typeof window.showCancelWarning === 'function') {
+    window.Logger?.info('cancelItem showing cancel warning modal', { itemType, itemId, itemName: displayName });
+    confirmed = await new Promise(resolve => {
+      window.showCancelWarning(itemType, displayName, entityLabel,
+        () => resolve(true),
+        () => resolve(false));
+    });
+  } else if (typeof window.showConfirmationDialog === 'function') {
+    window.Logger?.info('cancelItem showing confirmation dialog fallback', { itemType, itemId, itemName: displayName });
+    confirmed = await new Promise(resolve => {
+      window.showConfirmationDialog(
+        `ביטול ${entityLabel}`,
+        `האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
+        () => resolve(true),
+        () => resolve(false),
+        'warning'
+      );
+    });
+  } else {
+    confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
+  }
+
+  if (!confirmed) {
+    window.Logger?.info('cancelItem cancelled by user', { itemType, itemId });
+    return;
+  }
+
   await performItemCancellation(itemType, itemId, itemName);
 }
 
@@ -435,15 +485,18 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       ? window.LinkedItemsService.getEntityLabel(itemType) 
       : itemType;
     const successMessage = `${entityLabel} בוטל בהצלחה!`;
+    window.Logger?.info('performItemCancellation started', { itemType, itemId });
 
     switch (itemType) {
-    case 'trade_plan':
-      response = await fetch(`/api/trade_plans/${itemId}`, {
-        method: 'PUT',
+    case 'trade_plan': {
+      const payload = { cancel_reason: 'בוטל על ידי המשתמש דרך הממשק' };
+      response = await fetch(`/api/trade-plans/${itemId}/cancel`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'cancelled' }),
+        body: JSON.stringify(payload),
       });
       break;
+    }
 
     case 'trade':
       response = await fetch(`/api/trades/${itemId}/cancel`, {
@@ -481,24 +534,62 @@ async function performItemCancellation(itemType, itemId, _itemName) {
       throw new Error(`לא נתמך ביטול עבור סוג: ${itemType}`);
     }
 
+    window.Logger?.info('performItemCancellation response received', {
+      itemType,
+      itemId,
+      ok: response?.ok,
+      status: response?.status,
+    });
+
     if (response.ok) {
+      let responseData;
+      try {
+        const responseText = await response.clone().text();
+        window.Logger?.info('performItemCancellation response raw text', {
+          itemType,
+          itemId,
+          responseText,
+        });
+        responseData = responseText ? JSON.parse(responseText) : undefined;
+        window.Logger?.info('performItemCancellation response payload parsed', {
+          itemType,
+          itemId,
+          responseData,
+          apiStatus: responseData?.data?.status,
+        });
+      } catch (jsonError) {
+        window.Logger?.warn('performItemCancellation: failed to parse response body', {
+          itemType,
+          itemId,
+          error: jsonError?.message,
+        });
+      }
+      const apiSuccessMessage = responseData?.message || responseData?.status_message;
+      const finalSuccessMessage = apiSuccessMessage || successMessage;
       // Item cancelled successfully
+      window.Logger?.info('performItemCancellation success', {
+        itemType,
+        itemId,
+        successMessage: finalSuccessMessage,
+      });
 
       // הצגת הודעת הצלחה
       if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification(successMessage);
+        window.showSuccessNotification(finalSuccessMessage);
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification(successMessage, 'success');
+        window.showNotification(finalSuccessMessage, 'success');
       }
 
-      // רענון הנתונים
       if (typeof window.loadData === 'function') {
         await window.loadData();
       } else {
-        // נסיון לרענן לפי סוג האובייקט
-        const refreshFunction = window[`load${itemType.charAt(0).toUpperCase() + itemType.slice(1)}sData`];
-        if (typeof refreshFunction === 'function') {
-          await refreshFunction();
+        const basicRefresh = window[`load${itemType.charAt(0).toUpperCase() + itemType.slice(1)}sData`];
+        if (typeof basicRefresh === 'function') {
+          await basicRefresh();
+        } else if (typeof window.loadTradePlansData === 'function' && itemType === 'trade_plan') {
+          await window.loadTradePlansData();
+        } else if (typeof window.reloadPageData === 'function') {
+          await window.reloadPageData();
         }
       }
 
@@ -1217,6 +1308,13 @@ window.restoreAllSectionStates = async function () {
   // In accordion mode, if no section was opened (all closed), keep all closed
   // (do not auto-open first section - let user manually open sections)
   
+  // Set flag and dispatch event to signal that sections have been restored
+  // This allows lazy loading observers to wait before initializing
+  window.sectionsRestored = true;
+  window.dispatchEvent(new CustomEvent('sections:restored', {
+    detail: { pageName, restoredCount, totalSections: sections.length, accordionMode }
+  }));
+  
   if (window.Logger) { window.Logger.debug(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections${accordionMode ? ' (accordion mode)' : ''}`, { page: "ui-utils" }); }
   return restoredCount;
 };
@@ -1817,6 +1915,147 @@ async function loadSectionStates() {
 // ===== PAGE SUMMARY STATISTICS FUNCTIONS =====
 // These functions are used across multiple pages for summary statistics
 
+// ===== SCRIPT LOADING UTILITIES =====
+// Shared helpers for on-demand script loading (used by dashboard lazy flows)
+
+const __uiUtilsScriptRegistry = new Map();
+
+/**
+ * Normalize script key for registry comparison.
+ * Strips origin and cache-busting query parameters for consistent matching.
+ *
+ * @param {string} src - Script source path.
+ * @returns {string} Normalized path key.
+ */
+function normalizeScriptKey(src) {
+  if (!src) {
+    return '';
+  }
+  try {
+    const url = new URL(src, window.location.origin);
+    return url.pathname.replace(/^\//, '');
+  } catch (_error) {
+    return src.replace(window.location.origin, '').split('?')[0].replace(/^\//, '');
+  }
+}
+
+/**
+ * Check if script already exists in DOM.
+ * @param {string} normalizedKey - Normalized script key
+ * @returns {boolean}
+ */
+function isScriptInDOM(normalizedKey) {
+  return Array.from(document.querySelectorAll('script[src]')).some(scriptEl => {
+    const existingKey = normalizeScriptKey(scriptEl.src);
+    return existingKey === normalizedKey;
+  });
+}
+
+/**
+ * Load a script tag only once and cache the pending promise.
+ *
+ * @param {string} src - Script URL (relative or absolute).
+ * @param {Object} [options] - Optional configuration.
+ * @param {number} [options.timeoutMs=10000] - Timeout in milliseconds.
+ * @param {boolean} [options.async=true] - Whether to set the async attribute.
+ * @param {Object} [options.attributes] - Additional attributes for the script element.
+ * @returns {Promise<void>} Resolves when the script is loaded.
+ */
+function loadScriptOnce(src, options = {}) {
+  if (!src) {
+    return Promise.reject(new Error('loadScriptOnce: src is required'));
+  }
+
+  const {
+    timeoutMs = 10000,
+    async = true,
+    attributes = {}
+  } = options;
+
+  const normalizedKey = normalizeScriptKey(src);
+
+  if (__uiUtilsScriptRegistry.has(normalizedKey)) {
+    return __uiUtilsScriptRegistry.get(normalizedKey);
+  }
+
+  if (isScriptInDOM(normalizedKey)) {
+    return Promise.resolve();
+  }
+
+  const scriptPromise = new Promise((resolve, reject) => {
+    const scriptElement = document.createElement('script');
+    scriptElement.src = src;
+    scriptElement.async = async;
+    scriptElement.dataset.loader = 'ui-utils/loadScriptOnce';
+
+    Object.entries(attributes).forEach(([attr, value]) => {
+      if (typeof value !== 'undefined' && value !== null) {
+        scriptElement.setAttribute(attr, value);
+      }
+    });
+
+    let timeoutHandle = null;
+    const clear = () => {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+        timeoutHandle = null;
+      }
+    };
+
+    scriptElement.onload = () => {
+      clear();
+      if (window.Logger?.info) {
+        window.Logger.info(`✅ Script loaded: ${src}`, { page: 'ui-utils', loader: 'loadScriptOnce' });
+      }
+      resolve();
+    };
+
+    scriptElement.onerror = (event) => {
+      clear();
+      __uiUtilsScriptRegistry.delete(normalizedKey);
+      const error = new Error(`Failed to load script: ${src}`);
+      error.event = event;
+      if (window.Logger?.error) {
+        window.Logger.error('❌ Script load error', error, { page: 'ui-utils', loader: 'loadScriptOnce' });
+      }
+      reject(error);
+    };
+
+    timeoutHandle = setTimeout(() => {
+      __uiUtilsScriptRegistry.delete(normalizedKey);
+      if (window.Logger?.error) {
+        window.Logger.error(`❌ Script load timeout: ${src}`, { page: 'ui-utils', loader: 'loadScriptOnce', timeoutMs });
+      }
+      reject(new Error(`Script load timeout: ${src}`));
+    }, timeoutMs);
+
+    document.head.appendChild(scriptElement);
+  });
+
+  __uiUtilsScriptRegistry.set(normalizedKey, scriptPromise);
+  return scriptPromise;
+}
+
+/**
+ * Load multiple scripts sequentially while preserving the provided order.
+ *
+ * @param {string[]} sources - Array of script paths.
+ * @param {Object} [options] - Options forwarded to each loadScriptOnce call.
+ * @returns {Promise<void>} Resolves when all scripts finish loading.
+ */
+async function loadScriptsOnce(sources, options = {}) {
+  if (!Array.isArray(sources)) {
+    throw new Error('loadScriptsOnce: sources must be an array');
+  }
+
+  for (const source of sources) {
+    if (!source) {
+      continue;
+    }
+    await loadScriptOnce(source, options);
+  }
+}
+
 /**
  * Update page summary statistics - Unified function
  * Calculates and displays page-specific statistics using InfoSummarySystem
@@ -1829,17 +2068,37 @@ async function loadSectionStates() {
  */
 function updatePageSummaryStats(pageName, data, countElementId = null) {
   try {
-    // Using filtered data if available, otherwise provided data
-    let dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+    // Use provided data if available, otherwise try to get from filtered data or TableDataRegistry
+    let dataToUse = data;
 
-    if (window.TableDataRegistry) {
-      const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
-      if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
-        dataToUse = registryFiltered;
-      } else {
+    // Only use TableDataRegistry if no data was provided
+    if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
+      // Try filtered data first
+      dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+
+      // Then try TableDataRegistry
+      if (window.TableDataRegistry && (!Array.isArray(dataToUse) || dataToUse.length === 0)) {
+      const summary = window.TableDataRegistry.getSummary(pageName);
+      if (summary) {
+        const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
+          if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+          dataToUse = registryFiltered;
+        }
+      } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
+        const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
+        if (resolvedType) {
+          const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
+            if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+            dataToUse = registryFiltered;
+          }
+        }
+      }
+
+        if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
         const registryFull = window.TableDataRegistry.getFullData(pageName);
-        if ((!Array.isArray(dataToUse) || dataToUse.length === 0) && Array.isArray(registryFull) && registryFull.length > 0) {
+          if (Array.isArray(registryFull) && registryFull.length > 0) {
           dataToUse = registryFull;
+          }
         }
       }
     }
@@ -1882,6 +2141,127 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
   }
 }
 
+/**
+ * Update table count element with total filtered records (not just current page)
+ * Generic function to update count display using TableDataRegistry
+ * 
+ * @function updateTableCount
+ * @param {string|HTMLElement} countElementOrSelector - Element ID, selector, or element itself
+ * @param {string} tableType - Table type identifier (e.g., 'trades', 'tickers', 'alerts')
+ * @param {string} itemName - Item name for display (e.g., 'טריידים', 'טיקרים', 'התראות')
+ * @param {number} [fallbackCount] - Fallback count if TableDataRegistry not available
+ * @returns {void}
+ * 
+ * @example
+ * updateTableCount('#tradesCount', 'trades', 'טריידים');
+ * updateTableCount('.table-count', 'tickers', 'טיקרים');
+ * updateTableCount(document.getElementById('alertsCount'), 'alerts', 'התראות', 0);
+ */
+function updateTableCount(countElementOrSelector, tableType, itemName, fallbackCount = null) {
+  try {
+    let countElement = null;
+    
+    // Resolve element from various input types
+    if (typeof countElementOrSelector === 'string') {
+      if (countElementOrSelector.startsWith('#')) {
+        countElement = document.getElementById(countElementOrSelector.substring(1));
+      } else if (countElementOrSelector.startsWith('.')) {
+        countElement = document.querySelector(countElementOrSelector);
+      } else {
+        // Try as ID first, then as selector
+        countElement = document.getElementById(countElementOrSelector) || document.querySelector(countElementOrSelector);
+      }
+    } else if (countElementOrSelector instanceof HTMLElement) {
+      countElement = countElementOrSelector;
+    }
+    
+    if (!countElement) {
+      window.Logger?.debug('Count element not found', { tableType, selector: countElementOrSelector });
+      return;
+    }
+    
+    // Use TableDataRegistry to get total filtered count (not just current page)
+    let totalCount = fallbackCount;
+    if (window.getTableDataCounts) {
+      const counts = window.getTableDataCounts(tableType);
+      totalCount = counts.filtered || counts.total || fallbackCount || 0;
+    } else if (fallbackCount === null) {
+      // If no fallback provided and TableDataRegistry not available, try to get from window variable
+      const dataVar = window[`${tableType}Data`] || window[`filtered${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Data`];
+      totalCount = Array.isArray(dataVar) ? dataVar.length : 0;
+    }
+    
+    if (totalCount !== null && totalCount !== undefined) {
+      countElement.textContent = `${totalCount} ${itemName}`;
+    }
+  } catch (error) {
+    window.Logger?.warn('updateTableCount failed', { tableType, error: error?.message || error });
+  }
+}
+
+// Export to window for global access
+window.updateTableCount = updateTableCount;
+
+function renderUpdatedCell(entity, options = {}) {
+  const {
+    fields = ['updated_at', 'updatedAt'],
+    fallback = 'לא זמין',
+    columnClass = 'col-updated',
+    format = 'dhm',
+    includeSeconds = false
+  } = options || {};
+
+  let updatedDate = null;
+
+  if (typeof window.getLatestTimestamp === 'function') {
+    updatedDate = window.getLatestTimestamp(entity, fields);
+  } else if (typeof window.resolvePropertyPath === 'function') {
+    const paths = Array.isArray(fields) ? fields : [fields];
+    for (const path of paths) {
+      const candidate = window.resolvePropertyPath(entity, path);
+      // Use centralized date utils to handle DateEnvelope, datetime objects, and strings
+      let dateObj = null;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateObj = window.dateUtils.toDateObject(candidate);
+      } else if (candidate instanceof Date) {
+        dateObj = candidate;
+      } else if (candidate) {
+        dateObj = new Date(candidate);
+      }
+      if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
+        if (!updatedDate || dateObj.getTime() > updatedDate.getTime()) {
+          updatedDate = dateObj;
+        }
+      }
+    }
+  }
+
+  const epoch = updatedDate instanceof Date && !Number.isNaN(updatedDate.getTime())
+    ? updatedDate.getTime()
+    : '';
+
+  let displayHtml = fallback;
+  if (updatedDate instanceof Date && !Number.isNaN(updatedDate.getTime())) {
+    if (typeof window.renderUpdatedTimestamp === 'function') {
+      displayHtml = window.renderUpdatedTimestamp(updatedDate, { fallback, format, includeSeconds });
+    } else if (typeof window.getDurationSince === 'function') {
+      const duration = window.getDurationSince(updatedDate, { format, includeSeconds, fallback });
+      const absolute = typeof window.formatDateTime === 'function'
+        ? window.formatDateTime(updatedDate)
+        : (window.formatDate ? window.formatDate(updatedDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(updatedDate, { includeTime: true }) : updatedDate.toLocaleString('he-IL')));
+      const titleAttr = absolute ? ` title="${absolute}"` : '';
+      displayHtml = `<span class="updated-value" dir="ltr"${titleAttr}>${duration || absolute}</span>`;
+    } else {
+      const formattedDate = window.formatDate ? window.formatDate(updatedDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(updatedDate, { includeTime: true }) : updatedDate.toLocaleString('he-IL'));
+      displayHtml = `<span class="updated-value" dir="ltr">${formattedDate}</span>`;
+    }
+  } else {
+    displayHtml = `<span class="updated-value-empty">${fallback}</span>`;
+  }
+
+  return `<td class="${columnClass}" data-epoch="${epoch}">${displayHtml}</td>`;
+}
+
 // Export functions to global scope
 // toggleSection removed - use toggleSection('top') instead
 // window.toggleSection export removed - using global version from ui-utils.js
@@ -1891,6 +2271,9 @@ window.toggleAllSectionsGlobal = window.toggleAllSections;
 window.toggleTopSection = toggleTopSection;
 window.loadSectionStates = loadSectionStates;
 window.updatePageSummaryStats = updatePageSummaryStats;
+window.loadScriptOnce = loadScriptOnce;
+window.loadScriptsOnce = loadScriptsOnce;
+window.renderUpdatedCell = renderUpdatedCell;
 
 // הוסר - המערכת המאוחדת מטפלת באתחול
 // Load section states when DOM is ready

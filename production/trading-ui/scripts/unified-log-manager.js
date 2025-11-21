@@ -164,7 +164,7 @@ class UnifiedLogManager {
         this.logTypes.set('chartHistory', {
             name: 'היסטוריית גרפים',
             icon: 'fa-chart-line',
-            color: '#007bff',
+            color: '#26baac',
             description: 'היסטוריית נתוני גרפים',
             fields: ['chartType', 'data', 'timestamp', 'source'],
             defaultFilters: ['chartType', 'timeRange'],
@@ -292,7 +292,7 @@ class UnifiedLogManager {
         this.logTypes.set('chartHistory', {
             name: 'היסטוריית גרפים',
             icon: 'fa-chart-line',
-            color: '#007bff',
+            color: '#26baac',
             description: 'היסטוריית גרפים וניתוחים',
             fields: ['chartType', 'timestamp', 'data', 'source'],
             defaultFilters: ['chartType', 'timeRange'],

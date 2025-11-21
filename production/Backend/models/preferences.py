@@ -93,7 +93,7 @@ class PreferenceProfile(BaseModel):
 
 class UserPreference(BaseModel):
     """העדפת משתמש"""
-    __tablename__ = 'user_preferences_v3'
+    __tablename__ = 'user_preferences'
     
     # Temporarily remove foreign key constraints to avoid mapping issues
     # user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
@@ -101,6 +101,7 @@ class UserPreference(BaseModel):
     profile_id = Column(Integer, ForeignKey('preference_profiles.id'), nullable=False)
     preference_id = Column(Integer, ForeignKey('preference_types.id'), nullable=False)
     saved_value = Column(Text)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
     # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
     # preference_type = relationship("PreferenceType", back_populates="user_preferences")

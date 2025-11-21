@@ -114,17 +114,41 @@ if (typeof window !== 'undefined') {
 const CACHE_DEPENDENCIES = {
     // User Level
     'user-preferences': [],
+    'preference-data': ['user-preferences'],
+    'preference-single': ['preference-data'],
+    'preference-group': ['preference-data'],
+    'preference-multiple': ['preference-data'],
+    'preference-groups': ['preference-data'],
+    'preference-types': ['preference-data'],
+    'profile-data': ['user-preferences'],
     'user-profile': ['user-preferences'],
     
     // Account Level  
     'accounts-data': ['user-preferences'],
     'account-{id}': ['accounts-data'],
+    'trading-accounts-data': ['user-preferences'],
+    'trading-account-{id}': ['trading-accounts-data'],
     
     // Trading Level
     'trades-data': ['accounts-data'],
     'trade-{id}': ['trades-data'],
     'executions-data': ['accounts-data'],
     'execution-{id}': ['executions-data'],
+    
+    // Trade Plans Level
+    'trade-plans-data': ['accounts-data'],
+    'trade-plan-{id}': ['trade-plans-data'],
+    
+    // Cash Flows Level
+    'cash-flows-data': ['accounts-data'],
+    'cash-flow-{id}': ['cash-flows-data'],
+    
+    // Notes Level
+    'notes-data': [],
+    'note-{id}': ['notes-data'],
+    
+    // Research Level
+    'research-data': [],
     
     // Market Level
     'tickers-data': ['accounts-data'],
@@ -138,19 +162,43 @@ const CACHE_DEPENDENCIES = {
     'conditions-data': ['trades-data'],
     
     // Dashboard Level
-    'dashboard-data': ['market-data', 'trades-data', 'executions-data'],
+    'dashboard-data': [
+        'market-data',
+        'trades-data',
+        'executions-data',
+        'alerts-data',
+        'trade-plans-data',
+        'accounts-data',
+        'cash-flows-data'
+    ],
     'statistics-data': ['trades-data', 'executions-data']
 };
 
 // TTL Policies Configuration
 const TTL_POLICIES = {
     'user-preferences': 'long',      // 24 hours
+    'preference-data': 'medium',
+    'preference-single': 'medium',
+    'preference-group': 'medium',
+    'preference-multiple': 'medium',
+    'preference-groups': 'long',
+    'preference-types': 'long',
+    'profile-data': 'medium',
     'user-profile': 'long',          // 24 hours
     'accounts-data': 'medium',       // 30 minutes
     'account-{id}': 'medium',        // 30 minutes
+    'trading-accounts-data': 'medium',
+    'trading-account-{id}': 'medium',
     'trades-data': 'short',          // 5 minutes
     'trade-{id}': 'short',           // 5 minutes
     'executions-data': 'short',      // 5 minutes
+    'trade-plans-data': 'short',
+    'trade-plan-{id}': 'short',
+    'cash-flows-data': 'short',
+    'cash-flow-{id}': 'short',
+    'notes-data': 'short',
+    'note-{id}': 'short',
+    'research-data': 'medium',
     'market-data': 'very-short',     // 1 minute
     'quote-{symbol}': 'very-short',  // 1 minute
     'dashboard-data': 'medium',      // 30 minutes
@@ -196,6 +244,13 @@ class UnifiedCacheManager {
         // מדיניות מטמון ברירת מחדל
         this.defaultPolicies = {
             'user-preferences': { layer: 'localStorage', ttl: null, compress: false },
+            'preference-data': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['user-preferences'] },
+            'preference-single': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['preference-data'] },
+            'preference-group': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['preference-data'] },
+            'preference-multiple': { layer: 'localStorage', ttl: 120000, compress: false, dependencies: ['preference-data'] },
+            'profile-data': { layer: 'memory', ttl: 120000, compress: false, dependencies: ['user-preferences'] },
+            'preference-groups': { layer: 'memory', ttl: 300000, compress: false, dependencies: ['preference-data'] },
+            'preference-types': { layer: 'memory', ttl: 900000, compress: false, dependencies: ['preference-data'] },
             'preference_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
             'all_preferences_*': { layer: 'localStorage', ttl: 300000, compress: false }, // 5 דקות
             'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },
@@ -205,6 +260,12 @@ class UnifiedCacheManager {
             'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
+            'alerts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['accounts-data'] },
+            'alert-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['alerts-data'] },
+            'trading-accounts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['user-preferences'] },
+            'trading-account-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['trading-accounts-data'] },
+            'executions-data': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['accounts-data'] },
+            'execution-{id}': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['executions-data'] },
             'trade-data': { layer: 'backend', ttl: 30000, compress: false },
             'dashboard-data': { layer: 'backend', ttl: 300000, compress: false },
             'trade-positions': { layer: 'memory', ttl: 300000, compress: false, maxSize: 500 * 1024, validate: true, syncToBackend: false },

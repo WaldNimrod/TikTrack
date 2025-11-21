@@ -158,7 +158,7 @@
 
 .info-item:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-color: var(--color-primary, #007bff);
+    border-color: var(--color-primary, #26baac);
 }
 
 .info-label {

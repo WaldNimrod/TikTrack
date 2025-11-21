@@ -41,24 +41,60 @@ class TableRegistry {
 
   _normalizeDefaultSort(tableType, defaultSortConfig) {
     const resolveChainSource = () => {
-      if (defaultSortConfig && typeof defaultSortConfig === 'object') {
+      // If defaultSortConfig is explicitly provided, use it
+      if (defaultSortConfig && typeof defaultSortConfig === 'object' && !Array.isArray(defaultSortConfig)) {
         return defaultSortConfig;
       }
       if (Array.isArray(defaultSortConfig)) {
         return defaultSortConfig;
       }
 
+      // If no defaultSortConfig provided, try to get from getDefaultSortChain
+      // This allows automatic default sort based on table structure
+      // CRITICAL: Always try to get default sort chain, even if defaultSortConfig is undefined
       const resolver =
         window.getDefaultSortChain ||
         window.tableMappings && window.tableMappings.getDefaultSortChain;
       if (typeof resolver === 'function') {
-        return resolver(tableType);
+        try {
+          const chain = resolver(tableType);
+          // buildCanonDefaultSortChain should always return an array (even if empty)
+          // But we check for both array and object to be safe
+          if (chain) {
+            if (Array.isArray(chain) && chain.length > 0) {
+              return chain;
+            }
+            if (typeof chain === 'object' && !Array.isArray(chain)) {
+              return chain;
+            }
+            // If chain is empty array, still return it (will be handled later)
+            if (Array.isArray(chain)) {
+              return chain;
+            }
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableRegistry._normalizeDefaultSort: Failed to get default sort chain for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
+      } else {
+        // Log if resolver is not available (for debugging)
+        if (window.Logger) {
+          window.Logger.debug(`TableRegistry._normalizeDefaultSort: getDefaultSortChain not available for "${tableType}"`, { 
+            page: 'unified-table-system',
+            hasWindowGetDefaultSortChain: typeof window.getDefaultSortChain === 'function',
+            hasTableMappings: !!window.tableMappings,
+            hasTableMappingsGetDefaultSortChain: !!(window.tableMappings && typeof window.tableMappings.getDefaultSortChain === 'function')
+          });
+        }
       }
       return null;
     };
 
     const chainSource = resolveChainSource();
     if (!chainSource) {
+      // Return empty array if no chain source found
+      // This means the table will not have default sort
       return [];
     }
 
@@ -379,6 +415,10 @@ class TableSorter {
       sortOptions.tableType = tableType;
       sortOptions.columnIndex = columnIndex;
 
+      // Get tableId for pagination updates
+      const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+      const tableId = table ? table.id : null;
+
       let data = config.dataGetter();
       if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
         const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
@@ -402,20 +442,71 @@ class TableSorter {
         return [];
       }
 
-      // שימוש ב-sortTableData הקיים
+      // שימוש ב-sortTableData הקיים (שכבר מעדכן Registry ו-pagination)
       const { safeUpdateFunction, release: releaseUpdate } = TableSorter.prepareUpdateFunction(tableType, config);
 
       if (typeof window.sortTableData === 'function') {
         const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction, sortOptions);
         if (sortResult && typeof sortResult.then === 'function') {
           return sortResult
+            .then((sortedData) => {
+              // Additional update to Registry and pagination after sort completes
+              if (window.TableDataRegistry && tableId && Array.isArray(sortedData)) {
+                try {
+                  window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
+                } catch (err) {
+                  if (window.Logger) {
+                    window.Logger.warn(`TableSorter.sort: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+                  }
+                }
+              }
+              if (tableId && window.PaginationSystem && Array.isArray(sortedData)) {
+                try {
+                  const paginationInstance = window.PaginationSystem.get(tableId);
+                  if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                    paginationInstance.setData(sortedData);
+                  }
+                } catch (err) {
+                  if (window.Logger) {
+                    window.Logger.warn(`TableSorter.sort: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+                  }
+                }
+              }
+              return sortedData;
+            })
             .finally(() => {
               releaseUpdate();
               releaseSorter();
             })
             .catch(error => {
+              releaseUpdate();
+              releaseSorter();
               throw error;
             });
+        }
+        // For synchronous results, also update Registry and pagination
+        if (Array.isArray(sortResult)) {
+          if (window.TableDataRegistry && tableId) {
+            try {
+              window.TableDataRegistry.setFilteredData(tableType, sortResult, { tableId, skipPageReset: true });
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn(`TableSorter.sort: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+              }
+            }
+          }
+          if (tableId && window.PaginationSystem) {
+            try {
+              const paginationInstance = window.PaginationSystem.get(tableId);
+              if (paginationInstance && typeof paginationInstance.setData === 'function') {
+                paginationInstance.setData(sortResult);
+              }
+            } catch (err) {
+              if (window.Logger) {
+                window.Logger.warn(`TableSorter.sort: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+              }
+            }
+          }
         }
         releaseUpdate();
         releaseSorter();
@@ -525,6 +616,33 @@ class TableSorter {
         this.saveSortState(tableType, primary.columnIndex, primary.direction || 'asc', { chain: sortChain });
       }
 
+      // Get tableId for pagination updates
+      const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+      const tableId = table ? table.id : null;
+
+      // Update Registry and pagination with sorted data
+      if (window.TableDataRegistry && tableId) {
+        try {
+          window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableSorter.sortByChain: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
+      }
+      if (tableId && window.PaginationSystem) {
+        try {
+          const paginationInstance = window.PaginationSystem.get(tableId);
+          if (paginationInstance && typeof paginationInstance.setData === 'function') {
+            paginationInstance.setData(sortedData);
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableSorter.sortByChain: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
+      }
+
       const updateResult = safeUpdateFunction(sortedData);
       const finalize = () => {
         releaseUpdate();
@@ -580,6 +698,9 @@ class TableSorter {
 
     const config = this.registry.getConfig(tableType);
     if (!config) {
+      if (window.Logger) {
+        window.Logger.debug(`TableSorter.applyDefaultSort: Table "${tableType}" not registered`, { page: 'unified-table-system' });
+      }
       return null;
     }
 
@@ -591,6 +712,33 @@ class TableSorter {
 
     // Check if table has defaultSort configuration
     if (chain.length === 0) {
+      // If no default sort in config, try to get it from getDefaultSortChain
+      // This handles the case where _normalizeDefaultSort didn't find it during registration
+      // (e.g., if getDefaultSortChain wasn't available at registration time)
+      const resolver =
+        window.getDefaultSortChain ||
+        window.tableMappings && window.tableMappings.getDefaultSortChain;
+      if (typeof resolver === 'function') {
+        try {
+          const dynamicChain = resolver(tableType);
+          if (Array.isArray(dynamicChain) && dynamicChain.length > 0) {
+            // Found a chain, apply it
+            return this.sortByChain(tableType, dynamicChain, { saveState: true });
+          }
+        } catch (err) {
+          if (window.Logger) {
+            window.Logger.warn(`TableSorter.applyDefaultSort: Failed to get default sort chain for "${tableType}"`, err, { page: 'unified-table-system' });
+          }
+        }
+      }
+      
+      if (window.Logger) {
+        window.Logger.debug(`TableSorter.applyDefaultSort: No default sort chain for "${tableType}"`, { 
+          page: 'unified-table-system',
+          defaultSort: config.defaultSort,
+          hasGetDefaultSortChain: typeof (window.getDefaultSortChain || window.tableMappings?.getDefaultSortChain) === 'function'
+        });
+      }
       return null;
     }
 
@@ -712,8 +860,11 @@ const TYPE_GENERAL_VALUES = Object.freeze([
   'dividend',
   'fee',
   'interest',
+  'syep_interest',
   'bonus',
   'tax',
+  'currency_exchange_from',
+  'currency_exchange_to',
   'other_positive',
   'other_negative',
   'income',
@@ -1841,20 +1992,57 @@ class TableEventHandler {
       return;
     }
 
-    // חיפוש כל ה-sortable headers
-    const sortableHeaders = table.querySelectorAll('.sortable-header');
-    sortableHeaders.forEach((header, index) => {
-      // הסרת onclick handlers קיימים
-      header.removeAttribute('onclick');
+    // חיפוש כל ה-sortable headers (יכול להיות על ה-th או על כפתור בתוך ה-th)
+    // Note: We iterate through th elements to get proper column indices
+    const thElements = table.querySelectorAll('thead th');
+    thElements.forEach((th, thIndex) => {
+      // Find sortable header element (can be the th itself or a button inside it)
+      const sortableHeader = th.classList.contains('sortable-header') 
+        ? th 
+        : th.querySelector('.sortable-header');
+      
+      if (!sortableHeader) {
+        return; // No sortable header in this th
+      }
 
-      // הוספת event listener חדש
-      header.addEventListener('click', e => {
+      // Check if sortable header (or button inside th) already has data-onclick
+      // The data-onclick will be handled by EventHandlerManager
+      const buttonElement = sortableHeader.tagName === 'BUTTON' 
+        ? sortableHeader 
+        : (th.querySelector('button[data-onclick]') || sortableHeader.querySelector('button[data-onclick]'));
+      
+      const hasDataOnclick = (sortableHeader && sortableHeader.hasAttribute('data-onclick')) || 
+                             (buttonElement && buttonElement.hasAttribute('data-onclick'));
+      
+      if (hasDataOnclick) {
+        // Header already has data-onclick - let EventHandlerManager handle it
+        // Just remove any legacy onclick attributes
+        if (sortableHeader) sortableHeader.removeAttribute('onclick');
+        if (buttonElement) buttonElement.removeAttribute('onclick');
+        return; // Don't add our own event listener - data-onclick will handle it
+      }
+
+      // No data-onclick - set up sort handler using column index from th position
+      const columnIndex = thIndex;
+
+      // הסרת onclick handlers קיימים
+      if (sortableHeader) sortableHeader.removeAttribute('onclick');
+      if (buttonElement) buttonElement.removeAttribute('onclick');
+
+      // הוספת event listener חדש על האלמנט המתאים (th או button)
+      // Use buttonElement if it exists, otherwise use sortableHeader
+      const targetElement = buttonElement || sortableHeader;
+      if (!targetElement) return;
+
+      // Add event listener only if no data-onclick exists
+      // If data-onclick exists, EventHandlerManager will handle the click
+      targetElement.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
 
         // סידור לפי עמודה
         if (this.sorter) {
-          this.sorter.sort(tableType, index);
+          this.sorter.sort(tableType, columnIndex);
         }
       });
     });

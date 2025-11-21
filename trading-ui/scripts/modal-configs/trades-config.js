@@ -217,13 +217,61 @@ const tradesModalConfig = {
             multiple: true,
             includeEmpty: false,
             additionalClasses: ['tag-multi-select'],
-            rowClass: 'row',
-            colClass: 'col-12',
+            rowClass: 'row g-3 align-items-end',
+            colClass: 'col-md-4 col-12',
             attributes: {
                 'data-initial-value': '',
                 'data-tag-entity': 'trade'
             },
             description: 'בחר תגיות עבור טרייד זה לטובת סינון ואנליטיקה'
+        },
+        {
+            type: 'custom',
+            id: 'tradeConditionsControls',
+            rowClass: 'row g-3 align-items-end',
+            colClass: 'col-md-8 col-12',
+            html: `
+                <div class="conditions-control-wrapper d-flex flex-column gap-2" data-conditions-controls="trade">
+                    <div id="tradeConditionsSummary" class="conditions-summary-table" data-conditions-summary>
+                        <div class="text-muted small mb-0">
+                            תנאים פעילים יוצגו כאן לאחר שמירת הטרייד.
+                        </div>
+                    </div>
+                    <div class="text-muted small" data-conditions-disabled-hint>
+                        ניהול תנאים יהיה זמין לאחר שמירת הטרייד.
+                    </div>
+                    <div class="d-flex justify-content-end flex-wrap gap-2" dir="rtl">
+                        <button
+                            type="button"
+                            id="tradeEvaluateConditionsButton"
+                            data-button-type="REFRESH"
+                            data-variant="small"
+                            data-style="outline"
+                            data-classes=" btn-outline-secondary"
+                            data-icon="↻"
+                            data-text=""
+                            data-size="small"
+                            data-onclick="handleTradeEvaluateConditionsClick()"
+                            data-tooltip="בדיקת תנאים מול השוק"
+                            aria-label="בדיקת תנאים">
+                        </button>
+                        <button
+                            type="button"
+                            id="tradeOpenConditionsButton"
+                            data-button-type="ADD"
+                            data-variant="small"
+                            data-style="outline"
+                            data-classes=" btn-outline-primary"
+                            data-icon="➕"
+                            data-text=""
+                            data-size="small"
+                            data-onclick="handleTradeConditionsButtonClick()"
+                            data-tooltip="הוסף תנאי"
+                            aria-label="הוסף תנאי">
+                        </button>
+                    </div>
+                </div>
+            `
         },
         // שורה אחרונה: הערות (בשורה מלאה) - Rich Text Editor
         {

@@ -115,6 +115,7 @@ class Logger {
         'init-check': 'initialization',
         'cache-sync': 'cache',
         'entity-details': 'system',
+        'unified-crud-service': 'business',
         'trades': 'business',
         'executions': 'business',
         'alerts': 'business',

@@ -256,7 +256,7 @@ class ChartTheme {
                 this.dynamicColors.dangerColor || '#dc3545',
                 this.dynamicColors.infoColor || '#17a2b8',
                 this.dynamicColors.secondaryColor || '#6c757d',
-                this.dynamicColors.entityTradeColor || this.dynamicColors.primaryColor || '#007bff',
+                this.dynamicColors.entityTradeColor || this.dynamicColors.primaryColor || '#26baac',
                 this.dynamicColors.entityTradingAccountColor || this.dynamicColors.successColor || '#28a745'
             ];
         }
@@ -269,7 +269,7 @@ class ChartTheme {
             '#dc3545',  // אדום סכנה
             '#17a2b8',  // כחול מידע
             '#6c757d',  // אפור משני
-            '#007bff',  // כחול טריידים
+            '#26baac',  // טורקיז טריידים
             '#28a745'   // ירוק חשבונות
         ];
     }

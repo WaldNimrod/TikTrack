@@ -168,8 +168,9 @@ class FieldRendererService {
             }
         }
 
-        const dateObj = typeof window.toDateObject === 'function'
-            ? window.toDateObject(candidate)
+        // Use window.dateUtils.toDateObject (window.toDateObject doesn't exist)
+        const dateObj = (window.dateUtils && typeof window.dateUtils.toDateObject === 'function')
+            ? window.dateUtils.toDateObject(candidate)
             : (value instanceof Date ? value : new Date(value));
 
         if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) {
@@ -343,8 +344,12 @@ class FieldRendererService {
             'withdrawal': 'משיכה',
             'fee': 'עמלה',
             'dividend': 'דיבידנד',
+            'tax': 'מיסים',
+            'interest': 'ריבית',
             'transfer_in': 'העברה פנימה',
             'transfer_out': 'העברה החוצה',
+            'currency_exchange_from': 'המרת מט״ח - יציאה',
+            'currency_exchange_to': 'המרת מט״ח - כניסה',
             'other_positive': 'אחר חיובי',
             'other_negative': 'אחר שלילי',
             'opening_balance': 'יתרת פתיחה',
@@ -362,8 +367,21 @@ class FieldRendererService {
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
         } else {
-            const positiveTypes = new Set(['deposit', 'dividend', 'transfer_in', 'other_positive', 'opening_balance']);
-            const negativeTypes = new Set(['withdrawal', 'fee', 'transfer_out', 'other_negative']);
+            const positiveTypes = new Set([
+                'deposit',
+                'dividend',
+                'transfer_in',
+                'other_positive',
+                'opening_balance',
+                'currency_exchange_to'
+            ]);
+            const negativeTypes = new Set([
+                'withdrawal',
+                'fee',
+                'transfer_out',
+                'other_negative',
+                'currency_exchange_from'
+            ]);
             if (positiveTypes.has(typeLower)) {
                 colorClass = ' text-success';
             } else if (negativeTypes.has(typeLower)) {
@@ -372,6 +390,169 @@ class FieldRendererService {
         }
         
         return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${typeLower}">${typeHebrew}</span>`;
+    }
+
+    /**
+     * Render currency exchange badge
+     * @param {Object} meta - Exchange metadata
+     * @returns {string} badge HTML
+     */
+    static renderExchangeBadge(meta = {}) {
+        // Per requirement: do not render an exchange badge in the table (or anywhere)
+        return '';
+
+    }
+
+    /**
+     * Render stacked cards for currency exchange pair
+     * @param {Object} summary - Pair summary metadata
+     * @param {Object} options - Rendering options
+     * @param {number|string} options.currentId - Current cash flow ID (to highlight)
+     * @param {Function} options.renderAction - Callback to render action buttons per flow
+     * @returns {string} HTML string
+     */
+    static renderExchangePairCards(summary, options = {}) {
+        if (!summary) {
+            return '';
+        }
+
+        const currentId = options.currentId !== undefined && options.currentId !== null
+            ? Number(options.currentId)
+            : null;
+        const renderAction = typeof options.renderAction === 'function'
+            ? options.renderAction
+            : () => '';
+
+        const formatAmount = (value, symbol) => {
+            const numericValue = typeof value === 'number' ? value : parseFloat(value);
+            if (!Number.isFinite(numericValue)) {
+                return '<span class="text-muted">לא זמין</span>';
+            }
+            return this.renderAmount(numericValue, symbol || '', 2, true);
+        };
+
+        const formatDate = (raw) => {
+            if (!raw) {
+                return 'לא זמין';
+            }
+            try {
+                const date = new Date(raw);
+                if (Number.isNaN(date.getTime())) {
+                    return raw;
+                }
+                return date.toLocaleString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                return raw;
+            }
+        };
+
+        const renderCard = (flowData = {}, direction = 'from') => {
+            const isFrom = direction === 'from';
+            const title = isFrom ? 'צד שלילי - מטבע מקור' : 'צד חיובי - מטבע יעד';
+            const amountValue = flowData.raw_amount !== undefined
+                ? flowData.raw_amount
+                : (isFrom ? -(flowData.amount || 0) : (flowData.amount || 0));
+            const amountHtml = formatAmount(amountValue, flowData.currency_symbol);
+            const currencyHtml = this.renderCurrency(
+                flowData.currency_id,
+                flowData.currency_name,
+                flowData.currency_symbol || ''
+            );
+            const dateText = formatDate(flowData.date);
+            const actionHtml = renderAction(flowData, direction) || '';
+            const isCurrent = flowData.id !== undefined && currentId !== null && Number(flowData.id) === currentId;
+            const badgeHtml = flowData.id
+                ? `<span class="badge ${isCurrent ? 'bg-secondary' : 'bg-info'} ms-2">
+                        ${isCurrent ? 'רשומה נוכחית' : 'רשומה צמודה'}
+                   </span>`
+                : '';
+
+            return `
+                <div class="card exchange-pair-card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <div class="fw-bold">${title}${badgeHtml}</div>
+                            ${actionHtml}
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="text-muted small">סכום</div>
+                                ${amountHtml}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">מטבע</div>
+                                ${currencyHtml || '<span class="text-muted">לא זמין</span>'}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">תאריך</div>
+                                <span class="text-muted" dir="ltr">${dateText}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const fromCard = renderCard(summary.from, 'from');
+        const toCard = renderCard(summary.to, 'to');
+
+        const exchangeRateDisplay = Number.isFinite(summary.exchange_rate)
+            ? `<span dir="ltr">${summary.exchange_rate.toFixed(6)}</span>`
+            : '<span class="text-muted">לא זמין</span>';
+        const feeHtml = summary.fee_amount !== undefined
+            ? formatAmount(summary.fee_amount, summary.fee_currency_symbol)
+            : '<span class="text-muted">לא זמין</span>';
+        const netOutValue = summary.net_out_account_currency !== undefined
+            ? -Math.abs(Number(summary.net_out_account_currency) || 0)
+            : null;
+        const netInValue = summary.net_in_target_currency !== undefined
+            ? Math.abs(Number(summary.net_in_target_currency) || 0)
+            : null;
+        const netOutHtml = netOutValue !== null
+            ? formatAmount(netOutValue, summary.fee_currency_symbol)
+            : '<span class="text-muted">לא זמין</span>';
+        const netInHtml = netInValue !== null
+            ? formatAmount(netInValue, (summary.to && summary.to.currency_symbol) || '')
+            : '<span class="text-muted">לא זמין</span>';
+
+        const footer = `
+            <div class="card exchange-pair-summary">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <div class="text-muted small">שער המרה</div>
+                            ${exchangeRateDisplay}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small">עמלה</div>
+                            ${feeHtml}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small">נטו במטבע חשבון</div>
+                            ${netOutHtml}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-muted small">נטו במטבע יעד</div>
+                            ${netInHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return `
+            <div class="cash-flow-exchange-pair-cards">
+                ${fromCard}
+                ${toCard}
+                ${footer}
+            </div>
+        `;
     }
 
     /**
@@ -876,6 +1057,14 @@ class FieldRendererService {
             return '';
         }
 
+        // Use formatDateShort for consistent dd.mm format
+        if (typeof window.dateUtils?.formatDateShort === 'function') {
+            return window.dateUtils.formatDateShort(date);
+        }
+        if (typeof window.formatDateShort === 'function') {
+            return window.formatDateShort(date);
+        }
+
         let resolvedDate = null;
 
         try {
@@ -1134,10 +1323,28 @@ class FieldRendererService {
         }
 
         try {
+            // Fallback: use dateUtils functions for consistent formatting
+            if (typeof window.dateUtils?.formatDate === 'function') {
+                return window.dateUtils.formatDate(date, { includeTime });
+            }
+            if (typeof window.formatDate === 'function') {
+                return window.formatDate(date, includeTime);
+            }
+            // Last resort: manual formatting with European format
             const dateObj = new Date(date);
-            return includeTime
-                ? dateObj.toLocaleString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-                : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+            if (includeTime) {
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, '0');
+                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                return `${day}.${month}.${year} ${hours}:${minutes}`;
+            } else {
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                return `${day}.${month}.${year}`;
+            }
         } catch (error) {
             return isoCandidate || '-';
         }
@@ -1147,6 +1354,12 @@ class FieldRendererService {
      * Render short date dd.mm
      */
     static renderDateShort(date) {
+        if (typeof window.dateUtils?.formatDateShort === 'function') {
+            return window.dateUtils.formatDateShort(date);
+        }
+        if (typeof window.formatDateShort === 'function') {
+            return window.formatDateShort(date);
+        }
         return this._formatDateDdMm(date);
     }
 
@@ -1154,11 +1367,11 @@ class FieldRendererService {
      * רנדור תאריך ביצוע (שנה בשתי ספרות + שעה)
      * 
      * @param {string|Date} date - תאריך ביצוע
-     * @returns {string} - HTML עם תאריך ושעה בפורמט DD/MM/YY | HH:MM
+     * @returns {string} - HTML עם תאריך ושעה בפורמט dd.mm.YY HH:MM
      * 
      * @example
      * const html = FieldRendererService.renderExecutionDate('2024-01-15T14:30:00');
-     * // Output: '<span class="execution-date">15/01/24 | 14:30</span>'
+     * // Output: '<span class="execution-date">15.01.24 14:30</span>'
      */
     static renderExecutionDate(date) {
         if (!date && date !== 0) {
@@ -1189,18 +1402,23 @@ class FieldRendererService {
         }
 
         try {
+            // Use formatDateNormal for dd.mm.YY format with time
+            if (typeof window.dateUtils?.formatDateNormal === 'function') {
+                const formatted = window.dateUtils.formatDateNormal(date, { includeTime: true });
+                return `<span class="execution-date">${formatted}</span>`;
+            }
+            if (typeof window.formatDateNormal === 'function') {
+                const formatted = window.formatDateNormal(date, true);
+                return `<span class="execution-date">${formatted}</span>`;
+            }
+            // Fallback: manual formatting with European format
             const dateObj = new Date(date);
-            const dateStr = dateObj.toLocaleDateString('he-IL', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit'
-            });
-            const timeStr = dateObj.toLocaleTimeString('he-IL', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-            return `<span class="execution-date">${dateStr} | ${timeStr}</span>`;
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = String(dateObj.getFullYear()).slice(-2);
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+            return `<span class="execution-date">${day}.${month}.${year} ${hours}:${minutes}</span>`;
         } catch (error) {
             return isoCandidate || '-';
         }
@@ -1538,6 +1756,8 @@ window.FieldRendererService = FieldRendererService;
 
 // Shortcuts למתודות נפוצות
 window.renderStatus = (status, entityType) => FieldRendererService.renderStatus(status, entityType);
+window.renderExchangeBadge = (meta) => FieldRendererService.renderExchangeBadge(meta);
+window.renderExchangePairCards = (summary, options) => FieldRendererService.renderExchangePairCards(summary, options);
 window.renderSide = (side) => FieldRendererService.renderSide(side);
 window.renderNumericValue = (value, suffix, showPrefix) => FieldRendererService.renderNumericValue(value, suffix, showPrefix);
 window.renderNumericBadge = (value, suffix, showPrefix) => FieldRendererService.renderNumericBadge(value, suffix, showPrefix);

@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דשבורד נתונים חיצוניים - TikTrack</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    <!-- TikTrack Master Styles -->
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css?v=0da3519a_20251102_104906">
 </head>
 <body>
     <div class="background-wrapper">
@@ -17,8 +21,9 @@
                 <div class="top-section" data-section="top">
                     <div class="section-header">
                         <h2>🌐 דשבורד נתונים חיצוניים</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <button data-button-type="COPY" data-text="העתק לוג מפורט" data-onclick="ExternalDataDashboardActions.copyDetailedLog(event)" data-size="small" data-id="action-copy-log-header"></button>
+                            <button class="filter-toggle-btn" data-onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -106,7 +111,7 @@
                 <div class="content-section" id="status-overview-section">
                     <div class="section-header">
                         <h2>סטטוס מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('status-overview-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('status-overview-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -129,8 +134,8 @@
                                         <div class="small text-muted">סטטוס מפורט יוצג ברשימת הספקים.</div>
                                         <div class="mt-3 text-muted small">עדכון אחרון: <span id="alpha-last-update">טוען...</span></div>
                                     </div>
-                                </div>
-                            </div>
+                                        </div>
+                                        </div>
                             <div class="col-md-3">
                                 <div class="card h-100">
                                     <div class="card-body">
@@ -165,7 +170,7 @@
                 <div class="content-section" id="actions-section">
                     <div class="section-header">
                         <h2>פעולות מהירות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('actions-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('actions-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -191,6 +196,7 @@
                                     </div>
                                     <div class="card-body d-grid gap-2">
                                         <button data-button-type="MENU" data-text="ניקוי מטמון נתונים חיצוניים" data-onclick="ExternalDataDashboardActions.clearExternalCache(event)" data-id="action-clear-cache"></button>
+                                        <button data-button-type="RESET" data-text="איפוס מלא (מטמון + לוגים)" data-onclick="ExternalDataDashboardActions.resetExternalSystem(event)" data-id="action-reset-external-system"></button>
                                         <button data-button-type="MENU" data-text="אופטימיזציית מטמון נתונים חיצוניים" data-onclick="ExternalDataDashboardActions.optimizeExternalCache(event)" data-id="action-optimize-cache"></button>
                                         <button data-button-type="SAVE" data-text="שמירת הגדרות מטמון" data-onclick="ExternalDataDashboardActions.saveCacheSettings(event)" data-id="action-save-cache-settings"></button>
                                         <button data-button-type="CANCEL" data-text="איפוס הגדרות מטמון" data-onclick="ExternalDataDashboardActions.resetCacheSettings(event)" data-id="action-reset-cache-settings"></button>
@@ -233,9 +239,9 @@
                 <div class="content-section" id="providers-section">
                     <div class="section-header">
                         <h2>ספקי נתונים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('providers-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('providers-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
-                        </button>
+                                        </button>
                     </div>
                     <div class="section-body">
                         <div class="text-muted mb-3 small">
@@ -251,9 +257,9 @@
                 <div class="content-section" id="cache-section">
                     <div class="section-header">
                         <h2>ניהול מטמון נתונים חיצוניים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('cache-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('cache-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
-                        </button>
+                                        </button>
                     </div>
                     <div class="section-body">
                         <div class="row g-4">
@@ -310,7 +316,7 @@
                             <button data-button-type="REFRESH" data-text="רענון לוגים" data-onclick="ExternalDataDashboardActions.refreshLogs(event)" data-size="small" data-id="action-refresh-logs"></button>
                             <button data-button-type="DELETE" data-text="ניקוי לוגים" data-onclick="ExternalDataDashboardActions.clearLogs(event)" data-size="small" data-id="action-clear-logs"></button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('logs-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('logs-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -339,14 +345,14 @@
                         <h2>היסטוריית רענון קבוצתי</h2>
                         <div class="section-actions d-flex align-items-center gap-2">
                             <label class="form-label mb-0" for="group-limit">מספר רשומות:</label>
-                            <select id="group-limit" class="form-select form-select-sm" style="width: auto;">
+                            <select id="group-limit" class="form-select form-select-sm" class="w-auto">
                                 <option value="20">20</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
                             <button data-button-type="REFRESH" data-text="רענון היסטוריה" data-onclick="ExternalDataDashboardActions.refreshHistory(event)" data-size="small" data-id="action-refresh-history"></button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('history-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('history-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -361,7 +367,7 @@
                         <div class="section-actions">
                             <button data-button-type="REFRESH" data-text="רענון גרפים" data-onclick="ExternalDataDashboardActions.refreshPerformanceCharts(event)" data-size="small" data-id="action-refresh-charts"></button>
                         </div>
-                        <button class="filter-toggle-btn" onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" data-onclick="toggleSection('charts-section')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -414,59 +420,146 @@
             </div>
         </div>
     </div>
-
+    
     <!-- =============================================================== -->
+        <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
-    <!-- 📋 Loading Order: base → logs → external-data → charts → init-system -->
-    <!-- 📦 Packages: base, logs, external-data, charts, init-system -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Use PageTemplateGenerator.generateScriptTagsForPage() -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: external-data-dashboard | Generated: 2025-11-15T00:29:03.502Z -->
+    <!-- 📦 Packages: base, external-data, charts, logs, init-system -->
 
-    <!-- Base package -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script>
-    <script src="scripts/notification-system.js?v=1.0.0"></script>
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script>
-    <script src="scripts/ui-utils.js?v=1.0.0"></script>
-    <script src="scripts/warning-system.js?v=1.0.0"></script>
-    <script src="scripts/error-handlers.js?v=1.0.0"></script>
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script>
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
-    <script src="scripts/logger-service.js?v=1.0.0"></script>
-    <script src="scripts/header-system.js?v=1.0.0"></script>
-    <script src="scripts/page-utils.js?v=1.0.0"></script>
-    <script src="scripts/translation-utils.js?v=1.0.0"></script>
-    <script src="scripts/button-icons.js?v=1.0.0"></script>
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script>
-    <script src="scripts/button-system-init.js?v=1.0.0"></script>
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/5: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: מערכות ליבה חובה לכל עמוד -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 2.0.0 -->
 
-    <!-- Logs package -->
-    <script src="scripts/unified-log-api.js?v=1.0.0"></script>
-    <script src="scripts/unified-log-manager.js?v=1.0.0"></script>
-    <script src="scripts/unified-log-display.js?v=1.0.0"></script>
+    <!-- [1] Load Order: 1 -->
+    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- הגדרות API מרכזיות -->
+    <!-- [2] Load Order: 2 -->
+    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- ניהול favicon -->
+    <!-- [3] Load Order: 3 -->
+    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- מערכת התראות -->
+    <!-- [4] Load Order: 4 -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- מנהל סנכרון מטמון -->
+    <!-- [5] Load Order: 5 -->
+    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- כלי עזר UI -->
+    <!-- [6] Load Order: 6 -->
+    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- מערכת אזהרות -->
+    <!-- [7] Load Order: 7 -->
+    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- מערכת טיפול בשגיאות -->
+    <!-- [8] Load Order: 8 -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- מנהל מטמון מאוחד -->
+    <!-- [9] Load Order: 9 -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- שליטת ניקוי מטמון(Stage B-Lite) -->
+    <!-- [10] Load Order: 10 -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
+    <!-- [11] Load Order: 11 -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- שירות לוגים מתקדם -->
+    <!-- [12] Load Order: 12 -->
+    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- מערכת כותרת -->
+    <!-- [13] Load Order: 13 -->
+    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- מנהל מצב עמודים מאוחד -->
+    <!-- [14] Load Order: 14 -->
+    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- כלי עזר עמוד -->
+    <!-- [15] Load Order: 15 -->
+    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- תרגומים -->
+    <!-- [16] Load Order: 16 -->
+    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- מערכת איקונים וכפתורים -->
+    <!-- [17] Load Order: 17 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [18] Load Order: 18 -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- מערכת ניהול אירועים מרכזית -->
+    <!-- [19] Load Order: 19 -->
+    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
+    <!-- [20] Load Order: 20 -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
 
-    <!-- External data package -->
-    <script src="scripts/yahoo-finance-service.js?v=1.0.0"></script>
-    <script src="scripts/external-data-service.js?v=1.0.0"></script>
-    <script src="scripts/external-data-settings-service.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/5: EXTERNAL DATA PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 7 | Description: מערכות נתונים חיצוניים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- Charts package -->
-    <script src="scripts/charts/chart-theme.js?v=1.0.0"></script>
-    <script src="scripts/charts/chart-system.js?v=1.0.0"></script>
-    <script src="scripts/charts/chart-loader.js?v=1.0.0"></script>
-    <script src="scripts/charts/chart-export.js?v=1.0.0"></script>
-    <script src="scripts/charts/adapters/linter-adapter.js?v=1.0.0"></script>
-    <script src="scripts/charts/adapters/performance-adapter.js?v=1.0.0"></script>
-    <script src="scripts/charts/adapters/trades-adapter.js?v=1.0.0"></script>
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/yahoo-finance-service.js?v=1.0.0"></script> <!-- שירות Yahoo Finance -->
+    <!-- [22] Load Order: 22 -->
+    <script src="scripts/external-data-service.js?v=1.0.0"></script> <!-- שירות נתונים חיצוניים -->
+    <!-- [23] Load Order: 23 -->
+    <script src="scripts/external-data-settings-service.js?v=1.0.0"></script> <!-- הגדרות נתונים חיצוניים -->
 
-    <!-- Init system -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
-    <script src="scripts/init-system-check.js?v=1.0.0"></script>
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script>
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/5: CHARTS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 8 | Description: מערכות גרפים ותרשימים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
 
-    <!-- Page specific -->
-    <script src="scripts/external-data-dashboard.js?v=1.0.0"></script>
+    <!-- [24] Load Order: 24 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script> <!-- ספריית Chart.js (CDN) -->
+    <!-- [25] Load Order: 25 -->
+    <script src="scripts/charts/chart-theme.js?v=1.0.0"></script> <!-- ערכת גרפים -->
+    <!-- [26] Load Order: 26 -->
+    <script src="scripts/charts/chart-system.js?v=1.0.0"></script> <!-- מערכת גרפים -->
+    <!-- [27] Load Order: 27 -->
+    <script src="scripts/charts/chart-loader.js?v=1.0.0"></script> <!-- טוען גרפים -->
+    <!-- [28] Load Order: 28 -->
+    <script src="scripts/charts/chart-export.js?v=1.0.0"></script> <!-- ייצוא גרפים -->
+    <!-- [29] Load Order: 29 -->
+    <script src="scripts/charts/adapters/performance-adapter.js?v=1.0.0"></script> <!-- מתאם ביצועים -->
+    <!-- [30] Load Order: 30 -->
+    <script src="scripts/charts/adapters/trades-adapter.js?v=1.0.0"></script> <!-- מתאם עסקאות -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/5: LOGS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 9 | Description: מערכות לוגים -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [31] Load Order: 31 -->
+    <script src="scripts/unified-log-api.js?v=1.0.0"></script> <!-- API לוגים מאוחד -->
+    <!-- [32] Load Order: 32 -->
+    <script src="scripts/unified-log-manager.js?v=1.0.0"></script> <!-- מנהל לוגים מאוחד -->
+    <!-- [33] Load Order: 33 -->
+    <script src="scripts/unified-log-display.js?v=1.0.0"></script> <!-- תצוגת לוגים מאוחדת -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/5: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19 | Description: מערכות אתחול וניטור -->
+    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary -->
+    <!-- Critical: NO | Version: 2.0.0 -->
+
+    <!-- [34] Load Order: 34 -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- מנפסט חבילות -->
+    <!-- [35] Load Order: 35 -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- הגדרות אתחול עמודים -->
+    <!-- [36] Load Order: 36 -->
+    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- בדיקת מערכת איתחול -->
+    <!-- [37] Load Order: 37 -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
+    <!-- [38] Load Order: 38 -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- [39] Page-specific: external-data-dashboard -->
+    <script src="scripts/external-data-dashboard.js?v=1.0.0"></script> <!-- Page-specific script for external-data-dashboard -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 39 | Unique Scripts Loaded: 39 -->
+    <!-- 🔧 For maintenance: Use PageTemplateGenerator.generateScriptTagsForPage("external-data-dashboard") -->
+
+
+
 </body>
 </html>

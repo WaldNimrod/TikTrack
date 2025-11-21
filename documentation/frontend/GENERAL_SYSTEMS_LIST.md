@@ -12,6 +12,7 @@
 | Modal Manager V2 | `trading-ui/scripts/modal-manager-v2.js` | [MODAL_SYSTEM_V2.md](../02-ARCHITECTURE/FRONTEND/MODAL_SYSTEM_V2.md) | ניהול פתיחה, עריכה, מחיקה ותרחישי CRUD אחידים במודלים |
 | Modal Navigation System | `trading-ui/scripts/modal-navigation-manager.js` | [MODAL_NAVIGATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/MODAL_NAVIGATION_SYSTEM.md) | ניווט stack של מודלים, breadcrumb, backdrop מאוחד |
 | Conditions Dev Playbook | `documentation/04-FEATURES/CORE/conditions-system/CONDITIONS_SYSTEM_DEV_PLAYBOOK.md` | [CONDITIONS_SYSTEM_DEV_PLAYBOOK.md](../04-FEATURES/CORE/conditions-system/CONDITIONS_SYSTEM_DEV_PLAYBOOK.md) | מדריך מפתחים מלא למערכת התנאים – ארכיטקטורה, זרימות Modal, בדיקות, Plan→Trade→Alert |
+| Conditions Test Plan | `documentation/04-FEATURES/CORE/conditions-system/CONDITIONS_SYSTEM_TEST_PLAN.md` | [CONDITIONS_SYSTEM_TEST_PLAN.md](../04-FEATURES/CORE/conditions-system/CONDITIONS_SYSTEM_TEST_PLAN.md) | תוכנית בדיקות מלאה: CRUD, Evaluate (באלק/שורה), Auto Alerts, ירושה Plan→Trade, RTL, ביצועים |
 | UI Utilities & Section Toggle | `trading-ui/scripts/ui-utils.js` | [SECTION_TOGGLE_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/SECTION_TOGGLE_SYSTEM.md)<br>[JAVASCRIPT_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/JAVASCRIPT_ARCHITECTURE.md#ui-utilities) | פונקציות משותפות ל-Toggle, Refresh, טיפול בפעולות UI כלליות + כלי טעינת סקריפטים עצלה (`loadScriptOnce`, `loadScriptsOnce`) |
 | Page State Management | `trading-ui/scripts/page-utils.js` | [PAGE_STATE_MANAGEMENT_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/PAGE_STATE_MANAGEMENT_SYSTEM.md) | שמירת מצב עמוד, שחזור פילטרים וסקשנים, איפוס מצב |
 | Translation Utilities | `trading-ui/scripts/translation-utils.js` | [TRANSLATION_FUNCTIONS.md](../02-ARCHITECTURE/FRONTEND/TRANSLATION_FUNCTIONS.md) | טיפול במחרוזות, בחירת שפה ותמיכה ב-RTL |
@@ -20,6 +21,7 @@
 ### 🔵 מערכות CRUD ונתונים
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
+| **שירותי נתונים ייעודיים** | `trading-ui/scripts/services/*-data.js` | [DATA_SERVICES_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/DATA_SERVICES_DEVELOPER_GUIDE.md)<br>[DATA_SERVICES_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/DATA_SERVICES_ARCHITECTURE.md) | שירותי נתונים מאוחדים לכל ישות: trades-data.js, executions-data.js, cash-flows-data.js, notes-data.js, trading-accounts-data.js, data-import-data.js, research-data.js, preferences-data.js, alerts-data.js, tickers-data.js |
 | Data Collection Service | `trading-ui/scripts/services/data-collection-service.js` | [SERVICES_INTEGRATION_COMPLETION_REPORT.md](SERVICES_INTEGRATION_COMPLETION_REPORT.md) | איסוף/הצבת נתוני טפסים במפה אחידה והמרות טיפוס |
 | Dashboard Data Loader | `trading-ui/scripts/index.js` | [JAVASCRIPT_ARCHITECTURE.md](JAVASCRIPT_ARCHITECTURE.md#dashboard-loader-indexjs) | טעינת נתוני דשבורד אמיתיים + עיבוד מטבעות/סיכומים עם CacheTTLGuard |
 | Investment Calculation Service | `trading-ui/scripts/services/investment-calculation-service.js` | [INVESTMENT_CALCULATION_SERVICE.md](INVESTMENT_CALCULATION_SERVICE.md) | חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל |
@@ -57,7 +59,7 @@
 | --- | --- | --- | --- |
 | Cache Stage B-Lite (תצורה זמנית) | `trading-ui/scripts/unified-cache-manager.js`<br>`trading-ui/scripts/cache-clear-menu.js`<br>`trading-ui/scripts/cache-ttl-guard.js` | [CACHE_STAGE_B_LITE.md](../03-DEVELOPMENT/CACHE_STAGE_B_LITE.md) | שכבות Memory/LocalStorage/IndexedDB פעילות, מטמון שרת כבוי (`CACHE_DISABLED=true`), תפריט ניקוי מטמון אחיד, ניהול מפתחות פרופיל ועטיפת TTL לטעינת נתונים |
 | Unified Cache Manager | `trading-ui/scripts/unified-cache-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | בחירת שכבת מטמון (Memory/LocalStorage/IndexedDB/Backend) והחזרות TTL |
-| Cache Sync Manager | `trading-ui/scripts/cache-sync-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | סנכרון Frontend ↔ Backend, ניהול invalidation והפעלת reload חובה |
+| Cache Sync Manager | `trading-ui/scripts/cache-sync-manager.js` | [CACHE_SYNC_SPECIFICATION.md](../04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md) | סנכרון Frontend ↔ Backend, ניהול invalidation patterns, dependencies, והפעלת reload חובה. **שילוב מלא הושלם ב-9 עמודים מרכזיים (ינואר 2025)** |
 | Cache Policy Manager | `trading-ui/scripts/cache-policy-manager.js` | [CACHE_IMPLEMENTATION_GUIDE.md](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) | כלל אחיד למדיניות מטמון לפי סוג נתון ותוקף |
 | LocalStorage Events Sync | `trading-ui/scripts/modules/localstorage-sync.js` | [LOCALSTORAGE_EVENTS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LOCALSTORAGE_EVENTS_SYSTEM.md) | האזנה לאירועי שינוי אחסון ושמירת עקביות בין טאבים |
 
@@ -78,6 +80,6 @@
 ### ✅ סיכום
 - **סה״כ מערכות פעילות מתועדות:** 28 (לפי הטבלאות לעיל).
 - **חובת שימוש:** לפני כל פיתוח חדש יש לבדוק התאמה למערכת קיימת ולהשתמש בה דרך ה-API המתועד.
-- **עדכון אחרון:** 9 בנובמבר 2025 (בהתאם למיפוי מאותו היום).
+- **עדכון אחרון:** 27 בינואר 2025 (הוספת alerts-data.js, tickers-data.js, עדכון תיעוד שירותי נתונים).
 - **אחריות המשך:** כל מערכת חדשה שנכנסת לפרויקט חייבת להוסיף שורה בטבלה הרלוונטית + לינק לדוקומנטציה מעודכנת.
 

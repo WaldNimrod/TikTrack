@@ -167,8 +167,12 @@
                 entityId: context.entityId,
                 entityName: context.entityName || '',
                 parentModalId: context.parentModalId || null,
-                focusConditionId: context.focusConditionId ?? null
+                focusConditionId: context.focusConditionId ?? null,
+                layoutMode: context.layoutMode || null
             };
+            if (!this.context.layoutMode) {
+                this.context.layoutMode = 'form-only';
+            }
             this.parentModalId = this.context.parentModalId || null;
 
             if (!this.context.entityId) {
@@ -222,7 +226,8 @@
                             ? { modalId: this.parentModalId }
                             : null),
                     metadata: {
-                        parentModalId: this.parentModalId
+                        parentModalId: this.parentModalId,
+                        layoutMode: this.context.layoutMode
                     }
                 };
 
@@ -290,7 +295,8 @@
                 entityType: this.context.entityType,
                 entityId: this.context.entityId,
                 entityName: this.context.entityName,
-                containerId: 'conditionsManagerRoot'
+                containerId: 'conditionsManagerRoot',
+                layoutMode: this.context.layoutMode
             });
 
             if (this.context.focusConditionId && typeof this.managerInstance?.handleEditCondition === 'function') {

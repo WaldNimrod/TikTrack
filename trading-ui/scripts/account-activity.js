@@ -336,8 +336,26 @@ function populateAccountActivityTable(data) {
 
   // Sort by date (oldest first for balance calculation)
   allMovements.sort((a, b) => {
-    const dateA = a.date ? new Date(a.date) : new Date(0);
-    const dateB = b.date ? new Date(b.date) : new Date(0);
+    // Use dateUtils for consistent date parsing
+    let dateA, dateB;
+    if (a.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateA = window.dateUtils.toDateObject(a.date);
+      } else {
+        dateA = new Date(a.date);
+      }
+    } else {
+      dateA = new Date(0);
+    }
+    if (b.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateB = window.dateUtils.toDateObject(b.date);
+      } else {
+        dateB = new Date(b.date);
+      }
+    } else {
+      dateB = new Date(0);
+    }
     return dateA - dateB;
   });
 
@@ -359,8 +377,26 @@ function populateAccountActivityTable(data) {
 
   // Now sort newest first for display
   allMovements.sort((a, b) => {
-    const dateA = a.date ? new Date(a.date) : new Date(0);
-    const dateB = b.date ? new Date(b.date) : new Date(0);
+    // Use dateUtils for consistent date parsing
+    let dateA, dateB;
+    if (a.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateA = window.dateUtils.toDateObject(a.date);
+      } else {
+        dateA = new Date(a.date);
+      }
+    } else {
+      dateA = new Date(0);
+    }
+    if (b.date) {
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateB = window.dateUtils.toDateObject(b.date);
+      } else {
+        dateB = new Date(b.date);
+      }
+    } else {
+      dateB = new Date(0);
+    }
     return dateB - dateA;
   });
 
@@ -417,7 +453,25 @@ function renderMovementRow(movement, runningBalance) {
     if (movementDateEnvelope && window.dateUtils?.formatDate) {
       dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope);
     } else {
-      dateCell.textContent = movementDateValue ? new Date(movementDateValue).toLocaleDateString('he-IL') : '-';
+      // Use dateUtils for consistent date parsing
+      if (movementDateValue) {
+        let dateObj;
+        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+          dateObj = window.dateUtils.toDateObject(movementDateValue);
+        } else {
+          dateObj = new Date(movementDateValue);
+        }
+        // Use FieldRendererService or dateUtils for consistent date formatting
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          dateCell.textContent = window.FieldRendererService.renderDate(dateObj, false);
+        } else if (window.dateUtils?.formatDate) {
+          dateCell.textContent = window.dateUtils.formatDate(dateObj, { includeTime: false });
+        } else {
+          dateCell.textContent = dateObj.toLocaleDateString('he-IL');
+        }
+      } else {
+        dateCell.textContent = '-';
+      }
     }
   }
   row.appendChild(dateCell);
@@ -621,7 +675,13 @@ function updateActivitySummary(data) {
   if (tableTitleDateRange || summaryDateRange) {
     const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
     let startDate = null;
-    let endDate = new Date(); // Today
+    // Use dateUtils for consistent date handling
+    let endDate;
+    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+      endDate = window.dateUtils.getToday();
+    } else {
+      endDate = new Date(); // Today
+    }
 
     // Get account opening date for "כל זמן" case
     let accountOpeningDate = null;
@@ -706,7 +766,13 @@ function updateActivitySummary(data) {
     let dateRangeText = '';
     const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
     let startDate = null;
-    let endDate = new Date(); // Today
+    // Use dateUtils for consistent date handling
+    let endDate;
+    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+      endDate = window.dateUtils.getToday();
+    } else {
+      endDate = new Date(); // Today
+    }
 
     // Get account opening date for "כל זמן" case
     let accountOpeningDate = null;
@@ -905,8 +971,11 @@ function getSubtypeDisplay(subtype) {
     'fee': 'עמלה',
     'dividend': 'דיבידנד',
     'interest': 'ריבית',
+    'syep_interest': 'ריבית SYEP',
     'transfer_in': 'העברה פנימה',
     'transfer_out': 'העברה החוצה',
+    'currency_exchange_from': 'המרת מט״ח - יציאה',
+    'currency_exchange_to': 'המרת מט״ח - כניסה',
     'other_positive': 'אחר חיובי',
     'other_negative': 'אחר שלילי',
     'opening_balance': 'יתרת פתיחה',
@@ -952,19 +1021,26 @@ function normalizeAmountBySubtype(amount, type, subtype) {
     // Always positive (money coming in)
     if (subTypeValue === 'dividend' || subTypeValue === 'דיבידנד' ||
             subTypeValue === 'transfer_in' || subTypeValue === 'העברה פנימה' ||
-            subTypeValue === 'other_positive' || subTypeValue === 'אחר חיובי') {
+            subTypeValue === 'other_positive' || subTypeValue === 'אחר חיובי' ||
+            subTypeValue === 'currency_exchange_to') {
       return Math.abs(amountNum);
     }
 
     // Always negative (money going out)
     if (subTypeValue === 'fee' || subTypeValue === 'עמלה' ||
             subTypeValue === 'transfer_out' || subTypeValue === 'העברה החוצה' ||
-            subTypeValue === 'other_negative' || subTypeValue === 'אחר שלילי') {
+            subTypeValue === 'other_negative' || subTypeValue === 'אחר שלילי' ||
+            subTypeValue === 'currency_exchange_from') {
       return -Math.abs(amountNum);
     }
 
     // Interest can be positive or negative - keep original sign
-    if (subTypeValue === 'interest' || subTypeValue === 'ריבית') {
+    if (
+      subTypeValue === 'interest' ||
+      subTypeValue === 'syep_interest' ||
+      subTypeValue === 'ריבית' ||
+      subTypeValue === 'ריבית syep'
+    ) {
       return amountNum; // Keep original sign (can be positive or negative)
     }
 
@@ -1465,7 +1541,7 @@ function combineStatistics(cashFlowsStats, executionsStats) {
 /**
  * Split cash flows statistics by column
  * Column 1: deposits_withdrawals, fee, dividend
- * Column 2: interest, transfer, other
+ * Column 2: interest/SYEP interest, transfer, other
  * @param {Object} stats - Full cash flows statistics
  * @param {number} column - Column number (1 or 2)
  * @returns {Object} Filtered statistics object for the column
@@ -1476,7 +1552,7 @@ function splitCashFlowsByColumn(stats, column) {
   }
 
   const column1Subtypes = ['deposits_withdrawals', 'fee', 'dividend'];
-  const column2Subtypes = ['transfer', 'interest', 'other'];
+  const column2Subtypes = ['transfer', 'interest', 'syep_interest', 'other'];
 
   const targetSubtypes = column === 1 ? column1Subtypes : column2Subtypes;
 
@@ -2207,10 +2283,22 @@ function renderBreakdownBySubtype(stats, typeName, column) {
     // 2. fee (עמלה)
     // 3. dividend (דיבידנד)
     // 4. transfer (העברה)
-    // 5. interest (ריבית)
+    // 5. interest (ריבית) + syep_interest
     // 6. other (אחר)
     // For executions: keep alphabetical order (buy/sell)
-    const subtypeOrder = ['deposits_withdrawals', 'fee', 'dividend', 'transfer_in', 'transfer_out', 'interest', 'other_positive', 'other_negative'];
+    const subtypeOrder = [
+        'deposits_withdrawals',
+        'fee',
+        'dividend',
+        'transfer_in',
+        'transfer_out',
+        'currency_exchange_from',
+        'currency_exchange_to',
+        'interest',
+        'syep_interest',
+        'other_positive',
+        'other_negative'
+    ];
     const subtypes = Object.keys(stats.bySubtype).sort((a, b) => {
       if (isExecution) {
         // For executions: alphabetical order

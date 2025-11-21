@@ -537,10 +537,17 @@ class SMCacheSection extends SMBaseSection {
    * קבלת צבע hit rate
    */
   getHitRateColor(hitRate) {
-    if (hitRate >= 80) return '#28a745'; // Green
-    if (hitRate >= 60) return '#ffc107'; // Yellow
-    if (hitRate >= 40) return '#fd7e14'; // Orange
-    return '#dc3545'; // Red
+    const semanticColors = window.SMUIColorUtils || null;
+    if (hitRate >= 80) {
+      return semanticColors?.get('success', '#28a745') || '#28a745';
+    }
+    if (hitRate >= 60) {
+      return semanticColors?.get('warning', '#ffc107') || '#ffc107';
+    }
+    if (hitRate >= 40) {
+      return semanticColors?.getCSSVariableValue?.('--entity-cash_flow-color', '#fd7e14') || '#fd7e14';
+    }
+    return semanticColors?.get('danger', '#dc3545') || '#dc3545';
   }
 
   /**
@@ -576,10 +583,13 @@ class SMCacheSection extends SMBaseSection {
    * קבלת צבע פס התקדמות
    */
   getProgressColor(percent) {
-    if (percent >= 90) return '#dc3545'; // Red
-    if (percent >= 75) return '#ffc107'; // Yellow
-    if (percent >= 50) return '#17a2b8'; // Blue
-    return '#28a745'; // Green
+    if (window.SMUIComponents && typeof window.SMUIComponents.getProgressColor === 'function') {
+      return window.SMUIComponents.getProgressColor(percent);
+    }
+    if (percent >= 90) return 'var(--color-danger, #dc3545)';
+    if (percent >= 75) return 'var(--color-warning, #ffc107)';
+    if (percent >= 50) return 'var(--color-info, #17a2b8)';
+    return 'var(--color-success, #28a745)';
   }
 
   /**

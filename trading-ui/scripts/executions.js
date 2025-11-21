@@ -32,7 +32,7 @@
  * - addNewTrade() - * הוספת טיקר חדש
  * - updateExecutionsSummary() - * הוספת תכנון חדש
  * - calculateAddExecutionValues() - calculateAddExecutionValues function
- * - updateExecutionsTableForTradeModal() - * טעינת עסקאות לטרייד
+ * - updateExecutionsTableForTradeModal() - * טעינת ביצועים לטרייד
  * - addEditBuySell() - addEditBuySell function
  * - updateExecutionsGlobalData() - updateExecutionsGlobalData function
  * - updateTickersSummaryTable() - updateTickersSummaryTable function
@@ -101,7 +101,7 @@
  * Last Updated: 2025-01-27
  */
 
-// ===== קובץ JavaScript לדף עסקעות =====
+// ===== קובץ JavaScript לדף ביצועים =====
 
 // ===== EXECUTION MANAGEMENT FUNCTIONS =====
 // CRUD operations for executions
@@ -163,9 +163,14 @@ async function addExecution() {
  */
 
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
-window.loadExecutionsData = window.loadExecutionsData || function() {
-  // loadExecutionsData not yet defined, using placeholder
-};
+// Note: The actual function will be assigned later (line 2930)
+// This placeholder is only set if it doesn't already exist
+if (!window.loadExecutionsData) {
+  window.loadExecutionsData = function() {
+    window.Logger?.warn?.('⚠️ loadExecutionsData called before initialization', { page: "executions" });
+    return Promise.resolve([]);
+  };
+}
 
 // משתנים גלובליים
 if (!window.executionsData) {
@@ -225,24 +230,49 @@ async function editExecution(id) {
  */
 /**
  * עדכון שדה Realized P/L לפי סוג הפעולה
+ * ModalManagerV2 uses field.id directly from config (executionType, not addExecutionType/editExecutionType)
+ * 
+ * Realized P/L נדרש רק ל:
+ * - sell (מכירה) - סגירת פוזיציה long
+ * - cover (כיסוי) - סגירת פוזיציה short
+ * 
+ * Realized P/L לא נדרש ל:
+ * - buy (קנייה) - פתיחת פוזיציה long
+ * - short (מכירה בחסר) - פתיחת פוזיציה short
  */
-function updateRealizedPLField(mode = 'add') {
-  const actionSelect = document.getElementById(mode === 'add' ? 'addExecutionType' : 'editExecutionType');
+function updateRealizedPLField() {
+  // ModalManagerV2 uses the field id directly from config - no prefix
+  const actionSelect = document.getElementById('executionType');
   const realizedPLField = document.getElementById('executionRealizedPL');
   
   if (!actionSelect || !realizedPLField) {
+    window.Logger?.debug('⚠️ updateRealizedPLField: Field not found', {
+      actionSelect: !!actionSelect,
+      realizedPLField: !!realizedPLField,
+      page: 'executions'
+    });
     return;
   }
   
   const actionType = actionSelect.value;
   
-  if (actionType === 'buy') {
+  // Enable Realized P/L only for sell and cover (closing positions)
+  if (actionType === 'sell' || actionType === 'cover') {
+    realizedPLField.disabled = false;
+    realizedPLField.required = true;
+    window.Logger?.debug('✅ updateRealizedPLField: Enabled Realized P/L', {
+      actionType,
+      page: 'executions'
+    });
+  } else {
+    // Disable Realized P/L for buy, short, and any unknown types (opening positions)
     realizedPLField.disabled = true;
     realizedPLField.required = false;
     realizedPLField.value = '';
-  } else if (actionType === 'sell' || actionType === 'sale') {
-    realizedPLField.disabled = false;
-    realizedPLField.required = true;
+    window.Logger?.debug('✅ updateRealizedPLField: Disabled Realized P/L', {
+      actionType,
+      page: 'executions'
+    });
   }
 }
 
@@ -372,11 +402,13 @@ async function saveExecution() {
             hasErrors = true;
         }
         
-        // Validate realized_pl for sell actions
-        if (executionData.action === 'sell' || executionData.action === 'sale' || executionData.action === 'cover') {
+        // Validate realized_pl for sell and cover actions (closing positions only)
+        // Realized P/L is required only for sell (closing long position) and cover (closing short position)
+        if (executionData.action === 'sell' || executionData.action === 'cover') {
             if (executionData.realized_pl === null || executionData.realized_pl === undefined) {
                 if (window.showValidationWarning) {
-                    window.showValidationWarning('executionRealizedPL', 'Realized P/L חובה במכירה');
+                    const actionLabel = executionData.action === 'sell' ? 'מכירה' : 'כיסוי';
+                    window.showValidationWarning('executionRealizedPL', `Realized P/L חובה ב-${actionLabel}`);
                 }
                 hasErrors = true;
             }
@@ -394,14 +426,22 @@ async function saveExecution() {
         const url = isEdit ? `/api/executions/${executionId}` : '/api/executions';
         const method = isEdit ? 'PUT' : 'POST';
         
-        // Send to API
-        const response = await fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(executionData)
-        });
+        // Send to API using ExecutionsData service if available
+        let response;
+        if (isEdit && typeof window.ExecutionsData?.updateExecution === 'function') {
+            response = await window.ExecutionsData.updateExecution(executionId, executionData);
+        } else if (!isEdit && typeof window.ExecutionsData?.createExecution === 'function') {
+            response = await window.ExecutionsData.createExecution(executionData);
+        } else {
+            // Fallback to direct fetch
+            response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(executionData)
+            });
+        }
         
         // Use CRUDResponseHandler for consistent response handling
         let crudResult;
@@ -480,7 +520,9 @@ window.updateExecution = updateExecution;
 // Use viewLinkedItemsForExecution from linked-items.js instead
 
 /**
- * הצגת הפריטים המקושרים
+ * Display linked items for execution
+ * @param {Object} linkedItems - Object containing linked items (trades, plans, alerts, notes)
+ * @returns {void}
  */
 function displayLinkedItems(linkedItems) {
   try {
@@ -667,7 +709,9 @@ function displayLinkedItems(linkedItems) {
 // REMOVED: displayLinkedItems(executionId) - duplicate function (there's another displayLinkedItems(linkedItems) that's used)
 
 /**
- * מעבר לטרייד ספציפי
+ * Navigate to specific trade page
+ * @param {number|string} tradeId - Trade ID
+ * @returns {void}
  */
 function goToTrade(tradeId) {
   try {
@@ -681,7 +725,9 @@ function goToTrade(tradeId) {
 }
 
 /**
- * מעבר לתכנון ספציפי
+ * Navigate to specific trade plan page
+ * @param {number|string} planId - Trade plan ID
+ * @returns {void}
  */
 function goToPlan(planId) {
   try {
@@ -695,7 +741,9 @@ function goToPlan(planId) {
 }
 
 /**
- * מעבר להתראה ספציפית
+ * Navigate to specific alert page
+ * @param {number|string} alertId - Alert ID
+ * @returns {void}
  */
 function goToAlert(alertId) {
   try {
@@ -709,7 +757,9 @@ function goToAlert(alertId) {
 }
 
 /**
- * מעבר להערה ספציפית
+ * Navigate to specific note page
+ * @param {number|string} noteId - Note ID
+ * @returns {void}
  */
 function goToNote(noteId) {
   try {
@@ -747,8 +797,15 @@ async function loadExecutionsData(options = {}) {
 
     let rawExecutions;
     if (typeof window.ExecutionsData?.loadExecutionsData === 'function') {
+      window.Logger.debug('📦 Using ExecutionsData service', { page: "executions" });
       rawExecutions = await window.ExecutionsData.loadExecutionsData({ force, ttl });
+      window.Logger.debug('📦 ExecutionsData returned', { 
+        count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
+        type: typeof rawExecutions,
+        page: "executions" 
+      });
     } else {
+      window.Logger.warn('⚠️ ExecutionsData service not available, using direct fetch', { page: "executions" });
       const base = window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/executions/?_t=${Date.now()}`, {
         method: 'GET',
@@ -765,6 +822,10 @@ async function loadExecutionsData(options = {}) {
 
       const data = await response.json();
       rawExecutions = data?.data || data;
+      window.Logger.debug('📦 Direct fetch returned', { 
+        count: Array.isArray(rawExecutions) ? rawExecutions.length : 0,
+        page: "executions" 
+      });
     }
 
     executionsData = Array.isArray(rawExecutions)
@@ -774,6 +835,11 @@ async function loadExecutionsData(options = {}) {
         }))
       : [];
     window.executionsData = executionsData; // עדכון הנתונים הגלובליים
+    
+    window.Logger.info('✅ Executions data loaded', { 
+      count: executionsData.length,
+      page: "executions" 
+    });
 
     if (window.headerSystem && window.headerSystem.currentFilters) {
       const filters = window.headerSystem.currentFilters;
@@ -800,6 +866,10 @@ async function loadExecutionsData(options = {}) {
       }
     }
 
+    window.Logger.debug('🔄 Syncing executions pagination', { 
+      count: executionsData.length,
+      page: "executions" 
+    });
     syncExecutionsPagination(executionsData);
 
     if (typeof window.registerExecutionsTables === 'function') {
@@ -807,23 +877,39 @@ async function loadExecutionsData(options = {}) {
     }
 
     await restorePageState('executions');
+    
+    window.Logger.info('✅ Executions table updated', { 
+      count: executionsData.length,
+      page: "executions" 
+    });
   } catch (error) {
-    handleApiError(error, 'עסקעות');
+    handleApiError(error, 'ביצועים');
   }
 }
 
 /**
- * Synchronize executions pagination with dataset
- * @param {Array} executionsData
+ * Sync executions pagination with data
+ * @param {Array} executionsData - Executions data array
+ * @returns {void}
  */
 function syncExecutionsPagination(executionsData) {
   try {
     const tableId = 'executionsTable';
     const tableType = 'executions';
+    
+    window.Logger.debug('🔄 syncExecutionsPagination called', { 
+      count: Array.isArray(executionsData) ? executionsData.length : 0,
+      tableId,
+      tableType,
+      page: "executions" 
+    });
 
     if (window.setTableData) {
       window.setTableData(tableType, executionsData, { tableId });
       window.setFilteredTableData(tableType, executionsData, { tableId, skipPageReset: true });
+      window.Logger.debug('✅ setTableData called', { page: "executions" });
+    } else {
+      window.Logger.warn('⚠️ setTableData not available', { page: "executions" });
     }
 
     const paginationInstance = window.ensureTablePagination
@@ -832,19 +918,26 @@ function syncExecutionsPagination(executionsData) {
 
     if (paginationInstance) {
       paginationInstance.setData(executionsData);
+      window.Logger.debug('✅ Pagination instance setData called', { page: "executions" });
     } else {
+      window.Logger.debug('⚠️ No pagination instance, using updateExecutionsTableMain', { page: "executions" });
       updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
       updateExecutionsSummary(executionsData);
       updateExecutionsCounters(executionsData?.length || 0);
     }
   } catch (error) {
-    window.Logger?.error('syncExecutionsPagination failed', { error });
+    window.Logger?.error('❌ syncExecutionsPagination failed', { error: error?.message, page: "executions" });
     updateExecutionsTableMain(executionsData, { skipCounters: true, skipSummary: true, internal: true });
     updateExecutionsSummary(executionsData);
     updateExecutionsCounters(executionsData?.length || 0);
   }
 }
 
+/**
+ * Set filtered executions dataset and update table
+ * @param {Array} filteredExecutions - Filtered executions array
+ * @returns {void}
+ */
 function setExecutionsFilteredDataset(filteredExecutions) {
   try {
     const tableId = 'executionsTable';
@@ -873,6 +966,10 @@ function setExecutionsFilteredDataset(filteredExecutions) {
   }
 }
 
+/**
+ * Get pagination options for executions table
+ * @returns {Object} Pagination options object
+ */
 function getExecutionsPaginationOptions() {
   return {
     tableType: 'executions',
@@ -881,6 +978,13 @@ function getExecutionsPaginationOptions() {
   };
 }
 
+/**
+ * Handle executions page render event
+ * @param {Object} params - Render parameters
+ * @param {Array} params.pageData - Page data array
+ * @param {Object} params.pagination - Pagination info
+ * @returns {void}
+ */
 function handleExecutionsPageRender({ pageData, pagination }) {
   updateExecutionsTableMain(pageData, { skipCounters: true, skipSummary: true, internal: true });
   if (window.setPageTableData) {
@@ -892,16 +996,32 @@ function handleExecutionsPageRender({ pageData, pagination }) {
   updateExecutionsCounters();
 }
 
+/**
+ * Handle executions filtered data change event
+ * @param {Object} params - Filter parameters
+ * @param {Array} params.filteredData - Filtered data array
+ * @returns {void}
+ */
 function handleExecutionsFilteredChange({ filteredData }) {
   updateExecutionsSummary(filteredData);
   updateExecutionsCounters(filteredData?.length || 0);
 }
 
+/**
+ * Apply filtered executions data
+ * @param {Array} data - Filtered executions data
+ * @returns {void}
+ */
 function applyExecutionsFilteredData(data) {
   filteredExecutions = Array.isArray(data) ? data : [];
   setExecutionsFilteredDataset(filteredExecutions);
 }
 
+/**
+ * Update executions summary statistics
+ * @param {Array|null} [filteredDataOverride=null] - Optional filtered data override
+ * @returns {void}
+ */
 function updateExecutionsSummary(filteredDataOverride = null) {
   try {
     const filteredData = filteredDataOverride
@@ -929,31 +1049,42 @@ function updateExecutionsSummary(filteredDataOverride = null) {
   }
 }
 
+/**
+ * Update executions counter display
+ * @param {number|null} [filteredCountOverride=null] - Optional filtered count override
+ * @returns {void}
+ */
 function updateExecutionsCounters(filteredCountOverride = null) {
   try {
-    const countElement = document.querySelector('.table-count');
-    if (!countElement) {
-      return;
-    }
-
-    let filteredCount = filteredCountOverride;
-    if (filteredCount === null || typeof filteredCount === 'undefined') {
-      if (window.getTableDataCounts) {
-        const counts = window.getTableDataCounts('executions');
-        filteredCount = counts.filtered;
-      } else {
-        filteredCount = window.executionsData?.length || 0;
+    // Use generic updateTableCount function
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'executions', 'ביצועים', filteredCountOverride);
+    } else {
+      // Fallback to old implementation
+      const countElement = document.querySelector('.table-count');
+      if (!countElement) {
+        return;
       }
-    }
 
-    countElement.textContent = `${filteredCount} עסקעות`;
+      let filteredCount = filteredCountOverride;
+      if (filteredCount === null || typeof filteredCount === 'undefined') {
+        if (window.getTableDataCounts) {
+          const counts = window.getTableDataCounts('executions');
+          filteredCount = counts.filtered;
+        } else {
+          filteredCount = window.executionsData?.length || 0;
+        }
+      }
+
+      countElement.textContent = `${filteredCount} ביצועים`;
+    }
   } catch (error) {
     window.Logger?.warn('updateExecutionsCounters failed', { error });
   }
 }
 
 /**
- * עדכון טבלת עסקעות
+ * עדכון טבלת ביצועים
  */
 async function updateExecutionsTableMain(executions, options = {}) {
   if (!options.internal) {
@@ -984,7 +1115,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     .filter(id => !existingExecutionIds.has(id));
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו ביצועים</td></tr>';
     return;
   }
 
@@ -1005,27 +1136,20 @@ async function updateExecutionsTableMain(executions, options = {}) {
   let tickers = [];
 
   try {
-    const [tradesResponse, tickersResponse] = await Promise.all([
-      fetch('/api/trades/').then(r => {
-        if (r.ok) {
-          return r.json();
-        } else {
-          // // window.Logger.warn('⚠️ Trades API returned error:', r.status, { page: "executions" });
-          return { data: [] };
-        }
-      }).catch(() => ({ data: [] })),
-      fetch('/api/tickers/').then(r => {
-        if (r.ok) {
-          return r.json();
-        } else {
-          // // window.Logger.warn('⚠️ Tickers API returned error:', r.status, { page: "executions" });
-          return { data: [] };
-        }
-      }).catch(() => ({ data: [] })),
+    // Use entity services instead of direct fetch calls
+    const [tradesData, tickersData] = await Promise.all([
+      (window.TradesData && typeof window.TradesData.loadTradesData === 'function')
+        ? window.TradesData.loadTradesData().catch(() => [])
+        : Promise.resolve([]),
+      (window.tickerService && typeof window.tickerService.getTickers === 'function')
+        ? window.tickerService.getTickers().catch(() => [])
+        : (window.getTickers && typeof window.getTickers === 'function')
+          ? window.getTickers().catch(() => [])
+          : Promise.resolve([]),
     ]);
 
-    trades = tradesResponse.data || [];
-    tickers = tickersResponse.data || [];
+    trades = Array.isArray(tradesData) ? tradesData : [];
+    tickers = Array.isArray(tickersData) ? tickersData : [];
 
     // וידוא שהנתונים הם מערכים
     if (!Array.isArray(trades)) {
@@ -1076,7 +1200,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
 
     if (trade) {
       // מידע על הטרייד: תאריך פתיחה | צד | סוג
-      const openDate = trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
+      const openDate = trade.created_at ? (window.formatDate ? window.formatDate(trade.created_at) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(trade.created_at) : 'לא מוגדר')) : 'לא מוגדר';
       const side = trade.side || 'לא מוגדר';
       const type = trade.investment_type || 'לא מוגדר';
 
@@ -1096,7 +1220,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
     // Trade column - show trade ID with link button if exists
     const tradeCell = execution.trade_id 
       ? `<div class="table-cell-flex-small">
-           <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" title="פתח פרטי טרייד"></button>
+           <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" data-onclick="if(window.showEntityDetails) { window.showEntityDetails('trade', ${execution.trade_id}, { mode: 'view' }); } else if(window.showEntityDetailsModal) { window.showEntityDetailsModal('trade', ${execution.trade_id}, 'view'); }" title="פתח פרטי טרייד"></button>
            <span>#${execution.trade_id}</span>
          </div>`
       : '-';
@@ -1109,7 +1233,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 <td class="ticker-cell">
                     <div class="table-cell-flex">
                         <strong class="table-link-positive" 
-                          onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                          data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                           title="פתח פרטי סימבול">${symbol}</strong>
                     </div>
                 </td>
@@ -1120,7 +1244,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                       </span>`}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
-                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
+                  data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
                   title="פתח פרטי חשבון מסחר">${accountName}</td>
                 <td>${window.renderShares ? window.renderShares(execution.quantity) : execution.quantity}</td>
                 <td>${window.formatPrice ? window.formatPrice(execution.price) : (execution.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-')}</td>
@@ -1139,29 +1263,116 @@ async function updateExecutionsTableMain(executions, options = {}) {
                         '-'}
                 </td>
                 <td data-date="${execution.execution_date?.utc || execution.execution_date || execution.date || ''}">
-                    ${window.renderExecutionDate ? window.renderExecutionDate(execution.execution_date || execution.date) : window.renderDate ? window.renderDate(execution.execution_date || execution.date, true) : ((execution.execution_date || execution.date) ? new Date(execution.execution_date || execution.date).toLocaleDateString('he-IL') : '-')}
+                    ${window.renderExecutionDate ? window.renderExecutionDate(execution.execution_date || execution.date) : window.renderDate ? window.renderDate(execution.execution_date || execution.date, true) : ((execution.execution_date || execution.date) ? (window.formatDate ? window.formatDate(execution.execution_date || execution.date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(execution.execution_date || execution.date, { includeTime: true }) : '-')) : '-')}
                 </td>
                 <td class="numeric-ltr" dir="ltr">${execution.source || '-'}</td>
                 ${(() => {
-                  if (typeof window.renderUpdatedCell === 'function') {
-                    return window.renderUpdatedCell(execution, {
-                      fields: ['updated_at', 'execution_date', 'date', 'created_at'],
-                      columnClass: 'col-updated'
-                    });
-                  }
-                  const fallbackDate = window.toDateObject
-                    ? window.toDateObject(execution.updated_at || execution.execution_date || execution.date || execution.created_at)
-                    : (execution.updated_at || execution.execution_date || execution.date || execution.created_at
-                        ? new Date(execution.updated_at || execution.execution_date || execution.date || execution.created_at)
-                        : null);
-                  if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+                  // Prefer FieldRendererService.renderDate for consistent date formatting
+                  const rawDate = execution.updated_at || execution.execution_date || execution.date || execution.created_at || null;
+                  
+                  if (!rawDate) {
                     return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
                   }
-                  const absolute = fallbackDate.toLocaleString('he-IL');
-                  const duration = typeof window.getDurationSince === 'function'
-                    ? window.getDurationSince(fallbackDate, { fallback: absolute })
-                    : absolute;
-                  return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+                  // Use FieldRendererService.renderDate for proper date formatting
+                  let dateDisplay = '';
+                  let epoch = null;
+
+                  if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                    // Use FieldRendererService to render date with time
+                    dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                    
+                    // Get epoch for sorting
+                    if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                      const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                      epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                    } else if (rawDate instanceof Date) {
+                      epoch = rawDate.getTime();
+                    } else if (typeof rawDate === 'string') {
+                      const parsed = Date.parse(rawDate);
+                      epoch = Number.isNaN(parsed) ? null : parsed;
+                    } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                      epoch = rawDate.epochMs;
+                    }
+                  } else {
+                    // Fallback: work directly with date envelope objects or raw values
+                    const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                      ? window.dateUtils.ensureDateEnvelope(rawDate)
+                      : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                        ? rawDate
+                        : null;
+
+                    // Derive epoch milliseconds in a canonical way
+                    epoch = (() => {
+                      if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                        return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                      }
+                      if (typeof window.getEpochMilliseconds === 'function') {
+                        return window.getEpochMilliseconds(envelope || rawDate);
+                      }
+                      if (envelope && typeof envelope.epochMs === 'number') {
+                        return envelope.epochMs;
+                      }
+                      if (rawDate instanceof Date) {
+                        return rawDate.getTime();
+                      }
+                      if (typeof rawDate === 'string') {
+                        const parsed = Date.parse(rawDate);
+                        return Number.isNaN(parsed) ? null : parsed;
+                      }
+                      return null;
+                    })();
+
+                    if (epoch === null || Number.isNaN(epoch)) {
+                      return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                    }
+
+                    // Build date display using unified date utilities
+                    dateDisplay = (() => {
+                      if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                        return window.dateUtils.formatDateTime(envelope || rawDate);
+                      }
+                      if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                        return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                      }
+                      try {
+                        // Use dateUtils to convert epoch to Date object
+                        let dateObj;
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject({ epochMs: epoch });
+                        } else {
+                          dateObj = new Date(epoch);
+                        }
+                        // Use FieldRendererService or dateUtils for consistent date formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(dateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(dateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(dateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
+                        return dateObj.toLocaleString('he-IL', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      } catch (err) {
+                        window.Logger?.warn('⚠️ executions updated-cell date formatting failed', { err, executionId: execution?.id }, { page: 'executions' });
+                        return 'לא מוגדר';
+                      }
+                    })();
+                  }
+
+                  if (!dateDisplay || dateDisplay === '-') {
+                    return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                  }
+
+                  return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
                 })()}
                 <td class="actions-cell">
                     <div class="d-flex gap-1 justify-content-center align-items-center table-flex-nowrap">
@@ -1231,7 +1442,8 @@ async function updateExecutionsTableMain(executions, options = {}) {
             if (remainingHighlighted.length === 0) {
               const clearBtn = document.getElementById('clearHighlightsBtn');
               if (clearBtn) {
-                clearBtn.style.display = 'none';
+                clearBtn.classList.add('d-none');
+                clearBtn.classList.remove('d-inline-block');
               }
             }
           }, 3 * 60 * 1000); // 3 דקות
@@ -1241,7 +1453,8 @@ async function updateExecutionsTableMain(executions, options = {}) {
       // הצגת כפתור הניקוי
       const clearBtn = document.getElementById('clearHighlightsBtn');
       if (clearBtn) {
-        clearBtn.style.display = 'inline-block';
+        clearBtn.classList.remove('d-none');
+        clearBtn.classList.add('d-inline-block');
       }
     }, 100); // קצת delay כדי שהטבלה תיטען
   }
@@ -1277,8 +1490,20 @@ function isDateInRange(dateString, dateRange) {
     dateOnly = dateString.split(' ')[0];
   }
 
-  const date = new Date(dateOnly);
-  const today = new Date();
+  // Use dateUtils for consistent date parsing
+  let date;
+  if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+    date = window.dateUtils.toDateObject(dateOnly);
+  } else {
+    date = new Date(dateOnly);
+  }
+  
+  let today;
+  if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+    today = window.dateUtils.getToday();
+  } else {
+    today = new Date();
+  }
   today.setHours(23, 59, 59, 999); // סוף היום
 
   // Parsed date
@@ -1347,7 +1572,16 @@ function isDateInRange(dateString, dateRange) {
 // הגדרת הפונקציה כגלובלית
 window.isDateInRange = isDateInRange;
 
-// פונקציית פילטור מקומי לעסקאות
+/**
+ * Filter executions locally by multiple criteria
+ * @param {Array} executions - Executions array to filter
+ * @param {Array} selectedStatuses - Selected statuses filter
+ * @param {Array} selectedTypes - Selected types filter
+ * @param {Array} selectedAccounts - Selected accounts filter
+ * @param {string} dateRange - Date range filter
+ * @param {string} searchTerm - Search term filter
+ * @returns {Array} Filtered executions array
+ */
 function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, selectedAccounts, dateRange, searchTerm) {
   try {
   // filterExecutionsLocally called
@@ -1423,9 +1657,9 @@ function filterExecutionsLocally(executions, selectedStatuses, selectedTypes, se
   // Filtered executions
   return filtered;
   } catch (error) {
-    window.Logger.error('שגיאה בפילטור מקומי של עסקעות:', error, { page: "executions" });
+      window.Logger.error('שגיאה בפילטור מקומי של ביצועים:', error, { page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בפילטור מקומי של עסקעות', error.message);
+      window.showErrorNotification('שגיאה בפילטור מקומי של ביצועים', error.message);
     }
     return executions; // החזרת הנתונים המקוריים במקרה של שגיאה
   }
@@ -1458,7 +1692,7 @@ window.showEditExecutionModal = function(executionId) {
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
         window.ModalManagerV2.showEditModal('executionsModal', 'execution', executionId);
     } else {
-        console.error('ModalManagerV2 not available');
+        window.Logger.error('ModalManagerV2 not available', { page: 'executions' });
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'מערכת המודלים לא זמינה. אנא רענן את הדף.');
         }
@@ -1480,7 +1714,7 @@ window.goToNote = goToNote;
 // ===== פונקציות סידור =====
 
 /**
- * פונקציה לסידור טבלת עסקעות
+ * פונקציה לסידור טבלת ביצועים
  * @param {number} columnIndex - אינדקס העמודה לסידור
  *
  * דוגמאות שימוש:
@@ -1532,21 +1766,69 @@ window.initializeExecutionsPage = async function() {
   // הגדרת מודלים שלא נסגרים בלחיצה על הרקע
   setupModalConfigurations();
 
-  // אתחול ממשק יצירת טרייד מאשכול ביצועים
-  if (window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
-    window.PendingExecutionTradeCreation.initializeExecutionsSection({
-      containerId: 'executionTradeCreationClustersContainer',
-      countElementId: 'executionTradeCreationClustersCount',
-      loadingElementId: 'executionTradeCreationClustersLoading',
-      emptyStateId: 'executionTradeCreationClustersEmpty',
-      errorElementId: 'executionTradeCreationClustersError'
-    });
+  // אתחול ממשק יצירת טרייד מאשכול ביצועים - LAZY LOADING
+  // נטען רק כשהמשתמש פותח את הסקשן trade-creation
+  const tradeCreationSection = document.getElementById('trade-creation') || document.querySelector('[data-section="trade-creation"]');
+  if (tradeCreationSection && window.PendingExecutionTradeCreation) {
+    let tradeCreationInitialized = false;
+    
+    // Initialize section but don't load data yet
+    const initializeTradeCreationSection = () => {
+      if (!tradeCreationInitialized && window.PendingExecutionTradeCreation?.initializeExecutionsSection) {
+        tradeCreationInitialized = true;
+        window.Logger?.info('🔄 Initializing trade creation section (lazy loading)', { page: "executions" });
+        window.PendingExecutionTradeCreation.initializeExecutionsSection({
+          containerId: 'executionTradeCreationClustersContainer',
+          countElementId: 'executionTradeCreationClustersCount',
+          loadingElementId: 'executionTradeCreationClustersLoading',
+          emptyStateId: 'executionTradeCreationClustersEmpty',
+          errorElementId: 'executionTradeCreationClustersError'
+        });
+      }
+    };
+    
+    // Wait for sections to be restored before initializing observers
+    // This prevents loading data during initial page load when restoreAllSectionStates opens sections
+    let tradeCreationDebounceTimer = null;
+    const setupTradeCreationObserver = () => {
+      // Check if section is actually visible to user (not just restored state)
+      const sectionBody = tradeCreationSection.querySelector('.section-body');
+      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
+      
+      // Only initialize if section is actually open (user-initiated, not just restored state)
+      if (!isActuallyOpen) {
+        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !tradeCreationInitialized) {
+              // Debounce to avoid multiple rapid calls
+              if (tradeCreationDebounceTimer) {
+                clearTimeout(tradeCreationDebounceTimer);
+              }
+              tradeCreationDebounceTimer = setTimeout(() => {
+                initializeTradeCreationSection();
+                observer.disconnect();
+              }, 500); // 500ms debounce
+            }
+          });
+        }, { threshold: 0.1 });
+        
+        observer.observe(tradeCreationSection);
+      }
+    };
+    
+    // Wait for sections:restored event or check if already restored
+    if (window.sectionsRestored) {
+      setupTradeCreationObserver();
+    } else {
+      document.addEventListener('sections:restored', setupTradeCreationObserver, { once: true });
+    }
   }
 
   // שחזור מצב הסגירה - handled by global toggleSection system
 
-  // טעינת נתונים
-  loadExecutionsData();
+  // טעינת נתונים - נטען ב-customInitializers, לא כאן כדי למנוע קריאה כפולה
+  // await loadExecutionsData(); // Removed - loaded in customInitializers
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
@@ -1563,28 +1845,137 @@ window.initializeExecutionsPage = async function() {
     await window.UnifiedTableSystem.sorter.applyDefaultSort('executions');
   }
 
-  // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
-  updateTickersList('add', false);
-  updateTickersList('edit', false);
+  // אתחול רשימת טיקרים - LAZY LOADING: נטען רק כשהמשתמש פותח את ה-modal
+  // updateTickersList('add', false); // Removed - lazy loading on modal open
+  // updateTickersList('edit', false); // Removed - lazy loading on modal open
 
-  // Event listeners לעדכון שדה Realized P/L לפי סוג הפעולה
-  const addExecutionType = document.getElementById('addExecutionType');
-  const editExecutionType = document.getElementById('editExecutionType');
-  
-  if (addExecutionType) {
-    addExecutionType.addEventListener('change', () => updateRealizedPLField('add'));
-  }
-  
-  if (editExecutionType) {
-    editExecutionType.addEventListener('change', () => updateRealizedPLField('edit'));
-  }
-
-  // Load trade suggestions after page initialization
-  setTimeout(async () => {
-    if (typeof loadTradeSuggestionsForAll === 'function') {
-      await loadTradeSuggestionsForAll();
+    // Event listeners לעדכון שדה Realized P/L לפי סוג הפעולה
+  // ModalManagerV2 uses field.id directly from config (executionType, not addExecutionType/editExecutionType)
+  // We need to attach the listener when the modal is shown, not on page load
+  // LAZY LOADING: טעינת רשימת טיקרים רק כשהמשתמש פותח את ה-modal
+  // Use Bootstrap's shown.bs.modal event
+  document.addEventListener('shown.bs.modal', async function(event) {
+    const modalElement = event.target;
+    if (modalElement && modalElement.id === 'executionsModal') {
+      // Determine mode from modal or default to 'add'
+      const mode = modalElement.getAttribute('data-mode') || 'add';
+      const showClosedTrades = false; // ברירת מחדל
+      
+      // טעינת רשימת טיקרים רק כשהמשתמש פותח את ה-modal (lazy loading)
+      if (typeof updateTickersList === 'function') {
+        try {
+          window.Logger?.info('🔄 Loading tickers list (lazy loading - modal opened)', { mode, page: "executions" });
+          await updateTickersList(mode, showClosedTrades);
+        } catch (error) {
+          window.Logger?.warn('⚠️ Failed to load tickers list on modal open:', error, { page: "executions" });
+        }
+      }
     }
-  }, 2000); // Wait 2 seconds for page to fully load
+  });
+
+  // Load trade suggestions - LAZY LOADING: נטען רק כשהמשתמש מגיע לסקשן
+  // Event listener לטעינת המלצות כשהמשתמש פותח את סקשן suggestions
+  const suggestionsSection = document.getElementById('suggestions');
+  if (suggestionsSection && typeof loadTradeSuggestionsForAll === 'function') {
+    let suggestionsLoaded = false;
+    
+    // Wait for sections to be restored before initializing observers
+    // This prevents loading data during initial page load when restoreAllSectionStates opens sections
+    let suggestionsDebounceTimer = null;
+    const setupSuggestionsObserver = () => {
+      // Check if section is actually visible to user (not just restored state)
+      const sectionBody = suggestionsSection.querySelector('.section-body');
+      const isActuallyOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
+      
+      // Only initialize if section is actually open (user-initiated, not just restored state)
+      if (!isActuallyOpen) {
+        // Observer לבדיקת visibility של הסקשן - רק אחרי ש-sections שוחזרו
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            // אם הסקשן גלוי ולא טענו עדיין את הנתונים
+            if (entry.isIntersecting && !suggestionsLoaded) {
+              // Debounce to avoid multiple rapid calls
+              if (suggestionsDebounceTimer) {
+                clearTimeout(suggestionsDebounceTimer);
+              }
+              suggestionsDebounceTimer = setTimeout(() => {
+                suggestionsLoaded = true;
+                window.Logger?.info('🔄 Loading trade suggestions (lazy loading - section visible)', { page: "executions" });
+                loadTradeSuggestionsForAll().catch(error => {
+                  window.Logger?.warn('⚠️ Failed to load trade suggestions on section open:', error, { page: "executions" });
+                  suggestionsLoaded = false; // Allow retry
+                });
+                observer.disconnect(); // Stop observing after first load
+              }, 500); // 500ms debounce
+            }
+          });
+        }, { threshold: 0.1 }); // Trigger when 10% of section is visible
+        
+        observer.observe(suggestionsSection);
+      }
+    };
+    
+    // Wait for sections:restored event or check if already restored
+    if (window.sectionsRestored) {
+      setupSuggestionsObserver();
+    } else {
+      document.addEventListener('sections:restored', setupSuggestionsObserver, { once: true });
+    }
+  }
+  
+  // Wrapper ל-toggleSection עם lazy loading לסקשנים
+  if (typeof window.toggleSection === 'function') {
+    const originalToggleSection = window.toggleSection;
+    window.toggleSection = function(sectionId) {
+      const result = originalToggleSection.call(this, sectionId);
+      
+      // LAZY LOADING: טעינת נתונים כשהמשתמש פותח סקשן
+      setTimeout(() => {
+        const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
+        if (!section) return;
+        
+        const sectionBody = section.querySelector('.section-body');
+        const isOpen = sectionBody && sectionBody.style.display !== 'none' && !sectionBody.classList.contains('hidden');
+        
+        // Trade creation section - lazy loading
+        if (sectionId === 'trade-creation' && isOpen && window.PendingExecutionTradeCreation) {
+          const containerId = 'executionTradeCreationClustersContainer';
+          const container = document.getElementById(containerId);
+          
+          // אם הסקשן פתוח והקונטיינר לא מכיל נתונים, אתחל
+          if (container && (!container.children.length || container.textContent.trim() === '' || container.textContent.includes('טוען'))) {
+            if (window.PendingExecutionTradeCreation.initializeExecutionsSection) {
+              window.Logger?.info('🔄 Initializing trade creation section (lazy loading - user toggled section)', { page: "executions" });
+              window.PendingExecutionTradeCreation.initializeExecutionsSection({
+                containerId: containerId,
+                countElementId: 'executionTradeCreationClustersCount',
+                loadingElementId: 'executionTradeCreationClustersLoading',
+                emptyStateId: 'executionTradeCreationClustersEmpty',
+                errorElementId: 'executionTradeCreationClustersError'
+              });
+            }
+          }
+        }
+        
+        // Suggestions section - lazy loading
+        if (sectionId === 'suggestions' && isOpen && typeof loadTradeSuggestionsForAll === 'function') {
+          // Check if suggestions are already loaded
+          const suggestionsTable = section.querySelector('table');
+          const hasSuggestions = suggestionsTable && suggestionsTable.querySelector('tbody') && 
+                                 suggestionsTable.querySelector('tbody').children.length > 0;
+          
+          if (!hasSuggestions) {
+            window.Logger?.info('🔄 Loading trade suggestions (lazy loading - user toggled section)', { page: "executions" });
+            loadTradeSuggestionsForAll().catch(error => {
+              window.Logger?.warn('⚠️ Failed to load trade suggestions on toggle:', error, { page: "executions" });
+            });
+          }
+        }
+      }, 100); // Small delay to ensure section is fully opened
+      
+      return result;
+    };
+  }
 
   // עדכון אוטומטי כל 30 שניות - הושבת זמנית למניעת לופים
   // setInterval(() => {
@@ -1602,7 +1993,8 @@ if (document.readyState === 'loading') {
 }
 
 /**
- * הגדרת תצורות מודלים
+ * Setup modal configurations (backdrop, keyboard)
+ * @returns {void}
  */
 function setupModalConfigurations() {
   try {
@@ -1682,8 +2074,9 @@ async function loadTickersWithOpenOrClosedTradesAndPlans() {
 
 
 /**
- * הפעלת כל השדות אחרי בחירת טרייד/תכנון
- * @param {string} mode - 'add' או 'edit'
+ * Enable all form fields after trade/plan selection
+ * @param {string} [mode='add'] - Mode ('add' or 'edit')
+ * @returns {void}
  */
 function enableAllFields(mode = 'add') {
   try {
@@ -1715,9 +2108,20 @@ function enableAllFields(mode = 'add') {
 }
 
 /**
- * טעינת טריידים לטיקר שנבחר
+ * Load active trades for selected ticker using entity service
+ * 
+ * טעינת טריידים לטיקר שנבחר באמצעות שירות ישויות
+ * 
+ * Loads trades data using TradesData service instead of direct API calls.
+ * Falls back to direct API call if service is unavailable.
+ * 
  * @param {string} mode - מצב ('add' או 'edit')
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
+ * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await loadActiveTradesForTicker('add', false);
  */
 async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false) {
   window.Logger.info('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', _showClosedTrades, { page: "executions" });
@@ -1741,10 +2145,16 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
   }
 
   try {
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades/');
-    const tickerTradesData = await tradesResponse.json();
-    const trades = tickerTradesData.data || tickerTradesData || [];
+    // טעינת טריידים באמצעות שירות ישויות (preferred method)
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      const tickerTradesData = await tradesResponse.json();
+      trades = tickerTradesData.data || tickerTradesData || [];
+    }
 
     // סינון טריידים לטיקר שנבחר
     let filteredTrades;
@@ -1841,8 +2251,18 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
         let creationDate = 'תאריך לא ידוע';
         if (trade.created_at) {
           try {
-            const date = new Date(trade.created_at);
-            creationDate = date.toLocaleDateString('he-IL');
+            // Use FieldRendererService or dateUtils for consistent date formatting
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+              creationDate = window.FieldRendererService.renderDate(trade.created_at, false);
+            } else if (window.formatDate) {
+              const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+              creationDate = window.formatDate(date);
+            } else if (window.dateUtils?.formatDate) {
+              creationDate = window.dateUtils.formatDate(trade.created_at, { includeTime: false });
+            } else {
+              const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+              creationDate = date.toLocaleDateString('he-IL');
+            }
           } catch {
             // // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', trade.created_at, { page: "executions" });
           }
@@ -1865,8 +2285,9 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
 
 /**
- * עדכון טריידים כאשר הצ'קבוקס משתנה
- * @param {string} mode - 'add' או 'edit'
+ * Update trades list when checkbox changes
+ * @param {string} [mode='add'] - Mode ('add' or 'edit')
+ * @returns {Promise<void>}
  */
 async function updateTradesOnCheckboxChange(mode = 'add') {
   // // window.Logger.info('🔄 עדכון טריידים לפי צ\'קבוקס, מצב:', mode, { page: "executions" });
@@ -1898,8 +2319,9 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
 }
 
 /**
- * עדכון טריידים כאשר הטיקר משתנה
- * @param {string} mode - 'add' או 'edit'
+ * Update trades list when ticker changes
+ * @param {string} [mode='add'] - Mode ('add' or 'edit')
+ * @returns {Promise<void>}
  */
 async function updateTradesOnTickerChange(mode = 'add') {
   window.Logger.info('🔄 עדכון טריידים לפי שינוי טיקר, מצב:', mode, { page: "executions" });
@@ -1922,8 +2344,9 @@ async function updateTradesOnTickerChange(mode = 'add') {
 }
 
 /**
- * מעבר לדף טיקר (בפיתוח)
- * @param {string} symbol - סמל הטיקר
+ * Navigate to ticker page (in development)
+ * @param {string} _symbol - Ticker symbol (unused)
+ * @returns {void}
  */
 function goToTickerPage(_symbol) {
   try {
@@ -1970,7 +2393,8 @@ function showTickerHelp() {
 }
 
 /**
- * הוספת טיקר חדש
+ * Add new ticker (in development)
+ * @returns {void}
  */
 function addNewTicker() {
   try {
@@ -1990,7 +2414,8 @@ function addNewTicker() {
 }
 
 /**
- * הוספת תכנון חדש
+ * Add new trade plan (in development)
+ * @returns {void}
  */
 function addNewPlan() {
   // הוספת תכנון חדש
@@ -2016,8 +2441,8 @@ function addNewTrade() {
 }
 
 /**
- * עדכון סיכום נתונים לעסקעות
- * @param {Array} executions - מערך העסקעות
+ * עדכון סיכום נתונים לביצועים
+ * @param {Array} executions - מערך הביצועים
  */
 
 // הגדרת הפונקציות כגלובליות
@@ -2074,15 +2499,18 @@ function enableExecutionFormFields() {
 }
 
 /**
- * השבתת שדות הטופס
+ * Disable execution form fields
  * @deprecated Use toggleExecutionFormFields(false) instead
+ * @returns {void}
  */
 function disableExecutionFormFields() {
   toggleExecutionFormFields(false);
 }
 
 /**
- * טעינת מידע על הטיקר
+ * Load ticker information for execution form
+ * @param {number|string} tickerId - Ticker ID
+ * @returns {Promise<void>}
  */
 async function loadExecutionTickerInfo(tickerId) {
   try {
@@ -2139,7 +2567,9 @@ async function loadExecutionTickerInfo(tickerId) {
 }
 
 /**
- * הצגת מידע על הטיקר
+ * Display ticker information in execution form
+ * @param {Object} ticker - Ticker object
+ * @returns {void}
  */
 function displayExecutionTickerInfo(ticker) {
   // Create or update ticker info display
@@ -2207,7 +2637,8 @@ function displayExecutionTickerInfo(ticker) {
 }
 
 /**
- * הסתרת מידע על הטיקר
+ * Hide ticker information from execution form
+ * @returns {void}
  */
 function hideExecutionTickerInfo() {
   const tickerInfoDiv = document.getElementById('executionTickerInfo');
@@ -2217,8 +2648,9 @@ function hideExecutionTickerInfo() {
 }
 
 /**
- * חישוב ערכים מחושבים לטופס עסקה (הוספה או עריכה)
- * @param {string} formType - 'add' או 'edit'
+ * Calculate execution values (total, etc.) for form
+ * @param {string} formType - Form type ('add' or 'edit')
+ * @returns {void}
  */
 function calculateExecutionValues(formType) {
   const isEdit = formType === 'edit';
@@ -2268,16 +2700,18 @@ function calculateExecutionValues(formType) {
 }
 
 /**
- * חישוב ערכים מחושבים לטופס הוספה
+ * Calculate execution values for add form
  * @deprecated Use calculateExecutionValues('add') instead
+ * @returns {void}
  */
 function calculateAddExecutionValues() {
   calculateExecutionValues('add');
 }
 
 /**
- * חישוב ערכים מחושבים לטופס עריכה
+ * Calculate execution values for edit form
  * @deprecated Use calculateExecutionValues('edit') instead
+ * @returns {void}
  */
 function calculateEditExecutionValues() {
   calculateExecutionValues('edit');
@@ -2320,27 +2754,28 @@ window.goToLinkedTrade = goToLinkedTrade;
 // ========================================
 
 /**
- * טעינת עסקאות לטרייד
- * @param {number} tradeId - מזהה הטרייד
+ * Load executions for trade (used in trade modal)
+ * @param {number} _tradeId - Trade ID (unused)
+ * @returns {void}
  */
 function loadTradeExecutions(_tradeId) {
-  // טעינת עסקאות לטרייד
+  // טעינת ביצועים לטרייד
 
   try {
-    // כאן תהיה קריאה לשרת לטעינת העסקאות
+    // כאן תהיה קריאה לשרת לטעינת הביצועים
     // כרגע נציג נתוני דוגמה
 
     // לא צריך לעדכן טבלה בדף executions (זו פונקציה למודל עריכת טרייד)
     // loadTradeExecutions called on executions page - no action needed
     // loadTradeExecutions completed successfully
   } catch (error) {
-    handleApiError(error, 'עסקאות לטרייד');
+    handleApiError(error, 'ביצועים לטרייד');
   }
 }
 
 /**
- * עדכון טבלת העסקאות במודל עריכת טרייד
- * @param {Array} executions - מערך העסקאות
+ * עדכון טבלת הביצועים במודל עריכת טרייד
+ * @param {Array} executions - מערך הביצועים
  */
 function updateExecutionsTableForTradeModal(executions) {
   // updateExecutionsTableForTradeModal called
@@ -2401,7 +2836,8 @@ function addEditBuySell() {
 }
 
 /**
- * שיוך עסקה קיימת לטרייד
+ * Link existing execution to trade (in development)
+ * @returns {void}
  */
 function linkExistingExecution() {
   if (typeof window.showInfoNotification === 'function') {
@@ -2412,7 +2848,8 @@ function linkExistingExecution() {
 }
 
 /**
- * ביטול שיוך עסקה מטרייד
+ * Unlink execution from trade (in development)
+ * @returns {void}
  */
 function unlinkExecution() {
   if (typeof window.showInfoNotification === 'function') {
@@ -2492,10 +2929,12 @@ window.setupExecutionsFilterFunctions = setupExecutionsFilterFunctions;
 
     if (topSection && topIcon) {
       if (topSectionHidden) {
-        topSection.style.display = 'none';
+        topSection.classList.add('d-none');
+        topSection.classList.remove('d-block');
         topIcon.textContent = '▼';
       } else {
-        topSection.style.display = 'block';
+        topSection.classList.remove('d-none');
+        topSection.classList.add('d-block');
         topIcon.textContent = '▲';
       }
     }
@@ -2628,7 +3067,7 @@ function setupExecutionsFilterFunctions() {
         });
     }
     } catch (error) {
-      console.error('filterExecutionsByAccount failed:', error);
+      window.Logger.error('filterExecutionsByAccount failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2686,7 +3125,7 @@ function setupExecutionsFilterFunctions() {
     updateExecutionsSummary(filteredExecutions);
     // Search results
     } catch (error) {
-      console.error('searchExecutions failed:', error);
+      window.Logger.error('searchExecutions failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2717,7 +3156,7 @@ function setupExecutionsFilterFunctions() {
     updateExecutionsSummary(filteredExecutions);
     // Filtered by type
     } catch (error) {
-      console.error('filterExecutionsByType failed:', error);
+      window.Logger.error('filterExecutionsByType failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2732,12 +3171,25 @@ function setupExecutionsFilterFunctions() {
     if (!dateRange || dateRange === 'all' || dateRange === 'הכול') {
       filteredExecutions = [...originalExecutions];
     } else {
-      const today = new Date();
+      // Use dateUtils for consistent date handling
+      let today;
+      if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+        today = window.dateUtils.getToday();
+      } else {
+        today = new Date();
+      }
       const yesterday = new Date(today);
       yesterday.setDate(yesterday.getDate() - 1);
 
       filteredExecutions = originalExecutions.filter(execution => {
-        const executionDate = new Date(execution.execution_date || execution.created_at);
+        // Use dateUtils to parse execution date
+        let executionDate;
+        const dateValue = execution.execution_date || execution.created_at;
+        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+          executionDate = window.dateUtils.toDateObject(dateValue);
+        } else {
+          executionDate = new Date(dateValue);
+        }
 
         switch (dateRange) {
         case 'today':
@@ -2767,7 +3219,7 @@ function setupExecutionsFilterFunctions() {
     applyExecutionsFilteredData(filteredExecutions);
     // Filtered by date
     } catch (error) {
-      console.error('filterExecutionsByDate failed:', error);
+      window.Logger.error('filterExecutionsByDate failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2782,7 +3234,7 @@ function setupExecutionsFilterFunctions() {
     applyExecutionsFilteredData(filteredExecutions);
     // Filters reset, showing all executions
     } catch (error) {
-      console.error('resetExecutionsFilters failed:', error);
+      window.Logger.error('resetExecutionsFilters failed', { page: 'executions', error: error?.message || error });
       // Fallback - הצגת כל הביצועים
       filteredExecutions = [...originalExecutions];
       applyExecutionsFilteredData(filteredExecutions);
@@ -2801,9 +3253,13 @@ function updateExecutionsGlobalData(executions) {
 }
 
 // עדכון הפונקציה הקיימת loadExecutionsData
-const originalLoadExecutionsData = window.loadExecutionsData || loadExecutionsData;
-window.loadExecutionsData = async function() {
-  await originalLoadExecutionsData();
+// Use the actual function, not the placeholder
+// Standard pattern: when called from CRUD operations, always use force: true (like trades.js)
+const originalLoadExecutionsData = loadExecutionsData;
+window.loadExecutionsData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in trades.js and other pages
+  await originalLoadExecutionsData({ ...options, force: true });
 
   // עדכון הנתונים הגלובליים לאחר טעינה
   if (window.executionsData && window.executionsData.length > 0) {
@@ -2823,15 +3279,15 @@ window.loadExecutionsData = async function() {
     setupExecutionsFilterFunctions();
   }
 
-  // טעינת טבלת טיקרים חלקית
-  try {
-    const tickers = await loadTickersSummaryData();
-    updateTickersSummaryTable(tickers);
-    // window.Logger.info('✅ טבלת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים', { page: "executions" });
-  } catch (error) {
-    // window.Logger.error('❌ שגיאה בטעינת טבלת טיקרים חלקיים:', error, { page: "executions" });
-    handleApiError(error, 'טבלת טיקרים חלקית');
-  }
+  // טעינת טבלת טיקרים חלקית - LAZY LOADING: נטען רק כשנחוץ
+  // Removed from here - will be loaded on demand when needed
+  // This prevents multiple concurrent API calls on page load
+  // try {
+  //   const tickers = await loadTickersSummaryData();
+  //   updateTickersSummaryTable(tickers);
+  // } catch (error) {
+  //   handleApiError(error, 'טבלת טיקרים חלקית');
+  // }
 };
 
 // הוספת פונקציות CRUD גלובליות
@@ -2884,14 +3340,16 @@ function toggleExternalIdField(mode) {
 
   if (source === 'manual') {
     // הסתרת שדה מזהה חיצוני עבור מקור ידני
-    externalIdContainer.style.display = 'none';
+    externalIdContainer.classList.add('d-none');
+    externalIdContainer.classList.remove('d-block');
     if (externalIdField) {
       externalIdField.value = '';
     }
     // שדה מזהה חיצוני מוסתר (מקור ידני)
   } else {
     // הצגת שדה מזהה חיצוני עבור מקורות אחרים
-    externalIdContainer.style.display = 'block';
+    externalIdContainer.classList.remove('d-none');
+    externalIdContainer.classList.add('d-block');
     // שדה מזהה חיצוני מוצג
   }
 }
@@ -2907,21 +3365,47 @@ window.toggleExternalIdField = toggleExternalIdField;
 let tickersSummaryData = [];
 
 /**
- * טעינת נתוני טיקרים חלקיים
+ * Load tickers summary data using entity services
+ * 
+ * טעינת נתוני טיקרים חלקיים באמצעות שירותי ישויות
+ * 
+ * Loads tickers and trades data using global entity services instead of direct API calls.
+ * Falls back to direct API calls if services are unavailable.
+ * 
+ * @async
+ * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await loadTickersSummaryData();
  */
 async function loadTickersSummaryData() {
   // window.Logger.info('🔄 טעינת נתוני טיקרים חלקיים...', { page: "executions" });
 
   try {
-    // טעינת טיקרים
-    const tickersResponse = await fetch('/api/tickers/');
-    const tickersData = await tickersResponse.json();
-    const allTickers = tickersData.data || tickersData || [];
+    // טעינת טיקרים באמצעות שירות ישויות (preferred method)
+    let allTickers = [];
+    if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+      allTickers = await window.tickerService.getTickers().catch(() => []);
+    } else if (window.getTickers && typeof window.getTickers === 'function') {
+      allTickers = await window.getTickers().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tickersResponse = await fetch('/api/tickers/');
+      const tickersData = await tickersResponse.json();
+      allTickers = tickersData.data || tickersData || [];
+    }
 
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades/');
-    const summaryTradesData = await tradesResponse.json();
-    const trades = summaryTradesData.data || summaryTradesData || [];
+    // טעינת טריידים באמצעות שירות
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      const summaryTradesData = await tradesResponse.json();
+      trades = summaryTradesData.data || summaryTradesData || [];
+    }
 
     // סינון טיקרים עם טריידים פעילים או סגורים
     const relevantTickers = allTickers.filter(ticker => {
@@ -3008,8 +3492,18 @@ function updateTickersSummaryTable(tickers = null) {
     let creationDate = 'תאריך לא ידוע';
     if (ticker.created_at) {
       try {
-        const date = new Date(ticker.created_at);
-        creationDate = date.toLocaleDateString('he-IL');
+        // Use FieldRendererService or dateUtils for consistent date formatting
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          creationDate = window.FieldRendererService.renderDate(ticker.created_at, false);
+        } else if (window.formatDate) {
+          const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(ticker.created_at) : new Date(ticker.created_at);
+          creationDate = window.formatDate(date);
+        } else if (window.dateUtils?.formatDate) {
+          creationDate = window.dateUtils.formatDate(ticker.created_at, { includeTime: false });
+        } else {
+          const date = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(ticker.created_at) : new Date(ticker.created_at);
+          creationDate = date.toLocaleDateString('he-IL');
+        }
       } catch {
         // window.Logger.warn('⚠️ לא ניתן לעבד תאריך יצירה:', ticker.created_at, { page: "executions" });
       }
@@ -3032,8 +3526,8 @@ function updateTickersSummaryTable(tickers = null) {
             <td>${ticker.totalTrades} (${ticker.activeTrades} פעיל, ${ticker.closedTrades} סגור)</td>
             <td>${creationDate}</td>
             <td class="actions-cell">
-                <button data-button-type="VIEW" data-variant="small" data-icon="👁️" data-classes="btn-outline-primary table-btn-small" onclick="viewTickerDetails(${ticker.id})" title="צפה בפרטים"></button>
-                <button data-button-type="ADD" data-variant="small" data-icon="➕" data-classes="btn-outline-success table-btn-small" onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה"></button>
+                <button data-button-type="VIEW" data-variant="small" data-icon="👁️" data-classes="btn-outline-primary table-btn-small" data-onclick="viewTickerDetails(${ticker.id})" title="צפה בפרטים"></button>
+                <button data-button-type="ADD" data-variant="small" data-icon="➕" data-classes="btn-outline-success table-btn-small" data-onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה"></button>
             </td>
         `;
 
@@ -3134,23 +3628,48 @@ window.addExecutionForTicker = addExecutionForTicker;
 // REMOVED: window.toggleTickersSection - use window.toggleSection('tickers') directly
 
 /**
- * עדכון רשימת הטיקרים לפי הצ'קבוקס
+ * Update tickers list using entity services
+ * 
+ * עדכון רשימת טיקרים באמצעות שירותי ישויות
+ * 
+ * Loads tickers and trades data using global entity services instead of direct API calls.
+ * Filters tickers based on mode and showClosedTrades parameter.
+ * 
  * @param {string} mode - מצב ('add' או 'edit')
  * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
+ * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await updateTickersList('add', false);
  */
 async function updateTickersList(mode, showClosedTrades = false) {
   // window.Logger.info('🔄 עדכון רשימת טיקרים:', { mode, showClosedTrades }, { page: "executions" });
 
   try {
-    // טעינת כל הטיקרים
-    const tickersResponse = await fetch('/api/tickers/');
-    const tickersData = await tickersResponse.json();
-    const allTickers = tickersData.data || tickersData || [];
+    // טעינת כל הטיקרים באמצעות שירות ישויות (preferred method)
+    let allTickers = [];
+    if (window.tickerService && typeof window.tickerService.getTickers === 'function') {
+      allTickers = await window.tickerService.getTickers().catch(() => []);
+    } else if (window.getTickers && typeof window.getTickers === 'function') {
+      allTickers = await window.getTickers().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tickersResponse = await fetch('/api/tickers/');
+      const tickersData = await tickersResponse.json();
+      allTickers = tickersData.data || tickersData || [];
+    }
 
-    // טעינת טריידים
-    const tradesResponse = await fetch('/api/trades/');
-    const tickersTradesData = await tradesResponse.json();
-    const trades = tickersTradesData.data || tickersTradesData || [];
+    // טעינת טריידים באמצעות שירות
+    let trades = [];
+    if (window.TradesData && typeof window.TradesData.loadTradesData === 'function') {
+      trades = await window.TradesData.loadTradesData().catch(() => []);
+    } else {
+      // Fallback: direct API call
+      const tradesResponse = await fetch('/api/trades/');
+      const tickersTradesData = await tradesResponse.json();
+      trades = tickersTradesData.data || tickersTradesData || [];
+    }
 
     // סינון טיקרים לפי הקריטריונים
     let filteredTickers;
@@ -3239,9 +3758,21 @@ async function deleteExecution(executionId) {
                                ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
             const quantity = execution.quantity || '0';
             const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
-            const date = execution.date || execution.execution_date ? 
-                         new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : 
-                         'לא מוגדר';
+            // Use FieldRendererService or dateUtils for consistent date formatting
+            let date = 'לא מוגדר';
+            const dateValue = execution.date || execution.execution_date;
+            if (dateValue) {
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                date = window.FieldRendererService.renderDate(dateValue, false);
+              } else if (window.formatDate) {
+                date = window.formatDate(dateValue);
+              } else if (window.dateUtils?.formatDate) {
+                date = window.dateUtils.formatDate(dateValue, { includeTime: false });
+              } else {
+                const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(dateValue) : new Date(dateValue);
+                date = dateObj.toLocaleDateString('he-IL');
+              }
+            }
             executionDetails = `${ticker} - ${actionText}, ${quantity} יחידות ב-${price}, תאריך: ${date}`;
         }
         
@@ -3284,10 +3815,16 @@ async function performExecutionDeletion(executionId) {
             await window.unifiedCacheManager.clearByPattern('account-balance-*');
         }
         
-        // Send delete request
-        const response = await fetch(`/api/executions/${executionId}`, {
-            method: 'DELETE'
-        });
+        // Send delete request using ExecutionsData service if available
+        let response;
+        if (typeof window.ExecutionsData?.deleteExecution === 'function') {
+            response = await window.ExecutionsData.deleteExecution(executionId);
+        } else {
+            // Fallback to direct fetch
+            response = await fetch(`/api/executions/${executionId}`, {
+                method: 'DELETE'
+            });
+        }
         
         // Use CRUDResponseHandler for consistent response handling
         await CRUDResponseHandler.handleDeleteResponse(response, {
@@ -3345,7 +3882,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('executions', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('executions', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
@@ -3397,7 +3937,9 @@ window.registerExecutionsTables = function() {
         tableSelector: '#executionsTable',
         columns: getColumns('executions'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: date desc (column index 8)
+        defaultSort: { columnIndex: 8, direction: 'desc', key: 'date' }
     });
     
     // Register trade suggestions table
@@ -3416,7 +3958,9 @@ window.registerExecutionsTables = function() {
         tableSelector: '#tradeSuggestionsTable',
         columns: getColumns('trade_suggestions'),
         sortable: true,
-        filterable: false
+        filterable: false,
+        // Default sort: trade_created_at desc (column index 5)
+        defaultSort: { columnIndex: 5, direction: 'desc', key: 'trade_created_at' }
     });
 };
 
@@ -3633,7 +4177,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
         ? FieldRenderer.renderExecutionDate(executionDateValue)
         : (FieldRenderer?.renderDate
             ? FieldRenderer.renderDate(executionDateValue, true)
-            : (executionDateValue ? new Date(executionDateValue).toLocaleDateString('he-IL') : '-'));
+            : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(executionDateValue).toLocaleDateString('he-IL') : new Date(executionDateValue).toLocaleDateString('he-IL')))) : '-'));
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
     const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action === 'buy' ? 'קניה' : 'מכירה');
@@ -3644,7 +4188,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     
     const tradeEnvelope = suggestion.trade_created_at || suggestion.created_at;
     const tradeLocalValue = tradeEnvelope?.local || tradeEnvelope?.utc || tradeEnvelope?.display || suggestion.created_at;
-    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? new Date(tradeLocalValue).toLocaleDateString('he-IL') : '-');
+    const tradeDate = FieldRenderer?.renderDate ? FieldRenderer.renderDate(tradeLocalValue) : (tradeLocalValue ? (window.formatDate ? window.formatDate(tradeLocalValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(tradeLocalValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(tradeLocalValue).toLocaleDateString('he-IL') : new Date(tradeLocalValue).toLocaleDateString('he-IL')))) : '-');
     const tradeSortValue = tradeEnvelope?.epochMs ?? suggestion.trade_created_at_epoch ?? tradeEnvelope?.utc ?? tradeLocalValue ?? '';
     const tradeStatus = FieldRenderer?.renderStatus ? FieldRenderer.renderStatus(suggestion.status, 'trade') : (suggestion.status === 'open' || suggestion.status === 'active' ? 'פעיל' : suggestion.status === 'closed' ? 'סגור' : suggestion.status);
     const tradeSide = FieldRenderer?.renderSide ? FieldRenderer.renderSide(suggestion.side) : (suggestion.side || '-');
@@ -3654,7 +4198,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     const executionInfo = showExecutionInfo
         ? `<div class="table-cell-flex">
              <strong class="table-link-positive" 
-               onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${executionId}, 'view'); }"
+               data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${executionId}, 'view'); }"
                title="פתח פרטי ביצוע">
                #${executionId}
              </strong>
@@ -3682,7 +4226,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             </td>
             <td class="col-trade">
                 <div class="table-cell-flex">
-                    <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" onclick="openTradeDetailsModal(${suggestion.trade_id})" title="פתח פרטי טרייד"></button>
+                    <button data-button-type="LINK" data-variant="small" data-icon="🔗" data-classes="btn-outline-primary table-btn-small" data-onclick="openTradeDetailsModal(${suggestion.trade_id})" title="פתח פרטי טרייד"></button>
                     <strong>#${suggestion.trade_id}</strong>
                 </div>
                 <div class="text-muted small">${suggestion.ticker_symbol || ''}</div>
@@ -3707,8 +4251,8 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             </td>
             <td class="col-actions actions-cell">
                 <div class="table-cell-flex-small">
-                    <button data-button-type="APPROVE" data-variant="small" data-icon="✓" data-classes="btn-outline-success table-btn-small" onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})" title="קבל המלצה"></button>
-                    <button data-button-type="REJECT" data-variant="small" data-icon="✗" data-classes="btn-outline-danger table-btn-small" onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})" title="דחה המלצה"></button>
+                    <button data-button-type="APPROVE" data-variant="small" data-icon="✓" data-classes="btn-outline-success table-btn-small" data-onclick="acceptSuggestion(${executionId}, ${suggestion.trade_id})" title="קבל המלצה"></button>
+                    <button data-button-type="REJECT" data-variant="small" data-icon="✗" data-classes="btn-outline-danger table-btn-small" data-onclick="rejectSuggestion(${executionId}, ${suggestion.trade_id})" title="דחה המלצה"></button>
                 </div>
             </td>
         </tr>
@@ -3732,15 +4276,24 @@ async function acceptSuggestion(executionId, tradeId) {
     try {
         window.Logger?.info(`✅ Accepting suggestion: execution ${executionId} -> trade ${tradeId}`, { page: "executions" });
         
-        const response = await fetch(`/api/executions/${executionId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
+        // Use ExecutionsData service if available
+        let response;
+        if (typeof window.ExecutionsData?.updateExecution === 'function') {
+            response = await window.ExecutionsData.updateExecution(executionId, {
                 trade_id: tradeId
-            })
-        });
+            });
+        } else {
+            // Fallback to direct fetch
+            response = await fetch(`/api/executions/${executionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    trade_id: tradeId
+                })
+            });
+        }
         
         if (!response.ok) {
             const errorData = await response.json();
@@ -4176,8 +4729,12 @@ function buildTradeSuggestionsFlatList(sourceData) {
         try {
             if (typeof window.formatDate === 'function') {
                 display = window.formatDate(local);
+            } else if (typeof window.dateUtils?.formatDate === 'function') {
+                display = window.dateUtils.formatDate(timestamp);
             } else {
-                display = new Date(timestamp).toLocaleDateString('he-IL');
+                // Use dateUtils to convert timestamp to Date object
+                const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject({ epochMs: timestamp }) : new Date(timestamp);
+                display = dateObj.toLocaleDateString('he-IL');
             }
         } catch {
             display = new Date(timestamp).toISOString().split('T')[0];

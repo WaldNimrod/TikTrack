@@ -20,283 +20,274 @@
  */
 class ConditionsCRUDManager {
     constructor() {
-        this.baseUrl = '/api/plan-conditions';
+        this.baseUrls = {
+            plan: '/api/plan-conditions',
+            trade: '/api/trade-conditions'
+        };
+        this.entityType = 'plan';
         this.validator = window.conditionsValidator;
         this.translator = window.conditionsTranslations;
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }
-    
+
+    setContext({ entityType = 'plan' } = {}) {
+        if (!this.baseUrls[entityType]) {
+            window.Logger?.warn('[ConditionsCRUDManager] Unsupported entity type, defaulting to plan', { entityType }, { page: 'conditions-crud-manager' });
+            this.entityType = 'plan';
+            return;
+        }
+        this.entityType = entityType;
+    }
+
+    getBaseUrl() {
+        return this.baseUrls[this.entityType] || this.baseUrls.plan;
+    }
+
+    getCacheKey(entityId) {
+        return `conditions_${this.entityType}_${entityId}`;
+    }
+
     /**
      * Create new condition
-     * @function createCondition
-     * @async
-     * @param {number} tradePlanId - Trade plan ID
-     * @param {Object} conditionData - Condition data
-     * @returns {Promise<Object>} Created condition
      */
-    async createCondition(tradePlanId, conditionData) {
+    async createCondition(entityId, conditionData) {
+        const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
         try {
-            // Validate data
-            const validation = this.validator.validateForCreation(conditionData);
+            this.logEvent('create-start', { entityId, conditionData });
+            const entityField = this.entityType === 'plan' ? 'trade_plan_id' : 'trade_id';
+            const conditionWithContext = {
+                ...conditionData,
+                [entityField]: entityId
+            };
+
+            const validation = this.validator.validateForCreation(conditionWithContext);
             if (!validation.isValid) {
                 throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
             }
-            
-            // Prepare data
-            const preparedData = this.prepareConditionData(conditionData);
-            
-            // Make API call
-            const response = await this.makeApiCall(
-                `${this.baseUrl}/trade-plans/${tradePlanId}/conditions`,
-                'POST',
-                preparedData
-            );
-            
-            if (response.success) {
-                // Clear cache
-                this.clearCache(`conditions_${tradePlanId}`);
-                
-                // Show success notification
-                this.showNotification(
-                    this.translator.getMessage('condition_created'),
-                    'success'
-                );
-                
-                return response.data;
-            } else {
-                throw new Error(response.message || 'Failed to create condition');
-            }
-            
+
+            const preparedData = this.prepareConditionData(conditionWithContext);
+            const baseUrl = this.getBaseUrl();
+            const entitySegment = this.entityType === 'plan' ? 'trade-plans' : 'trades';
+            const endpoint = `${baseUrl}/${entitySegment}/${entityId}/conditions`;
+
+            let payload;
+
+            const json = await this.requestJson(endpoint, {
+                method: 'POST',
+                body: preparedData
+            });
+            payload = json.data ?? json;
+
+            this.clearCache(this.getCacheKey(entityId));
+            this.logEvent('create-success', { entityId, conditionId: payload?.id });
+            return this.translator.translateCondition(payload, this.entityType);
         } catch (error) {
-            console.error('Error creating condition:', error);
-            this.showNotification(
-                `שגיאה ביצירת תנאי: ${error.message}`,
-                'error'
-            );
+            window.Logger?.error('[ConditionsCRUDManager] Error creating condition', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('create-error', { entityId, error: error?.message });
             throw error;
         }
     }
-    
+
     /**
      * Read conditions
-     * @function readConditions
-     * @async
-     * @param {number} tradePlanId - Trade plan ID
-     * @param {boolean} useCache - Whether to use cache
-     * @returns {Promise<Array>} Conditions array
      */
-    async readConditions(tradePlanId, useCache = true) {
+    async readConditions(entityId, useCache = true) {
         try {
-            const cacheKey = `conditions_${tradePlanId}`;
-            
-            // Check cache first
+            this.logEvent('read-start', { entityId, useCache });
+            const cacheKey = this.getCacheKey(entityId);
+
             if (useCache && this.cache.has(cacheKey)) {
                 const cached = this.cache.get(cacheKey);
                 if (Date.now() - cached.timestamp < this.cacheTimeout) {
+                    this.logEvent('read-cache-hit', { entityId });
                     return cached.data;
                 }
             }
-            
-            // Make API call
-            const response = await this.makeApiCall(
-                `${this.baseUrl}/trade-plans/${tradePlanId}/conditions`,
-                'GET'
+
+            const baseUrl = this.getBaseUrl();
+            const entitySegment = this.entityType === 'plan' ? 'trade-plans' : 'trades';
+
+            const json = await this.requestJson(
+                `${baseUrl}/${entitySegment}/${entityId}/conditions`,
+                { method: 'GET' }
             );
-            
-            if (response.success) {
-                // Translate data
-                const translatedData = response.data.map(condition => 
-                    this.translator.translateCondition(condition)
-                );
-                
-                // Cache result
+
+            const translated = (json.data || []).map(condition =>
+                this.translator.translateCondition(condition, this.entityType)
+            );
+
+            if (translated.length > 0) {
                 this.cache.set(cacheKey, {
-                    data: translatedData,
+                    data: translated,
                     timestamp: Date.now()
                 });
-                
-                return translatedData;
-            } else {
-                throw new Error(response.message || 'Failed to read conditions');
+                this.logEvent('read-success', { entityId, count: translated.length, cached: true });
+            } else if (this.cache.has(cacheKey)) {
+                this.cache.delete(cacheKey);
+                this.logEvent('read-success', { entityId, count: 0, cached: false });
             }
-            
+
+            return translated;
         } catch (error) {
-            console.error('Error reading conditions:', error);
-            this.showNotification(
-                `שגיאה בקריאת תנאים: ${error.message}`,
-                'error'
-            );
+            window.Logger?.error('[ConditionsCRUDManager] Error reading conditions', { error: error?.message, stack: error?.stack, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('read-error', { entityId, error: error?.message });
             throw error;
         }
     }
-    
+
     /**
      * Update condition
-     * @function updateCondition
-     * @async
-     * @param {number} conditionId - Condition ID
-     * @param {Object} conditionData - Condition data
-     * @returns {Promise<Object>} Updated condition
      */
-    async updateCondition(conditionId, conditionData) {
+    async updateCondition(conditionId, conditionData, entityId = null) {
         try {
-            // Validate data
-            const validation = this.validator.validateForUpdate(conditionData);
+            this.logEvent('update-start', { conditionId, entityId });
+            const entityField = this.entityType === 'plan' ? 'trade_plan_id' : 'trade_id';
+            const conditionWithContext = {
+                ...conditionData,
+                id: conditionId
+            };
+
+            if (entityId !== null) {
+                conditionWithContext[entityField] = entityId;
+            }
+
+            const validation = this.validator.validateForUpdate(conditionWithContext);
             if (!validation.isValid) {
                 throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
             }
-            
-            // Prepare data
-            const preparedData = this.prepareConditionData(conditionData);
-            
-            // Make API call
-            const response = await this.makeApiCall(
-                `${this.baseUrl}/conditions/${conditionId}`,
-                'PUT',
-                preparedData
-            );
-            
-            if (response.success) {
-                // Clear cache
-                this.clearCache();
-                
-                // Show success notification
-                this.showNotification(
-                    this.translator.getMessage('condition_updated'),
-                    'success'
-                );
-                
-                return response.data;
+
+            const preparedData = this.prepareConditionData(conditionWithContext);
+            const baseUrl = this.getBaseUrl();
+            const endpoint = `${baseUrl}/${conditionId}`;
+            const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
+
+            let payload;
+
+            const json = await this.requestJson(endpoint, {
+                method: 'PUT',
+                body: preparedData
+            });
+            payload = json.data ?? json;
+
+            if (entityId !== null) {
+                this.clearCache(this.getCacheKey(entityId));
             } else {
-                throw new Error(response.message || 'Failed to update condition');
+                this.clearCache();
             }
-            
+
+            this.logEvent('update-success', { conditionId, entityId });
+            return this.translator.translateCondition(payload, this.entityType);
         } catch (error) {
-            console.error('Error updating condition:', error);
-            this.showNotification(
-                `שגיאה בעדכון תנאי: ${error.message}`,
-                'error'
-            );
+            window.Logger?.error('[ConditionsCRUDManager] Error updating condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('update-error', { conditionId, entityId, error: error?.message });
             throw error;
         }
     }
-    
+
     /**
      * Delete condition
-     * @function deleteCondition
-     * @async
-     * @param {number} conditionId - Condition ID
-     * @returns {Promise<boolean>} Success status
      */
-    async deleteCondition(conditionId) {
+    async deleteCondition(conditionId, entityId = null) {
         try {
-            // Confirm deletion
+            this.logEvent('delete-start', { conditionId, entityId });
             const confirmed = await this.confirmDeletion();
             if (!confirmed) {
+                this.logEvent('delete-cancelled', { conditionId });
                 return false;
             }
-            
-            // Make API call
-            const response = await this.makeApiCall(
-                `${this.baseUrl}/conditions/${conditionId}`,
-                'DELETE'
-            );
-            
-            if (response.success) {
-                // Clear cache
-                this.clearCache();
-                
-                // Show success notification
-                this.showNotification(
-                    this.translator.getMessage('condition_deleted'),
-                    'success'
-                );
-                
-                return true;
+
+            const baseUrl = this.getBaseUrl();
+            const endpoint = `${baseUrl}/${conditionId}`;
+            const entityLabel = this.translator.getMessage('condition_entity_label') || 'תנאי';
+
+            if (window.CRUDResponseHandler?.handleDeleteResponse) {
+                const response = await fetch(endpoint, {
+                    method: 'DELETE'
+                });
+
+                const serviceSuccess = await window.CRUDResponseHandler.handleDeleteResponse(response, {
+                    entityName: entityLabel,
+                    successMessage: this.translator.getMessage('condition_deleted'),
+                    reloadFn: async () => {}
+                });
+
+                if (!serviceSuccess) {
+                    if (entityId !== null) {
+                        this.clearCache(this.getCacheKey(entityId));
+                    } else {
+                        this.clearCache();
+                    }
+                    const error = new Error(this.translator.getMessage('condition_delete_error'));
+                    error.silent = true;
+                    error.forceRefresh = true;
+                    throw error;
+                }
             } else {
-                throw new Error(response.message || 'Failed to delete condition');
+                await this.requestJson(endpoint, { method: 'DELETE' });
             }
-            
+
+            if (entityId !== null) {
+                this.clearCache(this.getCacheKey(entityId));
+            } else {
+                this.clearCache();
+            }
+
+            this.logEvent('delete-success', { conditionId, entityId });
+            return true;
         } catch (error) {
-            console.error('Error deleting condition:', error);
-            this.showNotification(
-                `שגיאה במחיקת תנאי: ${error.message}`,
-                'error'
-            );
+            window.Logger?.error('[ConditionsCRUDManager] Error deleting condition', { error: error?.message, stack: error?.stack, conditionId, entityId }, { page: 'conditions-crud-manager' });
+            this.logEvent('delete-error', { conditionId, entityId, error: error?.message });
             throw error;
         }
     }
-    
+
     /**
      * Get trading methods
-     * @function getTradingMethods
-     * @async
-     * @param {boolean} useCache - Whether to use cache
-     * @returns {Promise<Array>} Trading methods array
      */
     async getTradingMethods(useCache = true) {
         try {
             const cacheKey = 'trading_methods';
-            
-            // Check cache first
+
             if (useCache && this.cache.has(cacheKey)) {
                 const cached = this.cache.get(cacheKey);
                 if (Date.now() - cached.timestamp < this.cacheTimeout) {
                     return cached.data;
                 }
             }
-            
-            // Make API call
-            const response = await this.makeApiCall(
-                '/api/trading-methods/',
-                'GET'
+
+            const json = await this.requestJson('/api/trading-methods/?include_parameters=true', { method: 'GET' });
+
+            const translatedMethods = (json.data || []).map(method =>
+                this.translator.translateMethod(method)
             );
-            
-            if (response.success) {
-                // Translate data
-                const translatedData = response.data.map(method => 
-                    this.translator.translateMethod(method)
-                );
-                
-                // Cache result
+
+            if (translatedMethods.length > 0) {
                 this.cache.set(cacheKey, {
-                    data: translatedData,
+                    data: translatedMethods,
                     timestamp: Date.now()
                 });
-                
-                return translatedData;
-            } else {
-                throw new Error(response.message || 'Failed to get trading methods');
+            } else if (this.cache.has(cacheKey)) {
+                this.cache.delete(cacheKey);
             }
-            
+
+            return translatedMethods;
         } catch (error) {
-            console.error('Error getting trading methods:', error);
-            this.showNotification(
-                `שגיאה בקבלת שיטות מסחר: ${error.message}`,
-                'error'
-            );
+            window.Logger?.error('[ConditionsCRUDManager] Error getting trading methods', { error: error?.message, stack: error?.stack }, { page: 'conditions-crud-manager' });
             throw error;
         }
     }
-    
+
     /**
      * Create alert from condition
-     * @function createAlertFromCondition
-     * @async
-     * @param {number} conditionId - Condition ID
-     * @param {Object} alertData - Alert data
-     * @returns {Promise<Object>} Created alert
      */
     async createAlertFromCondition(conditionId, alertData = {}) {
         try {
-            // Get condition data first
             const condition = await this.getConditionById(conditionId);
             if (!condition) {
                 throw new Error('Condition not found');
             }
-            
-            // Prepare alert data
+
             const preparedAlertData = {
                 title: alertData.title || `Alert for ${condition.method_name}`,
                 message: alertData.message || `Condition triggered: ${condition.method_name}`,
@@ -306,171 +297,171 @@ class ConditionsCRUDManager {
                 is_active: true,
                 ...alertData
             };
-            
-            // Make API call
-            const response = await this.makeApiCall(
-                '/api/alerts/',
-                'POST',
-                preparedAlertData
-            );
-            
-            if (response.success) {
-                this.showNotification(
-                    'התראה נוצרה בהצלחה',
-                    'success'
-                );
-                
-                return response.data;
-            } else {
-                throw new Error(response.message || 'Failed to create alert');
+
+            if (window.CRUDResponseHandler?.handleSaveResponse) {
+                const response = await fetch('/api/alerts/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(preparedAlertData)
+                });
+
+                const result = await window.CRUDResponseHandler.handleSaveResponse(response, {
+                    entityName: this.translator.getMessage('condition_entity_label') || 'תנאי',
+                    successMessage: 'התראה נוצרה בהצלחה',
+                    reloadFn: async () => {}
+                });
+
+                if (!result) {
+                    const error = new Error('שגיאה ביצירת התראה');
+                    error.silent = true;
+                    throw error;
+                }
+
+                return result.data ?? result;
             }
-            
+
+            const json = await this.requestJson('/api/alerts/', {
+                method: 'POST',
+                body: preparedAlertData
+            });
+
+            return json.data ?? json;
         } catch (error) {
-            console.error('Error creating alert:', error);
-            this.showNotification(
-                `שגיאה ביצירת התראה: ${error.message}`,
-                'error'
-            );
+            window.Logger?.error('[ConditionsCRUDManager] Error creating alert', { error: error?.message, stack: error?.stack, conditionId }, { page: 'conditions-crud-manager' });
             throw error;
         }
     }
-    
+
     /**
      * Get condition by ID
-     * @function getConditionById
-     * @async
-     * @param {number} conditionId - Condition ID
-     * @returns {Promise<Object|null>} Condition object or null
      */
     async getConditionById(conditionId) {
-        try {
-            const response = await this.makeApiCall(
-                `${this.baseUrl}/conditions/${conditionId}`,
-                'GET'
-            );
-            
-            if (response.success) {
-                return this.translator.translateCondition(response.data);
-            } else {
-                throw new Error(response.message || 'Failed to get condition');
-            }
-            
-        } catch (error) {
-            console.error('Error getting condition:', error);
-            throw error;
-        }
+        const baseUrl = this.getBaseUrl();
+        const json = await this.requestJson(`${baseUrl}/${conditionId}`, { method: 'GET' });
+        return this.translator.translateCondition(json.data ?? json, this.entityType);
     }
-    
-    /**
-     * Prepare condition data
-     * @function prepareConditionData
-     * @param {Object} conditionData - Raw condition data
-     * @returns {Object} Prepared condition data
-     */
+
     prepareConditionData(conditionData) {
         const prepared = { ...conditionData };
-        
-        // Convert parameters to JSON string if needed
+
         if (prepared.parameters_json && typeof prepared.parameters_json === 'object') {
             prepared.parameters_json = JSON.stringify(prepared.parameters_json);
         }
-        
-        // Ensure boolean values
+
+        if (prepared.method_id !== undefined && prepared.method_id !== null) {
+            const methodId = parseInt(prepared.method_id, 10);
+            prepared.method_id = Number.isNaN(methodId) ? null : methodId;
+        }
+
         if (prepared.is_active !== undefined) {
             prepared.is_active = Boolean(prepared.is_active);
         }
-        
-        // Ensure numeric values
+
         if (prepared.condition_group !== undefined) {
-            prepared.condition_group = parseInt(prepared.condition_group) || 0;
+            prepared.condition_group = parseInt(prepared.condition_group, 10) || 0;
         }
-        
+
+        if (prepared.trade_plan_id !== undefined && prepared.trade_plan_id !== null) {
+            const planId = parseInt(prepared.trade_plan_id, 10);
+            prepared.trade_plan_id = Number.isNaN(planId) ? null : planId;
+        }
+
+        if (prepared.trade_id !== undefined && prepared.trade_id !== null) {
+            const tradeId = parseInt(prepared.trade_id, 10);
+            prepared.trade_id = Number.isNaN(tradeId) ? null : tradeId;
+        }
+
+        if (prepared.id !== undefined && prepared.id !== null) {
+            const conditionId = parseInt(prepared.id, 10);
+            prepared.id = Number.isNaN(conditionId) ? null : conditionId;
+        }
+
+        if (prepared.trigger_action) {
+            prepared.trigger_action = String(prepared.trigger_action);
+        } else {
+            prepared.trigger_action = 'enter_trade_positive';
+        }
+
+        if (typeof prepared.action_notes === 'string') {
+            prepared.action_notes = prepared.action_notes.trim();
+        }
+
         return prepared;
     }
-    
-    /**
-     * Make API call
-     * @function makeApiCall
-     * @async
-     * @param {string} endpoint - API endpoint
-     * @param {string} method - HTTP method
-     * @param {Object|null} data - Request data
-     * @returns {Promise<Object>} API response
-     */
-    async makeApiCall(endpoint, method = 'GET', data = null) {
+
+    async requestJson(endpoint, { method = 'GET', body = null } = {}) {
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        if (body && method !== 'GET') {
+            options.body = JSON.stringify(body);
+        }
+
+        let response;
         try {
-            const options = {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            };
-            
-            if (data && method !== 'GET') {
-                options.body = JSON.stringify(data);
-            }
-            
-            const response = await fetch(endpoint, options);
-            const result = await response.json();
-            
-            return {
-                success: response.ok,
-                data: result.data || result,
-                message: result.message,
-                status: response.status
-            };
-            
+            window.Logger?.info?.(
+                '[ConditionsCRUDManager] requestJson -> fetch',
+                { endpoint, method, hasBody: Boolean(body) },
+                { page: 'conditions-crud-manager' }
+            );
+            this.logEvent('request-start', { endpoint, method });
+            response = await fetch(endpoint, options);
+        } catch (networkError) {
+            window.Logger?.error('[ConditionsCRUDManager] Network error during request', { endpoint, method, error: networkError?.message }, { page: 'conditions-crud-manager' });
+            this.logEvent('request-network-error', { endpoint, method, error: networkError?.message });
+            throw new Error(networkError?.message || 'שגיאה ברשת בעת פנייה לשרת');
+        }
+        let json;
+
+        try {
+            json = await response.json();
         } catch (error) {
-            console.error('API call failed:', error);
-            return {
-                success: false,
-                data: null,
-                message: error.message,
-                status: 0
-            };
+            window.Logger?.error('[ConditionsCRUDManager] Failed parsing JSON response', { endpoint, method, status: response.status, error: error?.message }, { page: 'conditions-crud-manager' });
+            throw new Error(`Invalid response from server (status ${response.status})`);
         }
+
+        const success = json?.status === 'success' || json?.success === true || response.ok;
+
+        window.Logger?.info?.(
+            '[ConditionsCRUDManager] requestJson <- response',
+            { endpoint, method, status: response.status, success },
+            { page: 'conditions-crud-manager' }
+        );
+        this.logEvent('request-response', { endpoint, method, status: response.status, success });
+
+        if (!success) {
+            const message = json?.message || json?.error || `Request failed with status ${response.status}`;
+            const error = new Error(message);
+            error.response = json;
+            error.status = response.status;
+            this.logEvent('request-error', { endpoint, method, status: response.status, message });
+            throw error;
+        }
+
+        return json;
     }
-    
-    /**
-     * Confirm deletion
-     * @function confirmDeletion
-     * @async
-     * @returns {Promise<boolean>} Confirmation result
-     */
+
     async confirmDeletion() {
-        return new Promise((resolve) => {
-            if (window.confirm && typeof window.confirm === 'function') {
-                resolve(window.confirm(this.translator.getMessage('confirm_delete')));
-            } else {
-                // Fallback for systems without confirm
-                resolve(true);
-            }
-        });
-    }
-    
-    /**
-     * Show notification
-     * @function showNotification
-     * @param {string} message - Message key
-     * @param {string} type - Notification type
-     * @returns {void}
-     */
-    showNotification(message, type = 'info') {
-        if (window.showNotification && typeof window.showNotification === 'function') {
-            window.showNotification(message, type);
-        } else if (window.notificationSystem && window.notificationSystem.showNotification) {
-            window.notificationSystem.showNotification(message, type);
-        } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+        if (window.showConfirmDialog) {
+            return window.showConfirmDialog(this.translator.getMessage('confirm_delete'));
         }
+        if (window.confirm && typeof window.confirm === 'function') {
+            return window.confirm(this.translator.getMessage('confirm_delete'));
+        }
+        return true;
     }
-    
-    /**
-     * Clear cache
-     * @function clearCache
-     * @param {string|null} pattern - Cache pattern
-     * @returns {void}
-     */
+
+    getCachedTradingMethods() {
+        const cached = this.cache.get('trading_methods');
+        return cached?.data || [];
+    }
+
     clearCache(pattern = null) {
         if (pattern) {
             for (const key of this.cache.keys()) {
@@ -482,12 +473,17 @@ class ConditionsCRUDManager {
             this.cache.clear();
         }
     }
-    
-    /**
-     * Get cache statistics
-     * @function getCacheStats
-     * @returns {Object} Cache statistics
-     */
+
+    logEvent(action, details = {}) {
+        const payload = {
+            action,
+            entityType: this.entityType,
+            timestamp: Date.now(),
+            ...details
+        };
+        window.Logger?.info?.('[ConditionsCRUD] Event', payload, { page: 'conditions-crud-manager' });
+    }
+
     getCacheStats() {
         return {
             size: this.cache.size,
@@ -496,42 +492,32 @@ class ConditionsCRUDManager {
             newestEntry: this.getNewestCacheEntry()
         };
     }
-    
-    /**
-     * Get oldest cache entry
-     * @function getOldestCacheEntry
-     * @returns {Object|null} Oldest cache entry
-     */
+
     getOldestCacheEntry() {
         let oldest = null;
         let oldestTime = Date.now();
-        
+
         for (const [key, value] of this.cache.entries()) {
             if (value.timestamp < oldestTime) {
                 oldestTime = value.timestamp;
                 oldest = key;
             }
         }
-        
+
         return oldest;
     }
-    
-    /**
-     * Get newest cache entry
-     * @function getNewestCacheEntry
-     * @returns {Object|null} Newest cache entry
-     */
+
     getNewestCacheEntry() {
         let newest = null;
         let newestTime = 0;
-        
+
         for (const [key, value] of this.cache.entries()) {
             if (value.timestamp > newestTime) {
                 newestTime = value.timestamp;
                 newest = key;
             }
         }
-        
+
         return newest;
     }
 }

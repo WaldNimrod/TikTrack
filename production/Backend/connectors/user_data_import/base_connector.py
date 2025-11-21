@@ -279,6 +279,49 @@ class BaseConnector(ABC):
             'processing_timestamp': datetime.now().isoformat()
         }
     
+    def precheck_file(
+        self,
+        file_content: str,
+        *,
+        file_name: Optional[str] = None,
+        task_type: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Lightweight validation hook that runs immediately after the user selects a file.
+        
+        Connectors can override this to add custom structural checks. The default implementation
+        verifies the file is non-empty and matches the connector format via identify_file().
+        """
+        errors = []
+        warnings: List[str] = []
+        
+        if not file_content or not file_content.strip():
+            errors.append('The uploaded file is empty or unreadable.')
+            return {
+                'success': False,
+                'errors': errors,
+                'warnings': warnings
+            }
+        
+        try:
+            if not self.identify_file(file_content, file_name or ''):
+                errors.append('File format does not match the selected data provider.')
+        except Exception as exc:
+            errors.append(str(exc))
+        
+        if errors:
+            return {
+                'success': False,
+                'errors': errors,
+                'warnings': warnings
+            }
+        
+        return {
+            'success': True,
+            'message': 'File structure looks valid.',
+            'warnings': warnings
+        }
+    
     def get_connector_info(self) -> Dict[str, Any]:
         """
         Get information about this connector.

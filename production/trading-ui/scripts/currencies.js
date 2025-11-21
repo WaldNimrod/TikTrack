@@ -236,10 +236,15 @@ function renderCurrenciesTable() {
     tbody.appendChild(row);
   });
 
-  // עדכון מספר הפריטים
-  const countElement = document.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${currenciesData.length} מטבעות`;
+  // עדכון מספר הפריטים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+  if (window.updateTableCount) {
+    window.updateTableCount('.table-count', 'currencies', 'מטבעות', currenciesData.length);
+  } else {
+    // Fallback
+    const countElement = document.querySelector('.table-count');
+    if (countElement) {
+      countElement.textContent = `${currenciesData.length} מטבעות`;
+    }
   }
 }
 

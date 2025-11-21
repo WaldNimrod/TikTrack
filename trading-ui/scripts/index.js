@@ -100,6 +100,11 @@ const SIDE_LABELS = Object.freeze({
     sell: 'מכירה'
 });
 
+/**
+ * Convert value to number
+ * @param {*} value - Value to convert
+ * @returns {number} Number value or 0 if invalid
+ */
 function toNumber(value) {
     if (typeof value === 'number' && Number.isFinite(value)) {
         return value;
@@ -108,6 +113,11 @@ function toNumber(value) {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/**
+ * Resolve date value from various formats
+ * @param {*} value - Date value (string, object, or null)
+ * @returns {string|null} Resolved date string or null
+ */
 function resolveDateValue(value) {
     if (!value && value !== 0) {
         return null;
@@ -121,6 +131,11 @@ function resolveDateValue(value) {
     return null;
 }
 
+/**
+ * Format date to short format
+ * @param {*} value - Date value to format
+ * @returns {string} Formatted date string or empty string
+ */
 function formatDateShort(value) {
     const resolved = resolveDateValue(value);
     if (!resolved) {
@@ -138,13 +153,18 @@ function formatDateShort(value) {
         if (Number.isNaN(dateObj.getTime())) {
             return '';
         }
-        return dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        return window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }));
     } catch (error) {
         window.Logger?.warn?.('⚠️ formatDateShort fallback failed', { error: error?.message }, { page: 'index' });
         return '';
     }
 }
 
+/**
+ * Normalize payload to array
+ * @param {*} payload - Payload to normalize
+ * @returns {Array} Normalized array
+ */
 function normalizeArray(payload) {
     if (!payload) {
         return [];
@@ -167,6 +187,12 @@ function normalizeArray(payload) {
     return [];
 }
 
+/**
+ * Determine currency symbol from accounts or trades
+ * @param {Array} [accounts=[]] - Array of accounts
+ * @param {Array} [trades=[]] - Array of trades
+ * @returns {string} Currency symbol or '$' as default
+ */
 function determineCurrencySymbol(accounts = [], trades = []) {
     for (const account of accounts) {
         if (account?.currency_symbol) {
@@ -190,6 +216,13 @@ function determineCurrencySymbol(accounts = [], trades = []) {
     return '$';
 }
 
+/**
+ * Format amount as HTML
+ * @param {*} value - Amount value
+ * @param {string} [currencySymbol='$'] - Currency symbol
+ * @param {number} [decimals=2] - Number of decimal places
+ * @returns {string} Formatted HTML string
+ */
 function formatAmountHtml(value, currencySymbol = '$', decimals = 2) {
     const numericValue = toNumber(value);
     if (!Number.isFinite(numericValue)) {
@@ -205,6 +238,11 @@ function formatAmountHtml(value, currencySymbol = '$', decimals = 2) {
     return `${currencySymbol}${numericValue.toFixed(decimals)}`;
 }
 
+/**
+ * Translate side value to Hebrew
+ * @param {*} side - Side value
+ * @returns {string} Translated side or original value
+ */
 function translateSide(side) {
     if (!side && side !== 0) {
         return '';
@@ -220,6 +258,13 @@ function translateSide(side) {
     return SIDE_LABELS[normalized] || side;
 }
 
+/**
+ * Compute portfolio profit and loss
+ * @param {Array} [trades=[]] - Array of trades
+ * @param {Array} [accounts=[]] - Array of accounts
+ * @param {Array} [cashFlows=[]] - Array of cash flows
+ * @returns {number} Total P&L
+ */
 function computePortfolioPnL(trades = [], accounts = [], cashFlows = []) {
     let total = 0;
     trades.forEach((trade) => {
@@ -253,6 +298,12 @@ function computePortfolioPnL(trades = [], accounts = [], cashFlows = []) {
     return total;
 }
 
+/**
+ * Update summary statistics on dashboard
+ * @param {Object} data - Dashboard data
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
 function updateSummaryStats(data, currencySymbol) {
     const { trades = [], alerts = [], accounts = [], cashFlows = [] } = data;
 
@@ -282,6 +333,12 @@ function updateSummaryStats(data, currencySymbol) {
     }
 }
 
+/**
+ * Update recent trades section
+ * @param {Array} [trades=[]] - Array of trades
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
 function updateRecentTrades(trades = [], currencySymbol) {
     if (window.RecentTradesWidget?.render) {
         window.RecentTradesWidget.render(trades, currencySymbol);
@@ -368,6 +425,11 @@ function updateRecentTrades(trades = [], currencySymbol) {
     container.appendChild(list);
 }
 
+/**
+ * Update active alerts section
+ * @param {Array} [alerts=[]] - Array of alerts
+ * @returns {void}
+ */
 function updateActiveAlerts(alerts = []) {
     const container = document.getElementById('activeAlerts');
     if (!container) {
@@ -446,6 +508,14 @@ function updateActiveAlerts(alerts = []) {
     container.appendChild(list);
 }
 
+/**
+ * Update dashboard count indicators
+ * @param {Object} data - Dashboard data
+ * @param {Array} [data.trades=[]] - Array of trades
+ * @param {Array} [data.alerts=[]] - Array of alerts
+ * @param {Array} [data.accounts=[]] - Array of accounts
+ * @returns {void}
+ */
 function updateDashboardCount({ trades = [], alerts = [], accounts = [] }) {
     const countEl = document.getElementById('dashboardCount');
     if (!countEl) {
@@ -456,6 +526,15 @@ function updateDashboardCount({ trades = [], alerts = [], accounts = [] }) {
     countEl.textContent = `טריידים: ${trades.length.toLocaleString('he-IL')} • התראות פעילות: ${activeAlerts.length.toLocaleString('he-IL')} • חשבונות: ${accounts.length.toLocaleString('he-IL')}`;
 }
 
+/**
+ * Update portfolio summary section
+ * @param {Object} data - Portfolio data
+ * @param {Array} [data.accounts=[]] - Array of accounts
+ * @param {Array} [data.trades=[]] - Array of trades
+ * @param {Array} [data.cashFlows=[]] - Array of cash flows
+ * @param {string} currencySymbol - Currency symbol
+ * @returns {void}
+ */
 function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, currencySymbol) {
     const container = document.getElementById('portfolioSummaryStats');
     if (!container) {
@@ -487,6 +566,11 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     `;
 }
 
+/**
+ * Show dashboard error message
+ * @param {string} message - Error message
+ * @returns {void}
+ */
 function showDashboardError(message) {
     const fallback = message || 'שגיאה בטעינת נתוני הדשבורד';
     const recentContainer = document.getElementById('recentTrades');
@@ -503,6 +587,11 @@ function showDashboardError(message) {
     }
 }
 
+/**
+ * Handle dashboard error
+ * @param {Error} error - Error object
+ * @returns {void}
+ */
 function handleDashboardError(error) {
     const message = error?.message || 'שגיאה בטעינת נתוני הדשבורד';
     window.Logger?.error?.('❌ Error loading dashboard data', { message, stack: error?.stack }, { page: 'index' });
@@ -512,6 +601,12 @@ function handleDashboardError(error) {
     showDashboardError(message);
 }
 
+/**
+ * Process dashboard data
+ * @param {Object} data - Dashboard data
+ * @param {string} [source='network'] - Data source
+ * @returns {void}
+ */
 function processDashboardData(data, source = 'network') {
     if (!data) {
         return;
@@ -565,7 +660,12 @@ function processDashboardData(data, source = 'network') {
     window.dashboardData = dashboardDataState.data;
 }
 
-async function fetchDashboardDataFromApi() {
+/**
+ * Legacy function to fetch dashboard data from API (DEPRECATED)
+ * @deprecated Use loadDashboardDataFromService instead
+ * @returns {Promise<Object>} Dashboard data
+ */
+async function legacyFetchDashboardDataFromApi() {
     const fetchJsonList = async (url, label) => {
         const response = await fetch(url, {
             headers: {
@@ -607,6 +707,30 @@ async function fetchDashboardDataFromApi() {
     return result;
 }
 
+/**
+ * Load dashboard data from service
+ * @param {Object} [options={}] - Loading options
+ * @param {boolean} [options.force=false] - Force refresh from server
+ * @returns {Promise<Object>} Dashboard data
+ */
+async function loadDashboardDataFromService(options = {}) {
+    const { force = false } = options;
+
+    if (window.DashboardData?.load) {
+        if (force && typeof window.DashboardData.invalidate === 'function') {
+            try {
+                await window.DashboardData.invalidate();
+            } catch (error) {
+                window.Logger?.warn?.('⚠️ Failed to invalidate dashboard data cache', { error: error?.message }, { page: 'index' });
+            }
+        }
+        return window.DashboardData.load({ force });
+    }
+
+    window.Logger?.warn?.('⚠️ DashboardData service not available, using legacy fetch', { page: 'index' });
+    return legacyFetchDashboardDataFromApi();
+}
+
 window.loadDashboardData = async function(options = {}) {
     const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
 
@@ -615,26 +739,66 @@ window.loadDashboardData = async function(options = {}) {
     }
 
     const executeLoad = async () => {
-        if (force && window.UnifiedCacheManager?.clearByPattern) {
-            try {
-                await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
-            } catch (clearError) {
-                window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+        if (force) {
+            // Try CacheSyncManager first (preferred method)
+            if (window.CacheSyncManager?.invalidateByAction) {
+                try {
+                    await window.CacheSyncManager.invalidateByAction('dashboard-updated');
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
+                        page: 'index',
+                        error: error?.message,
+                    });
+                    // Fallback to direct invalidation
+                    if (window.UnifiedCacheManager?.clearByPattern) {
+                        try {
+                            await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
+                        } catch (clearError) {
+                            window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+                        }
+                    }
+                }
+            } else if (window.UnifiedCacheManager?.clearByPattern) {
+                // Fallback if CacheSyncManager not available
+                try {
+                    await window.UnifiedCacheManager.clearByPattern(DASHBOARD_DATA_KEY);
+                } catch (clearError) {
+                    window.Logger?.warn?.('⚠️ Failed to clear dashboard cache', { error: clearError?.message }, { page: 'index' });
+                }
+            }
+
+            const fresh = await loadDashboardDataFromService({ force: true });
+            processDashboardData(fresh, 'network');
+            return fresh;
+        }
+
+        if (window.CacheTTLGuard?.ensure) {
+            const cachedOrFresh = await window.CacheTTLGuard.ensure(
+                DASHBOARD_DATA_KEY,
+                () => loadDashboardDataFromService({ force: false }),
+                {
+                    ttl,
+                    afterRead: (cached) => {
+                        if (cached) {
+                            processDashboardData(cached, 'cache');
+                        }
+                    },
+                    afterLoad: (fresh) => {
+                        if (fresh) {
+                            processDashboardData(fresh, 'network');
+                        }
+                    }
+                }
+            );
+
+            if (cachedOrFresh) {
+                return cachedOrFresh;
             }
         }
 
-        if (window.CacheTTLGuard?.ensure && !force) {
-            return window.CacheTTLGuard.ensure(DASHBOARD_DATA_KEY, fetchDashboardDataFromApi, {
-                ttl,
-                afterRead: (cached) => {
-                    if (cached) {
-                        processDashboardData(cached, 'cache');
-                    }
-                }
-            });
-        }
-
-        return fetchDashboardDataFromApi();
+        const fallback = await loadDashboardDataFromService({ force: false });
+        processDashboardData(fallback, 'network');
+        return fallback;
     };
 
     dashboardDataPromise = executeLoad()
@@ -661,6 +825,7 @@ window.dashboardDataState = dashboardDataState;
 /**
  * Switch between table tabs on the index page
  * @param {string} tabName - The name of the tab to switch to
+ * @returns {void}
  */
 function switchTableTab(tabName) {
     // Hide all table contents
@@ -686,6 +851,7 @@ function switchTableTab(tabName) {
 /**
  * Refresh overview data on the index page
  * Fetches and updates overview section data
+ * @returns {void}
  */
 function refreshOverview() {
     window.Logger.info('Refreshing overview data...', { page: "index" });
@@ -696,7 +862,8 @@ function refreshOverview() {
 
 /**
  * Export overview data from the index page
- * @param {string} format - Export format (csv, json, etc.)
+ * @param {string} [format='csv'] - Export format (csv, json, etc.)
+ * @returns {void}
  */
 function exportOverview(format = 'csv') {
     if (typeof showNotification === 'function') {
@@ -709,6 +876,7 @@ function exportOverview(format = 'csv') {
 /**
  * Execute quick actions on the index page
  * @param {string} actionType - Type of quick action to execute
+ * @returns {void}
  */
 function quickAction(actionType) {
     if (typeof showNotification === 'function') {
@@ -815,6 +983,10 @@ async function createPerformanceChart() {
     }
 }
 
+/**
+ * Create account chart
+ * @returns {Promise<void>}
+ */
 async function createAccountChart() {
     try {
         // window.Logger.info('🏦 Creating account chart...', { page: "index" });
@@ -859,6 +1031,10 @@ async function createAccountChart() {
     }
 }
 
+/**
+ * Create mixed chart on the index page
+ * @returns {Promise<void>}
+ */
 async function createMixedChart() {
     try {
         // window.Logger.info('🔀 Creating mixed chart...', { page: "index" });
@@ -912,6 +1088,10 @@ async function createMixedChart() {
 // Flag to prevent duplicate chart refresh
 let chartsRefreshing = false;
 
+/**
+ * Refresh all charts on the index page
+ * @returns {Promise<void>}
+ */
 async function refreshAllCharts() {
     // Prevent duplicate refresh
     if (chartsRefreshing) {
@@ -945,6 +1125,11 @@ async function refreshAllCharts() {
     }
 }
 
+/**
+ * Refresh a specific chart by ID
+ * @param {string} chartId - Chart ID ('tradesStatusChart', 'performanceChart', 'accountChart', 'mixedChart')
+ * @returns {Promise<void>}
+ */
 async function refreshChart(chartId) {
     window.Logger.info(`🔄 Refreshing chart: ${chartId}`, { page: "index" });
     
@@ -980,6 +1165,11 @@ async function refreshChart(chartId) {
     }
 }
 
+/**
+ * Export a specific chart by ID
+ * @param {string} chartId - Chart ID to export
+ * @returns {Promise<void>}
+ */
 async function exportChart(chartId) {
     window.Logger.info(`📤 Exporting chart: ${chartId}`, { page: "index" });
     
@@ -1004,6 +1194,10 @@ async function exportChart(chartId) {
     }
 }
 
+/**
+ * Export all charts on the index page
+ * @returns {Promise<void>}
+ */
 async function exportAllCharts() {
     window.Logger.info('📤 Exporting all charts...', { page: "index" });
     
@@ -1110,6 +1304,10 @@ window.exportChart = exportChart;
 window.exportAllCharts = exportAllCharts;
 
 // Detailed Log Functions for Index Page
+/**
+ * Generate detailed log for index page debugging
+ * @returns {string} JSON string with detailed log data
+ */
 function generateDetailedLog() {
     try {
         const logData = {
@@ -1224,7 +1422,10 @@ function generateDetailedLog() {
 }
 
 
-// Z-Index Debug Function - בדיקת מצב z-index בפועל
+/**
+ * Debug Z-Index status for header system
+ * @returns {void}
+ */
 function debugZIndexStatus() {
     window.Logger.info('🔍 בדיקת מצב Z-Index במערכת ראש הדף', { page: "index" });
     window.Logger.info('=====================================', { page: "index" });
@@ -1291,6 +1492,10 @@ function debugZIndexStatus() {
 // window.generateDetailedLog = generateDetailedLog; // REMOVED: Local function only
 
 // Local copyDetailedLog function for index page
+/**
+ * Copy detailed log to clipboard
+ * @returns {Promise<void>}
+ */
 async function copyDetailedLogLocal() {
     try {
         const detailedLog = await generateDetailedLog();

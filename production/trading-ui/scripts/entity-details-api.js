@@ -40,6 +40,7 @@ class EntityDetailsAPI {
     constructor() {
         this.baseUrl = '/api/entity-details';
         this.cache = new Map();
+        this.planConditionsCache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 דקות
         this.isInitialized = false;
         this.retryAttempts = 3;
@@ -56,7 +57,7 @@ class EntityDetailsAPI {
     init() {
         try {
             // ניקוי cache ישן
-            this.clearExpiredCache();
+        this.clearExpiredCache();
             
             // הגדרת interval לניקוי cache
             setInterval(() => {
@@ -200,6 +201,50 @@ class EntityDetailsAPI {
                 }
                 entityData.linked_items = entityData.linked_items || [];
             }
+
+            // 🔧 Enrichment for trade planning data:
+            // במקרה של trade, אם אין plan object/flat fields, ננסה להשלים מתוך trade_plan ב-linked_items
+            if (entityType === 'trade') {
+                try {
+                    const hasPlanObject = !!entityData.trade_plan;
+                    const hasFlatPlan = (entityData.trade_plan_planned_amount !== undefined && entityData.trade_plan_planned_amount !== null)
+                        || (entityData.planned_amount !== undefined && entityData.planned_amount !== null);
+                    const linked = Array.isArray(entityData.linked_items) ? entityData.linked_items : [];
+                    const planItem = linked.find(it => (it && (it.type === 'trade_plan' || it.type === 'plan')));
+                    
+                    if ((!hasPlanObject || !hasFlatPlan) && planItem && planItem.id) {
+                        // אם אין ערכים קריטיים, נטען את ה-trade_plan המלא מה-API
+                        if (window.Logger) {
+                            window.Logger.info('🔗 Enriching trade planning from trade_plan endpoint...', {
+                                tradeId: entityId,
+                                planId: planItem.id
+                            }, { page: "entity-details-api" });
+                        }
+                        const planResp = await fetch(`/api/trade-plans/${planItem.id}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            }
+                        });
+                        if (planResp.ok) {
+                            const planPayload = await planResp.json();
+                            const planData = planPayload?.data || planPayload || null;
+                            if (planData) {
+                                // שמירת האובייקט המלא
+                                entityData.trade_plan = entityData.trade_plan || planData;
+                                // שדות שטוחים שה-Renderer יודע לקרוא מהם
+                                // NO FALLBACKS - רק אם אין trade_plan_planned_amount, נשתמש בזה מהתוכנית (זה לא fallback, זה המקור האמיתי)
+                                // אבל entry_price - רק מה-Trade עצמו, לא מהתוכנית!
+                                // Removed: trade_plan_planned_amount fallback - זה שדה של התוכנית, לא של הטרייד
+                                // Removed: entry_price fallback - רק מה-Trade עצמו
+                            }
+                        }
+                    }
+                } catch (enrichError) {
+                    window.Logger?.debug('⚠️ Failed to enrich trade planning data from trade_plan', { error: enrichError?.message }, { page: "entity-details-api" });
+                }
+            }
             
             // טעינת נתוני שוק אם נדרש (לטיקרים)
             if (entityType === 'ticker' && options.includeMarketData !== false) {
@@ -254,6 +299,17 @@ class EntityDetailsAPI {
                     }
                 } catch (error) {
                     window.Logger.warn(`Failed to load trades and plans data for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                }
+            }
+
+            if (entityType === 'trade_plan') {
+                try {
+                    entityData.plan_conditions = await this.getTradePlanConditions(entityId, {
+                        forceRefresh: options.forceRefresh
+                    });
+                } catch (error) {
+                    window.Logger.warn(`Failed to load conditions for trade_plan ${entityId}:`, error, { page: "entity-details-api" });
+                    entityData.plan_conditions = Array.isArray(entityData.plan_conditions) ? entityData.plan_conditions : [];
                 }
             }
             
@@ -320,6 +376,11 @@ class EntityDetailsAPI {
     async fetchEntityFromAPI(entityType, entityId, options = {}) {
         if (entityType === 'position') {
             return this.fetchPositionDetails(entityId, options);
+        }
+        
+        // Import session uses a special endpoint
+        if (entityType === 'import_session') {
+            return this.fetchImportSessionDetails(entityId, options);
         }
         
         // נסה קודם את ה-endpoint החדש (מחזיר ticker object עם נתוני שוק)
@@ -467,13 +528,14 @@ class EntityDetailsAPI {
         const endpointMappings = {
             ticker: `/api/tickers/${entityId}`,
             trade: `/api/trades/${entityId}`,
-            trade_plan: `/api/trade_plans/${entityId}`,
+            trade_plan: `/api/trade-plans/${entityId}`,
             execution: `/api/executions/${entityId}`,
             account: `/api/trading-accounts/${entityId}`,
             trading_account: `/api/trading-accounts/${entityId}`, // Alias for trading_account
             alert: `/api/alerts/${entityId}`,
-            cash_flow: `/api/cash_flows/${entityId}`,
-            note: `/api/notes/${entityId}`
+            cash_flow: `/api/cash-flows/${entityId}`,
+            note: `/api/notes/${entityId}`,
+            import_session: `/api/user-data-import/session/${entityId}`
         };
 
         const endpoint = endpointMappings[entityType];
@@ -590,6 +652,55 @@ class EntityDetailsAPI {
         }
 
         return positionData;
+    }
+
+    /**
+     * Fetch import session details - קריאת פרטי סשן ייבוא
+     * @param {number|string} entityId - Session ID
+     * @param {Object} options - Additional options
+     * @returns {Promise<Object>} - Import session details payload
+     * @private
+     */
+    async fetchImportSessionDetails(entityId, options = {}) {
+        const url = `/api/user-data-import/session/${entityId}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error(`סשן ייבוא עם מזהה ${entityId} לא נמצא`);
+            }
+            throw new Error(`שגיאת שרת: ${response.status} ${response.statusText}`);
+        }
+
+        const payload = await response.json();
+        
+        // The API returns { success: true, session: {...} } or { status: 'success', session: {...} }
+        const sessionData = payload.session || payload.data || payload;
+        
+        if (!sessionData) {
+            throw new Error('השרת החזיר נתונים ריקים עבור פרטי סשן ייבוא');
+        }
+
+        // Normalize the data structure
+        const normalizedData = {
+            ...sessionData,
+            id: sessionData.id || entityId,
+            entity_type: 'import_session',
+            type: 'import_session'
+        };
+
+        // Ensure linked items array (import sessions may have linked cash flows, executions, etc.)
+        if (!Array.isArray(normalizedData.linked_items)) {
+            normalizedData.linked_items = [];
+        }
+
+        return normalizedData;
     }
 
     /**
@@ -840,6 +951,13 @@ class EntityDetailsAPI {
                 deletedCount++;
             }
         }
+
+        for (const [key, entry] of this.planConditionsCache.entries()) {
+            if (now - entry.timestamp > this.cacheTimeout) {
+                this.planConditionsCache.delete(key);
+                deletedCount++;
+            }
+        }
         
         if (deletedCount > 0) {
             window.Logger.debug(`Cleared ${deletedCount} expired cache entries`, { page: "entity-details-api" });
@@ -854,7 +972,9 @@ class EntityDetailsAPI {
     clearCache() {
         const cacheSize = this.cache.size;
         this.cache.clear();
-        window.Logger.info(`Cleared ${cacheSize} cache entries`, { page: "entity-details-api" });
+        const conditionsSize = this.planConditionsCache.size;
+        this.planConditionsCache.clear();
+        window.Logger.info(`Cleared ${cacheSize} entity cache entries and ${conditionsSize} plan conditions entries`, { page: "entity-details-api" });
     }
 
     /**
@@ -870,6 +990,79 @@ class EntityDetailsAPI {
         
         if (deleted) {
             window.Logger.debug(`Cleared cache for ${cacheKey}`, { page: "entity-details-api" });
+        }
+
+        if (entityType === 'trade_plan') {
+            const conditionsKey = this.getPlanConditionsCacheKey(entityId);
+            if (this.planConditionsCache.delete(conditionsKey)) {
+                window.Logger.debug(`Cleared plan conditions cache for ${conditionsKey}`, { page: "entity-details-api" });
+            }
+        }
+    }
+
+    /**
+     * Get cache key for plan conditions
+     * @param {number|string} tradePlanId
+     * @returns {string}
+     * @private
+     */
+    getPlanConditionsCacheKey(tradePlanId) {
+        return `trade_plan_conditions_${tradePlanId}`;
+    }
+
+    /**
+     * Load trade plan conditions for entity details
+     * @param {number|string} tradePlanId
+     * @param {Object} options
+     * @returns {Promise<Array>}
+     * @private
+     */
+    async getTradePlanConditions(tradePlanId, options = {}) {
+        if (!tradePlanId && tradePlanId !== 0) {
+            return [];
+        }
+
+        const cacheKey = this.getPlanConditionsCacheKey(tradePlanId);
+
+        if (!options.forceRefresh && this.planConditionsCache.has(cacheKey)) {
+            const cached = this.planConditionsCache.get(cacheKey);
+            if (Date.now() - cached.timestamp < this.cacheTimeout) {
+                window.Logger.debug(`Using cached plan conditions for ${tradePlanId}`, { page: "entity-details-api" });
+                return cached.data;
+            }
+        }
+
+        try {
+            window.Logger.info(`Loading plan conditions for trade_plan ${tradePlanId}`, { page: "entity-details-api" });
+            const response = await fetch(`/api/plan-conditions/trade-plans/${tradePlanId}/conditions`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`שגיאה בטעינת תנאים (status ${response.status})`);
+            }
+
+            const payload = await response.json();
+            if (payload?.status !== 'success') {
+                throw new Error(payload?.message || 'שגיאה בטעינת תנאים');
+            }
+
+            const conditions = Array.isArray(payload.data) ? payload.data : [];
+
+            this.planConditionsCache.set(cacheKey, {
+                data: conditions,
+                timestamp: Date.now()
+            });
+
+            window.Logger.info(`Loaded ${conditions.length} plan conditions for trade_plan ${tradePlanId}`, { page: "entity-details-api" });
+            return conditions;
+        } catch (error) {
+            window.Logger.error(`Failed to load plan conditions for trade_plan ${tradePlanId}:`, error, { page: "entity-details-api" });
+            throw error;
         }
     }
 
@@ -1376,9 +1569,11 @@ class EntityDetailsAPI {
             const confirmed = await this.confirmDeletion(entityType, entityId);
             if (!confirmed) return false;
 
-            const url = `${this.baseUrl}/${entityType}/${entityId}`;
+            // Use direct entity API endpoint to avoid 302 redirect
+            // entity-details API returns 302 redirect, so we use the actual endpoint directly
+            const directUrl = `/api/${entityType}s/${entityId}`;
             
-            const response = await fetch(url, {
+            const response = await fetch(directUrl, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1387,7 +1582,9 @@ class EntityDetailsAPI {
             });
 
             if (!response.ok) {
-                throw new Error(`שגיאה במחיקה: ${response.status} ${response.statusText}`);
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error?.message || errorData.message || `שגיאה במחיקה: ${response.status} ${response.statusText}`;
+                throw new Error(errorMessage);
             }
 
             // מחיקת cache
@@ -1432,12 +1629,11 @@ class EntityDetailsAPI {
                 // fallback לconfirm רגיל
                 if (typeof showConfirmationDialog === 'function') {
                     showConfirmationDialog(
-                        `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`,
-                        () => resolve(true),
-                        () => resolve(false),
-                        'מחיקת ישות',
-                        'מחק',
-                        'ביטול'
+                        'מחיקת ישות',  // title
+                        `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`,  // message
+                        () => resolve(true),  // onConfirm
+                        () => resolve(false),  // onCancel
+                        'danger'  // color
                     );
                 } else {
                     const result = window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);
@@ -1626,7 +1822,7 @@ window.debugCashFlow = async function(cashFlowId) {
     try {
         // 1. Fetch from API
         console.log('📡 Step 1: Fetching from API...');
-        const response = await fetch(`/api/cash_flows/${cashFlowId}`);
+        const response = await fetch(`/api/cash-flows/${cashFlowId}`);
         const apiData = await response.json();
         console.log('✅ API Response:', apiData);
         console.log('📊 API Data Field:', apiData.data);
@@ -1689,4 +1885,103 @@ window.debugCashFlow = async function(cashFlowId) {
         message: 'Debug complete. Check console for details.',
         cashFlowId: cashFlowId
     };
+};
+
+/**
+ * Debug trade details - פונקציה גלובלית לניטור נתוני טרייד
+ * 
+ * שימוש: בקונסול
+ *   await debugTrade(30)
+ * 
+ * תדפיס:
+ * - תמצית מה-GET הישן (/api/trades/{id})
+ * - תמצית מה-EntityDetailsAPI (כולל linked_items)
+ * - טבלת שדות קריטיים לתכנון/פוזיציה כפי שה-Renderer משתמש בהם
+ */
+window.debugTrade = async function(tradeId) {
+    console.group(`🔍 [DEBUG] Trade #${tradeId}`);
+    try {
+        // 1) Raw API
+        console.log('📡 Step 1: GET /api/trades/{id}');
+        const r1 = await fetch(`/api/trades/${tradeId}`);
+        const j1 = await r1.json().catch(() => ({}));
+        const d1 = j1?.data || j1 || null;
+        console.log('✅ API Response (raw):', j1);
+        if (d1) {
+            console.table({
+                id: d1.id,
+                trade_plan_id: d1.trade_plan_id,
+                trade_plan_planned_amount: d1.trade_plan_planned_amount,
+                planned_amount: d1.planned_amount,
+                entry_price: d1.entry_price,
+                current_price: d1.current_price,
+                has_trade_plan_obj: !!d1.trade_plan,
+                linked_items_count: Array.isArray(d1.linked_items) ? d1.linked_items.length : 0
+            });
+        }
+
+        // 2) Via EntityDetailsAPI
+        console.log('\n📡 Step 2: EntityDetailsAPI.getEntityDetails(trade, includeLinkedItems=true)');
+        const d2 = await (window.entityDetailsAPI
+            ? window.entityDetailsAPI.getEntityDetails('trade', tradeId, { includeLinkedItems: true, forceRefresh: true })
+            : Promise.reject(new Error('EntityDetailsAPI not available')));
+        console.log('✅ Entity Details:', d2);
+        console.table({
+            id: d2.id,
+            trade_plan_id: d2.trade_plan_id,
+            trade_plan_planned_amount: d2.trade_plan_planned_amount,
+            planned_amount: d2.planned_amount,
+            entry_price: d2.entry_price,
+            current_price: d2.current_price,
+            has_trade_plan_obj: !!d2.trade_plan,
+            linked_items_count: Array.isArray(d2.linked_items) ? d2.linked_items.length : 0
+        });
+
+        // 3) Extract planned fields as renderer would
+        console.log('\n🧮 Step 3: Renderer inputs (planning calc)');
+        const pick = (obj, key, fallback = 0) => {
+            const v = obj && obj[key];
+            return (v === undefined || v === null) ? fallback : v;
+        };
+        const fromObj = d2.trade_plan ? {
+            plannedAmount: Number(pick(d2.trade_plan, 'planned_amount')),
+            targetPrice: Number(pick(d2.trade_plan, 'target_price'))
+        } : null;
+        const flatPlannedAmount = Number(d2.trade_plan_planned_amount || d2.planned_amount || 0);
+        const flatEntryPrice = Number(d2.entry_price || 0);
+        let liPlan = null;
+        if (Array.isArray(d2.linked_items)) {
+            liPlan = d2.linked_items.find(x => (x.type === 'trade_plan' || x.type === 'plan')) || null;
+        }
+        const liPlannedAmount = Number(
+            (liPlan && (liPlan.planned_amount || liPlan.amount || (liPlan.metrics && liPlan.metrics.amount))) || 0
+        );
+        const liEntryPrice = Number(
+            (liPlan && (liPlan.entry_price || liPlan.target_price)) || 0
+        );
+        console.table({
+            fromPlanObject_plannedAmount: fromObj ? fromObj.plannedAmount : 'N/A',
+            fromPlanObject_targetPrice: fromObj ? fromObj.targetPrice : 'N/A',
+            flat_plannedAmount: flatPlannedAmount,
+            flat_entryPrice: flatEntryPrice,
+            linkedItem_plannedAmount: liPlannedAmount,
+            linkedItem_entryPrice: liEntryPrice
+        });
+
+        // 4) Decision tree summary
+        console.log('\n🧭 Step 4: Decision tree');
+        if (fromObj && fromObj.plannedAmount > 0 && fromObj.targetPrice > 0) {
+            console.log('➡️ Renderer uses plan object (planned_amount / target_price).');
+        } else if (flatPlannedAmount > 0 && flatEntryPrice > 0) {
+            console.log('➡️ Renderer uses flat fields (trade_plan_planned_amount/planned_amount + entry_price).');
+        } else if (liPlannedAmount > 0 && (liEntryPrice > 0 || flatEntryPrice > 0)) {
+            console.log('➡️ Renderer uses linked_items plan fallback.');
+        } else {
+            console.warn('❌ No valid planning source detected (all sources empty).');
+        }
+    } catch (error) {
+        console.error('❌ Debug failed:', error);
+    }
+    console.groupEnd();
+    return { ok: true };
 };

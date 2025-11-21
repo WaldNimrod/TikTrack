@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from config.database import get_db
 from services.currency_service import CurrencyService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
+from decimal import Decimal
 import logging
-import os
-import sqlite3
 import re
 
 # Import base classes
@@ -17,39 +17,24 @@ logger = logging.getLogger(__name__)
 
 currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/currencies')
 
-# Initialize base API (currencies uses direct SQLite, so we'll use it selectively)
-
-def get_db_connection():
-    """Get database connection"""
-    from config.settings import DB_PATH
-    
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
-
 @currencies_bp.route('/', methods=['GET'])
 @api_endpoint(cache_ttl=3600, rate_limit=60)
 @handle_database_session()
 @cache_with_deps(ttl=3600, dependencies=['currencies'])  # Cache for 1 hour - static data
 def get_currencies():
-    """Get all currencies using base API patterns"""
+    """Get all currencies using CurrencyService"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT symbol, name, usd_rate, id, created_at FROM currencies ORDER BY id")
-        currencies = cursor.fetchall()
-        
-        conn.close()
+        currencies = CurrencyService.get_all(db)
         
         result = []
         for currency in currencies:
             result.append({
-                'symbol': currency[0],  # symbol is at index 0
-                'name': currency[1],    # name is at index 1
-                'usd_rate': currency[2], # usd_rate is at index 2
-                'id': currency[3],      # id is at index 3
-                'created_at': currency[4] # created_at is at index 4
+                'symbol': currency.symbol,
+                'name': currency.name,
+                'usd_rate': float(currency.usd_rate) if currency.usd_rate else None,
+                'id': currency.id,
+                'created_at': currency.created_at.isoformat() if currency.created_at else None
             })
         
         return jsonify({
@@ -65,40 +50,38 @@ def get_currencies():
             "error": {"message": "שגיאה בטעינת רשימת המטבעות"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/<int:currency_id>', methods=['GET'])
+@cache_for(ttl=3600)
 def get_currency(currency_id: int):
-    """Get currency by ID"""
+    """Get currency by ID using CurrencyService"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        currency = CurrencyService.get_by_id(db, currency_id)
         
-        cursor.execute("SELECT symbol, name, usd_rate, id, created_at FROM currencies WHERE id = ?", (currency_id,))
-        currency = cursor.fetchone()
-        
-        conn.close()
-        
-        if currency:
-            currency_dict = {
-                'symbol': currency[0],  # symbol is at index 0
-                'name': currency[1],    # name is at index 1
-                'usd_rate': currency[2], # usd_rate is at index 2
-                'id': currency[3],      # id is at index 3
-                'created_at': currency[4] # created_at is at index 4
-            }
-            
+        if not currency:
             return jsonify({
-                "status": "success",
-                "data": currency_dict,
-                "message": "פרטי המטבע נטענו בהצלחה",
+                "status": "error",
+                "error": {"message": "Currency not found"},
                 "version": "1.0"
-            })
+            }), 404
+        
+        currency_dict = {
+            'symbol': currency.symbol,
+            'name': currency.name,
+            'usd_rate': float(currency.usd_rate) if currency.usd_rate else None,
+            'id': currency.id,
+            'created_at': currency.created_at.isoformat() if currency.created_at else None
+        }
         
         return jsonify({
-            "status": "error",
-            "error": {"message": "Currency not found"},
+            "status": "success",
+            "data": currency_dict,
+            "message": "פרטי המטבע נטענו בהצלחה",
             "version": "1.0"
-        }), 404
+        })
     except Exception as e:
         logger.error(f"Error getting currency {currency_id}: {str(e)}")
         return jsonify({
@@ -106,11 +89,14 @@ def get_currency(currency_id: int):
             "error": {"message": "שגיאה בטעינת פרטי המטבע"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/', methods=['POST'])
 @invalidate_cache(['currencies'])  # Invalidate cache after creating currency
 def create_currency():
-    """Create new currency"""
+    """Create new currency using CurrencyService"""
+    db: Session = next(get_db())
     try:
         data = request.get_json()
         symbol = data.get('symbol', '').strip().upper()
@@ -150,7 +136,7 @@ def create_currency():
         
         # וולידציה של שער דולר
         try:
-            usd_rate = float(usd_rate)
+            usd_rate = Decimal(str(usd_rate))
             if usd_rate <= 0:
                 return jsonify({
                     "status": "error",
@@ -164,52 +150,58 @@ def create_currency():
                 "version": "1.0"
             }), 400
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Create currency using CurrencyService
+        currency_data = {
+            'symbol': symbol,
+            'name': name,
+            'usd_rate': usd_rate
+        }
         
-        # בדיקה אם סמל המטבע כבר קיים
-        cursor.execute("SELECT id FROM currencies WHERE symbol = ?", (symbol,))
-        if cursor.fetchone():
-            conn.close()
-            return jsonify({
-                "status": "error",
-                "error": {"message": "סמל מטבע זה כבר קיים במערכת"},
-                "version": "1.0"
-            }), 400
-        
-        cursor.execute(
-            "INSERT INTO currencies (symbol, name, usd_rate) VALUES (?, ?, ?)",
-            (symbol, name, usd_rate)
-        )
-        currency_id = cursor.lastrowid
-        
-        conn.commit()
-        conn.close()
+        currency = CurrencyService.create(db, currency_data)
         
         return jsonify({
             "status": "success",
             "data": {
-                'id': currency_id,
-                'symbol': symbol,
-                'name': name,
-                'usd_rate': usd_rate,
-                'created_at': None  # Will be set by database default
+                'id': currency.id,
+                'symbol': currency.symbol,
+                'name': currency.name,
+                'usd_rate': float(currency.usd_rate) if currency.usd_rate else None,
+                'created_at': currency.created_at.isoformat() if currency.created_at else None
             },
             "message": "מטבע נוסף בהצלחה",
             "version": "1.0"
         }), 201
+    except ValueError as e:
+        logger.error(f"Validation error creating currency: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "1.0"
+        }), 400
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error creating currency: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "סמל מטבע זה כבר קיים במערכת"},
+            "version": "1.0"
+        }), 400
     except Exception as e:
+        db.rollback()
         logger.error(f"Error creating currency: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה פנימית בשרת"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/<int:currency_id>', methods=['PUT'])
 @invalidate_cache(['currencies'])  # Invalidate cache after updating currency
 def update_currency(currency_id: int):
-    """Update currency"""
+    """Update currency using CurrencyService"""
+    db: Session = next(get_db())
     try:
         # הגנה על רשומת הבסיס (מזהה 1)
         if currency_id == 1:
@@ -256,15 +248,17 @@ def update_currency(currency_id: int):
             }), 400
         
         # וולידציה של שער דולר
+        update_data = {'symbol': symbol, 'name': name}
         if usd_rate is not None:
             try:
-                usd_rate = float(usd_rate)
-                if usd_rate <= 0:
+                usd_rate_decimal = Decimal(str(usd_rate))
+                if usd_rate_decimal <= 0:
                     return jsonify({
                         "status": "error",
                         "error": {"message": "שער דולר חייב להיות מספר חיובי גדול מ-0. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
                         "version": "1.0"
                     }), 400
+                update_data['usd_rate'] = usd_rate_decimal
             except (ValueError, TypeError):
                 return jsonify({
                     "status": "error",
@@ -272,82 +266,60 @@ def update_currency(currency_id: int):
                     "version": "1.0"
                 }), 400
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Update currency using CurrencyService
+        currency = CurrencyService.update(db, currency_id, update_data)
         
-        # Check if currency exists
-        cursor.execute("SELECT id FROM currencies WHERE id = ?", (currency_id,))
-        if not cursor.fetchone():
-            conn.close()
+        return jsonify({
+            "status": "success",
+            "data": {
+                'id': currency.id,
+                'symbol': currency.symbol,
+                'name': currency.name,
+                'usd_rate': float(currency.usd_rate) if currency.usd_rate else None
+            },
+            "message": "מטבע עודכן בהצלחה",
+            "version": "1.0"
+        })
+    except ValueError as e:
+        logger.error(f"Validation error updating currency {currency_id}: {str(e)}")
+        error_message = str(e)
+        if "not found" in error_message.lower():
             return jsonify({
                 "status": "error",
                 "error": {"message": "המטבע לא נמצא במערכת"},
                 "version": "1.0"
             }), 404
-        
-        # בדיקה אם סמל המטבע כבר קיים (למעט המטבע הנוכחי)
-        cursor.execute("SELECT id FROM currencies WHERE symbol = ? AND id != ?", (symbol, currency_id))
-        if cursor.fetchone():
-            conn.close()
-            return jsonify({
-                "status": "error",
-                "error": {"message": "סמל מטבע זה כבר קיים במערכת"},
-                "version": "1.0"
-            }), 400
-        
-        # Update currency
-        if usd_rate is not None:
-            cursor.execute(
-                "UPDATE currencies SET symbol = ?, name = ?, usd_rate = ? WHERE id = ?",
-                (symbol, name, usd_rate, currency_id)
-            )
-        else:
-            cursor.execute(
-                "UPDATE currencies SET symbol = ?, name = ? WHERE id = ?",
-                (symbol, name, currency_id)
-            )
-        
-        conn.commit()
-        conn.close()
-        
         return jsonify({
-            "status": "success",
-            "data": {
-                'id': currency_id,
-                'symbol': symbol,
-                'name': name,
-                'usd_rate': usd_rate
-            },
-            "message": "מטבע עודכן בהצלחה",
+            "status": "error",
+            "error": {"message": error_message},
             "version": "1.0"
-        })
+        }), 400
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Integrity error updating currency {currency_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "סמל מטבע זה כבר קיים במערכת"},
+            "version": "1.0"
+        }), 400
     except Exception as e:
+        db.rollback()
         logger.error(f"Error updating currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה פנימית בשרת"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/dropdown', methods=['GET'])
+@cache_for(ttl=3600)
 def get_currencies_dropdown():
-    """Get currencies for dropdown display"""
+    """Get currencies for dropdown display using CurrencyService"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT id, symbol, name FROM currencies ORDER BY symbol")
-        currencies = cursor.fetchall()
-        
-        conn.close()
-        
-        result = []
-        for currency in currencies:
-            result.append({
-                'id': currency[0],
-                'symbol': currency[1],
-                'name': currency[2]
-            })
+        result = CurrencyService.get_currencies_for_dropdown(db)
         
         return jsonify({
             "status": "success",
@@ -362,11 +334,14 @@ def get_currencies_dropdown():
             "error": {"message": "שגיאה בטעינת רשימת המטבעות לתפריט נפתח"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()
 
 @currencies_bp.route('/<int:currency_id>', methods=['DELETE'])
 @invalidate_cache(['currencies'])  # Invalidate cache after deleting currency
 def delete_currency(currency_id: int):
-    """Delete currency"""
+    """Delete currency using CurrencyService"""
+    db: Session = next(get_db())
     try:
         # הגנה על רשומת הבסיס (מזהה 1)
         if currency_id == 1:
@@ -376,33 +351,35 @@ def delete_currency(currency_id: int):
                 "version": "1.0"
             }), 403
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Check if currency exists
-        cursor.execute("SELECT id FROM currencies WHERE id = ?", (currency_id,))
-        if not cursor.fetchone():
-            conn.close()
-            return jsonify({
-                "status": "error",
-                "error": {"message": "Currency not found"},
-                "version": "1.0"
-            }), 404
-        
-        # Delete currency
-        cursor.execute("DELETE FROM currencies WHERE id = ?", (currency_id,))
-        conn.commit()
-        conn.close()
+        # Delete currency using CurrencyService
+        CurrencyService.delete(db, currency_id)
         
         return jsonify({
             "status": "success",
             "message": "Currency deleted successfully",
             "version": "1.0"
         })
+    except ValueError as e:
+        logger.error(f"Validation error deleting currency {currency_id}: {str(e)}")
+        error_message = str(e)
+        if "not found" in error_message.lower():
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Currency not found"},
+                "version": "1.0"
+            }), 404
+        return jsonify({
+            "status": "error",
+            "error": {"message": error_message},
+            "version": "1.0"
+        }), 400
     except Exception as e:
+        db.rollback()
         logger.error(f"Error deleting currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה במחיקת המטבע"},
             "version": "1.0"
         }), 500
+    finally:
+        db.close()

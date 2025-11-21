@@ -695,7 +695,9 @@
         'scripts/trade-selector-modal.js?v=1.0.0',
         'scripts/modal-configs/trades-config.js?v=1.0.0',
         'scripts/trades.js?v=1.0.0',
-        'scripts/validation-utils.js?v=1.0.0'
+        'scripts/validation-utils.js?v=1.0.0',
+        'scripts/modal-configs/trade-plans-config.js?v=1.0.0',
+        'scripts/trade_plans.js?v=1.0.0'
       ];
       const bootstrapScript = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
 
@@ -769,6 +771,18 @@
         }
         if (!window.validateEntityForm) {
           throw new Error('Validation system not available after loading dependencies');
+        }
+        if (!window.tradePlansModalConfig) {
+          throw new Error('tradePlansModalConfig not available after loading dependencies');
+        }
+        if (typeof window.saveTradePlan !== 'function') {
+          throw new Error('saveTradePlan handler not available after loading dependencies');
+        }
+        if (typeof window.ModalManagerV2?.getModalInfo === 'function') {
+          const tradePlansModalInfo = window.ModalManagerV2.getModalInfo('tradePlansModal');
+          if (!tradePlansModalInfo?.element && typeof window.ModalManagerV2.createCRUDModal === 'function') {
+            window.ModalManagerV2.createCRUDModal(window.tradePlansModalConfig);
+          }
         }
       })().catch(error => {
         this.dependencyPromise = null;

@@ -177,7 +177,12 @@ class ConditionsTranslations {
                 'method_info_placeholder': 'בחר שיטת מסחר כדי לראות הסבר ודוגמה.',
                 'condition_delete_confirm_title': 'מחיקת תנאי',
                 'condition_delete_confirm_message': 'האם אתה בטוח שברצונך למחוק את התנאי הנבחר? הפעולה אינה הפיכה.',
-                'condition_delete_confirm_secondary': 'המחיקה תשפיע רק על התנאי הנוכחי.'
+                'condition_delete_confirm_secondary': 'המחיקה תשפיע רק על התנאי הנוכחי.',
+                'single_condition_evaluated': 'התנאי נבדק בהצלחה.',
+                'single_condition_evaluate_error': 'שגיאה בבדיקת התנאי.',
+                'auto_alerts_enabled': 'התראות אוטומטיות הופעלו עבור תנאי זה.',
+                'auto_alerts_disabled': 'התראות אוטומטיות כובו עבור תנאי זה.',
+                'auto_alerts_toggle_error': 'שגיאה בעדכון מצב ההתראות.'
             },
             
             // Form Labels

@@ -101,7 +101,7 @@
     padding: 8px 12px;
     margin: 5px 0;
     border-radius: 4px;
-    border-left: 4px solid #007bff;
+    border-left: 4px solid var(--primary-color, #26baac);
     background: white;
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;

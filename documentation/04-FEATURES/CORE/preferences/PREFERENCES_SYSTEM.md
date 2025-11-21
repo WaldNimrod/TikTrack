@@ -1,7 +1,16 @@
 # מערכת העדפות - TikTrack Preferences System
 
-> **גרסה 3.1** - מערכת העדפות גמישה ומתקדמת  
-> **עדכון אחרון:** 8 בנובמבר 2025 - הוספת endpoint ליצירת פרופיל חדש
+> **גרסה 4.0** - מערכת העדפות גמישה ומתקדמת  
+> **עדכון אחרון:** 27 בינואר 2025 - תיקון טעינת העדפות בכל העמודים, הסרת כפילות Bootstrap JS, הוספת טסטים מקיפים
+
+---
+
+## 📚 מדריכים
+
+- **[PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md](PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md)** - מדריך מפתחים מלא עם כל הממשקים והתרחישים
+- **[PREFERENCES_DEVELOPER_GUIDE.md](PREFERENCES_DEVELOPER_GUIDE.md)** - מדריך הוספה/עדכון/מחיקה של preference types
+- **[PREFERENCES_CACHE_INTEGRATION.md](PREFERENCES_CACHE_INTEGRATION.md)** - אינטגרציה עם UnifiedCacheManager
+- **[IMPLEMENTING_PREFERENCES.md](IMPLEMENTING_PREFERENCES.md)** - מדריך יישום קצר
 
 ---
 
@@ -20,14 +29,35 @@
 2. **הוספת קבוצה חדשה** - עדכן את `preference_groups` table  
 3. **שינוי מבנה** - עדכן את המודלים ב-`Backend/models/preferences.py`
 
-### סטטיסטיקות מערכת נוכחיות - **עדכון 31/01/2025:**
-- **123 העדפות** פעילות במערכת (עדכון מדויק לפי DB)
+### 🧪 בדיקות חובה למודול העדפות
+- **Frontend**  
+  - `tests/unit/preferences-page.test.js` – לוגיקה של שמירה ועומס UI  
+  - `tests/integration/preferences-integration.test.js` – זרימת CRUD מלאה מול cache/unified systems  
+  - `tests/e2e/user-pages/preferences-scripts-loading.test.js` – **חדש!** בדיקת טעינת העדפות בכל העמודים
+  - `tests/e2e/user-pages/preferences.test.js` – בדיקת עמוד העדפות
+  - `tests/e2e/preferences-flow.test.js` – מסלול משתמש מלא בעמוד ההעדפות
+  - `tests/unit/preferences.v4.events.test.js` – בדיקת אירועי Preferences V4
+  - `tests/integration/preferences.v4.bootstrap.integration.test.js` – בדיקת bootstrap flow
+- **Backend**  
+  - `Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py` – `/api/preferences/version` ו-`/api/preferences/user/check-updates`  
+  - `Backend/tests/test_services/test_tag_service.py` – וידוא אינטגרציית cache + analytics שמוזנות להעדפות
+- **פקודות מומלצות:**  
+  ```
+  npm run test -- --coverage --runInBand
+  npm run test -- tests/e2e/user-pages/preferences-scripts-loading.test.js
+  python3 -m pytest Backend/tests/test_routes/test_indexeddb_and_preferences_routes.py
+  ```
+  יש לעדכן את `tests/TEST_STATUS_REPORT.md` בכל שינוי המשפיע על העדפות.
+
+### סטטיסטיקות מערכת נוכחיות - **עדכון 27/01/2025:**
+- **126 העדפות פעילות** במערכת (עדכון מדויק לפי DB)
 - **7 קבוצות** העדפות מאורגנות
-- **2 פרופילים** משתמש (ברירת מחדל + נימרוד) - זהים לחלוטין
-- **123 העדפות** שמורות למשתמש בכל פרופיל
-- **מטבע משני יורו** מוגדר בפרופיל נימרוד
+- **פרופילים מרובים** - כל משתמש יכול ליצור מספר פרופילים
 - **63 צבעים** (entity, status, type, priority, value, chart colors, UI colors)
 - **23 הגדרות התראות** (הקבוצה הגדולה ביותר)
+- **Debug Monitor** - מערכת ניטור ובדיקה מפורטת
+- **15 עמודים** עם preferences package - כולם מתוקנים ומאומתים
+- **60+ טסטים** לבדיקת טעינת העדפות בכל העמודים
 
 ---
 
@@ -434,11 +464,19 @@ await window.resetToDefaults();
 - `Backend/migrations/add_missing_color_preferences.py` - הוספת צבעים חסרים
 
 ### Frontend:
-- `trading-ui/scripts/preferences-core.js` - ✨ **NEW v2.0** - מערכת מאוחדת עם OOP (12/01/2025)
+- `trading-ui/scripts/services/preferences-data.js` - שירות API מרכזי
+- `trading-ui/scripts/services/preferences-v4.js` - V4 SDK עם bootstrap ו-ETag
+- `trading-ui/scripts/preferences-core-new.js` - מערכת ליבה (OOP)
+- `trading-ui/scripts/preferences-ui.js` - ממשק משתמש V3 (Legacy)
+- `trading-ui/scripts/preferences-ui-v4.js` - ממשק משתמש V4 (מומלץ)
+- `trading-ui/scripts/preferences-page.js` - פונקציות ספציפיות לעמוד (loadAccountsForPreferences, renderPreferenceTypesAuditTable)
+- `trading-ui/scripts/preferences-debug-monitor.js` - מערכת ניטור ובדיקה מפורטת
+- `trading-ui/scripts/preferences-colors.js` - ניהול צבעים
+- `trading-ui/scripts/preferences-profiles.js` - ניהול פרופילים
+- `trading-ui/scripts/preferences-validation.js` - ולידציה
+- `trading-ui/scripts/preferences-group-manager.js` - ניהול קבוצות
+- `trading-ui/scripts/preferences-lazy-loader.js` - טעינה עצלה
 - `trading-ui/preferences.html` - עמוד העדפות (ממשק HTML)
-- `trading-ui/scripts/preferences-admin.js` - ממשק ניהול
-- ~~`trading-ui/scripts/preferences.js`~~ - **Archived** - הוחלף ב-preferences-core.js
-- ~~`trading-ui/scripts/preferences-page.js`~~ - **Archived** - הוחלף ב-preferences-core.js
 
 ### Testing:
 - `Backend/test_preferences_service.py` - בדיקות שירות
@@ -454,11 +492,135 @@ await window.resetToDefaults();
 - **Indexes** על user_id, profile_id, preference_id
 - **Batch operations** לשמירה מרובה
 - **Lazy loading** של פרופילים
+- **4-Layer Cache System** - Memory → localStorage → IndexedDB → Backend
+- **Cache Warming** - העדפות נשמרות ב-Memory layer לאחר טעינה
+- **Event-Driven Architecture** - מערכות תלויות מקבלות עדכונים דרך events
 
 ### מדדי ביצועים:
 - **קריאת העדפה בודדת**: < 10ms (עם cache)
-- **טעינת כל ההעדפות**: < 50ms (56 העדפות)
+- **טעינת כל ההעדפות**: < 50ms (עם cache), < 500ms (ללא cache)
+- **טעינת העדפות קריטיות**: < 50ms (עם cache), < 500ms (ללא cache)
 - **שמירת העדפות**: < 100ms (4 העדפות)
+
+---
+
+## 🔄 Lazy Loading עם Events
+
+### Event System
+
+המערכת משדרת 4 אירועים עיקריים:
+
+1. **`preferences:critical-loaded`** - העדפות קריטיות נטענו
+   - נשלח מיד לאחר טעינת העדפות הקריטיות
+   - Detail כולל: `preferences`, `fromCache`, `cacheLayer`, `userId`, `profileId`, `loadTime`, `environment`, `criticalCount`, `totalCritical`, `timestamp`
+
+2. **`preferences:all-loaded`** - כל ההעדפות נטענו
+   - נשלח לאחר טעינת כל ההעדפות
+   - Detail כולל: `preferences`, `fromCache`, `cacheLayer`, `loadTime`, `environment`
+
+3. **`preferences:cache-hit`** - העדפות נטענו מהמטמון
+   - Detail כולל: `cacheLayer`, `loadTime`, `environment`
+
+4. **`preferences:cache-miss`** - העדפות נטענו מהשרת
+   - Detail כולל: `loadTime`, `environment`
+
+### Global Flags
+
+- **`window.__preferencesCriticalLoaded`** - Boolean flag המציין אם העדפות הקריטיות נטענו
+- **`window.__preferencesCriticalLoadedDetail`** - Object עם מידע מפורט על ההעדפות שנטענו
+
+### שימוש במערכות תלויות
+
+```javascript
+// בדיקה אם העדפות כבר נטענו
+if (window.__preferencesCriticalLoaded) {
+  // העדפות כבר נטענו, אפשר להשתמש בהן מיד
+  const defaultAccount = window.currentPreferences?.default_trading_account;
+} else {
+  // המתין לאירוע
+  window.addEventListener('preferences:critical-loaded', () => {
+    const defaultAccount = window.currentPreferences?.default_trading_account;
+    // ... use preferences
+  }, { once: true });
+}
+```
+
+ראה [PREFERENCES_LOADING_BEST_PRACTICES.md](../../02-ARCHITECTURE/FRONTEND/PREFERENCES_LOADING_BEST_PRACTICES.md) למדריך מלא.
+
+---
+
+## 💾 Cache Integration
+
+### 4-Layer Cache System
+
+המערכת משתמשת ב-4 שכבות מטמון:
+
+1. **Memory** - המהיר ביותר, נמחק עם רענון דף
+2. **localStorage** - נשמר בין רענונים, מוגבל בגודל
+3. **IndexedDB** - נשמר לטווח ארוך, יכול לאחסן כמויות גדולות
+4. **Backend** - מקור האמת, נגיש תמיד
+
+### Cache Warming
+
+לאחר טעינת העדפות משכבה כלשהי, המערכת שומרת אותן גם ב-Memory layer לביצועים מהירים יותר בפעם הבאה.
+
+### Fallback Mechanisms
+
+אם שכבה אחת נכשלת, המערכת מנסה את השכבה הבאה:
+- Memory → localStorage → IndexedDB → Backend
+
+---
+
+## 🌍 Environment Handling
+
+### Development vs Production
+
+המערכת מזהה את הסביבה ומתאימה את ההתנהגות:
+
+- **Development:**
+  - Timeout: 3 שניות
+  - Logging מפורט
+  - Debug mode פעיל
+
+- **Production:**
+  - Timeout: 5 שניות
+  - Logging מינימלי
+  - Debug mode כבוי
+
+### זיהוי סביבה
+
+```javascript
+const environment = window.API_ENV || 'development';
+const timeoutMs = environment === 'production' ? 5000 : 3000;
+```
+
+---
+
+## 📱 מצבי טעינה
+
+### 1. טעינה רגילה (עם מטמון)
+
+- **מצב:** מטמון מלא (Memory + localStorage + IndexedDB)
+- **צפוי:** טעינה מהירה (< 100ms), `preferences:cache-hit`, `fromCache: true`
+- **Performance:** < 50ms לטעינת העדפות הקריטיות
+
+### 2. ריענון קשיח (ללא מטמון)
+
+- **מצב:** Ctrl+Shift+R או ניקוי מטמון מלא
+- **צפוי:** טעינה מהשרת, `preferences:cache-miss`, `fromCache: false`, אין שגיאות 429
+- **Performance:** < 500ms לטעינת העדפות הקריטיות
+
+### 3. גלישה בסטר (ללא מטמון)
+
+- **מצב:** חלון גלישה בסטר חדש
+- **צפוי:** טעינה מהשרת, אין שגיאות 429, כל הטבלאות נטענות
+- **Performance:** < 500ms לטעינת העדפות הקריטיות
+
+### 4. פיתוח vs פרודקשן
+
+- **מצב:** בדיקה בשני הסביבות
+- **צפוי:** timeout שונים (3s dev, 5s prod), logging מותאם
+- **Performance:** זהה בשני הסביבות, אך timeout שונים
 - **Cache hit ratio**: > 95%
 - **56 העדפות** שמורות למשתמש
 
@@ -492,9 +654,9 @@ await window.resetToDefaults();
 
 ---
 
-**גרסה**: 3.0  
-**תאריך עדכון**: ינואר 2025 (עדכון אחרון: 19.01.2025)  
-**סטטוס**: ✅ מושלם - כל הפונקציות עובדות  
+**גרסה**: 4.0  
+**תאריך עדכון**: 15 בנובמבר 2025  
+**סטטוס**: ✅ Production Ready - מערכת מלאה עם V4, Profiles, Debug Monitor  
 **מפתח**: TikTrack Development Team
 
 ---
@@ -590,7 +752,12 @@ await window.resetToDefaults();
 
 ---
 
-**עדכון אחרון:** 31 בינואר 2025 - איחוד קבוצות ושדרוג מערכת הצבעים
-**גרסה:** 4.2
-**שינויים:** איחוד 7 קבוצות, הוספת 33 צבעי entity, איחוד כפתורי שמירה, תיקון RGBA
+**עדכון אחרון:** 15 בנובמבר 2025 - תיקון טעינת חשבונות וטבלת סוגי העדפות, הוספת Debug Monitor
+**גרסה:** 4.0
+**שינויים:** 
+- תיקון טעינת חשבונות מסחר (SelectPopulatorService)
+- תיקון טבלת סוגי העדפות (renderPreferenceTypesAuditTable)
+- הוספת PreferencesDebugMonitor - מערכת ניטור ובדיקה מפורטת
+- הוספת לוגים מפורטים לכל הפונקציות
+- עדכון PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md - מדריך מפתחים מלא
 

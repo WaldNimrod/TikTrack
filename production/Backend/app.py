@@ -47,7 +47,6 @@ No connection to testing system!
 
 from flask import Flask, jsonify, request, send_from_directory, g, Request
 from flask_cors import CORS
-import sqlite3
 import os
 from datetime import datetime
 from typing import Dict, Any, Optional, List
@@ -71,7 +70,6 @@ from config.settings import (
     PORT,
     IS_PRODUCTION,
     ENVIRONMENT,
-    DB_PATH,
     UI_DIR
 )
 
@@ -96,13 +94,12 @@ import os
 # Add both the external_data_integration_server directory and its parent to Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
-repo_root = os.path.dirname(project_root)
 external_data_path = os.path.join(project_root, 'external_data_integration_server')
-shared_backend_path = os.path.join(repo_root, 'Backend')
 
-for path in (project_root, external_data_path, repo_root, shared_backend_path):
-    if path not in sys.path:
-        sys.path.insert(0, path)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+if external_data_path not in sys.path:
+    sys.path.insert(0, external_data_path)
 
 try:
     from services.data_refresh_scheduler import DataRefreshScheduler
@@ -135,6 +132,7 @@ from routes.api import (
     database_schema_bp,
     linked_items_bp,
     quality_check_bp,
+    quality_lint_bp,
     entity_relation_types_bp,
     file_scanner_bp,
     cache_management_bp,
@@ -146,6 +144,7 @@ from routes.api import (
     wal_bp,
     system_settings_bp
 )
+from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
 from routes.api.cache_changes import cache_changes_bp
 
@@ -311,6 +310,22 @@ try:
 except:
     logger.info("📦 Flask version: unknown")
 
+# Log effective database binding
+try:
+    # database_config is already used by LegacyDBProxy; engine binds to the active DB
+    effective_db_url = str(database_config.engine.url)
+    logger.info("🗄️ Effective DATABASE_URL: %s", effective_db_url)
+    if effective_db_url.startswith("sqlite"):
+        # For sqlite, also log resolved file path when possible
+        try:
+            # sqlite:////absolute/path or sqlite:///relative
+            path_part = effective_db_url.split("sqlite:///")[-1]
+            logger.info("📂 SQLite file path: %s", os.path.abspath(path_part))
+        except Exception:
+            pass
+except Exception as _log_db_err:
+    logger.warning("⚠️ Could not log database URL: %s", _log_db_err)
+
 try:
     logger.info("🗄️ Initializing database...")
     with PerformanceTracker("Database initialization"):
@@ -438,6 +453,7 @@ app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(tags_bp)
 app.register_blueprint(preferences_bp)
+app.register_blueprint(preferences_v4_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
@@ -463,6 +479,7 @@ app.register_blueprint(wal_bp)
 app.register_blueprint(system_settings_bp)
 app.register_blueprint(server_logs_bp)
 app.register_blueprint(quality_check_bp, url_prefix='/api/quality-check')
+app.register_blueprint(quality_lint_bp, url_prefix='/api')
 
 # Register User Data Import blueprint
 from routes.api.user_data_import import user_data_import_bp
@@ -1542,104 +1559,15 @@ def get_yahoo_quotes() -> Any:
 
 # Database and UI paths are now imported from config.settings
 # They are automatically set based on environment (development/production)
-
-# Check if DB file exists
-if not DB_PATH.exists():
-    raise FileNotFoundError(f"Database not found at: {DB_PATH}")
+# Database connection is handled via SQLAlchemy through config.database
 
 # Check if UI directory exists
 if not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
 
 # UI Directory validation - removed debug prints
-
-def get_db_connection() -> sqlite3.Connection:
-    try:
-        # Enhanced SQLite settings for stability
-        # Convert Path object to string for sqlite3.connect
-        db_path_str = str(DB_PATH)
-        conn = sqlite3.connect(
-            db_path_str, 
-            timeout=30.0,  # Longer timeout
-            check_same_thread=False  # Allow multi-thread usage
-        )
-        conn.row_factory = sqlite3.Row
-        
-        # WAL mode settings for better performance
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA synchronous=NORMAL")
-        conn.execute("PRAGMA cache_size=10000")
-        conn.execute("PRAGMA temp_store=MEMORY")
-        conn.execute("PRAGMA foreign_keys=ON")
-        
-        return conn
-    except Exception as e:
-        # Database connection error - removed debug print
-        raise
-
-def update_ticker_open_status(ticker_id: int) -> None:
-    """
-    Updates the active_trades field of a ticker according to open plans and trades status
-    """
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Check if there are active plans
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM trade_plans 
-            WHERE ticker_id = ? AND status = 'open'
-        """, (ticker_id,))
-        open_plans = cursor.fetchone()['count']
-        
-        # Check if there are active trades
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM trades 
-            WHERE ticker_id = ? AND status = 'open'
-        """, (ticker_id,))
-        open_trades = cursor.fetchone()['count']
-        
-        # Update active_trades field
-        is_active = (open_plans > 0 or open_trades > 0)
-        cursor.execute("""
-            UPDATE tickers 
-            SET active_trades = ? 
-            WHERE id = ?
-        """, (is_active, ticker_id))
-        
-        conn.commit()
-        # active_trades update completed - removed debug print
-        
-    except Exception as e:
-        # active_trades update error - removed debug print
-        conn.rollback()
-    finally:
-        conn.close()
-
-def update_all_tickers_open_status() -> None:
-    """
-    Updates the active_trades field of all tickers
-    """
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Get all tickers
-        cursor.execute("SELECT id FROM tickers")
-        tickers = cursor.fetchall()
-        
-        for ticker in tickers:
-            update_ticker_open_status(ticker['id'])
-        
-        # All tickers active_trades update completed - removed debug print
-        
-    except Exception as e:
-        # Error updating all tickers - removed debug print
-        pass
-    finally:
-        conn.close()
+# Note: Database operations now use SQLAlchemy through config.database
+# Ticker active_trades updates are handled via routes/api/tickers.py endpoints
 
 # Routes are now handled by pages_bp blueprint
 
@@ -1955,143 +1883,43 @@ def get_crud_test_status():
 
 @app.route("/api/indexeddb/stats", methods=["GET"])
 def get_indexeddb_stats():
-    """Get IndexedDB statistics"""
-    try:
-        # For now, return mock data as IndexedDB is client-side
-        # In a real implementation, this would connect to the client's IndexedDB
-        # or store statistics server-side
-
-        stats = {
-            "total_size_mb": 45.2,
-            "max_size_mb": 100,
-            "usage_percentage": 45.2,
-            "total_entries": 1250,
-            "last_cleanup": "2025-01-18T14:30:00Z",
-            "auto_cleanup_interval_hours": 6
-        }
-
-        return jsonify({
-            "success": True,
-            "data": stats
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Failed to get IndexedDB stats: {str(e)}"
-        }), 500
+    """IndexedDB statistics are only available on the client."""
+    return jsonify({
+        "success": False,
+        "error": "IndexedDB statistics are not available from the server environment"
+    }), 503
 
 @app.route("/api/indexeddb/cleanup/<int:max_size>", methods=["POST"])
 def cleanup_indexeddb(max_size):
-    """Perform manual IndexedDB cleanup"""
-    try:
-        # In a real implementation, this would trigger cleanup on the client
-        # For now, return mock successful cleanup data
-
-        cleanup_result = {
-            "entries_removed": 234,
-            "space_freed_mb": 12.8,
-            "current_size_mb": 32.4,
-            "max_size_mb": max_size,
-            "cleanup_timestamp": "2025-01-18T14:35:00Z"
-        }
-
-        return jsonify({
-            "success": True,
-            "data": cleanup_result
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Failed to cleanup IndexedDB: {str(e)}"
-        }), 500
+    """Manual IndexedDB cleanup is not supported server-side."""
+    return jsonify({
+        "success": False,
+        "error": "IndexedDB cleanup is only available from the client environment"
+    }), 503
 
 @app.route("/api/indexeddb/backup", methods=["POST"])
 def backup_indexeddb():
-    """Create IndexedDB backup"""
-    try:
-        # In a real implementation, this would create a backup of client-side data
-        # For now, return mock backup data
-
-        import datetime
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_file = f"indexeddb_backup_{timestamp}.json"
-
-        backup_result = {
-            "backup_file": backup_file,
-            "entries_backed_up": 1250,
-            "backup_size_mb": 45.2,
-            "timestamp": datetime.datetime.now().isoformat()
-        }
-
-        return jsonify({
-            "success": True,
-            "data": backup_result
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Failed to create backup: {str(e)}"
-        }), 500
+    """IndexedDB backup is not supported server-side."""
+    return jsonify({
+        "success": False,
+        "error": "IndexedDB backup must be initiated from the client environment"
+    }), 503
 
 @app.route("/api/indexeddb/restore", methods=["POST"])
 def restore_indexeddb():
-    """Restore IndexedDB from backup"""
-    try:
-        data = request.get_json()
-        backup_file = data.get('backup_file')
-
-        if not backup_file:
-            return jsonify({
-                "success": False,
-                "error": "Backup file name is required"
-            }), 400
-
-        # In a real implementation, this would restore from the specified backup file
-        # For now, return mock restore data
-
-        restore_result = {
-            "backup_file": backup_file,
-            "entries_restored": 1250,
-            "restore_timestamp": "2025-01-18T14:40:00Z"
-        }
-
-        return jsonify({
-            "success": True,
-            "data": restore_result
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Failed to restore backup: {str(e)}"
-        }), 500
+    """IndexedDB restore is not supported server-side."""
+    return jsonify({
+        "success": False,
+        "error": "IndexedDB restore must be initiated from the client environment"
+    }), 503
 
 @app.route("/api/indexeddb/clear", methods=["POST"])
 def clear_indexeddb():
-    """Clear all IndexedDB data"""
-    try:
-        # In a real implementation, this would clear all client-side IndexedDB data
-        # For now, return mock clear data
-
-        clear_result = {
-            "entries_removed": 1250,
-            "space_freed_mb": 45.2,
-            "clear_timestamp": "2025-01-18T14:45:00Z"
-        }
-
-        return jsonify({
-            "success": True,
-            "data": clear_result
-        })
-
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Failed to clear IndexedDB: {str(e)}"
-        }), 500
+    """IndexedDB clearing is not supported server-side."""
+    return jsonify({
+        "success": False,
+        "error": "IndexedDB clearing must be initiated from the client environment"
+    }), 503
 
 # ===== END INDEXEDDB MANAGEMENT ENDPOINTS =====
 
@@ -2183,40 +2011,41 @@ def save_file():
 @rate_limit_api(requests_per_minute=60)
 def get_system_setting(setting_key):
     """Get system setting by key"""
+    from config.database import get_db
+    from services.system_settings_service import SystemSettingsService
+    from models.system_settings import SystemSettingType
+    
+    db = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        svc = SystemSettingsService(db)
         
-        # Get setting value
-        cursor.execute("""
-            SELECT s.value, t.data_type, t.description, t.default_value
-            FROM system_settings s
-            JOIN system_setting_types t ON s.type_id = t.id
-            WHERE t.key = ? AND t.is_active = 1
-        """, (setting_key,))
+        # Get setting type for metadata
+        s_type = db.query(SystemSettingType).filter(
+            SystemSettingType.key == setting_key,
+            SystemSettingType.is_active == True
+        ).first()
         
-        result = cursor.fetchone()
-        conn.close()
-        
-        if result:
-            value, data_type, description, default_value = result
-            return jsonify({
-                "success": True,
-                "data": {
-                    "key": setting_key,
-                    "value": value,
-                    "data_type": data_type,
-                    "description": description,
-                    "default_value": default_value
-                },
-                "timestamp": datetime.now().isoformat()
-            }), 200
-        else:
+        if not s_type:
             return jsonify({
                 "success": False,
                 "error": f"System setting not found: {setting_key}",
                 "timestamp": datetime.now().isoformat()
             }), 404
+        
+        # Get setting value
+        value = svc.get_setting(setting_key)
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "key": setting_key,
+                "value": value,
+                "data_type": s_type.data_type,
+                "description": s_type.description,
+                "default_value": s_type.default_value
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
             
     except Exception as e:
         return jsonify({
@@ -2224,11 +2053,17 @@ def get_system_setting(setting_key):
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }), 500
+    finally:
+        db.close()
 
 @app.route("/api/system/settings/<setting_key>", methods=["POST"])
 @rate_limit_api(requests_per_minute=30)
 def update_system_setting(setting_key):
     """Update system setting by key"""
+    from config.database import get_db
+    from services.system_settings_service import SystemSettingsService
+    
+    db = next(get_db())
     try:
         data = request.get_json()
         if not data or 'value' not in data:
@@ -2240,32 +2075,19 @@ def update_system_setting(setting_key):
         new_value = data['value']
         updated_by = data.get('updated_by', 'system')
         
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        svc = SystemSettingsService(db)
+        success = svc.set_setting(setting_key, new_value, updated_by)
         
-        # Update setting value
-        cursor.execute("""
-            UPDATE system_settings 
-            SET value = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE type_id = (
-                SELECT id FROM system_setting_types 
-                WHERE key = ? AND is_active = 1
-            )
-        """, (new_value, updated_by, setting_key))
-        
-        if cursor.rowcount > 0:
-            conn.commit()
-            conn.close()
+        if success:
             return jsonify({
                 "success": True,
                 "message": f"System setting {setting_key} updated successfully",
                 "timestamp": datetime.now().isoformat()
             }), 200
         else:
-            conn.close()
             return jsonify({
                 "success": False,
-                "error": f"System setting not found: {setting_key}",
+                "error": f"System setting not found or update failed: {setting_key}",
                 "timestamp": datetime.now().isoformat()
             }), 404
             
@@ -2275,6 +2097,8 @@ def update_system_setting(setting_key):
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }), 500
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     # 🎯 **Flask Development Server**

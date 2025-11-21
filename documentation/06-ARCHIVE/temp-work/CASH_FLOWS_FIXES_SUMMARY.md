@@ -16,9 +16,29 @@
 
 ## ✅ עדכון 7 בנובמבר 2025 – המרת מטבע דו-רשומתית
 - כל רשומת תזרים שומרת כעת את העמלה בשדה `fee_amount` (ברירת מחדל 0, מטבע בסיס החשבון).
-- פעולת המרת מטבע מייצרת שתי רשומות בלבד (`other_negative`, `other_positive`), ללא רשומת fee נפרדת.
+- פעולת המרת מטבע מייצרת שתי רשומות בלבד (`currency_exchange_from`, `currency_exchange_to` – הוחלפו בעבר את `other_negative` / `other_positive`), ללא רשומת fee נפרדת.
 - ה-API מחזיר/מקבל `fee_amount` ו-`fee_currency_id`; ההתממשקות הקודמת (`fee_flow`) הוצאה משימוש.
 - במודל ה-UI מוצג כרטיס סיכום דינמי עם ארבעה נתוני מפתח: סכום להמרה, עמלה, נטו במטבע החשבון ונטו במטבע היעד, תוך רענון בזמן אמת בהתאם לשער ולעמלה.
+
+## ✅ עדכון 16 בנובמבר 2025 – סוגי תזרימי מט"ח ייעודיים
+- הוספו סוגי Enum חדשים `currency_exchange_from` ו-`currency_exchange_to` לכל שכבות המערכת (DB, API, UI, יבוא נתונים).
+- סקריפט `Backend/scripts/migrate_currency_exchange_types.py` ממיר אוטומטית את הרשומות ההיסטוריות (מבוססות `other_negative`/`other_positive`) כדי להבטיח שהפילטר \"המרות מטבע\" ישען על ה-type עצמו ולא על מטא-דאטה עקיף.
+- `FieldRendererService`, `translation-utils`, `entity-details-renderer`, `account-activity` ו-`cash_flows.js` עודכנו לצבוע/לתרגם את הסוגים החדשים ולהציג אותם במודולי פרטים/טבלאות.
+- תהליך היבוא (`import_orchestrator`) משייך רשומות `forex_conversion` אוטומטית לסוגים החדשים, וה-API של ההמרה דואג שמכל שמירה/עדכון יתקבלו רק הערכים הייעודיים.
+
+### עדכון 16 בנובמבר 2025 – רינדור פרטי המרה ושיפורי תצוגה
+- תאריכים: השרת שולח ומקבל DateEnvelope; כל נקודות ה-API של תזרימים/המרות עודכנו לתמיכה בעטיפה זו (וכן ISO/`YYYY-MM-DD`). ב-UI, `formatDate` מציג `display`/`local`/`utc`/`epochMs` כראוי.
+- פרטי המרה במודול פרטים: מוצגים "מקור" (from) ו"מבוקש" (to) עם שם/סמל מטבע מתוך `exchange_pair_summary`, יחד עם שער המרה ועמלה.
+- כפתור "פתח רשומה" בוטל עבור `cash_flow` (אין דף פרטים עצמאי).
+- בטבלאות: הוסר באדג' ההמרה (כולל אייקון); הכיוון/פרטים זמינים במודול הפרטים.
+
+## ✅ עדכון 15 בנובמבר 2025 – הדגשת צמדי המרה
+- יצירת שכבת מטא חדשה לכל רשומת המרה (`exchange_group_id`, `exchange_direction`, `exchange_pair_summary`, `linked_exchange_cash_flow_id`) זמינה החל מה-API הראשי, ממסך הפרטים ומה-EndPoint `/exchange/<uuid>`.
+- `FieldRendererService.renderExchangeBadge` מחליף את האייקון המקומי ומציג תגית 🔁 עם סכום הצד השני; השורות מסומנות ב-`data-exchange-group-id` ונשארות צמודות באמצעות `ensureExchangePairsAdjacency`.
+- `setupExchangeRowInteractions` מדגיש את שני הצדדים (Bootstrap `table-warning`) בכל מעבר עכבר/פוקוס כדי להבהיר קשרים גם כשמסננים וממיינים.
+- נוספה קומפוננטה אחידה `FieldRendererService.renderExchangePairCards` שמייצרת כרטיסים מוערמים (שלילי ➜ חיובי) עם כפתורי גישה מהירים; הקומפוננטה נצרכת במודול הפרטים ובמודל העריכה.
+- במודל תזרים רגיל נוסף שדה תצוגה `cashFlowExchangePairDisplay` שמציג את הצמד בעת עריכת רשומה מקושרת (כולל כפתור לפתיחת הרשומה הצמודה).
+- בלשונית "המרת מטבע" מחליף `setCurrencyExchangeSummary` את סיכום הטקסט, כולל Place-holder לפני שמירה ותצוגה מלאה בעת טעינת המרה קיימת.
 
 ## ✅ עדכון פברואר 2025 – קישור תזרימי מזומנים לטריידים
 - הוספת שדה `trade_id` אופציונלי לטבלת `cash_flows` (FOREIGN KEY ל-`trades.id`).

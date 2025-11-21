@@ -32,17 +32,30 @@ describe('Cash Flows Page E2E Tests', () => {
         expect(documentRef.body).toBeDefined();
     });
 
-    test('should have cash flows table', () => {
-        const table = documentRef.querySelector('table') || documentRef.querySelector('[data-table-type="cash_flow"]');
-        expect(table || documentRef.body).toBeDefined();
+    test('should have cash flows table with correct data-table-type', () => {
+        const table = documentRef.querySelector('table[data-table-type="cash_flow"]') ||
+                     documentRef.querySelector('table');
+        expect(table).not.toBeNull();
     });
 
-    test('should have add cash flow button', () => {
-        const addButton =
-            documentRef.querySelector('[data-onclick*="add"]') ||
-            documentRef.querySelector('[data-onclick*="cash_flow"]') ||
-            documentRef.querySelector('button');
-        expect(addButton || documentRef.body).toBeDefined();
+    test('should have add cash flow button wired to ModalManager via data-onclick', () => {
+        const addButton = documentRef.querySelector('button[data-button-type="ADD"][data-entity-type="cash_flow"]');
+        if (addButton) {
+            expect(addButton.getAttribute('data-onclick')).toContain('showModalSafe');
+        } else {
+            // Fallback: check for any add button
+            const addButtons = documentRef.querySelectorAll('button[data-onclick*="showModalSafe"][data-onclick*="cashFlow"]');
+            expect(addButtons.length).toBeGreaterThan(0);
+        }
+    });
+
+    test('should have proper page structure', () => {
+        expect(documentRef.querySelector('.main-content') || documentRef.querySelector('main')).not.toBeNull();
+    });
+
+    test('should be responsive', () => {
+        const viewport = documentRef.querySelector('meta[name="viewport"]');
+        expect(viewport).not.toBeNull();
     });
 });
 

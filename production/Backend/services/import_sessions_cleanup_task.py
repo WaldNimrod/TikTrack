@@ -9,8 +9,6 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from config.settings import DB_PATH
-
 # Add Backend to path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
@@ -26,8 +24,8 @@ def register_import_sessions_cleanup_task(task_manager: BackgroundTaskManager):
             from sqlalchemy import create_engine, text
             from sqlalchemy.orm import sessionmaker
             
-            # Database path
-            db_path = Path(DB_PATH)
+            # Database path - Use the unified tiktrack.db database file (standardized for dev and production)
+            db_path = backend_dir / "db" / "tiktrack.db"
             
             if not db_path.exists():
                 print(f"❌ Database not found at: {db_path}")

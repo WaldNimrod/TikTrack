@@ -295,7 +295,9 @@
                 tableSelector: '#tagCategoriesTable',
                 columns: window.TABLE_COLUMN_MAPPINGS?.[CATEGORY_TABLE_TYPE] || [],
                 sortable: true,
-                filterable: false
+                filterable: false,
+                // Default sort: updated_at desc (column index 3)
+                defaultSort: { columnIndex: 3, direction: 'desc', key: 'updated_at' }
             });
         }
 
@@ -306,7 +308,9 @@
                 tableSelector: '#tagsTable',
                 columns: window.TABLE_COLUMN_MAPPINGS?.[TAG_TABLE_TYPE] || [],
                 sortable: true,
-                filterable: false
+                filterable: false,
+                // Default sort: last_used_at desc (column index 4)
+                defaultSort: { columnIndex: 4, direction: 'desc', key: 'last_used_at' }
             });
         }
 
@@ -317,7 +321,9 @@
                 tableSelector: '#tagUsageLeaderboardTable',
                 columns: window.TABLE_COLUMN_MAPPINGS?.[USAGE_TABLE_TYPE] || [],
                 sortable: true,
-                filterable: false
+                filterable: false,
+                // Default sort: tag_name asc (column index 0, fallback - no date column)
+                defaultSort: { columnIndex: 0, direction: 'asc', key: 'tag_name' }
             });
         }
     }

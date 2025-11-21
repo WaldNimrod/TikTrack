@@ -1,0 +1,123 @@
+{
+  "snapshot_id": "pre-update_20251121_213516",
+  "step_1": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:34:52.357786",
+    "result": {
+      "success": true,
+      "commits_count": 15,
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251121_213450.log",
+      "commits": [
+        "58c7e441e Implement workflow enforcement (Level 1) and update all documentation",
+        "f4fa2e07c Add environment isolation guide and check script",
+        "b14cfefe1 Add merge confirmation document",
+        "9f6fe2954 Merge production PostgreSQL migration from new-db-uopgrde",
+        "b27ed9e23 Final updates before merging to main"
+      ]
+    }
+  },
+  "step_2": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:35:08.283810",
+    "result": {
+      "success": true,
+      "conflicts_resolved": 0,
+      "conflicts_unresolved": 0
+    }
+  },
+  "step_3": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:35:08.345654",
+    "result": {
+      "success": true,
+      "removed_count": 141
+    }
+  },
+  "step_4": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:35:08.439573",
+    "result": {
+      "success": true,
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251121_193508.db"
+    }
+  },
+  "step_5": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:35:08.756075",
+    "result": {
+      "success": true
+    }
+  },
+  "last_failed_step": 8,
+  "step_6": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:35:08.761034",
+    "result": {
+      "success": true,
+      "warning": "Cleanup had warnings"
+    }
+  },
+  "step_7": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:35:08.762912",
+    "result": {
+      "success": true,
+      "verified": false,
+      "warning": "Settings mismatch"
+    }
+  },
+  "step_8": {
+    "completed": false,
+    "timestamp": "2025-11-21T21:35:16.451537",
+    "result": {
+      "success": false,
+      "results": {
+        "isolation": false,
+        "structure": false,
+        "post_validation": false,
+        "ui_tests": true
+      }
+    }
+  },
+  "step_9": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:03:15.218054",
+    "result": {
+      "success": true,
+      "new_version": "1.2.1.0"
+    }
+  },
+  "step_10": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:03:32.197876",
+    "result": {
+      "success": true,
+      "commit_message": "chore: production update from main - 2025-11-21"
+    }
+  },
+  "step_11": {
+    "completed": true,
+    "timestamp": "2025-11-21T21:03:32.246537",
+    "result": {
+      "success": true,
+      "pid": 21898,
+      "background": true
+    }
+  },
+  "step_12": {
+    "completed": true,
+    "timestamp": "2025-11-21T14:30:46.904285",
+    "result": {
+      "success": true,
+      "dry_run": true
+    }
+  },
+  "step_13": {
+    "completed": true,
+    "timestamp": "2025-11-21T14:30:46.904555",
+    "result": {
+      "success": true,
+      "dry_run": true
+    }
+  }
+}

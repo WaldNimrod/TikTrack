@@ -8,9 +8,12 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.cash_flow_service import CashFlowService as CashFlowHelperService
 from services.account_activity_service import AccountActivityService
+from services.tag_service import TagService
+from services.preferences_service import PreferencesService
 import logging
 import uuid
 from datetime import datetime
+from services.date_normalization_service import DateNormalizationService
 
 # Import base classes
 from .base_entity import BaseEntityAPI
@@ -19,7 +22,29 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash_flows')
+# Initialize preferences service for date normalization
+preferences_service = PreferencesService()
+
+def _get_date_normalizer():
+    """Resolve timezone and create a DateNormalizationService for cash flows endpoints."""
+    timezone_name = DateNormalizationService.resolve_timezone(
+        request,
+        preferences_service=preferences_service
+    )
+    return DateNormalizationService(timezone_name)
+
+EXCHANGE_FROM_TYPE = CashFlowHelperService.EXCHANGE_FROM_TYPE
+EXCHANGE_TO_TYPE = CashFlowHelperService.EXCHANGE_TO_TYPE
+LEGACY_EXCHANGE_FROM_TYPE = CashFlowHelperService.LEGACY_EXCHANGE_FROM_TYPE
+LEGACY_EXCHANGE_TO_TYPE = CashFlowHelperService.LEGACY_EXCHANGE_TO_TYPE
+ALL_EXCHANGE_TYPES = {
+    EXCHANGE_FROM_TYPE,
+    EXCHANGE_TO_TYPE,
+    LEGACY_EXCHANGE_FROM_TYPE,
+    LEGACY_EXCHANGE_TO_TYPE,
+}
+
+cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash-flows')
 
 # Create a service class for cash flows
 class CashFlowService:
@@ -29,8 +54,9 @@ class CashFlowService:
     def get_all(self, db: Session, filters=None):
         cash_flows = db.query(CashFlow).options(
             joinedload(CashFlow.account),
-            joinedload(CashFlow.currency),
-            joinedload(CashFlow.trade)
+            joinedload(CashFlow.currency)
+            # Removed joinedload(CashFlow.trade) - causes errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).all()
         
         # Enhance data with account and currency names
@@ -49,8 +75,9 @@ class CashFlowService:
     def get_by_id(self, db: Session, cash_flow_id: int):
         return db.query(CashFlow).options(
             joinedload(CashFlow.account),
-            joinedload(CashFlow.currency),
-            joinedload(CashFlow.trade)
+            joinedload(CashFlow.currency)
+            # Removed joinedload(CashFlow.trade) - causes errors when Trade model has columns not in DB
+            # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
         ).filter(CashFlow.id == cash_flow_id).first()
 
 # Initialize base API
@@ -67,6 +94,33 @@ def get_cash_flows():
     
     # Enhance data with additional information and filter currency exchanges
     if response.get('status') == 'success' and response.get('data'):
+        def _apply_account_metadata(entry: dict, account_obj):
+            account_currency_id = None
+            account_currency_symbol = None
+            account_currency_name = None
+            if account_obj:
+                if isinstance(account_obj, dict):
+                    account_currency_id = account_obj.get('currency_id')
+                    account_currency_symbol = account_obj.get('currency_symbol')
+                    account_currency_name = account_obj.get('currency_name')
+                    currency_info = account_obj.get('currency')
+                    if isinstance(currency_info, dict):
+                        account_currency_symbol = currency_info.get('symbol', account_currency_symbol)
+                        account_currency_name = currency_info.get('name', account_currency_name)
+                else:
+                    account_currency_id = getattr(account_obj, 'currency_id', None)
+                    currency_info = getattr(account_obj, 'currency', None)
+                    if currency_info:
+                        account_currency_symbol = getattr(currency_info, 'symbol', None)
+                        account_currency_name = getattr(currency_info, 'name', None)
+
+            if account_currency_symbol:
+                entry['account_currency_symbol'] = account_currency_symbol
+            if account_currency_id is not None:
+                entry['account_currency_id'] = account_currency_id
+            if account_currency_name:
+                entry['account_currency_name'] = account_currency_name
+
         processed_flows = []
         exchange_pairs = {}
         
@@ -78,6 +132,7 @@ def get_cash_flows():
             account_info = cf_entry.pop('account', None)
             if account_info:
                 cf_entry['account_name'] = account_info.get('name', '')
+                _apply_account_metadata(cf_entry, account_info)
             
             currency_info = cf_entry.pop('currency', None)
             if currency_info:
@@ -85,15 +140,28 @@ def get_cash_flows():
                 cf_entry['currency_name'] = currency_info.get('name', '')
             
             external_id = cf_entry.get('external_id')
-            if CashFlowHelperService.is_currency_exchange(external_id):
-                cf_entry['exchange_group_id'] = external_id
-                cf_entry['exchange_direction'] = 'from' if cf_entry.get('type') == 'other_negative' else 'to'
+            flow_type = cf_entry.get('type')
+            is_exchange_flow = CashFlowHelperService.is_currency_exchange(external_id, flow_type)
+            if is_exchange_flow:
+                exchange_direction = CashFlowHelperService.get_exchange_direction(flow_type)
+                if not exchange_direction:
+                    try:
+                        amount_value = float(cf_entry.get('amount') or 0)
+                        exchange_direction = 'from' if amount_value < 0 else 'to'
+                    except (TypeError, ValueError):
+                        exchange_direction = None
+
+                if external_id:
+                    cf_entry['exchange_group_id'] = external_id
+                if exchange_direction:
+                    cf_entry['exchange_direction'] = exchange_direction
                 
-                pair = exchange_pairs.setdefault(external_id, {'from': None, 'to': None})
-                if cf_entry.get('type') == 'other_negative':
-                    pair['from'] = cf_entry
-                elif cf_entry.get('type') == 'other_positive':
-                    pair['to'] = cf_entry
+                if external_id and exchange_direction:
+                    pair = exchange_pairs.setdefault(external_id, {'from': None, 'to': None})
+                    if exchange_direction == 'from':
+                        pair['from'] = cf_entry
+                    elif exchange_direction == 'to':
+                        pair['to'] = cf_entry
             processed_flows.append(cf_entry)
         
         # Ensure completeness for each exchange group (fetch missing flows directly from DB if needed)
@@ -117,12 +185,15 @@ def get_cash_flows():
                     
                     if flow.account:
                         flow_entry['account_name'] = flow.account.name
+                        _apply_account_metadata(flow_entry, flow.account)
                     if flow.currency:
                         flow_entry['currency_symbol'] = flow.currency.symbol
                         flow_entry['currency_name'] = flow.currency.name
                     
                     flow_entry['exchange_group_id'] = exchange_id
-                    flow_entry['exchange_direction'] = 'from' if flow.type == 'other_negative' else 'to'
+                    flow_entry['exchange_direction'] = CashFlowHelperService.get_exchange_direction(flow.type) or (
+                        'from' if float(getattr(flow, 'amount', 0) or 0) < 0 else 'to'
+                    )
                     
                     processed_flows.append(flow_entry)
                     processed_by_id[flow.id] = flow_entry
@@ -134,12 +205,18 @@ def get_cash_flows():
                         group['to'] = flow_entry
         
         # Enrich exchange flows with linkage details
+        # Note: Dates are already normalized by base_api.get_all, so we can use them directly
         for exchange_id, pair in exchange_pairs.items():
             from_flow = pair.get('from')
             to_flow = pair.get('to')
             if from_flow and to_flow:
                 from_flow['linked_exchange_cash_flow_id'] = to_flow.get('id')
                 to_flow['linked_exchange_cash_flow_id'] = from_flow.get('id')
+                
+                # Dates are already normalized by base_api.get_all (DateEnvelope format)
+                # Use dates directly - they should already be DateEnvelope dicts
+                to_flow_date = to_flow.get('date')
+                from_flow_date = from_flow.get('date')
                 
                 from_flow['linked_exchange_summary'] = {
                     "cash_flow_id": to_flow.get('id'),
@@ -148,7 +225,7 @@ def get_cash_flows():
                     "currency_symbol": to_flow.get('currency_symbol'),
                     "currency_name": to_flow.get('currency_name'),
                     "usd_rate": to_flow.get('usd_rate'),
-                    "date": to_flow.get('date'),
+                    "date": to_flow_date,
                     "type": to_flow.get('type')
                 }
                 to_flow['linked_exchange_summary'] = {
@@ -158,9 +235,13 @@ def get_cash_flows():
                     "currency_symbol": from_flow.get('currency_symbol'),
                     "currency_name": from_flow.get('currency_name'),
                     "usd_rate": from_flow.get('usd_rate'),
-                    "date": from_flow.get('date'),
+                    "date": from_flow_date,
                     "type": from_flow.get('type')
                 }
+                pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+                if pair_summary:
+                    from_flow['exchange_pair_summary'] = pair_summary
+                    to_flow['exchange_pair_summary'] = pair_summary
             else:
                 # If we only have one side, still expose linkage metadata without ID
                 if from_flow and not from_flow.get('linked_exchange_cash_flow_id'):
@@ -172,11 +253,81 @@ def get_cash_flows():
     
     return jsonify(response), status_code
 
+# IMPORTANT: Specific routes (like /delete-imported) must be defined BEFORE parameterized routes (like /<int:cash_flow_id>)
+# Otherwise Flask will try to match "delete-imported" as an integer parameter
+@cash_flows_bp.route('/delete-imported', methods=['DELETE'])
+@handle_database_session(auto_commit=True, auto_close=True)
+@invalidate_cache(['cash_flows', 'account-activity-*'])
+def delete_imported_cash_flows():
+    """Delete all cash flows with source='file_import' - Dev utility for testing"""
+    try:
+        logger.info("=== DELETE IMPORTED CASH FLOWS START ===")
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
+        
+        # Count imported records
+        count = db.query(CashFlow).filter(CashFlow.source == 'file_import').count()
+        logger.info(f"Found {count} imported cash flows to delete")
+        
+        if count == 0:
+            logger.info("No imported cash flows to delete")
+            return jsonify({
+                "status": "success",
+                "message": "No imported cash flows found. Nothing to delete.",
+                "deleted_count": 0,
+                "version": "1.0"
+            }), 200
+        
+        # Get details for logging (before deletion)
+        cash_flows = db.query(CashFlow).filter(CashFlow.source == 'file_import').all()
+        cash_flow_ids = [cf.id for cf in cash_flows]
+        logger.info(f"Found {len(cash_flow_ids)} imported cash flows with IDs: {cash_flow_ids[:10] if len(cash_flow_ids) > 10 else cash_flow_ids}...")  # Log first 10 IDs
+        
+        # Remove tags for imported cash flows (non-blocking - continue even if fails)
+        tags_removed = 0
+        try:
+            # Remove tags for each imported cash flow individually
+            for cash_flow_id in cash_flow_ids:
+                try:
+                    removed = TagService.remove_all_tags_for_entity(db, 'cash_flow', cash_flow_id)
+                    tags_removed += removed
+                except Exception as tag_error:
+                    logger.warning(
+                        "Failed to remove tags for cash_flow %s before deletion: %s",
+                        cash_flow_id,
+                        tag_error
+                    )
+            if tags_removed > 0:
+                logger.info(f"Removed {tags_removed} tag links for imported cash flows")
+        except Exception as tag_error:
+            logger.warning("Failed to remove tags for imported cash flows before bulk deletion: %s", tag_error)
+
+        # Delete all imported records
+        # Note: commit will be done by handle_database_session decorator
+        deleted_count = db.query(CashFlow).filter(CashFlow.source == 'file_import').delete()
+        logger.info(f"Delete query executed, deleted_count={deleted_count}")
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully deleted {deleted_count} imported cash flow(s)",
+            "deleted_count": deleted_count,
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        logger.error(f"Error deleting imported cash flows: {str(e)}", exc_info=True)
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to delete imported cash flows: {str(e)}"},
+            "version": "1.0"
+        }), 500
+    # Don't close db here - handle_database_session decorator will do it
+
 @cash_flows_bp.route('/<int:cash_flow_id>', methods=['GET'])
 def get_cash_flow(cash_flow_id: int):
     """Get cash flow by ID"""
     try:
         db: Session = next(get_db())
+        normalizer = _get_date_normalizer()
         cash_flow = db.query(CashFlow).options(
             joinedload(CashFlow.account),
             joinedload(CashFlow.currency)
@@ -189,23 +340,42 @@ def get_cash_flow(cash_flow_id: int):
             if cash_flow.currency:
                 cf_dict['currency_symbol'] = cash_flow.currency.symbol
                 cf_dict['currency_name'] = cash_flow.currency.name
+
+            external_id = cf_dict.get('external_id')
+            if CashFlowHelperService.is_currency_exchange(external_id, cf_dict.get('type')):
+                flows = CashFlowHelperService.get_exchange_flows(db, external_id)
+                from_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+                to_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
+                pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+                if pair_summary:
+                    cf_dict['exchange_pair_summary'] = pair_summary
+                counterpart = next((f for f in flows if f.id != cash_flow.id), None)
+                if counterpart:
+                    cf_dict['linked_exchange_cash_flow_id'] = counterpart.id
+            
+            # Normalize dates to DateEnvelope format
+            cf_dict = normalizer.normalize_output(cf_dict)
             
             return jsonify({
                 "status": "success",
                 "data": cf_dict,
                 "message": "Cash flow retrieved successfully",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Cash flow not found"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting cash flow {cash_flow_id}: {str(e)}")
+        normalizer = _get_date_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve cash flow"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     # Don't close db here - handle_database_session decorator will do it
@@ -252,17 +422,38 @@ def create_cash_flow():
 
         data['fee_amount'] = fee_amount_value
         
-        # Convert date string to date object
+        # Convert date to date object (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
         if 'date' in data and data['date']:
-            from datetime import datetime
             try:
-                logger.info(f"Converting date string: {data['date']}")
-                data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
-                logger.info(f"Converted to date object: {data['date']}")
-            except ValueError:
+                date_input = data['date']
+                date_obj = None
+                if isinstance(date_input, dict):
+                    normalizer = DateNormalizationService()
+                    normalized = normalizer.normalize_input_payload({"date": date_input})
+                    dt = normalized.get("date") if isinstance(normalized, dict) else None
+                    if isinstance(dt, datetime):
+                        date_obj = dt.date()
+                elif isinstance(date_input, datetime):
+                    date_obj = date_input.date()
+                elif isinstance(date_input, str):
+                    try:
+                        date_obj = datetime.strptime(date_input, '%Y-%m-%d').date()
+                    except ValueError:
+                        try:
+                            date_obj = datetime.fromisoformat(date_input.replace('Z', '+00:00')).date()
+                        except ValueError:
+                            date_obj = None
+                if not date_obj:
+                    return jsonify({
+                        "status": "error",
+                        "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
+                        "version": "1.0"
+                    }), 400
+                data['date'] = date_obj
+            except Exception:
                 return jsonify({
                     "status": "error",
-                    "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                    "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                     "version": "1.0"
                 }), 400
         
@@ -366,17 +557,38 @@ def update_cash_flow(cash_flow_id: int):
             else:
                 data['fee_amount'] = cash_flow.fee_amount if cash_flow.fee_amount is not None else 0.0
             
-            # Convert date string to date object
+            # Convert date to date object (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
             if 'date' in data and data['date']:
-                from datetime import datetime
                 try:
-                    logger.info(f"Converting date string: {data['date']}")
-                    data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
-                    logger.info(f"Converted to date object: {data['date']}")
-                except ValueError:
+                    date_input = data['date']
+                    date_obj = None
+                    if isinstance(date_input, dict):
+                        normalizer = DateNormalizationService()
+                        normalized = normalizer.normalize_input_payload({"date": date_input})
+                        dt = normalized.get("date") if isinstance(normalized, dict) else None
+                        if isinstance(dt, datetime):
+                            date_obj = dt.date()
+                    elif isinstance(date_input, datetime):
+                        date_obj = date_input.date()
+                    elif isinstance(date_input, str):
+                        try:
+                            date_obj = datetime.strptime(date_input, '%Y-%m-%d').date()
+                        except ValueError:
+                            try:
+                                date_obj = datetime.fromisoformat(date_input.replace('Z', '+00:00')).date()
+                            except ValueError:
+                                date_obj = None
+                    if not date_obj:
+                        return jsonify({
+                            "status": "error",
+                            "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
+                            "version": "1.0"
+                        }), 400
+                    data['date'] = date_obj
+                except Exception:
                     return jsonify({
                         "status": "error",
-                        "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                        "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                         "version": "1.0"
                     }), 400
             
@@ -453,6 +665,14 @@ def delete_cash_flow(cash_flow_id: int):
         cash_flow = db.query(CashFlow).filter(CashFlow.id == cash_flow_id).first()
         
         if cash_flow:
+            try:
+                TagService.remove_all_tags_for_entity(db, 'cash_flow', cash_flow_id)
+            except ValueError as tag_error:
+                logger.warning(
+                    "Failed to remove tags for cash_flow %s before deletion: %s",
+                    cash_flow_id,
+                    tag_error,
+                )
             db.delete(cash_flow)
             # CRITICAL: Must commit here to make deletion visible to subsequent queries
             db.commit()
@@ -498,6 +718,11 @@ def delete_all_cash_flows():
                 "version": "1.0"
             }), 200
         
+        try:
+            TagService.remove_all_tags_for_type(db, 'cash_flow')
+        except ValueError as tag_error:
+            logger.warning("Failed to remove tags for all cash_flows before bulk deletion: %s", tag_error)
+
         # Delete all records
         deleted_count = db.query(CashFlow).delete()
         # CRITICAL: Must commit here to make deletion visible to subsequent queries
@@ -530,8 +755,8 @@ def create_currency_exchange():
     Create a currency exchange operation (atomic creation of two cash flows)
     
     Creates:
-    - From flow: type='other_negative', amount=-from_amount, currency_id=from_currency_id, stores fee_amount
-    - To flow: type='other_positive', amount=+to_amount, currency_id=to_currency_id
+    - From flow: type='currency_exchange_from', amount=-from_amount, currency_id=from_currency_id, stores fee_amount
+    - To flow: type='currency_exchange_to', amount=+to_amount, currency_id=to_currency_id
     
     All flows share the same external_id: 'exchange_<uuid>'
     """
@@ -631,13 +856,33 @@ def create_currency_exchange():
                 "version": "1.0"
             }), 400
 
-        # Convert date
+        # Convert date (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
+        date_obj = None
         try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
+            if isinstance(date_str, dict):
+                normalizer = DateNormalizationService()
+                normalized = normalizer.normalize_input_payload({"date": date_str})
+                dt = normalized.get("date") if isinstance(normalized, dict) else None
+                if isinstance(dt, datetime):
+                    date_obj = dt.date()
+            elif isinstance(date_str, datetime):
+                date_obj = date_str.date()
+            elif isinstance(date_str, str):
+                # Try date-only first
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    # Try ISO datetime
+                    try:
+                        date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00')).date()
+                    except ValueError:
+                        date_obj = None
+        except Exception:
+            date_obj = None
+        if not date_obj:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                 "version": "1.0"
             }), 400
         
@@ -655,50 +900,25 @@ def create_currency_exchange():
                 "version": "1.0"
             }), 404
         
-        # Create exchange UUID
-        exchange_uuid = uuid.uuid4().hex[:12]
-        exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
-        
-        # Create cash flows within transaction
+        # Create via service (SSOT)
         try:
-            # From flow (negative - outgoing)
-            from_flow = CashFlow(
+            svc_result = CashFlowHelperService.create_exchange(
+                db,
                 trading_account_id=trading_account_id,
-                type='other_negative',
-                amount=-from_amount,
+                from_currency_id=from_currency_id,
+                to_currency_id=to_currency_id,
+                date=date_obj,
+                from_amount=from_amount,
+                exchange_rate=exchange_rate,
                 fee_amount=fee_amount,
-                currency_id=from_currency_id,
-                usd_rate=float(from_currency.usd_rate),
-                date=date_obj,
                 description=description,
-                source=source_value,
-                external_id=exchange_id
+                source=source_value
             )
-            db.add(from_flow)
-            
-            # To flow (positive - incoming)
-            to_flow = CashFlow(
-                trading_account_id=trading_account_id,
-                type='other_positive',
-                amount=to_amount,
-                fee_amount=0.0,
-                currency_id=to_currency_id,
-                usd_rate=float(to_currency.usd_rate),
-                date=date_obj,
-                description=description,
-                source=source_value,
-                external_id=exchange_id
-            )
-            db.add(to_flow)
-            
-            # Commit transaction
-            db.commit()
-            
-            # Refresh to get IDs
-            db.refresh(from_flow)
-            db.refresh(to_flow)
-            
-            # Return response
+            from_flow = svc_result["from_flow"]
+            to_flow = svc_result["to_flow"]
+            exchange_id = svc_result["exchange_id"]
+            exchange_uuid = CashFlowHelperService.get_exchange_uuid_from_external_id(exchange_id)
+
             result = {
                 "exchange_id": exchange_uuid,
                 "exchange_external_id": exchange_id,
@@ -707,20 +927,25 @@ def create_currency_exchange():
                 "fee_amount": fee_amount,
                 "fee_currency_id": fee_currency_id
             }
-            
+            pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+            if pair_summary:
+                result["exchange_pair_summary"] = pair_summary
+
             logger.info(f"✅ Currency exchange created successfully: {exchange_id}")
-            
+
             return jsonify({
                 "status": "success",
                 "data": result,
                 "message": "Currency exchange created successfully",
                 "version": "1.0"
             }), 201
-            
         except Exception as e:
-            db.rollback()
             logger.error(f"Error creating currency exchange: {str(e)}")
-            raise
+            return jsonify({
+                "status": "error",
+                "error": {"message": str(e)},
+                "version": "1.0"
+            }), 400
             
     except Exception as e:
         logger.error(f"Error in create_currency_exchange: {str(e)}")
@@ -757,8 +982,8 @@ def get_currency_exchange(exchange_uuid: str):
             }), 400
         
         # Separate flows by type
-        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
-        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        from_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+        to_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
         
         # Calculate exchange rate from amounts
         exchange_rate = abs(to_flow.amount / from_flow.amount) if from_flow and to_flow else 0
@@ -774,6 +999,9 @@ def get_currency_exchange(exchange_uuid: str):
             "fee_amount": fee_amount,
             "fee_currency_id": fee_currency_id
         }
+        pair_summary = CashFlowHelperService.build_exchange_pair_summary(from_flow, to_flow)
+        if pair_summary:
+            result["exchange_pair_summary"] = pair_summary
         
         return jsonify({
             "status": "success",
@@ -823,8 +1051,8 @@ def update_currency_exchange(exchange_uuid: str):
             }), 400
         
         # Separate existing flows
-        from_flow = next((f for f in flows if f.type == 'other_negative'), None)
-        to_flow = next((f for f in flows if f.type == 'other_positive'), None)
+        from_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+        to_flow = next((f for f in flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
         # Validate required fields
         required_fields = ['trading_account_id', 'from_currency_id', 'to_currency_id',
                           'from_amount', 'exchange_rate', 'date']
@@ -904,13 +1132,33 @@ def update_currency_exchange(exchange_uuid: str):
                 "version": "1.0"
             }), 400
 
-        # Convert date
+        # Convert date (accepts YYYY-MM-DD, ISO datetime, DateEnvelope, or datetime)
+        date_obj = None
         try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
+            if isinstance(date_str, dict):
+                normalizer = DateNormalizationService()
+                normalized = normalizer.normalize_input_payload({"date": date_str})
+                dt = normalized.get("date") if isinstance(normalized, dict) else None
+                if isinstance(dt, datetime):
+                    date_obj = dt.date()
+            elif isinstance(date_str, datetime):
+                date_obj = date_str.date()
+            elif isinstance(date_str, str):
+                # Try date-only first
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    # Try ISO datetime
+                    try:
+                        date_obj = datetime.fromisoformat(date_str.replace('Z', '+00:00')).date()
+                    except ValueError:
+                        date_obj = None
+        except Exception:
+            date_obj = None
+        if not date_obj:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
+                "error": {"message": "Invalid date. Provide YYYY-MM-DD or an ISO datetime/DateEnvelope"},
                 "version": "1.0"
             }), 400
         
@@ -947,6 +1195,7 @@ def update_currency_exchange(exchange_uuid: str):
             # Update from flow
             if from_flow:
                 from_flow.trading_account_id = trading_account_id
+                from_flow.type = EXCHANGE_FROM_TYPE
                 from_flow.amount = -from_amount
                 from_flow.fee_amount = fee_amount
                 from_flow.currency_id = from_currency_id
@@ -957,6 +1206,7 @@ def update_currency_exchange(exchange_uuid: str):
             # Update to flow
             if to_flow:
                 to_flow.trading_account_id = trading_account_id
+                to_flow.type = EXCHANGE_TO_TYPE
                 to_flow.amount = to_amount
                 to_flow.fee_amount = 0.0
                 to_flow.currency_id = to_currency_id
@@ -975,8 +1225,8 @@ def update_currency_exchange(exchange_uuid: str):
             
             # Get updated flows
             updated_flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
-            updated_from_flow = next((f for f in updated_flows if f.type == 'other_negative'), None)
-            updated_to_flow = next((f for f in updated_flows if f.type == 'other_positive'), None)
+            updated_from_flow = next((f for f in updated_flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'from'), None)
+            updated_to_flow = next((f for f in updated_flows if CashFlowHelperService.get_exchange_direction(getattr(f, 'type', None)) == 'to'), None)
             
             result = {
                 "exchange_id": exchange_uuid,
@@ -986,6 +1236,9 @@ def update_currency_exchange(exchange_uuid: str):
                 "fee_amount": fee_amount,
                 "fee_currency_id": fee_currency_id
             }
+            pair_summary = CashFlowHelperService.build_exchange_pair_summary(updated_from_flow, updated_to_flow)
+            if pair_summary:
+                result["exchange_pair_summary"] = pair_summary
             
             logger.info(f"✅ Currency exchange updated successfully: {exchange_id}")
             

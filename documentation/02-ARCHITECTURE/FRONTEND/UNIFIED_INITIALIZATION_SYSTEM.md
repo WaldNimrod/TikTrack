@@ -1,10 +1,10 @@
 # Unified Initialization System - TikTrack
 ## מערכת אתחול מאוחדת
 
-**תאריך עדכון:** 2025-01-06  
-**גרסה:** 3.0  
-**סטטוס:** ✅ הושלם בהצלחה - מערכת חדשה עם 8 מודולים מאוחדים  
-**מטרה:** מערכת כללית חדשה עם טעינה סטטית וארכיטקטורה מאוחדת
+**תאריך עדכון:** 2025-01-27  
+**גרסה:** 3.1  
+**סטטוס:** ✅ הושלם בהצלחה - מערכת חדשה עם 8 מודולים מאוחדים + מערכת מוניטורינג משופרת V2  
+**מטרה:** מערכת כללית חדשה עם טעינה סטטית וארכיטקטורה מאוחדת + בדיקה כפולה HTML+DOM
 
 ### 📋 Overview
 
@@ -53,8 +53,8 @@ The New General Systems Architecture is a revolutionary approach to JavaScript i
 
 | File | Status | Reason |
 |------|--------|--------|
-| `unified-app-initializer.js` | Archived | Moved to `modules/core-systems.js` |
-| `page-initialization-configs.js` | Archived | Moved to `modules/core-systems.js` |
+| `unified-app-initializer.js` | Archived | Moved to `modules/core-systems.js` - See `archive/scripts/unified-app-initializer.js` |
+| `page-initialization-configs.js` | Active | **Single source of truth** for PAGE_CONFIGS with packages array |
 | `application-initializer.js` | Archived | Duplicate functionality, caused race conditions |
 | `smart-initialization.js` | Archived | Not used in production, only in test pages |
 | `master-initialization.js` | Archived | Not used in production, only in test pages |
@@ -107,9 +107,95 @@ The unified system includes:
 - **Dependencies:** Cache ready flag (UnifiedCacheManager), Core/UI systems
 - **Duration:** ~0.15ms (parallel execution)
 - **Notes:**
-  - ✅ לפני כל Service הצורך העדפות, המערכת מריצה פעם אחת `await window.PreferencesSystem.initialize()` אם קיים `preferences-core.js`.
-  - ✅ לאחר האתחול, המערכת מציבה `window.currentPreferences` ומשדרת אירוע `preferences:loaded` כדי לאפשר לצרכנים להמתין.
+  - ✅ לפני כל Service הצורך העדפות, המערכת מריצה פעם אחת `await window.PreferencesCore.initializeWithLazyLoading()` אם קיים `preferences-core.js`.
+  - ✅ לאחר האתחול, המערכת מציבה `window.currentPreferences` ומשדרת אירועים:
+    - `preferences:critical-loaded` - העדפות קריטיות נטענו (נשלח מיד לאחר טעינה)
+    - `preferences:all-loaded` - כל ההעדפות נטענו (נשלח לאחר טעינת העדפות הקריטיות)
+    - `preferences:cache-hit` - cache hit זוהה
+    - `preferences:cache-miss` - cache miss זוהה
+  - ✅ מערכות תלויות (header-system, color-scheme-system) ממתינות ל-`preferences:critical-loaded` לפני שימוש בהעדפות
+  - ✅ Timeout fallback: 3 שניות (development) או 5 שניות (production) למקרה של תקלה
   - ❌ אין אתחולי העדפות נקודתיים בעמודים.
+
+#### **Preferences Loading Event System**
+
+The preferences loading system uses an event-driven architecture to coordinate initialization across dependent systems:
+
+**Events:**
+- `preferences:critical-loaded` - Fired when critical preferences are loaded (immediately after loading)
+  - Detail includes: `preferences`, `fromCache`, `cacheLayer`, `userId`, `profileId`, `loadTime`, `environment`, `criticalCount`, `totalCritical`, `timestamp`
+- `preferences:all-loaded` - Fired when all preferences are loaded (after critical preferences)
+  - Detail includes: `preferences`, `fromCache`, `cacheLayer`, `loadTime`, `environment`
+- `preferences:cache-hit` - Fired when preferences are loaded from cache
+  - Detail includes: `cacheLayer`, `loadTime`, `environment`
+- `preferences:cache-miss` - Fired when preferences are loaded from backend
+  - Detail includes: `loadTime`, `environment`
+
+**Global Flags:**
+- `window.__preferencesCriticalLoaded` - Boolean flag indicating if critical preferences have been loaded
+- `window.__preferencesCriticalLoadedDetail` - Object containing detailed information about the loaded preferences
+  - Includes: `preferences`, `fromCache`, `cacheLayer`, `userId`, `profileId`, `loadTime`, `environment`, `criticalCount`, `totalCritical`, `timestamp`
+
+**Timing and Timeout:**
+- Preferences initialization uses `Promise.race` with a timeout to prevent indefinite blocking
+- Timeout values:
+  - Development: 3 seconds
+  - Production: 5 seconds
+- If timeout occurs, initialization continues without blocking page load
+- Systems should check `window.__preferencesCriticalLoaded` flag first, then listen for events with timeout fallback
+
+**Best Practices for Dependent Systems:**
+
+1. **Check Flag First:**
+   ```javascript
+   if (window.__preferencesCriticalLoaded) {
+     // Preferences already loaded, proceed immediately
+     proceed();
+   } else {
+     // Wait for event
+     waitForPreferences();
+   }
+   ```
+
+2. **Wait for Event with Timeout:**
+   ```javascript
+   const waitForPreferences = async () => {
+     const environment = window.API_ENV || 'development';
+     const timeoutMs = environment === 'production' ? 5000 : 3000;
+     
+     return new Promise((resolve) => {
+       // Check if already loaded
+       if (window.__preferencesCriticalLoaded) {
+         resolve();
+         return;
+       }
+       
+       // Wait for event
+       const eventHandler = () => {
+         resolve();
+       };
+       
+       window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+       
+       // Fallback timeout
+       setTimeout(() => {
+         window.removeEventListener('preferences:critical-loaded', eventHandler);
+         resolve(); // Continue even if event doesn't fire
+       }, timeoutMs);
+     });
+   };
+   ```
+
+3. **Access Preferences:**
+   ```javascript
+   // After waiting for preferences
+   await waitForPreferences();
+   
+   // Access preferences
+   const defaultAccount = window.currentPreferences?.default_trading_account;
+   ```
+
+See [PREFERENCES_LOADING_BEST_PRACTICES.md](PREFERENCES_LOADING_BEST_PRACTICES.md) for complete guide.
 
 #### **Stage 4: Validation Systems**
 - **Purpose:** Initialize validation and error handling
@@ -495,6 +581,58 @@ document.addEventListener('DOMContentLoaded', function() {
 - ✅ **90% Memory Saving:** Unified modules instead of separate files (Implemented)
 - ✅ **70% Loading Time Improvement:** Faster initial page load (Implemented)
 
+### **Preferences Loading Optimization (2025-01-18)**
+
+#### **Event System**
+The system now dispatches events for preferences loading:
+- `preferences:critical-loaded` - Fired when critical preferences are loaded
+  - Detail includes: `preferences`, `fromCache`, `cacheLayer`, `userId`, `profileId`, `loadTime`, `environment`
+- `preferences:all-loaded` - Fired when all preferences are loaded
+  - Detail includes: `userId`, `profileId`, `environment`, `criticalLoaded`, `totalCritical`
+- `preferences:cache-hit` - Fired when cache hit is detected
+- `preferences:cache-miss` - Fired when cache miss is detected
+
+#### **Cache Integration**
+- **4-Layer Cache System**: Memory → localStorage → IndexedDB → Backend
+- **Cache Warming**: Critical preferences are saved to memory layer for faster access
+- **Fallback Mechanisms**: Automatic fallback between cache layers
+- **Cache Detection**: System detects cache hit/miss and dispatches appropriate events
+
+#### **Environment Handling**
+- **Development**: 3-second timeout, detailed logging
+- **Production**: 5-second timeout, minimal logging
+- **Automatic Detection**: Uses `window.API_ENV` to determine environment
+
+#### **Dependent Systems**
+Systems that depend on preferences now wait for `preferences:critical-loaded`:
+- `header-system.js` - Waits before loading filter defaults
+- `color-scheme-system.js` - Waits before loading color preferences
+- All systems have timeout fallback for backward compatibility
+
+#### **Best Practices**
+1. **Wait for Events**: Use `preferences:critical-loaded` event before accessing preferences
+2. **Timeout Fallback**: Always include timeout fallback (3s dev, 5s prod)
+3. **Check Availability**: Check if `window.currentPreferences` exists before waiting
+4. **Backward Compatibility**: System works even if events don't fire
+
+#### **Example Usage**
+```javascript
+// Wait for critical preferences
+await new Promise((resolve) => {
+  if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+    resolve();
+    return;
+  }
+  
+  const timeoutMs = window.API_ENV === 'production' ? 5000 : 3000;
+  window.addEventListener('preferences:critical-loaded', resolve, { once: true });
+  setTimeout(resolve, timeoutMs); // Fallback
+});
+
+// Now safe to use preferences
+const value = await window.getPreference('myPreference');
+```
+
 ### **Future Enhancements (Planned)**
 
 - **Service Workers:** Background initialization
@@ -531,6 +669,7 @@ For issues or questions about the Unified Initialization System:
 ## 🔗 **Related Documentation**
 
 - ⭐ [Loading Standard](LOADING_STANDARD.md) - **תקן טעינת קבצים מדויק**
+- 🔍 [Monitoring System V2](MONITORING_SYSTEM_V2.md) - **מערכת מוניטורינג משופרת עם בדיקה כפולה HTML+DOM** ✅ **חדש! ינואר 2025**
 - [New General Systems Architecture Specification](../new_general_systems_architecture_specification.md)
 - [New General Systems Implementation Plan](../new_general_systems_implementation_plan.md)
 - [New General Systems Project Summary](../new_general_systems_project_summary.md)

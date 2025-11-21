@@ -7,6 +7,74 @@
  * the appropriate context, and ensures the modal footer is hidden.
  */
 (function () {
+    const reloadBypassState = (() => {
+        const stateKey = '__conditionsReloadBypassState';
+        if (window[stateKey]) {
+            return window[stateKey];
+        }
+
+        if (typeof window.location?.reload !== 'function') {
+            window.Logger?.warn('[ConditionsModalController] Cannot override window.location.reload', { page: 'conditions-modal-controller' });
+            return null;
+        }
+
+        const originalReload = window.location.reload.bind(window.location);
+        const state = {
+            originalReload,
+            enabled: false,
+            reason: null,
+            blockCount: 0,
+            lastAttempt: null,
+            lastEnabledAt: null
+        };
+
+        window.location.reload = function patchedReload(forceReload) {
+            if (state.enabled) {
+                const attempt = {
+                    forceReload: Boolean(forceReload),
+                    timestamp: Date.now(),
+                    reason: state.reason,
+                    stack: new Error().stack
+                };
+                state.blockCount += 1;
+                state.lastAttempt = attempt;
+                window.Logger?.warn('[ConditionsReloadBypass] Prevented reload attempt', attempt, { page: 'conditions-modal-controller' });
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('חוסם ריענון אוטומטי לזמן דיבוג תנאים', 'info');
+                }
+                return;
+            }
+            return originalReload(forceReload);
+        };
+
+        window.ConditionsReloadBypass = {
+            enable: (reason = 'conditions-modal') => {
+                state.enabled = true;
+                state.reason = reason;
+                state.lastEnabledAt = Date.now();
+                window.Logger?.info('[ConditionsReloadBypass] Enabled', { reason }, { page: 'conditions-modal-controller' });
+            },
+            disable: (reason = null) => {
+                if (reason && state.reason && reason !== state.reason) {
+                    return;
+                }
+                state.enabled = false;
+                state.reason = null;
+                window.Logger?.info('[ConditionsReloadBypass] Disabled', { requestedBy: reason }, { page: 'conditions-modal-controller' });
+            },
+            state: () => ({
+                enabled: state.enabled,
+                reason: state.reason,
+                blockCount: state.blockCount,
+                lastAttempt: state.lastAttempt,
+                lastEnabledAt: state.lastEnabledAt
+            }),
+            runOriginal: (forceReload) => originalReload(forceReload)
+        };
+
+        window[stateKey] = state;
+        return state;
+    })();
     const MODAL_ID = 'conditionsModal';
 
     class ConditionsModalController {
@@ -18,6 +86,9 @@
             this.isReady = false;
             this.parentModalId = null;
             this.parentModalInstance = null;
+            this.navigationInstanceId = null;
+            this.parentNavigationInstanceId = null;
+            this.reloadBypassActive = false;
 
             this.initialize();
         }
@@ -48,20 +119,60 @@
                 return;
             }
 
-            this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement);
+            try {
+                // Ensure modal is the last child under body so it stacks above previously opened modals
+                document.body.appendChild(this.modalElement);
+            } catch (error) {
+                window.Logger?.warn('[ConditionsModalController] Failed to reposition modal element in DOM', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+            }
+
+            this.modalElement.classList.add('modal-nested');
+
+            this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                backdrop: false,
+                keyboard: true
+            });
             this.modalElement.addEventListener('shown.bs.modal', () => this.onModalShown());
             this.modalElement.addEventListener('hidden.bs.modal', () => this.onModalHidden());
 
             this.isReady = true;
         }
 
+        ensureModalPosition() {
+            if (!this.modalElement) {
+                return;
+            }
+            try {
+                if (this.modalElement.parentElement !== document.body || document.body.lastElementChild !== this.modalElement) {
+                    document.body.appendChild(this.modalElement);
+                }
+            } catch (error) {
+                window.Logger?.warn('[ConditionsModalController] Failed to ensure modal position', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+            }
+        }
+
+        buildModalTitle() {
+            if (!this.context) {
+                return 'ניהול תנאים';
+            }
+            const entityLabel = this.context.entityType === 'plan' ? 'תוכנית מסחר' : 'עסקה';
+            const entityName = this.context.entityName ? ` (${this.context.entityName})` : '';
+            return `ניהול תנאים – ${entityLabel} #${this.context.entityId}${entityName}`;
+        }
+
         async open(context = {}) {
+            window.Logger?.info('[ConditionsModalController] open called', { context }, { page: 'conditions-modal-controller' });
             this.context = {
                 entityType: context.entityType || 'plan',
                 entityId: context.entityId,
                 entityName: context.entityName || '',
-                parentModalId: context.parentModalId || null
+                parentModalId: context.parentModalId || null,
+                focusConditionId: context.focusConditionId ?? null,
+                layoutMode: context.layoutMode || null
             };
+            if (!this.context.layoutMode) {
+                this.context.layoutMode = 'form-only';
+            }
             this.parentModalId = this.context.parentModalId || null;
 
             if (!this.context.entityId) {
@@ -83,7 +194,51 @@
                 }
             }
 
-            if (this.parentModalId) {
+            const navigationAvailable = Boolean(window.ModalNavigationService?.registerModalOpen);
+            let parentEntry = null;
+
+            if (navigationAvailable && typeof window.ModalNavigationService.getActiveEntry === 'function') {
+                parentEntry = window.ModalNavigationService.getActiveEntry();
+                if (!this.parentModalId && parentEntry?.modalId) {
+                    this.parentModalId = parentEntry.modalId;
+                }
+                this.parentNavigationInstanceId = parentEntry?.instanceId || null;
+            } else {
+                this.parentNavigationInstanceId = null;
+            }
+
+            if (navigationAvailable) {
+                const metadata = {
+                    modalId: MODAL_ID,
+                    modalType: 'conditions-modal',
+                    entityType: this.context.entityType === 'plan' ? 'trade_plan' : 'trade',
+                    entityId: this.context.entityId,
+                    title: this.buildModalTitle(),
+                    parentInstanceId: this.parentNavigationInstanceId,
+                    sourceInfo: parentEntry
+                        ? {
+                            modalId: parentEntry.modalId,
+                            entityType: parentEntry.entityType,
+                            entityId: parentEntry.entityId,
+                            instanceId: parentEntry.instanceId
+                        }
+                        : (this.parentModalId
+                            ? { modalId: this.parentModalId }
+                            : null),
+                    metadata: {
+                        parentModalId: this.parentModalId,
+                        layoutMode: this.context.layoutMode
+                    }
+                };
+
+                try {
+                    const navigationEntry = await window.ModalNavigationService.registerModalOpen(this.modalElement, metadata);
+                    this.navigationInstanceId = navigationEntry?.instanceId || null;
+                } catch (error) {
+                    window.Logger?.warn('[ConditionsModalController] Failed to register modal in navigation service', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                    this.navigationInstanceId = null;
+                }
+            } else if (this.parentModalId) {
                 const parentElement = document.getElementById(this.parentModalId);
                 if (parentElement) {
                     try {
@@ -96,7 +251,7 @@
                             parentElement.style.display = 'none';
                         }
                     } catch (error) {
-                        window.Logger?.warn('[ConditionsModalController] Failed to hide parent modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                        window.Logger?.warn('[ConditionsModalController] Failed to hide parent modal (fallback)', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                         parentElement.classList.remove('show');
                         parentElement.style.display = 'none';
                     }
@@ -104,40 +259,87 @@
             }
 
             if (this.bootstrapModal) {
+                this.ensureModalPosition();
                 this.bootstrapModal.show();
             } else if (this.modalElement) {
+                this.ensureModalPosition();
                 this.modalElement.classList.add('show');
                 this.modalElement.style.display = 'block';
             }
+
+            requestAnimationFrame(() => this.ensureModalPosition());
+            this.activateReloadBypass();
         }
 
         async onModalShown() {
+            window.Logger?.info('[ConditionsModalController] onModalShown triggered', { context: this.context }, { page: 'conditions-modal-controller' });
             if (!this.context) {
                 window.Logger?.error('[ConditionsModalController] Modal opened without context', { page: 'conditions-modal-controller' });
                 return;
             }
 
+            this.activateReloadBypass();
             this.configureModalUI();
 
             if (!this.managerInstance) {
+                window.Logger?.info('[ConditionsModalController] Creating new ConditionsUIManager instance', { page: 'conditions-modal-controller' });
                 this.managerInstance = new window.ConditionsUIManager();
+            } else {
+                window.Logger?.info('[ConditionsModalController] Reusing existing ConditionsUIManager instance', { page: 'conditions-modal-controller' });
             }
+
+            window.conditionsUIManager = this.managerInstance;
+            window.__conditionsActiveContext = { ...this.context };
 
             await this.managerInstance.initialize({
                 entityType: this.context.entityType,
                 entityId: this.context.entityId,
                 entityName: this.context.entityName,
-                containerId: 'conditionsManagerRoot'
+                containerId: 'conditionsManagerRoot',
+                layoutMode: this.context.layoutMode
             });
+
+            if (this.context.focusConditionId && typeof this.managerInstance?.handleEditCondition === 'function') {
+                const conditionIdToEdit = Number(this.context.focusConditionId);
+                if (!Number.isNaN(conditionIdToEdit)) {
+                    setTimeout(() => {
+                        try {
+                            this.managerInstance?.handleEditCondition(conditionIdToEdit);
+                        } catch (error) {
+                            window.Logger?.warn('[ConditionsModalController] Failed to auto-open condition edit form', { error: error?.message }, { page: 'conditions-modal-controller' });
+                        }
+                    }, 50);
+                }
+            }
+
+            if (this.navigationInstanceId && window.ModalNavigationService?.updateModalMetadata) {
+                window.ModalNavigationService.updateModalMetadata(MODAL_ID, {
+                    instanceId: this.navigationInstanceId,
+                    title: this.buildModalTitle()
+                });
+            }
         }
 
         onModalHidden() {
-            this.restoreParentModal();
+            window.Logger?.info('[ConditionsModalController] onModalHidden triggered', {}, { page: 'conditions-modal-controller' });
+            if (!window.ModalNavigationService?.registerModalOpen) {
+                this.restoreParentModal();
+            } else {
+                this.navigationInstanceId = null;
+            }
 
             this.context = null;
+            window.__conditionsActiveContext = null;
+
             if (this.managerInstance?.closeConditionForm) {
                 this.managerInstance.closeConditionForm();
             }
+
+            if (window.conditionsUIManager === this.managerInstance) {
+                window.conditionsUIManager = null;
+            }
+
+            this.deactivateReloadBypass();
         }
 
         configureModalUI() {
@@ -148,9 +350,7 @@
 
             const titleElement = this.modalElement.querySelector('.modal-title');
             if (titleElement) {
-                const entityLabel = this.context.entityType === 'plan' ? 'תוכנית מסחר' : 'עסקה';
-                const entityName = this.context.entityName ? ` (${this.context.entityName})` : '';
-                titleElement.textContent = `ניהול תנאים – ${entityLabel} #${this.context.entityId}${entityName}`;
+                titleElement.textContent = this.buildModalTitle();
             }
 
             const entityLabelContainer = this.modalElement.querySelector('#conditionsModalEntityLabel');
@@ -162,7 +362,13 @@
 
             const backButton = this.modalElement.querySelector('[data-action="conditions-back"]');
             if (backButton) {
-                if (this.parentModalId) {
+                const navigationAvailable = Boolean(window.ModalNavigationService?.goBack);
+                if (navigationAvailable && this.navigationInstanceId && this.parentNavigationInstanceId) {
+                    backButton.classList.remove('d-none');
+                    backButton.onclick = () => {
+                        window.ModalNavigationService.goBack?.();
+                    };
+                } else if (this.parentModalId) {
                     backButton.classList.remove('d-none');
                     backButton.onclick = () => this.goBackToParent();
                 } else {
@@ -173,6 +379,11 @@
         }
 
         goBackToParent() {
+            if (window.ModalNavigationService?.goBack && this.navigationInstanceId && this.parentNavigationInstanceId) {
+                window.ModalNavigationService.goBack();
+                return;
+            }
+
             if (this.bootstrapModal) {
                 this.bootstrapModal.hide();
             } else if (this.modalElement) {
@@ -183,6 +394,15 @@
         }
 
         restoreParentModal() {
+            if (window.ModalNavigationService?.navigateTo && this.parentNavigationInstanceId) {
+                const parentEntry = window.ModalNavigationService.getParentEntry?.(this.navigationInstanceId);
+                if (parentEntry?.modalId) {
+                    window.ModalNavigationService.navigateTo(parentEntry.modalId);
+                }
+                this.parentNavigationInstanceId = null;
+                return;
+            }
+
             if (!this.parentModalId) {
                 return;
             }
@@ -205,12 +425,30 @@
                     parentElement.style.display = 'block';
                 }
             } catch (error) {
-                window.Logger?.warn('[ConditionsModalController] Failed to restore parent modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                window.Logger?.warn('[ConditionsModalController] Failed to restore parent modal (fallback)', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                 parentElement.classList.add('show');
                 parentElement.style.display = 'block';
             } finally {
                 this.parentModalInstance = null;
             }
+        }
+
+        activateReloadBypass() {
+            if (this.reloadBypassActive || !reloadBypassState) {
+                return;
+            }
+            window.ConditionsReloadBypass?.enable('conditions-modal');
+            window.Logger?.info('[ConditionsModalController] Reload bypass activated', { entityId: this.context?.entityId }, { page: 'conditions-modal-controller' });
+            this.reloadBypassActive = true;
+        }
+
+        deactivateReloadBypass() {
+            if (!this.reloadBypassActive || !reloadBypassState) {
+                return;
+            }
+            window.ConditionsReloadBypass?.disable('conditions-modal');
+            window.Logger?.info('[ConditionsModalController] Reload bypass deactivated', {}, { page: 'conditions-modal-controller' });
+            this.reloadBypassActive = false;
         }
     }
 

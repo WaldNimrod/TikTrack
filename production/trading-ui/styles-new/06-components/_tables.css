@@ -69,7 +69,7 @@
 }
 
 .sortable-header:hover {
-    color: var(--primary-color, #007bff);
+    color: var(--primary-color, #26baac);
     text-decoration: none;
 }
 

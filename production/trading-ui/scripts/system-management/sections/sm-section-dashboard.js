@@ -301,10 +301,17 @@ class SMDashboardSection extends SMBaseSection {
    * קבלת צבע ציון בריאות
    */
   getHealthScoreColor(score) {
-    if (score >= 90) return '#28a745'; // Green
-    if (score >= 75) return '#ffc107'; // Yellow
-    if (score >= 50) return '#fd7e14'; // Orange
-    return '#dc3545'; // Red
+    const palette = window.SMUIColorUtils || null;
+    if (score >= 90) {
+      return palette?.get('success', '#28a745') || '#28a745';
+    }
+    if (score >= 75) {
+      return palette?.get('warning', '#ffc107') || '#ffc107';
+    }
+    if (score >= 50) {
+      return palette?.getCSSVariableValue?.('--entity-cash_flow-color', '#fd7e14') || '#fd7e14';
+    }
+    return palette?.get('danger', '#dc3545') || '#dc3545';
   }
 
   /**
@@ -434,10 +441,13 @@ class SMDashboardSection extends SMBaseSection {
    * קבלת צבע פס התקדמות
    */
   getProgressColor(percent) {
-    if (percent >= 90) return '#dc3545'; // Red
-    if (percent >= 75) return '#ffc107'; // Yellow
-    if (percent >= 50) return '#17a2b8'; // Blue
-    return '#28a745'; // Green
+    if (window.SMUIComponents && typeof window.SMUIComponents.getProgressColor === 'function') {
+      return window.SMUIComponents.getProgressColor(percent);
+    }
+    if (percent >= 90) return 'var(--color-danger, #dc3545)';
+    if (percent >= 75) return 'var(--color-warning, #ffc107)';
+    if (percent >= 50) return 'var(--color-info, #17a2b8)';
+    return 'var(--color-success, #28a745)';
   }
 }
 

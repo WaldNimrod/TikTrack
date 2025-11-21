@@ -30,6 +30,7 @@
     const state = {
         categories: [],
         tags: [],
+        allTags: [],
         filteredTags: [],
         usage: [],
         analytics: null,
@@ -48,14 +49,52 @@
         }
     }
 
+    function normalizeTagName(name) {
+        return (name || '').trim().toLowerCase();
+    }
+
+    function findExistingTagByName(name, excludeId = null) {
+        if (!name) {
+            return null;
+        }
+        const normalized = normalizeTagName(name);
+        const sourceTags = state.allTags.length ? state.allTags : state.tags;
+        return sourceTags.find((tag) => {
+            const tagName = normalizeTagName(tag.name);
+            if (!tagName || tagName !== normalized) {
+                return false;
+            }
+            if (excludeId == null) {
+                return true;
+            }
+            return Number(tag.id) !== Number(excludeId);
+        }) || null;
+    }
+
+    function escapeAttribute(value) {
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
     function showError(message, error) {
+        const errorDetails = error?.message && typeof error.message === 'string'
+            ? `${message} (${error.message})`
+            : message;
         if (window.Logger) {
-            window.Logger.error(message, { page: 'tag-management', error });
+            window.Logger.error(errorDetails, { page: 'tag-management', error });
         } else {
-            console.error(message, error);
+            console.error(errorDetails, error);
         }
         if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', message);
+            window.showErrorNotification('שגיאה', errorDetails);
         }
     }
 
@@ -85,12 +124,16 @@
                                 data-button-type="EDIT"
                                 data-variant="small"
                                 data-icon="✏️"
+                                data-text="עריכה"
+                                data-tooltip="עריכת קטגוריה"
                                 data-onclick="window.TagManagementPage?.openCategoryModal('edit', ${item.id})">
                             </button>
                             <button type="button"
                                 data-button-type="DELETE"
                                 data-variant="small"
                                 data-icon="🗑️"
+                                data-text="מחיקה"
+                                data-tooltip="מחיקת קטגוריה"
                                 data-onclick="window.TagManagementPage?.promptDeleteCategory(${item.id})">
                             </button>
                         </div>
@@ -117,10 +160,19 @@
             const lastUsed = item.last_used_at
                 ? window.FieldRendererService?.renderUpdatedTimestamp?.(item.last_used_at, { fallback: '—' })
                 : '<span class="text-muted">—</span>';
+            const tagName = item.name || `תגית #${item.id}`;
+            const attributeTagName = escapeAttribute(tagName);
 
             return `
                 <tr data-tag-id="${item.id}">
-                    <td>${window.escapeHtml?.(item.name) || item.name}</td>
+                    <td>
+                        <button type="button"
+                            data-button-type="LINK"
+                            data-variant="link"
+                            data-onclick="window.TagManagementPage?.showTagUsage(${item.id})"
+                            data-text="${attributeTagName}">
+                        </button>
+                    </td>
                     <td>${window.escapeHtml?.(item.category_name) || item.category_name || '<span class="text-muted">ללא קטגוריה</span>'}</td>
                     <td>${description}</td>
                     <td><span class="badge bg-info text-dark">${usage}</span></td>
@@ -131,12 +183,16 @@
                                 data-button-type="EDIT"
                                 data-variant="small"
                                 data-icon="✏️"
+                                data-text="עריכה"
+                                data-tooltip="עריכת תגית"
                                 data-onclick="window.TagManagementPage?.openTagModal('edit', ${item.id})">
                             </button>
                             <button type="button"
                                 data-button-type="DELETE"
                                 data-variant="small"
                                 data-icon="🗑️"
+                                data-text="מחיקה"
+                                data-tooltip="מחיקת תגית"
                                 data-onclick="window.TagManagementPage?.promptDeleteTag(${item.id})">
                             </button>
                         </div>
@@ -146,6 +202,11 @@
         });
 
         tbody.innerHTML = rows.join('');
+        if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+            setTimeout(() => {
+                window.ButtonSystem.initializeButtons();
+            }, 0);
+        }
     }
 
     function renderUsageTable(data) {
@@ -217,14 +278,11 @@
         }
     }
 
-    async function loadTags({ force = false, categoryId = null } = {}) {
+    async function loadTags({ force = false } = {}) {
         try {
-            const params = {};
-            if (categoryId) {
-                params.category_id = categoryId;
-            }
-            const tags = await window.TagService.fetchTags({ force, categoryId });
-            state.tags = Array.isArray(tags) ? tags : [];
+            const tags = await window.TagService.fetchTags({ force, includeInactive: true });
+            state.allTags = Array.isArray(tags) ? tags : [];
+            state.tags = state.allTags.filter((tag) => tag.is_active !== false);
             applyFilters();
             return state.tags;
         } catch (error) {
@@ -295,7 +353,9 @@
                 tableSelector: '#tagCategoriesTable',
                 columns: window.TABLE_COLUMN_MAPPINGS?.[CATEGORY_TABLE_TYPE] || [],
                 sortable: true,
-                filterable: false
+                filterable: false,
+                // Default sort: updated_at desc (column index 3)
+                defaultSort: { columnIndex: 3, direction: 'desc', key: 'updated_at' }
             });
         }
 
@@ -306,7 +366,9 @@
                 tableSelector: '#tagsTable',
                 columns: window.TABLE_COLUMN_MAPPINGS?.[TAG_TABLE_TYPE] || [],
                 sortable: true,
-                filterable: false
+                filterable: false,
+                // Default sort: last_used_at desc (column index 4)
+                defaultSort: { columnIndex: 4, direction: 'desc', key: 'last_used_at' }
             });
         }
 
@@ -317,7 +379,9 @@
                 tableSelector: '#tagUsageLeaderboardTable',
                 columns: window.TABLE_COLUMN_MAPPINGS?.[USAGE_TABLE_TYPE] || [],
                 sortable: true,
-                filterable: false
+                filterable: false,
+                // Default sort: tag_name asc (column index 0, fallback - no date column)
+                defaultSort: { columnIndex: 0, direction: 'asc', key: 'tag_name' }
             });
         }
     }
@@ -490,7 +554,104 @@
         }
     }
 
+    async function showTagUsage(tagId) {
+        const normalizedId = Number(tagId);
+        if (!Number.isFinite(normalizedId)) {
+            return;
+        }
+
+        try {
+            log('Loading tag usage', { tagId: normalizedId });
+            const usageData = await window.TagService.getTagUsage(normalizedId);
+
+            const rawEntities = Array.isArray(usageData?.child_entities)
+                ? usageData.child_entities
+                : [];
+
+            const normalizedEntities = rawEntities.map((entity) => {
+                const rawType = (entity.entity_type || entity.type || '').toLowerCase();
+                const entityType = rawType || 'entity';
+                const entityId = entity.entity_id ?? entity.id;
+                return {
+                    ...entity,
+                    type: entityType,
+                    entity_type: entityType,
+                    id: entityId,
+                    entity_id: entityId,
+                    linked_at: entity.linked_at || entity.created_at || null,
+                    created_at: entity.created_at || entity.linked_at || null,
+                    updated_at: entity.updated_at || entity.linked_at || null,
+                };
+            });
+
+            const fallbackTagName = state.tags.find((item) => Number(item.id) === normalizedId)?.name;
+            const modalPayload = {
+                tagId: normalizedId,
+                tagName: usageData?.tag?.name || fallbackTagName || `תגית ${normalizedId}`,
+                tag: usageData?.tag || null,
+                child_entities: normalizedEntities,
+                metadata: {
+                    source: 'tag-management',
+                    tagId: normalizedId,
+                    totalEntities: usageData?.total_entities ?? normalizedEntities.length,
+                },
+            };
+
+            if (normalizedEntities.length === 0) {
+                window.showInfoNotification?.('מידע', 'לא נמצאו ישויות המשויכות לתגית הזו');
+            }
+
+            if (typeof window.showLinkedItemsModal === 'function') {
+                window.showLinkedItemsModal(modalPayload, 'tag', normalizedId, 'view');
+            } else {
+                log('showLinkedItemsModal not available, falling back to console output', {
+                    modalPayload,
+                });
+            }
+        } catch (error) {
+            showError('טעינת הישויות המשויכות לתגית נכשלה', error);
+        }
+    }
+
     // ----- Modal Save Handlers -----
+    function closeTagModal(modalId) {
+        if (!modalId) {
+            return;
+        }
+
+        if (typeof window.closeModal === 'function') {
+            try {
+                window.closeModal(modalId);
+                return;
+            } catch (closeError) {
+                window.Logger?.warn('⚠️ Global closeModal failed, falling back to Bootstrap instance', {
+                    error: closeError,
+                    modalId,
+                    page: 'tag-management'
+                });
+            }
+        }
+
+        if (window.ModalManagerV2?.getModalInfo) {
+            const modalInfo = window.ModalManagerV2.getModalInfo(modalId);
+            if (modalInfo?.element) {
+                const instance =
+                    bootstrap.Modal.getInstance(modalInfo.element) ||
+                    bootstrap.Modal.getOrCreateInstance(modalInfo.element);
+                instance?.hide();
+                return;
+            }
+        }
+
+        const fallbackElement = document.getElementById(modalId);
+        if (fallbackElement) {
+            const instance =
+                bootstrap.Modal.getInstance(fallbackElement) ||
+                bootstrap.Modal.getOrCreateInstance(fallbackElement);
+            instance?.hide();
+        }
+    }
+
     async function saveTagCategory() {
         const form = document.getElementById('tagCategoryModalForm');
         if (!form) {
@@ -527,10 +688,98 @@
             await loadCategories(true);
             await loadTags({ force: true });
             await loadAnalytics(true);
-            window.ModalManagerV2?.closeModal('tagCategoryModal');
+            closeTagModal('tagCategoryModal');
         } catch (error) {
             showError('שמירת הקטגוריה נכשלה', error);
         }
+    }
+
+    const TAG_FORM_FIELD_CONFIG = {
+        name: { id: 'tagName', type: 'text' },
+        category_id: { id: 'tagCategory', type: 'int', default: null },
+        description: { id: 'tagDescription', type: 'text', default: null },
+        is_active: { id: 'tagActive', type: 'checkbox', default: true }
+    };
+
+    const debugState = {
+        lastTagSnapshot: null,
+        tagSnapshotHistory: []
+    };
+
+    function collectTagFormDataWithDebug() {
+        const form = document.getElementById('tagModalForm');
+        if (!form) {
+            throw new Error('tagModalForm not found');
+        }
+
+        const collectedData = window.DataCollectionService.collectFormData(TAG_FORM_FIELD_CONFIG);
+        const rawFields = Object.entries(TAG_FORM_FIELD_CONFIG).reduce((acc, [key, config]) => {
+            const element = document.getElementById(config.id);
+            if (!element) {
+                acc[key] = {
+                    sourceId: config.id,
+                    exists: false
+                };
+                return acc;
+            }
+
+            const baseInfo = {
+                sourceId: config.id,
+                exists: true,
+                tagName: element.tagName,
+                inputType: element.type || 'text',
+                dataset: { ...element.dataset }
+            };
+
+            if (element.type === 'checkbox') {
+                acc[key] = {
+                    ...baseInfo,
+                    rawValue: element.checked
+                };
+            } else if (element.tagName === 'SELECT') {
+                const selectedOption = element.options[element.selectedIndex];
+                acc[key] = {
+                    ...baseInfo,
+                    rawValue: element.value,
+                    selectedOption: selectedOption
+                        ? {
+                              value: selectedOption.value,
+                              label: selectedOption.textContent?.trim() || ''
+                          }
+                        : null
+                };
+            } else {
+                acc[key] = {
+                    ...baseInfo,
+                    rawValue: element.value
+                };
+            }
+
+            return acc;
+        }, {});
+
+        const snapshot = {
+            timestamp: new Date().toISOString(),
+            mode: form.dataset.mode || 'add',
+            entityId: form.dataset.entityId || null,
+            collectedData,
+            rawFields
+        };
+
+        debugState.lastTagSnapshot = snapshot;
+        debugState.tagSnapshotHistory.push(snapshot);
+        // Keep only last 10 entries
+        if (debugState.tagSnapshotHistory.length > 10) {
+            debugState.tagSnapshotHistory.shift();
+        }
+
+        window.Logger?.info?.(
+            '🧪 Tag form snapshot',
+            JSON.parse(JSON.stringify(snapshot)),
+            { page: 'tag-management' }
+        );
+
+        return { collectedData, snapshot };
     }
 
     async function saveTag() {
@@ -539,12 +788,7 @@
             throw new Error('tagModalForm not found');
         }
 
-        const tagData = window.DataCollectionService.collectFormData({
-            name: { id: 'tagName', type: 'text' },
-            category_id: { id: 'tagCategory', type: 'int', default: null },
-            description: { id: 'tagDescription', type: 'text', default: null },
-            is_active: { id: 'tagActive', type: 'checkbox', default: true }
-        });
+        const { collectedData: tagData, snapshot: tagSnapshot } = collectTagFormDataWithDebug();
 
         const validationConfig = [
             { id: 'tagName', name: 'שם תגית', rules: { required: true, minLength: 2 } }
@@ -557,20 +801,52 @@
 
         const mode = form.dataset.mode || 'add';
         const tagId = Number(form.dataset.entityId);
+        const normalizedName = normalizeTagName(tagData.name);
+
+        const duplicateTag = findExistingTagByName(normalizedName, mode === 'edit' ? tagId : null);
+        if (duplicateTag) {
+            const duplicateMessage = `השם "${duplicateTag.name}" כבר נמצא בשימוש. ניתן לערוך את התגית הקיימת או לבחור שם אחר.`;
+            document.getElementById('tagName')?.classList.add('is-invalid');
+            window.showErrorNotification?.('שם תגית כבר קיים', duplicateMessage);
+            return;
+        }
+
+        window.Logger?.info?.('📝 [TagManagement] saveTag request', {
+            mode,
+            tagId: Number.isFinite(tagId) ? tagId : null,
+            tagData,
+            snapshotId: tagSnapshot.timestamp
+        });
 
         try {
+            let savedTag = null;
             if (mode === 'edit' && tagId) {
-                await window.TagService.updateTag(tagId, tagData);
+                savedTag = await window.TagService.updateTag(tagId, tagData);
                 window.showSuccessNotification?.('תגית עודכנה בהצלחה');
             } else {
-                await window.TagService.createTag(tagData);
+                savedTag = await window.TagService.createTag(tagData);
                 window.showSuccessNotification?.('תגית נוצרה בהצלחה');
             }
             await loadTags({ force: true });
             await loadAnalytics(true);
-            window.ModalManagerV2?.closeModal('tagModal');
+            window.Logger?.info?.('✅ [TagManagement] saveTag success', {
+                mode,
+                tagId: savedTag?.id || tagId || 'new',
+                categoryId: savedTag?.category_id ?? tagData.category_id ?? null,
+                snapshotId: tagSnapshot.timestamp
+            });
+            closeTagModal('tagModal');
         } catch (error) {
-            showError('שמירת התגית נכשלה', error);
+            const message = window.TagService?.formatTagErrorMessage
+                ? window.TagService.formatTagErrorMessage('שמירת התגית נכשלה', error)
+                : 'שמירת התגית נכשלה';
+            window.Logger?.error?.('❌ [TagManagement] saveTag failure', {
+                mode,
+                tagId: Number.isFinite(tagId) ? tagId : null,
+                error: error?.message || error,
+                snapshot: tagSnapshot
+            });
+            showError(message, { error, tagSnapshot });
         }
     }
 
@@ -595,7 +871,17 @@
         promptDeleteCategory,
         promptDeleteTag,
         saveTagCategory,
-        saveTag
+        saveTag,
+        showTagUsage,
+        debugTagFormSnapshot: () => {
+            if (debugState.lastTagSnapshot) {
+                console.table(debugState.lastTagSnapshot.rawFields, ['sourceId', 'rawValue', 'inputType']);
+            } else {
+                window.Logger?.warn?.('No tag snapshot captured yet', { page: 'tag-management' });
+            }
+            return debugState.lastTagSnapshot;
+        },
+        getTagSnapshotHistory: () => [...debugState.tagSnapshotHistory]
     };
 
     document.addEventListener('DOMContentLoaded', () => {

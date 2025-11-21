@@ -1,6 +1,29 @@
-/*
+/**
  * Research Page Controller
+ * ========================
  * Minimal dashboard shell (no mock data, no legacy stubs).
+ * 
+ * @version 1.0.0
+ * @author TikTrack Development Team
+ * 
+ * ============================================================================
+ * FUNCTION INDEX - Research Page
+ * ============================================================================
+ * 
+ * Initialization:
+ * - initializeResearchPage() - Initialize research dashboard shell
+ * 
+ * Data Loading:
+ * - loadResearchData(options) - Load research data from service or API
+ * 
+ * Rendering:
+ * - renderPlaceholder(error) - Render placeholder message or error
+ * - renderDataState() - Render data state with timestamp
+ * 
+ * Utilities:
+ * - getContainer() - Get dashboard container element
+ * 
+ * ============================================================================
  */
 (function researchPageController() {
   const DASHBOARD_CONTAINER_ID = 'researchDashboardShell';
@@ -15,10 +38,19 @@
 
   window.researchDashboardState = state;
 
+  /**
+   * Get dashboard container element
+   * @returns {HTMLElement|null} Dashboard container element or null if not found
+   */
   function getContainer() {
     return document.getElementById(DASHBOARD_CONTAINER_ID);
   }
 
+  /**
+   * Render placeholder message or error state
+   * @param {Error|null} error - Error object to display, or null for idle state
+   * @returns {void}
+   */
   function renderPlaceholder(error) {
     const container = getContainer();
     if (!container) {
@@ -36,6 +68,10 @@
     `;
   }
 
+  /**
+   * Render data state with timestamp
+   * @returns {void}
+   */
   function renderDataState() {
     const container = getContainer();
     if (!container) {
@@ -55,6 +91,12 @@
     `;
   }
 
+  /**
+   * Load research data from service or API
+   * @param {Object} [options={}] - Loading options
+   * @param {boolean} [options.forceRefresh=false] - Force refresh from server
+   * @returns {Promise<void>}
+   */
   async function loadResearchData(options = {}) {
     const container = getContainer();
     if (!container) {
@@ -86,6 +128,10 @@
     }
   }
 
+  /**
+   * Initialize research dashboard shell
+   * @returns {Promise<void>}
+   */
   async function initializeResearchPage() {
     window.Logger?.info('Initializing research dashboard shell', { page: 'research' });
     renderPlaceholder();

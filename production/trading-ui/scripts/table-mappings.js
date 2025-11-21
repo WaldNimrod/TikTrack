@@ -17,12 +17,29 @@
 console.log('🔵 [table-mappings.js] FILE LOADING STARTED');
 console.log('🔵 [table-mappings.js] Current window.TABLE_COLUMN_MAPPINGS:', window.TABLE_COLUMN_MAPPINGS ? `exists (${Object.keys(window.TABLE_COLUMN_MAPPINGS).length} keys)` : 'NOT FOUND');
 
+// ===== DATE FIELD HINTS =====
+// Array of strings that indicate date/time fields in column names
+const DATE_KEY_HINTS = [
+  'date',
+  'time',
+  'timestamp',
+  '_at',
+  '_on',
+  'fetched',
+  'asof',
+  'created',
+  'updated',
+  'closed',
+  'expiry',
+  'triggered'
+];
+
 // ===== TABLE COLUMN MAPPINGS =====
 const TABLE_COLUMN_MAPPINGS = {
   // טבלת תכנונים (Trade Plans) - Trade Plans Page Structure (מוצג בפועל)
   'trade_plans': [
     'ticker_symbol',         // 0 - טיקר (מחושב)
-    'created_at',            // 1 - תאריך
+    'created_at',            // 1 - נוצר ב:
     'status',                // 2 - סטטוס
     'investment_type',       // 3 - סוג
     'side',                  // 4 - צד
@@ -32,6 +49,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'reward',                // 8 - סיכוי (מחושב)
     'risk',                  // 9 - סיכון (מחושב)
     'ratio',                 // 10 - יחס (מחושב)
+    'updated_at',            // 11 - עודכן
   ],
 
   // טבלת טריידים (Trades) - Trades Page Structure (מוצג בפועל)
@@ -46,8 +64,9 @@ const TABLE_COLUMN_MAPPINGS = {
     'investment_type',       // 7 - סוג
     'side',                  // 8 - צד
     'account_name',          // 9 - חשבון מסחר
-    'created_at',            // 10 - נוצר ב
+    'created_at',            // 10 - נוצר ב:
     'closed_at',             // 11 - נסגר ב
+    'updated_at',            // 12 - עודכן
   ],
 
   // טבלת חשבונות מסחר (Trading Accounts) - Trading Accounts Page Structure (מוצג בפועל)
@@ -58,6 +77,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'positions_count',       // 3 - פוזיציות (מחושב)
     'total_pl',              // 4 - רווח/הפסד
     'status',                // 5 - סטטוס
+    'updated_at',            // 6 - עודכן
   ],
 
   // טבלת טיקרים (Tickers) - Tickers Page Structure (מוצג בפועל)
@@ -70,7 +90,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'type',                  // 5 - סוג
     'name',                  // 6 - שם החברה
     'currency_id',           // 7 - מטבע
-    'yahoo_updated_at',      // 8 - עודכן ב
+    'updated_at',            // 8 - עודכן ב
   ],
 
   // טבלת פריטים מקושרים (Linked Items) - Entity Details Modal
@@ -79,7 +99,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'status',           // 1 - סטטוס (Status)
     'side',             // 2 - צד (Long/Short)
     'investment_type',  // 3 - סוג השקעה (Investment Type)
-    'created_at',       // 4 - תאריך יצירה
+    'created_at',       // 4 - נוצר ב:
   ],
 
   // טבלת ביצועים (Executions) - Executions Page Structure (מוצג בפועל)
@@ -94,16 +114,19 @@ const TABLE_COLUMN_MAPPINGS = {
     'mtm_pl',                // 7 - MTM P/L
     'date',                  // 8 - תאריך
     'source',                // 9 - מקור
+    'updated_at',            // 10 - עודכן
   ],
 
   // טבלת תזרימי מזומנים (Cash Flows) - Cash Flows Page Structure (מוצג בפועל)
   'cash_flows': [
-    'account_name',          // 0 - חשבון מסחר
-    'type',                  // 1 - סוג
-    'amount',                // 2 - סכום
-    'date',                  // 3 - תאריך
-    'description',           // 4 - תיאור
-    'source',                // 5 - מקור
+    'trade_id',             // 0 - טרייד
+    'account_name',          // 1 - חשבון מסחר
+    'type',                  // 2 - סוג
+    'amount',                // 3 - סכום
+    'date',                  // 4 - תאריך
+    'description',           // 5 - תיאור
+    'source',                // 6 - מקור
+    'updated_at',            // 7 - עודכן
   ],
 
   // טבלת היסטוריית ייבוא נתונים (Data Import History)
@@ -131,15 +154,17 @@ const TABLE_COLUMN_MAPPINGS = {
     'created_at',            // 6 - נוצר ב
     'triggered_at',          // 7 - הופעל ב
     'expiry_date',           // 8 - תאריך תפוגה
+    'updated_at',            // 9 - עודכן
   ],
 
   // טבלת הערות (Notes) - Notes Page Structure (מוצג בפועל)
-  // מציג: אובייקט מקושר, תוכן, תאריך, קובץ מצורף, פעולות
+  // מציג: אובייקט מקושר, תוכן, קובץ מצורף, נוצר ב:, עודכן, פעולות
   'notes': [
     'related_object',        // 0 - אובייקט מקושר (מחושב מהאובייקט המקושר)
     'content',               // 1 - תוכן ההערה
-    'created_at',            // 2 - תאריך (תאריך ההערה)
-    'attachment',            // 3 - קובץ מצורף
+    'attachment',            // 2 - קובץ מצורף
+    'created_at',            // 3 - נוצר ב: (תאריך יצירה)
+    'updated_at',            // 4 - עודכן
     // Note: actions column is not part of the mapping (handled separately)
   ],
 
@@ -176,6 +201,31 @@ const TABLE_COLUMN_MAPPINGS = {
     'id',              // 0 - מזהה
     'note_relation_type', // 1 - סוג קשר
     'created_at',       // 2 - נוצר ב
+  ],
+
+  // מערכת תגיות - קטגוריות
+  'tag_categories': [
+    'name',           // 0 - שם קטגוריה
+    'description',    // 1 - תיאור
+    'tags_count',     // 2 - כמות תגיות פעילות
+    'updated_at'      // 3 - עודכן
+  ],
+
+  // מערכת תגיות - תגיות
+  'tags': [
+    'name',           // 0 - שם תגית
+    'category_name',  // 1 - קטגוריה
+    'description',    // 2 - תיאור
+    'usage_count',    // 3 - שימושים
+    'last_used_at'    // 4 - שימוש אחרון
+  ],
+
+  // מערכת תגיות - טבלת שימוש מובילה
+  'tag_usage_leaderboard': [
+    'tag_name',       // 0 - שם תגית
+    'category_name',  // 1 - קטגוריה
+    'usage_count',    // 2 - מספר שימושים
+    'top_entities'    // 3 - ישויות מובילות (מטופל ייעודית ברינדור)
   ],
 
   // טבלת פוזיציות (Positions) - Positions by Account Table
@@ -227,6 +277,16 @@ const TABLE_COLUMN_MAPPINGS = {
     { key: 'match_reasons_text', sortType: 'string' },  // 9 - סיבות התאמה (טקסט חופשי)
     { key: 'actions', sortable: false },                // 10 - פעולות (לא ניתן למיין)
   ],
+
+  // טבלת ניטור לינטר - Lint Monitor Issues
+  'lint_monitor_issues': [
+    { key: 'tool', sortType: 'string' },        // 0 - כלי הלינטר (ESLint / Stylelint וכו')
+    { key: 'severity', sortType: 'string' },    // 1 - חומרה (error/warning/info)
+    { key: 'file', sortType: 'string' },        // 2 - קובץ
+    { key: 'rule', sortType: 'string' },        // 3 - כלל שהופעל
+    { key: 'message', sortType: 'string' },     // 4 - הודעה
+    { key: 'line', sortType: 'numeric' },       // 5 - מיקום שורה
+  ],
 };
 
 const TABLE_COLUMN_SORT_TYPES = {
@@ -234,6 +294,7 @@ const TABLE_COLUMN_SORT_TYPES = {
     created_at: 'dateEnvelope',
     triggered_at: 'dateEnvelope',
     expiry_date: 'dateEnvelope',
+    updated_at: 'dateEnvelope',
     status: 'string',
     is_triggered: 'string'
   },
@@ -249,17 +310,27 @@ const TABLE_COLUMN_SORT_TYPES = {
     match_reasons_text: 'string'
   },
   executions: {
-    date: 'date'
+    date: 'date',
+    updated_at: 'date'
   },
   trades: {
     created_at: 'date',
-    closed_at: 'date'
+    closed_at: 'date',
+    updated_at: 'date'
   },
   trade_plans: {
-    created_at: 'date'
+    created_at: 'date',
+    updated_at: 'date'
   },
   cash_flows: {
-    date: 'date'
+    trade_id: 'numeric',
+    account_name: 'string',
+    type: 'string',
+    amount: 'numeric',
+    date: 'date',
+    description: 'string',
+    source: 'string',
+    updated_at: 'date'
   },
   import_history: {
     id: 'numeric',
@@ -282,20 +353,60 @@ const TABLE_COLUMN_SORT_TYPES = {
     type: 'string',
     name: 'string',
     currency_id: 'string',
-    yahoo_updated_at: 'dateEnvelope'
-  },
-  alerts: {
-    created_at: 'dateEnvelope',
-    triggered_at: 'dateEnvelope',
-    expiry_date: 'dateEnvelope'
+    updated_at: 'dateEnvelope'
   },
   notes: {
-    created_at: 'date'
+    created_at: 'dateEnvelope',
+    updated_at: 'dateEnvelope',
+    content: 'string',
+    attachment: 'string'
   },
   linked_items: {
     created_at: 'date'
+  },
+  trading_accounts: {
+    updated_at: 'dateEnvelope'
+  },
+  lint_monitor_issues: {
+    tool: 'string',
+    severity: 'string',
+    file: 'string',
+    rule: 'string',
+    message: 'string',
+    line: 'numeric'
   }
 };
+
+const DEFAULT_DATE_KEYS = [
+  'date',
+  'created_at',
+  'opened_at',
+  'trade_created_at',
+  'closed_at',
+  'triggered_at',
+  'completed_at',
+  'expiry_date',
+  'updated_at',
+  'yahoo_updated_at'
+];
+
+const DEFAULT_STATUS_KEYS = [
+  'status',
+  'state',
+  'execution_status',
+  'order_status',
+  'is_triggered',
+  'severity'
+];
+
+const DEFAULT_TICKER_KEYS = [
+  'ticker_symbol',
+  'symbol',
+  'linked_to',
+  'account_name',
+  'name',
+  'related_object'
+];
 
 function normalizeColumnEntry(entry) {
   if (!entry) {
@@ -321,6 +432,87 @@ const TABLE_COLUMN_KEYS = Object.fromEntries(
     return [tableType, keys];
   })
 );
+
+function getColumnIndexByKey(tableType, columnKey) {
+  if (!columnKey) {
+    return -1;
+  }
+  const keys = TABLE_COLUMN_KEYS[tableType];
+  if (!keys) {
+    return -1;
+  }
+  return keys.indexOf(columnKey);
+}
+
+function findFirstMatchingColumn(tableType, candidates = []) {
+  if (!Array.isArray(candidates) || candidates.length === 0) {
+    return null;
+  }
+
+  for (const candidate of candidates) {
+    const columnIndex = getColumnIndexByKey(tableType, candidate);
+    if (columnIndex !== -1) {
+      return {
+        columnIndex,
+        key: candidate
+      };
+    }
+  }
+
+  return null;
+}
+
+function buildCanonDefaultSortChain(tableType) {
+  const seenIndices = new Set();
+  const chain = [];
+
+  const dateMatch = findFirstMatchingColumn(tableType, DEFAULT_DATE_KEYS);
+  if (dateMatch && !seenIndices.has(dateMatch.columnIndex)) {
+    seenIndices.add(dateMatch.columnIndex);
+    chain.push({
+      columnIndex: dateMatch.columnIndex,
+      direction: 'desc',
+      key: dateMatch.key,
+      priority: 'date'
+    });
+  }
+
+  const statusMatch = findFirstMatchingColumn(tableType, DEFAULT_STATUS_KEYS);
+  if (statusMatch && !seenIndices.has(statusMatch.columnIndex)) {
+    seenIndices.add(statusMatch.columnIndex);
+    chain.push({
+      columnIndex: statusMatch.columnIndex,
+      direction: 'asc',
+      key: statusMatch.key,
+      priority: 'status'
+    });
+  }
+
+  const tickerMatch = findFirstMatchingColumn(tableType, DEFAULT_TICKER_KEYS);
+  if (tickerMatch && !seenIndices.has(tickerMatch.columnIndex)) {
+    seenIndices.add(tickerMatch.columnIndex);
+    chain.push({
+      columnIndex: tickerMatch.columnIndex,
+      direction: 'asc',
+      key: tickerMatch.key,
+      priority: 'ticker'
+    });
+  }
+
+  if (chain.length === 0) {
+    const keys = TABLE_COLUMN_KEYS[tableType] || [];
+    if (keys.length > 0) {
+      chain.push({
+        columnIndex: 0,
+        direction: 'asc',
+        key: keys[0],
+        priority: 'fallback'
+      });
+    }
+  }
+
+  return chain;
+}
 
 function resolveUserTimezone() {
   if (window.currentPreferences && window.currentPreferences.timezone) {
@@ -387,6 +579,8 @@ function buildDateEnvelope(rawValue, options = {}) {
   try {
     if (typeof window.formatDate === 'function') {
       display = window.formatDate(local);
+    } else if (typeof window.dateUtils?.formatDate === 'function') {
+      display = window.dateUtils.formatDate(local);
     } else {
       display = new Date(epochMs).toLocaleDateString('he-IL');
     }
@@ -419,6 +613,43 @@ function getColumnValue(item, columnIndex, tableType) {
   const columns = TABLE_COLUMN_MAPPINGS[tableType] || [];
   const columnMeta = normalizeColumnEntry(columns[columnIndex]);
   const fieldName = columnMeta.key;
+  // Get sortType from column meta or from TABLE_COLUMN_SORT_TYPES
+  let sortType = columnMeta.sortType;
+  if (!sortType && TABLE_COLUMN_SORT_TYPES[tableType] && fieldName) {
+    sortType = TABLE_COLUMN_SORT_TYPES[tableType][fieldName];
+  }
+  if (!sortType && typeof window.getColumnSortType === 'function') {
+    sortType = window.getColumnSortType(tableType, columnIndex);
+  }
+
+  // Helper to extract epochMs from DateEnvelope for sorting
+  const extractEpochForSort = (value) => {
+    if (!value && value !== 0) {
+      return null;
+    }
+    // If it's already a DateEnvelope object
+    if (value && typeof value === 'object' && typeof value.epochMs === 'number' && !Number.isNaN(value.epochMs)) {
+      return value.epochMs;
+    }
+    // If it's a number (already epoch)
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    // Try to get epoch using dateUtils
+    if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+      const epoch = window.dateUtils.getEpochMilliseconds(value);
+      if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+        return epoch;
+      }
+    }
+    if (window.getEpochMilliseconds && typeof window.getEpochMilliseconds === 'function') {
+      const epoch = window.getEpochMilliseconds(value);
+      if (typeof epoch === 'number' && !Number.isNaN(epoch)) {
+        return epoch;
+      }
+    }
+    return null;
+  };
 
   const parseSortDateValue = (rawValue) => {
     if (!rawValue && rawValue !== 0) {
@@ -558,12 +789,63 @@ function getColumnValue(item, columnIndex, tableType) {
   
   // Cash flows table - special handling for calculated fields
   if (tableType === 'cash_flows') {
+    if (fieldName === 'trade_id') {
+      // Return trade_id as number for proper numeric sorting
+      const tradeId = item.trade_id;
+      if (tradeId === null || tradeId === undefined) {
+        return 0; // Sort null/undefined trade_ids first
+      }
+      return typeof tradeId === 'number' ? tradeId : parseInt(tradeId, 10) || 0;
+    }
     if (fieldName === 'account_name') {
       // Get account name
       if (item.account && item.account.name) {
         return item.account.name;
       }
       return item.account_name || item.account_id || '';
+    }
+    if (fieldName === 'type') {
+      // Return type as string - generic system will handle translation via localeCompare
+      return (item.type || '').toString();
+    }
+    if (fieldName === 'amount') {
+      // Return amount as number for proper numeric sorting
+      const amount = item.amount;
+      if (amount === null || amount === undefined) {
+        return 0;
+      }
+      return typeof amount === 'number' ? amount : parseFloat(amount) || 0;
+    }
+    // For date columns, extract epochMs for proper sorting
+    if (fieldName === 'date' || fieldName === 'updated_at') {
+      const dateValue = item[fieldName];
+      if (dateValue) {
+        const epochValue = extractEpochForSort(dateValue);
+        if (epochValue !== null) {
+          return epochValue;
+        }
+        // Fallback to parsing date string
+        if (typeof dateValue === 'string') {
+          const parsed = parseSortDateValue(dateValue);
+          if (parsed !== 0) {
+            return parsed;
+          }
+        }
+        // Last resort: try to convert to Date and get epoch
+        try {
+          const dateObj = new Date(dateValue);
+          if (!Number.isNaN(dateObj.getTime())) {
+            return dateObj.getTime();
+          }
+        } catch (e) {
+          // Ignore parsing errors
+        }
+      }
+      return 0; // Return 0 for null/undefined dates to sort them first
+    }
+    // For string fields (description, source), return as string
+    if (fieldName === 'description' || fieldName === 'source') {
+      return (item[fieldName] || '').toString();
     }
     // For other fields, return directly
     return item[fieldName] || '';
@@ -647,13 +929,32 @@ function getColumnValue(item, columnIndex, tableType) {
     }
     if (fieldName === 'yahoo_updated_at') {
       const dateValue = item.yahoo_updated_at || item.updated_at || item.last_price_update || null;
-      return buildDateEnvelope(dateValue);
+      // For sorting, extract epochMs from DateEnvelope
+      const envelope = buildDateEnvelope(dateValue);
+      if (envelope && typeof envelope.epochMs === 'number' && !Number.isNaN(envelope.epochMs)) {
+        return envelope.epochMs;
+      }
+      // Fallback to parsing date value directly
+      if (dateValue) {
+        const epochValue = extractEpochForSort(dateValue);
+        if (epochValue !== null) {
+          return epochValue;
+        }
+        if (typeof dateValue === 'string') {
+          const parsed = parseSortDateValue(dateValue);
+          if (parsed !== 0) {
+            return parsed;
+          }
+        }
+      }
+      return envelope || '';
     }
     // For other fields, return directly
     return item[fieldName] || '';
   }
   
-  // Notes table - special handling for calculated fields
+  // Notes table - special handling ONLY for calculated fields
+  // Date fields (created_at, updated_at) will be handled by the general date handling below
   if (tableType === 'notes') {
     if (fieldName === 'related_object') {
       // This is a calculated field - we need to get it from the display
@@ -670,8 +971,8 @@ function getColumnValue(item, columnIndex, tableType) {
       // Return attachment filename for sorting
       return item.attachment || '';
     }
-    // For other fields (created_at, etc.), return directly
-    return item[fieldName] || '';
+    // For all other fields (including created_at, updated_at), let the general handling below take care of it
+    // This ensures consistent date handling for all date fields
   }
   
   // Alerts table - special handling for calculated fields
@@ -878,10 +1179,32 @@ function getColumnValue(item, columnIndex, tableType) {
     if (fieldName === 'execution_date') {
       const envelopeCandidate = item.execution_date;
       if (envelopeCandidate && typeof envelopeCandidate === 'object') {
+        // For sorting, extract epochMs from DateEnvelope
+        if (typeof envelopeCandidate.epochMs === 'number' && !Number.isNaN(envelopeCandidate.epochMs)) {
+          return envelopeCandidate.epochMs;
+        }
+        const epochValue = extractEpochForSort(envelopeCandidate);
+        if (epochValue !== null) {
+          return epochValue;
+        }
         return envelopeCandidate;
       }
       const directValue = item.execution_date || (item.execution && item.execution.date);
-      return buildDateEnvelope(directValue);
+      const envelope = buildDateEnvelope(directValue);
+      if (envelope && typeof envelope.epochMs === 'number' && !Number.isNaN(envelope.epochMs)) {
+        return envelope.epochMs;
+      }
+      const epochValue = extractEpochForSort(directValue);
+      if (epochValue !== null) {
+        return epochValue;
+      }
+      if (directValue && typeof directValue === 'string') {
+        const parsed = parseSortDateValue(directValue);
+        if (parsed !== 0) {
+          return parsed;
+        }
+      }
+      return envelope || '';
     }
     if (fieldName === 'trade_id') {
       return item.trade_id || 0;
@@ -892,12 +1215,34 @@ function getColumnValue(item, columnIndex, tableType) {
     if (fieldName === 'trade_created_at') {
       const envelopeCandidate = item.trade_created_at;
       if (envelopeCandidate && typeof envelopeCandidate === 'object') {
+        // For sorting, extract epochMs from DateEnvelope
+        if (typeof envelopeCandidate.epochMs === 'number' && !Number.isNaN(envelopeCandidate.epochMs)) {
+          return envelopeCandidate.epochMs;
+        }
+        const epochValue = extractEpochForSort(envelopeCandidate);
+        if (epochValue !== null) {
+          return epochValue;
+        }
         return envelopeCandidate;
       }
       const dateValue = item.trade_created_at
         || (item.suggestion && (item.suggestion.created_at || item.suggestion.opened_at || item.suggestion.open_date || item.suggestion.start_date))
         || null;
-      return buildDateEnvelope(dateValue);
+      const envelope = buildDateEnvelope(dateValue);
+      if (envelope && typeof envelope.epochMs === 'number' && !Number.isNaN(envelope.epochMs)) {
+        return envelope.epochMs;
+      }
+      const epochValue = extractEpochForSort(dateValue);
+      if (epochValue !== null) {
+        return epochValue;
+      }
+      if (dateValue && typeof dateValue === 'string') {
+        const parsed = parseSortDateValue(dateValue);
+        if (parsed !== 0) {
+          return parsed;
+        }
+      }
+      return envelope || '';
     }
     if (fieldName === 'status') {
       return item.status || '';
@@ -925,8 +1270,31 @@ function getColumnValue(item, columnIndex, tableType) {
     }
   }
 
+  // Get the raw value
+  const rawValue = item[fieldName];
+  
+  // For date columns, extract epochMs for proper sorting
+  // Use window.DATE_KEY_HINTS if available, otherwise fallback to local DATE_KEY_HINTS
+  // CRITICAL: Always check window first to avoid ReferenceError if DATE_KEY_HINTS is not in scope
+  const dateHints = (typeof window !== 'undefined' && window.DATE_KEY_HINTS) 
+    ? window.DATE_KEY_HINTS 
+    : (typeof DATE_KEY_HINTS !== 'undefined' ? DATE_KEY_HINTS : []);
+  if (sortType === 'dateEnvelope' || sortType === 'date' || (Array.isArray(dateHints) && dateHints.some(hint => fieldName.toLowerCase().includes(hint)))) {
+    // Check if the value is a DateEnvelope or can be converted to epoch
+    const epochValue = extractEpochForSort(rawValue);
+    if (epochValue !== null) {
+      return epochValue;
+    }
+    // If not DateEnvelope, try to parse as date string
+    if (rawValue && typeof rawValue === 'string') {
+      const parsed = parseSortDateValue(rawValue);
+      if (parsed !== 0) {
+        return parsed;
+      }
+    }
+  }
 
-  return item[fieldName] || '';
+  return rawValue || '';
 }
 
 /**
@@ -1103,6 +1471,7 @@ function getColumnDefinition(tableName, columnName) {
     'planned_amount': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
     'stop_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
     'target_price': { ...defaultDefinition, type: 'number', sortable: true, display: 'currency', sortType: resolvedSortType || 'numeric' },
+    'line': { ...defaultDefinition, type: 'number', sortable: true, display: 'number', sortType: resolvedSortType || 'numeric' },
 
     // Status columns
     'status': { ...defaultDefinition, type: 'status', sortable: true, display: 'status', filterable: true, sortType: resolvedSortType || 'string' },
@@ -1174,11 +1543,15 @@ window.getTableConfig = getTableConfig;
 window.getColumnDefinition = getColumnDefinition;
 window.getColumnSortType = getColumnSortType;
 window.getColumnKey = getColumnKey;
+window.getColumnIndexByKey = getColumnIndexByKey;
+window.getDefaultSortChain = buildCanonDefaultSortChain;
+window.DATE_KEY_HINTS = DATE_KEY_HINTS;
 
 // ייצוא המודול עצמו
 window.tableMappings = {
   TABLE_COLUMN_MAPPINGS,
   TABLE_COLUMN_KEYS,
+  DATE_KEY_HINTS,
   getColumnValue,
   getTableMapping,
   isTableSupported,
@@ -1186,6 +1559,8 @@ window.tableMappings = {
   getColumnSortType,
   buildDateEnvelope,
   getColumnKey,
+  getColumnIndexByKey,
+  getDefaultSortChain: buildCanonDefaultSortChain,
 };
 
 console.log('🔵 [table-mappings.js] Exported to window.TABLE_COLUMN_MAPPINGS');

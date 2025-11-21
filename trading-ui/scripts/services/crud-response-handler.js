@@ -46,7 +46,22 @@ class CRUDResponseHandler {
             // טיפול בתגובה לא תקינה
             if (!response.ok) {
                 console.log('❌ handleSaveResponse - Response not OK');
-                const errorData = await response.json();
+                console.log('❌ Response status:', response.status);
+                console.log('❌ Response statusText:', response.statusText);
+                
+                let errorData;
+                try {
+                    const responseText = await response.text();
+                    console.log('❌ Response text (raw):', responseText);
+                    errorData = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('❌ Failed to parse error response:', parseError);
+                    errorData = { error: 'שגיאה לא צפויה מהשרת' };
+                }
+                
+                console.log('❌ Error data:', errorData);
+                console.log('❌ Error message:', errorData.message || errorData.error);
+                console.log('❌ Full error object:', JSON.stringify(errorData, null, 2));
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
@@ -55,6 +70,15 @@ class CRUDResponseHandler {
                     if (typeof message === 'object') {
                         message = message.message || JSON.stringify(message);
                     }
+                    
+                    // Log detailed validation error
+                    console.error('❌ Validation Error Details:', {
+                        status: response.status,
+                        message: message,
+                        errorData: errorData,
+                        errorMessage: errorData.error?.message || errorData.error,
+                        errors: errorData.errors || errorData.error
+                    });
                     
                     // אם יש parser מותאם לשגיאות validation ברמת שדות
                     if (options.customValidationParser && typeof options.customValidationParser === 'function') {
@@ -88,6 +112,14 @@ class CRUDResponseHandler {
             console.log('✅ handleSaveResponse - Response OK, reading JSON...');
             const result = await response.json();
             console.log('✅ handleSaveResponse - JSON read successfully');
+            console.log('🔍 handleSaveResponse - result structure:', {
+                hasStatus: 'status' in result,
+                hasData: 'data' in result,
+                hasId: result?.data?.id !== undefined,
+                resultId: result?.data?.id,
+                resultKeys: Object.keys(result),
+                dataKeys: result?.data ? Object.keys(result.data) : []
+            });
             
             // הצגת הודעת הצלחה
             if (typeof window.showSuccessNotification === 'function') {
@@ -717,22 +749,44 @@ class CRUDResponseHandler {
      */
     static async refreshEntityTables(entityType) {
         try {
-            // ניקוי מטמון עבור הישות - שימוש נכון ב-UnifiedCacheManager
-            if (this._isUnifiedCacheManagerAvailable()) {
-                // ניקוי ממוקד לפי entity type
-                const keys = await window.UnifiedCacheManager.getAllKeys();
-                const entityKeys = keys.filter(k => 
-                    k.startsWith(`${entityType}_`) || 
-                    k.startsWith(`all_${entityType}`) ||
-                    k.includes(entityType)
-                );
-                
-                for (const key of entityKeys) {
-                    await window.UnifiedCacheManager.remove(key);
+            // ניקוי מטמון עבור הישות - שימוש ב-CacheSyncManager
+            const actionMap = {
+                'trade': 'trade-updated',
+                'trades': 'trade-updated',
+                'trade_plan': 'trade-plan-updated',
+                'trade_plans': 'trade-plan-updated',
+                'alert': 'alert-updated',
+                'alerts': 'alert-updated',
+                'execution': 'execution-updated',
+                'executions': 'execution-updated',
+                'cash_flow': 'cash-flow-updated',
+                'cash_flows': 'cash-flow-updated',
+                'note': 'note-updated',
+                'notes': 'note-updated',
+                'ticker': 'ticker-updated',
+                'tickers': 'ticker-updated',
+                'trading_account': 'account-updated',
+                'trading_accounts': 'account-updated',
+                'account': 'account-updated',
+                'accounts': 'account-updated'
+            };
+            
+            // Try CacheSyncManager first (preferred method)
+            const action = actionMap[entityType];
+            if (action && window.CacheSyncManager?.invalidateByAction) {
+                try {
+                    await window.CacheSyncManager.invalidateByAction(action);
+                    console.log(`🔄 נוקה מטמון עבור ${entityType} דרך CacheSyncManager (action: ${action})`);
+                } catch (cacheError) {
+                    console.warn(`⚠️ CacheSyncManager.invalidateByAction failed for ${entityType}, falling back to direct invalidation`, cacheError);
+                    // Fallback to direct invalidation
+                    await this._invalidateCacheDirectly(entityType);
                 }
-                console.log(`🔄 נוקה מטמון עבור ${entityType} (${entityKeys.length} מפתחות)`);
+            } else if (this._isUnifiedCacheManagerAvailable()) {
+                // Fallback to direct invalidation if CacheSyncManager not available or entity type not mapped
+                await this._invalidateCacheDirectly(entityType);
             } else {
-                console.debug(`⚠️ UnifiedCacheManager not available - skipping cache clear for ${entityType}`);
+                console.debug(`⚠️ Cache managers not available - skipping cache clear for ${entityType}`);
             }
 
             // איפוס דגלי טעינה קיימים אם יש גישה אליהם
@@ -753,6 +807,33 @@ class CRUDResponseHandler {
 
         } catch (error) {
             console.error(`❌ שגיאה ברענון ${entityType}:`, error);
+        }
+    }
+
+    /**
+     * ניקוי מטמון ישיר (fallback method)
+     * @private
+     */
+    static async _invalidateCacheDirectly(entityType) {
+        if (!this._isUnifiedCacheManagerAvailable()) {
+            return;
+        }
+        
+        try {
+            // ניקוי ממוקד לפי entity type
+            const keys = await window.UnifiedCacheManager.getAllKeys();
+            const entityKeys = keys.filter(k => 
+                k.startsWith(`${entityType}_`) || 
+                k.startsWith(`all_${entityType}`) ||
+                k.includes(entityType)
+            );
+            
+            for (const key of entityKeys) {
+                await window.UnifiedCacheManager.remove(key);
+            }
+            console.log(`🔄 נוקה מטמון ישיר עבור ${entityType} (${entityKeys.length} מפתחות)`);
+        } catch (error) {
+            console.warn(`⚠️ Failed to invalidate cache directly for ${entityType}:`, error);
         }
     }
 

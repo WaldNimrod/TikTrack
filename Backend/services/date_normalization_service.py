@@ -49,8 +49,8 @@ class DateNormalizationService:
         r"^\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?(Z|[+-]\d{2}:?\d{2})?$"
     )
     _ISO_DATE_ONLY = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-    _DATE_KEY_HINTS = ("date", "time", "timestamp", "_at", "_on", "fetched", "asof")
-    _DEFAULT_DISPLAY_FORMAT = "%d/%m/%Y %H:%M"
+    _DATE_KEY_HINTS = ("date", "time", "timestamp", "_at", "_on", "fetched_at", "asof")
+    _DEFAULT_DISPLAY_FORMAT = "%d.%m.%Y %H:%M"
 
     def __init__(self, user_timezone: str = "UTC") -> None:
         self.user_timezone = self._validate_timezone(user_timezone)
@@ -84,15 +84,23 @@ class DateNormalizationService:
         if isinstance(payload, dict):
             if self._is_envelope_dict(payload):
                 return self._parse_envelope_input(payload)
-            return {
-                key: self.normalize_input_payload(value)
-                if not self._should_attempt_conversion(key, value, incoming=True)
-                else self._parse_user_datetime(value)
-                for key, value in payload.items()
-                if key != "timezone"
-            }
+            normalized_dict = {}
+            for key, value in payload.items():
+                if key == "timezone":
+                    continue
+                # IMPORTANT: Never convert condition fields - they are not dates!
+                if key and any(excluded in key.lower() for excluded in ['condition_attribute', 'condition_operator', 'condition_number', 'status', 'is_triggered']):
+                    normalized_dict[key] = value  # Preserve original value
+                elif not self._should_attempt_conversion(key, value, incoming=True):
+                    normalized_dict[key] = self.normalize_input_payload(value)
+                else:
+                    # Attempt date conversion, but preserve original if conversion fails
+                    parsed = self._parse_user_datetime(value)
+                    normalized_dict[key] = parsed if parsed is not None else value
+            return normalized_dict
         if self._should_attempt_conversion(None, payload, incoming=True):
-            return self._parse_user_datetime(payload)
+            parsed = self._parse_user_datetime(payload)
+            return parsed if parsed is not None else payload
         return payload
 
     def now_envelope(self) -> JSONDict:
@@ -300,6 +308,16 @@ class DateNormalizationService:
     def _should_attempt_conversion(self, key: Optional[str], value: Any, incoming: bool = False) -> bool:
         if value is None:
             return False
+        
+        # IMPORTANT: Never convert condition fields - they are not dates!
+        if key and any(excluded in key.lower() for excluded in ['condition_attribute', 'condition_operator', 'condition_number', 'status', 'is_triggered']):
+            return False
+        
+        # IMPORTANT: Never convert numeric count fields - they are not timestamps!
+        # These are typically integer counts like fetched, failed, requested, total, count, length, size
+        if key and key.lower() in ['fetched', 'failed', 'requested', 'total', 'count', 'length', 'size', 'skipped']:
+            return False
+        
         if isinstance(value, datetime):
             return True
         if isinstance(value, (int, float)):

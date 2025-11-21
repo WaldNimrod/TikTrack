@@ -206,6 +206,10 @@ class ResponseOptimizer:
         if any(ext in request_path for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico']):
             return 'static'
         
+        # Mockups pages - no cache (development/testing)
+        if '/mockups/' in request_path:
+            return 'sensitive'  # Use 'sensitive' cache type which has no-cache headers
+        
         # Sensitive pages - no cache
         if any(path in request_path for path in ['/login', '/admin', '/settings']):
             return 'sensitive'
@@ -218,15 +222,16 @@ class ResponseOptimizer:
                 '/api/tickers',
                 '/api/currencies',
                 '/api/constraints',
-                '/api/note_relation_types',
+                '/api/note-relation-types',
                 '/api/linked-items/types',
                 '/api/preferences',
                 '/api/users',
                 '/api/query-optimization',
                 '/api/cache',
                 '/api/trades',
-                '/api/trade_plans',
-                '/api/cash_flows',
+                '/api/trade-plans',
+                '/api/trade-plans',
+                '/api/cash-flows',
                 '/api/notes',
                 '/api/executions',
                 '/api/alerts',

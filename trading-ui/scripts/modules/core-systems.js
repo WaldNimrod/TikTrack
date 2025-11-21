@@ -250,6 +250,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       this.errorHandlers = [];
       this.customInitializers = [];
       this.legacySupport = true;
+      this._preferencesInitialized = false; // Track preferences initialization to prevent duplicates
 
       // Dynamic Loading Support
       this.dynamicLoadingEnabled = false; // Static loading only
@@ -662,6 +663,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       ) {
         pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
         console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+      } else if (
+        typeof window.PAGE_CONFIGS !== 'undefined' &&
+        window.PAGE_CONFIGS[this.pageInfo.name]
+      ) {
+        // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
+        pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
+        console.log(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig);
       } else {
         console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
       }
@@ -673,13 +681,20 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
       const config = {
         name: this.pageInfo.name,
-        type: this.pageInfo.type,
+        type: pageConfig?.pageType || this.pageInfo.type,
         requiresFilters: pageConfig?.requiresFilters ?? this.pageInfo.requirements.filters,
         requiresValidation: pageConfig?.requiresValidation ?? this.pageInfo.requirements.validation,
         requiresTables: pageConfig?.requiresTables ?? this.pageInfo.requirements.tables,
         requiresCharts: this.pageInfo.requirements.charts,
         customInitializers: this.customInitializers,
         availableSystems: Array.from(this.availableSystems),
+        // Add packages and metadata from pageConfig (critical for preferences initialization)
+        packages: pageConfig?.packages || [],
+        requiredGlobals: pageConfig?.requiredGlobals || [],
+        description: pageConfig?.description || '',
+        pageType: pageConfig?.pageType || this.pageInfo.type,
+        preloadAssets: pageConfig?.preloadAssets || [],
+        cacheStrategy: pageConfig?.cacheStrategy || 'standard',
       };
 
       this.performanceMetrics.stageTimes.prepare = Date.now() - stageStart;
@@ -831,29 +846,9 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           console.log('⚠️ Cache system not ready, using localStorage fallback');
         }
 
-        // Initialize Preferences System globally (once) before services/UI that rely on getPreference
-        try {
-          if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
-            console.log('🔧 Initializing PreferencesSystem (global)...');
-            await window.PreferencesSystem.initialize();
-            // Expose current preferences for consumers expecting window.currentPreferences
-            if (window.PreferencesSystem.manager?.currentPreferences) {
-              window.currentPreferences = window.PreferencesSystem.manager.currentPreferences;
-            }
-            // Notify listeners that preferences are ready
-            window.dispatchEvent(
-              new CustomEvent('preferences:loaded', {
-                detail: {
-                  source: 'unified-initializer',
-                  profileId: window.PreferencesSystem.manager?.currentProfile,
-                },
-              })
-            );
-            console.log('✅ PreferencesSystem initialized (global)');
-          }
-        } catch (err) {
-          console.warn('⚠️ PreferencesSystem global initialization failed or unavailable:', err);
-        }
+        // Initialize preferences system (standardized loading for all pages)
+        // This ensures single point of entry, proper cache usage, and no duplicate API calls
+        await this.initializePreferencesForPage(config);
 
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {
@@ -966,6 +961,196 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     }
 
     /**
+     * Initialize preferences system for the page
+     * Standardized preferences loading - single point of entry for all pages
+     * 
+     * @param {Object} config - Page configuration
+     * @returns {Promise<void>}
+     */
+    async initializePreferencesForPage(config) {
+      // Check if page has preferences package
+      console.log('📦 Checking packages for preferences:', config.packages);
+      if (!config.packages || !config.packages.includes('preferences')) {
+        console.log('⏭️ Page does not require preferences package, skipping initialization');
+        return; // Page doesn't need preferences
+      }
+
+      // Get page name from pageInfo (detected from URL) or config
+      const pageName = this.pageInfo?.name || 'unknown';
+      const isPreferencesPage = pageName === 'preferences';
+
+      // Deduplication: prevent multiple calls
+      if (this._preferencesInitialized) {
+        window.Logger?.debug?.('⏭️ Preferences already initialized, skipping', {
+          page: 'core-systems',
+          pageName,
+        });
+        return;
+      }
+
+      try {
+        // Preferences page: use PreferencesUIV4 with lazy loading first (like other pages)
+        // This ensures preferences are loaded to window.currentPreferences before UI initialization
+        if (isPreferencesPage) {
+          // First: Bootstrap to get profile context and determine correct userId/profileId
+          let resolvedUserId = 1;
+          let resolvedProfileId = 0;
+          
+          if (window.PreferencesV4 && typeof window.PreferencesV4.bootstrap === 'function') {
+            try {
+              // Updated to match actual group names in database:
+              // - ui_settings (not 'ui')
+              // - trading_settings (not 'trading')
+              // - colors_unified (not 'colors')
+              const bootstrapResult = await window.PreferencesV4.bootstrap(['ui_settings', 'trading_settings', 'colors_unified'], null, 1);
+              const profileContext = bootstrapResult?.profileContext;
+              if (profileContext) {
+                resolvedUserId = profileContext?.user_id ?? profileContext?.user?.id ?? 1;
+                resolvedProfileId = profileContext?.resolved_profile_id ?? profileContext?.resolved_profile?.id ?? 0;
+                window.Logger?.info?.('📄 Bootstrapped profile context for preferences page', {
+                  page: 'core-systems',
+                  pageName,
+                  userId: resolvedUserId,
+                  profileId: resolvedProfileId,
+                });
+              }
+            } catch (bootstrapError) {
+              window.Logger?.warn?.('⚠️ Bootstrap failed for preferences page, using defaults', {
+                page: 'core-systems',
+                pageName,
+                error: bootstrapError?.message,
+              });
+            }
+          }
+          
+          // Second: Initialize lazy loading with correct userId/profileId
+          if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+            const initStartTime = performance.now();
+            window.Logger?.info?.('📄 Initializing preferences with lazy loading for preferences page', {
+              page: 'core-systems',
+              pageName,
+              userId: resolvedUserId,
+              profileId: resolvedProfileId,
+            });
+            
+            // Detect environment for timeout configuration
+            const environment = window.API_ENV || 'development';
+            const timeoutMs = environment === 'production' ? 5000 : 3000;
+            
+            // Initialize with correct userId/profileId to ensure preferences are loaded for the right profile
+            const initPromise = window.PreferencesCore.initializeWithLazyLoading(resolvedUserId, resolvedProfileId);
+            const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => {
+                reject(new Error(`Preferences initialization timeout after ${timeoutMs}ms`));
+              }, timeoutMs);
+            });
+            
+            try {
+              await Promise.race([initPromise, timeoutPromise]);
+              const initDuration = performance.now() - initStartTime;
+              window.Logger?.info?.('✅ Preferences lazy loading initialized for preferences page', {
+                page: 'core-systems',
+                pageName,
+                duration: `${initDuration.toFixed(2)}ms`,
+                environment,
+                userId: resolvedUserId,
+                profileId: resolvedProfileId,
+              });
+            } catch (error) {
+              const initDuration = performance.now() - initStartTime;
+              window.Logger?.warn?.('⚠️ Preferences lazy loading initialization failed or timed out for preferences page', {
+                page: 'core-systems',
+                pageName,
+                duration: `${initDuration.toFixed(2)}ms`,
+                environment,
+                error: error?.message || error,
+              });
+              // Continue - don't block page load
+            }
+          }
+          
+          // Third: Initialize UI (this will populate forms and display preferences)
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            window.Logger?.info?.('📄 Initializing Preferences UI V4 for preferences page', {
+              page: 'core-systems',
+              pageName,
+            });
+            await window.PreferencesUIV4.initialize();
+            this._preferencesInitialized = true;
+            return;
+          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+            // Fallback to PreferencesUI if V4 not available
+            window.Logger?.info?.('📄 Initializing Preferences UI (legacy) for preferences page', {
+              page: 'core-systems',
+              pageName,
+            });
+            await window.PreferencesUI.initialize();
+            this._preferencesInitialized = true;
+            return;
+          }
+        }
+
+        // Other pages: use PreferencesCore.initializeWithLazyLoading() with cache (force: false)
+        // This loads critical preferences immediately from cache if available, rest in background
+        if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+          const initStartTime = performance.now();
+          window.Logger?.info?.('📄 Initializing preferences with lazy loading (using cache)', {
+            page: 'core-systems',
+            pageName,
+          });
+          
+          // Detect environment for timeout configuration
+          const environment = window.API_ENV || 'development';
+          const timeoutMs = environment === 'production' ? 5000 : 3000; // Production: 5s, Development: 3s
+          
+          // Initialize with await to ensure critical preferences are loaded before continuing
+          // Use Promise.race with timeout to prevent indefinite blocking
+          const initPromise = window.PreferencesCore.initializeWithLazyLoading();
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => {
+              reject(new Error(`Preferences initialization timeout after ${timeoutMs}ms`));
+            }, timeoutMs);
+          });
+          
+          try {
+            await Promise.race([initPromise, timeoutPromise]);
+            const initDuration = performance.now() - initStartTime;
+            window.Logger?.info?.('✅ Preferences lazy loading initialized successfully', {
+              page: 'core-systems',
+              pageName,
+              duration: `${initDuration.toFixed(2)}ms`,
+              environment,
+            });
+          } catch (error) {
+            const initDuration = performance.now() - initStartTime;
+            window.Logger?.warn?.('⚠️ Preferences lazy loading initialization failed or timed out', {
+              page: 'core-systems',
+              pageName,
+              duration: `${initDuration.toFixed(2)}ms`,
+              environment,
+              error: error?.message || error,
+            });
+            // Continue initialization even if preferences loading fails - don't block page load
+          }
+          
+          this._preferencesInitialized = true;
+        } else {
+          window.Logger?.warn?.('⚠️ PreferencesCore.initializeWithLazyLoading not available', {
+            page: 'core-systems',
+            pageName,
+          });
+        }
+      } catch (error) {
+        window.Logger?.error?.('❌ Error initializing preferences', {
+          page: 'core-systems',
+          pageName,
+          error: error?.message || error,
+        });
+        // Don't throw - preferences loading failure shouldn't block page initialization
+      }
+    }
+
+    /**
      * Stage 4: Finalize initialization
      */
     async finalizeInitialization(config) {
@@ -1072,22 +1257,30 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           window.__ttPreferencesListenersBound = true;
 
           // storage listener to react to changes from other tabs/pages
+          // Only reload if version actually changed to avoid unnecessary API calls
           window.addEventListener('storage', async e => {
             if (e && e.key === 'tt:preferences' && e.newValue) {
               try {
                 const payload = JSON.parse(e.newValue);
-                if (typeof window.loadUserPreferences === 'function') {
-                  await window.loadUserPreferences({ force: true, source: 'storage' });
+                const incomingVersion = payload?.version || payload?.profileContext?.versions?.last_update || payload?.profileContext?.last_update;
+                const currentVersion = window.__ttPreferencesVersion;
+                
+                // Only reload if version actually changed (avoid duplicate calls)
+                if (incomingVersion && incomingVersion !== currentVersion) {
+                  window.__ttPreferencesVersion = incomingVersion;
+                  if (typeof window.loadUserPreferences === 'function') {
+                    await window.loadUserPreferences({ force: true, source: 'storage' });
+                  }
+                  window.dispatchEvent(
+                    new CustomEvent('preferences:updated', {
+                      detail: {
+                        source: 'storage',
+                        profileId: payload.profileId,
+                        version: incomingVersion,
+                      },
+                    })
+                  );
                 }
-                window.dispatchEvent(
-                  new CustomEvent('preferences:updated', {
-                    detail: {
-                      source: 'storage',
-                      profileId: payload.profileId,
-                      version: payload.version,
-                    },
-                  })
-                );
               } catch {}
             }
           });
@@ -1100,21 +1293,22 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               if (now - lastCheckTs < 30000) return; // throttle 30s
               lastCheckTs = now;
               try {
-                const resp = await fetch('/api/preferences/version');
-                if (resp.ok) {
-                  const js = await resp.json();
-                  const incoming = js?.data?.version;
-                  const current = window.__ttPreferencesVersion;
-                  if (incoming && incoming !== current) {
-                    window.__ttPreferencesVersion = incoming;
-                    if (typeof window.loadUserPreferences === 'function') {
-                      await window.loadUserPreferences({ force: true, source: 'visibility-check' });
-                    }
+                // Use PreferencesData/Core instead of direct fetch to preferences endpoints
+                const payload = await (window.PreferencesData?.loadAllPreferencesRaw
+                  ? window.PreferencesData.loadAllPreferencesRaw({ force: false })
+                  : Promise.resolve({ profileContext: null }));
+                const incoming = payload?.profileContext?.versions?.last_update
+                  || payload?.profileContext?.last_update
+                  || null;
+                const current = window.__ttPreferencesVersion;
+                if (incoming && incoming !== current) {
+                  window.__ttPreferencesVersion = incoming;
+                  if (typeof window.loadUserPreferences === 'function') {
+                    await window.loadUserPreferences({ force: true, source: 'visibility-check' });
                   }
                 }
-                // Silently ignore 404 or other errors - endpoint may not be available
               } catch (err) {
-                // Silently ignore errors - endpoint may not be available or network issues
+                // Silently ignore errors - data service may be unavailable or network issues
               }
             }
           });
@@ -1123,14 +1317,12 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         console.warn('⚠️ Failed binding preferences listeners:', err);
       }
 
-      // Initial preferences load to apply CSS vars and non-CSS prefs immediately
-      try {
-        if (typeof window.loadUserPreferences === 'function') {
-          await window.loadUserPreferences({ force: true, source: 'init' });
-        }
-      } catch (e) {
-        console.warn('⚠️ Initial loadUserPreferences failed:', e);
-      }
+      // Initial preferences load removed - now handled by unified-app-initializer.js
+      // Preferences are loaded centrally through initializePreferencesForPage() which ensures:
+      // - Single point of entry
+      // - Proper cache usage (force: false for regular pages, force: true only for preferences page)
+      // - No duplicate API calls
+      // - Non-blocking initialization for better page load performance
 
       this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
       console.log('✅ Stage 4 Complete');
@@ -1977,8 +2169,14 @@ async function shouldShowNotification(category) {
       console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
     }
 
-    // If preference is not found (null), don't show notification
+    // If preference is not found (null), show notifications by default for critical categories
+    // This ensures error notifications are always shown even if preferences are not set up
     if (isEnabled === null) {
+      // For import-user-data category, always show errors and warnings
+      if (category === 'import-user-data') {
+        console.log(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`);
+        return true;
+      }
       console.log(`⚠️ Preference ${preferenceName} not found - notification disabled`);
       return false;
     }
@@ -2592,7 +2790,7 @@ function showFinalSuccessModal(successInfo) {
               </h6>
               <hr>
               <p class="mb-0">
-                <strong>זמן:</strong> ${new Date(successInfo.timestamp).toLocaleString('he-IL')}<br>
+                <strong>זמן:</strong> ${window.formatDate ? window.formatDate(new Date(successInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(successInfo.timestamp), { includeTime: true }) : new Date(successInfo.timestamp).toLocaleString('he-IL'))}<br>
                 <strong>קטגוריה:</strong> ${successInfo.category}<br>
                 <strong>מזהה:</strong> ${successInfo.id}
               </p>
@@ -2751,7 +2949,7 @@ function showFinalSuccessModalWithReload(successInfo) {
               </h6>
               <hr>
               <p class="mb-2">
-                <strong>זמן:</strong> ${new Date(successInfo.timestamp).toLocaleString('he-IL')}<br>
+                <strong>זמן:</strong> ${window.formatDate ? window.formatDate(new Date(successInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(successInfo.timestamp), { includeTime: true }) : new Date(successInfo.timestamp).toLocaleString('he-IL'))}<br>
                 <strong>קטגוריה:</strong> ${successInfo.category}<br>
                 <strong>מזהה:</strong> ${successInfo.id}
               </p>
@@ -2919,7 +3117,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
                 <div class="col-md-6">
                   <p><strong>שורה:</strong> ${errorInfo.line}</p>
                   <p><strong>קטגוריה:</strong> ${errorInfo.category}</p>
-                  <p><strong>זמן:</strong> ${new Date(errorInfo.timestamp).toLocaleString('he-IL')}</p>
+                  <p><strong>זמן:</strong> ${window.formatDate ? window.formatDate(new Date(errorInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(errorInfo.timestamp), { includeTime: true }) : new Date(errorInfo.timestamp).toLocaleString('he-IL'))}</p>
                 </div>
               </div>
               
@@ -3729,7 +3927,7 @@ ${successInfo.category}
 ${successInfo.id}
 
 ⏰ זמן:
-${new Date(successInfo.timestamp).toLocaleString('he-IL')}
+${window.formatDate ? window.formatDate(new Date(successInfo.timestamp), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(successInfo.timestamp), { includeTime: true }) : new Date(successInfo.timestamp).toLocaleString('he-IL'))}
 
 📊 פרטי הצלחה:
 ${JSON.stringify(successInfo.details, null, 2)}
@@ -3743,7 +3941,7 @@ ${JSON.stringify(successInfo.system, null, 2)}
 ${successInfo.performance ? `⚡ ביצועים:\n${JSON.stringify(successInfo.performance, null, 2)}\n` : ''}
 
 ═══════════════════════════════════════════════════════════════
-  נוצר על ידי מערכת TikTrack - ${new Date().toLocaleString('he-IL')}
+  נוצר על ידי מערכת TikTrack - ${window.formatDate ? window.formatDate(new Date(), true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(new Date(), { includeTime: true }) : new Date().toLocaleString('he-IL'))}
 ═══════════════════════════════════════════════════════════════
   `.trim();
 }
@@ -3902,7 +4100,7 @@ window.showDetailedNotification = async function (
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-              <button type="button" class="btn btn-primary" data-onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')">העתק</button>
+              <button type="button" class="btn btn-primary" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" id="${modalId}-copy-btn">העתק</button>
             </div>
           </div>
         </div>
@@ -3912,6 +4110,28 @@ window.showDetailedNotification = async function (
     // Use the unified helper function to create and show modal without ARIA warnings
     const modal = window.createAndShowModal(modalHtml, modalId);
     const modalElement = document.getElementById(modalId);
+
+    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
+    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
+        if (typeof window.copyToClipboard === 'function') {
+          window.copyToClipboard(textToCopy, title);
+        } else if (typeof copyToClipboard === 'function') {
+          copyToClipboard(textToCopy, title);
+        } else {
+          // Fallback: use navigator.clipboard directly
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            if (typeof window.showSuccessNotification === 'function') {
+              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
+            }
+          }).catch(err => {
+            console.error('Failed to copy:', err);
+          });
+        }
+      });
+    }
 
     // הסרת ה-modal אחרי סגירה
     modalElement.addEventListener('hidden.bs.modal', () => {
@@ -4031,10 +4251,14 @@ window.setDynamicLoading = function (enabled) {
 console.log('✅ Core Systems module loaded successfully (Static Loading)');
 
 // ===== PAGE INITIALIZATION CONFIGURATIONS =====
-// Unified page configurations - previously in page-initialization-configs.js
-// Moved here as part of loading system standardization (October 2025)
+// NOTE: PAGE_CONFIGS is now defined in page-initialization-configs.js
+// This file (core-systems.js) uses window.pageInitializationConfigs which is set by page-initialization-configs.js
+// The PAGE_CONFIGS definition below is kept for backward compatibility but should not be used
+// All page configurations with packages array are in page-initialization-configs.js
 
-if (typeof window.PAGE_CONFIGS === 'undefined') {
+// ARCHIVED: PAGE_CONFIGS definition removed - use page-initialization-configs.js instead
+// This ensures single source of truth and includes packages array required for preferences initialization
+if (false && typeof window.PAGE_CONFIGS === 'undefined') {
   const PAGE_CONFIGS = {
     // Main Pages
     index: {
@@ -4136,10 +4360,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined') {
       requiresCharts: true,
       customInitializers: [
         async pageConfig => {
-          console.log('⚡ Initializing Executions...');
+          window.Logger?.info?.('⚡ Initializing Executions (from core-systems)...', {
+            page: 'core-systems',
+          });
 
-          if (typeof window.initializeExecutionsPage === 'function') {
-            window.initializeExecutionsPage();
+          // Use page-initialization-configs if available, otherwise fallback
+          if (window.PAGE_CONFIGS?.executions?.customInitializers) {
+            const pageConfigInitializers = window.PAGE_CONFIGS.executions.customInitializers;
+            window.Logger?.info?.('📋 Using page-initialization-configs initializers', {
+              count: pageConfigInitializers.length,
+              page: 'core-systems',
+            });
+            for (const init of pageConfigInitializers) {
+              if (typeof init === 'function') {
+                try {
+                  await init(pageConfig);
+                } catch (error) {
+                  window.Logger?.error?.('❌ Error in page-initialization-configs initializer', {
+                    error: error?.message,
+                    page: 'core-systems',
+                  });
+                }
+              }
+            }
+          } else if (typeof window.initializeExecutionsPage === 'function') {
+            window.Logger?.info?.('📋 Using initializeExecutionsPage fallback', {
+              page: 'core-systems',
+            });
+            await window.initializeExecutionsPage();
+          } else {
+            window.Logger?.warn?.('⚠️ No executions initialization method available', {
+              page: 'core-systems',
+            });
           }
         },
       ],
@@ -4169,21 +4421,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined') {
       requiresFilters: true,
       requiresValidation: false,
       requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          console.log('💰 Initializing Cash Flows...');
-
-          // אתחול modals
-          if (typeof window.initializeCashFlowsModals === 'function') {
-            window.initializeCashFlowsModals();
-          }
-
-          // אתחול דף
-          if (typeof window.initializeCashFlowsPage === 'function') {
-            await window.initializeCashFlowsPage();
-          }
-        },
-      ],
+      // No custom initializers - use standard initialization pattern
+      // Page-specific initialization should be called from the page script itself
+      // using DOMContentLoaded or the standard initialization hooks
     },
 
     // Data Management
@@ -4425,19 +4665,25 @@ if (typeof window.PAGE_CONFIGS === 'undefined') {
           }
 
           // Initialize External Data Dashboard
-          if (typeof ExternalDataDashboard !== 'undefined' && !window.externalDataDashboard) {
+          if (typeof ExternalDataDashboard !== 'undefined') {
             try {
-              window.externalDataDashboard = new ExternalDataDashboard();
-              window.externalDataDashboard.init();
-              console.log('✅ External Data Dashboard initialized');
+              // Create instance if it doesn't exist
+              if (!window.externalDataDashboard) {
+                window.externalDataDashboard = new ExternalDataDashboard();
+              }
+              
+              // Initialize if not already initialized
+              if (!window.externalDataDashboard.isInitialized) {
+                await window.externalDataDashboard.init();
+                console.log('✅ External Data Dashboard initialized');
+              } else {
+                console.log('✅ External Data Dashboard already initialized');
+              }
             } catch (error) {
               console.error('❌ Failed to initialize External Data Dashboard:', error);
             }
           } else {
-            console.log('🔍 External Data Dashboard check:', {
-              ExternalDataDashboard: typeof ExternalDataDashboard,
-              externalDataDashboard: typeof window.externalDataDashboard,
-            });
+            console.warn('⚠️ ExternalDataDashboard class not available');
           }
 
           // Initialize Unified Log System
@@ -4934,8 +5180,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined') {
   };
 
   // ===== GLOBAL EXPORT =====
-
-  window.PAGE_CONFIGS = PAGE_CONFIGS;
-  window.PAGE_CONFIGS.__SOURCE = 'core-systems';
-  window.pageInitializationConfigs = PAGE_CONFIGS;
+  // REMOVED: PAGE_CONFIGS export - use page-initialization-configs.js instead
+  // window.PAGE_CONFIGS = PAGE_CONFIGS;
+  // window.PAGE_CONFIGS.__SOURCE = 'core-systems';
+  // window.pageInitializationConfigs = PAGE_CONFIGS;
 }

@@ -44,22 +44,24 @@ class ValidationService:
                 SELECT c.id, c.constraint_type, c.column_name, c.constraint_definition, 
                        c.is_active
                 FROM constraints c 
-                WHERE c.table_name = :table_name AND c.is_active = 1
+                WHERE c.table_name = :table_name AND c.is_active = TRUE
             """)
             
             constraints = db.execute(constraints_query, {"table_name": table_name}).fetchall()
             logger.info(f"Validating {table_name} - found {len(constraints)} constraints")
             
             # Custom validation for executions.realized_pl based on action
+            # Realized P/L is required only for sell (closing long position) and cover (closing short position)
+            # Realized P/L is not required for buy (opening long position) and short (opening short position)
             if table_name == 'executions':
                 action = data.get('action')
                 realized_pl = data.get('realized_pl')
                 
-                if action == 'sell' and realized_pl is None:
-                    errors.append("Field 'realized_pl' is required for sell actions")
-                elif action == 'buy' and realized_pl is not None and realized_pl != 0:
-                    # In buy, realized_pl should be NULL or 0
-                    logger.warning(f"Realized P/L should be NULL or 0 for buy actions, got: {realized_pl}")
+                if action in ['sell', 'cover'] and realized_pl is None:
+                    errors.append(f"Field 'realized_pl' is required for {action} actions (closing positions)")
+                elif action in ['buy', 'short'] and realized_pl is not None and realized_pl != 0:
+                    # In buy/short, realized_pl should be NULL or 0 (opening positions)
+                    logger.warning(f"Realized P/L should be NULL or 0 for {action} actions (opening positions), got: {realized_pl}")
                     # This is a warning, not an error - we'll allow it but log it
             
             logger.info(f"Starting constraint loop for {table_name}")
@@ -203,7 +205,7 @@ class ValidationService:
     def _validate_enum(db: Session, constraint_id: int, value: Any) -> bool:
         """Validate ENUM constraint - only checks active enum values"""
         try:
-            enum_query = text("SELECT value FROM enum_values WHERE constraint_id = :constraint_id AND is_active = 1")
+            enum_query = text("SELECT value FROM enum_values WHERE constraint_id = :constraint_id AND is_active = TRUE")
             enum_values = db.execute(enum_query, {"constraint_id": constraint_id}).fetchall()
             valid_values = [row[0] for row in enum_values]
             logger.info(f"Validating ENUM value '{value}' against active values: {valid_values}")

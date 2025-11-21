@@ -21,19 +21,19 @@ let tableData = {};
  * Initialize the database extra data display page
  */
 function initDatabaseExtraData() {
-  console.log('🔄 Initializing database extra data page...');
+  window.Logger?.info('Initializing database extra data page', { page: 'db_extradata' });
   
   // Load all tables
   loadAllTables();
   
-  console.log('✅ Database extra data page initialized successfully');
+  window.Logger?.info('Database extra data page initialized successfully', { page: 'db_extradata' });
 }
 
 /**
  * Load all extra data tables
  */
 async function loadAllTables() {
-  console.log('🔄 Loading all extra data tables...');
+  window.Logger?.debug('Loading all extra data tables', { page: 'db_extradata' });
   
   // API endpoints and their corresponding container IDs
   const tables = [
@@ -51,17 +51,17 @@ async function loadAllTables() {
   
   for (const table of tables) {
     try {
-      console.log(`📊 Loading ${table.type} (API: ${table.apiSlug})...`);
+      window.Logger?.debug('Loading table', { page: 'db_extradata', type: table.type, apiSlug: table.apiSlug });
       await loadTableData(table.type, table.apiSlug, table.container);
     } catch (error) {
       const identifier = table.apiSlug || table.type;
-      console.error(`Error loading ${identifier}:`, error);
+      window.Logger?.error('Error loading table', { page: 'db_extradata', identifier, error: error?.message || error });
     }
   }
   
   // Update summary stats
   updateSummaryStats();
-  console.log('✅ All extra data tables loaded');
+  window.Logger?.info('All extra data tables loaded', { page: 'db_extradata' });
 }
 
 // ===== DATA LOADING =====
@@ -73,7 +73,7 @@ async function loadAllTables() {
  */
 async function loadTableData(tableType, apiSlug, containerId) {
   try {
-    console.log(`📊 Loading data for table type: ${tableType}`);
+    window.Logger?.debug('Loading data for table type', { page: 'db_extradata', tableType });
 
     // Show loading state
     showLoadingState(tableType);
@@ -93,11 +93,11 @@ async function loadTableData(tableType, apiSlug, containerId) {
     // Add to total records
     totalRecords += data.length;
 
-    console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+    window.Logger?.debug('Data loaded for table type', { page: 'db_extradata', tableType, recordCount: data.length });
 
   } catch (error) {
     const identifier = apiSlug || tableType;
-    console.error(`❌ Error loading ${identifier}:`, error);
+    window.Logger?.error('Error loading table data', { page: 'db_extradata', identifier, error: error?.message || error });
     // Show error state
     updateTableDisplay([], tableType, containerId);
     updateTableInfo(tableType, 0);
@@ -110,7 +110,7 @@ async function loadTableData(tableType, apiSlug, containerId) {
  * @returns {Array} The table data
  */
 async function fetchTableData(apiSlug) {
-  console.log(`🌐 Fetching data from /api/${apiSlug}/`);
+  window.Logger?.debug('Fetching data from API', { page: 'db_extradata', apiSlug, url: `/api/${apiSlug}/` });
   
   const response = await fetch(`/api/${apiSlug}/`);
   
@@ -119,12 +119,12 @@ async function fetchTableData(apiSlug) {
   }
   
   const result = await response.json();
-  console.log(`📥 Received response for ${apiSlug}:`, result);
+  window.Logger?.debug('Received response', { page: 'db_extradata', apiSlug, result });
   
   if (result.data && Array.isArray(result.data)) {
     return result.data;
   } else {
-    console.warn(`⚠️ No data array found in response for ${apiSlug}`);
+    window.Logger?.warn('No data array found in response', { page: 'db_extradata', apiSlug });
     return [];
   }
 }
@@ -175,23 +175,23 @@ function updateTableDisplay(data, tableType, containerId) {
   
   const tableContainer = document.getElementById(containerId);
   if (!tableContainer) {
-    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    window.Logger?.error('Table container not found', { page: 'db_extradata', tableType, containerId });
     return;
   }
 
   const table = document.getElementById(tableId);
   if (!table) {
-    console.error(`❌ Table not found: ${tableId}`);
+    window.Logger?.error('Table not found', { page: 'db_extradata', tableId });
     return;
   }
 
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    console.error(`❌ Table body not found in table ${tableId}`);
+    window.Logger?.error('Table body not found', { page: 'db_extradata', tableId });
     return;
   }
 
-  console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
+  window.Logger?.debug('Updating table display', { page: 'db_extradata', tableType, recordCount: data.length });
 
   // Create table headers from first data row
   const thead = table.querySelector('thead');
@@ -282,7 +282,7 @@ function updateTableInfo(tableType, recordCount) {
   if (countElement) {
     countElement.textContent = `${recordCount} records`;
   } else {
-    console.log(`ℹ️ No count element found for ${countElementId}`);
+    window.Logger?.debug('No count element found', { page: 'db_extradata', countElementId });
   }
 }
 
@@ -418,7 +418,7 @@ function toggleSection(sectionId) {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('➕ Database extra data page DOM loaded');
+  window.Logger?.info('Database extra data page DOM loaded', { page: 'db_extradata' });
   
   // Initialize the page
   initDatabaseExtraData();
@@ -440,4 +440,4 @@ if (typeof window.loadUserPreferences !== 'function') {
   };
 }
 
-console.log('✅ DB Extra Data script loaded successfully');
+window.Logger?.info('DB Extra Data script loaded successfully', { page: 'db_extradata' });

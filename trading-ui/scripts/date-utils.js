@@ -57,7 +57,7 @@
  * Basic date formatting:
  * ```javascript
  * const formatted = formatDate('2025-08-24T10:30:00');
- * // Result: "24/08/2025"
+ * // Result: "24.08.2025"
  * ```
  *
  * Date validation:
@@ -306,37 +306,40 @@ function getEpochMilliseconds(value) {
   return dateObj ? dateObj.getTime() : null;
 }
 
-function buildDisplayString(dateObj, { includeTime = true, twoDigitYear = false } = {}) {
+function buildDisplayString(dateObj, { includeTime = true, twoDigitYear = false, shortFormat = false } = {}) {
   if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) {
     return '-';
   }
 
-  const options = {
-    timeZone: userTimezone,
-    day: '2-digit',
-    month: '2-digit',
-    year: twoDigitYear ? '2-digit' : 'numeric',
-  };
+  // Extract date components manually to ensure European format with dot separator
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const year = twoDigitYear 
+    ? String(dateObj.getFullYear()).slice(-2)
+    : String(dateObj.getFullYear());
 
+  // Build date part based on format
+  let datePart;
+  if (shortFormat) {
+    // Short format: dd.mm
+    datePart = `${day}.${month}`;
+  } else if (twoDigitYear) {
+    // Normal format: dd.mm.YY
+    datePart = `${day}.${month}.${year}`;
+  } else {
+    // Full format: DD.MM.YYYY
+    datePart = `${day}.${month}.${year}`;
+  }
+
+  // Build time part if needed
   if (includeTime) {
-    options.hour = '2-digit';
-    options.minute = '2-digit';
-    options.hour12 = false;
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    const timePart = `${hours}:${minutes}`;
+    return `${datePart} ${timePart}`;
   }
 
-  const formatted = dateObj.toLocaleString(DEFAULT_LOCALE, options);
-  if (!includeTime) {
-    return formatted.replace(',', '').trim();
-  }
-
-  const segments = formatted.split(',');
-  if (segments.length >= 2) {
-    const datePart = segments[0].trim();
-    const timePart = segments.slice(1).join(',').trim();
-    return `${datePart} | ${timePart}`;
-  }
-
-  return formatted.replace(',', ' | ').trim();
+  return datePart;
 }
 
 function ensureDateEnvelope(value) {
@@ -402,13 +405,14 @@ function formatWithIntl(date, options = {}) {
 
 // ===== DATE FORMATTING FUNCTIONS =====
 /**
- * Format date to standard display format
+ * Format date to standard display format (DD.MM.YYYY)
  *
- * Converts date strings to a consistent display format (DD/MM/YYYY)
+ * Converts date strings to a consistent display format with European format (DD.MM.YYYY)
  * Handles various input formats and provides fallback for invalid dates
  *
- * @param {string|Date} dateString - Date string or Date object to format
- * @returns {string} Formatted date string (DD/MM/YYYY) or '-' for invalid dates
+ * @param {string|Date|Object} value - Date string, Date object, or DateEnvelope to format
+ * @param {boolean|Object} options - Include time if boolean, or options object
+ * @returns {string} Formatted date string (DD.MM.YYYY) or '-' for invalid dates
  */
 function formatDate(value, options = {}) {
   let includeTime = false;
@@ -463,22 +467,113 @@ function formatDateOnly(dateString) {
 }
 
 /**
- * Format short date for compact display
+ * Format short date for compact display (dd.mm)
  *
  * Provides a shorter date format for space-constrained displays
  *
  * @param {string|Date} dateString - Date string or Date object to format
- * @returns {string} Short formatted date string or '-' for invalid dates
+ * @param {boolean} includeTime - Include time (HH:MM) if true
+ * @returns {string} Short formatted date string (dd.mm) or '-' for invalid dates
  */
-function formatShortDate(dateString) {
+function formatShortDate(dateString, includeTime = false) {
   const envelope = ensureDateEnvelope(dateString);
   const dateObj = toDateObject(envelope);
   if (!dateObj) {return '-';}
 
-  return formatWithIntl(dateObj, {
-    day: '2-digit',
-    month: '2-digit',
-  });
+  return buildDisplayString(dateObj, { includeTime, shortFormat: true });
+}
+
+/**
+ * Format date in full format (DD.MM.YYYY)
+ *
+ * Standard full date format with 4-digit year
+ *
+ * @param {string|Date|Object} value - Date string, Date object, or DateEnvelope
+ * @param {boolean|Object} includeTime - Include time (HH:MM) if true, or options object
+ * @returns {string} Formatted date string (DD.MM.YYYY) or '-' for invalid dates
+ */
+function formatDateFull(value, includeTime = false) {
+  let options = { includeTime: false, twoDigitYear: false, shortFormat: false };
+  
+  if (typeof includeTime === 'boolean') {
+    options.includeTime = includeTime;
+  } else if (includeTime && typeof includeTime === 'object') {
+    options = { ...options, ...includeTime };
+  }
+
+  const envelope = ensureDateEnvelope(value);
+  if (!envelope) {
+    return '-';
+  }
+
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {
+    return '-';
+  }
+
+  return buildDisplayString(dateObj, options);
+}
+
+/**
+ * Format date in normal format (dd.mm.YY)
+ *
+ * Compact date format with 2-digit year
+ *
+ * @param {string|Date|Object} value - Date string, Date object, or DateEnvelope
+ * @param {boolean|Object} includeTime - Include time (HH:MM) if true, or options object
+ * @returns {string} Formatted date string (dd.mm.YY) or '-' for invalid dates
+ */
+function formatDateNormal(value, includeTime = false) {
+  let options = { includeTime: false, twoDigitYear: true, shortFormat: false };
+  
+  if (typeof includeTime === 'boolean') {
+    options.includeTime = includeTime;
+  } else if (includeTime && typeof includeTime === 'object') {
+    options = { ...options, ...includeTime };
+  }
+
+  const envelope = ensureDateEnvelope(value);
+  if (!envelope) {
+    return '-';
+  }
+
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {
+    return '-';
+  }
+
+  return buildDisplayString(dateObj, options);
+}
+
+/**
+ * Format date in short format (dd.mm)
+ *
+ * Shortest date format without year
+ *
+ * @param {string|Date|Object} value - Date string, Date object, or DateEnvelope
+ * @param {boolean|Object} includeTime - Include time (HH:MM) if true, or options object
+ * @returns {string} Formatted date string (dd.mm) or '-' for invalid dates
+ */
+function formatDateShort(value, includeTime = false) {
+  let options = { includeTime: false, twoDigitYear: false, shortFormat: true };
+  
+  if (typeof includeTime === 'boolean') {
+    options.includeTime = includeTime;
+  } else if (includeTime && typeof includeTime === 'object') {
+    options = { ...options, ...includeTime };
+  }
+
+  const envelope = ensureDateEnvelope(value);
+  if (!envelope) {
+    return '-';
+  }
+
+  const dateObj = toDateObject(envelope);
+  if (!dateObj) {
+    return '-';
+  }
+
+  return buildDisplayString(dateObj, options);
 }
 
 /**
@@ -898,6 +993,9 @@ window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
 window.formatDateOnly = formatDateOnly;
 window.formatShortDate = formatShortDate;
+window.formatDateFull = formatDateFull;
+window.formatDateNormal = formatDateNormal;
+window.formatDateShort = formatDateShort;
 
 // Mark as ready
 window.dateUtilsReady = true;
@@ -1092,6 +1190,9 @@ window.dateUtils = {
   formatDateTime,
   formatDateOnly,
   formatShortDate,
+  formatDateFull,
+  formatDateNormal,
+  formatDateShort,
   formatLongDate,
   formatTimeOnly,
   parseDate,

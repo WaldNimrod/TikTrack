@@ -65,6 +65,12 @@ class NormalizationService:
                 elif task_type == 'account_reconciliation':
                     normalized = self._normalize_account_record(raw_record, connector)
                     validation_errors = self._validate_account_record(normalized)
+                elif task_type == 'portfolio_positions':
+                    normalized = self._normalize_portfolio_record(raw_record, connector)
+                    validation_errors = self._validate_portfolio_record(normalized)
+                elif task_type == 'taxes_and_fx':
+                    normalized = self._normalize_tax_fx_record(raw_record, connector)
+                    validation_errors = self._validate_tax_fx_record(normalized)
                 else:
                     normalized = connector.normalize_record(raw_record)
                     normalized['external_id'] = connector.generate_external_id(normalized)
@@ -173,6 +179,74 @@ class NormalizationService:
         normalized['external_id'] = self._generate_account_external_id(normalized)
         return normalized
 
+    def _normalize_portfolio_record(self, raw_record: Dict[str, Any], connector) -> Dict[str, Any]:
+        if raw_record is None:
+            raise ValueError("Portfolio record is empty")
+
+        statement_end = raw_record.get('statement_period_end')
+        statement_envelope = self._normalize_date_envelope(statement_end)
+
+        normalized = {
+            'task_type': 'portfolio_positions',
+            'record_type': raw_record.get('record_type') or 'open_position',
+            'account_id': raw_record.get('account_id') or '',
+            'symbol': raw_record.get('symbol') or '',
+            'description': raw_record.get('description') or '',
+            'asset_category': raw_record.get('asset_category') or '',
+            'currency': str(raw_record.get('currency') or '').upper(),
+            'quantity': self._coerce_float_value(raw_record.get('quantity')),
+            'multiplier': self._coerce_float_value(raw_record.get('multiplier')),
+            'cost_price': self._coerce_float_value(raw_record.get('cost_price')),
+            'cost_basis': self._coerce_float_value(raw_record.get('cost_basis')),
+            'close_price': self._coerce_float_value(raw_record.get('close_price')),
+            'market_value': self._coerce_float_value(raw_record.get('market_value')),
+            'unrealized_pl': self._coerce_float_value(raw_record.get('unrealized_pl')),
+            'code': raw_record.get('code') or '',
+            'statement_period': raw_record.get('statement_period'),
+            'statement_period_end': statement_envelope,
+            'source': connector.get_source_value(),
+            'raw_row': raw_record.get('_raw_row') or raw_record
+        }
+
+        normalized['external_id'] = self._generate_portfolio_external_id(normalized)
+        return normalized
+
+    def _normalize_tax_fx_record(self, raw_record: Dict[str, Any], connector) -> Dict[str, Any]:
+        if raw_record is None:
+            raise ValueError("Tax/FX record is empty")
+
+        effective_envelope = self._normalize_date_envelope(raw_record.get('effective_date'))
+        statement_envelope = self._normalize_date_envelope(raw_record.get('statement_period_end'))
+
+        normalized = {
+            'task_type': 'taxes_and_fx',
+            'record_type': raw_record.get('record_type') or 'tax_cashflow',
+            'currency': str(raw_record.get('currency') or '').upper(),
+            'amount': self._coerce_float_value(raw_record.get('amount')),
+            'effective_date': effective_envelope,
+            'description': raw_record.get('description') or '',
+            'component': raw_record.get('component') or '',
+            'tax_code': raw_record.get('tax_code') or '',
+            'symbol': raw_record.get('symbol') or '',
+            'statement_period': raw_record.get('statement_period'),
+            'statement_period_end': statement_envelope,
+            'source_account': raw_record.get('source_account') or '',
+            'source_currency': str(raw_record.get('source_currency') or '').upper(),
+            'target_currency': str(raw_record.get('target_currency') or '').upper(),
+            'quantity': self._coerce_float_value(raw_record.get('quantity')),
+            'trade_price': self._coerce_float_value(raw_record.get('trade_price')),
+            'commission': self._coerce_float_value(raw_record.get('commission')),
+            'basis': self._coerce_float_value(raw_record.get('basis')),
+            'realized_pl': self._coerce_float_value(raw_record.get('realized_pl')),
+            'mtm_pl': self._coerce_float_value(raw_record.get('mtm_pl')),
+            'record_metadata': raw_record.get('metadata') or {},
+            'source': connector.get_source_value(),
+            'raw_row': raw_record.get('_raw_row') or raw_record
+        }
+
+        normalized['external_id'] = self._generate_tax_fx_external_id(normalized)
+        return normalized
+
     # ------------------------------------------------------------------
     # Validation helpers
     # ------------------------------------------------------------------
@@ -226,6 +300,38 @@ class NormalizationService:
 
         return errors
 
+    def _validate_portfolio_record(self, record: Dict[str, Any]) -> List[str]:
+        errors: List[str] = []
+        record_type = record.get('record_type') or 'open_position'
+
+        if record_type == 'open_position' and not record.get('symbol'):
+            errors.append("symbol is required for position records")
+        if not record.get('currency'):
+            errors.append("currency is required")
+        if not record.get('account_id'):
+            errors.append("account_id is required")
+        if not record.get('statement_period_end'):
+            errors.append("statement_period_end envelope is required")
+
+        return errors
+
+    def _validate_tax_fx_record(self, record: Dict[str, Any]) -> List[str]:
+        errors: List[str] = []
+        record_type = record.get('record_type') or 'tax_cashflow'
+        amount_required = record_type in {'withholding_tax', 'tax_cashflow', 'forex_conversion'}
+
+        if amount_required and record.get('amount') is None:
+            errors.append("amount is required")
+        if amount_required and not record.get('currency'):
+            errors.append("currency is required")
+        if record_type == 'forex_conversion':
+            if not record.get('source_currency') or not record.get('target_currency'):
+                errors.append("forex conversion requires source and target currencies")
+        if record_type in {'tax_cashflow', 'withholding_tax'} and not record.get('description'):
+            errors.append("description is required for tax records")
+
+        return errors
+
     # ------------------------------------------------------------------
     # External ID helpers
     # ------------------------------------------------------------------
@@ -252,6 +358,40 @@ class NormalizationService:
         ]
         candidate = '_'.join(filter(None, parts))
         return self._sanitize_external_id(candidate)
+
+    def _generate_portfolio_external_id(self, record: Dict[str, Any]) -> str:
+        date_iso = self._coerce_date_to_iso(record.get('statement_period_end'))
+        parts = [
+            record.get('account_id') or 'portfolio',
+            record.get('record_type') or 'position',
+            record.get('symbol') or record.get('description') or '',
+            record.get('currency') or '',
+            date_iso or ''
+        ]
+        candidate = '_'.join(filter(None, parts))
+        return self._sanitize_external_id(candidate)
+
+    def _generate_tax_fx_external_id(self, record: Dict[str, Any]) -> str:
+        date_iso = self._coerce_date_to_iso(record.get('effective_date') or record.get('statement_period_end'))
+        amount = record.get('amount') or 0.0
+        parts = [
+            record.get('record_type') or 'tax_fx',
+            record.get('currency') or '',
+            f"{abs(float(amount)):.2f}",
+            record.get('symbol') or record.get('component') or '',
+            date_iso or ''
+        ]
+        candidate = '_'.join(filter(None, parts))
+        return self._sanitize_external_id(candidate)
+
+    @staticmethod
+    def _coerce_float_value(value: Any) -> float:
+        if value in (None, ''):
+            return 0.0
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
 
     @staticmethod
     def _sanitize_external_id(value: str) -> str:

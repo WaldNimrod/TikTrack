@@ -33,22 +33,19 @@
 window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "preferences-page" })...');
 
 /**
- * Function Index:
- * ==============
- *
- * DATA LOADING:
- * - loadAccountsForPreferences() - Loads trading accounts for default account preference
- *
- * PREFERENCES MANAGEMENT:
- * - savePreferences()
- * - loadPreferences()
- * - resetPreferences()
- *
- * UI MANAGEMENT:
- * - updateUI()
- * - validateForm()
- *
- * ==============
+ * ============================================================================
+ * FUNCTION INDEX - Preferences Page Functions
+ * ============================================================================
+ * 
+ * Global Functions:
+ * - loadAccountsForPreferences() - Load trading accounts for default account select
+ * - renderPreferenceTypesAuditTable() - Render preference types audit table
+ * 
+ * Helper Functions (Internal):
+ * - (Internal helpers for account loading and table rendering)
+ * 
+ * Documentation: See documentation/04-FEATURES/CORE/preferences/PREFERENCES_COMPLETE_DEVELOPER_GUIDE.md
+ * ============================================================================
  */
 
 // ===== DATA LOADING =====
@@ -57,6 +54,11 @@ window.Logger.info('📄 Loading preferences-page.js v3.0 (Clean, { page: "prefe
  * Fetches all trading accounts from API and populates the default_trading_account select
  */
 async function loadAccountsForPreferences() {
+  window.Logger?.info('🔍 [Accounts] Starting loadAccountsForPreferences', {
+    page: 'preferences-page',
+    timestamp: new Date().toISOString(),
+  });
+
   try {
     const activeContext = window.PreferencesUI?.profileContext
             || window.PreferencesUI?.latestProfileContext
@@ -75,17 +77,28 @@ async function loadAccountsForPreferences() {
       ? Number(finalProfileIdRaw)
       : 0;
 
-    window.Logger.info('🔄 Loading trading accounts for default account preference...', {
+    window.Logger?.info('🔄 [Accounts] Loading trading accounts for default account preference', {
       page: 'preferences-page',
       userId: finalUserId,
       profileId: finalProfileId,
+      activeContext: Boolean(activeContext),
     });
 
     const accountSelect = document.getElementById('default_trading_account');
     if (!accountSelect) {
-      window.Logger.warn('⚠️ default_trading_account select element not found', { page: 'preferences-page' });
+      window.Logger?.error('❌ [Accounts] default_trading_account select element not found', {
+        page: 'preferences-page',
+        suggestion: 'Check if the HTML element with id="default_trading_account" exists in the preferences page',
+      });
       return;
     }
+
+    window.Logger?.info('✅ [Accounts] Select element found', {
+      page: 'preferences-page',
+      elementId: accountSelect.id,
+      elementTagName: accountSelect.tagName,
+      currentOptionsCount: accountSelect.options?.length || 0,
+    });
 
     let defaultAccountId = null;
 
@@ -124,47 +137,152 @@ async function loadAccountsForPreferences() {
 
     if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
       usedSelectPopulatorService = true;
-      window.Logger.info('🚀 Using SelectPopulatorService.populateAccountsSelect for default trading account', {
+      window.Logger?.info('🚀 [Accounts] Using SelectPopulatorService.populateAccountsSelect', {
         page: 'preferences-page',
         defaultFromPreferences: !defaultAccountId,
         defaultValue: defaultAccountId,
-      });
-      await window.SelectPopulatorService.populateAccountsSelect(accountSelect, {
-        includeEmpty: true,
-        defaultFromPreferences: !defaultAccountId,
-        defaultValue: defaultAccountId,
-      });
-    } else {
-      window.Logger.warn('⚠️ SelectPopulatorService.populateAccountsSelect unavailable, falling back to direct fetch', { page: 'preferences-page' });
-
-      const response = await fetch(`/api/trading-accounts/open?_t=${Date.now()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
+        options: {
+          includeEmpty: true,
+          defaultFromPreferences: !defaultAccountId,
+          defaultValue: defaultAccountId,
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      try {
+        await window.SelectPopulatorService.populateAccountsSelect(accountSelect, {
+          includeEmpty: true,
+          defaultFromPreferences: !defaultAccountId,
+          defaultValue: defaultAccountId,
+        });
+
+        window.Logger?.info('✅ [Accounts] SelectPopulatorService.populateAccountsSelect completed', {
+          page: 'preferences-page',
+          optionsCountAfter: accountSelect.options?.length || 0,
+          selectedValue: accountSelect.value,
+        });
+      } catch (populateError) {
+        window.Logger?.error('❌ [Accounts] Error in SelectPopulatorService.populateAccountsSelect', {
+          page: 'preferences-page',
+          error: populateError.message,
+          errorStack: populateError.stack,
+        });
+        throw populateError;
+      }
+    } else {
+      window.Logger?.warn('⚠️ [Accounts] SelectPopulatorService.populateAccountsSelect unavailable, using TradingAccountsData service', {
+        page: 'preferences-page',
+        hasSelectPopulatorService: Boolean(window.SelectPopulatorService),
+        hasPopulateFunction: Boolean(window.SelectPopulatorService?.populateAccountsSelect),
+      });
+
+      let accounts = [];
+      if (window.TradingAccountsData?.loadTradingAccountsData) {
+        window.Logger?.info('📡 [Accounts] Loading via TradingAccountsData.loadTradingAccountsData', {
+          page: 'preferences-page',
+        });
+        const payload = await window.TradingAccountsData.loadTradingAccountsData({ force: true });
+        window.Logger?.info('📥 [Accounts] Received payload from TradingAccountsData', {
+          page: 'preferences-page',
+          isArray: Array.isArray(payload),
+          hasData: Boolean(payload?.data),
+          payloadKeys: payload ? Object.keys(payload) : [],
+        });
+        accounts = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+        window.Logger?.info('✅ [Accounts] Extracted accounts array', {
+          page: 'preferences-page',
+          accountsCount: accounts.length,
+          firstAccount: accounts.length > 0 ? accounts[0] : null,
+        });
+      } else {
+        window.Logger?.warn('⚠️ [Accounts] TradingAccountsData service not available, falling back to direct fetch', {
+          page: 'preferences-page',
+          hasTradingAccountsData: Boolean(window.TradingAccountsData),
+          hasLoadFunction: Boolean(window.TradingAccountsData?.loadTradingAccountsData),
+        });
+        const apiUrl = `/api/trading-accounts/open?_t=${Date.now()}`;
+        window.Logger?.info('📡 [Accounts] Fetching from API', {
+          page: 'preferences-page',
+          url: apiUrl,
+        });
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+          },
+        });
+
+        window.Logger?.info('📥 [Accounts] API response received', {
+          page: 'preferences-page',
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          window.Logger?.error('❌ [Accounts] API error response', {
+            page: 'preferences-page',
+            status: response.status,
+            statusText: response.statusText,
+            errorText,
+          });
+          throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
+        }
+
+        const result = await response.json();
+        window.Logger?.info('📥 [Accounts] API JSON parsed', {
+          page: 'preferences-page',
+          hasData: Boolean(result?.data),
+          isArray: Array.isArray(result),
+          resultKeys: result ? Object.keys(result) : [],
+        });
+        accounts = result.data || result;
+        window.Logger?.info('✅ [Accounts] Extracted accounts from API response', {
+          page: 'preferences-page',
+          accountsCount: accounts.length,
+        });
       }
 
-      const result = await response.json();
-      const accounts = result.data || result;
+      window.Logger?.info('🔄 [Accounts] Populating select manually', {
+        page: 'preferences-page',
+        accountsBeforeFilter: accounts.length,
+      });
 
       accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
 
-      accounts
-        .filter(account => account && (account.status === 'open' || account.status === 'active' || account.is_active === true))
-        .forEach(account => {
-          const option = document.createElement('option');
-          option.value = account.id;
-          option.textContent = account.name;
-          accountSelect.appendChild(option);
-        });
+      const filteredAccounts = accounts.filter(account => 
+        account && (account.status === 'open' || account.status === 'active' || account.is_active === true)
+      );
+
+      window.Logger?.info('✅ [Accounts] Filtered accounts', {
+        page: 'preferences-page',
+        accountsAfterFilter: filteredAccounts.length,
+        filteredAccounts: filteredAccounts.map(a => ({ id: a.id, name: a.name, status: a.status })),
+      });
+
+      filteredAccounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = account.name;
+        accountSelect.appendChild(option);
+      });
+
+      window.Logger?.info('✅ [Accounts] Options added to select', {
+        page: 'preferences-page',
+        totalOptions: accountSelect.options.length,
+      });
 
       if (defaultAccountId) {
         accountSelect.value = defaultAccountId;
+        window.Logger?.info('✅ [Accounts] Default account ID set', {
+          page: 'preferences-page',
+          defaultAccountId,
+        });
       }
     }
 
@@ -180,7 +298,7 @@ async function loadAccountsForPreferences() {
     const selectedOption = accountSelect.options[accountSelect.selectedIndex];
     const totalOptions = Math.max(accountSelect.options.length - (accountSelect.options[0]?.value === '' ? 1 : 0), 0);
 
-    window.Logger.info('✅ Loaded trading accounts for default account select', {
+    window.Logger?.info('✅ [Accounts] Loaded trading accounts for default account select', {
       page: 'preferences-page',
       usedSelectPopulatorService,
       accountsCount: totalOptions,
@@ -188,9 +306,19 @@ async function loadAccountsForPreferences() {
       defaultAccountName: selectedOption ? selectedOption.textContent : null,
       userId: finalUserId,
       profileId: finalProfileId,
+      allOptions: Array.from(accountSelect.options).map(opt => ({
+        value: opt.value,
+        text: opt.textContent,
+        selected: opt.selected,
+      })),
     });
   } catch (error) {
-    window.Logger.error('❌ Error loading trading accounts for default account preference:', error, { page: 'preferences-page' });
+    window.Logger?.error('❌ [Accounts] Error loading trading accounts for default account preference', {
+      page: 'preferences-page',
+      error: error.message,
+      errorStack: error.stack,
+      errorName: error.name,
+    });
   }
 }
 
@@ -364,11 +492,10 @@ window.debugProfileSystem = async function debugProfileSystem() {
 
     // 2. Check profiles from API
     logInfo('2️⃣ Profiles from API - Fetching');
-    const profilesResponse = await fetch('/api/preferences/profiles?user_id=1');
-    const profilesResult = await profilesResponse.json();
-    logInfo('   API Response received', { success: profilesResult.success, total: profilesResult.data?.profiles?.length || 0 });
-    if (profilesResult.success) {
-      const profiles = profilesResult.data.profiles;
+    const profilesPayload = await window.PreferencesData.loadProfiles({ userId: 1, force: true });
+    logInfo('   API Response received', { total: profilesPayload.profiles?.length || 0 });
+    if (profilesPayload.profiles) {
+      const profiles = profilesPayload.profiles;
       logInfo('   Profiles summary', { totalProfiles: profiles.length });
       profiles.forEach(p => {
         logInfo('   - Profile details', {
@@ -611,54 +738,49 @@ const PreferenceTypesAudit = (() => {
     const container = document.getElementById('preferenceTypesAuditContainer');
     const tableBody = document.getElementById('preferenceTypesAuditTableBody');
 
+    window.Logger?.info('🔍 [Types Table] Starting renderPreferenceTypesAuditTable', {
+      page: 'preferences-page',
+      containerExists: Boolean(container),
+      tableBodyExists: Boolean(tableBody),
+      hasPreferencesData: Boolean(window.PreferencesData),
+      hasLoadTypesFunction: Boolean(window.PreferencesData?.loadPreferenceTypes),
+    });
+
     if (!container || !tableBody) {
-      window.Logger?.warn('⚠️ Preference types audit container not found', { page: 'preferences-page' });
+      window.Logger?.error('❌ [Types Table] Container or table body not found', {
+        page: 'preferences-page',
+        containerId: 'preferenceTypesAuditContainer',
+        tableBodyId: 'preferenceTypesAuditTableBody',
+      });
       return;
     }
 
     tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">טוען נתונים...</td></tr>';
 
     try {
-      const response = await fetch('/api/preferences/admin/types', { credentials: 'same-origin' });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const payload = await response.json();
-      if (!payload.success) {
-        throw new Error(payload.error || 'Unknown error');
-      }
-
-      const extractTypes = data => {
-        if (!data) {
-          return [];
-        }
-
-        if (Array.isArray(data.preference_types)) {
-          return data.preference_types;
-        }
-
-        if (Array.isArray(data.data?.preference_types)) {
-          return data.data.preference_types;
-        }
-
-        if (Array.isArray(data.data)) {
-          return data.data;
-        }
-
-        if (Array.isArray(data.results)) {
-          return data.results;
-        }
-
-        return [];
-      };
-
-      const types = extractTypes(payload);
-
-      window.Logger?.info('📋 Preference types audit payload received', {
+      window.Logger?.info('📡 [Types Table] Calling PreferencesData.loadPreferenceTypes', {
         page: 'preferences-page',
-        hasDataKey: Boolean(payload.data),
+        force: true,
+      });
+
+      const result = await window.PreferencesData.loadPreferenceTypes({ force: true });
+      
+      window.Logger?.info('📥 [Types Table] Received response from loadPreferenceTypes', {
+        page: 'preferences-page',
+        hasResult: Boolean(result),
+        resultKeys: result ? Object.keys(result) : [],
+        hasTypes: Boolean(result?.types),
+        typesCount: Array.isArray(result?.types) ? result.types.length : 0,
+        rawResult: result,
+      });
+
+      const { types = [] } = result || {};
+
+      window.Logger?.info('📋 [Types Table] Preference types audit payload received', {
+        page: 'preferences-page',
         total: types.length,
+        firstType: types.length > 0 ? types[0] : null,
+        allTypes: types,
       });
 
       const normalizeGroupName = type => {
@@ -697,6 +819,10 @@ const PreferenceTypesAudit = (() => {
       });
 
       if (!types.length) {
+        window.Logger?.warn('⚠️ [Types Table] No types found in response', {
+          page: 'preferences-page',
+          result: result,
+        });
         tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">לא נמצאו סוגי העדפות.</td></tr>';
         return;
       }
@@ -750,12 +876,18 @@ const PreferenceTypesAudit = (() => {
       tableBody.innerHTML = '';
       tableBody.appendChild(fragment);
 
-      window.Logger?.info('✅ Preference types audit table rendered', {
+      window.Logger?.info('✅ [Types Table] Preference types audit table rendered successfully', {
         page: 'preferences-page',
         total: types.length,
+        rowsRendered: tableBody.querySelectorAll('tr').length,
       });
     } catch (error) {
-      window.Logger?.error('❌ Failed to render preference types audit table', error, { page: 'preferences-page' });
+      window.Logger?.error('❌ [Types Table] Failed to render preference types audit table', {
+        page: 'preferences-page',
+        error: error.message,
+        errorStack: error.stack,
+        errorName: error.name,
+      });
       tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת הנתונים: ${error.message}</td></tr>`;
     }
   };

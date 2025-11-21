@@ -59,6 +59,15 @@ def allowed_file(filename: str) -> bool:
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def _resolve_default_trading_account(db_session):
+    """Return the first available trading account (preferring open accounts)."""
+    account = db_session.query(TradingAccount).filter(
+        TradingAccount.status == 'open'
+    ).order_by(TradingAccount.id.asc()).first()
+    if not account:
+        account = db_session.query(TradingAccount).order_by(TradingAccount.id.asc()).first()
+    return account
+
 @user_data_import_bp.route('/upload-and-preview', methods=['POST'])
 def upload_and_preview():
     """
@@ -88,13 +97,10 @@ def upload_and_preview():
     file_name = file.filename
 
     try:
-        # Create database session
-        from sqlalchemy import create_engine
-        from sqlalchemy.orm import sessionmaker
-        engine = create_engine('sqlite:///db/tiktrack.db')
-        Session = sessionmaker(bind=engine)
-        db_session = Session()
-        
+        # Use application's configured DB session (no hardcoded engine/URL)
+        from config.database import SessionLocal
+        db_session = SessionLocal()
+        #
         orchestrator = ImportOrchestrator(db_session)
         
         # Create import session first
@@ -141,6 +147,11 @@ def upload_and_preview():
     except Exception as e:
         logger.error(f"Unexpected error during file preview: {e}", exc_info=True)
         return jsonify({"error": "An unexpected error occurred during file analysis."}), 500
+    finally:
+        try:
+            db_session.close()
+        except Exception:
+            pass
 
 @user_data_import_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -183,27 +194,6 @@ def upload_file():
                 'error': 'Invalid file type. Only CSV files are allowed'
             }), 400
         
-        # Get account ID
-        trading_account_id = request.form.get('trading_account_id', type=int)
-        logger.info(f"🏦 Trading account ID from request: {trading_account_id}")
-        
-        if not trading_account_id:
-            logger.info("🔍 No trading account provided, using default")
-            # Default to first account
-            db_session = next(get_db())
-            try:
-                account = db_session.query(TradingAccount).first()
-                if not account:
-                    logger.error("❌ No trading accounts found in database")
-                    return jsonify({
-                        'success': False,
-                        'error': 'No trading accounts found'
-                    }), 400
-                trading_account_id = account.id
-                logger.info(f"✅ Using default trading account: {trading_account_id}")
-            finally:
-                db_session.close()
-        
         # Get connector/task type
         connector_type = (request.form.get('connector_type') or 'ibkr').strip().lower()
         task_type = (request.form.get('task_type') or 'executions').strip().lower()
@@ -220,13 +210,30 @@ def upload_file():
         try:
             orchestrator = ImportOrchestrator(db_session)
             logger.info("✅ ImportOrchestrator created successfully")
+
+            binding_info = orchestrator.detect_account_binding(connector_type, file_content)
+            matched_account = binding_info.get('matched_account')
+            trading_account = matched_account or _resolve_default_trading_account(db_session)
+            if not trading_account:
+                logger.error("❌ No trading accounts found while preparing session")
+                return jsonify({
+                    'success': False,
+                    'error': 'No trading accounts found'
+                }), 400
+            trading_account_id = trading_account.id
+            linking_context = {
+                'file_account_number': binding_info.get('file_account_number'),
+                'matched_account_id': matched_account.id if matched_account else None,
+                'account_metadata': binding_info.get('account_metadata')
+            }
             
             result = orchestrator.create_import_session(
                 trading_account_id=trading_account_id,
                 file_name=file.filename,
                 file_content=file_content,
                 connector_type=connector_type,
-                task_type=task_type
+                task_type=task_type,
+                linking_context=linking_context
             )
             logger.info(f"📊 Session creation result: {result}")
             
@@ -280,6 +287,75 @@ def upload_file():
             'success': False,
             'error': f'File upload failed: {str(e)}'
         }), 500
+
+@user_data_import_bp.route('/precheck', methods=['POST'])
+def precheck_import_file():
+    """
+    Lightweight file validation triggered immediately after the user selects a file.
+    Each connector can run its own structural checks before the full analysis pipeline begins.
+    """
+    if 'file' not in request.files:
+        return jsonify({
+            'success': False,
+            'error': 'No file provided'
+        }), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({
+            'success': False,
+            'error': 'No file selected'
+        }), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({
+            'success': False,
+            'error': 'Invalid file type. Only CSV files are allowed'
+        }), 400
+
+    connector_type = (request.form.get('connector_type') or 'ibkr').strip().lower()
+    task_type = (request.form.get('task_type') or 'executions').strip().lower()
+
+    try:
+        file_content = file.read().decode('utf-8')
+    except UnicodeDecodeError:
+        file_content = file.read().decode('utf-8', errors='ignore')
+
+    db_session = next(get_db())
+    try:
+        orchestrator = ImportOrchestrator(db_session)
+        connector = orchestrator.connectors.get(connector_type)
+        if not connector:
+            return jsonify({
+                'success': False,
+                'error': f'Unsupported connector type: {connector_type}'
+            }), 400
+
+        result = connector.precheck_file(
+            file_content=file_content,
+            file_name=file.filename,
+            task_type=task_type
+        )
+        if not isinstance(result, dict):
+            result = {'success': False, 'error': 'Connector precheck returned an invalid response'}
+
+        success = bool(result.get('success'))
+        payload = {
+            'success': success,
+            'message': result.get('message') or ('הקובץ עבר בדיקה ראשונית בהצלחה.' if success else ''),
+            'warnings': result.get('warnings') or [],
+            'errors': result.get('errors') or []
+        }
+        status_code = 200 if success else 400
+        return jsonify(payload), status_code
+    except Exception as exc:
+        logger.error("File precheck failed: %s", exc, exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': 'בדיקת הקובץ נכשלה. נסה שוב או בדוק את הקובץ.'
+        }), 500
+    finally:
+        db_session.close()
 
 @user_data_import_bp.route('/session/<int:session_id>/analyze', methods=['GET'])
 def analyze_session(session_id: int):
@@ -364,6 +440,20 @@ def get_session(session_id: int):
             if summary_data:
                 session_dict['summary_data'] = _project_storage_payload(summary_data)
             
+            # Include linked trading account information
+            if session.trading_account_id:
+                try:
+                    trading_account = db_session.query(TradingAccount).filter(
+                        TradingAccount.id == session.trading_account_id
+                    ).first()
+                    if trading_account:
+                        from services.user_data_import.import_orchestrator import ImportOrchestrator
+                        orchestrator = ImportOrchestrator(db_session)
+                        session_dict['trading_account'] = orchestrator._serialize_account(trading_account)
+                        logger.info(f"✅ Included trading account info: ID={trading_account.id}, Name={trading_account.name}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to include trading account info: {str(e)}")
+            
             return jsonify({
                 'status': 'success',
                 'session': session_dict
@@ -387,23 +477,103 @@ def link_trading_account(session_id: int):
     The request body may include an optional `account_number` to override the detected value,
     but the server will still validate that a number exists.
     """
+    normalizer = _get_date_normalizer()
     payload = request.get_json(silent=True) or {}
     override_account_number = payload.get('account_number')
+    target_trading_account_id = payload.get('trading_account_id')
+    confirm_overwrite = bool(payload.get('confirm_overwrite'))
 
     try:
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result = orchestrator.link_trading_account_to_file(session_id, override_account_number)
+            result = orchestrator.link_trading_account_to_file(
+                session_id,
+                override_account_number,
+                target_trading_account_id=target_trading_account_id,
+                confirm_overwrite=confirm_overwrite
+            )
+            # Normalize dates in result
+            normalized_result = normalizer.normalize_output(result)
+            normalized_result['timestamp'] = normalizer.now_envelope()
+            status_code = 200 if result.get('success') else 400
+            return jsonify(normalized_result), status_code
+        finally:
+            db_session.close()
+    except Exception as exc:
+        logger.error("Failed to link trading account: %s", exc, exc_info=True)
+        error_payload = {
+            'success': False,
+            'error': f'Failed to link account: {exc}',
+            'timestamp': normalizer.now_envelope()
+        }
+        return jsonify(error_payload), 500
+
+@user_data_import_bp.route('/session/<int:session_id>/account-link/status', methods=['GET'])
+def get_account_link_status(session_id: int):
+    """Return the current account-linking status for a session."""
+    try:
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            result = orchestrator.get_account_link_status(session_id)
             status_code = 200 if result.get('success') else 400
             return jsonify(result), status_code
         finally:
             db_session.close()
     except Exception as exc:
-        logger.error("Failed to link trading account: %s", exc, exc_info=True)
+        logger.error("Failed to fetch account link status: %s", exc, exc_info=True)
         return jsonify({
             'success': False,
-            'error': f'Failed to link account: {exc}'
+            'error': f'Failed to fetch account link status: {exc}'
+        }), 500
+
+@user_data_import_bp.route('/session/<int:session_id>/account-link/confirm', methods=['POST'])
+def confirm_account_link(session_id: int):
+    """Confirm a recognized trading account before continuing the import."""
+    try:
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            result = orchestrator.confirm_account_link(session_id)
+            status_code = 200 if result.get('success') else 400
+            return jsonify(result), status_code
+        finally:
+            db_session.close()
+    except Exception as exc:
+        logger.error("Failed to confirm account link: %s", exc, exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': f'Failed to confirm account link: {exc}'
+        }), 500
+
+@user_data_import_bp.route('/session/<int:session_id>/account-link/select', methods=['POST'])
+def select_account_link(session_id: int):
+    """Link the session to a user-selected trading account and set the broker number."""
+    payload = request.get_json(silent=True) or {}
+    override_account_number = payload.get('account_number')
+    target_trading_account_id = payload.get('trading_account_id')
+    confirm_overwrite = bool(payload.get('confirm_overwrite'))
+
+    try:
+        db_session = next(get_db())
+        try:
+            orchestrator = ImportOrchestrator(db_session)
+            result = orchestrator.link_trading_account_to_file(
+                session_id,
+                override_account_number,
+                target_trading_account_id=target_trading_account_id,
+                confirm_overwrite=confirm_overwrite
+            )
+            status_code = 200 if result.get('success') else 400
+            return jsonify(result), status_code
+        finally:
+            db_session.close()
+    except Exception as exc:
+        logger.error("Failed to select trading account: %s", exc, exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': f'Failed to select account: {exc}'
         }), 500
 
 @user_data_import_bp.route('/sessions/active', methods=['GET'])
@@ -736,7 +906,8 @@ def allow_existing_record(session_id):
         record_index = data.get('record_index')
         
         # Get session
-        session = db.session.query(ImportSession).filter_by(id=session_id).first()
+        db_session = next(get_db())
+        session = db_session.query(ImportSession).filter_by(id=session_id).first()
         if not session:
             return jsonify({'status': 'error', 'message': 'Session not found'}), 404
         
@@ -778,7 +949,7 @@ def allow_existing_record(session_id):
             
             # Save updated preview
             session.preview_data = _utc_storage_normalizer.normalize_output(preview_data)
-            db.session.commit()
+            db_session.commit()
         
         projected_preview = _project_storage_payload(preview_data)
         return jsonify({'status': 'success', 'preview_data': projected_preview})
@@ -786,6 +957,11 @@ def allow_existing_record(session_id):
     except Exception as e:
         logger.error(f"Error allowing existing record: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    finally:
+        try:
+            db_session.close()
+        except Exception:
+            pass
 
 @user_data_import_bp.route('/session/<int:session_id>/execute', methods=['POST'])
 def execute_import(session_id: int):
@@ -798,6 +974,7 @@ def execute_import(session_id: int):
     Body params:
         task_type: Optional override for task type
         generate_report: Whether to generate a report after import
+        selected_types: Optional list of cashflow types to import (for cashflows task)
     
     Returns:
         JSON response with import results
@@ -805,10 +982,11 @@ def execute_import(session_id: int):
     try:
         payload = request.get_json(silent=True) or {}
         task_type = payload.get('task_type')
+        selected_types = payload.get('selected_types')  # List of cashflow types to import
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.execute_import(session_id, task_type)
+            result_raw = orchestrator.execute_import(session_id, task_type, selected_types=selected_types)
             
             if not result_raw.get('success'):
                 status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 400

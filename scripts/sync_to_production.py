@@ -153,16 +153,65 @@ def main():
     # Create target structure
     TARGET_BACKEND.parent.mkdir(parents=True, exist_ok=True)
     
-    # Remove existing target (clean sync)
+    # Backup and preserve DB before removing production directory
+    db_backup = None
+    production_db = TARGET_BACKEND / "db" / "tiktrack.db"
+    db_dir = TARGET_BACKEND / "db"
+    
     if TARGET_BACKEND.exists():
-        print(f"🗑️  Removing existing production directory...")
-        shutil.rmtree(TARGET_BACKEND)
+        if production_db.exists():
+            db_backup = TARGET_BACKEND.parent / "db_backup_before_sync.db"
+            print(f"💾 Backing up production DB before sync...")
+            shutil.copy2(production_db, db_backup)
+            print(f"   ✅ DB backed up to: {db_backup}")
+        
+        print(f"🗑️  Removing existing production directory (preserving DB)...")
+        # Remove everything except db directory
+        for item in TARGET_BACKEND.iterdir():
+            if item.name != 'db':
+                if item.is_file():
+                    item.unlink()
+                elif item.is_dir():
+                    shutil.rmtree(item)
     
     print("📋 Copying files...")
     print()
     
     # Copy files
     copied, skipped = copy_directory_structure(SOURCE_BACKEND, TARGET_BACKEND)
+    
+    # Restore or create DB
+    production_db = TARGET_BACKEND / "db" / "tiktrack.db"
+    production_db.parent.mkdir(parents=True, exist_ok=True)
+    
+    if not production_db.exists():
+        if db_backup and db_backup.exists():
+            print(f"💾 Restoring production DB from backup...")
+            shutil.copy2(db_backup, production_db)
+            print(f"   ✅ DB restored")
+            db_backup.unlink()
+        else:
+            # Try to copy from dev
+            dev_db = PROJECT_ROOT / "Backend" / "db" / "tiktrack.db"
+            tmp_db = PROJECT_ROOT / "_Tmp" / "tiktrack.db"
+            
+            source_db = None
+            if tmp_db.exists():
+                source_db = tmp_db
+                print(f"💾 Copying DB from _Tmp...")
+            elif dev_db.exists():
+                source_db = dev_db
+                print(f"💾 Copying DB from Backend...")
+            
+            if source_db:
+                shutil.copy2(source_db, production_db)
+                print(f"   ✅ DB copied to production")
+            else:
+                print(f"   ⚠️  No source DB found - server may fail to start")
+                print(f"   ⚠️  Run: cd production/Backend && python3 scripts/create_production_db.py")
+    elif db_backup and db_backup.exists():
+        # DB exists, remove backup
+        db_backup.unlink()
     
     print()
     print("=" * 60)

@@ -125,7 +125,8 @@ let alertsPaginationInstance = null;
  * @async
  * @returns {Promise<void>}
  */
-window.loadAlertsData = async function() {
+// Internal function for loading alerts data
+async function loadAlertsDataInternal(options = {}) {
   // Prevent multiple simultaneous calls
   if (loadAlertsDataInProgress) {
     window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
@@ -137,18 +138,25 @@ window.loadAlertsData = async function() {
     try {
       window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
 
-      // קריאה לשרת לקבלת נתוני התראות
-      window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
-      const response = await fetch('/api/alerts/');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Use AlertsData service if available, otherwise fallback to direct API call
+      let rawAlerts = [];
+      if (window.AlertsData?.loadAlertsData) {
+        rawAlerts = await window.AlertsData.loadAlertsData({ force: options.force || false });
+        window.Logger.info('📊 נתונים שהתקבלו מ-AlertsData service:', rawAlerts.length, 'התראות', { page: "alerts" });
+      } else {
+        // Fallback: direct API call
+        window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
+        const response = await fetch('/api/alerts/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+        rawAlerts = data?.data || data;
       }
 
-      const data = await response.json();
-      window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
-
       // שמירת הנתונים במשתנה גלובלי
-      const rawAlerts = data?.data || data;
       window.alertsData = Array.isArray(rawAlerts)
         ? rawAlerts.map(alert => ({
             ...alert,
@@ -201,6 +209,13 @@ window.loadAlertsData = async function() {
   })();
 
   return loadAlertsDataPromise;
+}
+
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+window.loadAlertsData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  return await loadAlertsDataInternal({ ...options, force: true });
 };
 
 /**
@@ -273,18 +288,15 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.setAttribute('data-bs-keyboard', 'true');
     }
 
-    // הוספת event listener לסגירה בלחיצה על הרקע
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      }
-    });
+    // REMOVED: Event listener לסגירה בלחיצה על הרקע
+    // ModalManagerV2 מטפל ב-backdrop click אוטומטית דרך handleGlobalBackdropClick
+    // אם המודל הוא חלק מ-ModalManagerV2, אין צורך ב-event listener מקומי
+    // אם המודל הוא מודל מיוחד (לא חלק מ-ModalManagerV2), Bootstrap מטפל בזה אוטומטית עם data-bs-backdrop
   });
 
-  window.Logger.info('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע', { page: "alerts" });
+  // REMOVED: הודעת לוג - event listeners לסגירה בלחיצה על הרקע הוסרו
+  // ModalManagerV2 מטפל ב-backdrop click אוטומטית
+  // window.Logger.info('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע', { page: "alerts" });
 
   // בדיקת הצבעים הסטטיים
   window.Logger.info('🎨 בודק צבעים סטטיים...', { page: "alerts" });
@@ -298,49 +310,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.Logger.info('🎨 צבע חשבון מסחר:', accountColor, { page: "alerts" });
 });
 
-
-// נתוני דמה
-const demoAlerts = [
-  {
-    id: 1,
-    title: 'התראה על מחיר AAPL',
-    type: 'price_alert',
-    status: 'open',
-    related_type_id: 4, // ticker
-    related_id: 1,
-    condition: 'מחיר > 210$',
-    message: 'AAPL הגיע ליעד מחיר',
-    created_at: '2024-01-15',
-    is_triggered: false,
-  },
-  {
-    id: 2,
-    title: 'סטופ לוס TSLA',
-    type: 'stop_loss',
-    status: 'open',
-    related_type_id: 2, // trade
-    related_id: 1,
-    condition: 'מחיר < 690$',
-    message: 'TSLA מתחת לסטופ',
-    created_at: '2024-01-14',
-    is_triggered: true,
-  },
-];
-
-
-/**
- * טעינת נתוני התראות מהשרת
- *
- * פונקציה זו מחזירה נתוני דמו להתראות
- * @returns {Array} מערך של התראות דמו
- */
-/**
- * REMOVED: Duplicate loadAlertsData function
- * This function has been replaced by window.loadAlertsData (defined above)
- * The new implementation includes proper guards to prevent multiple simultaneous calls
- * 
- * @deprecated Use window.loadAlertsData instead
- */
 
 // REMOVED: filterAlertsLocally - unused function
 
@@ -395,17 +364,30 @@ function renderAlertsTableRows(alerts) {
   // פונקציה לטעינת נתונים נוספים
   const loadAdditionalData = async () => {
     try {
-      const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-        fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/trade-plans/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+      // Use entity services instead of direct fetch calls
+      const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+        (window.getAccounts && typeof window.getAccounts === 'function') 
+          ? window.getAccounts().catch(() => [])
+          : Promise.resolve([]),
+        (window.TradesData && typeof window.TradesData.loadTradesData === 'function')
+          ? window.TradesData.loadTradesData().catch(() => [])
+          : Promise.resolve([]),
+        (window.tradePlanService && typeof window.tradePlanService.getTradePlans === 'function')
+          ? window.tradePlanService.getTradePlans().catch(() => [])
+          : (window.getTradePlans && typeof window.getTradePlans === 'function')
+            ? window.getTradePlans().catch(() => [])
+            : Promise.resolve([]),
+        (window.tickerService && typeof window.tickerService.getTickers === 'function')
+          ? window.tickerService.getTickers().catch(() => [])
+          : (window.getTickers && typeof window.getTickers === 'function')
+            ? window.getTickers().catch(() => [])
+            : Promise.resolve([]),
       ]);
 
-      accounts = (accountsResponse.data || accountsResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-      trades = (tradesResponse.data || tradesResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-      tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
-      tickers = (tickersResponse.data || tickersResponse || []).filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null);
+      accounts = Array.isArray(accountsData) ? accountsData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
+      trades = Array.isArray(tradesData) ? tradesData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
+      tradePlans = Array.isArray(tradePlansData) ? tradePlansData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
+      tickers = Array.isArray(tickersData) ? tickersData.filter(item => !Array.isArray(item) && typeof item === 'object' && item !== null) : [];
     } catch {
       // // window.Logger.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error, { page: "alerts" });
       // המשך עם מערכים ריקים
@@ -610,9 +592,12 @@ function renderAlertsTableRows(alerts) {
       const createdEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(createdSource)
         : createdSource;
+      // Use dateUtils for consistent date parsing
       const createdDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(createdEnvelope || null)
-        : (createdEnvelope ? new Date(createdEnvelope) : null);
+        : (createdEnvelope && typeof createdEnvelope === 'object' && typeof createdEnvelope.epochMs === 'number'
+          ? new Date(createdEnvelope.epochMs)
+          : (createdEnvelope ? new Date(createdEnvelope) : null));
       const createdAtDisplay = createdEnvelope
         ? (
             window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'
@@ -622,6 +607,17 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (createdDateObj && !Number.isNaN(createdDateObj.getTime())) {
+                        // Use FieldRendererService or dateUtils for formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(createdDateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(createdDateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(createdDateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
                         return createdDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
@@ -668,9 +664,12 @@ function renderAlertsTableRows(alerts) {
       const triggeredEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(triggeredSource)
         : triggeredSource;
+      // Use dateUtils for consistent date parsing
       const triggeredDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(triggeredEnvelope || null)
-        : (triggeredEnvelope ? new Date(triggeredEnvelope) : null);
+        : (triggeredEnvelope && typeof triggeredEnvelope === 'object' && typeof triggeredEnvelope.epochMs === 'number'
+          ? new Date(triggeredEnvelope.epochMs)
+          : (triggeredEnvelope ? new Date(triggeredEnvelope) : null));
       const triggeredAtDisplay = triggeredEnvelope
         ? (
             window.FieldRendererService?.renderDate
@@ -680,6 +679,17 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (triggeredDateObj && !Number.isNaN(triggeredDateObj.getTime())) {
+                        // Use FieldRendererService or dateUtils for formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(triggeredDateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(triggeredDateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(triggeredDateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
                         return triggeredDateObj.toLocaleString('he-IL', {
                           year: 'numeric',
                           month: '2-digit',
@@ -765,9 +775,12 @@ function renderAlertsTableRows(alerts) {
       const expiryEnvelope = window.dateUtils?.ensureDateEnvelope
         ? window.dateUtils.ensureDateEnvelope(expirySource)
         : expirySource;
+      // Use dateUtils for consistent date parsing
       const expiryDateObj = window.dateUtils?.toDateObject
         ? window.dateUtils.toDateObject(expiryEnvelope || null)
-        : (expiryEnvelope ? new Date(expiryEnvelope) : null);
+        : (expiryEnvelope && typeof expiryEnvelope === 'object' && typeof expiryEnvelope.epochMs === 'number'
+          ? new Date(expiryEnvelope.epochMs)
+          : (expiryEnvelope ? new Date(expiryEnvelope) : null));
       const expiryDisplay = expiryEnvelope
         ? (
             window.FieldRendererService?.renderDate
@@ -777,6 +790,17 @@ function renderAlertsTableRows(alerts) {
                 : (() => {
                     try {
                       if (expiryDateObj && !Number.isNaN(expiryDateObj.getTime())) {
+                        // Use FieldRendererService or dateUtils for formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(expiryDateObj, false);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(expiryDateObj);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(expiryDateObj, { includeTime: false });
+                        }
+                        // Last resort: use toLocaleDateString
                         return expiryDateObj.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
                       }
                     } catch (error) {
@@ -805,7 +829,7 @@ function renderAlertsTableRows(alerts) {
           <td class="ticker-cell">
             <div class="ticker-cell-content">
               <span class="ticker-symbol-link" 
-                    onclick="showEntityDetails('alert', ${alert.id}); return false;" 
+                    data-onclick="showEntityDetails('alert', ${alert.id}); return false;" 
                     title="פרטי התראה">
                 ${symbolDisplay}
               </span>
@@ -838,25 +862,95 @@ function renderAlertsTableRows(alerts) {
           <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
           <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
           ${(() => {
-            if (typeof window.renderUpdatedCell === 'function') {
-              return window.renderUpdatedCell(alert, {
-                fields: ['updated_at', 'triggered_at', 'created_at'],
-                columnClass: 'col-updated'
-              });
-            }
-            const fallbackDate = window.toDateObject
-              ? window.toDateObject(alert.updated_at || alert.triggered_at || alert.created_at)
-              : (alert.updated_at || alert.triggered_at || alert.created_at
-                  ? new Date(alert.updated_at || alert.triggered_at || alert.created_at)
-                  : null);
-            if (!(fallbackDate instanceof Date) || Number.isNaN(fallbackDate?.getTime?.())) {
+            // Prefer FieldRendererService.renderDate for consistent date formatting
+            const rawDate = alert.updated_at || alert.triggered_at || alert.created_at || null;
+            
+            if (!rawDate) {
               return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
             }
-            const absolute = fallbackDate.toLocaleString('he-IL');
-            const duration = typeof window.getDurationSince === 'function'
-              ? window.getDurationSince(fallbackDate, { fallback: absolute })
-              : absolute;
-            return `<td class="col-updated" data-epoch="${fallbackDate.getTime()}" title="${absolute}"><span class="updated-value" dir="ltr">${duration}</span></td>`;
+
+            // Use FieldRendererService.renderDate for proper date formatting
+            let dateDisplay = '';
+            let epoch = null;
+
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+              // Use FieldRendererService to render date with time
+              dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+              
+              // Get epoch for sorting
+              if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+              } else if (rawDate instanceof Date) {
+                epoch = rawDate.getTime();
+              } else if (typeof rawDate === 'string') {
+                const parsed = Date.parse(rawDate);
+                epoch = Number.isNaN(parsed) ? null : parsed;
+              } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                epoch = rawDate.epochMs;
+              }
+            } else {
+              // Fallback: work directly with date envelope objects or raw values
+              const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                ? window.dateUtils.ensureDateEnvelope(rawDate)
+                : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                  ? rawDate
+                  : null;
+
+              // Derive epoch milliseconds in a canonical way
+              epoch = (() => {
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                  return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                }
+                if (typeof window.getEpochMilliseconds === 'function') {
+                  return window.getEpochMilliseconds(envelope || rawDate);
+                }
+                if (envelope && typeof envelope.epochMs === 'number') {
+                  return envelope.epochMs;
+                }
+                if (rawDate instanceof Date) {
+                  return rawDate.getTime();
+                }
+                if (typeof rawDate === 'string') {
+                  const parsed = Date.parse(rawDate);
+                  return Number.isNaN(parsed) ? null : parsed;
+                }
+                return null;
+              })();
+
+              if (epoch === null || Number.isNaN(epoch)) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+              }
+
+              // Build date display using unified date utilities
+              dateDisplay = (() => {
+                if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                  return window.dateUtils.formatDateTime(envelope || rawDate);
+                }
+                if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                  return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                }
+                try {
+                  const dateObj = new Date(epoch);
+                  return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }));
+                } catch (err) {
+                  window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
+                  return 'לא מוגדר';
+                }
+              })();
+            }
+
+            if (!dateDisplay || dateDisplay === '-') {
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+
+            return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
           })()}
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             ${(() => {
@@ -876,10 +970,15 @@ function renderAlertsTableRows(alerts) {
 
     tbody.innerHTML = tableHTML;
 
-    // עדכון ספירת רשומות
-    const countElement = document.querySelector('.table-count');
-    if (countElement) {
-      countElement.textContent = `${alerts.length} התראות`;
+    // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+    if (window.updateTableCount) {
+      window.updateTableCount('.table-count', 'alerts', 'התראות', alerts.length);
+    } else {
+      // Fallback
+      const countElement = document.querySelector('.table-count');
+      if (countElement) {
+        countElement.textContent = `${alerts.length} התראות`;
+      }
     }
 
     // עדכון סטטיסטיקות דרך המערכת הגנרית
@@ -954,34 +1053,51 @@ async function updateAlertsTable(alerts, options = {}) {
 // Data loading, saving, and modal data management
 
 /**
- * Load modal data for alerts
- * Loads accounts, trades, trade plans, and tickers for modal dropdowns
+ * Load modal data for alerts page using entity services
+ * 
+ * טעינת נתוני מודל עבור עמוד התראות באמצעות שירותי ישויות
+ * 
+ * Loads accounts, trades, trade plans, and tickers data using global entity services
+ * instead of direct API calls. Falls back to direct API calls if services are unavailable.
  * 
  * @function loadModalData
  * @async
  * @returns {Promise<void>}
+ * @throws {Error} When data loading fails
+ * 
+ * @example
+ * await loadModalData();
  */
 async function loadModalData() {
   try {
 
     // טעינת נתונים במקביל
     // window.Logger.info('🔧 Loading modal data...', { page: "alerts" });
-    const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/trading-accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/trade-plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+    // Use entity services instead of direct fetch calls
+    const [accountsData, tradesData, tradePlansData, tickersData] = await Promise.all([
+      (window.getAccounts && typeof window.getAccounts === 'function') 
+        ? window.getAccounts().catch(() => [])
+        : Promise.resolve([]),
+      (window.TradesData && typeof window.TradesData.loadTradesData === 'function')
+        ? window.TradesData.loadTradesData().catch(() => [])
+        : Promise.resolve([]),
+      (window.tradePlanService && typeof window.tradePlanService.getTradePlans === 'function')
+        ? window.tradePlanService.getTradePlans().catch(() => [])
+        : (window.getTradePlans && typeof window.getTradePlans === 'function')
+          ? window.getTradePlans().catch(() => [])
+          : Promise.resolve([]),
+      (window.tickerService && typeof window.tickerService.getTickers === 'function')
+        ? window.tickerService.getTickers().catch(() => [])
+        : (window.getTickers && typeof window.getTickers === 'function')
+          ? window.getTickers().catch(() => [])
+          : Promise.resolve([]),
     ]);
 
     // וידוא שהנתונים הם מערכים
-    const accounts = Array.isArray(accountsResponse?.data) ? accountsResponse.data :
-      Array.isArray(accountsResponse) ? accountsResponse : [];
-    const trades = Array.isArray(tradesResponse?.data) ? tradesResponse.data :
-      Array.isArray(tradesResponse) ? tradesResponse : [];
-    const tradePlans = Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data :
-      Array.isArray(tradePlansResponse) ? tradePlansResponse : [];
-    const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data :
-      Array.isArray(tickersResponse) ? tickersResponse : [];
+    const accounts = Array.isArray(accountsData) ? accountsData : [];
+    const trades = Array.isArray(tradesData) ? tradesData : [];
+    const tradePlans = Array.isArray(tradePlansData) ? tradePlansData : [];
+    const tickers = Array.isArray(tickersData) ? tickersData : [];
 
     // window.Logger.info('🔧 Modal data loaded:', { page: "alerts" });
     // window.Logger.info('🔧 Accounts:', accounts.length, { page: "alerts" });
@@ -1177,7 +1293,7 @@ function populateSelect(selectId, data, field, prefix = '') {
             : (() => {
                 try {
                   if (dateObj && !Number.isNaN(dateObj.getTime())) {
-                    return dateObj.toLocaleDateString('he-IL');
+                    return window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ populateSelect trade date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
@@ -1210,7 +1326,7 @@ function populateSelect(selectId, data, field, prefix = '') {
             : (() => {
                 try {
                   if (dateObj && !Number.isNaN(dateObj.getTime())) {
-                    return dateObj.toLocaleDateString('he-IL');
+                    return window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
                   }
                 } catch (error) {
                   window.Logger?.warn('⚠️ populateSelect plan date fallback failed', { error, itemId: item?.id }, { page: 'alerts' });
@@ -1453,6 +1569,372 @@ function parseAlertCondition(condition) {
  * @async
  * @returns {Promise<void>}
  */
+/**
+ * Debug function for alert form - run in console: debugAlertForm()
+ * בדיקת כל השדות בטופס התראות - גרסה מפורטת
+ */
+window.debugAlertForm = function() {
+  console.group('🔍 [DEBUG] Alert Form Diagnostic - Advanced');
+  
+  // Find form
+  let form = document.getElementById('alertsModalForm');
+  if (!form) {
+    form = document.getElementById('addAlertForm');
+  }
+  
+  if (!form) {
+    console.error('❌ Form not found!');
+    console.groupEnd();
+    return;
+  }
+  
+  console.log('✅ Form found:', form.id);
+  console.log('📋 Form HTML:', form.outerHTML.substring(0, 500) + '...');
+  
+  // Check all alert fields with detailed info
+  const fieldsToCheck = [
+    'alertRelatedType',
+    'alertRelatedObject',
+    'alertType',
+    'alertCondition',
+    'alertValue',
+    'alertName',
+    'alertStatusCombined',
+    'alertStatus_hidden',
+    'alertIsTriggered_hidden',
+    'alertExpiryDate',
+    'alertTags'
+  ];
+  
+  const fieldValues = {};
+  fieldsToCheck.forEach(fieldId => {
+    console.group(`🔍 Checking field: ${fieldId}`);
+    
+    // Try multiple selectors
+    const selectors = [
+      `#${fieldId}`,
+      `[id="${fieldId}"]`,
+      `[name="${fieldId}"]`,
+      `input#${fieldId}`,
+      `select#${fieldId}`,
+      `textarea#${fieldId}`
+    ];
+    
+    let field = null;
+    let foundSelector = null;
+    
+    for (const selector of selectors) {
+      field = form.querySelector(selector);
+      if (field) {
+        foundSelector = selector;
+        break;
+      }
+    }
+    
+    // Also check in modal
+    if (!field) {
+      const modal = document.getElementById('alertsModal');
+      if (modal) {
+        for (const selector of selectors) {
+          field = modal.querySelector(selector);
+          if (field) {
+            foundSelector = selector + ' (in modal)';
+            break;
+          }
+        }
+      }
+    }
+    
+    if (field) {
+      const value = field.value || field.getAttribute('value') || '';
+      const selectedIndex = field.selectedIndex !== undefined ? field.selectedIndex : -1;
+      const selectedOption = field.options && selectedIndex >= 0 ? field.options[selectedIndex] : null;
+      
+      const fieldInfo = {
+        exists: true,
+        foundWith: foundSelector,
+        tagName: field.tagName,
+        type: field.type || 'N/A',
+        id: field.id,
+        name: field.name,
+        className: field.className,
+        value: value,
+        valueType: typeof value,
+        valueLength: value ? value.length : 0,
+        selectedIndex: selectedIndex,
+        selectedOption: selectedOption ? {
+          value: selectedOption.value,
+          text: selectedOption.text,
+          selected: selectedOption.selected
+        } : null,
+        options: field.options ? Array.from(field.options).map((opt, idx) => ({
+          index: idx,
+          value: opt.value,
+          text: opt.text,
+          selected: opt.selected,
+          defaultSelected: opt.defaultSelected
+        })) : null,
+        attributes: Array.from(field.attributes).reduce((acc, attr) => {
+          acc[attr.name] = attr.value;
+          return acc;
+        }, {}),
+        innerHTML: field.innerHTML ? field.innerHTML.substring(0, 200) : null
+      };
+      
+      fieldValues[fieldId] = fieldInfo;
+      console.log('✅ Field found:', fieldInfo);
+    } else {
+      fieldValues[fieldId] = { exists: false, triedSelectors: selectors };
+      console.error('❌ Field not found with any selector:', selectors);
+    }
+    
+    console.groupEnd();
+  });
+  
+  console.group('📋 Summary - All Field Values');
+  console.table(fieldValues);
+  console.groupEnd();
+  
+  // Check ModalManagerV2 form structure
+  const modal = document.getElementById('alertsModal');
+  if (modal) {
+    console.group('🔍 Modal Structure');
+    console.log('✅ Modal found:', modal.id);
+    const modalForm = modal.querySelector('form');
+    if (modalForm) {
+      console.log('✅ Form in modal found:', modalForm.id);
+      console.log('📋 Form action:', modalForm.action);
+      console.log('📋 Form method:', modalForm.method);
+      console.log('📋 Form elements count:', modalForm.elements.length);
+      console.log('📋 Form elements:', Array.from(modalForm.elements).map(el => ({
+        tagName: el.tagName,
+        id: el.id,
+        name: el.name,
+        type: el.type || 'N/A',
+        value: el.value || ''
+      })));
+    } else {
+      console.warn('⚠️ No form found in modal');
+    }
+    console.groupEnd();
+  } else {
+    console.warn('⚠️ Modal not found');
+  }
+  
+  // Test field collection exactly as saveAlert does
+  console.group('🧪 Test Collection (as in saveAlert)');
+  const testCollection = {
+    relatedType: form.querySelector('#alertRelatedType')?.value || '',
+    relatedId: form.querySelector('#alertRelatedObject')?.value || '',
+    conditionAttribute: form.querySelector('#alertType')?.value || '',
+    conditionOperator: form.querySelector('#alertCondition')?.value || '',
+    conditionNumber: form.querySelector('#alertValue')?.value || ''
+  };
+  
+  // Also test with multiple methods
+  const alertTypeField = form.querySelector('#alertType');
+  const alertConditionField = form.querySelector('#alertCondition');
+  const alertValueField = form.querySelector('#alertValue');
+  
+  const detailedCollection = {
+    alertType: {
+      field: alertTypeField ? 'found' : 'not found',
+      value: alertTypeField?.value || '',
+      selectedIndex: alertTypeField?.selectedIndex || -1,
+      selectedOption: alertTypeField?.options?.[alertTypeField?.selectedIndex]?.value || '',
+      allOptions: alertTypeField ? Array.from(alertTypeField.options).map(opt => ({
+        value: opt.value,
+        text: opt.text,
+        selected: opt.selected
+      })) : []
+    },
+    alertCondition: {
+      field: alertConditionField ? 'found' : 'not found',
+      value: alertConditionField?.value || '',
+      selectedIndex: alertConditionField?.selectedIndex || -1,
+      selectedOption: alertConditionField?.options?.[alertConditionField?.selectedIndex]?.value || '',
+      allOptions: alertConditionField ? Array.from(alertConditionField.options).map(opt => ({
+        value: opt.value,
+        text: opt.text,
+        selected: opt.selected
+      })) : []
+    },
+    alertValue: {
+      field: alertValueField ? 'found' : 'not found',
+      value: alertValueField?.value || '',
+      type: alertValueField?.type || 'N/A'
+    }
+  };
+  
+  console.log('📋 Simple Collection:', testCollection);
+  console.log('📋 Detailed Collection:', detailedCollection);
+  console.groupEnd();
+  
+  // Check what would be sent
+  console.group('📤 What would be sent to backend');
+  const finalPayload = {
+    related_type_id: parseInt(testCollection.relatedType) || null,
+    related_id: parseInt(testCollection.relatedId) || null,
+    condition_attribute: testCollection.conditionAttribute || 'price',
+    condition_operator: testCollection.conditionOperator || 'more_than',
+    condition_number: testCollection.conditionNumber || '',
+  };
+  console.log('📋 Final Payload:', finalPayload);
+  console.log('📋 Payload JSON:', JSON.stringify(finalPayload, null, 2));
+  console.groupEnd();
+  
+  console.groupEnd();
+  return {
+    fieldValues,
+    testCollection,
+    detailedCollection,
+    finalPayload
+  };
+};
+
+/**
+ * Debug function to test what would be sent to backend
+ * בדיקת מה נשלח בפועל ל-backend
+ */
+window.testAlertPayload = async function() {
+  console.group('🧪 [TEST] Alert Payload Test');
+  
+  // Find form
+  let form = document.getElementById('alertsModalForm');
+  if (!form) {
+    form = document.getElementById('addAlertForm');
+  }
+  
+  if (!form) {
+    console.error('❌ Form not found!');
+    console.groupEnd();
+    return;
+  }
+  
+  // Collect data exactly as saveAlert does
+  const relatedType = form.querySelector('#alertRelatedType')?.value || '';
+  const relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  
+  const alertTypeField = form.querySelector('#alertType');
+  const alertConditionField = form.querySelector('#alertCondition');
+  const alertValueField = form.querySelector('#alertValue');
+  
+  let alertTypeValue = '';
+  if (alertTypeField) {
+    alertTypeValue = alertTypeField.value || 
+                    alertTypeField.getAttribute('value') || 
+                    (alertTypeField.selectedIndex >= 0 ? alertTypeField.options[alertTypeField.selectedIndex]?.value : '') ||
+                    '';
+  }
+  
+  let alertConditionValue = '';
+  if (alertConditionField) {
+    alertConditionValue = alertConditionField.value || 
+                         alertConditionField.getAttribute('value') || 
+                         (alertConditionField.selectedIndex >= 0 ? alertConditionField.options[alertConditionField.selectedIndex]?.value : '') ||
+                         '';
+  }
+  
+  const conditionAttribute = alertTypeValue || 'price';
+  const conditionOperator = alertConditionValue || 'more_than';
+  const conditionNumber = alertValueField?.value || '';
+  
+  // Get message
+  let message = '';
+  if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
+    message = window.RichTextEditorService.getContent('alertName') || '';
+  } else {
+    message = form.querySelector('#alertName')?.value || '';
+  }
+  
+  // Get status
+  const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+  const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+  const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+  
+  const status = statusHidden;
+  const isTriggered = isTriggeredHidden;
+  
+  // Get expiry_date
+  const expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+  
+  // Build payload exactly as saveAlert does
+  const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
+  const finalConditionOperator = (conditionOperator && conditionOperator.trim() !== '') ? conditionOperator : 'more_than';
+  
+  let conditionNumberStr = '';
+  if (conditionNumber) {
+    const numericValue = parseFloat(conditionNumber);
+    if (!isNaN(numericValue)) {
+      conditionNumberStr = String(numericValue);
+    }
+  }
+  
+  const alertPayload = {
+    related_type_id: parseInt(relatedType) || null,
+    related_id: parseInt(relatedId) || null,
+    condition_attribute: finalConditionAttribute,
+    condition_operator: finalConditionOperator,
+    condition_number: conditionNumberStr,
+    message: message || null,
+    status: status || 'open',
+    is_triggered: isTriggered || 'false',
+  };
+  
+  if (expiryDate) {
+    alertPayload.expiry_date = expiryDate;
+  }
+  
+  console.log('📋 Collected Values:', {
+    relatedType,
+    relatedId,
+    conditionAttribute,
+    conditionOperator,
+    conditionNumber,
+    message: message.substring(0, 50) + '...',
+    status,
+    isTriggered,
+    expiryDate
+  });
+  
+  console.log('📋 Final Payload:', alertPayload);
+  console.log('📋 Payload JSON:', JSON.stringify(alertPayload, null, 2));
+  
+  // Test sending to backend
+  console.log('📤 Testing payload to backend...');
+  try {
+    const response = await fetch('/api/alerts/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(alertPayload),
+    });
+    
+    console.log('📥 Response status:', response.status);
+    console.log('📥 Response ok:', response.ok);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        console.error('❌ Error data:', errorData);
+      } catch (e) {
+        console.error('❌ Could not parse error as JSON');
+      }
+    } else {
+      const result = await response.json();
+      console.log('✅ Success response:', result);
+    }
+  } catch (error) {
+    console.error('❌ Network error:', error);
+  }
+  
+  console.groupEnd();
+  return alertPayload;
+};
+
 async function saveAlert() {
   window.Logger.info('🔧 saveAlert function called', { page: "alerts" });
   
@@ -1490,9 +1972,71 @@ async function saveAlert() {
     // New form structure (ModalManagerV2)
     relatedType = form.querySelector('#alertRelatedType')?.value || '';
     relatedId = form.querySelector('#alertRelatedObject')?.value || '';
-    conditionAttribute = form.querySelector('#alertType')?.value || '';
-    conditionOperator = form.querySelector('#alertCondition')?.value || '';
-    conditionNumber = form.querySelector('#alertValue')?.value || '';
+    
+    // Get condition fields - ensure they are not null/undefined
+    const alertTypeField = form.querySelector('#alertType');
+    const alertConditionField = form.querySelector('#alertCondition');
+    const alertValueField = form.querySelector('#alertValue');
+    
+    // Try multiple ways to get the value
+    let alertTypeValue = '';
+    if (alertTypeField) {
+      alertTypeValue = alertTypeField.value || 
+                      alertTypeField.getAttribute('value') || 
+                      (alertTypeField.selectedIndex >= 0 ? alertTypeField.options[alertTypeField.selectedIndex]?.value : '') ||
+                      '';
+    }
+    
+    let alertConditionValue = '';
+    if (alertConditionField) {
+      alertConditionValue = alertConditionField.value || 
+                           alertConditionField.getAttribute('value') || 
+                           (alertConditionField.selectedIndex >= 0 ? alertConditionField.options[alertConditionField.selectedIndex]?.value : '') ||
+                           '';
+    }
+    
+    conditionAttribute = alertTypeValue || 'price';
+    conditionOperator = alertConditionValue || 'more_than';
+    conditionNumber = alertValueField?.value || '';
+    
+    // Debug logging with detailed info
+    console.log('🔍 [saveAlert] Field Collection Debug:', {
+      alertTypeField: {
+        exists: !!alertTypeField,
+        id: alertTypeField?.id,
+        value: alertTypeField?.value,
+        selectedIndex: alertTypeField?.selectedIndex,
+        selectedOption: alertTypeField?.options?.[alertTypeField?.selectedIndex]?.value,
+        allOptions: alertTypeField ? Array.from(alertTypeField.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})) : null,
+        finalValue: conditionAttribute
+      },
+      alertConditionField: {
+        exists: !!alertConditionField,
+        id: alertConditionField?.id,
+        value: alertConditionField?.value,
+        selectedIndex: alertConditionField?.selectedIndex,
+        selectedOption: alertConditionField?.options?.[alertConditionField?.selectedIndex]?.value,
+        allOptions: alertConditionField ? Array.from(alertConditionField.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})) : null,
+        finalValue: conditionOperator
+      },
+      alertValueField: {
+        exists: !!alertValueField,
+        id: alertValueField?.id,
+        value: alertValueField?.value,
+        type: alertValueField?.type,
+        finalValue: conditionNumber
+      }
+    });
+    
+    window.Logger?.info('🔍 Alert form fields:', {
+      alertTypeField: alertTypeField ? 'found' : 'not found',
+      alertTypeValue: conditionAttribute,
+      alertConditionField: alertConditionField ? 'found' : 'not found',
+      alertConditionValue: conditionOperator,
+      alertValueField: alertValueField ? 'found' : 'not found',
+      alertValueValue: conditionNumber,
+      page: 'alerts'
+    });
     if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
       message = window.RichTextEditorService.getContent('alertName') || '';
     } else {
@@ -1585,19 +2129,17 @@ async function saveAlert() {
     hasErrors = true;
   }
 
-  // בדיקת תנאי התראה
-  if (!conditionAttribute) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionAttribute', 'יש לבחור מאפיין לתנאי');
-    }
-    hasErrors = true;
+  // בדיקת תנאי התראה - עם ברירות מחדל
+  if (!conditionAttribute || conditionAttribute === '') {
+    // Use default value from config if not set
+    conditionAttribute = 'price';
+    window.Logger?.warn('⚠️ conditionAttribute was empty, using default: price', { page: 'alerts' });
   }
 
-  if (!conditionOperator) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning('conditionOperator', 'יש לבחור אופרטור לתנאי');
-    }
-    hasErrors = true;
+  if (!conditionOperator || conditionOperator === '') {
+    // Use default value from config if not set
+    conditionOperator = 'more_than';
+    window.Logger?.warn('⚠️ conditionOperator was empty, using default: more_than', { page: 'alerts' });
   }
 
   if (!conditionNumber) {
@@ -1653,12 +2195,43 @@ async function saveAlert() {
   
   const isEdit = !!alertId;
   
+  // Convert condition_number to string (backend expects string)
+  // Ensure it's a valid number string
+  let conditionNumberStr = '';
+  if (conditionNumber) {
+    const numericValue = parseFloat(conditionNumber);
+    if (!isNaN(numericValue)) {
+      conditionNumberStr = String(numericValue);
+    }
+  }
+  
+  // Validate that condition_number is not empty
+  if (!conditionNumberStr) {
+    if (window.showValidationWarning) {
+      window.showValidationWarning('alertValue', 'יש להזין ערך תקין לתנאי');
+    }
+    return;
+  }
+  
+  // Ensure condition fields are not null/undefined/empty
+  const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
+  const finalConditionOperator = (conditionOperator && conditionOperator.trim() !== '') ? conditionOperator : 'more_than';
+  
+  window.Logger?.info('🔍 Final alert payload values:', {
+    condition_attribute: finalConditionAttribute,
+    condition_operator: finalConditionOperator,
+    condition_number: conditionNumberStr,
+    original_conditionAttribute: conditionAttribute,
+    original_conditionOperator: conditionOperator,
+    page: 'alerts'
+  });
+  
   const alertPayload = {
     related_type_id: parseInt(relatedType) || null,
     related_id: parseInt(relatedId) || null,
-    condition_attribute: conditionAttribute,
-    condition_operator: conditionOperator,
-    condition_number: conditionNumber,
+    condition_attribute: finalConditionAttribute,
+    condition_operator: finalConditionOperator,
+    condition_number: conditionNumberStr,
     message: message || null,
     status: status || 'open',
     is_triggered: isTriggered || 'false',
@@ -1671,6 +2244,36 @@ async function saveAlert() {
 
   // שולח התראה חדשה או מעדכן קיימת
   try {
+    // Detailed logging before sending
+    console.group('🔧 [SAVE ALERT] Detailed Debug Info');
+    console.log('📋 Form ID:', form.id);
+    console.log('📋 Is Edit:', isEdit);
+    console.log('📋 Alert ID:', alertId);
+    console.log('📋 Raw Field Values:', {
+      relatedType,
+      relatedId,
+      conditionAttribute,
+      conditionOperator,
+      conditionNumber,
+      status,
+      isTriggered
+    });
+    console.log('📋 Final Payload:', alertPayload);
+    console.log('📋 Payload JSON:', JSON.stringify(alertPayload, null, 2));
+    
+    // Check if any required fields are missing
+    const missingFields = [];
+    if (!finalConditionAttribute || finalConditionAttribute === '') missingFields.push('condition_attribute');
+    if (!finalConditionOperator || finalConditionOperator === '') missingFields.push('condition_operator');
+    if (!conditionNumberStr || conditionNumberStr === '') missingFields.push('condition_number');
+    
+    if (missingFields.length > 0) {
+      console.error('❌ Missing required fields:', missingFields);
+      window.Logger?.error('Missing required fields', { missingFields, page: 'alerts' });
+    }
+    
+    console.groupEnd();
+    
     window.Logger.info('🔧 === SAVING ALERT ===', { page: "alerts" });
     window.Logger.info('🔧 Is Edit:', isEdit, { page: "alerts" });
     window.Logger.info('🔧 Alert ID:', alertId, { page: "alerts" });
@@ -1679,17 +2282,28 @@ async function saveAlert() {
     window.Logger.info('🔧 Request method:', isEdit ? 'PUT' : 'POST', { page: "alerts" });
     window.Logger.info('🔧 Request body:', JSON.stringify(alertPayload, null, 2), { page: "alerts" });
 
-    const url = isEdit ? `/api/alerts/${alertId}` : '/api/alerts/';
-    const method = isEdit ? 'PUT' : 'POST';
     const modalId = 'alertsModal'; // ModalManagerV2 uses alertsModal
     
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(alertPayload),
-    });
+    // שימוש בשירות הנתונים החדש
+    let response;
+    if (window.AlertsData) {
+      if (isEdit) {
+        response = await window.AlertsData.updateAlert(alertId, alertPayload);
+      } else {
+        response = await window.AlertsData.createAlert(alertPayload);
+      }
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      const url = isEdit ? `/api/alerts/${alertId}` : '/api/alerts/';
+      const method = isEdit ? 'PUT' : 'POST';
+      response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(alertPayload),
+      });
+    }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
     const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
@@ -2125,10 +2739,16 @@ async function confirmDeleteAlert(alertId) {
     if (window.performAlertDeletion) {
       await window.performAlertDeletion(alertId);
     } else {
-      // Fallback if performAlertDeletion not available
-      const response = await fetch(`/api/alerts/${alertId}`, {
-        method: 'DELETE',
-      });
+      // שימוש בשירות הנתונים החדש
+      let response;
+      if (window.AlertsData && window.AlertsData.deleteAlert) {
+        response = await window.AlertsData.deleteAlert(alertId);
+      } else {
+        // Fallback ל-direct fetch אם השירות לא זמין
+        response = await fetch(`/api/alerts/${alertId}`, {
+          method: 'DELETE',
+        });
+      }
 
       await CRUDResponseHandler.handleDeleteResponse(response, {
         successMessage: 'התראה נמחקה בהצלחה!',
@@ -2290,8 +2910,7 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   if (type === 'account') {
     // DEPRECATED - use trading_account instead!
     const error = new Error(`❌ DEPRECATED: 'account' entity type is no longer supported. Use 'trading_account' instead!`);
-    window.Logger.error('❌ DEPRECATED: account entity type used in alerts', { type }, { page: "alerts" });
-    console.error(error);
+    window.Logger.error('DEPRECATED: account entity type used in alerts', { page: "alerts", type });
     throw error;
   }
 
@@ -2310,10 +2929,15 @@ function filterAlertsByRelatedObjectTypeWrapper(type) {
   updateAlertsTable(filteredAlerts);
   
 
-  // עדכון ספירת רשומות
-  const countElement = document.querySelector('.table-count');
-  if (countElement) {
-    countElement.textContent = `${filteredAlerts.length} התראות`;
+  // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
+  if (window.updateTableCount) {
+    window.updateTableCount('.table-count', 'alerts', 'התראות', filteredAlerts.length);
+  } else {
+    // Fallback
+    const countElement = document.querySelector('.table-count');
+    if (countElement) {
+      countElement.textContent = `${filteredAlerts.length} התראות`;
+    }
   }
 
   // window.Logger.info(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`, { page: "alerts" });
@@ -2539,15 +3163,10 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.setAttribute('data-bs-keyboard', 'true');
     }
 
-    // הוספת event listener לסגירה בלחיצה על הרקע
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      }
-    });
+    // REMOVED: Event listener לסגירה בלחיצה על הרקע
+    // ModalManagerV2 מטפל ב-backdrop click אוטומטית דרך handleGlobalBackdropClick
+    // אם המודל הוא חלק מ-ModalManagerV2, אין צורך ב-event listener מקומי
+    // אם המודל הוא מודל מיוחד (לא חלק מ-ModalManagerV2), Bootstrap מטפל בזה אוטומטית עם data-bs-backdrop
   });
 });
 
@@ -2562,7 +3181,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Export functions to global scope for HTML onclick attributes
 
 // Export all necessary functions to global scope
-window.loadAlertsData = window.loadAlertsData;
+// Note: window.loadAlertsData is already defined as wrapper function above (line 215)
 window.updateAlertsTable = updateAlertsTable;
 // REMOVED: window.updatePageSummaryStats - use window.InfoSummarySystem.calculateAndRender from services/statistics-calculator.js directly
 // REMOVED: window.showAddAlertModal - use window.ModalManagerV2.showModal('alertsModal', 'add') directly
@@ -3044,8 +3663,16 @@ async function createAlertFromCondition() {
 
         showSuccessNotification('התראה נוצרה בהצלחה מתנאי קיים');
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
-        modal?.hide();
+        // סגירת מודל דרך ModalManagerV2
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          window.ModalManagerV2.hideModal('addAlertModal');
+        } else {
+          // Fallback ל-Bootstrap modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addAlertModal'));
+          if (modal) {
+            modal.hide();
+          }
+        }
 
         if (typeof loadAlertsData === 'function') {
             loadAlertsData();
@@ -3090,7 +3717,8 @@ function initializeAlertModalTabs() {
  * Update modal buttons based on active tab
  */
 function updateModalButtons(activeTab) {
-    const addAlertBtn = document.querySelector('button[onclick="addAlert()"]');
+    // Use data-onclick selector instead of onclick (legacy support)
+    const addAlertBtn = document.querySelector('button[data-onclick*="addAlert()"]') || document.querySelector('button[onclick="addAlert()"]');
     const createFromConditionBtn = document.getElementById('createFromConditionBtn');
     
     if (activeTab === '#add-manual-pane') {
@@ -3236,7 +3864,7 @@ function displayEvaluationResults(data) {
                     <div>סה"כ תנאים: <strong>${results.length}</strong></div>
                     <div>תנאים שהתקיימו: <strong class="text-success">${metCount}</strong></div>
                     <div>תנאים שלא התקיימו: <strong class="text-danger">${notMetCount}</strong></div>
-                    <div>זמן הערכה: <strong>${new Date().toLocaleTimeString('he-IL')}</strong></div>
+                    <div>זמן הערכה: <strong>${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</strong></div>
                 </div>
             </div>
         `;
@@ -3260,7 +3888,7 @@ function updateEvaluationSummary(data) {
     if (totalConditions) totalConditions.textContent = results.length;
     if (metConditions) metConditions.textContent = metCount;
     if (notMetConditions) notMetConditions.textContent = notMetCount;
-    if (evaluationTime) evaluationTime.textContent = new Date().toLocaleTimeString('he-IL');
+    if (evaluationTime) evaluationTime.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
 }
 
 // ===== MODAL FUNCTIONS - NEW SYSTEM =====
@@ -3484,7 +4112,10 @@ async function restorePageState(pageName) {
     if (pageState.sort && window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       const { columnIndex, direction } = pageState.sort;
       if (typeof columnIndex === 'number' && columnIndex >= 0) {
-        await window.UnifiedTableSystem.sorter.sort('alerts', columnIndex);
+        await window.UnifiedTableSystem.sorter.sort('alerts', columnIndex, {
+          direction: direction || 'asc',
+          saveState: false // Don't save again, already restored
+        });
       }
     } else if (window.UnifiedTableSystem && window.UnifiedTableSystem.sorter) {
       // אם אין מצב שמור, נסה להחיל סידור ברירת מחדל
@@ -3536,7 +4167,9 @@ window.registerAlertsTables = function() {
         tableSelector: '#alertsTable',
         columns: getColumns('alerts'),
         sortable: true,
-        filterable: true
+        filterable: true,
+        // Default sort: created_at desc (column index 6)
+        defaultSort: { columnIndex: 6, direction: 'desc', key: 'created_at' }
     });
 };
 window.clearAlertTickerInfo = clearAlertTickerInfo;

@@ -233,6 +233,20 @@ const PACKAGE_MANIFEST = {
         description: 'מערכת צבעים דינמית',
         required: true,
         loadOrder: 19
+      },
+      {
+        file: 'debug-modal-z-index.js',
+        globalCheck: 'window.debugModalZIndex',
+        description: 'כלי דיבאג לבדיקת שכבות z-index של מודלים',
+        required: false,
+        loadOrder: 20
+      },
+      {
+        file: 'modules/core-systems.js',
+        globalCheck: 'window.UnifiedAppInitializer',
+        description: 'מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד)',
+        required: true,
+        loadOrder: 21
       }
     ],
     estimatedSize: '~280KB',
@@ -285,11 +299,39 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
+        file: 'services/preferences-data.js',
+        globalCheck: 'window.PreferencesData',
+        description: 'שירות נתוני העדפות (API + Cache)',
+        required: true,
+        loadOrder: 5.1
+      },
+      {
+        file: 'services/executions-data.js',
+        globalCheck: 'window.loadExecutionsData',
+        description: 'שירות נתונים לביצועים',
+        required: false,
+        loadOrder: 5.2
+      },
+      {
         file: 'services/crud-response-handler.js',
         globalCheck: 'window.CrudResponseHandler',
         description: 'מטפל בתגובות CRUD',
         required: true,
         loadOrder: 6
+      },
+      {
+        file: 'services/unified-crud-service.js',
+        globalCheck: 'window.UnifiedCRUDService',
+        description: 'שירות CRUD מאוחד לכל הישויות',
+        required: true,
+        loadOrder: 6.5
+      },
+      {
+        file: 'services/research-data.js',
+        globalCheck: 'window.ResearchData',
+        description: 'שירות נתוני תחקיר',
+        required: false,
+        loadOrder: 6.6
       },
       {
         file: 'services/investment-calculation-service.js',
@@ -327,7 +369,7 @@ const PACKAGE_MANIFEST = {
         loadOrder: 11
       },
       {
-        file: 'https://cdn.quilljs.com/1.3.7/quill.min.js',
+        file: 'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js',
         globalCheck: 'window.Quill',
         description: 'Quill.js - Rich Text Editor Library',
         required: true,
@@ -443,13 +485,6 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
-        file: 'modules/core-systems.js',
-        globalCheck: 'window.CoreSystems',
-        description: 'מערכות ליבה',
-        required: true,
-        loadOrder: 5
-      },
-      {
         file: 'modules/data-basic.js',
         globalCheck: 'window.DataBasic',
         description: 'נתונים בסיסיים',
@@ -509,7 +544,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'import-user-data.js',
         globalCheck: 'window.openImportUserDataModal',
-        description: 'מודל ייבוא נתוני עסקאות',
+        description: 'מודל ייבוא נתוני ביצועים',
         required: true,
         loadOrder: 14
       },
@@ -537,7 +572,7 @@ const PACKAGE_MANIFEST = {
       {
         file: 'modal-configs/executions-config.js',
         globalCheck: 'window.executionsModalConfig',
-        description: 'קונפיגורציית מודל ביצועים',
+        description: 'קונפיגורציית מודל ביצועים (ספציפי לעמוד executions)',
         required: false,
         loadOrder: 18
       },
@@ -566,7 +601,7 @@ const PACKAGE_MANIFEST = {
         file: 'modal-configs/notes-config.js',
         globalCheck: 'window.notesModalConfig',
         description: 'קונפיגורציית מודל הערות',
-        required: false,
+        required: false, // Not required for tag-management page
         loadOrder: 22
       },
       {
@@ -654,8 +689,15 @@ const PACKAGE_MANIFEST = {
     version: '2.0.0',
     critical: false,
     loadOrder: 5,
-    dependencies: ['base'],
+    dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
     scripts: [
+      {
+        file: 'services/preferences-v4.js',
+        globalCheck: 'window.PreferencesV4',
+        description: 'Preferences V4 SDK (group-first)',
+        required: true,
+        loadOrder: 0.5  // Must load before preferences-core-new.js
+      },
       {
         file: 'preferences-core-new.js',
         globalCheck: 'window.PreferencesCore',
@@ -692,6 +734,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 5
       },
       {
+        file: 'preferences-ui-v4.js',
+        globalCheck: 'window.PreferencesUIV4',
+        description: 'ממשק משתמש V4 (Group-First)',
+        required: true,
+        loadOrder: 5.5  // Must load before preferences-ui.js and preferences-group-manager.js
+      },
+      {
         file: 'preferences-ui.js',
         globalCheck: 'window.PreferencesUI',
         description: 'ממשק משתמש',
@@ -704,6 +753,13 @@ const PACKAGE_MANIFEST = {
         description: 'פונקציות ספציפיות לעמוד העדפות',
         required: false,
         loadOrder: 7
+      },
+      {
+        file: 'preferences-debug-monitor.js',
+        globalCheck: 'window.PreferencesDebugMonitor',
+        description: 'קוד ניטור ובדיקה לבעיות העדפות',
+        required: false,
+        loadOrder: 7.1
       },
       {
         file: 'preferences-group-manager.js',
@@ -983,6 +1039,13 @@ const PACKAGE_MANIFEST = {
     dependencies: ['base', 'services'],
     scripts: [
       {
+        file: 'services/trades-data.js',
+        globalCheck: 'window.TradesData',
+        description: 'שירות נתוני טריידים (CRUD + Cache)',
+        required: false,  // Required only for trades page, not all pages
+        loadOrder: 0
+      },
+      {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
         description: 'שירות חשבונות',
@@ -1014,15 +1077,29 @@ const PACKAGE_MANIFEST = {
         file: 'services/trade-plans-data.js',
         globalCheck: 'window.TradePlansData',
         description: 'שירות נתוני תוכניות מסחר',
-        required: true,
+        required: false,
         loadOrder: 6
       },
       {
         file: 'services/notes-data.js',
         globalCheck: 'window.NotesData',
         description: 'שירות נתוני הערות',
-        required: true,
+        required: false,
         loadOrder: 6.5
+      },
+      {
+        file: 'services/alerts-data.js',
+        globalCheck: 'window.AlertsData',
+        description: 'שירות נתוני התראות',
+        required: false,
+        loadOrder: 6.6
+      },
+      {
+        file: 'services/tickers-data.js',
+        globalCheck: 'window.TickersData',
+        description: 'שירות נתוני טיקרים',
+        required: false,
+        loadOrder: 6.7
       },
       {
         file: 'condition-translator.js',
@@ -1423,12 +1500,34 @@ const PACKAGE_MANIFEST = {
         loadOrder: 4
       },
       {
-        file: 'unified-app-initializer.js',
-        globalCheck: 'window.UnifiedAppInitializer',
-        description: 'מאתחל אפליקציה מאוחד',
-        required: true,
+        file: 'init-system/all-pages-monitoring-test.js',
+        globalCheck: 'window.allPagesMonitoringTest',
+        description: 'בדיקה אוטומטית של כל העמודים',
+        required: false,
         loadOrder: 5
       },
+      {
+        file: 'init-system/pages-standardization-plan.js',
+        globalCheck: 'window.pagesStandardizationPlan',
+        description: 'תוכנית סטנדרטיזציה לכל העמודים',
+        required: false,
+        loadOrder: 6
+      },
+      {
+        file: 'init-system/dependency-analyzer.js',
+        globalCheck: 'window.dependencyAnalyzer',
+        description: 'ניתוח תלויות במניפסט החבילות',
+        required: false,
+        loadOrder: 7
+      },
+      {
+        file: 'init-system/load-order-validator.js',
+        globalCheck: 'window.loadOrderValidator',
+        description: 'בדיקת סדר טעינה בפועל בעמודים',
+        required: false,
+        loadOrder: 8
+      },
+      // unified-app-initializer.js removed - initialization now handled by core-systems.js
     ],
     estimatedSize: '~45KB',
     initTime: '~30ms'

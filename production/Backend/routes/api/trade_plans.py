@@ -4,6 +4,7 @@ from config.database import get_db
 from services.trade_plan_service import TradePlanService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.preferences_service import PreferencesService
+from services.tag_service import TagService
 import logging
 
 # Import base classes
@@ -13,7 +14,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans')
+trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade-plans')
 
 # Initialize base API
 base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
@@ -204,6 +205,7 @@ def confirm_status_change(plan_id: int):
         db.close()
 
 @trade_plans_bp.route('/<int:plan_id>/cancel', methods=['POST'])
+@invalidate_cache(['trade_plans'])
 def cancel_trade_plan(plan_id: int):
     """Cancel trade plan"""
     db = None
@@ -327,6 +329,16 @@ def delete_trade_plan(plan_id: int):
     """Delete trade plan"""
     try:
         db: Session = g.db
+
+        try:
+            TagService.remove_all_tags_for_entity(db, 'trade_plan', plan_id)
+        except ValueError as tag_error:
+            logger.warning(
+                "Failed to remove tags for trade_plan %s before deletion: %s",
+                plan_id,
+                tag_error,
+            )
+
         success = TradePlanService.delete(db, plan_id)
         if success:
             normalizer = _get_date_normalizer()

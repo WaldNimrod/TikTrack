@@ -28,6 +28,9 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="styles-new/07-pages/_data-import.css?v=1.0.0">
+    
     <!-- ===== CRITICAL: showModalSafe Helper - Must be loaded before any data-onclick attributes ===== -->
     <script>
         window.showModalSafe = async function(modalId, mode = 'add') {
@@ -160,20 +163,21 @@
                                         <th class="col-updated">
                                             <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="עודכן לאחרונה" data-classes="btn-link sortable-header" data-onclick="window.sortTable('import_history', 9)" ></button>
                                         </th>
+                                        <th class="col-actions text-center">פעולות</th>
                                     </tr>
                                 </thead>
                                 <tbody id="importHistoryTableBody">
                                     <tr>
-                                        <td colspan="10" class="loading">טוען נתוני ייבוא...</td>
+                                        <td colspan="11" class="loading">טוען נתוני ייבוא...</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div id="importHistoryEmptyState" class="empty-state" style="display: none;">
+                        <div id="importHistoryEmptyState" class="empty-state d-none">
                             <i class="bi bi-inbox"></i>
                             <p>עדיין לא בוצעו תהליכי ייבוא. לחץ על "📥 הפעלת מודול ייבוא" כדי להתחיל תהליך חדש.</p>
                         </div>
-                        <div id="importHistoryErrorState" class="error-state" style="display: none;">
+                        <div id="importHistoryErrorState" class="error-state d-none">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <p id="importHistoryErrorMessage">שגיאה בטעינת תהליכי הייבוא. נסה לרענן את הנתונים.</p>
                         </div>
@@ -221,51 +225,46 @@
                                 <div class="step-label">תצוגה מקדימה + אישור</div>
                             </div>
                         </div>
-                        <div class="analysis-loading-indicator align-items-center gap-2 flex-wrap" id="analysisLoadingIndicator" style="display:none;">
-                            <div class="spinner-border text-primary" role="status" aria-hidden="true" style="width:1.8rem;height:1.8rem;"></div>
+                        <div class="analysis-loading-indicator align-items-center gap-2 flex-wrap d-none" id="analysisLoadingIndicator">
+                            <div class="spinner-border text-primary analysis-spinner" role="status" aria-hidden="true"></div>
                             <div class="flex-grow-1 d-flex flex-column gap-1">
-                                <span class="analysis-loading-text" style="font-weight:600;">טוען ומעבד נתונים...</span>
-                                <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height:6px;">
-                                    <div class="progress-bar" id="analysisProgressBar" style="width:0%"></div>
+                                <span class="analysis-loading-text">טוען ומעבד נתונים...</span>
+                                <div class="progress analysis-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                    <div class="progress-bar" id="analysisProgressBar"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="steps-header-actions d-flex align-items-center gap-2 flex-wrap" id="stepsHeaderPrimaryActions">
-                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="uploadStepActions" style="display:none;">
-                                <button data-button-type="TERTIARY"
-                                        data-text="המשך סשן פעיל"
-                                        data-onclick="resumeActiveImportSession()"
-                                        id="resumeImportSessionBtn"
-                                        style="display:none;"></button>
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="uploadStepActions">
                                 <button data-button-type="PRIMARY"
                                         data-text="המשך לניתוח"
                                         data-onclick="analyzeFile()"
                                         id="analyzeBtn"
                                         disabled></button>
                             </div>
-                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="analysisStepActions" style="display:none;">
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="analysisStepActions">
                                 <button data-button-type="PRIMARY"
                                         data-text="המשך לתצוגה מקדימה"
                                         data-onclick="proceedToPreviewFromProblems()"
                                         id="analysisContinueBtn"
                                         disabled></button>
                             </div>
-                            <div class="step-header-group align-items-center gap-2 flex-wrap" id="previewStepActions" style="display:none;">
-                                <button data-button-type="PRIMARY"
-                                        data-text="ביצוע ייבוא"
-                                        data-onclick="confirmImport()"
-                                        id="confirmImportHeaderBtn"></button>
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="previewStepActions">
                                 <button data-button-type="PRIMARY"
                                         data-text="ביצוע ייבוא + דוח"
                                         data-onclick="confirmImport(true)"
                                         id="confirmImportAndReportHeaderBtn"></button>
+                                <button data-button-type="PRIMARY"
+                                        data-text="ביצוע ייבוא"
+                                        data-onclick="confirmImport()"
+                                        id="confirmImportHeaderBtn"></button>
                             </div>
                         </div>
                     </div>
 
                     <div class="import-step" id="step-upload" data-step="1">
                         <div class="step-content">
-                            <div class="row g-3 align-items-center" id="activeSessionControlsRow" style="display:none;">
+                            <div class="row g-3 align-items-center d-none" id="activeSessionControlsRow">
                                 <div class="col-12 col-lg-6 d-flex align-items-center justify-content-lg-start justify-content-center">
                                     <div class="summary-card info-card d-flex align-items-center flex-wrap active-session-warning-card w-100">
                                         <div class="summary-title flex-grow-1">קיים סשן פתוח, ניתן להמשיך או לנקות</div>
@@ -274,7 +273,7 @@
                                                 data-onclick="confirmResetImportSession()"
                                                 data-entity-type="cash_flow"
                                                 id="resetImportSessionBtn"
-                                                style="display:none;"></button>
+                                                class="d-none"></button>
                                     </div>
                                 </div>
                                 <div class="col-12 col-lg-6">
@@ -282,9 +281,9 @@
                                 </div>
                             </div>
 
-                            <div class="row g-3" id="activeSessionDetailsRow" style="display:none;">
+                            <div class="row g-3 d-none" id="activeSessionDetailsRow">
                                 <div class="col-12">
-                                    <div class="summary-card active-session-card active-session-warning-card" id="activeSessionIndicator" style="display:none;">
+                                    <div class="summary-card active-session-card active-session-warning-card d-none" id="activeSessionIndicator">
                                         <h4>
                                             <i class="bi bi-activity"></i>
                                             סשן ייבוא פעיל
@@ -346,7 +345,7 @@
                             </div>
 
                             <div class="row g-3 align-items-start">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-lg-4">
                                     <div class="connector-section">
                                         <label for="connectorSelect">בחר ספק נתונים:</label>
                                         <select id="connectorSelect" class="form-select">
@@ -357,23 +356,26 @@
                                         <small class="form-text text-muted">בחר את הספק שממנו יובאו הנתונים</small>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-4">
-                                    <div class="account-section">
-                                        <label for="tradingAccountSelect">בחר חשבון מסחר:</label>
-                                        <select id="tradingAccountSelect" class="form-select">
-                                            <option value="">בחר חשבון מסחר...</option>
-                                        </select>
-                                        <small class="form-text text-muted">החשבון שאליו ישויכו כל הרשומות בקובץ</small>                                        
-                                        <small id="accountLockMessage" class="form-text text-warning" style="display:none;"></small>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-lg-4">
                                     <div class="data-type-section">
                                         <label for="importDataTypeSelect">בחר תהליך ייבוא:</label>
                                         <select id="importDataTypeSelect" class="form-select">
                                             <option value="executions">ביצועי מסחר (Executions)</option>
                                         </select>
                                         <small class="form-text text-muted">בחר את סוג הנתונים לניתוח הנוכחי</small>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-4">
+                                    <div class="data-type-section">
+                                        <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
+                                            <div class="summary-header">
+                                                <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
+                                                <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
+                                            </div>
+                                            <div class="summary-body" id="dataTypeInfoContent">
+                                                <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -386,23 +388,54 @@
                                             <p>גרור קובץ CSV או לחץ לבחירה</p>
                                             <input type="file" id="fileInput" accept=".csv" hidden>
                                         </div>
-                                        <div class="file-info" id="fileInfo" style="display:none;">
+                                        <div class="file-info d-none" id="fileInfo">
                                             <div class="file-details">
                                                 <span class="file-name" id="fileName"></span>
                                                 <span class="file-size" id="fileSize"></span>
                                             </div>
                                         <button data-button-type="WARNING" data-text="החלף קובץ" data-onclick="resetFile()"></button>
                                         </div>
+                                        <div class="file-precheck-status mt-3" id="filePrecheckStatusContainer">
+                                            <span class="badge bg-secondary" id="filePrecheckStatusBadge" data-status="idle">ממתין לקובץ</span>
+                                            <small class="form-text text-muted d-block mt-1" id="filePrecheckStatusText">בחר קובץ לבדיקה ראשונית.</small>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-lg-6">
-                                    <div class="summary-card data-type-info-card" id="dataTypeInfoCard">
-                                        <div class="summary-header">
-                                            <div class="summary-title" id="dataTypeInfoTitle">בחר תהליך לקבלת מידע</div>
-                                            <div class="summary-subtitle" id="dataTypeInfoSubtitle"></div>
+                                    <div class="account-section d-none" id="accountDetectionCard">
+                                        <label>זיהוי חשבון מסחר:</label>
+                                        <div class="account-detection-card" id="accountDetectionSummary">
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                <div>
+                                                    <div class="detection-label">מספר בקובץ</div>
+                                                    <div class="detection-value" id="detectedFileAccountValue">ממתין לקובץ</div>
+                                                </div>
+                                                <span class="badge bg-secondary" id="accountDetectionStatusBadge" data-status="unknown">
+                                                    ממתין לקובץ
+                                                </span>
+                                            </div>
+                                            <div class="detection-details mt-3">
+                                                <div class="detail-item">
+                                                    <span class="detail-label">חשבון מזוהה במערכת:</span>
+                                                    <span class="detail-value" id="detectedSystemAccountValue">טרם זוהה</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <span class="detail-label">סטטוס שיוך:</span>
+                                                    <span class="detail-value" id="detectedLinkingStatusValue">ממתין לשיוך</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="summary-body" id="dataTypeInfoContent">
-                                            <p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>
+                                        <div class="d-flex gap-2 mt-2 flex-wrap">
+                                            <small class="form-text text-muted flex-grow-1">
+                                                המערכת מזהה אוטומטית את חשבון המסחר מתוך הדוח.
+                                                ניתן לעדכן שיוך דרך הכפתור הבא.
+                                            </small>
+                                            <button
+                                                data-button-type="SECONDARY"
+                                                data-onclick="openAccountLinkingModalManually()"
+                                                data-text="ניהול שיוך חשבון"
+                                                id="openAccountLinkingBtn">
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -410,7 +443,7 @@
                         </div>
                     </div>
 
-                    <div class="import-step" id="step-analysis" data-step="2" style="display:none;">
+                    <div class="import-step d-none" id="step-analysis" data-step="2">
                         <div class="step-content">
                             <h3>תוצאות ניתוח</h3>
                             <div class="analysis-cards">
@@ -465,25 +498,30 @@
                                 </div>
                             </div>
 
-                            <div id="cashflowTypeSummarySection" style="display:none; margin-top:1.5rem;">
+                            <div id="cashflowTypeSummarySection" class="d-none mt-4">
                                 <h4>חלוקת רשומות לפי סוג</h4>
                                 <div class="analysis-cards" id="cashflowTypeSummaryCards"></div>
                             </div>
 
-                            <div id="cashflowCurrencySummarySection" style="display:none; margin-top:1.5rem;">
+                            <div id="cashflowCurrencySummarySection" class="d-none mt-4">
                                 <h4>סיכום לפי מטבע</h4>
                                 <div class="analysis-cards" id="cashflowCurrencySummaryCards"></div>
                             </div>
 
-                            <div id="cashflowIssuesSummarySection" style="display:none; margin-top:1.5rem;">
+                            <div id="cashflowSummaryComparisonSection" class="d-none mt-4">
+                                <h4>השוואת סיכומים מול Cash Report</h4>
+                                <div id="cashflowSummaryComparisonTable"></div>
+                            </div>
+
+                            <div id="cashflowIssuesSummarySection" class="d-none mt-4">
                                 <h4>התראות קריטיות</h4>
                                 <div class="problem-card-container problem-cards-container" id="cashflowIssuesSummaryList"></div>
                             </div>
 
-                            <div class="problem-resolution-section" id="problemResolutionSection" style="display:none;">
+                            <div class="problem-resolution-section d-none" id="problemResolutionSection">
                                 <h3>פתרון בעיות</h3>
 
-                                <div class="problem-section" id="missingTickersSection" style="display:none;">
+                                <div class="problem-section d-none" id="missingTickersSection">
                                     <h4><i class="bi bi-exclamation-circle"></i> סמלים חסרים</h4>
                                     <p>הסמלים הבאים לא קיימים במערכת. ניתן להוסיף אותם או לדלג על הרשומות:</p>
                                     <div class="table-responsive">
@@ -506,7 +544,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="cashflowMissingAccountsSection" style="display:none;">
+                                <div class="problem-section d-none" id="cashflowMissingAccountsSection">
                                     <h4><i class="bi bi-people"></i> חשבונות חסרים</h4>
                                     <p>החשבונות הבאים לא קיימים במערכת. יש לשייך אותם לפני המשך הייבוא:</p>
                                     <div class="table-responsive">
@@ -528,7 +566,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="cashflowCurrencyIssuesSection" style="display:none;">
+                                <div class="problem-section d-none" id="cashflowCurrencyIssuesSection">
                                     <h4><i class="bi bi-currency-exchange"></i> בעיות מטבע</h4>
                                     <p>נמצאו רשומות עם קודי מטבע לא מזוהים או שגויים:</p>
                                     <div class="table-responsive">
@@ -550,7 +588,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountMissingAccountsSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountMissingAccountsSection">
                                     <h4><i class="bi bi-person-x"></i> חשבונות חסרים</h4>
                                     <p>חשבונות אלו לא קיימים במערכת או אינם משויכים. יש לטפל בהם לפני המשך התהליך:</p>
                                     <div class="table-responsive">
@@ -571,7 +609,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountCurrencyMismatchesSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountCurrencyMismatchesSection">
                                     <h4><i class="bi bi-cash-stack"></i> אי התאמות מטבע בסיס</h4>
                                     <p>החשבונות הבאים מכילים מטבע בסיס שונה מזה המוגדר במערכת:</p>
                                     <div class="table-responsive">
@@ -592,7 +630,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountEntitlementWarningsSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountEntitlementWarningsSection">
                                     <h4><i class="bi bi-shield-exclamation"></i> הרשאות חסרות</h4>
                                     <p>החשבונות הבאים חסרים הרשאות נדרשות:</p>
                                     <div class="table-responsive">
@@ -613,7 +651,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="accountMissingDocumentsSection" style="display:none;">
+                                <div class="problem-section d-none" id="accountMissingDocumentsSection">
                                     <h4><i class="bi bi-file-earmark-excel"></i> מסמכים חסרים</h4>
                                     <p>יש להשלים את המסמכים המופיעים להלן עבור חשבונות אלו:</p>
                                     <div class="table-responsive">
@@ -633,7 +671,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="existingRecordsSection" style="display:none;">
+                                <div class="problem-section d-none" id="existingRecordsSection">
                                     <h4><i class="bi bi-database"></i> רשומות קיימות במערכת</h4>
                                     <p>רשומות אלו כבר קיימות במערכת. ניתן לייבא בכל זאת או לדלג עליהן:</p>
                                     <div class="table-responsive">
@@ -658,7 +696,7 @@
                                     </div>
                                 </div>
 
-                                <div class="problem-section" id="withinFileDuplicatesSection" style="display:none;">
+                                <div class="problem-section d-none" id="withinFileDuplicatesSection">
                                     <h4><i class="bi bi-files"></i> כפילויות בקובץ</h4>
                                     <p>נמצאו רשומות כפולות בתוך הקובץ. ניתן לבחור איזו רשומה לייבא:</p>
                                     <div class="table-responsive">
@@ -687,7 +725,7 @@
                         </div>
                     </div>
 
-                    <div class="import-step" id="step-preview" data-step="3" style="display:none;">
+                    <div class="import-step d-none" id="step-preview" data-step="3">
                         <div class="step-content">
                             <h3>תצוגה מקדימה ואישור</h3>
 
@@ -778,7 +816,7 @@
                             </div>
 
                             <div class="step-actions">
-                                <button data-button-type="BACK" data-text="חזור" data-import-back-step="2" data-onclick="goToStep(2)"></button>
+                                <button data-button-type="BACK" data-text="חזור" data-import-back-step="1" data-onclick="goToStep(1)"></button>
                                 <button data-button-type="WARNING"
                                         data-text="ביטול"
                                         data-onclick="confirmResetImportSession()"
@@ -823,28 +861,69 @@
                         </div>
                     </div>
                     <div class="summary-card">
-                        <div class="summary-details">
-                            <div class="detail-item">
-                                <span class="detail-label">מספר חשבון בקובץ:</span>
-                                <span class="detail-value" id="accountLinkingFileAccount">לא זמין</span>
+                        <div id="accountLinkingRecognizedSection" class="linking-recognized-section">
+                            <div class="summary-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">מספר חשבון בקובץ:</span>
+                                    <span class="detail-value" id="accountLinkingFileAccount">לא זמין</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">חשבון מזוהה:</span>
+                                    <span class="detail-value" id="accountLinkingRecognizedAccount">לא זוהה חשבון תואם</span>
+                                </div>
                             </div>
-                            <div class="detail-item">
-                                <span class="detail-label">מספר חשבון במערכת:</span>
-                                <span class="detail-value" id="accountLinkingCurrentAccount">לא הוגדר</span>
+                            <div class="d-flex gap-2 mt-3 flex-wrap" id="accountLinkingRecognizedActions">
+                                <button
+                                    data-button-type="SECONDARY"
+                                    data-text="בחר חשבון אחר"
+                                    data-onclick="showAccountLinkingSelection()"
+                                    id="accountLinkingSwitchToSelectionBtn">
+                                </button>
                             </div>
+                        </div>
+
+                        <div id="accountLinkingSelectionSection" class="linking-selection-section d-none">
+                            <div class="form-group mb-3">
+                                <label for="accountLinkingAccountSelect">בחר חשבון לשיוך:</label>
+                                <select id="accountLinkingAccountSelect" class="form-select">
+                                    <option value="">טוען חשבונות...</option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    החשבון הנבחר יעודכן עם מספר הברוקר שזוהה בקובץ.
+                                </small>
+                                <small class="form-text text-warning d-none" id="accountLinkingOverwriteWarning">
+                                    לחשבון זה קיים מזהה חיצוני. דרוש אישור החלפה.
+                                </small>
+                            </div>
+                                <div class="d-flex gap-2 flex-wrap" id="accountLinkingSelectionActions">
+                                    <button
+                                        data-button-type="PRIMARY"
+                                        data-onclick="submitAccountLinkSelection()"
+                                        data-text="שמור שיוך"
+                                        id="accountLinkingActionBtn">
+                                    </button>
+                                    <button
+                                        data-button-type="SECONDARY"
+                                        data-onclick="hideAccountLinkingModal()"
+                                        data-text="ביטול"
+                                        id="accountLinkingCancelSelectionBtn">
+                                    </button>
+                                </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <small class="text-muted">
-                        לאחר השיוך תבוצע בדיקת החשבון אוטומטית ותוכל להמשיך לייבוא.
+                <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <small class="text-muted" id="accountLinkingFooterNote">
+                        לאחר אישור או שיוך מחדש, ניתן להמשיך לניתוח הקובץ.
                     </small>
-                    <button
-                        data-button-type="PRIMARY"
-                        data-onclick="linkExternalAccountToTradingAccount()"
-                        data-text="שייך חשבון למערכת"
-                        id="accountLinkingActionBtn">
-                    </button>
+                    <div class="d-flex gap-2 flex-wrap" id="accountLinkingFooterActions">
+                        <button
+                            data-button-type="PRIMARY"
+                            data-text="אשר חשבון מזוהה"
+                            data-onclick="confirmAutoLinkedAccount()"
+                            id="accountLinkingConfirmBtn">
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -905,6 +984,8 @@
     <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- מערכת כפתורים -->
     <!-- [20] Load Order: 20 -->
     <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- מערכת צבעים דינמית -->
+    <!-- [21] Load Order: 21 -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכת אתחול מאוחדת - נקודת כניסה אחת (חובה לכל עמוד) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/12: SERVICES PACKAGE ===== -->
@@ -923,8 +1004,12 @@
     <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- מחשבון סטטיסטיקות -->
     <!-- [25] Load Order: 25 -->
     <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- שירות ברירות מחדל -->
+    <!-- [25a] Preferences Data Service -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- שירות נתוני העדפות (API + Cache) -->
     <!-- [26] Load Order: 26 -->
     <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- מטפל בתגובות CRUD -->
+    <!-- [26.5] Load Order: 26.5 -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- שירות CRUD מאוחד לכל הישויות -->
     <!-- [27] Load Order: 27 -->
     <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- חישובי סכום ↔ כמות לטפסי השקעות -->
     <!-- [28] Load Order: 28 -->
@@ -934,7 +1019,7 @@
     <!-- [30] Load Order: 30 -->
     <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- שירות סטטוס לינטר מאוחד (קריאת API והמרת נתונים) -->
     <!-- [31] Load Order: 31 -->
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
     <!-- [32] Load Order: 32 -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [33] Load Order: 33 -->
@@ -973,8 +1058,6 @@
     <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- ניהול בחירת תגיות במודלים -->
     <!-- [42] Load Order: 42 -->
     <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- מערכת אירועים גלובלית לתגיות -->
-    <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- מערכות ליבה -->
     <!-- [44] Load Order: 44 -->
     <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- נתונים בסיסיים -->
     <!-- [45] Load Order: 45 -->
@@ -992,12 +1075,14 @@
     <!-- [51] Load Order: 51 -->
     <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- תצורת טעינה דינמית -->
     <!-- [52] Load Order: 52 -->
-    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני עסקאות -->
+    <script src="scripts/import-user-data.js?v=1.0.0"></script> <!-- מודל ייבוא נתוני ביצועים -->
     <!-- [53] Load Order: 53 -->
     <script src="scripts/modal-configs/trades-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל טריידים -->
     <!-- [54] Load Order: 54 -->
     <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל תוכניות מסחר -->
     <!-- [55] Load Order: 55 -->
+    <script src="scripts/modal-configs/notes-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודל הערות -->
+    <!-- [56] Load Order: 56 -->
     <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0"></script> <!-- קונפיגורציית מודלים למערכת התגיות -->
 
     <!-- =============================================================== -->
@@ -1021,6 +1106,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 2.0.0 -->
 
+    <!-- [58.9] Load Order: 58.9 - Preferences V4 SDK (group-first) - MUST BE FIRST -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [59] Load Order: 59 -->
     <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- ליבת העדפות (ללא צבעים) -->
     <!-- [60] Load Order: 60 -->
@@ -1032,6 +1119,8 @@
     <!-- [63] Load Order: 63 -->
     <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
     <!-- [64] Load Order: 64 -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- ממשק משתמש V4 (Group-First) -->
+    <!-- [64.1] Load Order: 64.1 - Preferences UI V4 (Group-First) - MUST BE BEFORE preferences-group-manager -->
     <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- ממשק משתמש -->
     <!-- [65] Load Order: 65 -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- מנהל קבוצות העדפות -->
@@ -1091,6 +1180,7 @@
     <script src="scripts/constraints.js?v=1.0.0"></script> <!-- מערכת אילוצים -->
     <!-- [81] Load Order: 81 -->
     <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- שירות לוגיקה משותפת לפריטים מקושרים -->
+    <script src="scripts/services/data-import-data.js?v=1.0.0"></script> <!-- שירות נתונים לייבוא נתונים -->
     <!-- [82] Load Order: 82 -->
     <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- פריטים מקושרים -->
     <!-- [83] Load Order: 83 -->
@@ -1138,7 +1228,7 @@
     <!-- [92] Load Order: 92 -->
     <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- פונקציות ניטור עמודים -->
     <!-- [93] Load Order: 93 -->
-    <script src="scripts/unified-app-initializer.js?v=1.0.0"></script> <!-- מאתחל אפליקציה מאוחד -->
+    <!-- unified-app-initializer.js removed - initialization now handled by core-systems.js -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
@@ -1146,6 +1236,280 @@
 
     <!-- [94] Page-specific: data_import -->
     <script src="scripts/data_import.js?v=1.0.0"></script> <!-- Page-specific script for data_import -->
+    
+    <!-- [95] Debug Tools (Development) -->
+    <script src="scripts/debug-currency-exchange-import.js?v=1.0.0"></script> <!-- Currency Exchange Import Debug Tool -->
+    <script src="scripts/debug-import-filtering.js?v=1.0.0"></script> <!-- Import Filtering Debug Tool -->
+    <script src="scripts/debug-import-steps.js?v=1.0.0"></script> <!-- Import Steps Debug Helper -->
+    <script src="scripts/monitor-import-execution.js?v=1.0.0"></script> <!-- Import Execution Monitoring Tool -->
+    <script src="scripts/debug-active-session.js?v=1.0.0"></script> <!-- Active Session Debug Tool -->
+    
+    <!-- Inline debug script - Active Session Debug Tool -->
+    <script>
+        /**
+         * Debug script for active import session
+         * Run: debugActiveSession() or fixActiveSessionDisplay() in console
+         */
+        (function() {
+            window.debugActiveSession = function() {
+                console.group('🔍 [DEBUG] Active Session Diagnostic');
+                
+                // 0. Check if modal is open
+                const modal = document.getElementById('importUserDataModal');
+                console.log('0️⃣ Modal Status:');
+                console.log('  Modal element:', modal ? '✅ Found' : '❌ Not found');
+                if (modal) {
+                    const isVisible = modal.classList.contains('show') || window.getComputedStyle(modal).display !== 'none';
+                    console.log('  Modal visible:', isVisible);
+                    console.log('  Modal has show class:', modal.classList.contains('show'));
+                }
+                
+                // 1. Check session variables
+                console.log('\n1️⃣ Session Variables:');
+                const currentId = typeof currentSessionId !== 'undefined' ? currentSessionId : (window.currentSessionId || null);
+                const activeInfo = typeof activeSessionInfo !== 'undefined' ? activeSessionInfo : (window.activeSessionInfo || null);
+                console.log('  currentSessionId:', currentId);
+                console.log('  window.currentSessionId:', window.currentSessionId);
+                console.log('  activeSessionInfo:', activeInfo);
+                
+                // 2. Check if session is active
+                if (typeof isSessionActive === 'function' && activeInfo) {
+                    const statusToCheck = activeInfo?.statusRaw || activeInfo?.status;
+                    const isActive = isSessionActive(statusToCheck);
+                    console.log('  Status to check:', statusToCheck);
+                    console.log('  Is session active?', isActive);
+                } else {
+                    console.warn('  ⚠️ isSessionActive function not available or activeSessionInfo is null');
+                    if (typeof isSessionActive === 'function') {
+                        console.log('  isSessionActive function exists');
+                    } else {
+                        console.log('  isSessionActive function does NOT exist');
+                    }
+                }
+                
+                // 3. Check DOM elements
+                console.log('\n2️⃣ DOM Elements:');
+                const indicator = document.getElementById('activeSessionIndicator');
+                const controlsRow = document.getElementById('activeSessionControlsRow');
+                const detailsRow = document.getElementById('activeSessionDetailsRow');
+                const resumeButton = document.getElementById('resumeImportSessionBtn');
+                const resetButton = document.getElementById('resetImportSessionBtn');
+                const analyzeButton = document.getElementById('analyzeBtn');
+                
+                console.log('  activeSessionIndicator:', indicator ? '✅ Found' : '❌ Not found');
+                if (indicator) {
+                    console.log('    - display style:', window.getComputedStyle(indicator).display);
+                    console.log('    - has d-none:', indicator.classList.contains('d-none'));
+                    console.log('    - data-has-session:', indicator.getAttribute('data-has-session'));
+                }
+                
+                console.log('  activeSessionControlsRow:', controlsRow ? '✅ Found' : '❌ Not found');
+                if (controlsRow) {
+                    console.log('    - display style:', window.getComputedStyle(controlsRow).display);
+                    console.log('    - has d-none:', controlsRow.classList.contains('d-none'));
+                }
+                
+                console.log('  activeSessionDetailsRow:', detailsRow ? '✅ Found' : '❌ Not found');
+                if (detailsRow) {
+                    console.log('    - display style:', window.getComputedStyle(detailsRow).display);
+                    console.log('    - has d-none:', detailsRow.classList.contains('d-none'));
+                }
+                
+                console.log('  resumeImportSessionBtn:', resumeButton ? '✅ Found' : '❌ Not found');
+                if (resumeButton) {
+                    console.log('    - display style:', window.getComputedStyle(resumeButton).display);
+                    console.log('    - has d-none:', resumeButton.classList.contains('d-none'));
+                    console.log('    - disabled:', resumeButton.disabled);
+                }
+                
+                console.log('  resetImportSessionBtn:', resetButton ? '✅ Found' : '❌ Not found');
+                if (resetButton) {
+                    console.log('    - display style:', window.getComputedStyle(resetButton).display);
+                    console.log('    - has d-none:', resetButton.classList.contains('d-none'));
+                    console.log('    - disabled:', resetButton.disabled);
+                }
+                
+                console.log('  analyzeBtn:', analyzeButton ? '✅ Found' : '❌ Not found');
+                if (analyzeButton) {
+                    console.log('    - disabled:', analyzeButton.disabled);
+                    console.log('    - aria-disabled:', analyzeButton.getAttribute('aria-disabled'));
+                }
+                
+                // 4. Check session data values
+                console.log('\n3️⃣ Session Data Values:');
+                if (indicator) {
+                    const sessionIdEl = document.getElementById('activeSessionIdValue');
+                    const statusEl = document.getElementById('activeSessionStatusValue');
+                    const fileEl = document.getElementById('activeSessionFileValue');
+                    const accountEl = document.getElementById('activeSessionAccountValue');
+                    
+                    console.log('  Session ID value:', sessionIdEl?.textContent || 'N/A');
+                    console.log('  Status value:', statusEl?.textContent || 'N/A');
+                    console.log('  File value:', fileEl?.textContent || 'N/A');
+                    console.log('  Account value:', accountEl?.textContent || 'N/A');
+                }
+                
+                // 5. Try to fetch latest session
+                console.log('\n4️⃣ Fetching Latest Active Session from API...');
+                fetch('/api/user-data-import/sessions/active')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('  API Response:', data);
+                        if (data.session) {
+                            console.log('  ✅ Active session found:', {
+                                id: data.session.id,
+                                status: data.session.status,
+                                file_name: data.session.file_name,
+                                trading_account_id: data.session.trading_account_id
+                            });
+                        } else {
+                            console.log('  ❌ No active session in API response');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('  ❌ Error fetching session:', error);
+                    });
+                
+                // 6. Check localStorage
+                console.log('\n5️⃣ LocalStorage:');
+                try {
+                    const stored = localStorage.getItem('tiktrack_import_user_data_session');
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        console.log('  ✅ Stored session:', parsed);
+                    } else {
+                        console.log('  ❌ No stored session');
+                    }
+                } catch (error) {
+                    console.error('  ❌ Error reading localStorage:', error);
+                }
+                
+                // 7. Test update functions
+                console.log('\n6️⃣ Testing Update Functions:');
+                if (typeof updateActiveSessionIndicator === 'function') {
+                    console.log('  ✅ updateActiveSessionIndicator exists');
+                    console.log('  🔄 Calling updateActiveSessionIndicator()...');
+                    try {
+                        updateActiveSessionIndicator();
+                        console.log('  ✅ Function called successfully');
+                    } catch (error) {
+                        console.error('  ❌ Error calling function:', error);
+                    }
+                } else {
+                    console.warn('  ❌ updateActiveSessionIndicator function not available');
+                }
+                
+                if (typeof updateResetSessionButtonState === 'function') {
+                    console.log('  ✅ updateResetSessionButtonState exists');
+                    console.log('  🔄 Calling updateResetSessionButtonState()...');
+                    try {
+                        updateResetSessionButtonState();
+                        console.log('  ✅ Function called successfully');
+                    } catch (error) {
+                        console.error('  ❌ Error calling function:', error);
+                    }
+                } else {
+                    console.warn('  ❌ updateResetSessionButtonState function not available');
+                }
+                
+                if (typeof updateAnalyzeButton === 'function') {
+                    console.log('  ✅ updateAnalyzeButton exists');
+                    console.log('  🔄 Calling updateAnalyzeButton()...');
+                    try {
+                        updateAnalyzeButton();
+                        console.log('  ✅ Function called successfully');
+                    } catch (error) {
+                        console.error('  ❌ Error calling function:', error);
+                    }
+                } else {
+                    console.warn('  ❌ updateAnalyzeButton function not available');
+                }
+                
+                console.groupEnd();
+                
+                return {
+                    currentSessionId: currentId,
+                    activeSessionInfo: activeInfo,
+                    indicator: indicator,
+                    controlsRow: controlsRow,
+                    detailsRow: detailsRow,
+                    resumeButton: resumeButton,
+                    resetButton: resetButton,
+                    analyzeButton: analyzeButton,
+                    modal: modal
+                };
+            };
+            
+            window.fixActiveSessionDisplay = async function() {
+                console.group('🔧 [FIX] Attempting to fix active session display');
+                
+                // 1. Fetch latest session
+                console.log('1️⃣ Fetching latest active session...');
+                try {
+                    const response = await fetch('/api/user-data-import/sessions/active');
+                    const data = await response.json();
+                    
+                    if (data.session) {
+                        console.log('  ✅ Session found:', data.session.id);
+                        
+                        // Update variables
+                        if (typeof currentSessionId !== 'undefined') {
+                            currentSessionId = data.session.id;
+                            window.currentSessionId = data.session.id;
+                        } else {
+                            window.currentSessionId = data.session.id;
+                        }
+                        
+                        const sessionInfo = {
+                            sessionId: data.session.id,
+                            fileName: data.session.file_name,
+                            accountId: data.session.trading_account_id,
+                            provider: data.session.provider,
+                            status: data.session.status,
+                            statusRaw: data.session.status,
+                            totalRecords: data.session.total_records || 0,
+                            readyRecords: data.session.imported_records || 0,
+                            skipRecords: data.session.skipped_records || 0
+                        };
+                        
+                        if (typeof activeSessionInfo !== 'undefined') {
+                            activeSessionInfo = sessionInfo;
+                        } else {
+                            window.activeSessionInfo = sessionInfo;
+                        }
+                        
+                        // Call update functions
+                        if (typeof updateActiveSessionIndicator === 'function') {
+                            console.log('  🔄 Calling updateActiveSessionIndicator()...');
+                            updateActiveSessionIndicator();
+                        }
+                        
+                        if (typeof updateResetSessionButtonState === 'function') {
+                            console.log('  🔄 Calling updateResetSessionButtonState()...');
+                            updateResetSessionButtonState();
+                        }
+                        
+                        if (typeof updateAnalyzeButton === 'function') {
+                            console.log('  🔄 Calling updateAnalyzeButton()...');
+                            updateAnalyzeButton();
+                        }
+                        
+                        console.log('  ✅ Fix attempt completed');
+                    } else {
+                        console.log('  ❌ No active session found');
+                    }
+                } catch (error) {
+                    console.error('  ❌ Error:', error);
+                }
+                
+                console.groupEnd();
+            };
+            
+            console.log('✅ Debug functions loaded!');
+            console.log('📋 Run: debugActiveSession() to diagnose');
+            console.log('🔧 Run: fixActiveSessionDisplay() to attempt fix');
+        })();
+    </script>
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->

@@ -73,7 +73,7 @@ function clearCache() {
  */
 async function getAccounts() {
   try {
-    const response = await fetch('/api/accounts/');
+    const response = await fetch('/api/trading-accounts/');
     if (response.ok) {
       const data = await response.json();
       const accounts = data.data || data || [];

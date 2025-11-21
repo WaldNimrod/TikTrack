@@ -79,37 +79,28 @@ window.setPaginationSize = async function(tableType = 'default', size = 20) {
 window.getPreference = async function(preferenceName, userId = 1, profileId = null) {
     try {
         console.log(`🔍 Getting preference: ${preferenceName}`);
-        
-        // בדיקת מטמון
+
         const cached = window.preferencesCache.get();
         if (cached && cached[preferenceName] !== undefined) {
             console.log(`✅ Cache hit for ${preferenceName}:`, cached[preferenceName]);
             return cached[preferenceName];
         }
-        
-        // שאילתה לשרת
-        let url = `/api/preferences/user/single?preference_name=${preferenceName}&user_id=${userId}`;
-        if (profileId) {
-            url += `&profile_id=${profileId}`;
+
+        const result = await window.PreferencesData.loadPreference({
+            preferenceName,
+            userId,
+            profileId,
+        });
+
+        const value = result?.value ?? null;
+        console.log(`✅ Retrieved ${preferenceName}:`, value);
+
+        if (cached) {
+            cached[preferenceName] = value;
+            window.preferencesCache.set(cached);
         }
-        
-        const response = await fetch(url);
-        if (response.ok) {
-            const result = await response.json();
-            const value = result.data?.value;
-            
-            console.log(`✅ Retrieved ${preferenceName}:`, value);
-            
-            // עדכון מטמון
-            if (cached) {
-                cached[preferenceName] = value;
-                window.preferencesCache.set(cached);
-            }
-            
-            return value;
-      } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+
+        return value;
     } catch (error) {
         console.error(`❌ Error getting preference ${preferenceName}:`, error);
         throw error;
@@ -126,42 +117,33 @@ window.getPreference = async function(preferenceName, userId = 1, profileId = nu
 window.getGroupPreferences = async function(groupName, userId = 1, profileId = null) {
     try {
         console.log(`🔍 Getting group preferences: ${groupName}`);
-        
-        // בדיקת מטמון
+
         const cached = window.preferencesCache.get();
         if (cached && cached[`group_${groupName}`]) {
             console.log(`✅ Cache hit for group ${groupName}`);
             return cached[`group_${groupName}`];
         }
-        
-        // שאילתה לשרת
-        let url = `/api/preferences/user/group?group=${groupName}&user_id=${userId}`;
-        if (profileId) {
-            url += `&profile_id=${profileId}`;
+
+        const result = await window.PreferencesData.loadPreferenceGroup({
+            groupName,
+            userId,
+            profileId,
+        });
+
+        const preferences = result?.preferences || {};
+        console.log(`✅ Retrieved group ${groupName}:`, preferences);
+
+        if (cached) {
+            cached[`group_${groupName}`] = preferences;
+            window.preferencesCache.set(cached);
         }
-        
-        const response = await fetch(url);
-        if (response.ok) {
-            const result = await response.json();
-            const preferences = result.data?.preferences || {};
-            
-            console.log(`✅ Retrieved group ${groupName}:`, preferences);
-            
-            // עדכון מטמון
-            if (cached) {
-                cached[`group_${groupName}`] = preferences;
-                window.preferencesCache.set(cached);
-            }
-            
-            return {
-                success: true,
-                data: {
-                    preferences: preferences
-                }
-            };
-      } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+
+        return {
+            success: true,
+            data: {
+                preferences,
+            },
+        };
     } catch (error) {
         console.error(`❌ Error getting group preferences ${groupName}:`, error);
         throw error;
@@ -178,8 +160,7 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
 window.getPreferencesByNames = async function(preferenceNames, userId = 1, profileId = null) {
     try {
         console.log(`🔍 Getting multiple preferences:`, preferenceNames);
-        
-        // בדיקת מטמון
+
         const cached = window.preferencesCache.get();
         const missingFromCache = preferenceNames.filter(name => !cached || cached[name] === undefined);
         
@@ -191,35 +172,20 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
             }, {});
         }
         
-        // שאילתה לשרת
-        const response = await fetch('/api/preferences/user/multiple', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-            body: JSON.stringify({
-                preference_names: preferenceNames,
-                user_id: userId,
-                profile_id: profileId
-            })
+        const preferences = await window.PreferencesData.loadPreferencesByNames({
+            names: preferenceNames,
+            userId,
+            profileId,
         });
-        
-        if (response.ok) {
-            const result = await response.json();
-            const preferences = result.data?.preferences || {};
-            
-            console.log(`✅ Retrieved multiple preferences:`, preferences);
-            
-            // עדכון מטמון
-            if (cached) {
-                Object.assign(cached, preferences);
-                window.preferencesCache.set(cached);
-            }
-            
-            return preferences;
-          } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+
+        console.log(`✅ Retrieved multiple preferences:`, preferences);
+
+        if (cached) {
+            Object.assign(cached, preferences);
+            window.preferencesCache.set(cached);
+        }
+
+        return preferences;
     } catch (error) {
         console.error(`❌ Error getting multiple preferences:`, error);
         throw error;
@@ -236,7 +202,6 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
     try {
         console.log(`🔍 Getting all user preferences for user ${userId}, profile: ${profileId || 'active'}`);
         
-        // בדיקת מטמון - רק אם לא ביקשנו טעינה מחדש
         const cached = window.preferencesCache.get();
         if (cached && Object.keys(cached).length > 0) {
             console.log(`✅ All preferences found in cache`);
@@ -245,34 +210,23 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
         
         console.log(`🔄 Cache is empty, fetching fresh data from server...`);
         
-        // שאילתה לשרת
-        let url = `/api/preferences/user?user_id=${userId}`;
-        if (profileId) {
-            url += `&profile_id=${profileId}`;
+        const payload = await window.PreferencesData.loadAllPreferencesRaw({
+            userId,
+            profileId,
+            force: true,
+        });
+        const preferences = payload?.preferences || {};
+
+        console.log(`✅ Retrieved all preferences:`, preferences);
+
+        window.preferencesCache.set(preferences);
+
+        if (window.colorSchemeSystem?.updateCSSVariablesFromPreferences) {
+            console.log('🎨 Updating CSS variables from preferences...');
+            window.colorSchemeSystem.updateCSSVariablesFromPreferences(preferences);
         }
-        
-        console.log(`🔍 Fetching from URL: ${url}`);
-        
-        const response = await fetch(url);
-        if (response.ok) {
-            const result = await response.json();
-            const preferences = result.data?.preferences || {};
-            
-            console.log(`✅ Retrieved all preferences:`, preferences);
 
-            // עדכון מטמון
-            window.preferencesCache.set(preferences);
-
-            // עדכון CSS Variables מצבעים דינמיים
-            if (window.colorSchemeSystem && window.colorSchemeSystem.updateCSSVariablesFromPreferences) {
-                console.log('🎨 Updating CSS variables from preferences...');
-                window.colorSchemeSystem.updateCSSVariablesFromPreferences(preferences);
-            }
-
-            return preferences;
-        } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+        return preferences;
     } catch (error) {
         console.error(`❌ Error getting all user preferences:`, error);
         throw error;
@@ -293,31 +247,19 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
     try {
         console.log(`💾 Saving preference: ${preferenceName} = ${value}`);
         
-        const response = await fetch('/api/preferences/user/single', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                preference_name: preferenceName,
-                value: value,
-                user_id: userId,
-                profile_id: profileId
-            })
+        await window.PreferencesData.savePreference({
+            preferenceName,
+            value,
+            userId,
+            profileId,
         });
+
+        const cached = window.preferencesCache.get() || {};
+        cached[preferenceName] = value;
+        window.preferencesCache.set(cached);
         
-        if (response.ok) {
-            console.log(`✅ Saved preference: ${preferenceName}`);
-            
-            // עדכון מטמון
-            const cached = window.preferencesCache.get() || {};
-            cached[preferenceName] = value;
-            window.preferencesCache.set(cached);
-            
-            return true;
-      } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+        console.log(`✅ Saved preference: ${preferenceName}`);
+        return true;
     } catch (error) {
         console.error(`❌ Error saving preference ${preferenceName}:`, error);
         throw error;
@@ -334,35 +276,16 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
 window.savePreferences = async function(preferences, userId = 1, profileId = null) {
     try {
         console.log(`💾 Saving multiple preferences:`, preferences);
-      
-      const response = await fetch('/api/preferences/user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-            body: JSON.stringify({
-                preferences: preferences,
-                user_id: userId,
-                profile_id: profileId
-            })
+
+        const result = await window.PreferencesData.savePreferences({
+            preferences,
+            userId,
+            profileId,
         });
-        
-        if (response.ok) {
-            const result = await response.json();
-            
-            if (result.success) {
-                console.log(`✅ Saved multiple preferences:`, result);
-                
-                // עדכון מטמון - נקה מטמון כדי לטעון מחדש מהשרת
-                window.preferencesCache.clear();
-                
-                return true;
-      } else {
-                throw new Error(`API returned success: false - ${result.message || 'Unknown error'}`);
-            }
-      } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+
+        console.log(`✅ Saved multiple preferences:`, result);
+        window.preferencesCache.clear();
+        return result;
     } catch (error) {
         console.error(`❌ Error saving multiple preferences:`, error);
         throw error;
@@ -379,17 +302,10 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
 window.getUserProfiles = async function(userId = 1) {
     try {
         console.log(`🔍 Getting user profiles for user ${userId}`);
-        
-        const response = await fetch(`/api/preferences/profiles?user_id=${userId}`);
-        if (response.ok) {
-            const result = await response.json();
-            const profiles = result.data?.profiles || [];
-            
-            console.log(`✅ Retrieved user profiles:`, profiles);
-            return profiles;
-        } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+
+        const result = await window.PreferencesData.loadProfiles({ userId });
+        console.log(`✅ Retrieved user profiles:`, result.profiles);
+        return result.profiles || [];
     } catch (error) {
         console.error(`❌ Error getting user profiles:`, error);
         throw error;
@@ -413,16 +329,9 @@ window.clearPreferencesCache = function() {
 window.checkPreferencesServiceHealth = async function() {
     try {
         console.log(`🔍 Checking preferences service health`);
-        
-        const response = await fetch('/api/preferences/health');
-        if (response.ok) {
-            const result = await response.json();
-            console.log(`✅ Preferences service is healthy:`, result.data);
-            return true;
-      } else {
-            console.log(`❌ Preferences service is unhealthy: HTTP ${response.status}`);
-        return false;
-      }
+        const health = await window.PreferencesData.checkHealth();
+        console.log(`✅ Preferences service is healthy:`, health);
+        return true;
     } catch (error) {
         console.error(`❌ Error checking preferences service health:`, error);
       return false;
@@ -437,17 +346,9 @@ window.checkPreferencesServiceHealth = async function() {
 window.getPreferenceInfo = async function(preferenceName) {
     try {
         console.log(`🔍 Getting preference info: ${preferenceName}`);
-        
-        const response = await fetch(`/api/preferences/info/${preferenceName}`);
-        if (response.ok) {
-            const result = await response.json();
-            const info = result.data?.info;
-            
-            console.log(`✅ Retrieved preference info:`, info);
-            return info;
-      } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+        const info = await window.PreferencesData.loadPreferenceInfo(preferenceName);
+        console.log(`✅ Retrieved preference info:`, info);
+        return info;
     } catch (error) {
         console.error(`❌ Error getting preference info:`, error);
         throw error;
@@ -605,20 +506,9 @@ window.resetToDefaults = async function() {
     try {
         console.log('🔄 Resetting all preferences to defaults...');
         
-        // קבלת כל ההעדפות הנוכחיות
         const currentPreferences = await window.getAllUserPreferences();
-        if (!currentPreferences.success) {
-            throw new Error('Failed to get current preferences');
-        }
         
-        // קבלת ברירות מחדל מהמערכת
-        const response = await fetch('/api/preferences/admin/types');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const preferenceTypes = data.data.preference_types || [];
+        const { types: preferenceTypes = [] } = await window.PreferencesData.loadPreferenceTypes({ force: true });
         
         // יצירת אובייקט עם ברירות מחדל
         const defaultPreferences = {};
@@ -628,9 +518,8 @@ window.resetToDefaults = async function() {
             }
         });
         
-        // שמירת ברירות המחדל
         const saveResult = await window.savePreferences(defaultPreferences);
-        if (saveResult.success) {
+        if (saveResult?.success !== false) {
             console.log('✅ All preferences reset to defaults successfully');
             
             // Page will reload to show changes
@@ -765,36 +654,17 @@ window.loadProfile = async function() {
 window.switchProfile = async function(profileId) {
     try {
         console.log(`🔄 Switching to profile: ${profileId}`);
-        
-        // עדכון פרופיל פעיל בשרת
-        const response = await fetch('/api/preferences/profiles/activate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                user_id: 1,
-                profile_id: profileId
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-                // נקה מטמון וטען מחדש
-                window.preferencesCache.clear();
-                await window.loadPreferences();
-                
-                console.log('✅ Profile switched successfully');
-      if (typeof window.showSuccessNotification === 'function') {
-                    window.showSuccessNotification('פרופיל הוחלף בהצלחה!');
-                }
-                
-                return true;
-            }
+        await window.PreferencesData.activateProfile({ profileId, userId: 1 });
+
+        window.preferencesCache.clear();
+        await window.loadPreferences();
+
+        console.log('✅ Profile switched successfully');
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('פרופיל הוחלף בהצלחה!');
         }
-        
-        throw new Error('Failed to switch profile');
+
+        return true;
         
   } catch (error) {
         console.error('❌ Error switching profile:', error);

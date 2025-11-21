@@ -1308,6 +1308,13 @@ window.restoreAllSectionStates = async function () {
   // In accordion mode, if no section was opened (all closed), keep all closed
   // (do not auto-open first section - let user manually open sections)
   
+  // Set flag and dispatch event to signal that sections have been restored
+  // This allows lazy loading observers to wait before initializing
+  window.sectionsRestored = true;
+  window.dispatchEvent(new CustomEvent('sections:restored', {
+    detail: { pageName, restoredCount, totalSections: sections.length, accordionMode }
+  }));
+  
   if (window.Logger) { window.Logger.debug(`✅ restoreAllSectionStates completed - restored ${restoredCount}/${sections.length} sections${accordionMode ? ' (accordion mode)' : ''}`, { page: "ui-utils" }); }
   return restoredCount;
 };
@@ -2061,30 +2068,37 @@ async function loadScriptsOnce(sources, options = {}) {
  */
 function updatePageSummaryStats(pageName, data, countElementId = null) {
   try {
-    // Using filtered data if available, otherwise provided data
-    let dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+    // Use provided data if available, otherwise try to get from filtered data or TableDataRegistry
+    let dataToUse = data;
 
-    if (window.TableDataRegistry) {
+    // Only use TableDataRegistry if no data was provided
+    if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
+      // Try filtered data first
+      dataToUse = window[`filtered${pageName.charAt(0).toUpperCase() + pageName.slice(1)}Data`] || data;
+
+      // Then try TableDataRegistry
+      if (window.TableDataRegistry && (!Array.isArray(dataToUse) || dataToUse.length === 0)) {
       const summary = window.TableDataRegistry.getSummary(pageName);
       if (summary) {
         const registryFiltered = window.TableDataRegistry.getFilteredData(pageName);
-        if (Array.isArray(registryFiltered)) {
+          if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
           dataToUse = registryFiltered;
         }
       } else if (typeof window.TableDataRegistry.resolveTableType === 'function') {
         const resolvedType = window.TableDataRegistry.resolveTableType(pageName);
         if (resolvedType) {
           const registryFiltered = window.TableDataRegistry.getFilteredData(resolvedType);
-          if (Array.isArray(registryFiltered)) {
+            if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
             dataToUse = registryFiltered;
           }
         }
       }
 
-      if (!Array.isArray(dataToUse)) {
+        if (!Array.isArray(dataToUse) || dataToUse.length === 0) {
         const registryFull = window.TableDataRegistry.getFullData(pageName);
-        if (Array.isArray(registryFull)) {
+          if (Array.isArray(registryFull) && registryFull.length > 0) {
           dataToUse = registryFull;
+          }
         }
       }
     }
@@ -2127,6 +2141,67 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
   }
 }
 
+/**
+ * Update table count element with total filtered records (not just current page)
+ * Generic function to update count display using TableDataRegistry
+ * 
+ * @function updateTableCount
+ * @param {string|HTMLElement} countElementOrSelector - Element ID, selector, or element itself
+ * @param {string} tableType - Table type identifier (e.g., 'trades', 'tickers', 'alerts')
+ * @param {string} itemName - Item name for display (e.g., 'טריידים', 'טיקרים', 'התראות')
+ * @param {number} [fallbackCount] - Fallback count if TableDataRegistry not available
+ * @returns {void}
+ * 
+ * @example
+ * updateTableCount('#tradesCount', 'trades', 'טריידים');
+ * updateTableCount('.table-count', 'tickers', 'טיקרים');
+ * updateTableCount(document.getElementById('alertsCount'), 'alerts', 'התראות', 0);
+ */
+function updateTableCount(countElementOrSelector, tableType, itemName, fallbackCount = null) {
+  try {
+    let countElement = null;
+    
+    // Resolve element from various input types
+    if (typeof countElementOrSelector === 'string') {
+      if (countElementOrSelector.startsWith('#')) {
+        countElement = document.getElementById(countElementOrSelector.substring(1));
+      } else if (countElementOrSelector.startsWith('.')) {
+        countElement = document.querySelector(countElementOrSelector);
+      } else {
+        // Try as ID first, then as selector
+        countElement = document.getElementById(countElementOrSelector) || document.querySelector(countElementOrSelector);
+      }
+    } else if (countElementOrSelector instanceof HTMLElement) {
+      countElement = countElementOrSelector;
+    }
+    
+    if (!countElement) {
+      window.Logger?.debug('Count element not found', { tableType, selector: countElementOrSelector });
+      return;
+    }
+    
+    // Use TableDataRegistry to get total filtered count (not just current page)
+    let totalCount = fallbackCount;
+    if (window.getTableDataCounts) {
+      const counts = window.getTableDataCounts(tableType);
+      totalCount = counts.filtered || counts.total || fallbackCount || 0;
+    } else if (fallbackCount === null) {
+      // If no fallback provided and TableDataRegistry not available, try to get from window variable
+      const dataVar = window[`${tableType}Data`] || window[`filtered${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Data`];
+      totalCount = Array.isArray(dataVar) ? dataVar.length : 0;
+    }
+    
+    if (totalCount !== null && totalCount !== undefined) {
+      countElement.textContent = `${totalCount} ${itemName}`;
+    }
+  } catch (error) {
+    window.Logger?.warn('updateTableCount failed', { tableType, error: error?.message || error });
+  }
+}
+
+// Export to window for global access
+window.updateTableCount = updateTableCount;
+
 function renderUpdatedCell(entity, options = {}) {
   const {
     fields = ['updated_at', 'updatedAt'],
@@ -2144,9 +2219,15 @@ function renderUpdatedCell(entity, options = {}) {
     const paths = Array.isArray(fields) ? fields : [fields];
     for (const path of paths) {
       const candidate = window.resolvePropertyPath(entity, path);
-      const dateObj = typeof window.toDateObject === 'function'
-        ? window.toDateObject(candidate)
-        : (candidate instanceof Date ? candidate : new Date(candidate));
+      // Use centralized date utils to handle DateEnvelope, datetime objects, and strings
+      let dateObj = null;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateObj = window.dateUtils.toDateObject(candidate);
+      } else if (candidate instanceof Date) {
+        dateObj = candidate;
+      } else if (candidate) {
+        dateObj = new Date(candidate);
+      }
       if (dateObj instanceof Date && !Number.isNaN(dateObj.getTime())) {
         if (!updatedDate || dateObj.getTime() > updatedDate.getTime()) {
           updatedDate = dateObj;
@@ -2167,11 +2248,12 @@ function renderUpdatedCell(entity, options = {}) {
       const duration = window.getDurationSince(updatedDate, { format, includeSeconds, fallback });
       const absolute = typeof window.formatDateTime === 'function'
         ? window.formatDateTime(updatedDate)
-        : updatedDate.toLocaleString('he-IL');
+        : (window.formatDate ? window.formatDate(updatedDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(updatedDate, { includeTime: true }) : updatedDate.toLocaleString('he-IL')));
       const titleAttr = absolute ? ` title="${absolute}"` : '';
       displayHtml = `<span class="updated-value" dir="ltr"${titleAttr}>${duration || absolute}</span>`;
     } else {
-      displayHtml = `<span class="updated-value" dir="ltr">${updatedDate.toLocaleString('he-IL')}</span>`;
+      const formattedDate = window.formatDate ? window.formatDate(updatedDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(updatedDate, { includeTime: true }) : updatedDate.toLocaleString('he-IL'));
+      displayHtml = `<span class="updated-value" dir="ltr">${formattedDate}</span>`;
     }
   } else {
     displayHtml = `<span class="updated-value-empty">${fallback}</span>`;

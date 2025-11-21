@@ -267,6 +267,40 @@
   gap: var(--apple-spacing-md);
 }
 
+.active-alerts--empty {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--apple-spacing-xs);
+}
+
+.active-alerts--empty .active-alerts__header {
+  gap: var(--apple-spacing-xs);
+  padding: 0;
+}
+
+.active-alerts--empty .active-alerts__title-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--apple-spacing-xs);
+}
+
+.active-alerts--empty .active-alerts__title-text {
+  color: var(--apple-text-secondary);
+}
+
+.active-alerts--empty .active-alerts__body {
+  display: none;
+}
+
+.active-alerts--empty .active-alerts__count-badge,
+.active-alerts--empty .active-alerts__filters {
+  display: none;
+}
+
 .active-alerts__header {
   display: flex;
   align-items: flex-start;
@@ -289,6 +323,24 @@
   align-items: center;
   gap: var(--apple-spacing-sm);
   color: var(--apple-text-primary);
+}
+
+.active-alerts__title-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--apple-spacing-sm);
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.active-alerts__title-trigger:focus-visible {
+  outline: 2px solid var(--brand-primary, #26baac);
+  outline-offset: 2px;
 }
 
 .active-alerts__title-icon {
@@ -315,24 +367,64 @@
   font-weight: 600;
 }
 
-.active-alerts__legend {
+.active-alerts__filters {
+  display: flex;
+  justify-content: flex-start;
+  margin-inline-start: auto;
+}
+
+.active-alerts__filters.is-hidden {
+  display: none;
+}
+
+.active-alerts__filters-inner {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--apple-spacing-md);
-  color: var(--apple-text-secondary);
-  font-size: 0.8rem;
-}
-
-.active-alerts__legend-item {
-  display: flex;
-  align-items: center;
   gap: var(--apple-spacing-xs);
 }
 
-.active-alerts__legend-icon {
-  width: 20px;
-  height: 20px;
+.active-alerts__filter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--apple-spacing-xs);
+  height: 32px;
+  padding: 0 var(--apple-spacing-sm);
+  border-radius: var(--apple-radius-pill);
+  border: 1px solid var(--apple-border-light);
+  background: var(--apple-surface-subtle, #f5f7f9);
+  color: var(--apple-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: none;
+}
+
+.active-alerts__filter-button:focus-visible {
+  outline: 2px solid rgba(38, 186, 172, 0.45);
+  outline-offset: 2px;
+}
+
+.active-alerts__filter-button.is-active {
+  background: rgba(38, 186, 172, 0.12);
+  border-color: var(--brand-primary, #26baac);
+  color: var(--brand-primary, #26baac);
+}
+
+.active-alerts__filter-button[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.active-alerts__filter-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.active-alerts__filter-label {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .active-alerts__body {
@@ -385,13 +477,14 @@
 }
 
 .active-alerts__card {
-  border: 1px solid var(--apple-border-light);
-  border-radius: var(--apple-radius-md);
+  border: 1px solid var(--active-alert-card-border, var(--apple-border-light));
+  border-radius: var(--apple-radius-large);
   padding: var(--apple-spacing-md);
   display: flex;
   flex-direction: column;
   gap: var(--apple-spacing-sm);
-  background: #ffffff;
+  background: var(--active-alert-card-bg, #ffffff);
+  color: var(--active-alert-card-text, var(--apple-text-primary));
   transition: box-shadow 0.2s ease, transform 0.2s ease, opacity 0.18s ease;
   flex: 1 1 clamp(220px, 25%, 50%);
   max-width: 50%;
@@ -438,6 +531,36 @@
   line-height: 1.4;
 }
 
+.active-alerts__card[data-entity-type="trading_account"] {
+  --active-alert-card-bg: var(--entity-trading-account-bg, color-mix(in srgb, var(--entity-trading-account-color, #26baac) 12%, transparent));
+  --active-alert-card-border: var(--entity-trading-account-border, color-mix(in srgb, var(--entity-trading-account-color, #26baac) 28%, transparent));
+  --active-alert-card-text: var(--entity-trading-account-text, var(--apple-text-primary));
+}
+
+.active-alerts__card[data-entity-type="trade"] {
+  --active-alert-card-bg: var(--entity-trade-bg, color-mix(in srgb, var(--entity-trade-color, #26baac) 12%, transparent));
+  --active-alert-card-border: var(--entity-trade-border, color-mix(in srgb, var(--entity-trade-color, #26baac) 28%, transparent));
+  --active-alert-card-text: var(--entity-trade-text, var(--apple-text-primary));
+}
+
+.active-alerts__card[data-entity-type="trade_plan"] {
+  --active-alert-card-bg: var(--entity-trade-plan-bg, color-mix(in srgb, var(--entity-trade-plan-color, #0056b3) 12%, transparent));
+  --active-alert-card-border: var(--entity-trade-plan-border, color-mix(in srgb, var(--entity-trade-plan-color, #0056b3) 28%, transparent));
+  --active-alert-card-text: var(--entity-trade-plan-text, var(--apple-text-primary));
+}
+
+.active-alerts__card[data-entity-type="ticker"] {
+  --active-alert-card-bg: var(--entity-ticker-bg, color-mix(in srgb, var(--entity-ticker-color, #dc3545) 12%, transparent));
+  --active-alert-card-border: var(--entity-ticker-border, color-mix(in srgb, var(--entity-ticker-color, #dc3545) 28%, transparent));
+  --active-alert-card-text: var(--entity-ticker-text, var(--apple-text-primary));
+}
+
+.active-alerts__card[data-entity-type="alert"] {
+  --active-alert-card-bg: var(--entity-alert-bg, color-mix(in srgb, var(--entity-alert-color, #ff9c05) 12%, transparent));
+  --active-alert-card-border: var(--entity-alert-border, color-mix(in srgb, var(--entity-alert-color, #ff9c05) 28%, transparent));
+  --active-alert-card-text: var(--entity-alert-text, var(--apple-text-primary));
+}
+
 .active-alerts__card.is-dismissing {
   opacity: 0.55;
   transform: scale(0.98);
@@ -481,26 +604,22 @@
 
 .active-alerts__symbol-text {
   font-weight: 600;
-  color: var(--apple-text-primary);
+  color: var(--active-alert-card-text, var(--apple-text-primary));
 }
 
-.active-alerts__status {
+.active-alerts__details {
   display: flex;
   align-items: center;
-  gap: var(--apple-spacing-xs);
+  justify-content: flex-end;
 }
 
-.active-alerts__status-text {
-  font-size: 0.85rem;
-  color: var(--apple-text-secondary);
-}
 
 .active-alerts__card-body {
   display: flex;
   flex-direction: column;
   gap: var(--apple-spacing-xs);
   font-size: 0.85rem;
-  color: var(--apple-text-secondary);
+  color: var(--active-alert-card-text, var(--apple-text-secondary));
 }
 
 .active-alerts__row {
@@ -511,7 +630,7 @@
 
 .active-alerts__row-label {
   font-weight: 600;
-  color: var(--apple-text-primary);
+  color: var(--active-alert-card-text, var(--apple-text-primary));
 }
 
 .active-alerts__row--message .active-alerts__row-value {

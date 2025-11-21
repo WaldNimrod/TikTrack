@@ -89,6 +89,7 @@ class Logger {
         this.preferenceLoadInProgress = null;
         this.preferencesApplied = false;
         this.preferenceListenersRegistered = false;
+        this.serverLoggingUnavailableNotified = false;
         
         this.registerPreferenceListeners();
         
@@ -115,6 +116,7 @@ class Logger {
         'init-check': 'initialization',
         'cache-sync': 'cache',
         'entity-details': 'system',
+        'unified-crud-service': 'business',
         'trades': 'business',
         'executions': 'business',
         'alerts': 'business',
@@ -583,7 +585,7 @@ class Logger {
                 this.pendingLogs = this.pendingLogs.filter(log => !batch.includes(log));
                 
             } catch (error) {
-                console.error('❌ Failed to send log batch:', error);
+                this.handleServerLoggingFailure(error);
                 // Wait before trying next batch
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
@@ -666,9 +668,10 @@ class Logger {
             // Clear localStorage after successful send
             this.clearPendingLogs();
             this.flushAttempts = 0; // איפוס מונה הניסיונות
+            this.serverLoggingUnavailableNotified = false;
 
         } catch (error) {
-            console.error('❌ Failed to send logs to server:', error);
+            this.handleServerLoggingFailure(error);
             
             // Put logs back in pending queue
             this.pendingLogs.unshift(...logsToSend);
@@ -681,6 +684,30 @@ class Logger {
             clearTimeout(this.flushTimeout);
             this.flushTimeout = null;
         }
+    }
+
+    isNetworkUnavailableError(error) {
+        if (!error) {
+            return false;
+        }
+        if (error.name === 'AbortError') {
+            return true;
+        }
+        const message = error.message || '';
+        return error instanceof TypeError || message.includes('Failed to fetch') || message.includes('NetworkError');
+    }
+
+    handleServerLoggingFailure(error) {
+        if (this.isNetworkUnavailableError(error)) {
+            if (!this.serverLoggingUnavailableNotified) {
+                console.warn('⚠️ [Logger] שרת הלוגים אינו זמין כעת – נשמור את הלוגים מקומית וננסה שוב מאוחר יותר.');
+                this.serverLoggingUnavailableNotified = true;
+            } else if (this.shouldEmitVerboseLogs()) {
+                console.debug('[Logger] Server logging still unavailable.', error);
+            }
+            return;
+        }
+        console.error('❌ Failed to send logs to server:', error);
     }
 
     /**

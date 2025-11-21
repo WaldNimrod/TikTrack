@@ -15,6 +15,7 @@
 (function tagUiManagerFactory() {
     const SELECT_CLASS = 'tag-multi-select';
     const BADGE_CONTAINER_SUFFIX = 'TagBadgeContainer';
+    const SUGGESTION_CONTAINER_SUFFIX = 'TagSuggestionContainer';
 
     const state = {
         allTags: null,
@@ -22,6 +23,11 @@
     };
 
     async function ensureTags({ categoryId = null, includeInactive = false } = {}) {
+        if (!window.TagService || typeof window.TagService.fetchTags !== 'function') {
+            window.Logger?.warn('⚠️ TagService not available', { page: 'tag-ui-manager' });
+            return [];
+        }
+        
         if (!state.fetchPromise) {
             state.fetchPromise = window.TagService.fetchTags({
                 categoryId,
@@ -58,8 +64,23 @@
         const categoryId = categoryIdAttr ? Number.parseInt(categoryIdAttr, 10) : null;
         const includeInactive = select.dataset.includeInactive === 'true';
 
+        window.Logger?.info('🏷️ populateSelect called', { 
+            selectId: select.id,
+            categoryId,
+            includeInactive,
+            hasTagService: !!window.TagService,
+            hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+            page: 'tag-ui-manager' 
+        });
+
         try {
             const tags = await ensureTags({ categoryId, includeInactive });
+            window.Logger?.info('🏷️ Tags fetched successfully', { 
+                selectId: select.id,
+                tagsCount: tags.length,
+                page: 'tag-ui-manager' 
+            });
+            
             select.innerHTML = '';
 
             const fragment = document.createDocumentFragment();
@@ -71,8 +92,19 @@
                 setSelectedValues(select, initial);
             }
             updateBadgeDisplay(select);
+            
+            window.Logger?.info('🏷️ Tag select populated successfully', { 
+                selectId: select.id,
+                optionsCount: select.options.length,
+                page: 'tag-ui-manager' 
+            });
         } catch (error) {
-            window.Logger?.warn('⚠️ Failed to populate tag select', { error, elementId: select.id, page: 'tag-ui-manager' });
+            window.Logger?.warn('⚠️ Failed to populate tag select', { 
+                error: error.message || error, 
+                errorStack: error.stack,
+                elementId: select.id, 
+                page: 'tag-ui-manager' 
+            });
         }
     }
 
@@ -150,10 +182,30 @@
 
     function initializeModal(modalElement) {
         const selects = modalElement.querySelectorAll(`select.${SELECT_CLASS}`);
-        selects.forEach(initializeSelect);
+        window.Logger?.info('🏷️ TagUIManager.initializeModal called', { 
+            modalId: modalElement.id, 
+            selectsCount: selects.length,
+            selectIds: Array.from(selects).map(s => s.id),
+            page: 'tag-ui-manager' 
+        });
+        selects.forEach(select => {
+            window.Logger?.info('🏷️ Initializing tag select', { 
+                selectId: select.id,
+                hasTagService: !!window.TagService,
+                hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+                page: 'tag-ui-manager' 
+            });
+            initializeSelect(select);
+        });
     }
 
     async function refreshSelectOptions(select) {
+        window.Logger?.info('🏷️ refreshSelectOptions called', { 
+            selectId: select.id,
+            hasTagService: !!window.TagService,
+            hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+            page: 'tag-ui-manager' 
+        });
         state.fetchPromise = null;
         state.allTags = null;
         await populateSelect(select);
@@ -180,13 +232,175 @@
         }
     }
 
+    function getSuggestionContainer(select) {
+        const containerId = `${select.id}${SUGGESTION_CONTAINER_SUFFIX}`;
+        let container = document.getElementById(containerId);
+        if (!container) {
+            container = document.createElement('div');
+            container.id = containerId;
+            container.className = 'mt-3 d-flex flex-column gap-3';
+            const badgeContainer = document.getElementById(`${select.id}${BADGE_CONTAINER_SUFFIX}`);
+            if (badgeContainer) {
+                badgeContainer.insertAdjacentElement('afterend', container);
+            } else {
+                select.insertAdjacentElement('afterend', container);
+            }
+        }
+        return container;
+    }
+
+    function buildSuggestionChip(tag, select) {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.dataset.buttonType = 'FILTER';
+        chip.dataset.variant = 'full';
+        chip.dataset.icon = '🏷️';
+        chip.dataset.text = tag.name;
+        chip.dataset.classes = 'me-2 mb-2';
+        chip.dataset.tagId = tag.tag_id;
+        chip.addEventListener('click', () => applySuggestion(select, [tag.tag_id]));
+        return chip;
+    }
+
+    function applySuggestion(select, tagIds = []) {
+        if (!Array.isArray(tagIds) || !tagIds.length) {
+            return;
+        }
+        const currentValues = new Set(getSelectedValues(select));
+        let changed = false;
+        tagIds.forEach((tagId) => {
+            const normalizedId = Number.parseInt(tagId, 10);
+            if (!Number.isFinite(normalizedId)) {
+                return;
+            }
+            if (!currentValues.has(normalizedId)) {
+                currentValues.add(normalizedId);
+                changed = true;
+            }
+        });
+        if (!changed) {
+            return;
+        }
+        setSelectedValues(select, Array.from(currentValues));
+    }
+
+    function renderSuggestionGroup(container, title, tags, select) {
+        if (!Array.isArray(tags) || tags.length === 0) {
+            return;
+        }
+        const groupWrapper = document.createElement('div');
+        groupWrapper.className = 'd-flex flex-column gap-2';
+
+        const headerRow = document.createElement('div');
+        headerRow.className = 'd-flex align-items-center justify-content-between gap-2';
+        const titleEl = document.createElement('span');
+        titleEl.className = 'text-muted small';
+        titleEl.textContent = title;
+        headerRow.appendChild(titleEl);
+
+        groupWrapper.appendChild(headerRow);
+
+        const chipsRow = document.createElement('div');
+        chipsRow.className = 'd-flex flex-wrap gap-2';
+        tags.forEach((tag) => chipsRow.appendChild(buildSuggestionChip(tag, select)));
+        groupWrapper.appendChild(chipsRow);
+
+        container.appendChild(groupWrapper);
+    }
+
+    function renderSuggestionPanel(select, payload) {
+        if (!payload) {
+            return;
+        }
+        const container = getSuggestionContainer(select);
+        container.innerHTML = '';
+        const groups = [
+            { key: 'top_entity_tags', title: 'הצעות לישות' },
+            { key: 'top_category_tags', title: 'פופולריות לפי קטגוריה' },
+            { key: 'recent_tags', title: 'תגיות שהשתמשת לאחרונה' }
+        ];
+
+        let rendered = false;
+        groups.forEach((group) => {
+            const tags = payload[group.key];
+            if (Array.isArray(tags) && tags.length) {
+                renderSuggestionGroup(container, group.title, tags, select);
+                rendered = true;
+            }
+        });
+
+        if (!rendered) {
+            container.innerHTML = '<span class="text-muted small">אין הצעות זמינות עדיין</span>';
+        }
+
+        processButtons(container);
+    }
+
+    function filterSuggestionsBySelection(select, payload) {
+        if (!payload) {
+            return payload;
+        }
+        const selectedIds = new Set(getSelectedValues(select));
+        const normalizeId = (tag) => {
+            const candidate = tag?.tag_id ?? tag?.id ?? tag?.tagId;
+            const parsed = Number.parseInt(candidate, 10);
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+        const filterGroup = (group = []) =>
+            group.filter((tag) => {
+                const tagId = normalizeId(tag);
+                return tagId === null || !selectedIds.has(tagId);
+            });
+        return {
+            top_entity_tags: filterGroup(payload.top_entity_tags),
+            top_category_tags: filterGroup(payload.top_category_tags),
+            recent_tags: filterGroup(payload.recent_tags)
+        };
+    }
+
+    function processButtons(container) {
+        if (!container) {
+            return;
+        }
+        if (window.ButtonSystem?.processButtons) {
+            window.ButtonSystem.processButtons(container);
+        } else if (window.ButtonSystem?.hydrateButtons) {
+            window.ButtonSystem.hydrateButtons(container);
+        }
+    }
+
+    async function loadSuggestionsForSelect(select, { entityType, entityId = null } = {}) {
+        if (!window.TagService?.getSmartSuggestions || !entityType) {
+            return;
+        }
+        try {
+            const payload = await window.TagService.getSmartSuggestions({
+                entityType,
+                entityId,
+                limit: 6
+            });
+            const filtered = filterSuggestionsBySelection(select, payload);
+            renderSuggestionPanel(select, filtered);
+        } catch (error) {
+            window.Logger?.warn('⚠️ Failed to load tag suggestions', {
+                error,
+                selectId: select.id,
+                entityType,
+                entityId,
+                page: 'tag-ui-manager'
+            });
+        }
+    }
+
     window.TagUIManager = {
         initializeModal,
         refreshSelectOptions,
         getSelectedValues,
         setSelectedValues,
         updateBadgeDisplay,
-        hydrateSelectForEntity
+        hydrateSelectForEntity,
+        loadSuggestionsForSelect,
+        renderSuggestionPanel
     };
 })();
 

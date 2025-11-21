@@ -46,6 +46,26 @@
 let tradePlansData = [];
 let isDataLoaded = false;
 
+function normalizeTradePlansPayload(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (Array.isArray(payload?.data)) {
+    return payload.data;
+  }
+  throw new Error('Invalid trade plans payload');
+}
+
+function notifyTradePlanLoadError(message, error, context = {}) {
+  const metadata = { page: 'trade_plan_service', ...context };
+  if (typeof window.Logger?.error === 'function') {
+    window.Logger.error(message, error, metadata);
+  }
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה בטעינת תכניות מסחר', message, 6000, 'system');
+  }
+}
+
 /**
  * טעינת נתוני תכניות מסחר מהשרת
  */
@@ -55,50 +75,25 @@ let isDataLoaded = false;
  * @async
  * @returns {Promise<Array>} Array of trade plans
  */
-async function loadTradePlansData() {
+async function loadTradePlansData(options = {}) {
+  const { force = false } = options;
+  const loader = window.TradePlansData?.loadTradePlansData;
+  if (typeof loader !== 'function') {
+    const error = new Error('TradePlansData loader unavailable');
+    isDataLoaded = false;
+    notifyTradePlanLoadError('שכבת הנתונים של תכניות המסחר לא זמינה', error, { stage: 'missing-loader' });
+    throw error;
+  }
+
   try {
-    // Loading trade plans data from server...
-
-    // Use relative URL to work with both development (8080) and production (5001)
-    const url = '/api/trade_plans/';
-
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const responseData = await response.json();
-
-    if (!responseData.data) {
-      // Server response does not contain data field
-      tradePlansData = [];
-      isDataLoaded = true;
-      return [];
-    }
-
-    if (!Array.isArray(responseData.data)) {
-      // Server data is not an array
-      tradePlansData = [];
-      isDataLoaded = true;
-      return [];
-    }
-
-    tradePlansData = responseData.data;
+    const payload = await loader({ force });
+    tradePlansData = normalizeTradePlansPayload(payload);
     isDataLoaded = true;
-
-    // Loaded ${tradePlansData.length} trade plans
     return tradePlansData;
-
-  } catch {
-    // Error loading trade plans data
-
-    // Use demo data as fallback
-    tradePlansData = getDemoTradePlansData();
-    isDataLoaded = true;
-
-    // Using demo data: ${tradePlansData.length} trade plans
-    return tradePlansData;
+  } catch (error) {
+    isDataLoaded = false;
+    notifyTradePlanLoadError('טעינת נתוני תכניות המסחר נכשלה', error, { stage: 'load-failure' });
+    throw error;
   }
 }
 
@@ -304,51 +299,6 @@ function filterTradePlans(filters = {}) {
   return filteredData;
 }
 
-/**
- * נתוני דמו לתכניות מסחר
- */
-/**
- * Get demo trade plans data
- * @function getDemoTradePlansData
- * @returns {Array} Array of demo trade plans
- */
-function getDemoTradePlansData() {
-  return [
-    {
-      id: 1,
-      ticker_id: 1,
-      account_id: 1,
-      investment_type: 'stock',
-      status: 'open',
-      entry_conditions: 'מחיר מתחת ל-50$',
-      reasons: 'חברה יציבה עם פוטנציאל צמיחה',
-      created_at: '2025-08-01T10:00:00Z',
-      updated_at: '2025-08-01T10:00:00Z',
-      ticker: {
-        id: 1,
-        symbol: 'AAPL',
-        name: 'Apple Inc.',
-      },
-    },
-    {
-      id: 2,
-      ticker_id: 2,
-      account_id: 1,
-      investment_type: 'stock',
-      status: 'closed',
-      entry_conditions: 'מחיר מעל 100$',
-      reasons: 'חברה טכנולוגית עם ביצועים טובים',
-      created_at: '2025-07-15T14:30:00Z',
-      updated_at: '2025-08-15T16:45:00Z',
-      ticker: {
-        id: 2,
-        symbol: 'GOOGL',
-        name: 'Alphabet Inc.',
-      },
-    },
-  ];
-}
-
 // ===== Global Exports =====
 
 // Main service object
@@ -370,7 +320,13 @@ window.tradePlanService = {
 // Individual function exports
 window.getTradePlans = getTradePlans;
 window.isTradePlansLoaded = isTradePlansLoaded;
-window.loadTradePlansData = loadTradePlansData;
+// Wrapper function - always uses force: true for CRUD operations (standard pattern like executions.js)
+const originalLoadTradePlansData = loadTradePlansData;
+window.loadTradePlansData = async function(options = {}) {
+  // When called from CRUDResponseHandler, always force reload to get fresh data
+  // This matches the standard pattern used in executions.js and other pages
+  return await originalLoadTradePlansData({ ...options, force: true });
+};
 window.formatTradePlanStatus = formatTradePlanStatus;
 window.parseTradePlanStatus = parseTradePlanStatus;
 window.getTradePlanById = getTradePlanById;
@@ -380,7 +336,6 @@ window.getTradePlansByAccount = getTradePlansByAccount;
 window.getTradePlansByTicker = getTradePlansByTicker;
 window.searchTradePlans = searchTradePlans;
 window.filterTradePlans = filterTradePlans;
-window.getDemoTradePlansData = getDemoTradePlansData;
 
 // Data access for backward compatibility
 Object.defineProperty(window, 'tradePlansData', {

@@ -354,6 +354,57 @@ function getNotificationIcon(type) {
 }
 
 /**
+ * Get notification color based on preferences and entity colors
+ * NOTIFICATION SYSTEM - Centralized color resolver for notifications and blocking modals
+ *
+ * @param {string} type - Notification type (success, error, warning, info)
+ * @returns {string} Hex/RGB color string
+ */
+function getNotificationColor(type) {
+  const preferences = window.currentPreferences || {};
+  const customColorMap = {
+    success: preferences.notificationSuccessColor,
+    error: preferences.notificationErrorColor,
+    warning: preferences.notificationWarningColor,
+    info: preferences.notificationInfoColor
+  };
+
+  if (customColorMap[type]) {
+    return customColorMap[type];
+  }
+
+  if (typeof window.getEntityColor === 'function') {
+    switch (type) {
+      case 'success':
+        return window.getEntityColor('account') || '#28a745';
+      case 'error':
+        return window.getEntityColor('ticker') || '#dc3545';
+      case 'warning':
+        return window.getEntityColor('alert') || '#ffc107';
+      case 'info':
+        return window.getEntityColor('execution') || '#17a2b8';
+      default:
+        return '#6c757d';
+    }
+  }
+
+  switch (type) {
+    case 'success':
+      return '#28a745';
+    case 'error':
+      return '#dc3545';
+    case 'warning':
+      return '#ffc107';
+    case 'info':
+      return '#17a2b8';
+    default:
+      return '#6c757d';
+  }
+}
+
+let __NOTIFICATION_PREFS_AUTH_FAILED__ = false;
+
+/**
  * Check if notification should be shown based on category preferences
  * NOTIFICATION SYSTEM - Checks user preferences for notification category
  *
@@ -363,7 +414,9 @@ function getNotificationIcon(type) {
 async function shouldShowNotification(category, type = 'info', userInitiated = false, message = '', title = '', functionName = '') {
   try {
     // בדוק קודם את מצב העבודה החדש - עם שימוש במטמון הקיים
-    if (typeof window.preferencesCache !== 'undefined' && typeof window.getPreference === 'function') {
+    if (!__NOTIFICATION_PREFS_AUTH_FAILED__ &&
+        typeof window.preferencesCache !== 'undefined' &&
+        typeof window.getPreference === 'function') {
       // נסה לקבל מהמטמון תחילה
       let notificationMode = null;
       const cached = await window.preferencesCache.get();
@@ -405,8 +458,14 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       // window.Logger.info(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled, { page: "notification-system" });
     }
     
-    // If preference is not found (null), don't show notification
+    // If preference is not found (null), show notifications by default for critical categories
+    // This ensures error notifications are always shown even if preferences are not set up
     if (isEnabled === null) {
+      // For import-user-data category, always show errors and warnings
+      if (category === 'import-user-data') {
+        window.Logger?.info?.(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`, { page: "notification-system" });
+        return true;
+      }
       // window.Logger.info(`⚠️ Preference ${preferenceName} not found - notification disabled`, { page: "notification-system" });
       return false;
     }
@@ -421,6 +480,17 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       window.Logger.warn('Failed to check notification preference, showing by default:', error, { page: "notification-system" });
     }
     // For general category, map to system category; for others, show by default
+    if (error && error.isAuthError) {
+      __NOTIFICATION_PREFS_AUTH_FAILED__ = true;
+      if (window.DEBUG_MODE) {
+        window.Logger?.warn?.('⚠️ Notification preferences disabled due to authentication error; falling back to defaults', {
+          page: 'notification-system',
+          error: error?.message,
+        });
+      }
+      // When auth is missing, do not spam errors; just allow notifications to show.
+      return true;
+    }
     if (category === 'general') {
       // Map general to system category since general doesn't exist
       return await shouldShowNotification('system', type, userInitiated, message, title, functionName);
@@ -557,39 +627,6 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     window.Logger.info(`✅ Showing notification (category: ${category}, { page: "notification-system" })`);
   }
   
-  // Get dynamic colors from color scheme system
-  const getNotificationColor = (type) => {
-    const preferences = window.currentPreferences || {};
-    const customColorMap = {
-      success: preferences.notificationSuccessColor,
-      error: preferences.notificationErrorColor,
-      warning: preferences.notificationWarningColor,
-      info: preferences.notificationInfoColor
-    };
-
-    if (customColorMap[type]) {
-      return customColorMap[type];
-    }
-
-    if (typeof window.getEntityColor === 'function') {
-      switch (type) {
-        case 'success': return window.getEntityColor('account') || '#28a745';
-        case 'error': return window.getEntityColor('ticker') || '#dc3545';
-        case 'warning': return window.getEntityColor('alert') || '#ffc107';
-        case 'info': return window.getEntityColor('execution') || '#17a2b8';
-        default: return '#6c757d';
-      }
-    }
-    // Fallback to default colors
-    switch (type) {
-      case 'success': return '#28a745';
-      case 'error': return '#dc3545';
-      case 'warning': return '#ffc107';
-      case 'info': return '#17a2b8';
-      default: return '#6c757d';
-    }
-  };
-
   const notificationColor = getNotificationColor(type);
   
   // Debug: Log dynamic color
@@ -1000,7 +1037,7 @@ async function showDetailsModal(title, content, options = {}) {
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}-label" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#007bff' : '#007bff'};">
+          <div class="modal-header text-white d-flex justify-content-between align-items-center" style="direction: rtl; background-color: ${window.getEntityColor ? window.getEntityColor('trade') || '#26baac' : '#26baac'};">
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="${modalId}-copy-btn" data-text="העתק" title="העתק ללוח">
               </button>
@@ -1038,10 +1075,7 @@ async function showDetailsModal(title, content, options = {}) {
   modal.style.display = 'block';
   modal.classList.add('show');
   
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
-  }
+  // Backdrop handled by Bootstrap
   
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
@@ -1053,8 +1087,44 @@ async function showDetailsModal(title, content, options = {}) {
   // כפתור העתקה
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
   if (copyButton) {
-    copyButton.addEventListener('click', () => {
-      copyToClipboard(textContent, title);
+    copyButton.type = 'button';
+    copyButton.addEventListener('click', event => {
+      event?.preventDefault();
+      if (typeof window.copyToClipboard === 'function') {
+        window.copyToClipboard(textContent, title);
+        return;
+      }
+      if (typeof copyToClipboard === 'function') {
+        copyToClipboard(textContent, title);
+        return;
+      }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textContent);
+          if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('התוכן הועתק ללוח בהצלחה', title || 'העתקה');
+          }
+        } else {
+          const fallback = document.createElement('textarea');
+          fallback.value = textContent;
+          fallback.style.position = 'fixed';
+          fallback.style.opacity = '0';
+          document.body.appendChild(fallback);
+          fallback.select();
+          document.execCommand('copy');
+          document.body.removeChild(fallback);
+          if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('התוכן הועתק ללוח בהצלחה', title || 'העתקה');
+          }
+        }
+      } catch (error) {
+        window.Logger?.error('[NotificationSystem] Failed to copy modal content:', error, {
+          page: 'notification-system',
+        });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה בהעתקת התוכן', error.message);
+        }
+      }
     });
   }
   
@@ -1090,11 +1160,6 @@ function hideModal(modalId) {
   
   if (backdrop) {
     backdrop.remove();
-  }
-  
-  // ניהול backdrop מרכזית דרך ModalNavigationManager
-  if (window.modalNavigationManager && window.modalNavigationManager.manageBackdrop) {
-    window.modalNavigationManager.manageBackdrop();
   }
 }
 
@@ -1426,6 +1491,7 @@ window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
 window.showDetailsModal = showDetailsModal;
+window.getNotificationColor = getNotificationColor;
 
 // Export NOTIFICATION CATEGORIES SYSTEM functions to global scope
 window.shouldShowNotification = shouldShowNotification;
@@ -1463,6 +1529,7 @@ window.notificationSystem = {
   createNotificationContainer,
   hideNotification,
   getNotificationIcon,
+  getNotificationColor,
   
   // NOTIFICATION CATEGORIES SYSTEM functions
   shouldShowNotification,
@@ -1487,6 +1554,7 @@ window.NotificationSystem = {
     showDetails: window.showDetailsModal,
     shouldShow: window.shouldShowNotification,
     logWithCategory: window.logWithCategory,
+    getNotificationColor: window.getNotificationColor,
     getCategoryIcon: window.getCategoryIcon,
     addGlobal: window.addGlobalNotification,
     getGlobal: window.getGlobalNotifications,
@@ -1521,7 +1589,7 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
             </div>
             <div class="modal-footer">
               <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-              <button data-button-type="COPY" data-onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')" data-text="העתק" title="העתק ללוח"></button>
+              <button data-button-type="COPY" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" data-text="העתק" title="העתק ללוח" id="${modalId}-copy-btn"></button>
             </div>
           </div>
         </div>
@@ -1535,6 +1603,28 @@ window.showDetailedNotification = async function(title, message, type = 'info', 
     const modalElement = document.getElementById(modalId);
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
+    
+    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
+    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
+        if (typeof window.copyToClipboard === 'function') {
+          window.copyToClipboard(textToCopy, title);
+        } else if (typeof copyToClipboard === 'function') {
+          copyToClipboard(textToCopy, title);
+        } else {
+          // Fallback: use navigator.clipboard directly
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            if (typeof window.showSuccessNotification === 'function') {
+              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
+            }
+          }).catch(err => {
+            window.Logger?.error('[NotificationSystem] Failed to copy:', err, { page: 'notification-system' });
+          });
+        }
+      });
+    }
     
     // הסרת ה-modal אחרי סגירה
     modalElement.addEventListener('hidden.bs.modal', () => {

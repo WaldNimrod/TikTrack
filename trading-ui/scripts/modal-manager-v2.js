@@ -60,7 +60,13 @@ class ModalManagerV2 {
         }
 
         if (!assignedValue) {
-            const today = new Date();
+            // Use dateUtils for consistent date handling
+            let today;
+            if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+              today = window.dateUtils.getToday();
+            } else {
+              today = new Date();
+            }
             today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
             assignedValue = includeTime
                 ? today.toISOString().slice(0, 16)
@@ -88,9 +94,9 @@ class ModalManagerV2 {
             // הוספה לאובייקט הגלובלי
             window.ModalManagerV2 = this;
             
-            console.log('ModalManagerV2 initialized successfully');
+            window.Logger?.info('ModalManagerV2 initialized successfully', { page: 'modal-manager-v2' });
         } catch (error) {
-            console.error('Error initializing ModalManagerV2:', error);
+            window.Logger?.error('Error initializing ModalManagerV2', { page: 'modal-manager-v2', error: error?.message || error });
         }
     }
 
@@ -122,6 +128,12 @@ class ModalManagerV2 {
         document.addEventListener('hidden.bs.modal', (event) => {
             this.handleModalHidden(event.target);
         });
+        
+        // מאזין מרכזי ללחיצה על backdrop - פועל על כל המודולים במערכת
+        // זה מבטיח שלחיצה על הרקע תסגור את המודל כמו לחיצה על כפתור סגור
+        document.addEventListener('click', (event) => {
+            this.handleBackdropClick(event);
+        }, true); // useCapture: true כדי לתפוס את האירוע לפני שהוא מגיע למודל
         
         // מאזין לפתיחת מודלים
         document.addEventListener('shown.bs.modal', (event) => {
@@ -792,7 +804,13 @@ class ModalManagerV2 {
                 // Handle 'today' special value for datetime-local
                 let dateValue = field.defaultValue || '';
                 if (dateValue === 'today') {
-                    const today = new Date();
+                    // Use dateUtils for consistent date handling
+                    let today;
+                    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+                      today = window.dateUtils.getToday();
+                    } else {
+                      today = new Date();
+                    }
                     dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm                                                                   
                 }
                 const dateStyle = field.style || (field.width ? `width: ${field.width}px` : '');
@@ -815,6 +833,65 @@ class ModalManagerV2 {
                 `;
                 
             case 'select':
+                // Check if this is a tag multi-select field
+                const isTagMultiSelect = (field.additionalClasses && (
+                    (Array.isArray(field.additionalClasses) && field.additionalClasses.includes('tag-multi-select')) ||
+                    (typeof field.additionalClasses === 'string' && field.additionalClasses.includes('tag-multi-select'))
+                )) || (field.classList && Array.isArray(field.classList) && field.classList.includes('tag-multi-select'));
+                
+                // If it's a tag multi-select, render it with badge container like tag-multi-select type
+                if (isTagMultiSelect) {
+                    const initialTags = Array.isArray(field.defaultValue)
+                        ? field.defaultValue.join(',')
+                        : (field.defaultValue || '');
+                    const badgeContainerId = `${field.id}TagBadgeContainer`;
+                    const extraAttributes = [];
+                    if (field.multiple) {
+                        extraAttributes.push('multiple');
+                    }
+                    if (field.attributes && typeof field.attributes === 'object') {
+                        Object.entries(field.attributes).forEach(([attrKey, attrValue]) => {
+                            if (attrValue === true) {
+                                extraAttributes.push(attrKey);
+                            } else if (attrValue !== false && attrValue !== null && attrValue !== undefined) {
+                                extraAttributes.push(`${attrKey}="${attrValue}"`);
+                            }
+                        });
+                    }
+                    if (field.dataset && typeof field.dataset === 'object') {
+                        Object.entries(field.dataset).forEach(([dataKey, dataValue]) => {
+                            if (dataValue !== undefined && dataValue !== null) {
+                                extraAttributes.push(`data-${dataKey}="${dataValue}"`);
+                            }
+                        });
+                    }
+                    
+                    return `
+                        <div class="mb-3">
+                            <label for="${field.id}" class="form-label">
+                                ${field.label} ${requiredStar}
+                            </label>
+                            <select 
+                                class="form-select tag-multi-select"
+                                id="${field.id}"
+                                name="${field.name || field.id}"
+                                ${requiredAttr}
+                                ${disabledAttr}
+                                ${readOnlyAttr}
+                                data-tag-category="${field.tagCategory ?? ''}"
+                                data-include-inactive="${field.includeInactive ? 'true' : 'false'}"
+                                data-initial-value="${initialTags}"
+                                ${extraAttributes.join(' ')}>
+                                <option value="" disabled>טוען תגיות...</option>
+                            </select>
+                            <div id="${badgeContainerId}" class="mt-2 tag-picker-badges text-start small"></div>
+                            ${field.description ? `<small class="form-text text-muted">${field.description}</small>` : ''}
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    `;
+                }
+                
+                // Regular select field
                 let optionsHTML = '';
                 if (field.includeEmpty !== false) {
                     const emptyText = field.emptyText || 'בחר...';
@@ -1046,9 +1123,9 @@ class ModalManagerV2 {
      * @param {Object} entityData - נתוני הישות (לעריכה/צפייה)
      * @returns {Promise<void>}
      */
-    async showModal(modalId, mode = 'add', entityData = null) {
+    async showModal(modalId, mode = 'add', entityData = null, options = {}) {
         try {
-            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, modalsCount: this.modals.size });
+            console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, options, modalsCount: this.modals.size });
             
             // בדיקה שהמודל קיים - אם לא, ננסה ליצור אותו מהקונפיגורציה
             if (!this.modals.has(modalId)) {
@@ -1070,7 +1147,8 @@ class ModalManagerV2 {
                         modalId === 'tradingAccountsModal' ? 'tradingAccountsModalConfig' : null,
                         modalId === 'tickersModal' ? 'tickersModalConfig' : null,
                         modalId === 'executionsModal' ? 'executionsModalConfig' : null,
-                        modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null
+                        modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null,
+                        modalId === 'notesModal' ? 'notesModalConfig' : null
                     ].filter(Boolean); // הסרת null values
                     
                     for (const name of possibleNames) {
@@ -1149,7 +1227,12 @@ class ModalManagerV2 {
             
             // Initialize tabs if exists
             if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs) && modalInfo.config.tabs.length > 0) {
-                this.initializeTabs(modalElement, modalInfo.config);
+                // For cash flow modal - handle currency exchange vs regular flow
+                if (modalId === 'cashFlowModal') {
+                    this.initializeCashFlowTabs(modalElement, modalInfo.config, mode, entityData, options);
+                } else {
+                    this.initializeTabs(modalElement, modalInfo.config);
+                }
             }
             
             // יישום צבעים
@@ -1159,6 +1242,7 @@ class ModalManagerV2 {
             // Note: populateSelects already handles defaultFromPreferences
             await this.populateSelects(modalElement, modalInfo.config);
             
+            
             if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
                 window.initializeExternalIdFields();
             }
@@ -1166,6 +1250,16 @@ class ModalManagerV2 {
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
+                
+                // CRITICAL: For executions modal, save ticker value after populateForm
+                // This ensures the value is preserved when initializeSpecialHandlers clones the select
+                if (modalId === 'executionsModal') {
+                    const tickerSelect = modalElement.querySelector('#executionTicker');
+                    if (tickerSelect && tickerSelect.value) {
+                        tickerSelect.dataset.preservedValue = tickerSelect.value;
+                        console.log(`💾 [showModal] Preserved executionTicker value after populateForm: ${tickerSelect.value}`);
+                    }
+                }
                 
                 // After populating form, update external_id field state for executions modal
                 if (modalId === 'executionsModal') {
@@ -1457,6 +1551,53 @@ class ModalManagerV2 {
             }
             
             modalElement.dataset.modalMode = mode;
+            
+            // בדיקה אם המודל נפתח כמודל מקונן (לפני modal.show())
+            // בדיקה כפולה: גם ב-ModalNavigationService וגם ישירות ב-DOM
+            let isNested = false;
+            
+            // בדיקה 1: ModalNavigationService stack
+            if (window.ModalNavigationService && 
+                window.ModalNavigationService.getStack && 
+                typeof window.ModalNavigationService.getStack === 'function') {
+                const stack = window.ModalNavigationService.getStack();
+                isNested = stack.length > 0;
+            }
+            
+            // בדיקה 2: ישירות ב-DOM - אם יש מודל אחר עם class 'show' (חשוב למודלים שנפתחים לפני רישום)
+            if (!isNested) {
+                const otherOpenModals = document.querySelectorAll('.modal.show');
+                // נבדוק אם יש מודל אחר פתוח (לא המודל הנוכחי)
+                for (const otherModal of otherOpenModals) {
+                    if (otherModal !== modalElement && otherModal.id !== modalId) {
+                        isNested = true;
+                        window.Logger?.debug(`Modal ${modalId} detected as nested via DOM check (other modal: ${otherModal.id})`, {
+                            modalId,
+                            otherModalId: otherModal.id,
+                            page: 'modal-manager-v2'
+                        });
+                        break;
+                    }
+                }
+            }
+            
+            // הוספת modal-nested class אם נפתח כמודל מקונן (לפני modal.show())
+            if (isNested && modalElement) {
+                modalElement.classList.add('modal-nested', 'modal-nested-level-2');
+                // הגדרת offset גבוה יותר למודל מקונן (40 במקום 20)
+                modalElement.style.setProperty('--modal-nested-offset', '40');
+                window.Logger?.debug(`Modal ${modalId} marked as nested before show()`, {
+                    modalId,
+                    stackLength: window.ModalNavigationService?.getStack?.()?.length || 0,
+                    domCheck: true,
+                    page: 'modal-manager-v2'
+                });
+            } else if (modalElement) {
+                // הסרת modal-nested אם לא מקונן
+                modalElement.classList.remove('modal-nested', 'modal-nested-level-2');
+                modalElement.style.removeProperty('--modal-nested-offset');
+            }
+            
             modal.show();
             this.bindDismissButtons(modalElement);
             this.ensureGlobalBackdrop();
@@ -1508,10 +1649,340 @@ class ModalManagerV2 {
             // בדיקה שהמודל נפתח בהצלחה
             console.log(`✅ Modal ${modalId} shown successfully`);
             
-            // אתחול rich-text editors (חייב להיות אחרי שהמודל נפתח)
-            // צריך לחכות קצת כדי שהמודל יוצג במלואו
-            setTimeout(async () => {
-                await this.initializeRichTextEditors(modalElement, modalInfo.config);
+            // פונקציה לבדיקה שהמודל גלוי לחלוטין (חשוב למודולים מקוננים)
+            const checkModalFullyVisible = () => {
+                // בדיקה שהמודל באמת גלוי (לא רק עם class 'show')
+                const isFullyVisible = modalElement.classList.contains('show') && 
+                                      modalElement.style.display !== 'none' &&
+                                      modalElement.offsetParent !== null &&
+                                      modalElement.offsetWidth > 0 &&
+                                      modalElement.offsetHeight > 0 &&
+                                      getComputedStyle(modalElement).visibility !== 'hidden' &&
+                                      getComputedStyle(modalElement).opacity !== '0';
+                return isFullyVisible;
+            };
+            
+            // פונקציה לבדיקת visibility עם MutationObserver (למודולים מקוננים)
+            const checkVisibilityWithObserver = (container, callback, timeout = 2000) => {
+                if (!container) {
+                    callback(false);
+                    return;
+                }
+                
+                // בדיקה מיידית
+                if (checkContainerVisible(container)) {
+                    callback(true);
+                    return;
+                }
+                
+                // שימוש ב-MutationObserver לבדיקת שינויים ב-DOM
+                const observer = new MutationObserver(() => {
+                    if (checkContainerVisible(container)) {
+                        observer.disconnect();
+                        callback(true);
+                    }
+                });
+                
+                // מעקב אחרי שינויים ב-parent element
+                const parentElement = container.parentElement || container.closest('.modal-body') || modalElement;
+                if (parentElement) {
+                    observer.observe(parentElement, { 
+                        attributes: true, 
+                        attributeFilter: ['style', 'class'],
+                        childList: true, 
+                        subtree: true 
+                    });
+                }
+                
+                // Timeout fallback
+                setTimeout(() => {
+                    observer.disconnect();
+                    const isVisible = checkContainerVisible(container);
+                    callback(isVisible);
+                }, timeout);
+            };
+            
+            // פונקציה לבדיקת visibility של container
+            const checkContainerVisible = (container) => {
+                if (!container) return false;
+                return container.offsetParent !== null && 
+                       container.style.display !== 'none' && 
+                       !container.classList.contains('d-none') &&
+                       container.offsetWidth > 0 && 
+                       container.offsetHeight > 0 &&
+                       getComputedStyle(container).visibility !== 'hidden' &&
+                       getComputedStyle(container).opacity !== '0';
+            };
+            
+            // אתחול rich-text editors (חייב להיות אחרי שהמודל נפתח במלואו)
+            // משתמש באירוע shown.bs.modal כדי להבטיח שהמודל גלוי לחלוטין
+            const initializeRichTextEditorsHandler = async () => {
+                // בדיקה אם המודל מקונן (חייב לבדוק מחדש כי זה רץ אחרי shown.bs.modal)
+                const isNested = modalElement.classList.contains('modal-nested') || 
+                                (window.ModalNavigationService && 
+                                 window.ModalNavigationService.getStack && 
+                                 typeof window.ModalNavigationService.getStack === 'function' &&
+                                 window.ModalNavigationService.getStack().length > 1);
+                
+                // המתנה קצרה נוספת כדי להבטיח שהדום מוכן והקונטיינרים גלויים
+                // במודולים מקוננים, צריך יותר זמן
+                const waitTime = isNested ? 500 : 150; // הגדלה ל-500ms למודולים מקוננים
+                
+                // שימוש ב-requestAnimationFrame למודולים מקוננים
+                if (isNested) {
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                    await new Promise(resolve => requestAnimationFrame(resolve));
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+                
+                // בדיקה נוספת שהמודל עדיין גלוי
+                // CRITICAL: אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                const hasShowClass = modalElement.classList.contains('show');
+                const isVisible = checkModalFullyVisible();
+                
+                if (!isVisible && !hasShowClass) {
+                    window.Logger?.warn(`Modal ${modalId} is not fully visible, waiting for shown.bs.modal event...`, {
+                        modalId,
+                        isNested,
+                        visibility: {
+                            hasShowClass: modalElement.classList.contains('show'),
+                            display: modalElement.style.display,
+                            offsetParent: modalElement.offsetParent !== null,
+                            offsetWidth: modalElement.offsetWidth,
+                            offsetHeight: modalElement.offsetHeight,
+                            computedVisibility: getComputedStyle(modalElement).visibility,
+                            computedOpacity: getComputedStyle(modalElement).opacity
+                        },
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // אם המודל לא גלוי, נמתין לאירוע עם retry mechanism
+                    let retryCount = 0;
+                    const maxRetries = 3;
+                    const retryHandler = async () => {
+                        retryCount++;
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        if (checkModalFullyVisible() || modalElement.classList.contains('show')) {
+                            initializeRichTextEditorsHandler();
+                        } else if (retryCount < maxRetries) {
+                            modalElement.addEventListener('shown.bs.modal', retryHandler, { once: true });
+                        } else {
+                            window.Logger?.warn(`Modal ${modalId} still not visible after ${maxRetries} retries, attempting initialization anyway`, {
+                                modalId,
+                                page: 'modal-manager-v2'
+                            });
+                            // ננסה בכל זאת
+                            initializeRichTextEditorsHandler();
+                        }
+                    };
+                    modalElement.addEventListener('shown.bs.modal', retryHandler, { once: true });
+                    return;
+                }
+                
+                // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                if (!isVisible && hasShowClass) {
+                    window.Logger?.warn(`Modal ${modalId} has 'show' class but visibility check failed, attempting initialization anyway`, {
+                        modalId,
+                        page: 'modal-manager-v2'
+                    });
+                    // נמשיך לאתחל למרות שהבדיקה לא עברה
+                }
+                
+                // בדיקה ש-Quill.js נטען (אם לא, נמתין עד 2 שניות)
+                let quillCheckRetries = 20;
+                while (quillCheckRetries > 0 && typeof window.Quill === 'undefined') {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    quillCheckRetries--;
+                }
+                
+                // אם Quill.js עדיין לא נטען, ננסה לטעון אותו דינמית
+                if (typeof window.Quill === 'undefined') {
+                    console.warn('⚠️ Quill.js not found, attempting to load dynamically...');
+                    try {
+                        await new Promise((resolve, reject) => {
+                            // בדיקה אם כבר יש script tag
+                            const existingScript = document.querySelector('script[src*="quill"]');
+                            if (existingScript) {
+                                console.log('🔍 Found existing Quill.js script tag, waiting for it to load...');
+                                // אם יש script tag, נמתין שהוא יסתיים
+                                const checkQuill = () => {
+                                    if (typeof window.Quill !== 'undefined') {
+                                        console.log('✅ Quill.js loaded from existing script tag');
+                                        resolve();
+                                    }
+                                };
+                                
+                                // בדיקה מיידית
+                                checkQuill();
+                                
+                                // אם כבר נטען, נבדוק שוב
+                                if (existingScript.complete || existingScript.readyState === 'complete') {
+                                    // Script כבר נטען
+                                    setTimeout(() => {
+                                        if (typeof window.Quill !== 'undefined') {
+                                            resolve();
+                                        } else {
+                                            reject(new Error('Quill.js script tag exists but window.Quill is still undefined'));
+                                        }
+                                    }, 100);
+                                } else {
+                                    // נמתין לטעינה
+                                    existingScript.addEventListener('load', () => {
+                                        setTimeout(checkQuill, 100);
+                                    });
+                                    existingScript.addEventListener('error', (e) => {
+                                        console.error('❌ Error loading Quill.js from existing script tag:', e);
+                                        reject(new Error('Failed to load Quill.js from existing script tag'));
+                                    });
+                                    
+                                    // Timeout אחרי 5 שניות
+                                    setTimeout(() => {
+                                        if (typeof window.Quill === 'undefined') {
+                                            reject(new Error('Timeout waiting for Quill.js to load from existing script tag'));
+                                        }
+                                    }, 5000);
+                                }
+                            } else {
+                                console.log('🔍 No existing Quill.js script tag found, creating new one...');
+                                // אם אין script tag, ניצור אחד
+                                const script = document.createElement('script');
+                                script.src = 'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js';
+                                script.async = false; // לא async כדי להבטיח סדר טעינה
+                                script.onload = () => {
+                                    setTimeout(() => {
+                                        if (typeof window.Quill !== 'undefined') {
+                                            console.log('✅ Quill.js loaded dynamically');
+                                            resolve();
+                                        } else {
+                                            reject(new Error('Quill.js script loaded but window.Quill is still undefined'));
+                                        }
+                                    }, 100);
+                                };
+                                script.onerror = (e) => {
+                                    console.error('❌ Error loading Quill.js dynamically:', e);
+                                    reject(new Error('Failed to load Quill.js from CDN'));
+                                };
+                                document.head.appendChild(script);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('❌ Failed to load Quill.js dynamically:', error);
+                        console.error('❌ Rich-text editors will not be initialized.');
+                        return;
+                    }
+                }
+                
+                // בדיקה סופית
+                if (typeof window.Quill === 'undefined') {
+                    console.error('❌ Quill.js not available after all attempts. Rich-text editors will not be initialized.');
+                    return;
+                }
+                
+                // ניסיון אתחול עם retry אם הקונטיינרים עדיין לא גלויים
+                // למודולים מקוננים, נשתמש ב-MutationObserver
+                const allFields = [];
+                if (modalInfo.config.fields && Array.isArray(modalInfo.config.fields)) {
+                    allFields.push(...modalInfo.config.fields);
+                }
+                if (modalInfo.config.tabs && Array.isArray(modalInfo.config.tabs)) {
+                    modalInfo.config.tabs.forEach(tab => {
+                        if (tab.fields && Array.isArray(tab.fields)) {
+                            allFields.push(...tab.fields);
+                        }
+                    });
+                }
+                
+                const richTextFields = allFields.filter(f => f.type === 'rich-text');
+                
+                if (richTextFields.length === 0) {
+                    window.Logger?.debug('No rich-text fields found in modal config', { modalId, page: 'modal-manager-v2' });
+                    return;
+                }
+                
+                // למודולים מקוננים, נשתמש ב-retry mechanism משופר
+                if (isNested && richTextFields.length > 0) {
+                    window.Logger?.debug('Using enhanced retry mechanism for nested modal rich-text initialization', {
+                        modalId,
+                        richTextFieldsCount: richTextFields.length,
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // למודולים מקוננים, ננסה יותר פעמים עם המתנות ארוכות יותר
+                    let retries = 5; // יותר retries למודולים מקוננים
+                    let allInitialized = false;
+                    
+                    while (retries > 0 && !allInitialized) {
+                        // ננסה לאתחל את כל העורכים
+                        await this.initializeRichTextEditors(modalElement, modalInfo.config);
+                        
+                        // בדיקה אם כל העורכים אותחלו
+                        allInitialized = richTextFields.every(field => {
+                            const container = modalElement.querySelector(`#${field.id}`);
+                            if (!container) return false;
+                            return container.querySelector('.ql-container') || window.RichTextEditorService?.getEditorInstance(field.id);
+                        });
+                        
+                        if (allInitialized) {
+                            window.Logger?.info(`All rich-text editors initialized successfully for nested modal ${modalId}`, {
+                                modalId,
+                                attempts: 6 - retries,
+                                page: 'modal-manager-v2'
+                            });
+                            break;
+                        }
+                        
+                        retries--;
+                        if (retries > 0) {
+                            window.Logger?.warn(`Some rich-text editors not initialized in nested modal, retrying... (${retries} attempts left)`, {
+                                modalId,
+                                failedFields: richTextFields.filter(field => {
+                                    const container = modalElement.querySelector(`#${field.id}`);
+                                    if (!container) return true;
+                                    return !container.querySelector('.ql-container') && !window.RichTextEditorService?.getEditorInstance(field.id);
+                                }).map(f => f.id),
+                                page: 'modal-manager-v2'
+                            });
+                            // המתנה ארוכה יותר למודולים מקוננים
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                        }
+                    }
+                    
+                    if (!allInitialized) {
+                        window.Logger?.error(`Failed to initialize all rich-text editors in nested modal ${modalId} after all retries`, {
+                            modalId,
+                            totalFields: richTextFields.length,
+                            failedFields: richTextFields.filter(field => {
+                                const container = modalElement.querySelector(`#${field.id}`);
+                                if (!container) return true;
+                                return !container.querySelector('.ql-container') && !window.RichTextEditorService?.getEditorInstance(field.id);
+                            }).map(f => f.id),
+                            page: 'modal-manager-v2'
+                        });
+                    }
+                } else {
+                    // למודולים רגילים, נשתמש ב-retry mechanism הקיים
+                    let retries = 3;
+                    while (retries > 0) {
+                        await this.initializeRichTextEditors(modalElement, modalInfo.config);
+                        
+                        const allInitialized = richTextFields.every(field => {
+                            const container = modalElement.querySelector(`#${field.id}`);
+                            return container && (container.querySelector('.ql-container') || window.RichTextEditorService?.getEditorInstance(field.id));
+                        });
+                        
+                        if (allInitialized || retries === 1) {
+                            break;
+                        }
+                        
+                        retries--;
+                        window.Logger?.warn(`Some rich-text editors not initialized, retrying... (${retries} attempts left)`, {
+                            modalId,
+                            page: 'modal-manager-v2'
+                        });
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                }
                 
                 // אם במצב edit, צריך למלא את התוכן אחרי שהעורך אותחל
                 // populateForm נקרא לפני modal.show(), אז צריך למלא שוב אחרי אתחול העורך
@@ -1548,7 +2019,54 @@ class ModalManagerV2 {
                         }
                     }
                 }
-            }, 150);
+            };
+            
+            // אם המודל כבר מוצג לחלוטין, נמתין קצת ואז נאתחל
+            // למודולים מקוננים, נשתמש ב-requestAnimationFrame + setTimeout ארוך יותר
+            // CRITICAL: גם אם המודל לא עובר את הבדיקה המלאה, אם יש class 'show', ננסה לאתחל
+            const hasShowClass = modalElement.classList.contains('show');
+            const isFullyVisible = checkModalFullyVisible();
+            
+            if (isFullyVisible || hasShowClass) {
+                const isNested = modalElement.classList.contains('modal-nested') || 
+                                (window.ModalNavigationService && 
+                                 window.ModalNavigationService.getStack && 
+                                 typeof window.ModalNavigationService.getStack === 'function' &&
+                                 window.ModalNavigationService.getStack().length > 1);
+                const delay = isNested ? 800 : 300; // הגדלה ל-800ms למודולים מקוננים
+                
+                // למודולים מקוננים, נשתמש ב-requestAnimationFrame + setTimeout
+                if (isNested) {
+                    // המתנה עם requestAnimationFrame + setTimeout ארוך יותר
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            setTimeout(() => {
+                                // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                                if (checkModalFullyVisible() || modalElement.classList.contains('show')) {
+                                    initializeRichTextEditorsHandler();
+                                } else {
+                                    // אם המודל לא גלוי, נשתמש ב-event
+                                    modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
+                                }
+                            }, delay);
+                        });
+                    });
+                } else {
+                    // המתנה קצרה נוספת כדי להבטיח שהמודל באמת מוכן
+                    setTimeout(() => {
+                        // אם המודל כבר נפתח (יש class 'show'), ננסה לאתחל גם אם הבדיקה לא עוברת
+                        if (checkModalFullyVisible() || modalElement.classList.contains('show')) {
+                            initializeRichTextEditorsHandler();
+                        } else {
+                            // אם המודל לא גלוי, נשתמש ב-event
+                            modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
+                        }
+                    }, delay);
+                }
+            } else {
+                // אחרת, המתן לאירוע shown.bs.modal
+                modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
+            }
             
             const navigationMetadata = {
                 modalId,
@@ -1943,7 +2461,15 @@ class ModalManagerV2 {
             }
             
             const result = await response.json();
-            return result.data || result;
+            const entityData = result.data || result;
+            
+            // Adapt DateEnvelope objects if date-utils is available
+            // This ensures date fields are properly converted for form inputs
+            if (window.adaptDateEnvelopes && typeof window.adaptDateEnvelopes === 'function') {
+                return window.adaptDateEnvelopes(entityData);
+            }
+            
+            return entityData;
             
         } catch (error) {
             console.error(`Error loading entity data for ${entityType} ${entityId}:`, error);
@@ -1957,33 +2483,185 @@ class ModalManagerV2 {
      * @private
      */
     async _hydrateTagFieldsForModal(modalElement, defaultEntityType, entityId) {
-        if (!modalElement || !window.TagUIManager) {
+        if (!modalElement) {
+            window.Logger?.warn('⚠️ _hydrateTagFieldsForModal: modalElement not available', {
+                page: 'modal-manager-v2'
+            });
             return;
         }
 
+        // Wait for TagUIManager to be available (it might load after modal opens)
+        if (!window.TagUIManager) {
+            window.Logger?.info('🏷️ TagUIManager not available yet, waiting...', {
+                modalId: modalElement.id,
+                page: 'modal-manager-v2'
+            });
+            
+            // Retry mechanism: wait for TagUIManager to be available
+            let retries = 0;
+            const maxRetries = 10;
+            const retryDelay = 100; // 100ms between retries
+            
+            while (retries < maxRetries && !window.TagUIManager) {
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                retries++;
+            }
+            
+            if (!window.TagUIManager) {
+                window.Logger?.warn('⚠️ TagUIManager not available after waiting', {
+                    modalId: modalElement.id,
+                    retries,
+                    page: 'modal-manager-v2'
+                });
+                return;
+            }
+            
+            window.Logger?.info('🏷️ TagUIManager became available after waiting', {
+                modalId: modalElement.id,
+                retries,
+                page: 'modal-manager-v2'
+            });
+        }
+
+        // First, initialize all tag selects (sets up event listeners and ensures they're ready)
+        if (typeof window.TagUIManager.initializeModal === 'function') {
+            try {
+                window.Logger?.info('🏷️ Initializing tag picker in modal', { 
+                    modalId: modalElement.id,
+                    entityType: defaultEntityType,
+                    page: 'modal-manager-v2' 
+                });
+                window.TagUIManager.initializeModal(modalElement);
+            } catch (error) {
+                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { 
+                    error: error.message || error,
+                    modalId: modalElement.id, 
+                    page: 'modal-manager-v2' 
+                });
+            }
+        }
+
+        // Wait a bit to ensure DOM is ready
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         const tagSelects = modalElement.querySelectorAll('select.tag-multi-select');
+        window.Logger?.info('🏷️ _hydrateTagFieldsForModal called', {
+            modalId: modalElement.id,
+            defaultEntityType,
+            entityId,
+            tagSelectsCount: tagSelects.length,
+            selectIds: Array.from(tagSelects).map(s => s.id),
+            page: 'modal-manager-v2'
+        });
+        
         if (!tagSelects.length) {
+            window.Logger?.info('🏷️ No tag selects found in modal', { modalId: modalElement.id, page: 'modal-manager-v2' });
             return;
         }
 
         for (const select of tagSelects) {
             const targetEntityType = select.dataset.tagEntity || defaultEntityType;
             if (!targetEntityType || !select.id) {
+                window.Logger?.warn('⚠️ Skipping tag select - missing entityType or id', {
+                    selectId: select.id,
+                    targetEntityType,
+                    defaultEntityType,
+                    hasTagEntity: !!select.dataset.tagEntity,
+                    page: 'modal-manager-v2'
+                });
                 continue;
             }
+            
+            // For edit mode: load existing tags for the entity
             if (entityId && typeof window.TagUIManager.hydrateSelectForEntity === 'function') {
                 try {
+                    window.Logger?.info('🏷️ Hydrating tag select for entity (edit mode)', {
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        entityId,
+                        page: 'modal-manager-v2'
+                    });
                     await window.TagUIManager.hydrateSelectForEntity(select.id, targetEntityType, entityId, { force: true });
                 } catch (error) {
                     window.Logger?.warn?.('⚠️ Failed to hydrate tag select after edit load', {
-                        error,
+                        error: error.message || error,
+                        errorStack: error.stack,
                         selectId: select.id,
                         entityType: targetEntityType,
                         entityId,
                         page: 'modal-manager-v2'
                     });
                 }
+            } else {
+                // For add mode: ensure tags are populated - refreshSelectOptions will populate if not already done
+                if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
+                    window.Logger?.info('🏷️ Refreshing tag select options (add mode)', {
+                        selectId: select.id,
+                        entityType: targetEntityType,
+                        hasTagService: !!window.TagService,
+                        hasFetchTags: !!(window.TagService && typeof window.TagService.fetchTags === 'function'),
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    // Retry mechanism: wait for TagService to be available
+                    let retries = 0;
+                    const maxRetries = 5;
+                    const retryDelay = 200; // 200ms between retries
+                    
+                    while (retries < maxRetries) {
+                        try {
+                            // Check if TagService is available
+                            if (window.TagService && typeof window.TagService.fetchTags === 'function') {
+                                await window.TagUIManager.refreshSelectOptions(select);
+                                window.Logger?.info('🏷️ Tag select refreshed successfully', {
+                                    selectId: select.id,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                break; // Success, exit retry loop
+                            } else {
+                                window.Logger?.debug('🏷️ TagService not available yet, waiting...', {
+                                    selectId: select.id,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                // Wait a bit and retry
+                                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                                retries++;
+                            }
+                        } catch (error) {
+                            if (retries >= maxRetries - 1) {
+                                // Last retry failed, log warning
+                                window.Logger?.warn?.('⚠️ Failed to refresh tag select options in add mode after retries', {
+                                    error: error.message || error,
+                                    errorStack: error.stack,
+                                    selectId: select.id,
+                                    entityType: targetEntityType,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                            } else {
+                                window.Logger?.debug('🏷️ Error refreshing tag select, retrying...', {
+                                    selectId: select.id,
+                                    error: error.message || error,
+                                    retries,
+                                    page: 'modal-manager-v2'
+                                });
+                                // Wait and retry
+                                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                                retries++;
+                            }
+                        }
+                    }
+                } else {
+                    window.Logger?.warn('⚠️ TagUIManager.refreshSelectOptions not available', {
+                        selectId: select.id,
+                        page: 'modal-manager-v2'
+                    });
+                }
             }
+            
+            // Load suggestions for both add and edit modes
             if (typeof window.TagUIManager.loadSuggestionsForSelect === 'function') {
                 const suggestionEntityId = entityId && targetEntityType === defaultEntityType ? entityId : null;
                 window.TagUIManager.loadSuggestionsForSelect(select, {
@@ -2001,7 +2679,7 @@ class ModalManagerV2 {
      */
     getPluralEndpoint(entityType) {
         const pluralMap = {
-            'cash_flow': 'cash_flows',
+            'cash_flow': 'cash-flows',  // Fixed: matches url_prefix='/api/cash-flows' in backend
             'trade': 'trades',
             'trading_account': 'trading-accounts',
             'alert': 'alerts',
@@ -2112,6 +2790,7 @@ class ModalManagerV2 {
                             placeholder: options.placeholder || field.placeholder || 'הכנס תוכן כאן...',
                             direction: options.direction || 'rtl',
                             maxLength: options.maxLength || field.maxLength,
+                            minHeight: options.minHeight, // גובה מינימלי למודולים מקוננים
                             modules: {
                                 toolbar: options.toolbar || [
                                     [{ 'header': [2, 3, false] }],
@@ -2130,8 +2809,10 @@ class ModalManagerV2 {
                         const quill = window.RichTextEditorService.initEditor(field.id, editorOptions);
                         if (quill) {
                             console.log(`✅ Rich-text editor "${field.id}" initialized successfully`);
+                            // Check for pending content (set by populateForm before editor was initialized)
                             if (container.dataset.pendingContent !== undefined) {
                                 const pendingHtml = container.dataset.pendingContent || '';
+                                console.log(`📝 Loading pending content for ${field.id}:`, pendingHtml.substring(0, 100) + '...');
                                 this._setRichTextContent(field.id, pendingHtml, pendingHtml ? {} : { clearAutoMessage: true });
                                 delete container.dataset.pendingContent;
                             }
@@ -2159,9 +2840,28 @@ class ModalManagerV2 {
     /**
      * Populate form with data - מילוי טופס עם נתונים
      * 
+     * **Trade Planning Fields Support (2025-01-29):**
+     * - For trade entities, populates planning fields (planned_quantity, planned_amount, entry_price) 
+     *   ONLY from Trade entity itself
+     * - NO FALLBACKS - if data is missing, shows clear notification to user
+     * - Implements strict data source policy: only Trade's own fields, no position/plan fallbacks
+     * 
      * @param {HTMLElement} modalElement - אלמנט המודל
-     * @param {Object} data - נתונים למילוי
+     * @param {Object} data - נתונים למילוי, עבור trade כולל:
+     *   - planned_quantity: כמות מתוכננת מה-Trade עצמו
+     *   - planned_amount: סכום מתוכנן מה-Trade עצמו
+     *   - entry_price: מחיר כניסה מה-Trade עצמו
      * @param {string} formId - מזהה הטופס (אופציונלי)
+     * @returns {Promise<void>}
+     * 
+     * @example
+     * // For trade entity - only uses Trade's own planning fields
+     * await modalManager.populateForm(modalElement, {
+     *   planned_quantity: 100,
+     *   planned_amount: 10000,
+     *   entry_price: 100
+     * });
+     * // If fields are missing, user will see notification: "נתוני תכנון חסרים"
      */
     async populateForm(modalElement, data, formId = null) {
         const form = formId ? 
@@ -2182,6 +2882,27 @@ class ModalManagerV2 {
         const fieldMapping = this.getFieldMapping(config?.entityType);
         console.log('📝 populateForm - field mapping:', fieldMapping);
         
+        // Get all field configs to check for rich-text fields
+        const allFieldConfigs = [];
+        if (config?.fields && Array.isArray(config.fields)) {
+            allFieldConfigs.push(...config.fields);
+        }
+        if (config?.tabs && Array.isArray(config.tabs)) {
+            config.tabs.forEach(tab => {
+                if (tab.fields && Array.isArray(tab.fields)) {
+                    allFieldConfigs.push(...tab.fields);
+                }
+            });
+        }
+        
+        // Create a map of field IDs to their configs for quick lookup
+        const fieldConfigMap = new Map();
+        allFieldConfigs.forEach(fieldConfig => {
+            if (fieldConfig.id) {
+                fieldConfigMap.set(fieldConfig.id, fieldConfig);
+            }
+        });
+        
                 // Fields to ignore (metadata/relationship fields)
         const fieldsToIgnore = ['id', 'updated_at', 'account_name', 'currency_name', 'currency_symbol', 'usd_rate'];
         
@@ -2200,6 +2921,14 @@ class ModalManagerV2 {
             if (key === 'opened_at' && data['created_at'] && data['created_at'] === value && fieldMapping['created_at']) {
                 console.log(`⏭️ Skipping ${key} (same as created_at)`);
                 continue;
+            }
+            
+            // CRITICAL: For date fields, prefer DateEnvelope over display string
+            // Check if this is a date field and if there's a _envelope version
+            let actualValue = value;
+            if ((key === 'date' || key.endsWith('_date') || key.includes('Date')) && data[`${key}_envelope`]) {
+                actualValue = data[`${key}_envelope`];
+                console.log(`🔍 [populateForm] Using ${key}_envelope instead of ${key} (DateEnvelope detected)`);
             }
             
             // Try direct match first (search in form and all tab panes)
@@ -2225,7 +2954,7 @@ class ModalManagerV2 {
             }
             
             if (field) {
-                console.log(`✅ Found field for ${key} (value: ${value}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
+                console.log(`✅ Found field for ${key} (value: ${actualValue}, valueType: ${typeof actualValue}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
                 
                 // Check if this is a display field (div with id but not an input)
                 if (field.tagName === 'DIV' && field.id && field.classList.contains('form-control-plaintext')) {
@@ -2235,15 +2964,29 @@ class ModalManagerV2 {
                         // Format date for display
                         if (displayText) {
                             try {
-                                const date = new Date(displayText);
+                                // Use dateUtils for consistent date parsing
+                                let date;
+                                if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                                  date = window.dateUtils.toDateObject(displayText);
+                                } else {
+                                  date = new Date(displayText);
+                                }
                                 if (!isNaN(date.getTime())) {
-                                    displayText = date.toLocaleString('he-IL', {
+                                    // Use FieldRendererService or dateUtils for consistent date formatting
+                                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                                      displayText = window.FieldRendererService.renderDate(date, true);
+                                    } else if (window.formatDate) {
+                                      displayText = window.formatDate(date, true);
+                                    } else if (window.dateUtils?.formatDate) {
+                                      displayText = window.dateUtils.formatDate(date, { includeTime: true });
+                                    } else {
+                                      displayText = date.toLocaleString('he-IL', {
                                         year: 'numeric',
                                         month: '2-digit',
                                         day: '2-digit',
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                    });
+                                    }));
                                 }
                             } catch (e) {
                                 // Keep original value if parsing fails
@@ -2333,11 +3076,30 @@ class ModalManagerV2 {
                                     console.log(`✅ Populated currencies select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
                                 } else if (field.id.includes('Ticker') || field.id.includes('ticker')) {
                                     console.log(`   Populating tickers select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
+                                    console.log(`   🔍 [populateForm] Ticker field details:`, {
+                                        fieldId: field.id,
+                                        key: key,
+                                        value: value,
+                                        selectValue: selectValue,
+                                        defaultValueForSelect: defaultValueForSelect,
+                                        currentOptionsCount: field.options.length
+                                    });
+                                    
+                                    // Always populate tickers select with defaultValue to ensure value is set
+                                    // This is the working solution - not elegant but works
                                     await window.SelectPopulatorService.populateTickersSelect(field, {
                                         includeEmpty: true,
                                         defaultValue: defaultValueForSelect // Pass the value we want to set
                                     });
-                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
+                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`, {
+                                        expectedValue: defaultValueForSelect,
+                                        actualValue: field.value,
+                                        hasOption: Array.from(field.options).some(opt => opt.value === String(defaultValueForSelect))
+                                    });
+                                    
+                                    // CRITICAL: Skip the general select value setting below for ticker fields
+                                    // We already handled it above, and the general code might reset it
+                                    field.dataset.tickerHandled = 'true';
                                 }
                             } catch (populateError) {
                                 console.error(`❌ Failed to populate select ${field.id}:`, populateError);
@@ -2358,6 +3120,13 @@ class ModalManagerV2 {
                         if (field.options.length <= 1) {
                             console.error(`❌ Select ${field.id} still has no options after retries - cannot set value ${selectValue}`);
                         }
+                    }
+                    
+                    // CRITICAL: Skip general select value setting for ticker fields that were already handled
+                    if (field.dataset.tickerHandled === 'true') {
+                        console.log(`⏭️ Skipping general select value setting for ${field.id} - already handled by ticker-specific code`);
+                        // Skip to next iteration in the for loop
+                        continue;
                     }
                     
                     // Check if the value exists in options before trying to set it
@@ -2459,43 +3228,217 @@ class ModalManagerV2 {
                     } else if (selectValue && field.value === selectValue) {
                         console.log(`✅ VERIFIED: field.value matches selectValue (${selectValue}) for ${field.id}`);
                     }                                                                            
-                } else if (field.classList && field.classList.contains('rich-text-editor-container')) {
+                } else if ((field.classList && field.classList.contains('rich-text-editor-container')) || 
+                           (fieldConfigMap.has(field.id) && fieldConfigMap.get(field.id).type === 'rich-text')) {
                     // Rich text editor - use RichTextEditorService
+                    // Check both by class and by field config to ensure we catch all rich-text fields
                     if (window.RichTextEditorService && typeof window.RichTextEditorService.getEditorInstance === 'function') {
                         const editor = window.RichTextEditorService.getEditorInstance(field.id);
                         if (editor) {
                             this._setRichTextContent(field.id, value || '', value ? {} : { clearAutoMessage: true });
                             console.log(`📝 Set rich-text field ${field.id} to: ${value || ''}`);
                         } else {
+                            // Editor not initialized yet - store content for later
                             field.dataset.pendingContent = value || '';
+                            console.log(`⏳ Rich-text editor ${field.id} not initialized yet, storing pending content`);
                         }
                     } else {
+                        // RichTextEditorService not available - store content for later
                         field.dataset.pendingContent = value || '';
                         console.warn(`⚠️ RichTextEditorService not available for field ${field.id}, storing pending content`);
                     }
-                } else if (field.type === 'date' && value) {
+                } else if (field.type === 'date' && actualValue) {
                     // Date type - value should be in YYYY-MM-DD format
-                    const dateStr = typeof value === 'string' ? value : value.toString();
-                    // Extract date part if datetime format (YYYY-MM-DDTHH:MM:SS)
-                    field.value = dateStr.split('T')[0];
-                    console.log(`📅 Set date field ${field.id} to: ${field.value}`);
-                } else if (field.type === 'datetime-local' && value) {
-                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
-                    const dateStr = typeof value === 'string' ? value : value.toString();
-                    // Handle both formats: 'YYYY-MM-DD HH:MM:SS' and 'YYYY-MM-DDTHH:MM:SS'
-                    let formattedDate = dateStr;
-                    if (dateStr.includes(' ')) {
-                        // Convert 'YYYY-MM-DD HH:MM:SS' to 'YYYY-MM-DDTHH:MM'
-                        formattedDate = dateStr.replace(' ', 'T').substring(0, 16);
-                    } else if (!dateStr.includes('T')) {
-                        // If no time part, add default time
-                        formattedDate = `${dateStr}T00:00`;
-                    } else {
-                        // If has T, ensure it's in correct format (YYYY-MM-DDTHH:MM)
-                        formattedDate = dateStr.substring(0, 16);
+                    // CRITICAL: Server returns DateEnvelope objects, not strings!
+                    // DateEnvelope structure: { utc, epochMs, local, timezone, display }
+                    console.log(`🔍 [populateForm] Processing date field ${field.id}`, {
+                        actualValue,
+                        actualValueType: typeof actualValue,
+                        originalValue: value,
+                        isDateEnvelope: window.dateUtils ? window.dateUtils.isDateEnvelope(actualValue) : (actualValue && typeof actualValue === 'object' && 'epochMs' in actualValue && 'utc' in actualValue),
+                        isDateObject: actualValue instanceof Date,
+                        isString: typeof actualValue === 'string',
+                        valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                    });
+                    
+                    let dateObj = null;
+                    
+                    // Priority 1: Check if it's a DateEnvelope object (server returns this!)
+                    if (actualValue && typeof actualValue === 'object' && ('epochMs' in actualValue || 'utc' in actualValue || 'local' in actualValue)) {
+                        console.log(`🔍 [populateForm] Detected DateEnvelope for ${field.id}`, {
+                            utc: actualValue.utc,
+                            epochMs: actualValue.epochMs,
+                            local: actualValue.local,
+                            timezone: actualValue.timezone
+                        });
+                        
+                        // Use dateUtils if available (preferred method)
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(actualValue);
+                            console.log(`✅ [populateForm] Converted DateEnvelope to Date object via dateUtils:`, dateObj ? dateObj.toISOString() : null);
+                        } else {
+                            // Fallback: parse from DateEnvelope fields
+                            if (actualValue.epochMs && typeof actualValue.epochMs === 'number') {
+                                dateObj = new Date(actualValue.epochMs);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.epochMs to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.utc && typeof actualValue.utc === 'string') {
+                                dateObj = new Date(actualValue.utc);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.utc to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.local && typeof actualValue.local === 'string') {
+                                dateObj = new Date(actualValue.local);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.local to Date object:`, dateObj.toISOString());
+                            }
+                        }
                     }
-                    field.value = formattedDate;
-                    console.log(`📅 Set datetime-local field ${field.id} to: ${field.value} (from: ${value})`);
+                    // Priority 2: Handle Date objects directly (server may return Date objects)
+                    else if (actualValue instanceof Date) {
+                        // Use dateUtils for consistent date handling
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject(actualValue);
+                        } else {
+                          dateObj = new Date(actualValue.getTime());
+                        }
+                        console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
+                    }
+                    // Priority 3: Use centralized date utils for strings and other formats
+                    else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        dateObj = window.dateUtils.toDateObject(actualValue);
+                        console.log(`✅ [populateForm] Converted via dateUtils.toDateObject:`, dateObj ? dateObj.toISOString() : null);
+                    }
+                    // Priority 4: Fallback if date-utils not loaded
+                    else if (typeof actualValue === 'string') {
+                        dateObj = new Date(actualValue);
+                        console.log(`✅ [populateForm] Parsed string value:`, dateObj.toISOString());
+                    }
+                    else {
+                        // Try to convert to string and parse
+                        try {
+                            dateObj = new Date(actualValue.toString());
+                            console.log(`✅ [populateForm] Parsed via toString():`, dateObj.toISOString());
+                        } catch (e) {
+                            console.warn(`⚠️ Failed to parse date value for ${field.id}:`, actualValue, e);
+                        }
+                    }
+                    
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        // Format as YYYY-MM-DD for date input
+                        const year = dateObj.getFullYear();
+                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        field.value = `${year}-${month}-${day}`;
+                        console.log(`✅ Set date field ${field.id} to: ${field.value}`, {
+                            originalValue: value,
+                            actualValue: actualValue,
+                            dateObj: dateObj.toISOString(),
+                            formatted: field.value
+                        });
+                    } else {
+                        console.error(`❌ Invalid date value for ${field.id}:`, {
+                            actualValue,
+                            actualValueType: typeof actualValue,
+                            originalValue: value,
+                            dateObj,
+                            isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
+                            valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                        });
+                    }
+                } else if (field.type === 'datetime-local' && actualValue) {
+                    // Convert date value to datetime-local format (YYYY-MM-DDTHH:MM)
+                    // CRITICAL: Server returns DateEnvelope objects, not strings!
+                    // DateEnvelope structure: { utc, epochMs, local, timezone, display }
+                    console.log(`🔍 [populateForm] Processing datetime-local field ${field.id}`, {
+                        actualValue,
+                        actualValueType: typeof actualValue,
+                        originalValue: value,
+                        isDateEnvelope: window.dateUtils ? window.dateUtils.isDateEnvelope(actualValue) : (actualValue && typeof actualValue === 'object' && 'epochMs' in actualValue && 'utc' in actualValue),
+                        isDateObject: actualValue instanceof Date,
+                        isString: typeof actualValue === 'string',
+                        valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                    });
+                    
+                    let dateObj = null;
+                    
+                    // Priority 1: Check if it's a DateEnvelope object (server returns this!)
+                    if (actualValue && typeof actualValue === 'object' && ('epochMs' in actualValue || 'utc' in actualValue || 'local' in actualValue)) {
+                        console.log(`🔍 [populateForm] Detected DateEnvelope for ${field.id}`, {
+                            utc: actualValue.utc,
+                            epochMs: actualValue.epochMs,
+                            local: actualValue.local,
+                            timezone: actualValue.timezone
+                        });
+                        
+                        // Use dateUtils if available (preferred method)
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(actualValue);
+                            console.log(`✅ [populateForm] Converted DateEnvelope to Date object via dateUtils:`, dateObj ? dateObj.toISOString() : null);
+                        } else {
+                            // Fallback: parse from DateEnvelope fields
+                            if (actualValue.epochMs && typeof actualValue.epochMs === 'number') {
+                                dateObj = new Date(actualValue.epochMs);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.epochMs to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.utc && typeof actualValue.utc === 'string') {
+                                dateObj = new Date(actualValue.utc);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.utc to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.local && typeof actualValue.local === 'string') {
+                                dateObj = new Date(actualValue.local);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.local to Date object:`, dateObj.toISOString());
+                            }
+                        }
+                    }
+                    // Priority 2: Handle Date objects directly (server may return Date objects)
+                    else if (actualValue instanceof Date) {
+                        // Use dateUtils for consistent date handling
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject(actualValue);
+                        } else {
+                          dateObj = new Date(actualValue.getTime());
+                        }
+                        console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
+                    }
+                    // Priority 3: Use centralized date utils for strings and other formats
+                    else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        dateObj = window.dateUtils.toDateObject(actualValue);
+                        console.log(`✅ [populateForm] Converted via dateUtils.toDateObject:`, dateObj ? dateObj.toISOString() : null);
+                    }
+                    // Priority 4: Fallback if date-utils not loaded
+                    else if (typeof actualValue === 'string') {
+                        dateObj = new Date(actualValue);
+                        console.log(`✅ [populateForm] Parsed string value:`, dateObj.toISOString());
+                    }
+                    else {
+                        // Try to convert to string and parse
+                        try {
+                            dateObj = new Date(actualValue.toString());
+                            console.log(`✅ [populateForm] Parsed via toString():`, dateObj.toISOString());
+                        } catch (e) {
+                            console.warn(`⚠️ Failed to parse datetime value for ${field.id}:`, actualValue, e);
+                        }
+                    }
+                    
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        // Format as YYYY-MM-DDTHH:MM for datetime-local input
+                        const year = dateObj.getFullYear();
+                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        const hours = String(dateObj.getHours()).padStart(2, '0');
+                        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                        field.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                        console.log(`✅ Set datetime-local field ${field.id} to: ${field.value}`, {
+                            originalValue: value,
+                            actualValue: actualValue,
+                            dateObj: dateObj.toISOString(),
+                            formatted: field.value
+                        });
+                    } else {
+                        console.error(`❌ Invalid datetime value for ${field.id}:`, {
+                            actualValue,
+                            actualValueType: typeof actualValue,
+                            originalValue: value,
+                            dateObj,
+                            isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
+                            valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                        });
+                    }
                 } else if (field.type === 'file') {
                     // File inputs cannot have their value set programmatically for security reasons
                     // Only empty string is allowed. Instead, we can show the current filename in a label or text field
@@ -2556,80 +3499,79 @@ class ModalManagerV2 {
         // עדכון linkButton fields (trade/plan selectors)
         await this.updateLinkButtonFields(form, data);
         
-        // Special handling for trade entity: populate quantity and amount from position or trade_plan
+        // Special handling for trade entity: populate planning fields ONLY from Trade entity itself
+        // NO FALLBACKS - if data is missing, show clear notification to user
         if (config?.entityType === 'trade') {
-            console.log('🔍 [Trade Edit] Checking for quantity and amount fields...');
-            console.log('🔍 [Trade Edit] Available data keys:', Object.keys(data));
-            console.log('🔍 [Trade Edit] position_quantity:', data.position_quantity);
-            console.log('🔍 [Trade Edit] position_amount:', data.position_amount);
-            console.log('🔍 [Trade Edit] trade_plan:', data.trade_plan);
-            console.log('🔍 [Trade Edit] trade_plan_planned_amount:', data.trade_plan_planned_amount);
-            console.log('🔍 [Trade Edit] entry_price:', data.entry_price);
+            window.Logger?.info('🔍 [Trade Edit] Populating planning fields from Trade entity only', {
+                planned_quantity: data.planned_quantity,
+                planned_amount: data.planned_amount,
+                entry_price: data.entry_price
+            }, { page: 'modal-manager-v2' });
             
-            // Check if entry_price was already populated in the form
+            // Get Trade's own planning fields ONLY (no fallbacks)
+            // בדיקה מפורשת ל-null/undefined - לא להשתמש ב-|| כי 0 הוא ערך תקין
+            const tradePlannedQuantity = (data.planned_quantity !== null && data.planned_quantity !== undefined)
+                ? data.planned_quantity
+                : ((data.quantity !== null && data.quantity !== undefined) ? data.quantity : null);
+            const tradePlannedAmount = (data.planned_amount !== null && data.planned_amount !== undefined)
+                ? data.planned_amount
+                : null;
+            const tradeEntryPrice = (data.entry_price !== null && data.entry_price !== undefined)
+                ? data.entry_price
+                : null;
+            
+            // Track missing fields for notification
+            const missingFields = [];
+            
+            // Populate entry_price field - ONLY from Trade.entry_price
             const entryPriceField = form.querySelector('#tradeEntryPrice');
-            const entryPrice = data.entry_price || (entryPriceField ? parseFloat(entryPriceField.value) || 0 : 0);
-            console.log('🔍 [Trade Edit] entryPrice (from data or field):', entryPrice);
-            
-            // Try to populate quantity from position_quantity or trade_plan
-            const quantityField = form.querySelector('#tradeQuantity');
-            if (quantityField) {
-                console.log(`🔍 [Trade Edit] quantityField found, current value: "${quantityField.value}"`);
-                if (!quantityField.value || quantityField.value === '') {
-                    // Try position_quantity first (actual position)
-                    if (data.position_quantity && data.position_quantity !== 0) {
-                        quantityField.value = data.position_quantity;
-                        console.log(`✅ Set tradeQuantity from position_quantity: ${data.position_quantity}`);
+            if (entryPriceField) {
+                if (!entryPriceField.value || entryPriceField.value === '') {
+                    if (tradeEntryPrice && tradeEntryPrice !== 0) {
+                        entryPriceField.value = tradeEntryPrice;
+                        window.Logger?.info(`✅ Set tradeEntryPrice from Trade.entry_price: ${tradeEntryPrice}`, {}, { page: 'modal-manager-v2' });
+                    } else {
+                        missingFields.push('מחיר כניסה');
                     }
-                    // If still empty, try to calculate from trade_plan if available
-                    else {
-                        // Check both nested and flat formats
-                        const plannedAmount = (data.trade_plan && data.trade_plan.planned_amount) || data.trade_plan_planned_amount;
-                        // Get entry_price from data or from already-populated field
-                        const entryPriceValue = entryPrice || 0;
-                        
-                        if (plannedAmount && entryPriceValue && entryPriceValue !== 0) {
-                            const calculatedQuantity = plannedAmount / entryPriceValue;
-                            if (calculatedQuantity > 0) {
-                                quantityField.value = calculatedQuantity.toFixed(2);
-                                console.log(`✅ Set tradeQuantity from trade_plan calculation: ${calculatedQuantity.toFixed(2)} (planned_amount: ${plannedAmount}, entry_price: ${entryPriceValue})`);
-                            }
-                        } else {
-                            console.log(`⚠️ Cannot calculate quantity - plannedAmount: ${plannedAmount}, entryPrice: ${entryPriceValue}`);
-                        }
-                    }
-                } else {
-                    console.log(`⏭️ quantityField already has value: "${quantityField.value}", skipping`);
                 }
-            } else {
-                console.error('❌ quantityField (#tradeQuantity) not found!');
             }
             
-            // Try to populate amount from position_amount or trade_plan.planned_amount
+            // Populate quantity field - ONLY from Trade.planned_quantity
+            const quantityField = form.querySelector('#tradeQuantity');
+            if (quantityField) {
+                if (!quantityField.value || quantityField.value === '') {
+                    if (tradePlannedQuantity && tradePlannedQuantity !== 0) {
+                        quantityField.value = tradePlannedQuantity;
+                        window.Logger?.info(`✅ Set tradeQuantity from Trade.planned_quantity: ${tradePlannedQuantity}`, {}, { page: 'modal-manager-v2' });
+                    } else {
+                        missingFields.push('כמות');
+                    }
+                }
+            }
+            
+            // Populate amount field - ONLY from Trade.planned_amount
             const amountField = form.querySelector('#tradeTotalInvestment');
             if (amountField) {
-                console.log(`🔍 [Trade Edit] amountField found, current value: "${amountField.value}"`);
                 if (!amountField.value || amountField.value === '') {
-                    // Try position_amount first (actual position cost)
-                    if (data.position_amount && data.position_amount !== 0) {
-                        amountField.value = data.position_amount;
-                        console.log(`✅ Set tradeTotalInvestment from position_amount: ${data.position_amount}`);
+                    if (tradePlannedAmount && tradePlannedAmount !== 0) {
+                        amountField.value = tradePlannedAmount;
+                        window.Logger?.info(`✅ Set tradeTotalInvestment from Trade.planned_amount: ${tradePlannedAmount}`, {}, { page: 'modal-manager-v2' });
+                    } else {
+                        missingFields.push('סכום השקעה');
                     }
-                    // If still empty, try trade_plan.planned_amount (both nested and flat formats)
-                    else {
-                        const plannedAmount = (data.trade_plan && data.trade_plan.planned_amount) || data.trade_plan_planned_amount;
-                        if (plannedAmount && plannedAmount !== 0) {
-                            amountField.value = plannedAmount;
-                            console.log(`✅ Set tradeTotalInvestment from trade_plan.planned_amount: ${plannedAmount}`);
-                        } else {
-                            console.log(`⚠️ Cannot set amount - plannedAmount: ${plannedAmount}`);
-                        }
-                    }
-                } else {
-                    console.log(`⏭️ amountField already has value: "${amountField.value}", skipping`);
                 }
-            } else {
-                console.error('❌ amountField (#tradeTotalInvestment) not found!');
+            }
+            
+            // Show notification if any planning fields are missing
+            if (missingFields.length > 0 && window.showInfoNotification) {
+                const fieldsList = missingFields.join(', ');
+                window.showInfoNotification(
+                    'נתוני תכנון חסרים',
+                    `הטרייד לא כולל את השדות הבאים: ${fieldsList}. אנא מלא אותם ידנית.`,
+                    8000,
+                    'system'
+                );
+                window.Logger?.warn('⚠️ Trade missing planning fields', { missingFields, tradeId: data.id }, { page: 'modal-manager-v2' });
             }
         }
         
@@ -3188,6 +4130,7 @@ class ModalManagerV2 {
                 'name': 'tickerName',
                 'type': 'tickerType',
                 'currency_id': 'tickerCurrency',
+                'status': 'tickerStatus',
                 'remarks': 'tickerRemarks',
                 'sector': 'tickerSector',
                 'industry': 'tickerIndustry'
@@ -3472,11 +4415,11 @@ class ModalManagerV2 {
         if (typeof window.formatDate === 'function') {
             return window.formatDate(isoString);
         }
-        return date.toLocaleDateString('he-IL', {
+        return window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : date.toLocaleDateString('he-IL', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
-        });
+        }));
     }
     
     /**
@@ -3602,6 +4545,140 @@ class ModalManagerV2 {
     }
     
     /**
+     * Initialize cash flow tabs with currency exchange detection - אתחול טאבים של תזרימי מזומנים עם זיהוי המרת מטבע
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit)
+     * @param {Object} entityData - נתוני הישות (לעריכה)
+     * @param {Object} options - אפשרויות נוספות (isCurrencyExchange, exchangeId)
+     * @private
+     */
+    initializeCashFlowTabs(modalElement, config, mode, entityData, options = {}) {
+        if (!config.tabs || !Array.isArray(config.tabs) || config.tabs.length === 0) {
+            return;
+        }
+        
+        const tabsContainer = modalElement.querySelector(`#${config.id}Tabs`);
+        if (!tabsContainer) {
+            console.warn(`⚠️ Tabs container not found for modal ${config.id}`);
+            return;
+        }
+        
+        // Determine if this is a currency exchange
+        let isCurrencyExchange = false;
+        
+        if (options.isCurrencyExchange) {
+            // Explicitly marked as currency exchange
+            isCurrencyExchange = true;
+        } else if (mode === 'edit' && entityData) {
+            // Check entityData for currency exchange indicators
+            if (window.isCurrencyExchange && typeof window.isCurrencyExchange === 'function') {
+                isCurrencyExchange = window.isCurrencyExchange(entityData);
+            } else {
+                // Fallback check
+                const type = entityData.type || '';
+                const externalId = entityData.external_id || '';
+                isCurrencyExchange = (
+                    type === 'currency_exchange_from' || 
+                    type === 'currency_exchange_to' ||
+                    (typeof externalId === 'string' && externalId.startsWith('exchange_')) ||
+                    entityData.linked_exchange_cash_flow_id ||
+                    entityData.exchange_pair_summary
+                );
+            }
+        }
+        
+        // Find tab buttons and panes
+        const tabButtons = tabsContainer.querySelectorAll('button[data-tab-id]');
+        const tabPanes = modalElement.querySelectorAll('.tab-pane');
+        
+        // Show/hide tabs based on currency exchange status
+        tabButtons.forEach(button => {
+            const tabId = button.getAttribute('data-tab-id');
+            const tabPane = modalElement.querySelector(`#${config.id}Tab${tabId}`);
+            
+            if (tabId === 'regular') {
+                // Regular tab - show only for non-exchange flows
+                if (isCurrencyExchange) {
+                    button.style.display = 'none';
+                    if (tabPane) {
+                        tabPane.style.display = 'none';
+                    }
+                } else {
+                    button.style.display = '';
+                    if (tabPane) {
+                        tabPane.style.display = '';
+                    }
+                }
+            } else if (tabId === 'exchange') {
+                // Exchange tab - show only for exchange flows
+                if (isCurrencyExchange) {
+                    button.style.display = '';
+                    if (tabPane) {
+                        tabPane.style.display = '';
+                    }
+                    // Activate exchange tab
+                    button.classList.add('active');
+                    if (tabPane) {
+                        tabPane.classList.add('show', 'active');
+                    }
+                    // Deactivate regular tab
+                    const regularButton = tabsContainer.querySelector('button[data-tab-id="regular"]');
+                    const regularPane = modalElement.querySelector(`#${config.id}Tabregular`);
+                    if (regularButton) {
+                        regularButton.classList.remove('active');
+                    }
+                    if (regularPane) {
+                        regularPane.classList.remove('show', 'active');
+                    }
+                } else {
+                    button.style.display = 'none';
+                    if (tabPane) {
+                        tabPane.style.display = 'none';
+                    }
+                }
+            }
+        });
+        
+        // Update save button onclick based on active tab
+        const saveBtn = modalElement.querySelector(`#${config.id}SaveBtn`);
+        if (saveBtn) {
+            if (isCurrencyExchange && config.onSaveExchange) {
+                saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+            } else if (config.onSave) {
+                saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+            }
+        }
+        
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('shown.bs.tab', (e) => {
+                const tabId = e.target.getAttribute('data-tab-id');
+                
+                // Update save button onclick based on selected tab
+                if (saveBtn) {
+                    if (tabId === 'exchange' && config.onSaveExchange) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSaveExchange}()`);
+                    } else if (config.onSave) {
+                        saveBtn.setAttribute('data-onclick', `${config.onSave}()`);
+                    }
+                }
+                
+                // Initialize currency exchange calculations if exchange tab is active
+                if (tabId === 'exchange') {
+                    this.initializeCurrencyExchangeCalculations(modalElement);
+                }
+            });
+        });
+        
+        // Initialize currency exchange calculations if exchange tab is active
+        if (isCurrencyExchange) {
+            this.initializeCurrencyExchangeCalculations(modalElement);
+        }
+    }
+    
+    /**
      * Initialize currency exchange calculations - אתחול חישובי המרת מטבע
      * 
      * @param {HTMLElement} modalElement - אלמנט המודל
@@ -3626,6 +4703,11 @@ class ModalManagerV2 {
         const accountField = searchScope.querySelector('#cashFlowAccount');
         const descriptionField = searchScope.querySelector('#cashFlowDescription');
         const netAmountField = searchScope.querySelector('#currencyExchangeNetAmount');
+        if (typeof window.setCurrencyExchangeSummary === 'function') {
+            window.setCurrencyExchangeSummary(null);
+        } else if (netAmountField) {
+            netAmountField.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+        }
         
         console.log('🔵 Fields found:', {
             fromAmountField: !!fromAmountField,
@@ -4192,6 +5274,10 @@ class ModalManagerV2 {
             
             for (const select of selects) {
                 const selectId = select.id;
+                // Skip empty IDs (might be dynamically created elements)
+                if (!selectId || selectId.trim() === '') {
+                    continue;
+                }
                 const result = findFieldConfig(selectId, config);
                 if (!result) {
                     console.warn(`⚠️ Field config not found for ${selectId}`);
@@ -4290,12 +5376,18 @@ class ModalManagerV2 {
                 });
             } 
             // Ticker select fields (but NOT tickerType or tickerCurrency)
+            // Note: executionTicker with populateFromService will be handled above via populateFromService: 'tickers', not here
             else if ((selectId.includes('Ticker') || selectId.includes('ticker')) && 
                       !selectId.includes('Type') && !selectId.includes('Currency') &&
                       selectId !== 'tickerType' && selectId !== 'tickerCurrency') {
-                // Ticker select (e.g., cashFlowTicker, tradePlanTicker)
+                // Regular ticker select (e.g., tradePlanTicker)
+                // executionTicker with populateFromService is handled above, so it won't reach here
                 await window.SelectPopulatorService.populateTickersSelect(select, {
                     includeEmpty: true
+                });
+                console.log(`✅ נטענו טיקרים ל-${selectId}`, {
+                    selectOptionsAfter: select.options.length,
+                    selectValue: select.value
                 });
             } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
                 await window.SelectPopulatorService.populateTradePlansSelect(select, {
@@ -4320,7 +5412,7 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - אלמנט המודל
      * @private
      */
-    handleModalShown(modalElement) {
+    async handleModalShown(modalElement) {
         const modalId = modalElement.id;
         
         if (this.modals.has(modalId)) {
@@ -4328,14 +5420,13 @@ class ModalManagerV2 {
             this.activeModal = modalId;
         }
         
-        if (window.TagUIManager && typeof window.TagUIManager.initializeModal === 'function') {
-            try {
-                window.TagUIManager.initializeModal(modalElement);
-            } catch (error) {
-                window.Logger?.warn('⚠️ Failed to initialize tag picker in modal', { error, modalId, page: 'modal-manager-v2' });
-            }
-        }
-        this._hydrateTagFieldsForModal(modalElement, modalElement.dataset.entityType || null, null);
+        // Get entityType from modal config or dataset
+        const modalInfo = this.modals.get(modalId);
+        const entityType = modalInfo?.config?.entityType || modalElement.dataset.entityType || null;
+        
+        // Hydrate tag fields FIRST - this will also call initializeModal internally
+        // Must be async and awaited, and pass entityType from config
+        await this._hydrateTagFieldsForModal(modalElement, entityType, null);
         
         // פוקוס על השדה הראשון
         const firstInput = modalElement.querySelector('input:not([readonly]), select, textarea');
@@ -4442,18 +5533,37 @@ class ModalManagerV2 {
         
         // For Executions modal - handle ticker and account selection
         if (modalId === 'executionsModal') {
-            // Handle ticker selection
+            // Handle ticker selection - clone and re-populate to ensure value is preserved
+            // This is the working solution - not elegant but works
             const tickerSelect = modalElement.querySelector('#executionTicker');
             if (tickerSelect) {
-                // Save original before cloning
-                const originalTickerSelect = tickerSelect;
+                // CRITICAL: Get preserved value from data attribute (set by populateForm)
+                // OR use current value if preserved value not available
+                const preservedValue = tickerSelect.dataset.preservedValue;
+                const originalValue = preservedValue || tickerSelect.value;
+                console.log(`💾 [initializeSpecialHandlers] executionTicker - preservedValue: ${preservedValue}, currentValue: ${tickerSelect.value}, will use: ${originalValue}`);
                 
-                // Remove existing listeners
+                // Clone to remove existing listeners
                 const newTickerSelect = tickerSelect.cloneNode(true);
                 tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
                 
-                // Restore value after clone (critical for edit mode!)
-                this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'executionTicker');
+                console.log(`🔄 [initializeSpecialHandlers] After clone - originalValue: ${originalValue}, newSelect.value: ${newTickerSelect.value}`);
+                
+                // Re-populate with original value as defaultValue
+                if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+                    (async () => {
+                        try {
+                            console.log(`🔄 [initializeSpecialHandlers] Re-populating with defaultValue: ${originalValue}`);
+                            await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
+                                includeEmpty: true,
+                                defaultValue: originalValue // CRITICAL: Use the preserved value
+                            });
+                            console.log(`✅ [initializeSpecialHandlers] Re-populated, final value: ${newTickerSelect.value}, expected: ${originalValue}`);
+                        } catch (error) {
+                            console.error(`❌ Error re-populating executionTicker:`, error);
+                        }
+                    })();
+                }
                 
                 // Add change listener
                 newTickerSelect.addEventListener('change', async (e) => {
@@ -4510,6 +5620,53 @@ class ModalManagerV2 {
                 sourceSelect.addEventListener('change', updateExternalIdField);
                 
                 console.log('✅ Added source field listener for executionExternalId');
+            }
+            
+            // Handle execution type field - enable/disable Realized P/L and MTM P/L fields based on execution type
+            // Realized P/L and MTM P/L נדרשים רק ל-sell (מכירה) ו-cover (כיסוי) - סגירת פוזיציות
+            // Realized P/L and MTM P/L לא נדרשים ל-buy (קנייה) ו-short (מכירה בחסר) - פתיחת פוזיציות
+            const executionTypeSelect = modalElement.querySelector('#executionType');
+            const realizedPLField = modalElement.querySelector('#executionRealizedPL');
+            const mtmPLField = modalElement.querySelector('#executionMTMPL');
+            
+            // Function to update both Realized P/L and MTM P/L fields state (same logic for both)
+            const updatePLFields = () => {
+                const executionType = executionTypeSelect.value;
+                if (executionType === 'sell' || executionType === 'cover') {
+                    // Enable P/L fields for sell and cover (closing positions)
+                    if (realizedPLField) {
+                        realizedPLField.disabled = false;
+                        realizedPLField.required = true;
+                    }
+                    if (mtmPLField) {
+                        mtmPLField.disabled = false;
+                        mtmPLField.required = false; // MTM P/L is optional even when enabled
+                    }
+                    console.log(`🔓 Enabled P/L fields (type: ${executionType})`);
+                } else {
+                    // Disable P/L fields for buy, short, and any unknown types (opening positions)
+                    if (realizedPLField) {
+                        realizedPLField.disabled = true;
+                        realizedPLField.required = false;
+                        realizedPLField.value = '';
+                    }
+                    if (mtmPLField) {
+                        mtmPLField.disabled = true;
+                        mtmPLField.required = false;
+                        mtmPLField.value = '';
+                    }
+                    console.log(`🔒 Disabled P/L fields (type: ${executionType})`);
+                }
+            };
+            
+            if (executionTypeSelect) {
+                // Set initial state
+                updatePLFields();
+                
+                // Add change listener
+                executionTypeSelect.addEventListener('change', updatePLFields);
+                
+                console.log('✅ Added execution type listener for executionRealizedPL and executionMTMPL');
             }
         }
         
@@ -4951,6 +6108,16 @@ class ModalManagerV2 {
                         await window.loadAlertTickerInfo(tickerId);
                     }
                 });
+            }
+        }
+
+        if (modalId === 'tradesModal') {
+            if (typeof window.setupTradeConditionsButton === 'function') {
+                try {
+                    window.setupTradeConditionsButton(modalElement);
+                } catch (error) {
+                    window.Logger?.warn('⚠️ Failed to initialize trade conditions controls', { error, page: 'modal-manager-v2' });
+                }
             }
         }
 
@@ -5703,7 +6870,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.opened_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                 } else if (typeId === 3) {
                     // עבור תוכנית - צריך להתאים בדיוק לפורמט בטבלה: תוכנית | טיקר | צד | סוג השקעה | תאריך
@@ -5723,7 +6890,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                 } else if (typeId === 1) {
                     // עבור חשבון - שם + מטבע
@@ -5879,7 +7046,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.opened_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `טרייד | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                     
                     if (index < 3) { // Log only first 3 for debugging
@@ -5912,7 +7079,7 @@ class ModalManagerV2 {
                     const side = item.side || 'לא מוגדר';
                     const investmentType = item.investment_type || 'לא מוגדר';
                     const date = item.created_at || item.date;
-                    const formattedDate = date ? new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }) : 'לא מוגדר';
+                    const formattedDate = date ? (window.formatDate ? window.formatDate(date) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date) : new Date(date).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }))) : 'לא מוגדר';
                     displayText = `תוכנית | ${tickerSymbol} | ${side} | ${investmentType} | ${formattedDate}`;
                     
                     if (index < 3) { // Log only first 3 for debugging
@@ -6039,6 +7206,89 @@ class ModalManagerV2 {
         this.closeActiveModal();
     }
 
+    /**
+     * Handle backdrop click - טיפול בלחיצה על backdrop (כל סוגי המודולים)
+     * פונקציה מרכזית שפועלת על כל המודולים במערכת - גם Bootstrap וגם custom
+     * 
+     * @param {Event} event - אירוע הלחיצה
+     * @private
+     */
+    handleBackdropClick(event) {
+        if (!event) {
+            return;
+        }
+
+        const target = event.target;
+        
+        // בדיקה אם הלחיצה היא על backdrop (Bootstrap או global)
+        const isBackdropClick = 
+            target.classList.contains('modal-backdrop') || 
+            target === this.globalBackdrop;
+        
+        // בדיקה אם הלחיצה היא על modal element עצמו (לא על התוכן שלו)
+        // זה קורה כשלוחצים על הרקע של המודל (מחוץ ל-modal-dialog)
+        const modalElement = target.closest('.modal.show');
+        const isModalElementClick = 
+            modalElement && 
+            target === modalElement; // הלחיצה היא על modal element עצמו, לא על תוכן
+
+        if (!isBackdropClick && !isModalElementClick) {
+            return;
+        }
+
+        // מציאת המודל הפעיל
+        let activeModal = null;
+        
+        if (isBackdropClick) {
+            // אם לחיצה על backdrop - מציאת המודל הפעיל
+            const openModals = document.querySelectorAll('.modal.show');
+            if (openModals.length === 0) {
+                return;
+            }
+            activeModal = openModals[openModals.length - 1];
+        } else if (isModalElementClick) {
+            // אם לחיצה על modal element עצמו
+            activeModal = modalElement;
+        }
+
+        if (!activeModal) {
+            return;
+        }
+
+        // בדיקה אם המודל מאפשר סגירה בלחיצה על הרקע
+        // אם יש data-bs-backdrop="static" - לא נסגור
+        const backdropSetting = activeModal.getAttribute('data-bs-backdrop');
+        if (backdropSetting === 'static') {
+            return;
+        }
+
+        // בדיקה אם הלחיצה היא על modal-dialog (לא על הרקע)
+        // אם כן - לא נסגור (זה תוכן המודל)
+        if (isModalElementClick) {
+            const modalDialog = activeModal.querySelector('.modal-dialog');
+            if (modalDialog && modalDialog.contains(target)) {
+                return;
+            }
+        }
+
+        // סגירת המודל
+        event.preventDefault();
+        event.stopPropagation();
+
+        // ניסיון לסגור דרך Bootstrap Modal instance
+        const modalInstance = bootstrap?.Modal?.getInstance(activeModal);
+        if (modalInstance && typeof modalInstance.hide === 'function') {
+            modalInstance.hide();
+        } else {
+            // fallback - סגירה ידנית
+            activeModal.classList.remove('show');
+            activeModal.style.display = 'none';
+            activeModal.setAttribute('aria-hidden', 'true');
+            activeModal.removeAttribute('aria-modal');
+            activeModal.dispatchEvent(new Event('hidden.bs.modal'));
+        }
+    }
+
     _getActiveModalCount() {
         let count = 0;
         this.modals.forEach((modalInfo) => {
@@ -6082,6 +7332,40 @@ class ModalManagerV2 {
                 }
             }
         }
+        this.updateGlobalBackdropVisibility();
+    }
+
+    /**
+     * Hide modal by ID - סגירת מודל לפי מזהה
+     * 
+     * @param {string} modalId - מזהה המודל לסגירה (אופציונלי - אם לא מוגדר, סוגר את המודל הפעיל)
+     * @returns {void}
+     */
+    hideModal(modalId = null) {
+        const targetModalId = modalId || this.activeModal;
+        if (!targetModalId) {
+            return;
+        }
+
+        const modalElement = document.getElementById(targetModalId);
+        if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            } else {
+                // אם אין instance, נסה ליצור ולסגור
+                const newModal = bootstrap.Modal.getOrCreateInstance(modalElement, { backdrop: false });
+                if (newModal) {
+                    newModal.hide();
+                }
+            }
+        }
+
+        // עדכון activeModal אם זה המודל הפעיל
+        if (this.activeModal === targetModalId) {
+            this.activeModal = null;
+        }
+
         this.updateGlobalBackdropVisibility();
     }
 

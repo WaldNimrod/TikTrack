@@ -3,44 +3,45 @@
 User Preferences List API Routes
 Date: October 30, 2025
 Description: API routes for listing all user preferences from database table
+Updated: 17 November 2025 - Migrated to SQLAlchemy
 """
 
 from flask import Blueprint, request, jsonify
-from typing import Dict, Any
+from sqlalchemy.orm import Session
+from config.database import get_db
+from models.preferences import UserPreference
+from routes.api.base_entity_decorators import require_authentication
+from services.advanced_cache_service import cache_for
 import logging
-import os
-import sqlite3
+from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_prefix='/api/user-preferences')
 
-def get_db_connection():
-    """Get database connection"""
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DB_PATH = os.path.join(BASE_DIR, "db", "tiktrack.db")
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
 @user_preferences_list_bp.route('/', methods=['GET'])
+@require_authentication()
+@cache_for(ttl=300)  # Cache for 5 minutes
 def get_user_preferences():
-    """Get all user preferences"""
+    """Get all user preferences using SQLAlchemy"""
+    db: Session = next(get_db())
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT * FROM user_preferences ORDER BY id")
-        preferences = cursor.fetchall()
-        
-        conn.close()
+        preferences = db.query(UserPreference).order_by(UserPreference.id).all()
         
         # Convert to list of dictionaries
         result = []
         for pref in preferences:
-            result.append(dict(pref))
+            pref_dict = {
+                'id': pref.id,
+                'user_id': pref.user_id,
+                'profile_id': pref.profile_id,
+                'preference_id': pref.preference_id,
+                'saved_value': pref.saved_value,
+                'created_at': pref.created_at.isoformat() if pref.created_at else None,
+                'updated_at': pref.updated_at.isoformat() if pref.updated_at else None
+            }
+            result.append(pref_dict)
         
         return jsonify({
             'status': 'success',
@@ -57,4 +58,5 @@ def get_user_preferences():
             'message': f'Error retrieving user preferences: {str(e)}',
             'version': '1.0'
         }), 500
-
+    finally:
+        db.close()

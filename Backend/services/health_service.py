@@ -80,9 +80,19 @@ class HealthService:
             result.fetchall()
             query_time = time.time() - start_perf
             
-            # Check database size
-            result = db.execute(text("SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()"))
-            db_size = result.fetchone()[0]
+            # Check database size (PostgreSQL or SQLite)
+            from config.settings import USING_SQLITE
+            try:
+                if USING_SQLITE:
+                    result = db.execute(text("SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()"))
+                    db_size = result.fetchone()[0]
+                else:
+                    # PostgreSQL: Get database size in bytes
+                    result = db.execute(text("SELECT pg_database_size(current_database()) as size"))
+                    db_size = result.fetchone()[0]
+            except Exception as size_error:
+                logger.warning(f"Could not get database size: {size_error}")
+                db_size = 0  # Default to 0 if size check fails
             
             db.close()
             

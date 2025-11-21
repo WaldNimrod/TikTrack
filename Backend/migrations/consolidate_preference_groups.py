@@ -3,8 +3,8 @@
 Preferences Groups Consolidation Migration
 ========================================
 
-איחוד קבוצות העדפות מ-16 קבוצות ל-6 קבוצות מסודרות
-או מעבר מיטבי יותר - יצירת 6 קבוצות חדשות ואיחוד כל ההעדפות לתוכן
+איחוד קבוצות העדפות מ-16 קבוצות ל-7 קבוצות מסודרות לפי הדוח
+יצירת 7 קבוצות חדשות ואיחוד כל ההעדפות לתוכן
 
 Author: TikTrack Development Team
 Date: January 30, 2025
@@ -23,7 +23,7 @@ def consolidate_preference_groups():
     """איחוד קבוצות העדפות"""
     
     # נתיב לבסיס הנתונים
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'tiktrack.db')
     
     if not os.path.exists(db_path):
         print(f"❌ בסיס הנתונים לא נמצא: {db_path}")
@@ -61,14 +61,15 @@ def consolidate_preference_groups():
         # ============================================================
         print("\n📋 שלב 2: יצירת קבוצות חדשות...")
         
-        # 6 קבוצות חדשות
+        # 7 קבוצות חדשות לפי הדוח
         new_groups = [
-            ('basic_settings', 'הגדרות בסיסיות'),
-            ('trading_settings', 'הגדרות מסחר'),
-            ('filter_settings', 'פילטרים ברירת מחדל'),
-            ('colors_unified', 'צבעים'),
-            ('notification_settings', 'התראות'),
-            ('chart_settings_unified', 'הגדרות גרפים')
+            ('basic_settings', 'הגדרות בסיסיות - מטבעות, זמן, שפה, חשבון ברירת מחדל'),
+            ('trading_settings', 'הגדרות מסחר - Stop Loss, Target, Commission, סיכונים'),
+            ('filter_settings', 'פילטרים ברירת מחדל - סטטוס, סוג, תאריכים, חיפוש'),
+            ('colors_unified', 'צבעים - כל הצבעים במקום אחד (55 העדפות)'),
+            ('notification_settings', 'התראות ולוגים (23 העדפות)'),
+            ('chart_settings_unified', 'הגדרות גרפים - גרפים + צבעים + ייצוא (16 העדפות)'),
+            ('ui_settings', 'הגדרות ממשק - ערכת נושא, טבלאות (11 העדפות)')
         ]
         
         group_id_map = {}
@@ -98,9 +99,9 @@ def consolidate_preference_groups():
         # ============================================================
         print("\n🔄 שלב 3: העברת העדפות לקבוצות חדשות...")
         
-        # מיפוי קבוצות ישנות → חדשות
+        # מיפוי קבוצות ישנות → חדשות לפי הדוח
         migration_map = {
-            # basic_settings: general + basic_settings (לא כולל default_trading_account)
+            # 1. basic_settings (6 העדפות): general + basic_settings + default_trading_account + pagination_size_default
             'general': {
                 'timezone': 'basic_settings',
                 'notificationMode': 'basic_settings'  # אם זה עדיין קיים
@@ -111,39 +112,6 @@ def consolidate_preference_groups():
                 'language': 'basic_settings',
                 'default_trading_account': 'basic_settings'  # העברה מ-filter_settings
             },
-            
-            # trading_settings: trading_settings
-            'trading_settings': {
-                'defaultStopLoss': 'trading_settings',
-                'defaultTargetPrice': 'trading_settings',
-                'defaultCommission': 'trading_settings',
-                'maxAccountRisk': 'trading_settings',
-                'maxPositionSize': 'trading_settings',
-                'maxTradeRisk': 'trading_settings'
-            },
-            
-            # filter_settings: filters + filter_settings (לא כולל default_trading_account)
-            'filters': {
-                'entityAlertColor': 'filter_settings',
-                'entityAlertColorLight': 'filter_settings',
-                'entityAlertColorDark': 'filter_settings',
-                'entityNoteColor': 'filter_settings',
-                'entityNoteColorLight': 'filter_settings',
-                'entityNoteColorDark': 'filter_settings',
-                'entityTradePlanColor': 'filter_settings',
-                'entityTradePlanColorLight': 'filter_settings',
-                'entityTradePlanColorDark': 'filter_settings',
-                'entityResearchColor': 'filter_settings',
-                'entityResearchColorLight': 'filter_settings',
-                'entityResearchColorDark': 'filter_settings',
-                'entityPreferencesColor': 'filter_settings',
-                'entityPreferencesColorLight': 'filter_settings',
-                'entityPreferencesColorDark': 'filter_settings',
-                'defaultStatusFilter': 'filter_settings',
-                'defaultTypeFilter': 'filter_settings',
-                'defaultDateRangeFilter': 'filter_settings',
-                'defaultSearchFilter': 'filter_settings'
-            },
             'filter_settings': {
                 'defaultStatusFilter': 'filter_settings',
                 'defaultTypeFilter': 'filter_settings',
@@ -151,28 +119,35 @@ def consolidate_preference_groups():
                 'defaultSearchFilter': 'filter_settings',
                 'default_trading_account': 'basic_settings'  # העברה ל-basic_settings
             },
-            
-            # colors_unified: colors + ui_colors + entity_colors + value_colors
-            'colors': {
-                'statusOpenColor': 'colors_unified',
-                'statusClosedColor': 'colors_unified',
-                'statusCancelledColor': 'colors_unified',
-                'statusPendingColor': 'colors_unified'
+            'ui_settings': {
+                'pagination_size_default': 'basic_settings',  # העברה ל-basic_settings
+                # כל שאר ההעדפות נשארות ב-ui_settings (לא צריך לציין אותן במפורש)
             },
-            'ui_colors': 'colors_unified',
-            'entity_colors': 'colors_unified',
-            'value_colors': 'colors_unified',
             
-            # notification_settings: notifications + notification_settings
+            # 2. trading_settings (6 העדפות): trading_settings - נשאר במקום
+            # לא צריך מיפוי - כל ההעדפות נשארות ב-trading_settings
+            
+            # 3. filter_settings (4 העדפות): רק הגדרות פילטרים (ללא צבעים, ללא default_trading_account)
+            # כבר מעודכן למעלה - default_trading_account עובר ל-basic_settings
+            
+            # 4. colors_unified (55 העדפות): כל הצבעים - colors + ui_colors + entity_colors + value_colors + filters (צבעי פילטרים)
+            'colors': 'colors_unified',  # כל צבעי הסטטוס
+            'ui_colors': 'colors_unified',  # כל צבעי UI
+            'entity_colors': 'colors_unified',  # כל צבעי ישויות
+            'value_colors': 'colors_unified',  # כל צבעי ערכים
+            'filters': 'colors_unified',  # כל צבעי פילטרים (entityAlertColor, entityNoteColor וכו')
+            
+            # 5. notification_settings (23 העדפות): notifications + notification_settings
             'notifications': 'notification_settings',
             'notification_settings': 'notification_settings',
             
-            # chart_settings_unified: chart_colors + chart_settings + chart_export
+            # 6. chart_settings_unified (16 העדפות): chart_colors + chart_settings + chart_export
             'chart_colors': 'chart_settings_unified',
             'chart_settings': 'chart_settings_unified',
             'chart_export': 'chart_settings_unified',
             
-            # ui_settings: אין עדכון - משמש לגישה ממשק אחרת
+            # 7. ui_settings (11 העדפות): ui_settings (ללא pagination_size_default)
+            # כבר מעודכן למעלה - pagination_size_default עובר ל-basic_settings
         }
         
         # קבלת כל ההעדפות
@@ -199,12 +174,26 @@ def consolidate_preference_groups():
                 if isinstance(mapping, dict):
                     # מיפוי ספציפי per preference
                     new_group_name = mapping.get(pref_name)
+                    # אם לא נמצא מיפוי ספציפי, נשאיר במקום (אלא אם כן יש מיפוי כללי)
+                    if not new_group_name:
+                        # בדיקה אם יש מיפוי כללי לקבוצה (כמו 'ui_settings' → נשאר ב-ui_settings)
+                        # אבל אם יש מיפוי ספציפי שלא כולל את ההעדפה, נשאיר במקום
+                        pass
                 elif isinstance(mapping, str):
-                    # הכל מעבר לקבוצה אחת
+                    # כל הקבוצה מעבר לקבוצה אחת
                     new_group_name = mapping
             
             # אם לא מצאנו מיפוי, נשאיר במקום
             if not new_group_name:
+                # אם הקבוצה היא אחת מהקבוצות החדשות, נשאיר במקום (לא צריך לעדכן)
+                if old_group_name in [g[0] for g in new_groups]:
+                    skipped_count += 1
+                    continue
+                # אם יש dict mapping אבל ההעדפה לא נמצאת בו, נשאיר במקום
+                if old_group_name in migration_map and isinstance(migration_map[old_group_name], dict):
+                    skipped_count += 1
+                    continue
+                # אחרת, נשאיר במקום (לא צריך לעדכן)
                 skipped_count += 1
                 continue
             

@@ -349,7 +349,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
-        'window.initializePreferences',
+        'window.PreferencesUIV4',
       ],
 
       // ← NEW: מטאדאטה
@@ -383,11 +383,24 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             await window.loadAccountsForPreferences();
           }
 
-          // טעינת מערכת העדפות
-          if (typeof window.initializePreferences === 'function') {
-            await window.initializePreferences();
-          } else if (typeof window.loadAllPreferences === 'function') {
-            await window.loadAllPreferences();
+          // Initialize Preferences UI V4 (this loads user/profile data and displays it)
+          // Note: PreferencesCore.initializeWithLazyLoading() is called by core-systems.js
+          // but PreferencesUIV4.initialize() is page-specific and must be called here
+          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
+            window.Logger.info('🎨 Initializing Preferences UI V4...', {
+              page: 'page-initialization-configs',
+            });
+            await window.PreferencesUIV4.initialize();
+          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
+            // Fallback to PreferencesUI if PreferencesUIV4 is not available
+            window.Logger.info('🎨 Initializing Preferences UI (fallback)...', {
+              page: 'page-initialization-configs',
+            });
+            await window.PreferencesUI.initialize();
+          } else {
+            window.Logger.warn('⚠️ PreferencesUIV4 or PreferencesUI not available', {
+              page: 'page-initialization-configs',
+            });
           }
 
           // Load default colors if not set
@@ -443,7 +456,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
+        'window.TradesData',
         'window.ModalManagerV2',
+        'window.tradesModalConfig',
         'window.InvestmentCalculationService',
         'window.loadTradesData',
         'window.checkLinkedItemsBeforeAction',
@@ -539,6 +554,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.loadExecutionsData',
+        'window.executionsModalConfig',
         'window.SelectPopulatorService',
         'window.tickerService',
         'window.loadUserPreferences',
@@ -549,7 +565,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
 
       // ← NEW: מטאדאטה
-      description: 'מעקב ביצועי עסקאות - היסטוריית עסקאות שבוצעו',
+      description: 'מעקב ביצועי עסקאות - היסטוריית ביצועים שבוצעו',
       lastModified: '2025-11-13',
       pageType: 'crud',
 
@@ -567,26 +583,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             page: 'page-initialization-configs',
           });
 
-          // Load user preferences first
-          if (typeof window.loadUserPreferences === 'function') {
-            window.Logger.info('⚙️ Loading user preferences for Executions...', {
+          // Preferences are already loaded by core-systems.js via initializePreferencesForPage
+          // No need to call loadUserPreferences here - it causes duplicate API calls and 429 errors
+
+          window.Logger.info('🔍 Checking loadExecutionsData...', {
+            exists: typeof window.loadExecutionsData !== 'undefined',
+            type: typeof window.loadExecutionsData,
+            isFunction: typeof window.loadExecutionsData === 'function',
+            page: 'page-initialization-configs',
+          });
+          
+          if (typeof window.loadExecutionsData === 'function') {
+            window.Logger.info('📥 Calling loadExecutionsData...', {
               page: 'page-initialization-configs',
             });
-
-            // Debug current profile
-            console.log('🧪 Current PreferencesCore state:', {
-              currentUserId: window.PreferencesCore?.currentUserId,
-              currentProfileId: window.PreferencesCore?.currentProfileId,
-            });
-
-            const prefs = await window.loadUserPreferences();
-            console.log('🧪 loadUserPreferences returned:', prefs);
+            try {
+              await window.loadExecutionsData();
+              window.Logger.info('✅ loadExecutionsData completed', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.error('❌ loadExecutionsData failed', {
+                error: error?.message,
+                stack: error?.stack,
+                page: 'page-initialization-configs',
+              });
+            }
           } else {
-            console.warn('⚠️ loadUserPreferences not available!');
-          }
-
-          if (typeof window.loadExecutionsData === 'function') {
-            await window.loadExecutionsData();
+            window.Logger.warn('⚠️ window.loadExecutionsData is not a function', {
+              type: typeof window.loadExecutionsData,
+              value: window.loadExecutionsData,
+              page: 'page-initialization-configs',
+            });
           }
 
           // Initialize import modal
@@ -629,8 +657,18 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
 
       description: 'דף מרכזי לניהול תהליכי ייבוא נתונים ושיגור המודול המאוחד',
-      lastModified: '2025-11-13',
+      lastModified: '2025-11-18',
       pageType: 'crud',
+
+      // Page-specific scripts (not part of packages)
+      pageSpecificScripts: [
+        'scripts/data_import.js',
+        'scripts/services/data-import-data.js',
+        'scripts/debug-currency-exchange-import.js',
+        'scripts/debug-import-filtering.js',
+        'scripts/monitor-import-execution.js',
+        'scripts/debug-active-session.js',
+      ],
 
       requiresFilters: false,
       requiresValidation: true,
@@ -680,7 +718,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.loadTradePlansData',
         'window.ModalManagerV2',
+        'window.tradePlansModalConfig',
+        'window.alertsModalConfig',  // Required for editing alerts from linked items
+        'window.notesModalConfig',   // Required for editing notes from linked items
         'window.InvestmentCalculationService',
+        'window.UnifiedCRUDService',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
@@ -761,6 +803,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.loadAlertsData',
         'window.ModalManagerV2',
+        'window.alertsModalConfig',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
@@ -821,6 +864,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'base': מערכות ליבה בסיסיות (התראות, שגיאות, צבעים, תאריכים)
       // - 'services': שירותי עזר כלליים (נתונים, שדות, סטטיסטיקות)
       // - 'ui-advanced': ממשק משתמש מתקדם (כפתורים, טבלאות, עימוד)
+      // - 'modules': מודולים (modal-manager-v2, modal-navigation-manager, tag-ui-manager)
       // - 'crud': מערכות CRUD ו-entity-details
       // - 'preferences': מערכת העדפות (לקריאת צבעים והגדרות)
       // - 'info-summary': מערכת סיכום נתונים מאוחדת
@@ -830,6 +874,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'base',
         'services',
         'ui-advanced',
+        'modules',
         'crud',
         'preferences',
         'validation',
@@ -844,6 +889,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'NotificationSystem',
         'DataUtils',
         'window.loadTradingAccountsDataForTradingAccountsPage',
+        'window.ModalManagerV2',
+        'window.tradingAccountsModalConfig',
+        'window.TagUIManager',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
@@ -902,14 +950,93 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               page: 'page-initialization-configs',
             });
           }
-          // Initialize account activity system
-          if (typeof window.initAccountActivity === 'function') {
-            await window.initAccountActivity(true); // Auto-select default account
+
+          // Wait for trading accounts data to be available
+          let waitCount = 0;
+          while (!window.trading_accountsData || !Array.isArray(window.trading_accountsData) || window.trading_accountsData.length === 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitCount++;
+            if (waitCount > 50) { // 5 seconds timeout
+              window.Logger.warn('⚠️ Trading accounts data not available after timeout', {
+                page: 'page-initialization-configs',
+              });
+              break;
+            }
           }
 
-          // Initialize positions & portfolio system
+          // Wait for critical preferences to be loaded (for default account selection)
+          if (!window.__preferencesCriticalLoaded) {
+            window.Logger.info('⏳ Waiting for critical preferences to load...', {
+              page: 'page-initialization-configs',
+            });
+            await new Promise((resolve) => {
+              // Check if already loaded
+              if (window.__preferencesCriticalLoaded) {
+                resolve();
+                return;
+              }
+              
+              // Wait for event
+              const eventHandler = () => {
+                resolve();
+              };
+              window.addEventListener('preferences:critical-loaded', eventHandler, { once: true });
+              
+              // Timeout fallback
+              setTimeout(() => {
+                window.removeEventListener('preferences:critical-loaded', eventHandler);
+                window.Logger.warn('⚠️ Preferences timeout - continuing without waiting', {
+                  page: 'page-initialization-configs',
+                });
+                resolve();
+              }, 3000);
+            });
+          }
+
+          // Wait for filter system to be initialized (for date range)
+          let filterWaitCount = 0;
+          while (!window.selectedDateRangeForFilter && filterWaitCount < 30) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            filterWaitCount++;
+          }
+          
+          if (!window.selectedDateRangeForFilter) {
+            // Set default if not available
+            window.selectedDateRangeForFilter = 'כל זמן';
+            window.Logger.info('ℹ️ Using default date range: כל זמן', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          window.Logger.info('✅ All required data available - initializing tables', {
+            page: 'page-initialization-configs',
+            hasAccounts: !!(window.trading_accountsData && window.trading_accountsData.length > 0),
+            hasPreferences: !!window.__preferencesCriticalLoaded,
+            dateRange: window.selectedDateRangeForFilter,
+          });
+
+          // Initialize account activity system (now with all data available)
+          if (typeof window.initAccountActivity === 'function') {
+            window.Logger.info('🔄 Initializing account activity system...', {
+              page: 'page-initialization-configs',
+            });
+            await window.initAccountActivity(true); // Auto-select default account
+          } else {
+            window.Logger.warn('⚠️ initAccountActivity not available', {
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Initialize positions & portfolio system (now with all data available)
           if (typeof window.initPositionsPortfolio === 'function') {
+            window.Logger.info('🔄 Initializing positions & portfolio system...', {
+              page: 'page-initialization-configs',
+            });
             await window.initPositionsPortfolio(true); // Auto-select default account
+          } else {
+            window.Logger.warn('⚠️ initPositionsPortfolio not available', {
+              page: 'page-initialization-configs',
+            });
           }
 
           console.log('✅ Trading Accounts initialization completed');
@@ -947,6 +1074,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'NotificationSystem', // from base package
         'DataUtils', // from services package
         'window.loadCashFlowsData',
+        'window.ModalManagerV2',
+        'window.cashFlowModalConfig',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
@@ -965,13 +1094,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             page: 'page-initialization-configs',
           });
 
-          // אתחול מערכת ההעדפות לפני טעינת הנתונים
-          if (window.PreferencesSystem && !window.PreferencesSystem.initialized) {
-            window.Logger.info('⚙️ Initializing PreferencesSystem for Cash Flows...', {
-              page: 'page-initialization-configs',
-            });
-            await window.PreferencesSystem.initialize();
-          }
+          // Preferences are already loaded by core-systems.js via initializePreferencesForPage
+          // No need to call PreferencesSystem.initialize() here - it causes duplicate API calls and 429 errors
 
           if (typeof window.loadCashFlowsData === 'function') {
             await window.loadCashFlowsData();
@@ -1015,6 +1139,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'ExternalDataService',
         'window.loadTickersData',
+        'window.ModalManagerV2',
+        'window.tickersModalConfig',
       ],
 
       // ← NEW: מטאדאטה
@@ -1080,6 +1206,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.NotesData',
         'window.loadNotesData',
+        'window.ModalManagerV2',
+        'window.notesModalConfig',
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',

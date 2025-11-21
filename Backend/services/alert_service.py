@@ -52,6 +52,10 @@ class AlertService:
     def create(db: Session, alert_data: Dict[str, Any]) -> Alert:
         """Create a new alert"""
         try:
+            logger.info(f"AlertService.create called with data: {alert_data}")
+            logger.info(f"condition_attribute in data: {'condition_attribute' in alert_data}")
+            logger.info(f"condition_attribute value: {alert_data.get('condition_attribute')}")
+            
             # Set default value for is_triggered
             if 'is_triggered' not in alert_data:
                 alert_data['is_triggered'] = 'false'
@@ -66,8 +70,12 @@ class AlertService:
                 related_type_id = AlertService._get_relation_type_id(db, related_type)
                 alert_data['related_type_id'] = related_type_id
             
+            logger.info(f"Before _process_condition_fields - condition_attribute: {alert_data.get('condition_attribute')}")
+            
             # Handle new condition fields
             AlertService._process_condition_fields(alert_data)
+            
+            logger.info(f"After _process_condition_fields - condition_attribute: {alert_data.get('condition_attribute')}")
             
             # Validate expiry_date format if provided
             AlertService._validate_expiry_date(alert_data)
@@ -348,6 +356,8 @@ class AlertService:
     def _process_condition_fields(alert_data: Dict[str, Any]) -> None:
         """Process condition fields for new format"""
         try:
+            logger.info(f"Processing condition fields - input data: {alert_data}")
+            
             # If legacy condition field is provided, convert to new format
             if 'condition' in alert_data and alert_data['condition']:
                 legacy_condition = alert_data['condition']
@@ -386,31 +396,46 @@ class AlertService:
                         # Remove legacy field
                         del alert_data['condition']
             
-            # Set defaults for new fields if not provided
-            if 'condition_attribute' not in alert_data:
+            # IMPORTANT: Check if fields already exist and are not None/empty before setting defaults
+            # Only set defaults if field is truly missing, not if it's None or empty string
+            if 'condition_attribute' not in alert_data or not alert_data.get('condition_attribute'):
+                logger.warning(f"condition_attribute missing or empty, setting default. Current value: {alert_data.get('condition_attribute')}")
                 alert_data['condition_attribute'] = 'price'
-            if 'condition_operator' not in alert_data:
+            if 'condition_operator' not in alert_data or not alert_data.get('condition_operator'):
+                logger.warning(f"condition_operator missing or empty, setting default. Current value: {alert_data.get('condition_operator')}")
                 alert_data['condition_operator'] = 'more_than'
-            if 'condition_number' not in alert_data:
+            if 'condition_number' not in alert_data or not alert_data.get('condition_number'):
+                logger.warning(f"condition_number missing or empty, setting default. Current value: {alert_data.get('condition_number')}")
                 alert_data['condition_number'] = '0'
+            
+            logger.info(f"After processing - condition_attribute: {alert_data.get('condition_attribute')}, condition_operator: {alert_data.get('condition_operator')}, condition_number: {alert_data.get('condition_number')}")
             
             # Validate new condition fields
             valid_attributes = ['price', 'change', 'ma', 'volume', 'balance']
             valid_operators = ['more_than', 'less_than', 'cross', 'cross_up', 'cross_down', 'change', 'change_up', 'change_down', 'equals']
             
-            if alert_data['condition_attribute'] not in valid_attributes:
-                raise ValueError(f"Invalid condition_attribute: {alert_data['condition_attribute']}")
-            if alert_data['condition_operator'] not in valid_operators:
-                raise ValueError(f"Invalid condition_operator: {alert_data['condition_operator']}")
+            condition_attribute = alert_data.get('condition_attribute')
+            if not condition_attribute or condition_attribute not in valid_attributes:
+                logger.error(f"Invalid condition_attribute: {condition_attribute}. Valid values: {valid_attributes}")
+                raise ValueError(f"Invalid condition_attribute: {condition_attribute}")
+            
+            condition_operator = alert_data.get('condition_operator')
+            if not condition_operator or condition_operator not in valid_operators:
+                logger.error(f"Invalid condition_operator: {condition_operator}. Valid values: {valid_operators}")
+                raise ValueError(f"Invalid condition_operator: {condition_operator}")
             
             # Validate condition_number is numeric
-            try:
-                float(alert_data['condition_number'])
-            except ValueError:
-                raise ValueError(f"Invalid condition_number: {alert_data['condition_number']}")
+            condition_number = alert_data.get('condition_number')
+            if condition_number:
+                try:
+                    float(condition_number)
+                except (ValueError, TypeError):
+                    logger.error(f"Invalid condition_number: {condition_number}")
+                    raise ValueError(f"Invalid condition_number: {condition_number}")
                 
         except Exception as e:
             logger.error(f"Error processing condition fields: {e}")
+            logger.error(f"Alert data at error: {alert_data}")
             raise
     
     @staticmethod

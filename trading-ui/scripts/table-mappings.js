@@ -39,7 +39,7 @@ const TABLE_COLUMN_MAPPINGS = {
   // טבלת תכנונים (Trade Plans) - Trade Plans Page Structure (מוצג בפועל)
   'trade_plans': [
     'ticker_symbol',         // 0 - טיקר (מחושב)
-    'created_at',            // 1 - תאריך
+    'created_at',            // 1 - נוצר ב:
     'status',                // 2 - סטטוס
     'investment_type',       // 3 - סוג
     'side',                  // 4 - צד
@@ -64,7 +64,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'investment_type',       // 7 - סוג
     'side',                  // 8 - צד
     'account_name',          // 9 - חשבון מסחר
-    'created_at',            // 10 - נוצר ב
+    'created_at',            // 10 - נוצר ב:
     'closed_at',             // 11 - נסגר ב
     'updated_at',            // 12 - עודכן
   ],
@@ -99,7 +99,7 @@ const TABLE_COLUMN_MAPPINGS = {
     'status',           // 1 - סטטוס (Status)
     'side',             // 2 - צד (Long/Short)
     'investment_type',  // 3 - סוג השקעה (Investment Type)
-    'created_at',       // 4 - תאריך יצירה
+    'created_at',       // 4 - נוצר ב:
   ],
 
   // טבלת ביצועים (Executions) - Executions Page Structure (מוצג בפועל)
@@ -158,12 +158,12 @@ const TABLE_COLUMN_MAPPINGS = {
   ],
 
   // טבלת הערות (Notes) - Notes Page Structure (מוצג בפועל)
-  // מציג: אובייקט מקושר, תוכן, תאריך, קובץ מצורף, פעולות
+  // מציג: אובייקט מקושר, תוכן, קובץ מצורף, נוצר ב:, עודכן, פעולות
   'notes': [
     'related_object',        // 0 - אובייקט מקושר (מחושב מהאובייקט המקושר)
     'content',               // 1 - תוכן ההערה
-    'created_at',            // 2 - תאריך (תאריך ההערה)
-    'attachment',            // 3 - קובץ מצורף
+    'attachment',            // 2 - קובץ מצורף
+    'created_at',            // 3 - נוצר ב: (תאריך יצירה)
     'updated_at',            // 4 - עודכן
     // Note: actions column is not part of the mapping (handled separately)
   ],
@@ -356,8 +356,10 @@ const TABLE_COLUMN_SORT_TYPES = {
     updated_at: 'dateEnvelope'
   },
   notes: {
-    created_at: 'date',
-    updated_at: 'date'
+    created_at: 'dateEnvelope',
+    updated_at: 'dateEnvelope',
+    content: 'string',
+    attachment: 'string'
   },
   linked_items: {
     created_at: 'date'
@@ -968,7 +970,27 @@ function getColumnValue(item, columnIndex, tableType) {
       // Return attachment filename for sorting
       return item.attachment || '';
     }
-    // For other fields (created_at, etc.), return directly
+    // For date fields (created_at, updated_at), handle DateEnvelope properly
+    if (fieldName === 'created_at' || fieldName === 'updated_at') {
+      const rawValue = item[fieldName];
+      // If sortType is dateEnvelope, extract epochMs for proper sorting
+      if (sortType === 'dateEnvelope' || sortType === 'date') {
+        const epochValue = extractEpochForSort(rawValue);
+        if (epochValue !== null) {
+          return epochValue;
+        }
+        // Fallback: try to parse as date string
+        if (rawValue && typeof rawValue === 'string') {
+          const parsed = parseSortDateValue(rawValue);
+          if (parsed !== 0) {
+            return parsed;
+          }
+        }
+      }
+      // Return raw value if not dateEnvelope or parsing failed
+      return rawValue || '';
+    }
+    // For other fields, return directly
     return item[fieldName] || '';
   }
   

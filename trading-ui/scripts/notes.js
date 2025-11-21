@@ -145,7 +145,7 @@ window.loadNotesData = async function(options = {}) {
     
     try {
       if (typeof window.updateNotesTable === 'function') {
-        window.updateNotesTable(normalizedNotes);
+        await window.updateNotesTable(normalizedNotes);
       } else {
         window.Logger.warn('⚠️ updateNotesTable לא זמין', { page: 'notes' });
       }
@@ -422,9 +422,9 @@ window.deleteNote = deleteNote;
  * @param {Array} trades - Trades array
  * @param {Array} tradePlans - Trade plans array
  * @param {Array} tickers - Tickers array
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function updateNotesTable(notes) {
+async function updateNotesTable(notes) {
   try {
     window.Logger.info('🟢🟢🟢 updateNotesTable נקראה (פונקציה רגילה) עם', notes ? notes.length : 0, 'הערות', { page: "notes" });
     window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
@@ -535,36 +535,37 @@ function updateNotesTable(notes) {
     };
 
     // טעינת נתונים ועדכון הטבלה
-    loadAdditionalData().then(() => {
-      // בדיקה שהנתונים קיימים
-      if (!notes || !Array.isArray(notes)) {
-        window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
-        return;
-      }
+    await loadAdditionalData();
+    
+    // בדיקה שהנתונים קיימים
+    if (!notes || !Array.isArray(notes)) {
+      window.Logger.warn('⚠️ notes parameter is not available or not an array', { page: "notes" });
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">אין הערות להצגה</td></tr>';
+      return;
+    }
 
-      if (notes.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center text-muted">
-            <div style="padding: 20px;">
-              <h5>📝 אין הערות</h5>
-              <p>לא נמצאו הערות במערכת</p>
-              <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()" data-tooltip="הוסף הערה ראשונה למערכת" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
-            </div>
-          </td>
-        </tr>
-      `;
-      
-        // 🔘 עדכון כפתורים דינמיים
-        if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-          window.ButtonSystem.initializeButtons();
-        }
-        return;
+    if (notes.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center text-muted">
+          <div style="padding: 20px;">
+            <h5>📝 אין הערות</h5>
+            <p>לא נמצאו הערות במערכת</p>
+            <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()" data-tooltip="הוסף הערה ראשונה למערכת" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
+          </div>
+        </td>
+      </tr>
+    `;
+    
+      // 🔘 עדכון כפתורים דינמיים
+      if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
       }
+      return;
+    }
 
-      // בניית שורות הטבלה
-      const rows = notes.map(note => {
+    // בניית שורות הטבלה
+    const rows = notes.map(note => {
         const createdEnvelope = window.dateUtils?.ensureDateEnvelope
           ? window.dateUtils.ensureDateEnvelope(note.created_at)
           : note.created_at;
@@ -806,8 +807,8 @@ function updateNotesTable(notes) {
           <tr class="table-cell-clickable">
             <td class="related-cell">${relatedCellHtml}</td>
             <td class="col-content">${contentDisplay}</td>
-            <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
             <td class="col-attachment">${attachmentDisplay}</td>
+            <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
             ${(() => {
               // Prefer FieldRendererService.renderDate for consistent date formatting
               const rawDate = note.updated_at || note.created_at || null;
@@ -920,42 +921,41 @@ function updateNotesTable(notes) {
         `;
       }).join('');
 
-      tbody.innerHTML = rows;
-      window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
-      window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
+    tbody.innerHTML = rows;
+    window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות', { page: "notes", keepInfo: true });
+    window.Logger.info('🔍 מספר שורות בטבלה:', tbody.children.length, { page: "notes" });
 
-      // עדכון table-count ו-info-summary
-      // הערה: updateNotesSummary נקראת גם מ-loadNotesData, אז אין צורך לקרוא כאן שוב
-      // אם זו קריאה ישירה (לא דרך loadNotesData), נעדכן את הסיכום
-      if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
-        window.updateNotesSummary(notes);
-      }
-      
-      // 🔘 עדכון כפתורים דינמיים
-      // NOTE: processButtons already handles tooltip initialization for buttons with data-button-type
-      // initializeTooltips is only needed for custom buttons without data-button-type
-      if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
-        // Process all buttons including actions-menu buttons
-        // This will also initialize tooltips for buttons with data-button-type
-        window.advancedButtonSystem.processButtons(tbody);
-      } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-        window.ButtonSystem.initializeButtons();
-      }
-      
-      // 🔘 אתחול טולטיפים רק לכפתורים מותאמים אישית (ללא data-button-type)
-      // כפתורים עם data-button-type כבר טופלו ב-processButtons
-      if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
-        // Initialize tooltips for custom filter buttons (if any don't have data-button-type)
-        const filterContainer = document.querySelector('.filter-buttons-container');
-        if (filterContainer) {
-          // Only initialize tooltips for buttons without data-button-type
-          const customFilterButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-type]):not([data-button-processed])');
-          if (customFilterButtons.length > 0) {
-            window.advancedButtonSystem.initializeTooltips(filterContainer);
-          }
+    // עדכון table-count ו-info-summary
+    // הערה: updateNotesSummary נקראת גם מ-loadNotesData, אז אין צורך לקרוא כאן שוב
+    // אם זו קריאה ישירה (לא דרך loadNotesData), נעדכן את הסיכום
+    if (typeof window.updateNotesSummary === 'function' && !window._notesUpdateInProgress) {
+      window.updateNotesSummary(notes);
+    }
+    
+    // 🔘 עדכון כפתורים דינמיים
+    // NOTE: processButtons already handles tooltip initialization for buttons with data-button-type
+    // initializeTooltips is only needed for custom buttons without data-button-type
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+      // Process all buttons including actions-menu buttons
+      // This will also initialize tooltips for buttons with data-button-type
+      window.advancedButtonSystem.processButtons(tbody);
+    } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+      window.ButtonSystem.initializeButtons();
+    }
+    
+    // 🔘 אתחול טולטיפים רק לכפתורים מותאמים אישית (ללא data-button-type)
+    // כפתורים עם data-button-type כבר טופלו ב-processButtons
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+      // Initialize tooltips for custom filter buttons (if any don't have data-button-type)
+      const filterContainer = document.querySelector('.filter-buttons-container');
+      if (filterContainer) {
+        // Only initialize tooltips for buttons without data-button-type
+        const customFilterButtons = filterContainer.querySelectorAll('[data-tooltip]:not([data-button-type]):not([data-button-processed])');
+        if (customFilterButtons.length > 0) {
+          window.advancedButtonSystem.initializeTooltips(filterContainer);
         }
       }
-    });
+    }
   
   } catch (error) {
     window.Logger.error('שגיאה בעדכון טבלת הערות:', error, { page: "notes" });
@@ -1930,7 +1930,7 @@ function clearSelectedFile() {
  * דוגמאות שימוש:
  * sortTable(0); // סידור לפי עמודת ID
  * sortTable(1); // סידור לפי עמודת תוכן
- * sortTable(3); // סידור לפי עמודת תאריך יצירה
+ * sortTable(3); // סידור לפי עמודת נוצר ב:
  *
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
@@ -2784,8 +2784,8 @@ window.registerNotesTables = function() {
         columns: getColumns('notes'),
         sortable: true,
         filterable: true,
-        // Default sort: created_at desc (column index 2)
-        defaultSort: { columnIndex: 2, direction: 'desc', key: 'created_at' }
+        // Default sort: created_at desc (column index 3 after attachment moved before date)
+        defaultSort: { columnIndex: 3, direction: 'desc', key: 'created_at' }
     });
 };
 window.Logger.info('🔵🔵🔵 מייצא updateNotesTable גלובלית (שורה 2240)', { page: "notes" });

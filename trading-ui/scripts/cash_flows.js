@@ -920,7 +920,27 @@ async function deleteCashFlow(id) {
     const type = getCashFlowTypeText(cashFlow.type);
     const amount = cashFlow.amount;
     const currency = cashFlow.currency_symbol || '';
-    const date = formatDate(cashFlow.date);
+    const date = (() => {
+      const dateValue = cashFlow.date;
+      if (!dateValue) return 'לא מוגדר';
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
+        return window.FieldRendererService.renderDate(dateEnvelope || dateValue, false);
+      }
+      if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+        const dateEnvelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
+        return window.dateUtils.formatDate(dateEnvelope || dateValue, { includeTime: false });
+      }
+      try {
+        const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+        if (!Number.isNaN(dateObj.getTime())) {
+          return window.formatDate ? window.formatDate(dateObj, false) : dateObj.toLocaleDateString('he-IL');
+        }
+      } catch (error) {
+        window.Logger?.warn('⚠️ cash_flows date formatting failed in details', { error, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
+      }
+      return 'לא מוגדר';
+    })();
     const description = cashFlow.description || 'ללא תיאור';
     
     cashFlowDetails = `${accountName} - ${type}, ${amount}${currency}, תאריך: ${date}, תיאור: ${description}`;
@@ -1422,7 +1442,33 @@ async function renderCashFlowsTable() {
             <td class="col-amount text-end">
                 ${amountDisplay}
             </td>
-            <td class="col-date table-cell-center" data-date="${cashFlow.date || ''}">${formatDate(cashFlow.date)}</td>
+            <td class="col-date table-cell-center" data-date="${cashFlow.date || ''}">${(() => {
+              const dateValue = cashFlow.date;
+              if (!dateValue) {
+                return '<span class="date-text">-</span>';
+              }
+              // Use FieldRendererService.renderDate for consistent date formatting
+              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
+                return `<span class="date-text">${window.FieldRendererService.renderDate(dateEnvelope || dateValue, false)}</span>`;
+              }
+              // Fallback to dateUtils or formatDate
+              if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                const dateEnvelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
+                return `<span class="date-text">${window.dateUtils.formatDate(dateEnvelope || dateValue, { includeTime: false })}</span>`;
+              }
+              // Last fallback
+              try {
+                const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+                if (!Number.isNaN(dateObj.getTime())) {
+                  const formatted = window.formatDate ? window.formatDate(dateObj, false) : dateObj.toLocaleDateString('he-IL');
+                  return `<span class="date-text">${formatted}</span>`;
+                }
+              } catch (error) {
+                window.Logger?.warn('⚠️ cash_flows date formatting failed', { error, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
+              }
+              return '<span class="date-text">-</span>';
+            })()}</td>
             <td class="col-description">${descriptionDisplay}</td>
             <td class="col-source">${window.translateCashFlowSource ?
     window.translateCashFlowSource(cashFlow.source) :
@@ -1808,7 +1854,26 @@ function renderUnifiedForexExchangesTable(sourceRows) {
   const getAccountName = (id) => {
     return (typeof getAccountNameById === 'function' ? getAccountNameById(id) : null) || (id ? `חשבון מסחר ${id}` : '-');
   };
-  const fmtDate = (d) => formatDate(d);
+  const fmtDate = (d) => {
+    if (!d) return '-';
+    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+      const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(d) : d;
+      return window.FieldRendererService.renderDate(dateEnvelope || d, false);
+    }
+    if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+      const dateEnvelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(d) : d;
+      return window.dateUtils.formatDate(dateEnvelope || d, { includeTime: false });
+    }
+    try {
+      const dateObj = d instanceof Date ? d : new Date(d);
+      if (!Number.isNaN(dateObj.getTime())) {
+        return window.formatDate ? window.formatDate(dateObj, false) : dateObj.toLocaleDateString('he-IL');
+      }
+    } catch (error) {
+      window.Logger?.warn('⚠️ cash_flows fmtDate formatting failed', { error }, { page: 'cash_flows' });
+    }
+    return '-';
+  };
   const buildActions = (groupId, fromId, toId) => {
     if (!window.createActionsMenu) return '';
     const items = [];

@@ -1230,6 +1230,7 @@ class ModalManagerV2 {
             // Note: populateSelects already handles defaultFromPreferences
             await this.populateSelects(modalElement, modalInfo.config);
             
+            
             if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
                 window.initializeExternalIdFields();
             }
@@ -1237,6 +1238,17 @@ class ModalManagerV2 {
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
             if (mode === 'edit' && entityData) {
                 await this.populateForm(modalElement, entityData);
+                
+                // CRITICAL: For executions modal, save ticker value before initializeSpecialHandlers clones it
+                // This ensures the value is preserved after cloneNode
+                if (modalId === 'executionsModal') {
+                    const tickerSelect = modalElement.querySelector('#executionTicker');
+                    if (tickerSelect && tickerSelect.value) {
+                        // Store the value in a data attribute so initializeSpecialHandlers can use it
+                        tickerSelect.dataset.preservedValue = tickerSelect.value;
+                        console.log(`💾 [showModal] Preserved executionTicker value before initializeSpecialHandlers: ${tickerSelect.value}`);
+                    }
+                }
                 
                 // After populating form, update external_id field state for executions modal
                 if (modalId === 'executionsModal') {
@@ -2900,6 +2912,14 @@ class ModalManagerV2 {
                 continue;
             }
             
+            // CRITICAL: For date fields, prefer DateEnvelope over display string
+            // Check if this is a date field and if there's a _envelope version
+            let actualValue = value;
+            if ((key === 'date' || key.endsWith('_date') || key.includes('Date')) && data[`${key}_envelope`]) {
+                actualValue = data[`${key}_envelope`];
+                console.log(`🔍 [populateForm] Using ${key}_envelope instead of ${key} (DateEnvelope detected)`);
+            }
+            
             // Try direct match first (search in form and all tab panes)
             let field = form.querySelector(`#${key}, [name="${key}"]`);
             if (!field) {
@@ -2923,7 +2943,7 @@ class ModalManagerV2 {
             }
             
             if (field) {
-                console.log(`✅ Found field for ${key} (value: ${value}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
+                console.log(`✅ Found field for ${key} (value: ${actualValue}, valueType: ${typeof actualValue}, fieldId: ${field.id}, fieldName: ${field.name || 'N/A'})`);
                 
                 // Check if this is a display field (div with id but not an input)
                 if (field.tagName === 'DIV' && field.id && field.classList.contains('form-control-plaintext')) {
@@ -3031,11 +3051,54 @@ class ModalManagerV2 {
                                     console.log(`✅ Populated currencies select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
                                 } else if (field.id.includes('Ticker') || field.id.includes('ticker')) {
                                     console.log(`   Populating tickers select ${field.id} with defaultValue: ${defaultValueForSelect} (from selectValue: ${selectValue})...`);
-                                    await window.SelectPopulatorService.populateTickersSelect(field, {
-                                        includeEmpty: true,
-                                        defaultValue: defaultValueForSelect // Pass the value we want to set
+                                    console.log(`   🔍 [populateForm] Ticker field details:`, {
+                                        fieldId: field.id,
+                                        key: key,
+                                        value: value,
+                                        selectValue: selectValue,
+                                        defaultValueForSelect: defaultValueForSelect,
+                                        currentOptionsCount: field.options.length
                                     });
-                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`);
+                                    
+                                    // Special handling for executionTicker - use same logic as _populateSingleSelect
+                                    if (field.id === 'executionTicker' && window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
+                                        try {
+                                            const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
+                                                useCache: true
+                                            });
+                                            
+                                            if (relevantTickers.length > 0) {
+                                                await window.SelectPopulatorService.populateTickersSelect(field, {
+                                                    includeEmpty: true,
+                                                    filterFn: (ticker) => relevantTickers.some(t => t.id === ticker.id),
+                                                    defaultValue: defaultValueForSelect
+                                                });
+                                                console.log(`✅ [populateForm] Populated executionTicker with ${relevantTickers.length} relevant tickers, defaultValue: ${defaultValueForSelect}`);
+                                            } else {
+                                                await window.SelectPopulatorService.populateTickersSelect(field, {
+                                                    includeEmpty: true,
+                                                    defaultValue: defaultValueForSelect
+                                                });
+                                                console.log(`✅ [populateForm] Populated executionTicker with all tickers (no relevant), defaultValue: ${defaultValueForSelect}`);
+                                            }
+                                        } catch (error) {
+                                            console.warn(`⚠️ Error populating executionTicker in populateForm, using fallback:`, error);
+                                            await window.SelectPopulatorService.populateTickersSelect(field, {
+                                                includeEmpty: true,
+                                                defaultValue: defaultValueForSelect
+                                            });
+                                        }
+                                    } else {
+                                        await window.SelectPopulatorService.populateTickersSelect(field, {
+                                            includeEmpty: true,
+                                            defaultValue: defaultValueForSelect // Pass the value we want to set
+                                        });
+                                    }
+                                    console.log(`✅ Populated tickers select ${field.id} (${field.options.length} options), value set to: ${field.value}`, {
+                                        expectedValue: defaultValueForSelect,
+                                        actualValue: field.value,
+                                        hasOption: Array.from(field.options).some(opt => opt.value === String(defaultValueForSelect))
+                                    });
                                 }
                             } catch (populateError) {
                                 console.error(`❌ Failed to populate select ${field.id}:`, populateError);
@@ -3176,30 +3239,71 @@ class ModalManagerV2 {
                         field.dataset.pendingContent = value || '';
                         console.warn(`⚠️ RichTextEditorService not available for field ${field.id}, storing pending content`);
                     }
-                } else if (field.type === 'date' && value) {
+                } else if (field.type === 'date' && actualValue) {
                     // Date type - value should be in YYYY-MM-DD format
-                    // Use centralized date utils to handle DateEnvelope, Date objects, datetime objects, and strings
-                    // Same approach as notes page - handle all date formats properly
+                    // CRITICAL: Server returns DateEnvelope objects, not strings!
+                    // DateEnvelope structure: { utc, epochMs, local, timezone, display }
+                    console.log(`🔍 [populateForm] Processing date field ${field.id}`, {
+                        actualValue,
+                        actualValueType: typeof actualValue,
+                        originalValue: value,
+                        isDateEnvelope: window.dateUtils ? window.dateUtils.isDateEnvelope(actualValue) : (actualValue && typeof actualValue === 'object' && 'epochMs' in actualValue && 'utc' in actualValue),
+                        isDateObject: actualValue instanceof Date,
+                        isString: typeof actualValue === 'string',
+                        valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                    });
+                    
                     let dateObj = null;
                     
-                    // Handle Date objects directly (server may return Date objects)
-                    if (value instanceof Date) {
-                        dateObj = new Date(value.getTime());
+                    // Priority 1: Check if it's a DateEnvelope object (server returns this!)
+                    if (actualValue && typeof actualValue === 'object' && ('epochMs' in actualValue || 'utc' in actualValue || 'local' in actualValue)) {
+                        console.log(`🔍 [populateForm] Detected DateEnvelope for ${field.id}`, {
+                            utc: actualValue.utc,
+                            epochMs: actualValue.epochMs,
+                            local: actualValue.local,
+                            timezone: actualValue.timezone
+                        });
+                        
+                        // Use dateUtils if available (preferred method)
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(actualValue);
+                            console.log(`✅ [populateForm] Converted DateEnvelope to Date object via dateUtils:`, dateObj ? dateObj.toISOString() : null);
+                        } else {
+                            // Fallback: parse from DateEnvelope fields
+                            if (actualValue.epochMs && typeof actualValue.epochMs === 'number') {
+                                dateObj = new Date(actualValue.epochMs);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.epochMs to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.utc && typeof actualValue.utc === 'string') {
+                                dateObj = new Date(actualValue.utc);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.utc to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.local && typeof actualValue.local === 'string') {
+                                dateObj = new Date(actualValue.local);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.local to Date object:`, dateObj.toISOString());
+                            }
+                        }
                     }
-                    // Use centralized date utils for DateEnvelope, strings, and other formats
+                    // Priority 2: Handle Date objects directly (server may return Date objects)
+                    else if (actualValue instanceof Date) {
+                        dateObj = new Date(actualValue.getTime());
+                        console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
+                    }
+                    // Priority 3: Use centralized date utils for strings and other formats
                     else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
-                        dateObj = window.dateUtils.toDateObject(value);
+                        dateObj = window.dateUtils.toDateObject(actualValue);
+                        console.log(`✅ [populateForm] Converted via dateUtils.toDateObject:`, dateObj ? dateObj.toISOString() : null);
                     }
-                    // Fallback if date-utils not loaded
-                    else if (typeof value === 'string') {
-                        dateObj = new Date(value);
+                    // Priority 4: Fallback if date-utils not loaded
+                    else if (typeof actualValue === 'string') {
+                        dateObj = new Date(actualValue);
+                        console.log(`✅ [populateForm] Parsed string value:`, dateObj.toISOString());
                     }
                     else {
                         // Try to convert to string and parse
                         try {
-                            dateObj = new Date(value.toString());
+                            dateObj = new Date(actualValue.toString());
+                            console.log(`✅ [populateForm] Parsed via toString():`, dateObj.toISOString());
                         } catch (e) {
-                            console.warn(`⚠️ Failed to parse date value for ${field.id}:`, value, e);
+                            console.warn(`⚠️ Failed to parse date value for ${field.id}:`, actualValue, e);
                         }
                     }
                     
@@ -3209,34 +3313,87 @@ class ModalManagerV2 {
                         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
                         const day = String(dateObj.getDate()).padStart(2, '0');
                         field.value = `${year}-${month}-${day}`;
-                        console.log(`✅ Set date field ${field.id} to: ${field.value}`);
+                        console.log(`✅ Set date field ${field.id} to: ${field.value}`, {
+                            originalValue: value,
+                            actualValue: actualValue,
+                            dateObj: dateObj.toISOString(),
+                            formatted: field.value
+                        });
                     } else {
-                        console.warn(`⚠️ Invalid date value for ${field.id}:`, value, { dateObj, isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj' });
+                        console.error(`❌ Invalid date value for ${field.id}:`, {
+                            actualValue,
+                            actualValueType: typeof actualValue,
+                            originalValue: value,
+                            dateObj,
+                            isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
+                            valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                        });
                     }
-                } else if (field.type === 'datetime-local' && value) {
-                    // Convert date-only value to datetime-local format (YYYY-MM-DDTHH:MM)
-                    // Use centralized date utils to handle DateEnvelope, Date objects, datetime objects, and strings
-                    // Same approach as notes page - handle all date formats properly
+                } else if (field.type === 'datetime-local' && actualValue) {
+                    // Convert date value to datetime-local format (YYYY-MM-DDTHH:MM)
+                    // CRITICAL: Server returns DateEnvelope objects, not strings!
+                    // DateEnvelope structure: { utc, epochMs, local, timezone, display }
+                    console.log(`🔍 [populateForm] Processing datetime-local field ${field.id}`, {
+                        actualValue,
+                        actualValueType: typeof actualValue,
+                        originalValue: value,
+                        isDateEnvelope: window.dateUtils ? window.dateUtils.isDateEnvelope(actualValue) : (actualValue && typeof actualValue === 'object' && 'epochMs' in actualValue && 'utc' in actualValue),
+                        isDateObject: actualValue instanceof Date,
+                        isString: typeof actualValue === 'string',
+                        valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                    });
+                    
                     let dateObj = null;
                     
-                    // Handle Date objects directly (server may return Date objects)
-                    if (value instanceof Date) {
-                        dateObj = new Date(value.getTime());
+                    // Priority 1: Check if it's a DateEnvelope object (server returns this!)
+                    if (actualValue && typeof actualValue === 'object' && ('epochMs' in actualValue || 'utc' in actualValue || 'local' in actualValue)) {
+                        console.log(`🔍 [populateForm] Detected DateEnvelope for ${field.id}`, {
+                            utc: actualValue.utc,
+                            epochMs: actualValue.epochMs,
+                            local: actualValue.local,
+                            timezone: actualValue.timezone
+                        });
+                        
+                        // Use dateUtils if available (preferred method)
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(actualValue);
+                            console.log(`✅ [populateForm] Converted DateEnvelope to Date object via dateUtils:`, dateObj ? dateObj.toISOString() : null);
+                        } else {
+                            // Fallback: parse from DateEnvelope fields
+                            if (actualValue.epochMs && typeof actualValue.epochMs === 'number') {
+                                dateObj = new Date(actualValue.epochMs);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.epochMs to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.utc && typeof actualValue.utc === 'string') {
+                                dateObj = new Date(actualValue.utc);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.utc to Date object:`, dateObj.toISOString());
+                            } else if (actualValue.local && typeof actualValue.local === 'string') {
+                                dateObj = new Date(actualValue.local);
+                                console.log(`✅ [populateForm] Converted DateEnvelope.local to Date object:`, dateObj.toISOString());
+                            }
+                        }
                     }
-                    // Use centralized date utils for DateEnvelope, strings, and other formats
+                    // Priority 2: Handle Date objects directly (server may return Date objects)
+                    else if (actualValue instanceof Date) {
+                        dateObj = new Date(actualValue.getTime());
+                        console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
+                    }
+                    // Priority 3: Use centralized date utils for strings and other formats
                     else if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
-                        dateObj = window.dateUtils.toDateObject(value);
+                        dateObj = window.dateUtils.toDateObject(actualValue);
+                        console.log(`✅ [populateForm] Converted via dateUtils.toDateObject:`, dateObj ? dateObj.toISOString() : null);
                     }
-                    // Fallback if date-utils not loaded
-                    else if (typeof value === 'string') {
-                        dateObj = new Date(value);
+                    // Priority 4: Fallback if date-utils not loaded
+                    else if (typeof actualValue === 'string') {
+                        dateObj = new Date(actualValue);
+                        console.log(`✅ [populateForm] Parsed string value:`, dateObj.toISOString());
                     }
                     else {
                         // Try to convert to string and parse
                         try {
-                            dateObj = new Date(value.toString());
+                            dateObj = new Date(actualValue.toString());
+                            console.log(`✅ [populateForm] Parsed via toString():`, dateObj.toISOString());
                         } catch (e) {
-                            console.warn(`⚠️ Failed to parse datetime value for ${field.id}:`, value, e);
+                            console.warn(`⚠️ Failed to parse datetime value for ${field.id}:`, actualValue, e);
                         }
                     }
                     
@@ -3248,9 +3405,21 @@ class ModalManagerV2 {
                         const hours = String(dateObj.getHours()).padStart(2, '0');
                         const minutes = String(dateObj.getMinutes()).padStart(2, '0');
                         field.value = `${year}-${month}-${day}T${hours}:${minutes}`;
-                        console.log(`✅ Set datetime-local field ${field.id} to: ${field.value}`);
+                        console.log(`✅ Set datetime-local field ${field.id} to: ${field.value}`, {
+                            originalValue: value,
+                            actualValue: actualValue,
+                            dateObj: dateObj.toISOString(),
+                            formatted: field.value
+                        });
                     } else {
-                        console.warn(`⚠️ Invalid datetime value for ${field.id}:`, value, { dateObj, isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj' });
+                        console.error(`❌ Invalid datetime value for ${field.id}:`, {
+                            actualValue,
+                            actualValueType: typeof actualValue,
+                            originalValue: value,
+                            dateObj,
+                            isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
+                            valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
+                        });
                     }
                 } else if (field.type === 'file') {
                     // File inputs cannot have their value set programmatically for security reasons
@@ -5192,40 +5361,106 @@ class ModalManagerV2 {
             else if ((selectId.includes('Ticker') || selectId.includes('ticker')) && 
                       !selectId.includes('Type') && !selectId.includes('Currency') &&
                       selectId !== 'tickerType' && selectId !== 'tickerCurrency') {
-                // Special handling for executionTicker - only show tickers with open/closed trades or plans
+                console.log(`🔍 [DEBUG] Processing ticker select: ${selectId}`, {
+                    isExecutionTicker: selectId === 'executionTicker',
+                    isTradePlanTicker: selectId === 'tradePlanTicker',
+                    selectElement: select,
+                    selectExists: !!select,
+                    selectOptionsBefore: select.options.length,
+                    tickerServiceAvailable: !!(window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function'),
+                    selectPopulatorAvailable: !!(window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function')
+                });
+                
+                // For executionTicker, we want tickers with open/closed trades or plans
+                // Same approach as tradePlanTicker - use SelectPopulatorService directly
                 if (selectId === 'executionTicker' && window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
+                    // CRITICAL: Check if this select was already processed by initializeSpecialHandlers
+                    // This prevents double population that clears the value
+                    if (select.dataset.specialHandlersInitialized === 'true' && select.dataset.valuePreserved === 'true') {
+                        console.log(`⏭️ [DEBUG executionTicker] Select already initialized and value preserved, skipping re-population`, {
+                            preservedValue: select.dataset.preservedValue,
+                            currentValue: select.value
+                        });
+                        // Still ensure the value is set correctly
+                        const preservedValue = select.dataset.preservedValue;
+                        if (preservedValue && preservedValue !== '' && select.value !== preservedValue) {
+                            const matchingOption = Array.from(select.options).find(opt => 
+                                opt.value === preservedValue || 
+                                String(opt.value) === String(preservedValue) ||
+                                parseInt(opt.value) === parseInt(preservedValue)
+                            );
+                            if (matchingOption) {
+                                select.value = matchingOption.value;
+                                console.log(`✅ [DEBUG executionTicker] Restored preserved value: ${matchingOption.value}`);
+                            }
+                        }
+                        return; // Skip re-population
+                    }
+                    
                     try {
+                        // Save current value before populating (if in edit mode)
+                        const currentValue = select.value || select.dataset.preservedValue;
+                        console.log(`🔍 [DEBUG executionTicker] Fetching relevant tickers...`, {
+                            currentValue: currentValue,
+                            willPreserve: !!currentValue
+                        });
                         const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
                             useCache: true
                         });
+                        console.log(`🔍 [DEBUG executionTicker] Got ${relevantTickers.length} relevant tickers:`, relevantTickers.map(t => ({ id: t.id, symbol: t.symbol })));
                         
-                        // If no relevant tickers, fallback to all tickers
-                        const tickersToShow = relevantTickers.length > 0 
-                            ? relevantTickers 
-                            : (await window.tickerService.getTickers() || []);
-                        
-                        // Use tickerService.updateTickerSelect if available, otherwise use SelectPopulatorService
-                        if (window.tickerService.updateTickerSelect && typeof window.tickerService.updateTickerSelect === 'function') {
-                            window.tickerService.updateTickerSelect(selectId, tickersToShow, 'בחר טיקר...');
-                        } else {
-                            // Fallback to SelectPopulatorService with filter
+                        // If we have relevant tickers, use filter; otherwise show all (no filter)
+                        if (relevantTickers.length > 0) {
+                            console.log(`🔍 [DEBUG executionTicker] Using filter with ${relevantTickers.length} tickers`);
                             await window.SelectPopulatorService.populateTickersSelect(select, {
                                 includeEmpty: true,
-                                filterFn: (ticker) => tickersToShow.some(t => t.id === ticker.id)
+                                filterFn: (ticker) => relevantTickers.some(t => t.id === ticker.id),
+                                defaultValue: currentValue // CRITICAL: Preserve current value
+                            });
+                            console.log(`✅ נטענו ${relevantTickers.length} טיקרים ל-${selectId} (עם טריידים/תכנונים פתוחים/סגורים)`, {
+                                selectOptionsAfter: select.options.length,
+                                selectValue: select.value,
+                                expectedValue: currentValue,
+                                match: select.value === String(currentValue)
+                            });
+                        } else {
+                            // No relevant tickers - show all (same as tradePlanTicker when no filter)
+                            console.log(`🔍 [DEBUG executionTicker] No relevant tickers, showing all`);
+                            await window.SelectPopulatorService.populateTickersSelect(select, {
+                                includeEmpty: true,
+                                defaultValue: currentValue // CRITICAL: Preserve current value
+                            });
+                            console.log(`✅ נטענו כל הטיקרים ל-${selectId} (אין טריידים/תכנונים)`, {
+                                selectOptionsAfter: select.options.length,
+                                selectValue: select.value,
+                                expectedValue: currentValue,
+                                match: select.value === String(currentValue)
                             });
                         }
-                        console.log(`✅ נטענו ${tickersToShow.length} טיקרים רלוונטיים (עם טריידים/תכנונים פתוחים/סגורים) ל-${selectId}`);
                     } catch (error) {
                         console.warn(`⚠️ שגיאה בטעינת טיקרים רלוונטיים ל-${selectId}, משתמש בכל הטיקרים:`, error);
-                        // Fallback to all tickers
+                        // Fallback to all tickers (same as tradePlanTicker)
+                        const currentValue = select.value || select.dataset.preservedValue;
                         await window.SelectPopulatorService.populateTickersSelect(select, {
-                            includeEmpty: true
+                            includeEmpty: true,
+                            defaultValue: currentValue // CRITICAL: Preserve current value
+                        });
+                        console.log(`✅ [FALLBACK] נטענו כל הטיקרים ל-${selectId}`, {
+                            selectOptionsAfter: select.options.length,
+                            selectValue: select.value,
+                            expectedValue: currentValue,
+                            match: select.value === String(currentValue)
                         });
                     }
                 } else {
                     // Regular ticker select (e.g., cashFlowTicker, tradePlanTicker)
+                    console.log(`🔍 [DEBUG ${selectId}] Regular ticker select (like tradePlanTicker)`);
                     await window.SelectPopulatorService.populateTickersSelect(select, {
                         includeEmpty: true
+                    });
+                    console.log(`✅ נטענו טיקרים ל-${selectId}`, {
+                        selectOptionsAfter: select.options.length,
+                        selectValue: select.value
                     });
                 }
             } else if (selectId.includes('TradePlan') || selectId.includes('tradePlan')) {
@@ -5375,14 +5610,158 @@ class ModalManagerV2 {
             // Handle ticker selection
             const tickerSelect = modalElement.querySelector('#executionTicker');
             if (tickerSelect) {
+                // CRITICAL: Check if this select was already processed (has data attribute)
+                // This prevents double processing when initializeSpecialHandlers is called multiple times
+                if (tickerSelect.dataset.specialHandlersInitialized === 'true') {
+                    console.log(`⏭️ [initializeSpecialHandlers] executionTicker already initialized, skipping...`);
+                    return; // Already processed, skip
+                }
+                
                 // Save original before cloning
                 const originalTickerSelect = tickerSelect;
+                // CRITICAL: Check for preserved value from populateForm (set before cloneNode)
+                // This ensures we use the value that was set by populateForm, not the empty value from populateSelects
+                const preservedValue = tickerSelect.dataset.preservedValue;
+                const originalValue = preservedValue || tickerSelect.value;
+                const originalOptionsCount = tickerSelect.options.length;
+                
+                console.log(`🔍 [initializeSpecialHandlers] Cloning executionTicker`, {
+                    optionsBefore: originalOptionsCount,
+                    valueBefore: originalValue,
+                    preservedValue: preservedValue,
+                    currentValue: tickerSelect.value,
+                    usingPreserved: !!preservedValue
+                });
                 
                 // Remove existing listeners
                 const newTickerSelect = tickerSelect.cloneNode(true);
                 tickerSelect.parentNode.replaceChild(newTickerSelect, tickerSelect);
                 
+                // Mark as initialized to prevent double processing
+                newTickerSelect.dataset.specialHandlersInitialized = 'true';
+                
+                console.log(`🔍 [initializeSpecialHandlers] After clone`, {
+                    optionsAfter: newTickerSelect.options.length,
+                    valueAfter: newTickerSelect.value
+                });
+                
+                // ALWAYS re-populate tickers after clone to ensure they're available
+                // This is necessary because cloneNode might not preserve options correctly in all browsers
+                // or the options might be cleared by other code
+                // CRITICAL: Pass defaultValue to preserve the selected value in edit mode!
+                if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTickersSelect === 'function') {
+                    // Use same logic as _populateSingleSelect for executionTicker
+                    // CRITICAL: Pass originalValue as defaultValue to preserve selection in edit mode
+                    (async () => {
+                        try {
+                            console.log(`🔍 [initializeSpecialHandlers] Re-populating executionTicker after clone...`, {
+                                originalValue: originalValue,
+                                willUseAsDefault: !!originalValue
+                            });
+                            if (window.tickerService && typeof window.tickerService.getTickersWithOpenOrClosedTradesAndPlans === 'function') {
+                                const relevantTickers = await window.tickerService.getTickersWithOpenOrClosedTradesAndPlans({
+                                    useCache: true
+                                });
+                                
+                                if (relevantTickers.length > 0) {
+                                    await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
+                                        includeEmpty: true,
+                                        filterFn: (ticker) => relevantTickers.some(t => t.id === ticker.id),
+                                        defaultValue: originalValue // CRITICAL: Pass original value to preserve selection
+                                    });
+                                    console.log(`✅ [initializeSpecialHandlers] Re-populated executionTicker with ${relevantTickers.length} relevant tickers`, {
+                                        defaultValue: originalValue,
+                                        actualValue: newTickerSelect.value
+                                    });
+                                } else {
+                                    await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
+                                        includeEmpty: true,
+                                        defaultValue: originalValue // CRITICAL: Pass original value to preserve selection
+                                    });
+                                    console.log(`✅ [initializeSpecialHandlers] Re-populated executionTicker with all tickers (no relevant tickers)`, {
+                                        defaultValue: originalValue,
+                                        actualValue: newTickerSelect.value
+                                    });
+                                }
+                            } else {
+                                await window.SelectPopulatorService.populateTickersSelect(newTickerSelect, {
+                                    includeEmpty: true,
+                                    defaultValue: originalValue // CRITICAL: Pass original value to preserve selection
+                                });
+                                console.log(`✅ [initializeSpecialHandlers] Re-populated executionTicker with all tickers (fallback)`, {
+                                    defaultValue: originalValue,
+                                    actualValue: newTickerSelect.value
+                                });
+                            }
+                            console.log(`✅ [initializeSpecialHandlers] Re-population complete`, {
+                                optionsAfter: newTickerSelect.options.length,
+                                valueAfter: newTickerSelect.value,
+                                expectedValue: originalValue,
+                                match: newTickerSelect.value === String(originalValue)
+                            });
+                            
+                            // CRITICAL: After re-population, ALWAYS verify and restore value if needed
+                            // This is necessary because the async populate might complete after other code runs
+                            if (originalValue && originalValue !== '' && newTickerSelect.value !== String(originalValue)) {
+                                console.warn(`⚠️ [initializeSpecialHandlers] Value mismatch after re-population, restoring...`, {
+                                    expected: originalValue,
+                                    actual: newTickerSelect.value,
+                                    optionsCount: newTickerSelect.options.length,
+                                    hasOption: Array.from(newTickerSelect.options).some(opt => opt.value === String(originalValue))
+                                });
+                                // Try to restore manually - multiple attempts with different matching strategies
+                                let matchingOption = Array.from(newTickerSelect.options).find(opt => 
+                                    opt.value === String(originalValue)
+                                );
+                                if (!matchingOption) {
+                                    matchingOption = Array.from(newTickerSelect.options).find(opt => 
+                                        String(opt.value) === String(originalValue)
+                                    );
+                                }
+                                if (!matchingOption) {
+                                    matchingOption = Array.from(newTickerSelect.options).find(opt => 
+                                        parseInt(opt.value) === parseInt(originalValue)
+                                    );
+                                }
+                                if (matchingOption) {
+                                    newTickerSelect.value = matchingOption.value;
+                                    console.log(`✅ [initializeSpecialHandlers] Manually restored value: ${matchingOption.value} (${matchingOption.textContent})`);
+                                } else {
+                                    console.error(`❌ [initializeSpecialHandlers] Could not restore value ${originalValue} - option not found in list`, {
+                                        availableOptions: Array.from(newTickerSelect.options).map(opt => ({ value: opt.value, text: opt.textContent }))
+                                    });
+                                }
+                            } else if (originalValue && originalValue !== '') {
+                                console.log(`✅ [initializeSpecialHandlers] Value correctly preserved: ${newTickerSelect.value}`);
+                            }
+                            
+                            // CRITICAL: Set a flag to prevent any subsequent re-population from clearing this value
+                            newTickerSelect.dataset.valuePreserved = 'true';
+                            newTickerSelect.dataset.preservedValue = String(originalValue || '');
+                        } catch (error) {
+                            console.error(`❌ [initializeSpecialHandlers] Error re-populating executionTicker:`, error);
+                        }
+                    })();
+                } else {
+                    // If SelectPopulatorService not available, still try to restore value
+                    if (originalValue) {
+                        newTickerSelect.value = originalValue;
+                        console.log(`✅ [initializeSpecialHandlers] Restored value directly (no repopulation): ${originalValue}`);
+                    }
+                }
+                
                 // Restore value after clone (critical for edit mode!)
+                // Note: This is called synchronously, but populateTickersSelect above is async
+                // So we also restore in the async block above after population completes
+                // CRITICAL: Use preservedValue if available (from populateForm), otherwise use originalValue
+                const valueToRestore = preservedValue || originalValue;
+                if (valueToRestore) {
+                    // Temporarily set the value on the original select so _restoreSelectValueAfterClone can read it
+                    if (originalTickerSelect && !originalTickerSelect.value && preservedValue) {
+                        originalTickerSelect.value = preservedValue;
+                        console.log(`💾 [initializeSpecialHandlers] Set originalTickerSelect.value to preservedValue: ${preservedValue}`);
+                    }
+                }
                 this._restoreSelectValueAfterClone(originalTickerSelect, newTickerSelect, 'executionTicker');
                 
                 // Add change listener
@@ -5442,37 +5821,51 @@ class ModalManagerV2 {
                 console.log('✅ Added source field listener for executionExternalId');
             }
             
-            // Handle execution type field - enable/disable Realized P/L field based on execution type
-            // Realized P/L נדרש רק ל-sell (מכירה) ו-cover (כיסוי) - סגירת פוזיציות
-            // Realized P/L לא נדרש ל-buy (קנייה) ו-short (מכירה בחסר) - פתיחת פוזיציות
+            // Handle execution type field - enable/disable Realized P/L and MTM P/L fields based on execution type
+            // Realized P/L and MTM P/L נדרשים רק ל-sell (מכירה) ו-cover (כיסוי) - סגירת פוזיציות
+            // Realized P/L and MTM P/L לא נדרשים ל-buy (קנייה) ו-short (מכירה בחסר) - פתיחת פוזיציות
             const executionTypeSelect = modalElement.querySelector('#executionType');
             const realizedPLField = modalElement.querySelector('#executionRealizedPL');
+            const mtmPLField = modalElement.querySelector('#executionMTMPL');
             
-            if (executionTypeSelect && realizedPLField) {
-                // Function to update Realized P/L field state
-                const updateRealizedPLField = () => {
-                    const executionType = executionTypeSelect.value;
-                    if (executionType === 'sell' || executionType === 'cover') {
-                        // Enable Realized P/L for sell and cover (closing positions)
+            // Function to update both Realized P/L and MTM P/L fields state (same logic for both)
+            const updatePLFields = () => {
+                const executionType = executionTypeSelect.value;
+                if (executionType === 'sell' || executionType === 'cover') {
+                    // Enable P/L fields for sell and cover (closing positions)
+                    if (realizedPLField) {
                         realizedPLField.disabled = false;
                         realizedPLField.required = true;
-                        console.log(`🔓 Enabled executionRealizedPL (type: ${executionType})`);
-                    } else {
-                        // Disable Realized P/L for buy, short, and any unknown types (opening positions)
+                    }
+                    if (mtmPLField) {
+                        mtmPLField.disabled = false;
+                        mtmPLField.required = false; // MTM P/L is optional even when enabled
+                    }
+                    console.log(`🔓 Enabled P/L fields (type: ${executionType})`);
+                } else {
+                    // Disable P/L fields for buy, short, and any unknown types (opening positions)
+                    if (realizedPLField) {
                         realizedPLField.disabled = true;
                         realizedPLField.required = false;
                         realizedPLField.value = '';
-                        console.log(`🔒 Disabled executionRealizedPL (type: ${executionType})`);
                     }
-                };
-                
+                    if (mtmPLField) {
+                        mtmPLField.disabled = true;
+                        mtmPLField.required = false;
+                        mtmPLField.value = '';
+                    }
+                    console.log(`🔒 Disabled P/L fields (type: ${executionType})`);
+                }
+            };
+            
+            if (executionTypeSelect) {
                 // Set initial state
-                updateRealizedPLField();
+                updatePLFields();
                 
                 // Add change listener
-                executionTypeSelect.addEventListener('change', updateRealizedPLField);
+                executionTypeSelect.addEventListener('change', updatePLFields);
                 
-                console.log('✅ Added execution type listener for executionRealizedPL');
+                console.log('✅ Added execution type listener for executionRealizedPL and executionMTMPL');
             }
         }
         

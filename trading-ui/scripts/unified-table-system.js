@@ -1992,20 +1992,57 @@ class TableEventHandler {
       return;
     }
 
-    // חיפוש כל ה-sortable headers
-    const sortableHeaders = table.querySelectorAll('.sortable-header');
-    sortableHeaders.forEach((header, index) => {
-      // הסרת onclick handlers קיימים
-      header.removeAttribute('onclick');
+    // חיפוש כל ה-sortable headers (יכול להיות על ה-th או על כפתור בתוך ה-th)
+    // Note: We iterate through th elements to get proper column indices
+    const thElements = table.querySelectorAll('thead th');
+    thElements.forEach((th, thIndex) => {
+      // Find sortable header element (can be the th itself or a button inside it)
+      const sortableHeader = th.classList.contains('sortable-header') 
+        ? th 
+        : th.querySelector('.sortable-header');
+      
+      if (!sortableHeader) {
+        return; // No sortable header in this th
+      }
 
-      // הוספת event listener חדש
-      header.addEventListener('click', e => {
+      // Check if sortable header (or button inside th) already has data-onclick
+      // The data-onclick will be handled by EventHandlerManager
+      const buttonElement = sortableHeader.tagName === 'BUTTON' 
+        ? sortableHeader 
+        : (th.querySelector('button[data-onclick]') || sortableHeader.querySelector('button[data-onclick]'));
+      
+      const hasDataOnclick = (sortableHeader && sortableHeader.hasAttribute('data-onclick')) || 
+                             (buttonElement && buttonElement.hasAttribute('data-onclick'));
+      
+      if (hasDataOnclick) {
+        // Header already has data-onclick - let EventHandlerManager handle it
+        // Just remove any legacy onclick attributes
+        if (sortableHeader) sortableHeader.removeAttribute('onclick');
+        if (buttonElement) buttonElement.removeAttribute('onclick');
+        return; // Don't add our own event listener - data-onclick will handle it
+      }
+
+      // No data-onclick - set up sort handler using column index from th position
+      const columnIndex = thIndex;
+
+      // הסרת onclick handlers קיימים
+      if (sortableHeader) sortableHeader.removeAttribute('onclick');
+      if (buttonElement) buttonElement.removeAttribute('onclick');
+
+      // הוספת event listener חדש על האלמנט המתאים (th או button)
+      // Use buttonElement if it exists, otherwise use sortableHeader
+      const targetElement = buttonElement || sortableHeader;
+      if (!targetElement) return;
+
+      // Add event listener only if no data-onclick exists
+      // If data-onclick exists, EventHandlerManager will handle the click
+      targetElement.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
 
         // סידור לפי עמודה
         if (this.sorter) {
-          this.sorter.sort(tableType, index);
+          this.sorter.sort(tableType, columnIndex);
         }
       });
     });

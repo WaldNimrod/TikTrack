@@ -626,9 +626,26 @@
         }
 
         if (typeof value === 'number' && Number.isFinite(value)) {
-            const numericDate = new Date(value);
+            // Use dateUtils for consistent date handling
+            let numericDate;
+            if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+              numericDate = window.dateUtils.toDateObject({ epochMs: value });
+            } else {
+              numericDate = new Date(value);
+            }
             if (!Number.isNaN(numericDate.getTime())) {
-                return window.formatDate ? window.formatDate(numericDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(numericDate, { includeTime: true }) : numericDate.toLocaleString('he-IL'));
+                // Use FieldRendererService or dateUtils for consistent date formatting
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                  return window.FieldRendererService.renderDate(numericDate, true);
+                }
+                if (window.formatDate) {
+                  return window.formatDate(numericDate, true);
+                }
+                if (window.dateUtils?.formatDate) {
+                  return window.dateUtils.formatDate(numericDate, { includeTime: true });
+                }
+                // Last resort: use toLocaleString
+                return numericDate.toLocaleString('he-IL');
             }
         }
 

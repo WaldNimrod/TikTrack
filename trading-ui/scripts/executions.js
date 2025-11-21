@@ -1336,14 +1336,31 @@ async function updateExecutionsTableMain(executions, options = {}) {
                         return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
                       }
                       try {
-                        const dateObj = new Date(epoch);
-                        return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                        // Use dateUtils to convert epoch to Date object
+                        let dateObj;
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject({ epochMs: epoch });
+                        } else {
+                          dateObj = new Date(epoch);
+                        }
+                        // Use FieldRendererService or dateUtils for consistent date formatting
+                        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                          return window.FieldRendererService.renderDate(dateObj, true);
+                        }
+                        if (window.formatDate) {
+                          return window.formatDate(dateObj, true);
+                        }
+                        if (window.dateUtils?.formatDate) {
+                          return window.dateUtils.formatDate(dateObj, { includeTime: true });
+                        }
+                        // Last resort: use toLocaleString
+                        return dateObj.toLocaleString('he-IL', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit'
-                        }));
+                        });
                       } catch (err) {
                         window.Logger?.warn('⚠️ executions updated-cell date formatting failed', { err, executionId: execution?.id }, { page: 'executions' });
                         return 'לא מוגדר';

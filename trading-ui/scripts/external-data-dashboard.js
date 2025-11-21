@@ -776,6 +776,10 @@
       this.renderStatusIndicators(data);
       this.updateProviderLastUpdateTimes(data ? data.providers?.details || [] : []);
       this.updateStatisticsCards(data);
+      // Update cache settings display with fresh status data
+      this.updateCurrentSettings().catch(error => {
+        logger.error(`${MODULE_NAME}:update-current-settings:failed`, { error });
+      });
       this.updateChartsFromStatus(data).catch((error) => {
         logger.error(`${MODULE_NAME}:update-charts-failed`, { error });
       });
@@ -1052,7 +1056,35 @@
      * @returns {Promise<void>}
      */
     async updateChartsFromStatus(data) {
+      if (!data) {
+        return;
+      }
+
+      // Check if charts section is visible before creating charts
+      const chartsSection = document.getElementById('charts-section');
+      const isChartsSectionVisible = chartsSection && 
+        chartsSection.querySelector('.section-body')?.style.display !== 'none';
+
+      // Only create charts if section is visible
+      if (!isChartsSectionVisible) {
+        logger.debug(`${MODULE_NAME}:charts-section-hidden`, { message: 'Charts section is hidden, skipping chart updates' });
+        return;
+      }
+
+      // Ensure Chart.js is loaded and defaults are configured
+      if (window.Chart && window.ChartLoader) {
+        try {
+          await window.ChartLoader.load();
+          if (typeof window.ChartLoader._configureDefaults === 'function') {
+            window.ChartLoader._configureDefaults();
+          }
+        } catch (error) {
+          logger.warn(`${MODULE_NAME}:chart-loader-config`, { error });
+        }
+      }
+
       await Promise.all([
+        this.updateResponseTimeChart(),
         this.updateDataQualityChart(data),
         this.updateProviderComparisonChart(data),
         this.updateErrorAnalysisChart()
@@ -1225,35 +1257,90 @@
             </div>
         `;
 
-      this.updateCurrentSettings(stats);
+      // Update current settings from status data (not from cache stats)
+      this.updateCurrentSettings().catch(error => {
+        logger.error(`${MODULE_NAME}:update-current-settings:failed`, { error });
+      });
     }
 
     /**
      * Update current cache settings display
-     * @param {Object} cacheStats - Cache statistics object
-     * @returns {void}
+     * Loads settings from status data (providers) and cache TTL settings
+     * @returns {Promise<void>}
      */
-    updateCurrentSettings(cacheStats) {
+    async updateCurrentSettings() {
       const hotCacheElement = getElement('current-hot-cache');
       const warmCacheElement = getElement('current-warm-cache');
       const maxRequestsElement = getElement('current-max-requests');
 
-      if (hotCacheElement) {
-        hotCacheElement.textContent = cacheStats?.hot_ttl_minutes
-          ? `${formatNumber(cacheStats.hot_ttl_minutes)} דקות`
-          : NOT_AVAILABLE_TEXT;
-      }
+      try {
+        // Try to get settings from status data if available
+        if (this.statusData?.providers?.details && this.statusData.providers.details.length > 0) {
+          const yahooProvider = this.statusData.providers.details.find(p => p.name === 'yahoo_finance');
+          if (yahooProvider) {
+            // Get from provider settings
+            const hotTtlMinutes = yahooProvider.cache_ttl_hot ? Math.round(yahooProvider.cache_ttl_hot / 60) : null;
+            const warmTtlMinutes = yahooProvider.cache_ttl_warm ? Math.round(yahooProvider.cache_ttl_warm / 60) : null;
+            const maxRequests = yahooProvider.rate_limit_per_hour || null;
 
-      if (warmCacheElement) {
-        warmCacheElement.textContent = cacheStats?.warm_ttl_minutes
-          ? `${formatNumber(cacheStats.warm_ttl_minutes)} דקות`
-          : NOT_AVAILABLE_TEXT;
-      }
+            if (hotCacheElement) {
+              hotCacheElement.textContent = hotTtlMinutes
+                ? `${formatNumber(hotTtlMinutes)} דקות`
+                : NOT_AVAILABLE_TEXT;
+            }
 
-      if (maxRequestsElement) {
-        maxRequestsElement.textContent = cacheStats?.max_requests_per_hour
-          ? `${formatNumber(cacheStats.max_requests_per_hour)} לשעה`
-          : NOT_AVAILABLE_TEXT;
+            if (warmCacheElement) {
+              warmCacheElement.textContent = warmTtlMinutes
+                ? `${formatNumber(warmTtlMinutes)} דקות`
+                : NOT_AVAILABLE_TEXT;
+            }
+
+            if (maxRequestsElement) {
+              maxRequestsElement.textContent = maxRequests
+                ? `${formatNumber(maxRequests)} לשעה`
+                : NOT_AVAILABLE_TEXT;
+            }
+            return;
+          }
+        }
+
+        // Fallback: Try to get from cache TTL settings in status
+        if (this.statusData?.cache?.ttl_minutes) {
+          const ttlMinutes = this.statusData.cache.ttl_minutes;
+          const hotTtl = ttlMinutes.hot || ttlMinutes.hot_ttl || null;
+          const warmTtl = ttlMinutes.warm || ttlMinutes.warm_ttl || null;
+
+          if (hotCacheElement && hotTtl) {
+            hotCacheElement.textContent = `${formatNumber(hotTtl)} דקות`;
+          }
+          if (warmCacheElement && warmTtl) {
+            warmCacheElement.textContent = `${formatNumber(warmTtl)} דקות`;
+          }
+        }
+
+        // Load fresh status if not available
+        if (!this.statusData) {
+          await this.loadSystemStatus();
+          // Recursive call with fresh data
+          await this.updateCurrentSettings();
+          return;
+        }
+
+        // Set to NOT_AVAILABLE if still not found
+        if (hotCacheElement && !hotCacheElement.textContent) {
+          hotCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+        if (warmCacheElement && !warmCacheElement.textContent) {
+          warmCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+        if (maxRequestsElement && !maxRequestsElement.textContent) {
+          maxRequestsElement.textContent = NOT_AVAILABLE_TEXT;
+        }
+      } catch (error) {
+        logger.error(`${MODULE_NAME}:update-current-settings:error`, { error });
+        if (hotCacheElement) hotCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        if (warmCacheElement) warmCacheElement.textContent = NOT_AVAILABLE_TEXT;
+        if (maxRequestsElement) maxRequestsElement.textContent = NOT_AVAILABLE_TEXT;
       }
     }
 
@@ -2351,8 +2438,12 @@
       const selector = '#responseTimeChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas || !this.performanceSamples.length) {
-        this.destroyChart(chartId, 'responseTimeChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent || !this.performanceSamples.length) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'responseTimeChart');
+        }
         return;
       }
 
@@ -2380,6 +2471,16 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            }
+          },
           scales: {
             y: {
               beginAtZero: true
@@ -2411,8 +2512,12 @@
       const selector = '#dataQualityChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas || !data?.cache) {
-        this.destroyChart(chartId, 'dataQualityChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent || !data?.cache) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'dataQualityChart');
+        }
         return;
       }
 
@@ -2435,7 +2540,17 @@
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            }
+          }
         }
       };
 
@@ -2462,8 +2577,12 @@
       const selector = '#providerComparisonChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas || !data?.providers?.details?.length) {
-        this.destroyChart(chartId, 'providerComparisonChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent || !data?.providers?.details?.length) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'providerComparisonChart');
+        }
         return;
       }
 
@@ -2524,8 +2643,12 @@
       const selector = '#errorAnalysisChart';
       const canvas = document.querySelector(selector);
 
-      if (!canvas) {
-        this.destroyChart(chartId, 'errorAnalysisChart');
+      // Check if canvas is visible in DOM
+      if (!canvas || !canvas.offsetParent) {
+        if (canvas && !canvas.offsetParent) {
+          // Canvas exists but is hidden (section is collapsed)
+          this.destroyChart(chartId, 'errorAnalysisChart');
+        }
         return;
       }
 
@@ -2566,6 +2689,16 @@
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                padding: 15,
+                usePointStyle: true
+              }
+            }
+          },
           scales: {
             x: {
               beginAtZero: true
@@ -2876,58 +3009,16 @@ window.ExternalDataDashboard = ExternalDataDashboard;
   }
 
   /**
-   * Toggle all sections visibility
-   * @returns {void}
+   * NOTE: toggleSection and toggleAllSections are provided by the general system
+   * in ui-basic.js / ui-utils.js. Do not override them here.
+   * The general system handles:
+   * - Proper section-body toggling (not entire section)
+   * - State persistence via UnifiedCacheManager
+   * - Accordion mode support
+   * - Icon management
+   * 
+   * If you need custom section toggle behavior, extend the general system instead.
    */
-  window.toggleAllSections = function () {
-    const sections = document.querySelectorAll('.section-content, .section-body');
-    const toggleBtn = document.querySelector('.filter-toggle-btn .section-toggle-icon');
-    if (!sections.length) {
-      return;
-    }
-    const shouldExpand = Array.from(sections).some(
-      (section) => section.style.display === 'none' || section.classList.contains('collapsed')
-    );
-    sections.forEach((section) => {
-      if (shouldExpand) {
-        section.style.display = 'block';
-        section.classList.remove('collapsed');
-      } else {
-        section.style.display = 'none';
-        section.classList.add('collapsed');
-      }
-    });
-    if (toggleBtn) {
-      toggleBtn.textContent = shouldExpand ? '▼' : '▶';
-    }
-  };
-
-  /**
-   * Toggle section visibility by ID
-   * @param {string} sectionId - Section ID to toggle
-   * @returns {void}
-   */
-  window.toggleSection = function (sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) {
-      return;
-    }
-    const icon = document.querySelector(`[onclick*="${sectionId}"] .section-toggle-icon`);
-    const isCollapsed = section.style.display === 'none' || section.classList.contains('collapsed');
-    if (isCollapsed) {
-      section.style.display = 'block';
-      section.classList.remove('collapsed');
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    } else {
-      section.style.display = 'none';
-      section.classList.add('collapsed');
-      if (icon) {
-        icon.textContent = '▶';
-      }
-    }
-  };
 
   /**
    * Copy detailed log to clipboard (local wrapper)

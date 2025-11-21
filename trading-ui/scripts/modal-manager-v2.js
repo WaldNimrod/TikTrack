@@ -60,7 +60,13 @@ class ModalManagerV2 {
         }
 
         if (!assignedValue) {
-            const today = new Date();
+            // Use dateUtils for consistent date handling
+            let today;
+            if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+              today = window.dateUtils.getToday();
+            } else {
+              today = new Date();
+            }
             today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
             assignedValue = includeTime
                 ? today.toISOString().slice(0, 16)
@@ -798,7 +804,13 @@ class ModalManagerV2 {
                 // Handle 'today' special value for datetime-local
                 let dateValue = field.defaultValue || '';
                 if (dateValue === 'today') {
-                    const today = new Date();
+                    // Use dateUtils for consistent date handling
+                    let today;
+                    if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+                      today = window.dateUtils.getToday();
+                    } else {
+                      today = new Date();
+                    }
                     dateValue = today.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm                                                                   
                 }
                 const dateStyle = field.style || (field.width ? `width: ${field.width}px` : '');
@@ -2952,9 +2964,23 @@ class ModalManagerV2 {
                         // Format date for display
                         if (displayText) {
                             try {
-                                const date = new Date(displayText);
+                                // Use dateUtils for consistent date parsing
+                                let date;
+                                if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                                  date = window.dateUtils.toDateObject(displayText);
+                                } else {
+                                  date = new Date(displayText);
+                                }
                                 if (!isNaN(date.getTime())) {
-                                    displayText = window.formatDate ? window.formatDate(date, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(date, { includeTime: true }) : date.toLocaleString('he-IL', {
+                                    // Use FieldRendererService or dateUtils for consistent date formatting
+                                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                                      displayText = window.FieldRendererService.renderDate(date, true);
+                                    } else if (window.formatDate) {
+                                      displayText = window.formatDate(date, true);
+                                    } else if (window.dateUtils?.formatDate) {
+                                      displayText = window.dateUtils.formatDate(date, { includeTime: true });
+                                    } else {
+                                      displayText = date.toLocaleString('he-IL', {
                                         year: 'numeric',
                                         month: '2-digit',
                                         day: '2-digit',
@@ -3266,7 +3292,12 @@ class ModalManagerV2 {
                     }
                     // Priority 2: Handle Date objects directly (server may return Date objects)
                     else if (actualValue instanceof Date) {
-                        dateObj = new Date(actualValue.getTime());
+                        // Use dateUtils for consistent date handling
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject(actualValue);
+                        } else {
+                          dateObj = new Date(actualValue.getTime());
+                        }
                         console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
                     }
                     // Priority 3: Use centralized date utils for strings and other formats
@@ -3356,7 +3387,12 @@ class ModalManagerV2 {
                     }
                     // Priority 2: Handle Date objects directly (server may return Date objects)
                     else if (actualValue instanceof Date) {
-                        dateObj = new Date(actualValue.getTime());
+                        // Use dateUtils for consistent date handling
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                          dateObj = window.dateUtils.toDateObject(actualValue);
+                        } else {
+                          dateObj = new Date(actualValue.getTime());
+                        }
                         console.log(`✅ [populateForm] Using Date object directly:`, dateObj.toISOString());
                     }
                     // Priority 3: Use centralized date utils for strings and other formats

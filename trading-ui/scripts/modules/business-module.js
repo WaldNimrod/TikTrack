@@ -414,8 +414,32 @@ function updateTradesTable(trades) {
       </td>
       <td class="plan-cell">${trade.trade_plan_id ? `<a href="#" onclick="viewTradePlanDetails('${trade.trade_plan_id}')" class="plan-link" data-plan-id="${trade.trade_plan_id}">טוען...</a>` : '-'}</td>
       <td class="pl-cell">${window.colorAmountByValue(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
-      <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
-      <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
+      <td data-date="${trade.created_at}">${(() => {
+        if (!trade.created_at) return 'לא מוגדר';
+        // Use FieldRendererService or dateUtils for consistent date formatting
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          return window.FieldRendererService.renderDate(trade.created_at, false);
+        }
+        const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.created_at) : new Date(trade.created_at);
+        return window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: false }) : dateObj.toLocaleDateString('he-IL');
+      })()}</td>
+      <td>${(() => {
+        if (trade.closed_at) {
+          if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+            return window.FieldRendererService.renderDate(trade.closed_at, false);
+          }
+          const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.closed_at) : new Date(trade.closed_at);
+          return window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: false }) : dateObj.toLocaleDateString('he-IL');
+        }
+        if (trade.cancelled_at) {
+          if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+            return window.FieldRendererService.renderDate(trade.cancelled_at, false);
+          }
+          const dateObj = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(trade.cancelled_at) : new Date(trade.cancelled_at);
+          return window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: false }) : dateObj.toLocaleDateString('he-IL');
+        }
+        return '';
+      })()}</td>
       <td data-account="${trade.account_id || trade.account_name || ''}"><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
@@ -938,7 +962,13 @@ async function _REMOVED_loadEditTradeModalData(trade) {
 
         // Set dates if they exist - שימוש ב-created_at במקום opened_at
         if (trade.created_at) {
-          const createdDate = new Date(trade.created_at);
+          // Use dateUtils for consistent date parsing
+          let createdDate;
+          if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+            createdDate = window.dateUtils.toDateObject(trade.created_at);
+          } else {
+            createdDate = new Date(trade.created_at);
+          }
           const dateStr = createdDate.toISOString().slice(0, 16);
           const openedAtInput = document.getElementById('editTradeOpenedAt');
           if (openedAtInput) {
@@ -947,7 +977,13 @@ async function _REMOVED_loadEditTradeModalData(trade) {
         }
 
         if (trade.closed_at) {
-          const closedDate = new Date(trade.closed_at);
+          // Use dateUtils for consistent date parsing
+          let closedDate;
+          if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+            closedDate = window.dateUtils.toDateObject(trade.closed_at);
+          } else {
+            closedDate = new Date(trade.closed_at);
+          }
           const dateStr = closedDate.toISOString().slice(0, 16);
           const closedAtInput = document.getElementById('editTradeClosedAt');
           if (closedAtInput) {

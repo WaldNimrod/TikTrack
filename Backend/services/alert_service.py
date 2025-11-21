@@ -398,15 +398,34 @@ class AlertService:
             
             # IMPORTANT: Check if fields already exist and are not None/empty before setting defaults
             # Only set defaults if field is truly missing, not if it's None or empty string
-            if 'condition_attribute' not in alert_data or not alert_data.get('condition_attribute'):
-                logger.warning(f"condition_attribute missing or empty, setting default. Current value: {alert_data.get('condition_attribute')}")
+            # BUT: If field exists and has a value, preserve it!
+            if 'condition_attribute' not in alert_data:
+                logger.warning(f"condition_attribute missing, setting default")
                 alert_data['condition_attribute'] = 'price'
-            if 'condition_operator' not in alert_data or not alert_data.get('condition_operator'):
-                logger.warning(f"condition_operator missing or empty, setting default. Current value: {alert_data.get('condition_operator')}")
+            elif not alert_data.get('condition_attribute'):
+                # Field exists but is None or empty - set default
+                logger.warning(f"condition_attribute is None or empty, setting default. Current value: {alert_data.get('condition_attribute')}")
+                alert_data['condition_attribute'] = 'price'
+            else:
+                logger.info(f"condition_attribute already set to: {alert_data.get('condition_attribute')}")
+                
+            if 'condition_operator' not in alert_data:
+                logger.warning(f"condition_operator missing, setting default")
                 alert_data['condition_operator'] = 'more_than'
-            if 'condition_number' not in alert_data or not alert_data.get('condition_number'):
-                logger.warning(f"condition_number missing or empty, setting default. Current value: {alert_data.get('condition_number')}")
+            elif not alert_data.get('condition_operator'):
+                logger.warning(f"condition_operator is None or empty, setting default. Current value: {alert_data.get('condition_operator')}")
+                alert_data['condition_operator'] = 'more_than'
+            else:
+                logger.info(f"condition_operator already set to: {alert_data.get('condition_operator')}")
+                
+            if 'condition_number' not in alert_data:
+                logger.warning(f"condition_number missing, setting default")
                 alert_data['condition_number'] = '0'
+            elif not alert_data.get('condition_number'):
+                logger.warning(f"condition_number is None or empty, setting default. Current value: {alert_data.get('condition_number')}")
+                alert_data['condition_number'] = '0'
+            else:
+                logger.info(f"condition_number already set to: {alert_data.get('condition_number')}")
             
             logger.info(f"After processing - condition_attribute: {alert_data.get('condition_attribute')}, condition_operator: {alert_data.get('condition_operator')}, condition_number: {alert_data.get('condition_number')}")
             

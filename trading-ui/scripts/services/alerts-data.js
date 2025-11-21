@@ -223,6 +223,14 @@
 
   async function sendAlertMutation({ alertId, method, payload, signal }) {
     const endpoint = alertId ? `/api/alerts/${alertId}` : '/api/alerts';
+    
+    // Debug logging
+    console.group('🔍 [sendAlertMutation] Alert Mutation Debug');
+    console.log('📋 Endpoint:', endpoint);
+    console.log('📋 Method:', method);
+    console.log('📋 Payload:', payload);
+    console.log('📋 Payload JSON:', JSON.stringify(payload, null, 2));
+    
     try {
       const response = await fetch(buildUrl(endpoint), {
         method,
@@ -230,6 +238,27 @@
         body: payload ? JSON.stringify(payload) : undefined,
         signal,
       });
+
+      console.log('📋 Response status:', response.status);
+      console.log('📋 Response ok:', response.ok);
+      
+      if (!response.ok) {
+        // Try to get error details
+        try {
+          const responseText = await response.clone().text();
+          console.error('❌ Error response text:', responseText);
+          let errorData;
+          try {
+            errorData = JSON.parse(responseText);
+            console.error('❌ Error data:', errorData);
+            console.error('❌ Error message:', errorData.message || errorData.error);
+          } catch (parseError) {
+            console.error('❌ Failed to parse error:', parseError);
+          }
+        } catch (errorReadError) {
+          console.error('❌ Failed to read error response:', errorReadError);
+        }
+      }
 
       if (response.ok) {
         // Determine action based on method
@@ -248,8 +277,11 @@
         }
       }
 
+      console.groupEnd();
       return response;
     } catch (error) {
+      console.error('❌ [sendAlertMutation] Error:', error);
+      console.groupEnd();
       window.Logger?.error?.('❌ Alert mutation failed', {
         ...PAGE_LOG_CONTEXT,
         alertId,

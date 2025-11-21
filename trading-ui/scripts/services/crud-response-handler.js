@@ -46,7 +46,22 @@ class CRUDResponseHandler {
             // טיפול בתגובה לא תקינה
             if (!response.ok) {
                 console.log('❌ handleSaveResponse - Response not OK');
-                const errorData = await response.json();
+                console.log('❌ Response status:', response.status);
+                console.log('❌ Response statusText:', response.statusText);
+                
+                let errorData;
+                try {
+                    const responseText = await response.text();
+                    console.log('❌ Response text (raw):', responseText);
+                    errorData = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('❌ Failed to parse error response:', parseError);
+                    errorData = { error: 'שגיאה לא צפויה מהשרת' };
+                }
+                
+                console.log('❌ Error data:', errorData);
+                console.log('❌ Error message:', errorData.message || errorData.error);
+                console.log('❌ Full error object:', JSON.stringify(errorData, null, 2));
                 
                 // שגיאת ולידציה (HTTP 400)
                 if (response.status === 400) {
@@ -55,6 +70,15 @@ class CRUDResponseHandler {
                     if (typeof message === 'object') {
                         message = message.message || JSON.stringify(message);
                     }
+                    
+                    // Log detailed validation error
+                    console.error('❌ Validation Error Details:', {
+                        status: response.status,
+                        message: message,
+                        errorData: errorData,
+                        errorMessage: errorData.error?.message || errorData.error,
+                        errors: errorData.errors || errorData.error
+                    });
                     
                     // אם יש parser מותאם לשגיאות validation ברמת שדות
                     if (options.customValidationParser && typeof options.customValidationParser === 'function') {

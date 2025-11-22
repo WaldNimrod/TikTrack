@@ -92,3 +92,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-20T17:20:04+00:00 | 1.1.38.0 | 1.1.37.0 | ffd527b15aa5a11b6dd7a7d899415f8f4158b921 | 0d54decd53cf3ab9c57fd1e93fad652acf531b9a | patch | Update trade-history-page.html mockup |
 | 2025-11-20T17:22:46+00:00 | 1.1.39.0 | 1.1.38.0 | 81eb68e2ca2fbd3661dee61ffaa345816cc10c81 | ffd527b15aa5a11b6dd7a7d899415f8f4158b921 | patch | Add documentation updates and backup completeness check script |
 | 2025-11-21T23:02:56+00:00 | 1.1.40.0 | 1.1.39.0 | a000393345e4c471b89fca85a304e636510d719f | 81eb68e2ca2fbd3661dee61ffaa345816cc10c81 | patch | Fix data_import page: standardize date rendering using central code from executions.js |
+| 2025-11-22T11:49:25+00:00 | 1.1.41.0 | 1.1.40.0 | 47b08b26f67076058b084b8172d7b7d88422a5b4 | a000393345e4c471b89fca85a304e636510d719f | patch | Header System: Complete refactoring to prevent duplicates and improve initialization |

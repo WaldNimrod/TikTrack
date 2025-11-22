@@ -12,9 +12,21 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 - **Status**: **PREFERENCES INTEGRATED** - Full integration with unified initialization system
 - **Performance**: Header visible in ~150ms with proper preferences loading and cache management
 
-## 🎉 Current Status (January 2025)
+## 🎉 Current Status (November 2025)
 
-### 1. **Unified Header System v6.0.3 - PREFERENCES INTEGRATION COMPLETE** ✅ NEW!
+### 1. **Unified Header System v6.0.4 - REFACTORING COMPLETE** ✅ NEW!
+- **Status**: **COMPLETED** - Complete refactoring to prevent duplicates and improve initialization
+- **Date**: 22 November 2025
+- **Key Improvements**:
+  - **Cleanup System**: Added comprehensive `cleanup()` method to remove event listeners, portals, and timeouts
+  - **Initialization State Tracking**: Full tracking of initialization stages with timing and success/failure status
+  - **Duplicate Prevention**: Fixed duplicate filter submenus by hiding original menu when portal is open
+  - **Event Listener Management**: Proper cleanup and re-initialization of event listeners
+  - **Account Filter Enhancement**: Proper cleanup of account items before adding new ones
+  - **Naming Standardization**: Updated all references from "Account" to "Trading Account" (חשבון → חשבון מסחר)
+  - **Logging Enhancement**: Comprehensive logging at every stage with error recovery
+
+### 2. **Unified Header System v6.0.3 - PREFERENCES INTEGRATION COMPLETE** ✅
 - **Status**: **COMPLETED** - Full integration with unified initialization system and preferences
 - **Date**: 15 January 2025
 - **Key Improvements**:
@@ -60,6 +72,63 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
   - Total: 0.45s (ultra-responsive)
 - **Git Commits**: 13 commits total (refactoring + optimization)
 - **Documentation**: `HEADER_ANIMATION_OPTIMIZATION_REPORT.md`
+
+### Implementation Details (v6.0.4)
+
+#### **Cleanup System**
+```javascript
+// Comprehensive cleanup before re-initialization
+HeaderSystem.cleanup() {
+  // Removes all portals
+  // Clears all hover timeouts
+  // Removes event listeners from filter buttons
+  // Closes all open menus
+  // Resets setup flags
+}
+```
+
+#### **Initialization State Tracking**
+```javascript
+// Full tracking of initialization stages
+__initializationState = {
+  headerCreated: false,
+  filterSystemCreated: false,
+  accountsLoaded: false,
+  eventListenersSetup: false,
+  hoverBehaviorSetup: false,
+  initialized: false,
+  startTime: null,
+  endTime: null,
+  stages: {
+    createHeader: { success: true, duration: 5, timestamp: '...' },
+    createFilterSystem: { success: true, duration: 12, timestamp: '...' },
+    loadAccountsForFilter: { success: true, duration: 45, timestamp: '...' },
+    setupEventListeners: { success: true, duration: 8, timestamp: '...' },
+    setupHoverBehavior: { success: true, duration: 23, timestamp: '...' }
+  }
+};
+```
+
+#### **Duplicate Menu Prevention**
+```javascript
+// Hide original menu when portal is open
+function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
+  // Remove 'show' class and hide with inline styles
+  originalMenuEl.classList.remove('show');
+  originalMenuEl.style.display = 'none';
+  originalMenuEl.style.visibility = 'hidden';
+  originalMenuEl.style.opacity = '0';
+  
+  // Create portal (visible menu)
+  const portal = originalMenuEl.cloneNode(true);
+  // ... portal setup ...
+}
+```
+
+#### **Naming Standardization**
+- Updated all references from "Account" to "Trading Account" (חשבון מסחר)
+- Function names remain technical (accountFilter, accountFilterMenu)
+- User-facing text and comments updated to "Trading Account"
 
 ### Implementation Details (v6.0.3)
 

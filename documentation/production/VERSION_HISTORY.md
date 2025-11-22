@@ -29,3 +29,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-20T11:27:19+00:00 | 1.1.12.0 | 1.1.11.0 | 17dffed56f84f385a90a75686575804c162dc75f | c92ddc63c10c3816261773a59a53ae19591b2d47 | patch | Fix cash flow type filter: restore buttons, add dropdown, fix pagination render callback |
 | 2025-11-20T11:31:33+00:00 | 1.1.13.0 | 1.1.12.0 | bc6dff2069ef4449c1b9e5a65564a88f5d29d546 | 17dffed56f84f385a90a75686575804c162dc75f | patch | Remove cash flow filter buttons, keep only dropdown - full project sync |
 | 2025-11-20T11:34:46+00:00 | 1.2.0.0 | 1.1.13.0 | 568f18f6ed3ea36ed8a65f961234fd064eb697f4 | bc6dff2069ef4449c1b9e5a65564a88f5d29d546 | set | Update to version 1.2.0.0 |
+| 2025-11-22T11:56:35+00:00 | 1.3.0.0 | 1.2.0.0 | 997679b3129b635a7d1c489ca7b9ca9f3d8ce044 | 568f18f6ed3ea36ed8a65f961234fd064eb697f4 | set | Align production version with development - 1.3.0 |

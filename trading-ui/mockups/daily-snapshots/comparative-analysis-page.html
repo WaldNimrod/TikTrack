@@ -9,6 +9,10 @@
     <meta http-equiv="Expires" content="0">
     <title>ניתוח השוואתי - TikTrack</title>
     
+    <!-- Preconnect to CDN for faster loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -18,6 +22,23 @@
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
+    
+    <!-- Header System -->
+    <script src="../../scripts/header-system.js" defer></script>
+    
+    <!-- Preferences System -->
+    <script src="../../scripts/services/preferences-data.js" defer></script>
+    <script src="../../scripts/preferences-core-new.js" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    
+    <!-- Dynamic Colors System -->
+    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    
+    <!-- Linked Items System -->
+    <script src="../../scripts/linked-items.js" defer></script>
+    <script src="../../scripts/services/linked-items-service.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    <script src="../../scripts/services/entity-details-api.js" defer></script>
 </head>
 <body class="comparative-analysis-page">
     <!-- Header System -->
@@ -62,7 +83,6 @@
                         <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                            <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
                         </div><button class="filter-toggle-btn" onclick="toggleSection(\'comparative_analysis_page_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
@@ -331,5 +351,28 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <!-- Initialize Preferences System and Dynamic Colors -->
+    <script>
+        // Helper function to get CSS variable value
+        function getCSSVariableValue(variableName, fallback) {
+            try {
+                const value = getComputedStyle(document.documentElement).getPropertyValue(variableName);
+                return value && value.trim() ? value.trim() : fallback;
+            } catch (error) {
+                return fallback;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+                    await window.PreferencesCore.initializeWithLazyLoading();
+                }
+            } catch (error) {
+                console.warn('Preferences initialization failed (non-critical):', error);
+            }
+        });
+    </script>
 </body>
 </html>

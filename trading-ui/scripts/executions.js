@@ -1238,10 +1238,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                     </div>
                 </td>
                 <td class="type-cell" data-type="${typeForFilter}">
-                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : 
-                      `<span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
-                        ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
-                      </span>`}
+                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : '-'}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
                   data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
@@ -2797,8 +2794,7 @@ function updateExecutionsTableForTradeModal(executions) {
     executions.forEach(execution => {
       const row = document.createElement('tr');
 
-      const typeBadge = window.renderAction ? window.renderAction(execution.type) : 
-        (execution.type === 'buy' ? '<span class="badge bg-success">קניה</span>' : '<span class="badge bg-danger">מכירה</span>');
+      const typeBadge = window.renderAction ? window.renderAction(execution.type) : '-';
 
       const statusBadge = execution.status === 'completed'
         ? '<span class="badge bg-success">הושלם</span>'
@@ -4180,7 +4176,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(executionDateValue).toLocaleDateString('he-IL') : new Date(executionDateValue).toLocaleDateString('he-IL')))) : '-'));
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
-    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action === 'buy' ? 'קניה' : 'מכירה');
+    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action || '-');
     
     const scoreCategory = suggestion.score >= 100 ? 'open' : 
                           suggestion.score >= 70 ? 'warning' : 'info';

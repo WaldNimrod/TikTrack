@@ -485,6 +485,25 @@
         }
         
         // Apply filters
+        // Get selected accounts from multi-select filter
+        function getSelectedAccounts() {
+            const accountSelect = document.getElementById('filterAccount');
+            if (!accountSelect) {
+                return []; // Return empty array if select doesn't exist
+            }
+            
+            // Get all selected options
+            const selectedOptions = Array.from(accountSelect.selectedOptions);
+            const selectedIds = selectedOptions.map(option => option.value);
+            
+            // If no accounts selected, return all account IDs (means "all accounts")
+            if (selectedIds.length === 0 && allTradingAccounts.length > 0) {
+                return allTradingAccounts.map(acc => acc.id.toString());
+            }
+            
+            return selectedIds;
+        }
+        
         function applyFilters() {
             // Reload portfolio state with filters (this will filter trades, update charts and summary)
             loadPortfolioState();
@@ -619,7 +638,7 @@
             } catch (error) {
                 console.warn('Could not load chart default period from preferences:', error);
                 // Default to month if preferences fail
-                document.querySelectorAll('[data-onclick*="setChartPeriod('month'"]').forEach(btn => {
+                document.querySelectorAll('[data-onclick*="setChartPeriod(\'month\'"]').forEach(btn => {
                     btn.classList.add('active');
                 });
             }
@@ -1003,20 +1022,30 @@
         // Initialize Portfolio Value Chart
         async function initPortfolioValueChart() {
             const container = document.getElementById('portfolio-value-chart-container');
-            if (!container) return;
+            if (!container) {
+                console.warn('Portfolio value chart container not found');
+                return;
+            }
             
-            // Wait for TradingView to be available
+            // Wait for TradingView to be available with better error handling
             let retries = 0;
+            const maxRetries = 100; // Increased timeout for defer scripts
             while ((typeof window.TradingViewChartAdapter === 'undefined' || 
-                    typeof window.LightweightCharts === 'undefined' || 
-                    typeof window.lightweightCharts === 'undefined') && 
-                   retries < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+                    (typeof window.LightweightCharts === 'undefined' && 
+                     typeof window.lightweightCharts === 'undefined')) && 
+                   retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 50));
                 retries++;
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.error('TradingViewChartAdapter not available');
+                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                console.error('Available window objects:', Object.keys(window).filter(k => k.toLowerCase().includes('chart') || k.toLowerCase().includes('trading')));
+                return;
+            }
+            
+            if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+                console.error('❌ LightweightCharts library not available');
                 return;
             }
             
@@ -1085,20 +1114,29 @@
         // Initialize P/L Trend Chart
         async function initPLTrendChart() {
             const container = document.getElementById('pl-trend-chart-container');
-            if (!container) return;
+            if (!container) {
+                console.warn('P/L trend chart container not found');
+                return;
+            }
             
-            // Wait for TradingView to be available
+            // Wait for TradingView to be available with better error handling
             let retries = 0;
+            const maxRetries = 100; // Increased timeout for defer scripts
             while ((typeof window.TradingViewChartAdapter === 'undefined' || 
-                    typeof window.LightweightCharts === 'undefined' || 
-                    typeof window.lightweightCharts === 'undefined') && 
-                   retries < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+                    (typeof window.LightweightCharts === 'undefined' && 
+                     typeof window.lightweightCharts === 'undefined')) && 
+                   retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 50));
                 retries++;
             }
             
             if (typeof window.TradingViewChartAdapter === 'undefined') {
-                console.error('TradingViewChartAdapter not available');
+                console.error('❌ TradingViewChartAdapter not available after', maxRetries * 50, 'ms');
+                return;
+            }
+            
+            if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
+                console.error('❌ LightweightCharts library not available');
                 return;
             }
             
@@ -1499,19 +1537,26 @@
                 // Initialize preferences if available
                 if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
                     await window.PreferencesCore.initializeWithLazyLoading();
+                    console.log('✅ PreferencesCore initialized');
                 }
                 
-                // Wait a bit for preferences to be available
-                await new Promise(resolve => setTimeout(resolve, 300));
+                // Wait for preferences to be available in global scope
+                let retries = 0;
+                while ((!window.currentPreferences && !window.__latestPrefs) && retries < 20) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries++;
+                }
+                
+                if (window.currentPreferences || window.__latestPrefs) {
+                    console.log('✅ User preferences available in global scope');
+                } else {
+                    console.warn('⚠️ User preferences not found in global scope after timeout');
+                }
                 
                 // Reload TradingView theme preferences if available
                 if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
                     await window.TradingViewTheme.loadPreferences();
-                }
-                
-                // Reload FieldRendererService preferences if available
-                if (window.FieldRendererService && typeof window.FieldRendererService.loadPreferences === 'function') {
-                    await window.FieldRendererService.loadPreferences();
+                    console.log('✅ TradingView theme preferences reloaded');
                 }
                 
                 console.log('✅ User preferences loaded successfully');
@@ -1520,8 +1565,44 @@
             }
         }
         
+        // Wait for all required scripts to load
+        async function waitForScripts() {
+            // TradingViewChartAdapter is required
+            let retries = 0;
+            while (typeof window.TradingViewChartAdapter === 'undefined' && retries < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.TradingViewChartAdapter === 'undefined') {
+                console.warn('⚠️ Script TradingViewChartAdapter not loaded after timeout');
+            } else {
+                console.log('✅ Script TradingViewChartAdapter loaded');
+            }
+            
+            // LightweightCharts library - check both possible names
+            retries = 0;
+            while ((typeof window.LightweightCharts === 'undefined' && 
+                    typeof window.lightweightCharts === 'undefined') && 
+                   retries < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                retries++;
+            }
+            
+            if (typeof window.LightweightCharts !== 'undefined') {
+                console.log('✅ Script LightweightCharts loaded');
+            } else if (typeof window.lightweightCharts !== 'undefined') {
+                console.log('✅ Script lightweightCharts loaded');
+            } else {
+                console.warn('⚠️ Script LightweightCharts/lightweightCharts not loaded after timeout');
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for all scripts to load first
+            await waitForScripts();
+            
             // Load user preferences first
             await loadUserPreferences();
             

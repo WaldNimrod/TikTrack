@@ -105,3 +105,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-22T20:59:01+00:00 | 1.3.8.0 | 1.3.7.0 | 52a5ffc4bc2a2890b32beed9b8eaec31d8f937a9 | 7b8c107d620a4166e9414e217f15fa4171af5a1f | patch | Business Logic API: Fix validation bugs and add integration testing |
 | 2025-11-22T21:04:15+00:00 | 1.3.9.0 | 1.3.8.0 | 8e9d9a5a4e613ef03921810a51c547a3aa193380 | 52a5ffc4bc2a2890b32beed9b8eaec31d8f937a9 | patch | Fix: Add missing trim() in renderAction and all fallbacks |
 | 2025-11-22T21:08:25+00:00 | 1.3.10.0 | 1.3.9.0 | ad3eefa4c6f05660ae061b3f10dc46a77b8c2934 | 8e9d9a5a4e613ef03921810a51c547a3aa193380 | patch | Fix: Normalize action to lowercase in /execution/validate endpoint for consistency with business rules registry |
+| 2025-11-22T21:12:03+00:00 | 1.3.11.0 | 1.3.10.0 | d9b7781a090d0033f9ddc70966275bb9ee05b27d | ad3eefa4c6f05660ae061b3f10dc46a77b8c2934 | patch | Update: Mockup pages and header system improvements |

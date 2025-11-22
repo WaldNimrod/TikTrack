@@ -668,10 +668,10 @@
                             <button class="btn btn-sm btn-outline-secondary" id="timelineReset" title="איפוס זום">
                                 <i class="bi bi-arrow-counterclockwise"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה שמאלה">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)">
                                 <i class="bi bi-arrow-left"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה ימינה">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)">
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
@@ -2077,7 +2077,7 @@
             const dangerColor = getCSSVariableValue('--danger-color', '#dc3545');
             
             try {
-                // Create chart
+                // Create chart with dual Y-axes (left and right) for consistent display
                 marketPriceChart = window.TradingViewChartAdapter.createChart(container, {
                     width: container.clientWidth || 600,
                     height: container.clientHeight || 400,
@@ -2085,14 +2085,29 @@
                         textColor: getCSSVariableValue('--text-color', '#212529'),
                         background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
                     },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
                     timeScale: {
                         timeVisible: true,
                         secondsVisible: false
                     }
                 });
                 
-                // Market Price Line
+                // Market Price Line - Right Scale
                 const priceSeries = window.TradingViewChartAdapter.addLineSeries(marketPriceChart, {
+                    priceScaleId: 'right',
                     color: primaryColor,
                     lineWidth: 2,
                     title: 'מחיר שוק'
@@ -2103,6 +2118,51 @@
                     value: marketPrices[i]
                 }));
                 priceSeries.setData(priceData);
+                
+                // Position Size Line - Left Scale (for consistent dual-axis display)
+                // Use timeline data to get position size for each date
+                let positionSizeSeries = null;
+                if (window._timelineData && window._timelineData.length > 0) {
+                    const mutedColor = getCSSVariableValue('--muted-color', '#6c757d') || getCSSVariableValue('--text-muted', '#6c757d');
+                    
+                    positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(marketPriceChart, {
+                        priceScaleId: 'left',
+                        color: mutedColor,
+                        lineWidth: 2,
+                        lineType: 1, // Stepped
+                        title: 'גודל פוזיציה',
+                        visible: false // Hidden by default, but keeps the left axis visible
+                    });
+                    
+                    // Build position size data from timeline data
+                    // Since dates array is built from timeline data in the same order,
+                    // we can use the same index for both arrays
+                    const positionSizeData = [];
+                    window._timelineData.forEach((point, index) => {
+                        const tvDate = convertDateToTradingView(point.date);
+                        // Verify that the date matches (safety check)
+                        if (index < dates.length && dates[index] === tvDate) {
+                            positionSizeData.push({
+                                time: tvDate,
+                                value: point.positionSize || 0
+                            });
+                        } else {
+                            // If dates don't match, try to find the date in dates array
+                            const dateIndex = dates.findIndex(d => d === tvDate);
+                            if (dateIndex !== -1) {
+                                positionSizeData.push({
+                                    time: tvDate,
+                                    value: point.positionSize || 0
+                                });
+                            }
+                        }
+                    });
+                    
+                    if (positionSizeData.length > 0) {
+                        positionSizeSeries.setData(positionSizeData);
+                        console.log(`✅ [Market Price Chart] Added position size series (${positionSizeData.length} points) for left axis`);
+                    }
+                }
                 
                 // Add markers for entry and exit points
                 // Use executionData that was built from timelineData to ensure exact alignment

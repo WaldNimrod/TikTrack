@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.3.10.0",
+    "version": "1.3.11.0",
     "major": 1,
     "minor": 3,
-    "patch": 10,
+    "patch": 11,
     "build": 0,
-    "commit": "ad3eefa4c6f05660ae061b3f10dc46a77b8c2934",
-    "updated_at": "2025-11-22T21:08:25+00:00",
-    "notes": "Fix: Normalize action to lowercase in /execution/validate endpoint for consistency with business rules registry"
+    "commit": "d9b7781a090d0033f9ddc70966275bb9ee05b27d",
+    "updated_at": "2025-11-22T21:12:03+00:00",
+    "notes": "Update: Mockup pages and header system improvements"
   }
 }

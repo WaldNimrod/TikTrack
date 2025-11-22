@@ -638,8 +638,21 @@ class HeaderSystem {
 
   static getHeaderHTML() {
     // Detect if we're in a mockup page and adjust image paths accordingly
-    const isMockupPage = window.location.pathname.includes('/mockups/');
+    // Check both pathname and href to handle different server configurations
+    const pathname = window.location.pathname || '';
+    const href = window.location.href || '';
+    const isMockupPage = pathname.includes('/mockups/') || href.includes('/mockups/');
     const imagePathPrefix = isMockupPage ? '../../' : '';
+    
+    // Debug log for troubleshooting
+    if (isMockupPage && window.Logger) {
+      window.Logger.debug('🔍 Mockup page detected, using image path prefix', {
+        page: 'header-system',
+        pathname: pathname,
+        href: href,
+        imagePathPrefix: imagePathPrefix
+      });
+    }
     
     return `
         <div class="header-content">

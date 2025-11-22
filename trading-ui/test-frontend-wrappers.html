@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת Frontend Wrappers - Business Logic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .test-result.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .test-result.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .test-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #26baac;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1e9b8f;
+        }
+        .summary {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 בדיקת Frontend Wrappers - Business Logic</h1>
+    
+    <div class="test-container">
+        <h2>Phase 1.6: TradesData Wrappers</h2>
+        <button onclick="runAllTests()">הרץ כל הבדיקות</button>
+        <button onclick="clearResults()">נקה תוצאות</button>
+        <div id="summary" class="summary"></div>
+        <div id="results"></div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="/scripts/services/logger-service.js"></script>
+    <script src="/scripts/services/trades-data.js"></script>
+    <script src="/scripts/ui-utils.js"></script>
+
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0
+        };
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('summary').innerHTML = '';
+            testResults = { total: 0, passed: 0, failed: 0 };
+        }
+
+        function addResult(testName, passed, message, details = null) {
+            testResults.total++;
+            if (passed) {
+                testResults.passed++;
+            } else {
+                testResults.failed++;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'passed' : 'failed'}`;
+            
+            let html = `<strong>${passed ? '✅' : '❌'} ${testName}</strong><br>`;
+            html += `${message}<br>`;
+            if (details) {
+                html += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            
+            resultDiv.innerHTML = html;
+            resultsDiv.appendChild(resultDiv);
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            const percentage = testResults.total > 0 
+                ? ((testResults.passed / testResults.total) * 100).toFixed(1) 
+                : 0;
+            summaryDiv.innerHTML = `
+                סה"כ: ${testResults.total} | 
+                עברו: ${testResults.passed} | 
+                נכשלו: ${testResults.failed} | 
+                אחוז הצלחה: ${percentage}%
+            `;
+        }
+
+        async function testCalculateStopPrice() {
+            const testName = 'calculateStopPrice';
+            const startTime = performance.now();
+            
+            try {
+                // Test 1: Long position
+                const result1 = await window.TradesData.calculateStopPrice(100, 10, 'Long');
+                const expected1 = 90;
+                const passed1 = Math.abs(result1 - expected1) < 0.01;
+                addResult(
+                    `${testName} - Long`,
+                    passed1,
+                    `Expected: ${expected1}, Got: ${result1}`,
+                    { input: { price: 100, percentage: 10, side: 'Long' }, result: result1, expected: expected1 }
+                );
+
+                // Test 2: Short position
+                const result2 = await window.TradesData.calculateStopPrice(100, 10, 'Short');
+                const expected2 = 110;
+                const passed2 = Math.abs(result2 - expected2) < 0.01;
+                addResult(
+                    `${testName} - Short`,
+                    passed2,
+                    `Expected: ${expected2}, Got: ${result2}`,
+                    { input: { price: 100, percentage: 10, side: 'Short' }, result: result2, expected: expected2 }
+                );
+
+                // Test 3: Error handling (invalid input)
+                try {
+                    await window.TradesData.calculateStopPrice(-10, 10, 'Long');
+                    addResult(`${testName} - Error Handling`, false, 'Should have thrown error for invalid input');
+                } catch (error) {
+                    addResult(`${testName} - Error Handling`, true, `Correctly threw error: ${error.message}`);
+                }
+
+                // Test 4: Response time
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                addResult(
+                    `${testName} - Response Time`,
+                    duration < 200,
+                    `Duration: ${duration.toFixed(2)}ms (should be < 200ms)`,
+                    { duration: duration.toFixed(2) + 'ms' }
+                );
+
+            } catch (error) {
+                addResult(testName, false, `Error: ${error.message}`, { error: error.toString() });
+            }
+        }
+
+        async function testCalculateTargetPrice() {
+            const testName = 'calculateTargetPrice';
+            const startTime = performance.now();
+            
+            try {
+                // Test 1: Long position
+                const result1 = await window.TradesData.calculateTargetPrice(100, 2000, 'Long');
+                const expected1 = 2100;
+                const passed1 = Math.abs(result1 - expected1) < 0.01;
+                addResult(
+                    `${testName} - Long`,
+                    passed1,
+                    `Expected: ${expected1}, Got: ${result1}`,
+                    { input: { price: 100, percentage: 2000, side: 'Long' }, result: result1, expected: expected1 }
+                );
+
+                // Test 2: Short position (with realistic percentage)
+                const result2 = await window.TradesData.calculateTargetPrice(100, 50, 'Short');
+                const expected2 = 50;
+                const passed2 = Math.abs(result2 - expected2) < 0.01;
+                addResult(
+                    `${testName} - Short`,
+                    passed2,
+                    `Expected: ${expected2}, Got: ${result2}`,
+                    { input: { price: 100, percentage: 50, side: 'Short' }, result: result2, expected: expected2 }
+                );
+
+                // Test 3: Error handling
+                try {
+                    await window.TradesData.calculateTargetPrice(0, 10, 'Long');
+                    addResult(`${testName} - Error Handling`, false, 'Should have thrown error for invalid input');
+                } catch (error) {
+                    addResult(`${testName} - Error Handling`, true, `Correctly threw error: ${error.message}`);
+                }
+
+                // Test 4: Response time
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                addResult(
+                    `${testName} - Response Time`,
+                    duration < 200,
+                    `Duration: ${duration.toFixed(2)}ms (should be < 200ms)`,
+                    { duration: duration.toFixed(2) + 'ms' }
+                );
+
+            } catch (error) {
+                addResult(testName, false, `Error: ${error.message}`, { error: error.toString() });
+            }
+        }
+
+        async function testCalculatePercentageFromPrice() {
+            const testName = 'calculatePercentageFromPrice';
+            const startTime = performance.now();
+            
+            try {
+                // Test 1: Long position
+                const result1 = await window.TradesData.calculatePercentageFromPrice(100, 110, 'Long');
+                const expected1 = 10;
+                const passed1 = Math.abs(result1 - expected1) < 0.01;
+                addResult(
+                    `${testName} - Long`,
+                    passed1,
+                    `Expected: ${expected1}, Got: ${result1}`,
+                    { input: { currentPrice: 100, targetPrice: 110, side: 'Long' }, result: result1, expected: expected1 }
+                );
+
+                // Test 2: Short position
+                const result2 = await window.TradesData.calculatePercentageFromPrice(100, 90, 'Short');
+                const expected2 = 10;
+                const passed2 = Math.abs(result2 - expected2) < 0.01;
+                addResult(
+                    `${testName} - Short`,
+                    passed2,
+                    `Expected: ${expected2}, Got: ${result2}`,
+                    { input: { currentPrice: 100, targetPrice: 90, side: 'Short' }, result: result2, expected: expected2 }
+                );
+
+                // Test 3: Error handling
+                try {
+                    await window.TradesData.calculatePercentageFromPrice(0, 110, 'Long');
+                    addResult(`${testName} - Error Handling`, false, 'Should have thrown error for invalid input');
+                } catch (error) {
+                    addResult(`${testName} - Error Handling`, true, `Correctly threw error: ${error.message}`);
+                }
+
+                // Test 4: Response time
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                addResult(
+                    `${testName} - Response Time`,
+                    duration < 200,
+                    `Duration: ${duration.toFixed(2)}ms (should be < 200ms)`,
+                    { duration: duration.toFixed(2) + 'ms' }
+                );
+
+            } catch (error) {
+                addResult(testName, false, `Error: ${error.message}`, { error: error.toString() });
+            }
+        }
+
+        async function testValidateTrade() {
+            const testName = 'validateTrade';
+            const startTime = performance.now();
+            
+            try {
+                // Test 1: Valid trade (with all required fields)
+                const validTrade = {
+                    side: 'Long',
+                    price: 100,
+                    quantity: 10,
+                    investment_type: 'Investment',
+                    status: 'open'
+                };
+                const result1 = await window.TradesData.validateTrade(validTrade);
+                addResult(
+                    `${testName} - Valid Trade`,
+                    result1.is_valid === true,
+                    `Expected: is_valid=true, Got: is_valid=${result1.is_valid}`,
+                    { input: validTrade, result: result1 }
+                );
+
+                // Test 2: Invalid trade (missing required fields)
+                const invalidTrade = {
+                    side: 'InvalidSide'
+                };
+                const result2 = await window.TradesData.validateTrade(invalidTrade);
+                addResult(
+                    `${testName} - Invalid Trade (Missing Fields)`,
+                    result2.is_valid === false && result2.errors.length > 0,
+                    `Expected: is_valid=false with errors, Got: is_valid=${result2.is_valid}, errors=${result2.errors.length}`,
+                    { input: invalidTrade, result: result2 }
+                );
+
+                // Test 3: Invalid trade (invalid side value)
+                const invalidSideTrade = {
+                    side: 'InvalidSide',
+                    price: 100,
+                    quantity: 10,
+                    investment_type: 'Investment',
+                    status: 'open'
+                };
+                const result3 = await window.TradesData.validateTrade(invalidSideTrade);
+                addResult(
+                    `${testName} - Invalid Trade (Invalid Side)`,
+                    result3.is_valid === false && result3.errors.length > 0,
+                    `Expected: is_valid=false with errors, Got: is_valid=${result3.is_valid}, errors=${result3.errors.length}`,
+                    { input: invalidSideTrade, result: result3 }
+                );
+
+                // Test 4: Response time
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                addResult(
+                    `${testName} - Response Time`,
+                    duration < 200,
+                    `Duration: ${duration.toFixed(2)}ms (should be < 200ms)`,
+                    { duration: duration.toFixed(2) + 'ms' }
+                );
+
+            } catch (error) {
+                addResult(testName, false, `Error: ${error.message}`, { error: error.toString() });
+            }
+        }
+
+        async function testFallback() {
+            const testName = 'Fallback Mechanism';
+            
+            try {
+                // Test fallback in ui-utils.js (when API is unavailable)
+                // We can't easily simulate API failure, but we can test that ui-utils.js has fallback
+                if (window.calculateStopPrice && typeof window.calculateStopPrice === 'function') {
+                    // Test that fallback exists (local calculation)
+                    const result = await window.calculateStopPrice(100, 10, 'Long');
+                    const hasFallback = typeof result === 'number' && result > 0;
+                    addResult(
+                        testName,
+                        hasFallback,
+                        `Fallback mechanism exists and returns number: ${result}`,
+                        { result: result, hasFallback: hasFallback }
+                    );
+                } else {
+                    addResult(testName, false, 'window.calculateStopPrice not found');
+                }
+            } catch (error) {
+                addResult(testName, false, `Error: ${error.message}`, { error: error.toString() });
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            addResult('Info', true, 'Starting tests...', null);
+            
+            // Wait for services to be available
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!window.TradesData) {
+                addResult('Initialization', false, 'TradesData service not available');
+                return;
+            }
+
+            await testCalculateStopPrice();
+            await testCalculateTargetPrice();
+            await testCalculatePercentageFromPrice();
+            await testValidateTrade();
+            await testFallback();
+
+            addResult('Info', true, 'All tests completed!', null);
+        }
+
+        // Auto-run tests on load (optional)
+        // window.addEventListener('DOMContentLoaded', () => {
+        //     setTimeout(runAllTests, 1000);
+        // });
+    </script>
+</body>
+</html>
+

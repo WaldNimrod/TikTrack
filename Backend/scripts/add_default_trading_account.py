@@ -14,7 +14,7 @@ def add_default_trading_account():
     """הוספת חשבון מסחר ברירת מחדל"""
     
     # חיבור לבסיס הנתונים
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'simpleTrade_new.db')
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'db', 'tiktrack.db')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     

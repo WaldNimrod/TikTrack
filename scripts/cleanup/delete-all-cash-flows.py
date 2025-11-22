@@ -14,12 +14,13 @@ sys.path.insert(0, str(backend_dir))
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+from config.settings import DB_PATH
 
 def delete_all_cash_flows():
     """Delete all cash flows from database"""
     
     # Database path
-    db_path = backend_dir / "db" / "simpleTrade_new.db"
+    db_path = Path(DB_PATH)
     
     if not db_path.exists():
         print(f"❌ Database not found at: {db_path}")

@@ -31,19 +31,18 @@
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
                             <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px;">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">לוח כלכלי</a>
-                        <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">רשומת יומן</a>
-                    </div>
+                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
+                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
+                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
+                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
+                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
+                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
+                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
+                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
+                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
+                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
+                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
+</div>
                 </div>
             </div>
         </div>
@@ -54,17 +53,17 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section">
+                <div class="top-section" id="price_history_page_top_section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
                             <i class="bi bi-graph-up-arrow"></i>
                             היסטוריית מחירים
                         </div>
-                        <div class="table-actions">
+                        <div class="header-actions d-flex align-items-center gap-2"><div class="table-actions">
                             <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
                             <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
                             <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לרשימת טיקרים"></button>
-                        </div>
+                        </div><button class="filter-toggle-btn" onclick="toggleSection(\'price_history_page_top_section\')" title="הצג/הסתר סקשן"><span class="section-toggle-icon">▼</span></button></div>
                     </div>
                     
                     <div class="section-body">
@@ -100,11 +99,20 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Price Chart Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">גרף מחירים לאורך זמן</h5>
+                    </div>
+                </div>
+                
+                <!-- Price Chart Section -->
+                <div class="content-section" id="price-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up"></i> גרף מחירים לאורך זמן</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('price-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                                 <div class="mb-3">
                                     <button class="btn btn-sm btn-outline-primary">שבוע</button>
                                     <button class="btn btn-sm btn-primary">חודש</button>
@@ -120,13 +128,20 @@
                                     <span class="badge" style="background: #28a745;">● TSLA</span>
                                     <span class="badge" style="background: #dc3545;">● MSFT</span>
                                 </div>
-                            </div>
+                    </div>
+                </div>
+                
+                <!-- Daily Prices Table Section -->
+                <div class="content-section" id="daily-prices-table-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-table"></i> טבלת מחירים יומיים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('daily-prices-table-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
                         </div>
-                        
-                        <!-- Daily Prices Table Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">טבלת מחירים יומיים</h5>
+                    </div>
+                    <div class="section-body">
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
@@ -194,10 +209,20 @@
                                     <button class="btn btn-sm btn-outline-secondary">פילטרים</button>
                                     <button class="btn btn-sm btn-outline-primary">ייצא</button>
                                 </div>
-                            </div>
+                    </div>
+                </div>
+                
+                <!-- Change Statistics Section -->
+                <div class="content-section" id="change-statistics-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-bar-chart"></i> סטטיסטיקות שינוי</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('change-statistics-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
                         </div>
-                        
-                        <!-- Change Statistics Cards -->
+                    </div>
+                    <div class="section-body">
                         <div class="row mb-4">
                             <div class="col-md-3">
                                 <div class="compact-stat-card">
@@ -228,11 +253,20 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Comparison Chart Section (if multiple tickers selected) -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">השוואה בין טיקרים</h5>
+                    </div>
+                </div>
+                
+                <!-- Comparison Chart Section (if multiple tickers selected) -->
+                <div class="content-section" id="comparison-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-arrow-left-right"></i> השוואה בין טיקרים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('comparison-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                                 <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
                                     [גרף השוואה - Line Chart עם מספר טיקרים]
                                 </div>
@@ -241,10 +275,11 @@
                                     <span class="badge" style="background: #28a745;">● TSLA</span>
                                     <span class="badge" style="background: #dc3545;">● MSFT</span>
                                 </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
     </div>

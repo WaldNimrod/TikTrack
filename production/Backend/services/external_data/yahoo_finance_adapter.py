@@ -15,6 +15,7 @@ from models.external_data import ExternalDataProvider, MarketDataQuote, DataRefr
 from models.ticker import Ticker
 from models.user import User
 from services.user_service import UserService
+from services.ticker_symbol_mapping_service import TickerSymbolMappingService
 import pytz
 
 # Configure logging
@@ -97,6 +98,36 @@ class YahooFinanceAdapter:
 
         normalized = symbol.strip().upper()
         return normalized or None
+    
+    def _get_provider_symbol(self, ticker: Ticker) -> str:
+        """
+        Get provider-specific symbol for a ticker with fallback to internal symbol
+        
+        This method checks for a provider-specific symbol mapping and falls back
+        to the ticker's internal symbol if no mapping exists.
+        
+        Args:
+            ticker: Ticker object
+            
+        Returns:
+            str: Provider-specific symbol or internal symbol as fallback
+            
+        Example:
+            >>> symbol = adapter._get_provider_symbol(ticker)
+            >>> print(symbol)  # "500X.MI" or "500X" (fallback)
+        """
+        try:
+            provider_symbol = TickerSymbolMappingService.get_provider_symbol_with_fallback(
+                self.db_session, 
+                ticker.id, 
+                self.provider_id
+            )
+            if provider_symbol and provider_symbol != ticker.symbol:
+                logger.debug(f"Using provider symbol '{provider_symbol}' for ticker {ticker.symbol} (ID: {ticker.id})")
+            return provider_symbol
+        except Exception as e:
+            logger.warning(f"Error getting provider symbol for ticker {ticker.id}, using fallback: {e}")
+            return ticker.symbol
 
     def _is_symbol_valid(self, symbol: Optional[str]) -> bool:
         """Validate symbol format before hitting the provider"""
@@ -397,6 +428,18 @@ class YahooFinanceAdapter:
                 logger.debug(f"Request successful: {url}")
                 return data
                 
+            except requests.exceptions.HTTPError as e:
+                if e.response and e.response.status_code == 404:
+                    # Symbol not found in Yahoo Finance - likely European/unsupported ticker
+                    # Don't retry 404 errors - symbol simply doesn't exist in Yahoo Finance
+                    logger.warning(f"Symbol not found in Yahoo Finance (404): {url.split('/')[-1].split('?')[0]} - This may be a European or unsupported ticker")
+                    return None  # Don't retry 404 errors
+                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                if attempt < self.retry_attempts:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+                else:
+                    logger.error(f"All retry attempts failed for {url}")
+                    return None
             except requests.exceptions.RequestException as e:
                 logger.warning(f"Request attempt {attempt + 1} failed: {e}")
                 if attempt < self.retry_attempts:
@@ -410,23 +453,44 @@ class YahooFinanceAdapter:
         
         return None
     
-    def get_quote(self, symbol: str) -> Optional[QuoteData]:
-        """Get single quote for a symbol"""
+    def get_quote(self, symbol: str, ticker: Optional[Ticker] = None) -> Optional[QuoteData]:
+        """
+        Get single quote for a symbol
+        
+        Args:
+            symbol: Ticker symbol (internal symbol)
+            ticker: Optional Ticker object - if provided, will use provider-specific symbol mapping
+            
+        Returns:
+            Optional[QuoteData]: Quote data or None if not found
+        """
         try:
-            normalized_symbol = self._normalize_symbol(symbol)
-            if not self._is_symbol_valid(normalized_symbol):
-                logger.error(f"Invalid symbol supplied for quote fetch: '{symbol}'")
-                return None
-            symbol = normalized_symbol
+            # If ticker is provided, use provider-specific symbol
+            if ticker:
+                provider_symbol = self._get_provider_symbol(ticker)
+                logger.debug(f"Using provider symbol '{provider_symbol}' for ticker {ticker.symbol} (ID: {ticker.id})")
+            else:
+                # Normalize the provided symbol
+                normalized_symbol = self._normalize_symbol(symbol)
+                if not self._is_symbol_valid(normalized_symbol):
+                    logger.error(f"Invalid symbol supplied for quote fetch: '{symbol}'")
+                    return None
+                provider_symbol = normalized_symbol
+                # Try to find ticker by symbol for caching purposes
+                ticker = self.db_session.query(Ticker).filter(Ticker.symbol == provider_symbol).first()
 
-            # Check cache first
-            cached_quote = self._get_cached_quote(symbol)
+            # Check cache first (using internal symbol for cache lookup)
+            if ticker:
+                cached_quote = self._get_cached_quote_by_ticker(ticker)
+            else:
+                cached_quote = self._get_cached_quote(provider_symbol)
+            
             if cached_quote and not self._is_stale(cached_quote):
-                logger.debug(f"Cache hit for {symbol}")
+                logger.debug(f"Cache hit for {provider_symbol}")
                 return cached_quote
             
-            # Fetch from API
-            url = f"{self.base_url}/v8/finance/chart/{symbol}"
+            # Fetch from API using provider symbol
+            url = f"{self.base_url}/v8/finance/chart/{provider_symbol}"
             params = {
                 'interval': '1d',
                 'range': '1d',
@@ -437,11 +501,15 @@ class YahooFinanceAdapter:
             if not data:
                 return None
             
-            # Parse response
-            quote = self._parse_quote_response(symbol, data)
+            # Parse response - use internal symbol for the quote object
+            internal_symbol = ticker.symbol if ticker else provider_symbol
+            quote = self._parse_quote_response(internal_symbol, data)
             if quote:
                 # Cache the result
-                self._cache_quote(quote)
+                if ticker:
+                    self._cache_quote_by_ticker(quote, ticker)
+                else:
+                    self._cache_quote(quote)
                 
             return quote
             
@@ -450,16 +518,29 @@ class YahooFinanceAdapter:
             return None
     
     def get_quotes_batch(self, symbols: List[str]) -> List[QuoteData]:
-        """Get quotes for multiple symbols in batches"""
+        """
+        Get quotes for multiple symbols in batches
+        
+        This method will automatically use provider-specific symbol mappings if available.
+        """
         if not symbols:
             return []
 
+        # Normalize symbols and get tickers
+        symbol_to_ticker: Dict[str, Ticker] = {}
         sanitized_symbols: List[str] = []
+        
         for raw_symbol in symbols:
             normalized_symbol = self._normalize_symbol(raw_symbol)
             if not self._is_symbol_valid(normalized_symbol):
                 logger.warning(f"Skipping invalid symbol during batch fetch: '{raw_symbol}'")
                 continue
+            
+            # Try to find ticker for this symbol
+            ticker = self.db_session.query(Ticker).filter(Ticker.symbol == normalized_symbol).first()
+            if ticker:
+                symbol_to_ticker[normalized_symbol] = ticker
+            
             sanitized_symbols.append(normalized_symbol)
 
         if not sanitized_symbols:
@@ -469,30 +550,51 @@ class YahooFinanceAdapter:
         all_quotes = []
         start_time = datetime.now(timezone.utc)
         
-        # Split into batches
+        # Build provider symbols map (internal symbol -> provider symbol)
+        provider_symbols_map: Dict[str, str] = {}
+        for internal_symbol in sanitized_symbols:
+            if internal_symbol in symbol_to_ticker:
+                ticker = symbol_to_ticker[internal_symbol]
+                provider_symbol = self._get_provider_symbol(ticker)
+                provider_symbols_map[internal_symbol] = provider_symbol
+            else:
+                provider_symbols_map[internal_symbol] = internal_symbol
+        
+        # Split into batches (using provider symbols for API calls)
+        provider_symbols_list = [provider_symbols_map[s] for s in sanitized_symbols]
         batches = [
-            sanitized_symbols[i:i + self.preferred_batch_size]
+            (sanitized_symbols[i:i + self.preferred_batch_size], 
+             provider_symbols_list[i:i + self.preferred_batch_size])
             for i in range(0, len(sanitized_symbols), self.preferred_batch_size)
         ]
         
         logger.info(f"Processing {len(sanitized_symbols)} symbols in {len(batches)} batches")
         
-        for batch_num, batch_symbols in enumerate(batches, 1):
+        for batch_num, (batch_internal_symbols, batch_provider_symbols) in enumerate(batches, 1):
             try:
-                logger.debug(f"Processing batch {batch_num}/{len(batches)}: {batch_symbols}")
+                logger.debug(f"Processing batch {batch_num}/{len(batches)}: {batch_internal_symbols}")
                 
-                # Check cache for batch
-                cached_quotes = self._get_cached_quotes_batch(batch_symbols)
-                fresh_symbols = [s for s in batch_symbols if s not in [q.symbol for q in cached_quotes if not self._is_stale(q)]]
+                # Check cache for batch (using internal symbols)
+                cached_quotes = self._get_cached_quotes_batch(batch_internal_symbols, symbol_to_ticker)
+                fresh_symbols = [
+                    s for s in batch_internal_symbols 
+                    if s not in [q.symbol for q in cached_quotes if not self._is_stale(q)]
+                ]
                 
                 if fresh_symbols:
-                    # Fetch fresh data for uncached symbols
-                    fresh_quotes = self._fetch_batch_from_api(fresh_symbols)
+                    # Fetch fresh data for uncached symbols (using provider symbols)
+                    fresh_provider_symbols = [provider_symbols_map[s] for s in fresh_symbols]
+                    fresh_quotes = self._fetch_batch_from_api_with_mapping(
+                        fresh_symbols, fresh_provider_symbols, symbol_to_ticker
+                    )
                     if fresh_quotes:
                         all_quotes.extend(fresh_quotes)
                         # Cache fresh quotes
                         for quote in fresh_quotes:
-                            self._cache_quote(quote)
+                            if quote.symbol in symbol_to_ticker:
+                                self._cache_quote_by_ticker(quote, symbol_to_ticker[quote.symbol])
+                            else:
+                                self._cache_quote(quote)
                 
                 # Add cached quotes that aren't stale
                 all_quotes.extend([q for q in cached_quotes if not self._is_stale(q)])
@@ -526,7 +628,7 @@ class YahooFinanceAdapter:
         return all_quotes
     
     def _fetch_batch_from_api(self, symbols: List[str]) -> List[QuoteData]:
-        """Fetch quotes for a batch of symbols from API"""
+        """Fetch quotes for a batch of symbols from API (legacy method)"""
         quotes = []
         
         for symbol in symbols:
@@ -539,6 +641,30 @@ class YahooFinanceAdapter:
                     
             except Exception as e:
                 logger.error(f"Error fetching quote for {symbol}: {e}")
+                continue
+        
+        return quotes
+    
+    def _fetch_batch_from_api_with_mapping(
+        self, 
+        internal_symbols: List[str], 
+        provider_symbols: List[str],
+        symbol_to_ticker: Dict[str, Ticker]
+    ) -> List[QuoteData]:
+        """Fetch quotes for a batch of symbols from API with provider symbol mapping"""
+        quotes = []
+        
+        for internal_symbol, provider_symbol in zip(internal_symbols, provider_symbols):
+            try:
+                ticker = symbol_to_ticker.get(internal_symbol)
+                quote = self.get_quote(internal_symbol, ticker=ticker)
+                if quote:
+                    quotes.append(quote)
+                else:
+                    logger.warning(f"Failed to get quote for {internal_symbol} (provider: {provider_symbol})")
+                    
+            except Exception as e:
+                logger.error(f"Error fetching quote for {internal_symbol}: {e}")
                 continue
         
         return quotes
@@ -629,13 +755,22 @@ class YahooFinanceAdapter:
             return None
     
     def _get_cached_quote(self, symbol: str) -> Optional[QuoteData]:
-        """Get cached quote from database"""
+        """Get cached quote from database by symbol"""
         try:
             # Get ticker ID
             ticker = self.db_session.query(Ticker).filter(Ticker.symbol == symbol).first()
             if not ticker:
                 return None
             
+            return self._get_cached_quote_by_ticker(ticker)
+            
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting cached quote for {symbol}: {e}")
+            return None
+    
+    def _get_cached_quote_by_ticker(self, ticker: Ticker) -> Optional[QuoteData]:
+        """Get cached quote from database by ticker object"""
+        try:
             # Get latest quote
             quote = self.db_session.query(MarketDataQuote).filter(
                 MarketDataQuote.ticker_id == ticker.id,
@@ -644,7 +779,7 @@ class YahooFinanceAdapter:
             
             if quote:
                 return QuoteData(
-                    symbol=symbol,
+                    symbol=ticker.symbol,  # Always use internal symbol
                     price=quote.price,
                     change_pct=quote.change_pct_day,
                     change_amount=quote.change_amount_day,
@@ -657,14 +792,21 @@ class YahooFinanceAdapter:
             return None
             
         except SQLAlchemyError as e:
-            logger.error(f"Error getting cached quote for {symbol}: {e}")
+            logger.error(f"Error getting cached quote for ticker {ticker.id}: {e}")
             return None
     
-    def _get_cached_quotes_batch(self, symbols: List[str]) -> List[QuoteData]:
+    def _get_cached_quotes_batch(
+        self, 
+        symbols: List[str], 
+        symbol_to_ticker: Optional[Dict[str, Ticker]] = None
+    ) -> List[QuoteData]:
         """Get cached quotes for multiple symbols"""
         quotes = []
         for symbol in symbols:
-            quote = self._get_cached_quote(symbol)
+            if symbol_to_ticker and symbol in symbol_to_ticker:
+                quote = self._get_cached_quote_by_ticker(symbol_to_ticker[symbol])
+            else:
+                quote = self._get_cached_quote(symbol)
             if quote:
                 quotes.append(quote)
         return quotes
@@ -687,17 +829,24 @@ class YahooFinanceAdapter:
         return age_seconds > self.cache_ttl_hot
     
     def _cache_quote(self, quote: QuoteData):
-        """Cache quote in database"""
+        """Cache quote in database by symbol"""
         try:
-            logger.info(f"🔄 _cache_quote called for symbol: {quote.symbol}")
-            
             # Get ticker ID
             ticker = self.db_session.query(Ticker).filter(Ticker.symbol == quote.symbol).first()
             if not ticker:
                 logger.warning(f"⚠️ Ticker not found for symbol: {quote.symbol} - cannot cache quote")
                 return
             
-            logger.info(f"✅ Found ticker {ticker.symbol} (ID: {ticker.id}) - proceeding to cache quote")
+            self._cache_quote_by_ticker(quote, ticker)
+            
+        except Exception as e:
+            logger.error(f"❌ Error caching quote for {quote.symbol}: {e}")
+            self.db_session.rollback()
+    
+    def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
+        """Cache quote in database by ticker object"""
+        try:
+            logger.info(f"🔄 _cache_quote called for ticker: {ticker.symbol} (ID: {ticker.id})")
             
             # Create or update quote
             db_quote = MarketDataQuote(
@@ -714,24 +863,24 @@ class YahooFinanceAdapter:
                 quality_score=1.0
             )
             
-            logger.info(f"💾 Adding quote to database: {quote.symbol} = ${quote.price} ({quote.currency})")
+            logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")
             self.db_session.add(db_quote)
             
             # Also update quotes_last table as required by specification Section 3.1
             self._update_quotes_last(ticker.id, quote)
             
-            logger.info(f"🔄 Committing transaction for {quote.symbol}")
+            logger.info(f"🔄 Committing transaction for {ticker.symbol}")
             self.db_session.commit()
             
-            logger.info(f"✅ Successfully cached quote for {quote.symbol}: ${quote.price}")
+            logger.info(f"✅ Successfully cached quote for {ticker.symbol}: ${quote.price}")
             
         except SQLAlchemyError as e:
-            logger.error(f"❌ SQLAlchemy error caching quote for {quote.symbol}: {e}")
-            logger.error(f"🔄 Rolling back transaction for {quote.symbol}")
+            logger.error(f"❌ SQLAlchemy error caching quote for ticker {ticker.id}: {e}")
+            logger.error(f"🔄 Rolling back transaction for {ticker.symbol}")
             self.db_session.rollback()
         except Exception as e:
-            logger.error(f"❌ Unexpected error caching quote for {quote.symbol}: {e}")
-            logger.error(f"🔄 Rolling back transaction for {quote.symbol}")
+            logger.error(f"❌ Unexpected error caching quote for ticker {ticker.id}: {e}")
+            logger.error(f"🔄 Rolling back transaction for {ticker.symbol}")
             self.db_session.rollback()
     
     def _log_refresh_operation(self, **kwargs):
@@ -1075,11 +1224,17 @@ class YahooFinanceAdapter:
             logger.error(f"Error calculating change percentage from cache for {symbol}: {e}")
             return None
     
-    def _get_enhanced_quote_data(self, symbol: str) -> Optional[QuoteData]:
-        """Get quote data with enhanced fallback mechanisms for daily change"""
+    def _get_enhanced_quote_data(self, symbol: str, ticker: Optional[Ticker] = None) -> Optional[QuoteData]:
+        """
+        Get quote data with enhanced fallback mechanisms for daily change
+        
+        Args:
+            symbol: Ticker symbol (internal symbol)
+            ticker: Optional Ticker object - if provided, will use provider-specific symbol mapping
+        """
         try:
-            # First try regular quote fetch
-            quote = self.get_quote(symbol)
+            # First try regular quote fetch (with ticker support for mapping)
+            quote = self.get_quote(symbol, ticker=ticker)
             if not quote:
                 return None
             
@@ -1087,8 +1242,14 @@ class YahooFinanceAdapter:
             if quote.change_amount is None or quote.change_pct is None:
                 logger.info(f"📊 {symbol}: Attempting enhanced daily change calculation")
                 
+                # Get provider symbol for historical data lookup
+                if ticker:
+                    provider_symbol = self._get_provider_symbol(ticker)
+                else:
+                    provider_symbol = symbol
+                
                 # Try to get historical data for better change calculation
-                historical_quote = self._get_historical_quote(symbol, days_back=1)
+                historical_quote = self._get_historical_quote(provider_symbol, days_back=1)
                 if historical_quote:
                     if quote.change_amount is None:
                         quote.change_amount = quote.price - historical_quote['close']

@@ -319,13 +319,16 @@ class ChartTheme {
      * Get chart options
      * @function getChartOptions
      * @param {string|null} themeName - Theme name
+     * @param {Object} options - Additional options
+     * @param {boolean} options.includeScales - Whether to include scales (default: false)
      * @returns {Object} Chart options
      */
-    getChartOptions(themeName = null) {
+    getChartOptions(themeName = null, options = {}) {
         const theme = this.getTheme(themeName);
         const colors = this.getChartColors();
+        const { includeScales = false } = options;
         
-        return {
+        const chartOptions = {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -358,7 +361,16 @@ class ChartTheme {
                     }
                 }
             },
-            scales: {
+            animation: {
+                duration: theme.animations.duration,
+                easing: theme.animations.easing
+            }
+        };
+        
+        // Include scales only if explicitly requested
+        // This allows users to define their own scales (e.g., dual Y axes)
+        if (includeScales) {
+            chartOptions.scales = {
                 x: {
                     grid: {
                         color: theme.grid.color,
@@ -385,12 +397,10 @@ class ChartTheme {
                         color: colors.medium
                     }
                 }
-            },
-            animation: {
-                duration: theme.animations.duration,
-                easing: theme.animations.easing
-            }
-        };
+            };
+        }
+        
+        return chartOptions;
     }
 
     /**

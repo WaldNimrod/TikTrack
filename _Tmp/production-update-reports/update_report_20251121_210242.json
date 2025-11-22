@@ -1,0 +1,149 @@
+{
+  "start_time": "2025-11-21T21:02:41.975478",
+  "steps": [
+    {
+      "number": 4,
+      "name": "backup_database",
+      "success": true,
+      "duration_seconds": 0.09901905059814453,
+      "timestamp": "2025-11-21T21:02:42.093549",
+      "details": {
+        "success": true,
+        "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251121_190242.db"
+      }
+    },
+    {
+      "number": 5,
+      "name": "sync_code",
+      "success": true,
+      "duration_seconds": 0.5144860744476318,
+      "timestamp": "2025-11-21T21:02:42.608338",
+      "details": {
+        "success": true
+      }
+    },
+    {
+      "number": 6,
+      "name": "cleanup_backups",
+      "success": true,
+      "duration_seconds": 0.006314992904663086,
+      "timestamp": "2025-11-21T21:02:42.615027",
+      "details": {
+        "success": true,
+        "warning": "Cleanup had warnings"
+      }
+    },
+    {
+      "number": 7,
+      "name": "fix_config",
+      "success": true,
+      "duration_seconds": 0.0021791458129882812,
+      "timestamp": "2025-11-21T21:02:42.617507",
+      "details": {
+        "success": true,
+        "verified": false,
+        "warning": "Settings mismatch"
+      }
+    },
+    {
+      "number": 8,
+      "name": "validate",
+      "success": false,
+      "duration_seconds": 0.15826201438903809,
+      "timestamp": "2025-11-21T21:02:42.775999",
+      "details": {
+        "success": false,
+        "results": {
+          "isolation": false,
+          "structure": false,
+          "post_validation": false,
+          "ui_tests": true
+        }
+      }
+    }
+  ],
+  "files_updated": [
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-21T21:02:42.458329",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/demo_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-21T21:02:42.458335",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/ibkr_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-21T21:02:42.458340",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: scripts/map_active_files.py"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-21T21:02:42.458349",
+      "details": {
+        "action": "sync",
+        "details": "✅ Copied: 169 files"
+      }
+    },
+    {
+      "path": "production/trading-ui/*",
+      "timestamp": "2025-11-21T21:02:42.608288",
+      "details": {
+        "action": "sync",
+        "details": "✅ Successfully copied 511 files"
+      }
+    }
+  ],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251121_190242.db",
+      "timestamp": "2025-11-21T21:02:42.093535",
+      "details": {
+        "type": "database_backup",
+        "label": "pre-update"
+      }
+    }
+  ],
+  "files_deleted": [],
+  "warnings": [
+    {
+      "message": "Production settings may need verification",
+      "step": "fix_config",
+      "timestamp": "2025-11-21T21:02:42.615530"
+    },
+    {
+      "message": "Isolation verification had issues",
+      "step": "validate",
+      "timestamp": "2025-11-21T21:02:42.727533"
+    }
+  ],
+  "errors": [
+    {
+      "message": "Step 8 (validate) failed",
+      "step": "validate",
+      "timestamp": "2025-11-21T21:02:42.776003"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.800935,
+    "steps_completed": 4,
+    "steps_failed": 1,
+    "files_updated_count": 5,
+    "files_new_count": 1,
+    "files_deleted_count": 0,
+    "warnings_count": 2,
+    "errors_count": 1
+  },
+  "end_time": "2025-11-21T21:02:42.776413",
+  "success": false
+}

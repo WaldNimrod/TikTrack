@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 import sqlite3
 import sys
+from pathlib import Path
 
-db_path = 'Backend/db/simpleTrade_new.db'
+from config.settings import DB_PATH
+
+db_path = Path(DB_PATH)
 
 try:
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(str(db_path))
     cursor = conn.cursor()
     
     # Count before

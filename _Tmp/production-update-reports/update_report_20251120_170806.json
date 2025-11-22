@@ -1,0 +1,46 @@
+{
+  "start_time": "2025-11-20T17:08:06.277274",
+  "steps": [
+    {
+      "number": 8,
+      "name": "validate",
+      "success": false,
+      "duration_seconds": 0.13864994049072266,
+      "timestamp": "2025-11-20T17:08:06.425131",
+      "details": {
+        "success": false,
+        "results": {
+          "isolation": false,
+          "structure": false,
+          "post_validation": false,
+          "ui_tests": true
+        }
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [
+    {
+      "message": "Isolation verification had issues",
+      "step": "validate",
+      "timestamp": "2025-11-20T17:08:06.383330"
+    }
+  ],
+  "errors": [
+    "Step 8 (validate) failed"
+  ],
+  "summary": {
+    "total_duration_seconds": 0.148262,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 1,
+    "errors_count": 1
+  },
+  "end_time": "2025-11-20T17:08:06.425536",
+  "success": false
+}

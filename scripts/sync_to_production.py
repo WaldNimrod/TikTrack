@@ -17,10 +17,11 @@ import subprocess
 from pathlib import Path
 from typing import Set
 
-# Directories
-PROJECT_ROOT = Path(__file__).parent.parent
-SOURCE_BACKEND = PROJECT_ROOT / "Backend"
-TARGET_BACKEND = PROJECT_ROOT / "production" / "Backend"
+# Directories - calculated dynamically in main() based on cwd to handle subprocess calls
+# These are kept for backward compatibility but should not be used in main()
+PROJECT_ROOT = None  # Will be calculated in main()
+source_backend = None  # Will be calculated in main()
+target_backend = None  # Will be calculated in main()
 
 # Allowed directories (only these will be copied)
 ALLOWED_DIRS = {
@@ -141,36 +142,48 @@ def copy_directory_structure(source: Path, target: Path, relative: Path = Path('
 
 def main():
     """Main sync function"""
+    import os
+    # First check if project root is provided via environment variable (from master.py)
+    if 'TIKTRACK_PROJECT_ROOT' in os.environ:
+        project_root = Path(os.environ['TIKTRACK_PROJECT_ROOT'])
+    else:
+        # Fallback: calculate from script location
+        project_root = Path(__file__).parent.parent
+    
+    # Calculate directories
+    source_backend = project_root / "Backend"
+    target_backend = project_root / "production" / "Backend"
+    
     print("=" * 60)
     print("Syncing Active Files to Production")
     print("=" * 60)
-    print(f"Source: {SOURCE_BACKEND}")
-    print(f"Target: {TARGET_BACKEND}")
+    print(f"Source: {source_backend}")
+    print(f"Target: {target_backend}")
     print()
     
     # Verify source exists
-    if not SOURCE_BACKEND.exists():
-        print(f"❌ Source directory not found: {SOURCE_BACKEND}")
+    if not source_backend.exists():
+        print(f"❌ Source directory not found: {source_backend}")
         return False
     
     # Create target structure
-    TARGET_BACKEND.parent.mkdir(parents=True, exist_ok=True)
+    target_backend.parent.mkdir(parents=True, exist_ok=True)
     
     # Backup and preserve DB before removing production directory
     db_backup = None
-    production_db = TARGET_BACKEND / "db" / "tiktrack.db"
-    db_dir = TARGET_BACKEND / "db"
+    production_db = target_backend / "db" / "tiktrack.db"
+    db_dir = target_backend / "db"
     
-    if TARGET_BACKEND.exists():
+    if target_backend.exists():
         if production_db.exists():
-            db_backup = TARGET_BACKEND.parent / "db_backup_before_sync.db"
+            db_backup = target_backend.parent / "db_backup_before_sync.db"
             print(f"💾 Backing up production DB before sync...")
             shutil.copy2(production_db, db_backup)
             print(f"   ✅ DB backed up to: {db_backup}")
         
         print(f"🗑️  Removing existing production directory (preserving DB)...")
         # Remove everything except db directory
-        for item in TARGET_BACKEND.iterdir():
+        for item in target_backend.iterdir():
             if item.name != 'db':
                 if item.is_file():
                     item.unlink()
@@ -181,10 +194,10 @@ def main():
     print()
     
     # Copy files
-    copied, skipped = copy_directory_structure(SOURCE_BACKEND, TARGET_BACKEND)
+    copied, skipped = copy_directory_structure(source_backend, target_backend)
     
     # Restore or create DB
-    production_db = TARGET_BACKEND / "db" / "tiktrack.db"
+    production_db = target_backend / "db" / "tiktrack.db"
     production_db.parent.mkdir(parents=True, exist_ok=True)
     
     if not production_db.exists():
@@ -195,8 +208,8 @@ def main():
             db_backup.unlink()
         else:
             # Try to copy from dev
-            dev_db = PROJECT_ROOT / "Backend" / "db" / "tiktrack.db"
-            tmp_db = PROJECT_ROOT / "_Tmp" / "tiktrack.db"
+            dev_db = project_root / "Backend" / "db" / "tiktrack.db"
+            tmp_db = project_root / "_Tmp" / "tiktrack.db"
             
             source_db = None
             if tmp_db.exists():
@@ -222,7 +235,7 @@ def main():
     print("=" * 60)
     print(f"✅ Copied: {copied} files")
     print(f"⏭️  Skipped: {skipped} items")
-    print(f"📁 Target: {TARGET_BACKEND}")
+    print(f"📁 Target: {target_backend}")
     print()
     
     # Sync UI to production

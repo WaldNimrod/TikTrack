@@ -123,8 +123,8 @@ def create_production_database():
     """Create production database from development database"""
     
     # Paths
-    source_db = backend_dir / "db" / "simpleTrade_new.db"
-    target_db = backend_dir / "db" / "TikTrack_DB.db"
+    source_db = backend_dir / "db" / "tiktrack.db"
+    target_db = backend_dir / "db" / "tiktrack.db"
     
     # Check if source database exists
     if not source_db.exists():
@@ -133,7 +133,7 @@ def create_production_database():
     
     # Backup target if exists
     if target_db.exists():
-        backup_path = backend_dir / "db" / f"TikTrack_DB_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        backup_path = backend_dir / "db" / f"tiktrack_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
         print(f"📦 Backing up existing production database to: {backup_path}")
         shutil.copy2(target_db, backup_path)
     

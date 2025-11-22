@@ -57,7 +57,11 @@ class UpdateReporter:
         self.report['steps'].append(step_info)
         
         if not success:
-            self.report['errors'].append(f"Step {step_number} ({step_name}) failed")
+            self.report['errors'].append({
+                'message': f"Step {step_number} ({step_name}) failed",
+                'step': step_name,
+                'timestamp': datetime.now().isoformat()
+            })
     
     def add_file_updated(self, file_path: str, details: Optional[Dict] = None):
         """Add updated file to report"""

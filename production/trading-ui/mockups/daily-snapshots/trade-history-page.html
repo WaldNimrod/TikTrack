@@ -172,6 +172,52 @@
             text-decoration: underline;
         }
         
+        /* Execution and Cash Flow specific styles */
+        .execution-title, .cashflow-title {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .execution-price-pl {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .execution-price {
+            font-weight: bold;
+            color: var(--text-color, #212529);
+        }
+        
+        .execution-pl {
+            font-size: 0.9rem;
+        }
+        
+        .cashflow-amount {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        /* Numeric value colors - using system CSS variables */
+        .numeric-value-positive {
+            color: var(--numeric-positive-medium, #28a745);
+            font-weight: bold;
+        }
+        
+        .numeric-value-negative {
+            color: var(--numeric-negative-medium, #dc3545);
+            font-weight: bold;
+        }
+        
+        .numeric-value-zero {
+            color: var(--numeric-zero-medium, #6c757d);
+            font-weight: normal;
+        }
+        
         /* Relative Timeline */
         .timeline-relative {
             display: none;
@@ -303,17 +349,17 @@
                 <span style="font-weight: bold; color: #495057; font-size: 0.9rem; white-space: nowrap;">
                     <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
                 </span>
-                <a href="trade-history-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">היסטוריית טרייד</a>
-                <a href="portfolio-state-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">מצב תיק היסטורי</a>
-                <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">היסטוריית מחירים</a>
-                <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">ניתוח השוואתי</a>
-                <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">יומן מסחר</a>
-                <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">ניתוח אסטרטגיות</a>
-                <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">לוח כלכלי</a>
-                <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">ווידג'ט היסטוריה</a>
-                <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">תיעוד רגשי</a>
-                <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">השוואת תאריכים</a>
-                <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px; display: inline-block;">רשומת יומן</a>
+                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
+                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
+                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
+                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
+                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
+                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
+                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
+                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
+                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
+                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
+                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
             </div>
         </div>
     </div>
@@ -323,34 +369,42 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section">
+                <div class="top-section" id="trade-history-top-section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
                             <i class="bi bi-clock-history"></i>
                             היסטוריית טרייד
                         </div>
+                        <div class="header-actions d-flex align-items-center gap-2">
                         <div class="table-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="exportData()" title="ייצא נתונים">
-                                <i class="bi bi-download"></i> ייצא
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="showSettings()" title="הגדרות תצוגה">
-                                <i class="bi bi-gear"></i> הגדרות
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="window.history.back()" title="חזור לרשימת טריידים">
-                                <i class="bi bi-arrow-right"></i> חזור
+                                <button class="btn btn-sm btn-primary" onclick="openTradeSelectorModal()" title="בחר טרייד לניתוח">
+                                    <i class="bi bi-search"></i> בחר טרייד
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="exportData()" title="ייצא נתונים">
+                                    <i class="bi bi-download"></i> ייצא
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="window.history.back()" title="חזור לרשימת טריידים">
+                                    <i class="bi bi-arrow-right"></i> חזור
+                                </button>
+                            </div>
+                            <button class="filter-toggle-btn" onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     
                     <div class="section-body">
-                        <!-- Trade Selection -->
-                        <div class="mb-4">
-                            <label for="tradeSelect" class="form-label">בחירת טרייד:</label>
-                            <select id="tradeSelect" class="form-select" style="max-width: 300px;">
-                                <option value="">בחר טרייד...</option>
-                                <option value="123">Trade #123 - AAPL</option>
-                                <option value="124">Trade #124 - TSLA</option>
-                            </select>
+                        <!-- Selected Trade Display -->
+                        <div class="mb-4" id="selectedTradeDisplay" style="display: none;">
+                            <div class="alert alert-info d-flex align-items-center justify-content-between">
+                                <div>
+                                    <strong>טרייד נבחר:</strong> 
+                                    <span id="selectedTradeInfo">-</span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="clearSelectedTrade()">
+                                    <i class="bi bi-x"></i> נקה בחירה
+                                </button>
+                            </div>
                         </div>
                         
                         <!-- Statistics Section - Top -->
@@ -438,98 +492,192 @@
                             </div>
                         </div>
                         
-                        <!-- Timeline Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h5 class="card-title mb-0">Timeline של הטרייד</h5>
-                                    <div class="timeline-view-toggle">
-                                        <button class="timeline-view-btn active" data-view="absolute" onclick="switchTimelineView('absolute')">
-                                            <i class="bi bi-list-ul"></i> מוחלט
-                                        </button>
-                                        <button class="timeline-view-btn" data-view="relative" onclick="switchTimelineView('relative')">
-                                            <i class="bi bi-graph-up"></i> יחסי
-                                        </button>
                                     </div>
+                                    </div>
+                        
+                        <!-- Timeline Absolute Section -->
+                <div class="content-section" id="timeline-absolute-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-list-ul"></i> פירוט צעדים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
                                 </div>
-                                
-                                <!-- Absolute Timeline View -->
-                                <div class="timeline-absolute-wrapper" id="timelineAbsoluteWrapper">
-                                    <div id="timelineAbsolute" class="timeline-absolute" style="display: flex;">
-                                    <div class="timeline-step-absolute" data-step="0" onclick="selectTimelineStep(0)">
-                                        <div class="timeline-point-absolute"></div>
-                                        <div class="timeline-step-info">
-                                            <div class="timeline-step-title">תכנון</div>
-                                            <div class="timeline-step-date">01/01/2025</div>
-                                            <div class="timeline-step-details"><strong>סוג:</strong> Trade Plan | <strong>מזהה:</strong> #456</div>
-                                            <div class="timeline-step-details">Target: $160</div>
-                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(456, 'plan')">פרטים מלאים →</a>
+                    </div>
+                    <div class="section-body">
+                        <div class="timeline-absolute-wrapper" id="timelineAbsoluteWrapper">
+                            <div id="timelineAbsolute" class="timeline-absolute" style="display: flex; overflow-x: auto;">
+                                <!-- Trade Plan -->
+                                <div class="timeline-step-absolute" data-step="0" onclick="selectTimelineStep(0)">
+                                    <div class="timeline-point-absolute"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title">
+                                            <img src="/trading-ui/images/icons/trade_plans.svg" alt="תכנון" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            תכנון
                                         </div>
-                                    </div>
-                                    <div class="timeline-step-absolute" data-step="1" onclick="selectTimelineStep(1)">
-                                        <div class="timeline-point-absolute"></div>
-                                        <div class="timeline-step-info">
-                                            <div class="timeline-step-title">כניסה</div>
-                                            <div class="timeline-step-date">05/01/2025</div>
-                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #101</div>
-                                            <div class="timeline-step-details">Buy 100 @ $150</div>
-                                            <div class="timeline-step-details">Commission: $1.50</div>
-                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(101, 'execution')">פרטים מלאים →</a>
+                                        <div class="timeline-step-date">01/01/2025</div>
+                                        <div class="timeline-step-details">Target: $160</div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #456</div>
+                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(456, 'plan')">פרטים מלאים →</a>
+                            </div>
+                        </div>
+                        
+                                <!-- Execution 1 -->
+                                <div class="timeline-step-absolute" data-step="1" onclick="selectTimelineStep(1)">
+                                    <div class="timeline-point-absolute"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title execution-title">
+                                            <img src="/trading-ui/images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            Buy | 100#
+                                </div>
+                                        <div class="timeline-step-date">05/01/2025</div>
+                                        <div class="timeline-step-details execution-price-pl">
+                                            <span class="execution-price">$150</span>
+                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-zero">$0.00</span></span>
                                         </div>
-                                    </div>
-                                    <div class="timeline-step-absolute" data-step="2" onclick="selectTimelineStep(2)">
-                                        <div class="timeline-point-absolute"></div>
-                                        <div class="timeline-step-info">
-                                            <div class="timeline-step-title">ביצוע 1</div>
-                                            <div class="timeline-step-date">10/01/2025</div>
-                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #102</div>
-                                            <div class="timeline-step-details">Buy 50 @ $152</div>
-                                            <div class="timeline-step-details">P/L MTM: $100</div>
-                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(102, 'execution')">פרטים מלאים →</a>
-                                        </div>
-                                    </div>
-                                    <div class="timeline-step-absolute" data-step="3" onclick="selectTimelineStep(3)">
-                                        <div class="timeline-point-absolute"></div>
-                                        <div class="timeline-step-info">
-                                            <div class="timeline-step-title">ביצוע 2</div>
-                                            <div class="timeline-step-date">15/01/2025</div>
-                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #103</div>
-                                            <div class="timeline-step-details">Sell 30 @ $155</div>
-                                            <div class="timeline-step-details">P/L ממומש: $150</div>
-                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(103, 'execution')">פרטים מלאים →</a>
-                                        </div>
-                                    </div>
-                                    <div class="timeline-step-absolute" data-step="4" onclick="selectTimelineStep(4)">
-                                        <div class="timeline-point-absolute"></div>
-                                        <div class="timeline-step-info">
-                                            <div class="timeline-step-title">סגירה</div>
-                                            <div class="timeline-step-date">20/01/2025</div>
-                                            <div class="timeline-step-details"><strong>סוג:</strong> Execution | <strong>מזהה:</strong> #104</div>
-                                            <div class="timeline-step-details">Sell 120 @ $158</div>
-                                            <div class="timeline-step-details">P/L ממומש: $960</div>
-                                            <a href="#" class="timeline-step-link" onclick="showExecutionDetails(104, 'execution')">פרטים מלאים →</a>
-                                        </div>
-                                    </div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #101</div>
+                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(101, 'execution')">פרטים מלאים →</a>
                                 </div>
                                 </div>
                                 
-                                <!-- Relative Timeline View -->
-                                <div id="timelineRelative" class="timeline-relative" style="display: none;">
-                                    <div class="timeline-chart-container" style="height: 300px; position: relative;">
-                                        <canvas id="timelineChart"></canvas>
+                                <!-- Note -->
+                                <div class="timeline-step-absolute timeline-note" data-step="note1">
+                                    <div class="timeline-point-absolute" style="background-color: var(--info-color, #17a2b8);"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title">
+                                            <img src="/trading-ui/images/icons/notes.svg" alt="הערה" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            הערה
+                                        </div>
+                                        <div class="timeline-step-date">07/01/2025</div>
+                                        <div class="timeline-step-details">שינוי אסטרטגיה - הוספת stop loss</div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #201</div>
+                                        <a href="#" class="timeline-step-link" onclick="showNoteDetails(201)">פרטים מלאים →</a>
                                     </div>
-                                    <div class="text-center mt-3" style="font-size: 0.9rem; color: #6c757d;">
-                                        <p>ציר X מייצג זמן במרווחים קבועים | המרווח בין נקודות מייצג את הזמן שעבר בין שלבים</p>
-                                        <p style="margin-top: 5px;">לחץ על נקודה לפרטים מלאים</p>
+                                </div>
+                                
+                                <!-- Cash Flow -->
+                                <div class="timeline-step-absolute timeline-cashflow" data-step="cf1">
+                                    <div class="timeline-point-absolute" style="background-color: var(--secondary-color, #fc5a06);"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title cashflow-title">
+                                            <img src="/trading-ui/images/icons/cash_flows.svg" alt="תזרים מזומן" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            Deposit | $5,000
+                                        </div>
+                                        <div class="timeline-step-date">08/01/2025</div>
+                                        <div class="timeline-step-details cashflow-amount">
+                                            <span class="numeric-value-positive">$5,000.00</span>
+                                        </div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #301</div>
+                                        <a href="#" class="timeline-step-link" onclick="showCashFlowDetails(301)">פרטים מלאים →</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Execution 2 -->
+                                <div class="timeline-step-absolute" data-step="2" onclick="selectTimelineStep(2)">
+                                    <div class="timeline-point-absolute"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title execution-title">
+                                            <img src="/trading-ui/images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            Buy | 50#
+                                        </div>
+                                        <div class="timeline-step-date">10/01/2025</div>
+                                        <div class="timeline-step-details execution-price-pl">
+                                            <span class="execution-price">$152</span>
+                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-positive">$100.00</span></span>
+                                        </div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #102</div>
+                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(102, 'execution')">פרטים מלאים →</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Alert -->
+                                <div class="timeline-step-absolute timeline-alert" data-step="alert1">
+                                    <div class="timeline-point-absolute" style="background-color: var(--warning-color, #ffc107);"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title">
+                                            <img src="/trading-ui/images/icons/alerts.svg" alt="התראה" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            התראה
+                                        </div>
+                                        <div class="timeline-step-date">12/01/2025</div>
+                                        <div class="timeline-step-details">מחיר התקרב ל-stop loss</div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #401</div>
+                                        <a href="#" class="timeline-step-link" onclick="showAlertDetails(401)">פרטים מלאים →</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Execution 3 -->
+                                <div class="timeline-step-absolute" data-step="3" onclick="selectTimelineStep(3)">
+                                    <div class="timeline-point-absolute"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title execution-title">
+                                            <img src="/trading-ui/images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            Sell | 30#
+                                        </div>
+                                        <div class="timeline-step-date">15/01/2025</div>
+                                        <div class="timeline-step-details execution-price-pl">
+                                            <span class="execution-price">$155</span>
+                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-positive">$150.00</span></span>
+                                        </div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #103</div>
+                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(103, 'execution')">פרטים מלאים →</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Execution 4 -->
+                                <div class="timeline-step-absolute" data-step="4" onclick="selectTimelineStep(4)">
+                                    <div class="timeline-point-absolute"></div>
+                                    <div class="timeline-step-info">
+                                        <div class="timeline-step-title execution-title">
+                                            <img src="/trading-ui/images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                                            Sell | 120#
+                                        </div>
+                                        <div class="timeline-step-date">20/01/2025</div>
+                                        <div class="timeline-step-details execution-price-pl">
+                                            <span class="execution-price">$158</span>
+                                            <span class="execution-pl" style="margin-right: 8px;">P/L: <span class="numeric-value-positive">$960.00</span></span>
+                                        </div>
+                                        <div class="timeline-step-details"><strong>מזהה:</strong> #104</div>
+                                        <a href="#" class="timeline-step-link" onclick="showExecutionDetails(104, 'execution')">פרטים מלאים →</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- P/L Chart Section with Position Size -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">P/L לאורך זמן</h5>
+                    </div>
+                </div>
+                
+                <!-- Timeline Relative Section -->
+                <div class="content-section" id="timeline-relative-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up"></i> Timeline יחסי</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="timeline-chart-container" style="height: 400px; position: relative;">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                        <div class="text-center mt-3" style="font-size: 0.9rem; color: var(--text-muted, #6c757d);">
+                            <p><strong>גרף משולב:</strong> ציר Y שמאלי - גודל פוזיציה (משתנה בביצועים) | ציר Y ימני - P/L (משתנה יומי)</p>
+                            <p style="margin-top: 5px;">👁️ לחץ על נקודה עם מזהה לפרטים מלאים | מרווחי זמן משתנים בין נקודות</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- P/L Chart Section with Position Size -->
+                <div class="content-section" id="pl-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up-arrow"></i> P/L לאורך זמן</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('pl-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                                 <div class="chart-container" style="height: 400px; position: relative;">
                                     <canvas id="plChart"></canvas>
                                 </div>
@@ -558,9 +706,16 @@
                         </div>
                         
                         <!-- Executions Table Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">טבלת ביצועים</h5>
+                <div class="content-section" id="executions-table-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-table"></i> טבלת ביצועים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('executions-table-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                                 <div class="table-responsive">
                                     <table class="table table-hover" id="executionsTable">
                                         <thead>
@@ -633,9 +788,16 @@
                         </div>
                         
                         <!-- Market Price Chart Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">מחיר שוק מול מחירי כניסה/יציאה</h5>
+                <div class="content-section" id="market-price-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up"></i> מחיר שוק מול מחירי כניסה/יציאה</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('market-price-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                                </div>
+                                </div>
+                    <div class="section-body">
                                 <div class="chart-container" style="height: 400px; position: relative;">
                                     <canvas id="marketPriceChart"></canvas>
                                 </div>
@@ -651,9 +813,9 @@
                                     <div class="chart-legend-item">
                                         <span class="chart-legend-color" style="background: #dc3545; width: 12px; height: 12px; border-radius: 50%;"></span>
                                         <span>יציאה</span>
-                                    </div>
-                                </div>
-                                
+                            </div>
+                        </div>
+                        
                                 <!-- Market Chart Options Info -->
                                 <div class="market-chart-options">
                                     <h6><i class="bi bi-info-circle"></i> חלופות למערכת גרפים חיצונית:</h6>
@@ -668,27 +830,63 @@
                                     <p style="margin-top: 10px; margin-bottom: 0; font-size: 0.85rem; color: #6c757d;">
                                         <strong>המלצה:</strong> Lightweight Charts - אידיאלי למסחר, קל משקל, ללא תלות, וקוד פתוח.
                                     </p>
+                                    </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                                    </div>
+                                        </div>
+                                    </div>
+                                </div>
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     
     <script>
-        // Timeline View Switching
-        let currentTimelineView = 'absolute';
+        // Timeline Chart
         let selectedTimelineStep = null;
         let plChart = null;
         let timelineChart = null;
         let marketPriceChart = null;
+        let isInitializingTimelineChart = false; // Flag to prevent multiple initializations
         
-        function switchTimelineView(view) {
+        // Helper function to get CSS variable value
+        function getCSSVariableValue(variableName, fallback) {
+            try {
+                if (typeof window !== 'undefined' && window.getComputedStyle) {
+                    const value = getComputedStyle(document.documentElement).getPropertyValue(variableName);
+                    if (value) {
+                        const trimmed = value.trim();
+                        if (trimmed) {
+                            return trimmed;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to read CSS variable', variableName, error);
+            }
+            return fallback;
+        }
+        
+        // Helper functions for notes, alerts, and cash flows
+        function showNoteDetails(id) {
+            console.log('Show note details:', id);
+            // TODO: Implement note details modal
+        }
+        
+        function showAlertDetails(id) {
+            console.log('Show alert details:', id);
+            // TODO: Implement alert details modal
+        }
+        
+        function showCashFlowDetails(id) {
+            console.log('Show cash flow details:', id);
+            // TODO: Implement cash flow details modal
+        }
+        
+        // OLD FUNCTION - REMOVED (no longer needed with separate containers)
+        function switchTimelineView_OLD(view) {
             currentTimelineView = view;
             
             // Update buttons
@@ -715,10 +913,65 @@
                 if (relativeView) {
                     relativeView.style.display = 'block';
                     relativeView.classList.add('active');
-                    // Initialize chart if not already done
-                    if (!timelineChart) {
-                        setTimeout(() => initTimelineChart(), 100);
+                    
+                    // Prevent multiple simultaneous initializations
+                    if (isInitializingTimelineChart) {
+                        console.log('Timeline chart initialization already in progress, skipping...');
+                        return;
                     }
+                    
+                    // Initialize chart - only once, with proper cleanup
+                    setTimeout(async () => {
+                        isInitializingTimelineChart = true;
+                        
+                        try {
+                            // Destroy existing chart first (both ChartSystem and direct Chart.js)
+                            if (timelineChart) {
+                                try {
+                                    if (typeof timelineChart.destroy === 'function') {
+                                        timelineChart.destroy();
+                                    }
+                                } catch (e) {
+                                    console.warn('Error destroying timeline chart:', e);
+                                }
+                                timelineChart = null;
+                            }
+                            
+                            // Also destroy via ChartSystem if exists
+                            if (window.ChartSystem && window.ChartSystem.destroy) {
+                                try {
+                                    await window.ChartSystem.destroy('timelineChart');
+                                } catch (e) {
+                                    // Chart might not exist in ChartSystem, that's OK
+                                }
+                            }
+                            
+                            // Also check Chart.js registry
+                            const canvas = document.querySelector('#timelineChart');
+                            if (canvas && typeof Chart !== 'undefined' && Chart.getChart) {
+                                const existingChart = Chart.getChart(canvas);
+                                if (existingChart) {
+                                    try {
+                                        existingChart.destroy();
+                                    } catch (e) {
+                                        console.warn('Error destroying Chart.js chart:', e);
+                                    }
+                                }
+                            }
+                            
+                            // Wait for ChartSystem to be ready
+                            let retries = 0;
+                            while (!window.ChartSystem && retries < 20) {
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                retries++;
+                            }
+                            
+                            // Initialize chart only once
+                            await initTimelineChart();
+                        } finally {
+                            isInitializingTimelineChart = false;
+                        }
+                    }, 300);
                 }
             }
         }
@@ -744,67 +997,248 @@
         
         async function initTimelineChart() {
             const container = '#timelineChart';
-            if (!document.querySelector(container)) return;
+            const canvas = document.querySelector(container);
+            if (!canvas) {
+                console.warn('Timeline chart container not found');
+                return;
+            }
             
-            // Sample data for relative timeline
-            const dates = ['01/01', '05/01', '10/01', '15/01', '20/01'];
-            const timeIntervals = [0, 4, 5, 5, 5]; // Days between steps
-            const stepData = [
-                { step: 0, type: 'Trade Plan', id: 456, date: '01/01' },
-                { step: 1, type: 'Execution', id: 101, date: '05/01' },
-                { step: 2, type: 'Execution', id: 102, date: '10/01' },
-                { step: 3, type: 'Execution', id: 103, date: '15/01' },
-                { step: 4, type: 'Execution', id: 104, date: '20/01' }
+            // Prevent multiple simultaneous initializations
+            if (isInitializingTimelineChart) {
+                console.log('Timeline chart initialization already in progress, skipping...');
+                return;
+            }
+            
+            isInitializingTimelineChart = true;
+            
+            try {
+                // Destroy existing chart if it exists
+                if (timelineChart) {
+                    try {
+                        if (typeof timelineChart.destroy === 'function') {
+                            timelineChart.destroy();
+                        }
+                    } catch (e) {
+                        console.warn('Error destroying timeline chart:', e);
+                    }
+                    timelineChart = null;
+                }
+                
+                // Also destroy via ChartSystem if exists
+                if (window.ChartSystem && window.ChartSystem.destroy) {
+                    try {
+                        await window.ChartSystem.destroy('timelineChart');
+                    } catch (e) {
+                        // Chart might not exist in ChartSystem, that's OK
+                    }
+                }
+                
+                // Also check Chart.js registry
+                if (typeof Chart !== 'undefined' && Chart.getChart) {
+                    const existingChart = Chart.getChart(canvas);
+                    if (existingChart) {
+                        try {
+                            existingChart.destroy();
+                        } catch (e) {
+                            console.warn('Error destroying Chart.js chart:', e);
+                        }
+                    }
+                }
+                
+                // Clear canvas
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            } catch (e) {
+                console.warn('Error during chart cleanup:', e);
+            } finally {
+                isInitializingTimelineChart = false;
+            }
+            
+            // Enhanced data for relative timeline with different time intervals
+            // Each point represents a record (plan/execution/cash flow) with actual dates
+            const timelineData = [
+                { date: '01/01/2025', type: 'Trade Plan', id: 456, positionSize: 0, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 0 },
+                { date: '05/01/2025', type: 'Execution', id: 101, positionSize: 100, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 4 },
+                { date: '07/01/2025', type: 'Daily', id: null, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, daysFromStart: 6 },
+                { date: '08/01/2025', type: 'Cash Flow', id: 301, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, amount: 5000, daysFromStart: 7 },
+                { date: '10/01/2025', type: 'Execution', id: 102, positionSize: 150, realizedPL: 0, unrealizedPL: 100, totalPL: 100, daysFromStart: 9 },
+                { date: '12/01/2025', type: 'Daily', id: null, positionSize: 150, realizedPL: 0, unrealizedPL: 120, totalPL: 120, daysFromStart: 11 },
+                { date: '15/01/2025', type: 'Execution', id: 103, positionSize: 120, realizedPL: 150, unrealizedPL: 120, totalPL: 270, daysFromStart: 14 },
+                { date: '17/01/2025', type: 'Daily', id: null, positionSize: 120, realizedPL: 150, unrealizedPL: 80, totalPL: 230, daysFromStart: 16 },
+                { date: '20/01/2025', type: 'Execution', id: 104, positionSize: 0, realizedPL: 1110, unrealizedPL: 0, totalPL: 1110, daysFromStart: 19 }
             ];
             
-            // Use ChartSystem for basic charts
+            // Get dynamic colors from CSS variables
+            const mutedColor = getCSSVariableValue('--muted-color', '#6c757d') || getCSSVariableValue('--text-muted', '#6c757d');
+            const successColor = getCSSVariableValue('--success-color', '#28a745');
+            const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
+            const primaryColor = getCSSVariableValue('--primary-color', '#007bff') || getCSSVariableValue('--chart-primary-color', '#007bff');
+            const textColor = getCSSVariableValue('--text-color', '#212529') || getCSSVariableValue('--chart-text-color', '#212529');
+            const cardBackground = getCSSVariableValue('--card-background', '#ffffff');
+            
+            // Helper to convert hex to rgba
+            function hexToRgba(hex, alpha = 0.1) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                if (!result) return `rgba(108, 117, 125, ${alpha})`;
+                const r = parseInt(result[1], 16);
+                const g = parseInt(result[2], 16);
+                const b = parseInt(result[3], 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+            
+            // Extract labels (dates) and data FIRST
+            const dates = timelineData.map(d => d.date.split('/')[0] + '/' + d.date.split('/')[1]);
+            const positionSizes = timelineData.map(d => d.positionSize);
+            const realizedPL = timelineData.map(d => d.realizedPL);
+            const unrealizedPL = timelineData.map(d => d.unrealizedPL);
+            const totalPL = timelineData.map(d => d.totalPL);
+            
+            // Labels removed - will be added via tooltips only (datalabels plugin causes issues)
+            
+            // Use ChartSystem for unified chart with dual Y axes
+            // ChartSystem.create() automatically destroys existing chart with same ID
             if (window.ChartSystem) {
-                timelineChart = await window.ChartSystem.create({
-                    id: 'timelineChart',
-                    type: 'line',
-                    container: container,
-                    data: {
+                try {
+                    timelineChart = await window.ChartSystem.create({
+                        id: 'timelineChart',
+                        type: 'line',
+                        container: container,
+                        data: {
                         labels: dates,
-                        datasets: [{
-                            label: 'Timeline',
-                            data: [0, 1, 2, 3, 4],
-                            borderColor: '#26baac',
-                            backgroundColor: 'rgba(38, 186, 172, 0.1)',
-                            borderWidth: 2,
-                            pointRadius: 8,
-                            pointBackgroundColor: '#26baac',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            tension: 0.4
-                        }]
+                        datasets: [
+                            {
+                                label: 'גודל פוזיציה',
+                                data: positionSizes,
+                                borderColor: mutedColor,
+                                backgroundColor: hexToRgba(mutedColor, 0.1),
+                                borderWidth: 3,
+                                borderDash: [8, 4],
+                                pointRadius: 6,
+                                pointBackgroundColor: mutedColor,
+                                pointBorderColor: cardBackground,
+                                pointBorderWidth: 2,
+                                tension: 0,
+                                yAxisID: 'y',
+                                stepped: 'after',
+                                pointHoverRadius: 8,
+                                spanGaps: false
+                            },
+                            {
+                                label: 'P/L ממומש',
+                                data: realizedPL,
+                                borderColor: successColor,
+                                backgroundColor: hexToRgba(successColor, 0.1),
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                pointBackgroundColor: successColor,
+                                pointBorderColor: cardBackground,
+                                pointBorderWidth: 2,
+                                tension: 0.4,
+                                yAxisID: 'y1',
+                                spanGaps: false
+                            },
+                            {
+                                label: 'P/L לא ממומש',
+                                data: unrealizedPL,
+                                borderColor: warningColor,
+                                backgroundColor: hexToRgba(warningColor, 0.1),
+                                borderWidth: 2,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                pointBackgroundColor: warningColor,
+                                pointBorderColor: cardBackground,
+                                pointBorderWidth: 2,
+                                tension: 0.4,
+                                yAxisID: 'y1',
+                                spanGaps: false
+                            },
+                            {
+                                label: 'P/L כולל',
+                                data: totalPL,
+                                borderColor: primaryColor,
+                                backgroundColor: hexToRgba(primaryColor, 0.1),
+                                borderWidth: 3,
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                pointBackgroundColor: primaryColor,
+                                pointBorderColor: cardBackground,
+                                pointBorderWidth: 2,
+                                tension: 0.4,
+                                yAxisID: 'y1',
+                                spanGaps: false
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        },
                         plugins: {
                             legend: {
-                                display: false
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
                             },
                             tooltip: {
                                 callbacks: {
                                     title: function(context) {
                                         const index = context[0].dataIndex;
-                                        const step = stepData[index];
-                                        return step ? `${step.type} #${step.id} - ${step.date}` : '';
+                                        const point = timelineData[index];
+                                        let typeText = point.type;
+                                        if (point.type === 'Daily') typeText = 'עדכון יומי';
+                                        else if (point.type === 'Cash Flow') typeText = 'תזרים מזומן';
+                                        return point.date + ' - ' + typeText;
                                     },
                                     label: function(context) {
                                         const index = context.dataIndex;
-                                        const step = stepData[index];
-                                        if (step) {
-                                            return `סוג: ${step.type} | מזהה: #${step.id}`;
+                                        const point = timelineData[index];
+                                        let label = context.dataset.label || '';
+                                        
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        
+                                        if (context.dataset.yAxisID === 'y') {
+                                            // Position size
+                                            label += context.parsed.y + ' מניות';
+                                        } else {
+                                            // P/L
+                                            label += '$' + context.parsed.y;
+                                        }
+                                        
+                                        return label;
+                                    },
+                                    afterLabel: function(context) {
+                                        const index = context[0].dataIndex;
+                                        const point = timelineData[index];
+                                        
+                                        if (point.type !== 'Daily' && point.id) {
+                                            let info = 'סוג: ' + point.type + ' | מזהה: #' + point.id;
+                                            if (point.type === 'Cash Flow' && point.amount) {
+                                                info += ' | סכום: $' + point.amount;
+                                            }
+                                            return info;
                                         }
                                         return '';
                                     },
-                                    afterLabel: function(context) {
-                                        const index = context.dataIndex;
-                                        const step = stepData[index];
-                                        if (step) {
-                                            return 'לחץ לפרטים מלאים';
+                                    footer: function(tooltipItems) {
+                                        const index = tooltipItems[0].dataIndex;
+                                        const point = timelineData[index];
+                                        
+                                        if (point.type !== 'Daily' && point.id) {
+                                            return '👁️ לחץ לפרטים מלאים';
                                         }
                                         return '';
                                     }
@@ -815,80 +1249,369 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'תאריך'
+                                    text: 'תאריך (מרווחי זמן משתנים)',
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 12,
+                                        weight: 'normal'
+                                    }
+                                },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 11
+                                    }
                                 }
                             },
                             y: {
-                                display: false
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'גודל פוזיציה (מניות)',
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 12,
+                                        weight: 'normal'
+                                    }
+                                },
+                                grid: {
+                                    drawOnChartArea: true
+                                },
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 11
+                                    }
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'P/L ($)',
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 12,
+                                        weight: 'normal'
+                                    }
+                                },
+                                grid: {
+                                    drawOnChartArea: false
+                                },
+                                ticks: {
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 11
+                                    }
+                                }
                             }
                         },
                         onClick: function(event, elements) {
-                            if (elements.length > 0) {
+                            if (elements && elements.length > 0) {
                                 const index = elements[0].index;
-                                const step = stepData[index];
-                                if (step) {
-                                    const type = step.type === 'Trade Plan' ? 'plan' : 'execution';
-                                    showExecutionDetails(step.id, type);
+                                const point = timelineData[index];
+                                
+                                if (point && point.type !== 'Daily' && point.id) {
+                                    let type = 'execution';
+                                    if (point.type === 'Trade Plan') type = 'plan';
+                                    else if (point.type === 'Cash Flow') type = 'cashflow';
+                                    else if (point.type === 'Note') type = 'note';
+                                    else if (point.type === 'Alert') type = 'alert';
+                                    
+                                    if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
+                                        showCashFlowDetails(point.id);
+                                    } else if (type === 'note' && typeof showNoteDetails === 'function') {
+                                        showNoteDetails(point.id);
+                                    } else if (type === 'alert' && typeof showAlertDetails === 'function') {
+                                        showAlertDetails(point.id);
+                                    } else if (typeof showExecutionDetails === 'function') {
+                                        showExecutionDetails(point.id, type);
+                                    }
                                 }
+                            }
+                        },
+                        onHover: function(event, elements) {
+                            if (event && event.native && event.native.target) {
+                                event.native.target.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
                             }
                         }
                     }
-                });
-            } else {
-                // Fallback to direct Chart.js if ChartSystem not available
-                const ctx = document.getElementById('timelineChart');
-                timelineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Timeline',
-                        data: [0, 1, 2, 3, 4],
-                        borderColor: '#26baac',
-                        backgroundColor: 'rgba(38, 186, 172, 0.1)',
-                        borderWidth: 2,
-                        pointRadius: 8,
-                        pointBackgroundColor: '#26baac',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
+                    });
+                } catch (error) {
+                    console.error('Error creating timeline chart with ChartSystem:', error);
+                    timelineChart = null;
+                }
+            }
+            
+            // Fallback to direct Chart.js ONLY if ChartSystem completely failed
+            if (!timelineChart && !window.ChartSystem) {
+                const ctx = canvas;
+                if (ctx) {
+                    // Destroy existing chart if exists (check Chart.js registry)
+                    if (typeof Chart !== 'undefined' && Chart.getChart) {
+                        const existingChart = Chart.getChart(ctx);
+                        if (existingChart) {
+                            try {
+                                existingChart.destroy();
+                            } catch (e) {
+                                console.warn('Error destroying existing Chart.js chart:', e);
+                            }
+                        }
+                    }
+                    
+                    try {
+                        timelineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [
+                                {
+                                    label: 'גודל פוזיציה',
+                                    data: positionSizes,
+                                    borderColor: mutedColor,
+                                    backgroundColor: hexToRgba(mutedColor, 0.1),
+                                    borderWidth: 3,
+                                    borderDash: [8, 4],
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8,
+                                    pointBackgroundColor: mutedColor,
+                                    pointBorderColor: cardBackground,
+                                    pointBorderWidth: 2,
+                                    tension: 0,
+                                    yAxisID: 'y',
+                                    stepped: 'after',
+                                    spanGaps: false
+                                },
+                                {
+                                    label: 'P/L ממומש',
+                                    data: realizedPL,
+                                    borderColor: successColor,
+                                    backgroundColor: hexToRgba(successColor, 0.1),
+                                    borderWidth: 2,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: successColor,
+                                    pointBorderColor: cardBackground,
+                                    pointBorderWidth: 2,
+                                    tension: 0.4,
+                                    yAxisID: 'y1',
+                                    spanGaps: false
+                                },
+                                {
+                                    label: 'P/L לא ממומש',
+                                    data: unrealizedPL,
+                                    borderColor: warningColor,
+                                    backgroundColor: hexToRgba(warningColor, 0.1),
+                                    borderWidth: 2,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: warningColor,
+                                    pointBorderColor: cardBackground,
+                                    pointBorderWidth: 2,
+                                    tension: 0.4,
+                                    yAxisID: 'y1',
+                                    spanGaps: false
+                                },
+                                {
+                                    label: 'P/L כולל',
+                                    data: totalPL,
+                                    borderColor: primaryColor,
+                                    backgroundColor: hexToRgba(primaryColor, 0.1),
+                                    borderWidth: 3,
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8,
+                                    pointBackgroundColor: primaryColor,
+                                    pointBorderColor: cardBackground,
+                                    pointBorderWidth: 2,
+                                    tension: 0.4,
+                                    yAxisID: 'y1',
+                                    spanGaps: false
+                                }
+                            ]
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const step = context.dataIndex;
-                                    const stepNames = ['תכנון', 'כניסה', 'ביצוע 1', 'ביצוע 2', 'סגירה'];
-                                    return stepNames[step] + ' - ' + dates[step];
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 15,
+                                        font: {
+                                            size: 11
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            const index = context[0].dataIndex;
+                                            const point = timelineData[index];
+                                            let typeText = point.type;
+                                            if (point.type === 'Daily') typeText = 'עדכון יומי';
+                                            else if (point.type === 'Cash Flow') typeText = 'תזרים מזומן';
+                                            return point.date + ' - ' + typeText;
+                                        },
+                                        label: function(context) {
+                                            const index = context.dataIndex;
+                                            const point = timelineData[index];
+                                            let label = context.dataset.label || '';
+                                            
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            
+                                            if (context.dataset.yAxisID === 'y') {
+                                                label += context.parsed.y + ' מניות';
+                                            } else {
+                                                label += '$' + context.parsed.y;
+                                            }
+                                            
+                                            return label;
+                                        },
+                                        afterLabel: function(context) {
+                                            const index = context[0].dataIndex;
+                                            const point = timelineData[index];
+                                            
+                                            if (point.type !== 'Daily' && point.id) {
+                                                let info = 'סוג: ' + point.type + ' | מזהה: #' + point.id;
+                                                if (point.type === 'Cash Flow' && point.amount) {
+                                                    info += ' | סכום: $' + point.amount;
+                                                }
+                                                return info;
+                                            }
+                                            return '';
+                                        },
+                                        footer: function(tooltipItems) {
+                                            const index = tooltipItems[0].dataIndex;
+                                            const point = timelineData[index];
+                                            
+                                            if (point.type !== 'Daily' && point.id) {
+                                                return '👁️ לחץ לפרטים מלאים';
+                                            }
+                                            return '';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'תאריך (מרווחי זמן משתנים)',
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 12,
+                                            weight: 'normal'
+                                        }
+                                    },
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 11
+                                        }
+                                    }
+                                },
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: 'גודל פוזיציה (מניות)',
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 12,
+                                            weight: 'normal'
+                                        }
+                                    },
+                                    grid: {
+                                        drawOnChartArea: true
+                                    },
+                                    beginAtZero: true,
+                                    ticks: {
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 11
+                                        }
+                                    }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    title: {
+                                        display: true,
+                                        text: 'P/L ($)',
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 12,
+                                            weight: 'normal'
+                                        }
+                                    },
+                                    grid: {
+                                        drawOnChartArea: false
+                                    },
+                                    ticks: {
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 11
+                                        }
+                                    }
+                                }
+                            },
+                            onClick: function(event, elements) {
+                                if (elements && elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const point = timelineData[index];
+                                    
+                                    if (point && point.type !== 'Daily' && point.id) {
+                                        let type = 'execution';
+                                        if (point.type === 'Trade Plan') type = 'plan';
+                                        else if (point.type === 'Cash Flow') type = 'cashflow';
+                                        else if (point.type === 'Note') type = 'note';
+                                        else if (point.type === 'Alert') type = 'alert';
+                                        
+                                        if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
+                                            showCashFlowDetails(point.id);
+                                        } else if (type === 'note' && typeof showNoteDetails === 'function') {
+                                            showNoteDetails(point.id);
+                                        } else if (type === 'alert' && typeof showAlertDetails === 'function') {
+                                            showAlertDetails(point.id);
+                                        } else if (typeof showExecutionDetails === 'function') {
+                                            showExecutionDetails(point.id, type);
+                                        }
+                                    }
+                                }
+                            },
+                            onHover: function(event, elements) {
+                                if (event && event.native && event.native.target) {
+                                    event.native.target.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        y: {
-                            display: false
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'זמן (ימים)'
-                            }
-                        }
-                    },
-                    onClick: (e, elements) => {
-                        if (elements.length > 0) {
-                            selectTimelineStep(elements[0].index);
-                        }
+                        });
+                    } catch (error) {
+                        console.error('Error creating timeline chart with Chart.js fallback:', error);
+                        timelineChart = null;
                     }
                 }
-            });
+            }
         }
         
         async function initPLChart() {
@@ -1012,8 +1735,9 @@
             } else {
                 // Fallback to direct Chart.js if ChartSystem not available
                 const ctx = document.getElementById('plChart');
-                plChart = new Chart(ctx, {
-                type: 'line',
+                if (ctx) {
+                    plChart = new Chart(ctx, {
+                        type: 'line',
                 data: {
                     labels: dates,
                     datasets: [
@@ -1114,7 +1838,9 @@
                         }
                     }
                 }
-            });
+                    });
+                }
+            }
         }
         
         function updatePLChartMarker(stepIndex) {
@@ -1158,7 +1884,43 @@
             };
             
             // For now, use Chart.js as placeholder (will be replaced with external system)
+            // Wait for Chart.js to be available
+            if (typeof Chart === 'undefined') {
+                console.warn('Chart.js not available yet, retrying market price chart initialization...');
+                setTimeout(initMarketPriceChart, 500);
+                return;
+            }
+            
             const ctx = document.getElementById('marketPriceChart');
+            if (!ctx) {
+                console.warn('Market price chart container not found');
+                return;
+            }
+            
+            // Destroy existing chart if exists
+            if (marketPriceChart) {
+                try {
+                    if (typeof marketPriceChart.destroy === 'function') {
+                        marketPriceChart.destroy();
+                    }
+                } catch (e) {
+                    console.warn('Error destroying market price chart:', e);
+                }
+                marketPriceChart = null;
+            }
+            
+            // Also check Chart.js registry
+            if (typeof Chart !== 'undefined' && Chart.getChart) {
+                const existingChart = Chart.getChart(ctx);
+                if (existingChart) {
+                    try {
+                        existingChart.destroy();
+                    } catch (e) {
+                        console.warn('Error destroying Chart.js chart:', e);
+                    }
+                }
+            }
+            
             marketPriceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1260,10 +2022,6 @@
             alert('ייצוא נתונים - ייושם בעתיד');
         }
         
-        function showSettings() {
-            alert('הגדרות תצוגה - ייושם בעתיד');
-        }
-        
         // Initialize charts on page load
         document.addEventListener('DOMContentLoaded', async function() {
             // Wait for ChartSystem to be ready
@@ -1275,13 +2033,16 @@
             
             // Initialize charts using ChartSystem (async)
             try {
+                await initTimelineChart();
+            } catch (e) {
+                console.error('Error initializing timeline chart:', e);
+            }
+            
+            try {
                 await initPLChart();
             } catch (e) {
                 console.error('Error initializing P/L chart:', e);
             }
-            
-            // Timeline chart will be initialized when switching to relative view
-            // initTimelineChart(); // Don't initialize on load, only on view switch
             
             // Market price chart (uses Chart.js directly as placeholder)
             try {
@@ -1317,6 +2078,426 @@
                 });
             }
         });
+    </script>
+    
+    <!-- Bootstrap JS for Modal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Trade Selector Modal -->
+    <div id="tradeSelectorModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="tradeSelectorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tradeSelectorModalLabel">
+                        <i class="bi bi-search"></i> בחירת טרייד לניתוח
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
+                            </div>
+                <div class="modal-body">
+                    <!-- Filters Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="bi bi-funnel"></i> מסננים</h6>
+                                    </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <!-- Ticker Filter -->
+                                <div class="col-md-2">
+                                    <label for="filterTicker" class="form-label" style="font-size: 0.85rem;">טיקר</label>
+                                    <select id="filterTicker" class="form-select form-select-sm" onchange="applyTradeFilters()">
+                                        <option value="">הכל</option>
+                                        <!-- Will be populated dynamically -->
+                                    </select>
+                                        </div>
+                                
+                                <!-- Side Filter -->
+                                <div class="col-md-2">
+                                    <label for="filterSide" class="form-label" style="font-size: 0.85rem;">צד</label>
+                                    <select id="filterSide" class="form-select form-select-sm" onchange="applyTradeFilters()">
+                                        <option value="">הכל</option>
+                                        <option value="Long">Long</option>
+                                        <option value="Short">Short</option>
+                                    </select>
+                                    </div>
+                                
+                                <!-- Investment Type Filter -->
+                                <div class="col-md-2">
+                                    <label for="filterInvestmentType" class="form-label" style="font-size: 0.85rem;">סוג השקעה</label>
+                                    <select id="filterInvestmentType" class="form-select form-select-sm" onchange="applyTradeFilters()">
+                                        <option value="">הכל</option>
+                                        <!-- Will be populated dynamically -->
+                                    </select>
+                                </div>
+                                
+                                <!-- Date Range Filter -->
+                                <div class="col-md-2">
+                                    <label for="filterDateFrom" class="form-label" style="font-size: 0.85rem;">מתאריך</label>
+                                    <input type="date" id="filterDateFrom" class="form-control form-control-sm" onchange="applyTradeFilters()">
+                            </div>
+                                <div class="col-md-2">
+                                    <label for="filterDateTo" class="form-label" style="font-size: 0.85rem;">עד תאריך</label>
+                                    <input type="date" id="filterDateTo" class="form-control form-control-sm" onchange="applyTradeFilters()">
+                                    </div>
+                                
+                                <!-- Clear Filters Button -->
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button class="btn btn-outline-secondary btn-sm w-100" onclick="clearTradeFilters()">
+                                        <i class="bi bi-x-circle"></i> נקה
+                                    </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                    <!-- Trades Table -->
+                    <div class="table-responsive">
+                        <table id="tradeSelectorTable" class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>מספר טרייד</th>
+                                    <th>טיקר</th>
+                                    <th>צד</th>
+                                    <th>סוג השקעה</th>
+                                    <th>תאריך יצירה</th>
+                                    <th>תאריך סגירה</th>
+                                    <th>P/L</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tradeSelectorTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                        </div>
+                    
+                    <!-- No Results Message -->
+                    <div id="noTradesMessage" class="alert alert-info text-center" style="display: none;">
+                        <i class="bi bi-info-circle"></i> לא נמצאו טריידים התואמים למסננים
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Investment types from system constraints
+        const INVESTMENT_TYPES = [
+            { value: 'swing', label: 'סווינג' },
+            { value: 'investment', label: 'השקעה' },
+            { value: 'passive', label: 'פאסיבי' }
+        ];
+        
+        let allTrades = [];
+        let filteredTrades = [];
+        let selectedTradeId = null;
+        let allTickers = [];
+        
+        // Load tickers from API
+        async function loadTickers() {
+            try {
+                const response = await fetch('/api/tickers/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const tickers = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                    allTickers = tickers.map(t => ({
+                        id: t.id,
+                        symbol: t.symbol || t.ticker_symbol || ''
+                    })).filter(t => t.symbol).sort((a, b) => a.symbol.localeCompare(b.symbol));
+                    
+                    // Populate ticker dropdown
+                    const tickerSelect = document.getElementById('filterTicker');
+                    if (tickerSelect) {
+                        tickerSelect.innerHTML = '<option value="">הכל</option>';
+                        allTickers.forEach(ticker => {
+                            const option = document.createElement('option');
+                            option.value = ticker.symbol;
+                            option.textContent = ticker.symbol;
+                            tickerSelect.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading tickers:', error);
+            }
+        }
+        
+        // Load investment types dropdown
+        function loadInvestmentTypes() {
+            const investmentSelect = document.getElementById('filterInvestmentType');
+            if (investmentSelect) {
+                investmentSelect.innerHTML = '<option value="">הכל</option>';
+                INVESTMENT_TYPES.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.value;
+                    option.textContent = type.label;
+                    investmentSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Load trades from API
+        async function loadTrades() {
+            try {
+                const response = await fetch('/api/trades/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                    
+                    // Transform trades to match our format
+                    allTrades = trades.map(trade => ({
+                        id: trade.id,
+                        ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                        side: trade.side || '',
+                        investment_type: trade.investment_type || '',
+                        created_at: trade.created_at?.utc || trade.created_at || '',
+                        closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                        pl: trade.realized_pl || trade.pl || 0,
+                        pl_percent: trade.pl_percent || 0
+                    })).filter(t => t.ticker); // Only trades with ticker
+                    
+                    filteredTrades = [...allTrades];
+                    loadTradesTable();
+                } else {
+                    // Fallback to mock data if API fails
+                    loadMockTrades();
+                }
+            } catch (error) {
+                console.error('Error loading trades:', error);
+                // Fallback to mock data
+                loadMockTrades();
+            }
+        }
+        
+        // Mock data fallback
+        function loadMockTrades() {
+            allTrades = [
+                {
+                    id: 123,
+                    ticker: 'AAPL',
+                    side: 'Long',
+                    investment_type: 'swing',
+                    created_at: '2025-01-01',
+                    closed_at: '2025-01-20',
+                    pl: 1110,
+                    pl_percent: 7.4
+                },
+                {
+                    id: 124,
+                    ticker: 'TSLA',
+                    side: 'Short',
+                    investment_type: 'swing',
+                    created_at: '2025-01-15',
+                    closed_at: '2025-01-18',
+                    pl: -250,
+                    pl_percent: -2.1
+                },
+                {
+                    id: 125,
+                    ticker: 'MSFT',
+                    side: 'Long',
+                    investment_type: 'investment',
+                    created_at: '2024-12-20',
+                    closed_at: '2025-01-25',
+                    pl: 850,
+                    pl_percent: 5.2
+                },
+                {
+                    id: 126,
+                    ticker: 'GOOGL',
+                    side: 'Long',
+                    investment_type: 'swing',
+                    created_at: '2025-01-10',
+                    closed_at: '2025-01-22',
+                    pl: 420,
+                    pl_percent: 3.1
+                }
+            ];
+            filteredTrades = [...allTrades];
+            loadTradesTable();
+        }
+        
+        // Open trade selector modal
+        async function openTradeSelectorModal() {
+            const modalElement = document.getElementById('tradeSelectorModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            // Load data when modal opens
+            await Promise.all([
+                loadTickers(),
+                loadTrades()
+            ]);
+            loadInvestmentTypes();
+        }
+        
+        // Load trades into table
+        function loadTradesTable() {
+            const tbody = document.getElementById('tradeSelectorTableBody');
+            const noResults = document.getElementById('noTradesMessage');
+            
+            if (filteredTrades.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            tbody.innerHTML = filteredTrades.map(trade => {
+                const plClass = trade.pl >= 0 ? 'text-success' : 'text-danger';
+                const plSign = trade.pl >= 0 ? '+' : '';
+                const sideText = trade.side || '-';
+                const investmentTypeText = getInvestmentTypeText(trade.investment_type);
+                
+                return `
+                    <tr>
+                        <td>#${trade.id}</td>
+                        <td><strong>${trade.ticker}</strong></td>
+                        <td>${sideText}</td>
+                        <td>${investmentTypeText}</td>
+                        <td>${formatDate(trade.created_at)}</td>
+                        <td>${formatDate(trade.closed_at)}</td>
+                        <td class="${plClass}">
+                            <strong>${plSign}$${Math.abs(trade.pl).toLocaleString()}</strong>
+                            <small>(${plSign}${trade.pl_percent}%)</small>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm" onclick="viewTradeDetails(${trade.id})" title="פרטים">
+                                    👁️
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="selectTradeForAnalysis(${trade.id})" title="בחר לניתוח">
+                                    ✓
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Apply filters
+        function applyTradeFilters() {
+            const ticker = document.getElementById('filterTicker').value;
+            const side = document.getElementById('filterSide').value;
+            const investmentType = document.getElementById('filterInvestmentType').value;
+            const dateFrom = document.getElementById('filterDateFrom').value;
+            const dateTo = document.getElementById('filterDateTo').value;
+            
+            filteredTrades = allTrades.filter(trade => {
+                // Ticker filter (exact match from dropdown)
+                if (ticker && trade.ticker !== ticker) {
+                    return false;
+                }
+                
+                // Side filter
+                if (side && trade.side !== side) {
+                    return false;
+                }
+                
+                // Investment type filter
+                if (investmentType && trade.investment_type !== investmentType) {
+                    return false;
+                }
+                
+                // Date range filter - if any day in trade range is within filter range
+                if (dateFrom || dateTo) {
+                    const tradeStart = new Date(trade.created_at);
+                    const tradeEnd = trade.closed_at ? new Date(trade.closed_at) : new Date();
+                    const filterStart = dateFrom ? new Date(dateFrom) : null;
+                    const filterEnd = dateTo ? new Date(dateTo) : null;
+                    
+                    // Check if trade date range overlaps with filter date range
+                    if (filterStart && tradeEnd < filterStart) {
+                        return false; // Trade ends before filter starts
+                    }
+                    if (filterEnd && tradeStart > filterEnd) {
+                        return false; // Trade starts after filter ends
+                    }
+                }
+                
+                return true;
+            });
+            
+            loadTradesTable();
+        }
+        
+        // Clear filters
+        function clearTradeFilters() {
+            document.getElementById('filterTicker').value = '';
+            document.getElementById('filterSide').value = '';
+            document.getElementById('filterInvestmentType').value = '';
+            document.getElementById('filterDateFrom').value = '';
+            document.getElementById('filterDateTo').value = '';
+            filteredTrades = [...allTrades];
+            loadTradesTable();
+        }
+        
+        // View trade details
+        function viewTradeDetails(tradeId) {
+            const trade = allTrades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            // In production, this would open a trade details modal
+            alert(`פרטי טרייד #${tradeId}\n\nטיקר: ${trade.ticker}\nצד: ${trade.side}\nסוג: ${getInvestmentTypeText(trade.investment_type)}\nתאריך יצירה: ${formatDate(trade.created_at)}\nתאריך סגירה: ${formatDate(trade.closed_at)}\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`);
+        }
+        
+        // Select trade for analysis
+        function selectTradeForAnalysis(tradeId) {
+            const trade = allTrades.find(t => t.id === tradeId);
+            if (!trade) return;
+            
+            selectedTradeId = tradeId;
+            
+            // Update selected trade display
+            const display = document.getElementById('selectedTradeDisplay');
+            const info = document.getElementById('selectedTradeInfo');
+            info.textContent = `טרייד #${trade.id} - ${trade.ticker} (${getInvestmentTypeText(trade.investment_type)})`;
+            display.style.display = 'block';
+            
+            // Close modal
+            const modalElement = document.getElementById('tradeSelectorModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Load trade data for analysis
+            loadTradeForAnalysis(tradeId);
+        }
+        
+        // Clear selected trade
+        function clearSelectedTrade() {
+            selectedTradeId = null;
+            document.getElementById('selectedTradeDisplay').style.display = 'none';
+            // Clear all trade analysis data
+            // This would reset all charts, statistics, etc.
+        }
+        
+        // Load trade for analysis (placeholder - in production would load real data)
+        function loadTradeForAnalysis(tradeId) {
+            console.log(`Loading trade ${tradeId} for analysis...`);
+            // In production, this would:
+            // 1. Fetch trade data from API
+            // 2. Update all charts
+            // 3. Update statistics
+            // 4. Update timeline
+            // 5. Update executions table
+        }
+        
+        // Helper functions
+        function getInvestmentTypeText(type) {
+            const typeMap = INVESTMENT_TYPES.find(t => t.value === type);
+            return typeMap ? typeMap.label : type;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('he-IL');
+        }
     </script>
 </body>
 </html>

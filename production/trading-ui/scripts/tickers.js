@@ -587,8 +587,211 @@ function restoreTickersSectionState() {
 // פונקציות שמירה ועדכון
 // ========================================
 
+// ===== PROVIDER SYMBOL MAPPING FUNCTIONS =====
+// Functions for managing provider symbol mappings
+
+/**
+ * Load provider symbol mappings for a ticker (for edit mode)
+ * 
+ * @function loadTickerProviderSymbols
+ * @param {number} tickerId - ID of the ticker
+ * @async
+ * @returns {Promise<void>}
+ */
+async function loadTickerProviderSymbols(tickerId) {
+  if (!tickerId) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/tickers/${tickerId}/provider-symbols`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        // No mappings found - that's OK
+        return;
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const mappings = result.data || [];
+
+    if (mappings.length > 0) {
+      populateProviderSymbolFields(mappings);
+    }
+  } catch (error) {
+    console.error('Error loading provider symbols:', error);
+    // Don't show error to user - mappings are optional
+  }
+}
+
+/**
+ * Initialize provider symbol fields when modal is shown
+ * NOTE: This is now handled by ModalManagerV2.initializeSpecialHandlers()
+ * This function is kept for backward compatibility but is no longer called automatically.
+ * The modal initialization is handled in modal-manager-v2.js
+ */
+function initializeProviderSymbolFields() {
+  // This function is deprecated - ModalManagerV2 now handles this
+  // Kept for backward compatibility
+  console.warn('⚠️ initializeProviderSymbolFields is deprecated - ModalManagerV2 now handles this');
+}
+
 // ===== SAVE AND UPDATE FUNCTIONS =====
 // Ticker saving, updating, and data management
+
+/**
+ * Load external data providers and populate provider symbol fields
+ * 
+ * @function loadProviderSymbolFields
+ * @async
+ * @returns {Promise<void>}
+ */
+async function loadProviderSymbolFields() {
+  const fieldsContainer = document.getElementById('providerSymbolsFields');
+  if (!fieldsContainer) {
+    console.warn('⚠️ Provider symbols fields container not found');
+    return;
+  }
+
+  // Show loading state
+  fieldsContainer.innerHTML = `
+    <div class="text-center text-muted py-3">
+      <i class="fas fa-spinner fa-spin me-2"></i>טוען רשימת ספקים...
+    </div>
+  `;
+
+  try {
+    // Load providers from API
+    const response = await fetch('/api/external-data-providers/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const providers = (result.data || []).filter(p => p.is_active);
+
+    if (providers.length === 0) {
+      fieldsContainer.innerHTML = `
+        <div class="alert alert-info mb-0">
+          <i class="fas fa-info-circle me-2"></i>
+          <small>אין ספקי נתונים פעילים במערכת</small>
+        </div>
+      `;
+      return;
+    }
+
+    // Generate fields for each provider
+    const fieldsHTML = providers.map(provider => `
+      <div class="mb-3">
+        <label for="providerSymbol_${provider.name}" class="form-label small fw-semibold">
+          <i class="fas fa-exchange-alt me-1"></i>
+          ${provider.display_name || provider.name}
+        </label>
+        <input type="text" 
+               class="form-control form-control-sm" 
+               id="providerSymbol_${provider.name}" 
+               name="providerSymbol_${provider.name}"
+               placeholder="השאר ריק אם לא נדרש מיפוי"
+               maxlength="50"
+               data-provider-id="${provider.id}"
+               data-provider-name="${provider.name}">
+        <small class="form-text text-muted">
+          <i class="fas fa-info-circle me-1"></i>
+          אם ספק זה דורש סימבול שונה מהסימבול הפנימי, הזן כאן (למשל: 500X.MI עבור Yahoo Finance)
+        </small>
+      </div>
+    `).join('');
+
+    fieldsContainer.innerHTML = fieldsHTML;
+    
+    if (window.Logger) {
+      window.Logger.debug('Provider symbol fields loaded', { 
+        providerCount: providers.length,
+        page: 'tickers' 
+      });
+    }
+  } catch (error) {
+    console.error('Error loading providers:', error);
+    fieldsContainer.innerHTML = `
+      <div class="alert alert-danger mb-0">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <small>שגיאה בטעינת ספקי נתונים. נסה לרענן את הדף.</small>
+      </div>
+    `;
+    
+    if (window.Logger) {
+      window.Logger.error('Failed to load provider symbol fields', { 
+        error: error.message,
+        page: 'tickers' 
+      });
+    }
+  }
+}
+
+/**
+ * Collect provider symbols from form
+ * 
+ * @function collectProviderSymbols
+ * @returns {Object} Dictionary of provider_name -> provider_symbol
+ */
+function collectProviderSymbols() {
+  const providerSymbols = {};
+  const inputs = document.querySelectorAll('[id^="providerSymbol_"]');
+  
+  inputs.forEach(input => {
+    const providerName = input.id.replace('providerSymbol_', '');
+    const symbol = input.value.trim();
+    if (symbol) {
+      providerSymbols[providerName] = symbol;
+    }
+  });
+
+  return Object.keys(providerSymbols).length > 0 ? providerSymbols : null;
+}
+
+/**
+ * Populate provider symbol fields with existing mappings
+ * 
+ * @function populateProviderSymbolFields
+ * @param {Array} mappings - Array of provider symbol mappings
+ * @returns {void}
+ */
+function populateProviderSymbolFields(mappings) {
+  if (!mappings || mappings.length === 0) {
+    return;
+  }
+
+  mappings.forEach(mapping => {
+    // Support both provider_name and provider_display_name
+    const providerName = mapping.provider_name || mapping.provider_display_name;
+    if (!providerName) {
+      console.warn('⚠️ Mapping missing provider name:', mapping);
+      return;
+    }
+    
+    const input = document.getElementById(`providerSymbol_${providerName}`);
+    if (input) {
+      input.value = mapping.provider_symbol || '';
+      if (window.Logger) {
+        window.Logger.debug('Populated provider symbol field', {
+          providerName,
+          symbol: mapping.provider_symbol,
+          page: 'tickers'
+        });
+      }
+    } else {
+      console.warn(`⚠️ Provider symbol input field not found: providerSymbol_${providerName}`);
+      if (window.Logger) {
+        window.Logger.warn('Provider symbol input field not found', {
+          providerName,
+          availableFields: Array.from(document.querySelectorAll('[id^="providerSymbol_"]')).map(el => el.id),
+          page: 'tickers'
+        });
+      }
+    }
+  });
+}
 
 /**
  * Save new ticker
@@ -614,6 +817,12 @@ async function saveTicker() {
   });
   const tagIds = Array.isArray(tickerData.tag_ids) ? tickerData.tag_ids : [];
   delete tickerData.tag_ids;
+
+  // Collect provider symbols
+  const providerSymbols = collectProviderSymbols();
+  if (providerSymbols) {
+    tickerData.provider_symbols = providerSymbols;
+  }
 
   const tickerId = tickerData.id ? parseInt(tickerData.id) : null;
   const symbol = tickerData.symbol?.trim().toUpperCase();
@@ -688,6 +897,11 @@ async function saveTicker() {
       status: finalStatus,
       remarks: remarks || null
     };
+    
+    // Add provider symbols if they exist
+    if (providerSymbols) {
+      tickerPayload.provider_symbols = providerSymbols;
+    }
 
     // שימוש בשירות הנתונים החדש
     let response;
@@ -767,6 +981,12 @@ async function updateTicker() {
 
   const { id, symbol, name, type, currency_id, status, remarks, tag_ids = [] } = tickerData;
   const tagIds = Array.isArray(tag_ids) ? tag_ids : [];
+  
+  // Collect provider symbols
+  const providerSymbols = collectProviderSymbols();
+  if (providerSymbols) {
+    tickerData.provider_symbols = providerSymbols;
+  }
   
   // קבלת הטיקר הקיים לבדיקות ולידציה
   const originalTicker = (window.tickersData || []).find(t => t.id === parseInt(id));
@@ -907,6 +1127,11 @@ async function updateTicker() {
       status: finalStatus,
       remarks: remarks || null,
     };
+    
+    // Add provider symbols if they exist
+    if (providerSymbols) {
+      tickerPayload.provider_symbols = providerSymbols;
+    }
 
     // שימוש בשירות הנתונים החדש
     let response;
@@ -1735,6 +1960,7 @@ function renderTickersTableRows(tickers) {
       if (value instanceof Date) {
         return Number.isNaN(value.getTime()) ? null : value;
       }
+      // Use dateUtils for consistent date parsing
       if (typeof value === 'object') {
         const nestedCandidate = value.local || value.utc || value.iso || value.timestamp;
         return parseValidDate(nestedCandidate);
@@ -2108,8 +2334,8 @@ async function checkTickerExternalData() {
         return;
     }
     
-    const symbol = symbolField.value?.trim().toUpperCase();
-    if (!symbol || symbol.length === 0) {
+    const internalSymbol = symbolField.value?.trim().toUpperCase();
+    if (!internalSymbol || internalSymbol.length === 0) {
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', 'יש להכניס סמל טיקר לפני הבדיקה');
         }
@@ -2123,7 +2349,16 @@ async function checkTickerExternalData() {
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
         
-        window.Logger?.info(`Checking external data for symbol: ${symbol}`, { page: 'tickers' });
+        // Check if provider symbol mapping exists for Yahoo Finance
+        // Look for provider symbol field for Yahoo Finance
+        let symbolToUse = internalSymbol;
+        const yahooProviderField = document.getElementById('providerSymbol_yahoo_finance');
+        if (yahooProviderField && yahooProviderField.value && yahooProviderField.value.trim()) {
+            symbolToUse = yahooProviderField.value.trim().toUpperCase();
+            window.Logger?.info(`Using provider symbol '${symbolToUse}' instead of internal symbol '${internalSymbol}' for Yahoo Finance`, { page: 'tickers' });
+        }
+        
+        window.Logger?.info(`Checking external data for symbol: ${symbolToUse} (internal: ${internalSymbol})`, { page: 'tickers' });
         
         // Check if ExternalDataService is available
         if (!window.ExternalDataService) {
@@ -2131,11 +2366,12 @@ async function checkTickerExternalData() {
         }
         
         // Fetch quote data - force refresh to get latest data
-        const quoteData = await window.ExternalDataService.getQuote(symbol, { forceRefresh: true });
+        // Use provider symbol if available, otherwise use internal symbol
+        const quoteData = await window.ExternalDataService.getQuote(symbolToUse, { forceRefresh: true });
         
         if (quoteData && quoteData.price) {
             const currencyResolution = typeof window.resolveExternalCurrencySymbol === 'function'
-                ? window.resolveExternalCurrencySymbol(quoteData.currency, symbol)
+                ? window.resolveExternalCurrencySymbol(quoteData.currency, symbolToUse)
                 : {
                     symbol: (typeof quoteData.currency === 'string' && quoteData.currency.trim()) || '',
                     hasCurrency: Boolean(quoteData.currency)
@@ -2145,14 +2381,19 @@ async function checkTickerExternalData() {
             // המרת נתונים לפורמט שמצפה FieldRendererService.renderTickerInfo
             // ExternalDataService מחזיר: price, change_amount_day, change_pct_day, volume, currency
             const tickerInfo = {
-                symbol: symbol,
-                name: quoteData.name || symbol, // Use name from quote if available
+                symbol: internalSymbol, // Always show internal symbol in display
+                name: quoteData.name || internalSymbol, // Use name from quote if available
                 current_price: parseFloat(quoteData.price) || 0,
                 daily_change: parseFloat(quoteData.change_amount_day || quoteData.change_amount || 0),
                 daily_change_percent: parseFloat(quoteData.change_pct_day || quoteData.change_percent || 0),
                 volume: parseInt(quoteData.volume || 0),
                 currency_symbol: currencyResolution.symbol
             };
+            
+            // Add note if provider symbol was used
+            const providerSymbolNote = (symbolToUse !== internalSymbol) 
+                ? `<div class="text-info small mt-2"><i class="fas fa-info-circle me-1"></i>נבדק עם סימבול ספק: <strong>${symbolToUse}</strong> (סימבול פנימי: ${internalSymbol})</div>`
+                : '';
             
             // Render using FieldRendererService
             let tickerInfoHTML = '';
@@ -2183,16 +2424,17 @@ async function checkTickerExternalData() {
                 <div class="alert alert-success mb-0">
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <i class="fas fa-check-circle"></i>
-                        <strong>נתונים נמצאו עבור ${symbol}</strong>
+                        <strong>נתונים נמצאו עבור ${internalSymbol}</strong>
                     </div>
                     ${tickerInfoHTML}
                     ${currencyNotice}
+                    ${providerSymbolNote}
                 </div>
             `;
             resultDiv.style.display = 'block';
             warningDiv.style.display = 'none';
             
-            window.Logger?.info(`✅ External data loaded successfully for ${symbol}`, { page: 'tickers' });
+            window.Logger?.info(`✅ External data loaded successfully for ${symbolToUse} (internal: ${internalSymbol})`, { page: 'tickers' });
         } else {
             throw new Error('לא התקבלו נתונים מהשרת');
         }
@@ -2217,7 +2459,7 @@ async function checkTickerExternalData() {
         if (window.showWarningNotification) {
             window.showWarningNotification(
                 'נתונים חיצוניים לא זמינים',
-                `לא ניתן לטעון נתונים עבור ${symbol}. ניתן להמשיך בהוספת הטיקר ללא נתונים אלה.`
+                `לא ניתן לטעון נתונים עבור ${symbolToUse}${symbolToUse !== internalSymbol ? ` (סימבול פנימי: ${internalSymbol})` : ''}. ניתן להמשיך בהוספת הטיקר ללא נתונים אלה.`
             );
         }
     } finally {
@@ -2285,6 +2527,12 @@ window.checkLinkedItemsAndCancelTicker = checkLinkedItemsAndCancelTicker;
 // Export all necessary functions to global scope
 window.editTicker = editTicker;
 window.loadCurrenciesData = loadCurrenciesData;
+
+// Export provider symbol functions to window for ModalManagerV2 access
+window.loadProviderSymbolFields = loadProviderSymbolFields;
+window.loadTickerProviderSymbols = loadTickerProviderSymbols;
+window.collectProviderSymbols = collectProviderSymbols;
+window.populateProviderSymbolFields = populateProviderSymbolFields;
 window.updateActiveTradesField = updateActiveTradesField;
 window.updateAllActiveTradesStatuses = updateAllActiveTradesStatuses;
 window.restoreTickersSectionState = restoreTickersSectionState;

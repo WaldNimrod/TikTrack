@@ -1,0 +1,10 @@
+{
+  "id": "pre-update_20251120_182045",
+  "label": "pre-update",
+  "timestamp": "2025-11-20T18:20:45.017114",
+  "files": {
+    "config": "_Tmp/production-update-snapshots/pre-update_20251120_182045/config/config",
+    "database_backup": "Backend/db/backups/tiktrack_pre-update_20251120_150525.db"
+  },
+  "git_commit": "0d77cfa8ec2f5d73518ac37a0f04fe56c613bcc7"
+}

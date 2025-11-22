@@ -676,7 +676,7 @@ function syncAccountAndConnectorLockState() {
     const connectorSelect = modal.querySelector('#connectorSelect');
     // Lock provider selection only when a real session flow is in progress:
     // - an existing active session AND one of: file loaded, pending account-linking, or analysis results
-    // This keeps the provider selectable for a fresh upload even if an old session exists in storage.
+    // Removed old session lock logic - connector is always selectable in step 1
     const lockConnector = Boolean(
         currentSessionId && (selectedFile || pendingAccountLinking || analysisResults)
     );
@@ -2755,48 +2755,9 @@ function isSessionActive(status) {
 }
 
 function updateResetSessionButtonState() {
-    const resetButton = document.getElementById('resetImportSessionBtn');
-    const resumeButton = document.getElementById('resumeImportSessionBtn');
-    
-    // ALWAYS hide resume button - feature removed
-    if (resumeButton) {
-        resumeButton.classList.add('d-none');
-        resumeButton.style.display = 'none';
-        resumeButton.disabled = true;
-        resumeButton.setAttribute('aria-disabled', 'true');
-    }
-    
-    // Only show reset button if there's an active (not closed) session
-    // Use raw status if available (more reliable), otherwise use translated status
-    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
-    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
-
-    // CRITICAL: Always sync button visibility with session indicator
-    // If there's no active session, hide reset button and info
-    if (!hasActiveSession) {
-        if (resetButton) {
-            resetButton.classList.add('d-none');
-            resetButton.style.display = 'none';
-            resetButton.disabled = true;
-            resetButton.setAttribute('aria-disabled', 'true');
-        }
-        // Don't call updateActiveSessionIndicator here - it will be called separately
-        return;
-    }
-
-    // If we have an active session, show reset button and ensure info is visible
-    if (resetButton) {
-        resetButton.classList.remove('d-none');
-        resetButton.style.display = 'inline-flex';
-        // Force display if still hidden
-        if (window.getComputedStyle(resetButton).display === 'none') {
-            resetButton.style.display = 'inline-flex';
-        }
-        resetButton.disabled = false;
-        resetButton.setAttribute('aria-disabled', 'false');
-    }
-    
-    // Ensure indicator is also visible (will be called separately, but ensure consistency)
+    // Removed - reset session button removed from step 1
+    // Sessions can be managed from the sessions table instead
+    return;
 }
 
 function getApiErrorMessage(response, fallback = 'שגיאה לא ידועה') {
@@ -2911,32 +2872,9 @@ function updateActiveSessionInfo(updates = {}) {
 }
 
 function updateActiveSessionIndicator() {
-    const indicator = document.getElementById('activeSessionIndicator');
-    const controlsRow = document.getElementById('activeSessionControlsRow');
-    const detailsRow = document.getElementById('activeSessionDetailsRow');
-    if (!indicator) {
-        return;
-    }
-    
-    // Check if there's an active (not closed) session
-    // Use raw status if available (more reliable), otherwise use translated status
-    const statusToCheck = activeSessionInfo?.statusRaw || activeSessionInfo?.status;
-    const hasActiveSession = currentSessionId && activeSessionInfo && isSessionActive(statusToCheck);
-    
-    if (!hasActiveSession) {
-        indicator.classList.add('d-none');
-        indicator.style.display = 'none';
-        indicator.setAttribute('data-has-session', 'false');
-        if (controlsRow) {
-            controlsRow.classList.add('d-none');
-            controlsRow.style.display = 'none';
-        }
-        if (detailsRow) {
-            detailsRow.classList.add('d-none');
-            detailsRow.style.display = 'none';
-        }
-        return;
-    }
+    // Removed - old session indicator feature removed from step 1
+    // Sessions can be continued from the sessions table instead
+    return;
     
     // Show indicator and remove d-none class
     indicator.classList.remove('d-none');
@@ -3310,6 +3248,60 @@ function renderImportDate(value, fallback = '') {
     } catch (error) {
         if (window.Logger?.warn) {
             window.Logger.warn('[Import Modal] Failed to render date value', { value, error: error.message });
+        }
+    }
+    return fallback;
+}
+
+/**
+ * Render date and time for duplicate records - shows full date and time
+ */
+function renderImportDateTime(value, fallback = '—') {
+    try {
+        if (typeof window.dateUtils?.ensureDateEnvelope === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope(value);
+            if (envelope && typeof envelope === 'object') {
+                // Try to get full date-time display
+                if (envelope.display && envelope.display.includes(':')) {
+                    return envelope.display;
+                }
+                if (envelope.local && envelope.local.includes(':')) {
+                    return envelope.local;
+                }
+                if (envelope.utc && envelope.utc.includes(':')) {
+                    return envelope.utc;
+                }
+                // If no time component, try to format with time
+                if (window.FieldRendererService?.renderDate) {
+                    const dateDisplay = window.FieldRendererService.renderDate(envelope);
+                    // If FieldRendererService includes time, use it
+                    if (dateDisplay && dateDisplay.includes(':')) {
+                        return dateDisplay;
+                    }
+                }
+                // Fallback to date only
+                return envelope.display || envelope.local || envelope.utc || fallback;
+            }
+        }
+        if (value && typeof value === 'object') {
+            if (value.display && value.display.includes(':')) {
+                return value.display;
+            }
+            if (value.local && value.local.includes(':')) {
+                return value.local;
+            }
+            return value.display || value.local || value.utc || fallback;
+        }
+        if (value) {
+            // If it's a string, check if it has time component
+            if (typeof value === 'string' && value.includes(':')) {
+                return value;
+            }
+            return value;
+        }
+    } catch (error) {
+        if (window.Logger?.warn) {
+            window.Logger.warn('[Import Modal] Failed to render date-time value', { value, error: error.message });
         }
     }
     return fallback;
@@ -4700,15 +4692,7 @@ function updateHeaderActions(step) {
         setElementDisplay(previewActions, step === 3 ? 'flex' : 'none');
     }
     
-    // ALWAYS hide resume session button - feature removed completely
-    const resumeButton = document.getElementById('resumeImportSessionBtn');
-    if (resumeButton) {
-        resumeButton.classList.add('d-none');
-        resumeButton.style.display = 'none';
-        resumeButton.disabled = true;
-        resumeButton.setAttribute('aria-disabled', 'true');
-        resumeButton.style.visibility = 'hidden';
-    }
+    // Removed - resume session button removed completely from step 1
     
     // In other steps, let updateResetSessionButtonState handle visibility for reset button
     if (step !== 1) {
@@ -4974,7 +4958,7 @@ function displayExistingRecords(existingRecords) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(7, 'אין רשומות קיימות למעקב.');
+        tableBody.innerHTML = renderTableEmptyRow(8, 'אין רשומות קיימות למעקב.');
         markProblemTableReady('existingRecordsTable');
         return;
     }
@@ -5565,14 +5549,42 @@ function analyzeFile() {
         page: 'import-user-data'
     });
     
+    console.group('🔍 [ANALYZE_FILE] Starting file upload and analysis');
+    console.log('📋 Request parameters:', {
+        sessionId: currentSessionId,
+        connectorValue,
+        dataTypeValue,
+        accountValue,
+        fileName: selectedFile?.name,
+        fileSize: selectedFile?.size
+    });
+    
     setAnalysisLoadingState(true, 'מעלה את הקובץ ומתחיל ניתוח...', 10);
+    
+    console.log('📡 [ANALYZE_FILE] Sending POST request to /api/user-data-import/upload');
     
     fetch('/api/user-data-import/upload', {
             method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [ANALYZE_FILE] Response received:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+        });
+        
+        if (!response.ok) {
+            console.error('❌ [ANALYZE_FILE] Response not OK:', {
+                status: response.status,
+                statusText: response.statusText
+            });
+        }
+        
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [ANALYZE_FILE] Response data:', data);
         setAnalysisLoadingState(true, 'מעבד את הנתונים שהתקבלו...', 55);
         if (handleAccountLinkingBlockingResponse(data, 'upload')) {
             currentSessionId = data.session_id || currentSessionId;
@@ -5582,6 +5594,14 @@ function analyzeFile() {
             return;
         }
         if (data.success || data.status === 'success') {
+            console.log('✅ [ANALYZE_FILE] Analysis completed successfully');
+            console.log('📊 [ANALYZE_FILE] Analysis results:', {
+                sessionId: data.session_id,
+                provider: data.provider,
+                taskType: data.task_type,
+                hasAnalysisResults: !!data.analysis_results
+            });
+            
             window.Logger.info('[Import Modal] File analysis completed', { data, page: 'import-user-data' });
             currentSessionId = data.session_id;
             window.currentSessionId = data.session_id; // Make it global
@@ -5619,15 +5639,27 @@ function analyzeFile() {
             displayAnalysisResults(data.analysis_results);
             
             // Go to next step immediately (no artificial delay)
+            console.log('🔄 [ANALYZE_FILE] Navigating to step 2');
             goToStep(2);
+            console.log('✅ [ANALYZE_FILE] Step 2 navigation completed');
+            console.groupEnd();
     } else {
+            console.error('❌ [ANALYZE_FILE] Analysis failed:', data.error);
             showImportUserDataNotification(`שגיאה בניתוח הקובץ: ${data.error}`, 'error');
+            console.groupEnd();
         }
     })
     .catch(error => {
+        console.error('❌ [ANALYZE_FILE] Fetch error:', error);
+        console.error('❌ [ANALYZE_FILE] Error details:', {
+            message: error?.message,
+            stack: error?.stack,
+            name: error?.name
+        });
         setAnalysisLoadingState(false);
         window.Logger.error('Analysis error:', error);
         showImportUserDataNotification('שגיאה בניתוח הקובץ', 'error');
+        console.groupEnd();
     });
 }
 
@@ -6198,14 +6230,21 @@ async function loadProblemResolution(autoTriggered = false) {
         }
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
+            
+            // CRITICAL: Always display problem resolution
             displayProblemResolutionDetailed(data.preview_data);
-            window.Logger.info('[Import Modal] Problem resolution data loaded', {
+            
+            window.Logger.info('[Import Modal] Problem resolution data loaded and displayed', {
                 summary: data.preview_data?.summary,
                 autoTriggered,
+                hasPreviewData: !!data.preview_data,
+                currentStep,
                 page: 'import-user-data'
             });
+            
             setAnalysisLoadingState(true, 'מאתר פטרונות והצעות לשיפור...', 82);
             window.setTimeout(() => setAnalysisLoadingState(false), 1000);
+            
             const stepActions = document.getElementById('analysisStepActions');
             const continueBtn = document.getElementById('analysisContinueBtn');
             if (stepActions) {
@@ -6219,6 +6258,14 @@ async function loadProblemResolution(autoTriggered = false) {
                 hideProcessingOverlay();
                 overlayApplied = false;
             }
+            
+            // Ensure problem resolution section is visible
+            const problemSection = document.getElementById('problemResolutionSection');
+            if (problemSection && currentStep === 2) {
+                setElementDisplay(problemSection, 'block');
+                window.Logger.debug('[Import Modal] Problem resolution section made visible', { page: 'import-user-data' });
+            }
+            
             return;
         }
 
@@ -6302,45 +6349,37 @@ function proceedToPreviewFromProblems() {
     goToStep(3);
 }
 
-/**
- * Resume active import session - PLACEHOLDER for future implementation
- * Currently not implemented - modal always opens in clean state
- * This function is kept as a placeholder for future "Rerun Session" functionality
- */
-async function resumeActiveImportSession() {
-    window.Logger?.warn('[Import Modal] resumeActiveImportSession called - not yet implemented', { 
-        page: 'import-user-data' 
-    });
-    if (typeof window.showDetailedNotification === 'function') {
-        window.showDetailedNotification(
-            'פונקציונליות לא זמינה',
-            'המשך סשן פעיל - תכונה זו תתווסף בעתיד',
-            'info',
-            5000,
-            'import-user-data'
-        );
-    }
-}
 
 /**
  * Display preview data
  */
 function displayPreviewData(data) {
+    console.group('🔍 [DISPLAY_PREVIEW] Displaying preview data');
+    console.log('📋 Preview data:', {
+        hasData: !!data,
+        taskType: data?.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions',
+        recordsToImport: data?.records_to_import?.length || 0,
+        recordsToSkip: data?.records_to_skip?.length || 0,
+        currentStep
+    });
+    
     window.Logger.debug('[Import Modal] Displaying preview data', { data, page: 'import-user-data' });
     
     if (!data) {
+        console.warn('⚠️ [DISPLAY_PREVIEW] No preview data to display');
         window.Logger.warn('[Import Modal] No preview data to display', { page: 'import-user-data' });
+        console.groupEnd();
         return;
     }
     
     // CRITICAL: Load selectedCashflowTypes from preview_data if available
-    // This ensures resume session works correctly
     if (data.selected_types && Array.isArray(data.selected_types) && data.selected_types.length > 0) {
         // Reset selectedCashflowTypes and set only the types from preview_data
         selectedCashflowTypes = {};
         data.selected_types.forEach(type => {
             selectedCashflowTypes[type] = true;
         });
+        console.log('📋 [DISPLAY_PREVIEW] Loaded selectedCashflowTypes:', data.selected_types);
         window.Logger.info('[Import Modal] Loaded selectedCashflowTypes from preview_data', {
             selectedTypes: data.selected_types,
             selectedCashflowTypes,
@@ -6352,6 +6391,16 @@ function displayPreviewData(data) {
     let recordsToImport = data.records_to_import || [];
     const recordsToSkip = data.records_to_skip || [];
     const summary = data.summary || {};
+    
+    console.log('📊 [DISPLAY_PREVIEW] Records breakdown:', {
+        taskType,
+        recordsToImportCount: recordsToImport.length,
+        recordsToSkipCount: recordsToSkip.length,
+        summary: {
+            totalRecords: summary.total_records,
+            importRate: summary.import_rate
+        }
+    });
 
     // Filter records by selectedCashflowTypes for cashflows task
     if (taskType === 'cashflows' && Object.keys(selectedCashflowTypes).length > 0) {
@@ -6408,11 +6457,11 @@ function displayPreviewData(data) {
         return;
     }
 
-    renderExecutionPreviewTables(recordsToImport, recordsToSkip);
+    renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType);
     updateSummaryStats();
 }
 
-function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
+function renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType = 'executions') {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
         importTableHeadRow.innerHTML = `
@@ -6498,6 +6547,14 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
             skipTableBody.appendChild(row);
         });
     }
+    
+    console.log('✅ [DISPLAY_PREVIEW] Preview tables rendered successfully');
+    console.log('📊 [DISPLAY_PREVIEW] Final counts:', {
+        recordsToImport: recordsToImport.length,
+        recordsToSkip: recordsToSkip.length,
+        taskType
+    });
+    console.groupEnd();
 }
 
 function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
@@ -7127,7 +7184,30 @@ function displayProblemResolution(data) {
  * Accept duplicate
  */
 function acceptDuplicate(index, type) {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+        window.Logger?.warn('[ACCEPT_DUPLICATE] No session ID', { page: 'import-user-data' });
+        console.warn('🔍 [ACCEPT_DUPLICATE] ❌ No session ID available');
+        return;
+    }
+    
+    console.group('🔍 [ACCEPT_DUPLICATE] Starting accept duplicate process');
+    console.log('📋 Parameters:', { sessionId: currentSessionId, recordIndex: index, duplicateType: type });
+    
+    // Log current preview data state BEFORE accept
+    const beforeState = {
+        recordsToImport: previewData?.records_to_import?.length || 0,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        previewDataExists: !!previewData
+    };
+    console.log('📊 Before accept:', beforeState);
+    
+    window.Logger?.info('[ACCEPT_DUPLICATE] Starting accept duplicate', {
+        sessionId: currentSessionId,
+        recordIndex: index,
+        duplicateType: type,
+        beforeState,
+        page: 'import-user-data'
+    });
     
     fetch(`/api/user-data-import/session/${currentSessionId}/accept-duplicate`, {
         method: 'POST',
@@ -7139,22 +7219,43 @@ function acceptDuplicate(index, type) {
             duplicate_type: type
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [ACCEPT_DUPLICATE] API Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [ACCEPT_DUPLICATE] API Response data:', data);
+        
         if (handleAccountLinkingBlockingResponse(data, 'accept-duplicate')) {
+            console.warn('⚠️ [ACCEPT_DUPLICATE] Account linking required');
+            console.groupEnd();
             return;
         }
         if (data.success || data.status === 'success') {
+            console.log('✅ [ACCEPT_DUPLICATE] Backend accepted successfully');
             showImportUserDataNotification('כפילות אושרה', 'success');
-            // Refresh preview data
-            refreshPreviewData();
+            
+            // Refresh preview data - wait a bit to ensure backend commit is complete
+            console.log('🔄 [ACCEPT_DUPLICATE] Waiting 100ms before refreshing preview...');
+            setTimeout(() => {
+                console.log('🔄 [ACCEPT_DUPLICATE] Refreshing preview data...');
+                refreshPreviewData();
+            }, 100);
         } else {
+            console.error('❌ [ACCEPT_DUPLICATE] Backend returned error:', data.error);
             showImportUserDataNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
         }
+        console.groupEnd();
     })
     .catch(error => {
-        window.Logger.error('Accept duplicate error:', error);
+        console.error('❌ [ACCEPT_DUPLICATE] Fetch error:', error);
+        window.Logger?.error('[ACCEPT_DUPLICATE] Accept duplicate error', {
+            error: error?.message,
+            stack: error?.stack,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('שגיאה באישור כפילות', 'error');
+        console.groupEnd();
     });
 }
 
@@ -7162,7 +7263,30 @@ function acceptDuplicate(index, type) {
  * Reject duplicate
  */
 function rejectDuplicate(index, type) {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+        window.Logger?.warn('[REJECT_DUPLICATE] No session ID', { page: 'import-user-data' });
+        console.warn('🔍 [REJECT_DUPLICATE] ❌ No session ID available');
+        return;
+    }
+    
+    console.group('🔍 [REJECT_DUPLICATE] Starting reject duplicate process');
+    console.log('📋 Parameters:', { sessionId: currentSessionId, recordIndex: index, duplicateType: type });
+    
+    // Log current preview data state BEFORE reject
+    const beforeState = {
+        recordsToImport: previewData?.records_to_import?.length || 0,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        previewDataExists: !!previewData
+    };
+    console.log('📊 Before reject:', beforeState);
+    
+    window.Logger?.info('[REJECT_DUPLICATE] Starting reject duplicate', {
+        sessionId: currentSessionId,
+        recordIndex: index,
+        duplicateType: type,
+        beforeState,
+        page: 'import-user-data'
+    });
     
     fetch(`/api/user-data-import/session/${currentSessionId}/reject-duplicate`, {
             method: 'POST',
@@ -7174,22 +7298,43 @@ function rejectDuplicate(index, type) {
             duplicate_type: type
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [REJECT_DUPLICATE] API Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [REJECT_DUPLICATE] API Response data:', data);
+        
         if (handleAccountLinkingBlockingResponse(data, 'reject-duplicate')) {
+            console.warn('⚠️ [REJECT_DUPLICATE] Account linking required');
+            console.groupEnd();
             return;
         }
         if (data.success || data.status === 'success') {
+            console.log('✅ [REJECT_DUPLICATE] Backend rejected successfully');
             showImportUserDataNotification('כפילות נדחתה', 'success');
-            // Refresh preview data
-            refreshPreviewData();
+            
+            // Refresh preview data - wait a bit to ensure backend commit is complete
+            console.log('🔄 [REJECT_DUPLICATE] Waiting 100ms before refreshing preview...');
+            setTimeout(() => {
+                console.log('🔄 [REJECT_DUPLICATE] Refreshing preview data...');
+                refreshPreviewData();
+            }, 100);
         } else {
+            console.error('❌ [REJECT_DUPLICATE] Backend returned error:', data.error);
             showImportUserDataNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
         }
+        console.groupEnd();
     })
     .catch(error => {
-        window.Logger.error('Reject duplicate error:', error);
+        console.error('❌ [REJECT_DUPLICATE] Fetch error:', error);
+        window.Logger?.error('[REJECT_DUPLICATE] Reject duplicate error', {
+            error: error?.message,
+            stack: error?.stack,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('שגיאה בדחיית כפילות', 'error');
+        console.groupEnd();
     });
 }
 
@@ -8007,6 +8152,7 @@ function displayProblemResolutionDetailed(data) {
                     <th>מטבע</th>
                     <th>תאריך</th>
                     <th>חשבון</th>
+                    <th>תאריך ושעה</th>
                     <th>רמת ביטחון</th>
                     <th class="text-center">פעולות</th>
                 `;
@@ -8019,6 +8165,7 @@ function displayProblemResolutionDetailed(data) {
                     <th>מטבע</th>
                     <th>תאריך</th>
                     <th>חשבון</th>
+                    <th>תאריך ושעה</th>
                     <th>רמת ביטחון</th>
                     <th class="text-center">פעולות</th>
                 `;
@@ -8382,7 +8529,7 @@ function displayWithinFileDuplicates(duplicates, activeMatchIndexSet = new Set()
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(7, 'אין כפילויות פעילות בקובץ.');
+        tableBody.innerHTML = renderTableEmptyRow(8, 'אין כפילויות פעילות בקובץ.');
         markProblemTableReady('withinFileDuplicatesTable');
         return;
     }
@@ -8681,12 +8828,14 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
     let col3 = escapeHtml(buildValueOrFallback(record?.quantity ?? duplicate.quantity, '—'));
     let col4 = escapeHtml(buildValueOrFallback(record?.price ?? duplicate.price, '—'));
     let col5 = escapeHtml(renderImportDate(record?.date || duplicate.date, '—'));
+    let col6 = escapeHtml(renderImportDateTime(record?.date || duplicate.date, '—')); // Date and time column
     // Cashflows-style mapping
     if (isCashflow) {
         const typeLabel = resolveCashflowTypeLabel(record?.cashflow_type);
         const amountStr = formatAmount(record?.amount ?? duplicate.amount ?? 0);
         const currencyStr = record?.currency || duplicate.currency || '—';
         const dateStr = escapeHtml(renderImportDate(record?.effective_date || duplicate.effective_date, '—'));
+        const dateTimeStr = escapeHtml(renderImportDateTime(record?.effective_date || duplicate.effective_date, '—')); // Date and time column
         const accountDisplay = (typeof window.getTradingAccountName === 'function' && record?.source_account)
             ? escapeHtml(window.getTradingAccountName(record.source_account))
             : escapeHtml(buildValueOrFallback(record?.source_account ?? duplicate.source_account, '-'));
@@ -8695,6 +8844,7 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
         col3 = escapeHtml(currencyStr);
         col4 = dateStr;
         col5 = accountDisplay;
+        col6 = dateTimeStr; // Date and time for cashflows
     }
     const confidence = duplicate.confidence_score || duplicate.confidence || 0;
     const confidenceClass = getConfidenceClass(confidence);
@@ -8735,6 +8885,7 @@ function renderDuplicateRow(duplicate, type, index, activeMatchIndexSet = new Se
             <td>${escapeHtml(col3)}</td>
             <td>${escapeHtml(col4)}</td>
             <td>${escapeHtml(col5)}</td>
+            <td>${escapeHtml(col6)}</td>
             <td><span class="confidence-text ${confidenceClass}">${confidence}%</span></td>
             <td class="text-center table-action-buttons">
                 ${acceptButton}
@@ -8774,33 +8925,11 @@ function renderDuplicateMatchRows(matches) {
         }
         const confidence = match.confidence_score || match.confidence || 0;
         const confidenceClass = getConfidenceClass(confidence);
-        const matchIndex = getPreviewRecordIndex(record, match, match.record_index);
 
-        const acceptMatchButton = `
-            <button
-                data-button-type="APPROVE"
-                data-variant="small"
-                data-onclick="acceptDuplicate(${matchIndex}, 'within_file_duplicate_match')"
-                data-text="אשר"
-                title="אשר רשומה תואמת"
-                aria-label="אשר רשומה תואמת">
-            </button>
-        `;
-
-        const rejectMatchButton = `
-            <button
-                data-button-type="REJECT"
-                data-variant="small"
-                data-onclick="rejectDuplicate(${matchIndex}, 'within_file_duplicate_match')"
-                data-text="דחה"
-                title="דחה רשומה תואמת"
-                aria-label="דחה רשומה תואמת">
-            </button>
-        `;
-
+        // Removed buttons from match rows - only main row has action buttons
         return `
             <tr class="duplicate-match-row">
-                <td colspan="7">
+                <td colspan="8">
                     <div class="duplicate-match-container">
                         <div class="duplicate-match-details">
                             <strong>רשומה תואמת:</strong>
@@ -8810,10 +8939,6 @@ function renderDuplicateMatchRows(matches) {
                             <span>${escapeHtml(m4)}</span>
                             <span>${escapeHtml(m5)}</span>
                             <span class="confidence-text ${confidenceClass}">${confidence}%</span>
-                        </div>
-                        <div class="duplicate-match-actions">
-                            ${acceptMatchButton}
-                            ${rejectMatchButton}
                         </div>
                     </div>
                 </td>
@@ -8835,23 +8960,71 @@ function getConfidenceClass(confidence) {
  * Refresh preview data after user actions
  */
 function refreshPreviewData() {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+        console.warn('🔍 [REFRESH_PREVIEW] ❌ No session ID available');
+        return;
+    }
+    
+    console.group('🔍 [REFRESH_PREVIEW] Refreshing preview data');
+    console.log('📋 Session ID:', currentSessionId);
+    console.log('📊 Current step:', currentStep);
+    
+    // Log current preview data state BEFORE refresh
+    const beforeState = {
+        recordsToImport: previewData?.records_to_import?.length || 0,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        previewDataExists: !!previewData
+    };
+    console.log('📊 Before refresh:', beforeState);
+    
+    window.Logger?.info('[REFRESH_PREVIEW] Refreshing preview data', {
+        sessionId: currentSessionId,
+        currentStep,
+        beforeState,
+        page: 'import-user-data'
+    });
     
     // Run refresh in background - don't block UI
     fetch(`/api/user-data-import/session/${currentSessionId}/refresh-preview`, {
         method: 'POST'
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [REFRESH_PREVIEW] API Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [REFRESH_PREVIEW] API Response data:', {
+            success: data.success || data.status === 'success',
+            hasPreviewData: !!data.preview_data,
+            recordsToImport: data.preview_data?.records_to_import?.length || 0,
+            recordsToSkip: data.preview_data?.records_to_skip?.length || 0
+        });
+        
         if (handleAccountLinkingBlockingResponse(data, 'refresh-preview')) {
+            console.warn('⚠️ [REFRESH_PREVIEW] Account linking required');
+            console.groupEnd();
             return;
         }
         if (data.success || data.status === 'success') {
+            const afterState = {
+                recordsToImport: data.preview_data?.records_to_import?.length || 0,
+                recordsToSkip: data.preview_data?.records_to_skip?.length || 0
+            };
+            console.log('📊 After refresh:', afterState);
+            console.log('📊 Change:', {
+                importDelta: afterState.recordsToImport - beforeState.recordsToImport,
+                skipDelta: afterState.recordsToSkip - beforeState.recordsToSkip
+            });
+            
             previewData = data.preview_data;
             updateSymbolMetadataCache(data.preview_data?.symbol_metadata || data.preview_data?.summary?.symbol_metadata);
             updateActiveSessionFromPreview(data.preview_data);
+            
+            console.log('🔄 [REFRESH_PREVIEW] Updating UI for step:', currentStep);
+            
             // Refresh the current step display only if modal is still open
             if (currentStep === 2) {
+                console.log('📋 [REFRESH_PREVIEW] Updating step 2 (problem resolution)');
                 displayProblemResolutionDetailed(data.preview_data);
                 // Also update missing tickers list explicitly
                 const summary = data.preview_data?.summary || {};
@@ -8860,19 +9033,28 @@ function refreshPreviewData() {
                     .concat(Array.isArray(summary.missing_tickers) ? summary.missing_tickers : []);
                 displayMissingTickers(missingTickers);
             } else if (currentStep === 3) {
+                console.log('📋 [REFRESH_PREVIEW] Updating step 3 (preview tables)');
+                // CRITICAL: Update both problem resolution AND preview tables in step 3
                 displayProblemResolutionDetailed(data.preview_data);
+                displayPreviewData(data.preview_data);
             } else if (currentStep === 4) {
+                console.log('📋 [REFRESH_PREVIEW] Updating step 4');
                 displayPreview(data.preview_data);
             }
+            
+            console.log('✅ [REFRESH_PREVIEW] Preview data refreshed successfully');
         } else {
+            console.error('❌ [REFRESH_PREVIEW] Backend returned error:', data.error);
             // Don't show error notification if modal is closed - user already moved on
             if (document.getElementById('importUserDataModal')?.classList.contains('show')) {
                 showImportUserDataNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
             }
         }
+        console.groupEnd();
     })
     .catch(error => {
-        window.Logger?.warn('[Import Modal] Refresh preview error (non-blocking)', {
+        console.error('❌ [REFRESH_PREVIEW] Fetch error:', error);
+        window.Logger?.warn('[REFRESH_PREVIEW] Refresh preview error (non-blocking)', {
             error: error?.message,
             page: 'import-user-data'
         });
@@ -8880,6 +9062,7 @@ function refreshPreviewData() {
         if (document.getElementById('importUserDataModal')?.classList.contains('show')) {
             showImportUserDataNotification('שגיאה ברענון התצוגה', 'error');
         }
+        console.groupEnd();
     });
 }
 
@@ -9106,7 +9289,6 @@ window.resetFile = resetFile;
 window.confirmImport = confirmImport;
 window.proceedToPreviewFromProblems = proceedToPreviewFromProblems;
 window.proceedToProblemResolution = proceedToProblemResolution;
-window.resumeActiveImportSession = resumeActiveImportSession;
 window.getImportDebugState = getImportDebugState;
 window.linkExternalAccountToTradingAccount = linkExternalAccountToTradingAccount;
 window.confirmAutoLinkedAccount = confirmAutoLinkedAccount;
@@ -9161,7 +9343,10 @@ function renderExecutionProblemSections(data) {
 
 function renderExecutionStyleProblems(data) {
     const skipRecords = data.records_to_skip || [];
-    const withinFileDuplicates = skipRecords.filter(record => record.reason === 'within_file_duplicate');
+    // Filter out rejected duplicates - they should not be displayed
+    const withinFileDuplicates = skipRecords.filter(record => 
+        record.reason === 'within_file_duplicate' && !record.rejected
+    );
     const activeMatchIndexSet = new Set(
         skipRecords
             .filter(record => record.reason === 'within_file_duplicate_match' && typeof record.record_index === 'number')
@@ -9170,7 +9355,10 @@ function renderExecutionStyleProblems(data) {
 
     displayWithinFileDuplicates(withinFileDuplicates, activeMatchIndexSet);
 
-    const existingRecords = skipRecords.filter(record => record.reason === 'existing_record');
+    // Filter out rejected existing records - they should not be displayed
+    const existingRecords = skipRecords.filter(record => 
+        record.reason === 'existing_record' && !record.rejected
+    );
     displayExistingRecords(existingRecords);
 }
 
@@ -9472,7 +9660,6 @@ function applyEntityTypeToImportButtons(entityType = 'cash_flow') {
         'analysisContinueBtn',
         'confirmImportHeaderBtn',
         'confirmImportAndReportHeaderBtn',
-        'resetImportSessionBtn',
         'cancelImportStepBtn'
     ];
 

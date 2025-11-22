@@ -123,8 +123,8 @@ def create_production_database():
     """Create production database from development database"""
     
     # Paths
-    source_db = backend_dir / "db" / "simpleTrade_new.db"
-    target_db = backend_dir / "db" / "TikTrack_DB.db"
+    source_db = backend_dir / "db" / "tiktrack.db"
+    target_db = backend_dir / "db" / "tiktrack.db"
     
     # Check if source database exists
     if not source_db.exists():
@@ -133,7 +133,7 @@ def create_production_database():
     
     # Backup target if exists
     if target_db.exists():
-        backup_path = backend_dir / "db" / f"TikTrack_DB_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        backup_path = backend_dir / "db" / f"tiktrack_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
         print(f"📦 Backing up existing production database to: {backup_path}")
         shutil.copy2(target_db, backup_path)
     
@@ -271,6 +271,30 @@ def create_production_database():
                     print(f"  ✅ Created trigger")
                 except Exception as e:
                     print(f"  ⚠️  Could not create trigger: {e}")
+        target_conn.commit()
+        print()
+        
+        # Step 8.5: Run ticker_provider_symbols migration if needed
+        print("Step 8.5: Running ticker_provider_symbols migration...")
+        target_cursor = target_conn.cursor()
+        target_cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='table' AND name='ticker_provider_symbols'
+        """)
+        if not target_cursor.fetchone():
+            # Table doesn't exist - run migration
+            try:
+                from migrations.create_ticker_provider_symbols_table import run_migration
+                migration_success = run_migration(str(target_db))
+                if migration_success:
+                    print("  ✅ ticker_provider_symbols table created via migration")
+                else:
+                    print("  ⚠️  Migration script returned False - table may not have been created")
+            except Exception as e:
+                print(f"  ⚠️  Could not run migration: {e}")
+                print("  ℹ️  You may need to run migration manually")
+        else:
+            print("  ✅ ticker_provider_symbols table already exists")
         target_conn.commit()
         print()
         

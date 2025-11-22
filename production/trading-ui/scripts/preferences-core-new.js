@@ -582,8 +582,8 @@ class PreferencesCore {
    * @example
    * const allPrefs = await window.PreferencesCore.getAllPreferences(1, 2);
    */
-  async getAllPreferences(userId = null, profileId = null, criticalPrefs = []) {
-    // For default profile, use 0 explicitly
+  async getAllPreferences(userId = null, profileId = null, criticalPrefs = [], forceRefresh = false) {
+// For default profile, use 0 explicitly
     const finalUserId = userId || this.currentUserId;
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
@@ -601,15 +601,26 @@ class PreferencesCore {
       try {
         const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
 
-        // Check cache first via UnifiedCacheManager
-        if (window.UnifiedCacheManager) {
-          const cached = await window.UnifiedCacheManager.get(cacheKey, {
-            layer: 'localStorage',
-            ttl: 300000,
-          });
-          if (cached !== null) {
-            window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
-            return cached;
+        // If forceRefresh is true, skip cache and load from server
+        if (!forceRefresh) {
+          // Check cache first via UnifiedCacheManager
+          if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get(cacheKey, {
+              layer: 'localStorage',
+              ttl: 300000,
+            });
+            if (cached !== null) {
+              window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
+              return cached;
+            }
+          }
+        } else {
+          // Force refresh: clear cache first
+          window.Logger.info('🔄 Force refresh: clearing cache before loading from server', { page: 'preferences-core-new' });
+          if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
+            const prefixedKey = `tiktrack_${cacheKey}`;
+            await window.UnifiedCacheManager.remove(prefixedKey, { layer: 'localStorage' });
           }
         }
 
@@ -1054,7 +1065,9 @@ class PreferencesCore {
      */
   async initializeWithLazyLoading(userId = null, profileId = null) {
     try {
-      window.Logger.info('🚀 Initializing preferences with lazy loading...', { page: 'preferences-core-new' });
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('🚀 Initializing preferences with lazy loading...', { page: 'preferences-core-new' });
+      }
 
       // Update current profile if provided
       if (userId !== null && profileId !== null) {
@@ -1073,17 +1086,35 @@ class PreferencesCore {
           finalUserId,
           finalProfileId,
         );
-        window.Logger.info('✅ Lazy loading initialized', { page: 'preferences-core-new' });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('✅ Lazy loading initialized', { page: 'preferences-core-new' });
+        }
       } else {
-        window.Logger.warn('⚠️ LazyLoader not available, using standard loading', { page: 'preferences-core-new' });
+        if (window.Logger && typeof window.Logger.warn === 'function') {
+          window.Logger.warn('⚠️ LazyLoader not available, using standard loading', { page: 'preferences-core-new' });
+        }
         // Fallback to standard loading
         await this.getAllPreferences(userId, profileId);
       }
 
     } catch (error) {
-      window.Logger.error('❌ Error initializing lazy loading:', error, { page: 'preferences-core-new' });
+      // Handle error gracefully - Logger may not be available
+      if (window.Logger && typeof window.Logger.error === 'function') {
+        window.Logger.error('❌ Error initializing lazy loading:', error, { page: 'preferences-core-new' });
+      } else {
+        console.warn('⚠️ Error initializing lazy loading:', error);
+      }
       // Fallback to standard loading
-      await this.getAllPreferences(userId, profileId);
+      try {
+        await this.getAllPreferences(userId, profileId);
+      } catch (fallbackError) {
+        // If fallback also fails, just log and continue
+        if (window.Logger && typeof window.Logger.warn === 'function') {
+          window.Logger.warn('⚠️ Fallback loading also failed:', fallbackError, { page: 'preferences-core-new' });
+        } else {
+          console.warn('⚠️ Fallback loading also failed:', fallbackError);
+        }
+      }
     }
   }
 }

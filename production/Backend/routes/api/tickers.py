@@ -23,6 +23,8 @@ from config.database import get_db
 from services.ticker_service import TickerService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.tag_service import TagService
+from services.date_normalization_service import DateNormalizationService
+from services.preferences_service import PreferencesService
 import logging
 from typing import Dict, Any, Optional
 
@@ -37,6 +39,21 @@ tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/tickers')
 
 # Initialize base API
 base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
+
+# Initialize preferences service for date normalization
+preferences_service = PreferencesService()
+
+def _get_tickers_normalizer() -> DateNormalizationService:
+    """Resolve timezone and create a DateNormalizationService for tickers endpoints."""
+    try:
+        timezone_name = DateNormalizationService.resolve_timezone(
+            request,
+            preferences_service=preferences_service
+        )
+        return DateNormalizationService(timezone_name)
+    except Exception as e:
+        logger.warning(f"Failed to resolve timezone for tickers, using UTC: {str(e)}")
+        return DateNormalizationService("UTC")
 
 @tickers_bp.route('/', methods=['GET'])
 @handle_database_session()
@@ -108,6 +125,23 @@ def get_ticker(ticker_id: int):
             # Add market data like in get_all method
             ticker_dict = ticker.to_dict()
             
+            # Add provider symbol mappings if they exist
+            try:
+                from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                logger.info(f"🔍 Attempting to load provider symbol mappings for ticker {ticker_id}")
+                mappings = TickerSymbolMappingService.get_all_mappings(db, ticker_id)
+                logger.info(f"🔍 get_all_mappings returned {len(mappings) if mappings else 0} mappings")
+                if mappings:
+                    ticker_dict['provider_symbols'] = mappings
+                    logger.info(f"✅ Loaded {len(mappings)} provider symbol mapping(s) for ticker {ticker_id}")
+                else:
+                    logger.info(f"⚠️ No provider symbol mappings found for ticker {ticker_id}")
+            except Exception as mapping_error:
+                # Log but don't fail - mappings are optional
+                logger.error(f"❌ Could not load provider symbol mappings for ticker {ticker_id}: {str(mapping_error)}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+            
             # Try to get market data, but don't fail if database is corrupted
             try:
                 from models.external_data import MarketDataQuote
@@ -160,6 +194,7 @@ def check_linked_items(ticker_id: int):
     try:
         print(f"Starting check_linked_items for ticker {ticker_id}")
         db: Session = next(get_db())
+        normalizer = _get_tickers_normalizer()
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -167,6 +202,7 @@ def check_linked_items(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             }), 404
         
@@ -177,6 +213,9 @@ def check_linked_items(ticker_id: int):
             print(f"About to call check_linked_items_generic for ticker {ticker_id}")
             linked_items = TickerService.check_linked_items_generic(db, 'ticker', ticker_id)
             print(f"Successfully called check_linked_items_generic, result: {linked_items}")
+            
+            # Normalize dates in linked_items
+            normalized_linked_items = normalizer.normalize_output(linked_items)
         except Exception as e:
             logger.error(f"Error in check_linked_items_generic: {str(e)}")
             print(f"Error in check_linked_items_generic: {str(e)}")
@@ -185,13 +224,15 @@ def check_linked_items(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": f"Failed to check linked items: {str(e)}"},
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             }), 500
         
         return jsonify({
             "status": "success",
-            "data": linked_items,
+            "data": normalized_linked_items,
             "message": "Linked items check completed",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
     except Exception as e:
@@ -199,9 +240,11 @@ def check_linked_items(ticker_id: int):
         print(f"Main error checking linked items for ticker {ticker_id}: {str(e)}")
         import traceback
         traceback.print_exc()
+        normalizer = _get_tickers_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to check linked items"},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:
@@ -224,23 +267,66 @@ def create_ticker():
         # Use the session from the decorator (in g.db)
         db: Session = g.db
         
+        # Extract provider_symbols if provided (optional field)
+        provider_symbols = data.pop('provider_symbols', None)
+        
         # Create the ticker first
         try:
             ticker = TickerService.create(db, data)
         except Exception as e:
             error_msg = str(e)
-            if "UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg:
+            # Handle both SQLite and PostgreSQL unique constraint errors
+            is_unique_error = (
+                ("UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg) or
+                ("UniqueViolation" in error_msg or "duplicate key value violates unique constraint" in error_msg) and
+                ("ix_tickers_symbol" in error_msg or "tickers.symbol" in error_msg)
+            )
+            if is_unique_error:
+                # Rollback session before returning error response
+                db.rollback()
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת"},
                     "version": "1.0"
                 }), 400
             else:
+                # Rollback session on other errors
+                db.rollback()
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},
                     "version": "1.0"
                 }), 400
+        
+        # Create provider symbol mappings if provided
+        if provider_symbols and isinstance(provider_symbols, dict):
+            try:
+                from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                from models.external_data import ExternalDataProvider
+                
+                for provider_name, provider_symbol in provider_symbols.items():
+                    if provider_symbol and isinstance(provider_symbol, str):
+                        provider = db.query(ExternalDataProvider).filter(
+                            ExternalDataProvider.name == provider_name
+                        ).first()
+                        
+                        if provider:
+                            TickerSymbolMappingService.set_provider_symbol(
+                                db,
+                                ticker.id,
+                                provider.id,
+                                provider_symbol.strip(),
+                                is_primary=True
+                            )
+                            logger.info(
+                                f"Created provider symbol mapping for ticker {ticker.symbol} (ID: {ticker.id}): "
+                                f"{provider_name} -> {provider_symbol}"
+                            )
+                        else:
+                            logger.warning(f"Provider '{provider_name}' not found - skipping mapping")
+            except Exception as e:
+                logger.warning(f"Failed to create provider symbol mappings: {e}")
+                # Don't fail ticker creation if mapping fails
         
         # AFTER creating the ticker, try to fetch and cache external data
         external_data_available = False
@@ -274,8 +360,9 @@ def create_ticker():
             # Initialize adapter with database session
             yahoo_adapter = YahooFinanceAdapter(db, provider.id)
             
-            # Now try to get and cache quote for the newly created ticker (using enhanced method)
-            quote_data = yahoo_adapter._get_enhanced_quote_data(data['symbol'])
+            # Now try to get and cache quote for the newly created ticker
+            # Use ticker object to enable provider symbol mapping
+            quote_data = yahoo_adapter.get_quote(ticker.symbol, ticker=ticker)
             if quote_data and quote_data.price:
                 external_data_available = True
                 logger.info(f"✅ External data fetched and cached for new ticker {data['symbol']}: ${quote_data.price}")
@@ -366,9 +453,46 @@ def update_ticker(ticker_id: int):
                     "version": "1.0"
                 }), 400
         
+        # Extract provider_symbols if provided (optional field)
+        provider_symbols = data.pop('provider_symbols', None)
+        
         # Update ticker
         ticker = TickerService.update(db, ticker_id, data)
         if ticker:
+            # Update provider symbol mappings if provided
+            if provider_symbols is not None:
+                try:
+                    from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                    from models.external_data import ExternalDataProvider
+                    
+                    if isinstance(provider_symbols, dict):
+                        # Update/create mappings
+                        for provider_name, provider_symbol in provider_symbols.items():
+                            if provider_symbol and isinstance(provider_symbol, str):
+                                provider = db.query(ExternalDataProvider).filter(
+                                    ExternalDataProvider.name == provider_name
+                                ).first()
+                                
+                                if provider:
+                                    TickerSymbolMappingService.set_provider_symbol(
+                                        db,
+                                        ticker.id,
+                                        provider.id,
+                                        provider_symbol.strip(),
+                                        is_primary=True
+                                    )
+                                    logger.info(
+                                        f"Updated provider symbol mapping for ticker {ticker.symbol} (ID: {ticker.id}): "
+                                        f"{provider_name} -> {provider_symbol}"
+                                    )
+                                else:
+                                    logger.warning(f"Provider '{provider_name}' not found - skipping mapping")
+                    elif provider_symbols == {}:
+                        # Empty dict means delete all mappings (optional - not implemented for safety)
+                        logger.debug("Empty provider_symbols dict provided - no mappings deleted (safety)")
+                except Exception as e:
+                    logger.warning(f"Failed to update provider symbol mappings: {e}")
+                    # Don't fail ticker update if mapping fails
             return jsonify({
                 "status": "success",
                 "data": ticker.to_dict(),
@@ -388,6 +512,42 @@ def update_ticker(ticker_id: int):
             "version": "1.0"
         }), 400
     # Don't close db here - handle_database_session decorator will do it
+
+@tickers_bp.route('/<int:ticker_id>/provider-symbols', methods=['GET'])
+@handle_database_session(auto_commit=False, auto_close=True)
+def get_ticker_provider_symbols(ticker_id: int):
+    """Get all provider symbol mappings for a ticker"""
+    try:
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
+        
+        # Check that ticker exists
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "1.0"
+            }), 404
+        
+        # Get all mappings
+        from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+        mappings = TickerSymbolMappingService.get_all_mappings(db, ticker_id)
+        
+        return jsonify({
+            "status": "success",
+            "data": mappings,
+            "message": f"Retrieved {len(mappings)} provider symbol mappings",
+            "version": "1.0"
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting provider symbols for ticker {ticker_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "1.0"
+        }), 500
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
@@ -465,12 +625,14 @@ def update_active_trades(ticker_id: int):
     """Update only the active_trades field for a ticker"""
     try:
         db: Session = next(get_db())
+        normalizer = _get_tickers_normalizer()
         ticker = TickerService.get_by_id(db, ticker_id)
         
         if not ticker:
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             }), 404
         
@@ -496,18 +658,24 @@ def update_active_trades(ticker_id: int):
         
         logger.info(f"Updated active_trades for ticker {ticker_id} to {ticker.active_trades} (trades: {active_trades}, plans: {active_plans})")
         
+        # Normalize dates in ticker dict
+        ticker_dict = normalizer.normalize_output(ticker.to_dict())
+        
         return jsonify({
             "status": "success",
-            "data": ticker.to_dict(),
+            "data": ticker_dict,
             "message": "Active trades field updated successfully",
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         })
         
     except Exception as e:
         logger.error(f"Error updating active_trades for ticker {ticker_id}: {str(e)}")
+        normalizer = _get_tickers_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:
@@ -578,6 +746,7 @@ def update_ticker_status_auto(ticker_id: int):
     """Update ticker status automatically based on linked trades and trade plans"""
     try:
         db: Session = next(get_db())
+        normalizer = _get_tickers_normalizer()
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -585,6 +754,7 @@ def update_ticker_status_auto(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             }), 404
         
@@ -593,24 +763,30 @@ def update_ticker_status_auto(ticker_id: int):
         if success:
             # Get updated ticker
             updated_ticker = TickerService.get_by_id(db, ticker_id)
+            # Normalize dates in ticker dict
+            ticker_dict = normalizer.normalize_output(updated_ticker.to_dict())
             return jsonify({
                 "status": "success",
-                "data": updated_ticker.to_dict(),
+                "data": ticker_dict,
                 "message": "Ticker status updated automatically",
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             })
         else:
             return jsonify({
                 "status": "error",
                 "error": {"message": "Failed to update ticker status"},
+                "timestamp": normalizer.now_envelope(),
                 "version": "1.0"
             }), 500
         
     except Exception as e:
         logger.error(f"Error updating ticker status auto {ticker_id}: {str(e)}")
+        normalizer = _get_tickers_normalizer()
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
+            "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
     finally:

@@ -1,0 +1,73 @@
+{
+  "start_time": "2025-11-20T18:20:45.016757",
+  "steps": [
+    {
+      "number": 5,
+      "name": "sync_code",
+      "success": true,
+      "duration_seconds": 0.3370349407196045,
+      "timestamp": "2025-11-20T18:20:45.360414",
+      "details": {
+        "success": true
+      }
+    }
+  ],
+  "files_updated": [
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T18:20:45.227835",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/demo_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T18:20:45.227839",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/ibkr_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T18:20:45.227845",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: scripts/map_active_files.py"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-20T18:20:45.227855",
+      "details": {
+        "action": "sync",
+        "details": "✅ Copied: 168 files"
+      }
+    },
+    {
+      "path": "production/trading-ui/*",
+      "timestamp": "2025-11-20T18:20:45.360372",
+      "details": {
+        "action": "sync",
+        "details": "✅ Successfully copied 511 files"
+      }
+    }
+  ],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [],
+  "summary": {
+    "total_duration_seconds": 0.343906,
+    "steps_completed": 1,
+    "steps_failed": 0,
+    "files_updated_count": 5,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 0
+  },
+  "end_time": "2025-11-20T18:20:45.360663",
+  "success": true
+}

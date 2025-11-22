@@ -36,13 +36,13 @@ class TradingAccount(BaseModel):
     # Database columns - matching actual database schema
     name = Column(String(100), nullable=False)
     currency_id = Column(Integer, ForeignKey('currencies.id'), nullable=False)  # Foreign key to currencies table
-    external_account_number = Column(String(64), unique=True, nullable=True)
     status = Column(String(20), default='open')
     cash_balance = Column(Float, default=0)  # Exists in DB - deprecated, use /api/account-activity/<account_id>/balances for real-time calculation
     opening_balance = Column(Float, default=0.0, nullable=True)  # Opening balance in base currency
     total_value = Column(Float, default=0)
     total_pl = Column(Float, default=0)  # Not updated - shows "בפיתוח" in UI
     notes = Column(String(5000))
+    external_account_number = Column(String(64), nullable=True, unique=True)  # External broker account number for IBKR import matching
     
     # Relationships with other entities
     # Currency relationship
@@ -84,12 +84,12 @@ class TradingAccount(BaseModel):
             'currency_symbol': self.currency.symbol if self.currency else None,
             'currency_name': self.currency.name if self.currency else None,
             'status': self.status,
-            'external_account_number': self.external_account_number,
             # cash_balance removed - use /api/account-activity/<account_id>/balances for real-time calculation
             'opening_balance': self.opening_balance if self.opening_balance is not None else 0.0,
             'total_value': self.total_value,
             'total_pl': self.total_pl,  # Not updated - shows "בפיתוח" in UI
             'notes': self.notes,
+            'external_account_number': self.external_account_number,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
     

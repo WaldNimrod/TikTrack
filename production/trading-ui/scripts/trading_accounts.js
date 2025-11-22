@@ -1660,9 +1660,25 @@ function filterTradingAccountsLocally(trading_accounts, selectedStatuses, select
     filteredAccounts = filteredAccounts.filter(tradingAccount => {
       if (!tradingAccount.created_at) {return false;}
 
-      const accountDate = new Date(tradingAccount.created_at);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
+      // Use dateUtils for consistent date parsing
+      let accountDate;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        accountDate = window.dateUtils.toDateObject(tradingAccount.created_at);
+      } else {
+        accountDate = new Date(tradingAccount.created_at);
+      }
+      let start;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        start = window.dateUtils.toDateObject(startDate);
+      } else {
+        start = new Date(startDate);
+      }
+      let end;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        end = window.dateUtils.toDateObject(endDate);
+      } else {
+        end = new Date(endDate);
+      }
 
       // הגדרת זמן לתחילת היום לתאריך התחלה ולסוף היום לתאריך סיום
       start.setHours(0, 0, 0, 0);

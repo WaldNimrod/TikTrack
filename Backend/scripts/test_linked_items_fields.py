@@ -41,7 +41,7 @@ REQUIRED_FIELDS = {
 def get_db_connection():
     """Get database connection"""
     # Use Backend directory as base
-    DB_PATH = BACKEND_DIR / "db" / "simpleTrade_new.db"
+    DB_PATH = BACKEND_DIR / "db" / "tiktrack.db"
     
     conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row

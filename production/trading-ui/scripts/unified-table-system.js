@@ -240,14 +240,17 @@ class TableRegistry {
     const registryAwareGetter = () => {
       const registry = window.TableDataRegistry;
       if (registry) {
-        const registryFiltered = registry.getFilteredData(tableType, { asReference: true });
-        if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
-          return [...registryFiltered];
-        }
-
+        // CRITICAL FIX: Use getFullData first for sorting - sorting must be applied to ALL data
+        // Sorting must be applied to ALL data before pagination, not just current page
         const registryFull = registry.getFullData(tableType, { asReference: true });
         if (Array.isArray(registryFull) && registryFull.length > 0) {
           return [...registryFull];
+        }
+
+        // Fallback to filteredData if fullData is not available
+        const registryFiltered = registry.getFilteredData(tableType, { asReference: true });
+        if (Array.isArray(registryFiltered) && registryFiltered.length > 0) {
+          return [...registryFiltered];
         }
       }
 
@@ -421,9 +424,17 @@ class TableSorter {
 
       let data = config.dataGetter();
       if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
-        const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+        // CRITICAL FIX: Use getFullData instead of getFilteredData for sorting
+        // Sorting must be applied to ALL data, not just the current page
+        const registryData = window.TableDataRegistry.getFullData(tableType, { asReference: true });
         if (Array.isArray(registryData) && registryData.length > 0) {
           data = registryData;
+        } else {
+          // Fallback to filteredData if fullData is not available
+          const registryFilteredData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+          if (Array.isArray(registryFilteredData) && registryFilteredData.length > 0) {
+            data = registryFilteredData;
+          }
         }
       }
       if (!Array.isArray(data)) {
@@ -556,9 +567,17 @@ class TableSorter {
 
       let data = config.dataGetter();
       if ((!Array.isArray(data) || data.length === 0) && window.TableDataRegistry) {
-        const registryData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+        // CRITICAL FIX: Use getFullData instead of getFilteredData for sorting
+        // Sorting must be applied to ALL data, not just the current page
+        const registryData = window.TableDataRegistry.getFullData(tableType, { asReference: true });
         if (Array.isArray(registryData) && registryData.length > 0) {
           data = registryData;
+        } else {
+          // Fallback to filteredData if fullData is not available
+          const registryFilteredData = window.TableDataRegistry.getFilteredData(tableType, { asReference: true });
+          if (Array.isArray(registryFilteredData) && registryFilteredData.length > 0) {
+            data = registryFilteredData;
+          }
         }
       }
 

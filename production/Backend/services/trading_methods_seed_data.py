@@ -1,0 +1,310 @@
+"""
+Trading Methods Seed Data
+=========================
+Seed data for trading methods - extracted from migrations for production use.
+This file contains METHODS_DEFINITION that is used by trading_methods API.
+"""
+
+import json
+
+METHODS_DEFINITION = [
+    {
+        "name_en": "Moving Averages",
+        "name_he": "ממוצעים נעים",
+        "category": "technical_indicators",
+        "description_en": "Evaluate price action relative to configurable moving averages.",
+        "description_he": "ניתוח תנועת מחיר ביחס לממוצעים נעים ניתנים להגדרה.",
+        "icon_class": "fa-chart-line",
+        "sort_order": 10,
+        "parameters": [
+            {
+                "parameter_key": "ma_period",
+                "parameter_name_en": "Moving Average Period",
+                "parameter_name_he": "תקופת ממוצע נע",
+                "parameter_type": "period",
+                "default_value": "20",
+                "min_value": "1",
+                "max_value": "200",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 1
+            },
+            {
+                "parameter_key": "ma_type",
+                "parameter_name_en": "Moving Average Type",
+                "parameter_name_he": "סוג ממוצע נע",
+                "parameter_type": "dropdown",
+                "default_value": "SMA",
+                "validation_rule": json.dumps({"allowed_values": ["SMA", "EMA", "WMA"]}, ensure_ascii=False),
+                "is_required": True,
+                "sort_order": 2
+            },
+            {
+                "parameter_key": "comparison_type",
+                "parameter_name_en": "Comparison Type",
+                "parameter_name_he": "סוג השוואה",
+                "parameter_type": "dropdown",
+                "default_value": "above",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["above", "below", "cross_up", "cross_down"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 3
+            }
+        ]
+    },
+    {
+        "name_en": "Volume Analysis",
+        "name_he": "ניתוח נפח",
+        "category": "volume_analysis",
+        "description_en": "Identify unusual trading activity based on configurable volume thresholds.",
+        "description_he": "זיהוי פעילות מסחר חריגה על בסיס ספי נפח מוגדרים.",
+        "icon_class": "fa-water",
+        "sort_order": 20,
+        "parameters": [
+            {
+                "parameter_key": "volume_period",
+                "parameter_name_en": "Volume Lookback Period",
+                "parameter_name_he": "תקופת נפח להשוואה",
+                "parameter_type": "period",
+                "default_value": "20",
+                "min_value": "5",
+                "max_value": "200",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 1
+            },
+            {
+                "parameter_key": "volume_multiplier",
+                "parameter_name_en": "Volume Multiplier",
+                "parameter_name_he": "מכפיל נפח",
+                "parameter_type": "number",
+                "default_value": "1.5",
+                "min_value": "0.1",
+                "max_value": "10",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 2
+            },
+            {
+                "parameter_key": "comparison_type",
+                "parameter_name_en": "Comparison Type",
+                "parameter_name_he": "סוג השוואה",
+                "parameter_type": "dropdown",
+                "default_value": "above",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["above", "below"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 3
+            }
+        ]
+    },
+    {
+        "name_en": "Support & Resistance",
+        "name_he": "תמיכה והתנגדות",
+        "category": "support_resistance",
+        "description_en": "Track proximity and interaction with key price levels.",
+        "description_he": "מעקב אחר קרבה והתנהגות סביב רמות מחיר מרכזיות.",
+        "icon_class": "fa-bullseye",
+        "sort_order": 30,
+        "parameters": [
+            {
+                "parameter_key": "level_price",
+                "parameter_name_en": "Level Price",
+                "parameter_name_he": "מחיר רמה",
+                "parameter_type": "price",
+                "default_value": None,
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 1
+            },
+            {
+                "parameter_key": "level_type",
+                "parameter_name_en": "Level Type",
+                "parameter_name_he": "סוג רמה",
+                "parameter_type": "dropdown",
+                "default_value": "support",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["support", "resistance"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 2
+            },
+            {
+                "parameter_key": "tolerance_pct",
+                "parameter_name_en": "Tolerance (%)",
+                "parameter_name_he": "אחוז סבילות",
+                "parameter_type": "percentage",
+                "default_value": "2.0",
+                "min_value": "0.1",
+                "max_value": "10",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 3
+            },
+            {
+                "parameter_key": "comparison_type",
+                "parameter_name_en": "Comparison Type",
+                "parameter_name_he": "סוג השוואה",
+                "parameter_type": "dropdown",
+                "default_value": "near",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["near", "above", "below", "break_up", "break_down"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 4
+            }
+        ]
+    },
+    {
+        "name_en": "Trend Lines",
+        "name_he": "קווי מגמה",
+        "category": "trend_analysis",
+        "description_en": "Evaluate price interaction with calculated trend lines.",
+        "description_he": "הערכת התנהגות המחיר מול קווי מגמה מחושבים.",
+        "icon_class": "fa-chart-trend-up",
+        "sort_order": 40,
+        "parameters": [
+            {
+                "parameter_key": "trend_type",
+                "parameter_name_en": "Trend Type",
+                "parameter_name_he": "סוג מגמה",
+                "parameter_type": "dropdown",
+                "default_value": "uptrend",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["uptrend", "downtrend"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 1
+            },
+            {
+                "parameter_key": "lookback_period",
+                "parameter_name_en": "Lookback Period",
+                "parameter_name_he": "תקופת בדיקה",
+                "parameter_type": "period",
+                "default_value": "20",
+                "min_value": "10",
+                "max_value": "200",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 2
+            },
+            {
+                "parameter_key": "comparison_type",
+                "parameter_name_en": "Comparison Type",
+                "parameter_name_he": "סוג השוואה",
+                "parameter_type": "dropdown",
+                "default_value": "bounce",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["bounce", "break_up", "break_down"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 3
+            },
+            {
+                "parameter_key": "tolerance_pct",
+                "parameter_name_en": "Tolerance (%)",
+                "parameter_name_he": "אחוז סבילות",
+                "parameter_type": "percentage",
+                "default_value": "3.0",
+                "min_value": "0.5",
+                "max_value": "10",
+                "validation_rule": None,
+                "is_required": False,
+                "sort_order": 4
+            }
+        ]
+    },
+    {
+        "name_en": "Technical Patterns",
+        "name_he": "דפוסים טכניים",
+        "category": "price_patterns",
+        "description_en": "Detect classical technical patterns with configurable confidence.",
+        "description_he": "זיהוי דפוסים טכניים קלאסיים עם רמת ביטחון ניתנת להגדרה.",
+        "icon_class": "fa-wave-square",
+        "sort_order": 50,
+        "parameters": [
+            {
+                "parameter_key": "pattern_type",
+                "parameter_name_en": "Pattern Type",
+                "parameter_name_he": "סוג דפוס",
+                "parameter_type": "dropdown",
+                "default_value": "cup_handle",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["cup_handle", "head_shoulders", "triangle"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 1
+            },
+            {
+                "parameter_key": "lookback_period",
+                "parameter_name_en": "Lookback Period",
+                "parameter_name_he": "תקופת בדיקה",
+                "parameter_type": "period",
+                "default_value": "30",
+                "min_value": "10",
+                "max_value": "200",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 2
+            }
+        ]
+    },
+    {
+        "name_en": "Fibonacci Retracement",
+        "name_he": "פיבונאצ'י",
+        "category": "fibonacci",
+        "description_en": "Monitor Fibonacci retracement zones and golden levels.",
+        "description_he": "מעקב אחר אזורי פיבונאצ'י ואזורי הזהב.",
+        "icon_class": "fa-divide",
+        "sort_order": 60,
+        "parameters": [
+            {
+                "parameter_key": "lookback_period",
+                "parameter_name_en": "Lookback Period",
+                "parameter_name_he": "תקופת בדיקה",
+                "parameter_type": "period",
+                "default_value": "20",
+                "min_value": "10",
+                "max_value": "200",
+                "validation_rule": None,
+                "is_required": True,
+                "sort_order": 1
+            },
+            {
+                "parameter_key": "comparison_type",
+                "parameter_name_en": "Comparison Type",
+                "parameter_name_he": "סוג השוואה",
+                "parameter_type": "dropdown",
+                "default_value": "in_zone",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["in_zone", "above", "below"]},
+                    ensure_ascii=False
+                ),
+                "is_required": True,
+                "sort_order": 2
+            },
+            {
+                "parameter_key": "fib_type",
+                "parameter_name_en": "Fibonacci Type",
+                "parameter_name_he": "סוג פיבונאצ'י",
+                "parameter_type": "dropdown",
+                "default_value": "retracement",
+                "validation_rule": json.dumps(
+                    {"allowed_values": ["retracement", "extension"]},
+                    ensure_ascii=False
+                ),
+                "is_required": False,
+                "sort_order": 3
+            }
+        ]
+    }
+]

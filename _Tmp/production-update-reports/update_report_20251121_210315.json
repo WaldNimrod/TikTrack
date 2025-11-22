@@ -1,0 +1,86 @@
+{
+  "start_time": "2025-11-21T21:03:15.026941",
+  "steps": [
+    {
+      "number": 8,
+      "name": "validate",
+      "success": true,
+      "duration_seconds": 0.14903664588928223,
+      "timestamp": "2025-11-21T21:03:15.184673",
+      "details": {
+        "success": true,
+        "results": {
+          "isolation": false,
+          "structure": false,
+          "post_validation": false,
+          "ui_tests": true
+        },
+        "warnings": true
+      }
+    },
+    {
+      "number": 9,
+      "name": "bump_version",
+      "success": true,
+      "duration_seconds": 0.033061981201171875,
+      "timestamp": "2025-11-21T21:03:15.218052",
+      "details": {
+        "success": true,
+        "new_version": "1.2.1.0"
+      }
+    },
+    {
+      "number": 10,
+      "name": "commit_push",
+      "success": false,
+      "duration_seconds": 0.23441600799560547,
+      "timestamp": "2025-11-21T21:03:15.452756",
+      "details": {
+        "success": false,
+        "error": "\n🚫 TikTrack version policy: commits on main/production must include both\n    • documentation/version-manifest.json\n    • documentation/{development|production}/VERSION_HISTORY.md\n\nRun the version bump helper, e.g.:\n\n  python3 scripts/versioning/bump-version.py \\\n    --env production --bump patch --note \"Describe change\"\n\nTo override in emergencies:\n\n  SKIP_VERSION_CHECK=1 git commit ...\n\n"
+      }
+    }
+  ],
+  "files_updated": [
+    {
+      "path": "documentation/version-manifest.json",
+      "timestamp": "2025-11-21T21:03:15.218039",
+      "details": {
+        "new_version": "1.2.1.0"
+      }
+    }
+  ],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [
+    {
+      "message": "Isolation verification had issues",
+      "step": "validate",
+      "timestamp": "2025-11-21T21:03:15.141640"
+    }
+  ],
+  "errors": [
+    {
+      "message": "Git operation failed: \n🚫 TikTrack version policy: commits on main/production must include both\n    • documentation/version-manifest.json\n    • documentation/{development|production}/VERSION_HISTORY.md\n\nRun the version bump helper, e.g.:\n\n  python3 scripts/versioning/bump-version.py \\\n    --env production --bump patch --note \"Describe change\"\n\nTo override in emergencies:\n\n  SKIP_VERSION_CHECK=1 git commit ...\n\n",
+      "step": "commit_push",
+      "timestamp": "2025-11-21T21:03:15.452712"
+    },
+    {
+      "message": "Step 10 (commit_push) failed",
+      "step": "commit_push",
+      "timestamp": "2025-11-21T21:03:15.452759"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.426256,
+    "steps_completed": 2,
+    "steps_failed": 1,
+    "files_updated_count": 1,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 1,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-21T21:03:15.453197",
+  "success": false
+}

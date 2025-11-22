@@ -912,13 +912,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          console.log('🏦 Initializing Trading Accounts...');
-          console.log('🔍 Checking function availability:');
-          console.log(
-            '  - loadTradingAccountsDataForTradingAccountsPage:',
-            typeof window.loadTradingAccountsDataForTradingAccountsPage
-          );
-          console.log('  - loadAccountsData:', typeof window.loadAccountsData);
+          // Function availability is tracked internally
           window.Logger.info('🏦 Initializing Trading Accounts...', {
             page: 'page-initialization-configs',
           });
@@ -939,7 +933,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               ? window.loadTradingAccountsDataForTradingAccountsPage
               : window.loadAccountsData;
           if (typeof loadTradingAccounts === 'function') {
-            console.log('📡 Calling trading accounts loader via service...');
+            // Removed debug log - service calls are tracked internally
             window.Logger.info('📡 Calling trading accounts loader via service...', {
               page: 'page-initialization-configs',
             });
@@ -2209,6 +2203,49 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger.info('✅ CRUD Testing Dashboard initialized successfully', {
             page: 'page-initialization-configs',
           });
+        },
+      ],
+    },
+
+    // Trade History Page (Mockup)
+    'trade-history-page': {
+      name: 'Trade History Page',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'preferences',
+        'entity-services',
+        'tradingview-charts',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'TradingViewChartAdapter',
+        'TradingViewTheme',
+        'window.LightweightCharts',
+      ],
+      description: 'עמוד היסטוריית טרייד - מוקאפ עם גרפים TradingView',
+      lastModified: '2025-01-27',
+      pageType: 'mockup',
+      preloadAssets: ['trades-data', 'executions-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('📊 Initializing Trade History Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Wait for TradingView to be available
+          if (typeof window.lightweightCharts === 'undefined') {
+            window.Logger.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
+              page: 'page-initialization-configs',
+            });
+          }
         },
       ],
     },

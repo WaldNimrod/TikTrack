@@ -3,7 +3,8 @@
 # ==================================
 # Removes backup files from production environment
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 PRODUCTION_DIR="$PROJECT_ROOT/production"
 
 echo "=" * 70

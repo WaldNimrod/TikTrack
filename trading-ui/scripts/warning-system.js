@@ -14,7 +14,7 @@
  * תאריך יצירה: ספטמבר 2025
  *
  * הועבר מ: notification-system.js (ארכיטקטורה מחודשת)
- *
+ * 
  * תלויות:
  * - notification-system.js (לפונקציית showErrorNotification)
  * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
@@ -163,12 +163,12 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   let callbacksInvoked = false;
 
   // פונקציה לזימון callbacks רק פעם אחת
-  const invokeCallbacks = isConfirm => {
+  const invokeCallbacks = (isConfirm) => {
     if (callbacksInvoked) {
       return;
     }
     callbacksInvoked = true;
-
+    
     if (isConfirm && typeof onConfirm === 'function') {
       onConfirm();
     } else if (!isConfirm && typeof onCancel === 'function') {
@@ -206,7 +206,7 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   };
 
   // סגירה בלחיצה על הרקע
-  modal.addEventListener('click', e => {
+  modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.dataset.cancelled = 'true';
       invokeCallbacks(false);
@@ -262,29 +262,12 @@ function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null
   showConfirmationDialog(title, message, onConfirm, onCancel, 'warning');
 }
 
-/**
- * Show cancel warning
- * WARNING SYSTEM - Shows warning for cancel operations
- *
- * @param {string} itemType - Type of item being cancelled
- * @param {string} itemName - Name/ID of item being cancelled
- * @param {string} itemTypeDisplay - Display name for item type
- * @param {Function} onConfirm - Callback for confirm action
- * @param {Function} onCancel - Callback for cancel action
- */
-function showCancelWarning(itemType, itemName, itemTypeDisplay, onConfirm = null, onCancel = null) {
-  const title = `ביטול ${itemTypeDisplay}`;
-  const message = `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?\n\nהסטטוס יעודכן ל"מבוטל".`;
-
-  showConfirmationDialog(title, message, onConfirm, onCancel, 'warning');
-}
-
 // ===== GLOBAL CONFIRM REPLACEMENT =====
 
 /**
  * Global confirm replacement - replaces all confirm() calls with custom dialog
  * This function should be used instead of the native confirm() function
- *
+ * 
  * @param {string} message - The confirmation message
  * @param {function} onConfirm - Callback function when user confirms
  * @param {function} onCancel - Callback function when user cancels (optional)
@@ -297,37 +280,37 @@ function globalConfirm(message, onConfirm, onCancel = null, title = 'אישור'
     message,
     onConfirm,
     onCancel,
-    color,
+    color
   );
 }
 
 /**
  * Override native confirm function globally
  * This replaces the browser's native confirm() with our custom dialog
- *
+ * 
  * IMPORTANT: This maintains backward compatibility by handling both sync and async patterns
  */
 function overrideNativeConfirm() {
   // Store original confirm function
   window._originalConfirm = window.confirm;
-
+  
   // Override confirm function - maintains backward compatibility
   window.confirm = function(message, title = 'אישור') {
     // Use custom confirmation dialog
     showConfirmationDialog(
       title,
       message,
-      () =>
+      () => {
         // User confirmed - continue execution
-        true
-      ,
-      () =>
+        return true;
+      },
+      () => {
         // User cancelled - stop execution
-        false
-      ,
-      'warning',
+        return false;
+      },
+      'warning'
     );
-
+    
     // Return false by default to prevent immediate execution
     // The actual logic will be handled by the dialog callbacks
     return false;
@@ -341,13 +324,13 @@ function overrideNativeConfirm() {
 function smartConfirmReplacement() {
   // Store original confirm function
   window._originalConfirm = window.confirm;
-
+  
   // Create a proxy that intercepts confirm calls
   window.confirm = new Proxy(window._originalConfirm, {
-    apply(target, thisArg, argumentsList) {
+    apply: function(target, thisArg, argumentsList) {
       const message = argumentsList[0];
       const title = argumentsList[1] || 'אישור';
-
+      
       // Show custom confirmation dialog
       showConfirmationDialog(
         title,
@@ -359,12 +342,12 @@ function smartConfirmReplacement() {
         () => {
           // User cancelled
         },
-        'warning',
+        'warning'
       );
-
+      
       // Return false to prevent immediate execution
       return false;
-    },
+    }
   });
 }
 
@@ -374,7 +357,6 @@ function smartConfirmReplacement() {
 window.showValidationWarning = showValidationWarning;
 window.showConfirmationDialog = showConfirmationDialog;
 window.showDeleteWarning = showDeleteWarning;
-window.showCancelWarning = showCancelWarning;
 window.globalConfirm = globalConfirm;
 window.overrideNativeConfirm = overrideNativeConfirm;
 
@@ -383,7 +365,6 @@ window.warningSystem = {
   showValidationWarning,
   showConfirmationDialog,
   showDeleteWarning,
-  showCancelWarning,
 };
 
 // בדיקת פונקציות בסוף טעינת warning-system.js

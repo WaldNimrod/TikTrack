@@ -1,0 +1,44 @@
+{
+  "start_time": "2025-11-21T20:29:30.728578",
+  "steps": [
+    {
+      "number": 5,
+      "name": "sync_code",
+      "success": false,
+      "duration_seconds": 0.023533105850219727,
+      "timestamp": "2025-11-21T20:29:30.762561",
+      "details": {
+        "success": false,
+        "error": "============================================================\nSyncing Active Files to Production\n============================================================\nSource: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend\nTarget: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/production/Backend\n\n❌ Source directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Backend sync failed: ============================================================\nSyncing Active Files to Production\n============================================================\nSource: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend\nTarget: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/production/Backend\n\n❌ Source directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend",
+      "step": "sync_code",
+      "timestamp": "2025-11-21T20:29:30.762520"
+    },
+    {
+      "message": "Step 5 (sync_code) failed",
+      "step": "sync_code",
+      "timestamp": "2025-11-21T20:29:30.762565"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.034514,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-21T20:29:30.763092",
+  "success": false
+}

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime, CheckConstraint
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, DateTime, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped
 from .base import BaseModel
 from typing import Dict, Any, Optional, List
@@ -81,6 +81,7 @@ class Ticker(BaseModel):
     market_quotes = relationship("MarketDataQuote", back_populates="ticker")
     intraday_slots = relationship("IntradayDataSlot", back_populates="ticker")
     last_quote = relationship("QuotesLast", back_populates="ticker", uselist=False)
+    provider_symbols = relationship("TickerProviderSymbol", back_populates="ticker", cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
         """String representation of the ticker"""
@@ -293,3 +294,64 @@ class Ticker(BaseModel):
             return True
         
         return False
+
+
+class TickerProviderSymbol(BaseModel):
+    """
+    Ticker Provider Symbol Mapping - maps internal ticker symbols to provider-specific symbols
+    
+    This model allows different external data providers to use different symbol formats
+    for the same ticker. For example, ticker "500X" might need "500X.MI" for Yahoo Finance.
+    
+    Attributes:
+        ticker_id (int): Reference to the ticker
+        provider_id (int): Reference to the external data provider
+        provider_symbol (str): The symbol format required by this provider
+        is_primary (bool): Whether this is the primary mapping for this provider
+        
+    Relationships:
+        ticker: The ticker this mapping belongs to
+        provider: The external data provider this mapping is for
+        
+    Example:
+        >>> mapping = TickerProviderSymbol(
+        ...     ticker_id=1,
+        ...     provider_id=1,  # Yahoo Finance
+        ...     provider_symbol="500X.MI",
+        ...     is_primary=True
+        ... )
+    """
+    __tablename__ = "ticker_provider_symbols"
+    __table_args__ = (
+        UniqueConstraint('ticker_id', 'provider_id', name='uq_ticker_provider_symbols_ticker_provider'),
+        {'extend_existing': True}
+    )
+    
+    ticker_id = Column(Integer, ForeignKey('tickers.id', ondelete='CASCADE'), nullable=False, index=True,
+                      comment="Reference to ticker")
+    provider_id = Column(Integer, ForeignKey('external_data_providers.id'), nullable=False, index=True,
+                        comment="Reference to external data provider")
+    provider_symbol = Column(String(50), nullable=False,
+                            comment="Provider-specific symbol format (e.g., '500X.MI' for Yahoo Finance)")
+    is_primary = Column(Boolean, default=False, nullable=False,
+                       comment="Whether this is the primary mapping for this provider")
+    updated_at = Column(DateTime(timezone=True), nullable=True,
+                       comment="Last update timestamp")
+    
+    # Relationships
+    ticker = relationship("Ticker", back_populates="provider_symbols")
+    provider = relationship("ExternalDataProvider")
+    
+    def __repr__(self) -> str:
+        """String representation of the mapping"""
+        return f"<TickerProviderSymbol(ticker_id={self.ticker_id}, provider_id={self.provider_id}, symbol='{self.provider_symbol}')>"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert mapping to JSON dictionary
+        
+        Returns:
+            Dict[str, Any]: Dictionary with all mapping fields
+        """
+        result = super().to_dict()
+        return result

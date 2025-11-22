@@ -498,11 +498,11 @@ app.register_blueprint(status_bp)
 app.register_blueprint(pages_bp)
 
 # Register Conditions System blueprints
-from routes.api.trading_methods import trading_methods_bp
+# Note: trading_methods_bp removed - file deleted
 from routes.api.plan_conditions import plan_conditions_bp
 from routes.api.trade_conditions import trade_conditions_bp
 
-app.register_blueprint(trading_methods_bp)
+# Note: trading_methods_bp removed - file deleted
 app.register_blueprint(plan_conditions_bp)
 app.register_blueprint(trade_conditions_bp)
 

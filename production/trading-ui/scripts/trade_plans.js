@@ -909,13 +909,32 @@ function buildTradePlanConfirmationDetails(tradePlan, tradePlanId) {
 
   let date = 'לא מוגדר';
   if (dateEnvelope) {
-    if (window.dateUtils?.formatDate) {
+    // Use FieldRendererService or dateUtils for consistent date formatting
+    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+      date = window.FieldRendererService.renderDate(dateEnvelope, false);
+    } else if (window.dateUtils?.formatDate) {
       date = window.dateUtils.formatDate(dateEnvelope, { includeTime: false });
     } else {
       try {
-        const dateObj = dateEnvelope instanceof Date ? dateEnvelope : new Date(dateEnvelope);
+        // Parse date envelope to Date object if needed
+        let dateObj;
+        if (dateEnvelope && typeof dateEnvelope === 'object' && typeof dateEnvelope.epochMs === 'number') {
+          dateObj = new Date(dateEnvelope.epochMs);
+        } else if (dateEnvelope instanceof Date) {
+          dateObj = dateEnvelope;
+        } else {
+          dateObj = new Date(dateEnvelope);
+        }
+        
         if (!Number.isNaN(dateObj.getTime())) {
-          date = window.formatDate ? window.formatDate(dateObj) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj) : dateObj.toLocaleDateString('he-IL'));
+          if (window.formatDate) {
+            date = window.formatDate(dateObj);
+          } else if (window.dateUtils?.formatDate) {
+            date = window.dateUtils.formatDate(dateObj, { includeTime: false });
+          } else {
+            // Last resort: use toLocaleDateString
+            date = dateObj.toLocaleDateString('he-IL');
+          }
         }
       } catch {
         date = 'לא מוגדר';
@@ -1329,14 +1348,26 @@ async function applyTradePlanDefaultRiskLevels(options = {}) {
       }
 
       if (!assignedValue) {
-        const today = new Date();
+        // Use dateUtils for consistent date handling (if available)
+        let today;
+        if (window.dateUtils && typeof window.dateUtils.now === 'function') {
+          today = window.dateUtils.now();
+        } else {
+          today = new Date();
+        }
         today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         assignedValue = today.toISOString().slice(0, 10);
       }
 
       entryDateInput.value = assignedValue;
     } else {
-      const now = new Date();
+      // Use dateUtils for consistent date handling (if available)
+      let now;
+      if (window.dateUtils && typeof window.dateUtils.now === 'function') {
+        now = window.dateUtils.now();
+      } else {
+        now = new Date();
+      }
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       const isoString = now.toISOString();
 

@@ -29,7 +29,7 @@ import shutil
 backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, backend_path)
 
-DB_PATH = os.path.join(backend_path, 'db', 'simpleTrade_new.db')
+DB_PATH = os.path.join(backend_path, 'db', 'tiktrack.db')
 BACKUP_PATH = os.path.join(backend_path, 'db', f'simpleTrade_new_backup_generated_cols_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db')
 
 def create_backup():

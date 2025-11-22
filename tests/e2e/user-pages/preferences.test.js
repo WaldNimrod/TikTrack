@@ -9,13 +9,15 @@
  * @author TikTrack Development Team
  */
 
-const { loadPageTemplate } = require('../../utils/page-test-utils');
+const fs = require('fs');
+const path = require('path');
 
 describe('Preferences Page E2E Tests', () => {
     let htmlContent;
 
     beforeAll(() => {
-        htmlContent = loadPageTemplate('preferences');
+        const htmlPath = path.join(__dirname, '../../../trading-ui/preferences.html');
+        htmlContent = fs.readFileSync(htmlPath, 'utf8');
     });
 
     test('should load preferences page successfully', () => {

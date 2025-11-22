@@ -27,8 +27,8 @@
 - ✅ `Backend/config/preferences_defaults.json` - Default preferences
 
 ### Database:
-- ✅ `Backend/db/TikTrack_DB.db` - **NEW** - Production database
-- ❌ `Backend/db/simpleTrade_new.db` - Development only
+- ✅ `Backend/db/tiktrack.db` - **NEW** - Production database
+- ❌ `Backend/db/tiktrack.db` - Development only
 
 ### Logs:
 - ✅ `Backend/logs-production/` - **NEW** - Production logs directory
@@ -260,7 +260,7 @@ TikTrackApp/
 │   │   ├── backup_database.py          ✅ Backup utility
 │   │   └── create_production_db.py    ✅ NEW - DB creation
 │   ├── db/
-│   │   └── TikTrack_DB.db              ✅ NEW - Production DB
+│   │   └── tiktrack.db              ✅ NEW - Production DB
 │   └── logs-production/                ✅ NEW - Production logs
 ├── start_production.sh                 ✅ NEW - Production startup
 └── PRODUCTION_FILES_LIST.md            📄 This file
@@ -274,7 +274,7 @@ TikTrackApp/
 - [ ] `requirements.txt` is up to date
 - [ ] `start_production.sh` is created
 - [ ] `Backend/config/settings.prod.py` is created
-- [ ] `Backend/db/TikTrack_DB.db` is created
+- [ ] `Backend/db/tiktrack.db` is created
 - [ ] `Backend/logs-production/` directory exists
 - [ ] No test files in production
 - [ ] No migration files in production

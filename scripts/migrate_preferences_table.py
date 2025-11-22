@@ -14,13 +14,19 @@ import os
 import shutil
 from datetime import datetime
 import json
+from pathlib import Path
+
+from config.settings import DB_PATH
+
+DATABASE_PATH = Path(DB_PATH)
+BACKUP_PREFIX = "tiktrack_backup_preferences_migration"
 
 def create_backup():
     """יצירת גיבוי לפני המיגרציה"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_path = f"./db/simpleTrade_new_backup_preferences_migration_{timestamp}.db"
+    backup_path = DATABASE_PATH.parent / f"{BACKUP_PREFIX}_{timestamp}.db"
     
-    shutil.copy2("./db/simpleTrade_new.db", backup_path)
+    shutil.copy2(DATABASE_PATH, backup_path)
     print(f"✅ גיבוי נוצר: {backup_path}")
     return backup_path
 
@@ -34,7 +40,7 @@ def check_table_exists(cursor, table_name):
 
 def migrate_preferences_table():
     """מיגרציה של טבלת ההעדפות"""
-    db_path = "./db/simpleTrade_new.db"
+    db_path = DATABASE_PATH
     
     print("🔄 מתחיל מיגרציה של טבלת user_preferences...")
     
@@ -42,7 +48,7 @@ def migrate_preferences_table():
     backup_path = create_backup()
     
     try:
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(str(db_path))
         cursor = conn.cursor()
         
         # בדיקה אם הטבלה החדשה כבר קיימת

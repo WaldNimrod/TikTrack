@@ -761,6 +761,22 @@ class EntityDetailsAPI {
         // אם הנתונים עטופים בsucess/data, חלץ אותם
         const data = rawData.data || rawData;
         
+        // 🔍 DEBUG: Log provider_symbols for tickers
+        if (entityType === 'ticker') {
+            if (window.Logger) {
+                window.Logger.debug('🔍 [normalizeEntityData] Ticker provider symbols check:', {
+                    hasProviderSymbols: 'provider_symbols' in data,
+                    providerSymbolsType: typeof data.provider_symbols,
+                    providerSymbolsIsArray: Array.isArray(data.provider_symbols),
+                    providerSymbolsCount: (data.provider_symbols || []).length,
+                    providerSymbols: data.provider_symbols,
+                    tickerId: data.id,
+                    tickerSymbol: data.symbol,
+                    page: 'entity-details-api'
+                });
+            }
+        }
+        
         // 🔍 DEBUG: Log normalization for cash flows
         if (entityType === 'cash_flow') {
             console.group('🔍 [CASH_FLOW_NORMALIZE] Before Normalization');

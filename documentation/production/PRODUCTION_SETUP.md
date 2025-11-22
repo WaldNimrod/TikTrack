@@ -37,13 +37,13 @@ git push origin production
 
 ### סביבת פיתוח (Development)
 - **פורט:** 8080
-- **בסיס נתונים:** `Backend/db/simpleTrade_new.db`
+- **בסיס נתונים:** `Backend/db/tiktrack.db`
 - **לוגים:** `Backend/logs/`
 - **הפעלה:** `./start_server.sh`
 
 ### סביבת פרודקשן (Production)
 - **פורט:** 5001
-- **בסיס נתונים:** `production/Backend/db/TikTrack_DB.db`
+- **בסיס נתונים:** `production/Backend/db/tiktrack.db`
 - **לוגים:** `production/Backend/logs/`
 - **הפעלה:** `./start_production.sh`
 
@@ -51,7 +51,7 @@ git push origin production
 
 1. Python 3.x מותקן
 2. כל התלויות מ-`Backend/requirements.txt` מותקנות
-3. בסיס נתונים פיתוח קיים (`Backend/db/simpleTrade_new.db`)
+3. בסיס נתונים פיתוח קיים (`Backend/db/tiktrack.db`)
 
 ## תהליך ההקמה
 
@@ -64,7 +64,7 @@ python3 Backend/scripts/create_production_db.py
 ```
 
 הסקריפט:
-- יוצר בסיס נתונים חדש בשם `TikTrack_DB.db`
+- יוצר בסיס נתונים חדש בשם `tiktrack.db`
 - מעתיק את כל המבנה והטבלאות
 - מעתיק את כל טבלאות העזר והעדפות
 - מנקה את טבלאות המשתמש (trades, executions, cash_flows, וכו')
@@ -77,7 +77,7 @@ python3 Backend/scripts/create_production_db.py
 ```
 
 השרת יתחיל על פורט 5001 עם:
-- בסיס נתונים: `production/Backend/db/TikTrack_DB.db`
+- בסיס נתונים: `production/Backend/db/tiktrack.db`
 - לוגים: `production/Backend/logs/`
 - סביבה: Production
 

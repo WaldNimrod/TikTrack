@@ -19,7 +19,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def get_database_path():
     """Get the database path"""
-    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'db', 'simpleTrade_new.db')
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'db', 'tiktrack.db')
 
 def get_existing_accounts():
     """Get existing trading accounts from the database"""

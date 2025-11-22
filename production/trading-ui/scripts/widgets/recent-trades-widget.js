@@ -37,10 +37,32 @@
         window.Logger?.warn('RecentTradesWidget: renderDateShort failed', { error: error?.message });
       }
     }
-    const dateObj = new Date(resolved);
+    // Use dateUtils for consistent date parsing
+    let dateObj;
+    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+      const envelope = window.dateUtils.ensureDateEnvelope(resolved);
+      if (envelope && envelope.epochMs) {
+        dateObj = new Date(envelope.epochMs);
+      } else {
+        dateObj = new Date(resolved);
+      }
+    } else if (resolved && typeof resolved === 'object' && typeof resolved.epochMs === 'number') {
+      dateObj = new Date(resolved.epochMs);
+    } else {
+      dateObj = new Date(resolved);
+    }
+    
     if (Number.isNaN(dateObj.getTime())) {
       return '';
     }
+    
+    // Use FieldRendererService or dateUtils for date formatting
+    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+      return window.FieldRendererService.renderDate(dateObj, false);
+    } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+      return window.dateUtils.formatDate(dateObj, { includeTime: false });
+    }
+    // Last resort: use toLocaleDateString
     return dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
   }
 
@@ -78,8 +100,27 @@
         date: trade?.created_at || trade?.opened_at || trade?.entry_date || trade?.executed_at,
       }))
       .sort((a, b) => {
-        const timeA = new Date(resolveDateValue(a.date) || 0).getTime();
-        const timeB = new Date(resolveDateValue(b.date) || 0).getTime();
+        // Use dateUtils for consistent date comparison
+        const getEpoch = (dateValue) => {
+          if (!dateValue) return 0;
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
+            return window.dateUtils.getEpochMilliseconds(envelope || dateValue) || 0;
+          }
+          // Fallback for DateEnvelope objects
+          if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
+            return dateValue.epochMs;
+          }
+          // Fallback for Date objects or strings
+          try {
+            const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+            return dateObj.getTime() || 0;
+          } catch {
+            return 0;
+          }
+        };
+        const timeA = getEpoch(resolveDateValue(a.date));
+        const timeB = getEpoch(resolveDateValue(b.date));
         return timeB - timeA;
       })
       .slice(0, MAX_ITEMS);

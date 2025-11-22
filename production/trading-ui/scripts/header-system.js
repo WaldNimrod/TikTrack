@@ -23,7 +23,7 @@
  * - toggleHeaderFilters() - Main filter panel toggle
  * - toggleStatusFilterMenu() - Status filter dropdown
  * - toggleTypeFilterMenu() - Type filter dropdown
- * - toggleAccountFilterMenu() - Account filter dropdown
+ * - toggleAccountFilterMenu() - Trading account filter dropdown
  * - toggleDateRangeFilterMenu() - Date range filter dropdown
  *
  * General section toggle functions are handled by ui-utils.js
@@ -38,10 +38,7 @@
  * @lastUpdated January 15, 2025
  */
 
-// Logger will be available after initialization
-try {
-  console.log('🚀 header-system.js loaded');
-} catch (_) {}
+// Removed debug log - file loading is tracked internally
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v6.0.0...', { page: 'header-system' });
 }
@@ -50,25 +47,286 @@ if (window.Logger) {
  * מערכת ראש דף מאוחדת עם פילטרים
  * כוללת את כל הפונקציונליות של הפילטרים
  */
+// ===== Initialization State Tracking =====
+let __initializationState = {
+  headerCreated: false,
+  filterSystemCreated: false,
+  accountsLoaded: false,
+  eventListenersSetup: false,
+  hoverBehaviorSetup: false,
+  initialized: false,
+  startTime: null,
+  endTime: null,
+  stages: {},
+};
+
+// Expose for debugging
+window.__headerInitializationState = __initializationState;
+
 class HeaderSystem {
   constructor() {
     this.isInitialized = false;
+    // Reset initialization state for new instance
+    __initializationState = {
+      headerCreated: false,
+      filterSystemCreated: false,
+      accountsLoaded: false,
+      eventListenersSetup: false,
+      hoverBehaviorSetup: false,
+      initialized: false,
+      startTime: null,
+      endTime: null,
+      stages: {},
+    };
+  }
+
+  /**
+   * Cleanup method - removes all event listeners, portals, and timeouts
+   * Should be called before re-initialization to prevent duplicates
+   */
+  static cleanup() {
+    window.Logger?.info?.('🧹 HeaderSystem.cleanup() - START', {
+      page: 'header-system',
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      // Cleanup all portals
+      if (typeof __headerFilterPortals !== 'undefined' && __headerFilterPortals instanceof Map) {
+        let portalsCleaned = 0;
+        __headerFilterPortals.forEach((portal, menuId) => {
+          try {
+            // Remove scroll and resize listeners
+            if (portal.__repositionHandler) {
+              window.removeEventListener('scroll', portal.__repositionHandler, true);
+              window.removeEventListener('resize', portal.__repositionHandler);
+            }
+            
+            // Remove portal from DOM
+            if (portal && portal.parentNode) {
+              portal.remove();
+            }
+            
+            portalsCleaned++;
+            window.Logger?.debug?.(`🧹 Cleaned up portal for ${menuId}`, {
+              page: 'header-system',
+            });
+          } catch (error) {
+            window.Logger?.warn?.(`⚠️ Error cleaning up portal for ${menuId}:`, error.message, {
+              page: 'header-system',
+            });
+          }
+        });
+        
+        __headerFilterPortals.clear();
+        window.Logger?.info?.(`✅ Cleaned up ${portalsCleaned} portals`, {
+          page: 'header-system',
+        });
+      }
+
+      // Cleanup all hover timeouts
+      if (typeof hoverTimeouts !== 'undefined' && hoverTimeouts instanceof Map) {
+        let timeoutsCleaned = 0;
+        hoverTimeouts.forEach((timeoutId, buttonId) => {
+          try {
+            clearTimeout(timeoutId);
+            timeoutsCleaned++;
+          } catch (error) {
+            window.Logger?.warn?.(`⚠️ Error clearing timeout for ${buttonId}:`, error.message, {
+              page: 'header-system',
+            });
+          }
+        });
+        
+        hoverTimeouts.clear();
+        window.Logger?.info?.(`✅ Cleaned up ${timeoutsCleaned} hover timeouts`, {
+          page: 'header-system',
+        });
+      }
+
+      // Cleanup event listeners from filter buttons
+      const filterButtons = [
+        { buttonId: 'statusFilterToggle', menuId: 'statusFilterMenu' },
+        { buttonId: 'typeFilterToggle', menuId: 'typeFilterMenu' },
+        { buttonId: 'accountFilterToggle', menuId: 'accountFilterMenu' },
+        { buttonId: 'dateRangeFilterToggle', menuId: 'dateRangeFilterMenu' },
+      ];
+
+      let listenersCleaned = 0;
+      filterButtons.forEach(({ buttonId, menuId }) => {
+        const button = document.getElementById(buttonId);
+        const menu = document.getElementById(menuId);
+
+        if (button) {
+          // Remove stored handlers
+          if (button.__hoverHandlers) {
+            try {
+              if (button.__hoverHandlers.mouseenter) {
+                button.removeEventListener('mouseenter', button.__hoverHandlers.mouseenter);
+                listenersCleaned++;
+              }
+              if (button.__hoverHandlers.mouseleave) {
+                button.removeEventListener('mouseleave', button.__hoverHandlers.mouseleave);
+                listenersCleaned++;
+              }
+              if (button.__hoverHandlers.click) {
+                button.removeEventListener('click', button.__hoverHandlers.click, true);
+                listenersCleaned++;
+              }
+              
+              // Clear the handlers reference
+              delete button.__hoverHandlers;
+              
+              window.Logger?.debug?.(`🧹 Cleaned up event listeners for ${buttonId}`, {
+                page: 'header-system',
+              });
+            } catch (error) {
+              window.Logger?.warn?.(`⚠️ Error cleaning up listeners for ${buttonId}:`, error.message, {
+                page: 'header-system',
+              });
+            }
+          }
+        }
+
+        // Cleanup menu event listeners
+        if (menu) {
+          // Clone the menu to remove all event listeners
+          // (Note: This is a workaround - ideally we'd track all listeners)
+          const menuClone = menu.cloneNode(true);
+          if (menu.parentNode) {
+            menu.parentNode.replaceChild(menuClone, menu);
+            menuClone.id = menuId;
+            // Restore the menu element reference
+            if (window.Logger) {
+              window.Logger.debug(`🧹 Cleaned up menu event listeners for ${menuId}`, {
+                page: 'header-system',
+              });
+            }
+          }
+        }
+      });
+
+      // Reset setup flag
+      if (typeof __setupHoverBehaviorCalled !== 'undefined') {
+        __setupHoverBehaviorCalled = false;
+      }
+
+      // Close all open menus
+      filterButtons.forEach(({ menuId }) => {
+        const menu = document.getElementById(menuId);
+        if (menu && menu.classList.contains('show')) {
+          menu.classList.remove('show');
+        }
+      });
+
+      window.Logger?.info?.(`✅ HeaderSystem.cleanup() - COMPLETE`, {
+        page: 'header-system',
+        listenersCleaned,
+        portalsCleaned: typeof __headerFilterPortals !== 'undefined' ? __headerFilterPortals.size : 0,
+        timeoutsCleaned: typeof hoverTimeouts !== 'undefined' ? hoverTimeouts.size : 0,
+      });
+
+      return {
+        success: true,
+        listenersCleaned,
+        portalsCleaned: typeof __headerFilterPortals !== 'undefined' ? __headerFilterPortals.size : 0,
+        timeoutsCleaned: typeof hoverTimeouts !== 'undefined' ? hoverTimeouts.size : 0,
+      };
+    } catch (error) {
+      window.Logger?.error?.(`❌ HeaderSystem.cleanup() - ERROR:`, error.message, {
+        page: 'header-system',
+        stack: error.stack,
+      });
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   }
 
   init() {
+    window.Logger.info('🔧 HeaderSystem.init() called', {
+      page: 'header-system',
+      isInitialized: this.isInitialized,
+      bodyExists: !!document.body,
+      readyState: document.readyState,
+      stackTrace: new Error().stack?.split('\n').slice(1, 5).join('\n'),
+    });
+
+    // Cleanup before initialization to prevent duplicates
+    HeaderSystem.cleanup();
+
     if (this.isInitialized) {
-      console.log('⚠️ HeaderSystem.init already initialized');
-      return;
+      window.Logger.info('⚠️ HeaderSystem.init() - Already initialized, resetting state', {
+        page: 'header-system',
+      });
+      this.isInitialized = false; // Reset to allow re-initialization after cleanup
     }
 
-    // יצירת אלמנט הכותרת
-    HeaderSystem.createHeader();
+    // Track initialization start
+    __initializationState.startTime = Date.now();
+    window.Logger.info('📝 HeaderSystem.init() - About to call createHeader()', {
+      page: 'header-system',
+      startTime: new Date(__initializationState.startTime).toISOString(),
+    });
 
-    // יצירת מערכת הפילטרים
+    // Stage 1: Create header HTML
+    const stage1Start = Date.now();
+    try {
+      HeaderSystem.createHeader();
+      __initializationState.headerCreated = true;
+      __initializationState.stages.createHeader = {
+        success: true,
+        duration: Date.now() - stage1Start,
+        timestamp: new Date(stage1Start).toISOString(),
+      };
+      window.Logger.info('✅ Stage 1 complete: Header created', {
+        page: 'header-system',
+        duration: `${Date.now() - stage1Start}ms`,
+      });
+    } catch (error) {
+      __initializationState.stages.createHeader = {
+        success: false,
+        error: error.message,
+        duration: Date.now() - stage1Start,
+        timestamp: new Date(stage1Start).toISOString(),
+      };
+      window.Logger.error('❌ Stage 1 failed: Header creation', {
+        page: 'header-system',
+        error: error.message,
+      });
+      throw error; // Don't continue if header creation fails
+    }
+
+    // Stage 2: Create filter system
+    const stage2Start = Date.now();
     if (typeof HeaderSystem.createFilterSystem === 'function') {
       // קריאה async בתוך setTimeout כדי לא לעצור את האתחול
       setTimeout(async () => {
-        await HeaderSystem.createFilterSystem();
+        try {
+          await HeaderSystem.createFilterSystem();
+          __initializationState.filterSystemCreated = true;
+          __initializationState.stages.createFilterSystem = {
+            success: true,
+            duration: Date.now() - stage2Start,
+            timestamp: new Date(stage2Start).toISOString(),
+          };
+          window.Logger.info('✅ Stage 2 complete: Filter system created', {
+            page: 'header-system',
+            duration: `${Date.now() - stage2Start}ms`,
+          });
+        } catch (error) {
+          __initializationState.stages.createFilterSystem = {
+            success: false,
+            error: error.message,
+            duration: Date.now() - stage2Start,
+            timestamp: new Date(stage2Start).toISOString(),
+          };
+          window.Logger.error('❌ Stage 2 failed: Filter system creation', {
+            page: 'header-system',
+            error: error.message,
+          });
+        }
       }, 0);
     }
 
@@ -120,32 +378,250 @@ class HeaderSystem {
       });
     };
     
+    // Stage 3: Load accounts for filter
+    const stage3Start = Date.now();
     setTimeout(async () => {
-      await waitForPreferences();
-      await HeaderSystem.loadAccountsForFilter();
+      try {
+        await waitForPreferences();
+        await HeaderSystem.loadAccountsForFilter();
+        __initializationState.accountsLoaded = true;
+        __initializationState.stages.loadAccountsForFilter = {
+          success: true,
+          duration: Date.now() - stage3Start,
+          timestamp: new Date(stage3Start).toISOString(),
+        };
+        window.Logger.info('✅ Stage 3 complete: Accounts loaded for filter', {
+          page: 'header-system',
+          duration: `${Date.now() - stage3Start}ms`,
+        });
+      } catch (error) {
+        __initializationState.stages.loadAccountsForFilter = {
+          success: false,
+          error: error.message,
+          duration: Date.now() - stage3Start,
+          timestamp: new Date(stage3Start).toISOString(),
+        };
+        window.Logger.error('❌ Stage 3 failed: Loading accounts for filter', {
+          page: 'header-system',
+          error: error.message,
+        });
+        // Don't throw - initialization can continue
+      }
     }, 100);
 
-    // הגדרת event listeners
-    HeaderSystem.setupEventListeners();
+    // Stage 4: Setup event listeners
+    const stage4Start = Date.now();
+    window.Logger.info('🔧 HeaderSystem.init() - Setting up event listeners', {
+      page: 'header-system',
+    });
+    try {
+      HeaderSystem.setupEventListeners();
+      __initializationState.eventListenersSetup = true;
+      __initializationState.stages.setupEventListeners = {
+        success: true,
+        duration: Date.now() - stage4Start,
+        timestamp: new Date(stage4Start).toISOString(),
+      };
+      window.Logger.info('✅ Stage 4 complete: Event listeners setup', {
+        page: 'header-system',
+        duration: `${Date.now() - stage4Start}ms`,
+      });
+    } catch (error) {
+      __initializationState.stages.setupEventListeners = {
+        success: false,
+        error: error.message,
+        duration: Date.now() - stage4Start,
+        timestamp: new Date(stage4Start).toISOString(),
+      };
+      window.Logger.error('❌ Stage 4 failed: Event listeners setup', {
+        page: 'header-system',
+        error: error.message,
+      });
+      // Don't throw - continue with hover behavior
+    }
 
     // טעינת מצב שמור - יקרא אחרי שמערכת הפילטרים תהיה מוכנה
     // HeaderSystem.loadSavedState();
 
+    // Stage 5: Setup hover behavior for filter menus (called once after all initialization is complete)
+    const stage5Start = Date.now();
+    window.Logger.info('🔧 HeaderSystem.init() - Setting up hover behavior', {
+      page: 'header-system',
+      headerElementExists: !!document.getElementById('unified-header'),
+    });
+    try {
+      setupHoverBehavior();
+      __initializationState.hoverBehaviorSetup = true;
+      __initializationState.stages.setupHoverBehavior = {
+        success: true,
+        duration: Date.now() - stage5Start,
+        timestamp: new Date(stage5Start).toISOString(),
+      };
+      window.Logger.info('✅ Stage 5 complete: Hover behavior setup', {
+        page: 'header-system',
+        duration: `${Date.now() - stage5Start}ms`,
+      });
+    } catch (error) {
+      __initializationState.stages.setupHoverBehavior = {
+        success: false,
+        error: error.message,
+        duration: Date.now() - stage5Start,
+        timestamp: new Date(stage5Start).toISOString(),
+      };
+      window.Logger.error('❌ Stage 5 failed: Hover behavior setup', {
+        page: 'header-system',
+        error: error.message,
+      });
+      // Don't throw - initialization can continue
+    }
+
     this.isInitialized = true;
+    __initializationState.initialized = true;
+    __initializationState.endTime = Date.now();
+
+    // בדיקה סופית אחרי כל האתחול
+    const finalHeaderElement = document.getElementById('unified-header');
+    const finalCheck = {
+      headerElementExists: !!finalHeaderElement,
+      headerElementInDOM: finalHeaderElement ? document.body.contains(finalHeaderElement) : false,
+      headerElementVisible: finalHeaderElement ? window.getComputedStyle(finalHeaderElement).display !== 'none' : false,
+      headerElementHeight: finalHeaderElement?.offsetHeight || 0,
+      headerContentExists: !!document.querySelector('#unified-header .header-content'),
+      headerNavExists: !!document.querySelector('#unified-header .header-nav'),
+      navItemsCount: document.querySelectorAll('#unified-header .tiktrack-nav-item').length,
+    };
+
+    const totalDuration = __initializationState.endTime - __initializationState.startTime;
+    window.Logger.info('✅ HeaderSystem.init() - COMPLETE', {
+      page: 'header-system',
+      isInitialized: this.isInitialized,
+      finalCheck: finalCheck,
+      totalDuration: `${totalDuration}ms`,
+      stages: __initializationState.stages,
+      allStagesComplete: Object.keys(__initializationState.stages).every(
+        stage => __initializationState.stages[stage]?.success === true
+      ),
+      timestamp: new Date().toISOString(),
+    });
   }
 
   static createHeader() {
-    // מציאת או יצירת אלמנט הכותרת
-    let headerElement = document.getElementById('unified-header');
-    if (!headerElement) {
-      headerElement = document.createElement('div');
-      headerElement.id = 'unified-header';
-      document.body.insertBefore(headerElement, document.body.firstChild);
-    }
+    window.Logger.info('🏗️ HeaderSystem.createHeader() - START', {
+      page: 'header-system',
+      bodyExists: !!document.body,
+      readyState: document.readyState,
+      existingElement: !!document.getElementById('unified-header'),
+    });
 
-    // הוספת התוכן לאלמנט
-    const headerHTML = HeaderSystem.getHeaderHTML();
-    headerElement.innerHTML = headerHTML;
+    try {
+      // מציאת או יצירת אלמנט הכותרת
+      let headerElement = document.getElementById('unified-header');
+      
+      if (!headerElement) {
+        window.Logger.info('📦 HeaderSystem.createHeader() - Creating new header element', {
+          page: 'header-system',
+          bodyExists: !!document.body,
+        });
+
+        if (!document.body) {
+          window.Logger.error('❌ HeaderSystem.createHeader() - document.body does not exist!', {
+            page: 'header-system',
+            readyState: document.readyState,
+          });
+          throw new Error('document.body does not exist when trying to create header element');
+        }
+
+        headerElement = document.createElement('div');
+        headerElement.id = 'unified-header';
+        document.body.insertBefore(headerElement, document.body.firstChild);
+        
+        window.Logger.info('✅ HeaderSystem.createHeader() - Header element created and inserted', {
+          page: 'header-system',
+          elementId: headerElement.id,
+          parentElement: headerElement.parentElement?.tagName,
+          isInDOM: document.body.contains(headerElement),
+        });
+      } else {
+        window.Logger.info('♻️ HeaderSystem.createHeader() - Reusing existing header element', {
+          page: 'header-system',
+          elementId: headerElement.id,
+          isInDOM: document.body.contains(headerElement),
+        });
+      }
+
+      // הוספת התוכן לאלמנט
+      window.Logger.info('📝 HeaderSystem.createHeader() - Getting header HTML', {
+        page: 'header-system',
+      });
+      const headerHTML = HeaderSystem.getHeaderHTML();
+      
+      window.Logger.info('📝 HeaderSystem.createHeader() - Setting innerHTML', {
+        page: 'header-system',
+        htmlLength: headerHTML.length,
+      });
+      headerElement.innerHTML = headerHTML;
+
+      // בדיקות אחרי יצירה
+      const createdElements = {
+        headerElement: !!document.getElementById('unified-header'),
+        headerContent: !!document.querySelector('#unified-header .header-content'),
+        headerTop: !!document.querySelector('#unified-header .header-top'),
+        headerNav: !!document.querySelector('#unified-header .header-nav'),
+        logoSection: !!document.querySelector('#unified-header .logo-section'),
+        navList: !!document.querySelector('#unified-header .tiktrack-nav-list'),
+        navItems: document.querySelectorAll('#unified-header .tiktrack-nav-item').length,
+      };
+
+      // בדיקת סגנונות
+      const computedStyle = window.getComputedStyle(headerElement);
+      const styleInfo = {
+        display: computedStyle.display,
+        visibility: computedStyle.visibility,
+        position: computedStyle.position,
+        zIndex: computedStyle.zIndex,
+        width: computedStyle.width,
+        height: computedStyle.height,
+        backgroundColor: computedStyle.backgroundColor,
+        opacity: computedStyle.opacity,
+      };
+
+      // בדיקת טעינת header-styles.css
+      const styleSheets = Array.from(document.styleSheets);
+      const headerCssLoaded = styleSheets.some(sheet => {
+        try {
+          return sheet.href && sheet.href.includes('header-styles.css');
+        } catch (e) {
+          return false;
+        }
+      });
+
+      window.Logger.info('✅ HeaderSystem.createHeader() - COMPLETE', {
+        page: 'header-system',
+        elementsCreated: createdElements,
+        headerElementVisible: computedStyle.display !== 'none',
+        headerElementHeight: headerElement.offsetHeight,
+        headerElementWidth: headerElement.offsetWidth,
+        computedStyle: styleInfo,
+        headerCssLoaded: headerCssLoaded,
+        allStyleSheets: styleSheets.map(s => {
+          try {
+            return s.href ? s.href.split('/').pop() : 'inline';
+          } catch {
+            return 'unknown';
+          }
+        }),
+      });
+
+    } catch (error) {
+      window.Logger.error('❌ HeaderSystem.createHeader() - ERROR', {
+        page: 'header-system',
+        error: error.message,
+        stack: error.stack,
+        bodyExists: !!document.body,
+        readyState: document.readyState,
+      });
+      throw error; // Re-throw to allow init() to handle
+    }
 
     // בדיקה אם הפונקציות מוגדרות
     // window.Logger.info('🔧 Checking if filter functions are defined:', { page: "header-system" });
@@ -469,8 +945,75 @@ class HeaderSystem {
   }
 
   static setupEventListeners() {
+    window.Logger?.info?.(`🔧 setupEventListeners() - START`, {
+      page: 'header-system',
+      timestamp: new Date().toISOString(),
+    });
+
+    // Validation: Ensure header element exists
+    const headerElement = document.getElementById('unified-header');
+    if (!headerElement || !document.body.contains(headerElement)) {
+      window.Logger?.error?.(`❌ Header element not found or not in DOM`, {
+        page: 'header-system',
+        headerExists: !!headerElement,
+        inDOM: headerElement ? document.body.contains(headerElement) : false,
+      });
+      return; // Don't continue if header doesn't exist
+    }
+
+    // Cleanup existing event listeners before adding new ones
+    try {
+      // Store references to existing listeners for cleanup
+      const elementsWithListeners = [
+        { selector: '.filter-toggle[data-onclick]', type: 'filter-toggle' },
+        { selector: '.tiktrack-nav-item:has(.submenu)', type: 'nav-item-with-submenu' },
+      ];
+
+      elementsWithListeners.forEach(({ selector, type }) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          // Clone element to remove all event listeners
+          try {
+            const clone = element.cloneNode(true);
+            if (element.parentNode) {
+              // Preserve attributes
+              Array.from(element.attributes).forEach(attr => {
+                clone.setAttribute(attr.name, attr.value);
+              });
+              element.parentNode.replaceChild(clone, element);
+              window.Logger?.debug?.(`🧹 Cleaned up event listeners for ${type}`, {
+                page: 'header-system',
+                element: selector,
+              });
+            }
+          } catch (error) {
+            window.Logger?.warn?.(`⚠️ Error cleaning up ${type}:`, error.message, {
+              page: 'header-system',
+            });
+          }
+        });
+      });
+    } catch (error) {
+      window.Logger?.warn?.(`⚠️ Error in setupEventListeners cleanup:`, error.message, {
+        page: 'header-system',
+      });
+      // Continue anyway - cleanup is best effort
+    }
+
     // הגדרת מצב הכפתורים בהתאם למצב הפילטר
-    window.updateToggleButtons();
+    try {
+      if (typeof window.updateToggleButtons === 'function') {
+        window.updateToggleButtons();
+      } else {
+        window.Logger?.warn?.(`⚠️ updateToggleButtons function not available`, {
+          page: 'header-system',
+        });
+      }
+    } catch (error) {
+      window.Logger?.error?.(`❌ Error calling updateToggleButtons:`, error.message, {
+        page: 'header-system',
+      });
+    }
 
     // הוספת סגנונות CSS
     HeaderSystem.addStyles();
@@ -490,30 +1033,14 @@ class HeaderSystem {
     // בדיקת מעבר עכבר לכפתורי פילטר
     setTimeout(() => {
       const filterButtons = document.querySelectorAll('.filter-toggle[data-onclick]');
-      console.log('🔍 Found filter buttons:', filterButtons.length);
-
       filterButtons.forEach((btn, index) => {
-        console.log(`🔍 Button ${index}:`, {
-          id: btn.id,
-          className: btn.className,
-          dataOnclick: btn.getAttribute('data-onclick'),
-          visible: btn.offsetParent !== null,
-          clickable: btn.offsetWidth > 0 && btn.offsetHeight > 0,
-        });
-
         // בדיקת מעבר עכבר
         btn.addEventListener('mouseenter', () => {
-          console.log('🖱️ Mouse ENTER on filter button:', btn.id, btn.getAttribute('data-onclick'));
+          // Mouse enter event tracked
         });
 
         btn.addEventListener('click', e => {
-          console.log('🖱️ CLICK on filter button:', btn.id, btn.getAttribute('data-onclick'));
-          console.log('🖱️ Event details:', {
-            target: e.target,
-            currentTarget: e.currentTarget,
-            bubbles: e.bubbles,
-            cancelable: e.cancelable,
-          });
+          // Click event tracked
         });
       });
     }, 1000);
@@ -537,6 +1064,147 @@ class HeaderSystem {
         });
       }
     }, 100);
+
+    // ===== ניטור ובדיקה לתפריטי משנה - פתיחה כפולה =====
+    setTimeout(() => {
+      console.log('🔍 [HeaderSystem] Starting dropdown menu monitoring...');
+      
+      const dropdownItems = document.querySelectorAll('.tiktrack-nav-item.dropdown');
+      console.log(`🔍 [HeaderSystem] Found ${dropdownItems.length} dropdown menu items`);
+      
+      dropdownItems.forEach((item, index) => {
+        const menu = item.querySelector('.tiktrack-dropdown-menu');
+        if (!menu) {
+          console.warn(`⚠️ [HeaderSystem] Dropdown item ${index} has no menu`);
+          return;
+        }
+        
+        const menuId = menu.id || `menu-${index}`;
+        console.log(`🔍 [HeaderSystem] Monitoring dropdown ${index}:`, {
+          itemClass: item.className,
+          menuId: menuId,
+          menuVisible: menu.offsetParent !== null,
+          menuOpacity: window.getComputedStyle(menu).opacity,
+          menuVisibility: window.getComputedStyle(menu).visibility,
+          menuDisplay: window.getComputedStyle(menu).display,
+        });
+        
+        // ניטור mouseenter
+        item.addEventListener('mouseenter', (e) => {
+          const computedStyle = window.getComputedStyle(menu);
+          console.log(`🖱️ [HeaderSystem] MOUSEENTER on dropdown ${index}:`, {
+            menuId: menuId,
+            timestamp: new Date().toISOString(),
+            opacity: computedStyle.opacity,
+            visibility: computedStyle.visibility,
+            display: computedStyle.display,
+            transform: computedStyle.transform,
+            zIndex: computedStyle.zIndex,
+            eventTarget: e.target.tagName,
+            eventCurrentTarget: e.currentTarget.tagName,
+          });
+          
+          // בדיקה אם התפריט כבר פתוח
+          setTimeout(() => {
+            const afterStyle = window.getComputedStyle(menu);
+            const visibleMenus = document.querySelectorAll('.tiktrack-dropdown-menu[style*="opacity: 1"], .tiktrack-dropdown-menu[style*="visibility: visible"]');
+            const allMenus = document.querySelectorAll('.tiktrack-dropdown-menu');
+            
+            console.log(`📊 [HeaderSystem] After mouseenter (${index}):`, {
+              menuId: menuId,
+              opacity: afterStyle.opacity,
+              visibility: afterStyle.visibility,
+              display: afterStyle.display,
+              visibleMenusCount: visibleMenus.length,
+              totalMenusCount: allMenus.length,
+              allVisibleMenus: Array.from(visibleMenus).map(m => m.id || 'no-id'),
+            });
+            
+            // בדיקה אם יש תפריטים כפולים
+            if (visibleMenus.length > 1) {
+              console.warn(`⚠️ [HeaderSystem] Multiple menus visible! Count: ${visibleMenus.length}`);
+              visibleMenus.forEach((m, i) => {
+                console.warn(`  Menu ${i}:`, {
+                  id: m.id || 'no-id',
+                  parent: m.parentElement?.className || 'no-parent',
+                  opacity: window.getComputedStyle(m).opacity,
+                  visibility: window.getComputedStyle(m).visibility,
+                });
+              });
+            }
+          }, 50);
+        }, { capture: true });
+        
+        // ניטור mouseleave
+        item.addEventListener('mouseleave', (e) => {
+          const computedStyle = window.getComputedStyle(menu);
+          console.log(`🖱️ [HeaderSystem] MOUSELEAVE on dropdown ${index}:`, {
+            menuId: menuId,
+            timestamp: new Date().toISOString(),
+            opacity: computedStyle.opacity,
+            visibility: computedStyle.visibility,
+            display: computedStyle.display,
+          });
+        }, { capture: true });
+        
+        // ניטור שינויים ב-CSS
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+              const computedStyle = window.getComputedStyle(menu);
+              console.log(`🔄 [HeaderSystem] Style changed for dropdown ${index}:`, {
+                menuId: menuId,
+                opacity: computedStyle.opacity,
+                visibility: computedStyle.visibility,
+                display: computedStyle.display,
+                transform: computedStyle.transform,
+                newStyle: menu.getAttribute('style'),
+              });
+            }
+          });
+        });
+        
+        observer.observe(menu, {
+          attributes: true,
+          attributeFilter: ['style', 'class'],
+        });
+      });
+      
+      // בדיקת CSS rules שמשפיעים על התפריטים
+      console.log('🔍 [HeaderSystem] Checking CSS rules...');
+      const styleSheets = Array.from(document.styleSheets);
+      styleSheets.forEach((sheet, sheetIndex) => {
+        try {
+          const rules = Array.from(sheet.cssRules || sheet.rules || []);
+          rules.forEach((rule, ruleIndex) => {
+            if (rule.selectorText && (
+              rule.selectorText.includes('tiktrack-dropdown-menu') ||
+              rule.selectorText.includes('tiktrack-nav-item')
+            )) {
+              console.log(`📝 [HeaderSystem] CSS Rule found:`, {
+                sheetIndex: sheetIndex,
+                ruleIndex: ruleIndex,
+                selector: rule.selectorText,
+                href: sheet.href || 'inline',
+                cssText: rule.cssText.substring(0, 100),
+              });
+            }
+          });
+        } catch (e) {
+          // Cross-origin stylesheets may throw errors
+        }
+      });
+      
+      console.log('✅ [HeaderSystem] Dropdown menu monitoring initialized');
+      
+      // Display tracking info
+      console.log('\n📊 ===== MENU OPENING TRACKING ACTIVE =====');
+      console.log('💡 All menu open/close events are being tracked');
+      console.log('💡 Use window.printMenuTrackingSummary() to see summary');
+      console.log('💡 Use window.printMenuTrackingSummary("statusFilterMenu") for specific menu');
+      console.log('💡 Use window.getMenuTrackingSummary() for full data object');
+      console.log('==========================================\n');
+    }, 500);
   }
 
   static addStyles() {
@@ -1088,6 +1756,61 @@ class HeaderSystem {
   }
 
   static async loadAccountsForFilter() {
+    window.Logger?.info?.('🔧 loadAccountsForFilter() - START', {
+      page: 'header-system',
+      timestamp: new Date().toISOString(),
+    });
+
+    // Full cleanup of existing account items before adding new ones
+    try {
+      const accountMenu = document.getElementById('accountFilterMenu');
+      if (!accountMenu) {
+        window.Logger?.warn?.(`⚠️ accountFilterMenu not found - skipping cleanup`, {
+          page: 'header-system',
+        });
+        return;
+      }
+
+      // Validation: Ensure menu exists in DOM
+      if (!document.body.contains(accountMenu)) {
+        window.Logger?.warn?.(`⚠️ accountFilterMenu not in DOM - skipping`, {
+          page: 'header-system',
+        });
+        return;
+      }
+
+      // Remove ALL existing account items (except "הכול" if it exists)
+      const existingItems = accountMenu.querySelectorAll(
+        '.account-filter-item:not([data-value="הכול"])'
+      );
+      
+      const itemsToRemove = Array.from(existingItems);
+      let removedCount = 0;
+      
+      itemsToRemove.forEach(item => {
+        try {
+          item.remove();
+          removedCount++;
+        } catch (error) {
+          window.Logger?.warn?.(`⚠️ Error removing account item:`, error.message, {
+            page: 'header-system',
+          });
+        }
+      });
+
+      window.Logger?.info?.(`🧹 Cleaned up ${removedCount} existing account items`, {
+        page: 'header-system',
+        removedCount,
+        remainingItems: accountMenu.querySelectorAll('.account-filter-item').length,
+      });
+    } catch (error) {
+      window.Logger?.error?.(`❌ Error in loadAccountsForFilter cleanup:`, error.message, {
+        page: 'header-system',
+        stack: error.stack,
+      });
+      return; // Don't continue if cleanup failed
+    }
+
     // window.Logger.info('🔧 loadAccountsForFilter - מתחיל טעינת חשבונות מסחר', { page: "header-system" });
 
     try {
@@ -1130,12 +1853,16 @@ class HeaderSystem {
       // window.Logger.info('🔧 accountMenu element:', accountMenu, { page: "header-system" });
 
       if (accountMenu) {
-        // מחיקת חשבונות קיימים (חוץ מ"הכול")
-        const existingItems = accountMenu.querySelectorAll(
-          '.account-filter-item:not([data-value="הכול"])'
-        );
-        // window.Logger.info('🔧 מוחק חשבונות קיימים:', existingItems.length, { page: "header-system" });
-        existingItems.forEach(item => item.remove());
+        // Validation: Ensure menu still exists in DOM (cleanup may have been done earlier)
+        if (!document.body.contains(accountMenu)) {
+          window.Logger?.warn?.(`⚠️ accountFilterMenu no longer in DOM after cleanup`, {
+            page: 'header-system',
+          });
+          return;
+        }
+
+        // Note: Cleanup of existing items was already done at the start of this function
+        // No need to remove again - just add new items
 
         // הוספת חשבונות פתוחים
         openAccounts.forEach(account => {
@@ -1595,8 +2322,19 @@ class HeaderSystem {
             return true;
           }
 
-          const date = new Date(dateString);
-          const today = new Date();
+          // Use dateUtils for consistent date parsing
+          let date;
+          if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+            date = window.dateUtils.toDateObject(dateString);
+          } else {
+            date = new Date(dateString);
+          }
+          let today;
+          if (window.dateUtils && typeof window.dateUtils.getToday === 'function') {
+            today = window.dateUtils.getToday();
+          } else {
+            today = new Date();
+          }
           today.setHours(0, 0, 0, 0);
 
           switch (dateRange) {
@@ -1604,15 +2342,31 @@ class HeaderSystem {
               return date.toDateString() === today.toDateString();
 
             case 'אתמול':
-              const yesterday = new Date(today);
-              yesterday.setDate(today.getDate() - 1);
+              // Use dateUtils for consistent date handling
+              let yesterday;
+              if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                const yesterdayEpoch = today.getTime() - (24 * 60 * 60 * 1000);
+                yesterday = window.dateUtils.toDateObject({ epochMs: yesterdayEpoch });
+              } else {
+                yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+              }
               return date.toDateString() === yesterday.toDateString();
 
             // השבוע = מתחילת השבוע הקלנדארי (יום ראשון) עד היום
             case 'השבוע': {
-              const startOfWeek = new Date(today);
-              const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
-              startOfWeek.setDate(today.getDate() - dayOfWeek);
+              // Use dateUtils for consistent date handling
+              let startOfWeek;
+              if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                const daysToSubtract = dayOfWeek;
+                const startOfWeekEpoch = today.getTime() - (daysToSubtract * 24 * 60 * 60 * 1000);
+                startOfWeek = window.dateUtils.toDateObject({ epochMs: startOfWeekEpoch });
+              } else {
+                startOfWeek = new Date(today);
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                startOfWeek.setDate(today.getDate() - dayOfWeek);
+              }
               startOfWeek.setHours(0, 0, 0, 0);
               date.setHours(0, 0, 0, 0);
               return date >= startOfWeek && date <= today;
@@ -1852,7 +2606,7 @@ window.toggleAccountFilterMenu = function () {
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
       if (window.Logger) {
-        window.Logger.info('🔧 Account filter menu closed', { page: 'header-system' });
+        window.Logger.info('🔧 Trading account filter menu closed', { page: 'header-system' });
       }
       console.log('[header] toggleAccountFilterMenu -> closed');
     } else {
@@ -1864,7 +2618,7 @@ window.toggleAccountFilterMenu = function () {
         openFilterMenuPortal(menu, btn, 'account');
       }
       if (window.Logger) {
-        window.Logger.info('🔧 Account filter menu opened', { page: 'header-system' });
+        window.Logger.info('🔧 Trading account filter menu opened', { page: 'header-system' });
       }
       console.log('[header] toggleAccountFilterMenu -> open');
       logFilterMenuDiagnostics('accountFilterMenu');
@@ -1951,13 +2705,176 @@ function logFilterMenuDiagnostics(menuId) {
 // ===== Portal helpers for filter menus =====
 let __headerFilterPortals = new Map();
 
+// ===== ניטור מפורט לפתיחה כפולה =====
+let __menuOpenTracking = {
+  calls: new Map(), // Track all function calls
+  timestamps: new Map(), // Track timestamps
+  callCounts: new Map(), // Track call counts
+};
+
+function trackMenuOpen(functionName, menuId, details = {}) {
+  const timestamp = Date.now();
+  const callId = `${functionName}_${menuId}_${timestamp}`;
+  
+  // Get stack trace
+  const stack = new Error().stack;
+  const stackLines = stack ? stack.split('\n').slice(2, 8).map(line => line.trim()) : [];
+  
+  // Track call
+  const callInfo = {
+    functionName,
+    menuId,
+    timestamp,
+    callId,
+    stack: stackLines,
+    details,
+    previousCall: __menuOpenTracking.timestamps.get(`${functionName}_${menuId}`),
+  };
+  
+  __menuOpenTracking.calls.set(callId, callInfo);
+  __menuOpenTracking.timestamps.set(`${functionName}_${menuId}`, timestamp);
+  
+  const count = (__menuOpenTracking.callCounts.get(`${functionName}_${menuId}`) || 0) + 1;
+  __menuOpenTracking.callCounts.set(`${functionName}_${menuId}`, count);
+  
+  // Calculate time since previous call
+  const timeSincePrevious = callInfo.previousCall 
+    ? timestamp - callInfo.previousCall 
+    : null;
+  
+  console.log(`📊 [TRACK] ${functionName} called for ${menuId}:`, {
+    callNumber: count,
+    timestamp: new Date(timestamp).toISOString(),
+    timeSincePrevious: timeSincePrevious ? `${timeSincePrevious}ms` : 'first call',
+    details,
+    stack: stackLines.slice(0, 3), // First 3 stack lines
+  });
+  
+  // Check for rapid duplicate calls
+  if (timeSincePrevious !== null && timeSincePrevious < 100) {
+    console.warn(`⚠️ [TRACK] RAPID DUPLICATE CALL detected! ${functionName} for ${menuId} called ${timeSincePrevious}ms after previous call`);
+    console.warn(`   Previous call:`, __menuOpenTracking.calls.get(`${functionName}_${menuId}_${callInfo.previousCall}`));
+    console.warn(`   Current call:`, callInfo);
+  }
+  
+  return callInfo;
+}
+
+// Expose tracking for debugging
+window.__menuOpenTracking = __menuOpenTracking;
+window.trackMenuOpen = trackMenuOpen;
+
+// Function to get tracking summary
+window.getMenuTrackingSummary = function(menuId = null) {
+  const calls = Array.from(__menuOpenTracking.calls.values());
+  const filtered = menuId ? calls.filter(c => c.menuId === menuId) : calls;
+  
+  const summary = {
+    totalCalls: filtered.length,
+    byFunction: {},
+    byMenu: {},
+    rapidDuplicates: [],
+    timeline: filtered.sort((a, b) => a.timestamp - b.timestamp),
+  };
+  
+  filtered.forEach(call => {
+    // By function
+    if (!summary.byFunction[call.functionName]) {
+      summary.byFunction[call.functionName] = [];
+    }
+    summary.byFunction[call.functionName].push(call);
+    
+    // By menu
+    if (!summary.byMenu[call.menuId]) {
+      summary.byMenu[call.menuId] = [];
+    }
+    summary.byMenu[call.menuId].push(call);
+    
+    // Check for rapid duplicates
+    if (call.previousCall) {
+      const timeDiff = call.timestamp - call.previousCall;
+      if (timeDiff < 100) {
+        summary.rapidDuplicates.push({
+          functionName: call.functionName,
+          menuId: call.menuId,
+          timeDiff,
+          call1: call,
+          call2: __menuOpenTracking.calls.get(`${call.functionName}_${call.menuId}_${call.previousCall}`),
+        });
+      }
+    }
+  });
+  
+  return summary;
+};
+
+// Function to print tracking summary
+window.printMenuTrackingSummary = function(menuId = null) {
+  const summary = window.getMenuTrackingSummary(menuId);
+  
+  console.log('📊 ===== MENU TRACKING SUMMARY =====');
+  console.log(`Total calls tracked: ${summary.totalCalls}`);
+  if (menuId) {
+    console.log(`Filtered by menu: ${menuId}`);
+  }
+  
+  console.log('\n📈 By Function:');
+  Object.keys(summary.byFunction).forEach(funcName => {
+    console.log(`  ${funcName}: ${summary.byFunction[funcName].length} calls`);
+  });
+  
+  console.log('\n📋 By Menu:');
+  Object.keys(summary.byMenu).forEach(menu => {
+    console.log(`  ${menu}: ${summary.byMenu[menu].length} calls`);
+  });
+  
+  if (summary.rapidDuplicates.length > 0) {
+    console.log('\n⚠️ RAPID DUPLICATES DETECTED:');
+    summary.rapidDuplicates.forEach(dup => {
+      console.log(`  ${dup.functionName} for ${dup.menuId}: ${dup.timeDiff}ms apart`);
+    });
+  }
+  
+  console.log('\n⏱️ Timeline (first 10):');
+  summary.timeline.slice(0, 10).forEach(call => {
+    const time = new Date(call.timestamp).toISOString();
+    console.log(`  [${time}] ${call.functionName} - ${call.menuId}`);
+  });
+  
+  console.log('\n💡 Use window.getMenuTrackingSummary() for full data');
+  console.log('💡 Use window.getMenuTrackingSummary("statusFilterMenu") for specific menu');
+  
+  return summary;
+};
+
 function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
+  trackMenuOpen('openFilterMenuPortal', originalMenuEl.id, {
+    kind,
+    buttonId: anchorBtn?.id,
+    alreadyHasPortal: __headerFilterPortals.has(originalMenuEl.id),
+    menuHasShowClass: originalMenuEl.classList.contains('show'),
+  });
+  
   try {
     // If already portaled, just ensure position and return
     if (__headerFilterPortals.has(originalMenuEl.id)) {
+      console.log(`🔄 [TRACK] Portal already exists for ${originalMenuEl.id}, repositioning only`);
       positionPortal(__headerFilterPortals.get(originalMenuEl.id), anchorBtn);
       return;
     }
+
+    // IMPORTANT: Hide the original menu to prevent duplicate display
+    // The portal will be the visible menu
+    // Remove 'show' class and hide with inline styles
+    originalMenuEl.classList.remove('show');
+    originalMenuEl.style.display = 'none';
+    originalMenuEl.style.visibility = 'hidden';
+    originalMenuEl.style.opacity = '0';
+    
+    window.Logger?.debug?.(`🔧 Hidden original menu ${originalMenuEl.id} to prevent duplicate display`, {
+      page: 'header-system',
+      hadShowClass: originalMenuEl.classList.contains('show'),
+    });
 
     // Create portal container
     const portal = originalMenuEl.cloneNode(true);
@@ -1967,7 +2884,7 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
       position: 'fixed',
       display: 'block',
       visibility: 'visible',
-      opacity: '0',
+      opacity: '1', // Start visible (fade in handled by CSS transition)
       pointerEvents: 'auto',
       zIndex: '2000',
       transition: 'opacity 0.2s ease-in-out',
@@ -2009,15 +2926,33 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
       id: originalMenuEl.id,
       portalId: portal.id,
     });
+    
+    trackMenuOpen('openFilterMenuPortal_COMPLETE', originalMenuEl.id, {
+      kind,
+      portalId: portal.id,
+      portalCreated: true,
+    });
   } catch (e) {
     console.warn('⚠️ Failed to open portal menu:', e?.message);
   }
 }
 
 function closeFilterMenuPortal(originalMenuEl) {
+  trackMenuOpen('closeFilterMenuPortal', originalMenuEl.id, {
+    hasPortal: __headerFilterPortals.has(originalMenuEl.id),
+    menuHasShowClass: originalMenuEl.classList.contains('show'),
+  });
+  
   try {
     const portal = __headerFilterPortals.get(originalMenuEl.id);
-    if (!portal) return;
+    if (!portal) {
+      console.log(`⏭️ [TRACK] No portal to close for ${originalMenuEl.id}`);
+      // Restore original menu visibility if portal doesn't exist
+      originalMenuEl.style.display = '';
+      originalMenuEl.style.visibility = '';
+      originalMenuEl.style.opacity = '';
+      return;
+    }
 
     // Fade out effect
     portal.style.opacity = '0';
@@ -2026,10 +2961,43 @@ function closeFilterMenuPortal(originalMenuEl) {
       window.removeEventListener('resize', portal.__repositionHandler);
       portal.remove();
       __headerFilterPortals.delete(originalMenuEl.id);
+      
+      // Restore original menu visibility after portal is removed
+      // Only restore if menu should be visible (has 'show' class)
+      if (originalMenuEl.classList.contains('show')) {
+        originalMenuEl.style.display = '';
+        originalMenuEl.style.visibility = '';
+        originalMenuEl.style.opacity = '';
+      } else {
+        // Menu should be hidden, keep it hidden
+        originalMenuEl.style.display = 'none';
+        originalMenuEl.style.visibility = 'hidden';
+        originalMenuEl.style.opacity = '0';
+      }
+      
+      window.Logger?.debug?.(`🔧 Restored original menu ${originalMenuEl.id} visibility`, {
+        page: 'header-system',
+        hasShowClass: originalMenuEl.classList.contains('show'),
+      });
+      
       console.log('🧩 Portal removed for menu', originalMenuEl.id);
+      
+      trackMenuOpen('closeFilterMenuPortal_COMPLETE', originalMenuEl.id, {
+        portalRemoved: true,
+      });
     }, 200); // Match transition duration
   } catch (e) {
     console.warn('⚠️ Failed to close portal menu:', e?.message);
+    // Restore original menu visibility on error
+    try {
+      originalMenuEl.style.display = '';
+      originalMenuEl.style.visibility = '';
+      originalMenuEl.style.opacity = '';
+    } catch (restoreError) {
+      window.Logger?.warn?.(`⚠️ Failed to restore original menu visibility:`, restoreError.message, {
+        page: 'header-system',
+      });
+    }
   }
 }
 
@@ -2052,19 +3020,30 @@ function positionPortal(portalEl, anchorBtn) {
 
 // ===== Auto-close other filter menus when opening one =====
 function closeAllFilterMenus() {
+  trackMenuOpen('closeAllFilterMenus', 'ALL', {
+    activePortals: Array.from(__headerFilterPortals.keys()),
+  });
+  
   const menuIds = [
     'statusFilterMenu',
     'typeFilterMenu',
     'accountFilterMenu',
     'dateRangeFilterMenu',
   ];
+  
+  const closedMenus = [];
   menuIds.forEach(id => {
     const menu = document.getElementById(id);
     if (menu && menu.classList.contains('show')) {
+      closedMenus.push(id);
       menu.classList.remove('show');
       closeFilterMenuPortal(menu);
     }
   });
+  
+  if (closedMenus.length > 0) {
+    console.log(`🔄 [TRACK] closeAllFilterMenus closed ${closedMenus.length} menus:`, closedMenus);
+  }
 
   // Also close any existing portals
   if (__headerFilterPortals) {
@@ -2358,7 +3337,17 @@ function updatePortalSelections() {
   }
 }
 
+// Track if setupHoverBehavior has been called to prevent duplicates
+let __setupHoverBehaviorCalled = false;
+
 function setupHoverBehavior() {
+  window.Logger?.info?.('🔧 setupHoverBehavior() - START', {
+    page: 'header-system',
+    alreadyCalled: __setupHoverBehaviorCalled,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Cleanup existing hover behavior before setting up new one
   const filterButtons = [
     { buttonId: 'statusFilterToggle', menuId: 'statusFilterMenu', type: 'status' },
     { buttonId: 'typeFilterToggle', menuId: 'typeFilterMenu', type: 'type' },
@@ -2366,77 +3355,249 @@ function setupHoverBehavior() {
     { buttonId: 'dateRangeFilterToggle', menuId: 'dateRangeFilterMenu', type: 'date' },
   ];
 
+  // Full cleanup of existing event listeners before adding new ones
+  filterButtons.forEach(({ buttonId, menuId }) => {
+    const button = document.getElementById(buttonId);
+    const menu = document.getElementById(menuId);
+
+    if (button) {
+      // Cleanup existing handlers
+      if (button.__hoverHandlers) {
+        window.Logger?.debug?.(`🧹 Cleaning up existing handlers for ${buttonId}`, {
+          page: 'header-system',
+        });
+        
+        try {
+          if (button.__hoverHandlers.mouseenter) {
+            button.removeEventListener('mouseenter', button.__hoverHandlers.mouseenter);
+          }
+          if (button.__hoverHandlers.mouseleave) {
+            button.removeEventListener('mouseleave', button.__hoverHandlers.mouseleave);
+          }
+          if (button.__hoverHandlers.click) {
+            button.removeEventListener('click', button.__hoverHandlers.click, true);
+          }
+        } catch (error) {
+          window.Logger?.warn?.(`⚠️ Error removing handlers for ${buttonId}:`, error.message, {
+            page: 'header-system',
+          });
+        }
+      }
+
+      // Clear any existing timeouts for this button
+      if (hoverTimeouts.has(buttonId)) {
+        clearTimeout(hoverTimeouts.get(buttonId));
+        hoverTimeouts.delete(buttonId);
+      }
+
+      // Remove onclick attribute
+      button.removeAttribute('data-onclick');
+
+      // Reset handlers storage
+      button.__hoverHandlers = {
+        mouseenter: null,
+        mouseleave: null,
+        click: null,
+      };
+    }
+
+    // Cleanup menu event listeners by cloning
+    if (menu && menu.parentNode) {
+      try {
+        const menuClone = menu.cloneNode(true);
+        menu.parentNode.replaceChild(menuClone, menu);
+        menuClone.id = menuId;
+        window.Logger?.debug?.(`🧹 Cleaned up menu event listeners for ${menuId}`, {
+          page: 'header-system',
+        });
+      } catch (error) {
+        window.Logger?.warn?.(`⚠️ Error cleaning menu ${menuId}:`, error.message, {
+          page: 'header-system',
+        });
+      }
+    }
+  });
+
+  // Reset flag after cleanup
+  __setupHoverBehaviorCalled = false;
+  
+  // Now mark as called and proceed with setup
+  __setupHoverBehaviorCalled = true;
+  
+  trackMenuOpen('setupHoverBehavior', 'SYSTEM', {
+    timestamp: Date.now(),
+  });
+  
+  window.Logger?.info?.(`🔧 [TRACK] setupHoverBehavior - Setup after cleanup`, {
+    page: 'header-system',
+  });
+  
   filterButtons.forEach(({ buttonId, menuId, type }) => {
     const button = document.getElementById(buttonId);
     const menu = document.getElementById(menuId);
 
     if (button && menu) {
-      // Remove existing click handlers
-      button.removeAttribute('data-onclick');
+      // Validation: Ensure elements exist
+      if (!document.body.contains(button) || !document.body.contains(menu)) {
+        window.Logger?.warn?.(`⚠️ Button or menu not in DOM: ${buttonId} / ${menuId}`, {
+          page: 'header-system',
+        });
+        return;
+      }
+
+      // Check for existing event listeners BEFORE adding new ones
+      // Note: getEventListeners is only available in Chrome DevTools console
+      const existingListeners = (typeof getEventListeners !== 'undefined') ? getEventListeners(button) : null;
+      if (existingListeners) {
+        window.Logger?.debug?.(`🔍 [TRACK] Button ${buttonId} existing listeners:`, {
+          page: 'header-system',
+          mouseenter: existingListeners?.mouseenter?.length || 0,
+          mouseleave: existingListeners?.mouseleave?.length || 0,
+          click: existingListeners?.click?.length || 0,
+        });
+      }
+      
+      // Initialize handlers storage (should be clean after cleanup above)
+      if (!button.__hoverHandlers) {
+        button.__hoverHandlers = {
+          mouseenter: null,
+          mouseleave: null,
+          click: null,
+        };
+      }
 
       // Prevent click events from triggering toggle actions
-      button.addEventListener(
-        'click',
-        e => {
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          console.log(`🚫 Click prevented on ${buttonId}`);
-          return false;
-        },
-        true
-      ); // Use capture phase to catch before other handlers
+      const clickHandler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        console.log(`🚫 Click prevented on ${buttonId}`);
+        return false;
+      };
+      button.__hoverHandlers.click = clickHandler;
+      button.addEventListener('click', clickHandler, true); // Use capture phase to catch before other handlers
 
       // Add hover events
-      button.addEventListener('mouseenter', () => {
+      const mouseenterHandler = (e) => {
+        // Prevent event bubbling
+        if (e) {
+          e.stopPropagation();
+        }
+        
+        trackMenuOpen('mouseenter_HOVER', menuId, {
+          buttonId,
+          type,
+          menuHasShowClass: menu.classList.contains('show'),
+          hasExistingTimeout: hoverTimeouts.has(buttonId),
+          eventTarget: e?.target?.tagName,
+          eventCurrentTarget: e?.currentTarget?.tagName,
+        });
+        
         // Clear any existing timeout
         if (hoverTimeouts.has(buttonId)) {
-          clearTimeout(hoverTimeouts.get(buttonId));
+          const existingTimeout = hoverTimeouts.get(buttonId);
+          clearTimeout(existingTimeout);
           hoverTimeouts.delete(buttonId);
+          console.log(`🔄 [TRACK] Cleared existing hover timeout for ${buttonId}`);
         }
 
         // Open menu after short delay
-        hoverTimeouts.set(
-          buttonId,
-          setTimeout(() => {
-            if (!menu.classList.contains('show')) {
-              closeAllFilterMenus();
-              menu.classList.add('show');
-              openFilterMenuPortal(menu, button, type);
-              console.log(`🖱️ Hover opened ${menuId}`);
-            }
-          }, 150)
-        ); // 150ms delay
-      });
+        const timeoutId = setTimeout(() => {
+          trackMenuOpen('hoverTimeout_EXECUTE', menuId, {
+            buttonId,
+            type,
+            menuHasShowClass: menu.classList.contains('show'),
+            delay: 150,
+          });
+          
+          if (!menu.classList.contains('show')) {
+            trackMenuOpen('hoverTimeout_OPENING', menuId, {
+              buttonId,
+              type,
+              action: 'opening menu',
+            });
+            
+            closeAllFilterMenus();
+            menu.classList.add('show');
+            // openFilterMenuPortal will hide the original menu and show the portal
+            openFilterMenuPortal(menu, button, type);
+            console.log(`🖱️ Hover opened ${menuId}`);
+          } else {
+            console.log(`⏭️ [TRACK] Menu ${menuId} already has 'show' class, skipping open`);
+          }
+        }, 150); // 150ms delay
+        
+        hoverTimeouts.set(buttonId, timeoutId);
+        console.log(`⏰ [TRACK] Set hover timeout for ${buttonId}, will execute in 150ms`);
+      };
+      button.__hoverHandlers.mouseenter = mouseenterHandler;
+      button.addEventListener('mouseenter', mouseenterHandler);
 
-      button.addEventListener('mouseleave', () => {
+      const mouseleaveHandler = (e) => {
+        // Prevent event bubbling
+        if (e) {
+          e.stopPropagation();
+        }
+        
+        trackMenuOpen('mouseleave_HOVER', menuId, {
+          buttonId,
+          type,
+          menuHasShowClass: menu.classList.contains('show'),
+          hasExistingTimeout: hoverTimeouts.has(buttonId),
+          eventTarget: e?.target?.tagName,
+          eventCurrentTarget: e?.currentTarget?.tagName,
+        });
+        
         // Clear open timeout
         if (hoverTimeouts.has(buttonId)) {
-          clearTimeout(hoverTimeouts.get(buttonId));
+          const existingTimeout = hoverTimeouts.get(buttonId);
+          clearTimeout(existingTimeout);
           hoverTimeouts.delete(buttonId);
+          console.log(`🔄 [TRACK] Cleared hover timeout on mouseleave for ${buttonId}`);
         }
 
         // Defer close; only close if neither button nor portal is hovered
-        hoverTimeouts.set(
-          buttonId,
-          setTimeout(() => {
-            const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
-            const buttonHovered = button.matches(':hover');
-            const portalHovered = portal ? portal.matches(':hover') : false;
-            const menuHovered = menu.matches(':hover');
-            if (
-              !buttonHovered &&
-              !portalHovered &&
-              !menuHovered &&
-              menu.classList.contains('show')
-            ) {
-              menu.classList.remove('show');
-              closeFilterMenuPortal(menu);
-              console.log(`🖱️ Hover closed ${menuId}`);
-            }
-          }, 220)
-        ); // short defer to allow cursor to enter portal
-      });
+        const timeoutId = setTimeout(() => {
+          const portal = __headerFilterPortals && __headerFilterPortals.get(menuId);
+          const buttonHovered = button.matches(':hover');
+          const portalHovered = portal ? portal.matches(':hover') : false;
+          const menuHovered = menu.matches(':hover');
+          
+          trackMenuOpen('mouseleaveTimeout_CHECK', menuId, {
+            buttonId,
+            type,
+            buttonHovered,
+            portalHovered,
+            menuHovered,
+            menuHasShowClass: menu.classList.contains('show'),
+            hasPortal: !!portal,
+          });
+          
+          if (
+            !buttonHovered &&
+            !portalHovered &&
+            !menuHovered &&
+            menu.classList.contains('show')
+          ) {
+            trackMenuOpen('mouseleaveTimeout_CLOSING', menuId, {
+              buttonId,
+              type,
+              action: 'closing menu',
+            });
+            
+            menu.classList.remove('show');
+            closeFilterMenuPortal(menu);
+            console.log(`🖱️ Hover closed ${menuId}`);
+          } else {
+            console.log(`⏭️ [TRACK] Menu ${menuId} not closed - still hovered or not showing`);
+          }
+        }, 220); // short defer to allow cursor to enter portal
+        
+        hoverTimeouts.set(buttonId, timeoutId);
+        console.log(`⏰ [TRACK] Set close timeout for ${buttonId}, will check in 220ms`);
+      };
+      button.__hoverHandlers.mouseleave = mouseleaveHandler;
+      button.addEventListener('mouseleave', mouseleaveHandler);
 
       // Also handle menu hover to keep it open
       menu.addEventListener('mouseenter', () => {
@@ -2961,37 +4122,71 @@ window.updateFilterUI = function (filters) {
   if (typeof window.updateDateRangeFilterText === 'function') window.updateDateRangeFilterText();
 };
 
-// ===== Initialize Header System =====
-try {
-  if (!window.headerSystem) {
-    window.headerSystem = new HeaderSystem();
-  }
-  const initHeader = () => {
+// ===== Header System Initialization =====
+// NOTE: Header system initialization is primarily handled by the unified initialization system
+// (unified-app-initializer.js). However, we have a safety bootstrap that ensures the header
+// is created even if the unified system doesn't call it (prevents header not appearing issue).
+// The bootstrap only runs if the header hasn't been initialized within 1.5 seconds of DOMContentLoaded.
+
+(function() {
+  'use strict';
+  
+  // Safety bootstrap: Ensure header is created even if unified system doesn't initialize it
+  const ensureHeaderInitialization = () => {
+    // Check if header already initialized
+    if (window.headerSystemReady || (window.headerSystem && window.headerSystem.isInitialized)) {
+      window.Logger?.debug?.('✅ Header already initialized, skipping safety bootstrap', {
+        page: 'header-system',
+      });
+      return;
+    }
+
+    // Check if HeaderSystem is available
+    if (typeof window.HeaderSystem === 'undefined' || typeof window.HeaderSystem.initialize !== 'function') {
+      window.Logger?.warn?.('⚠️ HeaderSystem not available for safety bootstrap', {
+        page: 'header-system',
+      });
+      return;
+    }
+
+    // Check if header element already exists
+    const existingHeader = document.getElementById('unified-header');
+    if (existingHeader && existingHeader.innerHTML.trim().length > 0) {
+      window.Logger?.debug?.('✅ Header element already exists with content, skipping safety bootstrap', {
+        page: 'header-system',
+      });
+      return;
+    }
+
+    // Safety bootstrap: Initialize header if not already done
+    window.Logger.info('🔧 Safety bootstrap: Initializing header system', {
+      page: 'header-system',
+      readyState: document.readyState,
+      bodyExists: !!document.body,
+      timestamp: new Date().toISOString(),
+    });
+
     try {
-      window.headerSystem.init();
-      window.headerSystemReady = true;
-      // Setup hover behavior for filter menus
-      setupHoverBehavior();
-      window.Logger &&
-        window.Logger.info('✅ HeaderSystem initialized with hover behavior', {
-          page: 'header-system',
-        });
-    } catch (e) {
-      window.Logger &&
-        window.Logger.error('❌ HeaderSystem init failed', {
-          error: e?.message,
-          page: 'header-system',
-        });
+      window.HeaderSystem.initialize();
+    } catch (error) {
+      window.Logger?.error?.('❌ Safety bootstrap failed', {
+        page: 'header-system',
+        error: error.message,
+        stack: error.stack,
+      });
     }
   };
+
+  // Run safety bootstrap after DOMContentLoaded + delay (in case unified system doesn't run)
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHeader);
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(ensureHeaderInitialization, 1500); // 1.5 seconds after DOMContentLoaded
+    });
   } else {
-    initHeader();
+    // DOM already loaded, run immediately with delay
+    setTimeout(ensureHeaderInitialization, 1500);
   }
-} catch (e) {
-  console.error('HeaderSystem bootstrap error:', e);
-}
+})();
 
 window.resetAllFilters = async function () {
   console.log('↻ resetAllFilters - מחזיר לערכי ברירת מחדל מהעדפות');
@@ -3234,24 +4429,75 @@ window.HeaderSystemClass = HeaderSystem;
 // Create global HeaderSystem object for compatibility with unified initialization
 window.HeaderSystem = {
   initialize: function () {
-    window.Logger.info('🚀 HeaderSystem.initialize called', { page: 'header-system' });
+    window.Logger.info('🚀 HeaderSystem.initialize() - START', {
+      page: 'header-system',
+      timestamp: new Date().toISOString(),
+      readyState: document.readyState,
+      bodyExists: !!document.body,
+      HeaderSystemClassExists: typeof window.HeaderSystemClass === 'function',
+      existingInstance: !!window.headerSystem,
+      stackTrace: new Error().stack?.split('\n').slice(1, 6).join('\n'),
+    });
+
     try {
       // Check if HeaderSystem class exists
       if (typeof window.HeaderSystemClass === 'function') {
-        window.headerSystem = new window.HeaderSystemClass();
-        if (typeof window.headerSystem.init === 'function') {
-          window.headerSystem.init();
+        // Reuse existing instance if available, otherwise create new one
+        if (!window.headerSystem) {
+          window.Logger.info('🆕 HeaderSystem.initialize() - Creating new instance', {
+            page: 'header-system',
+          });
+          window.headerSystem = new window.HeaderSystemClass();
+        } else {
+          window.Logger.info('♻️ HeaderSystem.initialize() - Reusing existing instance', {
+            page: 'header-system',
+            isInitialized: window.headerSystem.isInitialized,
+          });
         }
-        // Setup hover behavior for filter menus
-        setupHoverBehavior();
+        
+        // Initialize the header system (init() handles duplicate prevention internally)
+        if (typeof window.headerSystem.init === 'function') {
+          window.Logger.info('🔄 HeaderSystem.initialize() - Calling init()', {
+            page: 'header-system',
+          });
+          window.headerSystem.init();
+          
+          // בדיקה אחרי init
+          const headerElement = document.getElementById('unified-header');
+          window.Logger.info('✅ HeaderSystem.initialize() - init() completed', {
+            page: 'header-system',
+            headerElementExists: !!headerElement,
+            headerElementVisible: headerElement ? window.getComputedStyle(headerElement).display !== 'none' : false,
+            headerElementHeight: headerElement?.offsetHeight || 0,
+            isInitialized: window.headerSystem.isInitialized,
+          });
+        } else {
+          window.Logger.error('❌ HeaderSystem.initialize() - init() method not found', {
+            page: 'header-system',
+          });
+        }
+        
+        // Mark as ready for compatibility
+        window.headerSystemReady = true;
+        
+        window.Logger.info('✅ HeaderSystem.initialize() - COMPLETE', {
+          page: 'header-system',
+          headerSystemReady: window.headerSystemReady,
+        });
+        
         return true;
       } else {
-        window.Logger.info('⚠️ HeaderSystem class not available yet', { page: 'header-system' });
+        window.Logger.error('❌ HeaderSystem.initialize() - HeaderSystemClass not available', {
+          page: 'header-system',
+          HeaderSystemClassType: typeof window.HeaderSystemClass,
+        });
         return false;
       }
     } catch (error) {
-      window.Logger.info('⚠️ HeaderSystem.initialize error:', error.message, {
+      window.Logger.error('❌ HeaderSystem.initialize() - ERROR', {
         page: 'header-system',
+        error: error.message,
+        stack: error.stack,
       });
       return false;
     }
@@ -3275,6 +4521,24 @@ window.HeaderSystem = {
   init: function () {
     return this.initialize();
   },
+};
+
+// Create initializeHeaderSystem wrapper for compatibility with core-systems.js
+// This is needed because core-systems.js calls window.initializeHeaderSystem()
+window.initializeHeaderSystem = function() {
+  window.Logger?.info?.('🔧 initializeHeaderSystem() wrapper called', {
+    page: 'header-system',
+    HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
+  });
+  
+  if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+    return window.HeaderSystem.initialize();
+  } else {
+    window.Logger?.error?.('❌ HeaderSystem.initialize not available', {
+      page: 'header-system',
+    });
+    return false;
+  }
 };
 
 // הוסר - המערכת המאוחדת מטפלת באתחול

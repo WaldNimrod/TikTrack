@@ -1,12 +1,14 @@
 # TikTrack Production Update Process - מדריך עדכון פרודקשן
 
-**תאריך:** 2025-11-09  
-**גרסה:** 1.2.0  
+**תאריך:** 2025-11-21  
+**גרסה:** 1.3.0  
 **מטרה:** תהליך מלא ומסודר לעדכון קוד הפרודקשן המקומי מול Git
 
 **⚠️ עדכון חשוב:** גרסה זו כוללת תיקונים קריטיים לבדיקת הגדרות production אחרי sync
 
 **🆕 עדכון 1.2.0:** כל ה-hardcoded URLs הוחלפו ב-relative URLs - הקוד עובד אוטומטית בפיתוח ובפרודקשן
+
+**🆕 עדכון 1.3.0:** שינוי מ-whitelist ל-blacklist - כל הקבצים מתעדכנים אוטומטית למעט חריגים ספציפיים (tests, archive, backups, documentation, legacy). הוספת verification מקיף אחרי sync.
 
 ---
 
@@ -164,7 +166,8 @@ python3 scripts/production-update/master.py
 - Step 2: Merge Main - מיזוג main → production (עם conflict resolver אוטומטי)
 - Step 3: Cleanup Documentation - ניקוי דוקומנטציה
 - Step 4: Backup Database - גיבוי DB
-- Step 5: Sync Code - סנכרון קוד (Backend + UI) + post-sync transformations
+- Step 5: Sync Code - סנכרון קוד (Backend + UI) + post-sync transformations + verification
+- Step 5b: Verify Sync - בדיקת שלמות העדכון (file count, checksums, directory structure) - **חובה**
 - Step 6: Cleanup Backups - ניקוי קבצי גיבוי
 - Step 7: Fix Config - תיקון הגדרות production
 - Step 8: Validate - בדיקות ואימות
@@ -214,11 +217,33 @@ git checkout production
 
 **מה הסקריפט עושה:**
 - **גיבוי DB** - מגבה את ה-DB לפני מחיקת production directory
-- **מעתיק קבצים פעילים** מ-`Backend/` ל-`production/Backend/`
+- **מעתיק כל הקבצים** מ-`Backend/` ל-`production/Backend/` (blacklist approach)
 - **מעתיק UI** מ-`trading-ui/` ל-`production/trading-ui/` (עם copy_function=shutil.copy2)
-- **שומר רק על קבצים פעילים** (ללא tests/migrations)
+- **מחריג רק קבצים ספציפיים** (blacklist): tests, archive, backups, documentation, legacy, migrations, logs, coverage, __pycache__, .git, node_modules
 - **משחזר DB** - משחזר את ה-DB אחרי sync
 - **בודק קבצים קריטיים** - verifies critical files (header-system.js, header-styles.css, וכו')
+- **בודק verification** - מבצע בדיקות מקיפות אחרי sync (file count, checksums, directory structure)
+
+**🆕 עדכון 1.3.0 - Blacklist Approach:**
+התהליך שונה מ-whitelist מוגבל ל-blacklist מקיף:
+- **ברירת מחדל:** העתק הכל מ-main לפרודקשן
+- **חריגים (EXCLUDED):** רק קבצים/תיקיות שצריך להוציא:
+  - `tests/`, `test/` - טסטים
+  - `archive/`, `archives/` - ארכיון
+  - `backup/`, `backups/` - גיבויים
+  - `documentation/`, `docs/` - דוקומנטציה
+  - `legacy/`, `old/`, `deprecated/` - קוד לגסי/ישן
+  - `debug/`, `debugs/` - קבצי debug (לא נדרש בפרודקשן)
+  - `migrations/` - migrations (לא נדרש בפרודקשן)
+  - `db/` - נשמר בנפרד
+  - `logs/`, `coverage/`, `__pycache__/`, `.git/`, `node_modules/` - קבצים טכניים
+  - קבצים עם `*debug*`, `*Debug*`, `*DEBUG*` בשם - קבצי debug
+
+**יתרונות:**
+- כל הקבצים מתעדכנים אוטומטית
+- אין צורך לעדכן רשימות whitelist ידנית
+- קבצים חדשים מתעדכנים אוטומטית
+- verification אוטומטי מאשר שהכל עודכן
 
 **תוצאה צפויה:**
 ```

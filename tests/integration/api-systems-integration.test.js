@@ -65,7 +65,6 @@ describe('API Systems Integration', () => {
         window.CacheSyncManager = new CacheSyncManagerClass();
         window.CacheSyncManager.delay = jest.fn(() => Promise.resolve());
         await window.CacheSyncManager.initialize();
-        global.fetch.mockClear();
 
         window.notificationSystem = {
             showNotification: jest.fn()

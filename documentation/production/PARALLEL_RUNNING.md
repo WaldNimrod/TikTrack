@@ -16,8 +16,8 @@
 - ✅ אין התנגשויות - כל שרת רץ על פורט משלו
 
 ### 2. בסיסי נתונים נפרדים
-- **פיתוח:** `Backend/db/simpleTrade_new.db`
-- **פרודקשן:** `production/Backend/db/TikTrack_DB.db`
+- **פיתוח:** `Backend/db/tiktrack.db`
+- **פרודקשן:** `production/Backend/db/tiktrack.db`
 - ✅ אין שיתוף נתונים - כל שרת עם DB משלו
 
 ### 3. לוגים נפרדים
@@ -132,7 +132,7 @@ sessionStorage.clear();
 | רכיב | פיתוח (8080) | פרודקשן (5001) | משותף? |
 |------|---------------|----------------|---------|
 | **Backend Code** | `Backend/` | `production/Backend/` | ❌ לא |
-| **Database** | `simpleTrade_new.db` | `TikTrack_DB.db` | ❌ לא |
+| **Database** | `tiktrack.db` | `tiktrack.db` | ❌ לא |
 | **Port** | 8080 | 5001 | ❌ לא |
 | **Logs** | `Backend/logs/` | `production/Backend/logs/` | ❌ לא |
 | **Frontend (UI)** | `trading-ui/` | `trading-ui/` | ✅ כן |

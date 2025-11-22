@@ -1,0 +1,44 @@
+{
+  "start_time": "2025-11-21T14:32:37.009598",
+  "steps": [
+    {
+      "number": 5,
+      "name": "sync_code",
+      "success": false,
+      "duration_seconds": 0.022361040115356445,
+      "timestamp": "2025-11-21T14:32:37.041231",
+      "details": {
+        "success": false,
+        "error": "Backend sync failed"
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Backend sync failed: ",
+      "step": "sync_code",
+      "timestamp": "2025-11-21T14:32:37.041030"
+    },
+    {
+      "message": "Step 5 (sync_code) failed",
+      "step": "sync_code",
+      "timestamp": "2025-11-21T14:32:37.041234"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 0.032412,
+    "steps_completed": 0,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 0,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-21T14:32:37.042010",
+  "success": false
+}

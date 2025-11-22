@@ -201,9 +201,28 @@ function applyFallbackDateSort(data) {
 
   try {
     const sortedData = [...data].sort((a, b) => {
-      const aDate = a && a.date ? new Date(a.date) : new Date(0);
-      const bDate = b && b.date ? new Date(b.date) : new Date(0);
-      return bDate - aDate;
+      // Use dateUtils for consistent date comparison
+      const getEpoch = (dateValue) => {
+        if (!dateValue) return 0;
+        if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+          const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
+          return window.dateUtils.getEpochMilliseconds(envelope || dateValue) || 0;
+        }
+        // Fallback for DateEnvelope objects
+        if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
+          return dateValue.epochMs;
+        }
+        // Fallback for Date objects or strings
+        try {
+          const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+          return dateObj.getTime() || 0;
+        } catch {
+          return 0;
+        }
+      };
+      const aEpoch = a && a.date ? getEpoch(a.date) : 0;
+      const bEpoch = b && b.date ? getEpoch(b.date) : 0;
+      return bEpoch - aEpoch;
     });
 
     // Update pagination if it exists, otherwise update table directly
@@ -801,7 +820,24 @@ function validateCashFlowAmount(value) {
  */
 function validateCashFlowDate(value) {
   if (!value) return 'יש להזין תאריך';
-  const date = new Date(value);
+  
+  // Use dateUtils for consistent date parsing
+  let date;
+  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+    const envelope = window.dateUtils.ensureDateEnvelope(value);
+    if (envelope && envelope.epochMs) {
+      date = new Date(envelope.epochMs);
+    } else {
+      date = new Date(value);
+    }
+  } else if (value && typeof value === 'object' && typeof value.epochMs === 'number') {
+    date = new Date(value.epochMs);
+  } else {
+    date = new Date(value);
+  }
+  
+  if (Number.isNaN(date.getTime())) return 'תאריך לא תקין';
+  
   const today = new Date();
   const maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
   const minDate = new Date(2000, 0, 1);
@@ -932,8 +968,29 @@ async function deleteCashFlow(id) {
         return window.dateUtils.formatDate(dateEnvelope || dateValue, { includeTime: false });
       }
       try {
-        const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+        // Use dateUtils for consistent date parsing
+        let dateObj;
+        if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+          const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+          if (envelope && envelope.epochMs) {
+            dateObj = new Date(envelope.epochMs);
+          } else {
+            dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+          }
+        } else if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
+          dateObj = new Date(dateValue.epochMs);
+        } else {
+          dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
+        }
+        
         if (!Number.isNaN(dateObj.getTime())) {
+          // Use FieldRendererService or dateUtils for formatting
+          if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+            return window.FieldRendererService.renderDate(dateObj, false);
+          }
+          if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+            return window.dateUtils.formatDate(dateObj, { includeTime: false });
+          }
           return window.formatDate ? window.formatDate(dateObj, false) : dateObj.toLocaleDateString('he-IL');
         }
       } catch (error) {
@@ -4045,13 +4102,14 @@ window.registerCashFlowsTables = function() {
             return window.cashFlowsData || [];
         },
         updateFunction: (data) => {
-            // Don't call pagination.setData here - it causes infinite loops
-            // The pagination system already handles data updates through its render callback
-            // Just update the table display directly if pagination is not active
+            // CRITICAL FIX: Sorting must update pagination with FULL sorted data
+            // The pagination system will handle slicing to current page
             const paginationInstance = getCashFlowsPaginationInstance();
             if (paginationInstance && typeof paginationInstance.setData === 'function') {
-                // Pagination is active - let it handle the update through render callback
-                // Don't call setData here to avoid loop
+                // Update pagination with full sorted data - it will slice to current page
+                // This ensures sorting is applied to ALL data, not just current page
+                paginationInstance.setData(Array.isArray(data) ? data : []);
+                // Pagination will trigger render callback automatically
                 return;
             }
             // If no pagination, update table directly

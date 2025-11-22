@@ -53,7 +53,7 @@ git push origin production
 
 - **תקייה נפרדת:** `production/Backend/` - רק קבצים פעילים
 - **Git Branch נפרד:** `production` - קוד נקי ללא tests/migrations
-- **בסיס נתונים נפרד:** `TikTrack_DB.db` - רק נתוני עזר והעדפות
+- **בסיס נתונים נפרד:** `tiktrack.db` - רק נתוני עזר והעדפות
 - **פורט נפרד:** 5001 (פיתוח: 8080)
 - **לוגים נפרדים:** `production/Backend/logs/`
 
@@ -72,7 +72,7 @@ TikTrackApp/
 │   ├── tests/                             # בדיקות
 │   ├── migrations/                       # מיגרציות
 │   ├── db/
-│   │   └── simpleTrade_new.db            # DB פיתוח
+│   │   └── tiktrack.db            # DB פיתוח
 │   └── logs/                              # לוגים פיתוח
 │
 ├── production/                            # סביבת פרודקשן (רק קבצים פעילים)
@@ -89,7 +89,7 @@ TikTrackApp/
 │   │   │   ├── create_production_db.py
 │   │   │   └── map_active_files.py
 │   │   ├── db/
-│   │   │   └── TikTrack_DB.db            # ✅ DB פרודקשן
+│   │   │   └── tiktrack.db            # ✅ DB פרודקשן
 │   │   └── logs/                          # ✅ לוגים פרודקשן
 │   │
 │   └── start_production.sh                # ✅ סקריפט הפעלה
@@ -195,7 +195,7 @@ conn = sqlite3.connect(str(DB_PATH))
 ```python
 # ❌ שגוי - נתיב קשיח
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
+DB_PATH = os.path.join(BASE_DIR, "db", "tiktrack.db")
 ```
 
 הסקריפט `scripts/fix_production_paths.py` מתקן אוטומטית נתיבים קשיחים.
@@ -210,8 +210,8 @@ python3 scripts/create_production_db.py
 ```
 
 הסקריפט:
-1. קורא מ-`Backend/db/simpleTrade_new.db` (פיתוח)
-2. יוצר `production/Backend/db/TikTrack_DB.db` (פרודקשן)
+1. קורא מ-`Backend/db/tiktrack.db` (פיתוח)
+2. יוצר `production/Backend/db/tiktrack.db` (פרודקשן)
 3. מעתיק את כל מבנה הטבלאות
 4. מעתיק נתוני עזר והעדפות
 5. מעתיק רק חשבון מסחר אחד (ברירת מחדל)
@@ -264,14 +264,14 @@ cd production
 - כל הקוד כולל tests, migrations, וכו'
 - עבודה יומיומית
 - פורט: 8080
-- DB: `simpleTrade_new.db`
+- DB: `tiktrack.db`
 
 ### production (production)
 - רק קבצים פעילים מ-`production/Backend/`
 - קוד נקי ללא tests/migrations
 - עדכון רק דרך sync script
 - פורט: 5001
-- DB: `TikTrack_DB.db`
+- DB: `tiktrack.db`
 
 ## הפרדה בין הסביבות
 
@@ -280,7 +280,7 @@ cd production
 | **תקייה** | `Backend/` | `production/Backend/` |
 | **Git Branch** | `main` | `production` |
 | **פורט** | 8080 | 5001 |
-| **DB** | `simpleTrade_new.db` | `TikTrack_DB.db` |
+| **DB** | `tiktrack.db` | `tiktrack.db` |
 | **לוגים** | `Backend/logs/` | `production/Backend/logs/` |
 | **קבצים** | כל הקבצים | רק פעילים (~145) |
 | **Tests** | ✅ יש | ❌ אין |

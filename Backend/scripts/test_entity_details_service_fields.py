@@ -18,7 +18,7 @@ from models.base import Base
 from services.entity_details_service import EntityDetailsService
 
 # Database setup
-DB_PATH = BACKEND_DIR / "db" / "simpleTrade_new.db"
+DB_PATH = BACKEND_DIR / "db" / "tiktrack.db"
 engine = create_engine(f'sqlite:///{DB_PATH}')
 SessionLocal = sessionmaker(bind=engine)
 

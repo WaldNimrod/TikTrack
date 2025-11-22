@@ -547,8 +547,9 @@ class StatisticsBusinessService(BaseBusinessService):
                     for cf_date, cf_amount in cash_flow_dates:
                         if cf_date == period_start:
                             # Cash flow happened at start of this period
-                            # Adjust start value (subtract deposit, add withdrawal)
-                            start_value -= cf_amount
+                            # Adjust start value (add deposit, subtract withdrawal)
+                            # Note: deposits are positive, withdrawals are negative in cash_flow_dates
+                            start_value += cf_amount
                 
                 # Calculate return for this period
                 if start_value > 0:
@@ -582,14 +583,20 @@ class StatisticsBusinessService(BaseBusinessService):
             # Calculate final TWR
             time_weighted_return = (cumulative_return - 1) * 100  # Convert to percentage
             
-            # Get final portfolio values
-            final_portfolio = PositionPortfolioService.calculate_portfolio_summary(
-                db=db,
-                account_id_filter=account_id,
-                include_closed=False
-            )
-            final_start_value = final_portfolio.get('summary', {}).get('total_market_value', 0.0)
-            final_end_value = final_portfolio.get('summary', {}).get('total_market_value', 0.0)
+            # Get final portfolio values from calculated periods
+            # Use the first period's start value and last period's end value
+            if periods:
+                final_start_value = periods[0].get('start_value', 0.0)
+                final_end_value = periods[-1].get('end_value', 0.0)
+            else:
+                # Fallback to current portfolio value if no periods calculated
+                final_portfolio = PositionPortfolioService.calculate_portfolio_summary(
+                    db=db,
+                    account_id_filter=account_id,
+                    include_closed=False
+                )
+                final_start_value = final_portfolio.get('summary', {}).get('total_market_value', 0.0)
+                final_end_value = final_portfolio.get('summary', {}).get('total_market_value', 0.0)
             
             # Calculate total cash flows
             total_cash_flows = sum(amount for _, amount in cash_flow_dates)

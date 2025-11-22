@@ -188,7 +188,9 @@ class TickerSymbolMappingService:
                 db.add(mapping)
                 logger.info(f"Created mapping for ticker {ticker_id}, provider {provider_id}: {provider_symbol}")
             
-            db.commit()
+            # Flush to get ID and ensure object is in session, but don't commit
+            # The decorator will handle the commit
+            db.flush()
             db.refresh(mapping)
             
             # Invalidate cache
@@ -196,6 +198,8 @@ class TickerSymbolMappingService:
             cache_service.delete(cache_key)
             all_mappings_key = TickerSymbolMappingService._get_all_mappings_cache_key(ticker_id)
             cache_service.delete(all_mappings_key)
+            
+            logger.info(f"✅ Provider symbol mapping flushed to session (will be committed by decorator): ticker {ticker_id}, provider {provider_id}, symbol {provider_symbol}")
             
             return mapping
             
@@ -228,7 +232,8 @@ class TickerSymbolMappingService:
             
             if mapping:
                 db.delete(mapping)
-                db.commit()
+                # Flush instead of commit - let decorator handle commit
+                db.flush()
                 
                 # Invalidate cache
                 cache_key = TickerSymbolMappingService._get_cache_key(ticker_id, provider_id)
@@ -236,7 +241,7 @@ class TickerSymbolMappingService:
                 all_mappings_key = TickerSymbolMappingService._get_all_mappings_cache_key(ticker_id)
                 cache_service.delete(all_mappings_key)
                 
-                logger.info(f"Deleted mapping for ticker {ticker_id}, provider {provider_id}")
+                logger.info(f"✅ Deleted mapping for ticker {ticker_id}, provider {provider_id} (flushed, will be committed by decorator)")
                 return True
             else:
                 logger.warning(f"Mapping not found for ticker {ticker_id}, provider {provider_id}")

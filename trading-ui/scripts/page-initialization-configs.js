@@ -2206,6 +2206,49 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+
+    // Trade History Page (Mockup)
+    'trade-history-page': {
+      name: 'Trade History Page',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'preferences',
+        'entity-services',
+        'tradingview-charts',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'TradingViewChartAdapter',
+        'TradingViewTheme',
+        'window.LightweightCharts',
+      ],
+      description: 'עמוד היסטוריית טרייד - מוקאפ עם גרפים TradingView',
+      lastModified: '2025-01-27',
+      pageType: 'mockup',
+      preloadAssets: ['trades-data', 'executions-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger.info('📊 Initializing Trade History Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Wait for TradingView to be available
+          if (typeof window.lightweightCharts === 'undefined') {
+            window.Logger.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
+              page: 'page-initialization-configs',
+            });
+          }
+        },
+      ],
+    },
   };
 
   // ===== GLOBAL EXPORT =====

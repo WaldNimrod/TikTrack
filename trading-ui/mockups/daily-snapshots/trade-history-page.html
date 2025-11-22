@@ -1003,22 +1003,57 @@
                 return;
             }
             
-            // Destroy existing chart if it exists
-            if (timelineChart) {
-                try {
-                    if (typeof timelineChart.destroy === 'function') {
-                        timelineChart.destroy();
-                    }
-                } catch (e) {
-                    console.warn('Error destroying timeline chart:', e);
-                }
-                timelineChart = null;
+            // Prevent multiple simultaneous initializations
+            if (isInitializingTimelineChart) {
+                console.log('Timeline chart initialization already in progress, skipping...');
+                return;
             }
             
-            // Clear canvas
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            isInitializingTimelineChart = true;
+            
+            try {
+                // Destroy existing chart if it exists
+                if (timelineChart) {
+                    try {
+                        if (typeof timelineChart.destroy === 'function') {
+                            timelineChart.destroy();
+                        }
+                    } catch (e) {
+                        console.warn('Error destroying timeline chart:', e);
+                    }
+                    timelineChart = null;
+                }
+                
+                // Also destroy via ChartSystem if exists
+                if (window.ChartSystem && window.ChartSystem.destroy) {
+                    try {
+                        await window.ChartSystem.destroy('timelineChart');
+                    } catch (e) {
+                        // Chart might not exist in ChartSystem, that's OK
+                    }
+                }
+                
+                // Also check Chart.js registry
+                if (typeof Chart !== 'undefined' && Chart.getChart) {
+                    const existingChart = Chart.getChart(canvas);
+                    if (existingChart) {
+                        try {
+                            existingChart.destroy();
+                        } catch (e) {
+                            console.warn('Error destroying Chart.js chart:', e);
+                        }
+                    }
+                }
+                
+                // Clear canvas
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            } catch (e) {
+                console.warn('Error during chart cleanup:', e);
+            } finally {
+                isInitializingTimelineChart = false;
             }
             
             // Enhanced data for relative timeline with different time intervals
@@ -1060,21 +1095,7 @@
             const unrealizedPL = timelineData.map(d => d.unrealizedPL);
             const totalPL = timelineData.map(d => d.totalPL);
             
-            // Generate labels for points (type + value) - AFTER data extraction
-            const positionSizeLabels = positionSizes.map((val, idx) => {
-                const point = timelineData[idx];
-                if (point.type === 'Daily') return '';
-                if (point.type === 'Trade Plan') return 'תכנון';
-                if (point.type === 'Cash Flow') return '';
-                return val > 0 ? `${val} מניות` : '';
-            });
-            
-            const totalPLLabels = totalPL.map((val, idx) => {
-                const point = timelineData[idx];
-                if (point.type === 'Daily') return '';
-                if (Math.abs(val) < 1) return '';
-                return `$${val}`;
-            });
+            // Labels removed - will be added via tooltips only (datalabels plugin causes issues)
             
             // Use ChartSystem for unified chart with dual Y axes
             // ChartSystem.create() automatically destroys existing chart with same ID
@@ -1084,7 +1105,7 @@
                         id: 'timelineChart',
                         type: 'line',
                         container: container,
-                    data: {
+                        data: {
                         labels: dates,
                         datasets: [
                             {
@@ -1102,26 +1123,7 @@
                                 yAxisID: 'y',
                                 stepped: 'after',
                                 pointHoverRadius: 8,
-                                spanGaps: false,
-                                datalabels: {
-                                    display: function(context) {
-                                        const idx = context.dataIndex;
-                                        return positionSizeLabels[idx] !== '';
-                                    },
-                                    anchor: 'end',
-                                    align: 'top',
-                                    color: textColor,
-                                    backgroundColor: cardBackground,
-                                    padding: 4,
-                                    borderRadius: 4,
-                                    font: {
-                                        size: 10,
-                                        weight: 'bold'
-                                    },
-                                    formatter: function(value, context) {
-                                        return positionSizeLabels[context.dataIndex];
-                                    }
-                                }
+                                spanGaps: false
                             },
                             {
                                 label: 'P/L ממומש',
@@ -1130,11 +1132,13 @@
                                 backgroundColor: hexToRgba(successColor, 0.1),
                                 borderWidth: 2,
                                 pointRadius: 5,
+                                pointHoverRadius: 7,
                                 pointBackgroundColor: successColor,
                                 pointBorderColor: cardBackground,
                                 pointBorderWidth: 2,
                                 tension: 0.4,
-                                yAxisID: 'y1'
+                                yAxisID: 'y1',
+                                spanGaps: false
                             },
                             {
                                 label: 'P/L לא ממומש',
@@ -1143,11 +1147,13 @@
                                 backgroundColor: hexToRgba(warningColor, 0.1),
                                 borderWidth: 2,
                                 pointRadius: 5,
+                                pointHoverRadius: 7,
                                 pointBackgroundColor: warningColor,
                                 pointBorderColor: cardBackground,
                                 pointBorderWidth: 2,
                                 tension: 0.4,
-                                yAxisID: 'y1'
+                                yAxisID: 'y1',
+                                spanGaps: false
                             },
                             {
                                 label: 'P/L כולל',
@@ -1156,30 +1162,13 @@
                                 backgroundColor: hexToRgba(primaryColor, 0.1),
                                 borderWidth: 3,
                                 pointRadius: 6,
+                                pointHoverRadius: 8,
                                 pointBackgroundColor: primaryColor,
                                 pointBorderColor: cardBackground,
                                 pointBorderWidth: 2,
                                 tension: 0.4,
                                 yAxisID: 'y1',
-                                datalabels: {
-                                    display: function(context) {
-                                        const idx = context.dataIndex;
-                                        return totalPLLabels[idx] !== '';
-                                    },
-                                    anchor: 'end',
-                                    align: 'top',
-                                    color: textColor,
-                                    backgroundColor: cardBackground,
-                                    padding: 4,
-                                    borderRadius: 4,
-                                    font: {
-                                        size: 10,
-                                        weight: 'bold'
-                                    },
-                                    formatter: function(value, context) {
-                                        return totalPLLabels[context.dataIndex];
-                                    }
-                                }
+                                spanGaps: false
                             }
                         ]
                     },
@@ -1260,11 +1249,20 @@
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'תאריך (מרווחי זמן משתנים)'
+                                    text: 'תאריך (מרווחי זמן משתנים)',
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 12,
+                                        weight: 'normal'
+                                    }
                                 },
                                 ticks: {
                                     maxRotation: 45,
-                                    minRotation: 45
+                                    minRotation: 45,
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 11
+                                    }
                                 }
                             },
                             y: {
@@ -1273,12 +1271,23 @@
                                 position: 'left',
                                 title: {
                                     display: true,
-                                    text: 'גודל פוזיציה (מניות)'
+                                    text: 'גודל פוזיציה (מניות)',
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 12,
+                                        weight: 'normal'
+                                    }
                                 },
                                 grid: {
                                     drawOnChartArea: true
                                 },
-                                beginAtZero: true
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 11
+                                    }
+                                }
                             },
                             y1: {
                                 type: 'linear',
@@ -1286,10 +1295,21 @@
                                 position: 'right',
                                 title: {
                                     display: true,
-                                    text: 'P/L ($)'
+                                    text: 'P/L ($)',
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 12,
+                                        weight: 'normal'
+                                    }
                                 },
                                 grid: {
                                     drawOnChartArea: false
+                                },
+                                ticks: {
+                                    font: {
+                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                        size: 11
+                                    }
                                 }
                             }
                         },
@@ -1299,15 +1319,20 @@
                                 const point = timelineData[index];
                                 
                                 if (point && point.type !== 'Daily' && point.id) {
-                                    if (point.type === 'Cash Flow') {
-                                        if (typeof showCashFlowDetails === 'function') {
-                                            showCashFlowDetails(point.id);
-                                        }
-                                    } else {
-                                        const type = point.type === 'Trade Plan' ? 'plan' : 'execution';
-                                        if (typeof showExecutionDetails === 'function') {
-                                            showExecutionDetails(point.id, type);
-                                        }
+                                    let type = 'execution';
+                                    if (point.type === 'Trade Plan') type = 'plan';
+                                    else if (point.type === 'Cash Flow') type = 'cashflow';
+                                    else if (point.type === 'Note') type = 'note';
+                                    else if (point.type === 'Alert') type = 'alert';
+                                    
+                                    if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
+                                        showCashFlowDetails(point.id);
+                                    } else if (type === 'note' && typeof showNoteDetails === 'function') {
+                                        showNoteDetails(point.id);
+                                    } else if (type === 'alert' && typeof showAlertDetails === 'function') {
+                                        showAlertDetails(point.id);
+                                    } else if (typeof showExecutionDetails === 'function') {
+                                        showExecutionDetails(point.id, type);
                                     }
                                 }
                             }
@@ -1350,56 +1375,64 @@
                                 {
                                     label: 'גודל פוזיציה',
                                     data: positionSizes,
-                                    borderColor: '#6c757d',
-                                    backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                                    borderColor: mutedColor,
+                                    backgroundColor: hexToRgba(mutedColor, 0.1),
                                     borderWidth: 3,
                                     borderDash: [8, 4],
                                     pointRadius: 6,
-                                    pointBackgroundColor: '#6c757d',
-                                    pointBorderColor: '#fff',
+                                    pointHoverRadius: 8,
+                                    pointBackgroundColor: mutedColor,
+                                    pointBorderColor: cardBackground,
                                     pointBorderWidth: 2,
                                     tension: 0,
                                     yAxisID: 'y',
-                                    stepped: 'after'
+                                    stepped: 'after',
+                                    spanGaps: false
                                 },
                                 {
                                     label: 'P/L ממומש',
                                     data: realizedPL,
-                                    borderColor: '#28a745',
-                                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                    borderColor: successColor,
+                                    backgroundColor: hexToRgba(successColor, 0.1),
                                     borderWidth: 2,
                                     pointRadius: 5,
-                                    pointBackgroundColor: '#28a745',
-                                    pointBorderColor: '#fff',
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: successColor,
+                                    pointBorderColor: cardBackground,
                                     pointBorderWidth: 2,
                                     tension: 0.4,
-                                    yAxisID: 'y1'
+                                    yAxisID: 'y1',
+                                    spanGaps: false
                                 },
                                 {
                                     label: 'P/L לא ממומש',
                                     data: unrealizedPL,
-                                    borderColor: '#ffc107',
-                                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                    borderColor: warningColor,
+                                    backgroundColor: hexToRgba(warningColor, 0.1),
                                     borderWidth: 2,
                                     pointRadius: 5,
-                                    pointBackgroundColor: '#ffc107',
-                                    pointBorderColor: '#fff',
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: warningColor,
+                                    pointBorderColor: cardBackground,
                                     pointBorderWidth: 2,
                                     tension: 0.4,
-                                    yAxisID: 'y1'
+                                    yAxisID: 'y1',
+                                    spanGaps: false
                                 },
                                 {
                                     label: 'P/L כולל',
                                     data: totalPL,
-                                    borderColor: '#007bff',
-                                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                    borderColor: primaryColor,
+                                    backgroundColor: hexToRgba(primaryColor, 0.1),
                                     borderWidth: 3,
                                     pointRadius: 6,
-                                    pointBackgroundColor: '#007bff',
-                                    pointBorderColor: '#fff',
+                                    pointHoverRadius: 8,
+                                    pointBackgroundColor: primaryColor,
+                                    pointBorderColor: cardBackground,
                                     pointBorderWidth: 2,
                                     tension: 0.4,
-                                    yAxisID: 'y1'
+                                    yAxisID: 'y1',
+                                    spanGaps: false
                                 }
                             ]
                         },
@@ -1427,7 +1460,10 @@
                                         title: function(context) {
                                             const index = context[0].dataIndex;
                                             const point = timelineData[index];
-                                            return point.date + ' - ' + (point.type === 'Daily' ? 'עדכון יומי' : point.type);
+                                            let typeText = point.type;
+                                            if (point.type === 'Daily') typeText = 'עדכון יומי';
+                                            else if (point.type === 'Cash Flow') typeText = 'תזרים מזומן';
+                                            return point.date + ' - ' + typeText;
                                         },
                                         label: function(context) {
                                             const index = context.dataIndex;
@@ -1451,7 +1487,11 @@
                                             const point = timelineData[index];
                                             
                                             if (point.type !== 'Daily' && point.id) {
-                                                return 'סוג: ' + point.type + ' | מזהה: #' + point.id;
+                                                let info = 'סוג: ' + point.type + ' | מזהה: #' + point.id;
+                                                if (point.type === 'Cash Flow' && point.amount) {
+                                                    info += ' | סכום: $' + point.amount;
+                                                }
+                                                return info;
                                             }
                                             return '';
                                         },
@@ -1473,12 +1513,18 @@
                                         display: true,
                                         text: 'תאריך (מרווחי זמן משתנים)',
                                         font: {
-                                            size: 12
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 12,
+                                            weight: 'normal'
                                         }
                                     },
                                     ticks: {
                                         maxRotation: 45,
-                                        minRotation: 45
+                                        minRotation: 45,
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 11
+                                        }
                                     }
                                 },
                                 y: {
@@ -1489,13 +1535,21 @@
                                         display: true,
                                         text: 'גודל פוזיציה (מניות)',
                                         font: {
-                                            size: 12
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 12,
+                                            weight: 'normal'
                                         }
                                     },
                                     grid: {
                                         drawOnChartArea: true
                                     },
-                                    beginAtZero: true
+                                    beginAtZero: true,
+                                    ticks: {
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 11
+                                        }
+                                    }
                                 },
                                 y1: {
                                     type: 'linear',
@@ -1505,27 +1559,50 @@
                                         display: true,
                                         text: 'P/L ($)',
                                         font: {
-                                            size: 12
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 12,
+                                            weight: 'normal'
                                         }
                                     },
                                     grid: {
                                         drawOnChartArea: false
+                                    },
+                                    ticks: {
+                                        font: {
+                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
+                                            size: 11
+                                        }
                                     }
                                 }
                             },
                             onClick: function(event, elements) {
-                                if (elements.length > 0) {
+                                if (elements && elements.length > 0) {
                                     const index = elements[0].index;
                                     const point = timelineData[index];
                                     
-                                    if (point.type !== 'Daily' && point.id) {
-                                        const type = point.type === 'Trade Plan' ? 'plan' : 'execution';
-                                        showExecutionDetails(point.id, type);
+                                    if (point && point.type !== 'Daily' && point.id) {
+                                        let type = 'execution';
+                                        if (point.type === 'Trade Plan') type = 'plan';
+                                        else if (point.type === 'Cash Flow') type = 'cashflow';
+                                        else if (point.type === 'Note') type = 'note';
+                                        else if (point.type === 'Alert') type = 'alert';
+                                        
+                                        if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
+                                            showCashFlowDetails(point.id);
+                                        } else if (type === 'note' && typeof showNoteDetails === 'function') {
+                                            showNoteDetails(point.id);
+                                        } else if (type === 'alert' && typeof showAlertDetails === 'function') {
+                                            showAlertDetails(point.id);
+                                        } else if (typeof showExecutionDetails === 'function') {
+                                            showExecutionDetails(point.id, type);
+                                        }
                                     }
                                 }
                             },
                             onHover: function(event, elements) {
-                                event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                                if (event && event.native && event.native.target) {
+                                    event.native.target.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
+                                }
                             }
                         }
                         });
@@ -1957,16 +2034,14 @@
             // Initialize charts using ChartSystem (async)
             try {
                 await initTimelineChart();
+            } catch (e) {
+                console.error('Error initializing timeline chart:', e);
+            }
+            
+            try {
                 await initPLChart();
             } catch (e) {
                 console.error('Error initializing P/L chart:', e);
-            }
-            
-            // Initialize timeline chart on page load (relative view is always visible now)
-            try {
-                await initTimelineChart();
-            } catch (e) {
-                console.error('Error initializing timeline chart:', e);
             }
             
             // Market price chart (uses Chart.js directly as placeholder)

@@ -251,7 +251,7 @@
                 // קריאה סדרתית כדי להפחית עומס וקונפליקטים על שכבת ה-DB
                 // המערכת המרכזית מנהלת לוגינג פנימי ב-fetchHistoryForAccount עבור שגיאות.
                 /* eslint-disable no-await-in-loop */
-                const accountHistory = await fetchHistoryForAccount(account);
+                const accountHistory = await fetchHistoryForAccount(account, force);
                 /* eslint-enable no-await-in-loop */
                 historyResults.push(accountHistory);
             }
@@ -351,9 +351,10 @@
      * @async
      * @function fetchHistoryForAccount
      * @param {Object} account - Trading account object.
+     * @param {boolean} [force=false] - Force reload from server, bypass cache.
      * @returns {Promise<Array<Object>>}
      */
-    async function fetchHistoryForAccount(account) {
+    async function fetchHistoryForAccount(account, force = false) {
         if (!account || !account.id) {
             return [];
         }
@@ -364,7 +365,8 @@
             if (window.DataImportData?.loadImportHistoryData) {
                 sessions = await window.DataImportData.loadImportHistoryData({
                     accountId: account.id,
-                    limit: 20
+                    limit: 20,
+                    force: force
                 });
                 Logger.debug('📦 Fetched history via DataImportData service', {
                     accountId: account.id,
@@ -929,24 +931,11 @@
             return `<td class="col-updated" data-sort-value="${epoch || ''}">${dateDisplay || 'לא זמין'}</td>`;
         })();
 
-        // Check if session can be continued (ready or analyzing status)
-        const canContinue = ACTIVE_STATUSES.has(session.status) && (session.status === 'ready' || session.status === 'analyzing');
-        
-        const continueButton = canContinue ? `
-            <button data-button-type="ACTION" 
-                    data-variant="primary" 
-                    data-size="small" 
-                    data-icon="▶️" 
-                    data-text="המשך סשן" 
-                    data-onclick="continueImportSession(${session.id}); event.stopPropagation();" 
-                    title="המשך סשן ייבוא זה"
-                    data-tooltip="המשך סשן ייבוא"></button>
-        ` : '';
-        
+        // CRITICAL: Only show delete button - no other buttons should exist
         const deleteButton = `
             <button data-button-type="DELETE" 
                     data-variant="small" 
-                    data-onclick="deleteImportSession(${session.id}); event.stopPropagation();" 
+                    data-onclick="if(window.deleteImportSession) { window.deleteImportSession(${session.id}); } else { console.error('deleteImportSession not available'); }" 
                     title="מחק סשן ייבוא זה"
                     data-tooltip="מחק סשן ייבוא"></button>
         `;
@@ -963,15 +952,6 @@
             createdDateCell,
             updatedDateCell,
             `<td class="col-actions text-center">
-                ${continueButton}
-                <button data-button-type="ACTION" 
-                        data-variant="primary" 
-                        data-size="small" 
-                        data-icon="🔄" 
-                        data-text="הרצה חוזרת" 
-                        data-onclick="rerunImportSession(${session.id}); event.stopPropagation();" 
-                        title="הרצה חוזרת של סשן ייבוא זה"
-                        data-tooltip="הרצה חוזרת של סשן ייבוא"></button>
                 ${deleteButton}
             </td>`
         ].join('');
@@ -1297,49 +1277,10 @@
         Logger.info('📊 Registered import history table with UnifiedTableSystem', { page: PAGE_NAME });
     }
 
-    /**
-     * Continue import session - opens import modal and jumps directly to step 2
-     * @function continueImportSession
-     * @param {number} sessionId - Session ID to continue
-     */
-    function continueImportSession(sessionId) {
-        Logger.info('▶️ Continue import session requested', { sessionId, page: PAGE_NAME });
-        
-        // Open import modal if available
-        if (typeof window.openImportUserDataModal === 'function') {
-            window.openImportUserDataModal();
-            
-            // Wait for modal to open, then continue the session
-            setTimeout(() => {
-                if (typeof window.resumeActiveImportSession === 'function') {
-                    window.resumeActiveImportSession(sessionId);
-                } else {
-                    Logger.warn('resumeActiveImportSession function not available', { page: PAGE_NAME });
-                    if (typeof window.showNotification === 'function') {
-                        window.showNotification(
-                            'שגיאה',
-                            'פונקציית המשך סשן לא זמינה. אנא רענן את הדף.',
-                            'error',
-                            5000
-                        );
-                    }
-                }
-            }, 300);
-        } else {
-            Logger.warn('openImportUserDataModal function not available', { page: PAGE_NAME });
-            if (typeof window.showNotification === 'function') {
-                window.showNotification(
-                    'שגיאה',
-                    'מודול הייבוא לא זמין. אנא רענן את הדף.',
-                    'error',
-                    5000
-                );
-            }
-        }
-    }
 
     /**
      * Delete import session
+     * Uses UnifiedCRUDService for automatic table refresh and consistent CRUD handling
      * @function deleteImportSession
      * @param {number} sessionId - Session ID to delete
      */
@@ -1351,121 +1292,88 @@
 
         Logger.info('🗑️ Delete import session requested', { sessionId, page: PAGE_NAME });
 
-        // Show confirmation dialog
-        const confirmationMessage = `האם אתה בטוח שברצונך למחוק את סשן הייבוא #${sessionId}?\n\nפעולה זו תמחק את הסשן לצמיתות.`;
-        
-        let confirmed = false;
-        if (typeof window.showConfirmationDialog === 'function') {
-            confirmed = await new Promise((resolve) => {
-                try {
-                    window.showConfirmationDialog(
-                        'מחיקת סשן ייבוא',
-                        confirmationMessage,
-                        () => resolve(true),
-                        () => resolve(false),
-                        'danger'
-                    );
-                } catch (error) {
-                    Logger.error('Error in showConfirmationDialog', { error, page: PAGE_NAME });
-                    // Fallback to simple confirm
-                    resolve(window.confirm(confirmationMessage));
-                }
-            });
-        } else {
-            // Fallback to simple confirm
-            confirmed = window.confirm(confirmationMessage);
-        }
-
-        if (!confirmed) {
-            Logger.info('Delete import session cancelled by user', { sessionId, page: PAGE_NAME });
-            return;
-        }
-
-        try {
-            // Show loading notification
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('מבצע מחיקה...', 'info', 3000);
-            }
-
-            // Call API endpoint
-            const response = await fetch(`/api/user-data-import/session/${sessionId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (response.ok && (data.status === 'success' || data.success)) {
-                const message = `סשן ייבוא #${sessionId} נמחק בהצלחה!`;
+        // Use UnifiedCRUDService for deletion - this automatically handles:
+        // - Confirmation dialog
+        // - API call
+        // - Response handling and notifications
+        // - Table refresh via CRUDResponseHandler.handleTableRefresh
+        // - Cache invalidation
+        if (window.UnifiedCRUDService?.deleteEntity) {
+            try {
+                const result = await window.UnifiedCRUDService.deleteEntity('import_session', sessionId, {
+                    successMessage: `סשן ייבוא #${sessionId} נמחק בהצלחה!`,
+                    entityName: 'סשן ייבוא',
+                    reloadFn: () => refreshDataImportHistory(true), // Force reload from server after deletion
+                    requiresHardReload: false
+                });
                 
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification(message, 'success', 5000);
-                } else {
-                    alert(message);
-                }
-
-                // Refresh the history table
-                if (typeof refreshDataImportHistory === 'function') {
-                    await refreshDataImportHistory();
-                }
-            } else {
-                const errorMessage = data.error?.message || data.message || 'שגיאה במחיקת סשן ייבוא';
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification(errorMessage, 'error', 6000);
-                } else {
-                    alert(`שגיאה: ${errorMessage}`);
-                }
-                
-                Logger.error('deleteImportSession: API error', { 
+                Logger.info('🗑️ Import session deletion completed via UnifiedCRUDService', {
+                    sessionId,
+                    result,
+                    page: PAGE_NAME
+                });
+            } catch (error) {
+                Logger.error('deleteImportSession: Error in UnifiedCRUDService', { 
                     sessionId,
                     page: PAGE_NAME, 
-                    error: errorMessage,
-                    response: data
+                    error: error.message,
+                    exception: error
                 });
             }
-        } catch (error) {
-            const errorMessage = error?.message || 'שגיאה לא ידועה במחיקת סשן ייבוא';
-            if (typeof window.showNotification === 'function') {
-                window.showNotification(errorMessage, 'error', 6000);
-            } else {
-                alert(`שגיאה: ${errorMessage}`);
-            }
-            
-            Logger.error('deleteImportSession: Exception', { 
-                sessionId,
-                page: PAGE_NAME, 
-                error: errorMessage,
-                exception: error
-            });
-        }
-    }
-
-    /**
-     * Rerun import session - placeholder function for future implementation
-     * @function rerunImportSession
-     * @param {number} sessionId - Session ID to rerun
-     */
-    function rerunImportSession(sessionId) {
-        Logger.info('🔄 Rerun import session requested', { sessionId, page: PAGE_NAME });
-        
-        // TODO: Implement rerun logic
-        // This will:
-        // 1. Load session data from database
-        // 2. Restore file content (if available)
-        // 3. Open import modal with pre-filled data
-        // 4. Allow user to modify settings and re-import
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification(
-                'הרצה חוזרת של סשן ייבוא',
-                'פונקציה זו תיושם בקרוב. היא תאפשר להריץ מחדש סשן ייבוא קיים עם אפשרות לעדכן הגדרות.',
-                'info',
-                5000
-            );
         } else {
-            alert(`הרצה חוזרת של סשן ייבוא #${sessionId}\n\nפונקציה זו תיושם בקרוב.`);
+            // Fallback to direct API call if UnifiedCRUDService not available
+            Logger.warn('⚠️ UnifiedCRUDService not available, using fallback', {
+                sessionId,
+                page: PAGE_NAME
+            });
+            
+            const confirmationMessage = `האם אתה בטוח שברצונך למחוק את סשן הייבוא #${sessionId}?\n\nפעולה זו תמחק את הסשן לצמיתות.`;
+            
+            if (window.confirm(confirmationMessage)) {
+                try {
+                    const response = await fetch(`/api/user-data-import/session/${sessionId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && (data.status === 'success' || data.success)) {
+                        if (typeof window.showNotification === 'function') {
+                            window.showNotification(`סשן ייבוא #${sessionId} נמחק בהצלחה!`, 'success', 5000);
+                        }
+                        
+                        // Refresh the history table
+                        if (typeof refreshDataImportHistory === 'function') {
+                            await refreshDataImportHistory();
+                        }
+                    } else {
+                        const errorMessage = data.error || data.message || 'שגיאה במחיקת סשן ייבוא';
+                        if (typeof window.showNotification === 'function') {
+                            window.showNotification(errorMessage, 'error', 6000);
+                        }
+                        Logger.error('deleteImportSession: API error', { 
+                            sessionId,
+                            page: PAGE_NAME, 
+                            error: errorMessage,
+                            response: data
+                        });
+                    }
+                } catch (error) {
+                    const errorMessage = error?.message || 'שגיאה לא ידועה במחיקת סשן ייבוא';
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification(errorMessage, 'error', 6000);
+                    }
+                    Logger.error('deleteImportSession: Exception', { 
+                        sessionId,
+                        page: PAGE_NAME, 
+                        error: errorMessage,
+                        exception: error
+                    });
+                }
+            }
         }
     }
 
@@ -1473,9 +1381,7 @@
     window.initializeDataImportPage = initializeDataImportPage;
     window.refreshDataImportHistory = refreshDataImportHistory;
     window.registerDataImportTable = registerDataImportTable;
-    window.continueImportSession = continueImportSession;
     window.deleteImportSession = deleteImportSession;
-    window.rerunImportSession = rerunImportSession;
 })();
 
 

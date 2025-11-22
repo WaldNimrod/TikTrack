@@ -6141,6 +6141,33 @@ class ModalManagerV2 {
             }
         }
 
+        // For Tickers modal - load provider symbol fields
+        if (modalId === 'tickersModal') {
+            // Load provider symbol fields when modal is shown
+            if (typeof window.loadProviderSymbolFields === 'function') {
+                (async () => {
+                    try {
+                        await window.loadProviderSymbolFields();
+                        
+                        // If in edit mode, load existing mappings
+                        const form = modalElement.querySelector('#tickersModalForm');
+                        const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+                        if (mode === 'edit') {
+                            const tickerIdInput = modalElement.querySelector('#tickerId');
+                            if (tickerIdInput && tickerIdInput.value) {
+                                const tickerId = parseInt(tickerIdInput.value);
+                                if (tickerId && typeof window.loadTickerProviderSymbols === 'function') {
+                                    await window.loadTickerProviderSymbols(tickerId);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ Failed to load provider symbol fields', { error, page: 'modal-manager-v2' });
+                    }
+                })();
+            }
+        }
+
         if (modalId === 'cashFlowModal') {
             const form = modalElement.querySelector('#cashFlowModalForm');
             const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';

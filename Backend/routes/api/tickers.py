@@ -125,6 +125,23 @@ def get_ticker(ticker_id: int):
             # Add market data like in get_all method
             ticker_dict = ticker.to_dict()
             
+            # Add provider symbol mappings if they exist
+            try:
+                from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                logger.info(f"🔍 Attempting to load provider symbol mappings for ticker {ticker_id}")
+                mappings = TickerSymbolMappingService.get_all_mappings(db, ticker_id)
+                logger.info(f"🔍 get_all_mappings returned {len(mappings) if mappings else 0} mappings")
+                if mappings:
+                    ticker_dict['provider_symbols'] = mappings
+                    logger.info(f"✅ Loaded {len(mappings)} provider symbol mapping(s) for ticker {ticker_id}")
+                else:
+                    logger.info(f"⚠️ No provider symbol mappings found for ticker {ticker_id}")
+            except Exception as mapping_error:
+                # Log but don't fail - mappings are optional
+                logger.error(f"❌ Could not load provider symbol mappings for ticker {ticker_id}: {str(mapping_error)}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+            
             # Try to get market data, but don't fail if database is corrupted
             try:
                 from models.external_data import MarketDataQuote

@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.1.41.0",
+    "version": "1.1.42.0",
     "major": 1,
     "minor": 1,
-    "patch": 41,
+    "patch": 42,
     "build": 0,
-    "commit": "47b08b26f67076058b084b8172d7b7d88422a5b4",
-    "updated_at": "2025-11-22T11:49:25+00:00",
-    "notes": "Header System: Complete refactoring to prevent duplicates and improve initialization"
+    "commit": "efc4f514ab1e733d3c04ce9568ddfd05e5cb19b6",
+    "updated_at": "2025-11-22T11:51:26+00:00",
+    "notes": "Pre-production release updates - ticker mappings, import improvements, chart system fixes"
   }
 }

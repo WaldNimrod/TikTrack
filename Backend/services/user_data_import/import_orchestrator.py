@@ -2484,20 +2484,31 @@ class ImportOrchestrator:
                 session_id,
                 selected_types
             )
-            preview_result = self.generate_preview(session_id, requested_task_type, selected_types=selected_types)
-            logger.info(f"🔍 [IMPORT] Step 4: Preview generation result: success={preview_result.get('success')}")
-            if not preview_result['success']:
-                error_message = preview_result.get('error', 'Failed to regenerate preview data')
-                logger.error(
-                    "❌ Failed to regenerate preview for session %s: %s",
-                    session_id,
-                    error_message
-                )
-                import_session.update_status('failed')
-                self.db_session.commit()
-                return {'success': False, 'error': error_message}
             
-            preview_data = preview_result['preview_data']
+            # CRITICAL: Use _ensure_preview_data instead of generate_preview
+            # This ensures we use the UPDATED preview data from cache (after accept/reject duplicate)
+            # generate_preview would regenerate from scratch and lose all accept/reject changes!
+            logger.info(f"🔍 [IMPORT] Step 4: Loading preview data from cache (preserves accept/reject changes)...")
+            preview_data = self._ensure_preview_data(session_id, session=import_session)
+            
+            if not preview_data:
+                # Fallback: regenerate if no preview data exists
+                logger.warning(f"⚠️ [IMPORT] No preview data in cache, regenerating...")
+                preview_result = self.generate_preview(session_id, requested_task_type, selected_types=selected_types)
+                logger.info(f"🔍 [IMPORT] Preview regeneration result: success={preview_result.get('success')}")
+                if not preview_result['success']:
+                    error_message = preview_result.get('error', 'Failed to regenerate preview data')
+                    logger.error(
+                        "❌ Failed to regenerate preview for session %s: %s",
+                        session_id,
+                        error_message
+                    )
+                    import_session.update_status('failed')
+                    self.db_session.commit()
+                    return {'success': False, 'error': error_message}
+                preview_data = preview_result['preview_data']
+            else:
+                logger.info(f"✅ [IMPORT] Preview data loaded from cache: records_to_import={len(preview_data.get('records_to_import', []))}, records_to_skip={len(preview_data.get('records_to_skip', []))}")
             
             # CRITICAL: Use selected_types from parameter OR from preview_data
             # This ensures filtering works even if selected_types wasn't passed to execute_import
@@ -2507,6 +2518,13 @@ class ImportOrchestrator:
                     "🔍 [EXECUTE_IMPORT] Loaded selected_types from preview_data: %s",
                     selected_types
                 )
+            
+            # CRITICAL: Log preview data state before import
+            logger.info(
+                "🔍 [EXECUTE_IMPORT] Preview data loaded: records_to_import=%s, records_to_skip=%s",
+                len(preview_data.get('records_to_import', [])),
+                len(preview_data.get('records_to_skip', []))
+            )
             
             # IMPORTANT: Double-check filtering by selected_types
             # Even though generate_preview should have filtered, we verify here to ensure consistency
@@ -4188,19 +4206,34 @@ class ImportOrchestrator:
             }
             expected_reason = reason_mapping.get(duplicate_type, duplicate_type)
             
+            logger.info(
+                f"🔍 [ACCEPT_DUPLICATE] Looking for record_index={record_index}, duplicate_type={duplicate_type}, expected_reason={expected_reason}"
+            )
+            logger.info(
+                f"🔍 [ACCEPT_DUPLICATE] Before: records_to_import={len(preview_data.get('records_to_import', []))}, records_to_skip={len(preview_data.get('records_to_skip', []))}"
+            )
+            
             record_to_move = None
             new_skip_list = []
             
             for skip_record in preview_data.get('records_to_skip', []):
                 skip_reason = skip_record.get('reason')
+                skip_index = skip_record.get('record_index')
                 # Match by record_index and reason (handle both mapped and direct values)
-                if (skip_record.get('record_index') == record_index and 
+                if (skip_index == record_index and 
                     (skip_reason == expected_reason or skip_reason == duplicate_type)):
                     record_to_move = skip_record
+                    logger.info(f"✅ [ACCEPT_DUPLICATE] Found record to move: index={skip_index}, reason={skip_reason}")
                 else:
                     new_skip_list.append(skip_record)
             
             if not record_to_move:
+                logger.error(
+                    f"❌ [ACCEPT_DUPLICATE] Record not found in skip list: record_index={record_index}, duplicate_type={duplicate_type}"
+                )
+                logger.error(
+                    f"❌ [ACCEPT_DUPLICATE] Available records in skip list: {[{'index': r.get('record_index'), 'reason': r.get('reason')} for r in preview_data.get('records_to_skip', [])]}"
+                )
                 return {'success': False, 'error': 'Record not found in skip list'}
             
             # Move to records_to_import
@@ -4249,10 +4282,14 @@ class ImportOrchestrator:
                 preview_data['summary']['total_records'] * 100
             ) if preview_data['summary']['total_records'] > 0 else 0
             
+            logger.info(
+                f"🔍 [ACCEPT_DUPLICATE] After: records_to_import={len(preview_data['records_to_import'])}, records_to_skip={len(preview_data['records_to_skip'])}"
+            )
+            
             # Cache updated preview data
             self._update_preview_cache(session_id, preview_data, session=session)
             
-            logger.info(f"✅ Accepted duplicate record {record_index} for session {session_id}")
+            logger.info(f"✅ [ACCEPT_DUPLICATE] Accepted duplicate record {record_index} for session {session_id} and updated cache")
             return {'success': True}
             
         except Exception as e:
@@ -4282,18 +4319,36 @@ class ImportOrchestrator:
             if not preview_data:
                 return {'success': False, 'error': 'No preview data found'}
             
+            logger.info(
+                f"🔍 [REJECT_DUPLICATE] Looking for record_index={record_index}, duplicate_type={duplicate_type}"
+            )
+            logger.info(
+                f"🔍 [REJECT_DUPLICATE] Before: records_to_skip={len(preview_data.get('records_to_skip', []))}"
+            )
+            
             # Find the record in records_to_skip and mark as rejected
+            found = False
             for skip_record in preview_data.get('records_to_skip', []):
                 if (skip_record.get('record_index') == record_index and 
                     skip_record.get('reason') == duplicate_type):
                     skip_record['rejected'] = True
                     skip_record['rejected_at'] = self.utc_normalizer.now_envelope()
+                    found = True
+                    logger.info(f"✅ [REJECT_DUPLICATE] Marked record_index={record_index} as rejected")
                     break
+            
+            if not found:
+                logger.error(
+                    f"❌ [REJECT_DUPLICATE] Record not found: record_index={record_index}, duplicate_type={duplicate_type}"
+                )
+                logger.error(
+                    f"❌ [REJECT_DUPLICATE] Available records: {[{'index': r.get('record_index'), 'reason': r.get('reason')} for r in preview_data.get('records_to_skip', [])]}"
+                )
             
             # Cache updated preview data
             self._update_preview_cache(session_id, preview_data, session=session)
             
-            logger.info(f"✅ Rejected duplicate record {record_index} for session {session_id}")
+            logger.info(f"✅ [REJECT_DUPLICATE] Rejected duplicate record {record_index} for session {session_id} and updated cache")
             return {'success': True}
             
         except Exception as e:
@@ -4462,6 +4517,11 @@ class ImportOrchestrator:
         cached_preview = self.processor.get_cached_results(session_id, 'preview')
         if cached_preview:
             preview_copy = json.loads(json.dumps(cached_preview))
+            import_count = len(preview_copy.get('records_to_import', []))
+            skip_count = len(preview_copy.get('records_to_skip', []))
+            logger.info(
+                f"✅ [ENSURE_PREVIEW] Loaded from cache for session {session_id}: records_to_import={import_count}, records_to_skip={skip_count}"
+            )
             return self._finalize_preview_data(session_id, preview_copy, session=session)
 
         session = session or self.session_manager.get_session(session_id)
@@ -4469,6 +4529,11 @@ class ImportOrchestrator:
             stored_preview = session.get_summary_data('preview_data')
             if stored_preview:
                 preview_copy = json.loads(json.dumps(stored_preview))
+                import_count = len(preview_copy.get('records_to_import', []))
+                skip_count = len(preview_copy.get('records_to_skip', []))
+                logger.info(
+                    f"✅ [ENSURE_PREVIEW] Loaded from database for session {session_id}: records_to_import={import_count}, records_to_skip={skip_count}"
+                )
                 self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
                 return self._finalize_preview_data(session_id, preview_copy, session=session)
 
@@ -4502,9 +4567,17 @@ class ImportOrchestrator:
         Persist updated preview data into the cache system and session summary.
         """
         preview_copy = json.loads(json.dumps(preview_data))
+        
+        import_count = len(preview_copy.get('records_to_import', []))
+        skip_count = len(preview_copy.get('records_to_skip', []))
+        logger.info(
+            f"🔍 [UPDATE_CACHE] Updating cache for session {session_id}: records_to_import={import_count}, records_to_skip={skip_count}"
+        )
+        
         self.processor.cache_results(session_id, 'preview', preview_copy, ttl=3600)
 
         session = session or self.session_manager.get_session(session_id)
         if session:
             session.add_summary_data({'preview_data': self.utc_normalizer.normalize_output(preview_copy)})
             self.db_session.commit()
+            logger.info(f"✅ [UPDATE_CACHE] Cache and database updated for session {session_id}")

@@ -80,49 +80,15 @@
 
 ### 2.3 ניקוי CSS
 **פתרון**:
-- הוסרו כל הסגנונות הקשורים ל-`activeSessionControlsRow`, `activeSessionDetailsRow`, `resetImportSessionBtn`, `resumeImportSessionBtn`
+- הוסרו כל הסגנונות הקשורים ל-`activeSessionControlsRow`, `activeSessionDetailsRow`, `resetImportSessionBtn`
 
 **קבצים**:
 - `trading-ui/styles-new/07-pages/_data-import.css` - שורות 74-105
 - `trading-ui/styles-new/06-components/_import-system.css` - שורות 35-41
 
-## 3. מימוש כפתור המשך סשן בטבלה
+## 3. מימוש כפתור מחיקת סשן
 
 ### 3.1 הוספת כפתור בטבלה
-**תכונה**: כפתור "המשך סשן" מופיע בטבלת סשני הייבוא (`data_import.html`).
-
-**פירוט**:
-- הכפתור מופיע רק לסשנים עם status `ready` או `analyzing` (סשנים שניתן להמשיך)
-- הכפתור ממוקם בעמודת הפעולות לפני כפתור "הרצה חוזרת"
-
-**קבצים**:
-- `trading-ui/scripts/data_import.js` - פונקציה `renderHistoryRow` (שורה 750)
-
-### 3.2 מימוש פונקציית המשך סשן
-**תכונה**: `resumeActiveImportSession` - PLACEHOLDER (לא מיושם כרגע).
-
-**הערה**: המשתמש החזיר את הפונקציה למצב placeholder. המימוש המלא שהיה מתוכנן:
-- טעינת נתוני הסשן מה-API
-- קפיצה ישר לשלב 2 (דילוג על שלב 1)
-- הצגת תוצאות ניתוח
-
-**קבצים**:
-- `trading-ui/scripts/import-user-data.js` - פונקציה `resumeActiveImportSession` (שורה 6309)
-
-### 3.3 הוספת פונקציה continueImportSession
-**תכונה**: `continueImportSession` - פותחת את מודול הייבוא ומנסה להמשיך סשן.
-
-**פירוט**:
-- פותחת את מודול הייבוא (`openImportUserDataModal`)
-- קוראת ל-`resumeActiveImportSession` עם ה-session ID
-- מחכה 300ms לפתיחת המודל
-
-**קבצים**:
-- `trading-ui/scripts/data_import.js` - פונקציה `continueImportSession` (שורה 1196)
-
-## 4. מימוש כפתור מחיקת סשן
-
-### 4.1 הוספת כפתור בטבלה
 **תכונה**: כפתור מחיקה (DELETE) מופיע בטבלת סשני הייבוא.
 
 **פירוט**:
@@ -132,7 +98,7 @@
 **קבצים**:
 - `trading-ui/scripts/data_import.js` - פונקציה `renderHistoryRow` (שורה 750)
 
-### 4.2 מימוש פונקציית מחיקה ב-frontend
+### 3.2 מימוש פונקציית מחיקה ב-frontend
 **תכונה**: `deleteImportSession` - מבקש אישור מהמשתמש ומבצע מחיקה.
 
 **פירוט**:
@@ -144,7 +110,7 @@
 **קבצים**:
 - `trading-ui/scripts/data_import.js` - פונקציה `deleteImportSession` (שורה 1201)
 
-### 4.3 יצירת API endpoint
+### 3.3 יצירת API endpoint
 **Endpoint**: `DELETE /api/user-data-import/session/<int:session_id>`
 
 **פירוט**:
@@ -155,7 +121,7 @@
 **קבצים**:
 - `Backend/routes/api/user_data_import.py` - פונקציה `delete_import_session` (שורה 1049)
 
-### 4.4 הוספת פונקציה ב-service
+### 3.4 הוספת פונקציה ב-service
 **תכונה**: `delete_session` - מוחקת סשן וניקוי cache.
 
 **פירוט**:
@@ -172,7 +138,7 @@
 
 ### Frontend
 1. `trading-ui/scripts/import-user-data.js` - תיקון כפילויות, הסרת קוד ישן
-2. `trading-ui/scripts/data_import.js` - הוספת כפתורי המשך סשן ומחיקה
+2. `trading-ui/scripts/data_import.js` - הוספת כפתור מחיקה
 3. `trading-ui/data_import.html` - הסרת HTML elements ישנים, עדכון כותרות טבלאות
 4. `trading-ui/styles-new/07-pages/_data-import.css` - ניקוי CSS
 5. `trading-ui/styles-new/06-components/_import-system.css` - ניקוי CSS
@@ -195,9 +161,7 @@
 
 ## הערות חשובות
 
-1. **resumeActiveImportSession**: הפונקציה הוחזרה למצב placeholder על ידי המשתמש. המימוש המלא שהיה מתוכנן לא פעיל כרגע.
-
-2. **5 דקות tolerance**: הלוגיקה כבר הייתה מיושמת נכון - רק וידאנו שהיא עובדת.
+1. **5 דקות tolerance**: הלוגיקה כבר הייתה מיושמת נכון - רק וידאנו שהיא עובדת.
 
 3. **סינון rejected duplicates**: רשומות שנדחו (rejected) לא מוצגות יותר בטבלאות כפילויות.
 

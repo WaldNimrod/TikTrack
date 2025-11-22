@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.3.2.0",
+    "version": "1.3.3.0",
     "major": 1,
     "minor": 3,
-    "patch": 2,
+    "patch": 3,
     "build": 0,
-    "commit": "56433bec378c1016a65d72c1d474d4875bc0f5fc",
-    "updated_at": "2025-11-22T18:32:11+00:00",
-    "notes": "Fix: cover action should be red (not green) - use dynamic colors from preferences"
+    "commit": "f8d582994ea09f72a317c1707bb26e3f5c6b9475",
+    "updated_at": "2025-11-22T18:36:43+00:00",
+    "notes": "Fix: cover action should be red (like sell), not green"
   }
 }

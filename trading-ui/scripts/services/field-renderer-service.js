@@ -586,7 +586,8 @@ class FieldRendererService {
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';
         } else {
-            // ברירת מחדל: buy/short = ירוק, sell/cover = אדום
+            // ברירת מחדל: buy/short = ירוק (חיובי), sell/cover = אדום (שלילי)
+            // cover הוא כמו sell - כיסוי פוזיציה בחסר = יוצא כסף = אדום
             const positiveActions = new Set(['buy', 'short']);
             if (positiveActions.has(actionLower)) {
                 colorClass = ' text-success';

@@ -29,6 +29,27 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 user_data_import_bp = Blueprint('user_data_import', __name__, url_prefix='/api/user-data-import')
 
+# Register error handler for this blueprint
+@user_data_import_bp.errorhandler(500)
+def handle_internal_error(e):
+    """Handle 500 Internal Server Error for user data import blueprint"""
+    import traceback
+    error_traceback = traceback.format_exc()
+    try:
+        logger.error(f"💥 [UPLOAD] Blueprint error handler caught 500: {str(e)}", exc_info=True)
+        logger.error(f"💥 [UPLOAD] Full traceback:\n{error_traceback}")
+    except Exception as log_error:
+        import sys
+        print(f"❌ [UPLOAD] Failed to log in error handler: {str(log_error)}", file=sys.stderr)
+        print(f"💥 [UPLOAD] Original error: {str(e)}", file=sys.stderr)
+        print(f"💥 [UPLOAD] Full traceback:\n{error_traceback}", file=sys.stderr)
+    
+    return jsonify({
+        'success': False,
+        'error': f'Internal server error: {str(e)}',
+        'traceback': error_traceback if current_app.config.get('DEBUG', False) else None
+    }), 500
+
 _preferences_service = PreferencesService()
 _utc_storage_normalizer = DateNormalizationService("UTC")
 
@@ -167,11 +188,22 @@ def upload_file():
     Returns:
         JSON response with session ID and analysis results
     """
-    logger.info("🚀 Starting file upload process")
+    import traceback
+    import sys
+    
+    # Log start - this should always work
+    try:
+        logger.info("🚀 [UPLOAD] Starting file upload process")
+    except Exception as log_error:
+        # Even if logging fails, try to log to stderr
+        print(f"❌ [UPLOAD] Failed to log start: {str(log_error)}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+    
+    # Main try-except for the entire function
     try:
         # Check if file is present
         if 'file' not in request.files:
-            logger.warning("❌ No file provided in request")
+            logger.warning("❌ [UPLOAD] No file provided in request")
             return jsonify({
                 'success': False,
                 'error': 'No file provided'
@@ -179,16 +211,16 @@ def upload_file():
         
         file = request.files['file']
         if file.filename == '':
-            logger.warning("❌ No file selected")
+            logger.warning("❌ [UPLOAD] No file selected")
             return jsonify({
                 'success': False,
                 'error': 'No file selected'
             }), 400
         
-        logger.info(f"📁 File received: {file.filename}")
+        logger.info(f"📁 [UPLOAD] File received: {file.filename}")
         
         if not allowed_file(file.filename):
-            logger.warning(f"❌ Invalid file type: {file.filename}")
+            logger.warning(f"❌ [UPLOAD] Invalid file type: {file.filename}")
             return jsonify({
                 'success': False,
                 'error': 'Invalid file type. Only CSV files are allowed'
@@ -197,84 +229,154 @@ def upload_file():
         # Get connector/task type
         connector_type = (request.form.get('connector_type') or 'ibkr').strip().lower()
         task_type = (request.form.get('task_type') or 'executions').strip().lower()
-        logger.info(f"🔌 Connector type: {connector_type}, Task: {task_type}")
+        logger.info(f"🔌 [UPLOAD] Connector type: {connector_type}, Task: {task_type}")
         
         # Read file content
-        file_content = file.read().decode('utf-8')
-        secure_filename(file.filename)
-        logger.info(f"📄 File content read successfully, length: {len(file_content)} characters")
+        try:
+            file_content = file.read().decode('utf-8')
+            secure_filename(file.filename)
+            logger.info(f"📄 [UPLOAD] File content read successfully, length: {len(file_content)} characters")
+        except Exception as decode_error:
+            logger.error(f"❌ [UPLOAD] Failed to read/decode file: {str(decode_error)}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'error': f'Failed to read file: {str(decode_error)}'
+            }), 400
         
         # Create import session
-        logger.info("🔧 Creating import session...")
-        db_session = next(get_db())
+        logger.info("🔧 [UPLOAD] Creating import session...")
+        try:
+            db_session = next(get_db())
+            logger.info("✅ [UPLOAD] Database session obtained")
+        except Exception as db_error:
+            logger.error(f"❌ [UPLOAD] Failed to get database session: {str(db_error)}", exc_info=True)
+            return jsonify({
+                'success': False,
+                'error': f'Database connection failed: {str(db_error)}'
+            }), 500
+        
         try:
             orchestrator = ImportOrchestrator(db_session)
-            logger.info("✅ ImportOrchestrator created successfully")
+            logger.info("✅ [UPLOAD] ImportOrchestrator created successfully")
 
-            binding_info = orchestrator.detect_account_binding(connector_type, file_content)
-            matched_account = binding_info.get('matched_account')
-            trading_account = matched_account or _resolve_default_trading_account(db_session)
-            if not trading_account:
-                logger.error("❌ No trading accounts found while preparing session")
+            logger.info("🔍 [UPLOAD] Detecting account binding...")
+            try:
+                binding_info = orchestrator.detect_account_binding(connector_type, file_content)
+                logger.info(f"✅ [UPLOAD] Account binding detected: {binding_info}")
+            except Exception as binding_error:
+                logger.error(f"❌ [UPLOAD] Failed to detect account binding: {str(binding_error)}", exc_info=True)
                 return jsonify({
                     'success': False,
-                    'error': 'No trading accounts found'
-                }), 400
-            trading_account_id = trading_account.id
+                    'error': f'Account binding failed: {str(binding_error)}'
+                }), 500
+            
+            matched_account = binding_info.get('matched_account')
+            logger.info(f"🔍 [UPLOAD] Resolving trading account...")
+            try:
+                trading_account = matched_account or _resolve_default_trading_account(db_session)
+                if not trading_account:
+                    logger.error("❌ [UPLOAD] No trading accounts found while preparing session")
+                    return jsonify({
+                        'success': False,
+                        'error': 'No trading accounts found'
+                    }), 400
+                trading_account_id = trading_account.id
+                logger.info(f"✅ [UPLOAD] Trading account resolved: ID={trading_account_id}")
+            except Exception as account_error:
+                logger.error(f"❌ [UPLOAD] Failed to resolve trading account: {str(account_error)}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': f'Trading account resolution failed: {str(account_error)}'
+                }), 500
+            
             linking_context = {
                 'file_account_number': binding_info.get('file_account_number'),
                 'matched_account_id': matched_account.id if matched_account else None,
                 'account_metadata': binding_info.get('account_metadata')
             }
             
-            result = orchestrator.create_import_session(
-                trading_account_id=trading_account_id,
-                file_name=file.filename,
-                file_content=file_content,
-                connector_type=connector_type,
-                task_type=task_type,
-                linking_context=linking_context
-            )
-            logger.info(f"📊 Session creation result: {result}")
+            logger.info("🔧 [UPLOAD] Creating import session...")
+            try:
+                result = orchestrator.create_import_session(
+                    trading_account_id=trading_account_id,
+                    file_name=file.filename,
+                    file_content=file_content,
+                    connector_type=connector_type,
+                    task_type=task_type,
+                    linking_context=linking_context
+                )
+                logger.info(f"📊 [UPLOAD] Session creation result: {result}")
+            except Exception as session_error:
+                logger.error(f"❌ [UPLOAD] Failed to create import session: {str(session_error)}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': f'Session creation failed: {str(session_error)}'
+                }), 500
             
             if not result['success']:
-                logger.error(f"❌ Session creation failed: {result['error']}")
+                logger.error(f"❌ [UPLOAD] Session creation failed: {result['error']}")
                 return jsonify({
                     'success': False,
                     'error': result['error']
                 }), 400
             
-            logger.info(f"✅ Import session created successfully: {result['session_id']}")
+            logger.info(f"✅ [UPLOAD] Import session created successfully: {result['session_id']}")
             
             # Analyze file
-            logger.info("🔍 Starting file analysis...")
-            analysis_result_raw = orchestrator.analyze_file(result['session_id'], task_type)
-            logger.info(f"📊 Analysis result: {analysis_result_raw}")
+            logger.info(f"🔍 [UPLOAD] Starting file analysis for session {result['session_id']}...")
+            try:
+                analysis_result_raw = orchestrator.analyze_file(result['session_id'], task_type)
+                logger.info(f"📊 [UPLOAD] Analysis result: {analysis_result_raw}")
+            except Exception as analysis_error:
+                logger.error(f"❌ [UPLOAD] File analysis failed: {str(analysis_error)}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': f'File analysis failed: {str(analysis_error)}',
+                    'session_id': result['session_id']
+                }), 500
             
             if not analysis_result_raw.get('success'):
                 logger.warning(
-                    "⚠️ File analysis did not complete",
+                    "⚠️ [UPLOAD] File analysis did not complete",
                     extra={'session_id': result['session_id'], 'details': analysis_result_raw}
                 )
                 error_payload = dict(analysis_result_raw)
                 error_payload['success'] = False
                 error_payload.setdefault('session_id', result['session_id'])
                 status_code = 400 if error_payload.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+                logger.error(f"❌ [UPLOAD] Analysis failed with status {status_code}: {error_payload.get('error', 'Unknown error')}")
                 return jsonify(error_payload), status_code
             
-            logger.info("✅ File analysis completed successfully")
+            logger.info("✅ [UPLOAD] File analysis completed successfully")
             
-            normalizer = _get_date_normalizer()
-            analysis_result = normalizer.normalize_output(analysis_result_raw)
+            try:
+                normalizer = _get_date_normalizer()
+                analysis_result = normalizer.normalize_output(analysis_result_raw)
+                logger.info("✅ [UPLOAD] Date normalization completed")
+            except Exception as normalize_error:
+                logger.error(f"❌ [UPLOAD] Date normalization failed: {str(normalize_error)}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': f'Date normalization failed: {str(normalize_error)}',
+                    'session_id': result['session_id']
+                }), 500
             
-            response_data = {
-                'success': True,
-                'session_id': result['session_id'],
-                'provider': result['provider'],
-                'task_type': task_type,
-                'analysis_results': analysis_result['analysis_results']
-            }
-            logger.info(f"🎉 Returning success response: {response_data}")
+            try:
+                response_data = {
+                    'success': True,
+                    'session_id': result['session_id'],
+                    'provider': result['provider'],
+                    'task_type': task_type,
+                    'analysis_results': analysis_result.get('analysis_results') if analysis_result else analysis_result_raw.get('analysis_results')
+                }
+                logger.info(f"🎉 [UPLOAD] Returning success response: session_id={response_data['session_id']}, provider={response_data['provider']}")
+            except Exception as response_error:
+                logger.error(f"❌ [UPLOAD] Failed to build response: {str(response_error)}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'error': f'Response building failed: {str(response_error)}',
+                    'session_id': result['session_id']
+                }), 500
             
             return jsonify(response_data), 200
             
@@ -282,10 +384,22 @@ def upload_file():
             db_session.close()
         
     except Exception as e:
-        logger.error(f"💥 File upload failed with exception: {str(e)}", exc_info=True)
+        import traceback
+        error_traceback = traceback.format_exc()
+        try:
+            logger.error(f"💥 [UPLOAD] File upload failed with exception: {str(e)}", exc_info=True)
+            logger.error(f"💥 [UPLOAD] Full traceback:\n{error_traceback}")
+        except Exception as log_error:
+            # If logging fails, print to stderr
+            import sys
+            print(f"❌ [UPLOAD] Failed to log error: {str(log_error)}", file=sys.stderr)
+            print(f"💥 [UPLOAD] Original error: {str(e)}", file=sys.stderr)
+            print(f"💥 [UPLOAD] Full traceback:\n{error_traceback}", file=sys.stderr)
+        
         return jsonify({
             'success': False,
-            'error': f'File upload failed: {str(e)}'
+            'error': f'File upload failed: {str(e)}',
+            'traceback': error_traceback if current_app.config.get('DEBUG', False) else None
         }), 500
 
 @user_data_import_bp.route('/precheck', methods=['POST'])
@@ -626,42 +740,70 @@ def get_preview(session_id: int):
     """
     Get preview data for user confirmation.
     
+    CRITICAL: This endpoint uses get_preview_snapshot (not generate_preview) to preserve
+    user actions like accept/reject duplicate. generate_preview would regenerate from
+    scratch and lose all accept/reject changes!
+    
     Args:
         session_id: Import session ID
     
     Query params:
-        task_type: Optional override for task type
+        task_type: Optional override for task type (for compatibility, but not used)
     
     Returns:
         JSON response with preview data
     """
     try:
-        task_type = request.args.get('task_type')
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.generate_preview(session_id, task_type)
             
-            if not result_raw.get('success'):
-                status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
-                return jsonify(result_raw), status_code
+            # CRITICAL: Use get_preview_snapshot to preserve accept/reject changes
+            # DO NOT use generate_preview here - it would regenerate from scratch!
+            logger.info(f"🔍 [GET_PREVIEW] Loading preview snapshot for session {session_id} (preserves accept/reject)")
+            snapshot = orchestrator.get_preview_snapshot(session_id)
+            
+            if not snapshot.get('success'):
+                # Fallback: if no preview data exists, generate it
+                logger.warning(f"⚠️ [GET_PREVIEW] No preview snapshot found for session {session_id}, generating...")
+                task_type = request.args.get('task_type')
+                result_raw = orchestrator.generate_preview(session_id, task_type)
+                
+                if not result_raw.get('success'):
+                    status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 500
+                    return jsonify(result_raw), status_code
 
-            normalizer = _get_date_normalizer()
-            result = normalizer.normalize_output(result_raw)
-            
-            return jsonify({
-                'status': 'success',
-                'preview_data': result['preview_data']
-            }), 200
+                normalizer = _get_date_normalizer()
+                result = normalizer.normalize_output(result_raw)
+                
+                return jsonify({
+                    'status': 'success',
+                    'success': True,
+                    'preview_data': result['preview_data']
+                }), 200
+            else:
+                # Use snapshot data (preserves accept/reject changes)
+                preview_data = snapshot['preview_data']
+                normalizer = _get_date_normalizer()
+                result = normalizer.normalize_output({'preview_data': preview_data})
+                
+                logger.info(f"✅ [GET_PREVIEW] Preview snapshot loaded for session {session_id}: records_to_import={len(preview_data.get('records_to_import', []))}, records_to_skip={len(preview_data.get('records_to_skip', []))}")
+                
+                return jsonify({
+                    'status': 'success',
+                    'success': True,
+                    'preview_data': result['preview_data']
+                }), 200
             
         finally:
             db_session.close()
         
     except Exception as e:
-        logger.error(f"Preview generation failed: {str(e)}")
+        logger.error(f"❌ [GET_PREVIEW] Preview loading failed for session {session_id}: {str(e)}", exc_info=True)
         return jsonify({
             'status': 'error',
-            'message': f'Preview generation failed: {str(e)}'
+            'success': False,
+            'message': f'Preview loading failed: {str(e)}'
         }), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/update-ticker', methods=['POST'])
@@ -1081,11 +1223,14 @@ def delete_import_session(session_id: int):
             db_session.close()
     
     except Exception as e:
-        logger.error(f"Failed to delete import session {session_id}: {str(e)}")
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Failed to delete import session {session_id}: {str(e)}\n{error_trace}")
         return jsonify({
             'success': False,
             'status': 'error',
-            'error': f'Failed to delete session: {str(e)}'
+            'error': f'Failed to delete session: {str(e)}',
+            'details': str(e) if current_app.debug else 'An internal error occurred'
         }), 500
 
 @user_data_import_bp.route('/session/<int:session_id>/status', methods=['GET'])

@@ -2718,12 +2718,15 @@ function setupHoverBehavior() {
 
     if (button && menu) {
       // Check for existing event listeners BEFORE adding new ones
-      const existingListeners = getEventListeners(button);
-      console.log(`🔍 [TRACK] Button ${buttonId} existing listeners:`, {
-        mouseenter: existingListeners?.mouseenter?.length || 0,
-        mouseleave: existingListeners?.mouseleave?.length || 0,
-        click: existingListeners?.click?.length || 0,
-      });
+      // Note: getEventListeners is only available in Chrome DevTools console
+      const existingListeners = (typeof getEventListeners !== 'undefined') ? getEventListeners(button) : null;
+      if (existingListeners) {
+        console.log(`🔍 [TRACK] Button ${buttonId} existing listeners:`, {
+          mouseenter: existingListeners?.mouseenter?.length || 0,
+          mouseleave: existingListeners?.mouseleave?.length || 0,
+          click: existingListeners?.click?.length || 0,
+        });
+      }
       
       // Store reference to handlers for cleanup
       if (!button.__hoverHandlers) {

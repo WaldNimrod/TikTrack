@@ -5549,14 +5549,42 @@ function analyzeFile() {
         page: 'import-user-data'
     });
     
+    console.group('🔍 [ANALYZE_FILE] Starting file upload and analysis');
+    console.log('📋 Request parameters:', {
+        sessionId: currentSessionId,
+        connectorValue,
+        dataTypeValue,
+        accountValue,
+        fileName: selectedFile?.name,
+        fileSize: selectedFile?.size
+    });
+    
     setAnalysisLoadingState(true, 'מעלה את הקובץ ומתחיל ניתוח...', 10);
+    
+    console.log('📡 [ANALYZE_FILE] Sending POST request to /api/user-data-import/upload');
     
     fetch('/api/user-data-import/upload', {
             method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [ANALYZE_FILE] Response received:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+        });
+        
+        if (!response.ok) {
+            console.error('❌ [ANALYZE_FILE] Response not OK:', {
+                status: response.status,
+                statusText: response.statusText
+            });
+        }
+        
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [ANALYZE_FILE] Response data:', data);
         setAnalysisLoadingState(true, 'מעבד את הנתונים שהתקבלו...', 55);
         if (handleAccountLinkingBlockingResponse(data, 'upload')) {
             currentSessionId = data.session_id || currentSessionId;
@@ -5566,6 +5594,14 @@ function analyzeFile() {
             return;
         }
         if (data.success || data.status === 'success') {
+            console.log('✅ [ANALYZE_FILE] Analysis completed successfully');
+            console.log('📊 [ANALYZE_FILE] Analysis results:', {
+                sessionId: data.session_id,
+                provider: data.provider,
+                taskType: data.task_type,
+                hasAnalysisResults: !!data.analysis_results
+            });
+            
             window.Logger.info('[Import Modal] File analysis completed', { data, page: 'import-user-data' });
             currentSessionId = data.session_id;
             window.currentSessionId = data.session_id; // Make it global
@@ -5603,15 +5639,27 @@ function analyzeFile() {
             displayAnalysisResults(data.analysis_results);
             
             // Go to next step immediately (no artificial delay)
+            console.log('🔄 [ANALYZE_FILE] Navigating to step 2');
             goToStep(2);
+            console.log('✅ [ANALYZE_FILE] Step 2 navigation completed');
+            console.groupEnd();
     } else {
+            console.error('❌ [ANALYZE_FILE] Analysis failed:', data.error);
             showImportUserDataNotification(`שגיאה בניתוח הקובץ: ${data.error}`, 'error');
+            console.groupEnd();
         }
     })
     .catch(error => {
+        console.error('❌ [ANALYZE_FILE] Fetch error:', error);
+        console.error('❌ [ANALYZE_FILE] Error details:', {
+            message: error?.message,
+            stack: error?.stack,
+            name: error?.name
+        });
         setAnalysisLoadingState(false);
         window.Logger.error('Analysis error:', error);
         showImportUserDataNotification('שגיאה בניתוח הקובץ', 'error');
+        console.groupEnd();
     });
 }
 
@@ -6182,14 +6230,21 @@ async function loadProblemResolution(autoTriggered = false) {
         }
         if (data.success || data.status === 'success') {
             previewData = data.preview_data;
+            
+            // CRITICAL: Always display problem resolution
             displayProblemResolutionDetailed(data.preview_data);
-            window.Logger.info('[Import Modal] Problem resolution data loaded', {
+            
+            window.Logger.info('[Import Modal] Problem resolution data loaded and displayed', {
                 summary: data.preview_data?.summary,
                 autoTriggered,
+                hasPreviewData: !!data.preview_data,
+                currentStep,
                 page: 'import-user-data'
             });
+            
             setAnalysisLoadingState(true, 'מאתר פטרונות והצעות לשיפור...', 82);
             window.setTimeout(() => setAnalysisLoadingState(false), 1000);
+            
             const stepActions = document.getElementById('analysisStepActions');
             const continueBtn = document.getElementById('analysisContinueBtn');
             if (stepActions) {
@@ -6203,6 +6258,14 @@ async function loadProblemResolution(autoTriggered = false) {
                 hideProcessingOverlay();
                 overlayApplied = false;
             }
+            
+            // Ensure problem resolution section is visible
+            const problemSection = document.getElementById('problemResolutionSection');
+            if (problemSection && currentStep === 2) {
+                setElementDisplay(problemSection, 'block');
+                window.Logger.debug('[Import Modal] Problem resolution section made visible', { page: 'import-user-data' });
+            }
+            
             return;
         }
 
@@ -6286,45 +6349,37 @@ function proceedToPreviewFromProblems() {
     goToStep(3);
 }
 
-/**
- * Resume active import session - PLACEHOLDER for future implementation
- * Currently not implemented - modal always opens in clean state
- * This function is kept as a placeholder for future "Rerun Session" functionality
- */
-async function resumeActiveImportSession() {
-    window.Logger?.warn('[Import Modal] resumeActiveImportSession called - not yet implemented', { 
-        page: 'import-user-data' 
-    });
-    if (typeof window.showDetailedNotification === 'function') {
-        window.showDetailedNotification(
-            'פונקציונליות לא זמינה',
-            'המשך סשן פעיל - תכונה זו תתווסף בעתיד',
-            'info',
-            5000,
-            'import-user-data'
-        );
-    }
-}
 
 /**
  * Display preview data
  */
 function displayPreviewData(data) {
+    console.group('🔍 [DISPLAY_PREVIEW] Displaying preview data');
+    console.log('📋 Preview data:', {
+        hasData: !!data,
+        taskType: data?.task_type || analysisResults?.task_type || selectedDataTypeKey || 'executions',
+        recordsToImport: data?.records_to_import?.length || 0,
+        recordsToSkip: data?.records_to_skip?.length || 0,
+        currentStep
+    });
+    
     window.Logger.debug('[Import Modal] Displaying preview data', { data, page: 'import-user-data' });
     
     if (!data) {
+        console.warn('⚠️ [DISPLAY_PREVIEW] No preview data to display');
         window.Logger.warn('[Import Modal] No preview data to display', { page: 'import-user-data' });
+        console.groupEnd();
         return;
     }
     
     // CRITICAL: Load selectedCashflowTypes from preview_data if available
-    // This ensures resume session works correctly
     if (data.selected_types && Array.isArray(data.selected_types) && data.selected_types.length > 0) {
         // Reset selectedCashflowTypes and set only the types from preview_data
         selectedCashflowTypes = {};
         data.selected_types.forEach(type => {
             selectedCashflowTypes[type] = true;
         });
+        console.log('📋 [DISPLAY_PREVIEW] Loaded selectedCashflowTypes:', data.selected_types);
         window.Logger.info('[Import Modal] Loaded selectedCashflowTypes from preview_data', {
             selectedTypes: data.selected_types,
             selectedCashflowTypes,
@@ -6336,6 +6391,16 @@ function displayPreviewData(data) {
     let recordsToImport = data.records_to_import || [];
     const recordsToSkip = data.records_to_skip || [];
     const summary = data.summary || {};
+    
+    console.log('📊 [DISPLAY_PREVIEW] Records breakdown:', {
+        taskType,
+        recordsToImportCount: recordsToImport.length,
+        recordsToSkipCount: recordsToSkip.length,
+        summary: {
+            totalRecords: summary.total_records,
+            importRate: summary.import_rate
+        }
+    });
 
     // Filter records by selectedCashflowTypes for cashflows task
     if (taskType === 'cashflows' && Object.keys(selectedCashflowTypes).length > 0) {
@@ -6392,11 +6457,11 @@ function displayPreviewData(data) {
         return;
     }
 
-    renderExecutionPreviewTables(recordsToImport, recordsToSkip);
+    renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType);
     updateSummaryStats();
 }
 
-function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
+function renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType = 'executions') {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
         importTableHeadRow.innerHTML = `
@@ -6482,6 +6547,14 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip) {
             skipTableBody.appendChild(row);
         });
     }
+    
+    console.log('✅ [DISPLAY_PREVIEW] Preview tables rendered successfully');
+    console.log('📊 [DISPLAY_PREVIEW] Final counts:', {
+        recordsToImport: recordsToImport.length,
+        recordsToSkip: recordsToSkip.length,
+        taskType
+    });
+    console.groupEnd();
 }
 
 function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
@@ -7111,7 +7184,30 @@ function displayProblemResolution(data) {
  * Accept duplicate
  */
 function acceptDuplicate(index, type) {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+        window.Logger?.warn('[ACCEPT_DUPLICATE] No session ID', { page: 'import-user-data' });
+        console.warn('🔍 [ACCEPT_DUPLICATE] ❌ No session ID available');
+        return;
+    }
+    
+    console.group('🔍 [ACCEPT_DUPLICATE] Starting accept duplicate process');
+    console.log('📋 Parameters:', { sessionId: currentSessionId, recordIndex: index, duplicateType: type });
+    
+    // Log current preview data state BEFORE accept
+    const beforeState = {
+        recordsToImport: previewData?.records_to_import?.length || 0,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        previewDataExists: !!previewData
+    };
+    console.log('📊 Before accept:', beforeState);
+    
+    window.Logger?.info('[ACCEPT_DUPLICATE] Starting accept duplicate', {
+        sessionId: currentSessionId,
+        recordIndex: index,
+        duplicateType: type,
+        beforeState,
+        page: 'import-user-data'
+    });
     
     fetch(`/api/user-data-import/session/${currentSessionId}/accept-duplicate`, {
         method: 'POST',
@@ -7123,24 +7219,43 @@ function acceptDuplicate(index, type) {
             duplicate_type: type
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [ACCEPT_DUPLICATE] API Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [ACCEPT_DUPLICATE] API Response data:', data);
+        
         if (handleAccountLinkingBlockingResponse(data, 'accept-duplicate')) {
+            console.warn('⚠️ [ACCEPT_DUPLICATE] Account linking required');
+            console.groupEnd();
             return;
         }
         if (data.success || data.status === 'success') {
+            console.log('✅ [ACCEPT_DUPLICATE] Backend accepted successfully');
             showImportUserDataNotification('כפילות אושרה', 'success');
+            
             // Refresh preview data - wait a bit to ensure backend commit is complete
+            console.log('🔄 [ACCEPT_DUPLICATE] Waiting 100ms before refreshing preview...');
             setTimeout(() => {
+                console.log('🔄 [ACCEPT_DUPLICATE] Refreshing preview data...');
                 refreshPreviewData();
             }, 100);
         } else {
+            console.error('❌ [ACCEPT_DUPLICATE] Backend returned error:', data.error);
             showImportUserDataNotification(`שגיאה באישור כפילות: ${data.error}`, 'error');
         }
+        console.groupEnd();
     })
     .catch(error => {
-        window.Logger.error('Accept duplicate error:', error);
+        console.error('❌ [ACCEPT_DUPLICATE] Fetch error:', error);
+        window.Logger?.error('[ACCEPT_DUPLICATE] Accept duplicate error', {
+            error: error?.message,
+            stack: error?.stack,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('שגיאה באישור כפילות', 'error');
+        console.groupEnd();
     });
 }
 
@@ -7148,7 +7263,30 @@ function acceptDuplicate(index, type) {
  * Reject duplicate
  */
 function rejectDuplicate(index, type) {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+        window.Logger?.warn('[REJECT_DUPLICATE] No session ID', { page: 'import-user-data' });
+        console.warn('🔍 [REJECT_DUPLICATE] ❌ No session ID available');
+        return;
+    }
+    
+    console.group('🔍 [REJECT_DUPLICATE] Starting reject duplicate process');
+    console.log('📋 Parameters:', { sessionId: currentSessionId, recordIndex: index, duplicateType: type });
+    
+    // Log current preview data state BEFORE reject
+    const beforeState = {
+        recordsToImport: previewData?.records_to_import?.length || 0,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        previewDataExists: !!previewData
+    };
+    console.log('📊 Before reject:', beforeState);
+    
+    window.Logger?.info('[REJECT_DUPLICATE] Starting reject duplicate', {
+        sessionId: currentSessionId,
+        recordIndex: index,
+        duplicateType: type,
+        beforeState,
+        page: 'import-user-data'
+    });
     
     fetch(`/api/user-data-import/session/${currentSessionId}/reject-duplicate`, {
             method: 'POST',
@@ -7160,24 +7298,43 @@ function rejectDuplicate(index, type) {
             duplicate_type: type
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [REJECT_DUPLICATE] API Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [REJECT_DUPLICATE] API Response data:', data);
+        
         if (handleAccountLinkingBlockingResponse(data, 'reject-duplicate')) {
+            console.warn('⚠️ [REJECT_DUPLICATE] Account linking required');
+            console.groupEnd();
             return;
         }
         if (data.success || data.status === 'success') {
+            console.log('✅ [REJECT_DUPLICATE] Backend rejected successfully');
             showImportUserDataNotification('כפילות נדחתה', 'success');
+            
             // Refresh preview data - wait a bit to ensure backend commit is complete
+            console.log('🔄 [REJECT_DUPLICATE] Waiting 100ms before refreshing preview...');
             setTimeout(() => {
+                console.log('🔄 [REJECT_DUPLICATE] Refreshing preview data...');
                 refreshPreviewData();
             }, 100);
         } else {
+            console.error('❌ [REJECT_DUPLICATE] Backend returned error:', data.error);
             showImportUserDataNotification(`שגיאה בדחיית כפילות: ${data.error}`, 'error');
         }
+        console.groupEnd();
     })
     .catch(error => {
-        window.Logger.error('Reject duplicate error:', error);
+        console.error('❌ [REJECT_DUPLICATE] Fetch error:', error);
+        window.Logger?.error('[REJECT_DUPLICATE] Reject duplicate error', {
+            error: error?.message,
+            stack: error?.stack,
+            page: 'import-user-data'
+        });
         showImportUserDataNotification('שגיאה בדחיית כפילות', 'error');
+        console.groupEnd();
     });
 }
 
@@ -8803,23 +8960,71 @@ function getConfidenceClass(confidence) {
  * Refresh preview data after user actions
  */
 function refreshPreviewData() {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+        console.warn('🔍 [REFRESH_PREVIEW] ❌ No session ID available');
+        return;
+    }
+    
+    console.group('🔍 [REFRESH_PREVIEW] Refreshing preview data');
+    console.log('📋 Session ID:', currentSessionId);
+    console.log('📊 Current step:', currentStep);
+    
+    // Log current preview data state BEFORE refresh
+    const beforeState = {
+        recordsToImport: previewData?.records_to_import?.length || 0,
+        recordsToSkip: previewData?.records_to_skip?.length || 0,
+        previewDataExists: !!previewData
+    };
+    console.log('📊 Before refresh:', beforeState);
+    
+    window.Logger?.info('[REFRESH_PREVIEW] Refreshing preview data', {
+        sessionId: currentSessionId,
+        currentStep,
+        beforeState,
+        page: 'import-user-data'
+    });
     
     // Run refresh in background - don't block UI
     fetch(`/api/user-data-import/session/${currentSessionId}/refresh-preview`, {
         method: 'POST'
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('📡 [REFRESH_PREVIEW] API Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('📡 [REFRESH_PREVIEW] API Response data:', {
+            success: data.success || data.status === 'success',
+            hasPreviewData: !!data.preview_data,
+            recordsToImport: data.preview_data?.records_to_import?.length || 0,
+            recordsToSkip: data.preview_data?.records_to_skip?.length || 0
+        });
+        
         if (handleAccountLinkingBlockingResponse(data, 'refresh-preview')) {
+            console.warn('⚠️ [REFRESH_PREVIEW] Account linking required');
+            console.groupEnd();
             return;
         }
         if (data.success || data.status === 'success') {
+            const afterState = {
+                recordsToImport: data.preview_data?.records_to_import?.length || 0,
+                recordsToSkip: data.preview_data?.records_to_skip?.length || 0
+            };
+            console.log('📊 After refresh:', afterState);
+            console.log('📊 Change:', {
+                importDelta: afterState.recordsToImport - beforeState.recordsToImport,
+                skipDelta: afterState.recordsToSkip - beforeState.recordsToSkip
+            });
+            
             previewData = data.preview_data;
             updateSymbolMetadataCache(data.preview_data?.symbol_metadata || data.preview_data?.summary?.symbol_metadata);
             updateActiveSessionFromPreview(data.preview_data);
+            
+            console.log('🔄 [REFRESH_PREVIEW] Updating UI for step:', currentStep);
+            
             // Refresh the current step display only if modal is still open
             if (currentStep === 2) {
+                console.log('📋 [REFRESH_PREVIEW] Updating step 2 (problem resolution)');
                 displayProblemResolutionDetailed(data.preview_data);
                 // Also update missing tickers list explicitly
                 const summary = data.preview_data?.summary || {};
@@ -8828,19 +9033,28 @@ function refreshPreviewData() {
                     .concat(Array.isArray(summary.missing_tickers) ? summary.missing_tickers : []);
                 displayMissingTickers(missingTickers);
             } else if (currentStep === 3) {
+                console.log('📋 [REFRESH_PREVIEW] Updating step 3 (preview tables)');
+                // CRITICAL: Update both problem resolution AND preview tables in step 3
                 displayProblemResolutionDetailed(data.preview_data);
+                displayPreviewData(data.preview_data);
             } else if (currentStep === 4) {
+                console.log('📋 [REFRESH_PREVIEW] Updating step 4');
                 displayPreview(data.preview_data);
             }
+            
+            console.log('✅ [REFRESH_PREVIEW] Preview data refreshed successfully');
         } else {
+            console.error('❌ [REFRESH_PREVIEW] Backend returned error:', data.error);
             // Don't show error notification if modal is closed - user already moved on
             if (document.getElementById('importUserDataModal')?.classList.contains('show')) {
                 showImportUserDataNotification(`שגיאה ברענון התצוגה: ${data.error}`, 'error');
             }
         }
+        console.groupEnd();
     })
     .catch(error => {
-        window.Logger?.warn('[Import Modal] Refresh preview error (non-blocking)', {
+        console.error('❌ [REFRESH_PREVIEW] Fetch error:', error);
+        window.Logger?.warn('[REFRESH_PREVIEW] Refresh preview error (non-blocking)', {
             error: error?.message,
             page: 'import-user-data'
         });
@@ -8848,6 +9062,7 @@ function refreshPreviewData() {
         if (document.getElementById('importUserDataModal')?.classList.contains('show')) {
             showImportUserDataNotification('שגיאה ברענון התצוגה', 'error');
         }
+        console.groupEnd();
     });
 }
 
@@ -9074,7 +9289,6 @@ window.resetFile = resetFile;
 window.confirmImport = confirmImport;
 window.proceedToPreviewFromProblems = proceedToPreviewFromProblems;
 window.proceedToProblemResolution = proceedToProblemResolution;
-window.resumeActiveImportSession = resumeActiveImportSession;
 window.getImportDebugState = getImportDebugState;
 window.linkExternalAccountToTradingAccount = linkExternalAccountToTradingAccount;
 window.confirmAutoLinkedAccount = confirmAutoLinkedAccount;

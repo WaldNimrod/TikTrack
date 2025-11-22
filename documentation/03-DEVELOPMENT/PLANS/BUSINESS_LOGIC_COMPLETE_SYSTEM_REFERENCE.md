@@ -255,7 +255,7 @@
 | **TradeBusinessService** | ✅ `Backend/services/business_logic/trade_business_service.py` | ✅ `/api/business/trade/*` | ✅ `trades-data.js` | ✅ מוכן |
 | **ExecutionBusinessService** | ✅ `Backend/services/business_logic/execution_business_service.py` | ✅ `/api/business/execution/*` | ✅ `executions-data.js` | ✅ מוכן |
 | **AlertBusinessService** | ✅ `Backend/services/business_logic/alert_business_service.py` | ✅ `/api/business/alert/*` | ✅ `alerts-data.js` | ✅ מוכן |
-| **StatisticsBusinessService** | ✅ `Backend/services/business_logic/statistics_business_service.py` | ✅ `/api/business/statistics/*` | ❌ חסר | ⏳ צריך Wrappers |
+| **StatisticsBusinessService** | ✅ `Backend/services/business_logic/statistics_business_service.py` | ✅ `/api/business/statistics/*` | ❌ חסר | ⏳ צריך Wrappers<br>📚 [מדריך מפתחים](../GUIDES/STATISTICS_BUSINESS_SERVICE_GUIDE.md) |
 | **CashFlowBusinessService** | ✅ `Backend/services/business_logic/cash_flow_business_service.py` | ✅ `/api/business/cash-flow/*` | ❌ חסר | ⏳ צריך Wrappers |
 
 ### Business Services חסרים (7 services)
@@ -330,7 +330,41 @@
 
 ---
 
+---
+
+## 📖 תיעוד מפורט - StatisticsBusinessService
+
+`StatisticsBusinessService` מספק חישובי סטטיסטיקה, KPI, וביצועי פורטפוליו.
+
+### תכונות עיקריות:
+- ✅ חישובי סטטיסטיקה בסיסיים: sum, average, count, min/max
+- ✅ חישובי KPI מורכבים
+- ✅ **חישוב Time-Weighted Return (TWR)** לביצועי פורטפוליו
+
+### פונקציות מרכזיות:
+
+#### 1. פונקציות בסיסיות:
+- `calculate_sum(data, field)` - חישוב סכום
+- `calculate_average(data, field)` - חישוב ממוצע
+- `count_records(data, filter_fn)` - ספירה עם פילטר
+- `calculate_min_max(data, field)` - מינימום ומקסימום
+
+#### 2. חישובי KPI:
+- `calculate_kpi(calculation_type, data, params)` - חישוב KPI על פי סוג
+  - סוגים: 'kpi', 'summary', 'average', 'position', 'portfolio'
+
+#### 3. חישוב Time-Weighted Return:
+- `calculate_time_weighted_return(db, account_id, start_date, end_date, include_cash_flows)`
+  - **מטרה**: חישוב ביצועי פורטפוליו ללא השפעה של הפקדות/משיכות
+  - **איך זה עובד**: מחלק את התקופה לתת-תקופות בין cash flows, מחשב תשואה לכל תת-תקופה, ומכפיל את כל התשואות
+  - **למה חשוב**: מתחשב בזמן הכניסה של הכסף - הפקדה בחודש הראשון "עובדת" יותר זמן מהפקדה בחודש האחרון
+
+### תיעוד מפורט:
+📚 **ראה:** [`STATISTICS_BUSINESS_SERVICE_GUIDE.md`](../GUIDES/STATISTICS_BUSINESS_SERVICE_GUIDE.md) למדריך מפורט עם דוגמאות שימוש
+
+---
+
 **תאריך עדכון אחרון:** 22 נובמבר 2025  
-**גרסה:** 1.0.0  
-**סטטוס:** ✅ מעודכן - כולל כל הישויות, המערכות, העמודים והאינטגרציות
+**גרסה:** 1.0.1  
+**סטטוס:** ✅ מעודכן - כולל תיעוד Time-Weighted Return
 

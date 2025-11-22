@@ -275,13 +275,23 @@ def create_ticker():
             ticker = TickerService.create(db, data)
         except Exception as e:
             error_msg = str(e)
-            if "UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg:
+            # Handle both SQLite and PostgreSQL unique constraint errors
+            is_unique_error = (
+                ("UNIQUE constraint failed" in error_msg and "tickers.symbol" in error_msg) or
+                ("UniqueViolation" in error_msg or "duplicate key value violates unique constraint" in error_msg) and
+                ("ix_tickers_symbol" in error_msg or "tickers.symbol" in error_msg)
+            )
+            if is_unique_error:
+                # Rollback session before returning error response
+                db.rollback()
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"טיקר עם סמל '{data.get('symbol', '')}' כבר קיים במערכת"},
                     "version": "1.0"
                 }), 400
             else:
+                # Rollback session on other errors
+                db.rollback()
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},

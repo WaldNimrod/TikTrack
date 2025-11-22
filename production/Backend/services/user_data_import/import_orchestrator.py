@@ -667,31 +667,52 @@ class ImportOrchestrator:
         linking_status = session.get_summary_data('linking_status')
         matched_account_id = session.get_summary_data('linking_matched_account_id')
 
-        # If linking is already confirmed, skip all checks
+        # Always require user confirmation - even if linking is already confirmed
+        # This ensures user can see and change the account before import
+        # Only skip if explicitly marked as confirmed by user interaction (not automatic match)
         if linking_confirmed and linking_status == 'confirmed':
             # Verify that file_account_number matches what's stored
             stored_file_account = session.get_summary_data('file_account_number')
             if stored_file_account == file_account_number:
-                logger.info(f"✅ [ACCOUNT_LINKING] Account linking already confirmed for session {session.id}")
-                return None
+                # Check if this was confirmed by user or automatically
+                user_confirmed = session.get_summary_data('linking_user_confirmed')
+                if user_confirmed:
+                    logger.info(f"✅ [ACCOUNT_LINKING] Account linking already confirmed by user for session {session.id}")
+                    return None
+                else:
+                    # Auto-confirmed but not by user - require confirmation
+                    logger.info(f"🔍 [ACCOUNT_LINKING] Auto-confirmed account linking for session {session.id} - requiring user confirmation")
+                    session.add_summary_data({
+                        'linking_status': 'pending_confirmation',
+                        'linking_confirmed': False
+                    })
+                    self.db_session.flush()
         
-        # CRITICAL: Also check if account is already linked in database (even if session not explicitly confirmed)
-        # This handles the case where confirm_account_link was called but session state wasn't fully updated
+        # CRITICAL: Always show account linking interface to allow user to see and change the account
+        # Even if account is already linked and matches session, we still need user confirmation
         if file_account_number:
             existing_binding = self.db_session.query(TradingAccount).filter(
                 TradingAccount.external_account_number == file_account_number
             ).first()
             if existing_binding and existing_binding.id == session.trading_account_id:
-                # Account is already linked and matches session - no need for confirmation
+                # Account is already linked and matches session - but still require confirmation
                 session.add_summary_data({
-                    'linking_status': 'confirmed',
-                    'linking_confirmed': True,
+                    'linking_status': 'pending_confirmation',
+                    'linking_confirmed': False,
                     'linking_matched_account_id': existing_binding.id,
                     'file_account_number': file_account_number
                 })
                 self.db_session.flush()
-                logger.info(f"✅ [ACCOUNT_LINKING] Account already linked in database for session {session.id}")
-                return None
+                logger.info(f"🔍 [ACCOUNT_LINKING] Account match found for session {session.id} - requiring user confirmation")
+                return self._build_account_link_error(
+                    session,
+                    status='pending_confirmation',
+                    message='המערכת זיהתה את מספר החשבון בקובץ. אשר את החשבון לפני המשך הייבוא.',
+                    file_account_number=file_account_number,
+                    current_account_number=self._normalize_account_identifier(existing_binding.external_account_number),
+                    recognized_account=existing_binding,
+                    requires_confirmation=True
+                )
 
         if matched_account_id and not linking_confirmed:
             matched_account = self.db_session.query(TradingAccount).filter(
@@ -954,6 +975,7 @@ class ImportOrchestrator:
         session.add_summary_data({
             'linking_status': 'confirmed',
             'linking_confirmed': True,
+            'linking_user_confirmed': True,  # Mark as confirmed by user interaction
             'linking_matched_account_id': matched_account.id
         })
         try:

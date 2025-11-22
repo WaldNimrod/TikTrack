@@ -2654,17 +2654,47 @@ function hideExecutionTickerInfo() {
 
 /**
  * Calculate execution values (total, etc.) for form
+ * Uses backend Business Logic API via ExecutionsData service
  * @param {string} formType - Form type ('add' or 'edit')
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function calculateExecutionValues(formType) {
+async function calculateExecutionValues(formType) {
   const isEdit = formType === 'edit';
   const prefix = isEdit ? 'editExecution' : 'execution';
   
   const quantity = parseFloat(document.getElementById(`${prefix}Quantity`).value) || 0;
   const price = parseFloat(document.getElementById(`${prefix}Price`).value) || 0;
   const commission = parseFloat(document.getElementById(`${prefix}Commission`).value) || 0;
+  const action = document.getElementById(`${prefix}Type`)?.value || 'buy';
 
+  // Use backend Business Logic API if available
+  if (window.ExecutionsData && typeof window.ExecutionsData.calculateExecutionValues === 'function') {
+    try {
+      const result = await window.ExecutionsData.calculateExecutionValues({
+        quantity,
+        price,
+        commission,
+        action
+      });
+      
+      if (result && result.total !== undefined) {
+        const totalElement = document.getElementById(`${prefix}Total`);
+        if (totalElement) {
+          const sign = result.total >= 0 ? '' : '-';
+          totalElement.innerHTML = `<strong>${result.label || 'סה"כ:'}</strong> ${sign}$${Math.abs(result.total).toFixed(2)}`;
+        }
+        return;
+      }
+    } catch (error) {
+      window.Logger?.warn?.('⚠️ Error calling ExecutionsData.calculateExecutionValues, using fallback', {
+        page: 'executions',
+        error: error?.message || error
+      });
+      // Fall through to local calculation
+    }
+  }
+
+  // Fallback: Local calculation (backward compatibility)
   let total = 0;
   let label = '';
   
@@ -2679,27 +2709,25 @@ function calculateExecutionValues(formType) {
     }
   } else {
     // בטופס הוספה - לוגיקה מתקדמת עם buy/sell
-    const type = document.getElementById(`${prefix}Type`).value;
+    if (action === 'buy') {
+      // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
+      total = -(quantity * price + commission);
+      label = 'סה"כ עלות:';
+    } else if (action === 'sell') {
+      // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
+      total = quantity * price - commission;
+      label = 'סה"כ מזומן:';
+    } else {
+      // אם לא נבחר סוג, הצג סכום בסיסי
+      total = quantity * price;
+      label = 'סה"כ:';
+    }
 
-  if (type === 'buy') {
-    // בקנייה: סה"כ עלות = -(כמות * מחיר + עמלה) - שלילי כי זה כסף שיוצא
-    total = -(quantity * price + commission);
-    label = 'סה"כ עלות:';
-  } else if (type === 'sell') {
-    // במכירה: סה"כ מזומן = כמות * מחיר - עמלה - חיובי כי זה כסף שנכנס
-    total = quantity * price - commission;
-    label = 'סה"כ מזומן:';
-  } else {
-    // אם לא נבחר סוג, הצג סכום בסיסי
-    total = quantity * price;
-    label = 'סה"כ:';
-  }
-
-  // עדכון התצוגה
+    // עדכון התצוגה
     const totalElement = document.getElementById(`${prefix}Total`);
-  if (totalElement) {
-    const sign = total >= 0 ? '' : '-';
-    totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
+    if (totalElement) {
+      const sign = total >= 0 ? '' : '-';
+      totalElement.innerHTML = `<strong>${label}</strong> ${sign}$${Math.abs(total).toFixed(2)}`;
     }
   }
 }
@@ -2707,19 +2735,19 @@ function calculateExecutionValues(formType) {
 /**
  * Calculate execution values for add form
  * @deprecated Use calculateExecutionValues('add') instead
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function calculateAddExecutionValues() {
-  calculateExecutionValues('add');
+async function calculateAddExecutionValues() {
+  await calculateExecutionValues('add');
 }
 
 /**
  * Calculate execution values for edit form
  * @deprecated Use calculateExecutionValues('edit') instead
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function calculateEditExecutionValues() {
-  calculateExecutionValues('edit');
+async function calculateEditExecutionValues() {
+  await calculateExecutionValues('edit');
 }
 
 // הגדרת הפונקציות כגלובליות

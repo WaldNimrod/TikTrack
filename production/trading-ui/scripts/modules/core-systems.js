@@ -340,7 +340,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         size: '38KB',
       });
 
-      console.log('🔧 Module configurations initialized:', this.moduleConfigs.size, 'modules');
+      // Removed debug log - module initialization is tracked internally
     }
 
     /**
@@ -364,7 +364,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       }
 
       if (this.loadingPromises.has(moduleName)) {
-        console.log(`⏳ Module ${moduleName} already loading...`);
+        // Removed debug log - module loading is tracked internally
         return await this.loadingPromises.get(moduleName);
       }
 
@@ -374,7 +374,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         return false;
       }
 
-      console.log(`🚀 Loading module: ${config.name} (${config.size})`);
+      // Removed debug log - module loading is tracked internally
 
       const loadingPromise = this._loadModuleScript(moduleName, config);
       this.loadingPromises.set(moduleName, loadingPromise);
@@ -383,7 +383,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         const success = await loadingPromise;
         if (success) {
           this.loadedModules.add(moduleName);
-          console.log(`✅ Module ${moduleName} loaded successfully`);
+          // Removed debug log - module loading is tracked internally
         }
         return success;
       } finally {
@@ -448,10 +448,8 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * @returns {Promise<boolean>} Success status
      */
     async loadRequiredModules(pageConfig) {
-      console.log('🔧 Loading required modules for page:', pageConfig.name);
-
+      // Removed debug logs - module loading is tracked internally
       const requiredModules = this.getRequiredModules(pageConfig);
-      console.log('📋 Required modules:', requiredModules);
 
       // Special handling for core-systems - if already loaded, mark as loaded
       if (requiredModules.includes('core-systems') && window.UnifiedAppInitializer) {
@@ -585,11 +583,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       }
 
       if (this.initializationInProgress) {
-        console.log('⏳ Initialization already in progress...');
+        // Removed debug log - initialization state is tracked internally
         return this.getStatus();
       }
 
-      console.log('🎯 Starting Unified App Initialization...');
+      // Removed debug log - initialization start is tracked via Logger if needed
       this.initializationInProgress = true;
       this.performanceMetrics.startTime = Date.now();
 
@@ -626,7 +624,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Stage 1: Detect and analyze page and systems
      */
     async detectAndAnalyze() {
-      console.log('🔍 Stage 1: Detecting and analyzing...');
+      // Removed debug log - stage progress is tracked internally
       const stageStart = Date.now();
 
       // Detect page information
@@ -639,18 +637,14 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       this.analyzePageRequirements();
 
       this.performanceMetrics.stageTimes.detect = Date.now() - stageStart;
-      console.log('✅ Stage 1 Complete:', {
-        page: this.pageInfo.name,
-        systems: this.availableSystems.size,
-        requirements: this.pageInfo.requirements,
-      });
+      // Removed debug log - stage completion is tracked internally
     }
 
     /**
      * Stage 2: Prepare optimal configuration
      */
     prepareConfiguration() {
-      console.log('⚙️ Stage 2: Preparing configuration...');
+      // Removed debug log - stage progress is tracked internally
       const stageStart = Date.now();
 
       // Load page-specific configuration from page-initialization-configs.js
@@ -662,16 +656,19 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.pageInitializationConfigs[this.pageInfo.name]
       ) {
         pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-        console.log(`📋 Loaded page config for ${this.pageInfo.name}:`, pageConfig);
+        // Removed debug log - page config loading is tracked internally
       } else if (
         typeof window.PAGE_CONFIGS !== 'undefined' &&
         window.PAGE_CONFIGS[this.pageInfo.name]
       ) {
         // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
         pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
-        console.log(`📋 Loaded page config from PAGE_CONFIGS for ${this.pageInfo.name}:`, pageConfig);
+        // Removed debug log - page config loading is tracked internally
       } else {
-        console.log(`⚠️ No page config found for ${this.pageInfo.name}`);
+        // Only log warning if page config is critical
+        if (window.Logger) {
+          window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { page: 'core-systems' });
+        }
       }
 
       // Store custom initializers from page config
@@ -852,10 +849,10 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
         // Use the application initializer if available
         if (typeof window.initializeApplication === 'function') {
-          console.log('🔧 Using application initializer with config:', config);
+          // Removed debug log - using application initializer
           await window.initializeApplication(config);
         } else {
-          console.log('⚠️ Application initializer not found, using manual initialization');
+          // Removed debug log - manual initialization fallback is normal
           // Fallback to manual initialization
           await this.manualInitialization(config);
         }
@@ -870,7 +867,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         throw error;
       } finally {
         this.performanceMetrics.stageTimes.execute = Date.now() - stageStart;
-        console.log('✅ Stage 3 Complete');
+        // Removed debug log - stage completion is tracked internally
       }
     }
 
@@ -878,18 +875,17 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
      * Log package loading
      */
     logPackageLoading(packages) {
+      // Removed debug logs - package loading is tracked internally
+      // Only log errors if package is missing and critical
       if (!packages || packages.length === 0) return;
-
-      console.group('📦 טוען חבילות:');
+      
       packages.forEach(pkgName => {
         const pkg = window.PACKAGE_MANIFEST?.[pkgName];
-        if (pkg) {
-          console.log(`  ✓ ${pkg.name} (${pkg.scripts.length} סקריפטים, ~${pkg.initTime})`);
-        } else {
-          console.warn(`  ⚠️ ${pkgName} (לא מוגדר)`);
+        if (!pkg && window.Logger) {
+          // Only log if package is critical
+          window.Logger.warn(`Package ${pkgName} not found in manifest`, { page: 'core-systems' });
         }
       });
-      console.groupEnd();
     }
 
     /**
@@ -918,7 +914,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             this.availableSystems.has('notification') &&
             typeof window.NotificationSystem !== 'undefined'
           ) {
-            console.log('🔔 Initializing Notification System...');
+            // Removed debug log - notification system initialization is tracked internally
             await window.NotificationSystem.initialize();
           }
         })(),
@@ -926,20 +922,20 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         // Actions Menu System - required for table action menus
         (async () => {
           if (typeof window.ActionsMenuSystem !== 'undefined') {
-            console.log('🎯 Initializing Actions Menu System...');
+            // Removed debug logs - actions menu system initialization is tracked internally
             // Initialize ActionsMenuSystem instance if not already initialized
             if (!window.actionsMenuSystemInstance) {
               window.actionsMenuSystemInstance = new window.ActionsMenuSystem();
-              console.log('✅ Actions Menu System instance created');
-            } else {
-              console.log('✅ Actions Menu System already initialized');
             }
           } else {
-            console.warn('⚠️ ActionsMenuSystem not available');
+            // Only log warning if ActionsMenuSystem is critical
+            if (window.Logger) {
+              window.Logger.warn('ActionsMenuSystem not available', { page: 'core-systems' });
+            }
           }
         })(),
       ]);
-      console.log('✅ UI Systems initialized');
+      // Removed debug log - UI systems initialization is tracked internally
 
       // Initialize page-specific systems
       if (config.requiresFilters && this.availableSystems.has('pageFilters')) {
@@ -957,7 +953,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.setupSortableHeaders();
       }
 
-      console.log('✅ Manual initialization completed');
+      // Removed debug log - manual initialization completion is tracked internally
     }
 
     /**
@@ -1178,16 +1174,19 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       // Execute custom finalizers with double initialization prevention
       // Check if customInitializers exists and is an array
       if (!this.customInitializers || !Array.isArray(this.customInitializers)) {
-        console.log('⚠️ No custom initializers found or not an array, skipping...');
+        // Removed debug log - custom initializers check is internal
         return;
       }
 
       if (!this.pageInfo || !this.pageInfo.name) {
-        console.warn('⚠️ pageInfo or pageInfo.name is missing, cannot execute custom initializers');
+        // Only log warning if critical
+        if (window.Logger) {
+          window.Logger.warn('pageInfo or pageInfo.name is missing, cannot execute custom initializers', { page: 'core-systems' });
+        }
         return;
       }
 
-      console.log('🔧 Executing custom initializers:', this.customInitializers.length);
+      // Removed debug log - custom initializers execution is tracked internally
       for (let i = 0; i < this.customInitializers.length; i++) {
         const initializer = this.customInitializers[i];
         const initializerKey = `${this.pageInfo.name}_${i}`;
@@ -1207,14 +1206,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
         // Check if this initializer was already executed
         if (window.globalInitializationState.customInitializers.has(initializerKey)) {
-          console.log(`⚠️ Custom initializer ${i + 1} already executed, skipping...`);
+          // Removed debug log - duplicate initializer check is internal
           continue;
         }
 
-        console.log(
-          `🔧 Executing custom initializer ${i + 1}/${this.customInitializers.length}:`,
-          typeof initializer
-        );
+        // Removed debug log - custom initializer execution is tracked internally
         if (typeof initializer === 'function') {
           try {
             // Pass config to initializer (as in unified-app-initializer.js)
@@ -1237,7 +1233,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               timestamp: Date.now(),
               page: this.pageInfo.name,
             });
-            console.log(`✅ Custom initializer ${i + 1} completed successfully`);
+            // Removed debug log - custom initializer completion is tracked internally
           } catch (error) {
             console.error(`❌ Custom initializer ${i + 1} failed:`, error);
             if (typeof window.Logger !== 'undefined' && window.Logger.error) {
@@ -1247,7 +1243,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             }
           }
         } else {
-          console.warn(`⚠️ Custom initializer ${i + 1} is not a function:`, typeof initializer);
+          // Only log warning if critical
+          if (window.Logger) {
+            window.Logger.warn(`Custom initializer ${i + 1} is not a function`, { 
+              type: typeof initializer,
+              page: 'core-systems' 
+            });
+          }
         }
       }
 
@@ -1325,7 +1327,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       // - Non-blocking initialization for better page load performance
 
       this.performanceMetrics.stageTimes.finalize = Date.now() - stageStart;
-      console.log('✅ Stage 4 Complete');
+      // Removed debug log - stage completion is tracked internally
     }
 
     /**
@@ -1857,9 +1859,14 @@ window.globalInitializationState = {
 
 // Single DOMContentLoaded listener - replaces all others
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🎯 DOM Content Loaded - Starting Unified App Initialization');
-  console.log('🔍 Current URL:', window.location.href);
-  console.log('🔍 Current pathname:', window.location.pathname);
+  // Use Logger for initialization logs
+  if (window.Logger && Logger.DEBUG_MODE) {
+    window.Logger.debug('DOM Content Loaded - Starting Unified App Initialization', {
+      url: window.location.href,
+      pathname: window.location.pathname,
+      page: 'core-systems'
+    });
+  }
 
   // Initialize globalInitializationState if not exists
   if (!window.globalInitializationState) {
@@ -1876,7 +1883,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.globalInitializationState.unifiedAppInitialized ||
     window.globalInitializationState.unifiedAppInitializing
   ) {
-    console.log('⚠️ Unified App already initialized or initializing, skipping...');
+    // Use Logger for warnings
+    if (window.Logger) {
+      window.Logger.warn('Unified App already initialized or initializing, skipping', { page: 'core-systems' });
+    }
     return;
   }
 
@@ -1885,16 +1895,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     // Small delay to ensure all scripts are loaded
     setTimeout(async () => {
-      console.log('🚀 About to call initializeUnifiedApp...');
+      // Use Logger for initialization logs
+      if (window.Logger && Logger.DEBUG_MODE) {
+        window.Logger.debug('About to call initializeUnifiedApp', { page: 'core-systems' });
+      }
       await window.initializeUnifiedApp();
       if (window.globalInitializationState) {
         window.globalInitializationState.unifiedAppInitialized = true;
         window.globalInitializationState.unifiedAppInitializing = false;
       }
-      console.log('✅ Unified App Initialization completed');
+      if (window.Logger && Logger.DEBUG_MODE) {
+        window.Logger.debug('Unified App Initialization completed', { page: 'core-systems' });
+      }
     }, 100);
   } catch (error) {
-    console.error('❌ Unified App auto-initialization failed:', error);
+    // Use Logger for errors
+    if (window.Logger) {
+      window.Logger.error('Unified App auto-initialization failed', { 
+        error: error.message,
+        stack: error.stack,
+        page: 'core-systems' 
+      });
+    }
     if (window.globalInitializationState) {
       window.globalInitializationState.unifiedAppInitializing = false;
     }

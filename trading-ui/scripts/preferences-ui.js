@@ -979,7 +979,7 @@ class PreferencesUI {
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
      */
-  async loadAllPreferences(userId = null, profileId = null) {
+  async loadAllPreferences(userId = null, profileId = null, forceRefresh = false) {
     const loaderId = 'load_preferences';
 
     try {
@@ -1028,9 +1028,9 @@ class PreferencesUI {
         window.Logger.debug(`🔍 Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`, { page: 'preferences-ui' });
 
         // Load ALL preferences at once from API
-        window.Logger.debug(`🔍 Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: 'preferences-ui' });
+        window.Logger.debug(`🔍 Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId}, forceRefresh=${forceRefresh})`, { page: 'preferences-ui' });
 
-        const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, resolvedProfileId);
+        const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, resolvedProfileId, [], forceRefresh);
         window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: 'preferences-ui' }).length} preferences from API`);
 
         // Load colors separately for color pickers
@@ -1069,6 +1069,8 @@ class PreferencesUI {
         const preferences = await window.PreferencesCore.getAllPreferences(
           finalUserId,
           resolvedProfileId,
+          [],
+          forceRefresh,
         );
 
         // Load color preferences
@@ -1396,8 +1398,21 @@ class PreferencesUI {
 
           // NOTE: refreshUserPreferences already calls initializeWithLazyLoading which loads preferences
           // We just need to reload the form with the already-loaded preferences
-          window.Logger.info('🔄 Reloading preferences into form...', { page: 'preferences-ui' });
-          await this.loadAllPreferences();
+          // CRITICAL: Force reload from server by passing force=true to bypass cache
+          window.Logger.info('🔄 Reloading preferences into form (forcing server reload)...', { page: 'preferences-ui' });
+          
+          // Force reload from server by clearing cache first, then reloading
+          if (window.PreferencesCore && typeof window.PreferencesCore.invalidatePreference === 'function') {
+            // Invalidate all changed preferences
+            for (const prefName of Object.keys(changedPreferences)) {
+              await window.PreferencesCore.invalidatePreference(prefName, finalUserId, finalProfileId);
+            }
+            // Also invalidate all_preferences cache
+            await window.PreferencesCore.invalidatePreference('all_preferences', finalUserId, finalProfileId);
+          }
+          
+          // Force reload from server by passing forceRefresh=true
+          await this.loadAllPreferences(finalUserId, finalProfileId, true);
           window.Logger.info('✅ Preferences form updated with new values', { page: 'preferences-ui' });
 
           window.Logger?.info('🧹 Cache clearing debug end', { page: 'preferences-ui' });

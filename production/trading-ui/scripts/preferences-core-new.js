@@ -582,8 +582,8 @@ class PreferencesCore {
    * @example
    * const allPrefs = await window.PreferencesCore.getAllPreferences(1, 2);
    */
-  async getAllPreferences(userId = null, profileId = null, criticalPrefs = []) {
-    // For default profile, use 0 explicitly
+  async getAllPreferences(userId = null, profileId = null, criticalPrefs = [], forceRefresh = false) {
+// For default profile, use 0 explicitly
     const finalUserId = userId || this.currentUserId;
     const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
@@ -601,15 +601,26 @@ class PreferencesCore {
       try {
         const cacheKey = `all_preferences_${finalUserId}_${finalProfileId}`;
 
-        // Check cache first via UnifiedCacheManager
-        if (window.UnifiedCacheManager) {
-          const cached = await window.UnifiedCacheManager.get(cacheKey, {
-            layer: 'localStorage',
-            ttl: 300000,
-          });
-          if (cached !== null) {
-            window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
-            return cached;
+        // If forceRefresh is true, skip cache and load from server
+        if (!forceRefresh) {
+          // Check cache first via UnifiedCacheManager
+          if (window.UnifiedCacheManager) {
+            const cached = await window.UnifiedCacheManager.get(cacheKey, {
+              layer: 'localStorage',
+              ttl: 300000,
+            });
+            if (cached !== null) {
+              window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
+              return cached;
+            }
+          }
+        } else {
+          // Force refresh: clear cache first
+          window.Logger.info('🔄 Force refresh: clearing cache before loading from server', { page: 'preferences-core-new' });
+          if (window.UnifiedCacheManager) {
+            await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
+            const prefixedKey = `tiktrack_${cacheKey}`;
+            await window.UnifiedCacheManager.remove(prefixedKey, { layer: 'localStorage' });
           }
         }
 

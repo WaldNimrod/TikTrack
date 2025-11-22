@@ -315,11 +315,11 @@ class UnifiedCRUDService {
                 }
             }
 
-            // Use EntityDetailsAPI if available
+            // Use EntityDetailsAPI if available (but not for import_session - it has custom endpoint)
             // Note: entityDetailsAPI.deleteEntity returns boolean, not Response object
             // entityDetailsAPI already handles confirmation, deletion, notifications, and cache clearing
             let deleteSuccess = false;
-            if (window.entityDetailsAPI?.deleteEntity) {
+            if (window.entityDetailsAPI?.deleteEntity && entityType !== 'import_session') {
                 deleteSuccess = await window.entityDetailsAPI.deleteEntity(entityType, entityId);
                 
                 // entityDetailsAPI already handles confirmation, deletion, notifications, and cache clearing
@@ -666,7 +666,45 @@ class UnifiedCRUDService {
                     }
                 }
             } else {
-                // Fallback to direct fetch
+                // Fallback to direct fetch (for import_session or when entityDetailsAPI not available)
+                // First, show confirmation dialog if not already confirmed
+                let confirmed = false;
+                if (options.skipConfirmation) {
+                    confirmed = true;
+                } else if (typeof window.showConfirmationDialog === 'function') {
+                    // Use global confirmation dialog
+                    const entityName = options.entityName || entityType;
+                    const confirmationMessage = `האם אתה בטוח שברצונך למחוק את ${entityName} #${entityId}?\n\nפעולה זו תמחק את הפריט לצמיתות.`;
+                    
+                    confirmed = await new Promise((resolve) => {
+                        window.showConfirmationDialog(
+                            `מחיקת ${entityName}`,
+                            confirmationMessage,
+                            () => {
+                                resolve(true);
+                            },
+                            () => {
+                                resolve(false);
+                            },
+                            'danger'
+                        );
+                    });
+                } else {
+                    // Fallback to simple confirm
+                    const entityName = options.entityName || entityType;
+                    confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את ${entityName} #${entityId}?`);
+                }
+                
+                if (!confirmed) {
+                    window.Logger?.info('Deletion cancelled by user', {
+                        entityType,
+                        entityId,
+                        page: 'unified-crud-service'
+                    });
+                    return false;
+                }
+                
+                // Proceed with deletion
                 const endpoint = this._getEntityAPIEndpoint(entityType);
                 const url = `${endpoint}/${entityId}`;
                 const response = await fetch(url, {
@@ -677,7 +715,34 @@ class UnifiedCRUDService {
                     redirect: 'follow' // Follow redirects (302)
                 });
 
-                // Handle response with CRUDResponseHandler
+                // Invalidate cache BEFORE handling response (critical for fresh data)
+                // Use standard cache invalidation pattern (same as all other data services)
+                const actionName = this._getEntityActionName(entityType, 'deleted');
+                
+                // For import_session, use DataImportData service (standard pattern)
+                if (entityType === 'import_session') {
+                    if (window.DataImportData?.invalidateHistoryCache) {
+                        try {
+                            await window.DataImportData.invalidateHistoryCache();
+                            window.Logger?.debug('Cache invalidated via DataImportData (standard pattern)', { page: 'unified-crud-service' });
+                        } catch (cacheError) {
+                            window.Logger?.warn('Cache invalidation failed', { error: cacheError, page: 'unified-crud-service' });
+                        }
+                    }
+                } else {
+                    // For other entities, use CacheSyncManager.invalidateByAction (standard pattern)
+                    // This handles both Backend Cache (via CacheSyncManager) and Frontend Cache (via fallback in data services)
+                    if (window.CacheSyncManager?.invalidateByAction) {
+                        try {
+                            await window.CacheSyncManager.invalidateByAction(actionName);
+                            window.Logger?.debug('Cache invalidated via CacheSyncManager (standard pattern)', { actionName, page: 'unified-crud-service' });
+                        } catch (cacheError) {
+                            window.Logger?.warn('Cache invalidation failed', { error: cacheError, page: 'unified-crud-service' });
+                        }
+                    }
+                }
+
+                // Handle response with CRUDResponseHandler (same as other delete operations)
                 const crudOptions = {
                     modalId: options.modalId,
                     successMessage: options.successMessage || `${options.entityName || entityType} נמחק בהצלחה!`,
@@ -690,13 +755,14 @@ class UnifiedCRUDService {
                 deleteSuccess = crudResult !== null && crudResult !== false;
             }
 
-            // Invalidate cache (only if entityDetailsAPI didn't already do it)
-            if (deleteSuccess && !window.entityDetailsAPI?.deleteEntity) {
+            // Invalidate cache for entityDetailsAPI path (already handled above for fallback path)
+            if (deleteSuccess && window.entityDetailsAPI?.deleteEntity && entityType !== 'import_session') {
+                // entityDetailsAPI already handles cache invalidation, but we ensure it's done
                 const actionName = this._getEntityActionName(entityType, 'deleted');
                 if (window.CacheSyncManager?.invalidateByAction) {
                     try {
                         await window.CacheSyncManager.invalidateByAction(actionName);
-                        window.Logger?.debug('Cache invalidated', { actionName, page: 'unified-crud-service' });
+                        window.Logger?.debug('Cache invalidated (entityDetailsAPI path)', { actionName, page: 'unified-crud-service' });
                     } catch (cacheError) {
                         window.Logger?.warn('Cache invalidation failed', { error: cacheError, page: 'unified-crud-service' });
                     }
@@ -742,7 +808,8 @@ class UnifiedCRUDService {
             'trading_account': '/api/trading-accounts',
             'execution': '/api/executions',
             'cash_flow': '/api/cash-flows',
-            'note': '/api/notes'
+            'note': '/api/notes',
+            'import_session': '/api/user-data-import/session'
         };
 
         return endpointMap[entityType] || `/api/${entityType}`;
@@ -767,7 +834,8 @@ class UnifiedCRUDService {
             'trading_account': 'account',
             'execution': 'execution',
             'cash_flow': 'cash-flow',
-            'note': 'note'
+            'note': 'note',
+            'import_session': 'import-session'
         };
 
         const entityName = entityNameMap[entityType] || entityType;
@@ -800,12 +868,20 @@ class UnifiedCRUDService {
             'trading_account',
             'execution',
             'cash_flow',
-            'note'
+            'note',
+            'import_session'
         ];
 
         return validTypes.includes(entityType);
     }
 
+    /**
+     * קבלת פונקציית רענון ברירת מחדל לפי סוג ישות
+     * 
+     * @private
+     * @param {string} entityType - סוג הישות
+     * @returns {Function|null} - פונקציית רענון או null
+     */
     /**
      * קבלת פונקציית רענון ברירת מחדל לפי סוג ישות
      * 
@@ -822,7 +898,8 @@ class UnifiedCRUDService {
             'trading_account': () => window.loadTradingAccountsDataForTradingAccountsPage?.(),
             'execution': () => window.loadExecutionsData?.(),
             'cash_flow': () => window.loadCashFlowsData?.(),
-            'note': () => window.loadNotesData?.({ force: true })
+            'note': () => window.loadNotesData?.({ force: true }),
+            'import_session': () => window.refreshDataImportHistory?.()
         };
 
         return reloadFunctionMap[entityType] || null;

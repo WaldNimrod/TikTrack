@@ -31,19 +31,18 @@
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <span style="font-weight: bold; color: #495057; font-size: 0.9rem;">
                             <i class="bi bi-link-45deg"></i> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="badge bg-primary" style="text-decoration: none; padding: 6px 12px;">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">לוח כלכלי</a>
-                        <a href="history-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">השוואת תאריכים</a>
-                        <a href="journal-entry-modal.html" class="badge bg-secondary" style="text-decoration: none; padding: 6px 12px;">רשומת יומן</a>
-                    </div>
+                        </span>                <a href="trade-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית טרייד</a>
+                <a href="portfolio-state-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #007bff; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">מצב תיק היסטורי</a>
+                <a href="price-history-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">היסטוריית מחירים</a>
+                <a href="comparative-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח השוואתי</a>
+                <a href="trading-journal-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">יומן מסחר</a>
+                <a href="strategy-analysis-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ניתוח אסטרטגיות</a>
+                <a href="economic-calendar-page.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">לוח כלכלי</a>
+                <a href="history-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">ווידג'ט היסטוריה</a>
+                <a href="emotional-tracking-widget.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">תיעוד רגשי</a>
+                <a href="date-comparison-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">השוואת תאריכים</a>
+                <a href="journal-entry-modal.html" style="text-decoration: none; padding: 6px 12px; display: inline-block; background-color: #6c757d; color: white; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">רשומת יומן</a>
+</div>
                 </div>
             </div>
         </div>
@@ -54,17 +53,22 @@
         <div class="page-body">
             <div class="main-content">
                 <!-- Header Section -->
-                <div class="top-section">
+                <div class="top-section" id="portfolio-state-top-section">
                     <div class="section-header entity-trade-main-header">
                         <div class="table-title">
                             <i class="bi bi-graph-up"></i>
                             מצב תיק היסטורי
                         </div>
-                        <div class="table-actions">
-                            <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                            <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
-                            <button data-button-type="COMPARE" data-variant="small" data-text="השווה" title="השוואת תאריכים"></button>
-                            <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <div class="table-actions">
+                                <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
+                                <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
+                                <button data-button-type="COMPARE" data-variant="small" data-text="השווה" title="השוואת תאריכים"></button>
+                                <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
+                            </div>
+                            <button class="filter-toggle-btn" onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
                         </div>
                     </div>
                     
@@ -103,11 +107,20 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Positions Table Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">טבלת פוזיציות</h5>
+                    </div>
+                </div>
+                
+                <!-- Positions Table Section -->
+                <div class="content-section" id="positions-table-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-table"></i> טבלת פוזיציות</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('positions-table-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
@@ -160,52 +173,73 @@
                                         </tfoot>
                                     </table>
                                 </div>
-                            </div>
+                    </div>
+                </div>
+                
+                <!-- Portfolio Value Chart Section -->
+                <div class="content-section" id="portfolio-value-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up"></i> שווי תיק לאורך זמן</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('portfolio-value-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
                         </div>
-                        
-                        <!-- Portfolio Value Chart Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">שווי תיק לאורך זמן</h5>
-                                <div class="mb-3">
-                                    <button class="btn btn-sm btn-outline-primary">שבוע</button>
-                                    <button class="btn btn-sm btn-primary">חודש</button>
-                                    <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
-                                    <button class="btn btn-sm btn-outline-primary">שנה</button>
-                                    <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
-                                </div>
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף שווי תיק - Line Chart]
-                                </div>
-                            </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="mb-3">
+                            <button class="btn btn-sm btn-outline-primary">שבוע</button>
+                            <button class="btn btn-sm btn-primary">חודש</button>
+                            <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
+                            <button class="btn btn-sm btn-outline-primary">שנה</button>
+                            <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
                         </div>
-                        
-                        <!-- P/L Trend Chart Section -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">P/L לאורך זמן</h5>
-                                <div class="mb-3">
-                                    <button class="btn btn-sm btn-outline-primary">שבוע</button>
-                                    <button class="btn btn-sm btn-primary">חודש</button>
-                                    <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
-                                    <button class="btn btn-sm btn-outline-primary">שנה</button>
-                                    <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
-                                </div>
-                                <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                    [גרף P/L - Line Chart עם 3 קווים]
-                                </div>
-                                <div class="mt-3">
-                                    <span class="badge" style="background: #28a745;">● P/L ממומש</span>
-                                    <span class="badge" style="background: #ffc107;">● P/L לא ממומש</span>
-                                    <span class="badge" style="background: #007bff;">● P/L כולל</span>
-                                </div>
-                            </div>
+                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                            [גרף שווי תיק - Line Chart]
                         </div>
-                        
-                        <!-- Comparison Section (Optional) -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">השוואה בין תאריכים</h5>
+                    </div>
+                </div>
+                
+                <!-- P/L Trend Chart Section -->
+                <div class="content-section" id="pl-trend-chart-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-graph-up-arrow"></i> P/L לאורך זמן</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('pl-trend-chart-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="mb-3">
+                            <button class="btn btn-sm btn-outline-primary">שבוע</button>
+                            <button class="btn btn-sm btn-primary">חודש</button>
+                            <button class="btn btn-sm btn-outline-primary">3 חודשים</button>
+                            <button class="btn btn-sm btn-outline-primary">שנה</button>
+                            <button class="btn btn-sm btn-outline-primary">כל הזמן</button>
+                        </div>
+                        <div class="chart-container" style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                            [גרף P/L - Line Chart עם 3 קווים]
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge" style="background: #28a745;">● P/L ממומש</span>
+                            <span class="badge" style="background: #ffc107;">● P/L לא ממומש</span>
+                            <span class="badge" style="background: #007bff;">● P/L כולל</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comparison Section (Optional) -->
+                <div class="content-section" id="comparison-section">
+                    <div class="section-header">
+                        <h2><i class="bi bi-arrow-left-right"></i> השוואה בין תאריכים</h2>
+                        <div class="header-actions">
+                            <button class="filter-toggle-btn" onclick="toggleSection('comparison-section')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
                                 <div class="mb-3">
                                     <label for="datePicker2" class="form-label">תאריך שני:</label>
                                     <input type="date" id="datePicker2" class="form-control d-inline-block" value="2025-01-10" style="max-width: 200px;">

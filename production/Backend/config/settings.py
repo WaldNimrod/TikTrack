@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 
 # Environment detection - check if production mode is requested
-ENVIRONMENT = 'production'  # Hardcoded for production environment
-IS_PRODUCTION = True  # Hardcoded for production environment
+ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
+IS_PRODUCTION = ENVIRONMENT == "production"
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent

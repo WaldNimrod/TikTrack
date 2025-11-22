@@ -178,7 +178,12 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // יצירת פונקציות גלובליות לכפתורים (עם data-onclick)
   window.confirmationModalConfirm = () => {
+    if (modal.dataset.confirmed === 'true') {
+      return; // Already confirmed, prevent double execution
+    }
     modal.dataset.confirmed = 'true';
+    // Remove aria-hidden before invoking callbacks to prevent accessibility warning
+    modal.removeAttribute('aria-hidden');
     invokeCallbacks(true);
     closeModal();
     // נקה את הפונקציה אחרי שימוש
@@ -187,7 +192,12 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
   };
 
   window.confirmationModalCancel = () => {
+    if (modal.dataset.cancelled === 'true') {
+      return; // Already cancelled, prevent double execution
+    }
     modal.dataset.cancelled = 'true';
+    // Remove aria-hidden before invoking callbacks to prevent accessibility warning
+    modal.removeAttribute('aria-hidden');
     invokeCallbacks(false);
     closeModal();
     // נקה את הפונקציה אחרי שימוש

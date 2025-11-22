@@ -107,18 +107,26 @@ check_python() {
 }
 
 setup_postgresql_env() {
-    # Only set PostgreSQL env vars if not already set and in development mode
-    if [ "$ENVIRONMENT" = "development" ]; then
-        if [ -z "$POSTGRES_HOST" ]; then
+    # Set PostgreSQL env vars if not already set
+    if [ -z "$POSTGRES_HOST" ]; then
+        if [ "$ENVIRONMENT" = "development" ]; then
             log_info "Setting PostgreSQL environment variables (development defaults)..."
             export POSTGRES_HOST=localhost
             export POSTGRES_DB=TikTrack-db-development
             export POSTGRES_USER=TikTrakDBAdmin
             export POSTGRES_PASSWORD="BigMeZoo1974!?"
-            log_success "PostgreSQL environment variables configured"
-        else
-            log_info "PostgreSQL environment variables already set (using existing values)"
+            log_success "PostgreSQL environment variables configured for development"
+        elif [ "$ENVIRONMENT" = "production" ]; then
+            log_info "Setting PostgreSQL environment variables (production defaults)..."
+            export POSTGRES_HOST=localhost
+            export POSTGRES_DB=TikTrack-db-development
+            export POSTGRES_USER=TikTrakDBAdmin
+            export POSTGRES_PASSWORD="BigMeZoo1974!?"
+            log_success "PostgreSQL environment variables configured for production"
+            log_warning "Production is using development database (TikTrack-db-development)"
         fi
+    else
+        log_info "PostgreSQL environment variables already set (using existing values)"
     fi
 }
 
@@ -251,7 +259,7 @@ start_server() {
     log_info "Port: $SERVER_PORT"
     
     # Display database information
-    if [ "$ENVIRONMENT" = "development" ] && [ -n "$POSTGRES_HOST" ]; then
+    if [ -n "$POSTGRES_HOST" ]; then
         log_info "Database: PostgreSQL"
         log_info "  Host: ${POSTGRES_HOST}"
         log_info "  Database: ${POSTGRES_DB}"
@@ -265,7 +273,16 @@ start_server() {
     chmod 644 "$OUTPUT_LOG" 2>/dev/null || true
     log_info "Server output redirected to: $OUTPUT_LOG"
 
-    nohup python3 app.py >> "$OUTPUT_LOG" 2>&1 &
+    # Export PostgreSQL environment variables for the server process
+    if [ -n "$POSTGRES_HOST" ]; then
+        export POSTGRES_HOST
+        export POSTGRES_DB
+        export POSTGRES_USER
+        export POSTGRES_PASSWORD
+        export POSTGRES_PORT
+    fi
+
+    nohup env POSTGRES_HOST="$POSTGRES_HOST" POSTGRES_DB="$POSTGRES_DB" POSTGRES_USER="$POSTGRES_USER" POSTGRES_PASSWORD="$POSTGRES_PASSWORD" POSTGRES_PORT="${POSTGRES_PORT:-5432}" python3 app.py >> "$OUTPUT_LOG" 2>&1 &
     SERVER_PID=$!
     popd >/dev/null
 

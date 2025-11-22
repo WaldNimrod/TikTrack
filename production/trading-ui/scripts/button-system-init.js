@@ -38,8 +38,9 @@ const BUTTON_SYSTEM_CONFIG = {
 
 const BUTTON_TOOLTIP_DEBUG_ENABLED = window.ButtonTooltipDebugMode === true;
 const buttonTooltipDebugLog = (...args) => {
-    if (BUTTON_TOOLTIP_DEBUG_ENABLED) {
-        console.log(...args);
+    // Removed debug logs - button tooltip debug is tracked via Logger if needed
+    if (BUTTON_TOOLTIP_DEBUG_ENABLED && window.Logger && Logger.DEBUG_MODE) {
+        window.Logger.debug('Button tooltip debug', { args, page: 'button-system' });
     }
 };
 

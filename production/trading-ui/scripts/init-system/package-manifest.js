@@ -1461,7 +1461,43 @@ const PACKAGE_MANIFEST = {
     initTime: '~15ms'
   },
 
-  // 19. INIT PACKAGE - אתחול
+  // 20. TRADINGVIEW CHARTS PACKAGE - גרפים TradingView
+  'tradingview-charts': {
+    id: 'tradingview-charts',
+    name: 'TradingView Charts Package',
+    description: 'מערכת גרפים TradingView Lightweight Charts',
+    version: '1.0.0',
+    critical: false,
+    loadOrder: 20,
+    dependencies: ['base'],
+    scripts: [
+      {
+        file: 'charts/vendor/lightweight-charts.standalone.production.js',
+        globalCheck: 'window.LightweightCharts',
+        description: 'TradingView Lightweight Charts',
+        required: true,
+        loadOrder: 0
+      },
+      {
+        file: 'charts/tradingview-theme.js',
+        globalCheck: 'window.TradingViewTheme',
+        description: 'ערכת נושא TradingView',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'charts/tradingview-adapter.js',
+        globalCheck: 'window.TradingViewChartAdapter',
+        description: 'Adapter למערכת TradingView',
+        required: true,
+        loadOrder: 2
+      }
+    ],
+    estimatedSize: '~35KB',
+    initTime: '~20ms'
+  },
+
+  // 21. INIT PACKAGE - אתחול
   'init-system': {
     id: 'init-system',
     name: 'Initialization Package',

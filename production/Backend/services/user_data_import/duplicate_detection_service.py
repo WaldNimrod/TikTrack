@@ -484,7 +484,22 @@ class DuplicateDetectionService:
                 })
                 continue
             
-            # Check for field similarity (3/5 rule)
+            # CRITICAL: For executions, check 5-minute time window BEFORE calculating similarity
+            # If time difference is more than 5 minutes, skip duplicate detection
+            if current_record.get('date') and other_record.get('date'):
+                try:
+                    date1 = self._resolve_datetime(current_record.get('date'))
+                    date2 = self._resolve_datetime(other_record.get('date'))
+                    
+                    if date1 and date2:
+                        time_diff = abs((date1 - date2).total_seconds())
+                        if time_diff > 300:  # More than 5 minutes = 300 seconds
+                            # Skip this record - not a duplicate if time difference > 5 minutes
+                            continue
+                except Exception:
+                    pass  # If date parsing fails, continue with similarity check
+            
+            # Check for field similarity (4/5 rule)
             similarity_score = self._calculate_field_similarity(
                 current_record, other_record
             )
@@ -527,7 +542,22 @@ class DuplicateDetectionService:
                 })
                 continue
             
-            # Check for field similarity (3/5 rule)
+            # CRITICAL: For executions, check 5-minute time window BEFORE calculating similarity
+            # If time difference is more than 5 minutes, skip duplicate detection
+            if record.get('date') and existing.get('date'):
+                try:
+                    date1 = self._resolve_datetime(record.get('date'))
+                    date2 = self._resolve_datetime(existing.get('date'))
+                    
+                    if date1 and date2:
+                        time_diff = abs((date1 - date2).total_seconds())
+                        if time_diff > 300:  # More than 5 minutes = 300 seconds
+                            # Skip this record - not a duplicate if time difference > 5 minutes
+                            continue
+                except Exception:
+                    pass  # If date parsing fails, continue with similarity check
+            
+            # Check for field similarity (4/5 rule)
             similarity_score = self._calculate_field_similarity(
                 record, existing
             )

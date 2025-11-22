@@ -563,6 +563,17 @@ class EntityDetailsService:
             if entity_type == 'ticker':
                 entity_dict['external_data'] = EntityDetailsService._get_external_data_summary(entity)
                 
+                # Add provider symbol mappings if they exist
+                try:
+                    from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                    mappings = TickerSymbolMappingService.get_all_mappings(db, entity_id)
+                    if mappings:
+                        entity_dict['provider_symbols'] = mappings
+                        logger.debug(f"Added {len(mappings)} provider symbol mapping(s) to ticker {entity_id}")
+                except Exception as mapping_error:
+                    # Log but don't fail - mappings are optional
+                    logger.debug(f"Could not load provider symbol mappings for ticker {entity_id}: {str(mapping_error)}")
+                
                 # Add market data directly to ticker entity (not just in nested ticker object)
                 from models.external_data import MarketDataQuote
                 latest_quote = db.query(MarketDataQuote).filter(

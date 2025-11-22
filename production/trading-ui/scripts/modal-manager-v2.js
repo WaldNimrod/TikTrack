@@ -2986,7 +2986,8 @@ class ModalManagerV2 {
                                         day: '2-digit',
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                    }));
+                                      });
+                                    }
                                 }
                             } catch (e) {
                                 // Keep original value if parsing fails
@@ -6137,6 +6138,33 @@ class ModalManagerV2 {
                     currencyField.classList.remove('form-control-disabled');
                     console.log(`✅ Enabled accountCurrency field in add mode (initializeSpecialHandlers)`);
                 }
+            }
+        }
+
+        // For Tickers modal - load provider symbol fields
+        if (modalId === 'tickersModal') {
+            // Load provider symbol fields when modal is shown
+            if (typeof window.loadProviderSymbolFields === 'function') {
+                (async () => {
+                    try {
+                        await window.loadProviderSymbolFields();
+                        
+                        // If in edit mode, load existing mappings
+                        const form = modalElement.querySelector('#tickersModalForm');
+                        const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
+                        if (mode === 'edit') {
+                            const tickerIdInput = modalElement.querySelector('#tickerId');
+                            if (tickerIdInput && tickerIdInput.value) {
+                                const tickerId = parseInt(tickerIdInput.value);
+                                if (tickerId && typeof window.loadTickerProviderSymbols === 'function') {
+                                    await window.loadTickerProviderSymbols(tickerId);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        window.Logger?.warn('⚠️ Failed to load provider symbol fields', { error, page: 'modal-manager-v2' });
+                    }
+                })();
             }
         }
 

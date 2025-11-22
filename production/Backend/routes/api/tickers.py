@@ -125,6 +125,23 @@ def get_ticker(ticker_id: int):
             # Add market data like in get_all method
             ticker_dict = ticker.to_dict()
             
+            # Add provider symbol mappings if they exist
+            try:
+                from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                logger.info(f"🔍 Attempting to load provider symbol mappings for ticker {ticker_id}")
+                mappings = TickerSymbolMappingService.get_all_mappings(db, ticker_id)
+                logger.info(f"🔍 get_all_mappings returned {len(mappings) if mappings else 0} mappings")
+                if mappings:
+                    ticker_dict['provider_symbols'] = mappings
+                    logger.info(f"✅ Loaded {len(mappings)} provider symbol mapping(s) for ticker {ticker_id}")
+                else:
+                    logger.info(f"⚠️ No provider symbol mappings found for ticker {ticker_id}")
+            except Exception as mapping_error:
+                # Log but don't fail - mappings are optional
+                logger.error(f"❌ Could not load provider symbol mappings for ticker {ticker_id}: {str(mapping_error)}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+            
             # Try to get market data, but don't fail if database is corrupted
             try:
                 from models.external_data import MarketDataQuote
@@ -250,6 +267,9 @@ def create_ticker():
         # Use the session from the decorator (in g.db)
         db: Session = g.db
         
+        # Extract provider_symbols if provided (optional field)
+        provider_symbols = data.pop('provider_symbols', None)
+        
         # Create the ticker first
         try:
             ticker = TickerService.create(db, data)
@@ -267,6 +287,36 @@ def create_ticker():
                     "error": {"message": f"שגיאה ביצירת טיקר: {error_msg}"},
                     "version": "1.0"
                 }), 400
+        
+        # Create provider symbol mappings if provided
+        if provider_symbols and isinstance(provider_symbols, dict):
+            try:
+                from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                from models.external_data import ExternalDataProvider
+                
+                for provider_name, provider_symbol in provider_symbols.items():
+                    if provider_symbol and isinstance(provider_symbol, str):
+                        provider = db.query(ExternalDataProvider).filter(
+                            ExternalDataProvider.name == provider_name
+                        ).first()
+                        
+                        if provider:
+                            TickerSymbolMappingService.set_provider_symbol(
+                                db,
+                                ticker.id,
+                                provider.id,
+                                provider_symbol.strip(),
+                                is_primary=True
+                            )
+                            logger.info(
+                                f"Created provider symbol mapping for ticker {ticker.symbol} (ID: {ticker.id}): "
+                                f"{provider_name} -> {provider_symbol}"
+                            )
+                        else:
+                            logger.warning(f"Provider '{provider_name}' not found - skipping mapping")
+            except Exception as e:
+                logger.warning(f"Failed to create provider symbol mappings: {e}")
+                # Don't fail ticker creation if mapping fails
         
         # AFTER creating the ticker, try to fetch and cache external data
         external_data_available = False
@@ -300,8 +350,9 @@ def create_ticker():
             # Initialize adapter with database session
             yahoo_adapter = YahooFinanceAdapter(db, provider.id)
             
-            # Now try to get and cache quote for the newly created ticker (using enhanced method)
-            quote_data = yahoo_adapter._get_enhanced_quote_data(data['symbol'])
+            # Now try to get and cache quote for the newly created ticker
+            # Use ticker object to enable provider symbol mapping
+            quote_data = yahoo_adapter.get_quote(ticker.symbol, ticker=ticker)
             if quote_data and quote_data.price:
                 external_data_available = True
                 logger.info(f"✅ External data fetched and cached for new ticker {data['symbol']}: ${quote_data.price}")
@@ -392,9 +443,46 @@ def update_ticker(ticker_id: int):
                     "version": "1.0"
                 }), 400
         
+        # Extract provider_symbols if provided (optional field)
+        provider_symbols = data.pop('provider_symbols', None)
+        
         # Update ticker
         ticker = TickerService.update(db, ticker_id, data)
         if ticker:
+            # Update provider symbol mappings if provided
+            if provider_symbols is not None:
+                try:
+                    from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                    from models.external_data import ExternalDataProvider
+                    
+                    if isinstance(provider_symbols, dict):
+                        # Update/create mappings
+                        for provider_name, provider_symbol in provider_symbols.items():
+                            if provider_symbol and isinstance(provider_symbol, str):
+                                provider = db.query(ExternalDataProvider).filter(
+                                    ExternalDataProvider.name == provider_name
+                                ).first()
+                                
+                                if provider:
+                                    TickerSymbolMappingService.set_provider_symbol(
+                                        db,
+                                        ticker.id,
+                                        provider.id,
+                                        provider_symbol.strip(),
+                                        is_primary=True
+                                    )
+                                    logger.info(
+                                        f"Updated provider symbol mapping for ticker {ticker.symbol} (ID: {ticker.id}): "
+                                        f"{provider_name} -> {provider_symbol}"
+                                    )
+                                else:
+                                    logger.warning(f"Provider '{provider_name}' not found - skipping mapping")
+                    elif provider_symbols == {}:
+                        # Empty dict means delete all mappings (optional - not implemented for safety)
+                        logger.debug("Empty provider_symbols dict provided - no mappings deleted (safety)")
+                except Exception as e:
+                    logger.warning(f"Failed to update provider symbol mappings: {e}")
+                    # Don't fail ticker update if mapping fails
             return jsonify({
                 "status": "success",
                 "data": ticker.to_dict(),
@@ -414,6 +502,42 @@ def update_ticker(ticker_id: int):
             "version": "1.0"
         }), 400
     # Don't close db here - handle_database_session decorator will do it
+
+@tickers_bp.route('/<int:ticker_id>/provider-symbols', methods=['GET'])
+@handle_database_session(auto_commit=False, auto_close=True)
+def get_ticker_provider_symbols(ticker_id: int):
+    """Get all provider symbol mappings for a ticker"""
+    try:
+        # Use the session from the decorator (in g.db)
+        db: Session = g.db
+        
+        # Check that ticker exists
+        ticker = TickerService.get_by_id(db, ticker_id)
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found"},
+                "version": "1.0"
+            }), 404
+        
+        # Get all mappings
+        from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+        mappings = TickerSymbolMappingService.get_all_mappings(db, ticker_id)
+        
+        return jsonify({
+            "status": "success",
+            "data": mappings,
+            "message": f"Retrieved {len(mappings)} provider symbol mappings",
+            "version": "1.0"
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting provider symbols for ticker {ticker_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "1.0"
+        }), 500
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)

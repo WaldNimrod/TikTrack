@@ -1,0 +1,72 @@
+{
+  "start_time": "2025-11-22T13:54:58.991120",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 1.7118439674377441,
+      "timestamp": "2025-11-22T13:55:00.713110",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251122_135459.log",
+        "commits": [
+          "9d11244ce chore: Align development version with production - 1.3.0.0",
+          "95d171f86 feat: Pre-production release updates",
+          "efc4f514a Header System: Complete refactoring to prevent duplicates and improve initialization",
+          "47b08b26f Fix: Use get_preview_snapshot in get_preview endpoint to preserve accept/reject duplicate changes",
+          "3add600d0 feat: Display provider symbol mappings in ticker entity details modal"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "merge_main",
+      "success": false,
+      "duration_seconds": 0.019335269927978516,
+      "timestamp": "2025-11-22T13:55:00.732911",
+      "details": {
+        "success": false,
+        "error": "Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128."
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251122_135459.log",
+      "timestamp": "2025-11-22T13:55:00.713092",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    }
+  ],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Merge failed: Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128.",
+      "step": "merge_main",
+      "timestamp": "2025-11-22T13:55:00.732864"
+    },
+    {
+      "message": "Step 2 (merge_main) failed",
+      "step": "merge_main",
+      "timestamp": "2025-11-22T13:55:00.732914"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 1.742326,
+    "steps_completed": 1,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 1,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-11-22T13:55:00.733446",
+  "success": false
+}

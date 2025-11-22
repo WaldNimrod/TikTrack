@@ -14,8 +14,10 @@
  */
 
 // ===== LOADING TRACKING =====
-console.log('🔵 [table-mappings.js] FILE LOADING STARTED');
-console.log('🔵 [table-mappings.js] Current window.TABLE_COLUMN_MAPPINGS:', window.TABLE_COLUMN_MAPPINGS ? `exists (${Object.keys(window.TABLE_COLUMN_MAPPINGS).length} keys)` : 'NOT FOUND');
+// Removed debug logs - use Logger.debug if needed
+if (window.Logger && Logger.DEBUG_MODE) {
+  window.Logger.debug('table-mappings.js file loading started', { page: 'table-mappings' });
+}
 
 // ===== DATE FIELD HINTS =====
 // Array of strings that indicate date/time fields in column names
@@ -1532,8 +1534,13 @@ function getColumnKey(tableType, columnIndex) {
 // These functions are made available globally for use by other scripts.
 // All table-related scripts depend on these functions being available.
 
-console.log('🔵 [table-mappings.js] About to export TABLE_COLUMN_MAPPINGS');
-console.log('🔵 [table-mappings.js] TABLE_COLUMN_MAPPINGS keys:', Object.keys(TABLE_COLUMN_KEYS));
+// Removed debug logs - use Logger.debug if needed
+if (window.Logger && Logger.DEBUG_MODE) {
+  window.Logger.debug('Exporting TABLE_COLUMN_MAPPINGS', { 
+    keysCount: Object.keys(TABLE_COLUMN_KEYS).length,
+    page: 'table-mappings' 
+  });
+}
 
 window.TABLE_COLUMN_MAPPINGS = TABLE_COLUMN_KEYS;
 window.getColumnValue = getColumnValue;
@@ -1563,8 +1570,13 @@ window.tableMappings = {
   getDefaultSortChain: buildCanonDefaultSortChain,
 };
 
-console.log('🔵 [table-mappings.js] Exported to window.TABLE_COLUMN_MAPPINGS');
-console.log('🔵 [table-mappings.js] window.TABLE_COLUMN_MAPPINGS keys:', Object.keys(window.TABLE_COLUMN_MAPPINGS || {}));
-console.log('🔵 [table-mappings.js] window.getColumnValue type:', typeof window.getColumnValue);
+// Removed debug logs - use Logger.debug if needed
+if (window.Logger && Logger.DEBUG_MODE) {
+  window.Logger.debug('TABLE_COLUMN_MAPPINGS exported successfully', { 
+    keysCount: Object.keys(window.TABLE_COLUMN_MAPPINGS || {}).length,
+    getColumnValueType: typeof window.getColumnValue,
+    page: 'table-mappings' 
+  });
+}
 
 // Table Mappings loaded successfully

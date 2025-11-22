@@ -1,24 +1,24 @@
 {
-  "snapshot_id": "pre-update_20251121_215441",
+  "snapshot_id": "pre-update_20251122_135513",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-21T21:37:08.071723",
+    "timestamp": "2025-11-22T13:55:14.885008",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251121_213706.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251122_135513.log",
       "commits": [
-        "58c7e441e Implement workflow enforcement (Level 1) and update all documentation",
-        "f4fa2e07c Add environment isolation guide and check script",
-        "b14cfefe1 Add merge confirmation document",
-        "9f6fe2954 Merge production PostgreSQL migration from new-db-uopgrde",
-        "b27ed9e23 Final updates before merging to main"
+        "9d11244ce chore: Align development version with production - 1.3.0.0",
+        "95d171f86 feat: Pre-production release updates",
+        "efc4f514a Header System: Complete refactoring to prevent duplicates and improve initialization",
+        "47b08b26f Fix: Use get_preview_snapshot in get_preview endpoint to preserve accept/reject duplicate changes",
+        "3add600d0 feat: Display provider symbol mappings in ticker entity details modal"
       ]
     }
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-21T21:37:11.472962",
+    "timestamp": "2025-11-22T13:55:18.207825",
     "result": {
       "success": true,
       "conflicts_resolved": 0,
@@ -27,32 +27,31 @@
   },
   "step_3": {
     "completed": true,
-    "timestamp": "2025-11-21T21:37:11.501512",
+    "timestamp": "2025-11-22T13:55:18.237810",
     "result": {
       "success": true,
-      "removed_count": 0
+      "removed_count": 4
     }
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-21T21:37:11.593590",
+    "timestamp": "2025-11-22T13:55:18.267155",
     "result": {
       "success": true,
-      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251121_193711.db"
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_115518.db"
     }
   },
   "step_5": {
-    "completed": false,
-    "timestamp": "2025-11-21T21:36:53.873048",
+    "completed": true,
+    "timestamp": "2025-11-22T13:55:18.748133",
     "result": {
-      "success": false,
-      "error": "============================================================\nSyncing Active Files to Production\n============================================================\nSource: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend\nTarget: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/production/Backend\n\n\u274c Source directory not found: /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/production-update/Backend"
+      "success": true
     }
   },
-  "last_failed_step": 10,
+  "last_failed_step": 2,
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-21T21:37:11.598763",
+    "timestamp": "2025-11-22T13:55:18.753622",
     "result": {
       "success": true,
       "warning": "Cleanup had warnings"
@@ -60,7 +59,7 @@
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-21T21:37:11.600643",
+    "timestamp": "2025-11-22T13:55:18.755749",
     "result": {
       "success": true,
       "verified": false,
@@ -69,7 +68,7 @@
   },
   "step_8": {
     "completed": true,
-    "timestamp": "2025-11-21T21:53:13.864276",
+    "timestamp": "2025-11-22T13:55:18.926832",
     "result": {
       "success": true,
       "results": {
@@ -82,27 +81,26 @@
   },
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-21T21:53:13.901383",
+    "timestamp": "2025-11-22T13:55:18.958851",
     "result": {
       "success": true,
-      "new_version": "1.2.2.0"
+      "new_version": "1.2.3.0"
     }
   },
   "step_10": {
-    "completed": false,
-    "timestamp": "2025-11-21T21:54:30.260289",
+    "completed": true,
+    "timestamp": "2025-11-21T22:20:00.243773",
     "result": {
-      "success": false,
-      "error": ""
+      "success": true,
+      "dry_run": true
     }
   },
   "step_11": {
     "completed": true,
-    "timestamp": "2025-11-21T21:03:32.246537",
+    "timestamp": "2025-11-21T22:20:00.243998",
     "result": {
       "success": true,
-      "pid": 21898,
-      "background": true
+      "dry_run": true
     }
   },
   "step_12": {
@@ -116,6 +114,14 @@
   "step_13": {
     "completed": true,
     "timestamp": "2025-11-21T14:30:46.904555",
+    "result": {
+      "success": true,
+      "dry_run": true
+    }
+  },
+  "step_5.5": {
+    "completed": true,
+    "timestamp": "2025-11-21T22:20:00.242529",
     "result": {
       "success": true,
       "dry_run": true

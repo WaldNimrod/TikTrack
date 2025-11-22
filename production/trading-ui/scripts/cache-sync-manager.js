@@ -120,6 +120,7 @@ class CacheSyncManager {
       'alert-created': ['alerts-data', 'dashboard-data'],
       'alert-updated': ['alerts-data', 'dashboard-data'],
       'alert-deleted': ['alerts-data', 'dashboard-data'],
+      'import-session-deleted': ['data-import-data', 'data-import-accounts'],
     };
   }
 

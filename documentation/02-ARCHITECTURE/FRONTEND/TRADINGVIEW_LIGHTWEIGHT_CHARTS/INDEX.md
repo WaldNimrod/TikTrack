@@ -64,6 +64,14 @@
 
 ## 🔗 קישורים מהירים
 
+### עמוד בדיקות
+- **עמוד בדיקות TradingView:** [/mockups/daily-snapshots/tradingview-test-page.html](/mockups/daily-snapshots/tradingview-test-page.html)
+  - בדיקות מקיפות של כל תכונות המערכת
+  - בדיקת אינטגרציה עם מערכת העדפות
+  - בדיקת יצירת גרפים (Line, Area, Candlestick)
+  - בדיקת Dual Y-Axes ו-Stepped Lines
+
+### קישורים חיצוניים
 - **GitHub Repository:** https://github.com/tradingview/lightweight-charts
 - **Official Documentation:** https://tradingview.github.io/lightweight-charts/docs/
 - **Examples:** https://tradingview.github.io/lightweight-charts/examples/

@@ -618,8 +618,14 @@ class AdvancedButtonSystem {
         if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
             // Handle null/undefined type (for custom buttons without data-button-type)
             const typeUpper = type ? type.toUpperCase() : '';
-            const icon = iconOverride || (typeUpper ? window.BUTTON_ICONS[typeUpper] : '') || '';
-            const buttonText = text || (typeUpper ? window.BUTTON_TEXTS[typeUpper] : '') || '';
+            // Use iconOverride if provided (even if empty string), otherwise try BUTTON_ICONS, otherwise empty
+            const icon = (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') 
+                ? iconOverride 
+                : (typeUpper && window.BUTTON_ICONS[typeUpper] ? window.BUTTON_ICONS[typeUpper] : '');
+            // Use text if provided (even if empty string), otherwise try BUTTON_TEXTS, otherwise empty
+            const buttonText = (text !== undefined && text !== null && text !== '') 
+                ? text 
+                : (typeUpper && window.BUTTON_TEXTS[typeUpper] ? window.BUTTON_TEXTS[typeUpper] : '');
             const buttonClass = type ? window.getButtonClass(type) : 'btn';
 
             // Set default variant to normal if not specified
@@ -671,7 +677,8 @@ class AdvancedButtonSystem {
             // Set content based on variant
             let content = '';
             if (variant === 'small') {
-                content = icon;
+                // For small variant, prefer icon, but fallback to text if icon is empty
+                content = icon || buttonText;
             } else if (variant === 'normal') {
                 content = buttonText;
             } else if (variant === 'full') {

@@ -637,6 +637,10 @@ class HeaderSystem {
   }
 
   static getHeaderHTML() {
+    // Detect if we're in a mockup page and adjust image paths accordingly
+    const isMockupPage = window.location.pathname.includes('/mockups/');
+    const imagePathPrefix = isMockupPage ? '../../' : '';
+    
     return `
         <div class="header-content">
           <!-- אזור לוגו ותפריט -->
@@ -648,7 +652,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <img src="images/icons/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                        <img src="${imagePathPrefix}images/icons/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
                       </a>
                     </li>
 
@@ -729,6 +733,7 @@ class HeaderSystem {
                         <li class="separator"></li>
 
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
@@ -780,7 +785,7 @@ class HeaderSystem {
 
               <div class="logo-section">
                 <div class="logo">
-                  <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
+                  <img src="${imagePathPrefix}images/logo.svg" alt="TikTrack Logo" class="logo-image">
                   <span class="logo-text">פשוט לנהל תיק</span>
                 </div>
               </div>

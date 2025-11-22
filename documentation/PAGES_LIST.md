@@ -116,6 +116,7 @@
 | **code-quality-dashboard.html** | דשבורד איכות קוד + לינטר | `http://localhost:5000/code-quality-dashboard.html` | `/api/quality/lint/*` |
 | **notifications-center.html** | מרכז התראות | `http://localhost:5000/notifications-center.html` | `/api/notifications/*` |
 | **css-management.html** | ניהול CSS | `http://localhost:5000/css-management.html` | `/api/css/*` |
+| **tradingview-test-page.html** | בדיקת TradingView Lightweight Charts | `http://localhost:8080/mockups/daily-snapshots/tradingview-test-page.html` | - |
 | **dynamic-colors-display.html** | תצוגת צבעים | `http://localhost:5000/dynamic-colors-display.html` | `/api/colors/*` |
 | **designs.html** | עיצובים | `http://localhost:5000/designs.html` | `/api/designs/*` |
 

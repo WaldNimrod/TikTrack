@@ -99,3 +99,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-22T18:32:11+00:00 | 1.3.2.0 | 1.3.1.0 | 56433bec378c1016a65d72c1d474d4875bc0f5fc | 10e29a76b3b63f1402f4e191589f05f1fafc5dd8 | patch | Fix: cover action should be red (not green) - use dynamic colors from preferences |
 | 2025-11-22T18:36:43+00:00 | 1.3.3.0 | 1.3.2.0 | f8d582994ea09f72a317c1707bb26e3f5c6b9475 | 56433bec378c1016a65d72c1d474d4875bc0f5fc | patch | Fix: cover action should be red (like sell), not green |
 | 2025-11-22T19:33:55+00:00 | 1.3.4.0 | 1.3.3.0 | 80616789b65e5d5ad519f9c16d0cb870eea39d25 | f8d582994ea09f72a317c1707bb26e3f5c6b9475 | patch | Fix: Add proper fallback with Hebrew translations and colors for renderAction |
+| 2025-11-22T19:44:03+00:00 | 1.3.5.0 | 1.3.4.0 | 130b4b66ba64656121b2735e983bcecf6d10dbf7 | 80616789b65e5d5ad519f9c16d0cb870eea39d25 | patch | Fix: Ensure fallback returns badge-secondary for empty action (consistent with renderAction) |

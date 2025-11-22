@@ -1240,11 +1240,12 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 <td class="type-cell" data-type="${typeForFilter}">
                     ${window.renderAction ? window.renderAction(execution.action || execution.type) : (() => {
                         const action = (execution.action || execution.type || '').toLowerCase();
+                        if (!action) return '<span class="badge badge-secondary">-</span>';
                         const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
                         const actionHebrew = actionTranslations[action] || action;
                         const positiveActions = new Set(['buy', 'short']);
                         const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
-                        return action ? `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>` : '-';
+                        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
                     })()}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
@@ -2803,11 +2804,12 @@ function updateExecutionsTableForTradeModal(executions) {
 
       const typeBadge = window.renderAction ? window.renderAction(execution.type) : (() => {
         const action = (execution.type || '').toLowerCase();
+        if (!action) return '<span class="badge badge-secondary">-</span>';
         const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
         const actionHebrew = actionTranslations[action] || action;
         const positiveActions = new Set(['buy', 'short']);
         const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
-        return action ? `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>` : '-';
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
       })();
 
       const statusBadge = execution.status === 'completed'
@@ -4196,11 +4198,12 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
     const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (() => {
         const action = (execution?.action || '').toLowerCase();
+        if (!action) return '<span class="badge badge-secondary">-</span>';
         const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
         const actionHebrew = actionTranslations[action] || action;
         const positiveActions = new Set(['buy', 'short']);
         const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
-        return action ? `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>` : '-';
+        return `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>`;
     })();
     
     const scoreCategory = suggestion.score >= 100 ? 'open' : 

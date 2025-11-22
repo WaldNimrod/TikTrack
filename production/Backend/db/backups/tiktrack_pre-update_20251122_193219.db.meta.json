@@ -1,8 +1,0 @@
-{
-  "created_at": "2025-11-22T19:32:19.650740Z",
-  "label": "pre-update",
-  "source": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/tiktrack.db",
-  "backup": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_193219.db",
-  "integrity_check": "ok",
-  "notes": "Before production update"
-}

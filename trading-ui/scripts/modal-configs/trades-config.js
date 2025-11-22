@@ -122,9 +122,10 @@ const tradesModalConfig = {
             type: 'datetime-local',
             id: 'tradeEntryDate',
             label: 'תאריך כניסה',
-            required: true,
+            required: false, // Not required on creation - will be set automatically from first execution
             rowClass: 'row',
-            colClass: 'col-md-6 col-sm-12'
+            colClass: 'col-md-6 col-sm-12',
+            description: 'תאריך הביצוע הראשון של הטרייד. אם לא מוגדר, יוגדר אוטומטית מהביצוע הראשון.'
         },
         // שורה רביעית: כמות + סה"כ השקעה
         {

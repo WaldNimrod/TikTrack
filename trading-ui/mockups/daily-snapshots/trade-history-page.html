@@ -27,6 +27,12 @@
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     
+    <!-- Linked Items System -->
+    <script src="../../scripts/linked-items.js" defer></script>
+    <script src="../../scripts/services/linked-items-service.js" defer></script>
+    <script src="../../scripts/entity-details-modal.js" defer></script>
+    <script src="../../scripts/services/entity-details-api.js" defer></script>
+    
     <style>
         /* Timeline Styles */
         .timeline-container {
@@ -336,6 +342,117 @@
         .market-chart-options li {
             margin-bottom: 5px;
         }
+        
+        /* Plan vs Execution Comparison Styles */
+        .plan-vs-execution-comparison {
+            padding: 20px 0;
+        }
+        
+        #planVsExecutionTable {
+            margin-top: 15px;
+        }
+        
+        #planVsExecutionTable thead th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        #planVsExecutionTable tbody td {
+            vertical-align: middle;
+            padding: 15px;
+        }
+        
+        #planVsExecutionTable tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        #planVsExecutionTable tbody td:first-child {
+            font-weight: 600;
+        }
+        
+        #planVsExecutionTable tbody td:first-child i {
+            color: #26baac;
+            margin-left: 6px;
+        }
+        
+        .comparison-value {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .comparison-value.planned {
+            color: #6c757d;
+        }
+        
+        .comparison-value.trade {
+            color: #495057;
+        }
+        
+        .comparison-value.executed {
+            color: #212529;
+        }
+        
+        .comparison-value .value {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+        
+        .comparison-value .price {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+        
+        .comparison-value .date {
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+        
+        .comparison-value .description {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 2px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .status-badge i {
+            font-size: 0.9rem;
+        }
+        
+        .status-badge.status-match {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.status-additional {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-badge.status-partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.status-difference {
+            background: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body class="trade-history-page">
@@ -438,55 +555,87 @@
                             </div>
                         </div>
                         
-                        <!-- Basic Info Card -->
+                        <!-- Trade Basic Details -->
                         <div class="card mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-info-circle"></i> פרטי הטרייד
+                                </h5>
+                                <button class="btn btn-sm btn-outline-primary ms-3" onclick="showTradeDetailsModal(); return false;" title="פתח מודול פרטים">
+                                    <i class="bi bi-box-arrow-up-right"></i> פרטים
+                                </button>
+                            </div>
                             <div class="card-body">
-                                <h5 class="card-title">נתונים בסיסיים</h5>
                                 <div class="row">
+                                    <!-- Column 1 -->
                                     <div class="col-md-3">
-                                        <strong>מספר טרייד:</strong> #123
+                                        <div class="mb-3">
+                                            <strong>טיקר:</strong> AAPL
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>צד:</strong> <span class="badge bg-success">Long</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>סוג השקעה:</strong> Swing
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>סטטוס:</strong> 
+                                            <span id="tradeStatusBadge">
+                                                <span class="badge bg-secondary">סגור</span>
+                                            </span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>חשבון מסחר:</strong> Account #1
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Column 2 -->
                                     <div class="col-md-3">
-                                        <strong>טיקר:</strong> AAPL
+                                        <div class="mb-3">
+                                            <strong>תאריך תכנון:</strong> 01/01/2025
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>תאריך פתיחה:</strong> 05/01/2025
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>תאריך כניסה:</strong> 05/01/2025
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>תאריך יציאה:</strong> 20/01/2025
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Column 3 -->
                                     <div class="col-md-3">
-                                        <strong>חשבון:</strong> Account #1
+                                        <div class="mb-3">
+                                            <strong>כמות מתוכננת:</strong> 150 מניות
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>כמות מקסימאלית:</strong> 150 מניות
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>סה"כ קניות:</strong> 150 מניות
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Column 4 -->
                                     <div class="col-md-3">
-                                        <strong>סטטוס:</strong> <span class="badge bg-success">סגור</span>
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-3">
-                                        <strong>סוג השקעה:</strong> Swing
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>צד:</strong> Long
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>כמות מתוכננת:</strong> 150 מניות
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>סכום מתוכנן:</strong> $22,500
-                                    </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-3">
-                                        <strong>מחיר כניסה מתוכנן:</strong> $150
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>תאריך פתיחה:</strong> 05/01/2025
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>תאריך סגירה:</strong> 20/01/2025
-                                    </div>
-                                    <div class="col-md-3">
-                                        <strong>P/L כולל:</strong> <span style="color: #28a745; font-weight: bold;">$1,110</span>
-                                    </div>
-                                </div>
-                                <div class="row mt-3" style="display: none;">
-                                    <div class="col-md-12">
-                                        <strong>הערות:</strong> טרייד מוצלח עם תשואה של 7.4%
+                                        <div class="mb-3">
+                                            <strong>תנאים וסיבות:</strong>
+                                            <div class="ms-2 mt-1">
+                                                <div><a href="#" onclick="showConditionDetails(1); return false;">תנאי כניסה #1</a></div>
+                                                <div><a href="#" onclick="showConditionDetails(2); return false;">תנאי יציאה #2</a></div>
+                                                <div><a href="#" onclick="showConditionDetails(3); return false;">סיבה #3</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>רווח והפסד:</strong>
+                                            <div class="ms-2 mt-1">
+                                                <div>ממומש: <span class="text-success">$1,110</span></div>
+                                                <div>לא ממומש: <span class="text-muted">-</span></div>
+                                                <div><strong>סה"כ: <span class="text-success">$1,110</span></strong></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -708,208 +857,208 @@
                     </div>
                     <div class="section-body">
                         <div class="plan-vs-execution-comparison">
-                            <div class="comparison-cards">
-                                <!-- Entry Comparison -->
-                                <div class="comparison-card">
-                                    <div class="comparison-card-header">
-                                        <h5><i class="bi bi-box-arrow-in-right"></i> כניסה</h5>
-                                    </div>
-                                    <div class="comparison-card-body">
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">תכנון:</div>
-                                            <div class="comparison-value planned">
-                                                <span class="value">100 מניות</span>
-                                                <span class="price">@ $150</span>
-                                                <span class="date">01/01/2025</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">ביצוע:</div>
-                                            <div class="comparison-value executed">
-                                                <span class="value">100 מניות</span>
-                                                <span class="price">@ $150</span>
-                                                <span class="date">05/01/2025</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-status">
-                                            <span class="status-badge status-match">
-                                                <i class="bi bi-check-circle"></i> תואם
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Additional Entry Comparison -->
-                                <div class="comparison-card">
-                                    <div class="comparison-card-header">
-                                        <h5><i class="bi bi-plus-circle"></i> הוספה</h5>
-                                    </div>
-                                    <div class="comparison-card-body">
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">תכנון:</div>
-                                            <div class="comparison-value planned">
-                                                <span class="value">-</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">ביצוע:</div>
-                                            <div class="comparison-value executed">
-                                                <span class="value">+50 מניות</span>
-                                                <span class="price">@ $152</span>
-                                                <span class="date">10/01/2025</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-status">
-                                            <span class="status-badge status-additional">
-                                                <i class="bi bi-info-circle"></i> הוספה לא מתוכננת
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Exit Comparison -->
-                                <div class="comparison-card">
-                                    <div class="comparison-card-header">
-                                        <h5><i class="bi bi-box-arrow-right"></i> יציאה</h5>
-                                    </div>
-                                    <div class="comparison-card-body">
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">תכנון:</div>
-                                            <div class="comparison-value planned">
-                                                <span class="value">150 מניות</span>
-                                                <span class="price">@ $160 (יעד)</span>
-                                                <span class="date">15/01/2025 (משוער)</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">ביצוע:</div>
-                                            <div class="comparison-value executed">
-                                                <span class="value">30 מניות @ $155</span>
-                                                <span class="value">120 מניות @ $158</span>
-                                                <span class="date">15/01/2025, 20/01/2025</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-status">
-                                            <span class="status-badge status-partial">
-                                                <i class="bi bi-exclamation-triangle"></i> יציאה חלקית
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- P/L Comparison -->
-                                <div class="comparison-card">
-                                    <div class="comparison-card-header">
-                                        <h5><i class="bi bi-graph-up-arrow"></i> רווח/הפסד</h5>
-                                    </div>
-                                    <div class="comparison-card-body">
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">תכנון:</div>
-                                            <div class="comparison-value planned">
-                                                <span class="value">$1,500</span>
-                                                <span class="description">(150 × $10 רווח משוער)</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-row">
-                                            <div class="comparison-label">ביצוע:</div>
-                                            <div class="comparison-value executed">
-                                                <span class="value">$1,110</span>
-                                                <span class="description">(P/L ממומש)</span>
-                                            </div>
-                                        </div>
-                                        <div class="comparison-status">
-                                            <span class="status-badge status-difference">
-                                                <i class="bi bi-arrow-down"></i> $390 פחות מהמתוכנן
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="planVsExecutionTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 120px;">קטגוריה</th>
+                                            <th style="width: 25%;">תוכנית</th>
+                                            <th style="width: 25%;">טרייד</th>
+                                            <th style="width: 25%;">ביצוע</th>
+                                            <th style="width: 200px;">סטטוס</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Entry Comparison -->
+                                        <tr>
+                                            <td>
+                                                <strong><i class="bi bi-box-arrow-in-right"></i> כניסה</strong>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value planned">
+                                                    <div class="value">100 מניות</div>
+                                                    <div class="price">@ $150</div>
+                                                    <div class="date">01/01/2025</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value trade">
+                                                    <div class="value">100 מניות</div>
+                                                    <div class="price">@ $150</div>
+                                                    <div class="date">01/01/2025</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value executed">
+                                                    <div class="value">100 מניות</div>
+                                                    <div class="price">@ $150</div>
+                                                    <div class="date">05/01/2025</div>
+                                                    <div class="description">פוזיציה: 0 → 100</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-match">
+                                                    <i class="bi bi-check-circle"></i> תואם
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Additional Entry Comparison -->
+                                        <tr>
+                                            <td>
+                                                <strong><i class="bi bi-plus-circle"></i> הוספה</strong>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value planned">
+                                                    <div class="value">-</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value trade">
+                                                    <div class="value">-</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value executed">
+                                                    <div class="value">+50 מניות</div>
+                                                    <div class="price">@ $152</div>
+                                                    <div class="date">10/01/2025</div>
+                                                    <div class="description">פוזיציה: 100 → 150</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-additional">
+                                                    <i class="bi bi-info-circle"></i> הוספה לא מתוכננת
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Partial Exit Comparison -->
+                                        <tr>
+                                            <td>
+                                                <strong><i class="bi bi-box-arrow-right"></i> יציאה חלקית</strong>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value planned">
+                                                    <div class="value">150 מניות</div>
+                                                    <div class="price">@ $160 (יעד)</div>
+                                                    <div class="date">15/01/2025 (משוער)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value trade">
+                                                    <div class="value">150 מניות</div>
+                                                    <div class="price">@ $160 (יעד)</div>
+                                                    <div class="date">15/01/2025 (משוער)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value executed">
+                                                    <div class="value">30 מניות</div>
+                                                    <div class="price">@ $155</div>
+                                                    <div class="date">15/01/2025</div>
+                                                    <div class="description">פוזיציה: 150 → 120</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-partial">
+                                                    <i class="bi bi-exclamation-triangle"></i> יציאה חלקית
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Final Exit Comparison -->
+                                        <tr>
+                                            <td>
+                                                <strong><i class="bi bi-box-arrow-right"></i> יציאה סופית</strong>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value planned">
+                                                    <div class="value">150 מניות</div>
+                                                    <div class="price">@ $160 (יעד)</div>
+                                                    <div class="date">15/01/2025 (משוער)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value trade">
+                                                    <div class="value">120 מניות</div>
+                                                    <div class="price">@ $160 (יעד)</div>
+                                                    <div class="date">20/01/2025 (משוער)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value executed">
+                                                    <div class="value">120 מניות</div>
+                                                    <div class="price">@ $158</div>
+                                                    <div class="date">20/01/2025</div>
+                                                    <div class="description">פוזיציה: 120 → 0</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-difference">
+                                                    <i class="bi bi-arrow-down"></i> מחיר נמוך מהמתוכנן
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- P/L Comparison -->
+                                        <tr>
+                                            <td>
+                                                <strong><i class="bi bi-graph-up-arrow"></i> רווח/הפסד</strong>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value planned">
+                                                    <div class="value">$1,500</div>
+                                                    <div class="description">(150 × $10 רווח משוער)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value trade">
+                                                    <div class="value">$1,200</div>
+                                                    <div class="description">(120 × $10 רווח משוער)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="comparison-value executed">
+                                                    <div class="value">$1,110</div>
+                                                    <div class="description">(P/L ממומש)</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-difference">
+                                                    <i class="bi bi-arrow-down"></i> $390 פחות מהמתוכנן
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
                         
                         <!-- Executions Table Section -->
-                <div class="content-section" id="executions-table-section">
+                <!-- Linked Items Section -->
+                <div class="content-section" id="linked-items-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-table"></i> טבלת ביצועים</h2>
+                        <h2><i class="bi bi-link-45deg"></i> פריטים מקושרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('executions-table-section')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover" id="executionsTable">
-                                        <thead>
-                                            <tr>
-                                                <th>תאריך</th>
-                                                <th>פעולה</th>
-                                                <th>כמות</th>
-                                                <th>מחיר</th>
-                                                <th>עמלה</th>
-                                                <th>P/L ממומש</th>
-                                                <th>P/L MTM</th>
-                                                <th class="col-actions actions-cell">
-                                                    <span class="actions-header-icon">⋮</span>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>05/01</td>
-                                                <td><span class="badge bg-success">Buy</span></td>
-                                                <td>100</td>
-                                                <td>$150</td>
-                                                <td>$1.50</td>
-                                                <td>-</td>
-                                                <td>-</td>
-                                                <td class="col-actions actions-cell" data-entity-id="101" data-entity-type="execution" data-status="completed"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>10/01</td>
-                                                <td><span class="badge bg-success">Buy</span></td>
-                                                <td>50</td>
-                                                <td>$152</td>
-                                                <td>$0.75</td>
-                                                <td>-</td>
-                                                <td>$100</td>
-                                                <td class="col-actions actions-cell" data-entity-id="102" data-entity-type="execution" data-status="completed"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>15/01</td>
-                                                <td><span class="badge bg-danger">Sell</span></td>
-                                                <td>30</td>
-                                                <td>$155</td>
-                                                <td>$0.50</td>
-                                                <td>$150</td>
-                                                <td>$120</td>
-                                                <td class="col-actions actions-cell" data-entity-id="103" data-entity-type="execution" data-status="completed"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>20/01</td>
-                                                <td><span class="badge bg-danger">Sell</span></td>
-                                                <td>120</td>
-                                                <td>$158</td>
-                                                <td>$1.20</td>
-                                                <td>$960</td>
-                                                <td>-</td>
-                                                <td class="col-actions actions-cell" data-entity-id="104" data-entity-type="execution" data-status="completed"></td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr class="table-info">
-                                                <td colspan="2"><strong>סיכום:</strong></td>
-                                                <td><strong>סה"כ קניות: 150</strong></td>
-                                                <td><strong>סה"כ מכירות: 150</strong></td>
-                                                <td colspan="4"><strong>P/L כולל: $1,110</strong></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                        <div id="linkedItemsContainer">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">טוען...</span>
                                 </div>
+                                <p class="mt-2">טוען פריטים מקושרים...</p>
                             </div>
                         </div>
+                    </div>
+                </div>
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
@@ -1771,6 +1920,18 @@
             }
         }
         
+        // Function to add new execution
+        function addNewExecution() {
+            // פותח מודל להוספת ביצוע חדש
+            if (window.ModalManagerV2) {
+                window.ModalManagerV2.showModal('executionModal', 'create', {});
+            } else if (window.showSuccessNotification) {
+                window.showSuccessNotification('פתיחת טופס הוספת ביצוע - ייושם בעתיד');
+            } else {
+                alert('פתיחת טופס הוספת ביצוע - ייושם בעתיד');
+            }
+        }
+        
         // Helper functions
         function exportData() {
             alert('ייצוא נתונים - ייושם בעתיד');
@@ -1788,33 +1949,239 @@
             // P/L Chart removed - no longer needed
             // Market price chart removed - market price series is now part of timeline chart
             
-            // Load action buttons for executions table
+            // Update trade status badge using FieldRendererService if available
+            updateTradeStatusBadge('closed');
+            
+            // Load linked items for the trade
+            loadLinkedItemsForTrade();
+        });
+        
+        // Function to update trade status badge
+        function updateTradeStatusBadge(status) {
+            const statusBadge = document.getElementById('tradeStatusBadge');
+            if (!statusBadge) return;
+            
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function') {
+                statusBadge.innerHTML = window.FieldRendererService.renderStatus(status, 'trade');
+            } else {
+                // Fallback: manual rendering
+                const statusLabels = {
+                    'open': { text: 'פתוח', class: 'bg-success' },
+                    'closed': { text: 'סגור', class: 'bg-secondary' },
+                    'cancelled': { text: 'בוטל', class: 'bg-danger' }
+                };
+                const statusInfo = statusLabels[status] || { text: status, class: 'bg-secondary' };
+                statusBadge.innerHTML = `<span class="badge ${statusInfo.class}">${statusInfo.text}</span>`;
+            }
+        }
+        
+        // Function to show trade details modal
+        function showTradeDetailsModal() {
+            const tradeId = getCurrentTradeId(); // Get current trade ID
+            if (window.showEntityDetails) {
+                window.showEntityDetails('trade', tradeId, {
+                    mode: 'view',
+                    includeLinkedItems: false
+                });
+            } else if (window.ModalManagerV2) {
+                window.ModalManagerV2.showModal('tradeModal', 'view', { id: tradeId });
+            } else {
+                alert(`פרטי טרייד #${tradeId}`);
+            }
+        }
+        
+        // Function to show condition details
+        function showConditionDetails(conditionId) {
+            if (window.showEntityDetails) {
+                window.showEntityDetails('trade_condition', conditionId, {
+                    mode: 'view'
+                });
+            } else {
+                alert(`פרטי תנאי #${conditionId}`);
+            }
+        }
+        
+        // Function to get current trade ID (placeholder - should be set based on selected trade)
+        function getCurrentTradeId() {
+            // In production, this should get the actual trade ID from the selected trade
+            return 123; // Placeholder
+        }
+        
+        // Function to load linked items for the trade
+        async function loadLinkedItemsForTrade() {
+            const tradeId = getCurrentTradeId();
+            const container = document.getElementById('linkedItemsContainer');
+            
+            if (!container) return;
+            
+            try {
+                // Check if linked items API is available
+                if (window.entityDetailsAPI && typeof window.entityDetailsAPI.getLinkedItems === 'function') {
+                    const data = await window.entityDetailsAPI.getLinkedItems('trade', tradeId);
+                    renderLinkedItemsTable(data, container);
+                } else if (window.viewLinkedItemsForTrade) {
+                    // Use the global linked items function
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <button class="btn btn-primary" onclick="window.viewLinkedItemsForTrade(${tradeId})">
+                                <i class="bi bi-link-45deg"></i> הצג פריטים מקושרים
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Fallback: show message
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> מערכת המקושרים לא זמינה כרגע
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading linked items:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> שגיאה בטעינת פריטים מקושרים: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Function to render linked items table
+        function renderLinkedItemsTable(data, container) {
+            if (!data || (!data.child_entities && !data.parent_entities)) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> אין פריטים מקושרים לטרייד זה
+                    </div>
+                `;
+                return;
+            }
+            
+            const allItems = [
+                ...(data.child_entities || []),
+                ...(data.parent_entities || [])
+            ];
+            
+            if (allItems.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> אין פריטים מקושרים לטרייד זה
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group items by type
+            const itemsByType = {};
+            allItems.forEach(item => {
+                if (!itemsByType[item.type]) {
+                    itemsByType[item.type] = [];
+                }
+                itemsByType[item.type].push(item);
+            });
+            
+            // Render table
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-hover" id="linkedItemsTable">
+                        <thead>
+                            <tr>
+                                <th>סוג</th>
+                                <th>מזהה</th>
+                                <th>שם/תיאור</th>
+                                <th>סטטוס</th>
+                                <th>תאריך יצירה</th>
+                                <th class="col-actions actions-cell">
+                                    <span class="actions-header-icon">⋮</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            allItems.forEach(item => {
+                const statusBadge = item.status ? 
+                    `<span class="badge bg-${getStatusBadgeColor(item.status)}">${item.status}</span>` : 
+                    '-';
+                const date = item.created_at ? new Date(item.created_at).toLocaleDateString('he-IL') : '-';
+                
+                html += `
+                    <tr>
+                        <td><span class="badge bg-${getTypeBadgeColor(item.type)}">${getTypeLabel(item.type)}</span></td>
+                        <td>#${item.id}</td>
+                        <td>${item.name || item.title || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${date}</td>
+                        <td class="col-actions actions-cell" data-entity-id="${item.id}" data-entity-type="${item.type}" data-status="${item.status || ''}"></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Load action buttons for linked items table
             if (window.loadTableActionButtons) {
                 try {
-                    window.loadTableActionButtons('executionsTable', 'execution', {
+                    window.loadTableActionButtons('linkedItemsTable', 'linked_item', {
                         showDetails: true,
                         showLinked: true,
                         showEdit: true,
-                        showDelete: false // ביצועים לא נמחקים
+                        showDelete: false
                     });
                 } catch (e) {
-                    console.error('Error loading action buttons:', e);
-                    // Fallback: manually add action buttons
-                    document.querySelectorAll('#executionsTable .actions-cell').forEach(cell => {
-                        if (!cell.innerHTML.trim()) {
-                            cell.innerHTML = '<button class="btn btn-sm btn-outline-secondary" title="פעולות">⋮</button>';
-                        }
-                    });
+                    console.error('Error loading action buttons for linked items:', e);
                 }
-            } else {
-                // Fallback: manually add action buttons
-                document.querySelectorAll('#executionsTable .actions-cell').forEach(cell => {
-                    if (!cell.innerHTML.trim()) {
-                        cell.innerHTML = '<button class="btn btn-sm btn-outline-secondary" title="פעולות">⋮</button>';
-                    }
-                });
             }
-        });
+        }
+        
+        // Helper functions for linked items display
+        function getTypeLabel(type) {
+            const labels = {
+                'execution': 'ביצוע',
+                'cash_flow': 'תזרים מזומן',
+                'note': 'הערה',
+                'alert': 'התראה',
+                'trading_account': 'חשבון מסחר',
+                'ticker': 'טיקר',
+                'trade_plan': 'תוכנית טרייד',
+                'trade': 'טרייד'
+            };
+            return labels[type] || type;
+        }
+        
+        function getTypeBadgeColor(type) {
+            const colors = {
+                'execution': 'success',
+                'cash_flow': 'secondary',
+                'note': 'dark',
+                'alert': 'warning',
+                'trading_account': 'info',
+                'ticker': 'info',
+                'trade_plan': 'primary',
+                'trade': 'primary'
+            };
+            return colors[type] || 'secondary';
+        }
+        
+        function getStatusBadgeColor(status) {
+            const statusLower = (status || '').toLowerCase();
+            if (statusLower.includes('open') || statusLower.includes('active') || statusLower.includes('completed')) {
+                return 'success';
+            } else if (statusLower.includes('closed')) {
+                return 'secondary';
+            } else if (statusLower.includes('pending')) {
+                return 'warning';
+            } else if (statusLower.includes('cancelled')) {
+                return 'danger';
+            }
+            return 'secondary';
+        }
     </script>
     
     <!-- Bootstrap JS for Modal -->

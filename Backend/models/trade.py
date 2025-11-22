@@ -133,7 +133,8 @@ def update_ticker_active_trades(connection, ticker_id: int) -> None:
         open_trades_count = open_trades_result[0] if open_trades_result else 0
         
         # Update the ticker's active_trades field
-        active_trades_value = 1 if open_trades_count > 0 else 0
+        # PostgreSQL requires boolean values, not integers
+        active_trades_value = True if open_trades_count > 0 else False
         connection.execute(
             text("UPDATE tickers SET active_trades = :active_trades, updated_at = :updated_at WHERE id = :ticker_id"),
             {

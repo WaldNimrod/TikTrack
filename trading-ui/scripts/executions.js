@@ -1238,7 +1238,14 @@ async function updateExecutionsTableMain(executions, options = {}) {
                     </div>
                 </td>
                 <td class="type-cell" data-type="${typeForFilter}">
-                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : '-'}
+                    ${window.renderAction ? window.renderAction(execution.action || execution.type) : (() => {
+                        const action = (execution.action || execution.type || '').toLowerCase();
+                        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+                        const actionHebrew = actionTranslations[action] || action;
+                        const positiveActions = new Set(['buy', 'short']);
+                        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+                        return action ? `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>` : '-';
+                    })()}
                 </td>
                 <td class="table-cell-clickable" data-account="${accountName}" 
                   data-onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { window.Logger.info('Entity details modal not available', { page: "executions" }); }" 
@@ -2794,7 +2801,14 @@ function updateExecutionsTableForTradeModal(executions) {
     executions.forEach(execution => {
       const row = document.createElement('tr');
 
-      const typeBadge = window.renderAction ? window.renderAction(execution.type) : '-';
+      const typeBadge = window.renderAction ? window.renderAction(execution.type) : (() => {
+        const action = (execution.type || '').toLowerCase();
+        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+        const actionHebrew = actionTranslations[action] || action;
+        const positiveActions = new Set(['buy', 'short']);
+        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+        return action ? `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>` : '-';
+      })();
 
       const statusBadge = execution.status === 'completed'
         ? '<span class="badge bg-success">הושלם</span>'
@@ -3751,7 +3765,11 @@ async function deleteExecution(executionId) {
             const ticker = execution.ticker_symbol || execution.symbol || 'לא מוגדר';
             const actionText = window.renderAction ? 
                                window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
-                               ((execution.action || execution.type) === 'buy' ? 'קנייה' : 'מכירה');
+                               (() => {
+                                   const action = ((execution.action || execution.type) || '').toLowerCase();
+                                   const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+                                   return actionTranslations[action] || action;
+                               })();
             const quantity = execution.quantity || '0';
             const price = execution.price ? (window.formatPrice ? window.formatPrice(execution.price) : `$${parseFloat(execution.price).toFixed(2)}`) : '$0';
             // Use FieldRendererService or dateUtils for consistent date formatting
@@ -4176,7 +4194,14 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
             : (executionDateValue ? (window.formatDate ? window.formatDate(executionDateValue) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(executionDateValue) : (window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(executionDateValue).toLocaleDateString('he-IL') : new Date(executionDateValue).toLocaleDateString('he-IL')))) : '-'));
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
-    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (execution?.action || '-');
+    const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (() => {
+        const action = (execution?.action || '').toLowerCase();
+        const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
+        const actionHebrew = actionTranslations[action] || action;
+        const positiveActions = new Set(['buy', 'short']);
+        const colorClass = positiveActions.has(action) ? ' text-success' : ' text-danger';
+        return action ? `<span class="badge badge-type badge-capsule${colorClass}" data-type="${action}">${actionHebrew}</span>` : '-';
+    })();
     
     const scoreCategory = suggestion.score >= 100 ? 'open' : 
                           suggestion.score >= 70 ? 'warning' : 'info';

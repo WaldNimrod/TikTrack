@@ -577,8 +577,10 @@ class FieldRendererService {
             'cover': 'כיסוי'
         };
         
-        const actionLower = action.toLowerCase();
-        const actionHebrew = actionTranslations[actionLower] || action;
+        // חובה לחתוך רווחים לפני המרה ל-lowercase
+        const actionStr = String(action).trim();
+        const actionLower = actionStr.toLowerCase();
+        const actionHebrew = actionTranslations[actionLower] || actionStr;
         
         // קביעת צבע לפי amount אם סופק - בדיוק כמו renderType
         // שימוש ב-text-success/text-danger שמתעדכנים דינמית מהעדפות

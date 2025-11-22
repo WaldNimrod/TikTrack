@@ -1239,7 +1239,7 @@ async function updateExecutionsTableMain(executions, options = {}) {
                 </td>
                 <td class="type-cell" data-type="${typeForFilter}">
                     ${window.renderAction ? window.renderAction(execution.action || execution.type) : (() => {
-                        const action = (execution.action || execution.type || '').toLowerCase();
+                        const action = ((execution.action || execution.type || '').trim()).toLowerCase();
                         if (!action) return '<span class="badge badge-secondary">-</span>';
                         const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
                         const actionHebrew = actionTranslations[action] || action;
@@ -2803,7 +2803,7 @@ function updateExecutionsTableForTradeModal(executions) {
       const row = document.createElement('tr');
 
       const typeBadge = window.renderAction ? window.renderAction(execution.type) : (() => {
-        const action = (execution.type || '').toLowerCase();
+        const action = ((execution.type || '').trim()).toLowerCase();
         if (!action) return '<span class="badge badge-secondary">-</span>';
         const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
         const actionHebrew = actionTranslations[action] || action;
@@ -3768,7 +3768,7 @@ async function deleteExecution(executionId) {
             const actionText = window.renderAction ? 
                                window.renderAction(execution.action || execution.type).replace(/<[^>]*>/g, '') : 
                                (() => {
-                                   const action = ((execution.action || execution.type) || '').toLowerCase();
+                                   const action = (((execution.action || execution.type) || '').trim()).toLowerCase();
                                    const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
                                    return actionTranslations[action] || action;
                                })();
@@ -4197,7 +4197,7 @@ function buildTradeSuggestionRow(executionId, execution, suggestion, showExecuti
     const executionPrice = FieldRenderer?.renderAmount ? FieldRenderer.renderAmount(execution?.price, '$', 2, false) : (execution?.price ? `$${parseFloat(execution.price).toFixed(2)}` : '-');
     const executionQuantity = FieldRenderer?.renderShares ? FieldRenderer.renderShares(execution?.quantity) : (execution?.quantity || '-');
     const executionAction = FieldRenderer?.renderAction ? FieldRenderer.renderAction(execution?.action) : (() => {
-        const action = (execution?.action || '').toLowerCase();
+        const action = ((execution?.action || '').trim()).toLowerCase();
         if (!action) return '<span class="badge badge-secondary">-</span>';
         const actionTranslations = { 'buy': 'קנייה', 'sell': 'מכירה', 'short': 'קנייה בחסר', 'cover': 'כיסוי' };
         const actionHebrew = actionTranslations[action] || action;

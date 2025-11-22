@@ -94,3 +94,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-21T23:02:56+00:00 | 1.1.40.0 | 1.1.39.0 | a000393345e4c471b89fca85a304e636510d719f | 81eb68e2ca2fbd3661dee61ffaa345816cc10c81 | patch | Fix data_import page: standardize date rendering using central code from executions.js |
 | 2025-11-22T11:49:25+00:00 | 1.1.41.0 | 1.1.40.0 | 47b08b26f67076058b084b8172d7b7d88422a5b4 | a000393345e4c471b89fca85a304e636510d719f | patch | Header System: Complete refactoring to prevent duplicates and improve initialization |
 | 2025-11-22T11:51:26+00:00 | 1.1.42.0 | 1.1.41.0 | efc4f514ab1e733d3c04ce9568ddfd05e5cb19b6 | 47b08b26f67076058b084b8172d7b7d88422a5b4 | patch | Pre-production release updates - ticker mappings, import improvements, chart system fixes |
+| 2025-11-22T11:52:27+00:00 | 1.3.0.0 | 1.1.42.0 | 95d171f867e42a18979239af461573f2eee2c953 | efc4f514ab1e733d3c04ce9568ddfd05e5cb19b6 | set | Align version with production - 1.3.0 |

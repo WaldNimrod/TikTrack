@@ -1,5 +1,5 @@
 {
-  "snapshot_id": "pre-update_20251122_135513",
+  "snapshot_id": "pre-update_20251122_135628",
   "step_1": {
     "completed": true,
     "timestamp": "2025-11-22T13:55:14.885008",
@@ -27,31 +27,31 @@
   },
   "step_3": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.237810",
+    "timestamp": "2025-11-22T13:56:28.289013",
     "result": {
       "success": true,
-      "removed_count": 4
+      "removed_count": 0
     }
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.267155",
+    "timestamp": "2025-11-22T13:56:28.318006",
     "result": {
       "success": true,
-      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_115518.db"
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_115628.db"
     }
   },
   "step_5": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.748133",
+    "timestamp": "2025-11-22T13:56:28.834380",
     "result": {
       "success": true
     }
   },
-  "last_failed_step": 2,
+  "last_failed_step": null,
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.753622",
+    "timestamp": "2025-11-22T13:56:28.839640",
     "result": {
       "success": true,
       "warning": "Cleanup had warnings"
@@ -59,7 +59,7 @@
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.755749",
+    "timestamp": "2025-11-22T13:56:28.840765",
     "result": {
       "success": true,
       "verified": false,
@@ -68,7 +68,7 @@
   },
   "step_8": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.926832",
+    "timestamp": "2025-11-22T13:56:29.021333",
     "result": {
       "success": true,
       "results": {
@@ -81,26 +81,27 @@
   },
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.958851",
+    "timestamp": "2025-11-22T13:56:29.055510",
     "result": {
       "success": true,
-      "new_version": "1.2.3.0"
+      "new_version": "1.2.4.0"
     }
   },
   "step_10": {
     "completed": true,
-    "timestamp": "2025-11-21T22:20:00.243773",
+    "timestamp": "2025-11-22T13:55:21.890031",
     "result": {
       "success": true,
-      "dry_run": true
+      "commit_message": "chore: production update from main - 2025-11-22"
     }
   },
   "step_11": {
     "completed": true,
-    "timestamp": "2025-11-21T22:20:00.243998",
+    "timestamp": "2025-11-22T13:55:21.952661",
     "result": {
       "success": true,
-      "dry_run": true
+      "pid": 11839,
+      "background": true
     }
   },
   "step_12": {

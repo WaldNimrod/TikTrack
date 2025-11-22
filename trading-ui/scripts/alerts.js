@@ -2149,8 +2149,8 @@ async function saveAlert() {
     hasErrors = true;
   }
 
-  // וולידציה של ערך מספרי
-  if (conditionNumber) {
+  // וולידציה של ערך מספרי - שימוש ב-Backend Business Logic API
+  if (conditionNumber && conditionAttribute) {
     const numericValue = parseFloat(conditionNumber);
     if (isNaN(numericValue)) {
       if (window.showValidationWarning) {
@@ -2158,28 +2158,47 @@ async function saveAlert() {
       }
       hasErrors = true;
     } else {
-      // וולידציה של ערך חיובי למחיר
-      if (conditionAttribute === 'price' && numericValue <= 0) {
-        if (window.showValidationWarning) {
-          window.showValidationWarning('conditionNumber', 'מחיר חייב להיות גדול מ-0');
+      // Use backend Business Logic API for validation if available
+      if (window.AlertsData && typeof window.AlertsData.validateConditionValue === 'function') {
+        try {
+          const validationResult = await window.AlertsData.validateConditionValue(conditionAttribute, numericValue);
+          if (!validationResult.is_valid) {
+            if (window.showValidationWarning) {
+              window.showValidationWarning('conditionNumber', validationResult.error || 'ערך התנאי לא תקין');
+            }
+            hasErrors = true;
+          }
+        } catch (error) {
+          window.Logger?.warn?.('⚠️ Error calling AlertsData.validateConditionValue, using fallback validation', {
+            page: 'alerts',
+            error: error?.message || error
+          });
+          // Fallback: Local validation (backward compatibility)
+          if (conditionAttribute === 'price' && numericValue <= 0) {
+            if (window.showValidationWarning) {
+              window.showValidationWarning('conditionNumber', 'מחיר חייב להיות גדול מ-0');
+            }
+            hasErrors = true;
+          } else if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
+            if (window.showValidationWarning) {
+              window.showValidationWarning('conditionNumber', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+            }
+            hasErrors = true;
+          }
         }
-        hasErrors = true;
-      }
-
-      // וולידציה של ערך מקסימלי למחיר
-      if (conditionAttribute === 'price' && numericValue > 1000000) {
-        if (window.showValidationWarning) {
-          window.showValidationWarning('conditionNumber', 'מחיר לא יכול להיות גדול מ-1,000,000');
+      } else {
+        // Fallback: Local validation (backward compatibility)
+        if (conditionAttribute === 'price' && numericValue <= 0) {
+          if (window.showValidationWarning) {
+            window.showValidationWarning('conditionNumber', 'מחיר חייב להיות גדול מ-0');
+          }
+          hasErrors = true;
+        } else if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
+          if (window.showValidationWarning) {
+            window.showValidationWarning('conditionNumber', 'אחוז שינוי חייב להיות בין -100% ל-100%');
+          }
+          hasErrors = true;
         }
-        hasErrors = true;
-      }
-
-      // וולידציה של אחוזים (לשינוי)
-      if (conditionAttribute === 'change' && (numericValue < -100 || numericValue > 100)) {
-        if (window.showValidationWarning) {
-          window.showValidationWarning('conditionNumber', 'אחוז שינוי חייב להיות בין -100% ל-100%');
-        }
-        hasErrors = true;
       }
     }
   }
@@ -2240,6 +2259,34 @@ async function saveAlert() {
   // Add expiry_date if provided
   if (expiryDate) {
     alertPayload.expiry_date = expiryDate;
+  }
+
+  // Validate alert data using backend Business Logic API if available
+  if (window.AlertsData && typeof window.AlertsData.validateAlert === 'function') {
+    try {
+      const validationResult = await window.AlertsData.validateAlert(alertPayload);
+      if (!validationResult.is_valid) {
+        if (validationResult.errors && validationResult.errors.length > 0) {
+          const errorMessage = validationResult.errors.join(', ');
+          if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאת ולידציה', errorMessage);
+          } else if (window.showValidationWarning) {
+            window.showValidationWarning('alertForm', errorMessage);
+          }
+        } else {
+          if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאת ולידציה', 'נתוני ההתראה לא תקינים');
+          }
+        }
+        return;
+      }
+    } catch (error) {
+      window.Logger?.warn?.('⚠️ Error calling AlertsData.validateAlert, continuing with save', {
+        page: 'alerts',
+        error: error?.message || error
+      });
+      // Continue with save even if validation API fails (backward compatibility)
+    }
   }
 
   // שולח התראה חדשה או מעדכן קיימת

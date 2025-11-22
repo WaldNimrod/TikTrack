@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.3.1.0",
+    "version": "1.3.2.0",
     "major": 1,
     "minor": 3,
-    "patch": 1,
+    "patch": 2,
     "build": 0,
-    "commit": "10e29a76b3b63f1402f4e191589f05f1fafc5dd8",
-    "updated_at": "2025-11-22T18:24:35+00:00",
-    "notes": "Fix: Align renderAction with renderType - simplify and standardize action rendering"
+    "commit": "56433bec378c1016a65d72c1d474d4875bc0f5fc",
+    "updated_at": "2025-11-22T18:32:11+00:00",
+    "notes": "Fix: cover action should be red (not green) - use dynamic colors from preferences"
   }
 }

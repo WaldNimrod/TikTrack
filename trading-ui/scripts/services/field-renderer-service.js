@@ -581,6 +581,7 @@ class FieldRendererService {
         const actionHebrew = actionTranslations[actionLower] || action;
         
         // קביעת צבע לפי amount אם סופק - בדיוק כמו renderType
+        // שימוש ב-text-success/text-danger שמתעדכנים דינמית מהעדפות
         let colorClass = '';
         if (amountForColor !== null && amountForColor !== undefined) {
             colorClass = amountForColor >= 0 ? ' text-success' : ' text-danger';

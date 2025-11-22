@@ -96,3 +96,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-22T11:51:26+00:00 | 1.1.42.0 | 1.1.41.0 | efc4f514ab1e733d3c04ce9568ddfd05e5cb19b6 | 47b08b26f67076058b084b8172d7b7d88422a5b4 | patch | Pre-production release updates - ticker mappings, import improvements, chart system fixes |
 | 2025-11-22T11:52:27+00:00 | 1.3.0.0 | 1.1.42.0 | 95d171f867e42a18979239af461573f2eee2c953 | efc4f514ab1e733d3c04ce9568ddfd05e5cb19b6 | set | Align version with production - 1.3.0 |
 | 2025-11-22T18:24:35+00:00 | 1.3.1.0 | 1.3.0.0 | 10e29a76b3b63f1402f4e191589f05f1fafc5dd8 | 95d171f867e42a18979239af461573f2eee2c953 | patch | Fix: Align renderAction with renderType - simplify and standardize action rendering |
+| 2025-11-22T18:32:11+00:00 | 1.3.2.0 | 1.3.1.0 | 56433bec378c1016a65d72c1d474d4875bc0f5fc | 10e29a76b3b63f1402f4e191589f05f1fafc5dd8 | patch | Fix: cover action should be red (not green) - use dynamic colors from preferences |

@@ -75,7 +75,7 @@
                         <div class="header-actions d-flex align-items-center gap-2">
                             <div class="table-actions">
                                 <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                                <button data-button-type="COMPARE" data-variant="small" data-text="השווה" title="השוואת תאריכים"></button>
+                                <button data-button-type="COMPARE" data-variant="small" data-text="השווה" data-onclick="compareDates()" title="השוואת תאריכים"></button>
                                 <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
                             </div>
                             <button class="filter-toggle-btn" onclick="toggleSection('portfolio-state-top-section')" title="הצג/הסתר סקשן">
@@ -101,10 +101,13 @@
                                     <!-- Trading Account Filter -->
                                     <div class="col-md-3">
                                         <label for="filterAccount" class="form-label" style="font-size: 0.85rem;">חשבון מסחר</label>
-                                        <select id="filterAccount" class="form-select form-select-sm" multiple onchange="applyFilters()">
+                                        <select id="filterAccount" class="form-select form-select-sm" multiple size="4" onchange="updateSelectedAccountsCount(); applyFilters();" style="padding: 0.375rem 0.75rem;">
                                             <!-- Will be populated dynamically -->
                                         </select>
-                                        <small class="text-muted">ניתן לבחור מספר חשבונות (ברירת מחדל: כל החשבונות)</small>
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="bi bi-info-circle"></i> ניתן לבחור מספר חשבונות (Ctrl+Click / Cmd+Click)
+                                            <br><span id="selected-accounts-count" class="text-primary fw-bold"></span>
+                                        </small>
                                     </div>
                                     
                                     <!-- Investment Type Filter -->
@@ -463,6 +466,9 @@
                             option.selected = true;
                             accountSelect.appendChild(option);
                         });
+                        
+                        // Update selected accounts count
+                        updateSelectedAccountsCount();
                     }
                 }
             } catch (error) {
@@ -484,7 +490,30 @@
             }
         }
         
-        // Apply filters
+        // Update selected accounts count display
+        function updateSelectedAccountsCount() {
+            const accountSelect = document.getElementById('filterAccount');
+            const countElement = document.getElementById('selected-accounts-count');
+            
+            if (!accountSelect || !countElement) {
+                return;
+            }
+            
+            const selectedCount = accountSelect.selectedOptions.length;
+            const totalCount = allTradingAccounts.length;
+            
+            if (selectedCount === 0) {
+                countElement.textContent = 'לא נבחרו חשבונות';
+                countElement.className = 'text-danger fw-bold';
+            } else if (selectedCount === totalCount) {
+                countElement.textContent = `כל החשבונות נבחרו (${totalCount})`;
+                countElement.className = 'text-success fw-bold';
+            } else {
+                countElement.textContent = `נבחרו ${selectedCount} מתוך ${totalCount} חשבונות`;
+                countElement.className = 'text-primary fw-bold';
+            }
+        }
+        
         // Get selected accounts from multi-select filter
         function getSelectedAccounts() {
             const accountSelect = document.getElementById('filterAccount');
@@ -505,6 +534,9 @@
         }
         
         function applyFilters() {
+            // Update selected accounts count
+            updateSelectedAccountsCount();
+            
             // Reload portfolio state with filters (this will filter trades, update charts and summary)
             loadPortfolioState();
         }
@@ -560,6 +592,12 @@
             if (accountSelect) {
                 Array.from(accountSelect.options).forEach(opt => opt.selected = true);
             }
+            
+            // Reset investment type
+            document.getElementById('filterInvestmentType').value = '';
+            
+            // Update selected accounts count
+            updateSelectedAccountsCount();
             
             document.getElementById('filterInvestmentType').value = '';
             applyFilters();
@@ -980,6 +1018,17 @@
             }).format(value);
         }
         
+        // Get lighter color for percentage series
+        function getLighterColor(color, amount = 0.3) {
+            if (!color) return 'rgba(128, 128, 128, 0.5)';
+            const hex = color.replace('#', '');
+            if (hex.length !== 6) return color;
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            return `rgba(${r}, ${g}, ${b}, ${amount})`;
+        }
+        
         // Set chart period
         function setChartPeriod(period, chartType, event = null) {
             currentPeriod[chartType] = period;
@@ -1086,18 +1135,113 @@
                     timeScale: {
                         timeVisible: true,
                         secondsVisible: false
+                    },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    crosshair: {
+                        mode: 1, // Normal mode - shows crosshair with tooltip
+                        vertLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        },
+                        horzLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        }
                     }
                 });
                 
+                // Get lighter shade for percentage series
+                const primaryColorLighter = getLighterColor(primaryColor, 0.5);
+                
+                // Value series (left Y axis - amounts)
                 const portfolioValueSeries = window.TradingViewChartAdapter.addLineSeries(portfolioValueChart, {
                     color: primaryColor,
                     lineWidth: 2,
-                    title: 'שווי תיק'
+                    title: 'שווי תיק ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
+                });
+                
+                // Percentage series (right Y axis - percentages)
+                const portfolioValuePercentSeries = window.TradingViewChartAdapter.addLineSeries(portfolioValueChart, {
+                    color: primaryColorLighter,
+                    lineWidth: 2,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'שווי תיק (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
                 });
                 
                 // Generate data based on filtered trades - TODO: Load from API
                 const mockData = generateMockPortfolioValueData(currentPeriod['both'] || 'month');
-                portfolioValueSeries.setData(mockData);
+                portfolioValueSeries.setData(mockData.values);
+                portfolioValuePercentSeries.setData(mockData.percentages);
+                
+                // Add markers for min/max points
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightCharts) {
+                    const markers = [];
+                    if (mockData.minIndex >= 0) {
+                        markers.push({
+                            time: mockData.values[mockData.minIndex].time,
+                            position: 'belowBar',
+                            color: '#dc3545',
+                            shape: 'arrowUp',
+                            text: `מינימום: $${mockData.values[mockData.minIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    if (mockData.maxIndex >= 0) {
+                        markers.push({
+                            time: mockData.values[mockData.maxIndex].time,
+                            position: 'aboveBar',
+                            color: '#28a745',
+                            shape: 'arrowDown',
+                            text: `מקסימום: $${mockData.values[mockData.maxIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    
+                    // Try to use createSeriesMarkers if available
+                    if (typeof lightweightCharts.createSeriesMarkers === 'function') {
+                        try {
+                            const markersPrimitive = lightweightCharts.createSeriesMarkers(portfolioValueSeries);
+                            if (markersPrimitive && typeof markersPrimitive.setMarkers === 'function') {
+                                markersPrimitive.setMarkers(markers);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Failed to create markers primitive:', error);
+                        }
+                    } else if (typeof portfolioValueSeries.setMarkers === 'function') {
+                        // Fallback to direct setMarkers if available
+                        portfolioValueSeries.setMarkers(markers);
+                    }
+                }
                 
                 // Always fit content on load
                 portfolioValueChart.timeScale().fitContent();
@@ -1179,25 +1323,118 @@
                     timeScale: {
                         timeVisible: true,
                         secondsVisible: false
+                    },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    crosshair: {
+                        mode: 1, // Normal mode - shows crosshair with tooltip
+                        vertLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        },
+                        horzLine: {
+                            color: '#6A5ACD',
+                            width: 1,
+                            style: 0,
+                            labelBackgroundColor: '#6A5ACD'
+                        }
                     }
                 });
                 
+                // Get lighter shades for percentage series
+                const successColorLighter = getLighterColor(successColor, 0.5);
+                const warningColorLighter = getLighterColor(warningColor, 0.5);
+                const primaryColorLighter = getLighterColor(primaryColor, 0.5);
+                
+                // Value series (left Y axis - amounts)
                 const realizedPLSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
                     color: successColor,
                     lineWidth: 2,
-                    title: 'P/L ממומש'
+                    title: 'P/L ממומש ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
                 });
                 
                 const unrealizedPLSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
                     color: warningColor,
                     lineWidth: 2,
-                    title: 'P/L לא ממומש'
+                    title: 'P/L לא ממומש ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
                 });
                 
                 const totalPLSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
                     color: primaryColor,
                     lineWidth: 3,
-                    title: 'P/L כולל'
+                    title: 'P/L כולל ($)',
+                    priceScaleId: 'left',
+                    priceFormat: {
+                        type: 'price',
+                        precision: 0,
+                        minMove: 1
+                    }
+                });
+                
+                // Percentage series (right Y axis - percentages)
+                const realizedPLPercentSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: successColorLighter,
+                    lineWidth: 2,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'P/L ממומש (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
+                });
+                
+                const unrealizedPLPercentSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: warningColorLighter,
+                    lineWidth: 2,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'P/L לא ממומש (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
+                });
+                
+                const totalPLPercentSeries = window.TradingViewChartAdapter.addLineSeries(plTrendChart, {
+                    color: primaryColorLighter,
+                    lineWidth: 3,
+                    lineType: 0, // Normal line (using lighter color to differentiate)
+                    title: 'P/L כולל (%)',
+                    priceScaleId: 'right',
+                    priceFormat: {
+                        type: 'percent',
+                        precision: 2,
+                        minMove: 0.01
+                    }
                 });
                 
                 // Generate data based on filtered trades - TODO: Load from API
@@ -1205,6 +1442,50 @@
                 realizedPLSeries.setData(mockData.realized);
                 unrealizedPLSeries.setData(mockData.unrealized);
                 totalPLSeries.setData(mockData.total);
+                realizedPLPercentSeries.setData(mockData.realizedPercent);
+                unrealizedPLPercentSeries.setData(mockData.unrealizedPercent);
+                totalPLPercentSeries.setData(mockData.totalPercent);
+                
+                // Add markers for min/max points on total PL
+                const lightweightChartsPL = window.LightweightCharts || window.lightweightCharts;
+                if (mockData.minIndex >= 0 && mockData.maxIndex >= 0 && lightweightChartsPL) {
+                    const markers = [];
+                    if (mockData.minIndex >= 0) {
+                        markers.push({
+                            time: mockData.total[mockData.minIndex].time,
+                            position: 'belowBar',
+                            color: '#dc3545',
+                            shape: 'arrowUp',
+                            text: `מינימום: $${mockData.total[mockData.minIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    if (mockData.maxIndex >= 0) {
+                        markers.push({
+                            time: mockData.total[mockData.maxIndex].time,
+                            position: 'aboveBar',
+                            color: '#28a745',
+                            shape: 'arrowDown',
+                            text: `מקסימום: $${mockData.total[mockData.maxIndex].value.toLocaleString()}`,
+                            size: 1
+                        });
+                    }
+                    
+                    // Try to use createSeriesMarkers if available
+                    if (typeof lightweightChartsPL.createSeriesMarkers === 'function') {
+                        try {
+                            const markersPrimitive = lightweightChartsPL.createSeriesMarkers(totalPLSeries);
+                            if (markersPrimitive && typeof markersPrimitive.setMarkers === 'function') {
+                                markersPrimitive.setMarkers(markers);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Failed to create markers primitive for P/L chart:', error);
+                        }
+                    } else if (typeof totalPLSeries.setMarkers === 'function') {
+                        // Fallback to direct setMarkers if available
+                        totalPLSeries.setMarkers(markers);
+                    }
+                }
                 
                 // Always fit content on load
                 plTrendChart.timeScale().fitContent();
@@ -1393,6 +1674,7 @@
         // Generate mock portfolio value data (filtered by date/account/investment type)
         function generateMockPortfolioValueData(period) {
             const data = [];
+            const dataPercent = [];
             const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
             
             // Calculate base value from filtered trades
@@ -1402,18 +1684,48 @@
             }, 50000);
             
             const startValue = baseValue;
+            let minValue = Infinity;
+            let maxValue = -Infinity;
+            let minIndex = -1;
+            let maxIndex = -1;
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const value = startValue + (days - i) * 50 + Math.random() * 1000;
+                const roundedValue = Math.round(value);
+                
+                // Track min/max for markers
+                if (roundedValue < minValue) {
+                    minValue = roundedValue;
+                    minIndex = data.length;
+                }
+                if (roundedValue > maxValue) {
+                    maxValue = roundedValue;
+                    maxIndex = data.length;
+                }
+                
+                // Calculate percentage change from start
+                const percentChange = ((roundedValue - startValue) / startValue) * 100;
+                
                 data.push({
                     time: date.toISOString().split('T')[0],
-                    value: Math.round(value)
+                    value: roundedValue
+                });
+                
+                dataPercent.push({
+                    time: date.toISOString().split('T')[0],
+                    value: percentChange
                 });
             }
             
-            return data;
+            return {
+                values: data,
+                percentages: dataPercent,
+                minIndex: minIndex,
+                maxIndex: maxIndex,
+                startValue: startValue
+            };
         }
         
         // Generate mock P/L data (filtered by date/account/investment type)
@@ -1422,10 +1734,18 @@
             const realized = [];
             const unrealized = [];
             const total = [];
+            const realizedPercent = [];
+            const unrealizedPercent = [];
+            const totalPercent = [];
             
             // Calculate base values from filtered trades
             const baseUnrealizedPL = filteredTrades.reduce((sum, trade) => sum + (trade.position_pl_value || 0), 0);
             const baseRealizedPL = 10000; // Mock - should come from closed trades
+            const baseTotalPL = baseRealizedPL + baseUnrealizedPL;
+            
+            // Track min/max for markers
+            let minTotal = Infinity, maxTotal = -Infinity;
+            let minIndex = -1, maxIndex = -1;
             
             for (let i = days; i >= 0; i--) {
                 const date = new Date();
@@ -1434,23 +1754,42 @@
                 const unrealizedValue = baseUnrealizedPL + (days - i) * 30 + Math.random() * 800;
                 const totalValue = realizedValue + unrealizedValue;
                 
-                realized.push({
-                    time: date.toISOString().split('T')[0],
-                    value: Math.round(realizedValue)
-                });
+                const roundedRealized = Math.round(realizedValue);
+                const roundedUnrealized = Math.round(unrealizedValue);
+                const roundedTotal = Math.round(totalValue);
                 
-                unrealized.push({
-                    time: date.toISOString().split('T')[0],
-                    value: Math.round(unrealizedValue)
-                });
+                // Track min/max for total PL
+                if (roundedTotal < minTotal) {
+                    minTotal = roundedTotal;
+                    minIndex = total.length;
+                }
+                if (roundedTotal > maxTotal) {
+                    maxTotal = roundedTotal;
+                    maxIndex = total.length;
+                }
                 
-                total.push({
-                    time: date.toISOString().split('T')[0],
-                    value: Math.round(totalValue)
-                });
+                // Calculate percentages
+                const realizedPercentValue = baseRealizedPL > 0 ? ((roundedRealized - baseRealizedPL) / baseRealizedPL) * 100 : 0;
+                const unrealizedPercentValue = baseUnrealizedPL > 0 ? ((roundedUnrealized - baseUnrealizedPL) / baseUnrealizedPL) * 100 : 0;
+                const totalPercentValue = baseTotalPL > 0 ? ((roundedTotal - baseTotalPL) / baseTotalPL) * 100 : 0;
+                
+                const timeStr = date.toISOString().split('T')[0];
+                
+                realized.push({ time: timeStr, value: roundedRealized });
+                unrealized.push({ time: timeStr, value: roundedUnrealized });
+                total.push({ time: timeStr, value: roundedTotal });
+                
+                realizedPercent.push({ time: timeStr, value: realizedPercentValue });
+                unrealizedPercent.push({ time: timeStr, value: unrealizedPercentValue });
+                totalPercent.push({ time: timeStr, value: totalPercentValue });
             }
             
-            return { realized, unrealized, total };
+            return { 
+                realized, unrealized, total,
+                realizedPercent, unrealizedPercent, totalPercent,
+                minIndex, maxIndex,
+                baseRealizedPL, baseUnrealizedPL, baseTotalPL
+            };
         }
         
         // Compare dates

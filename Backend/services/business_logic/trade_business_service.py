@@ -209,11 +209,18 @@ class TradeBusinessService(BaseBusinessService):
         side_lower = side.lower() if side else 'long'
         is_long = side_lower in ['long', 'buy']
         
-        # Calculate
+        # Calculate percentage
         if is_long:
             percentage = (target_price - current_price) / current_price * 100
         else:
             percentage = (current_price - target_price) / current_price * 100
+        
+        # For stop price (target_price < current_price for Long, target_price > current_price for Short),
+        # percentage will be negative. In the system, stop percentage is always positive.
+        # So we use absolute value to ensure consistency with frontend expectations.
+        # Note: This function is used for both stop and target prices, but stop percentage
+        # should always be positive in the UI (10% not -10%).
+        percentage = abs(percentage)
         
         return {
             'percentage': round(percentage, 2),

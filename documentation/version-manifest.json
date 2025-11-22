@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.3.6.0",
+    "version": "1.3.7.0",
     "major": 1,
     "minor": 3,
-    "patch": 6,
+    "patch": 7,
     "build": 0,
-    "commit": "06e281c1808b67d03f9ea43aea4881e2f425d3fd",
-    "updated_at": "2025-11-22T20:40:11+00:00",
-    "notes": "Business Logic Layer - Complete system documentation and integration planning"
+    "commit": "7b8c107d620a4166e9414e217f15fa4171af5a1f",
+    "updated_at": "2025-11-22T20:40:49+00:00",
+    "notes": "Portfolio State Page: Add trades table, fix filters, charts, settings, and various bug fixes"
   }
 }

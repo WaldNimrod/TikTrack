@@ -1,33 +1,33 @@
 {
-  "snapshot_id": "pre-update_20251122_135628",
+  "snapshot_id": "pre-update_20251122_213214",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:14.885008",
+    "timestamp": "2025-11-22T21:32:16.199016",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251122_135513.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251122_213214.log",
       "commits": [
+        "10e29a76b Fix TradingView preferences integration and sequential group saving",
+        "d1d8d0d15 fix: Delete related market data before deleting ticker",
         "9d11244ce chore: Align development version with production - 1.3.0.0",
         "95d171f86 feat: Pre-production release updates",
-        "efc4f514a Header System: Complete refactoring to prevent duplicates and improve initialization",
-        "47b08b26f Fix: Use get_preview_snapshot in get_preview endpoint to preserve accept/reject duplicate changes",
-        "3add600d0 feat: Display provider symbol mappings in ticker entity details modal"
+        "efc4f514a Header System: Complete refactoring to prevent duplicates and improve initialization"
       ]
     }
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-22T13:55:18.207825",
+    "timestamp": "2025-11-22T21:32:19.599778",
     "result": {
       "success": true,
-      "conflicts_resolved": 0,
+      "conflicts_resolved": 1,
       "conflicts_unresolved": 0
     }
   },
   "step_3": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:28.289013",
+    "timestamp": "2025-11-22T21:32:19.619381",
     "result": {
       "success": true,
       "removed_count": 0
@@ -35,15 +35,15 @@
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:28.318006",
+    "timestamp": "2025-11-22T21:32:19.653267",
     "result": {
       "success": true,
-      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_115628.db"
+      "backup_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/db/backups/tiktrack_pre-update_20251122_193219.db"
     }
   },
   "step_5": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:28.834380",
+    "timestamp": "2025-11-22T21:32:20.143465",
     "result": {
       "success": true
     }
@@ -51,7 +51,7 @@
   "last_failed_step": null,
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:28.839640",
+    "timestamp": "2025-11-22T21:32:20.149732",
     "result": {
       "success": true,
       "warning": "Cleanup had warnings"
@@ -59,7 +59,7 @@
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:28.840765",
+    "timestamp": "2025-11-22T21:32:20.153676",
     "result": {
       "success": true,
       "verified": false,
@@ -68,7 +68,7 @@
   },
   "step_8": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:29.021333",
+    "timestamp": "2025-11-22T21:32:20.317680",
     "result": {
       "success": true,
       "results": {
@@ -81,10 +81,10 @@
   },
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-22T13:56:29.055510",
+    "timestamp": "2025-11-22T21:32:20.349816",
     "result": {
       "success": true,
-      "new_version": "1.2.4.0"
+      "new_version": "1.2.5.0"
     }
   },
   "step_10": {

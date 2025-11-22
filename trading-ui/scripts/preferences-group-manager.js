@@ -407,22 +407,25 @@ class PreferencesGroupManager {
     );
 
     if (!sectionId) {
-      window.Logger?.error(`Group ${groupName} not found in mapping`, { page: 'preferences-group-manager' });
+      const error = new Error(`Group ${groupName} not found in mapping`);
+      window.Logger?.error(error.message, { page: 'preferences-group-manager' });
       window.showErrorNotification?.('קבוצה לא נמצאה');
-      return;
+      throw error;
     }
 
     const section = document.getElementById(sectionId);
     if (!section) {
-      window.Logger?.error(`Section ${sectionId} not found`, { page: 'preferences-group-manager' });
-      return;
+      const error = new Error(`Section ${sectionId} not found`);
+      window.Logger?.error(error.message, { page: 'preferences-group-manager' });
+      throw error;
     }
 
     const formData = this.collectGroupData(section);
 
     if (Object.keys(formData).length === 0) {
       window.Logger?.warn(`No data to save for group ${groupName}`, { page: 'preferences-group-manager' });
-      return;
+      // Return success (no data to save is not an error)
+      return { saved: 0, skipped: true };
     }
 
     try {
@@ -430,9 +433,10 @@ class PreferencesGroupManager {
 
       // בדיקה אם PreferencesCore זמין
       if (!window.PreferencesCore || !window.PreferencesCore.saveGroupPreferences) {
-        window.Logger?.error('PreferencesCore.saveGroupPreferences not available', { page: 'preferences-group-manager' });
+        const error = new Error('PreferencesCore.saveGroupPreferences not available');
+        window.Logger?.error(error.message, { page: 'preferences-group-manager' });
         window.showErrorNotification?.('מערכת העדפות לא זמינה');
-        return;
+        throw error;
       }
 
       // שמירה
@@ -467,9 +471,12 @@ class PreferencesGroupManager {
       } catch (e) {
         window.Logger?.warn('⚠️ Failed to dispatch preferences:types-refresh event', e, { page: 'preferences-group-manager' });
       }
+
+      return results;
     } catch (error) {
       window.Logger?.error(`Failed to save group ${groupName}:`, error, { page: 'preferences-group-manager' });
       window.showErrorNotification?.('שגיאה בשמירת הגדרות');
+      throw error; // Re-throw to allow caller to handle
     }
   }
 
@@ -685,12 +692,12 @@ window.PreferencesGroupManager = new PreferencesGroupManager();
  * שמירת קבוצה
  * @param {string} groupName - Group name
  */
-window.savePreferenceGroup = function(groupName) {
+window.savePreferenceGroup = async function(groupName) {
   if (!window.PreferencesGroupManager) {
     window.Logger?.error('PreferencesGroupManager not available', { page: 'preferences-group-manager' });
-    return;
+    throw new Error('PreferencesGroupManager not available');
   }
-  window.PreferencesGroupManager.saveGroup(groupName);
+  return await window.PreferencesGroupManager.saveGroup(groupName);
 };
 
 // NOTE: toggleAllSections is handled by ui-utils.js with accordion logic

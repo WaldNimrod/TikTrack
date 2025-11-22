@@ -93,26 +93,26 @@
         async loadPreferences() {
             try {
                 if (window.PreferencesData) {
-                    // Load chart preferences
+                    // Load chart preferences (using camelCase names as per database)
                     const chartQuality = await window.PreferencesData.loadPreference({
-                        preferenceName: 'chart-quality',
+                        preferenceName: 'chartQuality',
                         force: false
                     });
                     
                     const chartAnimations = await window.PreferencesData.loadPreference({
-                        preferenceName: 'chart-animations',
+                        preferenceName: 'chartAnimations',
                         force: false
                     });
                     
                     this.preferences = {
-                        quality: chartQuality?.value || 'high',
+                        quality: chartQuality?.value || 'medium',
                         animations: chartAnimations?.value !== false
                     };
                 }
             } catch (error) {
-                window.Logger?.warn('⚠️ Failed to load chart preferences', { error }, { page: 'tradingview-theme' });
+                // Silently fallback to defaults - preferences may not exist yet
                 this.preferences = {
-                    quality: 'high',
+                    quality: 'medium',
                     animations: true
                 };
             }

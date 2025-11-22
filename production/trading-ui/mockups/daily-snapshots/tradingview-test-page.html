@@ -162,6 +162,11 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Preferences System (MUST BE LOADED FIRST for preferences) -->
+    <script src="../../scripts/services/preferences-data.js"></script>
+    <script src="../../scripts/preferences-core-new.js"></script>
+    <script src="../../scripts/preferences-lazy-loader.js"></script>
+    
     <!-- TradingView Lightweight Charts -->
     <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js"></script>
     
@@ -347,8 +352,33 @@
                                         return;
                                     }
                                     
-                                    status.className = 'test-status success';
-                                    status.textContent = '✅ גרף בסיסי נוצר בהצלחה';
+                                    // Add a basic line series to make the chart visible
+                                    try {
+                                        const lineSeries = window.TradingViewChartAdapter.addLineSeries(chart, {
+                                            color: '#26baac',
+                                            lineWidth: 2,
+                                        });
+                                        
+                                        // Add sample data
+                                        const sampleData = [
+                                            { time: '2025-01-01', value: 100 },
+                                            { time: '2025-01-02', value: 105 },
+                                            { time: '2025-01-03', value: 110 },
+                                            { time: '2025-01-04', value: 108 },
+                                            { time: '2025-01-05', value: 115 },
+                                            { time: '2025-01-06', value: 120 },
+                                            { time: '2025-01-07', value: 118 },
+                                        ];
+                                        
+                                        lineSeries.setData(sampleData);
+                                        
+                                        status.className = 'test-status success';
+                                        status.textContent = '✅ גרף בסיסי נוצר בהצלחה עם נתונים';
+                                    } catch (seriesError) {
+                                        status.className = 'test-status warning';
+                                        status.textContent = `⚠️ גרף נוצר אבל לא ניתן להוסיף series: ${seriesError.message}`;
+                                        console.error('Series Error:', seriesError);
+                                    }
                                 } catch (error) {
                                     status.className = 'test-status error';
                                     status.textContent = `❌ שגיאה: ${error.message}`;
@@ -688,53 +718,7 @@
                 }
             };
             
-            // Run all tests
-            function runAllTests() {
-                console.log('🧪 Starting TradingView Lightweight Charts tests...');
-                
-                let passed = 0;
-                let failed = 0;
-                
-                Object.keys(tests).forEach((testKey, index) => {
-                    setTimeout(() => {
-                        const test = tests[testKey];
-                        console.log(`Running test ${index + 1}: ${test.name}`);
-                        
-                        try {
-                            const result = test.run();
-                            if (result) {
-                                passed++;
-                            } else {
-                                failed++;
-                            }
-                        } catch (error) {
-                            console.error(`Test ${test.name} failed:`, error);
-                            failed++;
-                        }
-                        
-                        // Final summary
-                        if (index === Object.keys(tests).length - 1) {
-                            setTimeout(() => {
-                                console.log(`\n📊 Test Summary:`);
-                                console.log(`✅ Passed: ${passed}`);
-                                console.log(`❌ Failed: ${failed}`);
-                                console.log(`📈 Total: ${passed + failed}`);
-                            }, 500);
-                        }
-                    }, index * 200);
-                });
-            }
-            
-            // Wait for DOM and scripts to load
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    setTimeout(runAllTests, 500);
-                });
-            } else {
-                setTimeout(runAllTests, 500);
-            }
-            
-            // Store test results for log copying
+            // Store test results for log copying (must be defined before runAllTests)
             const testResults = {
                 passed: 0,
                 failed: 0,
@@ -745,6 +729,144 @@
                 startTime: new Date(),
                 endTime: null
             };
+            
+            // Element ID mapping for tests (used in runAllTests)
+            const elementIdMap = {
+                'library': 'library',
+                'theme': 'theme',
+                'adapter': 'adapter',
+                'basicChart': 'basic-chart',
+                'lineSeries': 'line-series',
+                'steppedLine': 'stepped-line',
+                'dualYAxes': 'dual-axes',
+                'colors': 'colors',
+                'preferences': 'preferences',
+                'rtl': 'rtl'
+            };
+            
+            // Run all tests
+            async function runAllTests() {
+                console.log('🧪 Starting TradingView Lightweight Charts tests...');
+                
+                testResults.startTime = new Date();
+                testResults.passed = 0;
+                testResults.failed = 0;
+                testResults.total = Object.keys(tests).length;
+                
+                const testKeys = Object.keys(tests);
+                
+                for (let index = 0; index < testKeys.length; index++) {
+                    const testKey = testKeys[index];
+                    const test = tests[testKey];
+                    
+                    await new Promise(resolve => {
+                        setTimeout(async () => {
+                            console.log(`Running test ${index + 1}: ${test.name}`);
+                            
+                            const statusEl = document.getElementById(`${elementIdMap[testKey] || testKey}-status`);
+                            const infoEl = document.getElementById(`${elementIdMap[testKey] || testKey}-info`);
+                            
+                            let testResult = {
+                                name: test.name,
+                                status: 'pending',
+                                message: '',
+                                info: '',
+                                error: null
+                            };
+                            
+                            try {
+                                const result = test.run();
+                                
+                                // Wait a bit for async operations
+                                await new Promise(r => setTimeout(r, 100));
+                                
+                                // Update from DOM if available
+                                if (statusEl) {
+                                    testResult.status = statusEl.className.includes('success') ? 'passed' : 
+                                                       statusEl.className.includes('error') ? 'failed' : 'pending';
+                                    testResult.message = statusEl.textContent || '';
+                                }
+                                
+                                if (infoEl && infoEl.style.display !== 'none') {
+                                    testResult.info = infoEl.innerHTML || '';
+                                }
+                                
+                                if (result) {
+                                    testResults.passed++;
+                                } else {
+                                    testResults.failed++;
+                                }
+                                
+                                testResult.status = result ? 'passed' : 'failed';
+                            } catch (error) {
+                                console.error(`Test ${test.name} failed:`, error);
+                                testResults.failed++;
+                                testResult.status = 'failed';
+                                testResult.error = error.message;
+                                testResult.message = `❌ שגיאה: ${error.message}`;
+                            }
+                            
+                            testResults.tests[testKey] = testResult;
+                            resolve();
+                        }, index * 300);
+                    });
+                }
+                
+                testResults.endTime = new Date();
+                
+                setTimeout(() => {
+                    console.log(`\n📊 Test Summary:`);
+                    console.log(`✅ Passed: ${testResults.passed}`);
+                    console.log(`❌ Failed: ${testResults.failed}`);
+                    console.log(`📈 Total: ${testResults.total}`);
+                    
+                    // Update summary display
+                    const summaryPassed = document.getElementById('summary-passed');
+                    const summaryFailed = document.getElementById('summary-failed');
+                    const summaryTotal = document.getElementById('summary-total');
+                    
+                    if (summaryPassed) summaryPassed.textContent = `✅ עברו: ${testResults.passed}`;
+                    if (summaryFailed) summaryFailed.textContent = `❌ נכשלו: ${testResults.failed}`;
+                    if (summaryTotal) summaryTotal.textContent = `📈 סך הכל: ${testResults.total}`;
+                }, 500);
+            }
+            
+            // Wait for DOM, scripts, and preferences to load
+            async function initializeAndRunTests() {
+                try {
+                    // Initialize preferences with lazy loading (as per documentation)
+                    if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+                        console.log('📄 Initializing preferences with lazy loading...');
+                        await window.PreferencesCore.initializeWithLazyLoading();
+                        console.log('✅ Preferences initialized successfully');
+                        
+                        // Wait a bit for preferences to fully load
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        // Reload TradingView theme preferences after preferences are loaded
+                        if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
+                            await window.TradingViewTheme.loadPreferences();
+                            console.log('✅ TradingView theme preferences reloaded');
+                        }
+                    } else {
+                        console.warn('⚠️ PreferencesCore.initializeWithLazyLoading not available');
+                    }
+                    
+                    // Run tests
+                    runAllTests();
+                } catch (error) {
+                    console.error('⚠️ Error during initialization, running tests anyway:', error);
+                    runAllTests();
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(initializeAndRunTests, 500);
+                });
+            } else {
+                setTimeout(initializeAndRunTests, 500);
+            }
             
             // Override console methods to capture logs
             const originalConsoleLog = console.log;
@@ -794,50 +916,6 @@
             console.info = function(...args) {
                 captureConsoleLog('info', args);
                 originalConsoleInfo.apply(console, args);
-            };
-            
-            // Update test results tracking
-            const originalRunAllTests = runAllTests;
-            runAllTests = function() {
-                testResults.startTime = new Date();
-                originalRunAllTests();
-                
-                // Update results after tests complete
-                setTimeout(() => {
-                    testResults.endTime = new Date();
-                    testResults.passed = passed;
-                    testResults.failed = failed;
-                    testResults.total = passed + failed;
-                    
-                    // Store individual test results
-                    Object.keys(tests).forEach(testKey => {
-                        const test = tests[testKey];
-                        // Map test keys to element IDs
-                        const elementIdMap = {
-                            'library': 'library',
-                            'theme': 'theme',
-                            'adapter': 'adapter',
-                            'basicChart': 'basic-chart',
-                            'lineSeries': 'line-series',
-                            'steppedLine': 'stepped-line',
-                            'dualYAxes': 'dual-axes',
-                            'colors': 'colors',
-                            'preferences': 'preferences',
-                            'rtl': 'rtl'
-                        };
-                        
-                        const elementId = elementIdMap[testKey] || testKey;
-                        const statusEl = document.getElementById(`${elementId}-status`);
-                        const infoEl = document.getElementById(`${elementId}-info`);
-                        
-                        testResults.tests[testKey] = {
-                            name: test.name,
-                            status: statusEl ? (statusEl.className.includes('success') ? 'passed' : statusEl.className.includes('error') ? 'failed' : 'pending') : 'unknown',
-                            message: statusEl ? statusEl.textContent : '',
-                            info: infoEl ? infoEl.innerHTML : ''
-                        };
-                    });
-                }, 2000);
             };
             
             // Copy detailed log function
@@ -961,6 +1039,8 @@
                 }
             });
         })();
+        
+        // Preferences initialization is handled in initializeAndRunTests()
     </script>
 </body>
 </html>

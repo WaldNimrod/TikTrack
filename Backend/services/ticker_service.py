@@ -771,6 +771,9 @@ class TickerService:
         """
         Delete ticker - only if no linked items
         Returns True if ticker deleted successfully, False otherwise
+        
+        Note: This method also deletes related market data (quotes, intraday slots, quotes_last)
+        before deleting the ticker to avoid foreign key constraint violations.
         """
         # Check that ticker exists
         ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
@@ -783,9 +786,40 @@ class TickerService:
             # Has linked items - cannot delete
             raise ValueError("Cannot delete ticker with linked items (open trades, trade plans, notes, or alerts)")
         
-        # No linked items - can delete
+        # Delete related market data before deleting ticker
+        # This prevents foreign key constraint violations
+        from models.external_data import IntradayDataSlot
+        from models.quotes_last import QuotesLast
+        
+        # Delete related market data before deleting ticker
+        # This prevents foreign key constraint violations
+        # Note: We use flush() instead of commit() to allow the decorator to handle the final commit
+        
+        # Delete market data quotes
+        market_quotes_count = db.query(MarketDataQuote).filter(
+            MarketDataQuote.ticker_id == ticker_id
+        ).delete(synchronize_session=False)
+        if market_quotes_count > 0:
+            logger.debug(f"Deleted {market_quotes_count} market data quotes for ticker {ticker_id}")
+        
+        # Delete intraday data slots
+        intraday_slots_count = db.query(IntradayDataSlot).filter(
+            IntradayDataSlot.ticker_id == ticker_id
+        ).delete(synchronize_session=False)
+        if intraday_slots_count > 0:
+            logger.debug(f"Deleted {intraday_slots_count} intraday data slots for ticker {ticker_id}")
+        
+        # Delete quotes_last entry
+        quotes_last_count = db.query(QuotesLast).filter(
+            QuotesLast.ticker_id == ticker_id
+        ).delete(synchronize_session=False)
+        if quotes_last_count > 0:
+            logger.debug(f"Deleted {quotes_last_count} quotes_last entry for ticker {ticker_id}")
+        
+        # Now delete the ticker (provider_symbols will be deleted automatically via CASCADE)
         db.delete(ticker)
-        db.commit()
+        # Use flush() instead of commit() to allow the decorator to handle the final commit
+        db.flush()
         return True
     
     @staticmethod

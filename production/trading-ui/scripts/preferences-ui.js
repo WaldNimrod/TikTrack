@@ -979,7 +979,7 @@ class PreferencesUI {
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
      */
-  async loadAllPreferences(userId = null, profileId = null, forceRefresh = false) {
+  async loadAllPreferences(userId = null, profileId = null) {
     const loaderId = 'load_preferences';
 
     try {
@@ -1028,9 +1028,9 @@ class PreferencesUI {
         window.Logger.debug(`🔍 Lazy loading stats: ${stats.loaded}/${stats.total} (${stats.percentage}%)`, { page: 'preferences-ui' });
 
         // Load ALL preferences at once from API
-        window.Logger.debug(`🔍 Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId}, forceRefresh=${forceRefresh})`, { page: 'preferences-ui' });
+        window.Logger.debug(`🔍 Calling PreferencesCore.getAllPreferences(userId=${finalUserId}, profileId=${resolvedProfileId})`, { page: 'preferences-ui' });
 
-        const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, resolvedProfileId, [], forceRefresh);
+        const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, resolvedProfileId);
         window.Logger.info(`✅ Loaded ${Object.keys(allPreferences, { page: 'preferences-ui' }).length} preferences from API`);
 
         // Load colors separately for color pickers
@@ -1069,8 +1069,6 @@ class PreferencesUI {
         const preferences = await window.PreferencesCore.getAllPreferences(
           finalUserId,
           resolvedProfileId,
-          [],
-          forceRefresh,
         );
 
         // Load color preferences
@@ -1218,240 +1216,94 @@ class PreferencesUI {
   }
 
   /**
-     * Save All Preferences - Clean Implementation
-     * Handles saving preferences with proper validation and error handling
+     * Save All Preferences - Sequential Group Saving
+     * Saves all preference groups one by one in order
      * @param {number} userId - User ID
      * @param {number} profileId - Profile ID
      * @returns {Promise<boolean>} Success status
      */
   async saveAllPreferences(userId = null, profileId = null) {
     try {
-      window.Logger.info('💾 Starting save all preferences process...', { page: 'preferences-ui' });
+      window.Logger.info('💾 Starting save all preferences process (sequential group saving)...', { page: 'preferences-ui' });
 
-      // Get form element
-      const form = document.getElementById('preferencesForm');
-      if (!form) {
-        throw new Error('Preferences form not found');
+      // Check if PreferencesGroupManager is available
+      if (!window.PreferencesGroupManager || !window.savePreferenceGroup) {
+        window.Logger.error('❌ PreferencesGroupManager or savePreferenceGroup not available', { page: 'preferences-ui' });
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('מערכת שמירת קבוצות לא זמינה');
+        }
+        return false;
       }
 
-      // Collect form data using FormManager (handles both name and id)
-      const formData = this.formManager.collectFormData('preferencesForm');
-      const changedPreferences = {};
+      // Get all groups from PreferencesGroupManager
+      const groupsMap = window.PreferencesGroupManager.groupsMap || {};
+      const groupNames = Object.values(groupsMap); // Get all group names in order
 
-      // Check for changes and collect only changed preferences
-      // Filter out non-preference fields (profile management, etc.)
-      const excludedFields = ['profileSelect', 'newProfileName', 'switchProfileBtn', 'createProfileBtn'];
-
-      for (const [key, value] of Object.entries(formData)) {
-        // Skip excluded fields
-        if (excludedFields.includes(key)) {
-          continue;
-        }
-
-        if (this.hasChanged(key, value)) {
-          // Convert values to strings for database storage
-          if (typeof value === 'boolean') {
-            changedPreferences[key] = value.toString();
-          } else if (typeof value === 'number') {
-            changedPreferences[key] = value.toString();
-          } else {
-            changedPreferences[key] = value;
-          }
-        }
-      }
-
-      // Check if there are any changes
-      if (Object.keys(changedPreferences).length === 0) {
-        window.Logger.info('ℹ️ No changes to save', { page: 'preferences-ui' });
+      if (groupNames.length === 0) {
+        window.Logger.warn('⚠️ No preference groups found', { page: 'preferences-ui' });
         if (typeof window.showInfoNotification === 'function') {
-          window.showInfoNotification('אין שינויים לשמירה');
+          window.showInfoNotification('לא נמצאו קבוצות העדפות לשמירה');
         }
         return true;
       }
 
-      window.Logger.info(`📊 Found ${Object.keys(changedPreferences).length} changed preferences`);
-      window.Logger?.info('🔍 Changed preferences captured', {
-        page: 'preferences-ui',
-        changedCount: Object.keys(changedPreferences).length,
-        changedKeys: Object.keys(changedPreferences),
-      });
+      window.Logger.info(`📊 Found ${groupNames.length} preference groups to save`, { page: 'preferences-ui', groups: groupNames });
 
-      // Validate all changed preferences
-      for (const [name, value] of Object.entries(changedPreferences)) {
-        window.Logger.info(`🔍 Validating ${name} = ${value} (type: ${typeof value})...`, { page: 'preferences-ui' });
-
-        if (window.PreferenceValidator) {
-          const validation = await window.PreferenceValidator.validatePreference(name, value);
-          if (!validation.valid) {
-            window.Logger.error(`❌ Validation failed for ${name}:`, {
-              value,
-              valueType: typeof value,
-              errors: validation.errors,
-              page: 'preferences-ui',
-            });
-            const errorMessages = validation.errors.map(e => e.message).join(', ');
-            throw new Error(`Validation failed for ${name}: ${errorMessages}`);
-          }
-        }
-      }
-
-      window.Logger.info('✅ All preferences validated successfully', { page: 'preferences-ui' });
-
-      // Get current profile IDs for debugging
-      const finalUserId = userId || window.PreferencesCore?.currentUserId || 1;
-      const finalProfileId = profileId || window.PreferencesCore?.currentProfileId || null;
-
-      window.Logger?.info('🔍 Profile IDs before save', {
-        page: 'preferences-ui',
-        userId_param: userId,
-        profileId_param: profileId,
-        PreferencesCore_currentUserId: window.PreferencesCore?.currentUserId,
-        PreferencesCore_currentProfileId: window.PreferencesCore?.currentProfileId,
-        PreferencesUI_currentProfileId: this.currentProfileId,
-        finalUserId,
-        finalProfileId,
-      });
-
-      // Save to backend
-      const requestData = {
-        user_id: finalUserId,
-        profile_id: finalProfileId,
-        preferences: changedPreferences,
+      const results = {
+        saved: 0,
+        failed: 0,
+        details: {},
       };
 
-      window.Logger?.info('🔍 Sending save request to server', {
-        page: 'preferences-ui',
-        payload: requestData,
-      });
+      // Save each group sequentially (one after another)
+      for (let i = 0; i < groupNames.length; i++) {
+        const groupName = groupNames[i];
+        const groupDisplayName = window.PreferencesGroupManager?.getGroupDisplayName?.(groupName) || groupName;
 
-      const result = await window.PreferencesData.savePreferences({
-        preferences: changedPreferences,
-        userId: finalUserId,
-        profileId: finalProfileId,
-      });
-      window.Logger?.info('🔍 Save server response parsed', {
-        page: 'preferences-ui',
-        result,
-      });
+        try {
+          window.Logger.info(`💾 Saving group ${i + 1}/${groupNames.length}: ${groupName}...`, { page: 'preferences-ui' });
 
-      // Show success notification
-      if (typeof window.showSuccessNotification === 'function') {
-        const savedCount = Object.keys(changedPreferences).length;
-        window.showSuccessNotification(
-          `העדפות נשמרו בהצלחה! (${savedCount} העדפות)`,
-          3000,
-        );
-      }
+          // Call savePreferenceGroup for this group
+          await window.savePreferenceGroup(groupName);
 
-      // Clear preferences cache and reload using UnifiedCacheManager.refreshUserPreferences
-      // This is the CORRECT way according to the architecture
-      window.Logger?.info('🧹 Cache clearing debug start', { page: 'preferences-ui' });
-      window.Logger.info('🧹 Clearing preferences cache and reloading from backend...', { page: 'preferences-ui' });
+          results.saved++;
+          results.details[groupName] = { status: 'success', displayName: groupDisplayName };
+          window.Logger.info(`✅ Group ${i + 1}/${groupNames.length} saved: ${groupName}`, { page: 'preferences-ui' });
 
-      // DEBUG: Check localStorage before clearing
-      const allKeysBefore = Object.keys(localStorage);
-      const prefKeysBefore = allKeysBefore.filter(k =>
-        k.includes('preference') || k.includes('all_preferences'),
-      );
-      window.Logger?.info('🔍 localStorage keys before clearing', {
-        page: 'preferences-ui',
-        totalKeys: allKeysBefore.length,
-        preferenceKeys: prefKeysBefore,
-      });
-
-      try {
-        // Use the official refreshUserPreferences method which:
-        // 1. Clears all preference cache keys
-        // 2. Reloads preferences from backend via PreferencesCore
-        // 3. Updates the UI automatically via LazyLoader
-        window.Logger?.info('🔍 Checking UnifiedCacheManager availability', {
-          page: 'preferences-ui',
-          exists: !!window.UnifiedCacheManager,
-          hasRefreshMethod: !!window.UnifiedCacheManager?.refreshUserPreferences,
-        });
-
-        if (window.UnifiedCacheManager && window.UnifiedCacheManager.refreshUserPreferences) {
-          window.Logger?.info('✅ Calling UnifiedCacheManager.refreshUserPreferences()', { page: 'preferences-ui' });
-
-          // CRITICAL: Use the same profileId that was used for saving
-          // Otherwise we'll reload the wrong profile's preferences
-          const saveProfileId = finalProfileId;
-          window.Logger?.info('🔍 Will reload preferences for profileId', { page: 'preferences-ui', profileId: saveProfileId });
-
-          await window.UnifiedCacheManager.refreshUserPreferences(saveProfileId, null, {
-            userId: finalUserId,
-            preferenceNames: Object.keys(changedPreferences),
-          });
-          window.Logger?.info('✅ refreshUserPreferences completed', { page: 'preferences-ui' });
-          window.Logger.info('✅ Preferences cache cleared and reloaded from backend', { page: 'preferences-ui' });
-
-          // DEBUG: Check localStorage after clearing
-          const allKeysAfter = Object.keys(localStorage);
-          const prefKeysAfter = allKeysAfter.filter(k =>
-            k.includes('preference') || k.includes('all_preferences'),
-          );
-          window.Logger?.info('🔍 localStorage keys after clearing', {
+        } catch (error) {
+          results.failed++;
+          results.details[groupName] = { status: 'error', error: error.message, displayName: groupDisplayName };
+          window.Logger.error(`❌ Failed to save group ${i + 1}/${groupNames.length}: ${groupName}`, {
+            error,
             page: 'preferences-ui',
-            preferenceKeys: prefKeysAfter,
-            removedCount: prefKeysBefore.length - prefKeysAfter.length,
           });
-
-          // NOTE: refreshUserPreferences already calls initializeWithLazyLoading which loads preferences
-          // We just need to reload the form with the already-loaded preferences
-          // CRITICAL: Force reload from server by passing force=true to bypass cache
-          window.Logger.info('🔄 Reloading preferences into form (forcing server reload)...', { page: 'preferences-ui' });
-          
-          // Force reload from server by clearing cache first, then reloading
-          if (window.PreferencesCore && typeof window.PreferencesCore.invalidatePreference === 'function') {
-            // Invalidate all changed preferences
-            for (const prefName of Object.keys(changedPreferences)) {
-              await window.PreferencesCore.invalidatePreference(prefName, finalUserId, finalProfileId);
-            }
-            // Also invalidate all_preferences cache
-            await window.PreferencesCore.invalidatePreference('all_preferences', finalUserId, finalProfileId);
-          }
-          
-          // Force reload from server by passing forceRefresh=true
-          await this.loadAllPreferences(finalUserId, finalProfileId, true);
-          window.Logger.info('✅ Preferences form updated with new values', { page: 'preferences-ui' });
-
-          window.Logger?.info('🧹 Cache clearing debug end', { page: 'preferences-ui' });
-        } else {
-          // Fallback to manual clearing if refreshUserPreferences not available
-          window.Logger.warn('⚠️ refreshUserPreferences not available, using manual clearing', { page: 'preferences-ui' });
-
-          const finalUserId = userId || window.PreferencesCore.currentUserId;
-          const finalProfileId = profileId || window.PreferencesCore.currentProfileId;
-
-          const allKeys = Object.keys(localStorage);
-          const prefKeys = allKeys.filter(key =>
-            key.startsWith('preference_') && key.includes(`_${finalUserId}_${finalProfileId}`) ||
-                        key.startsWith('tiktrack_preference_') && key.includes(`_${finalUserId}_${finalProfileId}`) ||
-                        key === `all_preferences_${finalUserId}_${finalProfileId}` ||
-                        key === `tiktrack_all_preferences_${finalUserId}_${finalProfileId}` ||
-                        key === 'user-preferences' ||
-                        key === 'tiktrack_user-preferences',
-          );
-
-          for (const key of prefKeys) {
-            localStorage.removeItem(key);
-            if (window.UnifiedCacheManager && window.UnifiedCacheManager.remove) {
-              await window.UnifiedCacheManager.remove(key);
-            }
-          }
-
-          // Reload preferences
-          await this.loadAllPreferences();
+          // Continue with next group even if one fails
         }
-      } catch (cacheError) {
-        window.Logger.warn('⚠️ Error refreshing preferences cache:', cacheError, { page: 'preferences-ui' });
-        // Continue even if cache clearing fails
       }
 
-      return true;
+      // Show summary notification
+      if (results.saved > 0) {
+        if (typeof window.showSuccessNotification === 'function') {
+          const message = results.failed > 0
+            ? `נשמרו ${results.saved} קבוצות, ${results.failed} נכשלו`
+            : `כל הקבוצות נשמרו בהצלחה! (${results.saved} קבוצות)`;
+          window.showSuccessNotification(message, 3000);
+        }
+      } else if (results.failed > 0) {
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification(`כל הקבוצות נכשלו בשמירה (${results.failed} קבוצות)`);
+        }
+      }
+
+      window.Logger.info(`✅ Save all preferences completed: ${results.saved} saved, ${results.failed} failed`, {
+        page: 'preferences-ui',
+        results,
+      });
+
+      return results.failed === 0;
 
     } catch (error) {
-      window.Logger.error('❌ Error saving preferences:', error, { page: 'preferences-ui' });
+      window.Logger.error('❌ Error in save all preferences:', error, { page: 'preferences-ui' });
 
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification(`שגיאה בשמירת העדפות: ${error.message}`);

@@ -10,13 +10,13 @@
     "notes": "Update to version 1.2.0.0"
   },
   "development": {
-    "version": "1.3.9.0",
+    "version": "1.3.10.0",
     "major": 1,
     "minor": 3,
-    "patch": 9,
+    "patch": 10,
     "build": 0,
-    "commit": "8e9d9a5a4e613ef03921810a51c547a3aa193380",
-    "updated_at": "2025-11-22T21:04:15+00:00",
-    "notes": "Fix: Add missing trim() in renderAction and all fallbacks"
+    "commit": "ad3eefa4c6f05660ae061b3f10dc46a77b8c2934",
+    "updated_at": "2025-11-22T21:08:25+00:00",
+    "notes": "Fix: Normalize action to lowercase in /execution/validate endpoint for consistency with business rules registry"
   }
 }

@@ -402,6 +402,12 @@ def validate_execution():
     try:
         data = request.get_json() or {}
         
+        # Normalize action to lowercase for consistency with business rules registry
+        # The registry expects lowercase values: 'buy', 'sell', 'short', 'cover'
+        # This matches the pattern used in /trade/validate for 'side' field
+        if 'action' in data and data['action']:
+            data['action'] = data['action'].lower()
+        
         result = execution_service.validate(data)
         
         if result['is_valid']:

@@ -274,6 +274,30 @@ def create_production_database():
         target_conn.commit()
         print()
         
+        # Step 8.5: Run ticker_provider_symbols migration if needed
+        print("Step 8.5: Running ticker_provider_symbols migration...")
+        target_cursor = target_conn.cursor()
+        target_cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='table' AND name='ticker_provider_symbols'
+        """)
+        if not target_cursor.fetchone():
+            # Table doesn't exist - run migration
+            try:
+                from migrations.create_ticker_provider_symbols_table import run_migration
+                migration_success = run_migration(str(target_db))
+                if migration_success:
+                    print("  ✅ ticker_provider_symbols table created via migration")
+                else:
+                    print("  ⚠️  Migration script returned False - table may not have been created")
+            except Exception as e:
+                print(f"  ⚠️  Could not run migration: {e}")
+                print("  ℹ️  You may need to run migration manually")
+        else:
+            print("  ✅ ticker_provider_symbols table already exists")
+        target_conn.commit()
+        print()
+        
         # Step 9: Enable foreign keys and verify
         print("Step 9: Enabling foreign keys and verifying production database...")
         target_conn.execute("PRAGMA foreign_keys = ON")

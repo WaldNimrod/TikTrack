@@ -147,10 +147,21 @@ class ChartSystem {
         }
 
         // Merge options with theme
+        // Use deep merge for scales to support dual Y axes and custom scale configurations
         const themeOptions = window.ChartTheme ? window.ChartTheme.getChartOptions() : {};
         const chartOptions = {
             ...themeOptions,
-            ...config.options
+            ...config.options,
+            // Deep merge for scales to preserve both theme defaults and custom scales (e.g., y1)
+            scales: config.options?.scales ? {
+                ...themeOptions.scales,
+                ...config.options.scales
+            } : themeOptions.scales,
+            // Deep merge for plugins to preserve theme defaults and custom plugin configs
+            plugins: config.options?.plugins ? {
+                ...themeOptions.plugins,
+                ...config.options.plugins
+            } : themeOptions.plugins
         };
 
         // Create chart

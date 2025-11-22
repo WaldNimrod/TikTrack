@@ -79,18 +79,57 @@
      */
     function coerceDateEnvelope(value) {
         if (!value) {
+            if (window.Logger && Logger.DEBUG_MODE) {
+                window.Logger.debug('coerceDateEnvelope - null/undefined value', { page: PAGE_NAME });
+            }
             return null;
+        }
+
+        // Debug: Log input value
+        if (window.Logger && Logger.DEBUG_MODE) {
+            window.Logger.debug('coerceDateEnvelope - input', {
+                value: value,
+                value_type: typeof value,
+                is_object: typeof value === 'object',
+                has_epochMs: value && typeof value === 'object' && 'epochMs' in value,
+                has_utc: value && typeof value === 'object' && 'utc' in value,
+                page: PAGE_NAME
+            });
+        }
+
+        // Check if already a DateEnvelope object
+        // Backend returns DateEnvelope with epochMs (capital M) - check for both
+        if (value && typeof value === 'object' && (value.epochMs !== undefined || value.epoch_ms !== undefined || value.utc || value.local || value.display)) {
+            if (window.Logger && Logger.DEBUG_MODE) {
+                window.Logger.debug('coerceDateEnvelope - already DateEnvelope', { 
+                    envelope: value, 
+                    hasEpochMs: value.epochMs !== undefined,
+                    hasEpoch_ms: value.epoch_ms !== undefined,
+                    hasUtc: value.utc !== undefined,
+                    hasLocal: value.local !== undefined,
+                    hasDisplay: value.display !== undefined,
+                    page: PAGE_NAME 
+                });
+            }
+            return value;
         }
 
         try {
             if (window.dateUtils?.ensureDateEnvelope) {
-                return window.dateUtils.ensureDateEnvelope(value);
+                const envelope = window.dateUtils.ensureDateEnvelope(value);
+                if (window.Logger && Logger.DEBUG_MODE) {
+                    window.Logger.debug('coerceDateEnvelope - ensured via dateUtils', { envelope: envelope, page: PAGE_NAME });
+                }
+                return envelope;
             }
         } catch (error) {
             Logger.warn?.('⚠️ Failed to normalize date envelope', { value, error: error.message, page: PAGE_NAME });
         }
 
         if (typeof value === 'object') {
+            if (window.Logger && Logger.DEBUG_MODE) {
+                window.Logger.debug('coerceDateEnvelope - returning object as-is', { value: value, page: PAGE_NAME });
+            }
             return value;
         }
 
@@ -212,15 +251,47 @@
                 // קריאה סדרתית כדי להפחית עומס וקונפליקטים על שכבת ה-DB
                 // המערכת המרכזית מנהלת לוגינג פנימי ב-fetchHistoryForAccount עבור שגיאות.
                 /* eslint-disable no-await-in-loop */
-                const accountHistory = await fetchHistoryForAccount(account);
+                const accountHistory = await fetchHistoryForAccount(account, force);
                 /* eslint-enable no-await-in-loop */
                 historyResults.push(accountHistory);
             }
 
-            const sessions = historyResults
-                .flat()
-                .map(normalizeSessionRecord)
-                .sort((a, b) => (b.createdAtEpoch || 0) - (a.createdAtEpoch || 0));
+            // Use sessions directly - same as executions.js, no normalization needed
+            const sessions = historyResults.flat();
+            
+            // Sort by created_at (same logic as executions)
+            sessions.sort((a, b) => {
+                const dateA = a.created_at || a.completed_at || null;
+                const dateB = b.created_at || b.completed_at || null;
+                if (!dateA && !dateB) return 0;
+                if (!dateA) return 1;
+                if (!dateB) return -1;
+                
+                // Get epoch for comparison
+                let epochA = null;
+                let epochB = null;
+                
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    epochA = window.dateUtils.getEpochMilliseconds(dateA);
+                    epochB = window.dateUtils.getEpochMilliseconds(dateB);
+                } else if (dateA && typeof dateA === 'object' && dateA.epochMs) {
+                    epochA = dateA.epochMs;
+                } else if (dateA instanceof Date) {
+                    epochA = dateA.getTime();
+                } else if (typeof dateA === 'string') {
+                    epochA = Date.parse(dateA);
+                }
+                
+                if (dateB && typeof dateB === 'object' && dateB.epochMs) {
+                    epochB = dateB.epochMs;
+                } else if (dateB instanceof Date) {
+                    epochB = dateB.getTime();
+                } else if (typeof dateB === 'string') {
+                    epochB = Date.parse(dateB);
+                }
+                
+                return (epochB || 0) - (epochA || 0);
+            });
 
             state.sessions = sessions;
             state.lastError = null;
@@ -280,9 +351,10 @@
      * @async
      * @function fetchHistoryForAccount
      * @param {Object} account - Trading account object.
+     * @param {boolean} [force=false] - Force reload from server, bypass cache.
      * @returns {Promise<Array<Object>>}
      */
-    async function fetchHistoryForAccount(account) {
+    async function fetchHistoryForAccount(account, force = false) {
         if (!account || !account.id) {
             return [];
         }
@@ -293,7 +365,8 @@
             if (window.DataImportData?.loadImportHistoryData) {
                 sessions = await window.DataImportData.loadImportHistoryData({
                     accountId: account.id,
-                    limit: 20
+                    limit: 20,
+                    force: force
                 });
                 Logger.debug('📦 Fetched history via DataImportData service', {
                     accountId: account.id,
@@ -308,6 +381,26 @@
                         'Accept': 'application/json'
                     }
                 });
+                
+                // Debug: Log API response
+                if (window.Logger && Logger.DEBUG_MODE) {
+                    const responseClone = response.clone();
+                    responseClone.json().then(data => {
+                        if (data.sessions && data.sessions.length > 0) {
+                            const firstSession = data.sessions[0];
+                            window.Logger.debug('fetchHistoryForAccount - API response', {
+                                accountId: account.id,
+                                sessionsCount: data.sessions.length,
+                                firstSessionId: firstSession.id,
+                                firstSession_created_at: firstSession.created_at,
+                                firstSession_created_at_type: typeof firstSession.created_at,
+                                firstSession_completed_at: firstSession.completed_at,
+                                firstSession_completed_at_type: typeof firstSession.completed_at,
+                                page: PAGE_NAME
+                            });
+                        }
+                    }).catch(() => {});
+                }
 
                 if (!response.ok) {
                     throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
@@ -315,6 +408,22 @@
 
                 const payload = await response.json();
                 sessions = payload.sessions || payload.data || [];
+                
+                // Debug: Log API response
+                if (window.Logger && Logger.DEBUG_MODE && Array.isArray(sessions) && sessions.length > 0) {
+                    const firstSession = sessions[0];
+                    window.Logger.debug('fetchHistoryForAccount - API response', {
+                        accountId: account.id,
+                        sessionsCount: sessions.length,
+                        firstSessionId: firstSession.id,
+                        firstSession_created_at: firstSession.created_at,
+                        firstSession_created_at_type: typeof firstSession.created_at,
+                        firstSession_completed_at: firstSession.completed_at,
+                        firstSession_completed_at_type: typeof firstSession.completed_at,
+                        page: PAGE_NAME
+                    });
+                }
+                
                 Logger.debug('📦 Fetched history via direct fetch', {
                     accountId: account.id,
                     sessionsCount: Array.isArray(sessions) ? sessions.length : 0,
@@ -343,6 +452,21 @@
                 enrichedCount: enrichedSessions.length,
                 page: PAGE_NAME
             });
+
+            // Debug: Log first session dates if available
+            if (enrichedSessions.length > 0 && window.Logger && Logger.DEBUG_MODE) {
+                const firstSession = enrichedSessions[0];
+                window.Logger.debug('fetchHistoryForAccount - First session dates', {
+                    sessionId: firstSession.id,
+                    created_at: firstSession.created_at,
+                    created_at_type: typeof firstSession.created_at,
+                    completed_at: firstSession.completed_at,
+                    completed_at_type: typeof firstSession.completed_at,
+                    has_epochMs: firstSession.created_at && typeof firstSession.created_at === 'object' && 'epochMs' in firstSession.created_at,
+                    has_display: firstSession.created_at && typeof firstSession.created_at === 'object' && 'display' in firstSession.created_at,
+                    page: PAGE_NAME
+                });
+            }
 
             return enrichedSessions;
         } catch (error) {
@@ -382,27 +506,86 @@
      * @returns {Object}
      */
     function normalizeSessionRecord(session) {
+        // Debug: Log raw session data
+        if (window.Logger && Logger.DEBUG_MODE) {
+            window.Logger.debug('normalizeSessionRecord - raw session', {
+                id: session.id,
+                created_at: session.created_at,
+                completed_at: session.completed_at,
+                created_at_type: typeof session.created_at,
+                completed_at_type: typeof session.completed_at,
+                created_at_is_object: typeof session.created_at === 'object',
+                created_at_keys: session.created_at && typeof session.created_at === 'object' ? Object.keys(session.created_at) : null,
+                created_at_epochMs: session.created_at && typeof session.created_at === 'object' ? session.created_at.epochMs : null,
+                created_at_display: session.created_at && typeof session.created_at === 'object' ? session.created_at.display : null,
+                page: PAGE_NAME
+            });
+        }
+
         const summary = session.summary_data || {};
         const analysisTimestamp = summary.analysis_timestamp || summary.analysis?.timestamp || null;
         const previewTimestamp = summary.preview_timestamp || summary.preview?.timestamp || null;
 
         // Use completed_at as fallback if created_at is null/undefined
-        const createdSource =
-            session.created_at ||
-            summary.created_at ||
-            session.completed_at ||  // Fallback to completed_at
-            summary.completed_at ||  // Fallback to completed_at from summary
-            analysisTimestamp;
+        // Handle both DateEnvelope objects and ISO strings
+        let createdSource = null;
+        if (session.created_at) {
+            createdSource = session.created_at;
+        } else if (summary.created_at) {
+            createdSource = summary.created_at;
+        } else if (session.completed_at) {
+            createdSource = session.completed_at;
+        } else if (summary.completed_at) {
+            createdSource = summary.completed_at;
+        } else if (analysisTimestamp) {
+            createdSource = analysisTimestamp;
+        }
 
-        const updatedSource =
-            session.completed_at ||
-            summary.completed_at ||
-            previewTimestamp ||
-            analysisTimestamp ||
-            createdSource;  // Fallback to createdSource if nothing else available
+        let updatedSource = null;
+        if (session.completed_at) {
+            updatedSource = session.completed_at;
+        } else if (summary.completed_at) {
+            updatedSource = summary.completed_at;
+        } else if (previewTimestamp) {
+            updatedSource = previewTimestamp;
+        } else if (analysisTimestamp) {
+            updatedSource = analysisTimestamp;
+        } else if (createdSource) {
+            updatedSource = createdSource;  // Fallback to createdSource if nothing else available
+        }
+
+        // Debug: Log sources
+        if (window.Logger && Logger.DEBUG_MODE) {
+            window.Logger.debug('normalizeSessionRecord - date sources', {
+                createdSource: createdSource,
+                createdSource_type: typeof createdSource,
+                updatedSource: updatedSource,
+                updatedSource_type: typeof updatedSource,
+                page: PAGE_NAME
+            });
+        }
 
         const createdEnvelope = coerceDateEnvelope(createdSource);
         const updatedEnvelope = coerceDateEnvelope(updatedSource);
+
+        // Debug: Log envelopes
+        if (window.Logger && Logger.DEBUG_MODE) {
+            window.Logger.debug('normalizeSessionRecord - date envelopes', {
+                createdSource: createdSource,
+                createdSource_type: typeof createdSource,
+                createdEnvelope: createdEnvelope,
+                createdEnvelope_type: typeof createdEnvelope,
+                createdEnvelope_is_null: createdEnvelope === null,
+                createdEnvelope_display: createdEnvelope && createdEnvelope.display,
+                updatedSource: updatedSource,
+                updatedSource_type: typeof updatedSource,
+                updatedEnvelope: updatedEnvelope,
+                updatedEnvelope_type: typeof updatedEnvelope,
+                updatedEnvelope_is_null: updatedEnvelope === null,
+                updatedEnvelope_display: updatedEnvelope && updatedEnvelope.display,
+                page: PAGE_NAME
+            });
+        }
 
         return {
             id: session.id,
@@ -424,11 +607,121 @@
             summaryData: summary,
             createdAt: createdEnvelope,
             createdAtEpoch: getEpochFromEnvelope(createdEnvelope),
-            createdAtDisplay: formatDateValue(createdEnvelope),
+            createdAtDisplay: (() => {
+                if (!createdEnvelope) {
+                    // Debug: Log when envelope is null
+                    if (window.Logger && Logger.DEBUG_MODE) {
+                        window.Logger.debug('normalizeSessionRecord - createdEnvelope is null', {
+                            sessionId: session.id,
+                            createdSource: createdSource,
+                            page: PAGE_NAME
+                        });
+                    }
+                    return '';
+                }
+                
+                // Try FieldRendererService first
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                    const result = window.FieldRendererService.renderDate(createdEnvelope, true);
+                    // Debug: Log result
+                    if (window.Logger && Logger.DEBUG_MODE) {
+                        window.Logger.debug('normalizeSessionRecord - createdAtDisplay result (FieldRendererService)', {
+                            sessionId: session.id,
+                            result: result,
+                            result_type: typeof result,
+                            envelope: createdEnvelope,
+                            page: PAGE_NAME
+                        });
+                    }
+                    // FieldRendererService should return a string, use it if not empty/null
+                    if (result && result !== '-' && result !== '') {
+                        return result;
+                    }
+                }
+                
+                // Fallback to display property from envelope
+                if (createdEnvelope.display) {
+                    if (window.Logger && Logger.DEBUG_MODE) {
+                        window.Logger.debug('normalizeSessionRecord - using envelope.display', {
+                            sessionId: session.id,
+                            display: createdEnvelope.display,
+                            page: PAGE_NAME
+                        });
+                    }
+                    return createdEnvelope.display;
+                }
+                
+                // Last resort: use formatDateValue
+                const result = formatDateValue(createdEnvelope);
+                if (window.Logger && Logger.DEBUG_MODE) {
+                    window.Logger.debug('normalizeSessionRecord - createdAtDisplay result (formatDateValue)', {
+                        sessionId: session.id,
+                        result: result,
+                        page: PAGE_NAME
+                    });
+                }
+                return result || '';
+            })(),
             created_at: createdEnvelope,
             updatedAt: updatedEnvelope,
             updatedAtEpoch: getEpochFromEnvelope(updatedEnvelope),
-            updatedAtDisplay: formatDateValue(updatedEnvelope || createdEnvelope),
+            updatedAtDisplay: (() => {
+                const dateToRender = updatedEnvelope || createdEnvelope;
+                if (!dateToRender) {
+                    // Debug: Log when envelope is null
+                    if (window.Logger && Logger.DEBUG_MODE) {
+                        window.Logger.debug('normalizeSessionRecord - updatedEnvelope is null', {
+                            sessionId: session.id,
+                            updatedSource: updatedSource,
+                            createdEnvelope: createdEnvelope,
+                            page: PAGE_NAME
+                        });
+                    }
+                    return '';
+                }
+                
+                // Try FieldRendererService first
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                    const result = window.FieldRendererService.renderDate(dateToRender, true);
+                    // Debug: Log result
+                    if (window.Logger && Logger.DEBUG_MODE) {
+                        window.Logger.debug('normalizeSessionRecord - updatedAtDisplay result (FieldRendererService)', {
+                            sessionId: session.id,
+                            result: result,
+                            result_type: typeof result,
+                            envelope: dateToRender,
+                            page: PAGE_NAME
+                        });
+                    }
+                    // FieldRendererService should return a string, use it if not empty/null
+                    if (result && result !== '-' && result !== '') {
+                        return result;
+                    }
+                }
+                
+                // Fallback to display property from envelope
+                if (dateToRender.display) {
+                    if (window.Logger && Logger.DEBUG_MODE) {
+                        window.Logger.debug('normalizeSessionRecord - using envelope.display', {
+                            sessionId: session.id,
+                            display: dateToRender.display,
+                            page: PAGE_NAME
+                        });
+                    }
+                    return dateToRender.display;
+                }
+                
+                // Last resort: use formatDateValue
+                const result = formatDateValue(dateToRender);
+                if (window.Logger && Logger.DEBUG_MODE) {
+                    window.Logger.debug('normalizeSessionRecord - updatedAtDisplay result (formatDateValue)', {
+                        sessionId: session.id,
+                        result: result,
+                        page: PAGE_NAME
+                    });
+                }
+                return result || '';
+            })(),
             completed_at: updatedEnvelope
         };
     }
@@ -529,29 +822,137 @@
 
         const statusDisplay = renderStatus(session.status);
 
-        const createdDisplay = session.createdAtDisplay || formatDateValue(session.createdAt);
-        const updatedDisplay = session.updatedAtDisplay || formatDateValue(session.updatedAt || session.createdAt);
+        // Use the same date rendering logic as executions.js for consistency
+        const createdDateCell = (() => {
+            // Prefer FieldRendererService.renderDate for consistent date formatting
+            const rawDate = session.created_at || null;
+            
+            if (!rawDate) {
+                return `<td class="col-created"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
 
+            // Use FieldRendererService.renderDate for proper date formatting
+            let dateDisplay = '';
+            let epoch = null;
+
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                // Use FieldRendererService to render date with time
+                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                
+                // Get epoch for sorting
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                    epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                } else if (rawDate instanceof Date) {
+                    epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    epoch = Number.isNaN(parsed) ? null : parsed;
+                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                    epoch = rawDate.epochMs;
+                }
+            } else {
+                // Fallback: work directly with date envelope objects or raw values
+                const envelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                if (envelope && typeof envelope === 'object' && envelope.display) {
+                    dateDisplay = envelope.display;
+                    epoch = envelope.epochMs || envelope.epoch_ms || null;
+                } else if (rawDate instanceof Date) {
+                    dateDisplay = rawDate.toLocaleString('he-IL');
+                    epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    if (!Number.isNaN(parsed)) {
+                        const date = new Date(parsed);
+                        dateDisplay = date.toLocaleString('he-IL');
+                        epoch = parsed;
+                    } else {
+                        dateDisplay = rawDate;
+                    }
+                } else {
+                    dateDisplay = String(rawDate);
+                }
+            }
+
+            return `<td class="col-created" data-sort-value="${epoch || ''}">${dateDisplay || 'לא זמין'}</td>`;
+        })();
+
+        const updatedDateCell = (() => {
+            // Prefer FieldRendererService.renderDate for consistent date formatting
+            const rawDate = session.completed_at || session.created_at || null;
+            
+            if (!rawDate) {
+                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+
+            // Use FieldRendererService.renderDate for proper date formatting
+            let dateDisplay = '';
+            let epoch = null;
+
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                // Use FieldRendererService to render date with time
+                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                
+                // Get epoch for sorting
+                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                    epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                } else if (rawDate instanceof Date) {
+                    epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    epoch = Number.isNaN(parsed) ? null : parsed;
+                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                    epoch = rawDate.epochMs;
+                }
+            } else {
+                // Fallback: work directly with date envelope objects or raw values
+                const envelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                if (envelope && typeof envelope === 'object' && envelope.display) {
+                    dateDisplay = envelope.display;
+                    epoch = envelope.epochMs || envelope.epoch_ms || null;
+                } else if (rawDate instanceof Date) {
+                    dateDisplay = rawDate.toLocaleString('he-IL');
+                    epoch = rawDate.getTime();
+                } else if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    if (!Number.isNaN(parsed)) {
+                        const date = new Date(parsed);
+                        dateDisplay = date.toLocaleString('he-IL');
+                        epoch = parsed;
+                    } else {
+                        dateDisplay = rawDate;
+                    }
+                } else {
+                    dateDisplay = String(rawDate);
+                }
+            }
+
+            return `<td class="col-updated" data-sort-value="${epoch || ''}">${dateDisplay || 'לא זמין'}</td>`;
+        })();
+
+        // CRITICAL: Only show delete button - no other buttons should exist
+        const deleteButton = `
+            <button data-button-type="DELETE" 
+                    data-variant="small" 
+                    data-onclick="if(window.deleteImportSession) { window.deleteImportSession(${session.id}); } else { console.error('deleteImportSession not available'); }" 
+                    title="מחק סשן ייבוא זה"
+                    data-tooltip="מחק סשן ייבוא"></button>
+        `;
+        
         row.innerHTML = [
             `<td class="col-session-id">#${session.id}</td>`,
-            `<td class="col-account">${session.tradingAccountName}</td>`,
-            `<td class="col-provider">${session.provider}</td>`,
-            `<td class="col-file" title="${session.fileName}">${session.fileName}</td>`,
+            `<td class="col-account">${session.trading_account_name || (session.trading_account_id ? `חשבון #${session.trading_account_id}` : 'לא ידוע')}</td>`,
+            `<td class="col-provider">${session.provider || 'לא צויין'}</td>`,
+            `<td class="col-file" title="${session.file_name || ''}">${session.file_name || 'לא צויין'}</td>`,
             `<td class="col-status">${statusDisplay}</td>`,
-            `<td class="col-records text-center">${session.totalRecords}</td>`,
-            `<td class="col-imported text-center">${session.importedRecords}</td>`,
-            `<td class="col-skipped text-center">${session.skippedRecords}</td>`,
-            `<td class="col-created">${createdDisplay || 'לא זמין'}</td>`,
-            `<td class="col-updated">${updatedDisplay || 'לא זמין'}</td>`,
+            `<td class="col-records text-center">${session.total_records || 0}</td>`,
+            `<td class="col-imported text-center">${session.imported_records || 0}</td>`,
+            `<td class="col-skipped text-center">${session.skipped_records || 0}</td>`,
+            createdDateCell,
+            updatedDateCell,
             `<td class="col-actions text-center">
-                <button data-button-type="ACTION" 
-                        data-variant="primary" 
-                        data-size="small" 
-                        data-icon="🔄" 
-                        data-text="הרצה חוזרת" 
-                        data-onclick="rerunImportSession(${session.id}); event.stopPropagation();" 
-                        title="הרצה חוזרת של סשן ייבוא זה"
-                        data-tooltip="הרצה חוזרת של סשן ייבוא"></button>
+                ${deleteButton}
             </td>`
         ].join('');
 
@@ -656,9 +1057,19 @@
             }
         }
 
+        // Check if value is already a DateEnvelope object
+        if (value && typeof value === 'object' && (value.epochMs !== undefined || value.utc || value.local || value.display)) {
+            // It's already a DateEnvelope, use FieldRendererService directly
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                return window.FieldRendererService.renderDate(value, true);
+            }
+            // Fallback to display property
+            return value.display || value.local || value.utc || '';
+        }
+
         const envelope = coerceDateEnvelope(value);
         if (envelope) {
-            if (window.FieldRendererService?.renderDate) {
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
                 const rendered = window.FieldRendererService.renderDate(envelope, true);
                 if (rendered) {
                     const renderedNormalized = rendered.trim();
@@ -866,30 +1277,103 @@
         Logger.info('📊 Registered import history table with UnifiedTableSystem', { page: PAGE_NAME });
     }
 
+
     /**
-     * Rerun import session - placeholder function for future implementation
-     * @function rerunImportSession
-     * @param {number} sessionId - Session ID to rerun
+     * Delete import session
+     * Uses UnifiedCRUDService for automatic table refresh and consistent CRUD handling
+     * @function deleteImportSession
+     * @param {number} sessionId - Session ID to delete
      */
-    function rerunImportSession(sessionId) {
-        Logger.info('🔄 Rerun import session requested', { sessionId, page: PAGE_NAME });
-        
-        // TODO: Implement rerun logic
-        // This will:
-        // 1. Load session data from database
-        // 2. Restore file content (if available)
-        // 3. Open import modal with pre-filled data
-        // 4. Allow user to modify settings and re-import
-        
-        if (typeof window.showNotification === 'function') {
-            window.showNotification(
-                'הרצה חוזרת של סשן ייבוא',
-                'פונקציה זו תיושם בקרוב. היא תאפשר להריץ מחדש סשן ייבוא קיים עם אפשרות לעדכן הגדרות.',
-                'info',
-                5000
-            );
+    async function deleteImportSession(sessionId) {
+        if (!sessionId) {
+            Logger.warn('deleteImportSession: No session ID provided', { page: PAGE_NAME });
+            return;
+        }
+
+        Logger.info('🗑️ Delete import session requested', { sessionId, page: PAGE_NAME });
+
+        // Use UnifiedCRUDService for deletion - this automatically handles:
+        // - Confirmation dialog
+        // - API call
+        // - Response handling and notifications
+        // - Table refresh via CRUDResponseHandler.handleTableRefresh
+        // - Cache invalidation
+        if (window.UnifiedCRUDService?.deleteEntity) {
+            try {
+                const result = await window.UnifiedCRUDService.deleteEntity('import_session', sessionId, {
+                    successMessage: `סשן ייבוא #${sessionId} נמחק בהצלחה!`,
+                    entityName: 'סשן ייבוא',
+                    reloadFn: () => refreshDataImportHistory(true), // Force reload from server after deletion
+                    requiresHardReload: false
+                });
+                
+                Logger.info('🗑️ Import session deletion completed via UnifiedCRUDService', {
+                    sessionId,
+                    result,
+                    page: PAGE_NAME
+                });
+            } catch (error) {
+                Logger.error('deleteImportSession: Error in UnifiedCRUDService', { 
+                    sessionId,
+                    page: PAGE_NAME, 
+                    error: error.message,
+                    exception: error
+                });
+            }
         } else {
-            alert(`הרצה חוזרת של סשן ייבוא #${sessionId}\n\nפונקציה זו תיושם בקרוב.`);
+            // Fallback to direct API call if UnifiedCRUDService not available
+            Logger.warn('⚠️ UnifiedCRUDService not available, using fallback', {
+                sessionId,
+                page: PAGE_NAME
+            });
+            
+            const confirmationMessage = `האם אתה בטוח שברצונך למחוק את סשן הייבוא #${sessionId}?\n\nפעולה זו תמחק את הסשן לצמיתות.`;
+            
+            if (window.confirm(confirmationMessage)) {
+                try {
+                    const response = await fetch(`/api/user-data-import/session/${sessionId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && (data.status === 'success' || data.success)) {
+                        if (typeof window.showNotification === 'function') {
+                            window.showNotification(`סשן ייבוא #${sessionId} נמחק בהצלחה!`, 'success', 5000);
+                        }
+                        
+                        // Refresh the history table
+                        if (typeof refreshDataImportHistory === 'function') {
+                            await refreshDataImportHistory();
+                        }
+                    } else {
+                        const errorMessage = data.error || data.message || 'שגיאה במחיקת סשן ייבוא';
+                        if (typeof window.showNotification === 'function') {
+                            window.showNotification(errorMessage, 'error', 6000);
+                        }
+                        Logger.error('deleteImportSession: API error', { 
+                            sessionId,
+                            page: PAGE_NAME, 
+                            error: errorMessage,
+                            response: data
+                        });
+                    }
+                } catch (error) {
+                    const errorMessage = error?.message || 'שגיאה לא ידועה במחיקת סשן ייבוא';
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification(errorMessage, 'error', 6000);
+                    }
+                    Logger.error('deleteImportSession: Exception', { 
+                        sessionId,
+                        page: PAGE_NAME, 
+                        error: errorMessage,
+                        exception: error
+                    });
+                }
+            }
         }
     }
 
@@ -897,7 +1381,7 @@
     window.initializeDataImportPage = initializeDataImportPage;
     window.refreshDataImportHistory = refreshDataImportHistory;
     window.registerDataImportTable = registerDataImportTable;
-    window.rerunImportSession = rerunImportSession;
+    window.deleteImportSession = deleteImportSession;
 })();
 
 

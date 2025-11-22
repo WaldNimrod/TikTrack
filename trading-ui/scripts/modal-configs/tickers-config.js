@@ -130,6 +130,46 @@
                     ]
                 }
             },
+            // אזור מיפויי ספקים (נוסף ינואר 2025)
+            {
+                type: 'custom',
+                id: 'tickerProviderSymbolsSection',
+                html: `
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card border-secondary">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-exchange-alt me-2"></i>מיפויי ספקי נתונים (אופציונלי)
+                                    </h6>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-secondary" 
+                                            id="toggleProviderSymbolsSection"
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#providerSymbolsCollapse"
+                                            aria-expanded="false">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                </div>
+                                <div class="collapse" id="providerSymbolsCollapse">
+                                    <div class="card-body">
+                                        <p class="text-muted small mb-3">
+                                            אם ספק נתונים חיצוני דורש סימבול שונה מהסימבול הפנימי, ניתן להגדיר כאן.
+                                            לדוגמה: טיקר "500X" עשוי לדרוש "500X.MI" עבור Yahoo Finance.
+                                        </p>
+                                        <div id="providerSymbolsFields">
+                                            <!-- שדות מיפוי יטענו דינמית -->
+                                            <div class="text-center text-muted py-3">
+                                                <i class="fas fa-spinner fa-spin me-2"></i>טוען רשימת ספקים...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
             // אזור בדיקת נתונים חיצוניים (נוסף דינמית)
             {
                 type: 'custom',

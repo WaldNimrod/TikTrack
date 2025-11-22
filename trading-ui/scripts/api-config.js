@@ -58,8 +58,9 @@ window.API_ENV = (function() {
 
 // ===== LOGGING (Development only) =====
 
-if (window.API_ENV === 'development') {
-    console.log('🔧 API Config initialized:', {
+if (window.API_ENV === 'development' && window.Logger && Logger.DEBUG_MODE) {
+    // Only log in DEBUG mode via Logger
+    window.Logger.debug('API Config initialized', {
         baseURL: window.API_BASE_URL,
         environment: window.API_ENV,
         port: window.location.port,

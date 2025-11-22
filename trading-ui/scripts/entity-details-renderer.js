@@ -390,7 +390,6 @@ class EntityDetailsRenderer {
                         minute: '2-digit'
                     });
                 }
-                }
             } catch (e) {
                 updatedAtDisplay = updatedAt;
             }
@@ -859,8 +858,59 @@ class EntityDetailsRenderer {
         // תאריך יצירה
         const createdAt = this.formatDateTime(tickerData.created_at) || '-';
         
-        // הערות
+        // Provider symbols (מיפויי ספקי נתונים)
+        const providerSymbols = tickerData.provider_symbols || [];
+        
+        // 🔍 DEBUG: Log provider symbols for troubleshooting
+        if (window.Logger) {
+            window.Logger.debug('🔍 [renderTickerSpecific] Provider symbols check:', {
+                hasProviderSymbols: 'provider_symbols' in tickerData,
+                providerSymbolsType: typeof tickerData.provider_symbols,
+                providerSymbolsIsArray: Array.isArray(tickerData.provider_symbols),
+                providerSymbolsCount: providerSymbols.length,
+                providerSymbols: providerSymbols,
+                tickerId: tickerData.id,
+                tickerSymbol: tickerData.symbol,
+                page: 'entity-details-renderer'
+            });
+        }
+        
+        let providerSymbolsHtml = '';
+        if (providerSymbols && providerSymbols.length > 0) {
+            // יצירת רשימת מיפויים - כל מיפוי בשורה נפרדת, מיושר ימינה כמו שאר השדות
+            const mappingsList = providerSymbols.map(mapping => {
+                const providerName = mapping.provider_display_name || mapping.provider_name || 'לא ידוע';
+                const providerSymbol = mapping.provider_symbol || '';
+                return `
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">${this._escapeHtml(providerName)}:</label>
+                    <span>${this._escapeHtml(providerSymbol)}</span>
+                </div>`;
+            }).join('');
+            
+            providerSymbolsHtml = `
+                <div class="mb-3 mt-3">
+                    <h6 class="border-bottom pb-2 mb-2" style="border-color: ${color} !important;">מיפויי ספקים</h6>
+                    ${mappingsList}
+                </div>
+            `;
+        }
+        
+        // הערות - תמיכה בטקסט עשיר
         const remarks = tickerData.remarks || null;
+        let remarksHtml = '';
+        if (remarks) {
+            // Sanitize HTML using RichTextEditorService for safe rich text rendering
+            const sanitizedRemarks = this._sanitizeRichText(remarks);
+            remarksHtml = `
+                <div class="mb-3 d-flex align-items-start">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">הערות:</label>
+                    <div class="flex-grow-1 rich-text-content" style="white-space: pre-wrap; word-wrap: break-word;">
+                        ${sanitizedRemarks || '<span class="text-muted">אין תוכן</span>'}
+                    </div>
+                </div>
+            `;
+        }
         
         return `
             <div class="ticker-specific">
@@ -881,12 +931,9 @@ class EntityDetailsRenderer {
                     <span class="text-muted">${createdAt}</span>
                 </div>
                 
-                ${remarks ? `
-                <div class="mb-3">
-                    <label class="form-label fw-bold mb-2">הערות:</label>
-                    <p class="mb-0">${window.FieldRendererService.renderTextPreview(remarks, { maxLength: 500 })}</p>
-                </div>
-                ` : ''}
+                ${providerSymbolsHtml}
+                
+                ${remarksHtml}
             </div>
         `;
     }

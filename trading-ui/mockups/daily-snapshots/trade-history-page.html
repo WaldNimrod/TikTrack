@@ -19,10 +19,10 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
-    <!-- TikTrack Chart System (Central Chart System) -->
-    <script src="../../scripts/charts/chart-loader.js?v=1.0.0"></script>
-    <script src="../../scripts/charts/chart-theme.js?v=1.0.0"></script>
-    <script src="../../scripts/charts/chart-system.js?v=1.0.0"></script>
+    <!-- TradingView Lightweight Charts -->
+    <script src="../../scripts/charts/vendor/lightweight-charts.standalone.production.js" defer></script>
+    <script src="../../scripts/charts/tradingview-theme.js" defer></script>
+    <script src="../../scripts/charts/tradingview-adapter.js" defer></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
@@ -646,10 +646,10 @@
                     </div>
                 </div>
                 
-                <!-- Timeline Relative Section -->
+                <!-- Timeline Section (Combined) -->
                 <div class="content-section" id="timeline-relative-section">
                     <div class="section-header">
-                        <h2><i class="bi bi-graph-up"></i> Timeline יחסי</h2>
+                        <h2><i class="bi bi-graph-up"></i> טיימליין</h2>
                         <div class="header-actions">
                             <button class="filter-toggle-btn" onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
@@ -657,53 +657,48 @@
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="timeline-chart-container" style="height: 400px; position: relative;">
-                            <canvas id="timelineChart"></canvas>
+                        <!-- Chart Controls -->
+                        <div class="chart-controls mb-2" style="display: flex; gap: 5px; justify-content: flex-end; align-items: center;">
+                            <button class="btn btn-sm btn-outline-secondary" id="timelineZoomIn" title="זום פנימה">
+                                <i class="bi bi-zoom-in"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="timelineZoomOut" title="זום החוצה">
+                                <i class="bi bi-zoom-out"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="timelineReset" title="איפוס זום">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanLeft" title="תזוזה שמאלה">
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="timelinePanRight" title="תזוזה ימינה">
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
                         </div>
-                        <div class="text-center mt-3" style="font-size: 0.9rem; color: var(--text-muted, #6c757d);">
-                            <p><strong>גרף משולב:</strong> ציר Y שמאלי - גודל פוזיציה (משתנה בביצועים) | ציר Y ימני - P/L (משתנה יומי)</p>
-                            <p style="margin-top: 5px;">👁️ לחץ על נקודה עם מזהה לפרטים מלאים | מרווחי זמן משתנים בין נקודות</p>
+                        <!-- Timeline Chart -->
+                        <div class="timeline-chart-container" style="height: 400px; position: relative;">
+                            <div id="timelineChart" style="width: 100%; height: 400px;"></div>
+                        </div>
+                        <!-- Market Price Chart -->
+                        <div class="chart-container mt-4" style="height: 400px; position: relative;">
+                            <div id="marketPriceChart" style="width: 100%; height: 400px;"></div>
+                        </div>
+                        <div class="chart-legend mt-2">
+                            <div class="chart-legend-item">
+                                <span class="chart-legend-color" style="background: #007bff;"></span>
+                                <span>מחיר שוק</span>
+                            </div>
+                            <div class="chart-legend-item">
+                                <span class="chart-legend-color" style="background: #28a745; width: 12px; height: 12px; border-radius: 50%;"></span>
+                                <span>כניסה</span>
+                            </div>
+                            <div class="chart-legend-item">
+                                <span class="chart-legend-color" style="background: #dc3545; width: 12px; height: 12px; border-radius: 50%;"></span>
+                                <span>יציאה</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- P/L Chart Section with Position Size -->
-                <div class="content-section" id="pl-chart-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-graph-up-arrow"></i> P/L לאורך זמן</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('pl-chart-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                                <div class="chart-container" style="height: 400px; position: relative;">
-                                    <canvas id="plChart"></canvas>
-                                </div>
-                                <div class="chart-legend">
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #28a745;"></span>
-                                        <span>P/L ממומש</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #ffc107;"></span>
-                                        <span>P/L לא ממומש</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #007bff;"></span>
-                                        <span>P/L כולל</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #6c757d; border-top: 3px solid #6c757d;"></span>
-                                        <span>גודל פוזיציה</span>
-                                    </div>
-                                </div>
-                                <div class="mt-3" style="font-size: 0.85rem; color: #6c757d;">
-                                    <i class="bi bi-info-circle"></i> סימון שלב בטיימליין מסמן אותו גם בגרף P/L
-                                </div>
-                            </div>
-                        </div>
                         
                         <!-- Executions Table Section -->
                 <div class="content-section" id="executions-table-section">
@@ -786,59 +781,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Market Price Chart Section -->
-                <div class="content-section" id="market-price-chart-section">
-                    <div class="section-header">
-                        <h2><i class="bi bi-graph-up"></i> מחיר שוק מול מחירי כניסה/יציאה</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" onclick="toggleSection('market-price-chart-section')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                                </div>
-                                </div>
-                    <div class="section-body">
-                                <div class="chart-container" style="height: 400px; position: relative;">
-                                    <canvas id="marketPriceChart"></canvas>
-                                </div>
-                                <div class="chart-legend">
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #007bff;"></span>
-                                        <span>מחיר שוק</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #28a745; width: 12px; height: 12px; border-radius: 50%;"></span>
-                                        <span>כניסה</span>
-                                    </div>
-                                    <div class="chart-legend-item">
-                                        <span class="chart-legend-color" style="background: #dc3545; width: 12px; height: 12px; border-radius: 50%;"></span>
-                                        <span>יציאה</span>
-                            </div>
-                        </div>
-                        
-                                <!-- Market Chart Options Info -->
-                                <div class="market-chart-options">
-                                    <h6><i class="bi bi-info-circle"></i> חלופות למערכת גרפים חיצונית:</h6>
-                                    <ul>
-                                        <li><strong>TradingView Widget</strong> - פתרון מוכן, קל להטמעה, מוגבל בהתאמה אישית</li>
-                                        <li><strong>Lightweight Charts (TradingView)</strong> - ספרייה קלה ומהירה, ללא תלות, מתאימה למסחר</li>
-                                        <li><strong>Chart.js עם פלאגינים</strong> - פתרון קיים במערכת, דורש הרחבה</li>
-                                        <li><strong>D3.js</strong> - גמישות מקסימלית, דורש פיתוח נרחב</li>
-                                        <li><strong>Highcharts</strong> - ספרייה מסחרית חזקה, דורשת רישיון</li>
-                                        <li><strong>Plotly.js</strong> - פתרון חזק עם תמיכה בגרפים פיננסיים</li>
-                                    </ul>
-                                    <p style="margin-top: 10px; margin-bottom: 0; font-size: 0.85rem; color: #6c757d;">
-                                        <strong>המלצה:</strong> Lightweight Charts - אידיאלי למסחר, קל משקל, ללא תלות, וקוד פתוח.
-                                    </p>
-                                    </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                                    </div>
-                                        </div>
-                                    </div>
-                                </div>
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
@@ -846,7 +788,6 @@
     <script>
         // Timeline Chart
         let selectedTimelineStep = null;
-        let plChart = null;
         let timelineChart = null;
         let marketPriceChart = null;
         let isInitializingTimelineChart = false; // Flag to prevent multiple initializations
@@ -925,43 +866,23 @@
                         isInitializingTimelineChart = true;
                         
                         try {
-                            // Destroy existing chart first (both ChartSystem and direct Chart.js)
-                            if (timelineChart) {
+                            // Destroy existing chart if it exists
+                            if (timelineChart && typeof window.TradingViewChartAdapter !== 'undefined' && 
+                                typeof window.TradingViewChartAdapter.destroyChart === 'function') {
                                 try {
-                                    if (typeof timelineChart.destroy === 'function') {
-                                        timelineChart.destroy();
-                                    }
+                                    window.TradingViewChartAdapter.destroyChart(timelineChart);
                                 } catch (e) {
                                     console.warn('Error destroying timeline chart:', e);
                                 }
                                 timelineChart = null;
                             }
                             
-                            // Also destroy via ChartSystem if exists
-                            if (window.ChartSystem && window.ChartSystem.destroy) {
-                                try {
-                                    await window.ChartSystem.destroy('timelineChart');
-                                } catch (e) {
-                                    // Chart might not exist in ChartSystem, that's OK
-                                }
-                            }
-                            
-                            // Also check Chart.js registry
-                            const canvas = document.querySelector('#timelineChart');
-                            if (canvas && typeof Chart !== 'undefined' && Chart.getChart) {
-                                const existingChart = Chart.getChart(canvas);
-                                if (existingChart) {
-                                    try {
-                                        existingChart.destroy();
-                                    } catch (e) {
-                                        console.warn('Error destroying Chart.js chart:', e);
-                                    }
-                                }
-                            }
-                            
-                            // Wait for ChartSystem to be ready
+                            // Wait for TradingView to be ready
                             let retries = 0;
-                            while (!window.ChartSystem && retries < 20) {
+                            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                                    typeof window.LightweightCharts === 'undefined' || 
+                                    typeof window.lightweightCharts === 'undefined') && 
+                                   retries < 50) {
                                 await new Promise(resolve => setTimeout(resolve, 100));
                                 retries++;
                             }
@@ -988,17 +909,13 @@
                 step.querySelector('.timeline-point-absolute').classList.add('selected');
                 selectedTimelineStep = stepIndex;
                 
-                // Update P/L chart marker
-                if (plChart) {
-                    updatePLChartMarker(stepIndex);
-                }
+                // P/L chart removed - no longer needed
             }
         }
         
         async function initTimelineChart() {
-            const container = '#timelineChart';
-            const canvas = document.querySelector(container);
-            if (!canvas) {
+            const container = document.getElementById('timelineChart');
+            if (!container) {
                 console.warn('Timeline chart container not found');
                 return;
             }
@@ -1012,44 +929,34 @@
             isInitializingTimelineChart = true;
             
             try {
+                // Wait for TradingView to be available
+                let retries = 0;
+                while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                        typeof window.LightweightCharts === 'undefined' || 
+                        typeof window.lightweightCharts === 'undefined') && 
+                       retries < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    retries++;
+                }
+                
+                if (typeof window.TradingViewChartAdapter === 'undefined') {
+                    console.error('TradingViewChartAdapter not available');
+                    isInitializingTimelineChart = false;
+                    return;
+                }
+                
                 // Destroy existing chart if it exists
-                if (timelineChart) {
+                if (timelineChart && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
                     try {
-                        if (typeof timelineChart.destroy === 'function') {
-                            timelineChart.destroy();
-                        }
+                        window.TradingViewChartAdapter.destroyChart(timelineChart);
                     } catch (e) {
                         console.warn('Error destroying timeline chart:', e);
                     }
                     timelineChart = null;
                 }
                 
-                // Also destroy via ChartSystem if exists
-                if (window.ChartSystem && window.ChartSystem.destroy) {
-                    try {
-                        await window.ChartSystem.destroy('timelineChart');
-                    } catch (e) {
-                        // Chart might not exist in ChartSystem, that's OK
-                    }
-                }
-                
-                // Also check Chart.js registry
-                if (typeof Chart !== 'undefined' && Chart.getChart) {
-                    const existingChart = Chart.getChart(canvas);
-                    if (existingChart) {
-                        try {
-                            existingChart.destroy();
-                        } catch (e) {
-                            console.warn('Error destroying Chart.js chart:', e);
-                        }
-                    }
-                }
-                
-                // Clear canvas
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
+                // Clear container
+                container.innerHTML = '';
             } catch (e) {
                 console.warn('Error during chart cleanup:', e);
             } finally {
@@ -1057,953 +964,1238 @@
             }
             
             // Enhanced data for relative timeline with different time intervals
-            // Each point represents a record (plan/execution/cash flow) with actual dates
+            // Each point represents a record (plan/execution/cash flow/dividend) with actual dates
+            // IMPORTANT: Dates must match exactly with market price chart data
             const timelineData = [
-                { date: '01/01/2025', type: 'Trade Plan', id: 456, positionSize: 0, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 0 },
-                { date: '05/01/2025', type: 'Execution', id: 101, positionSize: 100, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 4 },
-                { date: '07/01/2025', type: 'Daily', id: null, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, daysFromStart: 6 },
-                { date: '08/01/2025', type: 'Cash Flow', id: 301, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, amount: 5000, daysFromStart: 7 },
-                { date: '10/01/2025', type: 'Execution', id: 102, positionSize: 150, realizedPL: 0, unrealizedPL: 100, totalPL: 100, daysFromStart: 9 },
-                { date: '12/01/2025', type: 'Daily', id: null, positionSize: 150, realizedPL: 0, unrealizedPL: 120, totalPL: 120, daysFromStart: 11 },
-                { date: '15/01/2025', type: 'Execution', id: 103, positionSize: 120, realizedPL: 150, unrealizedPL: 120, totalPL: 270, daysFromStart: 14 },
-                { date: '17/01/2025', type: 'Daily', id: null, positionSize: 120, realizedPL: 150, unrealizedPL: 80, totalPL: 230, daysFromStart: 16 },
-                { date: '20/01/2025', type: 'Execution', id: 104, positionSize: 0, realizedPL: 1110, unrealizedPL: 0, totalPL: 1110, daysFromStart: 19 }
+                { date: '01/01/2025', type: 'Trade Plan', id: 456, positionSize: 0, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 0, qty: null, price: null },
+                { date: '05/01/2025', type: 'Execution', id: 101, positionSize: 100, realizedPL: 0, unrealizedPL: 0, totalPL: 0, daysFromStart: 4, qty: 100, price: 150, side: 'Buy' },
+                { date: '07/01/2025', type: 'Daily', id: null, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, daysFromStart: 6, qty: null, price: null },
+                { date: '08/01/2025', type: 'Cash Flow', id: 301, positionSize: 100, realizedPL: 0, unrealizedPL: 50, totalPL: 50, amount: 5000, daysFromStart: 7, qty: null, price: null },
+                { date: '10/01/2025', type: 'Execution', id: 102, positionSize: 150, realizedPL: 0, unrealizedPL: 100, totalPL: 100, daysFromStart: 9, qty: 50, price: 152, side: 'Buy' },
+                { date: '12/01/2025', type: 'Daily', id: null, positionSize: 150, realizedPL: 0, unrealizedPL: 120, totalPL: 120, daysFromStart: 11, qty: null, price: null },
+                { date: '13/01/2025', type: 'Dividend', id: 401, positionSize: 150, realizedPL: 0, unrealizedPL: 120, totalPL: 120, amount: 150, daysFromStart: 12, qty: null, price: null, dividendPerShare: 1.0 },
+                { date: '15/01/2025', type: 'Execution', id: 103, positionSize: 120, realizedPL: 150, unrealizedPL: 120, totalPL: 270, daysFromStart: 14, qty: 30, price: 155, side: 'Sell', realized: 150 },
+                { date: '17/01/2025', type: 'Daily', id: null, positionSize: 120, realizedPL: 150, unrealizedPL: 80, totalPL: 230, daysFromStart: 16, qty: null, price: null },
+                { date: '20/01/2025', type: 'Execution', id: 104, positionSize: 0, realizedPL: 1110, unrealizedPL: 0, totalPL: 1110, daysFromStart: 19, qty: 120, price: 158, side: 'Sell', realized: 960 }
             ];
             
-            // Get dynamic colors from CSS variables
+            // Store timeline data globally for market price chart to use
+            window._timelineData = timelineData;
+            
+            // Get dynamic colors from CSS variables or theme
+            function getCSSVariableValue(varName, defaultValue) {
+                if (typeof window.getComputedStyle === 'function') {
+                    const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+                    return value || defaultValue;
+                }
+                return defaultValue;
+            }
+            
             const mutedColor = getCSSVariableValue('--muted-color', '#6c757d') || getCSSVariableValue('--text-muted', '#6c757d');
             const successColor = getCSSVariableValue('--success-color', '#28a745');
             const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
-            const primaryColor = getCSSVariableValue('--primary-color', '#007bff') || getCSSVariableValue('--chart-primary-color', '#007bff');
-            const textColor = getCSSVariableValue('--text-color', '#212529') || getCSSVariableValue('--chart-text-color', '#212529');
-            const cardBackground = getCSSVariableValue('--card-background', '#ffffff');
+            const dangerColor = getCSSVariableValue('--danger-color', '#dc3545');
+            const primaryColor = getCSSVariableValue('--primary-color', '#26baac') || getCSSVariableValue('--chart-primary-color', '#26baac');
             
-            // Helper to convert hex to rgba
-            function hexToRgba(hex, alpha = 0.1) {
-                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-                if (!result) return `rgba(108, 117, 125, ${alpha})`;
-                const r = parseInt(result[1], 16);
-                const g = parseInt(result[2], 16);
-                const b = parseInt(result[3], 16);
-                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-            }
-            
-            // Extract labels (dates) and data FIRST
-            const dates = timelineData.map(d => d.date.split('/')[0] + '/' + d.date.split('/')[1]);
-            const positionSizes = timelineData.map(d => d.positionSize);
-            const realizedPL = timelineData.map(d => d.realizedPL);
-            const unrealizedPL = timelineData.map(d => d.unrealizedPL);
-            const totalPL = timelineData.map(d => d.totalPL);
-            
-            // Labels removed - will be added via tooltips only (datalabels plugin causes issues)
-            
-            // Use ChartSystem for unified chart with dual Y axes
-            // ChartSystem.create() automatically destroys existing chart with same ID
-            if (window.ChartSystem) {
-                try {
-                    timelineChart = await window.ChartSystem.create({
-                        id: 'timelineChart',
-                        type: 'line',
-                        container: container,
-                        data: {
-                        labels: dates,
-                        datasets: [
-                            {
-                                label: 'גודל פוזיציה',
-                                data: positionSizes,
-                                borderColor: mutedColor,
-                                backgroundColor: hexToRgba(mutedColor, 0.1),
-                                borderWidth: 3,
-                                borderDash: [8, 4],
-                                pointRadius: 6,
-                                pointBackgroundColor: mutedColor,
-                                pointBorderColor: cardBackground,
-                                pointBorderWidth: 2,
-                                tension: 0,
-                                yAxisID: 'y',
-                                stepped: 'after',
-                                pointHoverRadius: 8,
-                                spanGaps: false
-                            },
-                            {
-                                label: 'P/L ממומש',
-                                data: realizedPL,
-                                borderColor: successColor,
-                                backgroundColor: hexToRgba(successColor, 0.1),
-                                borderWidth: 2,
-                                pointRadius: 5,
-                                pointHoverRadius: 7,
-                                pointBackgroundColor: successColor,
-                                pointBorderColor: cardBackground,
-                                pointBorderWidth: 2,
-                                tension: 0.4,
-                                yAxisID: 'y1',
-                                spanGaps: false
-                            },
-                            {
-                                label: 'P/L לא ממומש',
-                                data: unrealizedPL,
-                                borderColor: warningColor,
-                                backgroundColor: hexToRgba(warningColor, 0.1),
-                                borderWidth: 2,
-                                pointRadius: 5,
-                                pointHoverRadius: 7,
-                                pointBackgroundColor: warningColor,
-                                pointBorderColor: cardBackground,
-                                pointBorderWidth: 2,
-                                tension: 0.4,
-                                yAxisID: 'y1',
-                                spanGaps: false
-                            },
-                            {
-                                label: 'P/L כולל',
-                                data: totalPL,
-                                borderColor: primaryColor,
-                                backgroundColor: hexToRgba(primaryColor, 0.1),
-                                borderWidth: 3,
-                                pointRadius: 6,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: primaryColor,
-                                pointBorderColor: cardBackground,
-                                pointBorderWidth: 2,
-                                tension: 0.4,
-                                yAxisID: 'y1',
-                                spanGaps: false
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 15,
-                                    font: {
-                                        size: 11
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    title: function(context) {
-                                        const index = context[0].dataIndex;
-                                        const point = timelineData[index];
-                                        let typeText = point.type;
-                                        if (point.type === 'Daily') typeText = 'עדכון יומי';
-                                        else if (point.type === 'Cash Flow') typeText = 'תזרים מזומן';
-                                        return point.date + ' - ' + typeText;
-                                    },
-                                    label: function(context) {
-                                        const index = context.dataIndex;
-                                        const point = timelineData[index];
-                                        let label = context.dataset.label || '';
-                                        
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        
-                                        if (context.dataset.yAxisID === 'y') {
-                                            // Position size
-                                            label += context.parsed.y + ' מניות';
-                                        } else {
-                                            // P/L
-                                            label += '$' + context.parsed.y;
-                                        }
-                                        
-                                        return label;
-                                    },
-                                    afterLabel: function(context) {
-                                        const index = context[0].dataIndex;
-                                        const point = timelineData[index];
-                                        
-                                        if (point.type !== 'Daily' && point.id) {
-                                            let info = 'סוג: ' + point.type + ' | מזהה: #' + point.id;
-                                            if (point.type === 'Cash Flow' && point.amount) {
-                                                info += ' | סכום: $' + point.amount;
-                                            }
-                                            return info;
-                                        }
-                                        return '';
-                                    },
-                                    footer: function(tooltipItems) {
-                                        const index = tooltipItems[0].dataIndex;
-                                        const point = timelineData[index];
-                                        
-                                        if (point.type !== 'Daily' && point.id) {
-                                            return '👁️ לחץ לפרטים מלאים';
-                                        }
-                                        return '';
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'תאריך (מרווחי זמן משתנים)',
-                                    font: {
-                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                        size: 12,
-                                        weight: 'normal'
-                                    }
-                                },
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 45,
-                                    font: {
-                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                        size: 11
-                                    }
-                                }
-                            },
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                position: 'left',
-                                title: {
-                                    display: true,
-                                    text: 'גודל פוזיציה (מניות)',
-                                    font: {
-                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                        size: 12,
-                                        weight: 'normal'
-                                    }
-                                },
-                                grid: {
-                                    drawOnChartArea: true
-                                },
-                                beginAtZero: true,
-                                ticks: {
-                                    font: {
-                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                        size: 11
-                                    }
-                                }
-                            },
-                            y1: {
-                                type: 'linear',
-                                display: true,
-                                position: 'right',
-                                title: {
-                                    display: true,
-                                    text: 'P/L ($)',
-                                    font: {
-                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                        size: 12,
-                                        weight: 'normal'
-                                    }
-                                },
-                                grid: {
-                                    drawOnChartArea: false
-                                },
-                                ticks: {
-                                    font: {
-                                        family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                        size: 11
-                                    }
-                                }
-                            }
-                        },
-                        onClick: function(event, elements) {
-                            if (elements && elements.length > 0) {
-                                const index = elements[0].index;
-                                const point = timelineData[index];
-                                
-                                if (point && point.type !== 'Daily' && point.id) {
-                                    let type = 'execution';
-                                    if (point.type === 'Trade Plan') type = 'plan';
-                                    else if (point.type === 'Cash Flow') type = 'cashflow';
-                                    else if (point.type === 'Note') type = 'note';
-                                    else if (point.type === 'Alert') type = 'alert';
-                                    
-                                    if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
-                                        showCashFlowDetails(point.id);
-                                    } else if (type === 'note' && typeof showNoteDetails === 'function') {
-                                        showNoteDetails(point.id);
-                                    } else if (type === 'alert' && typeof showAlertDetails === 'function') {
-                                        showAlertDetails(point.id);
-                                    } else if (typeof showExecutionDetails === 'function') {
-                                        showExecutionDetails(point.id, type);
-                                    }
-                                }
-                            }
-                        },
-                        onHover: function(event, elements) {
-                            if (event && event.native && event.native.target) {
-                                event.native.target.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
-                            }
-                        }
-                    }
-                    });
-                } catch (error) {
-                    console.error('Error creating timeline chart with ChartSystem:', error);
-                    timelineChart = null;
+            // Convert dates to TradingView format (YYYY-MM-DD)
+            function convertDateToTradingView(dateStr) {
+                // Input: '01/01/2025' or '05/01/2025'
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    const day = parts[0].padStart(2, '0');
+                    const month = parts[1].padStart(2, '0');
+                    const year = parts[2];
+                    return `${year}-${month}-${day}`;
                 }
+                return dateStr;
             }
             
-            // Fallback to direct Chart.js ONLY if ChartSystem completely failed
-            if (!timelineChart && !window.ChartSystem) {
-                const ctx = canvas;
-                if (ctx) {
-                    // Destroy existing chart if exists (check Chart.js registry)
-                    if (typeof Chart !== 'undefined' && Chart.getChart) {
-                        const existingChart = Chart.getChart(ctx);
-                        if (existingChart) {
-                            try {
-                                existingChart.destroy();
-                            } catch (e) {
-                                console.warn('Error destroying existing Chart.js chart:', e);
-                            }
+            // Create chart with TradingView
+            try {
+                // Create chart
+                timelineChart = window.TradingViewChartAdapter.createChart(container, {
+                    width: container.clientWidth || 800,
+                    height: container.clientHeight || 400,
+                    layout: {
+                        textColor: getCSSVariableValue('--text-color', '#212529'),
+                        background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
+                    },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
                         }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: false
+                    }
+                });
+                
+                // Convert data to TradingView format
+                const tradingViewData = timelineData.map(d => ({
+                    time: convertDateToTradingView(d.date)
+                }));
+                
+                // Position Size - Left Scale, Stepped Line
+                const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'left',
+                    color: mutedColor,
+                    lineWidth: 3,
+                    lineType: 1, // Stepped
+                    title: 'גודל פוזיציה'
+                });
+                
+                const positionSizeData = timelineData.map(d => ({
+                    time: convertDateToTradingView(d.date),
+                    value: d.positionSize
+                }));
+                positionSizeSeries.setData(positionSizeData);
+                
+                // Realized P/L - Right Scale
+                const realizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'right',
+                    color: successColor,
+                    lineWidth: 2,
+                    lineType: 0, // Normal
+                    title: 'P/L ממומש'
+                });
+                
+                const realizedPLData = timelineData.map(d => ({
+                    time: convertDateToTradingView(d.date),
+                    value: d.realizedPL
+                }));
+                realizedPLSeries.setData(realizedPLData);
+                
+                // Unrealized P/L - Right Scale
+                const unrealizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'right',
+                    color: warningColor,
+                    lineWidth: 2,
+                    lineType: 0, // Normal
+                    title: 'P/L לא ממומש'
+                });
+                
+                const unrealizedPLData = timelineData.map(d => ({
+                    time: convertDateToTradingView(d.date),
+                    value: d.unrealizedPL
+                }));
+                unrealizedPLSeries.setData(unrealizedPLData);
+                
+                // Total P/L - Right Scale
+                const totalPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'right',
+                    color: primaryColor,
+                    lineWidth: 3,
+                    lineType: 0, // Normal
+                    title: 'P/L כולל'
+                });
+                
+                const totalPLData = timelineData.map(d => ({
+                    time: convertDateToTradingView(d.date),
+                    value: d.totalPL
+                }));
+                totalPLSeries.setData(totalPLData);
+                
+                // Add markers for all timeline points with detailed information (like market price chart)
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                let markersPrimitive = null;
+                
+                // Try to use createSeriesMarkers if available
+                if (lightweightCharts && typeof lightweightCharts.createSeriesMarkers === 'function') {
+                    console.log('✅ [Timeline Chart] Using createSeriesMarkers for markers');
+                    try {
+                        markersPrimitive = lightweightCharts.createSeriesMarkers(positionSizeSeries);
+                    } catch (error) {
+                        console.warn('⚠️ [Timeline Chart] Failed to create markers primitive:', error);
+                    }
+                }
+                
+                // Create markers for all timeline points
+                const timelineMarkers = [];
+                for (let i = 0; i < timelineData.length; i++) {
+                    const point = timelineData[i];
+                    let markerText = '';
+                    let markerColor = mutedColor;
+                    let markerPosition = 'belowBar';
+                    
+                    // Build marker text based on point type
+                    if (point.type === 'Execution') {
+                        markerText = `${point.side} ${point.qty}# | $${point.price}`;
+                        if (point.realized) {
+                            markerText += ` | Rez. = $${point.realized}`;
+                        }
+                        markerColor = point.side === 'Buy' ? successColor : dangerColor;
+                        markerPosition = point.side === 'Buy' ? 'belowBar' : 'aboveBar';
+                    } else if (point.type === 'Dividend') {
+                        markerText = `Dividend $${point.amount} | $${point.dividendPerShare}/share`;
+                        markerColor = primaryColor;
+                        markerPosition = 'aboveBar';
+                    } else if (point.type === 'Cash Flow') {
+                        markerText = `Cash Flow $${point.amount}`;
+                        markerColor = primaryColor;
+                        markerPosition = 'belowBar';
+                    } else if (point.type === 'Trade Plan') {
+                        markerText = `Plan #${point.id}`;
+                        markerColor = mutedColor;
+                        markerPosition = 'belowBar';
+                    } else if (point.type === 'Daily') {
+                        // Skip daily points - no marker needed
+                        continue;
                     }
                     
-                    try {
-                        timelineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dates,
-                            datasets: [
-                                {
-                                    label: 'גודל פוזיציה',
-                                    data: positionSizes,
-                                    borderColor: mutedColor,
-                                    backgroundColor: hexToRgba(mutedColor, 0.1),
-                                    borderWidth: 3,
-                                    borderDash: [8, 4],
-                                    pointRadius: 6,
-                                    pointHoverRadius: 8,
-                                    pointBackgroundColor: mutedColor,
-                                    pointBorderColor: cardBackground,
-                                    pointBorderWidth: 2,
-                                    tension: 0,
-                                    yAxisID: 'y',
-                                    stepped: 'after',
-                                    spanGaps: false
-                                },
-                                {
-                                    label: 'P/L ממומש',
-                                    data: realizedPL,
-                                    borderColor: successColor,
-                                    backgroundColor: hexToRgba(successColor, 0.1),
-                                    borderWidth: 2,
-                                    pointRadius: 5,
-                                    pointHoverRadius: 7,
-                                    pointBackgroundColor: successColor,
-                                    pointBorderColor: cardBackground,
-                                    pointBorderWidth: 2,
-                                    tension: 0.4,
-                                    yAxisID: 'y1',
-                                    spanGaps: false
-                                },
-                                {
-                                    label: 'P/L לא ממומש',
-                                    data: unrealizedPL,
-                                    borderColor: warningColor,
-                                    backgroundColor: hexToRgba(warningColor, 0.1),
-                                    borderWidth: 2,
-                                    pointRadius: 5,
-                                    pointHoverRadius: 7,
-                                    pointBackgroundColor: warningColor,
-                                    pointBorderColor: cardBackground,
-                                    pointBorderWidth: 2,
-                                    tension: 0.4,
-                                    yAxisID: 'y1',
-                                    spanGaps: false
-                                },
-                                {
-                                    label: 'P/L כולל',
-                                    data: totalPL,
-                                    borderColor: primaryColor,
-                                    backgroundColor: hexToRgba(primaryColor, 0.1),
-                                    borderWidth: 3,
-                                    pointRadius: 6,
-                                    pointHoverRadius: 8,
-                                    pointBackgroundColor: primaryColor,
-                                    pointBorderColor: cardBackground,
-                                    pointBorderWidth: 2,
-                                    tension: 0.4,
-                                    yAxisID: 'y1',
-                                    spanGaps: false
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            interaction: {
-                                mode: 'index',
-                                intersect: false
-                            },
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'bottom',
-                                    labels: {
-                                        usePointStyle: true,
-                                        padding: 15,
-                                        font: {
-                                            size: 11
-                                        }
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        title: function(context) {
-                                            const index = context[0].dataIndex;
-                                            const point = timelineData[index];
-                                            let typeText = point.type;
-                                            if (point.type === 'Daily') typeText = 'עדכון יומי';
-                                            else if (point.type === 'Cash Flow') typeText = 'תזרים מזומן';
-                                            return point.date + ' - ' + typeText;
-                                        },
-                                        label: function(context) {
-                                            const index = context.dataIndex;
-                                            const point = timelineData[index];
-                                            let label = context.dataset.label || '';
-                                            
-                                            if (label) {
-                                                label += ': ';
-                                            }
-                                            
-                                            if (context.dataset.yAxisID === 'y') {
-                                                label += context.parsed.y + ' מניות';
-                                            } else {
-                                                label += '$' + context.parsed.y;
-                                            }
-                                            
-                                            return label;
-                                        },
-                                        afterLabel: function(context) {
-                                            const index = context[0].dataIndex;
-                                            const point = timelineData[index];
-                                            
-                                            if (point.type !== 'Daily' && point.id) {
-                                                let info = 'סוג: ' + point.type + ' | מזהה: #' + point.id;
-                                                if (point.type === 'Cash Flow' && point.amount) {
-                                                    info += ' | סכום: $' + point.amount;
-                                                }
-                                                return info;
-                                            }
-                                            return '';
-                                        },
-                                        footer: function(tooltipItems) {
-                                            const index = tooltipItems[0].dataIndex;
-                                            const point = timelineData[index];
-                                            
-                                            if (point.type !== 'Daily' && point.id) {
-                                                return '👁️ לחץ לפרטים מלאים';
-                                            }
-                                            return '';
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'תאריך (מרווחי זמן משתנים)',
-                                        font: {
-                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                            size: 12,
-                                            weight: 'normal'
-                                        }
-                                    },
-                                    ticks: {
-                                        maxRotation: 45,
-                                        minRotation: 45,
-                                        font: {
-                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                            size: 11
-                                        }
-                                    }
-                                },
-                                y: {
-                                    type: 'linear',
-                                    display: true,
-                                    position: 'left',
-                                    title: {
-                                        display: true,
-                                        text: 'גודל פוזיציה (מניות)',
-                                        font: {
-                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                            size: 12,
-                                            weight: 'normal'
-                                        }
-                                    },
-                                    grid: {
-                                        drawOnChartArea: true
-                                    },
-                                    beginAtZero: true,
-                                    ticks: {
-                                        font: {
-                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                            size: 11
-                                        }
-                                    }
-                                },
-                                y1: {
-                                    type: 'linear',
-                                    display: true,
-                                    position: 'right',
-                                    title: {
-                                        display: true,
-                                        text: 'P/L ($)',
-                                        font: {
-                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                            size: 12,
-                                            weight: 'normal'
-                                        }
-                                    },
-                                    grid: {
-                                        drawOnChartArea: false
-                                    },
-                                    ticks: {
-                                        font: {
-                                            family: 'Noto Sans Hebrew, Arial, sans-serif',
-                                            size: 11
-                                        }
-                                    }
-                                }
-                            },
-                            onClick: function(event, elements) {
-                                if (elements && elements.length > 0) {
-                                    const index = elements[0].index;
-                                    const point = timelineData[index];
-                                    
-                                    if (point && point.type !== 'Daily' && point.id) {
-                                        let type = 'execution';
-                                        if (point.type === 'Trade Plan') type = 'plan';
-                                        else if (point.type === 'Cash Flow') type = 'cashflow';
-                                        else if (point.type === 'Note') type = 'note';
-                                        else if (point.type === 'Alert') type = 'alert';
-                                        
-                                        if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
-                                            showCashFlowDetails(point.id);
-                                        } else if (type === 'note' && typeof showNoteDetails === 'function') {
-                                            showNoteDetails(point.id);
-                                        } else if (type === 'alert' && typeof showAlertDetails === 'function') {
-                                            showAlertDetails(point.id);
-                                        } else if (typeof showExecutionDetails === 'function') {
-                                            showExecutionDetails(point.id, type);
-                                        }
-                                    }
-                                }
-                            },
-                            onHover: function(event, elements) {
-                                if (event && event.native && event.native.target) {
-                                    event.native.target.style.cursor = (elements && elements.length > 0) ? 'pointer' : 'default';
-                                }
-                            }
-                        }
-                        });
-                    } catch (error) {
-                        console.error('Error creating timeline chart with Chart.js fallback:', error);
-                        timelineChart = null;
+                    // Add position size change indicator if changed
+                    const prev = i > 0 ? timelineData[i - 1] : null;
+                    if (prev && point.positionSize !== prev.positionSize && point.type !== 'Daily') {
+                        markerText += ` | Pos: ${point.positionSize}`;
                     }
+                    
+                    timelineMarkers.push({
+                        time: convertDateToTradingView(point.date),
+                        position: markerPosition,
+                        color: markerColor,
+                        shape: 'circle',
+                        text: markerText,
+                        size: 1
+                    });
                 }
-            }
-        }
-        
-        async function initPLChart() {
-            const container = '#plChart';
-            if (!document.querySelector(container)) return;
-            
-            // Sample data
-            const dates = ['01/01', '05/01', '10/01', '15/01', '20/01'];
-            const realizedPL = [0, 0, 0, 150, 1110];
-            const unrealizedPL = [0, 0, 100, 120, 0];
-            const totalPL = [0, 0, 100, 270, 1110];
-            const positionSize = [0, 100, 150, 120, 0];
-            
-            // Use ChartSystem for basic charts
-            if (window.ChartSystem) {
-                plChart = await window.ChartSystem.create({
-                    id: 'plChart',
-                    type: 'line',
-                    container: container,
-                    data: {
-                        labels: dates,
-                        datasets: [
-                            {
-                                label: 'P/L ממומש',
-                                data: realizedPL,
-                                borderColor: '#28a745',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                borderWidth: 2,
-                                tension: 0.4,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'P/L לא ממומש',
-                                data: unrealizedPL,
-                                borderColor: '#ffc107',
-                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                                borderWidth: 2,
-                                tension: 0.4,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'P/L כולל',
-                                data: totalPL,
-                                borderColor: '#007bff',
-                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                                borderWidth: 3,
-                                tension: 0.4,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'גודל פוזיציה',
-                                data: positionSize,
-                                borderColor: '#6c757d',
-                                backgroundColor: 'rgba(108, 117, 125, 0.1)',
-                                borderWidth: 2,
-                                borderDash: [5, 5],
-                                tension: 0.4,
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.dataset.label === 'גודל פוזיציה') {
-                                            label += context.parsed.y + ' מניות';
-                                        } else {
-                                            label += '$' + context.parsed.y.toLocaleString();
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'תאריך'
-                                }
-                            },
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                position: 'left',
-                                title: {
-                                    display: true,
-                                    text: 'P/L ($)'
-                                }
-                            },
-                            y1: {
-                                type: 'linear',
-                                display: true,
-                                position: 'right',
-                                title: {
-                                    display: true,
-                                    text: 'גודל פוזיציה (מניות)'
-                                },
-                                grid: {
-                                    drawOnChartArea: false
-                                }
-                            }
+                
+                // Set markers if primitive was created
+                if (markersPrimitive && timelineMarkers.length > 0) {
+                    try {
+                        markersPrimitive.setMarkers(timelineMarkers);
+                        console.log(`✅ [Timeline Chart] Added ${timelineMarkers.length} markers`);
+                    } catch (error) {
+                        console.error('❌ [Timeline Chart] Error setting markers:', error);
+                    }
+                } else if (typeof positionSizeSeries.setMarkers === 'function' && timelineMarkers.length > 0) {
+                    try {
+                        positionSizeSeries.setMarkers(timelineMarkers);
+                        console.log(`✅ [Timeline Chart] Added ${timelineMarkers.length} markers using series.setMarkers`);
+                    } catch (error) {
+                        console.error('❌ [Timeline Chart] Error setting markers on series:', error);
+                    }
+                } else {
+                    console.warn('⚠️ [Timeline Chart] Cannot set markers - method not available');
+                }
+                
+                // Fit content to show all data
+                try {
+                    console.log('🔍 [Timeline Chart] Attempting fitContent()...');
+                    console.log('🔍 [Timeline Chart] Data points:', timelineData.length);
+                    console.log('🔍 [Timeline Chart] TimeScale methods:', Object.keys(timelineChart.timeScale()));
+                    console.log('🔍 [Timeline Chart] fitContent type:', typeof timelineChart.timeScale().fitContent);
+                    
+                    timelineChart.timeScale().fitContent();
+                    
+                    // Check if fitContent worked
+                    setTimeout(() => {
+                        const visibleRange = timelineChart.timeScale().getVisibleRange();
+                        console.log('✅ [Timeline Chart] fitContent() called. Visible range:', visibleRange);
+                        if (!visibleRange) {
+                            console.warn('⚠️ [Timeline Chart] fitContent() did not set visible range!');
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ [Timeline Chart] Error calling fitContent():', error);
+                }
+                
+                // Store timelineData for tooltip and click handlers
+                timelineChart._timelineData = timelineData;
+                timelineChart._series = {
+                    positionSize: positionSizeSeries,
+                    realizedPL: realizedPLSeries,
+                    unrealizedPL: unrealizedPLSeries,
+                    totalPL: totalPLSeries
+                };
+                
+                // Setup zoom and pan controls
+                setupTimelineChartControls(timelineChart);
+                
+                // Subscribe to crosshair move for custom tooltips
+                timelineChart.subscribeCrosshairMove(param => {
+                    if (param.point === undefined || !param.time || param.point.x < 0 || param.point.x > container.clientWidth || param.point.y < 0 || param.point.y > container.clientHeight) {
+                        return;
+                    }
+                    
+                    // Find the closest data point
+                    const timeStr = param.time;
+                    const dataIndex = timelineData.findIndex(d => convertDateToTradingView(d.date) === timeStr);
+                    if (dataIndex === -1) return;
+                    
+                    const point = timelineData[dataIndex];
+                    // Tooltip will be handled by TradingView's built-in tooltip
+                });
+                
+                // Subscribe to click for showing details
+                timelineChart.subscribeClick(param => {
+                    if (!param.time) return;
+                    
+                    const timeStr = param.time;
+                    const dataIndex = timelineData.findIndex(d => convertDateToTradingView(d.date) === timeStr);
+                    if (dataIndex === -1) return;
+                    
+                    const point = timelineData[dataIndex];
+                    if (point && point.type !== 'Daily' && point.id) {
+                        let type = 'execution';
+                        if (point.type === 'Trade Plan') type = 'plan';
+                        else if (point.type === 'Cash Flow') type = 'cashflow';
+                        else if (point.type === 'Note') type = 'note';
+                        else if (point.type === 'Alert') type = 'alert';
+                        
+                        if (type === 'cashflow' && typeof showCashFlowDetails === 'function') {
+                            showCashFlowDetails(point.id);
+                        } else if (type === 'note' && typeof showNoteDetails === 'function') {
+                            showNoteDetails(point.id);
+                        } else if (type === 'alert' && typeof showAlertDetails === 'function') {
+                            showAlertDetails(point.id);
+                        } else if (typeof showExecutionDetails === 'function') {
+                            showExecutionDetails(point.id, type);
                         }
                     }
                 });
-            } else {
-                // Fallback to direct Chart.js if ChartSystem not available
-                const ctx = document.getElementById('plChart');
-                if (ctx) {
-                    plChart = new Chart(ctx, {
-                        type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        {
-                            label: 'P/L ממומש',
-                            data: realizedPL,
-                            borderColor: '#28a745',
-                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'P/L לא ממומש',
-                            data: unrealizedPL,
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'P/L כולל',
-                            data: totalPL,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'גודל פוזיציה',
-                            data: positionSize,
-                            borderColor: '#6c757d',
-                            backgroundColor: 'rgba(108, 117, 125, 0.1)',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            tension: 0.4,
-                            yAxisID: 'y1'
+                
+            } catch (error) {
+                console.error('Error creating timeline chart with TradingView:', error);
+                timelineChart = null;
+            }
+        }
+        
+        // Chart synchronization flag to prevent infinite loops
+        let isSyncingCharts = false;
+        let chartsSynchronized = false; // Flag to ensure synchronization is set up only once
+        
+        // Setup synchronization between timeline and market price charts
+        // Expected behavior: When user zooms/pans one chart, the other chart should automatically
+        // update to show the same time range. This includes:
+        // - Mouse wheel zoom
+        // - Click and drag to zoom
+        // - Pan (scroll) left/right
+        // - Using zoom/pan buttons
+        // - Programmatic zoom changes
+        
+        // Track sync setup attempts to prevent infinite loops
+        let syncSetupAttempts = 0;
+        const MAX_SYNC_SETUP_ATTEMPTS = 50; // Stop after 5 seconds (50 * 100ms)
+        
+        function setupChartSynchronization() {
+            // Prevent multiple setups
+            if (chartsSynchronized) {
+                console.log('⚠️ [Sync] Charts already synchronized, skipping setup');
+                return;
+            }
+            
+            if (!timelineChart || !marketPriceChart) {
+                syncSetupAttempts++;
+                
+                if (syncSetupAttempts >= MAX_SYNC_SETUP_ATTEMPTS) {
+                    console.error('❌ [Sync] Max attempts reached. Timeline chart may have failed to initialize.');
+                    console.error('❌ [Sync] Timeline chart:', timelineChart);
+                    console.error('❌ [Sync] Market chart:', marketPriceChart);
+                    console.error('❌ [Sync] Stopping sync setup attempts. Please check console for errors.');
+                    return; // Stop trying
+                }
+                
+                // Only log every 10 attempts to reduce console spam
+                if (syncSetupAttempts % 10 === 0) {
+                    console.log(`⏳ [Sync] Charts not ready yet (attempt ${syncSetupAttempts}/${MAX_SYNC_SETUP_ATTEMPTS}). Timeline:`, !!timelineChart, 'Market:', !!marketPriceChart);
+                }
+                
+                // If charts are not ready, try again after a short delay
+                setTimeout(setupChartSynchronization, 100);
+                return;
+            }
+            
+            // Reset attempts counter on success
+            syncSetupAttempts = 0;
+            
+            console.log('🔧 [Sync] Setting up chart synchronization...');
+            console.log('📋 [Sync] Expected behavior:');
+            console.log('   - Zoom in/out on one chart → other chart zooms too');
+            console.log('   - Pan (scroll) one chart → other chart pans too');
+            console.log('   - Use zoom buttons on one chart → other chart updates too');
+            console.log('   - Both charts always show the same time range');
+            
+            const timelineTimeScale = timelineChart.timeScale();
+            const marketTimeScale = marketPriceChart.timeScale();
+            
+            // Check if subscribeVisibleTimeRangeChange exists
+            console.log('🔍 [Sync] Timeline timeScale methods:', Object.keys(timelineTimeScale));
+            console.log('🔍 [Sync] Market timeScale methods:', Object.keys(marketTimeScale));
+            console.log('🔍 [Sync] subscribeVisibleTimeRangeChange type (Timeline):', typeof timelineTimeScale.subscribeVisibleTimeRangeChange);
+            console.log('🔍 [Sync] subscribeVisibleTimeRangeChange type (Market):', typeof marketTimeScale.subscribeVisibleTimeRangeChange);
+            
+            if (typeof timelineTimeScale.subscribeVisibleTimeRangeChange !== 'function') {
+                console.error('❌ [Sync] subscribeVisibleTimeRangeChange is not a function on timeline chart!');
+                console.error('❌ [Sync] Available methods:', Object.keys(timelineTimeScale));
+                return;
+            }
+            
+            if (typeof marketTimeScale.subscribeVisibleTimeRangeChange !== 'function') {
+                console.error('❌ [Sync] subscribeVisibleTimeRangeChange is not a function on market chart!');
+                console.error('❌ [Sync] Available methods:', Object.keys(marketTimeScale));
+                return;
+            }
+            
+            // Mark as synchronized to prevent duplicate setup
+            chartsSynchronized = true;
+            
+            // Helper function to compare time ranges (avoid unnecessary updates)
+            // Returns true only if ranges are EXACTLY the same
+            // IMPORTANT: This function is called very frequently, so we minimize logging
+            let timeRangesEqualCallCount = 0;
+            function timeRangesEqual(range1, range2) {
+                timeRangesEqualCallCount++;
+                
+                if (!range1 || !range2) {
+                    return false;
+                }
+                if (!range1.from || !range1.to || !range2.from || !range2.to) {
+                    return false;
+                }
+                
+                // Normalize to strings for comparison - handle both string dates and timestamps
+                let from1, to1, from2, to2;
+                
+                // Convert to comparable format
+                if (typeof range1.from === 'string') {
+                    from1 = range1.from.trim();
+                } else {
+                    // It's a timestamp or number - convert to date string
+                    from1 = new Date(range1.from).toISOString().split('T')[0];
+                }
+                
+                if (typeof range1.to === 'string') {
+                    to1 = range1.to.trim();
+                } else {
+                    to1 = new Date(range1.to).toISOString().split('T')[0];
+                }
+                
+                if (typeof range2.from === 'string') {
+                    from2 = range2.from.trim();
+                } else {
+                    from2 = new Date(range2.from).toISOString().split('T')[0];
+                }
+                
+                if (typeof range2.to === 'string') {
+                    to2 = range2.to.trim();
+                } else {
+                    to2 = new Date(range2.to).toISOString().split('T')[0];
+                }
+                
+                const isEqual = from1 === from2 && to1 === to2;
+                
+                // Only log differences occasionally to avoid spam
+                if (!isEqual && timeRangesEqualCallCount % 20 === 0) {
+                    console.log('🔍 [timeRangesEqual] Ranges differ:', {
+                        range1: { from: from1, to: to1, original: { from: range1.from, to: range1.to } },
+                        range2: { from: from2, to: to2, original: { from: range2.from, to: range2.to } },
+                        fromEqual: from1 === from2,
+                        toEqual: to1 === to2
+                    });
+                }
+                
+                return isEqual;
+            }
+            
+            // Helper function to sync ranges between charts
+            function syncRangeToOtherChart(sourceRange, sourceTimeScale, targetTimeScale, direction) {
+                if (isSyncingCharts) {
+                    console.log(`⏸️ [Sync] ${direction} - Already syncing, skipping`);
+                    return; // Prevent infinite loop
+                }
+                
+                if (!sourceRange || !sourceRange.from || !sourceRange.to) {
+                    console.warn(`⚠️ [Sync] ${direction} - Invalid range:`, sourceRange);
+                    return;
+                }
+                
+                // Check if target chart already has the same range (avoid unnecessary update)
+                const currentTargetRange = targetTimeScale.getVisibleRange();
+                const rangesEqual = timeRangesEqual(sourceRange, currentTargetRange);
+                
+                console.log(`🔍 [Sync] ${direction} - Range comparison:`, {
+                    source: sourceRange,
+                    target: currentTargetRange,
+                    equal: rangesEqual
+                });
+                
+                if (rangesEqual) {
+                    console.log(`✅ [Sync] ${direction} - Already in sync, skipping`);
+                    return; // Already in sync
+                }
+                
+                console.log(`🔄 [Sync] ${direction} - Syncing:`, {
+                    from: sourceRange.from,
+                    to: sourceRange.to
+                }, '→ Target current:', currentTargetRange);
+                
+                isSyncingCharts = true;
+                try {
+                    targetTimeScale.setVisibleRange({
+                        from: sourceRange.from,
+                        to: sourceRange.to
+                    });
+                    console.log(`✅ [Sync] ${direction} - Sync completed successfully`);
+                } catch (error) {
+                    console.error(`❌ [Sync] ${direction} - Error:`, error);
+                } finally {
+                    // Reset flag after a short delay to allow the update to complete
+                    setTimeout(() => {
+                        isSyncingCharts = false;
+                        console.log(`🔄 [Sync] ${direction} - Sync flag reset`);
+                    }, 50);
+                }
+            }
+            
+            // SIMPLIFIED: Timeline chart is the MASTER, Market chart is the SLAVE
+            // Only Timeline → Market synchronization (one-way only)
+            // This ensures they always stay in sync on the X-axis
+            
+            // Step 1: Wait for both charts to complete fitContent, then sync initial ranges
+            // We wait a bit longer to ensure fitContent has completed on both charts
+            setTimeout(() => {
+                const timelineRange = timelineTimeScale.getVisibleRange();
+                const marketRange = marketTimeScale.getVisibleRange();
+                
+                console.log('🔄 [Sync] Initial ranges after fitContent:');
+                console.log('   Timeline:', timelineRange);
+                console.log('   Market:', marketRange);
+                
+                if (timelineRange) {
+                    // Set market chart to match timeline chart
+                    console.log('🔄 [Sync] Initial sync - Setting market chart to timeline range:', timelineRange);
+                    try {
+                        marketTimeScale.setVisibleRange({
+                            from: timelineRange.from,
+                            to: timelineRange.to
+                        });
+                        console.log('✅ [Sync] Initial sync completed');
+                    } catch (error) {
+                        console.error('❌ [Sync] Error in initial sync:', error);
+                    }
+                } else {
+                    console.warn('⚠️ [Sync] Timeline range not available for initial sync');
+                }
+            }, 200); // Wait 200ms for fitContent to complete
+            
+            // Step 2: Simple polling - Timeline is master, Market follows
+            let lastTimelineRange = null;
+            let syncDebounceTimer = null;
+            const SYNC_DEBOUNCE_DELAY = 50; // 50ms debounce
+            
+            console.log('🔄 [Sync] Starting simple one-way synchronization: Timeline (master) → Market (slave)');
+            
+            const syncPollInterval = setInterval(() => {
+                if (isSyncingCharts) {
+                    return; // Skip if already syncing
+                }
+                
+                const currentTimelineRange = timelineTimeScale.getVisibleRange();
+                
+                // Check if timeline range changed
+                if (currentTimelineRange) {
+                    if (!lastTimelineRange || !timeRangesEqual(currentTimelineRange, lastTimelineRange)) {
+                        // Range changed - sync to market chart
+                        lastTimelineRange = currentTimelineRange;
+                        
+                        // Debounce the sync
+                        if (syncDebounceTimer) {
+                            clearTimeout(syncDebounceTimer);
                         }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
+                        syncDebounceTimer = setTimeout(() => {
+                            if (!isSyncingCharts) {
+                                isSyncingCharts = true;
+                                try {
+                                    marketTimeScale.setVisibleRange({
+                                        from: currentTimelineRange.from,
+                                        to: currentTimelineRange.to
+                                    });
+                                    // Only log occasionally to avoid spam
+                                    if (Math.random() < 0.1) {
+                                        console.log('✅ [Sync] Timeline → Market synced:', {
+                                            from: currentTimelineRange.from,
+                                            to: currentTimelineRange.to
+                                        });
                                     }
-                                    if (context.dataset.label === 'גודל פוזיציה') {
-                                        label += context.parsed.y + ' מניות';
-                                    } else {
-                                        label += '$' + context.parsed.y.toLocaleString();
-                                    }
-                                    return label;
+                                } catch (error) {
+                                    console.error('❌ [Sync] Error syncing Timeline → Market:', error);
+                                } finally {
+                                    setTimeout(() => {
+                                        isSyncingCharts = false;
+                                    }, 20);
                                 }
                             }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'תאריך'
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'P/L ($)'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'גודל פוזיציה'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
-                        }
+                        }, SYNC_DEBOUNCE_DELAY);
                     }
                 }
+            }, 30); // Check every 30ms
+            
+            // Store interval for cleanup
+            window._syncPollInterval = syncPollInterval;
+            
+            // Store interval ID for cleanup
+            window._syncPollInterval = syncPollInterval;
+            
+            console.log('✅ [Sync] Chart synchronization setup complete');
+            console.log('🧪 [Sync] Test: Try zooming/panning one chart and watch the other update');
+        }
+        
+        // Test function to check series methods (can be called from console)
+        window.testSeriesMethods = function(seriesName = 'positionSize') {
+            console.log(`🧪 Testing series methods for: ${seriesName}`);
+            
+            if (!timelineChart || !timelineChart._series) {
+                console.error('❌ Timeline chart or series not available');
+                return;
+            }
+            
+            const series = timelineChart._series[seriesName];
+            if (!series) {
+                console.error(`❌ Series ${seriesName} not found. Available series:`, Object.keys(timelineChart._series));
+                return;
+            }
+            
+            console.log(`✅ Found series: ${seriesName}`);
+            console.log('Series object:', series);
+            console.log('Series methods:', Object.keys(series));
+            console.log('Series prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(series)));
+            
+            // Check for setMarkers
+            console.log('setMarkers type:', typeof series.setMarkers);
+            if (typeof series.setMarkers === 'function') {
+                console.log('✅ setMarkers is a function');
+            } else {
+                console.warn('⚠️ setMarkers is not a function');
+            }
+            
+            // Check for createSeriesMarkers
+            const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+            if (lightweightCharts) {
+                console.log('LightweightCharts.createSeriesMarkers type:', typeof lightweightCharts.createSeriesMarkers);
+                if (typeof lightweightCharts.createSeriesMarkers === 'function') {
+                    console.log('✅ createSeriesMarkers is available');
+                    try {
+                        const markersPrimitive = lightweightCharts.createSeriesMarkers(series);
+                        console.log('✅ createSeriesMarkers worked! Primitive:', markersPrimitive);
+                        console.log('Primitive methods:', Object.keys(markersPrimitive));
+                        console.log('Primitive setMarkers type:', typeof markersPrimitive.setMarkers);
+                    } catch (error) {
+                        console.error('❌ createSeriesMarkers failed:', error);
+                    }
+                } else {
+                    console.warn('⚠️ createSeriesMarkers is not available');
+                }
+            } else {
+                console.error('❌ LightweightCharts not available');
+            }
+        };
+        
+        // Debug function to check chart state (can be called from console)
+        window.debugCharts = function() {
+            console.log('=== 📊 CHART DEBUG INFO ===');
+            console.log('Timeline Chart:', timelineChart);
+            console.log('Market Price Chart:', marketPriceChart);
+            
+            if (timelineChart) {
+                const timelineTimeScale = timelineChart.timeScale();
+                console.log('Timeline TimeScale:', timelineTimeScale);
+                console.log('Timeline Visible Range:', timelineTimeScale.getVisibleRange());
+                console.log('Timeline TimeScale methods:', Object.keys(timelineTimeScale));
+                console.log('Timeline fitContent type:', typeof timelineTimeScale.fitContent);
+                console.log('Timeline subscribeVisibleTimeRangeChange type:', typeof timelineTimeScale.subscribeVisibleTimeRangeChange);
+                
+                // Try to get all series data
+                if (timelineChart._series) {
+                    console.log('Timeline Series:', Object.keys(timelineChart._series));
+                    Object.keys(timelineChart._series).forEach(key => {
+                        const series = timelineChart._series[key];
+                        if (series && typeof series.data === 'function') {
+                            try {
+                                const data = series.data();
+                                console.log(`Timeline Series ${key} data points:`, data ? data.length : 0);
+                            } catch (e) {
+                                console.log(`Timeline Series ${key} - cannot get data:`, e.message);
+                            }
+                        }
                     });
                 }
             }
-        }
-        
-        function updatePLChartMarker(stepIndex) {
-            if (!plChart) return;
             
-            // Add vertical line at selected step
-            const chart = plChart;
-            const meta = chart.getDatasetMeta(0);
-            const xScale = chart.scales.x;
-            
-            // This would require adding a plugin to draw a vertical line
-            // For now, we'll just highlight the point
-            chart.data.datasets.forEach((dataset, i) => {
-                if (chart.getDatasetMeta(i).data[stepIndex]) {
-                    chart.getDatasetMeta(i).data[stepIndex].options.radius = 8;
-                    chart.getDatasetMeta(i).data[stepIndex].options.borderWidth = 4;
-                }
-            });
-            chart.update();
-        }
-        
-        // Note: Market Price Chart uses external charting system (not ChartSystem)
-        // This is a placeholder - will be replaced with Lightweight Charts or similar
-        function initMarketPriceChart() {
-            const container = '#marketPriceChart';
-            if (!document.querySelector(container)) return;
-            
-            // Sample market price data
-            const dates = ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01', '08/01', '09/01', '10/01', 
-                          '11/01', '12/01', '13/01', '14/01', '15/01', '16/01', '17/01', '18/01', '19/01', '20/01'];
-            const marketPrices = [148, 149, 150, 151, 150, 152, 153, 152, 154, 152, 153, 154, 155, 156, 155, 157, 158, 157, 158, 158];
-            const entryPoints = [null, null, null, null, 150, null, null, null, null, 152, null, null, null, null, null, null, null, null, null, null];
-            const exitPoints = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 155, null, null, null, null, 158];
-            
-            // Execution data for tooltips
-            const executionData = {
-                4: { type: 'Buy', qty: 100, price: 150, id: 101 },
-                9: { type: 'Buy', qty: 50, price: 152, id: 102 },
-                14: { type: 'Sell', qty: 30, price: 155, realized: 150, percent: 3.2, id: 103 },
-                19: { type: 'Sell', qty: 120, price: 158, realized: 960, percent: 5.1, id: 104 }
-            };
-            
-            // For now, use Chart.js as placeholder (will be replaced with external system)
-            // Wait for Chart.js to be available
-            if (typeof Chart === 'undefined') {
-                console.warn('Chart.js not available yet, retrying market price chart initialization...');
-                setTimeout(initMarketPriceChart, 500);
-                return;
-            }
-            
-            const ctx = document.getElementById('marketPriceChart');
-            if (!ctx) {
-                console.warn('Market price chart container not found');
-                return;
-            }
-            
-            // Destroy existing chart if exists
             if (marketPriceChart) {
+                const marketTimeScale = marketPriceChart.timeScale();
+                console.log('Market TimeScale:', marketTimeScale);
+                console.log('Market Visible Range:', marketTimeScale.getVisibleRange());
+                console.log('Market TimeScale methods:', Object.keys(marketTimeScale));
+                console.log('Market fitContent type:', typeof marketTimeScale.fitContent);
+                console.log('Market subscribeVisibleTimeRangeChange type:', typeof marketTimeScale.subscribeVisibleTimeRangeChange);
+            }
+            
+            console.log('Charts Synchronized:', chartsSynchronized);
+            console.log('Is Syncing:', isSyncingCharts);
+            console.log('=== END DEBUG INFO ===');
+        };
+        
+        // Test function to manually trigger fitContent (can be called from console)
+        window.testFitContent = function(chartName = 'both') {
+            console.log(`🧪 Testing fitContent for: ${chartName}`);
+            
+            if ((chartName === 'timeline' || chartName === 'both') && timelineChart) {
                 try {
-                    if (typeof marketPriceChart.destroy === 'function') {
-                        marketPriceChart.destroy();
+                    console.log('🔍 Testing Timeline Chart fitContent...');
+                    const timeScale = timelineChart.timeScale();
+                    const before = timeScale.getVisibleRange();
+                    console.log('Before fitContent:', before);
+                    
+                    timeScale.fitContent();
+                    
+                    setTimeout(() => {
+                        const after = timeScale.getVisibleRange();
+                        console.log('After fitContent:', after);
+                        if (before && after && 
+                            (before.from !== after.from || before.to !== after.to)) {
+                            console.log('✅ Timeline Chart fitContent worked!');
+                        } else {
+                            console.warn('⚠️ Timeline Chart fitContent may not have changed the range');
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Error testing Timeline fitContent:', error);
+                }
+            }
+            
+            if ((chartName === 'market' || chartName === 'both') && marketPriceChart) {
+                try {
+                    console.log('🔍 Testing Market Price Chart fitContent...');
+                    const timeScale = marketPriceChart.timeScale();
+                    const before = timeScale.getVisibleRange();
+                    console.log('Before fitContent:', before);
+                    
+                    timeScale.fitContent();
+                    
+                    setTimeout(() => {
+                        const after = timeScale.getVisibleRange();
+                        console.log('After fitContent:', after);
+                        if (before && after && 
+                            (before.from !== after.from || before.to !== after.to)) {
+                            console.log('✅ Market Price Chart fitContent worked!');
+                        } else {
+                            console.warn('⚠️ Market Price Chart fitContent may not have changed the range');
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ Error testing Market fitContent:', error);
+                }
+            }
+        };
+        
+        // Test function to manually trigger sync (can be called from console)
+        window.testSync = function() {
+            console.log('🧪 Testing chart synchronization...');
+            
+            if (!timelineChart || !marketPriceChart) {
+                console.error('❌ Charts not available');
+                return;
+            }
+            
+            const timelineTimeScale = timelineChart.timeScale();
+            const marketTimeScale = marketPriceChart.timeScale();
+            
+            const timelineRange = timelineTimeScale.getVisibleRange();
+            const marketRange = marketTimeScale.getVisibleRange();
+            
+            console.log('Timeline range:', timelineRange);
+            console.log('Market range:', marketRange);
+            
+            // Try to change timeline range and see if market updates
+            if (timelineRange && timelineRange.from && timelineRange.to) {
+                const testRange = {
+                    from: timelineRange.from,
+                    to: timelineRange.to
+                };
+                
+                console.log('🔄 Setting timeline range to:', testRange);
+                timelineTimeScale.setVisibleRange(testRange);
+                
+                setTimeout(() => {
+                    const newMarketRange = marketTimeScale.getVisibleRange();
+                    console.log('Market range after timeline change:', newMarketRange);
+                    
+                    if (newMarketRange && 
+                        newMarketRange.from === testRange.from && 
+                        newMarketRange.to === testRange.to) {
+                        console.log('✅ Sync is working!');
+                    } else {
+                        console.warn('⚠️ Sync may not be working. Expected:', testRange, 'Got:', newMarketRange);
                     }
+                }, 200);
+            }
+        };
+        
+        // Setup zoom and pan controls for timeline chart
+        function setupTimelineChartControls(chart) {
+            if (!chart) return;
+            
+            const timeScale = chart.timeScale();
+            
+            // Helper function to get time difference in milliseconds
+            function getTimeDiff(from, to) {
+                if (typeof from === 'string' && typeof to === 'string') {
+                    // Both are time strings (YYYY-MM-DD)
+                    return new Date(to).getTime() - new Date(from).getTime();
+                }
+                // Both are timestamps
+                return to - from;
+            }
+            
+            // Helper function to add/subtract time
+            function addTime(time, ms) {
+                if (typeof time === 'string') {
+                    const date = new Date(time);
+                    date.setTime(date.getTime() + ms);
+                    return date.toISOString().split('T')[0]; // Return YYYY-MM-DD
+                }
+                return time + ms;
+            }
+            
+            // Zoom In
+            const zoomInBtn = document.getElementById('timelineZoomIn');
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                    try {
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                            const newRange = range * 0.8; // Zoom in by 20%
+                            const centerTime = typeof visibleRange.from === 'string' 
+                                ? new Date(visibleRange.from).getTime() + range / 2
+                                : visibleRange.from + range / 2;
+                            const newFrom = addTime(visibleRange.from, (range - newRange) / 2);
+                            const newTo = addTime(visibleRange.from, range - (range - newRange) / 2);
+                            timeScale.setVisibleRange({
+                                from: newFrom,
+                                to: newTo
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('Error zooming in:', error);
+                    }
+                });
+            }
+            
+            // Zoom Out
+            const zoomOutBtn = document.getElementById('timelineZoomOut');
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                    try {
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                            const newRange = range * 1.25; // Zoom out by 25%
+                            const shift = (newRange - range) / 2;
+                            
+                            // Calculate center point
+                            const centerTime = typeof visibleRange.from === 'string' 
+                                ? new Date(visibleRange.from).getTime() + range / 2
+                                : visibleRange.from + range / 2;
+                            
+                            // Expand range around center
+                            const newFromTime = centerTime - newRange / 2;
+                            const newToTime = centerTime + newRange / 2;
+                            
+                            // Convert back to string format if needed
+                            let newFrom, newTo;
+                            if (typeof visibleRange.from === 'string') {
+                                newFrom = new Date(newFromTime).toISOString().split('T')[0];
+                                newTo = new Date(newToTime).toISOString().split('T')[0];
+                            } else {
+                                newFrom = newFromTime;
+                                newTo = newToTime;
+                            }
+                            
+                            timeScale.setVisibleRange({
+                                from: newFrom,
+                                to: newTo
+                            });
+                            console.log('🔍 [Zoom Out] Range expanded:', { from: newFrom, to: newTo });
+                        }
+                    } catch (error) {
+                        console.warn('Error zooming out:', error);
+                    }
+                });
+            }
+            
+            // Reset Zoom (Fit Content)
+            const resetBtn = document.getElementById('timelineReset');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    try {
+                        timeScale.fitContent();
+                    } catch (error) {
+                        console.warn('Error resetting zoom:', error);
+                    }
+                });
+            }
+            
+            // Pan Left (move left in time - show later data) - SWAPPED with Pan Right
+            const panLeftBtn = document.getElementById('timelinePanLeft');
+            if (panLeftBtn) {
+                panLeftBtn.addEventListener('click', () => {
+                    try {
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                            const shift = range * 0.2; // Shift by 20% of visible range
+                            // Move right (show later data) - positive shift
+                            const newFrom = addTime(visibleRange.from, shift);
+                            const newTo = addTime(visibleRange.to, shift);
+                            timeScale.setVisibleRange({
+                                from: newFrom,
+                                to: newTo
+                            });
+                            console.log('⬅️ [Pan Left] Moved right (later data):', { from: newFrom, to: newTo });
+                        }
+                    } catch (error) {
+                        console.warn('Error panning left:', error);
+                    }
+                });
+            }
+            
+            // Pan Right (move right in time - show earlier data) - SWAPPED with Pan Left
+            const panRightBtn = document.getElementById('timelinePanRight');
+            if (panRightBtn) {
+                panRightBtn.addEventListener('click', () => {
+                    try {
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = getTimeDiff(visibleRange.from, visibleRange.to);
+                            const shift = range * 0.2; // Shift by 20% of visible range
+                            // Move left (show earlier data) - negative shift
+                            const newFrom = addTime(visibleRange.from, -shift);
+                            const newTo = addTime(visibleRange.to, -shift);
+                            timeScale.setVisibleRange({
+                                from: newFrom,
+                                to: newTo
+                            });
+                            console.log('➡️ [Pan Right] Moved left (earlier data):', { from: newFrom, to: newTo });
+                        }
+                    } catch (error) {
+                        console.warn('Error panning right:', error);
+                    }
+                });
+            }
+        }
+        
+        // P/L Chart removed - no longer needed
+        
+        async function initMarketPriceChart() {
+            const container = document.getElementById('marketPriceChart');
+            if (!container) return;
+            
+            // Wait for TradingView to be available
+            let retries = 0;
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                    typeof window.LightweightCharts === 'undefined' || 
+                    typeof window.lightweightCharts === 'undefined') && 
+                   retries < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (typeof window.TradingViewChartAdapter === 'undefined') {
+                console.error('TradingViewChartAdapter not available');
+                return;
+            }
+            
+            // Destroy existing chart
+            if (marketPriceChart && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
+                try {
+                    window.TradingViewChartAdapter.destroyChart(marketPriceChart);
                 } catch (e) {
                     console.warn('Error destroying market price chart:', e);
                 }
                 marketPriceChart = null;
             }
             
-            // Also check Chart.js registry
-            if (typeof Chart !== 'undefined' && Chart.getChart) {
-                const existingChart = Chart.getChart(ctx);
-                if (existingChart) {
-                    try {
-                        existingChart.destroy();
-                    } catch (e) {
-                        console.warn('Error destroying Chart.js chart:', e);
-                    }
+            container.innerHTML = '';
+            
+            // Market price data - MUST use EXACT same dates as timeline chart
+            // Build dates and prices from timeline data to ensure perfect alignment
+            const dates = [];
+            const marketPrices = [];
+            
+            // Helper function to convert date (same as in timeline chart)
+            function convertDateToTradingView(dateStr) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    const day = parts[0].padStart(2, '0');
+                    const month = parts[1].padStart(2, '0');
+                    const year = parts[2];
+                    return `${year}-${month}-${day}`;
                 }
+                return dateStr;
             }
             
-            marketPriceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [
-                        {
-                            label: 'מחיר שוק',
-                            data: marketPrices,
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            pointRadius: 0
-                        },
-                        {
-                            label: 'כניסה',
-                            data: entryPoints,
-                            borderColor: '#28a745',
-                            backgroundColor: '#28a745',
-                            borderWidth: 0,
-                            pointRadius: 8,
-                            pointStyle: 'circle',
-                            showLine: false
-                        },
-                        {
-                            label: 'יציאה',
-                            data: exitPoints,
-                            borderColor: '#dc3545',
-                            backgroundColor: '#dc3545',
-                            borderWidth: 0,
-                            pointRadius: 8,
-                            pointStyle: 'circle',
-                            showLine: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    if (context.dataset.label === 'מחיר שוק') {
-                                        return 'מחיר שוק: $' + context.parsed.y;
-                                    } else if (context.dataset.label === 'כניסה') {
-                                        const index = context.dataIndex;
-                                        // דוגמה: "כניסה: Buy 100# | 150$"
-                                        return 'כניסה: Buy 100# | $' + context.parsed.y;
-                                    } else if (context.dataset.label === 'יציאה') {
-                                        const index = context.dataIndex;
-                                        // דוגמה: "יציאה: מכירה 50# | 134$ , Rez. = 50$ | 5%"
-                                        if (index === 14) {
-                                            return 'יציאה: מכירה 30# | $155 , Rez. = $150 | 3.2%';
-                                        } else if (index === 19) {
-                                            return 'יציאה: מכירה 120# | $158 , Rez. = $960 | 5.1%';
-                                        }
-                                        return 'יציאה: $' + context.parsed.y;
-                                    }
-                                    return context.dataset.label + ': $' + context.parsed.y;
-                                }
+            // Use timeline data if available, otherwise use fallback
+            if (window._timelineData && window._timelineData.length > 0) {
+                console.log('📊 [Market Price Chart] Building dates and prices from timeline data...');
+                let lastKnownPrice = 150; // Starting price before first execution
+                
+                // First pass: collect all execution prices and their indices
+                const executionPrices = new Map();
+                window._timelineData.forEach((point, index) => {
+                    if (point.type === 'Execution' && point.price) {
+                        executionPrices.set(index, point.price);
+                    }
+                });
+                
+                // Second pass: build dates and prices
+                window._timelineData.forEach((point, index) => {
+                    const tvDate = convertDateToTradingView(point.date);
+                    dates.push(tvDate);
+                    
+                    // Use price from execution if available
+                    if (point.type === 'Execution' && point.price) {
+                        marketPrices.push(point.price);
+                        lastKnownPrice = point.price;
+                        console.log(`  📍 [${tvDate}] Execution price: $${point.price}`);
+                    } else {
+                        // For Daily, Cash Flow, Dividend, Trade Plan - interpolate between known prices
+                        // Find previous and next execution prices
+                        let prevExecutionPrice = lastKnownPrice;
+                        let prevExecutionIndex = -1;
+                        let nextExecutionPrice = null;
+                        let nextExecutionIndex = -1;
+                        
+                        // Find previous execution
+                        for (let i = index - 1; i >= 0; i--) {
+                            if (executionPrices.has(i)) {
+                                prevExecutionPrice = executionPrices.get(i);
+                                prevExecutionIndex = i;
+                                break;
                             }
                         }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'תאריך'
+                        
+                        // Find next execution
+                        for (let i = index + 1; i < window._timelineData.length; i++) {
+                            if (executionPrices.has(i)) {
+                                nextExecutionPrice = executionPrices.get(i);
+                                nextExecutionIndex = i;
+                                break;
                             }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'מחיר ($)'
-                            }
+                        }
+                        
+                        // Interpolate between previous and next execution prices
+                        if (nextExecutionPrice !== null && prevExecutionIndex >= 0) {
+                            // Linear interpolation based on position between executions
+                            const totalSteps = nextExecutionIndex - prevExecutionIndex;
+                            const currentStep = index - prevExecutionIndex;
+                            const progress = currentStep / totalSteps;
+                            const interpolatedPrice = prevExecutionPrice + (nextExecutionPrice - prevExecutionPrice) * progress;
+                            marketPrices.push(Math.round(interpolatedPrice * 10) / 10); // Round to 1 decimal
+                            console.log(`  📍 [${tvDate}] Interpolated price: $${marketPrices[marketPrices.length - 1]} (between $${prevExecutionPrice} and $${nextExecutionPrice}, progress: ${(progress * 100).toFixed(0)}%)`);
+                        } else {
+                            // No next execution, use last known price
+                            marketPrices.push(lastKnownPrice);
+                            console.log(`  📍 [${tvDate}] Using last known price: $${lastKnownPrice}`);
                         }
                     }
+                });
+                console.log(`✅ [Market Price Chart] Created ${dates.length} data points from timeline data`);
+                console.log(`   Dates:`, dates);
+                console.log(`   Prices:`, marketPrices);
+            } else {
+                console.warn('⚠️ [Market Price Chart] Timeline data not available, using fallback dates');
+                // Fallback: Use same dates as timeline chart would have
+                const fallbackDates = [
+                    { date: '01/01/2025', price: 150 },
+                    { date: '05/01/2025', price: 150 },
+                    { date: '07/01/2025', price: 152 },
+                    { date: '08/01/2025', price: 152 },
+                    { date: '10/01/2025', price: 152 },
+                    { date: '12/01/2025', price: 154 },
+                    { date: '13/01/2025', price: 154 },
+                    { date: '15/01/2025', price: 155 },
+                    { date: '17/01/2025', price: 157 },
+                    { date: '20/01/2025', price: 158 }
+                ];
+                fallbackDates.forEach(item => {
+                    dates.push(convertDateToTradingView(item.date));
+                    marketPrices.push(item.price);
+                });
+            }
+            
+            // Execution data for markers - using exact dates from timeline data
+            // Since dates array now matches timeline data exactly, we can map by index
+            const executionData = {};
+            if (window._timelineData) {
+                console.log('📊 [Market Price Chart] Building execution data from timeline data...');
+                window._timelineData.forEach((point, index) => {
+                    if (point.type === 'Execution') {
+                        // Since dates array is built from timeline data in the same order,
+                        // the index in timelineData matches the index in dates array
+                        executionData[index] = {
+                            type: point.side,
+                            qty: point.qty,
+                            price: point.price,
+                            id: point.id,
+                            realized: point.realized || null,
+                            percent: point.realized ? ((point.realized / (point.qty * point.price)) * 100).toFixed(1) : null
+                        };
+                        const tvDate = convertDateToTradingView(point.date);
+                        console.log(`✅ [Market Price Chart] Mapped execution ${point.id} (${point.side} ${point.qty}# @ $${point.price}) to index ${index} (date ${tvDate})`);
+                    }
+                });
+                console.log(`✅ [Market Price Chart] Created execution data:`, executionData);
+            } else {
+                console.warn('⚠️ [Market Price Chart] Timeline data not available, using fallback execution data');
+                // Fallback if timeline data not available - indices match fallback dates
+                executionData[1] = { type: 'Buy', qty: 100, price: 150, id: 101 }; // 2025-01-05 (index 1)
+                executionData[4] = { type: 'Buy', qty: 50, price: 152, id: 102 }; // 2025-01-10 (index 4)
+                executionData[7] = { type: 'Sell', qty: 30, price: 155, realized: 150, percent: 3.2, id: 103 }; // 2025-01-15 (index 7)
+                executionData[9] = { type: 'Sell', qty: 120, price: 158, realized: 960, percent: 5.1, id: 104 }; // 2025-01-20 (index 9)
+            }
+            
+            function getCSSVariableValue(varName, defaultValue) {
+                if (typeof window.getComputedStyle === 'function') {
+                    const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+                    return value || defaultValue;
                 }
-            });
+                return defaultValue;
+            }
+            
+            const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
+            const successColor = getCSSVariableValue('--success-color', '#28a745');
+            const dangerColor = getCSSVariableValue('--danger-color', '#dc3545');
+            
+            try {
+                // Create chart
+                marketPriceChart = window.TradingViewChartAdapter.createChart(container, {
+                    width: container.clientWidth || 600,
+                    height: container.clientHeight || 400,
+                    layout: {
+                        textColor: getCSSVariableValue('--text-color', '#212529'),
+                        background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
+                    },
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: false
+                    }
+                });
+                
+                // Market Price Line
+                const priceSeries = window.TradingViewChartAdapter.addLineSeries(marketPriceChart, {
+                    color: primaryColor,
+                    lineWidth: 2,
+                    title: 'מחיר שוק'
+                });
+                
+                const priceData = dates.map((date, i) => ({
+                    time: date,
+                    value: marketPrices[i]
+                }));
+                priceSeries.setData(priceData);
+                
+                // Add markers for entry and exit points
+                // Use executionData that was built from timelineData to ensure exact alignment
+                const markers = [];
+                
+                // Iterate through all execution data entries
+                Object.keys(executionData).forEach(index => {
+                    const exec = executionData[index];
+                    const execDate = dates[parseInt(index)];
+                    
+                    if (!execDate) {
+                        console.warn(`⚠️ [Market Price Chart] No date found for execution index ${index}`);
+                        return;
+                    }
+                    
+                    const isBuy = exec.type === 'Buy';
+                    markers.push({
+                        time: execDate,
+                        position: isBuy ? 'belowBar' : 'aboveBar',
+                        color: isBuy ? successColor : dangerColor,
+                        shape: 'circle',
+                        text: isBuy 
+                            ? `Buy ${exec.qty}# | $${exec.price}`
+                            : `Sell ${exec.qty}# | $${exec.price}${exec.realized ? ` | Rez. = $${exec.realized}${exec.percent ? ` | ${exec.percent}%` : ''}` : ''}`,
+                        size: 1
+                    });
+                });
+                
+                console.log(`✅ [Market Price Chart] Created ${markers.length} markers from execution data:`, executionData);
+                
+                // Check if setMarkers exists on the series
+                console.log('🔍 [Market Price Chart] Checking priceSeries methods:', Object.keys(priceSeries));
+                console.log('🔍 [Market Price Chart] setMarkers type:', typeof priceSeries.setMarkers);
+                
+                // Try to use createSeriesMarkers if setMarkers doesn't exist
+                const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
+                if (lightweightCharts && typeof lightweightCharts.createSeriesMarkers === 'function') {
+                    console.log('✅ [Market Price Chart] Using createSeriesMarkers');
+                    const markersPrimitive = lightweightCharts.createSeriesMarkers(priceSeries);
+                    markersPrimitive.setMarkers(markers);
+                } else if (typeof priceSeries.setMarkers === 'function') {
+                    console.log('✅ [Market Price Chart] Using series.setMarkers');
+                    priceSeries.setMarkers(markers);
+                } else {
+                    console.warn('⚠️ [Market Price Chart] setMarkers not available on series, skipping markers');
+                }
+                
+                // Fit content to show all data (default zoom to fit)
+                try {
+                    console.log('🔍 [Market Price Chart] Attempting fitContent()...');
+                    console.log('🔍 [Market Price Chart] Data points:', dates.length);
+                    console.log('🔍 [Market Price Chart] TimeScale methods:', Object.keys(marketPriceChart.timeScale()));
+                    console.log('🔍 [Market Price Chart] fitContent type:', typeof marketPriceChart.timeScale().fitContent);
+                    
+                    marketPriceChart.timeScale().fitContent();
+                    
+                    // Check if fitContent worked
+                    setTimeout(() => {
+                        const visibleRange = marketPriceChart.timeScale().getVisibleRange();
+                        console.log('✅ [Market Price Chart] fitContent() called. Visible range:', visibleRange);
+                        if (!visibleRange) {
+                            console.warn('⚠️ [Market Price Chart] fitContent() did not set visible range!');
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('❌ [Market Price Chart] Error calling fitContent():', error);
+                }
+                
+                // Setup chart synchronization (will sync with timeline chart)
+                setupChartSynchronization();
+                
+                // Store execution data for click handlers
+                marketPriceChart._executionData = executionData;
+                marketPriceChart._dates = dates;
+                
+                // Subscribe to click for showing execution details
+                marketPriceChart.subscribeClick(param => {
+                    if (!param.time) return;
+                    
+                    const timeStr = param.time;
+                    const dataIndex = dates.findIndex(d => d === timeStr);
+                    if (dataIndex === -1 || !executionData[dataIndex]) return;
+                    
+                    const exec = executionData[dataIndex];
+                    if (typeof showExecutionDetails === 'function') {
+                        showExecutionDetails(exec.id, 'execution');
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error creating market price chart with TradingView:', error);
+                marketPriceChart = null;
+            }
         }
         
         // Function to show execution details modal
@@ -2024,29 +2216,28 @@
         
         // Initialize charts on page load
         document.addEventListener('DOMContentLoaded', async function() {
-            // Wait for ChartSystem to be ready
+            // Wait for TradingView to be ready
             let retries = 0;
-            while (!window.ChartSystem && retries < 10) {
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                    typeof window.LightweightCharts === 'undefined' || 
+                    typeof window.lightweightCharts === 'undefined') && 
+                   retries < 50) {
                 await new Promise(resolve => setTimeout(resolve, 100));
                 retries++;
             }
             
-            // Initialize charts using ChartSystem (async)
+            // Initialize charts using TradingView (async)
             try {
                 await initTimelineChart();
             } catch (e) {
                 console.error('Error initializing timeline chart:', e);
             }
             
-            try {
-                await initPLChart();
-            } catch (e) {
-                console.error('Error initializing P/L chart:', e);
-            }
+            // P/L Chart removed - no longer needed
             
-            // Market price chart (uses Chart.js directly as placeholder)
+            // Market price chart
             try {
-                initMarketPriceChart();
+                await initMarketPriceChart();
             } catch (e) {
                 console.error('Error initializing market price chart:', e);
             }

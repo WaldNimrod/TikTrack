@@ -1,0 +1,66 @@
+[
+  {
+    "test_name": "Trade: Calculate Stop Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"stop_price\": 90.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.195810Z\", \"epochMs\": 1763844741195, \"local\": \"2025-11-22T22:52:21.195810+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Stop Price (Short)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"stop_price\": 110.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.230235Z\", \"epochMs\": 1763844741230, \"local\": \"2025-11-22T22:52:21.230235+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Target Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-target-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 18,
+    "response": "{\"data\": {\"target_price\": 2100.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.269053Z\", \"epochMs\": 1763844741269, \"local\": \"2025-11-22T22:52:21.269053+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Target Price (Short)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-target-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 15,
+    "response": "{\"data\": {\"target_price\": 50.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.310870Z\", \"epochMs\": 1763844741310, \"local\": \"2025-11-22T22:52:21.310870+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Percentage From Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-percentage-from-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 13,
+    "response": "{\"data\": {\"percentage\": 10.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.346090Z\", \"epochMs\": 1763844741346, \"local\": \"2025-11-22T22:52:21.346090+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Investment (by quantity)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-investment",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"amount\": 1000.0, \"price\": 100.0, \"quantity\": 10.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.376590Z\", \"epochMs\": 1763844741376, \"local\": \"2025-11-22T22:52:21.376590+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Investment (by amount)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-investment",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 11,
+    "response": "{\"data\": {\"amount\": 1000.0, \"price\": 100.0, \"quantity\": 10.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.406171Z\", \"epochMs\": 1763844741406, \"local\": \"2025-11-22T22:52:21.406171+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Validate (valid)",
+    "endpoint": "http://localhost:8080/api/business/trade/validate",
+    "status": "failed",
+    "http_code": "400",
+    "duration_ms": 13,
+    "response": "{\"error\": {\"errors\": [\"investment_type must be one of: Investment, Swing, Passive\"], \"message\": \"Validation failed\"}, \"status\": \"error\", \"timestamp\": {\"utc\": \"2025-11-22T20:52:21.437083Z\", \"epochMs\": 1763844741437, \"local\": \"2025-11-22T22:52:21.437083+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:52\"}, \"version\": \"1.0\"}"
+  }
+]

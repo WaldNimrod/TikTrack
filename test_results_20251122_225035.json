@@ -1,0 +1,10 @@
+[
+  {
+    "test_name": "Trade: Calculate Stop Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "failed",
+    "http_code": "200",
+    "duration_ms": 13,
+    "response": "{\"data\": {\"stop_price\": 90.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:50:35.670966Z\", \"epochMs\": 1763844635670, \"local\": \"2025-11-22T22:50:35.670966+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:50\"}, \"version\": \"1.0\"}"
+  }
+]

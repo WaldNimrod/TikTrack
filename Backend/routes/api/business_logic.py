@@ -281,6 +281,10 @@ def validate_trade():
     try:
         data = request.get_json() or {}
         
+        # Normalize side to lowercase for consistency with other endpoints
+        if 'side' in data and data['side']:
+            data['side'] = data['side'].lower()
+        
         result = trade_service.validate(data)
         
         if result['is_valid']:
@@ -523,9 +527,15 @@ def calculate_statistics():
         result = statistics_service.calculate_kpi(calculation_type, records, params)
         
         if result.get('is_valid', True):
+            # Extract only calculated fields, exclude internal service fields
+            response_data = {}
+            for key, value in result.items():
+                if key not in ['is_valid', 'error']:
+                    response_data[key] = value
+            
             return jsonify({
                 'status': 'success',
-                'data': result
+                'data': response_data
             }), 200
         else:
             return jsonify({

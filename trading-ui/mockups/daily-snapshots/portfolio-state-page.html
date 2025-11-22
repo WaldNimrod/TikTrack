@@ -75,7 +75,6 @@
                         <div class="header-actions d-flex align-items-center gap-2">
                             <div class="table-actions">
                                 <button data-button-type="EXPORT" data-variant="small" data-text="ייצא" title="ייצא נתונים"></button>
-                                <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה" data-onclick="showPortfolioSettings()"></button>
                                 <button data-button-type="COMPARE" data-variant="small" data-text="השווה" title="השוואת תאריכים"></button>
                                 <button data-button-type="BACK" data-variant="small" data-text="← חזור" title="חזור לדשבורד"></button>
                             </div>
@@ -102,10 +101,10 @@
                                     <!-- Trading Account Filter -->
                                     <div class="col-md-3">
                                         <label for="filterAccount" class="form-label" style="font-size: 0.85rem;">חשבון מסחר</label>
-                                        <select id="filterAccount" class="form-select form-select-sm" onchange="applyFilters()">
-                                            <option value="">כל החשבונות</option>
+                                        <select id="filterAccount" class="form-select form-select-sm" multiple onchange="applyFilters()">
                                             <!-- Will be populated dynamically -->
                                         </select>
+                                        <small class="text-muted">ניתן לבחור מספר חשבונות (ברירת מחדל: כל החשבונות)</small>
                                     </div>
                                     
                                     <!-- Investment Type Filter -->
@@ -129,11 +128,15 @@
                         <div class="row mb-4">
                             <!-- Cash Balance Card (Expandable) -->
                             <div class="col-md-3">
-                                <div class="compact-stat-card" style="cursor: pointer;" onclick="toggleCardDetails('cash-balance-details')">
-                                    <div class="compact-stat-label">יתרות מזומן</div>
-                                    <div class="compact-stat-number" id="total-cash-balance">$50,000</div>
-                                    <div class="compact-stat-label" style="font-size: 0.75rem; color: #6c757d; margin-top: 5px;">
-                                        <i class="bi bi-chevron-down" id="cash-balance-chevron"></i> לחץ לפרטים
+                                <div class="compact-stat-card">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="compact-stat-label">יתרות מזומן</div>
+                                            <div class="compact-stat-number" id="total-cash-balance">$50,000</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleCardDetails('cash-balance-details')" title="הצג/הסתר פרטים">
+                                            <i class="bi bi-chevron-down" id="cash-balance-chevron"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <!-- Expanded Details -->
@@ -160,12 +163,16 @@
                             
                             <!-- P/L Card (Expandable) -->
                             <div class="col-md-3">
-                                <div class="compact-stat-card" style="cursor: pointer;" onclick="toggleCardDetails('pl-details')">
-                                    <div class="compact-stat-label">P/L כולל</div>
-                                    <div class="compact-stat-number positive" id="total-pl">$25,000</div>
-                                    <div class="compact-stat-label" style="font-size: 0.8rem; color: #28a745;" id="pl-percentage">(+50%)</div>
-                                    <div class="compact-stat-label" style="font-size: 0.75rem; color: #6c757d; margin-top: 5px;">
-                                        <i class="bi bi-chevron-down" id="pl-chevron"></i> לחץ לפרטים
+                                <div class="compact-stat-card">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="compact-stat-label">P/L כולל</div>
+                                            <div class="compact-stat-number positive" id="total-pl">$25,000</div>
+                                            <div class="compact-stat-label" style="font-size: 0.8rem; color: #28a745;" id="pl-percentage">(+50%)</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleCardDetails('pl-details')" title="הצג/הסתר פרטים">
+                                            <i class="bi bi-chevron-down" id="pl-chevron"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <!-- Expanded Details -->
@@ -444,14 +451,16 @@
                         name: acc.name || acc.account_name || `Account #${acc.id}`
                     })).sort((a, b) => a.name.localeCompare(b.name));
                     
-                    // Populate account dropdown
+                    // Populate account multi-select
                     const accountSelect = document.getElementById('filterAccount');
                     if (accountSelect) {
-                        accountSelect.innerHTML = '<option value="">כל החשבונות</option>';
+                        accountSelect.innerHTML = '';
                         allTradingAccounts.forEach(account => {
                             const option = document.createElement('option');
-                            option.value = account.id;
+                            option.value = account.id.toString();
                             option.textContent = account.name;
+                            // Select all by default (multi-select with all selected = all accounts)
+                            option.selected = true;
                             accountSelect.appendChild(option);
                         });
                     }
@@ -482,7 +491,7 @@
         }
         
         // Filter trades based on filters
-        function filterTrades(date, accountId, investmentType) {
+        function filterTrades(date, selectedAccounts, investmentType) {
             filteredTrades = allTrades.filter(trade => {
                 // Date filter - check if trade was active on the selected date
                 if (date) {
@@ -501,9 +510,12 @@
                     }
                 }
                 
-                // Account filter
-                if (accountId && trade.trading_account_id != accountId) {
-                    return false;
+                // Account filter - if accounts selected, trade must be in one of them
+                if (selectedAccounts && selectedAccounts.length > 0) {
+                    const accountId = trade.trading_account_id?.toString();
+                    if (!selectedAccounts.includes(accountId)) {
+                        return false;
+                    }
                 }
                 
                 // Investment type filter
@@ -523,7 +535,13 @@
             // Reset date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('filterDate').value = today;
-            document.getElementById('filterAccount').value = '';
+            
+            // Select all accounts (default)
+            const accountSelect = document.getElementById('filterAccount');
+            if (accountSelect) {
+                Array.from(accountSelect.options).forEach(opt => opt.selected = true);
+            }
+            
             document.getElementById('filterInvestmentType').value = '';
             applyFilters();
         }
@@ -538,296 +556,86 @@
             return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
         }
         
-        // Show portfolio settings modal
-        function showPortfolioSettings() {
-            // Get relevant preferences from system
-            const settings = {
-                display: {
-                    currency: 'מטבע תצוגה',
-                    dateFormat: 'פורמט תאריך',
-                    numberFormat: 'פורמט מספרים'
-                },
-                charts: {
-                    theme: 'ערכת נושא גרפים',
-                    animation: 'אנימציה',
-                    showGrid: 'הצגת רשת',
-                    defaultPeriod: 'תקופה ברירת מחדל'
-                },
-                ui: {
-                    tableShowIcons: 'הצגת אייקונים בטבלה',
-                    autoRefresh: 'רענון אוטומטי',
-                    refreshInterval: 'מרווח רענון (שניות)'
-                },
-                filters: {
-                    defaultDateRange: 'טווח תאריכים ברירת מחדל',
-                    defaultAccount: 'חשבון ברירת מחדל',
-                    defaultInvestmentType: 'סוג השקעה ברירת מחדל'
-                }
-            };
-            
-            // Create modal content
-            let modalContent = `
-                <div class="modal fade" id="portfolioSettingsModal" tabindex="-1" aria-labelledby="portfolioSettingsModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="portfolioSettingsModalLabel">
-                                    <i class="bi bi-gear"></i> הגדרות עמוד מצב תיק היסטורי
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i>
-                                    <strong>הערה:</strong> הגדרות אלה נלקחות מהעדפות המשתמש והגדרות המערכת הכלליות.
-                                    <br>לשינוי ההגדרות, נא לעבור לעמוד <a href="/preferences.html" target="_blank">העדפות</a>.
-                                </div>
-                                
-                                <div class="accordion" id="settingsAccordion">
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#displaySettings">
-                                                <i class="bi bi-display"></i> הגדרות תצוגה
-                                            </button>
-                                        </h2>
-                                        <div id="displaySettings" class="accordion-collapse collapse show" data-bs-parent="#settingsAccordion">
-                                            <div class="accordion-body">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.display.currency}</span>
-                                                        <span class="text-muted" id="setting-currency">USD</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.display.dateFormat}</span>
-                                                        <span class="text-muted" id="setting-dateFormat">DD/MM/YYYY</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.display.numberFormat}</span>
-                                                        <span class="text-muted" id="setting-numberFormat">1,234.56</span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#chartSettings">
-                                                <i class="bi bi-graph-up"></i> הגדרות גרפים
-                                            </button>
-                                        </h2>
-                                        <div id="chartSettings" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
-                                            <div class="accordion-body">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.charts.theme}</span>
-                                                        <span class="text-muted" id="setting-chartTheme">modern</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.charts.animation}</span>
-                                                        <span class="text-muted" id="setting-chartAnimation">מופעל</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.charts.showGrid}</span>
-                                                        <span class="text-muted" id="setting-chartShowGrid">מופעל</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.charts.defaultPeriod}</span>
-                                                        <span class="text-muted" id="setting-chartDefaultPeriod">1M</span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#uiSettings">
-                                                <i class="bi bi-layout-text-window"></i> הגדרות ממשק
-                                            </button>
-                                        </h2>
-                                        <div id="uiSettings" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
-                                            <div class="accordion-body">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.ui.tableShowIcons}</span>
-                                                        <span class="text-muted" id="setting-tableShowIcons">מופעל</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.ui.autoRefresh}</span>
-                                                        <span class="text-muted" id="setting-autoRefresh">כבוי</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.ui.refreshInterval}</span>
-                                                        <span class="text-muted" id="setting-refreshInterval">30</span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterSettings">
-                                                <i class="bi bi-funnel"></i> הגדרות מסננים
-                                            </button>
-                                        </h2>
-                                        <div id="filterSettings" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
-                                            <div class="accordion-body">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.filters.defaultDateRange}</span>
-                                                        <span class="text-muted" id="setting-defaultDateRange">היום</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.filters.defaultAccount}</span>
-                                                        <span class="text-muted" id="setting-defaultAccount">כל החשבונות</span>
-                                                    </li>
-                                                    <li class="list-group-item d-flex justify-content-between">
-                                                        <span>${settings.filters.defaultInvestmentType}</span>
-                                                        <span class="text-muted" id="setting-defaultInvestmentType">הכל</span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-                                <a href="/preferences.html" target="_blank" class="btn btn-primary">
-                                    <i class="bi bi-gear"></i> פתח עמוד העדפות
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Remove existing modal if any
-            const existingModal = document.getElementById('portfolioSettingsModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Add modal to body
-            document.body.insertAdjacentHTML('beforeend', modalContent);
-            
-            // Load actual preference values
-            loadSettingsValues();
-            
-            // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('portfolioSettingsModal'));
-            modal.show();
-        }
-        
-        // Load actual preference values
-        async function loadSettingsValues() {
+        // Load chart default period from preferences
+        async function loadChartDefaultPeriod() {
             try {
-                // Helper function to safely update element
-                const updateElement = (id, value, fallback = '-') => {
-                    const el = document.getElementById(id);
-                    if (el && value !== null && value !== undefined) {
-                        el.textContent = value;
-                    } else if (el) {
-                        el.textContent = fallback;
-                    }
-                };
-                
-                // Try to load from preferences system
-                let displayPrefs = null, chartPrefs = null, uiPrefs = null, filterPrefs = null;
+                let chartPrefs = null;
                 
                 // Try multiple methods to load preferences
                 if (typeof window.getGroupPreferences === 'function') {
                     try {
-                        [displayPrefs, chartPrefs, uiPrefs, filterPrefs] = await Promise.all([
-                            window.getGroupPreferences('general').catch(() => null),
-                            window.getGroupPreferences('ui').catch(() => null),
-                            window.getGroupPreferences('ui').catch(() => null),
-                            window.getGroupPreferences('defaultFilters').catch(() => null)
-                        ]);
+                        chartPrefs = await window.getGroupPreferences('ui').catch(() => null);
                     } catch (e) {
                         console.warn('Error loading preferences via getGroupPreferences:', e);
                     }
                 }
                 
                 // Fallback: Try PreferencesCore
-                if (!displayPrefs && window.PreferencesCore) {
+                if (!chartPrefs && window.PreferencesCore) {
                     try {
-                        displayPrefs = await window.PreferencesCore.loadGroupPreferences('general').catch(() => null);
                         chartPrefs = await window.PreferencesCore.loadGroupPreferences('ui').catch(() => null);
-                        uiPrefs = await window.PreferencesCore.loadGroupPreferences('ui').catch(() => null);
-                        filterPrefs = await window.PreferencesCore.loadGroupPreferences('defaultFilters').catch(() => null);
                     } catch (e) {
                         console.warn('Error loading preferences via PreferencesCore:', e);
                     }
                 }
                 
                 // Fallback: Try PreferencesData
-                if (!displayPrefs && window.PreferencesData) {
+                if (!chartPrefs && window.PreferencesData) {
                     try {
-                        displayPrefs = await window.PreferencesData.loadPreferenceGroup({ groupName: 'general' }).catch(() => null);
                         chartPrefs = await window.PreferencesData.loadPreferenceGroup({ groupName: 'ui' }).catch(() => null);
-                        uiPrefs = await window.PreferencesData.loadPreferenceGroup({ groupName: 'ui' }).catch(() => null);
-                        filterPrefs = await window.PreferencesData.loadPreferenceGroup({ groupName: 'defaultFilters' }).catch(() => null);
                     } catch (e) {
                         console.warn('Error loading preferences via PreferencesData:', e);
                     }
                 }
                 
-                // Display settings - from general group
-                const generalPrefs = displayPrefs?.data?.preferences || displayPrefs?.preferences || {};
-                updateElement('setting-currency', generalPrefs.primaryCurrency, 'USD');
-                updateElement('setting-dateFormat', generalPrefs.dateFormat, 'DD/MM/YYYY');
-                updateElement('setting-numberFormat', generalPrefs.numberFormat, '1,234.56');
-                
-                // Chart settings - from ui.charts group
-                const uiPrefsData = uiPrefs?.data?.preferences || uiPrefs?.preferences || {};
+                // Get default period from preferences
+                const uiPrefsData = chartPrefs?.data?.preferences || chartPrefs?.preferences || {};
                 const chartPrefsData = uiPrefsData.charts || {};
-                updateElement('setting-chartTheme', chartPrefsData.theme, 'modern');
-                updateElement('setting-chartAnimation', chartPrefsData.animation ? 'מופעל' : 'כבוי', 'מופעל');
-                updateElement('setting-chartShowGrid', chartPrefsData.showGrid ? 'מופעל' : 'כבוי', 'מופעל');
-                updateElement('setting-chartDefaultPeriod', chartPrefsData.defaultPeriod, '1M');
+                const defaultPeriod = chartPrefsData.defaultPeriod || '1M';
                 
-                // UI settings - from ui.table group
-                const tablePrefs = uiPrefsData.table || {};
-                updateElement('setting-tableShowIcons', tablePrefs.showIcons ? 'מופעל' : 'כבוי', 'מופעל');
-                updateElement('setting-autoRefresh', tablePrefs.autoRefresh ? 'מופעל' : 'כבוי', 'כבוי');
-                updateElement('setting-refreshInterval', tablePrefs.refreshInterval, '30');
+                // Map period to button
+                const periodMap = {
+                    '1W': 'week',
+                    '1M': 'month',
+                    '3M': '3months',
+                    '1Y': 'year',
+                    'ALL': 'all'
+                };
                 
-                // Filter settings - from defaultFilters group
-                const filterPrefsData = filterPrefs?.data?.preferences || filterPrefs?.preferences || {};
-                const dateRangeMap = {
-                    'this_week': 'השבוע',
-                    'today': 'היום',
-                    'yesterday': 'אתמול',
-                    'this_month': 'החודש',
-                    'this_year': 'השנה'
-                };
-                updateElement('setting-defaultDateRange', dateRangeMap[filterPrefsData.dateRange] || filterPrefsData.dateRange || 'היום', 'היום');
-                updateElement('setting-defaultAccount', filterPrefsData.account === 'all' ? 'כל החשבונות' : filterPrefsData.account || 'כל החשבונות', 'כל החשבונות');
-                const typeMap = {
-                    'swing': 'סווינג',
-                    'investment': 'השקעה',
-                    'passive': 'פסיבי'
-                };
-                updateElement('setting-defaultInvestmentType', typeMap[filterPrefsData.type] || filterPrefsData.type || 'הכל', 'הכל');
+                const periodButton = periodMap[defaultPeriod] || 'month';
+                
+                // Set active button
+                document.querySelectorAll('[data-onclick*="setChartPeriod"]').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-onclick').includes(`'${periodButton}'`)) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Load chart with default period
+                if (periodButton) {
+                    await setChartPeriod(periodButton, 'both', null);
+                }
             } catch (error) {
-                console.warn('Could not load preference values:', error);
+                console.warn('Could not load chart default period from preferences:', error);
+                // Default to month if preferences fail
+                document.querySelectorAll('[data-onclick*="setChartPeriod('month'"]').forEach(btn => {
+                    btn.classList.add('active');
+                });
             }
         }
         
         // Load portfolio state
         async function loadPortfolioState() {
             const date = document.getElementById('filterDate').value;
-            const accountId = document.getElementById('filterAccount').value;
+            const selectedAccounts = getSelectedAccounts();
             const investmentType = document.getElementById('filterInvestmentType').value;
             
             // Load trades from API (only if not already loaded or date changed)
-            await loadTrades(date, accountId, investmentType);
+            await loadTrades(date, selectedAccounts, investmentType);
             
             // Filter trades based on current filters
-            filterTrades(date, accountId, investmentType);
+            filterTrades(date, selectedAccounts, investmentType);
             
             // Calculate summary from filtered trades
             const summary = calculateSummaryFromTrades(filteredTrades);
@@ -846,7 +654,7 @@
         }
         
         // Load trades from API
-        async function loadTrades(date, accountId, investmentType) {
+        async function loadTrades(date, selectedAccounts, investmentType) {
             try {
                 // TODO: Load from API endpoint /api/daily-snapshots/{date}/trades
                 // For now, using mock data
@@ -1199,8 +1007,8 @@
             
             // Wait for TradingView to be available
             let retries = 0;
-            while (((typeof window.TradingViewChartAdapter === 'undefined' || 
-                    typeof window.LightweightCharts === 'undefined') && 
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                    typeof window.LightweightCharts === 'undefined' || 
                     typeof window.lightweightCharts === 'undefined') && 
                    retries < 50) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -1281,8 +1089,8 @@
             
             // Wait for TradingView to be available
             let retries = 0;
-            while (((typeof window.TradingViewChartAdapter === 'undefined' || 
-                    typeof window.LightweightCharts === 'undefined') && 
+            while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                    typeof window.LightweightCharts === 'undefined' || 
                     typeof window.lightweightCharts === 'undefined') && 
                    retries < 50) {
                 await new Promise(resolve => setTimeout(resolve, 100));
@@ -1685,8 +1493,38 @@
             }
         }
         
+        // Load user preferences
+        async function loadUserPreferences() {
+            try {
+                // Initialize preferences if available
+                if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+                    await window.PreferencesCore.initializeWithLazyLoading();
+                }
+                
+                // Wait a bit for preferences to be available
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Reload TradingView theme preferences if available
+                if (window.TradingViewTheme && typeof window.TradingViewTheme.loadPreferences === 'function') {
+                    await window.TradingViewTheme.loadPreferences();
+                }
+                
+                // Reload FieldRendererService preferences if available
+                if (window.FieldRendererService && typeof window.FieldRendererService.loadPreferences === 'function') {
+                    await window.FieldRendererService.loadPreferences();
+                }
+                
+                console.log('✅ User preferences loaded successfully');
+            } catch (error) {
+                console.warn('⚠️ Could not load user preferences (non-critical):', error);
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
+            // Load user preferences first
+            await loadUserPreferences();
+            
             // Set default date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('filterDate').value = today;
@@ -1694,6 +1532,9 @@
             await loadTradingAccounts();
             loadInvestmentTypes();
             await loadPortfolioState();
+            
+            // Load chart default period from preferences
+            await loadChartDefaultPeriod();
             
             // Setup chart controls after charts are initialized
             setTimeout(() => {

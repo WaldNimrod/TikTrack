@@ -789,6 +789,7 @@
 
 **📋 מסמכים קשורים:**
 - `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_COMPLETE_SYSTEM_REFERENCE.md` - **הפניה מלאה למערכת** (כולל כל הישויות, המערכות, העמודים והאינטגרציות)
+- `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_INTEGRATION_TESTING_PLAN.md` - **תוכנית בדיקות אינטגרציה מקיפה** (Phase 1: בדיקות מעשיות, Phase 2: אינטגרציה עם מטמון)
 - `documentation/05-REPORTS/BUSINESS_LOGIC_INITIALIZATION_INTEGRATION_ANALYSIS.md` - ניתוח אינטגרציה
 - `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_INTEGRATION_CHECKLIST.md` - רשימת בדיקות
 

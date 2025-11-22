@@ -1,0 +1,122 @@
+[
+  {
+    "test_name": "Trade: Calculate Stop Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"stop_price\": 90.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.205206Z\", \"epochMs\": 1763844784205, \"local\": \"2025-11-22T22:53:04.205206+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Stop Price (Short)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"stop_price\": 110.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.252173Z\", \"epochMs\": 1763844784252, \"local\": \"2025-11-22T22:53:04.252173+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Target Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-target-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"target_price\": 2100.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.298907Z\", \"epochMs\": 1763844784298, \"local\": \"2025-11-22T22:53:04.298907+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Target Price (Short)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-target-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 22,
+    "response": "{\"data\": {\"target_price\": 50.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.356299Z\", \"epochMs\": 1763844784356, \"local\": \"2025-11-22T22:53:04.356299+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Percentage From Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-percentage-from-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"percentage\": 10.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.424948Z\", \"epochMs\": 1763844784424, \"local\": \"2025-11-22T22:53:04.424948+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Investment (by quantity)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-investment",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 13,
+    "response": "{\"data\": {\"amount\": 1000.0, \"price\": 100.0, \"quantity\": 10.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.467799Z\", \"epochMs\": 1763844784467, \"local\": \"2025-11-22T22:53:04.467799+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Investment (by amount)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-investment",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 13,
+    "response": "{\"data\": {\"amount\": 1000.0, \"price\": 100.0, \"quantity\": 10.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.510445Z\", \"epochMs\": 1763844784510, \"local\": \"2025-11-22T22:53:04.510445+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Validate (valid)",
+    "endpoint": "http://localhost:8080/api/business/trade/validate",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"is_valid\": true}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.552508Z\", \"epochMs\": 1763844784552, \"local\": \"2025-11-22T22:53:04.552508+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Execution: Calculate Values (Buy)",
+    "endpoint": "http://localhost:8080/api/business/execution/calculate-values",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 11,
+    "response": "{\"data\": {\"label\": \"\\u05e1\\u05d4\\\"\\u05db \\u05e2\\u05dc\\u05d5\\u05ea:\", \"total\": -1001.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.576928Z\", \"epochMs\": 1763844784576, \"local\": \"2025-11-22T22:53:04.576928+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Execution: Calculate Values (Sell)",
+    "endpoint": "http://localhost:8080/api/business/execution/calculate-values",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"label\": \"\\u05e1\\u05d4\\\"\\u05db \\u05de\\u05d6\\u05d5\\u05de\\u05df:\", \"total\": 999.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.619401Z\", \"epochMs\": 1763844784619, \"local\": \"2025-11-22T22:53:04.619401+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Execution: Calculate Average Price",
+    "endpoint": "http://localhost:8080/api/business/execution/calculate-average-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"average_price\": 103.33, \"total_amount\": 1550.0, \"total_quantity\": 15.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.666201Z\", \"epochMs\": 1763844784666, \"local\": \"2025-11-22T22:53:04.666201+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Execution: Validate (valid)",
+    "endpoint": "http://localhost:8080/api/business/execution/validate",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"is_valid\": true}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.691416Z\", \"epochMs\": 1763844784691, \"local\": \"2025-11-22T22:53:04.691416+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Alert: Validate Condition Value (Price - valid)",
+    "endpoint": "http://localhost:8080/api/business/alert/validate-condition-value",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"is_valid\": true}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.716679Z\", \"epochMs\": 1763844784716, \"local\": \"2025-11-22T22:53:04.716679+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Alert: Validate (valid)",
+    "endpoint": "http://localhost:8080/api/business/alert/validate",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 12,
+    "response": "{\"data\": {\"is_valid\": true}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:53:04.759288Z\", \"epochMs\": 1763844784759, \"local\": \"2025-11-22T22:53:04.759288+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:53\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Statistics: Calculate Sum",
+    "endpoint": "http://localhost:8080/api/business/statistics/calculate-sum",
+    "status": "failed",
+    "http_code": "500",
+    "duration_ms": 16,
+    "response": "{\"details\": \"The server encountered an unexpected error\", \"error_code\": \"INTERNAL_ERROR\", \"message\": \"An internal error occurred\", \"status\": \"error\", \"timestamp\": {\"utc\": \"2025-11-22T22:53:04.788650Z\", \"epochMs\": 1763851984788, \"local\": \"2025-11-23T00:53:04.788650+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"23.11.2025 00:53\"}, \"version\": \"1.0\"}"
+  }
+]

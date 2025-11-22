@@ -1,0 +1,34 @@
+[
+  {
+    "test_name": "Trade: Calculate Stop Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 13,
+    "response": "{\"data\": {\"stop_price\": 90.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:51:00.372119Z\", \"epochMs\": 1763844660372, \"local\": \"2025-11-22T22:51:00.372119+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:51\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Stop Price (Short)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-stop-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 13,
+    "response": "{\"data\": {\"stop_price\": 110.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:51:00.405225Z\", \"epochMs\": 1763844660405, \"local\": \"2025-11-22T22:51:00.405225+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:51\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Target Price (Long)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-target-price",
+    "status": "passed",
+    "http_code": "200",
+    "duration_ms": 14,
+    "response": "{\"data\": {\"target_price\": 2100.0}, \"status\": \"success\", \"timestamp\": {\"utc\": \"2025-11-22T20:51:00.438645Z\", \"epochMs\": 1763844660438, \"local\": \"2025-11-22T22:51:00.438645+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:51\"}, \"version\": \"1.0\"}"
+  },
+  {
+    "test_name": "Trade: Calculate Target Price (Short)",
+    "endpoint": "http://localhost:8080/api/business/trade/calculate-target-price",
+    "status": "failed",
+    "http_code": "400",
+    "duration_ms": 13,
+    "response": "{\"error\": {\"message\": \"Calculated target price is invalid\"}, \"status\": \"error\", \"timestamp\": {\"utc\": \"2025-11-22T20:51:00.472249Z\", \"epochMs\": 1763844660472, \"local\": \"2025-11-22T22:51:00.472249+02:00\", \"timezone\": \"Asia/Jerusalem\", \"display\": \"22.11.2025 22:51\"}, \"version\": \"1.0\"}"
+  }
+]

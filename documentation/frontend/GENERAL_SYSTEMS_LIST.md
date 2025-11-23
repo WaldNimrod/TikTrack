@@ -39,6 +39,7 @@
 ### 🎨 מערכות תצוגה ו-UI
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
+| Icon System | `trading-ui/scripts/icon-system.js`<br>`trading-ui/scripts/icon-mappings.js` | [ICON_SYSTEM_GUIDE.md](ICON_SYSTEM_GUIDE.md)<br>[ICON_SYSTEM_ARCHITECTURE.md](ICON_SYSTEM_ARCHITECTURE.md) | ניהול מרכזי של איקונים: 17 איקוני ישויות מקוריים + Tabler Icons, אינטגרציה עם Cache ו-Auto-fallback |
 | Header & Filters System | `trading-ui/scripts/header-system.js` | [HEADER_SYSTEM_README.md](../02-ARCHITECTURE/FRONTEND/HEADER_SYSTEM_README.md) | תפריט ראשי, פילטרים מאוחדים, שמירת מצב ו-RTL |
 | Color Scheme System | `trading-ui/scripts/color-scheme-system.js` | [COLOR_SCHEME_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/COLOR_SCHEME_SYSTEM.md) | ניהול צבעים גלובלי, יישום צבעי המותג והנמכת התנגשויות |
 | Button System | `trading-ui/scripts/button-system-init.js`<br>`trading-ui/scripts/button-icons.js` | [button-system.md](../02-ARCHITECTURE/FRONTEND/button-system.md) | יצירת כפתורי פעולה, עבודה עם `data-onclick`, כללי נגישות |

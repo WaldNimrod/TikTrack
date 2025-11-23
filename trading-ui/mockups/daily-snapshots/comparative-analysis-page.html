@@ -17,8 +17,9 @@
     <link rel="stylesheet" href="../../styles-new/master.css">
     
     <!-- External Libraries -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
@@ -540,22 +541,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- With/Without Plan Parameter -->
-                                    <div class="col-md-3">
-                                        <div class="form-check mb-2">
-                                            <input type="checkbox" id="compareByPlan" class="form-check-input" onchange="toggleComparisonParameter('withWithoutPlan')">
-                                            <label for="compareByPlan" class="form-check-label fw-bold">תוכנית מסחר</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" id="comparisonWithPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
-                                            <label for="comparisonWithPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="checkbox" id="comparisonWithoutPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
-                                            <label for="comparisonWithoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
-                                        </div>
-                                    </div>
-                                    
                                     <!-- Tags Parameter -->
                                     <div class="col-md-3">
                                         <div class="form-check mb-2">
@@ -569,6 +554,22 @@
                                             <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="selectAllOptions('comparisonTags')" title="בחר הכל">הכל</button>
                                             <span style="color: #dee2e6;">|</span>
                                             <button type="button" class="btn btn-link p-0 text-decoration-none" style="font-size: 0.75rem; padding: 0 !important;" onclick="clearAllOptions('comparisonTags')" title="נקה הכל">נקה</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- With/Without Plan Parameter -->
+                                    <div class="col-md-3">
+                                        <div class="form-check mb-2">
+                                            <input type="checkbox" id="compareByPlan" class="form-check-input" onchange="toggleComparisonParameter('withWithoutPlan')">
+                                            <label for="compareByPlan" class="form-check-label fw-bold">תוכנית מסחר</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" id="comparisonWithPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
+                                            <label for="comparisonWithPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" id="comparisonWithoutPlan" class="form-check-input" onchange="applyComparisonParameters()" disabled>
+                                            <label for="comparisonWithoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
                                         </div>
                                     </div>
                                 </div>
@@ -1665,20 +1666,33 @@
             return plFormatted;
         }
         
-        // Format total investment (max at point + total purchases)
-        function formatTotalInvestment(maxAtPoint, totalPurchases) {
-            // Format: "מקס: $X | סה"כ: $Y"
-            const formatValue = (val) => {
-                if (val >= 1000) {
-                    return `$${(val / 1000).toFixed(1)}K`;
-                }
-                return `$${val.toFixed(0)}`;
-            };
+        // Format investment value with percentage (similar to formatPLWithPercent)
+        function formatInvestmentWithPercent(value, percent) {
+            if (value === null || value === undefined) {
+                return '<span class="text-muted">-</span>';
+            }
             
-            return `<div class="d-flex flex-column align-items-end">
-                <small class="text-muted">מקס בנקודה: ${formatValue(maxAtPoint)}</small>
-                <small class="text-muted">סה"כ קניות: ${formatValue(totalPurchases)}</small>
-            </div>`;
+            // Use FieldRendererService if available
+            let valueFormatted;
+            if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+                valueFormatted = window.FieldRendererService.renderAmount(value, '$', 0, false);
+            } else {
+                // Fallback formatting
+                if (value >= 1000) {
+                    valueFormatted = `$${(value / 1000).toFixed(1)}K`;
+                } else {
+                    valueFormatted = `$${value.toFixed(0)}`;
+                }
+            }
+            
+            // Add percentage if available
+            if (percent !== null && percent !== undefined && !isNaN(percent)) {
+                const percentFormatted = percent.toFixed(1);
+                const percentClass = percent >= 0 ? 'text-success' : 'text-danger';
+                return `${valueFormatted} <span class="${percentClass}" style="font-size: 0.85em; opacity: 0.8;">(${percent >= 0 ? '+' : ''}${percentFormatted}%)</span>`;
+            }
+            
+            return valueFormatted;
         }
         
         // Get color class based on percentile
@@ -1863,12 +1877,13 @@
                 '<th>P/L ממוצע</th>' +
                 '<th>P/L כולל</th>' +
                 '<th>אחוז הצלחה</th>' +
-                '<th class="text-end">סה"כ השקעה</th>';
+                '<th class="text-end">מקס בנקודה</th>' +
+                '<th class="text-end">סה"כ קניות</th>';
             
             thead.innerHTML = headerHTML;
             
             // Calculate colspan for summary and info rows
-            const summaryColspan = paramHeaders.length + 5; // param columns + 5 data columns (trades, avgPL, totalPL, successRate, totalInvestment)
+            const summaryColspan = paramHeaders.length + 6; // param columns + 6 data columns (trades, avgPL, totalPL, successRate, maxInvestment, totalPurchases)
             
             // Update summary colspan
             if (summaryRow) {
@@ -1899,6 +1914,10 @@
             tbody.style.transition = 'opacity 0.3s';
             
             setTimeout(() => {
+                // Calculate totals for percentage calculation
+                const totalMaxInvestment = data.reduce((sum, cat) => sum + (cat.maxInvestmentAtPoint || 0), 0);
+                const totalTotalPurchases = data.reduce((sum, cat) => sum + (cat.totalPurchases || 0), 0);
+                
                 tbody.innerHTML = data.map(cat => {
                     // Build parameter value cells
                     const paramCells = paramHeaders.map(header => {
@@ -1911,13 +1930,22 @@
                         ? ((cat.totalPL / cat.totalInvestment) * 100) 
                         : null;
                     
+                    // Calculate investment percentages (based on total across all categories)
+                    const maxInvestmentPercent = totalMaxInvestment > 0 
+                        ? ((cat.maxInvestmentAtPoint || 0) / totalMaxInvestment) * 100 
+                        : null;
+                    const totalPurchasesPercent = totalTotalPurchases > 0 
+                        ? ((cat.totalPurchases || 0) / totalTotalPurchases) * 100 
+                        : null;
+                    
                     // Build data cells
                     const dataCells = `
                         <td>${cat.trades}</td>
                         <td>${formatPLWithPercent(cat.avgPL, plPercent)}</td>
                         <td class="text-success">${formatPLWithPercent(cat.totalPL, plPercent)}</td>
                         <td>${cat.successRate}%</td>
-                        <td class="text-end">${formatTotalInvestment(cat.maxInvestmentAtPoint, cat.totalPurchases)}</td>
+                        <td class="text-end">${formatInvestmentWithPercent(cat.maxInvestmentAtPoint, maxInvestmentPercent)}</td>
+                        <td class="text-end">${formatInvestmentWithPercent(cat.totalPurchases, totalPurchasesPercent)}</td>
                     `;
                     
                     return `<tr style="animation: fadeIn 0.3s;">${paramCells}${dataCells}</tr>`;

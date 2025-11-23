@@ -10,13 +10,13 @@
     "notes": "Business Logic Phase 2 - הושלם במלואן: תיקון ולידציה, סקריפטי בדיקות, דוחות מקיפים"
   },
   "development": {
-    "version": "1.3.25.0",
+    "version": "1.3.26.0",
     "major": 1,
     "minor": 3,
-    "patch": 25,
+    "patch": 26,
     "build": 0,
-    "commit": "0620b022a535f7bcc267800162a33c0088f8b327",
-    "updated_at": "2025-11-23T18:07:23+00:00",
-    "notes": "תיקוני עיצוב ותפקוד למערכת ראש הדף"
+    "commit": "b93669e17364847f334996f245b3d61627fcb7ea",
+    "updated_at": "2025-11-23T18:08:55+00:00",
+    "notes": "Fix: Currency validation required fields and HTML global functions"
   }
 }

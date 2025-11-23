@@ -23,6 +23,146 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
+    <!-- Filter Styles (same as header system) -->
+    <style>
+        .filter-group {
+            position: relative;
+        }
+        
+        .filter-dropdown {
+            position: relative;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.25rem 0.9rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #333;
+            width: 100%;
+            text-align: right;
+            direction: rtl;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-toggle:hover {
+            border-color: #ff9500;
+            color: #ff9500;
+            background: white;
+            box-shadow: none;
+        }
+        
+        .filter-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            display: none;
+            direction: rtl;
+        }
+        
+        .filter-group:hover .filter-menu,
+        .filter-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            display: block;
+        }
+        
+        .account-filter-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .account-filter-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+        
+        .account-filter-item:last-child {
+            border-bottom: none;
+        }
+        
+        .account-filter-item.selected {
+            background-color: #f0f8ff;
+            color: #26baac;
+            font-weight: 500;
+        }
+        
+        .account-filter-item.selected::before {
+            content: "✓";
+            margin-left: 8px;
+            color: #26baac;
+            font-weight: bold;
+        }
+        
+        .date-range-filter-item {
+            padding: 6px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .date-range-filter-item:hover {
+            background: #f8f9ff;
+            color: #667eea;
+        }
+        
+        .date-range-filter-item:last-child {
+            border-bottom: none;
+        }
+        
+        .date-range-filter-item.selected {
+            background-color: #f0f8ff;
+            color: #26baac;
+            font-weight: 500;
+        }
+        
+        .date-range-filter-item.selected::before {
+            content: "✓";
+            margin-left: 8px;
+            color: #26baac;
+            font-weight: bold;
+        }
+        
+        .option-text {
+            font-weight: 500;
+        }
+        
+        .selected-value {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .filter-toggle:hover .dropdown-arrow {
+            transform: translateY(2px);
+        }
+    </style>
+    
     <!-- Header System -->
     <script src="../../scripts/header-system.js" defer></script>
     
@@ -41,6 +181,10 @@
     
     <!-- Field Renderer Service -->
     <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    
+    <!-- Tag System -->
+    <script src="../../scripts/services/tag-service.js" defer></script>
+    <script src="../../scripts/tag-ui-manager.js" defer></script>
     
     <!-- Action Buttons System -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
@@ -99,15 +243,7 @@
                     </div>
                     
                     <div class="section-body">
-                        <!-- Date Range Selection -->
-                        <div class="mb-4">
-                            <label for="dateRangeStart" class="form-label">תקופה:</label>
-                            <div class="d-flex gap-2">
-                                <input type="date" id="dateRangeStart" class="form-control" value="2025-01-01" style="max-width: 200px;">
-                                <span class="align-self-center">עד</span>
-                                <input type="date" id="dateRangeEnd" class="form-control" value="2025-01-31" style="max-width: 200px;">
-                            </div>
-                        </div>
+                        <!-- Date Range Selection - will be moved to filters section -->
                     </div>
                 </div>
                 
@@ -122,64 +258,146 @@
                         </div>
                     </div>
                     <div class="section-body">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="investmentTypes" class="form-label">
-                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
-                                               title="בחר סוגי השקעות לניתוח. ניתן לבחור מספר אפשרויות."></i>
-                                            סוגי השקעות:
-                                        </label>
-                                        <select id="investmentTypes" class="form-select" multiple title="בחר סוגי השקעות לניתוח">
-                                            <option value="swing" selected>swing</option>
-                                            <option value="day" selected>day</option>
-                                            <option value="long-term" selected>long-term</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="tradingMethods" class="form-label">
-                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
-                                               title="בחר שיטות מסחר לניתוח. ניתן לבחור מספר אפשרויות."></i>
-                                            שיטות מסחר:
-                                        </label>
-                                        <select id="tradingMethods" class="form-select" multiple title="בחר שיטות מסחר לניתוח">
-                                            <option value="Moving Average" selected>Moving Average</option>
-                                            <option value="RSI" selected>RSI</option>
-                                            <option value="MACD">MACD</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">
-                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
-                                               title="בחר האם לכלול טריידים עם או בלי תוכנית מסחר."></i>
-                                            עם/בלי תוכנית:
-                                        </label>
-                                        <div>
-                                            <input type="checkbox" id="withPlan" class="form-check-input" checked>
-                                            <label for="withPlan" class="form-check-label">עם תוכנית</label>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-funnel"></i> מסננים</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <!-- Date Range Filter (Preset) -->
+                                    <div class="col-md-2">
+                                        <label class="form-label" style="font-size: 0.85rem;">טווח מוגדר</label>
+                                        <div class="filter-group date-range-filter">
+                                            <div class="filter-dropdown">
+                                                <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" onclick="toggleDateRangeFilterMenu()" style="max-width: 100%;">
+                                                    <span class="selected-value selected-date-text" id="selectedDateRange">השנה</span>
+                                                    <span class="dropdown-arrow">▼</span>
+                                                </button>
+                                                <div class="filter-menu" id="dateRangeFilterMenu">
+                                                    <div class="date-range-filter-item" data-value="כל זמן" onclick="selectDateRangeOption('כל זמן')">
+                                                        <span class="option-text">כל זמן</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="היום" onclick="selectDateRangeOption('היום')">
+                                                        <span class="option-text">היום</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="אתמול" onclick="selectDateRangeOption('אתמול')">
+                                                        <span class="option-text">אתמול</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="השבוע" onclick="selectDateRangeOption('השבוע')">
+                                                        <span class="option-text">השבוע</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שבוע" onclick="selectDateRangeOption('שבוע')">
+                                                        <span class="option-text">שבוע (7 ימים)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
+                                                        <span class="option-text">שבוע שעבר</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="החודש" onclick="selectDateRangeOption('החודש')">
+                                                        <span class="option-text">החודש</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="חודש" onclick="selectDateRangeOption('חודש')">
+                                                        <span class="option-text">חודש (30 יום)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
+                                                        <span class="option-text">חודש קודם</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="השנה" onclick="selectDateRangeOption('השנה')">
+                                                        <span class="option-text">השנה</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שנה" onclick="selectDateRangeOption('שנה')">
+                                                        <span class="option-text">שנה (365 ימים)</span>
+                                                    </div>
+                                                    <div class="date-range-filter-item" data-value="שנה קודמת" onclick="selectDateRangeOption('שנה קודמת')">
+                                                        <span class="option-text">שנה שעברה</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <input type="checkbox" id="withoutPlan" class="form-check-input" checked>
-                                            <label for="withoutPlan" class="form-check-label">בלי תוכנית</label>
+                                    </div>
+                                    
+                                    <!-- Custom Date Range Inputs (always visible) -->
+                                    <div class="col-md-4">
+                                        <div class="row g-2">
+                                            <!-- Custom Date From -->
+                                            <div class="col-md-6">
+                                                <label for="customDateFrom" class="form-label" style="font-size: 0.85rem;">מתאריך</label>
+                                                <input type="date" id="customDateFrom" class="form-control form-control-sm" onchange="handleCustomDateFromChange()">
+                                            </div>
+                                            
+                                            <!-- Custom Date To -->
+                                            <div class="col-md-6">
+                                                <label for="customDateTo" class="form-label" style="font-size: 0.85rem;">עד תאריך</label>
+                                                <input type="date" id="customDateTo" class="form-control form-control-sm" onchange="handleCustomDateToChange()">
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="timeToEntry" class="form-label">
-                                            <i class="bi bi-info-circle" style="font-size: 0.85rem; color: #6c757d; cursor: help;" 
-                                               title="מסנן לפי זמן שחלף מתכנון הטרייד לכניסה בפועל."></i>
-                                            משך זמן מתכנון לכניסה:
-                                        </label>
-                                        <select id="timeToEntry" class="form-select" title="מסנן לפי זמן מתכנון לכניסה">
-                                            <option value="">כל הזמנים</option>
-                                            <option value="<1">פחות מיום</option>
-                                            <option value="1-7">1-7 ימים</option>
-                                            <option value=">7">יותר מ-7 ימים</option>
+                                    
+                                    <!-- Trading Account Filter -->
+                                    <div class="col-md-2">
+                                        <label class="form-label" style="font-size: 0.85rem;">חשבון מסחר</label>
+                                        <select id="tradingAccounts" class="form-select form-select-sm" multiple onchange="applyFilters()" title="בחר חשבונות מסחר">
+                                            <option value="1" selected>Account #1</option>
+                                            <option value="2">Account #2</option>
+                                            <option value="3">Account #3</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-12">
-                                        <button class="btn btn-primary" onclick="applyFilters()">החל פילטרים</button>
-                                        <button class="btn btn-outline-secondary" onclick="resetFilters()">איפוס</button>
+                                    
+                                    <!-- Investment Types Filter -->
+                                    <div class="col-md-2">
+                                        <label for="investmentTypes" class="form-label" style="font-size: 0.85rem;">סוג השקעה</label>
+                                        <select id="investmentTypes" class="form-select form-select-sm" multiple onchange="applyFilters()" title="בחר סוגי השקעות לניתוח">
+                                            <option value="Investment" selected>Investment</option>
+                                            <option value="Swing" selected>Swing</option>
+                                            <option value="Passive" selected>Passive</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Trading Methods Filter -->
+                                    <div class="col-md-2">
+                                        <label for="tradingMethods" class="form-label" style="font-size: 0.85rem;">שיטות מסחר</label>
+                                        <select id="tradingMethods" class="form-select form-select-sm" multiple onchange="applyFilters()" title="בחר שיטות מסחר לניתוח">
+                                            <option value="Moving Averages" selected>ממוצעים נעים</option>
+                                            <option value="Volume Analysis" selected>ניתוח נפח</option>
+                                            <option value="Support & Resistance">תמיכה והתנגדות</option>
+                                            <option value="Trend Lines">קווי מגמה</option>
+                                            <option value="Technical Patterns">דפוסים טכניים</option>
+                                            <option value="Fibonacci Retracement">פיבונאצ'י</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- With/Without Plan Filter -->
+                                    <div class="col-md-2">
+                                        <label class="form-label" style="font-size: 0.85rem;">תוכנית מסחר</label>
+                                        <div class="form-check">
+                                            <input type="checkbox" id="withPlan" class="form-check-input" checked onchange="applyFilters()">
+                                            <label for="withPlan" class="form-check-label" style="font-size: 0.85rem;">עם תוכנית</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" id="withoutPlan" class="form-check-input" checked onchange="applyFilters()">
+                                            <label for="withoutPlan" class="form-check-label" style="font-size: 0.85rem;">בלי תוכנית</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tags Filter -->
+                                    <div class="col-md-2">
+                                        <label for="filterTags" class="form-label" style="font-size: 0.85rem;">תגיות</label>
+                                        <select id="filterTags" class="form-select form-select-sm tag-multi-select" multiple onchange="applyFilters()" title="בחר תגיות לסינון">
+                                            <!-- Will be populated by TagUIManager -->
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Clear Filters Buttons -->
+                                    <div class="col-md-2 d-flex align-items-end gap-2">
+                                        <button class="btn btn-outline-secondary btn-sm flex-fill" onclick="resetFilters()" title="נקה את כל הפילטרים">
+                                            <i class="bi bi-x-circle"></i> נקה
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="resetToDefaults()" title="איפוס לברירת מחדל">
+                                            <i class="bi bi-arrow-counterclockwise"></i> ברירת מחדל
+                                        </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -203,6 +421,7 @@
                                                 <th>P/L ממוצע</th>
                                                 <th>P/L כולל</th>
                                                 <th>אחוז הצלחה</th>
+                                                <th>תגיות</th>
                                             </tr>
                                         </thead>
                                         <tbody id="comparison-table-body">
@@ -210,7 +429,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr class="table-info">
-                                                <td colspan="5" id="comparison-table-summary">
+                                                <td colspan="6" id="comparison-table-summary">
                                                     <strong>סיכום:</strong> טוען נתונים...
                                                 </td>
                                             </tr>
@@ -388,21 +607,272 @@
                 .map(opt => opt.value);
             const tradingMethods = Array.from(document.getElementById('tradingMethods')?.selectedOptions || [])
                 .map(opt => opt.value);
+            const tradingAccounts = Array.from(document.getElementById('tradingAccounts')?.selectedOptions || [])
+                .map(opt => opt.value);
             const withPlan = document.getElementById('withPlan')?.checked || false;
             const withoutPlan = document.getElementById('withoutPlan')?.checked || false;
-            const timeToEntry = document.getElementById('timeToEntry')?.value || '';
-            const dateRangeStart = document.getElementById('dateRangeStart')?.value || '';
-            const dateRangeEnd = document.getElementById('dateRangeEnd')?.value || '';
+            
+            // Get selected tags
+            let selectedTags = [];
+            if (window.TagUIManager && typeof window.TagUIManager.getSelectedValues === 'function') {
+                const tagsSelect = document.getElementById('filterTags');
+                if (tagsSelect) {
+                    selectedTags = window.TagUIManager.getSelectedValues(tagsSelect);
+                }
+            } else {
+                // Fallback: get from select directly
+                const tagsSelect = document.getElementById('filterTags');
+                if (tagsSelect) {
+                    selectedTags = Array.from(tagsSelect.selectedOptions || [])
+                        .map(opt => parseInt(opt.value))
+                        .filter(v => !isNaN(v));
+                }
+            }
+            
+            // Get date range
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+            const { start, end } = getDateRange();
             
             return {
                 investmentTypes,
                 tradingMethods,
+                tradingAccounts,
                 withPlan,
                 withoutPlan,
-                timeToEntry,
-                dateRangeStart,
-                dateRangeEnd
+                tags: selectedTags,
+                dateRange,
+                dateRangeStart: start ? start.toISOString().split('T')[0] : '',
+                dateRangeEnd: end ? end.toISOString().split('T')[0] : ''
             };
+        }
+        
+        // Toggle date range filter menu
+        function toggleDateRangeFilterMenu() {
+            const menu = document.getElementById('dateRangeFilterMenu');
+            if (menu) {
+                const isCurrentlyOpen = menu.classList.contains('show');
+                if (isCurrentlyOpen) {
+                    menu.classList.remove('show');
+                } else {
+                    menu.classList.add('show');
+                }
+            }
+        }
+        
+        // Select date range option
+        function selectDateRangeOption(dateRange) {
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            
+            const clickedItem = Array.from(dateRangeItems).find(
+                item => item.getAttribute('data-value') === dateRange
+            );
+            if (clickedItem) {
+                clickedItem.classList.add('selected');
+            }
+            
+            // Clear custom date inputs when preset is selected
+            const fromInput = document.getElementById('customDateFrom');
+            const toInput = document.getElementById('customDateTo');
+            if (fromInput) {
+                fromInput.value = '';
+            }
+            if (toInput) {
+                toInput.value = '';
+            }
+            
+            updateDateRangeFilterText();
+            
+            // Close menu
+            const dateMenu = document.getElementById('dateRangeFilterMenu');
+            if (dateMenu) {
+                dateMenu.classList.remove('show');
+            }
+            
+            // Apply filters
+            applyFilters();
+        }
+        
+        // Handle custom date from change
+        function handleCustomDateFromChange() {
+            // Clear preset selection when custom date is changed
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            
+            const fromDate = document.getElementById('customDateFrom')?.value;
+            const toDate = document.getElementById('customDateTo')?.value;
+            
+            // Update filter text
+            updateDateRangeFilterText();
+            
+            // Only apply if both dates are set
+            if (fromDate && toDate) {
+                applyFilters();
+            }
+        }
+        
+        // Handle custom date to change
+        function handleCustomDateToChange() {
+            // Clear preset selection when custom date is changed
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            
+            const fromDate = document.getElementById('customDateFrom')?.value;
+            const toDate = document.getElementById('customDateTo')?.value;
+            
+            // Update filter text
+            updateDateRangeFilterText();
+            
+            // Only apply if both dates are set
+            if (fromDate && toDate) {
+                applyFilters();
+            }
+        }
+        
+        // Update date range filter text
+        function updateDateRangeFilterText() {
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateElement = document.getElementById('selectedDateRange');
+            const fromDate = document.getElementById('customDateFrom')?.value;
+            const toDate = document.getElementById('customDateTo')?.value;
+            
+            if (dateElement) {
+                // If custom dates are set, show them
+                if (fromDate && toDate) {
+                    const formatDate = (dateStr) => {
+                        const date = new Date(dateStr);
+                        return date.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                    };
+                    dateElement.textContent = `${formatDate(fromDate)} - ${formatDate(toDate)}`;
+                } else if (selectedItem) {
+                    // Show preset selection
+                    const optionText = selectedItem.querySelector('.option-text');
+                    const displayText = optionText ? optionText.textContent.trim() : selectedItem.getAttribute('data-value');
+                    dateElement.textContent = displayText;
+                } else {
+                    dateElement.textContent = 'השנה'; // Default
+                }
+            }
+        }
+        
+        // Get date range (returns start and end dates based on selected range)
+        function getDateRange() {
+            // Check if custom dates are set (priority over preset)
+            const fromDate = document.getElementById('customDateFrom')?.value;
+            const toDate = document.getElementById('customDateTo')?.value;
+            
+            if (fromDate && toDate) {
+                const start = new Date(fromDate);
+                const end = new Date(toDate);
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 59, 999);
+                return { start, end, range: 'מותאם אישית' };
+            }
+            
+            // Use preset if no custom dates
+            const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+            if (!selectedItem) {
+                // Default to current year
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const yearStart = new Date(today.getFullYear(), 0, 1);
+                return { start: yearStart, end: today, range: 'השנה' };
+            }
+            
+            const range = selectedItem.getAttribute('data-value');
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let start = null;
+            let end = today;
+            
+            switch (range) {
+                case 'כל זמן':
+                    return { start: null, end: null, range };
+                    
+                case 'היום':
+                    start = new Date(today);
+                    break;
+                    
+                case 'אתמול':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 1);
+                    end = new Date(start);
+                    break;
+                    
+                case 'השבוע': {
+                    const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+                    start = new Date(today);
+                    start.setDate(today.getDate() - dayOfWeek);
+                    break;
+                }
+                
+                case 'שבוע':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 7);
+                    break;
+                    
+                case 'שבוע קודם': {
+                    const dayOfWeek = today.getDay();
+                    const lastWeekEnd = new Date(today);
+                    lastWeekEnd.setDate(today.getDate() - dayOfWeek - 1);
+                    end = new Date(lastWeekEnd);
+                    end.setHours(23, 59, 59, 999);
+                    start = new Date(lastWeekEnd);
+                    start.setDate(lastWeekEnd.getDate() - 6);
+                    start.setHours(0, 0, 0, 0);
+                    break;
+                }
+                
+                case 'החודש': {
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                }
+                
+                case 'חודש':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 30);
+                    break;
+                    
+                case 'חודש קודם': {
+                    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+                    start = lastMonthStart;
+                    end = lastMonthEnd;
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                }
+                
+                case 'השנה': {
+                    start = new Date(today.getFullYear(), 0, 1);
+                    break;
+                }
+                
+                case 'שנה':
+                    start = new Date(today);
+                    start.setDate(today.getDate() - 365);
+                    break;
+                    
+                case 'שנה קודמת': {
+                    const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
+                    const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31);
+                    start = lastYearStart;
+                    end = lastYearEnd;
+                    end.setHours(23, 59, 59, 999);
+                    break;
+                }
+            }
+            
+            if (start) {
+                start.setHours(0, 0, 0, 0);
+            }
+            if (end) {
+                end.setHours(23, 59, 59, 999);
+            }
+            
+            return { start, end, range };
         }
         
         // Save filter state to localStorage
@@ -451,21 +921,86 @@
                     document.getElementById('withoutPlan').checked = filters.withoutPlan !== false;
                 }
                 
-                // Restore time to entry
-                if (filters.timeToEntry && document.getElementById('timeToEntry')) {
-                    document.getElementById('timeToEntry').value = filters.timeToEntry;
+                // Restore date range
+                if (filters.dateRange) {
+                    const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+                    dateRangeItems.forEach(item => item.classList.remove('selected'));
+                    const selectedItem = document.querySelector(`#dateRangeFilterMenu .date-range-filter-item[data-value="${filters.dateRange}"]`);
+                    if (selectedItem) {
+                        selectedItem.classList.add('selected');
+                        if (filters.dateRange === 'מותאם אישית') {
+                            const customInputs = document.getElementById('customDateRangeInputs');
+                            if (customInputs) {
+                                customInputs.style.display = 'block';
+                            }
+                            if (filters.dateRangeStart && document.getElementById('customDateFrom')) {
+                                document.getElementById('customDateFrom').value = filters.dateRangeStart;
+                            }
+                            if (filters.dateRangeEnd && document.getElementById('customDateTo')) {
+                                document.getElementById('customDateTo').value = filters.dateRangeEnd;
+                            }
+                        }
+                        updateDateRangeFilterText();
+                    }
                 }
                 
-                // Restore date range
-                if (filters.dateRangeStart && document.getElementById('dateRangeStart')) {
-                    document.getElementById('dateRangeStart').value = filters.dateRangeStart;
+                // Restore trading accounts
+                if (filters.tradingAccounts) {
+                    const select = document.getElementById('tradingAccounts');
+                    if (select) {
+                        Array.from(select.options).forEach(opt => {
+                            opt.selected = filters.tradingAccounts.includes(opt.value);
+                        });
+                    }
                 }
-                if (filters.dateRangeEnd && document.getElementById('dateRangeEnd')) {
-                    document.getElementById('dateRangeEnd').value = filters.dateRangeEnd;
+                
+                // Restore tags
+                if (filters.tags && Array.isArray(filters.tags)) {
+                    const tagsSelect = document.getElementById('filterTags');
+                    if (tagsSelect && window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                        window.TagUIManager.setSelectedValues(tagsSelect, filters.tags);
+                    } else if (tagsSelect) {
+                        // Fallback: set directly
+                        Array.from(tagsSelect.options).forEach(opt => {
+                            opt.selected = filters.tags.includes(parseInt(opt.value));
+                        });
+                    }
                 }
             } catch (error) {
                 console.warn('Failed to load filter state:', error);
             }
+        }
+        
+        // Generate mock tags for categories (for display purposes)
+        function generateMockTagsForCategory(categoryName) {
+            // Mock tags based on category name
+            const mockTags = [
+                { id: 1, name: 'מוצלח', category: { name: 'תוצאות', color_hex: '#28a745' } },
+                { id: 2, name: 'סיכון נמוך', category: { name: 'סיכון', color_hex: '#007bff' } },
+                { id: 3, name: 'רווחי', category: { name: 'תוצאות', color_hex: '#28a745' } },
+                { id: 4, name: 'מהיר', category: { name: 'זמן', color_hex: '#ffc107' } },
+                { id: 5, name: 'ארוך טווח', category: { name: 'זמן', color_hex: '#17a2b8' } }
+            ];
+            
+            // Return 1-3 random tags
+            const count = Math.floor(Math.random() * 3) + 1;
+            const shuffled = [...mockTags].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+        
+        // Render tags as badges
+        function renderTagsBadges(tags) {
+            if (!tags || tags.length === 0) {
+                return '<span class="text-muted small">-</span>';
+            }
+            
+            return tags.map(tag => {
+                const color = tag.category?.color_hex || '#26baac';
+                const displayName = tag.category?.name 
+                    ? `${tag.category.name} • ${tag.name}`
+                    : tag.name;
+                return `<span class="badge rounded-pill bg-light text-dark border me-1 mb-1" style="border-color: ${color}; font-size: 0.75rem;">${displayName}</span>`;
+            }).join('');
         }
         
         // Generate mock comparison table data
@@ -473,60 +1008,96 @@
             const categories = [];
             
             // Investment types
-            if (filters.investmentTypes.includes('swing')) {
+            if (filters.investmentTypes.includes('Investment')) {
                 categories.push({
-                    name: 'swing',
+                    name: 'Investment',
                     trades: 25,
                     avgPL: 500,
                     totalPL: 12500,
-                    successRate: 68
+                    successRate: 68,
+                    tags: generateMockTagsForCategory('Investment')
                 });
             }
-            if (filters.investmentTypes.includes('day')) {
+            if (filters.investmentTypes.includes('Swing')) {
                 categories.push({
-                    name: 'day',
-                    trades: 15,
-                    avgPL: 300,
-                    totalPL: 4500,
-                    successRate: 60
+                    name: 'Swing',
+                    trades: 20,
+                    avgPL: 450,
+                    totalPL: 9000,
+                    successRate: 65,
+                    tags: generateMockTagsForCategory('Swing')
                 });
             }
-            if (filters.investmentTypes.includes('long-term')) {
+            if (filters.investmentTypes.includes('Passive')) {
                 categories.push({
-                    name: 'long-term',
+                    name: 'Passive',
                     trades: 10,
                     avgPL: 800,
                     totalPL: 8000,
-                    successRate: 80
+                    successRate: 80,
+                    tags: generateMockTagsForCategory('Passive')
                 });
             }
             
             // Trading methods
-            if (filters.tradingMethods.includes('Moving Average')) {
+            if (filters.tradingMethods.includes('Moving Averages')) {
                 categories.push({
-                    name: 'Moving Average',
+                    name: 'ממוצעים נעים',
                     trades: 20,
                     avgPL: 400,
                     totalPL: 8000,
-                    successRate: 65
+                    successRate: 65,
+                    tags: generateMockTagsForCategory('Moving Averages')
                 });
             }
-            if (filters.tradingMethods.includes('RSI')) {
+            if (filters.tradingMethods.includes('Volume Analysis')) {
                 categories.push({
-                    name: 'RSI',
+                    name: 'ניתוח נפח',
                     trades: 15,
                     avgPL: 350,
                     totalPL: 5250,
-                    successRate: 67
+                    successRate: 67,
+                    tags: generateMockTagsForCategory('Volume Analysis')
                 });
             }
-            if (filters.tradingMethods.includes('MACD')) {
+            if (filters.tradingMethods.includes('Support & Resistance')) {
                 categories.push({
-                    name: 'MACD',
+                    name: 'תמיכה והתנגדות',
                     trades: 12,
                     avgPL: 380,
                     totalPL: 4560,
-                    successRate: 63
+                    successRate: 63,
+                    tags: generateMockTagsForCategory('Support & Resistance')
+                });
+            }
+            if (filters.tradingMethods.includes('Trend Lines')) {
+                categories.push({
+                    name: 'קווי מגמה',
+                    trades: 18,
+                    avgPL: 420,
+                    totalPL: 7560,
+                    successRate: 66,
+                    tags: generateMockTagsForCategory('Trend Lines')
+                });
+            }
+            if (filters.tradingMethods.includes('Technical Patterns')) {
+                categories.push({
+                    name: 'דפוסים טכניים',
+                    trades: 14,
+                    avgPL: 360,
+                    totalPL: 5040,
+                    successRate: 64,
+                    tags: generateMockTagsForCategory('Technical Patterns')
+                });
+            }
+            if (filters.tradingMethods.includes('Fibonacci Retracement')) {
+                categories.push({
+                    name: 'פיבונאצ\'י',
+                    trades: 11,
+                    avgPL: 390,
+                    totalPL: 4290,
+                    successRate: 62,
+                    tags: generateMockTagsForCategory('Fibonacci Retracement')
                 });
             }
             
@@ -537,7 +1108,8 @@
                     trades: 30,
                     avgPL: 600,
                     totalPL: 18000,
-                    successRate: 70
+                    successRate: 70,
+                    tags: generateMockTagsForCategory('With Plan')
                 });
             }
             if (filters.withoutPlan) {
@@ -546,7 +1118,8 @@
                     trades: 20,
                     avgPL: 250,
                     totalPL: 5000,
-                    successRate: 55
+                    successRate: 55,
+                    tags: generateMockTagsForCategory('Without Plan')
                 });
             }
             
@@ -678,6 +1251,7 @@
                         <td>${formatCurrency(cat.avgPL)}</td>
                         <td class="text-success">${formatCurrency(cat.totalPL)}</td>
                         <td>${cat.successRate}%</td>
+                        <td>${renderTagsBadges(cat.tags || [])}</td>
                     </tr>
                 `).join('');
                 
@@ -1016,60 +1590,154 @@
             initPieChart();
         }
         
-        // Apply filters with visual feedback
+        // Apply filters (called automatically on filter change)
         function applyFilters() {
-            // Show loading state
-            const applyBtn = document.querySelector('button[onclick="applyFilters()"]');
-            if (applyBtn) {
-                const originalText = applyBtn.textContent;
-                applyBtn.disabled = true;
-                applyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> מעבד...';
-                
-                setTimeout(() => {
-                    applyBtn.disabled = false;
-                    applyBtn.textContent = originalText;
-                }, 500);
-            }
-            
             saveFilterState();
             updateAllVisualizations();
-            
-            // Show success notification if available
-            if (window.showNotification) {
-                window.showNotification('הפילטרים הוחלו בהצלחה', 'success');
-            }
         }
         
-        // Reset filters
+        // Make functions globally available
+        window.applyFilters = applyFilters;
+        
+        // Reset filters (clear everything)
         function resetFilters() {
-            // Reset to defaults
+            // Clear date range preset
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            
+            // Clear custom date inputs
+            const fromInput = document.getElementById('customDateFrom');
+            const toInput = document.getElementById('customDateTo');
+            if (fromInput) {
+                fromInput.value = '';
+            }
+            if (toInput) {
+                toInput.value = '';
+            }
+            updateDateRangeFilterText();
+            
+            // Clear investment types
             const investmentTypes = document.getElementById('investmentTypes');
             if (investmentTypes) {
                 Array.from(investmentTypes.options).forEach(opt => {
-                    opt.selected = ['swing', 'day', 'long-term'].includes(opt.value);
+                    opt.selected = false;
                 });
             }
             
+            // Clear trading methods
             const tradingMethods = document.getElementById('tradingMethods');
             if (tradingMethods) {
                 Array.from(tradingMethods.options).forEach(opt => {
-                    opt.selected = ['Moving Average', 'RSI'].includes(opt.value);
+                    opt.selected = false;
                 });
             }
             
+            // Clear trading accounts
+            const tradingAccounts = document.getElementById('tradingAccounts');
+            if (tradingAccounts) {
+                Array.from(tradingAccounts.options).forEach(opt => {
+                    opt.selected = false;
+                });
+            }
+            
+            // Clear tags
+            const tagsSelect = document.getElementById('filterTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    // Fallback: clear selection
+                    Array.from(tagsSelect.options).forEach(opt => {
+                        opt.selected = false;
+                    });
+                }
+            }
+            
+            // Clear plan checkboxes
             if (document.getElementById('withPlan')) {
-                document.getElementById('withPlan').checked = true;
+                document.getElementById('withPlan').checked = false;
             }
             if (document.getElementById('withoutPlan')) {
-                document.getElementById('withoutPlan').checked = true;
-            }
-            if (document.getElementById('timeToEntry')) {
-                document.getElementById('timeToEntry').value = '';
+                document.getElementById('withoutPlan').checked = false;
             }
             
             saveFilterState();
             updateAllVisualizations();
         }
+        
+        // Reset to default values
+        function resetToDefaults() {
+            // Set date range to "השנה" (current year)
+            const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+            dateRangeItems.forEach(item => item.classList.remove('selected'));
+            const yearItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="השנה"]');
+            if (yearItem) {
+                yearItem.classList.add('selected');
+            }
+            
+            // Clear custom date inputs
+            const fromInput = document.getElementById('customDateFrom');
+            const toInput = document.getElementById('customDateTo');
+            if (fromInput) {
+                fromInput.value = '';
+            }
+            if (toInput) {
+                toInput.value = '';
+            }
+            updateDateRangeFilterText();
+            
+            // Set investment types to all selected
+            const investmentTypes = document.getElementById('investmentTypes');
+            if (investmentTypes) {
+                Array.from(investmentTypes.options).forEach(opt => {
+                    opt.selected = ['Investment', 'Swing', 'Passive'].includes(opt.value);
+                });
+            }
+            
+            // Clear trading methods (none selected)
+            const tradingMethods = document.getElementById('tradingMethods');
+            if (tradingMethods) {
+                Array.from(tradingMethods.options).forEach(opt => {
+                    opt.selected = false;
+                });
+            }
+            
+            // Set trading accounts to first account only (default account)
+            const tradingAccounts = document.getElementById('tradingAccounts');
+            if (tradingAccounts) {
+                Array.from(tradingAccounts.options).forEach((opt, index) => {
+                    opt.selected = index === 0; // First account only
+                });
+            }
+            
+            // Clear tags (none selected)
+            const tagsSelect = document.getElementById('filterTags');
+            if (tagsSelect) {
+                if (window.TagUIManager && typeof window.TagUIManager.setSelectedValues === 'function') {
+                    window.TagUIManager.setSelectedValues(tagsSelect, []);
+                } else {
+                    // Fallback: clear selection
+                    Array.from(tagsSelect.options).forEach(opt => {
+                        opt.selected = false;
+                    });
+                }
+            }
+            
+            // Clear plan checkboxes (none selected)
+            if (document.getElementById('withPlan')) {
+                document.getElementById('withPlan').checked = false;
+            }
+            if (document.getElementById('withoutPlan')) {
+                document.getElementById('withoutPlan').checked = false;
+            }
+            
+            saveFilterState();
+            updateAllVisualizations();
+        }
+        
+        // Make functions globally available
+        window.resetFilters = resetFilters;
+        window.resetToDefaults = resetToDefaults;
         
         // Toggle section
         function toggleSection(sectionId) {
@@ -1125,6 +1793,40 @@
             }
         });
         
+        // Initialize tags filter
+        async function initializeTagsFilter() {
+            const tagsSelect = document.getElementById('filterTags');
+            if (!tagsSelect) {
+                console.warn('⚠️ Tags filter select not found');
+                return;
+            }
+            
+            // Wait for TagUIManager to be available
+            let retries = 0;
+            const maxRetries = 50;
+            while (!window.TagUIManager && retries < maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (!window.TagUIManager) {
+                console.warn('⚠️ TagUIManager not available after waiting');
+                return;
+            }
+            
+            try {
+                // Initialize the tag select
+                if (typeof window.TagUIManager.refreshSelectOptions === 'function') {
+                    await window.TagUIManager.refreshSelectOptions(tagsSelect);
+                    console.log('✅ Tags filter initialized');
+                } else {
+                    console.warn('⚠️ TagUIManager.refreshSelectOptions not available');
+                }
+            } catch (error) {
+                console.error('❌ Error initializing tags filter:', error);
+            }
+        }
+        
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -1133,7 +1835,55 @@
                     await window.PreferencesCore.initializeWithLazyLoading();
                 }
                 
-                // Load saved filter state
+                // Set default values (only if no saved state)
+                const saved = localStorage.getItem(FILTER_STORAGE_KEY);
+                if (!saved) {
+                    // Set default date range to "השנה" (current year)
+                    const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+                    dateRangeItems.forEach(item => item.classList.remove('selected'));
+                    const yearItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="השנה"]');
+                    if (yearItem) {
+                        yearItem.classList.add('selected');
+                    }
+                    
+                    // Set default investment types to all selected
+                    const investmentTypes = document.getElementById('investmentTypes');
+                    if (investmentTypes) {
+                        Array.from(investmentTypes.options).forEach(opt => {
+                            opt.selected = ['Investment', 'Swing', 'Passive'].includes(opt.value);
+                        });
+                    }
+                    
+                    // Set default trading account to first account only
+                    const tradingAccounts = document.getElementById('tradingAccounts');
+                    if (tradingAccounts) {
+                        Array.from(tradingAccounts.options).forEach((opt, index) => {
+                            opt.selected = index === 0; // First account only
+                        });
+                    }
+                    
+                    // Clear trading methods, plan checkboxes, and tags (default: none selected)
+                    const tradingMethods = document.getElementById('tradingMethods');
+                    if (tradingMethods) {
+                        Array.from(tradingMethods.options).forEach(opt => {
+                            opt.selected = false;
+                        });
+                    }
+                    
+                    if (document.getElementById('withPlan')) {
+                        document.getElementById('withPlan').checked = false;
+                    }
+                    if (document.getElementById('withoutPlan')) {
+                        document.getElementById('withoutPlan').checked = false;
+                    }
+                    
+                    updateDateRangeFilterText();
+                }
+                
+                // Initialize tags filter
+                await initializeTagsFilter();
+                
+                // Load saved filter state (will override defaults if exists)
                 loadFilterState();
                 
                 // Initialize charts
@@ -1160,3 +1910,4 @@
     </script>
 </body>
 </html>
+

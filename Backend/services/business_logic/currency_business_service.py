@@ -56,15 +56,17 @@ class CurrencyBusinessService(BaseBusinessService):
         
         errors = []
         
-        # Validate name
-        if 'name' in data and data['name']:
-            if not isinstance(data['name'], str) or len(data['name'].strip()) == 0:
-                errors.append('Currency name must be a non-empty string')
+        # Validate name (required)
+        if 'name' not in data or not data.get('name'):
+            errors.append('Currency name is required')
+        elif not isinstance(data['name'], str) or len(data['name'].strip()) == 0:
+            errors.append('Currency name must be a non-empty string')
         
-        # Validate symbol
-        if 'symbol' in data and data['symbol']:
-            if not isinstance(data['symbol'], str) or len(data['symbol'].strip()) == 0:
-                errors.append('Currency symbol must be a non-empty string')
+        # Validate symbol (required)
+        if 'symbol' not in data or not data.get('symbol'):
+            errors.append('Currency symbol is required')
+        elif not isinstance(data['symbol'], str) or len(data['symbol'].strip()) == 0:
+            errors.append('Currency symbol must be a non-empty string')
         
         # Validate exchange_rate (if provided)
         if 'exchange_rate' in data and data['exchange_rate'] is not None:

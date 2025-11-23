@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 
@@ -29,9 +30,14 @@ class TagBusinessService(BaseBusinessService):
     NAME_MIN_LENGTH = 1
     NAME_MAX_LENGTH = 100
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for tags."""
+        return 'tags'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the tag business service."""
-        super().__init__()
+        super().__init__(db_session)
     
     # ========================================================================
     # Validation Methods
@@ -61,6 +67,13 @@ class TagBusinessService(BaseBusinessService):
         
         errors = []
         
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         # Validate name
         name_validation = self.validate_name(data.get('name'))
         if not name_validation['is_valid']:

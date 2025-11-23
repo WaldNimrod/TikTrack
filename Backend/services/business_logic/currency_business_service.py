@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 
@@ -29,9 +30,14 @@ class CurrencyBusinessService(BaseBusinessService):
     RATE_MIN = 0.0001
     RATE_MAX = 1000000
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for currencies."""
+        return 'currencies'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the currency business service."""
-        super().__init__()
+        super().__init__(db_session)
     
     # ========================================================================
     # Validation Methods
@@ -56,6 +62,13 @@ class CurrencyBusinessService(BaseBusinessService):
         
         errors = []
         
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         # Validate name (required)
         if 'name' not in data or not data.get('name'):
             errors.append('Currency name is required')

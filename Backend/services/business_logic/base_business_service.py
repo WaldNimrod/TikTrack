@@ -13,7 +13,10 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+from sqlalchemy.orm import Session
+
+from services.validation_service import ValidationService
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +29,29 @@ class BaseBusinessService(ABC):
     the required methods for validation, calculation, and rule application.
     """
     
-    def __init__(self):
-        """Initialize the business service."""
+    def __init__(self, db_session: Optional[Session] = None):
+        """
+        Initialize the business service.
+        
+        Args:
+            db_session: Optional database session for constraint validation.
+                       If None, constraint validation will be skipped.
+        """
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.db_session = db_session
+    
+    @property
+    @abstractmethod
+    def table_name(self) -> Optional[str]:
+        """
+        Return the database table name for this entity.
+        
+        Returns:
+            Table name (e.g., 'trades', 'executions') or None if not applicable.
+            Services without a database table (e.g., StatisticsBusinessService)
+            should return None.
+        """
+        pass
     
     @abstractmethod
     def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
@@ -96,6 +119,42 @@ class BaseBusinessService(ABC):
             'rules_checked': [],
             'violations': []
         }
+    
+    def validate_with_constraints(self, data: Dict[str, Any], exclude_id: Optional[int] = None) -> Tuple[bool, List[str]]:
+        """
+        Validate data against database constraints (first step in validation chain).
+        
+        This method should be called FIRST in the validate() method of each service,
+        before BusinessRulesRegistry validation and complex business rules.
+        
+        Args:
+            data: Data dictionary to validate
+            exclude_id: ID to exclude from unique checks (for updates)
+            
+        Returns:
+            Tuple of (is_valid, list_of_errors)
+            
+        Note:
+            - If db_session is None, constraint validation is skipped (returns True, [])
+            - If table_name is None, constraint validation is skipped (returns True, [])
+            - This allows services without DB tables (e.g., Statistics) to work correctly
+        """
+        if not self.db_session:
+            # No DB session - skip constraint validation
+            self.logger.debug(f"No DB session provided for {self.__class__.__name__}, skipping constraint validation")
+            return True, []
+        
+        if not self.table_name:
+            # No table name - skip constraint validation (e.g., StatisticsBusinessService)
+            self.logger.debug(f"No table name defined for {self.__class__.__name__}, skipping constraint validation")
+            return True, []
+        
+        try:
+            return ValidationService.validate_data(self.db_session, self.table_name, data, exclude_id)
+        except Exception as e:
+            self.logger.error(f"Error validating constraints for {self.__class__.__name__}: {str(e)}")
+            # Return validation error instead of crashing
+            return False, [f"Constraint validation error: {str(e)}"]
     
     def log_business_event(self, event_type: str, data: Dict[str, Any], level: str = 'info'):
         """

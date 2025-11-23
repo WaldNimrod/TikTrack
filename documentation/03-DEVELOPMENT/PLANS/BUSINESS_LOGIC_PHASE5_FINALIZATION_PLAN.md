@@ -165,6 +165,11 @@
 5. הוספת import של `Session` מ-sqlalchemy.orm
 6. הוספת import של `Tuple` מ-typing
 
+**בדיקות בסיסיות אחרי שלב זה:**
+- ✅ וידוא ש-BaseBusinessService מתקמפל ללא שגיאות
+- ✅ וידוא ש-`validate_with_constraints()` עובד עם `table_name=None` (StatisticsBusinessService)
+- ✅ וידוא ש-`validate_with_constraints()` עובד עם `table_name='trades'` (TradeBusinessService)
+
 **דרישות:**
 - כל Service חייב לממש `table_name` property
 - Services ללא table (כמו Statistics) יחזירו `None`
@@ -254,6 +259,12 @@ class BaseBusinessService(ABC):
 9. `Backend/services/business_logic/currency_business_service.py` - table_name: `'currencies'`
 10. `Backend/services/business_logic/tag_business_service.py` - table_name: `'tags'`
 11. `Backend/services/business_logic/statistics_business_service.py` - **אין table_name** (service לחישובים, לא ישות DB)
+
+**בדיקות בסיסיות אחרי שלב זה:**
+- ✅ וידוא שכל Service מתקמפל ללא שגיאות
+- ✅ וידוא שכל Service מחזיר `table_name` נכון
+- ✅ וידוא ש-StatisticsBusinessService מחזיר `None`
+- ✅ וידוא ש-`validate()` בכל Service קורא ל-`validate_with_constraints()` כשלב ראשון
 
 **שינויים לכל Service:**
 
@@ -387,6 +398,12 @@ class StatisticsBusinessService(BaseBusinessService):
 1. עדכון כל ה-validate endpoints להעביר `db_session` ל-Services
 2. הוספת `@handle_database_session()` decorator לכל validate endpoint
 3. עדכון כל ה-calculate endpoints (אופציונלי - לא דורש db_session, אבל יכול להיות שימושי)
+
+**בדיקות בסיסיות אחרי שלב זה:**
+- ✅ וידוא שכל validate endpoint מתקמפל ללא שגיאות
+- ✅ וידוא ש-`@handle_database_session()` עובד
+- ✅ וידוא ש-`db_session` מועבר ל-Service
+- ✅ בדיקת validate endpoint אחד (למשל `/api/business/trade/validate`) - וידוא שהוא בודק constraints
 
 **רשימת validate endpoints לעדכון (14 endpoints):**
 
@@ -625,6 +642,12 @@ def validate_preference():
 - בדיקות Business Rules
 - בדיקות אינטגרציה עם ValidationService
 
+**בדיקות בסיסיות אחרי Phase 5.1:**
+- ✅ וידוא ש-PreferencesBusinessService מתקמפל ללא שגיאות
+- ✅ וידוא ש-API endpoints עובדים
+- ✅ וידוא ש-Frontend wrappers עובדים
+- ✅ הרצת tests בסיסיים
+
 ---
 
 ## Phase 5.2: הוספת Frontend Wrappers חסרים
@@ -656,6 +679,11 @@ def validate_preference():
 - `validateTagCategoryViaAPI(category)` - ולידציה של category דרך Business Logic API
 
 **הערה:** לשמור על הפונקציות הקיימות (CRUD) ולהוסיף wrappers חדשים עם suffix `ViaAPI`.
+
+**בדיקות בסיסיות אחרי Phase 5.2:**
+- ✅ וידוא ש-Statistics wrappers עובדים
+- ✅ וידוא ש-Tag wrappers עובדים
+- ✅ בדיקת API calls מ-Frontend
 
 ---
 
@@ -722,6 +750,10 @@ def validate_preference():
 - הוספת הערה על wrappers במערכות אחרות (לא רק Data Services)
 - **הוספת סעיף "Validation Integration"** - איך להשתמש ב-ValidationService ו-BusinessRulesRegistry
 
+**בדיקות בסיסיות אחרי Phase 5.3:**
+- ✅ וידוא שהתיעוד מעודכן ומדויק
+- ✅ וידוא שכל הקישורים עובדים
+
 ---
 
 ## Phase 5.4: בדיקות מקיפות סופיות
@@ -742,6 +774,8 @@ def validate_preference():
 - בדיקת cache behavior
 - בדיקת batch operations
 - **בדיקת אינטגרציה עם ValidationService** - וידוא ש-validate endpoints בודקים constraints
+
+**הערה:** זהו חלק מבדיקות מקיפות סופיות - בדיקות בסיסיות בוצעו אחרי כל שלב קודם.
 
 ### שלב 5.4.2: בדיקות Frontend Wrappers
 
@@ -871,6 +905,52 @@ def validate_preference():
 - רשימת כל הקבצים שנוצרו/עודכנו
 - רשימת כל הבדיקות שבוצעו
 - המלצות לשיחרור
+
+---
+
+## תשובות לשאלות פתוחות
+
+### שאלה 4: StatisticsBusinessService - האם דרושה טבלה?
+
+**תשובה:**
+
+**לא, אין צורך בטבלה.**
+
+`StatisticsBusinessService` הוא service לחישובים, לא ישות DB. הוא:
+- מחשב סטטיסטיקות על נתונים שמועברים אליו (רשימות של dictionaries)
+- לא מייצג ישות DB ספציפית
+- לא צריך `table_name` - יחזיר `None`
+
+**מה השירות יחזיר:**
+- `table_name` property: `None`
+- `validate_with_constraints()` יחזיר `True, []` (skip constraint validation אוטומטית)
+- `db_session` יכול להיות שימושי לחישובים מורכבים (כמו `calculate_time_weighted_return`) אבל לא לולידציה של constraints
+
+**התוכנית נכונה:**
+- התוכנית כבר מציינת ש-StatisticsBusinessService יחזיר `None` ל-table_name
+- אין צורך בשינויים בתוכנית
+- ההתנהגות המתוארת בתוכנית נכונה ומתאימה
+
+### שאלה 5: סדר ביצוע ובדיקות
+
+**תשובות (לפי תשובות המשתמש):**
+
+1. **סדר ביצוע:** יש לממש את התוכנית כפי שנבנתה לפי כל השלבים ובסדר הנכון
+   - ✅ Phase 5.0.4 (תיקון אינטגרציה) - **קריטי, לפני הכל**
+   - ✅ Phase 5.1 (PreferencesBusinessService)
+   - ✅ Phase 5.2 (Frontend Wrappers)
+   - ✅ Phase 5.3 (תיקון התיעוד)
+   - ✅ Phase 5.4 (בדיקות מקיפות)
+   - ✅ Phase 5.5 (תיקונים וסיכום)
+
+2. **בדיקות:**
+   - ✅ **בדיקות בסיסיות אחרי כל שלב** - וידוא שהשלב עובד לפני המשך
+   - ✅ **בדיקות מקיפות בסיום** - E2E tests + בדיקות בדפדפן (כל 28 העמודים)
+   - ✅ בדיקות Performance
+   - ✅ בדיקות אינטגרציה (כולל ValidationService)
+
+3. **תיעוד:**
+   - ✅ עדכון התיעוד **בסוף** (Phase 5.3) - לא תוך כדי
 
 ---
 
@@ -1010,10 +1090,21 @@ def validate_preference():
    - בדיקות Performance
    - בדיקות אינטגרציה
    - **בדיקת אינטגרציה עם ValidationService**
+   - **ביצוע בדיקות בסיסיות אחרי כל שלב**
+   - **ביצוע בדיקות מקיפות (E2E + בדפדפן) בסיום**
 
 5. **תיעוד:**
+   - עדכון התיעוד **בסוף** (Phase 5.3)
    - עדכון התוכנית המקורית
    - תיקון כל התיעוד
    - יישום כל ההמלצות
    - **תיעוד ארכיטקטורת ולידציה**
+
+6. **StatisticsBusinessService - אין צורך בטבלה:**
+   - ✅ **StatisticsBusinessService הוא service לחישובים, לא ישות DB**
+   - ✅ **אין לו table_name - יחזיר `None`**
+   - ✅ **`validate_with_constraints()` יחזיר `True, []` (skip constraint validation)**
+   - ✅ **התוכנית נכונה - אין צורך בשינויים**
+   - ✅ **השירות מחזיר תוצאות חישובים (KPI, סטטיסטיקות) ולא ישויות DB**
+   - ✅ **`db_session` יכול להיות שימושי לחישובים מורכבים (כמו `calculate_time_weighted_return`) אבל לא לולידציה של constraints**
 

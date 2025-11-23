@@ -746,7 +746,128 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 
 ---
 
-## 9. Related Documentation
+## 9. Validation Integration
+
+### סקירה כללית
+
+כל Data Service יכול לכלול wrappers ל-Business Logic API עבור ולידציה. ה-wrappers משתמשים ב-ValidationService (Database Constraints) ו-BusinessRulesRegistry (Business Rules) כדי לספק ולידציה מקיפה.
+
+### ארכיטקטורת ולידציה:
+
+**3 שכבות ולידציה:**
+
+1. **Database Constraints** (ValidationService) - אילוצים בסיסיים מבסיס הנתונים
+2. **Business Rules** (BusinessRulesRegistry) - חוקי עסק מורכבים
+3. **Frontend Validation** - ולידציה בלקוח (UX)
+
+### דוגמה: הוספת Validation Wrapper
+
+```javascript
+/**
+ * Validate {entity} data using backend business logic service.
+ * Uses UnifiedCacheManager for caching results (60s TTL).
+ * @param {Object} {entity}Data - {Entity} data to validate
+ * @returns {Promise<Object>} Validation result: {is_valid, errors}
+ */
+async function validate{Entity}({entity}Data) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-{entity}', {entity}Data)
+      : `business:validate-{entity}:${JSON.stringify({entity}Data)}`;
+    
+    try {
+        // Use CacheTTLGuard for automatic cache management
+        if (window.CacheTTLGuard?.ensure) {
+            return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+                const response = await fetch('/api/business/{entity}/validate', {
+                    method: 'POST',
+                    headers: DEFAULT_HEADERS,
+                    body: JSON.stringify({entity}Data)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    return {
+                        is_valid: false,
+                        errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+                    };
+                }
+
+                const result = await response.json();
+                return {
+                    is_valid: result.status === 'success',
+                    errors: []
+                };
+            }, { ttl: 60 * 1000 });
+        }
+        
+        // Fallback if CacheTTLGuard not available
+        const response = await fetch('/api/business/{entity}/validate', {
+            method: 'POST',
+            headers: DEFAULT_HEADERS,
+            body: JSON.stringify({entity}Data)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return {
+                is_valid: false,
+                errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+            };
+        }
+
+        const result = await response.json();
+        return {
+            is_valid: result.status === 'success',
+            errors: []
+        };
+    } catch (error) {
+        window.Logger?.error?.('❌ Error validating {entity}', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+        return {
+            is_valid: false,
+            errors: [error?.message || 'Validation failed']
+        };
+    }
+}
+
+// Export to window
+window.{Entity}Data = {
+    // ... other functions ...
+    validate{Entity}
+};
+```
+
+### שימוש ב-Validation Wrapper:
+
+```javascript
+// In page script
+const validationResult = await window.{Entity}Data.validate{Entity}({
+    field1: 'value1',
+    field2: 'value2'
+});
+
+if (!validationResult.is_valid) {
+    window.NotificationSystem.showError('Validation failed', {
+        details: validationResult.errors.join(', ')
+    });
+    return;
+}
+
+// Continue with save/update operation
+```
+
+### Validation Order (Backend):
+
+בביצוע, ה-Business Service בודק לפי הסדר הבא:
+
+1. **Database Constraints** (ValidationService) - דרך `validate_with_constraints()`
+2. **Business Rules Registry** - דרך `registry.validate_value()`
+3. **Complex Business Rules** - לוגיקה עסקית מורכבת
+
+**ראה:** [BUSINESS_LOGIC_LAYER.md](../../02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md#validation-architecture) לפרטים מלאים
+
+---
+
+## 10. Related Documentation
 
 - [CRUD Response Handler](../02-ARCHITECTURE/FRONTEND/CRUD_RESPONSE_HANDLER.md) - Standardized CRUD response handling
 - [Cache Implementation Guide](../02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md) - Unified caching system
@@ -755,7 +876,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 
 ---
 
-## 10. Examples
+## 11. Examples
 
 ### Complete Service Example
 

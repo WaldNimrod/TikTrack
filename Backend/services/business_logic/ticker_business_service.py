@@ -13,6 +13,7 @@ from __future__ import annotations
 import logging
 import re
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 
@@ -33,9 +34,14 @@ class TickerBusinessService(BaseBusinessService):
     # Symbol format: alphanumeric, dots, hyphens, underscores
     SYMBOL_PATTERN = re.compile(r'^[A-Za-z0-9._-]+$')
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for tickers."""
+        return 'tickers'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the ticker business service."""
-        super().__init__()
+        super().__init__(db_session)
     
     # ========================================================================
     # Validation Methods
@@ -67,6 +73,13 @@ class TickerBusinessService(BaseBusinessService):
         
         errors = []
         
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         # Validate symbol
         symbol_validation = self.validate_symbol(data.get('symbol'))
         if not symbol_validation['is_valid']:

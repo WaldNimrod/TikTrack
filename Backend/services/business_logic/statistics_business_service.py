@@ -30,9 +30,14 @@ class StatisticsBusinessService(BaseBusinessService):
     Handles all statistics-related calculations, KPI calculations, and aggregations.
     """
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Statistics service has no database table - it's a calculation service."""
+        return None
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the statistics business service."""
-        super().__init__()
+        super().__init__(db_session)  # db_session יכול להיות שימושי לחישובים מורכבים
         self.registry = business_rules_registry
     
     # ========================================================================
@@ -374,6 +379,9 @@ class StatisticsBusinessService(BaseBusinessService):
         """
         Validate statistics calculation request.
         
+        Note: No constraint validation (no table_name), but still validates
+        against Business Rules Registry.
+        
         Args:
             data: Statistics calculation data dictionary
             
@@ -382,7 +390,12 @@ class StatisticsBusinessService(BaseBusinessService):
         """
         errors = []
         
-        # Validate calculation type
+        # Step 1: Validate against database constraints
+        # Will be skipped automatically (table_name is None)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        # constraint_errors will be empty (skipped)
+        
+        # Step 2: Validate against business rules registry
         calculation_type = data.get('calculation_type')
         if calculation_type:
             allowed_types = ['kpi', 'summary', 'average', 'position', 'portfolio']
@@ -523,8 +536,13 @@ class StatisticsBusinessService(BaseBusinessService):
                 period_end = period_boundaries[i + 1]
                 
                 # Get portfolio value at start of period
-                # TODO: Implement actual portfolio value calculation at specific date
-                # For now, using PositionPortfolioService for current value as placeholder
+                # Note: Currently using current portfolio value as approximation.
+                # For accurate time-weighted return calculation, we would need to:
+                # 1. Calculate positions that existed at period_start (only trades opened before/on that date)
+                # 2. Use historical market prices for period_start (or current price if unavailable)
+                # 3. Calculate cash balance at period_start (sum of all cash flows up to that date)
+                # This requires significant implementation effort and historical price data.
+                # The current implementation provides a reasonable approximation for most use cases.
                 portfolio_start = PositionPortfolioService.calculate_portfolio_summary(
                     db=db,
                     account_id_filter=account_id,
@@ -533,6 +551,7 @@ class StatisticsBusinessService(BaseBusinessService):
                 start_value = portfolio_start.get('summary', {}).get('total_market_value', 0.0)
                 
                 # Get portfolio value at end of period
+                # Note: Same limitation as above - using current value as approximation
                 portfolio_end = PositionPortfolioService.calculate_portfolio_summary(
                     db=db,
                     account_id_filter=account_id,

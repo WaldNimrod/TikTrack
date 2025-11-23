@@ -11,10 +11,11 @@ Documentation:
 
 from flask import Blueprint, jsonify, request, g
 from typing import Dict, Any
+from sqlalchemy.orm import Session
 import logging
 import time
 
-from routes.api.base_entity_decorators import monitor_performance
+from routes.api.base_entity_decorators import monitor_performance, handle_database_session
 from services.business_logic import (
     TradeBusinessService,
     ExecutionBusinessService,
@@ -26,7 +27,8 @@ from services.business_logic import (
     TradePlanBusinessService,
     TickerBusinessService,
     CurrencyBusinessService,
-    TagBusinessService
+    TagBusinessService,
+    PreferencesBusinessService
 )
 
 logger = logging.getLogger(__name__)
@@ -292,16 +294,21 @@ def calculate_risk_reward():
 
 
 @business_logic_bp.route('/trade/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_trade():
     """Validate trade data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
         # Normalize side to lowercase for consistency with other endpoints
         if 'side' in data and data['side']:
             data['side'] = data['side'].lower()
         
-        result = trade_service.validate(data)
+        # Initialize service with DB session
+        service = TradeBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -413,10 +420,13 @@ def calculate_average_price():
 
 
 @business_logic_bp.route('/execution/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_execution():
     """Validate execution data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
         # Normalize action to lowercase for consistency with business rules registry
         # The registry expects lowercase values: 'buy', 'sell', 'short', 'cover'
@@ -424,7 +434,9 @@ def validate_execution():
         if 'action' in data and data['action']:
             data['action'] = data['action'].lower()
         
-        result = execution_service.validate(data)
+        # Initialize service with DB session
+        service = ExecutionBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -457,12 +469,17 @@ def validate_execution():
 # ============================================================================
 
 @business_logic_bp.route('/alert/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_alert():
     """Validate alert data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = alert_service.validate(data)
+        # Initialize service with DB session
+        service = AlertBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -782,12 +799,17 @@ def calculate_currency_conversion():
 
 
 @business_logic_bp.route('/cash-flow/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_cash_flow():
     """Validate cash flow data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = cash_flow_service.validate(data)
+        # Initialize service with DB session
+        service = CashFlowBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -820,12 +842,17 @@ def validate_cash_flow():
 # ============================================================================
 
 @business_logic_bp.route('/note/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_note():
     """Validate note data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = note_service.validate(data)
+        # Initialize service with DB session
+        service = NoteBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -908,12 +935,17 @@ def validate_note_relation():
 # ============================================================================
 
 @business_logic_bp.route('/trading-account/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_trading_account():
     """Validate trading account data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = trading_account_service.validate(data)
+        # Initialize service with DB session
+        service = TradingAccountBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -946,12 +978,17 @@ def validate_trading_account():
 # ============================================================================
 
 @business_logic_bp.route('/trade-plan/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_trade_plan():
     """Validate trade plan data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = trade_plan_service.validate(data)
+        # Initialize service with DB session
+        service = TradePlanBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -984,12 +1021,17 @@ def validate_trade_plan():
 # ============================================================================
 
 @business_logic_bp.route('/ticker/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_ticker():
     """Validate ticker data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = ticker_service.validate(data)
+        # Initialize service with DB session
+        service = TickerBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({
@@ -1094,16 +1136,161 @@ def validate_currency_rate():
 
 
 # ============================================================================
+# Preferences Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/preferences/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_preference():
+    """Validate preference value."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        preference_name = data.get('preference_name')
+        value = data.get('value')
+        data_type = data.get('data_type', 'string')
+        
+        if not preference_name:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'preference_name is required'
+                }
+            }), 400
+        
+        # Initialize service with DB session
+        service = PreferencesBusinessService(db_session=db)
+        result = service.validate_preference(preference_name, value, data_type)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating preference: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/preferences/validate-profile', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_profile():
+    """Validate profile data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        # Initialize service with DB session
+        service = PreferencesBusinessService(db_session=db)
+        result = service.validate_profile(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating profile: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/preferences/validate-dependencies', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_dependencies():
+    """Validate dependencies between preferences."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db
+        
+        preferences = data.get('preferences', {})
+        
+        if not preferences:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'preferences dictionary is required'
+                }
+            }), 400
+        
+        # Initialize service with DB session
+        service = PreferencesBusinessService(db_session=db)
+        result = service.validate_dependencies(preferences)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating dependencies: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
 # Tag Business Logic Endpoints
 # ============================================================================
 
 @business_logic_bp.route('/tag/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
 def validate_tag():
     """Validate tag data."""
     try:
         data = request.get_json() or {}
+        db: Session = g.db
         
-        result = tag_service.validate(data)
+        # Initialize service with DB session
+        service = TagBusinessService(db_session=db)
+        result = service.validate(data)
         
         if result['is_valid']:
             return jsonify({

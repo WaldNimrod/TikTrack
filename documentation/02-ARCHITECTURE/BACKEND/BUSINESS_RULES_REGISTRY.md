@@ -28,6 +28,19 @@ Business Rules Registry הוא מרשם מרכזי לכל חוקי העסק במ
 - **תחזוקה קלה** - שינוי חוק עסקי במקום אחד משפיע על כל המערכת
 - **עקביות** - הבטחת עקביות בלוגיקה העסקית
 
+### חלוקה בין Constraints ל-Business Rules:
+
+**Database Constraints (ValidationService):**
+- אילוצים בסיסיים מבסיס הנתונים (NOT NULL, UNIQUE, FOREIGN KEY, ENUM, RANGE, CHECK)
+- נבדקים כשלב ראשון ב-`validate()` דרך `validate_with_constraints()`
+
+**Business Rules (BusinessRulesRegistry):**
+- חוקי עסק מורכבים (min/max, allowed_values, required)
+- חוקים שלא ניתן לבטא ב-constraints
+- נבדקים כשלב שני ב-`validate()` דרך `registry.validate_value()`
+
+**הערה חשובה:** אין כפילות - Constraints בודקים אילוצים בסיסיים, Business Rules בודקים חוקים מורכבים יותר.
+
 ### מיקום:
 
 **קובץ:** `Backend/services/business_logic/business_rules_registry.py`
@@ -481,8 +494,9 @@ class TradeBusinessService(BaseBusinessService):
 | **Ticker** | 0 | ⏳ לא מוגדר |
 | **Currency** | 0 | ⏳ לא מוגדר |
 | **Tag** | 0 | ⏳ לא מוגדר |
+| **Preferences** | 3 | ✅ מוגדר |
 
-**סה"כ:** 21 חוקים מוגדרים (5 ישויות)
+**סה"כ:** 24 חוקים מוגדרים (6 ישויות)
 
 ---
 

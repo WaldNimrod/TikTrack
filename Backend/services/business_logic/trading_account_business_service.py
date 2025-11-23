@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 
@@ -35,9 +36,14 @@ class TradingAccountBusinessService(BaseBusinessService):
     # Notes validation rules
     NOTES_MAX_LENGTH = 5000
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for trading accounts."""
+        return 'trading_accounts'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the trading account business service."""
-        super().__init__()
+        super().__init__(db_session)
     
     # ========================================================================
     # Validation Methods
@@ -70,6 +76,14 @@ class TradingAccountBusinessService(BaseBusinessService):
         self.log_business_event('trading_account_validation', data)
         
         errors = []
+        
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         
         # Validate name
         name_validation = self.validate_name(data.get('name'))

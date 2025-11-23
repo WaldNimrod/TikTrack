@@ -268,12 +268,16 @@ class IconSystem {
         this.initialized = false;
         this.mappings = null;
         this.cacheEnabled = false;
+        this.basePath = '/trading-ui/images/icons/';
+        this.tablerPath = this.basePath + 'tabler/';
+        this.entityPath = this.basePath + 'entities/';
         this.defaultIcon = '/trading-ui/images/icons/entities/home.svg';
     }
     
+    // Public API
     async initialize() { /* ... */ }
     async getIconPath(type, name, options) { /* ... */ }
-    async renderIcon(type, name, options) { /* ... */ }
+    async renderIcon(type, name, options) { /* ... */ } // Returns inline SVG for Tabler, img tag for Entity
     async getEntityIcon(entityType) { /* ... */ }
     async getButtonIcon(buttonType) { /* ... */ }
     async getCategoryIcon(category) { /* ... */ }
@@ -281,6 +285,24 @@ class IconSystem {
     async getChartIcon(chartIcon) { /* ... */ }
     async invalidateCache(type, name) { /* ... */ }
     async clearCache() { /* ... */ }
+    
+    // Private helpers for inline SVG support
+    async _loadSVGContent(path) { /* ... */ } // Loads SVG file content via fetch
+    _prepareInlineSVG(svgContent, size, alt, className, style) { /* ... */ } // Converts SVG to inline with currentColor
+}
+```
+
+### Button System Integration
+
+```javascript
+// button-system-init.js
+class AdvancedButtonSystem {
+    // Private method for automatic icon enhancement
+    async _enhanceButtonIcons(button) {
+        // Finds all img tags with data-icon-enhance="true"
+        // Converts them to inline SVG for Tabler icons
+        // This enables dynamic color support
+    }
 }
 ```
 
@@ -316,6 +338,58 @@ class IconSystem {
 .icon--active { /* state */ }
 ```
 
+## 🎨 Dynamic Color Support
+
+### Inline SVG for Tabler Icons
+
+**Tabler Icons** מוטמעים כ-**inline SVG** במקום `<img>` tags, מה שמאפשר תמיכה בצבעים דינמיים דרך CSS:
+
+```javascript
+// renderIcon() עבור Tabler Icons
+async renderIcon(type, name, options) {
+    // Entity Icons → <img> tags (צבעים קבועים)
+    if (type === 'entity') {
+        return `<img src="${path}" ...>`;
+    }
+    
+    // Tabler Icons → inline SVG עם currentColor
+    if (path.includes('/tabler/')) {
+        const svgContent = await this._loadSVGContent(path);
+        // ממיר ל-inline SVG עם stroke="currentColor"
+        return this._prepareInlineSVG(svgContent, ...);
+    }
+}
+```
+
+### Automatic Enhancement
+
+מערכת הכפתורים מבצעת המרה אוטומטית של `<img>` tags ל-inline SVG:
+
+```javascript
+// button-system-init.js
+async _enhanceButtonIcons(button) {
+    const iconImages = button.querySelectorAll('img.icon[data-icon-enhance="true"]');
+    // ממיר כל img tag ל-inline SVG
+    for (const img of iconImages) {
+        const inlineSVG = await window.IconSystem.renderIcon(...);
+        img.replaceWith(svgElement);
+    }
+}
+```
+
+### Icon Alignment
+
+כפתורים עם רק איקון ממורכזים אוטומטית:
+
+```css
+/* CSS alignment rules */
+button:has(> .icon:only-child),
+.btn:has(> svg.icon:only-child) {
+    justify-content: center !important;
+    align-items: center !important;
+}
+```
+
 ## 🔒 Security & Performance
 
 ### Security
@@ -323,11 +397,14 @@ class IconSystem {
 - **Local files only** - כל האיקונים מקומיים
 - **No external CDN** - Bootstrap Icons ו-FontAwesome הוסרו
 - **SVG validation** - רק קבצי SVG
+- **Inline SVG sanitization** - תמיכה ב-SVG parsing ו-modification
 
 ### Performance
 
 - **Cache integration** - Memory cache עם TTL 5 דקות
+- **SVG content caching** - תוכן SVG נשמר ב-cache (TTL 1 שעה)
 - **Lazy loading** - איקונים נטענים רק כשצריך
+- **Async enhancement** - המרה ל-inline SVG מתבצעת באופן א-סינכרוני (100ms delay)
 - **Minimal bundle** - רק איקונים בשימוש
 
 ## 📈 מיגרציה

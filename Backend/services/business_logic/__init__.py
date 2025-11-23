@@ -16,7 +16,7 @@ Documentation:
 """
 
 from .base_business_service import BaseBusinessService
-from .business_rules_registry import BUSINESS_RULES, BusinessRulesRegistry
+from .business_rules_registry import BUSINESS_RULES, BusinessRulesRegistry, business_rules_registry
 from .trade_business_service import TradeBusinessService
 from .execution_business_service import ExecutionBusinessService
 from .alert_business_service import AlertBusinessService
@@ -28,11 +28,13 @@ from .trade_plan_business_service import TradePlanBusinessService
 from .ticker_business_service import TickerBusinessService
 from .currency_business_service import CurrencyBusinessService
 from .tag_business_service import TagBusinessService
+from .preferences_business_service import PreferencesBusinessService
 
 __all__ = [
     'BaseBusinessService',
     'BUSINESS_RULES',
     'BusinessRulesRegistry',
+    'business_rules_registry',
     'TradeBusinessService',
     'ExecutionBusinessService',
     'AlertBusinessService',
@@ -44,5 +46,6 @@ __all__ = [
     'TickerBusinessService',
     'CurrencyBusinessService',
     'TagBusinessService',
+    'PreferencesBusinessService',
 ]
 

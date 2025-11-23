@@ -7,8 +7,10 @@
 
 ### תכונות עיקריות
 
-- **17 איקוני ישויות מקוריים** - נשארים כ-brute default
+- **17 איקוני ישויות מקוריים** - נשארים כ-brute default (צבעים קבועים)
 - **Tabler Icons** - מעל 5800 איקונים חינמיים (MIT license)
+- **תמיכה בצבעים דינמיים** - Tabler Icons מוטמעים כ-inline SVG עם `currentColor` ✅ **חדש! נובמבר 2025**
+- **יישור אוטומטי** - איקונים בכפתורים עם רק איקון ממורכזים אוטומטית ✅ **חדש! נובמבר 2025**
 - **אינטגרציה מלאה** עם מערכות הטעינה, האתחול והמטמון
 - **Fallback mechanism** - תמיד יש איקון להצגה
 - **Cache integration** - שיפור ביצועים
@@ -118,6 +120,8 @@ const path = await window.IconSystem.getIconPath('button', 'edit');
 
 מחזיר HTML של איקון.
 
+**חשוב:** עבור Tabler Icons, הפונקציה מחזירה **inline SVG** במקום `<img>` tag, מה שמאפשר תמיכה בצבעים דינמיים דרך CSS. Entity Icons נשארים כ-`<img>` tags (צבעים קבועים).
+
 **Parameters:**
 - `type` (string): סוג האיקון
 - `name` (string): שם האיקון
@@ -127,15 +131,24 @@ const path = await window.IconSystem.getIconPath('button', 'edit');
   - `class` (string): CSS classes
   - `style` (string): CSS styles inline
 
-**Returns:** `Promise<string>` - HTML string
+**Returns:** `Promise<string>` - HTML string (inline SVG עבור Tabler Icons, `<img>` עבור Entity Icons)
 
 **Example:**
 ```javascript
+// Tabler Icon - מחזיר inline SVG עם תמיכה בצבעים דינמיים
 const html = await window.IconSystem.renderIcon('button', 'edit', {
     size: '24',
     alt: 'ערוך',
     class: 'icon icon--large'
 });
+// Returns: '<svg ... stroke="currentColor">...</svg>'
+
+// Entity Icon - מחזיר img tag (צבעים קבועים)
+const entityHtml = await window.IconSystem.renderIcon('entity', 'trade', {
+    size: '24',
+    alt: 'טרייד'
+});
+// Returns: '<img src="/trading-ui/images/icons/entities/trades.svg" ...>'
 ```
 
 #### `getEntityIcon(entityType)`
@@ -217,6 +230,82 @@ Wrapper ל-chart icons. משתמש ב-Tabler Icons.
 --icon-color-disabled: #6c757d;
 ```
 
+## 🎨 תמיכה בצבעים דינמיים
+
+### איך זה עובד
+
+**Tabler Icons** מוטמעים כ-**inline SVG** עם `stroke="currentColor"`, מה שמאפשר לאיקונים לייצג את הצבע מהכפתור או מהאלמנט ההורה דרך CSS.
+
+**Entity Icons** נשארים כ-`<img>` tags עם צבעים קבועים (לא ניתן לשנות צבע).
+
+### דוגמאות שימוש
+
+```javascript
+// איקון בכפתור - יורש את הצבע מהכפתור
+const button = document.createElement('button');
+button.className = 'btn btn-primary'; // צבע כחול
+const iconHTML = await window.IconSystem.renderIcon('button', 'edit');
+button.innerHTML = iconHTML; // האיקון יהיה כחול (יורש מ-currentColor)
+
+// איקון עם צבע מותאם אישית
+const iconHTML = await window.IconSystem.renderIcon('button', 'delete', {
+    size: '16',
+    class: 'icon',
+    style: 'color: red;' // צבע אדום מותאם
+});
+```
+
+### CSS Styling
+
+```css
+/* איקון יורש צבע מהכפתור */
+.btn-primary .icon {
+    color: inherit; /* האיקון יהיה באותו צבע כמו הכפתור */
+}
+
+/* איקון עם צבע ספציפי */
+.icon--error {
+    color: var(--icon-color-error, #dc3545);
+}
+
+/* איקון בכפתור עם צבע דינמי */
+.btn[data-color="success"] .icon {
+    color: var(--success-color, #28a745);
+}
+```
+
+### יישור איקונים בכפתורים
+
+כפתורים עם **רק איקון** (ללא טקסט) ממורכזים אוטומטית:
+
+```css
+/* כפתור עם רק איקון - ממורכז */
+button:has(> .icon:only-child),
+.btn:has(> svg.icon:only-child) {
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* האיקון עצמו - ללא margins */
+button > .icon:only-child {
+    margin: 0 !important;
+}
+```
+
+**דוגמה:**
+```html
+<!-- כפתור עם רק איקון - ממורכז אוטומטית -->
+<button class="btn">
+    <svg class="icon" ...>...</svg>
+</button>
+
+<!-- כפתור עם איקון + טקסט - האיקון משמאל, טקסט מימין -->
+<button class="btn">
+    <svg class="icon">...</svg>
+    ערוך
+</button>
+```
+
 ## 🔄 אינטגרציה עם מערכות אחרות
 
 ### Entity Details Modal
@@ -233,13 +322,22 @@ async getEntityIcon(entityType) {
 
 ### Button System
 
+מערכת הכפתורים משתמשת ב-`IconSystem` להמרה אוטומטית של Tabler Icons ל-inline SVG:
+
 ```javascript
+// button-system-init.js
+// כפתורים עם Tabler icons מומרים אוטומטית ל-inline SVG
+// זה מאפשר לאיקונים לייצג צבעים דינמיים מהכפתור
+
 // button-icons.js
 const BUTTON_ICONS = {
     EDIT: '/trading-ui/images/icons/tabler/pencil.svg',
     DELETE: '/trading-ui/images/icons/tabler/trash.svg',
     // ...
 };
+
+// המרה אוטומטית מתבצעת ב-_enhanceButtonIcons():
+// img.icon[data-icon-enhance="true"] → inline SVG
 ```
 
 ### Category Detector
@@ -273,26 +371,52 @@ await window.IconSystem.clearCache();
 
 ## 📝 דוגמאות שימוש
 
-### דוגמה 1: הוספת איקון לכפתור
+### דוגמה 1: הוספת איקון לכפתור עם צבע דינמי
 
 ```javascript
 const button = document.createElement('button');
+button.className = 'btn btn-primary'; // כפתור כחול
 const iconHTML = await window.IconSystem.renderIcon('button', 'edit', {
     size: '16',
     class: 'icon me-2'
 });
 button.innerHTML = iconHTML + 'ערוך';
+// האיקון יהיה כחול (יורש מ-currentColor של הכפתור)
 ```
 
-### דוגמה 2: עדכון איקון entity במודל
+### דוגמה 2: כפתור עם רק איקון (ממורכז אוטומטית)
+
+```javascript
+const iconButton = document.createElement('button');
+iconButton.className = 'btn btn-danger'; // כפתור אדום
+const iconHTML = await window.IconSystem.renderIcon('button', 'delete', {
+    size: '16',
+    class: 'icon'
+});
+iconButton.innerHTML = iconHTML; // רק איקון, ללא טקסט
+// הכפתור והאיקון ממורכזים אוטומטית, האיקון אדום
+```
+
+### דוגמה 3: איקון עם צבע מותאם אישית
+
+```javascript
+const warningIcon = await window.IconSystem.renderIcon('button', 'warning', {
+    size: '20',
+    class: 'icon',
+    style: 'color: #ffc107;' // צבע צהוב מותאם
+});
+```
+
+### דוגמה 4: עדכון איקון entity במודל
 
 ```javascript
 const iconPath = await window.IconSystem.getEntityIcon('trade');
 const iconElement = document.querySelector('.entity-icon img');
 iconElement.src = iconPath;
+// Entity icons נשארים כ-img tags (צבעים קבועים)
 ```
 
-### דוגמה 3: הצגת איקון קטגוריה
+### דוגמה 5: הצגת איקון קטגוריה
 
 ```javascript
 const category = 'development';
@@ -302,6 +426,110 @@ const iconHTML = await window.IconSystem.renderIcon('category', category, {
 });
 badge.innerHTML = iconHTML + 'פיתוח';
 ```
+
+### דוגמה 6: יצירת כפתור עם צבע דינמי לפי משתנה CSS
+
+```javascript
+// HTML/CSS
+// .btn-success { --icon-color: var(--success-color, #28a745); }
+
+const successButton = document.createElement('button');
+successButton.className = 'btn btn-success';
+const checkIcon = await window.IconSystem.renderIcon('button', 'check', {
+    size: '16',
+    class: 'icon'
+});
+successButton.innerHTML = checkIcon;
+// האיקון יקבל את הצבע מה-CSS variable של הכפתור
+```
+
+## 👨‍💻 מדריך למפתח העתידי
+
+### מתי להשתמש ב-Tabler Icons vs Entity Icons?
+
+**Tabler Icons** - לכל איקון שצריך:
+- ✅ שינוי צבע דינמי
+- ✅ התאמה לצבע הכפתור/אלמנט
+- ✅ איקונים כלליים (כפתורים, קטגוריות, עמודים)
+
+**Entity Icons** - רק ל-17 הישויות המקוריות:
+- ✅ איקוני ישויות ספציפיים (trades, alerts, accounts, etc.)
+- ✅ צבעים קבועים (לא ניתן לשנות)
+
+### דפוסי שימוש נפוצים
+
+#### 1. כפתור עם איקון + טקסט
+
+```javascript
+const button = document.createElement('button');
+button.className = 'btn btn-primary';
+const icon = await window.IconSystem.renderIcon('button', 'save', {
+    size: '16',
+    class: 'icon me-2'
+});
+button.innerHTML = icon + 'שמור';
+// האיקון משמאל, הטקסט מימין, האיקון יורש צבע מהכפתור
+```
+
+#### 2. כפתור עם רק איקון
+
+```javascript
+const iconButton = document.createElement('button');
+iconButton.className = 'btn btn-outline-secondary';
+iconButton.setAttribute('aria-label', 'ערוך');
+const icon = await window.IconSystem.renderIcon('button', 'edit', {
+    size: '16',
+    class: 'icon'
+});
+iconButton.innerHTML = icon;
+// הכפתור ממורכז אוטומטית, האיקון ממורכז בכפתור
+```
+
+#### 3. איקון עם מצבים (active, disabled, etc.)
+
+```html
+<!-- בדף HTML -->
+<button class="btn">
+    <svg class="icon icon--active">...</svg>
+    כפתור פעיל
+</button>
+
+<button class="btn" disabled>
+    <svg class="icon icon--disabled">...</svg>
+    כפתור מושבת
+</button>
+```
+
+```css
+/* ב-CSS */
+.icon--active {
+    color: var(--icon-color-active, #26baac);
+}
+
+.icon--disabled {
+    color: var(--icon-color-disabled, #6c757d);
+    opacity: 0.5;
+}
+```
+
+#### 4. שילוב עם מערכת הכפתורים הקיימת
+
+```javascript
+// השימוש ב-button-system-init.js כבר מטפל בהכל אוטומטית
+// רק צריך להגדיר את נתיב האיקון ב-button-icons.js
+const BUTTON_ICONS = {
+    EDIT: '/trading-ui/images/icons/tabler/pencil.svg',
+    // המערכת תמיר אוטומטית ל-inline SVG
+};
+```
+
+### טיפים וביטולי
+
+1. **תמיד השתמש ב-`await`** - `renderIcon()` היא async function
+2. **בדוק שהמערכת נטענה** - לפני שימוש, וודא ש-`window.IconSystem` קיים
+3. **אל תשנה צבעים ידנית ל-Entity Icons** - הם נשארים קבועים
+4. **השתמש ב-CSS variables** - לצבעים דינמיים, השתמש ב-CSS variables
+5. **כפתורים עם רק איקון** - אל תוסיף margins ידנית, המערכת מטפלת בזה
 
 ## 🔍 פתרון בעיות
 
@@ -333,6 +561,46 @@ badge.innerHTML = iconHTML + 'פיתוח';
 - נקה cache ידנית:
   ```javascript
   await window.IconSystem.invalidateCache('button', 'edit');
+  ```
+
+### איקון לא משנה צבע (Tabler Icons)
+
+1. **בדוק שהאיקון מוטמע כ-inline SVG:**
+   ```javascript
+   // בדוק ב-console
+   const icon = document.querySelector('.icon');
+   console.log(icon.tagName); // צריך להיות 'svg', לא 'img'
+   ```
+
+2. **בדוק שה-SVG משתמש ב-currentColor:**
+   ```javascript
+   const svg = document.querySelector('svg.icon');
+   console.log(svg.getAttribute('stroke')); // צריך להיות 'currentColor'
+   ```
+
+3. **ודא שהכפתור/אלמנט ההורה מגדיר צבע:**
+   ```css
+   .btn {
+       color: var(--primary-color); /* האיקון יורש את זה */
+   }
+   ```
+
+### איקון לא ממורכז בכפתור
+
+- בדוק שיש רק איקון בכפתור (ללא טקסט):
+  ```html
+  <!-- ✅ נכון - ימורכז -->
+  <button class="btn"><svg class="icon">...</svg></button>
+  
+  <!-- ❌ לא נכון - לא ימורכז -->
+  <button class="btn"><svg class="icon">...</svg>טקסט</button>
+  ```
+
+- בדוק שה-CSS נטען:
+  ```css
+  button:has(> .icon:only-child) {
+      justify-content: center !important;
+  }
   ```
 
 ## 📚 מיפוי איקונים

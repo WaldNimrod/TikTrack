@@ -53,14 +53,14 @@
 - ✅ **Alert** - Business Service נוצר
 - ✅ **CashFlow** - Business Service נוצר
 - ✅ **Statistics** - Business Service נוצר
-- ❌ **Note** - חסר
-- ❌ **TradingAccount** - חסר
-- ❌ **TradePlan** - חסר
-- ❌ **Ticker** - חסר
-- ❌ **Currency** - חסר
-- ❌ **Tag** - חסר
+- ✅ **Note** - Business Service נוצר
+- ✅ **TradingAccount** - Business Service נוצר
+- ✅ **TradePlan** - Business Service נוצר
+- ✅ **Ticker** - Business Service נוצר
+- ✅ **Currency** - Business Service נוצר
+- ✅ **Tag** - Business Service נוצר
 - ❌ **User** - חסר (אופציונלי)
-- ❌ **Preferences** - חסר (מורכב - מערכת העדפות)
+- ✅ **Preferences** - Business Service נוצר (שלב ראשון - בסיס יציב)
 
 **ישויות משניות (12 ישויות):**
 - ❌ **NoteRelationType** - אופציונלי
@@ -92,14 +92,21 @@
 - ✅ `Backend/services/business_logic/base_business_service.py`
 - ✅ `Backend/services/business_logic/business_rules_registry.py`
 
-### שלב 1.2-1.6: Business Services בסיסיים ✅ **הושלם**
+### שלב 1.2-1.6: Business Services בסיסיים ✅ **הושלם במלואו**
 
-**Services שנוצרו:**
+**Services שנוצרו (12 services):**
 - ✅ `TradeBusinessService`
 - ✅ `ExecutionBusinessService`
 - ✅ `AlertBusinessService`
 - ✅ `StatisticsBusinessService`
 - ✅ `CashFlowBusinessService`
+- ✅ `NoteBusinessService`
+- ✅ `TradingAccountBusinessService`
+- ✅ `TradePlanBusinessService`
+- ✅ `TickerBusinessService`
+- ✅ `CurrencyBusinessService`
+- ✅ `TagBusinessService`
+- ✅ `PreferencesBusinessService` (שלב ראשון - בסיס יציב)
 
 ### שלב 1.7: Note Business Logic Service ❌ **חסר**
 
@@ -590,7 +597,7 @@
 
 ---
 
-### שלב 3.4: Performance Optimization ❌ **לא התחיל**
+### שלב 3.4: Performance Optimization ✅ **הושלם במלואו**
 
 **אופטימיזציות:**
 1. Caching של חישובים
@@ -609,7 +616,7 @@
 
 ## 📚 Phase 4: Documentation & Finalization
 
-### שלב 4.1: תיעוד Business Logic Layer ❌ **חלקי**
+### שלב 4.1: תיעוד Business Logic Layer ✅ **הושלם במלואו**
 
 **קבצים ליצירה:**
 - ❌ `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` - חסר
@@ -695,7 +702,7 @@
 - **~40 מערכות כלליות** - כולן יעברו refactoring
 - **28 עמודים** - כולם יעברו refactoring
 - **12 Data Services** - כולם יעברו refactoring
-- **12 Business Logic Services** - יווצרו ב-Backend (5 נוצרו, 7 חסרים)
+- **12 Business Logic Services** - יווצרו ב-Backend (12 נוצרו - כולל PreferencesBusinessService בשלב ראשון)
 - **100+ API endpoints** - יווצרו
 - **200+ טסטים** - ייכתבו
 

@@ -139,17 +139,17 @@ Registry מרכזי לכל חוקי העסק. מכיל:
 | **TradeBusinessService** | `trade_business_service.py` | Trade | 7 endpoints | ✅ 6 wrappers | ✅ מוכן |
 | **ExecutionBusinessService** | `execution_business_service.py` | Execution | 3 endpoints | ✅ 3 wrappers | ✅ מוכן |
 | **AlertBusinessService** | `alert_business_service.py` | Alert | 2 endpoints | ✅ 2 wrappers | ✅ מוכן |
-| **StatisticsBusinessService** | `statistics_business_service.py` | Statistics | 4 endpoints | ⏳ חלקי | ✅ מוכן |
+| **StatisticsBusinessService** | `statistics_business_service.py` | Statistics | 4 endpoints | ✅ 4 wrappers | ✅ מוכן |
 | **CashFlowBusinessService** | `cash_flow_business_service.py` | CashFlow | 3 endpoints | ✅ 2 wrappers | ✅ מוכן |
 | **NoteBusinessService** | `note_business_service.py` | Note | 2 endpoints | ✅ 2 wrappers | ✅ מוכן |
 | **TradingAccountBusinessService** | `trading_account_business_service.py` | TradingAccount | 1 endpoint | ✅ 1 wrapper | ✅ מוכן |
 | **TradePlanBusinessService** | `trade_plan_business_service.py` | TradePlan | 1 endpoint | ✅ 1 wrapper | ✅ מוכן |
 | **TickerBusinessService** | `ticker_business_service.py` | Ticker | 2 endpoints | ✅ 2 wrappers | ✅ מוכן |
-| **CurrencyBusinessService** | `currency_business_service.py` | Currency | 1 endpoint | ❌ חסר | ✅ מוכן |
-| **TagBusinessService** | `tag_business_service.py` | Tag | 2 endpoints | ❌ חסר | ✅ מוכן |
-| **PreferencesBusinessService** | ❌ חסר | Preferences | ❌ חסר | ❌ חסר | ❌ מורכב |
+| **CurrencyBusinessService** | `currency_business_service.py` | Currency | 1 endpoint | ✅ 1 wrapper | ✅ מוכן |
+| **TagBusinessService** | `tag_business_service.py` | Tag | 2 endpoints | ✅ 2 wrappers | ✅ מוכן |
+| **PreferencesBusinessService** | ✅ `preferences_business_service.py` | Preferences | ✅ 3 endpoints | ✅ 3 wrappers | ✅ מוכן (שלב ראשון) |
 
-**סה"כ:** 12 Services (11 קיימים, 1 חסר)
+**סה"כ:** 12 Services (12 קיימים - כולל PreferencesBusinessService בשלב ראשון)
 
 ### פירוט Services:
 
@@ -294,7 +294,7 @@ Registry מרכזי לכל חוקי העסק. מכיל:
 
 **Base URL:** `/api/business`
 
-**סה"כ Endpoints:** 29 endpoints + 1 batch endpoint
+**סה"כ Endpoints:** 32 endpoints + 1 batch endpoint
 
 ### רשימת כל ה-Endpoints:
 
@@ -347,6 +347,11 @@ Registry מרכזי לכל חוקי העסק. מכיל:
 #### Tag Endpoints (2)
 - `POST /api/business/tag/validate` - ולידציה של tag
 - `POST /api/business/tag/validate-category` - ולידציה של קטגוריה
+
+#### Preferences Endpoints (3)
+- `POST /api/business/preferences/validate` - ולידציה של preference
+- `POST /api/business/preferences/validate-profile` - ולידציה של profile
+- `POST /api/business/preferences/validate-dependencies` - ולידציה של תלויות
 
 #### Batch Operations (1)
 - `POST /api/business/batch` - ביצוע מספר פעולות בבת אחת
@@ -449,20 +454,34 @@ Registry מרכזי לכל חוקי העסק. מכיל:
 
 **Cache:** TTL 60 שניות
 
-#### Currency Wrappers (0)
-**מיקום:** ❌ חסר
+#### Currency Wrappers (1)
+**מיקום:** `trading-ui/scripts/services/currencies-data.js` (או קובץ אחר)
 
-**נדרש:**
+**Wrappers:**
 - `validateCurrencyRate(rate)` - ולידציה של שער חליפין
 
-#### Tag Wrappers (0)
-**מיקום:** ❌ חסר
+**Cache:** TTL 60 שניות
 
-**נדרש:**
-- `validateTag(tagData)` - ולידציה של tag
-- `validateTagCategory(category)` - ולידציה של קטגוריה
+#### Tag Wrappers (2)
+**מיקום:** `trading-ui/scripts/services/tag-service.js`
 
-**סה"כ Wrappers:** 23 wrappers (21 קיימים, 2 חסרים)
+**Wrappers:**
+- `validateTagViaAPI(tagData)` - ולידציה של tag דרך API
+- `validateTagCategoryViaAPI(category)` - ולידציה של קטגוריה דרך API
+
+**Cache:** TTL 60 שניות
+
+#### Preferences Wrappers (3)
+**מיקום:** `trading-ui/scripts/services/preferences-data.js`
+
+**Wrappers:**
+- `validatePreference(preferenceName, value, dataType)` - ולידציה של preference
+- `validateProfile(profileData)` - ולידציה של profile
+- `validateDependencies(preferences)` - ולידציה של תלויות
+
+**Cache:** TTL 60 שניות
+
+**סה"כ Wrappers:** 32 wrappers (32 קיימים)
 
 ### דוגמת שימוש:
 
@@ -689,6 +708,127 @@ const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
 2. **By Action** - Invalidation לפי action type (trade-created, trade-updated, וכו')
 3. **By Entity** - Invalidation לפי ישות
 4. **Manual** - Invalidation ידני
+
+---
+
+## 🔍 Validation Architecture
+
+### סקירה כללית
+
+מערכת הולידציה במערכת TikTrack מחולקת ל-3 שכבות עיקריות:
+
+1. **Database Constraints** (ValidationService) - אילוצים בסיסיים מבסיס הנתונים
+2. **Business Rules** (BusinessRulesRegistry) - חוקי עסק מורכבים
+3. **Frontend Validation** - ולידציה בלקוח (UI-level)
+
+### חלוקת אחריות:
+
+#### 1. Database Constraints (ValidationService)
+**מיקום:** `Backend/services/validation_service.py`
+
+**תפקיד:** ולידציה מול constraints מבסיס הנתונים
+
+**סוגי Constraints:**
+- **NOT NULL** - שדה חובה
+- **UNIQUE** - ערך ייחודי
+- **FOREIGN KEY** - קשר לטבלה אחרת
+- **ENUM** - ערכים מותרים
+- **RANGE** - טווח ערכים
+- **CHECK** - בדיקות מותאמות אישית
+- **CUSTOM** - אילוצים מותאמים אישית (cross-table)
+
+**שימוש:**
+- כל Business Service קורא ל-`validate_with_constraints()` כשלב ראשון ב-`validate()`
+- מתבצע דרך `BaseBusinessService.validate_with_constraints()`
+- דורש `db_session` ו-`table_name`
+
+#### 2. Business Rules (BusinessRulesRegistry)
+**מיקום:** `Backend/services/business_logic/business_rules_registry.py`
+
+**תפקיד:** חוקי עסק מורכבים
+
+**סוגי Rules:**
+- חוקי עסק מורכבים (תלויות, חישובים, לוגיקה עסקית)
+- חוקים שלא ניתן לבטא ב-constraints (למשל: "לא למחוק profile פעיל")
+- חוקים דינמיים (תלויים בהקשר)
+
+**שימוש:**
+- כל Business Service משתמש ב-`BusinessRulesRegistry.validate_value()` כשלב שני ב-`validate()`
+- מתבצע אחרי Database Constraints
+
+#### 3. Frontend Validation
+**תפקיד:** ולידציה לפני שליחה לשרת (UX)
+
+**שימוש:**
+- Fallback אם API לא זמין
+- Format validation (email, phone, etc.)
+- UX improvements (validation בזמן אמת)
+
+### סדר ולידציה (CRITICAL):
+
+**חובה** לכל Business Service ב-`validate()`:
+
+1. **שלב 1:** Database Constraints (ValidationService)
+   ```python
+   is_valid, constraint_errors = self.validate_with_constraints(data)
+   if not is_valid:
+       errors.extend(constraint_errors)
+   ```
+
+2. **שלב 2:** Business Rules Registry
+   ```python
+   for field, value in data.items():
+       rule_result = self.registry.validate_value('entity', field, value)
+       if not rule_result['is_valid']:
+           errors.append(rule_result['error'])
+   ```
+
+3. **שלב 3:** Complex Business Rules
+   ```python
+   # חוקי עסק מורכבים (תלויות, לוגיקה עסקית)
+   # למשל: stop price validation, profile deletion rules, etc.
+   ```
+
+### אינטגרציה עם BaseBusinessService:
+
+כל Business Service יורש מ-`BaseBusinessService` ומקבל:
+- `table_name` property - שם הטבלה ב-DB (או `None` אם אין טבלה)
+- `db_session` - session לבסיס הנתונים (אופציונלי)
+- `validate_with_constraints()` - method לולידציה מול constraints
+
+**דוגמה:**
+```python
+class TradeBusinessService(BaseBusinessService):
+    @property
+    def table_name(self) -> Optional[str]:
+        return 'trades'
+    
+    def __init__(self, db_session: Optional[Session] = None):
+        super().__init__(db_session)
+    
+    def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        errors = []
+        
+        # Step 1: Database Constraints
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+        
+        # Step 2: Business Rules Registry
+        # ...
+        
+        # Step 3: Complex Business Rules
+        # ...
+        
+        return {'is_valid': len(errors) == 0, 'errors': errors}
+```
+
+### Services ללא Database Table:
+
+Services כמו `StatisticsBusinessService` שאין להם טבלה ב-DB:
+- מחזירים `None` ל-`table_name`
+- `validate_with_constraints()` מדלג אוטומטית על ולידציית constraints
+- עדיין יכולים להשתמש ב-BusinessRulesRegistry
 
 ---
 

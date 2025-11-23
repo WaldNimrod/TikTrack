@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 
@@ -47,9 +48,14 @@ class TradePlanBusinessService(BaseBusinessService):
     PERCENTAGE_MIN = 0.01
     PERCENTAGE_MAX = 10000  # Support high percentages
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for trade plans."""
+        return 'trade_plans'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the trade plan business service."""
-        super().__init__()
+        super().__init__(db_session)
     
     # ========================================================================
     # Validation Methods
@@ -92,6 +98,13 @@ class TradePlanBusinessService(BaseBusinessService):
         
         errors = []
         
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         # Validate trading_account_id
         account_validation = self.validate_trading_account_id(data.get('trading_account_id'))
         if not account_validation['is_valid']:

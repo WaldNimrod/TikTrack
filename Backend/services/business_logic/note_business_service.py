@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
 
 from .base_business_service import BaseBusinessService
 
@@ -40,9 +41,14 @@ class NoteBusinessService(BaseBusinessService):
     # Forbidden characters in content (if any)
     FORBIDDEN_CHARACTERS = []  # Can be extended if needed
     
-    def __init__(self):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Return the database table name for notes."""
+        return 'notes'
+    
+    def __init__(self, db_session: Optional[Session] = None):
         """Initialize the note business service."""
-        super().__init__()
+        super().__init__(db_session)
     
     # ========================================================================
     # Validation Methods
@@ -51,6 +57,11 @@ class NoteBusinessService(BaseBusinessService):
     def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate note data according to business rules.
+        
+        Validation order (CRITICAL - must follow this order):
+        1. Database Constraints (ValidationService) - checks NOT NULL, UNIQUE, FOREIGN KEY, ENUM, RANGE, CHECK
+        2. Business Rules Registry - checks min/max, allowed_values, required (only if not in Constraints)
+        3. Complex Business Rules - checks business logic
         
         Args:
             data: Note data dictionary with keys:
@@ -72,6 +83,16 @@ class NoteBusinessService(BaseBusinessService):
             })
         """
         self.log_business_event('note_validation', data)
+        
+        errors = []
+        
+        # Step 1: Validate against database constraints (FIRST!)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        if not is_valid:
+            errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
+        
+        # Step 2: Validate against business rules registry (SECOND!)
         
         errors = []
         

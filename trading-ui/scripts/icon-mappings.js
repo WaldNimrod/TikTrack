@@ -109,7 +109,7 @@ const IconMappings = {
     charts: {
         'type-line': 'chart-line',
         'type-bar': 'chart-bar',
-            'type-candlestick': 'chart-line', // chart-candlestick not available, using chart-line
+            'type-candlestick': 'chart-candle',
         'scale-linear': 'line',
         'scale-log': 'chart-line',
         'volume-toggle': 'volume',

@@ -662,7 +662,7 @@ class EntityDetailsModal {
             }
 
         // עדכון כותרת המודל
-        this.updateModalTitle(entityType, entityData);
+        await this.updateModalTitle(entityType, entityData);
 
         const finalTitle = this.getModalTitleText(entityType, entityData);
         if (window.ModalNavigationService?.updateModalMetadata) {
@@ -812,7 +812,7 @@ class EntityDetailsModal {
      * @param {Object} entityData - נתוני הישות
      * @private
      */
-    updateModalTitle(entityType, entityDataOrId) {
+    async updateModalTitle(entityType, entityDataOrId) {
         const titleElement = document.getElementById(`${this.modalId}Label`);
         const headerElement = this.modal?.querySelector('.modal-header');
         

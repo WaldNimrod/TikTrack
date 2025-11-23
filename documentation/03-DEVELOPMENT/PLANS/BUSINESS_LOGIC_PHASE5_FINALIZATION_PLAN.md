@@ -127,6 +127,31 @@
 
 להוסיף תמיכה ב-ValidationService ל-BaseBusinessService כדי שכל ה-Business Services יוכלו להשתמש בו.
 
+**קריטי:** זה השלב החשוב ביותר - ללא תיקון זה, כל ה-Business Services לא בודקים constraints מבסיס הנתונים, מה שיוצר כפילות וסיכון לאי-עקביות.
+
+**דרישות:**
+- ✅ כל Service חייב לממש `table_name` property
+- ✅ כל Service חייב לעדכן `__init__()` לקבל `db_session`
+- ✅ כל Service חייב לעדכן `validate()` להשתמש ב-`validate_with_constraints()` כשלב ראשון
+- ✅ כל validate endpoint חייב להשתמש ב-`@handle_database_session()` ולהעביר `db_session` ל-Service
+
+**מיפוי Services עם table_name:**
+
+| Service | Table Name | הערות |
+|---------|-----------|-------|
+| TradeBusinessService | `'trades'` | יש table |
+| ExecutionBusinessService | `'executions'` | יש table |
+| AlertBusinessService | `'alerts'` | יש table |
+| CashFlowBusinessService | `'cash_flows'` | יש table |
+| NoteBusinessService | `'notes'` | יש table |
+| TradingAccountBusinessService | `'trading_accounts'` | יש table |
+| TradePlanBusinessService | `'trade_plans'` | יש table |
+| TickerBusinessService | `'tickers'` | יש table |
+| CurrencyBusinessService | `'currencies'` | יש table |
+| TagBusinessService | `'tags'` | יש table |
+| StatisticsBusinessService | `None` | אין table - service לחישובים |
+| PreferencesBusinessService | `'user_preferences'` או `'preference_types'` | יש table (יצור חדש) |
+
 ### שלב 5.0.4.1: עדכון BaseBusinessService
 
 **קובץ לעדכון:** `Backend/services/business_logic/base_business_service.py`
@@ -136,6 +161,14 @@
 1. הוספת `db_session` parameter ל-`__init__()`
 2. הוספת `table_name` property (abstract method)
 3. הוספת method `validate_with_constraints()`
+4. הוספת import של `ValidationService`
+5. הוספת import של `Session` מ-sqlalchemy.orm
+6. הוספת import של `Tuple` מ-typing
+
+**דרישות:**
+- כל Service חייב לממש `table_name` property
+- Services ללא table (כמו Statistics) יחזירו `None`
+- `validate_with_constraints()` יטפל אוטומטית ב-None cases
 
 **קוד מוצע:**
 
@@ -146,7 +179,13 @@ from services.validation_service import ValidationService
 
 class BaseBusinessService(ABC):
     def __init__(self, db_session: Optional[Session] = None):
-        """Initialize the business service."""
+        """
+        Initialize the business service.
+        
+        Args:
+            db_session: Optional database session for constraint validation.
+                       If None, constraint validation will be skipped.
+        """
         self.logger = logging.getLogger(self.__class__.__name__)
         self.db_session = db_session
     
@@ -157,13 +196,18 @@ class BaseBusinessService(ABC):
         Return the database table name for this entity.
         
         Returns:
-            Table name (e.g., 'trades', 'executions') or None if not applicable
+            Table name (e.g., 'trades', 'executions') or None if not applicable.
+            Services without a database table (e.g., StatisticsBusinessService)
+            should return None.
         """
         pass
     
     def validate_with_constraints(self, data: Dict[str, Any], exclude_id: Optional[int] = None) -> Tuple[bool, List[str]]:
         """
-        Validate data against database constraints (first step).
+        Validate data against database constraints (first step in validation chain).
+        
+        This method should be called FIRST in the validate() method of each service,
+        before BusinessRulesRegistry validation and complex business rules.
         
         Args:
             data: Data dictionary to validate
@@ -171,71 +215,102 @@ class BaseBusinessService(ABC):
             
         Returns:
             Tuple of (is_valid, list_of_errors)
+            
+        Note:
+            - If db_session is None, constraint validation is skipped (returns True, [])
+            - If table_name is None, constraint validation is skipped (returns True, [])
+            - This allows services without DB tables (e.g., Statistics) to work correctly
         """
         if not self.db_session:
             # No DB session - skip constraint validation
-            self.logger.warning("No DB session provided, skipping constraint validation")
+            self.logger.debug(f"No DB session provided for {self.__class__.__name__}, skipping constraint validation")
             return True, []
         
         if not self.table_name:
-            # No table name - skip constraint validation
-            self.logger.warning(f"No table name defined for {self.__class__.__name__}, skipping constraint validation")
+            # No table name - skip constraint validation (e.g., StatisticsBusinessService)
+            self.logger.debug(f"No table name defined for {self.__class__.__name__}, skipping constraint validation")
             return True, []
         
-        return ValidationService.validate_data(self.db_session, self.table_name, data, exclude_id)
+        try:
+            return ValidationService.validate_data(self.db_session, self.table_name, data, exclude_id)
+        except Exception as e:
+            self.logger.error(f"Error validating constraints for {self.__class__.__name__}: {str(e)}")
+            # Return validation error instead of crashing
+            return False, [f"Constraint validation error: {str(e)}"]
 ```
 
 ### שלב 5.0.4.2: עדכון כל Business Services
 
 **קבצים לעדכון:**
 
-1. `Backend/services/business_logic/trade_business_service.py`
-2. `Backend/services/business_logic/execution_business_service.py`
-3. `Backend/services/business_logic/alert_business_service.py`
-4. `Backend/services/business_logic/cash_flow_business_service.py`
-5. `Backend/services/business_logic/note_business_service.py`
-6. `Backend/services/business_logic/trading_account_business_service.py`
-7. `Backend/services/business_logic/trade_plan_business_service.py`
-8. `Backend/services/business_logic/ticker_business_service.py`
-9. `Backend/services/business_logic/currency_business_service.py`
-10. `Backend/services/business_logic/tag_business_service.py`
-11. `Backend/services/business_logic/statistics_business_service.py`
+1. `Backend/services/business_logic/trade_business_service.py` - table_name: `'trades'`
+2. `Backend/services/business_logic/execution_business_service.py` - table_name: `'executions'`
+3. `Backend/services/business_logic/alert_business_service.py` - table_name: `'alerts'`
+4. `Backend/services/business_logic/cash_flow_business_service.py` - table_name: `'cash_flows'`
+5. `Backend/services/business_logic/note_business_service.py` - table_name: `'notes'`
+6. `Backend/services/business_logic/trading_account_business_service.py` - table_name: `'trading_accounts'`
+7. `Backend/services/business_logic/trade_plan_business_service.py` - table_name: `'trade_plans'`
+8. `Backend/services/business_logic/ticker_business_service.py` - table_name: `'tickers'`
+9. `Backend/services/business_logic/currency_business_service.py` - table_name: `'currencies'`
+10. `Backend/services/business_logic/tag_business_service.py` - table_name: `'tags'`
+11. `Backend/services/business_logic/statistics_business_service.py` - **אין table_name** (service לחישובים, לא ישות DB)
 
 **שינויים לכל Service:**
 
-1. הוספת `table_name` property
-2. עדכון `__init__()` לקבל `db_session`
-3. עדכון `validate()` להשתמש ב-`validate_with_constraints()` כשלב ראשון
+1. הוספת `table_name` property (או `None` אם אין table - כמו Statistics)
+2. עדכון `__init__()` לקבל `db_session: Optional[Session] = None`
+3. עדכון `validate()` להשתמש ב-`validate_with_constraints()` כשלב ראשון (רק אם יש table_name)
+
+**הערה חשובה - StatisticsBusinessService:**
+- StatisticsBusinessService הוא service לחישובים, לא ישות DB
+- אין לו table_name - יחזיר `None`
+- `validate_with_constraints()` יחזיר `True, []` (skip constraint validation)
+- עדיין צריך לעדכן את `__init__()` לקבל `db_session` (לחישובים מורכבים)
 
 **דוגמה - TradeBusinessService:**
 
 ```python
+from typing import Optional
+from sqlalchemy.orm import Session
+
 class TradeBusinessService(BaseBusinessService):
     @property
     def table_name(self) -> Optional[str]:
+        """Return the database table name for trades."""
         return 'trades'
     
     def __init__(self, db_session: Optional[Session] = None):
+        """Initialize the trade business service."""
         super().__init__(db_session)
-        # ... rest of init
+        self.registry = business_rules_registry
+        # ... rest of init (if any)
     
     def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate trade data according to business rules.
         
-        Order of validation:
-        1. Database Constraints (ValidationService)
-        2. Business Rules Registry
-        3. Complex Business Rules
+        Validation order (CRITICAL - must follow this order):
+        1. Database Constraints (ValidationService) - checks NOT NULL, UNIQUE, FOREIGN KEY, ENUM, RANGE, CHECK
+        2. Business Rules Registry - checks min/max, allowed_values, required (only if not in Constraints)
+        3. Complex Business Rules - checks business logic (e.g., price*quantity validation)
+        
+        Args:
+            data: Trade data dictionary
+            
+        Returns:
+            Dict with 'is_valid' (bool) and 'errors' (List[str])
         """
         errors = []
         
-        # Step 1: Validate against database constraints
+        # Step 1: Validate against database constraints (FIRST!)
         is_valid, constraint_errors = self.validate_with_constraints(data)
         if not is_valid:
             errors.extend(constraint_errors)
+            self.logger.debug(f"Constraint validation found {len(constraint_errors)} errors")
         
-        # Step 2: Validate against business rules registry
+        # Step 2: Validate against business rules registry (SECOND!)
+        # Note: BusinessRulesRegistry יכול לבדוק חוקים מורכבים יותר מ-Constraints
+        # (למשל: min/max values שלא מוגדרים ב-CHECK constraints, או חוקים דינמיים)
         for field, value in data.items():
             if value is None or value == '':
                 continue
@@ -244,7 +319,7 @@ class TradeBusinessService(BaseBusinessService):
             if not rule_result['is_valid']:
                 errors.append(rule_result['error'])
         
-        # Step 3: Complex business rules
+        # Step 3: Complex business rules (THIRD!)
         if 'price' in data and 'quantity' in data:
             price = data.get('price')
             quantity = data.get('quantity')
@@ -252,6 +327,50 @@ class TradeBusinessService(BaseBusinessService):
                 inv_result = self.calculate_investment(price=price, quantity=quantity)
                 if not inv_result['is_valid']:
                     errors.append(f"Invalid price/quantity combination: {inv_result.get('error')}")
+        
+        # Additional complex validations...
+        # (e.g., stop/target price validations, side validations, etc.)
+        
+        return {
+            'is_valid': len(errors) == 0,
+            'errors': errors
+        }
+```
+
+**דוגמה - StatisticsBusinessService (אין table_name):**
+
+```python
+class StatisticsBusinessService(BaseBusinessService):
+    @property
+    def table_name(self) -> Optional[str]:
+        """Statistics service has no database table - it's a calculation service."""
+        return None  # ← אין table_name
+    
+    def __init__(self, db_session: Optional[Session] = None):
+        """Initialize the statistics business service."""
+        super().__init__(db_session)  # db_session יכול להיות שימושי לחישובים מורכבים
+        self.registry = business_rules_registry
+    
+    def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate statistics calculation data.
+        
+        Note: No constraint validation (no table_name), but still validates
+        against Business Rules Registry.
+        """
+        errors = []
+        
+        # Step 1: Validate against database constraints
+        # Will be skipped automatically (table_name is None)
+        is_valid, constraint_errors = self.validate_with_constraints(data)
+        # constraint_errors will be empty (skipped)
+        
+        # Step 2: Validate against business rules registry
+        calculation_type = data.get('calculation_type')
+        if calculation_type:
+            rule_result = self.registry.validate_value('statistics', 'calculation_types', calculation_type)
+            if not rule_result['is_valid']:
+                errors.append(rule_result['error'])
         
         return {
             'is_valid': len(errors) == 0,
@@ -266,22 +385,94 @@ class TradeBusinessService(BaseBusinessService):
 **שינויים:**
 
 1. עדכון כל ה-validate endpoints להעביר `db_session` ל-Services
-2. עדכון כל ה-calculate endpoints (אופציונלי - לא דורש db_session)
+2. הוספת `@handle_database_session()` decorator לכל validate endpoint
+3. עדכון כל ה-calculate endpoints (אופציונלי - לא דורש db_session, אבל יכול להיות שימושי)
 
-**דוגמה:**
+**רשימת validate endpoints לעדכון (14 endpoints):**
+
+1. `POST /api/business/trade/validate`
+2. `POST /api/business/execution/validate`
+3. `POST /api/business/alert/validate`
+4. `POST /api/business/alert/validate-condition-value`
+5. `POST /api/business/cash-flow/validate`
+6. `POST /api/business/note/validate`
+7. `POST /api/business/note/validate-relation`
+8. `POST /api/business/trading-account/validate`
+9. `POST /api/business/trade-plan/validate`
+10. `POST /api/business/ticker/validate`
+11. `POST /api/business/ticker/validate-symbol`
+12. `POST /api/business/currency/validate-rate`
+13. `POST /api/business/tag/validate`
+14. `POST /api/business/tag/validate-category`
+
+**תבנית עדכון לכל validate endpoint:**
 
 ```python
+from flask import g
+from sqlalchemy.orm import Session
+from routes.api.base_entity_decorators import handle_database_session
+
+@business_logic_bp.route('/[entity]/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)  # ← הוספה - auto_commit=False כי זה רק קריאה
+def validate_[entity]():
+    """Validate [entity] data."""
+    try:
+        data = request.get_json() or {}
+        db: Session = g.db  # ← הוספה - db_session מה-decorator
+        
+        # Initialize service with DB session
+        service = [Entity]BusinessService(db_session=db)  # ← עדכון
+        
+        result = service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {'is_valid': True}
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+    except Exception as e:
+        logger.error(f"Error validating [entity]: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {'message': 'Internal server error'}
+        }), 500
+```
+
+**הערה חשובה - @handle_database_session():**
+- ✅ Decorator קיים ב-`routes/api/base_entity_decorators.py`
+- ✅ הוא מספק `g.db` (Session object) אוטומטית
+- ✅ צריך לייבא: `from routes.api.base_entity_decorators import handle_database_session`
+- ✅ צריך לייבא `g` מ-Flask: `from flask import g`
+- ✅ Decorator מטפל ב-commit ו-close אוטומטית (אם auto_commit=True, auto_close=True)
+- ⚠️ **חשוב:** ל-validate endpoints, בדרך כלל לא צריך auto_commit (רק קריאה, לא כתיבה)
+
+**דוגמה - Trade validate endpoint:**
+
+```python
+from flask import g
+from sqlalchemy.orm import Session
+from routes.api.base_entity_decorators import handle_database_session
+
 @business_logic_bp.route('/trade/validate', methods=['POST'])
 @monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
-@handle_database_session()
+@handle_database_session(auto_commit=False, auto_close=True)  # ← הוספה - auto_commit=False כי זה רק קריאה
 def validate_trade():
     """Validate trade data."""
     try:
         data = request.get_json() or {}
-        db: Session = g.db
+        db: Session = g.db  # ← הוספה - db_session מה-decorator
         
         # Initialize service with DB session
-        service = TradeBusinessService(db_session=db)
+        service = TradeBusinessService(db_session=db)  # ← עדכון
         
         result = service.validate(data)
         
@@ -370,7 +561,7 @@ def validate_trade():
 ```python
 @business_logic_bp.route('/preferences/validate', methods=['POST'])
 @monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
-@handle_database_session()
+@handle_database_session(auto_commit=False, auto_close=True)  # auto_commit=False כי זה רק קריאה
 def validate_preference():
     """Validate preference value."""
     try:
@@ -605,6 +796,28 @@ def validate_preference():
 - בדיקת אינטגרציה עם Preferences Loading Events
 - בדיקת cache invalidation patterns
 - **בדיקת אינטגרציה עם ValidationService** - וידוא שכל ה-Business Services משתמשים ב-ValidationService
+
+**בדיקות ספציפיות לאינטגרציה:**
+
+1. **בדיקת validate_with_constraints() בכל Services:**
+   - וידוא שכל Service מחזיר `table_name` נכון
+   - וידוא ש-StatisticsBusinessService מחזיר `None`
+   - וידוא ש-`validate_with_constraints()` נקרא ב-`validate()`
+
+2. **בדיקת סדר ולידציה:**
+   - וידוא ש-Constraints נבדקים לפני BusinessRulesRegistry
+   - וידוא ש-BusinessRulesRegistry נבדק לפני Complex Rules
+   - וידוא שאין כפילות בין Constraints ל-BusinessRulesRegistry
+
+3. **בדיקת API endpoints:**
+   - וידוא שכל validate endpoint משתמש ב-`@handle_database_session()`
+   - וידוא שכל validate endpoint מעביר `db_session` ל-Service
+   - וידוא ש-constraints נבדקים בפועל (בדיקת logs)
+
+4. **בדיקת edge cases:**
+   - Service ללא db_session - וידוא ש-constraint validation מושמט
+   - Service ללא table_name - וידוא ש-constraint validation מושמט
+   - Update עם exclude_id - וידוא ש-UNIQUE checks עובדים נכון
 
 ### שלב 5.4.6: בדיקות Performance סופיות
 

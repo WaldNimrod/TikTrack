@@ -623,10 +623,12 @@
                                         <thead>
                                             <tr>
                                                 <th></th>
+                                                <th>טריידים</th>
+                                                <th>P/L ממוצע</th>
                                                 <th>P/L כולל</th>
                                                 <th>אחוז הצלחה</th>
-                                                <th>P/L ממוצע</th>
-                                                <th>טריידים</th>
+                                                <th class="text-end">מקס בנקודה</th>
+                                                <th class="text-end">סה"כ קניות</th>
                                             </tr>
                                         </thead>
                                         <tbody id="heatmap-table-body">
@@ -1629,6 +1631,8 @@
             const allSuccessRates = tableData.map(cat => cat.successRate);
             const allAvgPL = tableData.map(cat => cat.avgPL);
             const allTrades = tableData.map(cat => cat.trades);
+            const allMaxInvestment = tableData.map(cat => cat.maxInvestmentAtPoint || 0);
+            const allTotalPurchases = tableData.map(cat => cat.totalPurchases || 0);
             
             const getPercentile = (value, arr) => {
                 const sorted = [...arr].sort((a, b) => a - b);
@@ -1642,10 +1646,15 @@
                 successRate: cat.successRate,
                 avgPL: cat.avgPL,
                 trades: cat.trades,
+                maxInvestmentAtPoint: cat.maxInvestmentAtPoint || 0,
+                totalPurchases: cat.totalPurchases || 0,
+                totalInvestment: cat.totalInvestment || 0,
                 plPercentile: getPercentile(cat.totalPL, allPLValues),
                 successPercentile: getPercentile(cat.successRate, allSuccessRates),
                 avgPLPercentile: getPercentile(cat.avgPL, allAvgPL),
-                tradesPercentile: getPercentile(cat.trades, allTrades)
+                tradesPercentile: getPercentile(cat.trades, allTrades),
+                maxInvestmentPercentile: getPercentile(cat.maxInvestmentAtPoint || 0, allMaxInvestment),
+                totalPurchasesPercentile: getPercentile(cat.totalPurchases || 0, allTotalPurchases)
             }));
         }
         
@@ -1993,7 +2002,7 @@
                 }).join('');
                 
                 // Build summary row (last row, highlighted)
-                const summaryParamCells = paramHeaders.map(() => '<td><strong>סה"כ / ממוצע</strong></td>').join('');
+                const summaryParamCells = paramHeaders.map(() => '<td><strong>סה"כ<br>ממוצע</strong></td>').join('');
                 
                 // Calculate percentages for summary investment values
                 const summaryMaxInvestmentPercent = totalMaxInvestment > 0 ? 100 : null; // Total is 100% of itself
@@ -2002,12 +2011,12 @@
                 const summaryRow = `
                     <tr class="table-info fw-bold" style="background-color: #d1ecf1; border-top: 2px solid #0c5460;">
                         ${summaryParamCells}
-                        <td><strong>${totalTrades} / ${avgTrades.toFixed(1)}</strong></td>
-                        <td><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)} / ${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
-                        <td class="text-success"><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)} / ${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
+                        <td><strong>${totalTrades}<br>${avgTrades.toFixed(1)}</strong></td>
+                        <td><strong>${formatPLWithPercent(totalAvgPL, summaryPLPercent)}<br>${formatPLWithPercent(avgAvgPL, summaryPLPercent)}</strong></td>
+                        <td class="text-success"><strong>${formatPLWithPercent(totalTotalPL, summaryPLPercent)}<br>${formatPLWithPercent(avgTotalPL, summaryPLPercent)}</strong></td>
                         <td><strong>${avgSuccessRate.toFixed(1)}%</strong></td>
-                        <td class="text-end"><strong>${formatInvestmentWithPercent(totalMaxInvestment, summaryMaxInvestmentPercent)} / ${formatInvestmentWithPercent(avgMaxInvestment, null)}</strong></td>
-                        <td class="text-end"><strong>${formatInvestmentWithPercent(totalTotalPurchases, summaryTotalPurchasesPercent)} / ${formatInvestmentWithPercent(avgTotalPurchases, null)}</strong></td>
+                        <td class="text-end"><strong>${formatInvestmentWithPercent(totalMaxInvestment, summaryMaxInvestmentPercent)}<br>${formatInvestmentWithPercent(avgMaxInvestment, null)}</strong></td>
+                        <td class="text-end"><strong>${formatInvestmentWithPercent(totalTotalPurchases, summaryTotalPurchasesPercent)}<br>${formatInvestmentWithPercent(avgTotalPurchases, null)}</strong></td>
                     </tr>
                 `;
                 
@@ -2066,19 +2075,38 @@
             
             if (!tbody) return;
             
-            tbody.innerHTML = data.map((item, index) => `
+            tbody.innerHTML = data.map((item, index) => {
+                // Calculate percentages for investment values
+                const totalMaxInvestment = data.reduce((sum, it) => sum + (it.maxInvestmentAtPoint || 0), 0);
+                const totalTotalPurchases = data.reduce((sum, it) => sum + (it.totalPurchases || 0), 0);
+                const maxInvestmentPercent = totalMaxInvestment > 0 
+                    ? ((item.maxInvestmentAtPoint || 0) / totalMaxInvestment) * 100 
+                    : null;
+                const totalPurchasesPercent = totalTotalPurchases > 0 
+                    ? ((item.totalPurchases || 0) / totalTotalPurchases) * 100 
+                    : null;
+                
+                // Calculate P/L percentage
+                const plPercent = item.totalInvestment > 0 
+                    ? ((item.totalPL / item.totalInvestment) * 100) 
+                    : null;
+                
+                return `
                 <tr class="heatmap-row" data-category="${item.category}" data-index="${index}" 
                     onmouseover="showHeatmapTooltip(event, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
                     onmouseout="hideHeatmapTooltip()"
                     onclick="filterByCategory('${item.category}')"
                     style="cursor: pointer; transition: background-color 0.2s;">
                     <td><strong>${item.category}</strong></td>
-                    <td class="${getColorClass(item.plPercentile)}" data-value="${item.totalPL}">${formatCurrency(item.totalPL)}</td>
-                    <td class="${getColorClass(item.successPercentile)}" data-value="${item.successRate}">${item.successRate}%</td>
-                    <td class="${getColorClass(item.avgPLPercentile)}" data-value="${item.avgPL}">${formatCurrency(item.avgPL)}</td>
                     <td class="${getColorClass(item.tradesPercentile)}" data-value="${item.trades}">${item.trades}</td>
+                    <td class="${getColorClass(item.avgPLPercentile)}" data-value="${item.avgPL}">${formatPLWithPercent(item.avgPL, plPercent)}</td>
+                    <td class="${getColorClass(item.plPercentile)} text-success" data-value="${item.totalPL}">${formatPLWithPercent(item.totalPL, plPercent)}</td>
+                    <td class="${getColorClass(item.successPercentile)}" data-value="${item.successRate}">${item.successRate}%</td>
+                    <td class="${getColorClass(item.maxInvestmentPercentile)} text-end" data-value="${item.maxInvestmentAtPoint || 0}">${formatInvestmentWithPercent(item.maxInvestmentAtPoint || 0, maxInvestmentPercent)}</td>
+                    <td class="${getColorClass(item.totalPurchasesPercentile)} text-end" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
             
             // Add hover effects
             tbody.querySelectorAll('.heatmap-row').forEach(row => {
@@ -2113,10 +2141,12 @@
             `;
             tooltip.innerHTML = `
                 <strong>${item.category}</strong><br>
+                טריידים: ${item.trades}<br>
+                P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
                 P/L כולל: ${formatCurrency(item.totalPL)}<br>
                 אחוז הצלחה: ${item.successRate}%<br>
-                P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
-                טריידים: ${item.trades}
+                מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}<br>
+                סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}
             `;
             
             document.body.appendChild(tooltip);
